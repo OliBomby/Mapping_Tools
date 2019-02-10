@@ -1,12 +1,6 @@
-﻿using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Windows;
-using System.ComponentModel;
-using System.Globalization;
-using System.Collections;
 using System.Windows.Input;
 using System.Windows.Controls;
 using MaterialDesignThemes.Wpf;
