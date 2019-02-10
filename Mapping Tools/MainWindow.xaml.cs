@@ -6,24 +6,18 @@ using System.Windows.Controls;
 using MaterialDesignThemes.Wpf;
 using Mapping_Tools.viewmodels;
 
-//TODO: 
-//  Doubled greenlines: they will both change different things
-//  Filename obsoletes custom index only
-
 namespace Mapping_Tools {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    /// 
     public partial class MainWindow : Window {
-        private bool isMaximized = false;
-        private double widthWin, heightWin;
+        private bool isMaximized = false; //Check for window state
+        private double widthWin, heightWin; //Set default sizes of window
 
         public MainWindow() {
             InitializeComponent();
-            widthWin = ActualWidth;
-            heightWin = ActualHeight;
-            DataContext = new StandardVM();
+            widthWin = ActualWidth; //Set width to window
+            heightWin = ActualHeight; //Set height to window
+            DataContext = new StandardVM(); //Generate Standard view model to show on startup
+            
+            //Check and create backup folder
             try {
                 System.IO.Directory.CreateDirectory(System.Environment.CurrentDirectory + "\\Backups\\");
             }
@@ -31,8 +25,9 @@ namespace Mapping_Tools {
                 MessageBox.Show(ex.Message);
             }
         }
-
-        public void LoadCleaner(object sender, RoutedEventArgs e) {
+        
+        //Method for loading the cleaner interface 
+        private void LoadCleaner(object sender, RoutedEventArgs e) {
             DataContext = new CleanerVM();
             TextBlock txt = this.FindName("currentTool") as TextBlock;
             txt.Text = "Map_Cleaner";
@@ -40,7 +35,8 @@ namespace Mapping_Tools {
             this.MinHeight = 520;
         }
 
-        public void LoadCopier(object sender, RoutedEventArgs e) {
+        //Method for loading the standard interface
+        private void LoadCopier(object sender, RoutedEventArgs e) {
             DataContext = new StandardVM();
             TextBlock txt = this.FindName("currentTool") as TextBlock;
             txt.Text = "None";
@@ -48,7 +44,8 @@ namespace Mapping_Tools {
             this.MinHeight = 100;
         }
 
-        public void OpenBackups(object sender, RoutedEventArgs e) {
+        //Open backup folder in file explorer
+        private void OpenBackups(object sender, RoutedEventArgs e) {
             try {
                 Process.Start(System.Environment.CurrentDirectory + "\\Backups\\");
             }
@@ -57,14 +54,18 @@ namespace Mapping_Tools {
                 return;
             }
         }
-        public void OpenGitHub(object sender, RoutedEventArgs e) {
+
+        //Open project in browser
+        private void OpenGitHub(object sender, RoutedEventArgs e) {
             Process.Start("https://github.com/Potoofu/Mapping_Tools");
         }
 
-        public void OpenInfo(object sender, RoutedEventArgs e) {
+        //Open info screen
+        private void OpenInfo(object sender, RoutedEventArgs e) {
             MessageBox.Show("Mapping Tools v. 1.0\nmade by\nOliBomby\nPotoofu");
         }
-
+        
+        //Change top right icons on changed window state and set state variable
         private void Window_StateChanged(object sender, EventArgs e) {
             Button bt = this.FindName("toggle_button") as Button;
             switch (this.WindowState) {
@@ -80,7 +81,8 @@ namespace Mapping_Tools {
                     break;
             }
         }
-
+    
+        //Clickevent for top right maximize/minimize button
         private void ToggleWin(object sender, RoutedEventArgs e) {
             Button bt = this.FindName("toggle_button") as Button;
             if (isMaximized) {
@@ -104,15 +106,18 @@ namespace Mapping_Tools {
                 bt.Content = new PackIcon { Kind = PackIconKind.WindowRestore };
             }
         }
-
+        
+        //Minimize window on click
         private void MinimizeWin(object sender, RoutedEventArgs e) {
             this.WindowState = WindowState.Minimized;
         }
-
+        
+        //Close window
         private void CloseWin(object sender, RoutedEventArgs e) {
             this.Close();
         }
-
+    
+        //Enable drag control of window and set icons when docked
         private void DragWin(object sender, MouseButtonEventArgs e) {
             if (e.ChangedButton == MouseButton.Left) {
                 Button bt = this.FindName("toggle_button") as Button;
