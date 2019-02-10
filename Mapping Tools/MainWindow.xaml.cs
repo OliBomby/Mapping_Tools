@@ -30,6 +30,12 @@ namespace Mapping_Tools {
             widthWin = ActualWidth;
             heightWin = ActualHeight;
             DataContext = new StandardVM();
+            try {
+                System.IO.Directory.CreateDirectory(System.Environment.CurrentDirectory + "\\Backups\\");
+            }
+            catch (Exception ex) {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         public void LoadCleaner(object sender, RoutedEventArgs e) {
@@ -91,11 +97,15 @@ namespace Mapping_Tools {
                 bt.Content = new PackIcon { Kind = PackIconKind.WindowMaximize };
             }
             else {
+                widthWin = ActualWidth;
+                heightWin = ActualHeight;
+                Console.WriteLine(widthWin + "  " + heightWin);
                 this.Left = SystemParameters.WorkArea.Left;
                 this.Top = SystemParameters.WorkArea.Top;
                 this.Height = SystemParameters.WorkArea.Height;
                 this.Width = SystemParameters.WorkArea.Width;
                 //this.WindowState = WindowState.Maximized;
+                
                 isMaximized = true;
                 bt.Content = new PackIcon { Kind = PackIconKind.WindowRestore };
             }
