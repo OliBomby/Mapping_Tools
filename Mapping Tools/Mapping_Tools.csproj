@@ -83,12 +83,16 @@
     </ApplicationDefinition>
     <Compile Include="TValue.cs" />
     <Compile Include="viewmodels\CleanerVM.cs" />
+    <Compile Include="viewmodels\SliderMergerVM.cs" />
     <Compile Include="viewmodels\StandardVM.cs" />
     <Compile Include="views\StandardView.xaml.cs">
       <DependentUpon>StandardView.xaml</DependentUpon>
     </Compile>
     <Compile Include="views\CleanerView.xaml.cs">
       <DependentUpon>CleanerView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="views\SliderMergerView.xaml.cs">
+      <DependentUpon>SliderMergerView.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -116,6 +120,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="views\CleanerView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="views\SliderMergerView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

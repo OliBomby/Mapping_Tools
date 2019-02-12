@@ -73,5 +73,9 @@ namespace Mapping_Tools {
         public string GetString() {
             return Math.Round(X) + ", " + Math.Round(Y);
         }
+
+        internal Poi MirrorPoint(Tuple<double, double, double> line, int v) {
+            throw new NotImplementedException();
+        }
     }
 }

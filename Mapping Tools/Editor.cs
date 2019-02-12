@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
 
 namespace Mapping_Tools {
     class Editor {
@@ -21,7 +19,12 @@ namespace Mapping_Tools {
         public List<string> ReadFile(string path) {
             // Get contents of the file
             string[] linesz = new string[0];
-            linesz = System.IO.File.ReadAllLines(path);
+            try {
+                linesz = System.IO.File.ReadAllLines(path);
+            }
+            catch(Exception ex) {
+                MessageBox.Show(ex.Message + "ABC");
+            }
             var lines = new List<string>(linesz);
             return lines;
         }

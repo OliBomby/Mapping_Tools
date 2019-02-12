@@ -7,12 +7,12 @@
              xmlns:cm="clr-namespace:System.ComponentModel;assembly=System"
              mc:Ignorable="d" 
              d:DesignHeight="450" Width="759.5">
-    <Grid Name="MasterGrid" HorizontalAlignment="Center" VerticalAlignment="Center">
+    <Grid Name="MasterGrid" Margin="20">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="2*"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -24,33 +24,43 @@
                 <RowDefinition/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <StackPanel Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Left">
-                <TextBlock FontSize="40" TextWrapping="NoWrap" Text="General" FontWeight="Bold" Foreground="#FF5F5E5E" />
-                <CheckBox FontSize="20" x:Name="VolumeSliders" Cursor="Hand" IsChecked="True" Foreground="#FFD6D6D6">
-                    <TextBlock>
+            <Grid Grid.Row="0" VerticalAlignment="Center">
+                <StackPanel Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Left">
+                    <TextBlock FontSize="40" TextWrapping="NoWrap" Text="General" FontWeight="Bold" Foreground="#FF5F5E5E" />
+                    <CheckBox FontSize="20" x:Name="VolumeSliders" Cursor="Hand" IsChecked="True" Foreground="#FFD6D6D6">
+                        <TextBlock>
                             Map uses volume changes in sliders
-                    </TextBlock>
-                </CheckBox>
-                <CheckBox FontSize="20" Name="SamplesetSliders" Cursor="Hand" IsChecked="True" Foreground="#FFD6D6D6">
-                    <TextBlock>
+                        </TextBlock>
+                    </CheckBox>
+                    <CheckBox FontSize="20" Name="SamplesetSliders" Cursor="Hand" IsChecked="True" Foreground="#FFD6D6D6">
+                        <TextBlock>
                             Map uses sampleset changes in sliders
-                    </TextBlock>
-                </CheckBox>
-                <CheckBox FontSize="20" x:Name="VolumeSpinners" Cursor="Hand" IsChecked="True" Foreground="#FFD6D6D6">
-                    <TextBlock>
+                        </TextBlock>
+                    </CheckBox>
+                    <CheckBox FontSize="20" x:Name="VolumeSpinners" Cursor="Hand" IsChecked="True" Foreground="#FFD6D6D6">
+                        <TextBlock>
                             Map uses volume changes in spinners
-                    </TextBlock>
-                </CheckBox>
-            </StackPanel>
-            <Grid Grid.Row="1" VerticalAlignment="Center">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <StackPanel Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left">
+                        </TextBlock>
+                    </CheckBox>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Right">
+                    <TextBlock FontSize="40"  TextWrapping="NoWrap" Text="Signatures" FontWeight="Bold" Foreground="#FF5F5E5E"/>
+                    <ComboBox FontSize="20" x:Name="Snap1" Cursor="Hand" SelectedIndex="4" Foreground="#FFD6D6D6">
+                        <ComboBoxItem Content="1/1" Cursor="Hand"/>
+                        <ComboBoxItem Content="1/2" Cursor="Hand"/>
+                        <ComboBoxItem Content="1/4" Cursor="Hand"/>
+                        <ComboBoxItem Content="1/8" Cursor="Hand"/>
+                        <ComboBoxItem Content="1/16" Cursor="Hand"/>
+                    </ComboBox>
+                    <ComboBox FontSize="20" x:Name="Snap2" Cursor="Hand" SelectedIndex="3" Foreground="#FFD6D6D6">
+                        <ComboBoxItem Content="1/1" Cursor="Hand"/>
+                        <ComboBoxItem Content="1/3" Cursor="Hand"/>
+                        <ComboBoxItem Content="1/6" Cursor="Hand"/>
+                        <ComboBoxItem Content="1/12" Cursor="Hand"/>
+                    </ComboBox>
+                </StackPanel>
+            </Grid>
+            <StackPanel Margin="0,20,0,0" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Left">
                     <TextBlock FontSize="40" TextWrapping="NoWrap" Text="Other" FontWeight="Bold" Foreground="#FF5F5E5E"/>
                     <CheckBox FontSize="20" x:Name="ResnapBookmarks" Cursor="Hand" Foreground="#FFD6D6D6">
                         <TextBlock>
@@ -68,61 +78,8 @@
                         </TextBlock>
                     </CheckBox>
                 </StackPanel>
-                <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right">
-                    <TextBlock FontSize="40"  TextWrapping="NoWrap" Text="Signatures" FontWeight="Bold" Foreground="#FF5F5E5E"/>
-                    <ComboBox FontSize="20" x:Name="Snap1" Cursor="Hand" SelectedIndex="4" Foreground="#FFD6D6D6">
-                        <ComboBoxItem Content="1/1" Cursor="Hand"/>
-                        <ComboBoxItem Content="1/2" Cursor="Hand"/>
-                        <ComboBoxItem Content="1/4" Cursor="Hand"/>
-                        <ComboBoxItem Content="1/8" Cursor="Hand"/>
-                        <ComboBoxItem Content="1/16" Cursor="Hand"/>
-                    </ComboBox>
-                    <ComboBox FontSize="20" x:Name="Snap2" Cursor="Hand" SelectedIndex="3" Foreground="#FFD6D6D6">
-                        <ComboBoxItem Content="1/1" Cursor="Hand"/>
-                        <ComboBoxItem Content="1/3" Cursor="Hand"/>
-                        <ComboBoxItem Content="1/6" Cursor="Hand"/>
-                        <ComboBoxItem Content="1/12" Cursor="Hand"/>
-                    </ComboBox>
-                </StackPanel>
             </Grid>
-        </Grid>
         <Grid Name="SecoundGrid" Grid.Row="1" Grid.Column="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
-            <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-                <Button Width="Auto" Height="Auto" x:Name="select" Click="Select_Click" Cursor="Hand" BorderBrush="{x:Null}" Foreground="{x:Null}" Background="{x:Null}">
-                    <Button.Style>
-                        <Style TargetType="{x:Type Button}">
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border
-                                    x:Name="border"
-                                    CornerRadius="3"
-                                    TextBlock.Foreground="White">
-                                            <Grid Background="Transparent">
-                                                <ContentPresenter/>
-                                            </Grid>
-                                        </Border>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="true">
-                                                <Setter TargetName="border" Property="Background" Value="#404040"/>
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </Button.Style>
-                    <materialDesign:PackIcon Kind="Folder" Width="40" Height="40" Foreground="#FFD6D6D6" Cursor="Hand"/>
-                </Button >
-                <TextBox x:Name="selectBox" MaxLines="1" TextWrapping="NoWrap" HorizontalAlignment="Stretch" Width="500"/>
-            </StackPanel>
             <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Right">
                 <Button Width="Auto" Height="Auto" x:Name="start" Cursor="Hand" Click="Start_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}">
                     <Button.Style>
@@ -152,15 +109,28 @@
                 </Button >
             </StackPanel>
         </Grid>
-        <Grid Margin="0,20,0,0" Name="ThirdGrid" Grid.Row="2" Grid.Column="0">
-            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" Orientation="Horizontal">
-                <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Foreground="#FF5F5E5E"/>
-                <ProgressBar x:Name="progress" Foreground="#FF838383" Background="{x:Null}" BorderBrush="{x:Null}"/>
-            </StackPanel>
-            
+        <Grid Margin="0,0,0,0" Name="ThirdGrid" Grid.Row="2" Grid.Column="0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Column="0">
+                    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" Orientation="Horizontal">
+                        <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Foreground="#FF5F5E5E"/>
+                        <ProgressBar x:Name="loader_progress" Foreground="#FF838383" Background="{x:Null}" BorderBrush="{x:Null}"/>
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Column="1">
+                    <DockPanel>
+                        <ProgressBar x:Name="progress" Margin="20,0,20,0" Height="20" Foreground="#FF838383" Background="{x:Null}" BorderBrush="{x:Null}"/>
+                    </DockPanel>
+                </Grid>
+            </Grid>
         </Grid>
-
-
     </Grid>
     <UserControl.Resources>
         <cm:BackgroundWorker x:Key="backgroundWorker"
@@ -168,6 +138,12 @@
          RunWorkerCompleted="BackgroundWorker_RunWorkerCompleted"
          WorkerReportsProgress="True"
          ProgressChanged="BackgroundWorker_ProgressChanged"/>
+
+        <cm:BackgroundWorker x:Key="backgroundLoader"
+         DoWork="BackgroundLoader_DoWork"
+         RunWorkerCompleted="BackgroundLoader_RunWorkerCompleted"
+         WorkerReportsProgress="True"
+         ProgressChanged="BackgroundLoader_ProgressChanged"/>
     </UserControl.Resources>
 </UserControl>
 

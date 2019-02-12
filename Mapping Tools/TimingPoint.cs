@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Mapping_Tools {
     class TimingPoint {
@@ -44,14 +40,14 @@ namespace Mapping_Tools {
         }
 
         public bool Equals(TimingPoint tp) {
-            if (tp.Inherited && !Inherited) {
+            if( tp.Inherited && !Inherited ) {
                 return MpB == -100 && Meter == tp.Meter && SampleSet == tp.SampleSet && SampleIndex == tp.SampleIndex && Volume == tp.Volume && Kiai == tp.Kiai;
             }
             return MpB == tp.MpB && Meter == tp.Meter && SampleSet == tp.SampleSet && SampleIndex == tp.SampleIndex && Volume == tp.Volume && Kiai == tp.Kiai;
         }
 
         public double GetBPM() {
-            if (Inherited) {
+            if( Inherited ) {
                 return 60000 / MpB;
             }
             else {

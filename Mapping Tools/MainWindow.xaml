@@ -6,14 +6,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:cm="clr-namespace:System.ComponentModel;assembly=System"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:views="clr-namespace:Mapping_Tools.views"
         xmlns:viewmodels="clr-namespace:Mapping_Tools.viewmodels"
         mc:Ignorable="d"
         Title="Beatmap Cleaner 2.0.0"  
         WindowStyle="None"
-        ResizeMode="CanResizeWithGrip"
+        ResizeMode="CanResize"
         AllowsTransparency="True"
         WindowStartupLocation="CenterScreen"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
@@ -24,59 +23,88 @@
         >
     <WindowChrome.WindowChrome>
         <WindowChrome 
-        CaptionHeight="35"
-        ResizeBorderThickness="5" />
+            CaptionHeight="35"
+            ResizeBorderThickness="5" />
     </WindowChrome.WindowChrome>
+
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="1*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-        <Grid x:Name="FirstGrid" VerticalAlignment="Top" Grid.Column="0" Grid.Row="0">
-            <StackPanel WindowChrome.IsHitTestVisibleInChrome="true" Height="35" VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Horizontal">
-                <Image Margin="10,0,0,0" HorizontalAlignment="Left" Source="data/map_cleaner.png" Height="35"/>
-                <TextBlock HorizontalAlignment="Left" Height="35" Text="Mapping Tools" Foreground="#FF5F5E5E" Padding="0,13,0,0" Width="135"/>
-            </StackPanel>
-            <StackPanel WindowChrome.IsHitTestVisibleInChrome="true" Height="35" VerticalAlignment="Top" HorizontalAlignment="Right" Orientation="Horizontal">
-                <Button Style="{DynamicResource MaterialDesignRaisedDarkButton}" Content="{materialDesign:PackIcon WindowMinimize}" Click="MinimizeWin" BorderBrush="{x:Null}" Background="{x:Null}" HorizontalAlignment="Right" Height="35" Panel.ZIndex="1" Foreground="#FFD6D6D6"/>
-                <Button x:Name="toggle_button" Style="{DynamicResource MaterialDesignRaisedDarkButton}" Content="{materialDesign:PackIcon WindowMaximize}" Click="ToggleWin" BorderBrush="{x:Null}" Background="{x:Null}" HorizontalAlignment="Right" Height="35" Foreground="#FFD6D6D6"/>
-                <Button Style="{DynamicResource MaterialDesignRaisedDarkButton}" Content="{materialDesign:PackIcon WindowCLose}" Click="CloseWin" Background="{x:Null}" BorderBrush="{x:Null}" HorizontalAlignment="Right"  Height="35" Foreground="#FFD6D6D6"/>
-            </StackPanel>
-        </Grid>
-        <Grid x:Name="SecoundGrid" Grid.Column="0" Grid.Row="1">
-            <Menu Foreground="#FFD6D6D6" >
-                <MenuItem Header="_Tools" Padding="12,0,0,0" Height="31" MinWidth="65">
-                    <MenuItem Header="_General Cleaner" Click="LoadCleaner"/>
-                    <MenuItem Header="_Hitsound Copier" Click="LoadCopier"/>
-                </MenuItem>
-                <MenuItem Header="_Options" Padding="12,0,0,0" Height="31" MinWidth="80">
-                    <MenuItem Header="_Preferences"/>
-                    <MenuItem Header="_Open Backup Folder" Click="OpenBackups"/>
-                </MenuItem>
-                <MenuItem Header="_About" Padding="12,0,0,0" Height="31" MinWidth="67">
-                    <MenuItem Header="_Github" Click="OpenGitHub"/>
-                    <MenuItem Header="_Info" Click="OpenInfo"/>
-                </MenuItem>
-            </Menu>
-        </Grid>
+            <Grid x:Name="FirstGrid" VerticalAlignment="Top" Grid.Column="0" Grid.Row="0">
+                <StackPanel WindowChrome.IsHitTestVisibleInChrome="true" Height="35" VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Horizontal">
+                    <Image Margin="10,0,0,0" HorizontalAlignment="Left" Source="data/map_cleaner.png" Height="35"/>
+                    <TextBlock Name="header" HorizontalAlignment="Left" Height="35" Text="Mapping Tools" Foreground="#FF5F5E5E" Padding="0,13,0,0"/>
+                </StackPanel>
+                <StackPanel WindowChrome.IsHitTestVisibleInChrome="true" Height="35" VerticalAlignment="Top" HorizontalAlignment="Right" Orientation="Horizontal">
+                    <Button Style="{DynamicResource MaterialDesignRaisedDarkButton}" Content="{materialDesign:PackIcon WindowMinimize}" Click="MinimizeWin" BorderBrush="{x:Null}" Background="{x:Null}" HorizontalAlignment="Right" Height="35" Panel.ZIndex="1" Foreground="#FFD6D6D6"/>
+                    <Button x:Name="toggle_button" Style="{DynamicResource MaterialDesignRaisedDarkButton}" Content="{materialDesign:PackIcon WindowMaximize}" Click="ToggleWin" BorderBrush="{x:Null}" Background="{x:Null}" HorizontalAlignment="Right" Height="35" Foreground="#FFD6D6D6"/>
+                    <Button Style="{DynamicResource MaterialDesignRaisedDarkButton}" Content="{materialDesign:PackIcon WindowCLose}" Click="CloseWin" Background="{x:Null}" BorderBrush="{x:Null}" HorizontalAlignment="Right"  Height="35" Foreground="#FFD6D6D6"/>
+                </StackPanel>
+            </Grid>
+            <Grid x:Name="SecoundGrid" Grid.Column="0" Grid.Row="1">
+                <Menu Foreground="#FFD6D6D6" >
+                    <MenuItem Height="31" Header="_File" Padding="12,0,0,0" MinWidth="50">
+                        <MenuItem Header="_Open Beatmap" Click="OpenBeatmap"/>
+                        <MenuItem Header="_Generate Backup" Click="SaveBackup"/>
+                    </MenuItem>
+                    <MenuItem Height="31" Header="_Tools" Padding="12,0,0,0" MinWidth="65">
+                        <MenuItem Header="_General Cleaner" Click="LoadCleaner"/>
+                        <MenuItem Header="_Slider Merger" Click="LoadMerger"/>
+                        <MenuItem Header="_Hitsound Copier" Click="LoadCopier"/>
+                    </MenuItem>
+                    <MenuItem Height="31" Header="_Options" Padding="12,0,0,0" MinWidth="80">
+                        <MenuItem Header="_Preferences"/>
+                        <MenuItem Header="_Open Backup Folder" Click="OpenBackups"/>
+                    </MenuItem>
+                    <MenuItem Height="31" Header="_About" Padding="12,0,0,0" MinWidth="67">
+                        <MenuItem Header="_Github" Click="OpenGitHub"/>
+                        <MenuItem Header="_Info" Click="OpenInfo"/>
+                    </MenuItem>
+                </Menu>
+            </Grid>
 
-        <Grid x:Name="ThirdGrid" Grid.Row="2">
-            <Border BorderThickness="1" BorderBrush="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}">
-                <ContentControl Content="{Binding}"></ContentControl>
-            </Border>
+            <Grid x:Name="ThirdGrid" Grid.Row="2">
+                <ContentControl Name="content_views" Content="{Binding}"></ContentControl>
+            </Grid>
+            <Grid x:Name="ForthGrid" Grid.Row="3" Margin="0,1,0,0" RenderTransformOrigin="0.5,0.5" Background="#FF2B2B2B">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Column="0">
+                        <StackPanel HorizontalAlignment="Left" Height="35" VerticalAlignment="Bottom" Orientation="Horizontal">
+                            <TextBlock Padding="10,10,0,0" HorizontalAlignment="Left" Height="35" Text="Current Map:" Foreground="#FF5F5E5E"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid Grid.Column="1">
+                        <Viewbox Margin="0,0,20,0" HorizontalAlignment="Left" Height ="35">
+                            <TextBlock x:FieldModifier="public" Name="currentMap" TextWrapping="Wrap" Padding="10,10,0,0" Height="35" Foreground="#FF5F5E5E"/>
+                        </Viewbox>
+                    </Grid>
+                </Grid>
+            </Grid>
         </Grid>
-        <Grid x:Name="ForthGrid" Grid.Row="3" Margin="0,1,0,0" RenderTransformOrigin="0.5,0.5">
-            <StackPanel WindowChrome.IsHitTestVisibleInChrome="true" Height="35" VerticalAlignment="Bottom" Orientation="Horizontal">
-                <TextBlock Padding="10,10,0,0" HorizontalAlignment="Left" Height="35" Text="Current Tool:" Foreground="#FF5F5E5E"/>
-                <TextBlock Name="currentTool" Padding="10,10,0,0" Height="35" Foreground="#FF5F5E5E"/>
-            </StackPanel>
-        </Grid>
+        <Border Name="window_border" BorderThickness="1" Background="{x:Null}" BorderBrush="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="20" 
+                                  Color="{DynamicResource {x:Static SystemColors.HotTrackColorKey}}" 
+                                  Opacity="1" 
+                                  ShadowDepth="0.1" />
+            </Border.Effect>
+        </Border>
     </Grid>
     <Window.Resources>
         <DataTemplate DataType="{x:Type viewmodels:StandardVM}">
@@ -84,6 +112,9 @@
         </DataTemplate>
         <DataTemplate DataType="{x:Type viewmodels:CleanerVM}">
             <views:CleanerView DataContext="{Binding}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:SliderMergerVM}">
+            <views:SliderMergerView DataContext="{Binding}"/>
         </DataTemplate>
     </Window.Resources>
 </Window>
