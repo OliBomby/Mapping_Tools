@@ -1,7 +1,7 @@
 # Mapping_Tools
 Collection of tools for manipulating osu! beatmaps
 
-## Tools from
+## Tools included
 - [Map Cleaner](https://github.com/OliBomby/Map-Cleaner) by [OliBomby](https://github.com/OliBomby) 
 - [Slider Merger]() by [OliBomby](https://github.com/OliBomby) 
 
