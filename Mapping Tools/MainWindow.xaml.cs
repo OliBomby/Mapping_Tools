@@ -7,6 +7,7 @@ using MaterialDesignThemes.Wpf;
 using Mapping_Tools.viewmodels;
 using Microsoft.Win32;
 using System.Windows.Media;
+using System.IO;
 
 namespace Mapping_Tools {
     public partial class MainWindow :Window {
@@ -42,7 +43,18 @@ namespace Mapping_Tools {
         }
 
         private void SaveBackup(object sender, RoutedEventArgs e) {
-
+            Console.WriteLine("ababa");
+            DateTime now = DateTime.Now;
+            string fileToCopy = currentMap.Text;
+            string destinationDirectory = System.Environment.CurrentDirectory + "\\Backups\\";
+            try {
+                File.Copy(fileToCopy, destinationDirectory + now.ToString("yyyy-MM-dd HH-mm-ss") + "___" + System.IO.Path.GetFileName(fileToCopy));
+            }
+            catch( Exception ex ) {
+                MessageBox.Show(ex.Message);
+                return;
+            }
+            MessageBox.Show("Beatmap successfully copied!");
         }
 
         //Method for loading the cleaner interface 
