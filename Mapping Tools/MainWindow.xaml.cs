@@ -65,7 +65,7 @@ namespace Mapping_Tools {
             txt.Text = "Mapping Tools - Map_Cleaner";
 
             MinWidth = 630;
-            MinHeight = 520;
+            MinHeight = 560;
         }
 
         //Method for loading the merger interface

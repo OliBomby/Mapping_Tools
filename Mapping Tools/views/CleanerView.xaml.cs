@@ -330,13 +330,13 @@ namespace Mapping_Tools.views {
                 return;
             }
 
-            backgroundWorker.RunWorkerAsync(new List<string> { fileToCopy, VolumeSliders.IsChecked.ToString(), SamplesetSliders.IsChecked.ToString(),
+            backgroundWorker.RunWorkerAsync(new List<string> {fileToCopy, VolumeSliders.IsChecked.ToString(), SamplesetSliders.IsChecked.ToString(),
                                                     VolumeSpinners.IsChecked.ToString(), RemoveSliderendMuting.IsChecked.ToString(),
-                                                    ResnapObjects.IsChecked.ToString(), ResnapBookmarks.IsChecked.ToString(), Snap1.Text, Snap2.Text});
+                                                    ResnapObjects.IsChecked.ToString(), ResnapBookmarks.IsChecked.ToString(), Snap1.Text, Snap2.Text, RemoveUnclickableHitsounds.IsChecked.ToString()});
 
-            backgroundLoader.RunWorkerAsync(new List<string> { fileToCopy, VolumeSliders.IsChecked.ToString(), SamplesetSliders.IsChecked.ToString(),
+            backgroundLoader.RunWorkerAsync(new List<string> {fileToCopy, VolumeSliders.IsChecked.ToString(), SamplesetSliders.IsChecked.ToString(),
                                                     VolumeSpinners.IsChecked.ToString(), RemoveSliderendMuting.IsChecked.ToString(),
-                                                    ResnapObjects.IsChecked.ToString(), ResnapBookmarks.IsChecked.ToString(), Snap1.Text, Snap2.Text});
+                                                    ResnapObjects.IsChecked.ToString(), ResnapBookmarks.IsChecked.ToString(), Snap1.Text, Snap2.Text, RemoveUnclickableHitsounds.IsChecked.ToString()});
             start.IsEnabled = false;
         }
 
@@ -351,6 +351,7 @@ namespace Mapping_Tools.views {
             bool resnapBookmarks = arguments[6] == "True";
             int snap1 = int.Parse(arguments[7].Split('/')[1]);
             int snap2 = int.Parse(arguments[8].Split('/')[1]);
+            bool removeUnclickabeHitsounds = arguments[9] == "True";
 
             Editor editor = new Editor(path);
             Timing timing = editor.Beatmap.BeatmapTiming;
@@ -422,6 +423,16 @@ namespace Mapping_Tools.views {
                     UpdateProgressbar(worker, (double) i / bookmarks.Count, 4, maxStages);
                 }
                 editor.Beatmap.SetBookmarks(newBookmarks);
+            }
+
+            // Maybe mute unclickable timelineobjects
+            if( removeUnclickabeHitsounds ) {
+                foreach( TimelineObject tlo in timeline.TimeLineObjects ) {
+                    if( !( tlo.IsCircle || tlo.IsSliderHead || tlo.IsHoldnoteHead ) )  // Not clickable
+                    {
+                        tlo.FenoSampleVolume = 5;  // 5% volume mute
+                    }
+                }
             }
 
             // Make new timingpoints
