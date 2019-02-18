@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mapping_Tools {
+namespace Mapping_Tools.classes.BeatmapHelper {
     class Timeline {
         public List<TimelineObject> TimeLineObjects { get; set; }
 

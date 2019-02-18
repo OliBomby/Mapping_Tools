@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace Mapping_Tools {
+namespace Mapping_Tools.classes.BeatmapHelper {
     class TimingPoint {
         // Offset, Milliseconds per Beat, Meter, Sample Set, Sample Index, Volume, Inherited, Kiai Mode
         public double Offset { get; set; }

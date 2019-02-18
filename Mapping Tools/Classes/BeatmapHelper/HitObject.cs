@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
-namespace Mapping_Tools {
+namespace Mapping_Tools.classes.BeatmapHelper {
     class HitObject {
         public string Line { get => GetLine(); set => SetLine(value); }
 

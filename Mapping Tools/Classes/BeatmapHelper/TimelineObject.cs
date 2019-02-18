@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mapping_Tools {
+namespace Mapping_Tools.classes.BeatmapHelper {
     class TimelineObject {
         public HitObject Origin { get; set; }
         public double Time { get; set; }
@@ -58,19 +58,19 @@ namespace Mapping_Tools {
             bool isSpinner = c[3];
             bool isHoldNote = c[7];
 
-            if (repeat == 0) {
+            if( repeat == 0 ) {
                 IsSliderHead = isSlider;
                 IsSpinnerHead = isSpinner;
                 IsHoldnoteHead = isHoldNote;
 
-                if (IsCircle || isHoldNote) // Can have custom index/volume/filename
+                if( IsCircle || isHoldNote ) // Can have custom index/volume/filename
                 {
                     CustomIndex = origin.CustomIndex;
                     SampleVolume = origin.SampleVolume;
                     Filename = origin.Filename;
                 }
             }
-            else if (repeat == origin.Repeat) {
+            else if( repeat == origin.Repeat ) {
                 IsSliderEnd = isSlider;
                 IsSpinnerEnd = isSpinner;
                 IsHoldnoteEnd = isHoldNote;
@@ -88,7 +88,7 @@ namespace Mapping_Tools {
         }
 
         private int GetIntFromBitArray(BitArray bitArray) {
-            if (bitArray.Length > 32)
+            if( bitArray.Length > 32 )
                 throw new ArgumentException("Argument length shall be at most 32 bits.");
 
             int[] array = new int[1];

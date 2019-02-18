@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mapping_Tools {
+namespace Mapping_Tools.classes.BeatmapHelper {
     class TValue {
         public string StringValue { get; set; }
         public dynamic Value { get => GetValue(); set => SetValue(value); }
@@ -14,8 +14,8 @@ namespace Mapping_Tools {
         }
 
         public dynamic GetValue() {
-            if (double.TryParse(StringValue, out double d)) {
-                if (StringValue.Split('.').Count() > 1) {
+            if( double.TryParse(StringValue, out double d) ) {
+                if( StringValue.Split('.').Count() > 1 ) {
                     return d;
                 }
                 else {

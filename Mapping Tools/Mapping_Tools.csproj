@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Mapping_Tools</RootNamespace>
     <AssemblyName>Mapping_Tools</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -29,6 +29,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -39,7 +40,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -50,9 +52,10 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>map_cleaner_icon_pDk_icon.ico</ApplicationIcon>
+    <ApplicationIcon>Data\map_cleaner_icon_pDk_icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="MaterialDesignColors, Version=1.1.3.0, Culture=neutral, processorArchitecture=MSIL">
@@ -81,17 +84,60 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="TValue.cs" />
-    <Compile Include="viewmodels\CleanerVM.cs" />
-    <Compile Include="viewmodels\SliderMergerVM.cs" />
-    <Compile Include="viewmodels\StandardVM.cs" />
-    <Compile Include="views\StandardView.xaml.cs">
+    <Compile Include="Classes\MathUtil\Extensions.cs" />
+    <Compile Include="Classes\MathUtil\BezierCurve.cs" />
+    <Compile Include="Classes\MathUtil\BezierCurveCubic.cs" />
+    <Compile Include="Classes\MathUtil\BezierCurveQuadric.cs" />
+    <Compile Include="Classes\MathUtil\Box2.cs" />
+    <Compile Include="Classes\MathUtil\Box2d.cs" />
+    <Compile Include="Classes\MathUtil\Half.cs" />
+    <Compile Include="Classes\MathUtil\MathHelper.cs" />
+    <Compile Include="Classes\MathUtil\Matrix2.cs" />
+    <Compile Include="Classes\MathUtil\Matrix2d.cs" />
+    <Compile Include="Classes\MathUtil\Matrix2x3.cs" />
+    <Compile Include="Classes\MathUtil\Matrix2x3d.cs" />
+    <Compile Include="Classes\MathUtil\Matrix2x4.cs" />
+    <Compile Include="Classes\MathUtil\Matrix2x4d.cs" />
+    <Compile Include="Classes\MathUtil\Matrix3.cs" />
+    <Compile Include="Classes\MathUtil\Matrix3d.cs" />
+    <Compile Include="Classes\MathUtil\Matrix3x2.cs" />
+    <Compile Include="Classes\MathUtil\Matrix3x2d.cs" />
+    <Compile Include="Classes\MathUtil\Matrix3x4.cs" />
+    <Compile Include="Classes\MathUtil\Matrix3x4d.cs" />
+    <Compile Include="Classes\MathUtil\Matrix4.cs" />
+    <Compile Include="Classes\MathUtil\Matrix4d.cs" />
+    <Compile Include="Classes\MathUtil\Matrix4x2.cs" />
+    <Compile Include="Classes\MathUtil\Matrix4x2d.cs" />
+    <Compile Include="Classes\MathUtil\Matrix4x3.cs" />
+    <Compile Include="Classes\MathUtil\Matrix4x3d.cs" />
+    <Compile Include="Classes\MathUtil\Quaternion.cs" />
+    <Compile Include="Classes\MathUtil\Quaterniond.cs" />
+    <Compile Include="Classes\MathUtil\Vector2.cs" />
+    <Compile Include="Classes\MathUtil\Vector2d.cs" />
+    <Compile Include="Classes\MathUtil\Vector2h.cs" />
+    <Compile Include="Classes\MathUtil\Vector3.cs" />
+    <Compile Include="Classes\MathUtil\Vector3d.cs" />
+    <Compile Include="Classes\MathUtil\Vector3h.cs" />
+    <Compile Include="Classes\MathUtil\Vector4.cs" />
+    <Compile Include="Classes\MathUtil\Vector4d.cs" />
+    <Compile Include="Classes\MathUtil\Vector4h.cs" />
+    <Compile Include="Classes\SliderPath\PathApproximator.cs" />
+    <Compile Include="Classes\SliderPath\PathType.cs" />
+    <Compile Include="Classes\MathUtil\Precision.cs" />
+    <Compile Include="Classes\MathUtil\RNG.cs" />
+    <Compile Include="Classes\SliderPath\SliderInterpreter.cs" />
+    <Compile Include="Classes\SliderPath\SliderPath.cs" />
+    <Compile Include="Classes\BeatmapHelper\TValue.cs" />
+    <Compile Include="Viewmodels\CleanerVM.cs" />
+    <Compile Include="Viewmodels\SliderMergerVM.cs" />
+    <Compile Include="Viewmodels\StandardVM.cs" />
+    <Compile Include="Views\StandardView.xaml.cs">
       <DependentUpon>StandardView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="views\CleanerView.xaml.cs">
+    <Compile Include="Views\CleanerView.xaml.cs">
       <DependentUpon>CleanerView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="views\SliderMergerView.xaml.cs">
+    <Compile Include="Views\SliderMergerView.xaml.cs">
       <DependentUpon>SliderMergerView.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
@@ -102,28 +148,28 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Beatmap.cs" />
-    <Compile Include="Colour.cs" />
-    <Compile Include="Editor.cs" />
-    <Compile Include="HitObject.cs" />
-    <Compile Include="Point.cs" />
-    <Compile Include="Timeline.cs" />
-    <Compile Include="TimelineObject.cs" />
-    <Compile Include="Timing.cs" />
-    <Compile Include="TimingPoint.cs" />
+    <Compile Include="Classes\BeatmapHelper\Beatmap.cs" />
+    <Compile Include="Classes\BeatmapHelper\Colour.cs" />
+    <Compile Include="Classes\BeatmapHelper\Editor.cs" />
+    <Compile Include="Classes\BeatmapHelper\HitObject.cs" />
+    <Compile Include="Classes\BeatmapHelper\Point.cs" />
+    <Compile Include="Classes\BeatmapHelper\Timeline.cs" />
+    <Compile Include="Classes\BeatmapHelper\TimelineObject.cs" />
+    <Compile Include="Classes\BeatmapHelper\Timing.cs" />
+    <Compile Include="Classes\BeatmapHelper\TimingPoint.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="views\StandardView.xaml">
+    <Page Include="Views\StandardView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="views\CleanerView.xaml">
+    <Page Include="Views\CleanerView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="views\SliderMergerView.xaml">
+    <Page Include="Views\SliderMergerView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -157,13 +203,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="map_cleaner_icon_6j1_icon.ico" />
+    <Resource Include="Data\map_cleaner_icon_6j1_icon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="map_cleaner_icon_pDk_icon.ico" />
+    <Resource Include="Data\map_cleaner_icon_pDk_icon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="data\map_cleaner.png" />
+    <Resource Include="Data\map_cleaner.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
@@ -177,6 +223,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

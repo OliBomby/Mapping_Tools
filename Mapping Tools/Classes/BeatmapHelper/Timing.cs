@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mapping_Tools {
+namespace Mapping_Tools.classes.BeatmapHelper {
     class Timing {
         public List<TimingPoint> TimingPoints { get; set; }
         public double SliderMultiplier { get; set; }
@@ -17,8 +17,8 @@ namespace Mapping_Tools {
 
         public double GetNearestTimeMeter(double time, TimingPoint tp, int divisor) {
             double d = tp.MpB / divisor;
-            double remainder = (time - tp.Offset) % d;
-            if (remainder < 0.5 * d) {
+            double remainder = ( time - tp.Offset ) % d;
+            if( remainder < 0.5 * d ) {
                 return time - remainder;
             }
             else {
@@ -37,14 +37,14 @@ namespace Mapping_Tools {
             double snapDistance3 = Math.Abs(time - newTime3);
 
             double newTime = time;
-            if (snapDistance3 < snapDistance2) {
+            if( snapDistance3 < snapDistance2 ) {
                 newTime = newTime3;
             }
             else {
                 newTime = newTime2;
             }
 
-            if (afterTP != null && newTime > afterTP.Offset) {
+            if( afterTP != null && newTime > afterTP.Offset ) {
                 newTime = afterTP.Offset;
             }
             return newTime;
@@ -61,18 +61,18 @@ namespace Mapping_Tools {
             double snapDistance3 = snapDistance3 = Math.Abs(time - newTime3);
 
             double newTime = time;
-            if (snapDistance3 < snapDistance2) {
+            if( snapDistance3 < snapDistance2 ) {
                 newTime = newTime3;
             }
             else {
                 newTime = newTime2;
             }
 
-            if (afterTP != null && newTime > afterTP.Offset) {
+            if( afterTP != null && newTime > afterTP.Offset ) {
                 newTime = afterTP.Offset;
             }
 
-            if (newTime <= ho.Time + 1 || newTime >= ho.EndTime - 1) // Don't resnap if it would move outside
+            if( newTime <= ho.Time + 1 || newTime >= ho.EndTime - 1 ) // Don't resnap if it would move outside
             {
                 newTime = time;
             }
@@ -80,8 +80,8 @@ namespace Mapping_Tools {
         }
 
         public double GetTimingPointEffectiveRange(TimingPoint ttp) {
-            foreach (TimingPoint tp in TimingPoints) {
-                if (tp.Offset > ttp.Offset) {
+            foreach( TimingPoint tp in TimingPoints ) {
+                if( tp.Offset > ttp.Offset ) {
                     return tp.Offset;
                 }
             }
@@ -90,8 +90,8 @@ namespace Mapping_Tools {
 
         public TimingPoint GetTimingPointAtTime(double time) {
             TimingPoint lastTP = GetFirstTimingPointExtended();
-            foreach (TimingPoint tp in TimingPoints) {
-                if (tp.Offset > time) {
+            foreach( TimingPoint tp in TimingPoints ) {
+                if( tp.Offset > time ) {
                     return lastTP;
                 }
                 lastTP = tp;
@@ -101,8 +101,8 @@ namespace Mapping_Tools {
 
         public List<TimingPoint> GetTimingPointsInTimeRange(double startTime, double endTime) {
             List<TimingPoint> TPs = new List<TimingPoint>();
-            foreach (TimingPoint tp in TimingPoints) {
-                if (tp.Offset > startTime && tp.Offset < endTime) {
+            foreach( TimingPoint tp in TimingPoints ) {
+                if( tp.Offset > startTime && tp.Offset < endTime ) {
                     TPs.Add(tp);
                 }
             }
@@ -119,11 +119,11 @@ namespace Mapping_Tools {
 
         public TimingPoint GetRedlineAtTime(double time) {
             TimingPoint lastTP = GetFirstTimingPointExtended();
-            foreach (TimingPoint tp in TimingPoints) {
-                if (tp.Offset > time) {
+            foreach( TimingPoint tp in TimingPoints ) {
+                if( tp.Offset > time ) {
                     return lastTP;
                 }
-                if (tp.Inherited) {
+                if( tp.Inherited ) {
                     lastTP = tp;
                 }
             }
@@ -131,8 +131,8 @@ namespace Mapping_Tools {
         }
 
         public TimingPoint GetRedlineAfterTime(double time) {
-            foreach (TimingPoint tp in TimingPoints) {
-                if (tp.Offset > time && tp.Inherited) {
+            foreach( TimingPoint tp in TimingPoints ) {
+                if( tp.Offset > time && tp.Inherited ) {
                     return tp;
                 }
             }
@@ -145,11 +145,11 @@ namespace Mapping_Tools {
 
         public double GetSVAtTime(double time) {
             double lastSV = -100;
-            foreach (TimingPoint tp in TimingPoints) {
-                if (tp.Offset > time) {
+            foreach( TimingPoint tp in TimingPoints ) {
+                if( tp.Offset > time ) {
                     return lastSV;
                 }
-                if (!tp.Inherited) {
+                if( !tp.Inherited ) {
                     lastSV = tp.MpB;
                 }
                 else {
@@ -160,24 +160,24 @@ namespace Mapping_Tools {
         }
 
         public double CalculateSliderTemporalLength(double time, double length) {
-            return (length * GetMpBAtTime(time) * GetSVAtTime(time)) / (-10000 * SliderMultiplier);
+            return ( length * GetMpBAtTime(time) * GetSVAtTime(time) ) / ( -10000 * SliderMultiplier );
         }
 
         public double CalculateSliderLength(double time, double temporalLength) {
-            return (-10000 * temporalLength * SliderMultiplier) / (GetMpBAtTime(time) * GetSVAtTime(time));
+            return ( -10000 * temporalLength * SliderMultiplier ) / ( GetMpBAtTime(time) * GetSVAtTime(time) );
         }
 
         public double CalculateSliderLengthCustomSV(double time, double temporalLength, double sv) {
-            return (-10000 * temporalLength * SliderMultiplier) / (GetMpBAtTime(time) * sv);
+            return ( -10000 * temporalLength * SliderMultiplier ) / ( GetMpBAtTime(time) * sv );
         }
 
         public double GetSliderMultiplier(List<string> lines) {
-            foreach (string line in lines) {
+            foreach( string line in lines ) {
                 string[] split = line.Split(':');
-                if (split.Length < 2) {
+                if( split.Length < 2 ) {
                     continue;
                 }
-                else if (split[0] == "SliderMultiplier") {
+                else if( split[0] == "SliderMultiplier" ) {
                     return double.Parse(split[1], CultureInfo.InvariantCulture);
                 }
             }
@@ -186,8 +186,8 @@ namespace Mapping_Tools {
 
         public List<TimingPoint> GetAllRedlines() {
             List<TimingPoint> redlines = new List<TimingPoint>();
-            foreach (TimingPoint tp in TimingPoints) {
-                if (tp.Inherited) {
+            foreach( TimingPoint tp in TimingPoints ) {
+                if( tp.Inherited ) {
                     redlines.Add(tp);
                 }
             }
@@ -199,12 +199,12 @@ namespace Mapping_Tools {
             bool atTiming = false;
             int currentLine = 0;
 
-            while (currentLine + 1 < lines.Count) {
-                if (atTiming) {
+            while( currentLine + 1 < lines.Count ) {
+                if( atTiming ) {
                     string[] values = lines[currentLine].Split(',');
 
                     // Check if it's already done with the TimingPoints
-                    if (values.Length < 6) {
+                    if( values.Length < 6 ) {
                         break;
                     }
                     timingPoints.Add(new TimingPoint(
@@ -218,7 +218,7 @@ namespace Mapping_Tools {
                         values[7] == "1"));
                 }
                 else {
-                    if (lines[currentLine] == "[TimingPoints]") {
+                    if( lines[currentLine] == "[TimingPoints]" ) {
                         atTiming = true;
                     }
                 }
@@ -238,7 +238,7 @@ namespace Mapping_Tools {
             // The timeline will work like a redline on 0 offset and 1000 milliseconds per beat
 
             TimingPoint firstTP = TimingPoints.First();
-            if (firstTP.Inherited) {
+            if( firstTP.Inherited ) {
                 return new TimingPoint(firstTP.Offset - firstTP.MpB * firstTP.Meter * 10, firstTP.MpB,
                                         firstTP.Meter, firstTP.SampleSet, firstTP.SampleIndex, firstTP.Volume, firstTP.Inherited, false);
             }
