@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Mapping_Tools.classes.BeatmapHelper {
-    class Timing {
+    public class Timing {
         public List<TimingPoint> TimingPoints { get; set; }
         public double SliderMultiplier { get; set; }
 

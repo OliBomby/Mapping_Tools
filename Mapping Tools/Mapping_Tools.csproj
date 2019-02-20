@@ -128,6 +128,15 @@
     <Compile Include="Classes\SliderPath\SliderInterpreter.cs" />
     <Compile Include="Classes\SliderPath\SliderPath.cs" />
     <Compile Include="Classes\BeatmapHelper\TValue.cs" />
+    <Compile Include="Components\TimeLine\TimeLine.xaml.cs">
+      <DependentUpon>TimeLine.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Components\TimeLine\TimeLineElement.xaml.cs">
+      <DependentUpon>TimeLineElement.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Components\TimeLine\TimeLineMark.xaml.cs">
+      <DependentUpon>TimeLineMark.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Viewmodels\CleanerVM.cs" />
     <Compile Include="Viewmodels\SliderMergerVM.cs" />
     <Compile Include="Viewmodels\StandardVM.cs" />
@@ -140,6 +149,18 @@
     <Compile Include="Views\SliderMergerView.xaml.cs">
       <DependentUpon>SliderMergerView.xaml</DependentUpon>
     </Compile>
+    <Page Include="Components\TimeLine\TimeLine.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Components\TimeLine\TimeLineElement.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Components\TimeLine\TimeLineMark.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

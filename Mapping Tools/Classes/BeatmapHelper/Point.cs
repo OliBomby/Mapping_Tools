@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Mapping_Tools.classes.BeatmapHelper {
-    class Poi {
+    public class Poi {
         public double X { get; set; }
         public double Y { get; set; }
         public Poi(double X, double Y) {

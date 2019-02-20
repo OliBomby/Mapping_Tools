@@ -15,6 +15,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid Name="FirstGrid" Grid.Row="0" Grid.Column="0">
             <Grid.ColumnDefinitions>
@@ -114,7 +115,7 @@
                 </Button >
             </StackPanel>
         </Grid>
-        <Grid Margin="0,0,0,0" Name="ThirdGrid" Grid.Row="2" Grid.Column="0">
+        <Grid Name="ThirdGrid" Grid.Row="2" Grid.Column="0">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -136,6 +137,9 @@
                 </Grid>
             </Grid>
         </Grid>
+        <Grid Name="FourthGrid" Grid.Row="3" Grid.Column="0">
+            <StackPanel x:Name="tl_host"/>
+        </Grid>
     </Grid>
     <UserControl.Resources>
         <cm:BackgroundWorker x:Key="backgroundWorker"
@@ -147,8 +151,7 @@
         <cm:BackgroundWorker x:Key="backgroundLoader"
          DoWork="BackgroundLoader_DoWork"
          RunWorkerCompleted="BackgroundLoader_RunWorkerCompleted"
-         WorkerReportsProgress="True"
-         ProgressChanged="BackgroundLoader_ProgressChanged"/>
+         WorkerReportsProgress="True"></cm:BackgroundWorker>
     </UserControl.Resources>
 </UserControl>
 

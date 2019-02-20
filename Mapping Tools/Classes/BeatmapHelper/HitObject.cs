@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Linq;
 
 namespace Mapping_Tools.classes.BeatmapHelper {
-    class HitObject {
+    public class HitObject {
         public string Line { get => GetLine(); set => SetLine(value); }
 
         public string[] Values { get => GetValues(); set => SetValues(value); }
