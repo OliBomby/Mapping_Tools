@@ -518,8 +518,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vec2">The second vector</param>
         /// <returns>The distance</returns>
         public static double Distance(Vector3d vec1, Vector3d vec2) {
-            double result;
-            Distance(ref vec1, ref vec2, out result);
+            Distance(ref vec1, ref vec2, out double result);
             return result;
         }
 
@@ -540,8 +539,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vec2">The second vector</param>
         /// <returns>The squared distance</returns>
         public static double DistanceSquared(Vector3d vec1, Vector3d vec2) {
-            double result;
-            DistanceSquared(ref vec1, ref vec2, out result);
+            DistanceSquared(ref vec1, ref vec2, out double result);
             return result;
         }
 
@@ -632,8 +630,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="right">Second operand</param>
         /// <returns>The cross product of the two inputs</returns>
         public static Vector3d Cross(Vector3d left, Vector3d right) {
-            Vector3d result;
-            Cross(ref left, ref right, out result);
+            Cross(ref left, ref right, out Vector3d result);
             return result;
         }
 
@@ -723,8 +720,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="mat">The desired transformation</param>
         /// <returns>The transformed vector</returns>
         public static Vector3d TransformVector(Vector3d vec, Matrix4d mat) {
-            Vector3d result;
-            TransformVector(ref vec, ref mat, out result);
+            TransformVector(ref vec, ref mat, out Vector3d result);
             return result;
         }
 
@@ -787,8 +783,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="invMat">The inverse of the desired transformation</param>
         /// <returns>The transformed normal</returns>
         public static Vector3d TransformNormalInverse(Vector3d norm, Matrix4d invMat) {
-            Vector3d result;
-            TransformNormalInverse(ref norm, ref invMat, out result);
+            TransformNormalInverse(ref norm, ref invMat, out Vector3d result);
             return result;
         }
 
@@ -819,8 +814,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="mat">The desired transformation</param>
         /// <returns>The transformed position</returns>
         public static Vector3d TransformPosition(Vector3d pos, Matrix4d mat) {
-            Vector3d result;
-            TransformPosition(ref pos, ref mat, out result);
+            TransformPosition(ref pos, ref mat, out Vector3d result);
             return result;
         }
 
@@ -850,8 +844,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="mat">The desired transformation</param>
         /// <returns>The transformed vector</returns>
         public static Vector3d Transform(Vector3d vec, Matrix4d mat) {
-            Vector3d result;
-            Transform(ref vec, ref mat, out result);
+            Transform(ref vec, ref mat, out Vector3d result);
             return result;
         }
 
@@ -879,8 +872,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="quat">The quaternion to rotate the vector by.</param>
         /// <returns>The result of the operation.</returns>
         public static Vector3d Transform(Vector3d vec, Quaterniond quat) {
-            Vector3d result;
-            Transform(ref vec, ref quat, out result);
+            Transform(ref vec, ref quat, out Vector3d result);
             return result;
         }
 
@@ -893,9 +885,9 @@ namespace Mapping_Tools.Classes.MathUtil {
         public static void Transform(ref Vector3d vec, ref Quaterniond quat, out Vector3d result) {
             // Since vec.W == 0, we can optimize quat * vec * quat^-1 as follows:
             // vec + 2.0 * cross(quat.xyz, cross(quat.xyz, vec) + quat.w * vec)
-            Vector3d xyz = quat.Xyz, temp, temp2;
-            Vector3d.Cross(ref xyz, ref vec, out temp);
-            Vector3d.Multiply(ref vec, quat.W, out temp2);
+            Vector3d xyz = quat.Xyz;
+            Vector3d.Cross(ref xyz, ref vec, out Vector3d temp);
+            Vector3d.Multiply(ref vec, quat.W, out Vector3d temp2);
             Vector3d.Add(ref temp, ref temp2, out temp);
             Vector3d.Cross(ref xyz, ref temp, out temp);
             Vector3d.Multiply(ref temp, 2, out temp);
@@ -909,8 +901,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="mat">The desired transformation</param>
         /// <returns>The transformed vector</returns>
         public static Vector3d TransformPerspective(Vector3d vec, Matrix4d mat) {
-            Vector3d result;
-            TransformPerspective(ref vec, ref mat, out result);
+            TransformPerspective(ref vec, ref mat, out Vector3d result);
             return result;
         }
 
@@ -934,8 +925,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <returns>Angle (in radians) between the vectors.</returns>
         /// <remarks>Note that the returned angle is never bigger than the constant Pi.</remarks>
         public static double CalculateAngle(Vector3d first, Vector3d second) {
-            double result;
-            CalculateAngle(ref first, ref second, out result);
+            CalculateAngle(ref first, ref second, out double result);
             return result;
         }
 
@@ -945,8 +935,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="result">Angle (in radians) between the vectors.</param>
         /// <remarks>Note that the returned angle is never bigger than the constant Pi.</remarks>
         public static void CalculateAngle(ref Vector3d first, ref Vector3d second, out double result) {
-            double temp;
-            Vector3d.Dot(ref first, ref second, out temp);
+            Vector3d.Dot(ref first, ref second, out double temp);
             result = System.Math.Acos(MathHelper.Clamp(temp / ( first.Length * second.Length ), -1.0, 1.0));
         }
 
@@ -1137,7 +1126,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="v3d">The Vector3d to convert.</param>
         /// <returns>The resulting Vector3.</returns>
         public static explicit operator Vector3(Vector3d v3d) {
-            return new Vector3((float) v3d.X, (float) v3d.Y, (float) v3d.Z);
+            return new Vector3(v3d.X, v3d.Y, v3d.Z);
         }
 
         private static string listSeparator = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;

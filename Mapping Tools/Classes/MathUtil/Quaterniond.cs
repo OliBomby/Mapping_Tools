@@ -131,10 +131,11 @@ namespace Mapping_Tools.Classes.MathUtil {
                 q.Normalize();
             }
 
-            Vector4d result = new Vector4d();
-
-            result.W = 2.0f * (float) System.Math.Acos(q.W); // angle
-            float den = (float) System.Math.Sqrt(1.0 - q.W * q.W);
+            Vector4d result = new Vector4d
+            {
+                W = 2.0f * System.Math.Acos(q.W) // angle
+            };
+            double den = System.Math.Sqrt(1.0 - q.W * q.W);
             if( den > 0.0001f ) {
                 result.Xyz = q.Xyz / den;
             }
@@ -153,7 +154,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <seealso cref="LengthSquared"/>
         public double Length {
             get {
-                return (double) System.Math.Sqrt(W * W + Xyz.LengthSquared);
+                return System.Math.Sqrt(W * W + Xyz.LengthSquared);
             }
         }
 
@@ -267,8 +268,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="right">The second instance.</param>
         /// <returns>A new instance containing the result of the calculation.</returns>
         public static Quaterniond Multiply(Quaterniond left, Quaterniond right) {
-            Quaterniond result;
-            Multiply(ref left, ref right, out result);
+            Multiply(ref left, ref right, out Quaterniond result);
             return result;
         }
 
@@ -328,8 +328,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="q">The Quaterniond to invert</param>
         /// <returns>The inverse of the given Quaterniond</returns>
         public static Quaterniond Invert(Quaterniond q) {
-            Quaterniond result;
-            Invert(ref q, out result);
+            Invert(ref q, out Quaterniond result);
             return result;
         }
 
@@ -355,8 +354,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="q">The Quaterniond to normalize</param>
         /// <returns>The normalized Quaterniond</returns>
         public static Quaterniond Normalize(Quaterniond q) {
-            Quaterniond result;
-            Normalize(ref q, out result);
+            Normalize(ref q, out Quaterniond result);
             return result;
         }
 
@@ -385,8 +383,8 @@ namespace Mapping_Tools.Classes.MathUtil {
 
             angle *= 0.5f;
             axis.Normalize();
-            result.Xyz = axis * (double) System.Math.Sin(angle);
-            result.W = (double) System.Math.Cos(angle);
+            result.Xyz = axis * System.Math.Sin(angle);
+            result.W = System.Math.Cos(angle);
 
             return Normalize(result);
         }
@@ -436,8 +434,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="matrix">A rotation matrix</param>
         /// <returns>The equivalent quaternion</returns>
         public static Quaterniond FromMatrix(Matrix3d matrix) {
-            Quaterniond result;
-            FromMatrix(ref matrix, out result);
+            FromMatrix(ref matrix, out Quaterniond result);
             return result;
         }
 
@@ -527,11 +524,11 @@ namespace Mapping_Tools.Classes.MathUtil {
             double blendB;
             if( cosHalfAngle < 0.99f ) {
                 // do proper slerp for big angles
-                double halfAngle = (double) System.Math.Acos(cosHalfAngle);
-                double sinHalfAngle = (double) System.Math.Sin(halfAngle);
+                double halfAngle = System.Math.Acos(cosHalfAngle);
+                double sinHalfAngle = System.Math.Sin(halfAngle);
                 double oneOverSinHalfAngle = 1.0f / sinHalfAngle;
-                blendA = (double) System.Math.Sin(halfAngle * ( 1.0f - blend )) * oneOverSinHalfAngle;
-                blendB = (double) System.Math.Sin(halfAngle * blend) * oneOverSinHalfAngle;
+                blendA = System.Math.Sin(halfAngle * (1.0f - blend)) * oneOverSinHalfAngle;
+                blendB = System.Math.Sin(halfAngle * blend) * oneOverSinHalfAngle;
             }
             else {
                 // do lerp if angle is really small.

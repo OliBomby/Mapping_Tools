@@ -64,17 +64,17 @@ namespace Mapping_Tools.Classes.MathUtil {
         }
 
         /// <summary>
-        /// Returns a single-precision floating point number in the range [0,1).
+        /// Returns a double-precision floating point number in the range [0,1).
         /// </summary>
-        /// <returns>A single-precision floating point number in the range [0,1).</returns>
-        public static float NextSingle() => (float) NextDouble();
+        /// <returns>A double-precision floating point number in the range [0,1).</returns>
+        public static double NextSingle() => NextDouble();
 
         /// <summary>
-        /// Returns a single-precision floating point number in the range [0,maxValue).
+        /// Returns a double-precision floating point number in the range [0,maxValue).
         /// </summary>
         /// <param name="maxValue">The maximum value that should be returned (exclusive).</param>
-        /// <returns>A single-precision floating point number in the range [0,maxValue).</returns>
-        public static float NextSingle(float maxValue) {
+        /// <returns>A double-precision floating point number in the range [0,maxValue).</returns>
+        public static double NextSingle(double maxValue) {
             if( maxValue < 0.0f )
                 throw new ArgumentOutOfRangeException(nameof(maxValue), "The given maximum value must be greater than or equal to 0.");
 
@@ -82,12 +82,12 @@ namespace Mapping_Tools.Classes.MathUtil {
         }
 
         /// <summary>
-        /// Returns a single-precision floating point number in the range [minValue,maxValue).
+        /// Returns a double-precision floating point number in the range [minValue,maxValue).
         /// </summary>
         /// <param name="minValue">The minimum value that should be returned (inclusive).</param>
         /// <param name="maxValue">The maximum value that should be returned (exclusive).</param>
-        /// <returns>A single-precision floating point number in the range [minValue,maxValue).</returns>
-        public static float NextSingle(float minValue, float maxValue) {
+        /// <returns>A double-precision floating point number in the range [minValue,maxValue).</returns>
+        public static double NextSingle(double minValue, double maxValue) {
             if( minValue > maxValue )
                 throw new ArgumentOutOfRangeException(nameof(minValue), "The given minimum value must be less than or equal to the given maximum value.");
 

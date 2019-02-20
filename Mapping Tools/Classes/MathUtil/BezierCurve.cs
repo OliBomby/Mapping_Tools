@@ -24,7 +24,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// parallel curve to the original bezier curve. A value of 0.0f represents
         /// the original curve, 5.0f i.e. stands for a curve that has always a distance
         /// of 5.0f to the orignal curve at any point.</remarks>
-        public float Parallel;
+        public double Parallel;
 
         /// <summary>
         /// Gets the points of this curve.
@@ -67,7 +67,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// </summary>
         /// <param name="parallel">The parallel value.</param>
         /// <param name="points">The points.</param>
-        public BezierCurve(float parallel, params Vector2[] points) {
+        public BezierCurve(double parallel, params Vector2[] points) {
             if( points == null ) {
                 throw new ArgumentNullException("points", "Must point to a valid list of Vector2 structures.");
             }
@@ -81,7 +81,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// </summary>
         /// <param name="parallel">The parallel value.</param>
         /// <param name="points">The points.</param>
-        public BezierCurve(float parallel, IEnumerable<Vector2> points) {
+        public BezierCurve(double parallel, IEnumerable<Vector2> points) {
             if( points == null ) {
                 throw new ArgumentNullException("points", "Must point to a valid list of Vector2 structures.");
             }
@@ -96,7 +96,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// </summary>
         /// <param name="t">The t value, between 0.0f and 1.0f.</param>
         /// <returns>Resulting point.</returns>
-        public Vector2 CalculatePoint(float t) {
+        public Vector2 CalculatePoint(double t) {
             return BezierCurve.CalculatePoint(points, t, Parallel);
         }
 
@@ -107,7 +107,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <returns>Length of curve.</returns>
         /// <remarks>The precision gets better as the <paramref name="precision"/>
         /// value gets smaller.</remarks>
-        public float CalculateLength(float precision) {
+        public double CalculateLength(double precision) {
             return BezierCurve.CalculateLength(points, precision, Parallel);
         }
 
@@ -118,7 +118,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="precision">The precision value.</param>
         /// <returns>The precision gets better as the <paramref name="precision"/>
         /// value gets smaller.</returns>
-        public static float CalculateLength(IList<Vector2> points, float precision) {
+        public static double CalculateLength(IList<Vector2> points, double precision) {
             return BezierCurve.CalculateLength(points, precision, 0.0f);
         }
 
@@ -135,11 +135,11 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// parallel curve to the original bezier curve. A value of 0.0f represents
         /// the original curve, 5.0f represents a curve that has always a distance
         /// of 5.0f to the orignal curve.</para></remarks>
-        public static float CalculateLength(IList<Vector2> points, float precision, float parallel) {
-            float length = 0.0f;
+        public static double CalculateLength(IList<Vector2> points, double precision, double parallel) {
+            double length = 0.0f;
             Vector2 old = BezierCurve.CalculatePoint(points, 0.0f, parallel);
 
-            for( float i = precision; i < ( 1.0f + precision ); i += precision ) {
+            for( double i = precision; i < ( 1.0f + precision ); i += precision ) {
                 Vector2 n = CalculatePoint(points, i, parallel);
                 length += ( n - old ).Length;
                 old = n;
@@ -154,7 +154,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="points">The points.</param>
         /// <param name="t">The t parameter, a value between 0.0f and 1.0f.</param>
         /// <returns>Resulting point.</returns>
-        public static Vector2 CalculatePoint(IList<Vector2> points, float t) {
+        public static Vector2 CalculatePoint(IList<Vector2> points, double t) {
             return BezierCurve.CalculatePoint(points, t, 0.0f);
         }
 
@@ -169,15 +169,15 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// parallel curve to the original bezier curve. A value of 0.0f represents
         /// the original curve, 5.0f represents a curve that has always a distance
         /// of 5.0f to the orignal curve.</remarks>
-        public static Vector2 CalculatePoint(IList<Vector2> points, float t, float parallel) {
+        public static Vector2 CalculatePoint(IList<Vector2> points, double t, double parallel) {
             Vector2 r = new Vector2();
-            double c = 1.0d - (double) t;
-            float temp;
+            double c = 1.0d - t;
+            double temp;
             int i = 0;
 
             foreach( Vector2 pt in points ) {
-                temp = (float) MathHelper.BinomialCoefficient(points.Count - 1, i) * (float) ( System.Math.Pow(t, i) *
-                        System.Math.Pow(c, ( points.Count - 1 ) - i) );
+                temp = MathHelper.BinomialCoefficient(points.Count - 1, i) * System.Math.Pow(t, i) *
+                        System.Math.Pow(c, (points.Count - 1) - i);
 
                 r.X += temp * pt.X;
                 r.Y += temp * pt.Y;
@@ -206,15 +206,15 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="points">The points.</param>
         /// <param name="t">The t parameter, value between 0.0f and 1.0f.</param>
         /// <returns>Resulting point.</returns>
-        private static Vector2 CalculatePointOfDerivative(IList<Vector2> points, float t) {
+        private static Vector2 CalculatePointOfDerivative(IList<Vector2> points, double t) {
             Vector2 r = new Vector2();
-            double c = 1.0d - (double) t;
-            float temp;
+            double c = 1.0d - t;
+            double temp;
             int i = 0;
 
             foreach( Vector2 pt in points ) {
-                temp = (float) MathHelper.BinomialCoefficient(points.Count - 2, i) * (float) ( System.Math.Pow(t, i) *
-                        System.Math.Pow(c, ( points.Count - 2 ) - i) );
+                temp = MathHelper.BinomialCoefficient(points.Count - 2, i) * System.Math.Pow(t, i) *
+                        System.Math.Pow(c, (points.Count - 2) - i);
 
                 r.X += temp * pt.X;
                 r.Y += temp * pt.Y;

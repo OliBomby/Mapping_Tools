@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using Mapping_Tools.classes.BeatmapHelper;
+using Mapping_Tools.Classes.BeatmapHelper;
 
 namespace Mapping_Tools.views {
     public partial class CleanerView :UserControl {

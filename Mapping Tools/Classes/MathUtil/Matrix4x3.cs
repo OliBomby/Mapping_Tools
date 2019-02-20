@@ -85,10 +85,10 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="m31">Second item of the fourth row of the matrix.</param>
         /// <param name="m32">Third item of the fourth row of the matrix.</param>
         public Matrix4x3(
-            float m00, float m01, float m02,
-            float m10, float m11, float m12,
-            float m20, float m21, float m22,
-            float m30, float m31, float m32) {
+            double m00, double m01, double m02,
+            double m10, double m11, double m12,
+            double m20, double m21, double m22,
+            double m30, double m31, double m32) {
             Row0 = new Vector3(m00, m01, m02);
             Row1 = new Vector3(m10, m11, m12);
             Row2 = new Vector3(m20, m21, m22);
@@ -119,62 +119,62 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <summary>
         /// Gets or sets the value at row 1, column 1 of this instance.
         /// </summary>
-        public float M11 { get { return Row0.X; } set { Row0.X = value; } }
+        public double M11 { get { return Row0.X; } set { Row0.X = value; } }
 
         /// <summary>
         /// Gets or sets the value at row 1, column 2 of this instance.
         /// </summary>
-        public float M12 { get { return Row0.Y; } set { Row0.Y = value; } }
+        public double M12 { get { return Row0.Y; } set { Row0.Y = value; } }
 
         /// <summary>
         /// Gets or sets the value at row 1, column 3 of this instance.
         /// </summary>
-        public float M13 { get { return Row0.Z; } set { Row0.Z = value; } }
+        public double M13 { get { return Row0.Z; } set { Row0.Z = value; } }
 
         /// <summary>
         /// Gets or sets the value at row 2, column 1 of this instance.
         /// </summary>
-        public float M21 { get { return Row1.X; } set { Row1.X = value; } }
+        public double M21 { get { return Row1.X; } set { Row1.X = value; } }
 
         /// <summary>
         /// Gets or sets the value at row 2, column 2 of this instance.
         /// </summary>
-        public float M22 { get { return Row1.Y; } set { Row1.Y = value; } }
+        public double M22 { get { return Row1.Y; } set { Row1.Y = value; } }
 
         /// <summary>
         /// Gets or sets the value at row 2, column 3 of this instance.
         /// </summary>
-        public float M23 { get { return Row1.Z; } set { Row1.Z = value; } }
+        public double M23 { get { return Row1.Z; } set { Row1.Z = value; } }
 
         /// <summary>
         /// Gets or sets the value at row 3, column 1 of this instance.
         /// </summary>
-        public float M31 { get { return Row2.X; } set { Row2.X = value; } }
+        public double M31 { get { return Row2.X; } set { Row2.X = value; } }
 
         /// <summary>
         /// Gets or sets the value at row 3, column 2 of this instance.
         /// </summary>
-        public float M32 { get { return Row2.Y; } set { Row2.Y = value; } }
+        public double M32 { get { return Row2.Y; } set { Row2.Y = value; } }
 
         /// <summary>
         /// Gets or sets the value at row 3, column 3 of this instance.
         /// </summary>
-        public float M33 { get { return Row2.Z; } set { Row2.Z = value; } }
+        public double M33 { get { return Row2.Z; } set { Row2.Z = value; } }
 
         /// <summary>
         /// Gets or sets the value at row 4, column 1 of this instance.
         /// </summary>
-        public float M41 { get { return Row3.X; } set { Row3.X = value; } }
+        public double M41 { get { return Row3.X; } set { Row3.X = value; } }
 
         /// <summary>
         /// Gets or sets the value at row 4, column 2 of this instance.
         /// </summary>
-        public float M42 { get { return Row3.Y; } set { Row3.Y = value; } }
+        public double M42 { get { return Row3.Y; } set { Row3.Y = value; } }
 
         /// <summary>
         /// Gets or sets the value at row 4, column 3 of this instance.
         /// </summary>
-        public float M43 { get { return Row3.Z; } set { Row3.Z = value; } }
+        public double M43 { get { return Row3.Z; } set { Row3.Z = value; } }
 
         /// <summary>
         /// Gets or sets the values along the main diagonal of the matrix.
@@ -193,12 +193,12 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <summary>
         /// Gets the trace of the matrix, the sum of the values along the diagonal.
         /// </summary>
-        public float Trace { get { return Row0.X + Row1.Y + Row2.Z; } }
+        public double Trace { get { return Row0.X + Row1.Y + Row2.Z; } }
 
         /// <summary>
         /// Gets or sets the value at a specified row and column.
         /// </summary>
-        public float this[int rowIndex, int columnIndex] {
+        public double this[int rowIndex, int columnIndex] {
             get {
                 if( rowIndex == 0 ) {
                     return Row0[columnIndex];
@@ -246,22 +246,22 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="axis">The axis to rotate about.</param>
         /// <param name="angle">Angle in radians to rotate counter-clockwise (looking in the direction of the given axis).</param>
         /// <param name="result">A matrix instance.</param>
-        public static void CreateFromAxisAngle(Vector3 axis, float angle, out Matrix4x3 result) {
+        public static void CreateFromAxisAngle(Vector3 axis, double angle, out Matrix4x3 result) {
             axis.Normalize();
-            float axisX = axis.X, axisY = axis.Y, axisZ = axis.Z;
+            double axisX = axis.X, axisY = axis.Y, axisZ = axis.Z;
 
-            float cos = (float) System.Math.Cos(-angle);
-            float sin = (float) System.Math.Sin(-angle);
-            float t = 1.0f - cos;
+            double cos = System.Math.Cos(-angle);
+            double sin = System.Math.Sin(-angle);
+            double t = 1.0f - cos;
 
-            float tXX = t * axisX * axisX,
+            double tXX = t * axisX * axisX,
                 tXY = t * axisX * axisY,
                 tXZ = t * axisX * axisZ,
                 tYY = t * axisY * axisY,
                 tYZ = t * axisY * axisZ,
                 tZZ = t * axisZ * axisZ;
 
-            float sinX = sin * axisX,
+            double sinX = sin * axisX,
                 sinY = sin * axisY,
                 sinZ = sin * axisZ;
 
@@ -285,9 +285,8 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="axis">The axis to rotate about.</param>
         /// <param name="angle">Angle in radians to rotate counter-clockwise (looking in the direction of the given axis).</param>
         /// <returns>A matrix instance.</returns>
-        public static Matrix4x3 CreateFromAxisAngle(Vector3 axis, float angle) {
-            Matrix4x3 result;
-            CreateFromAxisAngle(axis, angle, out result);
+        public static Matrix4x3 CreateFromAxisAngle(Vector3 axis, double angle) {
+            CreateFromAxisAngle(axis, angle, out Matrix4x3 result);
             return result;
         }
 
@@ -297,7 +296,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="q">The quaternion to rotate by.</param>
         /// <param name="result">A matrix instance.</param>
         public static void CreateFromQuaternion(ref Quaternion q, out Matrix4x3 result) {
-            float x = q.X, y = q.Y, z = q.Z, w = q.W,
+            double x = q.X, y = q.Y, z = q.Z, w = q.W,
                 tx = 2 * x, ty = 2 * y, tz = 2 * z,
                 txx = tx * x, tyy = ty * y, tzz = tz * z,
                 txy = tx * y, txz = tx * z, tyz = ty * z,
@@ -317,7 +316,7 @@ namespace Mapping_Tools.Classes.MathUtil {
             result.Row3.Z = 0;
 
             /*Vector3 axis;
-            float angle;
+            double angle;
             q.ToAxisAngle(out axis, out angle);
             CreateFromAxisAngle(axis, angle, out result);*/
         }
@@ -328,8 +327,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="q">The quaternion to rotate by.</param>
         /// <returns>A matrix instance.</returns>
         public static Matrix4x3 CreateFromQuaternion(Quaternion q) {
-            Matrix4x3 result;
-            CreateFromQuaternion(ref q, out result);
+            CreateFromQuaternion(ref q, out Matrix4x3 result);
             return result;
         }
 
@@ -338,9 +336,9 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// </summary>
         /// <param name="angle">The counter-clockwise angle in radians.</param>
         /// <param name="result">The resulting Matrix4 instance.</param>
-        public static void CreateRotationX(float angle, out Matrix4x3 result) {
-            float cos = (float) System.Math.Cos(angle);
-            float sin = (float) System.Math.Sin(angle);
+        public static void CreateRotationX(double angle, out Matrix4x3 result) {
+            double cos = System.Math.Cos(angle);
+            double sin = System.Math.Sin(angle);
 
             result.Row0.X = 1;
             result.Row0.Y = 0;
@@ -361,9 +359,8 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// </summary>
         /// <param name="angle">The counter-clockwise angle in radians.</param>
         /// <returns>The resulting Matrix4 instance.</returns>
-        public static Matrix4x3 CreateRotationX(float angle) {
-            Matrix4x3 result;
-            CreateRotationX(angle, out result);
+        public static Matrix4x3 CreateRotationX(double angle) {
+            CreateRotationX(angle, out Matrix4x3 result);
             return result;
         }
 
@@ -372,9 +369,9 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// </summary>
         /// <param name="angle">The counter-clockwise angle in radians.</param>
         /// <param name="result">The resulting Matrix4 instance.</param>
-        public static void CreateRotationY(float angle, out Matrix4x3 result) {
-            float cos = (float) System.Math.Cos(angle);
-            float sin = (float) System.Math.Sin(angle);
+        public static void CreateRotationY(double angle, out Matrix4x3 result) {
+            double cos = System.Math.Cos(angle);
+            double sin = System.Math.Sin(angle);
 
             result.Row0.X = cos;
             result.Row0.Y = 0;
@@ -395,9 +392,8 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// </summary>
         /// <param name="angle">The counter-clockwise angle in radians.</param>
         /// <returns>The resulting Matrix4 instance.</returns>
-        public static Matrix4x3 CreateRotationY(float angle) {
-            Matrix4x3 result;
-            CreateRotationY(angle, out result);
+        public static Matrix4x3 CreateRotationY(double angle) {
+            CreateRotationY(angle, out Matrix4x3 result);
             return result;
         }
 
@@ -406,9 +402,9 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// </summary>
         /// <param name="angle">The counter-clockwise angle in radians.</param>
         /// <param name="result">The resulting Matrix4 instance.</param>
-        public static void CreateRotationZ(float angle, out Matrix4x3 result) {
-            float cos = (float) System.Math.Cos(angle);
-            float sin = (float) System.Math.Sin(angle);
+        public static void CreateRotationZ(double angle, out Matrix4x3 result) {
+            double cos = System.Math.Cos(angle);
+            double sin = System.Math.Sin(angle);
 
             result.Row0.X = cos;
             result.Row0.Y = sin;
@@ -429,9 +425,8 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// </summary>
         /// <param name="angle">The counter-clockwise angle in radians.</param>
         /// <returns>The resulting Matrix4 instance.</returns>
-        public static Matrix4x3 CreateRotationZ(float angle) {
-            Matrix4x3 result;
-            CreateRotationZ(angle, out result);
+        public static Matrix4x3 CreateRotationZ(double angle) {
+            CreateRotationZ(angle, out Matrix4x3 result);
             return result;
         }
 
@@ -442,7 +437,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="y">Y translation.</param>
         /// <param name="z">Z translation.</param>
         /// <param name="result">The resulting Matrix4 instance.</param>
-        public static void CreateTranslation(float x, float y, float z, out Matrix4x3 result) {
+        public static void CreateTranslation(double x, double y, double z, out Matrix4x3 result) {
             result.Row0.X = 1;
             result.Row0.Y = 0;
             result.Row0.Z = 0;
@@ -484,9 +479,8 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="y">Y translation.</param>
         /// <param name="z">Z translation.</param>
         /// <returns>The resulting Matrix4 instance.</returns>
-        public static Matrix4x3 CreateTranslation(float x, float y, float z) {
-            Matrix4x3 result;
-            CreateTranslation(x, y, z, out result);
+        public static Matrix4x3 CreateTranslation(double x, double y, double z) {
+            CreateTranslation(x, y, z, out Matrix4x3 result);
             return result;
         }
 
@@ -496,8 +490,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vector">The translation vector.</param>
         /// <returns>The resulting Matrix4 instance.</returns>
         public static Matrix4x3 CreateTranslation(Vector3 vector) {
-            Matrix4x3 result;
-            CreateTranslation(vector.X, vector.Y, vector.Z, out result);
+            CreateTranslation(vector.X, vector.Y, vector.Z, out Matrix4x3 result);
             return result;
         }
 
@@ -506,7 +499,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// </summary>
         /// <param name="scale">Single scale factor for x,y and z axes</param>
         /// <returns>A scaling matrix</returns>
-        public static Matrix4x3 CreateScale(float scale) {
+        public static Matrix4x3 CreateScale(double scale) {
             return CreateScale(scale, scale, scale);
         }
 
@@ -526,7 +519,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="y">Scale factor for y-axis</param>
         /// <param name="z">Scale factor for z-axis</param>
         /// <returns>A scaling matrix</returns>
-        public static Matrix4x3 CreateScale(float x, float y, float z) {
+        public static Matrix4x3 CreateScale(double x, double y, double z) {
             Matrix4x3 result;
             result.Row0.X = x;
             result.Row0.Y = 0;
@@ -551,8 +544,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="right">The right operand of the multiplication.</param>
         /// <returns>A new instance that is the result of the multiplication</returns>
         public static Matrix4 Mult(Matrix4x3 left, Matrix3x4 right) {
-            Matrix4 result;
-            Mult(ref left, ref right, out result);
+            Mult(ref left, ref right, out Matrix4 result);
             return result;
         }
 
@@ -564,7 +556,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="right">The right operand of the multiplication.</param>
         /// <param name="result">A new instance that is the result of the multiplication</param>
         public static void Mult(ref Matrix4x3 left, ref Matrix3x4 right, out Matrix4 result) {
-            float lM11 = left.Row0.X, lM12 = left.Row0.Y, lM13 = left.Row0.Z,
+            double lM11 = left.Row0.X, lM12 = left.Row0.Y, lM13 = left.Row0.Z,
                 lM21 = left.Row1.X, lM22 = left.Row1.Y, lM23 = left.Row1.Z,
                 lM31 = left.Row2.X, lM32 = left.Row2.Y, lM33 = left.Row2.Z,
                 lM41 = left.Row3.X, lM42 = left.Row3.Y, lM43 = left.Row3.Z,
@@ -597,8 +589,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="right">The right operand of the multiplication.</param>
         /// <returns>A new instance that is the result of the multiplication</returns>
         public static Matrix4x3 Mult(Matrix4x3 left, Matrix4x3 right) {
-            Matrix4x3 result;
-            Mult(ref left, ref right, out result);
+            Mult(ref left, ref right, out Matrix4x3 result);
             return result;
         }
 
@@ -610,7 +601,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="right">The right operand of the multiplication.</param>
         /// <param name="result">A new instance that is the result of the multiplication</param>
         public static void Mult(ref Matrix4x3 left, ref Matrix4x3 right, out Matrix4x3 result) {
-            float lM11 = left.Row0.X, lM12 = left.Row0.Y, lM13 = left.Row0.Z,
+            double lM11 = left.Row0.X, lM12 = left.Row0.Y, lM13 = left.Row0.Z,
                 lM21 = left.Row1.X, lM22 = left.Row1.Y, lM23 = left.Row1.Z,
                 lM31 = left.Row2.X, lM32 = left.Row2.Y, lM33 = left.Row2.Z,
                 lM41 = left.Row3.X, lM42 = left.Row3.Y, lM43 = left.Row3.Z,
@@ -639,9 +630,8 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="left">The left operand of the multiplication.</param>
         /// <param name="right">The right operand of the multiplication.</param>
         /// <returns>A new instance that is the result of the multiplication</returns>
-        public static Matrix4x3 Mult(Matrix4x3 left, float right) {
-            Matrix4x3 result;
-            Mult(ref left, right, out result);
+        public static Matrix4x3 Mult(Matrix4x3 left, double right) {
+            Mult(ref left, right, out Matrix4x3 result);
             return result;
         }
 
@@ -651,7 +641,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="left">The left operand of the multiplication.</param>
         /// <param name="right">The right operand of the multiplication.</param>
         /// <param name="result">A new instance that is the result of the multiplication</param>
-        public static void Mult(ref Matrix4x3 left, float right, out Matrix4x3 result) {
+        public static void Mult(ref Matrix4x3 left, double right, out Matrix4x3 result) {
             result.Row0 = left.Row0 * right;
             result.Row1 = left.Row1 * right;
             result.Row2 = left.Row2 * right;
@@ -665,8 +655,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="right">The right operand of the addition.</param>
         /// <returns>A new instance that is the result of the addition.</returns>
         public static Matrix4x3 Add(Matrix4x3 left, Matrix4x3 right) {
-            Matrix4x3 result;
-            Add(ref left, ref right, out result);
+            Add(ref left, ref right, out Matrix4x3 result);
             return result;
         }
 
@@ -690,8 +679,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="right">The right operand of the subraction.</param>
         /// <returns>A new instance that is the result of the subraction.</returns>
         public static Matrix4x3 Subtract(Matrix4x3 left, Matrix4x3 right) {
-            Matrix4x3 result;
-            Subtract(ref left, ref right, out result);
+            Subtract(ref left, ref right, out Matrix4x3 result);
             return result;
         }
 
@@ -715,8 +703,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <returns>The inverse of the given matrix if it has one, or the input if it is singular</returns>
         /// <exception cref="InvalidOperationException">Thrown if the Matrix4 is singular.</exception>
         public static Matrix4x3 Invert(Matrix4x3 mat) {
-            Matrix4x3 result;
-            Invert(ref mat, out result);
+            Invert(ref mat, out Matrix4x3 result);
             return result;
         }
 
@@ -785,7 +772,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="left">left-hand operand</param>
         /// <param name="right">right-hand operand</param>
         /// <returns>A new Matrix4x3 which holds the result of the multiplication</returns>
-        public static Matrix4x3 operator *(Matrix4x3 left, float right) {
+        public static Matrix4x3 operator *(Matrix4x3 left, double right) {
             return Matrix4x3.Mult(left, right);
         }
 

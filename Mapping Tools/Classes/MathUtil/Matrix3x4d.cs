@@ -242,8 +242,8 @@ namespace Mapping_Tools.Classes.MathUtil {
             axis.Normalize();
             double axisX = axis.X, axisY = axis.Y, axisZ = axis.Z;
 
-            double cos = (double) System.Math.Cos(angle);
-            double sin = (double) System.Math.Sin(angle);
+            double cos = System.Math.Cos(angle);
+            double sin = System.Math.Sin(angle);
             double t = 1.0f - cos;
 
             double tXX = t * axisX * axisX,
@@ -278,8 +278,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="angle">Angle in radians to rotate counter-clockwise (looking in the direction of the given axis).</param>
         /// <returns>A matrix instance.</returns>
         public static Matrix3x4d CreateFromAxisAngle(Vector3d axis, double angle) {
-            Matrix3x4d result;
-            CreateFromAxisAngle(axis, angle, out result);
+            CreateFromAxisAngle(axis, angle, out Matrix3x4d result);
             return result;
         }
 
@@ -320,8 +319,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="q">The quaternion to rotate by.</param>
         /// <returns>A matrix instance.</returns>
         public static Matrix3x4d CreateFromQuaternion(Quaternion q) {
-            Matrix3x4d result;
-            CreateFromQuaternion(ref q, out result);
+            CreateFromQuaternion(ref q, out Matrix3x4d result);
             return result;
         }
 
@@ -331,8 +329,8 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="angle">The counter-clockwise angle in radians.</param>
         /// <param name="result">The resulting Matrix4 instance.</param>
         public static void CreateRotationX(double angle, out Matrix3x4d result) {
-            double cos = (double) System.Math.Cos(angle);
-            double sin = (double) System.Math.Sin(angle);
+            double cos = System.Math.Cos(angle);
+            double sin = System.Math.Sin(angle);
 
             result.Row0.X = 1;
             result.Row0.Y = 0;
@@ -354,8 +352,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="angle">The counter-clockwise angle in radians.</param>
         /// <returns>The resulting Matrix4 instance.</returns>
         public static Matrix3x4d CreateRotationX(double angle) {
-            Matrix3x4d result;
-            CreateRotationX(angle, out result);
+            CreateRotationX(angle, out Matrix3x4d result);
             return result;
         }
 
@@ -365,8 +362,8 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="angle">The counter-clockwise angle in radians.</param>
         /// <param name="result">The resulting Matrix4 instance.</param>
         public static void CreateRotationY(double angle, out Matrix3x4d result) {
-            double cos = (double) System.Math.Cos(angle);
-            double sin = (double) System.Math.Sin(angle);
+            double cos = System.Math.Cos(angle);
+            double sin = System.Math.Sin(angle);
 
             result.Row0.X = cos;
             result.Row0.Y = 0;
@@ -388,8 +385,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="angle">The counter-clockwise angle in radians.</param>
         /// <returns>The resulting Matrix4 instance.</returns>
         public static Matrix3x4d CreateRotationY(double angle) {
-            Matrix3x4d result;
-            CreateRotationY(angle, out result);
+            CreateRotationY(angle, out Matrix3x4d result);
             return result;
         }
 
@@ -399,8 +395,8 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="angle">The counter-clockwise angle in radians.</param>
         /// <param name="result">The resulting Matrix4 instance.</param>
         public static void CreateRotationZ(double angle, out Matrix3x4d result) {
-            double cos = (double) System.Math.Cos(angle);
-            double sin = (double) System.Math.Sin(angle);
+            double cos = System.Math.Cos(angle);
+            double sin = System.Math.Sin(angle);
 
             result.Row0.X = cos;
             result.Row0.Y = sin;
@@ -422,8 +418,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="angle">The counter-clockwise angle in radians.</param>
         /// <returns>The resulting Matrix4 instance.</returns>
         public static Matrix3x4d CreateRotationZ(double angle) {
-            Matrix3x4d result;
-            CreateRotationZ(angle, out result);
+            CreateRotationZ(angle, out Matrix3x4d result);
             return result;
         }
 
@@ -477,8 +472,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="z">Z translation.</param>
         /// <returns>The resulting Matrix4 instance.</returns>
         public static Matrix3x4d CreateTranslation(double x, double y, double z) {
-            Matrix3x4d result;
-            CreateTranslation(x, y, z, out result);
+            CreateTranslation(x, y, z, out Matrix3x4d result);
             return result;
         }
 
@@ -488,8 +482,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vector">The translation vector.</param>
         /// <returns>The resulting Matrix4 instance.</returns>
         public static Matrix3x4d CreateTranslation(Vector3d vector) {
-            Matrix3x4d result;
-            CreateTranslation(vector.X, vector.Y, vector.Z, out result);
+            CreateTranslation(vector.X, vector.Y, vector.Z, out Matrix3x4d result);
             return result;
         }
 
@@ -542,8 +535,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="right">The right operand of the multiplication.</param>
         /// <returns>A new instance that is the result of the multiplication</returns>
         public static Matrix3d Mult(Matrix3x4d left, Matrix4x3d right) {
-            Matrix3d result;
-            Mult(ref left, ref right, out result);
+            Mult(ref left, ref right, out Matrix3d result);
             return result;
         }
 
@@ -580,8 +572,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="right">The right operand of the multiplication.</param>
         /// <returns>A new instance that is the result of the multiplication</returns>
         public static Matrix3x4d Mult(Matrix3x4d left, Matrix3x4d right) {
-            Matrix3x4d result;
-            Mult(ref left, ref right, out result);
+            Mult(ref left, ref right, out Matrix3x4d result);
             return result;
         }
 
@@ -629,8 +620,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="right">The right operand of the multiplication.</param>
         /// <returns>A new instance that is the result of the multiplication</returns>
         public static Matrix3x4d Mult(Matrix3x4d left, double right) {
-            Matrix3x4d result;
-            Mult(ref left, right, out result);
+            Mult(ref left, right, out Matrix3x4d result);
             return result;
         }
 
@@ -653,8 +643,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="right">The right operand of the addition.</param>
         /// <returns>A new instance that is the result of the addition.</returns>
         public static Matrix3x4d Add(Matrix3x4d left, Matrix3x4d right) {
-            Matrix3x4d result;
-            Add(ref left, ref right, out result);
+            Add(ref left, ref right, out Matrix3x4d result);
             return result;
         }
 
@@ -677,8 +666,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="right">The right operand of the subraction.</param>
         /// <returns>A new instance that is the result of the subraction.</returns>
         public static Matrix3x4d Subtract(Matrix3x4d left, Matrix3x4d right) {
-            Matrix3x4d result;
-            Subtract(ref left, ref right, out result);
+            Subtract(ref left, ref right, out Matrix3x4d result);
             return result;
         }
 
@@ -701,8 +689,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <returns>The inverse of the given matrix if it has one, or the input if it is singular</returns>
         /// <exception cref="InvalidOperationException">Thrown if the Matrix4 is singular.</exception>
         public static Matrix3x4d Invert(Matrix3x4d mat) {
-            Matrix3x4d result;
-            Invert(ref mat, out result);
+            Invert(ref mat, out Matrix3x4d result);
             return result;
         }
 

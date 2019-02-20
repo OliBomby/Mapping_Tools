@@ -41,7 +41,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// parallel curve to the original bezier curve. A value of 0.0f represents
         /// the original curve, 5.0f i.e. stands for a curve that has always a distance
         /// of 5.f to the orignal curve at any point.</remarks>
-        public float Parallel;
+        public double Parallel;
 
         /// <summary>
         /// Constructs a new <see cref="BezierCurveCubic"/>.
@@ -66,7 +66,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="endAnchor">The end anchor point.</param>
         /// <param name="firstControlPoint">The first control point.</param>
         /// <param name="secondControlPoint">The second control point.</param>
-        public BezierCurveCubic(float parallel, Vector2 startAnchor, Vector2 endAnchor, Vector2 firstControlPoint, Vector2 secondControlPoint) {
+        public BezierCurveCubic(double parallel, Vector2 startAnchor, Vector2 endAnchor, Vector2 firstControlPoint, Vector2 secondControlPoint) {
             this.Parallel = parallel;
             this.StartAnchor = startAnchor;
             this.EndAnchor = endAnchor;
@@ -79,9 +79,9 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// </summary>
         /// <param name="t">The t value, between 0.0f and 1.0f.</param>
         /// <returns>Resulting point.</returns>
-        public Vector2 CalculatePoint(float t) {
+        public Vector2 CalculatePoint(double t) {
             Vector2 r = new Vector2();
-            float c = 1.0f - t;
+            double c = 1.0f - t;
 
             r.X = ( StartAnchor.X * c * c * c ) + ( FirstControlPoint.X * 3 * t * c * c ) + ( SecondControlPoint.X * 3 * t * t * c )
                 + EndAnchor.X * t * t * t;
@@ -109,9 +109,9 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// </summary>
         /// <param name="t">The t, value between 0.0f and 1.0f.</param>
         /// <returns>Resulting point.</returns>
-        private Vector2 CalculatePointOfDerivative(float t) {
+        private Vector2 CalculatePointOfDerivative(double t) {
             Vector2 r = new Vector2();
-            float c = 1.0f - t;
+            double c = 1.0f - t;
 
             r.X = ( c * c * StartAnchor.X ) + ( 2 * t * c * FirstControlPoint.X ) + ( t * t * SecondControlPoint.X );
             r.Y = ( c * c * StartAnchor.Y ) + ( 2 * t * c * FirstControlPoint.Y ) + ( t * t * SecondControlPoint.Y );
@@ -126,11 +126,11 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <returns>Length of the curve.</returns>
         /// <remarks>The precision gets better when the <paramref name="precision"/>
         /// value gets smaller.</remarks>
-        public float CalculateLength(float precision) {
-            float length = 0.0f;
+        public double CalculateLength(double precision) {
+            double length = 0.0f;
             Vector2 old = CalculatePoint(0.0f);
 
-            for( float i = precision; i < ( 1.0f + precision ); i += precision ) {
+            for( double i = precision; i < ( 1.0f + precision ); i += precision ) {
                 Vector2 n = CalculatePoint(i);
                 length += ( n - old ).Length;
                 old = n;

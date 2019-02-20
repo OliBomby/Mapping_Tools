@@ -25,9 +25,9 @@ using System.Runtime.InteropServices;
 using System.Xml.Serialization;
 
 namespace Mapping_Tools.Classes.MathUtil {
-    /// <summary>Represents a 4D vector using four single-precision floating-point numbers.</summary>
+    /// <summary>Represents a 4D vector using four double-precision floating-point numbers.</summary>
     /// <remarks>
-    /// The Vector4 structure is suitable for interoperation with unmanaged code requiring four consecutive floats.
+    /// The Vector4 structure is suitable for interoperation with unmanaged code requiring four consecutive doubles.
     /// </remarks>
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
@@ -35,22 +35,22 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <summary>
         /// The X component of the Vector4.
         /// </summary>
-        public float X;
+        public double X;
 
         /// <summary>
         /// The Y component of the Vector4.
         /// </summary>
-        public float Y;
+        public double Y;
 
         /// <summary>
         /// The Z component of the Vector4.
         /// </summary>
-        public float Z;
+        public double Z;
 
         /// <summary>
         /// The W component of the Vector4.
         /// </summary>
-        public float W;
+        public double W;
 
         /// <summary>
         /// Defines a unit-length Vector4 that points towards the X-axis.
@@ -91,7 +91,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// Constructs a new instance.
         /// </summary>
         /// <param name="value">The value that will initialize this instance.</param>
-        public Vector4(float value) {
+        public Vector4(double value) {
             X = value;
             Y = value;
             Z = value;
@@ -105,7 +105,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="y">The y component of the Vector4.</param>
         /// <param name="z">The z component of the Vector4.</param>
         /// <param name="w">The w component of the Vector4.</param>
-        public Vector4(float x, float y, float z, float w) {
+        public Vector4(double x, double y, double z, double w) {
             X = x;
             Y = y;
             Z = z;
@@ -128,7 +128,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// The w component is initialized to 0.
         /// </summary>
         /// <param name="v">The Vector3 to copy components from.</param>
-        /// <remarks><seealso cref="Vector4(Vector3, float)"/></remarks>
+        /// <remarks><seealso cref="Vector4(Vector3, double)"/></remarks>
         public Vector4(Vector3 v) {
             X = v.X;
             Y = v.Y;
@@ -141,7 +141,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// </summary>
         /// <param name="v">The Vector3 to copy components from.</param>
         /// <param name="w">The w component of the new Vector4.</param>
-        public Vector4(Vector3 v, float w) {
+        public Vector4(Vector3 v, double w) {
             X = v.X;
             Y = v.Y;
             Z = v.Z;
@@ -162,7 +162,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <summary>
         /// Gets or sets the value at the index of the Vector.
         /// </summary>
-        public float this[int index] {
+        public double this[int index] {
             get {
                 if( index == 0 ) {
                     return X;
@@ -202,9 +202,9 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// </summary>
         /// <see cref="LengthFast"/>
         /// <seealso cref="LengthSquared"/>
-        public float Length {
+        public double Length {
             get {
-                return (float) System.Math.Sqrt(X * X + Y * Y + Z * Z + W * W);
+                return System.Math.Sqrt(X * X + Y * Y + Z * Z + W * W);
             }
         }
 
@@ -217,7 +217,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// </remarks>
         /// <see cref="Length"/>
         /// <seealso cref="LengthSquared"/>
-        public float LengthFast {
+        public double LengthFast {
             get {
                 return 1.0f / MathHelper.InverseSqrtFast(X * X + Y * Y + Z * Z + W * W);
             }
@@ -232,7 +232,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// </remarks>
         /// <see cref="Length"/>
         /// <seealso cref="LengthFast"/>
-        public float LengthSquared {
+        public double LengthSquared {
             get {
                 return X * X + Y * Y + Z * Z + W * W;
             }
@@ -251,7 +251,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// Scales the Vector4 to unit length.
         /// </summary>
         public void Normalize() {
-            float scale = 1.0f / this.Length;
+            double scale = 1.0f / this.Length;
             X *= scale;
             Y *= scale;
             Z *= scale;
@@ -262,7 +262,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// Scales the Vector4 to approximately unit length.
         /// </summary>
         public void NormalizeFast() {
-            float scale = MathHelper.InverseSqrtFast(X * X + Y * Y + Z * Z + W * W);
+            double scale = MathHelper.InverseSqrtFast(X * X + Y * Y + Z * Z + W * W);
             X *= scale;
             Y *= scale;
             Z *= scale;
@@ -323,7 +323,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vector">Left operand.</param>
         /// <param name="scale">Right operand.</param>
         /// <returns>Result of the operation.</returns>
-        public static Vector4 Multiply(Vector4 vector, float scale) {
+        public static Vector4 Multiply(Vector4 vector, double scale) {
             Multiply(ref vector, scale, out vector);
             return vector;
         }
@@ -334,7 +334,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vector">Left operand.</param>
         /// <param name="scale">Right operand.</param>
         /// <param name="result">Result of the operation.</param>
-        public static void Multiply(ref Vector4 vector, float scale, out Vector4 result) {
+        public static void Multiply(ref Vector4 vector, double scale, out Vector4 result) {
             result.X = vector.X * scale;
             result.Y = vector.Y * scale;
             result.Z = vector.Z * scale;
@@ -371,7 +371,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vector">Left operand.</param>
         /// <param name="scale">Right operand.</param>
         /// <returns>Result of the operation.</returns>
-        public static Vector4 Divide(Vector4 vector, float scale) {
+        public static Vector4 Divide(Vector4 vector, double scale) {
             Divide(ref vector, scale, out vector);
             return vector;
         }
@@ -382,7 +382,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vector">Left operand.</param>
         /// <param name="scale">Right operand.</param>
         /// <param name="result">Result of the operation.</param>
-        public static void Divide(ref Vector4 vector, float scale, out Vector4 result) {
+        public static void Divide(ref Vector4 vector, double scale, out Vector4 result) {
             result.X = vector.X / scale;
             result.Y = vector.Y / scale;
             result.Z = vector.Z / scale;
@@ -606,7 +606,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vec">The input vector</param>
         /// <returns>The normalized vector</returns>
         public static Vector4 Normalize(Vector4 vec) {
-            float scale = 1.0f / vec.Length;
+            double scale = 1.0f / vec.Length;
             vec.X *= scale;
             vec.Y *= scale;
             vec.Z *= scale;
@@ -620,7 +620,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vec">The input vector</param>
         /// <param name="result">The normalized vector</param>
         public static void Normalize(ref Vector4 vec, out Vector4 result) {
-            float scale = 1.0f / vec.Length;
+            double scale = 1.0f / vec.Length;
             result.X = vec.X * scale;
             result.Y = vec.Y * scale;
             result.Z = vec.Z * scale;
@@ -633,7 +633,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vec">The input vector</param>
         /// <returns>The normalized vector</returns>
         public static Vector4 NormalizeFast(Vector4 vec) {
-            float scale = MathHelper.InverseSqrtFast(vec.X * vec.X + vec.Y * vec.Y + vec.Z * vec.Z + vec.W * vec.W);
+            double scale = MathHelper.InverseSqrtFast(vec.X * vec.X + vec.Y * vec.Y + vec.Z * vec.Z + vec.W * vec.W);
             vec.X *= scale;
             vec.Y *= scale;
             vec.Z *= scale;
@@ -647,7 +647,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vec">The input vector</param>
         /// <param name="result">The normalized vector</param>
         public static void NormalizeFast(ref Vector4 vec, out Vector4 result) {
-            float scale = MathHelper.InverseSqrtFast(vec.X * vec.X + vec.Y * vec.Y + vec.Z * vec.Z + vec.W * vec.W);
+            double scale = MathHelper.InverseSqrtFast(vec.X * vec.X + vec.Y * vec.Y + vec.Z * vec.Z + vec.W * vec.W);
             result.X = vec.X * scale;
             result.Y = vec.Y * scale;
             result.Z = vec.Z * scale;
@@ -660,7 +660,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="left">First operand</param>
         /// <param name="right">Second operand</param>
         /// <returns>The dot product of the two inputs</returns>
-        public static float Dot(Vector4 left, Vector4 right) {
+        public static double Dot(Vector4 left, Vector4 right) {
             return left.X * right.X + left.Y * right.Y + left.Z * right.Z + left.W * right.W;
         }
 
@@ -670,7 +670,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="left">First operand</param>
         /// <param name="right">Second operand</param>
         /// <param name="result">The dot product of the two inputs</param>
-        public static void Dot(ref Vector4 left, ref Vector4 right, out float result) {
+        public static void Dot(ref Vector4 left, ref Vector4 right, out double result) {
             result = left.X * right.X + left.Y * right.Y + left.Z * right.Z + left.W * right.W;
         }
 
@@ -681,7 +681,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="b">Second input vector</param>
         /// <param name="blend">The blend factor. a when blend=0, b when blend=1.</param>
         /// <returns>a when blend=0, b when blend=1, and a linear combination otherwise</returns>
-        public static Vector4 Lerp(Vector4 a, Vector4 b, float blend) {
+        public static Vector4 Lerp(Vector4 a, Vector4 b, double blend) {
             a.X = blend * ( b.X - a.X ) + a.X;
             a.Y = blend * ( b.Y - a.Y ) + a.Y;
             a.Z = blend * ( b.Z - a.Z ) + a.Z;
@@ -696,7 +696,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="b">Second input vector</param>
         /// <param name="blend">The blend factor. a when blend=0, b when blend=1.</param>
         /// <param name="result">a when blend=0, b when blend=1, and a linear combination otherwise</param>
-        public static void Lerp(ref Vector4 a, ref Vector4 b, float blend, out Vector4 result) {
+        public static void Lerp(ref Vector4 a, ref Vector4 b, double blend, out Vector4 result) {
             result.X = blend * ( b.X - a.X ) + a.X;
             result.Y = blend * ( b.Y - a.Y ) + a.Y;
             result.Z = blend * ( b.Z - a.Z ) + a.Z;
@@ -712,7 +712,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="u">First Barycentric Coordinate</param>
         /// <param name="v">Second Barycentric Coordinate</param>
         /// <returns>a when u=v=0, b when u=1,v=0, c when u=0,v=1, and a linear combination of a,b,c otherwise</returns>
-        public static Vector4 BaryCentric(Vector4 a, Vector4 b, Vector4 c, float u, float v) {
+        public static Vector4 BaryCentric(Vector4 a, Vector4 b, Vector4 c, double u, double v) {
             return a + u * ( b - a ) + v * ( c - a );
         }
 
@@ -723,7 +723,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="u">First Barycentric Coordinate.</param>
         /// <param name="v">Second Barycentric Coordinate.</param>
         /// <param name="result">Output Vector. a when u=v=0, b when u=1,v=0, c when u=0,v=1, and a linear combination of a,b,c otherwise</param>
-        public static void BaryCentric(ref Vector4 a, ref Vector4 b, ref Vector4 c, float u, float v, out Vector4 result) {
+        public static void BaryCentric(ref Vector4 a, ref Vector4 b, ref Vector4 c, double u, double v, out Vector4 result) {
             result = a; // copy
 
             Vector4 temp = b; // copy
@@ -742,8 +742,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="mat">The desired transformation</param>
         /// <returns>The transformed vector</returns>
         public static Vector4 Transform(Vector4 vec, Matrix4 mat) {
-            Vector4 result;
-            Transform(ref vec, ref mat, out result);
+            Transform(ref vec, ref mat, out Vector4 result);
             return result;
         }
 
@@ -766,8 +765,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="quat">The quaternion to rotate the vector by.</param>
         /// <returns>The result of the operation.</returns>
         public static Vector4 Transform(Vector4 vec, Quaternion quat) {
-            Vector4 result;
-            Transform(ref vec, ref quat, out result);
+            Transform(ref vec, ref quat, out Vector4 result);
             return result;
         }
 
@@ -778,9 +776,9 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="quat">The quaternion to rotate the vector by.</param>
         /// <param name="result">The result of the operation.</param>
         public static void Transform(ref Vector4 vec, ref Quaternion quat, out Vector4 result) {
-            Quaternion v = new Quaternion(vec.X, vec.Y, vec.Z, vec.W), i, t;
-            Quaternion.Invert(ref quat, out i);
-            Quaternion.Multiply(ref quat, ref v, out t);
+            Quaternion v = new Quaternion(vec.X, vec.Y, vec.Z, vec.W);
+            Quaternion.Invert(ref quat, out Quaternion i);
+            Quaternion.Multiply(ref quat, ref v, out Quaternion t);
             Quaternion.Multiply(ref t, ref i, out v);
 
             result.X = v.X;
@@ -793,8 +791,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="mat">The desired transformation</param>
         /// <param name="vec">The vector to transform</param>
         public static Vector4 Transform(Matrix4 mat, Vector4 vec) {
-            Vector4 result;
-            Transform(ref mat, ref vec, out result);
+            Transform(ref mat, ref vec, out Vector4 result);
             return result;
         }
 
@@ -1235,7 +1232,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vec">The instance.</param>
         /// <param name="scale">The scalar.</param>
         /// <returns>The result of the calculation.</returns>
-        public static Vector4 operator *(Vector4 vec, float scale) {
+        public static Vector4 operator *(Vector4 vec, double scale) {
             vec.X *= scale;
             vec.Y *= scale;
             vec.Z *= scale;
@@ -1249,7 +1246,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="scale">The scalar.</param>
         /// <param name="vec">The instance.</param>
         /// <returns>The result of the calculation.</returns>
-        public static Vector4 operator *(float scale, Vector4 vec) {
+        public static Vector4 operator *(double scale, Vector4 vec) {
             vec.X *= scale;
             vec.Y *= scale;
             vec.Z *= scale;
@@ -1278,8 +1275,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="mat">The desired transformation</param>
         /// <returns>The transformed vector</returns>
         public static Vector4 operator *(Vector4 vec, Matrix4 mat) {
-            Vector4 result;
-            Vector4.Transform(ref vec, ref mat, out result);
+            Vector4.Transform(ref vec, ref mat, out Vector4 result);
             return result;
         }
 
@@ -1290,8 +1286,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vec">The vector to transform</param>
         /// <returns>The transformed vector</returns>
         public static Vector4 operator *(Matrix4 mat, Vector4 vec) {
-            Vector4 result;
-            Vector4.Transform(ref mat, ref vec, out result);
+            Vector4.Transform(ref mat, ref vec, out Vector4 result);
             return result;
         }
 
@@ -1302,8 +1297,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vec">The vector to transform.</param>
         /// <returns>The transformed vector</returns>
         public static Vector4 operator *(Quaternion quat, Vector4 vec) {
-            Vector4 result;
-            Vector4.Transform(ref vec, ref quat, out result);
+            Vector4.Transform(ref vec, ref quat, out Vector4 result);
             return result;
         }
 
@@ -1313,7 +1307,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vec">The instance.</param>
         /// <param name="scale">The scalar.</param>
         /// <returns>The result of the calculation.</returns>
-        public static Vector4 operator /(Vector4 vec, float scale) {
+        public static Vector4 operator /(Vector4 vec, double scale) {
             vec.X /= scale;
             vec.Y /= scale;
             vec.Z /= scale;
@@ -1346,8 +1340,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// </summary>
         /// <param name="v">The instance.</param>
         /// <returns>A pointer to the first element of v.</returns>
-        [CLSCompliant(false)]
-        public static unsafe explicit operator float* (Vector4 v) {
+        public static unsafe explicit operator double* (Vector4 v) {
             return &v.X;
         }
 

@@ -9,7 +9,8 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using Mapping_Tools.classes.BeatmapHelper;
+using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.views {
     /// <summary>
@@ -176,28 +177,28 @@ namespace Mapping_Tools.views {
 
         private string ConvertSlider(string[] values, string[] sliderData, BackgroundWorker worker, DoWorkEventArgs e) {
             //get the anchors and middle of circle
-            Poi p1 = new Poi(double.Parse(values[0]), double.Parse(values[1]));
-            Poi p2 = new Poi(double.Parse(sliderData[1].Split(':')[0]), double.Parse(sliderData[1].Split(':')[1]));
-            Poi p3 = new Poi(double.Parse(sliderData[2].Split(':')[0]), double.Parse(sliderData[2].Split(':')[1]));
+            Vector2 p1 = new Vector2(double.Parse(values[0]), double.Parse(values[1]));
+            Vector2 p2 = new Vector2(double.Parse(sliderData[1].Split(':')[0]), double.Parse(sliderData[1].Split(':')[1]));
+            Vector2 p3 = new Vector2(double.Parse(sliderData[2].Split(':')[0]), double.Parse(sliderData[2].Split(':')[1]));
 
             const int bezier_steps = 20;
             const int looky_steps = 500;
             const int num_steps = 20000;
             const double loss_goal = 0.0015;
 
-            Poi pc = CircleCenter(p1, p2, p3);
-            double r = pc.GetDistance(p1);
+            Vector2 pc = CircleCenter(p1, p2, p3);
+            double r = Vector2.Distance(pc, p1);
 
-            Poi d1 = p1 - pc;
-            Poi d2 = p2 - pc;
-            Poi d3 = p3 - pc;
+            Vector2 d1 = p1 - pc;
+            Vector2 d2 = p2 - pc;
+            Vector2 d3 = p3 - pc;
 
-            double a1 = d1.GetAngle();
-            double a2 = d2.GetAngle();
-            double a3 = d3.GetAngle();
+            double a1 = d1.Theta;
+            double a2 = d2.Theta;
+            double a3 = d3.Theta;
 
-            double da1 = getSmallestAngle(a1, a2);
-            double da2 = getSmallestAngle(a2, a3);
+            double da1 = GetSmallestAngle(a1, a2);
+            double da2 = GetSmallestAngle(a2, a3);
 
             if( da1 * da2 > 0 ) {
                 a2 = ( da1 + da2 ) / 2 + a1;
@@ -205,18 +206,18 @@ namespace Mapping_Tools.views {
             else {
                 a2 = ( da1 + da2 ) / 2 + Math.PI + a1;
             }
-            p2 = new Poi(r * Math.Cos(a2), r * Math.Sin(a2)) + pc;
+            p2 = new Vector2(r * Math.Cos(a2), r * Math.Sin(a2)) + pc;
 
             /*Debug.WriteLine("x " + p1.X + " y " + p1.Y);
             Debug.WriteLine("x " + p2.X + " y " + p2.Y);
             Debug.WriteLine("x " + p3.X + " y " + p3.Y);*/
 
-            double da = getSmallestAngle(a1, a2);
-            Tuple<double, double, double> abc = MakeLine(p2, pc);
+            double da = GetSmallestAngle(a1, a2);
+            Line abc = new Line(p2, pc);
 
             // Get the tangents for snapping later
-            Tuple<double, double, double> firstTangent = PointAngleToLine(p1, a1 + 0.5 * Math.PI);
-            Tuple<double, double, double> lastTangent = PointAngleToLine(p3, a3 + 0.5 * Math.PI);
+            Line firstTangent = new Line(p1, a1 + 0.5 * Math.PI);
+            Line lastTangent = new Line(p3, a3 + 0.5 * Math.PI);
 
             double lrr = 0;
             if( Math.Abs(da) > Math.PI / 4 ) {
@@ -231,13 +232,13 @@ namespace Mapping_Tools.views {
 
             double dv = da / ( num_anchors + 1 );
 
-            List<Poi> prev_anchors = MakeAnchors(pc, r, dv, num_anchors, a1);
+            List<Vector2> prev_anchors = MakeAnchors(pc, r, dv, num_anchors, a1);
             SnapTangents(prev_anchors, firstTangent, lastTangent);
-            List<Poi> anchors = new List<Poi>();
+            List<Vector2> anchors = new List<Vector2>();
 
 
 
-            List<Poi> Points = MakePoints(p1, prev_anchors, p3, abc);
+            List<Vector2> Points = MakePoints(p1, prev_anchors, p3, abc);
             double prev_loss = TestPoints(Points, pc, r, bezier_steps);
             double loss = new double();
 
@@ -248,7 +249,7 @@ namespace Mapping_Tools.views {
                 double lr = r * prev_loss * lrr;
 
                 double bl = prev_loss;
-                List<Poi> next_anchors = new List<Poi>();
+                List<Vector2> next_anchors = new List<Vector2>();
                 for( int i = 0; i < Math.Ceiling(prev_loss * looky_steps); i++ ) {
                     anchors = Mutate(prev_anchors, lr, random);
                     SnapTangents(anchors, firstTangent, lastTangent);
@@ -257,12 +258,12 @@ namespace Mapping_Tools.views {
 
                     if( loss < bl ) {
                         bl = loss;
-                        next_anchors = new List<Poi>(anchors);
+                        next_anchors = new List<Vector2>(anchors);
                     }
                 }
 
                 if( bl < prev_loss ) {
-                    prev_anchors = new List<Poi>(next_anchors);
+                    prev_anchors = new List<Vector2>(next_anchors);
                     prev_loss = bl;
                     if( worker != null ) {
                         if( worker.WorkerReportsProgress ) {
@@ -314,11 +315,11 @@ namespace Mapping_Tools.views {
             return a - Math.Floor(a / n) * n;
         }
 
-        private double getSmallestAngle(double a1, double a2) {
+        private double GetSmallestAngle(double a1, double a2) {
             return Modulo(( a2 - a1 + Math.PI ), ( 2 * Math.PI )) - Math.PI;
         }
 
-        private Poi CircleCenter(Poi p1, Poi p2, Poi p3) {
+        private Vector2 CircleCenter(Vector2 p1, Vector2 p2, Vector2 p3) {
             double t = p2.X * p2.X + p2.Y * p2.Y;
             double bc = ( p1.X * p1.X + p1.Y * p1.Y - t ) / 2.0;
             double cd = ( t - p3.X * p3.X - p3.Y * p3.Y ) / 2.0;
@@ -332,11 +333,11 @@ namespace Mapping_Tools.views {
             double x = ( bc * ( p2.Y - p3.Y ) - cd * ( p1.Y - p2.Y ) ) * det;
             double y = ( ( p1.X - p2.X ) * cd - ( p2.X - p3.X ) * bc ) * det;
 
-            Poi Centre = new Poi(x, y);
+            Vector2 Centre = new Vector2(x, y);
             return Centre;
         }
 
-        private Tuple<double, double, double> MakeLine(Poi p1, Poi p2) {
+        private Tuple<double, double, double> MakeLine(Vector2 p1, Vector2 p2) {
             if( p1.X == p2.X ) {
                 return new Tuple<double, double, double>(1, 0, p1.X);
             }
@@ -345,7 +346,7 @@ namespace Mapping_Tools.views {
             return new Tuple<double, double, double>(a, 1, c);
         }
 
-        private Tuple<double, double, double> PointAngleToLine(Poi p1, double angle) {
+        private Tuple<double, double, double> PointAngleToLine(Vector2 p1, double angle) {
             if( Math.Abs(angle) == 0.5 * Math.PI ) {
                 return new Tuple<double, double, double>(1, 0, p1.X);
             }
@@ -354,39 +355,39 @@ namespace Mapping_Tools.views {
             return new Tuple<double, double, double>(a, 1, c);
         }
 
-        private List<Poi> MakeAnchors(Poi pc, double r, double dv, double num_anchors, double a1) {
-            List<Poi> anchors = new List<Poi>();
+        private List<Vector2> MakeAnchors(Vector2 pc, double r, double dv, double num_anchors, double a1) {
+            List<Vector2> anchors = new List<Vector2>();
             for( int n = 1; n <= num_anchors; n++ ) {
                 double theta = n * dv + a1;
                 double co = Math.Cos(theta);
                 double si = Math.Sin(theta);
-                anchors.Add(pc + new Poi(co, si) * r);
+                anchors.Add(pc + new Vector2(co, si) * r);
             }
             return anchors;
         }
 
-        private List<Poi> MakePoints(Poi p1, List<Poi> anchors, Poi p2, Tuple<double, double, double> abc) {
-            List<Poi> fullanchors = anchors.Concat(MirrorPoints(anchors, abc)).ToList();
+        private List<Vector2> MakePoints(Vector2 p1, List<Vector2> anchors, Vector2 p2, Line abc) {
+            List<Vector2> fullanchors = anchors.Concat(MirrorPoints(anchors, abc)).ToList();
             fullanchors.Insert(0, p1);
             fullanchors.Insert(fullanchors.Count, p2);
             return fullanchors;
         }
 
-        private List<Poi> MirrorPoints(List<Poi> points, Tuple<double, double, double> line) {
-            List<Poi> newPoints = new List<Poi>();
-            foreach( Poi p in points ) {
-                newPoints.Add(p.MirrorPoint(line, 2));
+        private List<Vector2> MirrorPoints(List<Vector2> points, Line line) {
+            List<Vector2> newPoints = new List<Vector2>();
+            foreach( Vector2 p in points ) {
+                newPoints.Add(Vector2.Mirror(p, line));
             }
             newPoints.Reverse();
             return newPoints;
         }
 
-        private double TestPoints(List<Poi> points, Poi pc, double r, int bezier_steps) {
+        private double TestPoints(List<Vector2> points, Vector2 pc, double r, int bezier_steps) {
             double hLoss = 0;
             for( int n = 0; n < bezier_steps; n++ ) {
                 double t = ( n + 0.2 ) / ( bezier_steps - 0.8 ) * 0.5;
-                Poi p = Bezier(points, t);
-                double loss = Math.Abs(p.GetDistance(pc) - r) / r;
+                Vector2 p = Bezier(points, t);
+                double loss = Math.Abs(Vector2.Distance(p, pc) - r) / r;
                 if( loss > hLoss ) {
                     hLoss = loss;
                 }
@@ -394,8 +395,8 @@ namespace Mapping_Tools.views {
             return hLoss;
         }
 
-        private Poi Bezier(List<Poi> points, double t) {
-            List<Poi> bPoints = new List<Poi>(points);
+        private Vector2 Bezier(List<Vector2> points, double t) {
+            List<Vector2> bPoints = new List<Vector2>(points);
             int Order = bPoints.Count - 1;
             int Calc_Order = Order;
             int at = 0;
@@ -410,22 +411,22 @@ namespace Mapping_Tools.views {
             return bPoints[bPoints.Count - 1];
         }
 
-        private List<Poi> Mutate(List<Poi> points, double lr, Random random) {
-            List<Poi> newPoints = new List<Poi>(points);
+        private List<Vector2> Mutate(List<Vector2> points, double lr, Random random) {
+            List<Vector2> newPoints = new List<Vector2>(points);
             for( int i = 0; i < newPoints.Count; i++ ) {
                 double randomx = random.NextDouble() - 0.5;
                 double randomy = random.NextDouble() - 0.5;
-                newPoints[i] = new Poi(newPoints[i].X + lr * randomx, newPoints[i].Y + lr * randomy);
+                newPoints[i] = new Vector2(newPoints[i].X + lr * randomx, newPoints[i].Y + lr * randomy);
             }
             return newPoints;
         }
 
-        private void SnapTangents(List<Poi> points, Tuple<double, double, double> firstLine, Tuple<double, double, double> lastLine) {
-            points[0] = points[0].MirrorPoint(firstLine, 1);
+        private void SnapTangents(List<Vector2> points, Line firstLine, Line lastLine) {
+            points[0] = Vector2.Mirror(points[0], firstLine);
             //points[points.Count - 1] = points[points.Count - 1].MirrorPoint(lastLine, 1);
         }
 
-        private void PrintListP(List<Poi> points) {
+        private void PrintListP(List<Vector2> points) {
             for( int n = 0; n < points.Count; n++ ) {
                 Debug.WriteLine("X: " + points[n].X.ToString() + " Y: " + points[n].Y.ToString());
             }
