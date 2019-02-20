@@ -62,6 +62,11 @@
             </Grid>
             <StackPanel Margin="0,20,0,0" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Left">
                 <TextBlock FontSize="40" TextWrapping="NoWrap" Text="Other" FontWeight="Bold" Foreground="#FF5F5E5E"/>
+                <CheckBox FontSize="20" x:Name="ResnapObjects" Cursor="Hand" Foreground="#FFD6D6D6">
+                    <TextBlock>
+                            Resnap Objects
+                    </TextBlock>
+                </CheckBox>
                 <CheckBox FontSize="20" x:Name="ResnapBookmarks" Cursor="Hand" Foreground="#FFD6D6D6">
                     <TextBlock>
                                 Resnap Bookmarks
@@ -70,11 +75,6 @@
                 <CheckBox FontSize="20" x:Name="RemoveSliderendMuting" Cursor="Hand" Foreground="#FFD6D6D6">
                     <TextBlock>
                             Remove sliderend muting
-                    </TextBlock>
-                </CheckBox>
-                <CheckBox FontSize="20" x:Name="ResnapObjects" Cursor="Hand" Foreground="#FFD6D6D6">
-                    <TextBlock>
-                            Resnap Objects
                     </TextBlock>
                 </CheckBox>
                 <CheckBox FontSize="20" x:Name="RemoveUnclickableHitsounds" Cursor="Hand" Foreground="#FFD6D6D6">

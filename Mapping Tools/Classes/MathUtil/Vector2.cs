@@ -25,9 +25,9 @@ using System.Runtime.InteropServices;
 using System.Xml.Serialization;
 
 namespace Mapping_Tools.Classes.MathUtil {
-    /// <summary>Represents a 2D vector using two single-precision floating-point numbers.</summary>
+    /// <summary>Represents a 2D vector using two double-precision floating-point numbers.</summary>
     /// <remarks>
-    /// The Vector2 structure is suitable for interoperation with unmanaged code requiring two consecutive floats.
+    /// The Vector2 structure is suitable for interoperation with unmanaged code requiring two consecutive doubles.
     /// </remarks>
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
@@ -35,18 +35,18 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <summary>
         /// The X component of the Vector2.
         /// </summary>
-        public float X;
+        public double X;
 
         /// <summary>
         /// The Y component of the Vector2.
         /// </summary>
-        public float Y;
+        public double Y;
 
         /// <summary>
         /// Constructs a new instance.
         /// </summary>
         /// <param name="value">The value that will initialize this instance.</param>
-        public Vector2(float value) {
+        public Vector2(double value) {
             X = value;
             Y = value;
         }
@@ -56,7 +56,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// </summary>
         /// <param name="x">The x coordinate of the net Vector2.</param>
         /// <param name="y">The y coordinate of the net Vector2.</param>
-        public Vector2(float x, float y) {
+        public Vector2(double x, double y) {
             X = x;
             Y = y;
         }
@@ -64,7 +64,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <summary>
         /// Gets or sets the value at the index of the Vector.
         /// </summary>
-        public float this[int index] {
+        public double this[int index] {
             get {
                 if( index == 0 ) {
                     return X;
@@ -92,9 +92,9 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// </summary>
         /// <see cref="LengthFast"/>
         /// <seealso cref="LengthSquared"/>
-        public float Length {
+        public double Length {
             get {
-                return (float) System.Math.Sqrt(X * X + Y * Y);
+                return Math.Sqrt(X * X + Y * Y);
             }
         }
 
@@ -107,7 +107,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// </remarks>
         /// <see cref="Length"/>
         /// <seealso cref="LengthSquared"/>
-        public float LengthFast {
+        public double LengthFast {
             get {
                 return 1.0f / MathHelper.InverseSqrtFast(X * X + Y * Y);
             }
@@ -122,9 +122,20 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// </remarks>
         /// <see cref="Length"/>
         /// <seealso cref="LengthFast"/>
-        public float LengthSquared {
+        public double LengthSquared {
             get {
                 return X * X + Y * Y;
+            }
+        }
+
+        /// <summary>
+        /// Gets the angle (direction) of the vector.
+        /// </summary>
+        public double Theta
+        {
+            get
+            {
+                return Math.Acos(X / Math.Sqrt(X * X + Y * Y));
             }
         }
 
@@ -147,6 +158,28 @@ namespace Mapping_Tools.Classes.MathUtil {
         }
 
         /// <summary>
+        /// Returns a System.String that represents the X coordinate of the current Vector2.
+        /// </summary>
+        /// <returns></returns>
+        public string StringX {
+            get {
+                return X.ToString();
+            }
+        }
+
+        /// <summary>
+        /// Returns a System.String that represents the X coordinate of the current Vector2.
+        /// </summary>
+        /// <returns></returns>
+        public string StringY
+        {
+            get
+            {
+                return Y.ToString();
+            }
+        }
+
+        /// <summary>
         /// Returns a copy of the Vector2 scaled to unit length.
         /// </summary>
         /// <returns></returns>
@@ -159,7 +192,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// Scales the Vector2 to unit length.
         /// </summary>
         public void Normalize() {
-            float scale = 1.0f / this.Length;
+            double scale = 1.0f / this.Length;
             X *= scale;
             Y *= scale;
         }
@@ -168,7 +201,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// Scales the Vector2 to approximately unit length.
         /// </summary>
         public void NormalizeFast() {
-            float scale = MathHelper.InverseSqrtFast(X * X + Y * Y);
+            double scale = MathHelper.InverseSqrtFast(X * X + Y * Y);
             X *= scale;
             Y *= scale;
         }
@@ -192,6 +225,11 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// Defines an instance with all components set to 1.
         /// </summary>
         public static readonly Vector2 One = new Vector2(1, 1);
+
+        /// <summary>
+        /// Defines an instance with all components set to NaN.
+        /// </summary>
+        public static readonly Vector2 NaN = new Vector2(Double.NaN, Double.NaN);
 
         /// <summary>
         /// Defines the size of the Vector2 struct in bytes.
@@ -248,7 +286,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vector">Left operand.</param>
         /// <param name="scale">Right operand.</param>
         /// <returns>Result of the operation.</returns>
-        public static Vector2 Multiply(Vector2 vector, float scale) {
+        public static Vector2 Multiply(Vector2 vector, double scale) {
             Multiply(ref vector, scale, out vector);
             return vector;
         }
@@ -259,7 +297,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vector">Left operand.</param>
         /// <param name="scale">Right operand.</param>
         /// <param name="result">Result of the operation.</param>
-        public static void Multiply(ref Vector2 vector, float scale, out Vector2 result) {
+        public static void Multiply(ref Vector2 vector, double scale, out Vector2 result) {
             result.X = vector.X * scale;
             result.Y = vector.Y * scale;
         }
@@ -292,7 +330,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vector">Left operand.</param>
         /// <param name="scale">Right operand.</param>
         /// <returns>Result of the operation.</returns>
-        public static Vector2 Divide(Vector2 vector, float scale) {
+        public static Vector2 Divide(Vector2 vector, double scale) {
             Divide(ref vector, scale, out vector);
             return vector;
         }
@@ -303,7 +341,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vector">Left operand.</param>
         /// <param name="scale">Right operand.</param>
         /// <param name="result">Result of the operation.</param>
-        public static void Divide(ref Vector2 vector, float scale, out Vector2 result) {
+        public static void Divide(ref Vector2 vector, double scale, out Vector2 result) {
             result.X = vector.X / scale;
             result.Y = vector.Y / scale;
         }
@@ -475,9 +513,8 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vec1">The first vector</param>
         /// <param name="vec2">The second vector</param>
         /// <returns>The distance</returns>
-        public static float Distance(Vector2 vec1, Vector2 vec2) {
-            float result;
-            Distance(ref vec1, ref vec2, out result);
+        public static double Distance(Vector2 vec1, Vector2 vec2) {
+            Distance(ref vec1, ref vec2, out double result);
             return result;
         }
 
@@ -487,8 +524,31 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vec1">The first vector</param>
         /// <param name="vec2">The second vector</param>
         /// <param name="result">The distance</param>
-        public static void Distance(ref Vector2 vec1, ref Vector2 vec2, out float result) {
-            result = (float) Math.Sqrt(( vec2.X - vec1.X ) * ( vec2.X - vec1.X ) + ( vec2.Y - vec1.Y ) * ( vec2.Y - vec1.Y ));
+        public static void Distance(ref Vector2 vec1, ref Vector2 vec2, out double result) {
+            result = Math.Sqrt(( vec2.X - vec1.X ) * ( vec2.X - vec1.X ) + ( vec2.Y - vec1.Y ) * ( vec2.Y - vec1.Y ));
+        }
+
+        /// <summary>
+        /// Compute the euclidean distance between a vector and a line.
+        /// </summary>
+        /// <param name="vec1">The vector</param>
+        /// <param name="line">The line</param>
+        /// <returns>The distance</returns>
+        public static double Distance(Vector2 vec1, Line line)
+        {
+            Distance(ref vec1, ref line, out double result);
+            return result;
+        }
+
+        /// <summary>
+        /// Compute the euclidean distance between a vector and a line.
+        /// </summary>
+        /// <param name="vec1">The vector</param>
+        /// <param name="line">The line</param>
+        /// <param name="result">The distance</param>
+        public static void Distance(ref Vector2 vec1, ref Line line, out double result)
+        {
+            result = Math.Abs(line.A * vec1.X + line.B * vec1.Y - line.C) / Math.Sqrt(line.A * line.A + line.B * line.B);
         }
 
         /// <summary>
@@ -497,9 +557,8 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vec1">The first vector</param>
         /// <param name="vec2">The second vector</param>
         /// <returns>The squared distance</returns>
-        public static float DistanceSquared(Vector2 vec1, Vector2 vec2) {
-            float result;
-            DistanceSquared(ref vec1, ref vec2, out result);
+        public static double DistanceSquared(Vector2 vec1, Vector2 vec2) {
+            DistanceSquared(ref vec1, ref vec2, out double result);
             return result;
         }
 
@@ -509,8 +568,54 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vec1">The first vector</param>
         /// <param name="vec2">The second vector</param>
         /// <param name="result">The squared distance</param>
-        public static void DistanceSquared(ref Vector2 vec1, ref Vector2 vec2, out float result) {
+        public static void DistanceSquared(ref Vector2 vec1, ref Vector2 vec2, out double result) {
             result = ( vec2.X - vec1.X ) * ( vec2.X - vec1.X ) + ( vec2.Y - vec1.Y ) * ( vec2.Y - vec1.Y );
+        }
+
+        /// <summary>
+        /// Compute the angle between two vectors.
+        /// </summary>
+        /// <param name="vec1">The first vector</param>
+        /// <param name="vec2">The second vector</param>
+        /// <returns>The angle</returns>
+        public static double Angle(Vector2 vec1, Vector2 vec2)
+        {
+            Angle(ref vec1, ref vec2, out double result);
+            return result;
+        }
+
+        /// <summary>
+        /// Compute angle between two vectors.
+        /// </summary>
+        /// <param name="vec1">The first vector</param>
+        /// <param name="vec2">The second vector</param>
+        /// <param name="result">The angle</param>
+        public static void Angle(ref Vector2 vec1, ref Vector2 vec2, out double result)
+        {
+            result = Math.Acos(Dot(vec1, vec2) / (vec1.Length * vec2.Length));
+        }
+
+        /// <summary>
+        /// Compute the angle between two vectors.
+        /// </summary>
+        /// <param name="vec1">The first vector</param>
+        /// <param name="vec2">The second vector</param>
+        /// <returns>The angle</returns>
+        public static double Angle(Vector2 vec1)
+        {
+            Angle(ref vec1, out double result);
+            return result;
+        }
+
+        /// <summary>
+        /// Compute angle between two vectors.
+        /// </summary>
+        /// <param name="vec1">The first vector</param>
+        /// <param name="vec2">The second vector</param>
+        /// <param name="result">The angle</param>
+        public static void Angle(ref Vector2 vec1, out double result)
+        {
+            result = Math.Acos(vec1.X / vec1.Length);
         }
 
         /// <summary>
@@ -519,7 +624,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vec">The input vector</param>
         /// <returns>The normalized vector</returns>
         public static Vector2 Normalize(Vector2 vec) {
-            float scale = 1.0f / vec.Length;
+            double scale = 1.0f / vec.Length;
             vec.X *= scale;
             vec.Y *= scale;
             return vec;
@@ -531,7 +636,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vec">The input vector</param>
         /// <param name="result">The normalized vector</param>
         public static void Normalize(ref Vector2 vec, out Vector2 result) {
-            float scale = 1.0f / vec.Length;
+            double scale = 1.0f / vec.Length;
             result.X = vec.X * scale;
             result.Y = vec.Y * scale;
         }
@@ -542,7 +647,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vec">The input vector</param>
         /// <returns>The normalized vector</returns>
         public static Vector2 NormalizeFast(Vector2 vec) {
-            float scale = MathHelper.InverseSqrtFast(vec.X * vec.X + vec.Y * vec.Y);
+            double scale = MathHelper.InverseSqrtFast(vec.X * vec.X + vec.Y * vec.Y);
             vec.X *= scale;
             vec.Y *= scale;
             return vec;
@@ -554,7 +659,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vec">The input vector</param>
         /// <param name="result">The normalized vector</param>
         public static void NormalizeFast(ref Vector2 vec, out Vector2 result) {
-            float scale = MathHelper.InverseSqrtFast(vec.X * vec.X + vec.Y * vec.Y);
+            double scale = MathHelper.InverseSqrtFast(vec.X * vec.X + vec.Y * vec.Y);
             result.X = vec.X * scale;
             result.Y = vec.Y * scale;
         }
@@ -565,7 +670,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="left">First operand</param>
         /// <param name="right">Second operand</param>
         /// <returns>The dot product of the two inputs</returns>
-        public static float Dot(Vector2 left, Vector2 right) {
+        public static double Dot(Vector2 left, Vector2 right) {
             return left.X * right.X + left.Y * right.Y;
         }
 
@@ -575,7 +680,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="left">First operand</param>
         /// <param name="right">Second operand</param>
         /// <param name="result">The dot product of the two inputs</param>
-        public static void Dot(ref Vector2 left, ref Vector2 right, out float result) {
+        public static void Dot(ref Vector2 left, ref Vector2 right, out double result) {
             result = left.X * right.X + left.Y * right.Y;
         }
 
@@ -585,7 +690,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="left">First operand</param>
         /// <param name="right">Second operand</param>
         /// <returns>The perpendicular dot product of the two inputs</returns>
-        public static float PerpDot(Vector2 left, Vector2 right) {
+        public static double PerpDot(Vector2 left, Vector2 right) {
             return left.X * right.Y - left.Y * right.X;
         }
 
@@ -595,8 +700,60 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="left">First operand</param>
         /// <param name="right">Second operand</param>
         /// <param name="result">The perpendicular dot product of the two inputs</param>
-        public static void PerpDot(ref Vector2 left, ref Vector2 right, out float result) {
+        public static void PerpDot(ref Vector2 left, ref Vector2 right, out double result) {
             result = left.X * right.Y - left.Y * right.X;
+        }
+
+        /// <summary>
+        /// Calculate the mirror projection of the given vector and line
+        /// </summary>
+        /// <param name="left">First operand</param>
+        /// <param name="right">Second operand</param>
+        /// <returns>The mirror projection of the input</returns>
+        public static Vector2 Mirror(Vector2 left, Line right)
+        {
+            Mirror(ref left, ref right, out Vector2 result);
+            return result;
+        }
+
+        /// <summary>
+        /// Calculate the mirror projection of the given vector and line
+        /// </summary>
+        /// <param name="left">First operand</param>
+        /// <param name="right">Second operand</param>
+        /// <returns>The mirror projection of the input</returns>
+        public static void Mirror(ref Vector2 left, ref Line right, out Vector2 result)
+        {
+            double temp = -2 * (right.A * left.X + right.B * left.Y - right.C) / (Math.Pow(right.A, 2) + Math.Pow(right.B, 2));
+            double x = 2 * right.A + left.X;
+            double y = 2 * right.B + left.Y;
+            result = new Vector2(x, y);
+        }
+
+        /// <summary>
+        /// Project given vector onto a line
+        /// </summary>
+        /// <param name="left">First operand</param>
+        /// <param name="right">Second operand</param>
+        /// <returns>The closest point on the line</returns>
+        public static Vector2 Snap(Vector2 left, Line right)
+        {
+            Mirror(ref left, ref right, out Vector2 result);
+            return result;
+        }
+
+        /// <summary>
+        /// Project given vector onto a line
+        /// </summary>
+        /// <param name="left">First operand</param>
+        /// <param name="right">Second operand</param>
+        /// <returns>The closest point on the line</returns>
+        public static void Snap(ref Vector2 left, ref Line right, out Vector2 result)
+        {
+            double temp = -1 * (right.A * left.X + right.B * left.Y - right.C) / (Math.Pow(right.A, 2) + Math.Pow(right.B, 2));
+            double x = right.A + left.X;
+            double y = right.B + left.Y;
+            result = new Vector2(x, y);
         }
 
         /// <summary>
@@ -606,7 +763,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="b">Second input vector</param>
         /// <param name="blend">The blend factor. a when blend=0, b when blend=1.</param>
         /// <returns>a when blend=0, b when blend=1, and a linear combination otherwise</returns>
-        public static Vector2 Lerp(Vector2 a, Vector2 b, float blend) {
+        public static Vector2 Lerp(Vector2 a, Vector2 b, double blend) {
             a.X = blend * ( b.X - a.X ) + a.X;
             a.Y = blend * ( b.Y - a.Y ) + a.Y;
             return a;
@@ -619,7 +776,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="b">Second input vector</param>
         /// <param name="blend">The blend factor. a when blend=0, b when blend=1.</param>
         /// <param name="result">a when blend=0, b when blend=1, and a linear combination otherwise</param>
-        public static void Lerp(ref Vector2 a, ref Vector2 b, float blend, out Vector2 result) {
+        public static void Lerp(ref Vector2 a, ref Vector2 b, double blend, out Vector2 result) {
             result.X = blend * ( b.X - a.X ) + a.X;
             result.Y = blend * ( b.Y - a.Y ) + a.Y;
         }
@@ -633,7 +790,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="u">First Barycentric Coordinate</param>
         /// <param name="v">Second Barycentric Coordinate</param>
         /// <returns>a when u=v=0, b when u=1,v=0, c when u=0,v=1, and a linear combination of a,b,c otherwise</returns>
-        public static Vector2 BaryCentric(Vector2 a, Vector2 b, Vector2 c, float u, float v) {
+        public static Vector2 BaryCentric(Vector2 a, Vector2 b, Vector2 c, double u, double v) {
             return a + u * ( b - a ) + v * ( c - a );
         }
 
@@ -644,7 +801,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="u">First Barycentric Coordinate.</param>
         /// <param name="v">Second Barycentric Coordinate.</param>
         /// <param name="result">Output Vector. a when u=v=0, b when u=1,v=0, c when u=0,v=1, and a linear combination of a,b,c otherwise</param>
-        public static void BaryCentric(ref Vector2 a, ref Vector2 b, ref Vector2 c, float u, float v, out Vector2 result) {
+        public static void BaryCentric(ref Vector2 a, ref Vector2 b, ref Vector2 c, double u, double v, out Vector2 result) {
             result = a; // copy
 
             Vector2 temp = b; // copy
@@ -665,8 +822,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="quat">The quaternion to rotate the vector by.</param>
         /// <returns>The result of the operation.</returns>
         public static Vector2 Transform(Vector2 vec, Quaternion quat) {
-            Vector2 result;
-            Transform(ref vec, ref quat, out result);
+            Transform(ref vec, ref quat, out Vector2 result);
             return result;
         }
 
@@ -677,9 +833,9 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="quat">The quaternion to rotate the vector by.</param>
         /// <param name="result">The result of the operation.</param>
         public static void Transform(ref Vector2 vec, ref Quaternion quat, out Vector2 result) {
-            Quaternion v = new Quaternion(vec.X, vec.Y, 0, 0), i, t;
-            Quaternion.Invert(ref quat, out i);
-            Quaternion.Multiply(ref quat, ref v, out t);
+            Quaternion v = new Quaternion(vec.X, vec.Y, 0, 0);
+            Quaternion.Invert(ref quat, out Quaternion i);
+            Quaternion.Multiply(ref quat, ref v, out Quaternion t);
             Quaternion.Multiply(ref t, ref i, out v);
 
             result.X = v.X;
@@ -733,7 +889,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vec">Left operand.</param>
         /// <param name="scale">Right operand.</param>
         /// <returns>Result of multiplication.</returns>
-        public static Vector2 operator *(Vector2 vec, float scale) {
+        public static Vector2 operator *(Vector2 vec, double scale) {
             vec.X *= scale;
             vec.Y *= scale;
             return vec;
@@ -745,7 +901,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="scale">Left operand.</param>
         /// <param name="vec">Right operand.</param>
         /// <returns>Result of multiplication.</returns>
-        public static Vector2 operator *(float scale, Vector2 vec) {
+        public static Vector2 operator *(double scale, Vector2 vec) {
             vec.X *= scale;
             vec.Y *= scale;
             return vec;
@@ -769,7 +925,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vec">Left operand</param>
         /// <param name="scale">Right operand</param>
         /// <returns>Result of the division.</returns>
-        public static Vector2 operator /(Vector2 vec, float scale) {
+        public static Vector2 operator /(Vector2 vec, double scale) {
             vec.X /= scale;
             vec.Y /= scale;
             return vec;
@@ -810,7 +966,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <returns>A System.Int32 containing the unique hashcode for this instance.</returns>
         public override int GetHashCode() {
             unchecked {
-                return ( this.X.GetHashCode() * 397 ) ^ this.Y.GetHashCode();
+                return (X.GetHashCode() * 397 ) ^ Y.GetHashCode();
             }
         }
 
@@ -824,7 +980,7 @@ namespace Mapping_Tools.Classes.MathUtil {
                 return false;
             }
 
-            return this.Equals((Vector2) obj);
+            return Equals((Vector2) obj);
         }
 
         /// <summary>Indicates whether the current vector is equal to another vector.</summary>

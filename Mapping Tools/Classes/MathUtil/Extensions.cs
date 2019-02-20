@@ -14,5 +14,12 @@ namespace Mapping_Tools.Classes.MathUtil {
         public static int Length(this List<Vector2> list) {
             return list.Count;
         }
+
+        public static List<Vector2> Copy(this List<Vector2> list)
+        {
+            List<Vector2> newList = new List<Vector2>();
+            newList.AddRange(list);
+            return newList;
+        }
     }
 }

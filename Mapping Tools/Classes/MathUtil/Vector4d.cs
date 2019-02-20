@@ -734,8 +734,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="mat">The desired transformation</param>
         /// <returns>The transformed vector</returns>
         public static Vector4d Transform(Vector4d vec, Matrix4d mat) {
-            Vector4d result;
-            Transform(ref vec, ref mat, out result);
+            Transform(ref vec, ref mat, out Vector4d result);
             return result;
         }
 
@@ -758,8 +757,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="quat">The quaternion to rotate the vector by.</param>
         /// <returns>The result of the operation.</returns>
         public static Vector4d Transform(Vector4d vec, Quaterniond quat) {
-            Vector4d result;
-            Transform(ref vec, ref quat, out result);
+            Transform(ref vec, ref quat, out Vector4d result);
             return result;
         }
 
@@ -770,9 +768,9 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="quat">The quaternion to rotate the vector by.</param>
         /// <param name="result">The result of the operation.</param>
         public static void Transform(ref Vector4d vec, ref Quaterniond quat, out Vector4d result) {
-            Quaterniond v = new Quaterniond(vec.X, vec.Y, vec.Z, vec.W), i, t;
-            Quaterniond.Invert(ref quat, out i);
-            Quaterniond.Multiply(ref quat, ref v, out t);
+            Quaterniond v = new Quaterniond(vec.X, vec.Y, vec.Z, vec.W);
+            Quaterniond.Invert(ref quat, out Quaterniond i);
+            Quaterniond.Multiply(ref quat, ref v, out Quaterniond t);
             Quaterniond.Multiply(ref t, ref i, out v);
 
             result.X = v.X;
@@ -1281,7 +1279,6 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// </summary>
         /// <param name="v">The instance.</param>
         /// <returns>A pointer to the first element of v.</returns>
-        [CLSCompliant(false)]
         unsafe public static explicit operator double* (Vector4d v) {
             return &v.X;
         }
@@ -1308,7 +1305,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="v4d">The Vector4d to convert.</param>
         /// <returns>The resulting Vector4.</returns>
         public static explicit operator Vector4(Vector4d v4d) {
-            return new Vector4((float) v4d.X, (float) v4d.Y, (float) v4d.Z, (float) v4d.W);
+            return new Vector4(v4d.X, v4d.Y, v4d.Z, v4d.W);
         }
 
         private static string listSeparator = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;

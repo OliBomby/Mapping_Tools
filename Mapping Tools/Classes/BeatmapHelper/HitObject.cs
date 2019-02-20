@@ -1,16 +1,17 @@
-﻿using System;
+﻿using Mapping_Tools.Classes.MathUtil;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
-namespace Mapping_Tools.classes.BeatmapHelper {
+namespace Mapping_Tools.Classes.BeatmapHelper {
     class HitObject {
         public string Line { get => GetLine(); set => SetLine(value); }
 
         public string[] Values { get => GetValues(); set => SetValues(value); }
 
-        public Poi Pos { get; set; }
+        public Vector2 Pos { get; set; }
 
         public double Time { get; set; }
 
@@ -36,7 +37,7 @@ namespace Mapping_Tools.classes.BeatmapHelper {
         public string Filename { get; set; }
 
         public string SliderType { get; set; }
-        public Poi[] CurvePoints { get; set; }
+        public Vector2[] CurvePoints { get; set; }
         public int Repeat { get; set; }
         public double PixelLength { get; set; }
         public int[] EdgeHitsounds { get; set; }
@@ -114,7 +115,7 @@ namespace Mapping_Tools.classes.BeatmapHelper {
         }
 
         public void SetValues(string[] values) {
-            Pos = new Poi(ParseDouble(values[0]), ParseDouble(values[1]));
+            Pos = new Vector2(ParseDouble(values[0]), ParseDouble(values[1]));
             Time = ParseDouble(values[2]);
             ObjectType = int.Parse(values[3]);
             Hitsounds = int.Parse(values[4]);
@@ -123,12 +124,12 @@ namespace Mapping_Tools.classes.BeatmapHelper {
             if (IsSlider) {
                 string[] sliderData = values[5].Split('|');
                 SliderType = GetLastLetter(sliderData);
-                List<Poi> points = new List<Poi>();
+                List<Vector2> points = new List<Vector2>();
                 for (int i = 1; i < sliderData.Length; i++) {
                     string[] spl = sliderData[i].Split(':');
                     if (spl.Length == 2) // It has to have 2 coordinates inside
                     {
-                        points.Add(new Poi(ParseDouble(spl[0]), ParseDouble(spl[1])));
+                        points.Add(new Vector2(ParseDouble(spl[0]), ParseDouble(spl[1])));
                     }
                 }
                 CurvePoints = points.ToArray();
@@ -165,9 +166,9 @@ namespace Mapping_Tools.classes.BeatmapHelper {
         public string[] GetValues() {
             if (IsSlider) {
                 string ret = "";
-                foreach (Poi p in CurvePoints) {
-                    ret += "|" + p.StringX();
-                    ret += ":" + p.StringY();
+                foreach (Vector2 p in CurvePoints) {
+                    ret += "|" + p.StringX;
+                    ret += ":" + p.StringY;
                 }
                 string sliderShapeString = SliderType + ret;
 
@@ -181,19 +182,19 @@ namespace Mapping_Tools.classes.BeatmapHelper {
                     }
                     string edgeAd = rett.Substring(1);
 
-                    return new string[] { Pos.StringX(), Pos.StringY(), Math.Round(Time).ToString(), ObjectType.ToString(), Hitsounds.ToString(),
+                    return new string[] { Pos.StringX, Pos.StringY, Math.Round(Time).ToString(), ObjectType.ToString(), Hitsounds.ToString(),
                                         sliderShapeString, Repeat.ToString(), PixelLength.ToString(CultureInfo.InvariantCulture), edgeHS, edgeAd, Extras };
                 }
                 else {
-                    return new string[] { Pos.StringX(), Pos.StringY(), Math.Round(Time).ToString(), ObjectType.ToString(), Hitsounds.ToString(),
+                    return new string[] { Pos.StringX, Pos.StringY, Math.Round(Time).ToString(), ObjectType.ToString(), Hitsounds.ToString(),
                                         sliderShapeString, Repeat.ToString(), PixelLength.ToString(CultureInfo.InvariantCulture) };
                 }
             }
             else if (IsSpinner) {
-                return new string[] { Pos.StringX(), Pos.StringY(), Math.Round(Time).ToString(), ObjectType.ToString(), Hitsounds.ToString(), Math.Round(EndTime).ToString(), Extras };
+                return new string[] { Pos.StringX, Pos.StringY, Math.Round(Time).ToString(), ObjectType.ToString(), Hitsounds.ToString(), Math.Round(EndTime).ToString(), Extras };
             }
             else {
-                return new string[] { Pos.StringX(), Pos.StringY(), Math.Round(Time).ToString(), ObjectType.ToString(), Hitsounds.ToString(), Extras };
+                return new string[] { Pos.StringX, Pos.StringY, Math.Round(Time).ToString(), ObjectType.ToString(), Hitsounds.ToString(), Extras };
             }
         }
 

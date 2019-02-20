@@ -39,14 +39,14 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <summary>
         /// The W component of this instance.
         /// </summary>
-        public float W;
+        public double W;
 
         /// <summary>
         /// Construct a new Quaternion from vector and w components
         /// </summary>
         /// <param name="v">The vector part</param>
         /// <param name="w">The w part</param>
-        public Quaternion(Vector3 v, float w) {
+        public Quaternion(Vector3 v, double w) {
             Xyz = v;
             W = w;
         }
@@ -58,7 +58,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="y">The y component</param>
         /// <param name="z">The z component</param>
         /// <param name="w">The w component</param>
-        public Quaternion(float x, float y, float z, float w)
+        public Quaternion(double x, double y, double z, double w)
             : this(new Vector3(x, y, z), w) { }
 
         /// <summary>
@@ -69,17 +69,17 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="rotationX">Counterclockwise rotation around X axis in radian</param>
         /// <param name="rotationY">Counterclockwise rotation around Y axis in radian</param>
         /// <param name="rotationZ">Counterclockwise rotation around Z axis in radian</param>
-        public Quaternion(float rotationX, float rotationY, float rotationZ) {
+        public Quaternion(double rotationX, double rotationY, double rotationZ) {
             rotationX *= 0.5f;
             rotationY *= 0.5f;
             rotationZ *= 0.5f;
 
-            float c1 = (float) Math.Cos(rotationX);
-            float c2 = (float) Math.Cos(rotationY);
-            float c3 = (float) Math.Cos(rotationZ);
-            float s1 = (float) Math.Sin(rotationX);
-            float s2 = (float) Math.Sin(rotationY);
-            float s3 = (float) Math.Sin(rotationZ);
+            double c1 = Math.Cos(rotationX);
+            double c2 = Math.Cos(rotationY);
+            double c3 = Math.Cos(rotationZ);
+            double s1 = Math.Sin(rotationX);
+            double s2 = Math.Sin(rotationY);
+            double s3 = Math.Sin(rotationZ);
 
             W = c1 * c2 * c3 - s1 * s2 * s3;
             Xyz.X = s1 * c2 * c3 + c1 * s2 * s3;
@@ -99,26 +99,26 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// Gets or sets the X component of this instance.
         /// </summary>
         [XmlIgnore]
-        public float X { get { return Xyz.X; } set { Xyz.X = value; } }
+        public double X { get { return Xyz.X; } set { Xyz.X = value; } }
 
         /// <summary>
         /// Gets or sets the Y component of this instance.
         /// </summary>
         [XmlIgnore]
-        public float Y { get { return Xyz.Y; } set { Xyz.Y = value; } }
+        public double Y { get { return Xyz.Y; } set { Xyz.Y = value; } }
 
         /// <summary>
         /// Gets or sets the Z component of this instance.
         /// </summary>
         [XmlIgnore]
-        public float Z { get { return Xyz.Z; } set { Xyz.Z = value; } }
+        public double Z { get { return Xyz.Z; } set { Xyz.Z = value; } }
 
         /// <summary>
         /// Convert the current quaternion to axis angle representation
         /// </summary>
         /// <param name="axis">The resultant axis</param>
         /// <param name="angle">The resultant angle</param>
-        public void ToAxisAngle(out Vector3 axis, out float angle) {
+        public void ToAxisAngle(out Vector3 axis, out double angle) {
             Vector4 result = ToAxisAngle();
             axis = result.Xyz;
             angle = result.W;
@@ -134,10 +134,11 @@ namespace Mapping_Tools.Classes.MathUtil {
                 q.Normalize();
             }
 
-            Vector4 result = new Vector4();
-
-            result.W = 2.0f * (float) System.Math.Acos(q.W); // angle
-            float den = (float) System.Math.Sqrt(1.0 - q.W * q.W);
+            Vector4 result = new Vector4
+            {
+                W = 2.0f * System.Math.Acos(q.W) // angle
+            };
+            double den = System.Math.Sqrt(1.0 - q.W * q.W);
             if( den > 0.0001f ) {
                 result.Xyz = q.Xyz / den;
             }
@@ -154,16 +155,16 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// Gets the length (magnitude) of the quaternion.
         /// </summary>
         /// <seealso cref="LengthSquared"/>
-        public float Length {
+        public double Length {
             get {
-                return (float) System.Math.Sqrt(W * W + Xyz.LengthSquared);
+                return System.Math.Sqrt(W * W + Xyz.LengthSquared);
             }
         }
 
         /// <summary>
         /// Gets the square of the quaternion length (magnitude).
         /// </summary>
-        public float LengthSquared {
+        public double LengthSquared {
             get {
                 return W * W + Xyz.LengthSquared;
             }
@@ -198,7 +199,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// Scales the Quaternion to unit length.
         /// </summary>
         public void Normalize() {
-            float scale = 1.0f / this.Length;
+            double scale = 1.0f / this.Length;
             Xyz *= scale;
             W *= scale;
         }
@@ -270,8 +271,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="right">The second instance.</param>
         /// <returns>A new instance containing the result of the calculation.</returns>
         public static Quaternion Multiply(Quaternion left, Quaternion right) {
-            Quaternion result;
-            Multiply(ref left, ref right, out result);
+            Multiply(ref left, ref right, out Quaternion result);
             return result;
         }
 
@@ -293,7 +293,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="quaternion">The instance.</param>
         /// <param name="scale">The scalar.</param>
         /// <param name="result">A new instance containing the result of the calculation.</param>
-        public static void Multiply(ref Quaternion quaternion, float scale, out Quaternion result) {
+        public static void Multiply(ref Quaternion quaternion, double scale, out Quaternion result) {
             result = new Quaternion(quaternion.X * scale, quaternion.Y * scale, quaternion.Z * scale, quaternion.W * scale);
         }
 
@@ -303,7 +303,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="quaternion">The instance.</param>
         /// <param name="scale">The scalar.</param>
         /// <returns>A new instance containing the result of the calculation.</returns>
-        public static Quaternion Multiply(Quaternion quaternion, float scale) {
+        public static Quaternion Multiply(Quaternion quaternion, double scale) {
             return new Quaternion(quaternion.X * scale, quaternion.Y * scale, quaternion.Z * scale, quaternion.W * scale);
         }
 
@@ -331,8 +331,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="q">The quaternion to invert</param>
         /// <returns>The inverse of the given quaternion</returns>
         public static Quaternion Invert(Quaternion q) {
-            Quaternion result;
-            Invert(ref q, out result);
+            Invert(ref q, out Quaternion result);
             return result;
         }
 
@@ -342,9 +341,9 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="q">The quaternion to invert</param>
         /// <param name="result">The inverse of the given quaternion</param>
         public static void Invert(ref Quaternion q, out Quaternion result) {
-            float lengthSq = q.LengthSquared;
+            double lengthSq = q.LengthSquared;
             if( lengthSq != 0.0 ) {
-                float i = 1.0f / lengthSq;
+                double i = 1.0f / lengthSq;
                 result = new Quaternion(q.Xyz * -i, q.W * i);
             }
             else {
@@ -358,8 +357,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="q">The quaternion to normalize</param>
         /// <returns>The normalized quaternion</returns>
         public static Quaternion Normalize(Quaternion q) {
-            Quaternion result;
-            Normalize(ref q, out result);
+            Normalize(ref q, out Quaternion result);
             return result;
         }
 
@@ -369,7 +367,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="q">The quaternion to normalize</param>
         /// <param name="result">The normalized quaternion</param>
         public static void Normalize(ref Quaternion q, out Quaternion result) {
-            float scale = 1.0f / q.Length;
+            double scale = 1.0f / q.Length;
             result = new Quaternion(q.Xyz * scale, q.W * scale);
         }
 
@@ -379,7 +377,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="axis">The axis to rotate about</param>
         /// <param name="angle">The rotation angle in radians</param>
         /// <returns>The equivalent quaternion</returns>
-        public static Quaternion FromAxisAngle(Vector3 axis, float angle) {
+        public static Quaternion FromAxisAngle(Vector3 axis, double angle) {
             if( axis.LengthSquared == 0.0f ) {
                 return Identity;
             }
@@ -388,8 +386,8 @@ namespace Mapping_Tools.Classes.MathUtil {
 
             angle *= 0.5f;
             axis.Normalize();
-            result.Xyz = axis * (float) System.Math.Sin(angle);
-            result.W = (float) System.Math.Cos(angle);
+            result.Xyz = axis * System.Math.Sin(angle);
+            result.W = System.Math.Cos(angle);
 
             return Normalize(result);
         }
@@ -403,7 +401,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="yaw">The yaw (heading), counterclockwise rotation around Y axis</param>
         /// <param name="roll">The roll (bank), counterclockwise rotation around Z axis</param>
         /// <returns></returns>
-        public static Quaternion FromEulerAngles(float pitch, float yaw, float roll) {
+        public static Quaternion FromEulerAngles(double pitch, double yaw, double roll) {
             return new Quaternion(pitch, yaw, roll);
         }
 
@@ -427,12 +425,12 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="result">The equivalent Quaternion</param>
         public static void FromEulerAngles(ref Vector3 eulerAngles, out Quaternion result) {
 
-            float c1 = (float) Math.Cos(eulerAngles.X * 0.5f);
-            float c2 = (float) Math.Cos(eulerAngles.Y * 0.5f);
-            float c3 = (float) Math.Cos(eulerAngles.Z * 0.5f);
-            float s1 = (float) Math.Sin(eulerAngles.X * 0.5f);
-            float s2 = (float) Math.Sin(eulerAngles.Y * 0.5f);
-            float s3 = (float) Math.Sin(eulerAngles.Z * 0.5f);
+            double c1 = Math.Cos(eulerAngles.X * 0.5f);
+            double c2 = Math.Cos(eulerAngles.Y * 0.5f);
+            double c3 = Math.Cos(eulerAngles.Z * 0.5f);
+            double s1 = Math.Sin(eulerAngles.X * 0.5f);
+            double s2 = Math.Sin(eulerAngles.Y * 0.5f);
+            double s3 = Math.Sin(eulerAngles.Z * 0.5f);
 
             result.W = c1 * c2 * c3 - s1 * s2 * s3;
             result.Xyz.X = s1 * c2 * c3 + c1 * s2 * s3;
@@ -446,8 +444,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="matrix">A rotation matrix</param>
         /// <returns>The equivalent quaternion</returns>
         public static Quaternion FromMatrix(Matrix3 matrix) {
-            Quaternion result;
-            FromMatrix(ref matrix, out result);
+            FromMatrix(ref matrix, out Quaternion result);
             return result;
         }
 
@@ -457,11 +454,11 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="matrix">A rotation matrix</param>
         /// <param name="result">The equivalent quaternion</param>
         public static void FromMatrix(ref Matrix3 matrix, out Quaternion result) {
-            float trace = matrix.Trace;
+            double trace = matrix.Trace;
 
             if( trace > 0 ) {
-                float s = (float) Math.Sqrt(trace + 1) * 2;
-                float invS = 1f / s;
+                double s = Math.Sqrt(trace + 1) * 2;
+                double invS = 1f / s;
 
                 result.W = s * 0.25f;
                 result.Xyz.X = ( matrix.Row2.Y - matrix.Row1.Z ) * invS;
@@ -469,11 +466,11 @@ namespace Mapping_Tools.Classes.MathUtil {
                 result.Xyz.Z = ( matrix.Row1.X - matrix.Row0.Y ) * invS;
             }
             else {
-                float m00 = matrix.Row0.X, m11 = matrix.Row1.Y, m22 = matrix.Row2.Z;
+                double m00 = matrix.Row0.X, m11 = matrix.Row1.Y, m22 = matrix.Row2.Z;
 
                 if( m00 > m11 && m00 > m22 ) {
-                    float s = (float) Math.Sqrt(1 + m00 - m11 - m22) * 2;
-                    float invS = 1f / s;
+                    double s = Math.Sqrt(1 + m00 - m11 - m22) * 2;
+                    double invS = 1f / s;
 
                     result.W = ( matrix.Row2.Y - matrix.Row1.Z ) * invS;
                     result.Xyz.X = s * 0.25f;
@@ -481,8 +478,8 @@ namespace Mapping_Tools.Classes.MathUtil {
                     result.Xyz.Z = ( matrix.Row0.Z + matrix.Row2.X ) * invS;
                 }
                 else if( m11 > m22 ) {
-                    float s = (float) Math.Sqrt(1 + m11 - m00 - m22) * 2;
-                    float invS = 1f / s;
+                    double s = Math.Sqrt(1 + m11 - m00 - m22) * 2;
+                    double invS = 1f / s;
 
                     result.W = ( matrix.Row0.Z - matrix.Row2.X ) * invS;
                     result.Xyz.X = ( matrix.Row0.Y + matrix.Row1.X ) * invS;
@@ -490,8 +487,8 @@ namespace Mapping_Tools.Classes.MathUtil {
                     result.Xyz.Z = ( matrix.Row1.Z + matrix.Row2.Y ) * invS;
                 }
                 else {
-                    float s = (float) Math.Sqrt(1 + m22 - m00 - m11) * 2;
-                    float invS = 1f / s;
+                    double s = Math.Sqrt(1 + m22 - m00 - m11) * 2;
+                    double invS = 1f / s;
 
                     result.W = ( matrix.Row1.X - matrix.Row0.Y ) * invS;
                     result.Xyz.X = ( matrix.Row0.Z + matrix.Row2.X ) * invS;
@@ -508,7 +505,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="q2">The second quaternion</param>
         /// <param name="blend">The blend factor</param>
         /// <returns>A smooth blend between the given quaternions</returns>
-        public static Quaternion Slerp(Quaternion q1, Quaternion q2, float blend) {
+        public static Quaternion Slerp(Quaternion q1, Quaternion q2, double blend) {
             // if either input is zero, return the other.
             if( q1.LengthSquared == 0.0f ) {
                 if( q2.LengthSquared == 0.0f ) {
@@ -521,7 +518,7 @@ namespace Mapping_Tools.Classes.MathUtil {
             }
 
 
-            float cosHalfAngle = q1.W * q2.W + Vector3.Dot(q1.Xyz, q2.Xyz);
+            double cosHalfAngle = q1.W * q2.W + Vector3.Dot(q1.Xyz, q2.Xyz);
 
             if( cosHalfAngle >= 1.0f || cosHalfAngle <= -1.0f ) {
                 // angle = 0.0f, so just return one input.
@@ -533,15 +530,15 @@ namespace Mapping_Tools.Classes.MathUtil {
                 cosHalfAngle = -cosHalfAngle;
             }
 
-            float blendA;
-            float blendB;
+            double blendA;
+            double blendB;
             if( cosHalfAngle < 0.99f ) {
                 // do proper slerp for big angles
-                float halfAngle = (float) System.Math.Acos(cosHalfAngle);
-                float sinHalfAngle = (float) System.Math.Sin(halfAngle);
-                float oneOverSinHalfAngle = 1.0f / sinHalfAngle;
-                blendA = (float) System.Math.Sin(halfAngle * ( 1.0f - blend )) * oneOverSinHalfAngle;
-                blendB = (float) System.Math.Sin(halfAngle * blend) * oneOverSinHalfAngle;
+                double halfAngle = System.Math.Acos(cosHalfAngle);
+                double sinHalfAngle = System.Math.Sin(halfAngle);
+                double oneOverSinHalfAngle = 1.0f / sinHalfAngle;
+                blendA = System.Math.Sin(halfAngle * (1.0f - blend)) * oneOverSinHalfAngle;
+                blendB = System.Math.Sin(halfAngle * blend) * oneOverSinHalfAngle;
             }
             else {
                 // do lerp if angle is really small.
@@ -599,7 +596,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="quaternion">The instance.</param>
         /// <param name="scale">The scalar.</param>
         /// <returns>A new instance containing the result of the calculation.</returns>
-        public static Quaternion operator *(Quaternion quaternion, float scale) {
+        public static Quaternion operator *(Quaternion quaternion, double scale) {
             Multiply(ref quaternion, scale, out quaternion);
             return quaternion;
         }
@@ -610,7 +607,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="quaternion">The instance.</param>
         /// <param name="scale">The scalar.</param>
         /// <returns>A new instance containing the result of the calculation.</returns>
-        public static Quaternion operator *(float scale, Quaternion quaternion) {
+        public static Quaternion operator *(double scale, Quaternion quaternion) {
             return new Quaternion(quaternion.X * scale, quaternion.Y * scale, quaternion.Z * scale, quaternion.W * scale);
         }
 

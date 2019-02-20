@@ -207,8 +207,8 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="angle">The counter-clockwise angle in radians.</param>
         /// <param name="result">The resulting Matrix3x2 instance.</param>
         public static void CreateRotation(double angle, out Matrix4x2d result) {
-            double cos = (double) System.Math.Cos(angle);
-            double sin = (double) System.Math.Sin(angle);
+            double cos = System.Math.Cos(angle);
+            double sin = System.Math.Sin(angle);
 
             result.Row0.X = cos;
             result.Row0.Y = sin;
@@ -226,8 +226,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="angle">The counter-clockwise angle in radians.</param>
         /// <returns>The resulting Matrix3x2 instance.</returns>
         public static Matrix4x2d CreateRotation(double angle) {
-            Matrix4x2d result;
-            CreateRotation(angle, out result);
+            CreateRotation(angle, out Matrix4x2d result);
             return result;
         }
 
@@ -253,8 +252,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="scale">Single scale factor for the x and y axes.</param>
         /// <returns>A scale matrix.</returns>
         public static Matrix4x2d CreateScale(double scale) {
-            Matrix4x2d result;
-            CreateScale(scale, out result);
+            CreateScale(scale, out Matrix4x2d result);
             return result;
         }
 
@@ -280,8 +278,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="scale">Scale factors for the x and y axes.</param>
         /// <returns>A scale matrix.</returns>
         public static Matrix4x2d CreateScale(Vector2d scale) {
-            Matrix4x2d result;
-            CreateScale(scale, out result);
+            CreateScale(scale, out Matrix4x2d result);
             return result;
         }
 
@@ -309,8 +306,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="y">Scale factor for the y axis.</param>
         /// <returns>A scale matrix.</returns>
         public static Matrix4x2d CreateScale(double x, double y) {
-            Matrix4x2d result;
-            CreateScale(x, y, out result);
+            CreateScale(x, y, out Matrix4x2d result);
             return result;
         }
 
@@ -338,8 +334,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="right">The right operand of the multiplication.</param>
         /// <returns>A new instance that is the result of the multiplication.</returns>
         public static Matrix4x2d Mult(Matrix4x2d left, double right) {
-            Matrix4x2d result;
-            Mult(ref left, right, out result);
+            Mult(ref left, right, out Matrix4x2d result);
             return result;
         }
 
@@ -374,8 +369,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="right">The right operand of the multiplication.</param>
         /// <returns>A new instance that is the result of the multiplication.</returns>
         public static Matrix4x2d Mult(Matrix4x2d left, Matrix2d right) {
-            Matrix4x2d result;
-            Mult(ref left, ref right, out result);
+            Mult(ref left, ref right, out Matrix4x2d result);
             return result;
         }
 
@@ -414,8 +408,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="right">The right operand of the multiplication.</param>
         /// <returns>A new instance that is the result of the multiplication.</returns>
         public static Matrix4x3d Mult(Matrix4x2d left, Matrix2x3d right) {
-            Matrix4x3d result;
-            Mult(ref left, ref right, out result);
+            Mult(ref left, ref right, out Matrix4x3d result);
             return result;
         }
 
@@ -458,8 +451,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="right">The right operand of the multiplication.</param>
         /// <returns>A new instance that is the result of the multiplication.</returns>
         public static Matrix4d Mult(Matrix4x2d left, Matrix2x4d right) {
-            Matrix4d result;
-            Mult(ref left, ref right, out result);
+            Mult(ref left, ref right, out Matrix4d result);
             return result;
         }
 
@@ -487,8 +479,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="right">The right operand of the addition.</param>
         /// <returns>A new instance that is the result of the addition.</returns>
         public static Matrix4x2d Add(Matrix4x2d left, Matrix4x2d right) {
-            Matrix4x2d result;
-            Add(ref left, ref right, out result);
+            Add(ref left, ref right, out Matrix4x2d result);
             return result;
         }
 
@@ -516,8 +507,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="right">The right operand of the subtraction.</param>
         /// <returns>A new instance that is the result of the subtraction.</returns>
         public static Matrix4x2d Subtract(Matrix4x2d left, Matrix4x2d right) {
-            Matrix4x2d result;
-            Subtract(ref left, ref right, out result);
+            Subtract(ref left, ref right, out Matrix4x2d result);
             return result;
         }
 
@@ -543,8 +533,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="mat">The matrix to transpose.</param>
         /// <returns>The transpose of the given matrix.</returns>
         public static Matrix2x4d Transpose(Matrix4x2d mat) {
-            Matrix2x4d result;
-            Transpose(ref mat, out result);
+            Transpose(ref mat, out Matrix2x4d result);
             return result;
         }
 

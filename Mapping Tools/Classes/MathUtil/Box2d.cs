@@ -94,12 +94,12 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <summary>
         /// Gets a double describing the width of the Box2d structure.
         /// </summary>
-        public double Width { get { return (double) System.Math.Abs(Right - Left); } }
+        public double Width { get { return System.Math.Abs(Right - Left); } }
 
         /// <summary>
         /// Gets a double describing the height of the Box2d structure.
         /// </summary>
-        public double Height { get { return (double) System.Math.Abs(Bottom - Top); } }
+        public double Height { get { return System.Math.Abs(Bottom - Top); } }
 
         /// <summary>
         /// Returns whether the box contains the specified point on the closed region described by this Box2.

@@ -13,22 +13,22 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <summary>
         /// The left boundary of the structure.
         /// </summary>
-        public float Left;
+        public double Left;
 
         /// <summary>
         /// The right boundary of the structure.
         /// </summary>
-        public float Right;
+        public double Right;
 
         /// <summary>
         /// The top boundary of the structure.
         /// </summary>
-        public float Top;
+        public double Top;
 
         /// <summary>
         /// The bottom boundary of the structure.
         /// </summary>
-        public float Bottom;
+        public double Bottom;
 
         /// <summary>
         /// Constructs a new Box2 with the specified dimensions.
@@ -49,7 +49,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="top">The position of the top boundary.</param>
         /// <param name="right">The position of the right boundary.</param>
         /// <param name="bottom">The position of the bottom boundary.</param>
-        public Box2(float left, float top, float right, float bottom) {
+        public Box2(double left, double top, double right, double bottom) {
             Left = left;
             Top = top;
             Right = right;
@@ -64,7 +64,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="right">The position of the right boundary.</param>
         /// <param name="bottom">The position of the bottom boundary.</param>
         /// <returns>A new osuTK.Box2 with the specfied dimensions.</returns>
-        public static Box2 FromTLRB(float top, float left, float right, float bottom) {
+        public static Box2 FromTLRB(double top, double left, double right, double bottom) {
             return new Box2(left, top, right, bottom);
         }
 
@@ -76,7 +76,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="width">The width of the box.</param>
         /// <param name="height">The height of the box.</param>
         /// <returns>A new osuTK.Box2 with the specfied dimensions.</returns>
-        public static Box2 FromDimensions(float left, float top, float width, float height) {
+        public static Box2 FromDimensions(double left, double top, double width, double height) {
             return new Box2(left, top, left + width, top + height);
         }
 
@@ -91,14 +91,14 @@ namespace Mapping_Tools.Classes.MathUtil {
         }
 
         /// <summary>
-        /// Gets a float describing the width of the Box2 structure.
+        /// Gets a double describing the width of the Box2 structure.
         /// </summary>
-        public float Width { get { return (float) System.Math.Abs(Right - Left); } }
+        public double Width { get { return System.Math.Abs(Right - Left); } }
 
         /// <summary>
-        /// Gets a float describing the height of the Box2 structure.
+        /// Gets a double describing the height of the Box2 structure.
         /// </summary>
-        public float Height { get { return (float) System.Math.Abs(Bottom - Top); } }
+        public double Height { get { return System.Math.Abs(Bottom - Top); } }
 
         /// <summary>
         /// Returns whether the box contains the specified point on the closed region described by this Box2.

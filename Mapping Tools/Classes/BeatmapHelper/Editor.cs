@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Windows;
 
-namespace Mapping_Tools.classes.BeatmapHelper {
+namespace Mapping_Tools.Classes.BeatmapHelper {
     class Editor {
         string Path { get; set; }
         public Beatmap Beatmap { get; set; }
