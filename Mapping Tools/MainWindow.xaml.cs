@@ -33,7 +33,7 @@ namespace Mapping_Tools {
 
         private void OpenBeatmap(object sender, RoutedEventArgs e) {
             OpenFileDialog openFileDialog = new OpenFileDialog {
-                InitialDirectory = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Local\\osu!\\Songs"),
+                InitialDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "osu!\\Songs"),
                 Filter = "Osu files (*.osu)|*.osu",
                 FilterIndex = 1,
                 RestoreDirectory = true
