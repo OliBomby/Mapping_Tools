@@ -96,7 +96,7 @@ namespace Mapping_Tools.Classes.Tools
             // Converge on arcLength of thetaRange
             int n = arc.Count - 1;
             double tf = cs.ThetaRange / arcLength;
-            while (Math.Abs(tf - 1) > 0.00001)
+            while (Math.Abs(tf - 1) > 0.0000001)
             {
                 for (int j = 0; j < n; j++)
                 {
