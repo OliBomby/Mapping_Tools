@@ -120,6 +120,9 @@ namespace Mapping_Tools.Classes.Tools
             {
                 arc[i] = Matrix2.Mult(rotator, arc[i]) + cs.Centre;
             }
+            List<Vector2> inter = cs.Interpolate(2);
+            arc[0] = inter.First();
+            arc[arc.Count - 1] = inter.Last();
             return arc;
         }
 

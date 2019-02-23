@@ -151,6 +151,23 @@ namespace Mapping_Tools.Classes.MathUtil {
         }
 
         /// <summary>
+        /// Calculates points among the CircleArc.
+        /// </summary>
+        /// <param name="amountPoints">Number of points to calculate.</param>
+        public List<Vector2> Interpolate(int amountPoints) {
+            List<Vector2> output = new List<Vector2>(amountPoints);
+
+            for (int i = 0; i < amountPoints; ++i) {
+                double fract = (double)i / (amountPoints - 1);
+                double theta = ThetaStart + Dir * fract * ThetaRange;
+                Vector2 o = new Vector2(Math.Cos(theta), Math.Sin(theta)) * Radius;
+                output.Add(Centre + o);
+            }
+
+            return output;
+        }
+
+        /// <summary>
         /// Compares the specified instances for equality.
         /// </summary>
         /// <param name="left">Left operand.</param>
