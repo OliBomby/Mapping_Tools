@@ -78,12 +78,13 @@ namespace Mapping_Tools.views {
 
         private string Merge_Sliders(Arguments arg, BackgroundWorker worker, DoWorkEventArgs e) {
             int slidersMerged = 0;
+            bool mergeLast = false;
 
             Editor editor = new Editor(arg.Path);
             List<HitObject> markedObjects = arg.RequireBookmarks ? editor.GetBookmarkedObjects() : editor.Beatmap.HitObjects;
             editor.GetBookmarkedObjects();
 
-            for (int i = 0; i + 1 < markedObjects.Count; i++) {
+            for (int i = 0; i < markedObjects.Count - 1; i++) {
                 HitObject ho1 = markedObjects[i];
                 HitObject ho2 = markedObjects[i + 1];
                 if (ho1.IsSlider && ho2.IsSlider && (ho1.CurvePoints.Last() - ho2.Pos).Length <= arg.Leniency) {
@@ -91,11 +92,15 @@ namespace Mapping_Tools.views {
                     SliderPath sp1 = BezierConverter.ConvertToBezier(ho1.SliderPath);
                     SliderPath sp2 = BezierConverter.ConvertToBezier(ho2.SliderPath);
                     SliderPath mergedPath = new SliderPath(PathType.Bezier, sp1.ControlPoints.Concat(sp2.ControlPoints).ToArray(), ho1.PixelLength + ho2.PixelLength);
-                    Console.WriteLine(mergedPath.ControlPoints[mergedPath.ControlPoints.Count-2].Y);
                     ho1.SliderPath = mergedPath;
                     editor.Beatmap.HitObjects.Remove(ho2);
-                    slidersMerged += 1;
+                    markedObjects.Remove(ho2);
+                    slidersMerged++;
+                    if(!mergeLast) { slidersMerged++; }
+                    mergeLast = true;
                     i--;
+                } else {
+                    mergeLast = false;
                 }
                 if (worker != null && worker.WorkerReportsProgress) {
                     worker.ReportProgress(i / markedObjects.Count);
