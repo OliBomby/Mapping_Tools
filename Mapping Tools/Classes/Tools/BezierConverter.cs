@@ -96,7 +96,7 @@ namespace Mapping_Tools.Classes.Tools
             // Converge on arcLength of thetaRange
             int n = arc.Count - 1;
             double tf = cs.ThetaRange / arcLength;
-            while (Math.Abs(tf - 1) > 0.00001)
+            while (Math.Abs(tf - 1) > 0.0000001)
             {
                 for (int j = 0; j < n; j++)
                 {
@@ -120,6 +120,9 @@ namespace Mapping_Tools.Classes.Tools
             {
                 arc[i] = Matrix2.Mult(rotator, arc[i]) + cs.Centre;
             }
+            List<Vector2> inter = cs.Interpolate(2);
+            arc[0] = inter.First();
+            arc[arc.Count - 1] = inter.Last();
             return arc;
         }
 

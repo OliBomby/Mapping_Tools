@@ -36,10 +36,11 @@ namespace Mapping_Tools {
                 InitialDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "osu!\\Songs"),
                 Filter = "Osu files (*.osu)|*.osu",
                 FilterIndex = 1,
-                RestoreDirectory = true
+                RestoreDirectory = true,
+                CheckFileExists = true
             };
             openFileDialog.ShowDialog();
-            currentMap.Text = openFileDialog.FileName;
+            currentMap.Text = openFileDialog.FileName != "" ? openFileDialog.FileName : currentMap.Text;
         }
 
         private void SaveBackup(object sender, RoutedEventArgs e) {

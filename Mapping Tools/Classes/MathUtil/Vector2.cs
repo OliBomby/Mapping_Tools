@@ -163,7 +163,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <returns></returns>
         public string StringX {
             get {
-                return X.ToString();
+                return ((int)Math.Round(X)).ToString();
             }
         }
 
@@ -175,7 +175,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         {
             get
             {
-                return Y.ToString();
+                return ((int)Y).ToString();
             }
         }
 

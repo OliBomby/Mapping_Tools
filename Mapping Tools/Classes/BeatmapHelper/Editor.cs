@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
@@ -27,6 +28,22 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
             var lines = new List<string>(linesz);
             return lines;
+        }
+
+        public List<HitObject> GetBookmarkedObjects() {
+            return GetBookmarkedObjects(Beatmap);
+        }
+
+        public List<HitObject> GetBookmarkedObjects(Beatmap beatmap)
+        {
+            List<HitObject> markedObjects = new List<HitObject>();
+            List<double> bookmarks = beatmap.GetBookmarks();
+            foreach (HitObject ho in beatmap.HitObjects)
+            {
+                if (!bookmarks.Exists(o => (ho.Time <= o && o <= ho.EndTime))) { continue; }
+                markedObjects.Add(ho);
+            }
+            return markedObjects;
         }
 
         public void SaveFile(string path, List<string> lines) {

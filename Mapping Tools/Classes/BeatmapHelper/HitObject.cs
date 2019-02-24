@@ -1,4 +1,5 @@
 ﻿using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SliderPathStuff;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -36,8 +37,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public double SampleVolume { get; set; }
         public string Filename { get; set; }
 
-        public string SliderType { get; set; }
-        public Vector2[] CurvePoints { get; set; }
+        public PathType SliderType { get; set; }
+        public List<Vector2> CurvePoints { get; set; }
+        public SliderPath SliderPath { get => GetSliderPath(); set => SetSliderPath(value); }
         public int Repeat { get; set; }
         public double PixelLength { get; set; }
         public int[] EdgeHitsounds { get; set; }
@@ -83,6 +85,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
+        public void Move(Vector2 delta) {
+            Pos += delta;
+            CurvePoints.ForEach(o => o += delta);
+        }
+
         public bool ResnapSelf(Timing timing, int snap1, int snap2) {
             double newTime = Math.Floor(timing.Resnap(Time, snap1, snap2));
             double deltaTime = newTime - Time;
@@ -123,7 +130,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             SliderExtras = IsSlider && values.Count() > 8; // Sliders remove extras and edges stuff if there are no hitsounds
             if (IsSlider) {
                 string[] sliderData = values[5].Split('|');
-                SliderType = GetLastLetter(sliderData);
+                SliderType = GetPathType(sliderData);
                 List<Vector2> points = new List<Vector2>();
                 for (int i = 1; i < sliderData.Length; i++) {
                     string[] spl = sliderData[i].Split(':');
@@ -132,7 +139,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                         points.Add(new Vector2(ParseDouble(spl[0]), ParseDouble(spl[1])));
                     }
                 }
-                CurvePoints = points.ToArray();
+                CurvePoints = points;
 
                 Repeat = int.Parse(values[6]);
                 PixelLength = ParseDouble(values[7]);
@@ -170,7 +177,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                     ret += "|" + p.StringX;
                     ret += ":" + p.StringY;
                 }
-                string sliderShapeString = SliderType + ret;
+                string sliderShapeString = GetPathTypeString() + ret;
 
                 if (SliderExtras) {
                     string edgeHS = string.Join("|", EdgeHitsounds.Select(p => p.ToString()).ToArray());
@@ -252,6 +259,22 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Filename = split[i + 4];
         }
 
+        public SliderPath GetSliderPath()
+        {
+            List<Vector2> controlPoints = new List<Vector2> { Pos };
+            controlPoints.AddRange(CurvePoints);
+            return new SliderPath(SliderType, controlPoints.ToArray(), PixelLength);
+        }
+
+        public void SetSliderPath(SliderPath sliderPath)
+        {
+            List<Vector2> controlPoints = sliderPath.ControlPoints;
+            Pos = controlPoints.First();
+            CurvePoints = controlPoints.GetRange(1, controlPoints.Count - 1);
+            SliderType = sliderPath.Type;
+            PixelLength = sliderPath.Distance;
+        }
+
         private int GetIntFromBitArray(BitArray bitArray) {
             if (bitArray.Length > 32)
                 throw new ArgumentException("Argument length shall be at most 32 bits.");
@@ -265,11 +288,33 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return double.Parse(d, CultureInfo.InvariantCulture);
         }
 
-        private string GetLastLetter(string[] sliderData) {
-            for (int i = sliderData.Length - 1; i >= 0; i--) {
-                if (Char.IsLetter(sliderData[i], 0)) {
-                    return sliderData[i][0].ToString(); // Return first letter
+        private PathType GetPathType(string[] sliderData) {
+            for (int i = sliderData.Length - 1; i >= 0; i--) {  // Iterating in reverse to get the last valid letter
+                char letter = sliderData[i].Count() > 0 ? sliderData[i][0] : '0';  // 0 is not a letter so it will get ignored
+                if (Char.IsLetter(letter)) {
+                    switch (letter) {
+                        case 'L':
+                            return PathType.Linear;
+                        case 'B':
+                            return PathType.Bezier;
+                        case 'P':
+                            return PathType.PerfectCurve;
+                        case 'C':
+                            return PathType.Catmull;
+                    } 
                 }
+            }
+            return PathType.Bezier;
+        }
+
+        private string GetPathTypeString() {
+            switch (SliderType) {
+                case (PathType.Linear):
+                    return "L";
+                case (PathType.PerfectCurve):
+                    return "P";
+                case (PathType.Catmull):
+                    return "C";
             }
             return "B";
         }
