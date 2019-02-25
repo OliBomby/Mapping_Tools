@@ -8,8 +8,9 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.Tools;
 
-namespace Mapping_Tools.views {
+namespace Mapping_Tools.Views {
     public partial class CleanerView :UserControl {
         private readonly BackgroundWorker backgroundWorker;
         public readonly BackgroundWorker backgroundLoader;
@@ -160,13 +161,13 @@ namespace Mapping_Tools.views {
             }
 
             // Make new timingpoints
-            List<Change> changes = new List<Change>();
+            List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
             // Add redlines
             List<TimingPoint> redlines = timing.GetAllRedlines();
             for (int i = 0; i < redlines.Count; i++)
             {
                 TimingPoint tp = redlines[i];
-                changes.Add(new Change(tp, mpb: true, meter: true, inherited: true));
+                timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, meter: true, inherited: true));
                 UpdateProgressbar(worker, (double)i / redlines.Count, 5, maxStages);
             }
             // Add SV changes for taiko and mania
@@ -175,7 +176,7 @@ namespace Mapping_Tools.views {
                 for (int i = 0; i < svChanges.Count; i++)
                 {
                     TimingPoint tp = svChanges[i];
-                    changes.Add(new Change(tp, mpb: true));
+                    timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true));
                     UpdateProgressbar(worker, (double)i / svChanges.Count, 6, maxStages);
                 }
             }
@@ -183,7 +184,7 @@ namespace Mapping_Tools.views {
             for (int i = 0; i < kiaiToggles.Count; i++)
             {
                 TimingPoint tp = kiaiToggles[i];
-                changes.Add(new Change(tp, kiai: true));
+                timingPointsChanges.Add(new TimingPointsChange(tp, kiai: true));
                 UpdateProgressbar(worker, (double)i / kiaiToggles.Count, 7, maxStages);
             }
             // Add Hitobject stuff
@@ -195,7 +196,7 @@ namespace Mapping_Tools.views {
                     TimingPoint tp = ho.TP.Copy();
                     tp.Offset = ho.Time;
                     tp.MpB = ho.SV;
-                    changes.Add(new Change(tp, mpb: true));
+                    timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true));
                 }
                 // Body hitsounds
                 bool vol = (ho.IsSlider && volumeSliders) || (ho.IsSpinner && volumeSpinners);
@@ -205,7 +206,7 @@ namespace Mapping_Tools.views {
                 foreach (TimingPoint tp in ho.BodyHitsounds)
                 {
                     if (tp.Volume == 5 && removeSliderendMuting) { vol = false; }  // Removing sliderbody silencing
-                    changes.Add(new Change(tp, volume: vol, index: ind, sampleset: sam));
+                    timingPointsChanges.Add(new TimingPointsChange(tp, volume: vol, index: ind, sampleset: sam));
                     if (tp.SampleSet != ho.HitsoundTP.SampleSet) { samplesetActuallyChanged = samplesetSliders && ho.SampleSet == 0; }  // True for sampleset change in sliderbody
                 }
                 if (ho.IsSlider && (!samplesetActuallyChanged) && ho.SampleSet == 0)  // Case can put sampleset on sliderbody
@@ -217,7 +218,7 @@ namespace Mapping_Tools.views {
                 {
                     TimingPoint tp = ho.HitsoundTP.Copy();
                     tp.Offset = ho.Time;
-                    changes.Add(new Change(tp, sampleset: true));
+                    timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: true));
                 }
                 UpdateProgressbar(worker, (double)i / editor.Beatmap.HitObjects.Count, 8, maxStages);
             }
@@ -278,20 +279,20 @@ namespace Mapping_Tools.views {
                     tp.Volume = tlo.FenoSampleVolume;
                     bool ind = !(tlo.Filename != "" && (tlo.IsCircle || tlo.IsHoldnoteHead || tlo.IsSpinnerEnd));  // Index doesnt have to change if custom is overridden by Filename
                     bool vol = !(tp.Volume == 5 && removeSliderendMuting && (tlo.IsSliderEnd || tlo.IsSpinnerEnd));  // Remove volume change if sliderend muting or spinnerend muting
-                    changes.Add(new Change(tp, volume: vol, index: ind));
+                    timingPointsChanges.Add(new TimingPointsChange(tp, volume: vol, index: ind));
                 }
                 UpdateProgressbar(worker, (double)i / timeline.TimeLineObjects.Count, 9, maxStages);
             }
 
 
             // Add the new timingpoints
-            changes = changes.OrderBy(o => o.TP.Offset).ToList();
+            timingPointsChanges = timingPointsChanges.OrderBy(o => o.TP.Offset).ToList();
             List<TimingPoint> newTimingPoints = new List<TimingPoint>();
-            for (int i = 0; i < changes.Count; i++)
+            for (int i = 0; i < timingPointsChanges.Count; i++)
             {
-                Change c = changes[i];
+                TimingPointsChange c = timingPointsChanges[i];
                 c.AddChange(newTimingPoints, timing);
-                UpdateProgressbar(worker, (double)i / changes.Count, 10, maxStages);
+                UpdateProgressbar(worker, (double)i / timingPointsChanges.Count, 10, maxStages);
             }
 
             // Take note of all the changes
@@ -468,26 +469,26 @@ namespace Mapping_Tools.views {
             }
 
             // Make new timingpoints
-            List<Change> changes = new List<Change>();
+            List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
             // Add redlines
             List<TimingPoint> redlines = timing.GetAllRedlines();
             for( int i = 0; i < redlines.Count; i++ ) {
                 TimingPoint tp = redlines[i];
-                changes.Add(new Change(tp, mpb: true, meter: true, inherited: true));
+                timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, meter: true, inherited: true));
                 UpdateProgressbar(worker, (double) i / redlines.Count, 5, maxStages);
             }
             // Add SV changes for taiko and mania
             if( mode == 1 || mode == 3 ) {
                 for( int i = 0; i < svChanges.Count; i++ ) {
                     TimingPoint tp = svChanges[i];
-                    changes.Add(new Change(tp, mpb: true));
+                    timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true));
                     UpdateProgressbar(worker, (double) i / svChanges.Count, 6, maxStages);
                 }
             }
             // Add Kiai toggles
             for( int i = 0; i < kiaiToggles.Count; i++ ) {
                 TimingPoint tp = kiaiToggles[i];
-                changes.Add(new Change(tp, kiai: true));
+                timingPointsChanges.Add(new TimingPointsChange(tp, kiai: true));
                 UpdateProgressbar(worker, (double) i / kiaiToggles.Count, 7, maxStages);
             }
             // Add Hitobject stuff
@@ -498,7 +499,7 @@ namespace Mapping_Tools.views {
                     TimingPoint tp = ho.TP.Copy();
                     tp.Offset = ho.Time;
                     tp.MpB = ho.SV;
-                    changes.Add(new Change(tp, mpb: true));
+                    timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true));
                 }
                 // Body hitsounds
                 bool vol = ( ho.IsSlider && volumeSliders ) || ( ho.IsSpinner && volumeSpinners );
@@ -507,7 +508,7 @@ namespace Mapping_Tools.views {
                 bool samplesetActuallyChanged = false;
                 foreach( TimingPoint tp in ho.BodyHitsounds ) {
                     if( tp.Volume == 5 && removeSliderendMuting ) { vol = false; }  // Removing sliderbody silencing
-                    changes.Add(new Change(tp, volume: vol, index: ind, sampleset: sam));
+                    timingPointsChanges.Add(new TimingPointsChange(tp, volume: vol, index: ind, sampleset: sam));
                     if( tp.SampleSet != ho.HitsoundTP.SampleSet ) { samplesetActuallyChanged = samplesetSliders && ho.SampleSet == 0; }  // True for sampleset change in sliderbody
                 }
                 if( ho.IsSlider && ( !samplesetActuallyChanged ) && ho.SampleSet == 0 )  // Case can put sampleset on sliderbody
@@ -519,7 +520,7 @@ namespace Mapping_Tools.views {
                 {
                     TimingPoint tp = ho.HitsoundTP.Copy();
                     tp.Offset = ho.Time;
-                    changes.Add(new Change(tp, sampleset: true));
+                    timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: true));
                 }
                 UpdateProgressbar(worker, (double) i / editor.Beatmap.HitObjects.Count, 8, maxStages);
             }
@@ -572,19 +573,19 @@ namespace Mapping_Tools.views {
                     tp.Volume = tlo.FenoSampleVolume;
                     bool ind = !( tlo.Filename != "" && ( tlo.IsCircle || tlo.IsHoldnoteHead || tlo.IsSpinnerEnd ) );  // Index doesnt have to change if custom is overridden by Filename
                     bool vol = !( tp.Volume == 5 && removeSliderendMuting && ( tlo.IsSliderEnd || tlo.IsSpinnerEnd ) );  // Remove volume change if sliderend muting or spinnerend muting
-                    changes.Add(new Change(tp, volume: vol, index: ind));
+                    timingPointsChanges.Add(new TimingPointsChange(tp, volume: vol, index: ind));
                 }
                 UpdateProgressbar(worker, (double) i / timeline.TimeLineObjects.Count, 9, maxStages);
             }
 
 
             // Add the new timingpoints
-            changes = changes.OrderBy(o => o.TP.Offset).ToList();
+            timingPointsChanges = timingPointsChanges.OrderBy(o => o.TP.Offset).ToList();
             List<TimingPoint> newTimingPoints = new List<TimingPoint>();
-            for( int i = 0; i < changes.Count; i++ ) {
-                Change c = changes[i];
+            for( int i = 0; i < timingPointsChanges.Count; i++ ) {
+                TimingPointsChange c = timingPointsChanges[i];
                 c.AddChange(newTimingPoints, timing);
-                UpdateProgressbar(worker, (double) i / changes.Count, 10, maxStages);
+                UpdateProgressbar(worker, (double) i / timingPointsChanges.Count, 10, maxStages);
             }
 
             // Replace the old timingpoints
@@ -620,97 +621,6 @@ namespace Mapping_Tools.views {
                 message += " objects!";
             }
             return message;
-        }
-
-        class Change {
-            public TimingPoint TP { get; set; }
-            public bool MpB = false;
-            public bool Meter = false;
-            public bool Sampleset = false;
-            public bool Index = false;
-            public bool Volume = false;
-            public bool Inherited = false;
-            public bool Kiai = false;
-            public Change(TimingPoint tpNew, bool mpb = false, bool meter = false, bool sampleset = false, bool index = false, bool volume = false, bool inherited = false, bool kiai = false) {
-                TP = tpNew;
-                MpB = mpb;
-                Meter = meter;
-                Sampleset = sampleset;
-                Index = index;
-                Volume = volume;
-                Inherited = inherited;
-                Kiai = kiai;
-            }
-
-            public void AddChange(List<TimingPoint> list, Timing timing) {
-                TimingPoint prev = null;
-                TimingPoint on = null;
-                foreach( TimingPoint tp in list ) {
-                    if( tp == null ) {
-                        continue;
-                    }
-                    if( prev == null ) {
-                        if( tp.Offset < TP.Offset ) {
-                            prev = tp;
-                        }
-                    }
-                    else if( tp.Offset >= prev.Offset && tp.Offset < TP.Offset ) {
-                        prev = tp;
-                    }
-                    if( tp.Offset == TP.Offset ) {
-                        if( tp.Inherited && MpB ) {
-                            prev = tp;
-                        }
-                        else {
-                            on = tp;
-                        }
-                    }
-                }
-
-                if( on != null ) {
-                    if( MpB ) { on.MpB = TP.MpB; }
-                    if( Meter ) { on.Meter = TP.Meter; }
-                    if( Sampleset ) { on.SampleSet = TP.SampleSet; }
-                    if( Index ) { on.SampleIndex = TP.SampleIndex; }
-                    if( Volume ) { on.Volume = TP.Volume; }
-                    if( Inherited ) { on.Inherited = TP.Inherited; }
-                    if( Kiai ) { on.Kiai = TP.Kiai; }
-                }
-                else {
-                    if( prev != null ) {
-                        // Make new timingpoint
-                        if( prev.Inherited ) {
-                            on = new TimingPoint(TP.Offset, -100, prev.Meter, prev.SampleSet, prev.SampleIndex, prev.Volume, false, prev.Kiai);
-                        }
-                        else {
-                            on = new TimingPoint(TP.Offset, prev.MpB, prev.Meter, prev.SampleSet, prev.SampleIndex, prev.Volume, false, prev.Kiai);
-                        }
-                        if( MpB ) { on.MpB = TP.MpB; }
-                        if( Meter ) { on.Meter = TP.Meter; }
-                        if( Sampleset ) { on.SampleSet = TP.SampleSet; }
-                        if( Index ) { on.SampleIndex = TP.SampleIndex; }
-                        if( Volume ) { on.Volume = TP.Volume; }
-                        if( Inherited ) { on.Inherited = TP.Inherited; }
-                        if( Kiai ) { on.Kiai = TP.Kiai; }
-
-                        if( !on.Equals(prev) || Inherited ) {
-                            list.Add(on);
-                        }
-                    }
-                    else {
-                        list.Add(TP);
-                    }
-                }
-
-                if( Kiai ) // Change every timingpoint after to the kiai toggle
-                {
-                    foreach( TimingPoint tp in list ) {
-                        if( tp.Offset > TP.Offset ) {
-                            tp.Kiai = TP.Kiai;
-                        }
-                    }
-                }
-            }
         }
 
         private void UpdateProgressbar(BackgroundWorker worker, double fraction, int stage, int maxStages) {

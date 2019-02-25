@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Mapping_Tools.views
+namespace Mapping_Tools.Views
 {
     /// <summary>
     /// Interaktionslogik für UserControl2.xaml

@@ -7,7 +7,7 @@ using System.Globalization;
 using System.Linq;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
-    class HitObject {
+    public class HitObject {
         public string Line { get => GetLine(); set => SetLine(value); }
 
         public string[] Values { get => GetValues(); set => SetValues(value); }
@@ -259,11 +259,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Filename = split[i + 4];
         }
 
-        public SliderPath GetSliderPath()
+        public SliderPath GetSliderPath(bool fullLength = false)
         {
             List<Vector2> controlPoints = new List<Vector2> { Pos };
             controlPoints.AddRange(CurvePoints);
-            return new SliderPath(SliderType, controlPoints.ToArray(), PixelLength);
+            return fullLength ? new SliderPath(SliderType, controlPoints.ToArray()) : new SliderPath(SliderType, controlPoints.ToArray(), PixelLength);
         }
 
         public void SetSliderPath(SliderPath sliderPath)
