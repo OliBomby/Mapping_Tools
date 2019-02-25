@@ -8,7 +8,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:views="clr-namespace:Mapping_Tools.Views"
-        xmlns:viewmodels="clr-namespace:Mapping_Tools.viewmodels"
+        xmlns:viewmodels="clr-namespace:Mapping_Tools.Viewmodels"
         mc:Ignorable="d"
         Title="Beatmap Cleaner 2.0.0"  
         WindowStyle="None"
@@ -59,6 +59,7 @@
                     <MenuItem Height="31" Header="_Tools" Padding="12,0,0,0" MinWidth="65">
                         <MenuItem Header="_General Cleaner" Click="LoadCleaner"/>
                         <MenuItem Header="_Slider Merger" Click="LoadMerger"/>
+                        <MenuItem Header="_Slider Completionator" Click="LoadCompletionator"/>
                         <MenuItem Header="_Hitsound Copier" Click="LoadCopier"/>
                     </MenuItem>
                     <MenuItem Height="31" Header="_Options" Padding="12,0,0,0" MinWidth="80">
@@ -115,6 +116,9 @@
         </DataTemplate>
         <DataTemplate DataType="{x:Type viewmodels:SliderMergerVM}">
             <views:SliderMergerView DataContext="{Binding}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:SliderCompletionatorVM}">
+            <views:SliderCompletionatorView DataContext="{Binding}"/>
         </DataTemplate>
     </Window.Resources>
 </Window>

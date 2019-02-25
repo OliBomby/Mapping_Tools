@@ -62,7 +62,7 @@ namespace Mapping_Tools {
             DataContext = new CleanerVM();
 
             TextBlock txt = this.FindName("header") as TextBlock;
-            txt.Text = "Mapping Tools - Map_Cleaner";
+            txt.Text = "Mapping Tools - Map Cleaner";
 
             MinWidth = 630;
             MinHeight = 560;
@@ -73,7 +73,18 @@ namespace Mapping_Tools {
             DataContext = new SliderMergerVM();
 
             TextBlock txt = this.FindName("header") as TextBlock;
-            txt.Text = "Mapping Tools - Slider_merger";
+            txt.Text = "Mapping Tools - Slider Merger";
+
+            this.MinWidth = 400;
+            this.MinHeight = 380;
+        }
+
+        //Method for loading the completionator interface
+        private void LoadCompletionator(object sender, RoutedEventArgs e) {
+            DataContext = new SliderCompletionatorVM();
+
+            TextBlock txt = this.FindName("header") as TextBlock;
+            txt.Text = "Mapping Tools - Slider Completionator";
 
             this.MinWidth = 400;
             this.MinHeight = 380;

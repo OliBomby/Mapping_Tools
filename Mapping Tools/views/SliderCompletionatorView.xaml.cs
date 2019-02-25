@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -15,10 +16,10 @@ namespace Mapping_Tools.Views {
     /// <summary>
     /// Interaktionslogik für UserControl1.xaml
     /// </summary>
-    public partial class SliderMergerView :UserControl {
+    public partial class SliderCompletionatorView :UserControl {
         private BackgroundWorker backgroundWorker;
 
-        public SliderMergerView() {
+        public SliderCompletionatorView() {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
@@ -27,7 +28,7 @@ namespace Mapping_Tools.Views {
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
-            e.Result = Merge_Sliders((Arguments) e.Argument, bgw, e);
+            e.Result = Complete_Sliders((Arguments) e.Argument, bgw, e);
         }
 
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
@@ -56,50 +57,63 @@ namespace Mapping_Tools.Views {
                 MessageBox.Show(ex.Message);
                 return;
             }
-            backgroundWorker.RunWorkerAsync(new Arguments(fileToCopy, LeniencyBox.GetDouble(), (bool) ReqBookmBox.IsChecked));
+            backgroundWorker.RunWorkerAsync(new Arguments(fileToCopy, OverrideBox.GetDouble(), (bool) ReqBookmBox.IsChecked));
             start.IsEnabled = false;
         }
 
         private struct Arguments {
             public string Path;
-            public double Leniency;
+            public double TemporalOverride;
             public bool RequireBookmarks;
-            public Arguments(string path, double leniency, bool requireBookmarks)
+            public Arguments(string path, double temporalOverride, bool requireBookmarks)
             {
                 Path = path;
-                Leniency = leniency;
+                TemporalOverride = temporalOverride;
                 RequireBookmarks = requireBookmarks;
             }
         }
 
-        private string Merge_Sliders(Arguments arg, BackgroundWorker worker, DoWorkEventArgs e) {
-            int slidersMerged = 0;
-            bool mergeLast = false;
+        private string Complete_Sliders(Arguments arg, BackgroundWorker worker, DoWorkEventArgs e) {
+            int slidersCompleted = 0;
 
             Editor editor = new Editor(arg.Path);
+            Timing timing = editor.Beatmap.BeatmapTiming;
             List<HitObject> markedObjects = arg.RequireBookmarks ? editor.GetBookmarkedObjects() : editor.Beatmap.HitObjects;
 
-            for (int i = 0; i < markedObjects.Count - 1; i++) {
-                HitObject ho1 = markedObjects[i];
-                HitObject ho2 = markedObjects[i + 1];
-                if (ho1.IsSlider && ho2.IsSlider && (ho1.CurvePoints.Last() - ho2.Pos).Length <= arg.Leniency) {
-                    ho2.Move(ho1.CurvePoints.Last() - ho2.Pos);
-                    SliderPath sp1 = BezierConverter.ConvertToBezier(ho1.SliderPath);
-                    SliderPath sp2 = BezierConverter.ConvertToBezier(ho2.SliderPath);
-                    SliderPath mergedPath = new SliderPath(PathType.Bezier, sp1.ControlPoints.Concat(sp2.ControlPoints).ToArray(), ho1.PixelLength + ho2.PixelLength);
-                    ho1.SliderPath = mergedPath;
-                    editor.Beatmap.HitObjects.Remove(ho2);
-                    markedObjects.Remove(ho2);
-                    slidersMerged++;
-                    if(!mergeLast) { slidersMerged++; }
-                    mergeLast = true;
-                    i--;
-                } else {
-                    mergeLast = false;
+            for(int i = 0; i < markedObjects.Count; i++) {
+                HitObject ho = markedObjects[i];
+                if (ho.IsSlider) {
+                    double newPixelLength = ho.GetSliderPath(fullLength: true).Distance;
+                    double newTemporalLength = arg.TemporalOverride != 0 ? timing.GetMpBAtTime(ho.Time) * arg.TemporalOverride : timing.CalculateSliderTemporalLength(ho.Time, newPixelLength);
+                    double oldTemporalLength = timing.CalculateSliderTemporalLength(ho.Time, ho.PixelLength);
+                    double newSV = timing.GetSVAtTime(ho.Time) * (newTemporalLength / oldTemporalLength);
+                    ho.SV = newSV;
+                    ho.PixelLength = newPixelLength;
+                    slidersCompleted++;
                 }
                 if (worker != null && worker.WorkerReportsProgress) {
                     worker.ReportProgress(i / markedObjects.Count);
                 }
+            }
+
+            // Reconstruct SV
+            List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
+            // Add Hitobject stuff
+            foreach (HitObject ho in editor.Beatmap.HitObjects)
+            {
+                if (ho.IsSlider) // SV changes
+                {
+                    TimingPoint tp = ho.TP.Copy();
+                    tp.Offset = ho.Time;
+                    tp.MpB = ho.SV;
+                    timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true));
+                }
+            }
+
+            // Add the new SV changes
+            timingPointsChanges = timingPointsChanges.OrderBy(o => o.TP.Offset).ToList();
+            foreach (TimingPointsChange c in timingPointsChanges) {
+                c.AddChange(timing.TimingPoints, timing);
             }
 
             // Save the file
@@ -113,13 +127,13 @@ namespace Mapping_Tools.Views {
 
             // Make an accurate message
             string message = "";
-            if (Math.Abs(slidersMerged) == 1)
+            if (Math.Abs(slidersCompleted) == 1)
             {
-                message += "Successfully merged " + slidersMerged + " slider!";
+                message += "Successfully completed " + slidersCompleted + " slider!";
             }
             else
             {
-                message += "Successfully merged " + slidersMerged + " sliders!";
+                message += "Successfully completed " + slidersCompleted + " sliders!";
             }
             return message;
         }

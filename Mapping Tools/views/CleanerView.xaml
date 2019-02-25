@@ -155,4 +155,3 @@
          ProgressChanged="BackgroundLoader_ProgressChanged"/>
     </UserControl.Resources>
 </UserControl>
-
