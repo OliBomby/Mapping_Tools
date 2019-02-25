@@ -9,18 +9,34 @@ using System.Windows;
 using System.Windows.Controls;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Components.TimeLine;
 
 namespace Mapping_Tools.Views {
     public partial class CleanerView :UserControl {
         private readonly BackgroundWorker backgroundWorker;
         public readonly BackgroundWorker backgroundLoader;
+        List<double> TimingpointsRemoved;
+        List<double> TimingpointsAdded;
+        List<double> TimingpointsChanged;
+        double EndTime_monitor, EndOffset_monitor;
+        TimeLine TL;
 
         public CleanerView() {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
+
             backgroundWorker = ( (BackgroundWorker) this.FindResource("backgroundWorker") );
             backgroundLoader = ( (BackgroundWorker) this.FindResource("backgroundLoader") );
+        }
+
+        private void CompileTimeLine(string fileToCopy) {
+            if( fileToCopy != "" )
+                backgroundLoader.RunWorkerAsync(new List<string> {
+                    fileToCopy, VolumeSliders.IsChecked.ToString(), SamplesetSliders.IsChecked.ToString(),
+                    VolumeSpinners.IsChecked.ToString(), RemoveSliderendMuting.IsChecked.ToString(),
+                    ResnapObjects.IsChecked.ToString(), ResnapBookmarks.IsChecked.ToString(), Snap1.Text, Snap2.Text, RemoveUnclickableHitsounds.IsChecked.ToString()
+            });
         }
 
         private void UpdateLoaderProgress(BackgroundWorker worker, double fraction, int stage, int maxStages) {
@@ -34,6 +50,42 @@ namespace Mapping_Tools.Views {
             if( e.Error != null ) {
             }
             else {
+                if( TL != null ) {
+                    TL.mainCanvas.Children.Clear();
+                }
+                try {
+                    TL = new TimeLine((int) MainWindow.AppWindow.ActualWidth, 100, EndTime_monitor);
+                    foreach( Double timing_s in TimingpointsAdded ) {
+                        TL.AddElement(timing_s, 1);
+                    }
+                    foreach( Double timing_s in TimingpointsChanged ) {
+                        TL.AddElement(timing_s, 2);
+                    }
+                    foreach( Double timing_s in TimingpointsRemoved ) {
+                        TL.AddElement(timing_s, 3);
+                    }
+                    tl_host.Children.Add(TL);
+                }
+                catch( Exception ex ) {
+                    Console.WriteLine(ex.Message);
+                    if( TL != null ) {
+                        TL.mainCanvas.Children.Clear();
+                    }
+                    TL = new TimeLine((int) MainWindow.AppWindow.ActualWidth, 100, EndOffset_monitor);
+                    foreach( Double timing_s in TimingpointsAdded ) {
+                        TL.AddElement(timing_s, 1);
+                    }
+                    foreach( Double timing_s in TimingpointsChanged ) {
+                        TL.AddElement(timing_s, 2);
+                    }
+                    foreach( Double timing_s in TimingpointsRemoved ) {
+                        TL.AddElement(timing_s, 3);
+                    }
+                    tl_host.Children.Add(TL);
+                }
+                finally {
+
+                }
 
             }
         }
@@ -66,7 +118,7 @@ namespace Mapping_Tools.Views {
             Timeline timeline = editor.Beatmap.GetTimeline();
 
             List<TimingPoint> original = new List<TimingPoint>();
-            foreach(TimingPoint tp in timing.TimingPoints) { original.Add(tp.Copy()); }
+            foreach( TimingPoint tp in timing.TimingPoints ) { original.Add(tp.Copy()); }
 
             int mode = editor.Beatmap.General["Mode"].Value;
             int num_timingPoints = editor.Beatmap.BeatmapTiming.TimingPoints.Count;
@@ -80,80 +132,66 @@ namespace Mapping_Tools.Views {
             List<TimingPoint> svChanges = new List<TimingPoint>();
             bool lastKiai = false;
             double lastSV = -100;
-            for (int i = 0; i < timing.TimingPoints.Count; i++)
-            {
+            for( int i = 0; i < timing.TimingPoints.Count; i++ ) {
                 TimingPoint tp = timing.TimingPoints[i];
-                if (tp.Kiai != lastKiai)
-                {
+                if( tp.Kiai != lastKiai ) {
                     kiaiToggles.Add(tp.Copy());
                     lastKiai = tp.Kiai;
                 }
-                if (tp.Inherited)
-                {
+                if( tp.Inherited ) {
                     lastSV = -100;
                 }
-                else
-                {
-                    if (tp.MpB != lastSV)
-                    {
+                else {
+                    if( tp.MpB != lastSV ) {
                         svChanges.Add(tp.Copy());
                         lastSV = tp.MpB;
                     }
                 }
-                UpdateProgressbar(worker, (double)i / timing.TimingPoints.Count, 0, maxStages);
+                UpdateProgressbar(worker, (double) i / timing.TimingPoints.Count, 0, maxStages);
             }
 
             // Resnap shit
-            if (resnapObjects)
-            {
+            if( resnapObjects ) {
                 // Resnap all objects
-                for (int i = 0; i < editor.Beatmap.HitObjects.Count; i++)
-                {
+                for( int i = 0; i < editor.Beatmap.HitObjects.Count; i++ ) {
                     HitObject ho = editor.Beatmap.HitObjects[i];
                     bool resnapped = ho.ResnapSelf(timing, snap1, snap2);
-                    if (resnapped)
-                    {
+                    if( resnapped ) {
                         objectsResnapped += 1;
                     }
                     ho.ResnapEnd(timing, snap1, snap2);
-                    UpdateProgressbar(worker, (double)i / editor.Beatmap.HitObjects.Count, 1, maxStages);
+                    UpdateProgressbar(worker, (double) i / editor.Beatmap.HitObjects.Count, 1, maxStages);
                 }
 
                 // Resnap Kiai toggles and SV changes
-                for (int i = 0; i < kiaiToggles.Count; i++)
-                {
+                for( int i = 0; i < kiaiToggles.Count; i++ ) {
                     TimingPoint tp = kiaiToggles[i];
                     tp.ResnapSelf(timing, snap1, snap2);
-                    UpdateProgressbar(worker, (double)i / kiaiToggles.Count, 2, maxStages);
+                    UpdateProgressbar(worker, (double) i / kiaiToggles.Count, 2, maxStages);
                 }
-                for (int i = 0; i < svChanges.Count; i++)
-                {
+                for( int i = 0; i < svChanges.Count; i++ ) {
                     TimingPoint tp = svChanges[i];
                     tp.ResnapSelf(timing, snap1, snap2);
-                    UpdateProgressbar(worker, (double)i / svChanges.Count, 3, maxStages);
+                    UpdateProgressbar(worker, (double) i / svChanges.Count, 3, maxStages);
                 }
             }
 
-            if (resnapBookmarks)
-            {
+            if( resnapBookmarks ) {
                 // Resnap the bookmarks
                 List<double> newBookmarks = new List<double>();
                 List<double> bookmarks = editor.Beatmap.GetBookmarks();
-                for (int i = 0; i < bookmarks.Count; i++)
-                {
+                for( int i = 0; i < bookmarks.Count; i++ ) {
                     double bookmark = bookmarks[i];
                     newBookmarks.Add(Math.Floor(timing.Resnap(bookmark, snap1, snap2)));
-                    UpdateProgressbar(worker, (double)i / bookmarks.Count, 4, maxStages);
+                    UpdateProgressbar(worker, (double) i / bookmarks.Count, 4, maxStages);
                 }
                 editor.Beatmap.SetBookmarks(newBookmarks);
             }
 
             // Maybe mute unclickable timelineobjects
-            if (removeUnclickabeHitsounds)
-            {
-                foreach (TimelineObject tlo in timeline.TimeLineObjects)
-                {
-                    if (!(tlo.IsCircle || tlo.IsSliderHead || tlo.IsHoldnoteHead))  // Not clickable
+            if( removeUnclickabeHitsounds ) {
+                foreach( TimelineObject tlo in timeline.TimeLineObjects ) {
+                    if( !( tlo.IsCircle || tlo.IsSliderHead || tlo.IsHoldnoteHead ) )  // Not clickable
                     {
                         tlo.FenoSampleVolume = 5;  // 5% volume mute
                     }
@@ -164,34 +202,29 @@ namespace Mapping_Tools.Views {
             List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
             // Add redlines
             List<TimingPoint> redlines = timing.GetAllRedlines();
-            for (int i = 0; i < redlines.Count; i++)
-            {
+            for( int i = 0; i < redlines.Count; i++ ) {
                 TimingPoint tp = redlines[i];
                 timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, meter: true, inherited: true));
                 UpdateProgressbar(worker, (double)i / redlines.Count, 5, maxStages);
             }
             // Add SV changes for taiko and mania
-            if (mode == 1 || mode == 3)
-            {
-                for (int i = 0; i < svChanges.Count; i++)
-                {
+            if( mode == 1 || mode == 3 ) {
+                for( int i = 0; i < svChanges.Count; i++ ) {
                     TimingPoint tp = svChanges[i];
                     timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true));
                     UpdateProgressbar(worker, (double)i / svChanges.Count, 6, maxStages);
                 }
             }
             // Add Kiai toggles
-            for (int i = 0; i < kiaiToggles.Count; i++)
-            {
+            for( int i = 0; i < kiaiToggles.Count; i++ ) {
                 TimingPoint tp = kiaiToggles[i];
                 timingPointsChanges.Add(new TimingPointsChange(tp, kiai: true));
                 UpdateProgressbar(worker, (double)i / kiaiToggles.Count, 7, maxStages);
             }
             // Add Hitobject stuff
-            for (int i = 0; i < editor.Beatmap.HitObjects.Count; i++)
-            {
+            for( int i = 0; i < editor.Beatmap.HitObjects.Count; i++ ) {
                 HitObject ho = editor.Beatmap.HitObjects[i];
-                if (ho.IsSlider) // SV changes
+                if( ho.IsSlider ) // SV changes
                 {
                     TimingPoint tp = ho.TP.Copy();
                     tp.Offset = ho.Time;
@@ -199,9 +232,9 @@ namespace Mapping_Tools.Views {
                     timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true));
                 }
                 // Body hitsounds
-                bool vol = (ho.IsSlider && volumeSliders) || (ho.IsSpinner && volumeSpinners);
-                bool sam = (ho.IsSlider && samplesetSliders && ho.SampleSet == 0);
-                bool ind = (ho.IsSlider && samplesetSliders);
+                bool vol = ( ho.IsSlider && volumeSliders ) || ( ho.IsSpinner && volumeSpinners );
+                bool sam = ( ho.IsSlider && samplesetSliders && ho.SampleSet == 0 );
+                bool ind = ( ho.IsSlider && samplesetSliders );
                 bool samplesetActuallyChanged = false;
                 foreach (TimingPoint tp in ho.BodyHitsounds)
                 {
@@ -209,69 +242,61 @@ namespace Mapping_Tools.Views {
                     timingPointsChanges.Add(new TimingPointsChange(tp, volume: vol, index: ind, sampleset: sam));
                     if (tp.SampleSet != ho.HitsoundTP.SampleSet) { samplesetActuallyChanged = samplesetSliders && ho.SampleSet == 0; }  // True for sampleset change in sliderbody
                 }
-                if (ho.IsSlider && (!samplesetActuallyChanged) && ho.SampleSet == 0)  // Case can put sampleset on sliderbody
+                if( ho.IsSlider && ( !samplesetActuallyChanged ) && ho.SampleSet == 0 )  // Case can put sampleset on sliderbody
                 {
                     ho.SampleSet = ho.HitsoundTP.SampleSet;
                     ho.SliderExtras = true;
                 }
-                if (ho.IsSlider && samplesetActuallyChanged) // Make it start out with the right sampleset
+                if( ho.IsSlider && samplesetActuallyChanged ) // Make it start out with the right sampleset
                 {
                     TimingPoint tp = ho.HitsoundTP.Copy();
                     tp.Offset = ho.Time;
                     timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: true));
                 }
-                UpdateProgressbar(worker, (double)i / editor.Beatmap.HitObjects.Count, 8, maxStages);
+                UpdateProgressbar(worker, (double) i / editor.Beatmap.HitObjects.Count, 8, maxStages);
             }
             // Add timeline hitsounds
-            for (int i = 0; i < timeline.TimeLineObjects.Count; i++)
-            {
+            for( int i = 0; i < timeline.TimeLineObjects.Count; i++ ) {
                 TimelineObject tlo = timeline.TimeLineObjects[i];
                 // Change the samplesets in the hitobjects
-                if (tlo.Origin.IsCircle)
-                {
+                if( tlo.Origin.IsCircle ) {
                     tlo.Origin.SampleSet = tlo.FenoSampleSet;
                     tlo.Origin.AdditionSet = tlo.FenoAdditionSet;
-                    if (mode == 3)
-                    {
+                    if( mode == 3 ) {
                         tlo.Origin.CustomIndex = tlo.FenoCustomIndex;
                         tlo.Origin.SampleVolume = tlo.FenoSampleVolume;
                     }
                 }
-                else if (tlo.Origin.IsSlider)
-                {
+                else if( tlo.Origin.IsSlider ) {
                     tlo.Origin.EdgeHitsounds[tlo.Repeat] = tlo.GetHitsounds();
                     tlo.Origin.EdgeSampleSets[tlo.Repeat] = tlo.FenoSampleSet;
                     tlo.Origin.EdgeAdditionSets[tlo.Repeat] = tlo.FenoAdditionSet;
                     tlo.Origin.SliderExtras = true;
-                    if (tlo.Origin.EdgeAdditionSets[tlo.Repeat] == tlo.Origin.EdgeSampleSets[tlo.Repeat])  // Simplify additions to auto
+                    if( tlo.Origin.EdgeAdditionSets[tlo.Repeat] == tlo.Origin.EdgeSampleSets[tlo.Repeat] )  // Simplify additions to auto
                     {
                         tlo.Origin.EdgeAdditionSets[tlo.Repeat] = 0;
                     }
                 }
-                else if (tlo.Origin.IsSpinner)
-                {
-                    if (tlo.Repeat == 1)
-                    {
+                else if( tlo.Origin.IsSpinner ) {
+                    if( tlo.Repeat == 1 ) {
                         tlo.Origin.SampleSet = tlo.FenoSampleSet;
                         tlo.Origin.AdditionSet = tlo.FenoAdditionSet;
 
                     }
                 }
-                else if (tlo.Origin.IsHoldNote)
-                {
-                    if (tlo.Repeat == 0)
-                    {
+                else if( tlo.Origin.IsHoldNote ) {
+                    if( tlo.Repeat == 0 ) {
                         tlo.Origin.SampleSet = tlo.FenoSampleSet;
                         tlo.Origin.AdditionSet = tlo.FenoAdditionSet;
                         tlo.Origin.CustomIndex = tlo.FenoCustomIndex;
                         tlo.Origin.SampleVolume = tlo.FenoSampleVolume;
                     }
                 }
-                if (tlo.Origin.AdditionSet == tlo.Origin.SampleSet)  // Simplify additions to auto
+                if( tlo.Origin.AdditionSet == tlo.Origin.SampleSet )  // Simplify additions to auto
                 {
                     tlo.Origin.AdditionSet = 0;
                 }
-                if (mode == 0 && tlo.HasHitsound) // Add greenlines for custom indexes and volumes
+                if( mode == 0 && tlo.HasHitsound ) // Add greenlines for custom indexes and volumes
                 {
                     TimingPoint tp = tlo.Origin.TP.Copy();
                     tp.Offset = tlo.Time;
@@ -281,7 +306,7 @@ namespace Mapping_Tools.Views {
                     bool vol = !(tp.Volume == 5 && removeSliderendMuting && (tlo.IsSliderEnd || tlo.IsSpinnerEnd));  // Remove volume change if sliderend muting or spinnerend muting
                     timingPointsChanges.Add(new TimingPointsChange(tp, volume: vol, index: ind));
                 }
-                UpdateProgressbar(worker, (double)i / timeline.TimeLineObjects.Count, 9, maxStages);
+                UpdateProgressbar(worker, (double) i / timeline.TimeLineObjects.Count, 9, maxStages);
             }
 
 
@@ -296,23 +321,21 @@ namespace Mapping_Tools.Views {
             }
 
             // Take note of all the changes
-            List<double> timingpointsChanged = new List<double>();
+            TimingpointsChanged = new List<double>();
 
-            var originalInNew = (from first in original
-                                       join second in newTimingPoints
-                                       on first.Offset equals second.Offset
-                                       select first).ToList();
+            var originalInNew = ( from first in original
+                                  join second in newTimingPoints
+                                  on first.Offset equals second.Offset
+                                  select first ).ToList();
 
-            var newInOriginal = (from first in original
-                                join second in newTimingPoints
-                                on first.Offset equals second.Offset
-                                select second).ToList();
+            var newInOriginal = ( from first in original
+                                  join second in newTimingPoints
+                                  on first.Offset equals second.Offset
+                                  select second ).ToList();
 
-            for(int i = 0; i < originalInNew.Count(); i++)
-            {
-                if (originalInNew[i] != newInOriginal[i])
-                {
-                    timingpointsChanged.Add(originalInNew[i].Offset);
+            for( int i = 0; i < originalInNew.Count(); i++ ) {
+                if( originalInNew[i] != newInOriginal[i] ) {
+                    TimingpointsChanged.Add(originalInNew[i].Offset);
                 }
             }
 
@@ -321,12 +344,13 @@ namespace Mapping_Tools.Views {
             original.ForEach(o => originalOffsets.Add(o.Offset));
             newTimingPoints.ForEach(o => newOffsets.Add(o.Offset));
 
-            List<double> timingpointsRemoved = originalOffsets.Except(newOffsets).ToList();
-            List<double> timingpointsAdded = newOffsets.Except(originalOffsets).ToList();
+            TimingpointsRemoved = originalOffsets.Except(newOffsets).ToList();
+            TimingpointsAdded = newOffsets.Except(originalOffsets).ToList();
+            EndTime_monitor = editor.Beatmap.HitObjects.Last().EndTime;
+            EndOffset_monitor = editor.Beatmap.BeatmapTiming.TimingPoints.Last().Offset;
 
             // Complete progressbar
-            if (worker != null && worker.WorkerReportsProgress)
-            {
+            if( worker != null && worker.WorkerReportsProgress ) {
                 worker.ReportProgress(100);
             }
         }
