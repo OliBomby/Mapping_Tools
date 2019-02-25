@@ -68,20 +68,7 @@ namespace Mapping_Tools.Views {
                 }
                 catch( Exception ex ) {
                     Console.WriteLine(ex.Message);
-                    if( TL != null ) {
-                        TL.mainCanvas.Children.Clear();
-                    }
-                    TL = new TimeLine((int) MainWindow.AppWindow.ActualWidth, 100, EndOffset_monitor);
-                    foreach( Double timing_s in TimingpointsAdded ) {
-                        TL.AddElement(timing_s, 1);
-                    }
-                    foreach( Double timing_s in TimingpointsChanged ) {
-                        TL.AddElement(timing_s, 2);
-                    }
-                    foreach( Double timing_s in TimingpointsRemoved ) {
-                        TL.AddElement(timing_s, 3);
-                    }
-                    tl_host.Children.Add(TL);
+                    return;
                 }
                 finally {
 
