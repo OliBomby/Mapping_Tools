@@ -57,18 +57,20 @@ namespace Mapping_Tools.Views {
                 MessageBox.Show(ex.Message);
                 return;
             }
-            backgroundWorker.RunWorkerAsync(new Arguments(fileToCopy, OverrideBox.GetDouble(), (bool) ReqBookmBox.IsChecked));
+            backgroundWorker.RunWorkerAsync(new Arguments(fileToCopy, TemporalBox.GetDouble(), SpatialBox.GetDouble(), (bool) ReqBookmBox.IsChecked));
             start.IsEnabled = false;
         }
 
         private struct Arguments {
             public string Path;
-            public double TemporalOverride;
+            public double TemporalLength;
+            public double SpatialLength;
             public bool RequireBookmarks;
-            public Arguments(string path, double temporalOverride, bool requireBookmarks)
+            public Arguments(string path, double temporal, double spatial, bool requireBookmarks)
             {
                 Path = path;
-                TemporalOverride = temporalOverride;
+                TemporalLength = temporal;
+                SpatialLength = spatial;
                 RequireBookmarks = requireBookmarks;
             }
         }
@@ -83,12 +85,14 @@ namespace Mapping_Tools.Views {
             for(int i = 0; i < markedObjects.Count; i++) {
                 HitObject ho = markedObjects[i];
                 if (ho.IsSlider) {
-                    double newPixelLength = ho.GetSliderPath(fullLength: true).Distance;
-                    double newTemporalLength = arg.TemporalOverride != 0 ? timing.GetMpBAtTime(ho.Time) * arg.TemporalOverride : timing.CalculateSliderTemporalLength(ho.Time, newPixelLength);
+                    double oldSpatialLength = ho.PixelLength;
+                    double newSpatialLength = arg.SpatialLength != 0 ? ho.GetSliderPath(fullLength: true).Distance * arg.SpatialLength : oldSpatialLength;
                     double oldTemporalLength = timing.CalculateSliderTemporalLength(ho.Time, ho.PixelLength);
-                    double newSV = timing.GetSVAtTime(ho.Time) * (newTemporalLength / oldTemporalLength);
+                    double newTemporalLength = arg.TemporalLength != 0 ? timing.GetMpBAtTime(ho.Time) * arg.TemporalLength : oldTemporalLength;
+                    double oldSV = timing.GetSVAtTime(ho.Time);
+                    double newSV = oldSV / ((newSpatialLength / oldSpatialLength) / (newTemporalLength / oldTemporalLength));
                     ho.SV = newSV;
-                    ho.PixelLength = newPixelLength;
+                    ho.PixelLength = newSpatialLength;
                     slidersCompleted++;
                 }
                 if (worker != null && worker.WorkerReportsProgress) {
