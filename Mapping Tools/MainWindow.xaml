@@ -7,7 +7,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        xmlns:views="clr-namespace:Mapping_Tools.views"
+        xmlns:views="clr-namespace:Mapping_Tools.Views"
         xmlns:viewmodels="clr-namespace:Mapping_Tools.viewmodels"
         mc:Ignorable="d"
         Title="Beatmap Cleaner 2.0.0"  

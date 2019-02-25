@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Controls;
 using MaterialDesignThemes.Wpf;
-using Mapping_Tools.viewmodels;
+using Mapping_Tools.Viewmodels;
 using Microsoft.Win32;
 using System.Windows.Media;
 using System.IO;

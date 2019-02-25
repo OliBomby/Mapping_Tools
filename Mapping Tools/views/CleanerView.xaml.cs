@@ -10,7 +10,7 @@ using System.Windows.Controls;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Components.TimeLine;
 
-namespace Mapping_Tools.views {
+namespace Mapping_Tools.Views {
     public partial class CleanerView :UserControl {
         private readonly BackgroundWorker backgroundWorker;
         public readonly BackgroundWorker backgroundLoader;
