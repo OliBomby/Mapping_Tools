@@ -44,7 +44,6 @@ namespace Mapping_Tools {
         }
 
         private void SaveBackup(object sender, RoutedEventArgs e) {
-            Console.WriteLine("ababa");
             DateTime now = DateTime.Now;
             string fileToCopy = currentMap.Text;
             string destinationDirectory = System.Environment.CurrentDirectory + "\\Backups\\";

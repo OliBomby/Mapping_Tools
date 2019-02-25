@@ -1,0 +1,11 @@
+﻿<UserControl x:Class="Mapping_Tools.Components.TimeLine.TimeLine"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             UseLayoutRounding="True"
+             SnapsToDevicePixels="True"
+             mc:Ignorable="d" >
+    <Canvas x:Name="mainCanvas">
+    </Canvas>
+</UserControl>
