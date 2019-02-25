@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Mapping_Tools.Classes.MathUtil;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -6,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
-    class Timing {
+    public class Timing {
         public List<TimingPoint> TimingPoints { get; set; }
         public double SliderMultiplier { get; set; }
 
@@ -44,7 +45,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 newTime = newTime2;
             }
 
-            if( afterTP != null && newTime > afterTP.Offset ) {
+            if( afterTP != null && Precision.DefinitelyBigger(newTime, afterTP.Offset) ) {
                 newTime = afterTP.Offset;
             }
             return newTime;
@@ -68,7 +69,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 newTime = newTime2;
             }
 
-            if( afterTP != null && newTime > afterTP.Offset ) {
+            if( afterTP != null && Precision.DefinitelyBigger(newTime, afterTP.Offset) ) {
                 newTime = afterTP.Offset;
             }
 
@@ -81,7 +82,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public double GetTimingPointEffectiveRange(TimingPoint ttp) {
             foreach( TimingPoint tp in TimingPoints ) {
-                if( tp.Offset > ttp.Offset ) {
+                if(Precision.DefinitelyBigger(tp.Offset, ttp.Offset) ) {
                     return tp.Offset;
                 }
             }
@@ -91,7 +92,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public TimingPoint GetTimingPointAtTime(double time) {
             TimingPoint lastTP = GetFirstTimingPointExtended();
             foreach( TimingPoint tp in TimingPoints ) {
-                if( tp.Offset > time ) {
+                if(Precision.DefinitelyBigger(tp.Offset, time) ) {
                     return lastTP;
                 }
                 lastTP = tp;
@@ -102,7 +103,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public List<TimingPoint> GetTimingPointsInTimeRange(double startTime, double endTime) {
             List<TimingPoint> TPs = new List<TimingPoint>();
             foreach( TimingPoint tp in TimingPoints ) {
-                if( tp.Offset > startTime && tp.Offset < endTime ) {
+                if( Precision.DefinitelyBigger(tp.Offset, startTime) && Precision.DefinitelyBigger(endTime, tp.Offset) ) {
                     TPs.Add(tp);
                 }
             }
@@ -120,7 +121,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public TimingPoint GetRedlineAtTime(double time) {
             TimingPoint lastTP = GetFirstTimingPointExtended();
             foreach( TimingPoint tp in TimingPoints ) {
-                if( tp.Offset > time ) {
+                if( Precision.DefinitelyBigger(tp.Offset, time) ) {
                     return lastTP;
                 }
                 if( tp.Inherited ) {
@@ -132,7 +133,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public TimingPoint GetRedlineAfterTime(double time) {
             foreach( TimingPoint tp in TimingPoints ) {
-                if( tp.Offset > time && tp.Inherited ) {
+                if( Precision.DefinitelyBigger(tp.Offset, time) && tp.Inherited) {
                     return tp;
                 }
             }
@@ -146,7 +147,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public double GetSVAtTime(double time) {
             double lastSV = -100;
             foreach( TimingPoint tp in TimingPoints ) {
-                if( tp.Offset > time ) {
+                if( Precision.DefinitelyBigger(tp.Offset, time) ) {
                     return lastSV;
                 }
                 if( !tp.Inherited ) {

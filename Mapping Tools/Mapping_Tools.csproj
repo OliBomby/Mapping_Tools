@@ -137,9 +137,15 @@
     <Compile Include="Components\TimeLine\TimeLineMark.xaml.cs">
       <DependentUpon>TimeLineMark.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Classes\Tools\TimingPointsChange.cs" />
     <Compile Include="Viewmodels\CleanerVM.cs" />
+    <Compile Include="Viewmodels\SliderCompletionatorVM.cs" />
     <Compile Include="Viewmodels\SliderMergerVM.cs" />
     <Compile Include="Viewmodels\StandardVM.cs" />
+    <Compile Include="Views\Extensions.cs" />
+    <Compile Include="Views\SliderCompletionatorView.xaml.cs">
+      <DependentUpon>SliderCompletionatorView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\StandardView.xaml.cs">
       <DependentUpon>StandardView.xaml</DependentUpon>
     </Compile>
@@ -181,6 +187,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\SliderCompletionatorView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\StandardView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

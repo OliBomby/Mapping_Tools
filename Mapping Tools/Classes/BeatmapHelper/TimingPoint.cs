@@ -2,7 +2,7 @@
 using System.Globalization;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
-    class TimingPoint {
+    public class TimingPoint {
         // Offset, Milliseconds per Beat, Meter, Sample Set, Sample Index, Volume, Inherited, Kiai Mode
         public double Offset { get; set; }
         public double MpB { get; set; }

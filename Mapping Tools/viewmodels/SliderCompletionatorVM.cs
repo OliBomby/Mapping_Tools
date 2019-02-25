@@ -1,4 +1,4 @@
 ﻿namespace Mapping_Tools.Viewmodels {
-    public class SliderMergerVM {
+    public class SliderCompletionatorVM {
     }
 }
