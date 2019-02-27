@@ -97,6 +97,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -159,6 +160,9 @@
     <Compile Include="Classes\BeatmapHelper\TValue.cs" />
     <Compile Include="Classes\Tools\BezierConverter.cs" />
     <Compile Include="Classes\Tools\CircleBezierPreset.cs" />
+    <Compile Include="Components\Hotkey.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Components\TimeLine\TimeLine.xaml.cs">
       <DependentUpon>TimeLine.xaml</DependentUpon>
     </Compile>
