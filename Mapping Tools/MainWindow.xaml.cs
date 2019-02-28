@@ -90,6 +90,15 @@ namespace Mapping_Tools {
             this.MinHeight = 380;
         }
 
+        //Method for loading the preferences
+        private void LoadPreferences(object sender, RoutedEventArgs e) {
+            DataContext = new PreferencesVM();
+            TextBlock txt = this.FindName("header") as TextBlock;
+            txt.Text = "Mapping Tools - Preferences";
+            this.MinWidth = 100;
+            this.MinHeight = 100;
+        }
+
         //Method for loading the standard interface
         private void LoadCopier(object sender, RoutedEventArgs e) {
             DataContext = new StandardVM();

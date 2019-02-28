@@ -160,9 +160,6 @@
     <Compile Include="Classes\BeatmapHelper\TValue.cs" />
     <Compile Include="Classes\Tools\BezierConverter.cs" />
     <Compile Include="Classes\Tools\CircleBezierPreset.cs" />
-    <Compile Include="Components\HotKeyControl.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Components\TimeLine\TimeLine.xaml.cs">
       <DependentUpon>TimeLine.xaml</DependentUpon>
     </Compile>
@@ -176,10 +173,14 @@
     <Compile Include="Viewmodels\CleanerVM.cs" />
     <Compile Include="Viewmodels\SliderCompletionatorVM.cs" />
     <Compile Include="Viewmodels\SliderMergerVM.cs" />
+    <Compile Include="Viewmodels\PreferencesVM.cs" />
     <Compile Include="Viewmodels\StandardVM.cs" />
     <Compile Include="Views\Extensions.cs" />
     <Compile Include="Views\SliderCompletionatorView.xaml.cs">
       <DependentUpon>SliderCompletionatorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PreferencesView.xaml.cs">
+      <DependentUpon>PreferencesView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\StandardView.xaml.cs">
       <DependentUpon>StandardView.xaml</DependentUpon>
@@ -223,6 +224,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\SliderCompletionatorView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\PreferencesView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
