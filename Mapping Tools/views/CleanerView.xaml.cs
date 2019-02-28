@@ -14,7 +14,7 @@ using Mapping_Tools.Components.TimeLine;
 namespace Mapping_Tools.Views {
     public partial class CleanerView :UserControl {
         private readonly BackgroundWorker backgroundWorker;
-        public readonly BackgroundWorker backgroundLoader;
+        private readonly BackgroundWorker backgroundLoader;
         List<double> TimingpointsRemoved;
         List<double> TimingpointsAdded;
         List<double> TimingpointsChanged;
@@ -73,7 +73,6 @@ namespace Mapping_Tools.Views {
                 finally {
 
                 }
-
             }
         }
 

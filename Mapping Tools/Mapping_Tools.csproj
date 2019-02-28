@@ -64,6 +64,9 @@
     <Reference Include="MaterialDesignThemes.Wpf, Version=2.5.0.1205, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MaterialDesignThemes.2.5.0.1205\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -126,6 +129,8 @@
     <Compile Include="Classes\SliderPathStuff\SliderInterpreter.cs" />
     <Compile Include="Classes\SliderPathStuff\SliderPath.cs" />
     <Compile Include="Classes\BeatmapHelper\TValue.cs" />
+    <Compile Include="Classes\SystemTools\Settings.cs" />
+    <Compile Include="Classes\SystemTools\SettingsManager.cs" />
     <Compile Include="Classes\Tools\BezierConverter.cs" />
     <Compile Include="Classes\Tools\CircleBezierPreset.cs" />
     <Compile Include="Components\TimeLine\TimeLine.xaml.cs">

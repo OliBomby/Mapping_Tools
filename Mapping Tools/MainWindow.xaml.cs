@@ -6,14 +6,15 @@ using System.Windows.Controls;
 using MaterialDesignThemes.Wpf;
 using Mapping_Tools.Viewmodels;
 using Microsoft.Win32;
-using System.Windows.Media;
 using System.IO;
+using Mapping_Tools.Classes.SystemTools;
 
 namespace Mapping_Tools {
     public partial class MainWindow :Window {
         private bool isMaximized = false; //Check for window state
         private double widthWin, heightWin; //Set default sizes of window
         public static MainWindow AppWindow { get; set; }
+        public SettingsManager settingsManager;
 
         public MainWindow() {
             InitializeComponent();
@@ -21,6 +22,7 @@ namespace Mapping_Tools {
             widthWin = ActualWidth; //Set width to window
             heightWin = ActualHeight; //Set height to window
             DataContext = new StandardVM(); //Generate Standard view model to show on startup
+            settingsManager = new SettingsManager();
 
             //Check and create backup folder
             try {
@@ -41,6 +43,8 @@ namespace Mapping_Tools {
             };
             openFileDialog.ShowDialog();
             currentMap.Text = openFileDialog.FileName != "" ? openFileDialog.FileName : currentMap.Text;
+
+            settingsManager.settings.AddRecentMaps(currentMap.Text, DateTime.Now);
         }
 
         private void SaveBackup(object sender, RoutedEventArgs e) {
@@ -172,6 +176,7 @@ namespace Mapping_Tools {
 
         //Close window
         private void CloseWin(object sender, RoutedEventArgs e) {
+            settingsManager.WriteToJSON();
             this.Close();
         }
 
