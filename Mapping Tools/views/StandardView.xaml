@@ -56,6 +56,12 @@
                 </Viewbox>
                 <Viewbox HorizontalAlignment="Left" Grid.Row="1" VerticalAlignment="Top">
                     <ListView x:Name="recentList" Foreground="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Path" DisplayMemberBinding="{Binding Path}"/>
+                                <GridViewColumn Header="Date" DisplayMemberBinding="{Binding Date}"/>
+                            </GridView>
+                        </ListView.View>
                     </ListView>
                 </Viewbox>
             </Grid>
@@ -73,6 +79,9 @@
             </Viewbox>
             <Grid VerticalAlignment="Top" Grid.Row="1">
                 <ListView x:Name="NewsList" VerticalContentAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListViewItem>
+                        <TextBlock>User configuration implemented in backend</TextBlock>
+                    </ListViewItem>
                     <ListViewItem>
                         <TextBlock>Slidermerger 2.0 is almost ready</TextBlock>
                     </ListViewItem>
