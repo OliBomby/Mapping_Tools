@@ -13,5 +13,5 @@ Collection of tools for manipulating osu! beatmaps
 - More clear instructions on startup / in a helping page
 
 ## Used libraries
-[MaterialDesignInXamlToolkit](https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit)
-[Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)
+- [MaterialDesignInXamlToolkit](https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit)
+- [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)
