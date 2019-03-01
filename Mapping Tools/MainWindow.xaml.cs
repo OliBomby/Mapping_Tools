@@ -44,7 +44,7 @@ namespace Mapping_Tools {
             openFileDialog.ShowDialog();
             currentMap.Text = openFileDialog.FileName != "" ? openFileDialog.FileName : currentMap.Text;
 
-            settingsManager.settings.AddRecentMaps(currentMap.Text, DateTime.Now);
+            settingsManager.AddRecentMaps(currentMap.Text, DateTime.Now, true);
         }
 
         private void SaveBackup(object sender, RoutedEventArgs e) {
@@ -176,7 +176,7 @@ namespace Mapping_Tools {
 
         //Close window
         private void CloseWin(object sender, RoutedEventArgs e) {
-            settingsManager.WriteToJSON();
+            settingsManager.WriteToJSON(false);
             this.Close();
         }
 

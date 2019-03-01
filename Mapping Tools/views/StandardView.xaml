@@ -80,6 +80,9 @@
             <Grid VerticalAlignment="Top" Grid.Row="1">
                 <ListView x:Name="NewsList" VerticalContentAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                     <ListViewItem>
+                        <TextBlock>User configuration implemented in backend</TextBlock>
+                    </ListViewItem>
+                    <ListViewItem>
                         <TextBlock>Slidermerger 2.0 is almost ready</TextBlock>
                     </ListViewItem>
                     <ListViewItem>
