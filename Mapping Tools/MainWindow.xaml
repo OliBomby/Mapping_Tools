@@ -54,6 +54,7 @@
                 <Menu Foreground="#FFD6D6D6" >
                     <MenuItem Height="31" Header="_File" Padding="12,0,0,0" MinWidth="50">
                         <MenuItem Header="_Open Beatmap" Click="OpenBeatmap"/>
+                        <MenuItem Header="_Open Current Beatmap" Click="OpenCurrentBeatmap"/>
                         <MenuItem Header="_Generate Backup" Click="SaveBackup"/>
                     </MenuItem>
                     <MenuItem Height="31" Header="_Tools" Padding="12,0,0,0" MinWidth="65">
