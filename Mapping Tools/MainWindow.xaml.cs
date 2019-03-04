@@ -68,7 +68,7 @@ namespace Mapping_Tools {
             var reader = OsuMemoryDataProvider.DataProvider.Instance;
             string folder = reader.GetMapFolderName();
             string filename = reader.GetOsuFileName();
-            string path = Path.Combine(new string[] { osuFolder, "Songs", folder, filename });
+            string path = Path.Combine(osuFolder, "Songs", folder, filename);
 
             if (osuFolder == "" || folder == "" || filename == "") { return; }
             currentMap.Text = path;
