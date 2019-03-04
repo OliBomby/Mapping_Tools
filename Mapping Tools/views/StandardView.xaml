@@ -55,7 +55,7 @@
                     <TextBlock Foreground="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}">Recent</TextBlock>
                 </Viewbox>
                 <Viewbox HorizontalAlignment="Left" Grid.Row="1" VerticalAlignment="Top">
-                    <ListView x:Name="recentList" Foreground="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
+                    <ListView x:Name="recentList" Foreground="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}" MouseDoubleClick="RecentList_MouseDoubleClick">
                         <ListView.View>
                             <GridView>
                                 <GridViewColumn Header="Path" DisplayMemberBinding="{Binding Path}"/>

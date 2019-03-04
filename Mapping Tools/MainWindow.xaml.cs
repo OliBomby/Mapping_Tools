@@ -94,6 +94,17 @@ namespace Mapping_Tools {
             this.MinHeight = 380;
         }
 
+        //Method for loading the snapping tools interface
+        private void LoadSnappingTools(object sender, RoutedEventArgs e) {
+            DataContext = new SnappingToolsVM();
+
+            TextBlock txt = this.FindName("header") as TextBlock;
+            txt.Text = "Mapping Tools - Snapping Tools";
+
+            this.MinWidth = 400;
+            this.MinHeight = 380;
+        }
+
         //Method for loading the standard interface
         private void LoadCopier(object sender, RoutedEventArgs e) {
             DataContext = new StandardVM();
