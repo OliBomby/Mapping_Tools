@@ -15,6 +15,7 @@ namespace Mapping_Tools {
         private double widthWin, heightWin; //Set default sizes of window
         public static MainWindow AppWindow { get; set; }
         public SettingsManager settingsManager;
+        public string osuFolder;
 
         public MainWindow() {
             InitializeComponent();
@@ -23,6 +24,8 @@ namespace Mapping_Tools {
             heightWin = ActualHeight; //Set height to window
             DataContext = new StandardVM(); //Generate Standard view model to show on startup
             settingsManager = new SettingsManager();
+            RegistryKey regKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall");
+            osuFolder = FindByDisplayName(regKey, "osu!");
 
             //Check and create backup folder
             try {
@@ -35,7 +38,7 @@ namespace Mapping_Tools {
 
         private void OpenBeatmap(object sender, RoutedEventArgs e) {
             OpenFileDialog openFileDialog = new OpenFileDialog {
-                InitialDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "osu!\\Songs"),
+                InitialDirectory = Path.Combine(osuFolder, "Songs"),
                 Filter = "Osu files (*.osu)|*.osu",
                 FilterIndex = 1,
                 RestoreDirectory = true,
@@ -44,6 +47,31 @@ namespace Mapping_Tools {
             openFileDialog.ShowDialog();
             currentMap.Text = openFileDialog.FileName != "" ? openFileDialog.FileName : currentMap.Text;
 
+            settingsManager.AddRecentMaps(currentMap.Text, DateTime.Now, true);
+        }
+
+        private string FindByDisplayName(RegistryKey parentKey, string name) {
+            string[] nameList = parentKey.GetSubKeyNames();
+            for (int i = 0; i < nameList.Length; i++) {
+                RegistryKey regKey = parentKey.OpenSubKey(nameList[i]);
+                try {
+                    if (regKey.GetValue("DisplayName").ToString() == name) {
+                        return Path.GetDirectoryName(regKey.GetValue("UninstallString").ToString());
+                    }
+                } catch { }
+            }
+            return "";
+        }
+
+        private void OpenCurrentBeatmap(object sender, RoutedEventArgs e) {
+            OsuMemoryDataProvider.DataProvider.Initalize();
+            var reader = OsuMemoryDataProvider.DataProvider.Instance;
+            string folder = reader.GetMapFolderName();
+            string filename = reader.GetOsuFileName();
+            string path = Path.Combine(new string[] { osuFolder, "Songs", folder, filename });
+
+            if (osuFolder == "" || folder == "" || filename == "") { return; }
+            currentMap.Text = path;
             settingsManager.AddRecentMaps(currentMap.Text, DateTime.Now, true);
         }
 
@@ -89,6 +117,17 @@ namespace Mapping_Tools {
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Slider Completionator";
+
+            this.MinWidth = 400;
+            this.MinHeight = 380;
+        }
+
+        //Method for loading the snapping tools interface
+        private void LoadSnappingTools(object sender, RoutedEventArgs e) {
+            DataContext = new SnappingToolsVM();
+
+            TextBlock txt = this.FindName("header") as TextBlock;
+            txt.Text = "Mapping Tools - Snapping Tools";
 
             this.MinWidth = 400;
             this.MinHeight = 380;

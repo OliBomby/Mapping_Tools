@@ -21,5 +21,9 @@ namespace Mapping_Tools.Views {
 
             public string Date { get; set; }
         }
+
+        private void RecentList_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e) {
+            MainWindow.AppWindow.currentMap.Text = ((MyItem)recentList.SelectedItem).Path;
+        }
     }
 }
