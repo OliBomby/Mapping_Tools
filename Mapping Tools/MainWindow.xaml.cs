@@ -67,7 +67,7 @@ namespace Mapping_Tools {
                     if (regKey.GetValue("DisplayName").ToString() == name) {
                         return Path.GetDirectoryName(regKey.GetValue("UninstallString").ToString());
                     }
-                } catch { }
+                } catch (NullReferenceException) { }
             }
             return "";
         }
