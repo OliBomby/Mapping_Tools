@@ -24,6 +24,8 @@ namespace Mapping_Tools {
             heightWin = ActualHeight; //Set height to window
             DataContext = new StandardVM(); //Generate Standard view model to show on startup
             settingsManager = new SettingsManager();
+            if (settingsManager.GetRecentMaps().Count > 0) {
+                SetCurrentMap(settingsManager.GetRecentMaps()[0][0]); } //Set currentmap to previously opened map
             RegistryKey regKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall");
             osuFolder = FindByDisplayName(regKey, "osu!");
 
@@ -36,6 +38,15 @@ namespace Mapping_Tools {
             }
         }
 
+        public void SetCurrentMap(string path) {
+            currentMap.Text = path;
+            settingsManager.AddRecentMaps(path, DateTime.Now, true);
+        }
+
+        public string GetCurrentMap() {
+            return currentMap.Text;
+        }
+
         private void OpenBeatmap(object sender, RoutedEventArgs e) {
             OpenFileDialog openFileDialog = new OpenFileDialog {
                 InitialDirectory = Path.Combine(osuFolder, "Songs"),
@@ -45,9 +56,7 @@ namespace Mapping_Tools {
                 CheckFileExists = true
             };
             openFileDialog.ShowDialog();
-            currentMap.Text = openFileDialog.FileName != "" ? openFileDialog.FileName : currentMap.Text;
-
-            settingsManager.AddRecentMaps(currentMap.Text, DateTime.Now, true);
+            if (openFileDialog.FileName != "") { SetCurrentMap(openFileDialog.FileName); }
         }
 
         private string FindByDisplayName(RegistryKey parentKey, string name) {
@@ -71,8 +80,7 @@ namespace Mapping_Tools {
             string path = Path.Combine(osuFolder, "Songs", folder, filename);
 
             if (osuFolder == "" || folder == "" || filename == "") { return; }
-            currentMap.Text = path;
-            settingsManager.AddRecentMaps(currentMap.Text, DateTime.Now, true);
+            SetCurrentMap(path);
         }
 
         private void SaveBackup(object sender, RoutedEventArgs e) {
