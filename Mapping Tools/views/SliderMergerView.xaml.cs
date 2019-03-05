@@ -48,9 +48,9 @@ namespace Mapping_Tools.Views {
         private void Start_Click(object sender, RoutedEventArgs e) {
             DateTime now = DateTime.Now;
             string fileToCopy = MainWindow.AppWindow.currentMap.Text;
-            string destinationDirectory = Environment.CurrentDirectory + "\\Backups\\";
+            string destinationDirectory = MainWindow.AppWindow.BackupPath;
             try {
-                File.Copy(fileToCopy, destinationDirectory + now.ToString("yyyy-MM-dd HH-mm-ss") + "___" + System.IO.Path.GetFileName(fileToCopy));
+                File.Copy(fileToCopy, Path.Combine(destinationDirectory, now.ToString("yyyy-MM-dd HH-mm-ss") + "___" + System.IO.Path.GetFileName(fileToCopy)));
             }
             catch( Exception ex ) {
                 MessageBox.Show(ex.Message);

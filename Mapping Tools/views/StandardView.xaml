@@ -27,19 +27,19 @@
             <Viewbox MaxWidth="300" HorizontalAlignment="Left" Grid.Row="0">
                 <TextBlock Foreground="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}">Getting started</TextBlock>
             </Viewbox>
-            <Viewbox MaxWidth="500" HorizontalAlignment="Left" Grid.Row="1" VerticalAlignment="Top">
+            <Viewbox HorizontalAlignment="Left" Grid.Row="1" VerticalAlignment="Top">
                 <ListView Foreground="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
                     <ListViewItem>
-                        1. Open a beatmap from File -> Open Beatmap
+                        1. Open a beatmap from [File] -> [Open Beatmap/Open Current Beatmap] to select a file from your system OR the currently in-game selected map
                     </ListViewItem>
                     <ListViewItem>
-                        2. Select a tool that you want to use from Tools -> [Tool]
+                        2. Select a tool that you want to use from [Tools]
                     </ListViewItem>
                     <ListViewItem>
                         3. Tune the parameters to what you want to achieve
                     </ListViewItem>
                     <ListViewItem>
-                        4. Click on the white play button in the bottom right to run the program
+                        4. Click on the white button in the bottom right to run the program
                     </ListViewItem>
                 </ListView>
             </Viewbox>

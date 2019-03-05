@@ -8,6 +8,9 @@ using Mapping_Tools.Viewmodels;
 using Microsoft.Win32;
 using System.IO;
 using Mapping_Tools.Classes.SystemTools;
+using AutoUpdaterDotNET;
+using Newtonsoft.Json;
+using System.Security.Principal;
 
 namespace Mapping_Tools {
     public partial class MainWindow :Window {
@@ -16,24 +19,78 @@ namespace Mapping_Tools {
         public static MainWindow AppWindow { get; set; }
         public SettingsManager settingsManager;
         public string osuFolder;
+        public bool SessionhasAdminRights;
+        public string AppDataPath;
+        public string BackupPath;
 
         public MainWindow() {
+            Setup();
             InitializeComponent();
             AppWindow = this;
             widthWin = ActualWidth; //Set width to window
             heightWin = ActualHeight; //Set height to window
             DataContext = new StandardVM(); //Generate Standard view model to show on startup
             settingsManager = new SettingsManager();
-            RegistryKey regKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall");
-            osuFolder = FindByDisplayName(regKey, "osu!");
 
-            //Check and create backup folder
+            RegistryKey regKey;
             try {
-                System.IO.Directory.CreateDirectory(System.Environment.CurrentDirectory + "\\Backups\\");
+                regKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall");
             }
             catch( Exception ex ) {
-                MessageBox.Show(ex.Message);
+                regKey = null;
             }
+            if( regKey != null )
+                osuFolder = FindByDisplayName(regKey, "osu!");
+
+        }
+
+        private void Setup() {
+            SessionhasAdminRights = IsUserAdministrator() ? true : false;
+
+            /*
+            AutoUpdater.ParseUpdateInfoEvent += AutoUpdaterOnParseUpdateInfoEvent;
+            AutoUpdater.Start("https://osu-mappingtools.potoofu.moe/Updater/updater.json");
+            */
+
+            string appCommon = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+            AppDataPath = Path.Combine(appCommon, "Mapping-Tools");
+            BackupPath = Path.Combine(AppDataPath, "Backups");
+
+            if( !Directory.Exists(AppDataPath) ) {
+                try {
+                    Directory.CreateDirectory(AppDataPath);
+                    Directory.CreateDirectory(BackupPath);
+                }
+                catch( Exception ex ) {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+        }
+
+        private bool IsUserAdministrator() {
+            bool isAdmin;
+            try {
+                WindowsIdentity user = WindowsIdentity.GetCurrent();
+                WindowsPrincipal principal = new WindowsPrincipal(user);
+                isAdmin = principal.IsInRole(WindowsBuiltInRole.Administrator);
+            }
+            catch( UnauthorizedAccessException ex ) {
+                isAdmin = false;
+            }
+            catch( Exception ex ) {
+                isAdmin = false;
+            }
+            return isAdmin;
+        }
+
+        private void AutoUpdaterOnParseUpdateInfoEvent(ParseUpdateInfoEventArgs args) {
+            dynamic json = JsonConvert.DeserializeObject(args.RemoteData);
+            args.UpdateInfo = new UpdateInfoEventArgs {
+                CurrentVersion = json.version,
+                ChangelogURL = json.changelog,
+                Mandatory = json.mandatory,
+                DownloadURL = json.url
+            };
         }
 
         private void OpenBeatmap(object sender, RoutedEventArgs e) {
@@ -52,13 +109,14 @@ namespace Mapping_Tools {
 
         private string FindByDisplayName(RegistryKey parentKey, string name) {
             string[] nameList = parentKey.GetSubKeyNames();
-            for (int i = 0; i < nameList.Length; i++) {
+            for( int i = 0; i < nameList.Length; i++ ) {
                 RegistryKey regKey = parentKey.OpenSubKey(nameList[i]);
                 try {
-                    if (regKey.GetValue("DisplayName").ToString() == name) {
+                    if( regKey.GetValue("DisplayName").ToString() == name ) {
                         return Path.GetDirectoryName(regKey.GetValue("UninstallString").ToString());
                     }
-                } catch { }
+                }
+                catch { }
             }
             return "";
         }
@@ -70,7 +128,7 @@ namespace Mapping_Tools {
             string filename = reader.GetOsuFileName();
             string path = Path.Combine(new string[] { osuFolder, "Songs", folder, filename });
 
-            if (osuFolder == "" || folder == "" || filename == "") { return; }
+            if( osuFolder == "" || folder == "" || filename == "" ) { return; }
             currentMap.Text = path;
             settingsManager.AddRecentMaps(currentMap.Text, DateTime.Now, true);
         }
@@ -78,9 +136,9 @@ namespace Mapping_Tools {
         private void SaveBackup(object sender, RoutedEventArgs e) {
             DateTime now = DateTime.Now;
             string fileToCopy = currentMap.Text;
-            string destinationDirectory = System.Environment.CurrentDirectory + "\\Backups\\";
+            string destinationDirectory = BackupPath;
             try {
-                File.Copy(fileToCopy, destinationDirectory + now.ToString("yyyy-MM-dd HH-mm-ss") + "___" + System.IO.Path.GetFileName(fileToCopy));
+                File.Copy(fileToCopy, Path.Combine(destinationDirectory, now.ToString("yyyy-MM-dd HH-mm-ss") + "___" + System.IO.Path.GetFileName(fileToCopy)));
             }
             catch( Exception ex ) {
                 MessageBox.Show(ex.Message);
@@ -154,7 +212,7 @@ namespace Mapping_Tools {
         //Open backup folder in file explorer
         private void OpenBackups(object sender, RoutedEventArgs e) {
             try {
-                Process.Start(System.Environment.CurrentDirectory + "\\Backups\\");
+                Process.Start(BackupPath);
             }
             catch( Exception ex ) {
                 MessageBox.Show(ex.Message);
@@ -203,7 +261,7 @@ namespace Mapping_Tools {
                 window_border.BorderThickness = new Thickness(1);
                 bt.Content = new PackIcon { Kind = PackIconKind.WindowMaximize };
             }
-            else {               
+            else {
                 widthWin = ActualWidth;
                 heightWin = ActualHeight;
                 this.Left = SystemParameters.WorkArea.Left;
