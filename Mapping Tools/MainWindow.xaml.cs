@@ -93,6 +93,7 @@ namespace Mapping_Tools {
                 Mandatory = json.mandatory,
                 DownloadURL = json.url
             };
+        }
           
         public void SetCurrentMap(string path) {
             currentMap.Text = path;
