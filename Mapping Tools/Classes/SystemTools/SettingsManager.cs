@@ -6,7 +6,7 @@ using System.Windows;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public class SettingsManager {
-        private static readonly string Path = Environment.CurrentDirectory + "\\config.json";
+        private static readonly string JSONPath = Path.Combine(MainWindow.AppWindow.AppDataPath, "config.json");
         private static readonly JsonSerializer Serializer = new JsonSerializer {
             NullValueHandling = NullValueHandling.Ignore
         };
@@ -14,12 +14,12 @@ namespace Mapping_Tools.Classes.SystemTools {
         private Settings settings;
 
         public SettingsManager() {
-            bool instanceComplete = File.Exists(Path) ? LoadFromJSON() : CreateJSON();
+            bool instanceComplete = File.Exists(JSONPath) ? LoadFromJSON() : CreateJSON();
         }
 
         private bool LoadFromJSON() {
             try {
-                using( StreamReader sr = new StreamReader(Path) )
+                using( StreamReader sr = new StreamReader(JSONPath) )
                 using( JsonReader reader = new JsonTextReader(sr) ) {
                     settings = Serializer.Deserialize<Settings>(reader);
                 }
@@ -38,7 +38,7 @@ namespace Mapping_Tools.Classes.SystemTools {
             try {
                 settings = new Settings();
 
-                using( StreamWriter sw = new StreamWriter(Path) )
+                using( StreamWriter sw = new StreamWriter(JSONPath) )
                 using( JsonWriter writer = new JsonTextWriter(sw) ) {
                     Serializer.Serialize(writer, settings);
                 }
@@ -55,7 +55,7 @@ namespace Mapping_Tools.Classes.SystemTools {
 
         public bool WriteToJSON(bool doLoading) {
             try {
-                using( StreamWriter sw = new StreamWriter(Path) )
+                using( StreamWriter sw = new StreamWriter(JSONPath) )
                 using( JsonWriter writer = new JsonTextWriter(sw) ) {
                     Serializer.Serialize(writer, settings);
                 }

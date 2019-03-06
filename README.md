@@ -10,8 +10,10 @@ Collection of tools for manipulating osu! beatmaps
 - Snapping Tools (Geo-Triangle & Drafting Compass)
 - Timeline
 - Better feedback for users on errors (and logs)
+- Autoupdates and installer
 - More clear instructions on startup / in a helping page
 
 ## Used libraries
 - [MaterialDesignInXamlToolkit](https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit)
 - [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)
+- [AutoUpdater.NET](https://github.com/ravibpatel/AutoUpdater.NET)
