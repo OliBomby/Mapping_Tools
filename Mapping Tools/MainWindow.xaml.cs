@@ -31,6 +31,8 @@ namespace Mapping_Tools {
             heightWin = ActualHeight; //Set height to window
             DataContext = new StandardVM(); //Generate Standard view model to show on startup
             settingsManager = new SettingsManager();
+            if (settingsManager.GetRecentMaps().Count > 0) {
+                SetCurrentMap(settingsManager.GetRecentMaps()[0][0]); } //Set currentmap to previously opened map
 
             RegistryKey regKey;
             try {
@@ -92,6 +94,15 @@ namespace Mapping_Tools {
                 DownloadURL = json.url
             };
         }
+          
+        public void SetCurrentMap(string path) {
+            currentMap.Text = path;
+            settingsManager.AddRecentMaps(path, DateTime.Now, true);
+        }
+
+        public string GetCurrentMap() {
+            return currentMap.Text;
+        }
 
         private void OpenBeatmap(object sender, RoutedEventArgs e) {
             OpenFileDialog openFileDialog = new OpenFileDialog {
@@ -102,9 +113,7 @@ namespace Mapping_Tools {
                 CheckFileExists = true
             };
             openFileDialog.ShowDialog();
-            currentMap.Text = openFileDialog.FileName != "" ? openFileDialog.FileName : currentMap.Text;
-
-            settingsManager.AddRecentMaps(currentMap.Text, DateTime.Now, true);
+            if (openFileDialog.FileName != "") { SetCurrentMap(openFileDialog.FileName); }
         }
 
         private string FindByDisplayName(RegistryKey parentKey, string name) {
@@ -115,8 +124,7 @@ namespace Mapping_Tools {
                     if( regKey.GetValue("DisplayName").ToString() == name ) {
                         return Path.GetDirectoryName(regKey.GetValue("UninstallString").ToString());
                     }
-                }
-                catch { }
+                } catch (NullReferenceException) { }
             }
             return "";
         }
@@ -126,11 +134,10 @@ namespace Mapping_Tools {
             var reader = OsuMemoryDataProvider.DataProvider.Instance;
             string folder = reader.GetMapFolderName();
             string filename = reader.GetOsuFileName();
-            string path = Path.Combine(new string[] { osuFolder, "Songs", folder, filename });
+            string path = Path.Combine(osuFolder, "Songs", folder, filename);
 
-            if( osuFolder == "" || folder == "" || filename == "" ) { return; }
-            currentMap.Text = path;
-            settingsManager.AddRecentMaps(currentMap.Text, DateTime.Now, true);
+            if (osuFolder == "" || folder == "" || filename == "") { return; }
+            SetCurrentMap(path);
         }
 
         private void SaveBackup(object sender, RoutedEventArgs e) {

@@ -16,7 +16,7 @@ namespace Mapping_Tools.Classes.SystemTools {
                 try {
                     RecentMaps.Remove(RecentMaps.Last());
                 }
-                catch(ArgumentOutOfRangeException argEx) {
+                catch (ArgumentOutOfRangeException) {
                 }
             }
             RecentMaps.Insert(0, new string[] { path, date.ToString()});

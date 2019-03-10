@@ -23,7 +23,7 @@ namespace Mapping_Tools.Views {
         }
 
         private void RecentList_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e) {
-            MainWindow.AppWindow.currentMap.Text = ((MyItem)recentList.SelectedItem).Path;
+            MainWindow.AppWindow.SetCurrentMap(((MyItem)recentList.SelectedItem).Path);
         }
     }
 }
