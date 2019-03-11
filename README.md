@@ -8,6 +8,8 @@ Collection of tools for manipulating osu! beatmaps
 
 ## Future implementations
 - Snapping Tools (Geo-Triangle & Drafting Compass)
+- Hitsound Copier Extra
+- Slider SS-inator
 - Timeline
 - Better feedback for users on errors (and logs)
 - Autoupdates and installer
