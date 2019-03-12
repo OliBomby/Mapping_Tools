@@ -225,8 +225,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 }
                 currentLine += 1;
             }
-
-
+            // Sort the timingPoints
+            TimingPoints = timingPoints.OrderBy(o => o.Offset).ToList();
 
             return timingPoints;
         }

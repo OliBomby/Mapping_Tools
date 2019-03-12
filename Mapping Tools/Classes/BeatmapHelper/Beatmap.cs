@@ -52,6 +52,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             foreach (string line in hitobjectLines) {
                 HitObjects.Add(new HitObject(line));
             }
+            // Sort the HitObjects
+            HitObjects = HitObjects.OrderBy(o => o.Time).ToList();
 
             CalculateSliderEndTimes();
             GiveObjectsGreenlines();
