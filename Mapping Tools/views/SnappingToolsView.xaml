@@ -19,7 +19,7 @@
         </Grid.RowDefinitions>
         <Grid Name="FirstGrid" Grid.Row="0" Grid.Column="0" Margin="0,0,204,0">
             <StackPanel Grid.Row="0" Margin="0,0,10,0">
-                <TextBlock FontSize="40" TextWrapping="NoWrap" FontWeight="Bold" Foreground="#FF5F5E5E"><Run Text="Info"/><Run Text="d"/></TextBlock>
+                <TextBlock FontSize="40" TextWrapping="NoWrap" FontWeight="Bold" Foreground="#FF5F5E5E" Text="WIP"/>
                 <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="500" TextWrapping="Wrap" Foreground="#FFD6D6D6"><Run Text="Change the "/><Run Text="l"/><Run Text="ength and "/><Run Text="d"/><Run Text="uration of marked sliders and this tool will automaticly handle the SV for you."/><LineBreak/><Run Text="Leave the boxes blank for no change."/></TextBlock>
                 <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="500" Foreground="#FFD6D6D6" Margin="10,26,0,0" Width="358"><Run Text="Temporal length (beats)"/><Run Text=":"/></TextBlock>
                 <TextBox x:Name="TemporalBox" Height="23" Width="218" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#FFD6D6D6" Margin="10,0,0,0"/>
