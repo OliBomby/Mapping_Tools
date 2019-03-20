@@ -160,9 +160,11 @@ namespace Mapping_Tools.Classes.Tools {
                 bool ind = (ho.IsSlider && arguments.SamplesetSliders);
                 bool samplesetActuallyChanged = false;
                 foreach (TimingPoint tp in ho.BodyHitsounds) {
-                    if (tp.Volume == 5 && arguments.RemoveSliderendMuting) { vol = false; }  // Removing sliderbody silencing
+                    if (tp.Volume == 5 && arguments.RemoveSliderendMuting) {
+                        vol = false; }  // Removing sliderbody silencing
                     timingPointsChanges.Add(new TimingPointsChange(tp, volume: vol, index: ind, sampleset: sam));
-                    if (tp.SampleSet != ho.HitsoundTP.SampleSet) { samplesetActuallyChanged = arguments.SamplesetSliders && ho.SampleSet == 0; }  // True for sampleset change in sliderbody
+                    if (tp.SampleSet != ho.HitsoundTP.SampleSet) {
+                        samplesetActuallyChanged = arguments.SamplesetSliders && ho.SampleSet == 0; }  // True for sampleset change in sliderbody
                 }
                 if (ho.IsSlider && (!samplesetActuallyChanged) && ho.SampleSet == 0)  // Case can put sampleset on sliderbody
                 {
@@ -201,7 +203,6 @@ namespace Mapping_Tools.Classes.Tools {
                     if (tlo.Repeat == 1) {
                         tlo.Origin.SampleSet = tlo.FenoSampleSet;
                         tlo.Origin.AdditionSet = tlo.FenoAdditionSet;
-
                     }
                 } else if (tlo.Origin.IsHoldNote) {
                     if (tlo.Repeat == 0) {
