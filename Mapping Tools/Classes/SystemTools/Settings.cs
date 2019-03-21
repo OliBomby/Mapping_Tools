@@ -5,9 +5,13 @@ using System.Linq;
 namespace Mapping_Tools.Classes.SystemTools {
     public class Settings {
         public List<String[]> RecentMaps;
+        public string OsuPath;
+        public string SongsPath;
 
         public Settings() {
             RecentMaps = new List<String[]>();
+            OsuPath = "";
+            SongsPath = "";
         }
 
         public void AddRecentMaps(String path, DateTime date) {

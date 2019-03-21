@@ -180,12 +180,16 @@
     </Compile>
     <Compile Include="Classes\Tools\TimingPointsChange.cs" />
     <Compile Include="Viewmodels\CleanerVM.cs" />
+    <Compile Include="Viewmodels\HitsoundCopierVM.cs" />
     <Compile Include="Viewmodels\SnappingToolsVM.cs" />
     <Compile Include="Viewmodels\SliderCompletionatorVM.cs" />
     <Compile Include="Viewmodels\SliderMergerVM.cs" />
     <Compile Include="Viewmodels\PreferencesVM.cs" />
     <Compile Include="Viewmodels\StandardVM.cs" />
     <Compile Include="Views\Extensions.cs" />
+    <Compile Include="Views\HitsoundCopierView.xaml.cs">
+      <DependentUpon>HitsoundCopierView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SnappingToolsView.xaml.cs">
       <DependentUpon>SnappingToolsView.xaml</DependentUpon>
     </Compile>
@@ -236,6 +240,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\HitsoundCopierView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\SnappingToolsView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

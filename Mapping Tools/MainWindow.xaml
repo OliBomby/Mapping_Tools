@@ -66,6 +66,7 @@
                     </MenuItem>
                     <MenuItem Height="31" Header="_Options" Padding="12,0,0,0" MinWidth="80">
                         <MenuItem Header="_Preferences" Click="LoadPreferences"/>
+                        <MenuItem Header="_Preferences" Click="LoadStartup"/>
                         <MenuItem Header="_Open Backup Folder" Click="OpenBackups"/>
                     </MenuItem>
                     <MenuItem Height="31" Header="_About" Padding="12,0,0,0" MinWidth="67">
@@ -124,6 +125,9 @@
         </DataTemplate>
         <DataTemplate DataType="{x:Type viewmodels:SnappingToolsVM}">
             <views:SnappingToolsView DataContext="{Binding}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:HitsoundCopierVM}">
+            <views:HitsoundCopierView DataContext="{Binding}"/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type viewmodels:PreferencesVM}">
             <views:PreferencesView DataContext="{Binding}"/>

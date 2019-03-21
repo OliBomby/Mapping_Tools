@@ -18,7 +18,6 @@ namespace Mapping_Tools {
         private double widthWin, heightWin; //Set default sizes of window
         public static MainWindow AppWindow { get; set; }
         public SettingsManager settingsManager;
-        public string osuFolder;
         public bool SessionhasAdminRights;
         public string AppDataPath;
         public string BackupPath;
@@ -33,17 +32,6 @@ namespace Mapping_Tools {
             settingsManager = new SettingsManager();
             if (settingsManager.GetRecentMaps().Count > 0) {
                 SetCurrentMap(settingsManager.GetRecentMaps()[0][0]); } //Set currentmap to previously opened map
-
-            RegistryKey regKey;
-            try {
-                regKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall");
-            }
-            catch( Exception ex ) {
-                regKey = null;
-            }
-            if( regKey != null )
-                osuFolder = FindByDisplayName(regKey, "osu!");
-
         }
 
         private void Setup() {
@@ -57,7 +45,7 @@ namespace Mapping_Tools {
             string appCommon = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
             AppDataPath = Path.Combine(appCommon, "Mapping-Tools");
             BackupPath = Path.Combine(AppDataPath, "Backups");
-
+            
             if( !Directory.Exists(AppDataPath) ) {
                 try {
                     Directory.CreateDirectory(AppDataPath);
@@ -76,10 +64,10 @@ namespace Mapping_Tools {
                 WindowsPrincipal principal = new WindowsPrincipal(user);
                 isAdmin = principal.IsInRole(WindowsBuiltInRole.Administrator);
             }
-            catch( UnauthorizedAccessException ex ) {
+            catch( UnauthorizedAccessException) {
                 isAdmin = false;
             }
-            catch( Exception ex ) {
+            catch( Exception ) {
                 isAdmin = false;
             }
             return isAdmin;
@@ -106,7 +94,7 @@ namespace Mapping_Tools {
 
         private void OpenBeatmap(object sender, RoutedEventArgs e) {
             OpenFileDialog openFileDialog = new OpenFileDialog {
-                InitialDirectory = Path.Combine(osuFolder, "Songs"),
+                InitialDirectory = settingsManager.GetSongsPath(),
                 Filter = "Osu files (*.osu)|*.osu",
                 FilterIndex = 1,
                 RestoreDirectory = true,
@@ -116,27 +104,14 @@ namespace Mapping_Tools {
             if (openFileDialog.FileName != "") { SetCurrentMap(openFileDialog.FileName); }
         }
 
-        private string FindByDisplayName(RegistryKey parentKey, string name) {
-            string[] nameList = parentKey.GetSubKeyNames();
-            for( int i = 0; i < nameList.Length; i++ ) {
-                RegistryKey regKey = parentKey.OpenSubKey(nameList[i]);
-                try {
-                    if( regKey.GetValue("DisplayName").ToString() == name ) {
-                        return Path.GetDirectoryName(regKey.GetValue("UninstallString").ToString());
-                    }
-                } catch (NullReferenceException) { }
-            }
-            return "";
-        }
-
         private void OpenCurrentBeatmap(object sender, RoutedEventArgs e) {
             OsuMemoryDataProvider.DataProvider.Initalize();
             var reader = OsuMemoryDataProvider.DataProvider.Instance;
             string folder = reader.GetMapFolderName();
             string filename = reader.GetOsuFileName();
-            string path = Path.Combine(osuFolder, "Songs", folder, filename);
+            string path = Path.Combine(settingsManager.GetSongsPath(), folder, filename);
 
-            if (osuFolder == "" || folder == "" || filename == "") { return; }
+            if (settingsManager.GetSongsPath() == "" || folder == "" || filename == "") { return; }
             SetCurrentMap(path);
         }
 
@@ -198,8 +173,17 @@ namespace Mapping_Tools {
             this.MinHeight = 380;
         }
 
-        //Method for loading the standard interface
+        //Method for loading the hitsound copier
         private void LoadCopier(object sender, RoutedEventArgs e) {
+            DataContext = new HitsoundCopierVM();
+            TextBlock txt = this.FindName("header") as TextBlock;
+            txt.Text = "Mapping Tools - Hitsound Copier";
+            this.MinWidth = 100;
+            this.MinHeight = 100;
+        }
+
+        //Method for loading the standard interface
+        private void LoadStartup(object sender, RoutedEventArgs e) {
             DataContext = new StandardVM();
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools";

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Win32;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,6 +16,7 @@ namespace Mapping_Tools.Classes.SystemTools {
 
         public SettingsManager() {
             bool instanceComplete = File.Exists(JSONPath) ? LoadFromJSON() : CreateJSON();
+            DefaultPaths();
         }
 
         private bool LoadFromJSON() {
@@ -83,8 +85,46 @@ namespace Mapping_Tools.Classes.SystemTools {
                 return false;
         }
 
+        public void DefaultPaths() {
+            if (settings.OsuPath == "") {
+                RegistryKey regKey;
+                try {
+                    regKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall");
+                } catch (Exception) {
+                    regKey = null;
+                }
+                if (regKey != null)
+                    settings.OsuPath = FindByDisplayName(regKey, "osu!");
+            }
+
+            if (settings.SongsPath == "") {
+                settings.SongsPath = Path.Combine(settings.OsuPath, "Songs");
+            }
+        }
+
+        private string FindByDisplayName(RegistryKey parentKey, string name) {
+            string[] nameList = parentKey.GetSubKeyNames();
+            for (int i = 0; i < nameList.Length; i++) {
+                RegistryKey regKey = parentKey.OpenSubKey(nameList[i]);
+                try {
+                    if (regKey.GetValue("DisplayName").ToString() == name) {
+                        return Path.GetDirectoryName(regKey.GetValue("UninstallString").ToString());
+                    }
+                } catch (NullReferenceException) { }
+            }
+            return "";
+        }
+
         public List<string[]> GetRecentMaps() {
             return settings.RecentMaps;
+        }
+
+        public string GetOsuPath() {
+            return settings.OsuPath;
+        }
+
+        public string GetSongsPath() {
+            return settings.SongsPath;
         }
     }
 }
