@@ -72,10 +72,15 @@ namespace Mapping_Tools.Views {
         }
 
         private string Copy_Hitsounds(Arguments arg, BackgroundWorker worker, DoWorkEventArgs e) {
-            Editor editor = new Editor(arg.Path);
+            Editor editorTo = new Editor(arg.Path);
+            Editor editorFrom = new Editor(arg.PathFrom);
+
+            // Clean both for the resnaps
+            MapCleaner.CleanMap(editorTo.Beatmap, MapCleaner.Arguments.BasicResnap(arg.Path));
+            MapCleaner.CleanMap(editorFrom.Beatmap, MapCleaner.Arguments.BasicResnap(arg.PathFrom));
 
             // Save the file
-            editor.SaveFile();
+            editorTo.SaveFile();
 
             // Complete progressbar
             if (worker != null && worker.WorkerReportsProgress)

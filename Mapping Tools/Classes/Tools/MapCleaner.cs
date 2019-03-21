@@ -19,6 +19,7 @@ namespace Mapping_Tools.Classes.Tools {
             public int Snap1;
             public int Snap2;
             public bool RemoveUnclickableHitsounds;
+
             public Arguments(string path, bool volumeSliders, bool samplesetSliders, bool volumeSpinners, bool removeSliderendMuting, bool resnapObjects, bool resnapBookmarks,
                              int snap1, int snap2, bool removeUnclickableHitsounds) {
                 Path = path;
@@ -31,6 +32,10 @@ namespace Mapping_Tools.Classes.Tools {
                 Snap1 = snap1;
                 Snap2 = snap2;
                 RemoveUnclickableHitsounds = removeUnclickableHitsounds;
+            }
+
+            public static Arguments BasicResnap(string path) {
+                return new Arguments(path, true, true, true, false, true, false, 16, 12, false);
             }
         }
 

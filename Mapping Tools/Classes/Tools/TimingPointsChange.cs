@@ -28,7 +28,7 @@ namespace Mapping_Tools.Classes.Tools {
             Kiai = kiai;
         }
 
-        public void AddChange(List<TimingPoint> list, Timing timing) {
+        public void AddChange(List<TimingPoint> list, Timing timing, bool allAfter=false) {
             TimingPoint prev = null;
             TimingPoint on = null;
             foreach (TimingPoint tp in list) {
@@ -83,11 +83,14 @@ namespace Mapping_Tools.Classes.Tools {
                 }
             }
 
-            if (Kiai) // Change every timingpoint after to the kiai toggle
+            if (allAfter) // Change every timingpoint after
             {
                 foreach (TimingPoint tp in list) {
                     if (tp.Offset > TP.Offset) {
-                        tp.Kiai = TP.Kiai;
+                        if (Sampleset) { tp.SampleSet = TP.SampleSet; }
+                        if (Index) { tp.SampleIndex = TP.SampleIndex; }
+                        if (Volume) { tp.Volume = TP.Volume; }
+                        if (Kiai) { tp.Kiai = TP.Kiai; }
                     }
                 }
             }
