@@ -13,7 +13,7 @@
         Title="Beatmap Cleaner 2.0.0"  
         WindowStyle="None"
         ResizeMode="CanResize"
-        AllowsTransparency="True"
+        AllowsTransparency="False"
         WindowStartupLocation="CenterScreen"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Medium"

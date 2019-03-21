@@ -28,7 +28,7 @@ namespace Mapping_Tools.Views {
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
-            e.Result = Merge_Sliders((Arguments) e.Argument, bgw, e);
+            e.Result = Copy_Hitsounds((Arguments) e.Argument, bgw, e);
         }
 
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
@@ -71,9 +71,8 @@ namespace Mapping_Tools.Views {
             }
         }
 
-        private string Merge_Sliders(Arguments arg, BackgroundWorker worker, DoWorkEventArgs e) {
+        private string Copy_Hitsounds(Arguments arg, BackgroundWorker worker, DoWorkEventArgs e) {
             Editor editor = new Editor(arg.Path);
-            
 
             // Save the file
             editor.SaveFile();
