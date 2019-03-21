@@ -93,26 +93,13 @@ namespace Mapping_Tools {
         }
 
         private void OpenBeatmap(object sender, RoutedEventArgs e) {
-            OpenFileDialog openFileDialog = new OpenFileDialog {
-                InitialDirectory = settingsManager.GetSongsPath(),
-                Filter = "Osu files (*.osu)|*.osu",
-                FilterIndex = 1,
-                RestoreDirectory = true,
-                CheckFileExists = true
-            };
-            openFileDialog.ShowDialog();
-            if (openFileDialog.FileName != "") { SetCurrentMap(openFileDialog.FileName); }
+            string path = BeatmapFinder.FileDialog();
+            if (path != "") { SetCurrentMap(path); }
         }
 
         private void OpenCurrentBeatmap(object sender, RoutedEventArgs e) {
-            OsuMemoryDataProvider.DataProvider.Initalize();
-            var reader = OsuMemoryDataProvider.DataProvider.Instance;
-            string folder = reader.GetMapFolderName();
-            string filename = reader.GetOsuFileName();
-            string path = Path.Combine(settingsManager.GetSongsPath(), folder, filename);
-
-            if (settingsManager.GetSongsPath() == "" || folder == "" || filename == "") { return; }
-            SetCurrentMap(path);
+            string path = BeatmapFinder.CurrentBeatmap();
+            if (path != "") { SetCurrentMap(path); }
         }
 
         private void SaveBackup(object sender, RoutedEventArgs e) {

@@ -164,6 +164,7 @@
     <Compile Include="Classes\SliderPathStuff\SliderInterpreter.cs" />
     <Compile Include="Classes\SliderPathStuff\SliderPath.cs" />
     <Compile Include="Classes\BeatmapHelper\TValue.cs" />
+    <Compile Include="Classes\SystemTools\BeatmapFinder.cs" />
     <Compile Include="Classes\SystemTools\Settings.cs" />
     <Compile Include="Classes\SystemTools\SettingsManager.cs" />
     <Compile Include="Classes\Tools\BezierConverter.cs" />

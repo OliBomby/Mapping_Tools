@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SliderPathStuff;
+using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
 
 namespace Mapping_Tools.Views {
@@ -94,11 +95,13 @@ namespace Mapping_Tools.Views {
         }
 
         private void Browse_Click(object sender, RoutedEventArgs e) {
-
+            string path = BeatmapFinder.FileDialog();
+            if (path != "") { PathBox.Text = path; }
         }
 
         private void Current_Map_Click(object sender, RoutedEventArgs e) {
-
+            string path = BeatmapFinder.CurrentBeatmap();
+            if (path != "") { PathBox.Text = path; }
         }
     }
 }
