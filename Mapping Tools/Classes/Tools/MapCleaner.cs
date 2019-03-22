@@ -241,7 +241,7 @@ namespace Mapping_Tools.Classes.Tools {
 
             for (int i = 0; i < timingPointsChanges.Count; i++) {
                 TimingPointsChange c = timingPointsChanges[i];
-                c.AddChange(newTimingPoints, timing);
+                c.AddChange(newTimingPoints);
                 UpdateProgressbar(worker, (double)i / timingPointsChanges.Count, 10, maxStages);
             }
 

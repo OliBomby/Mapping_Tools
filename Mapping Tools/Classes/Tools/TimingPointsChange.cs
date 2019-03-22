@@ -30,9 +30,12 @@ namespace Mapping_Tools.Classes.Tools {
             OmitFirstBarLine = omitFirstBarLine;
         }
 
-        public void AddChange2(List<TimingPoint> list, bool allAfter = false) {
+        public void AddChange(List<TimingPoint> list, bool allAfter = false) {
+            TimingPoint addingTimingPoint = null;
             TimingPoint prevTimingPoint = null;
             List<TimingPoint> onTimingPoints = new List<TimingPoint>();
+            bool onHasRed = false;
+            bool onHasGreen = false;
 
             foreach (TimingPoint tp in list) {
                 if (tp == null) { continue; }  // Continue nulls to avoid exceptions
@@ -41,23 +44,57 @@ namespace Mapping_Tools.Classes.Tools {
                 }
                 if (tp.Offset == MyTP.Offset) {
                     onTimingPoints.Add(tp);
+                    onHasRed = tp.Inherited || onHasRed;
+                    onHasGreen = !tp.Inherited || onHasGreen;
                 }
             }
 
-            foreach(TimingPoint on in onTimingPoints) {
-                if (MpB) { on.MpB = MyTP.MpB; }
-                if (Meter) { on.Meter = MyTP.Meter; }
+            if (onTimingPoints.Count > 0) {
+                prevTimingPoint = onTimingPoints.Last();
+            }
+
+            if (Inherited && !onHasRed) {
+                // Make new redline
+                if (prevTimingPoint == null) {
+                    addingTimingPoint = MyTP;
+                } else {
+                    addingTimingPoint = prevTimingPoint.Copy();
+                    addingTimingPoint.Offset = MyTP.Offset;
+                    addingTimingPoint.Inherited = true;
+                }
+                onTimingPoints.Add(addingTimingPoint);
+                onHasRed = true;
+            }
+            if (!Inherited && (onTimingPoints.Count == 0 || (MpB && !onHasGreen))) {
+                // Make new greenline (based on prev)
+                if (prevTimingPoint == null) {
+                    addingTimingPoint = MyTP;
+                } else {
+                    addingTimingPoint = prevTimingPoint.Copy();
+                    addingTimingPoint.Offset = MyTP.Offset;
+                    addingTimingPoint.Inherited = false;
+                    if (prevTimingPoint.Inherited) { addingTimingPoint.MpB = -100; }
+                }
+                onTimingPoints.Add(addingTimingPoint);
+                onHasGreen = true;
+            }
+
+            foreach (TimingPoint on in onTimingPoints) {
+                if (MpB && (Inherited ? on.Inherited : !on.Inherited)) { on.MpB = MyTP.MpB; }
+                if (Meter && Inherited && on.Inherited) { on.Meter = MyTP.Meter; }
                 if (Sampleset) { on.SampleSet = MyTP.SampleSet; }
                 if (Index) { on.SampleIndex = MyTP.SampleIndex; }
                 if (Volume) { on.Volume = MyTP.Volume; }
-                if (Inherited) { on.Inherited = MyTP.Inherited; }
                 if (Kiai) { on.Kiai = MyTP.Kiai; }
-                if (OmitFirstBarLine) { on.OmitFirstBarLine = MyTP.OmitFirstBarLine; }
+                if (OmitFirstBarLine && Inherited && on.Inherited) { on.OmitFirstBarLine = MyTP.OmitFirstBarLine; }
             }
 
+            if (addingTimingPoint != null && (prevTimingPoint == null || !addingTimingPoint.SameEffect(prevTimingPoint) || Inherited)) {
+                list.Add(addingTimingPoint);
+            }
         }
 
-        public void AddChange(List<TimingPoint> list, Timing timing, bool allAfter=false) {
+        public void AddChangeOld(List<TimingPoint> list, Timing timing, bool allAfter=false) {
             TimingPoint prev = null;
             TimingPoint on = null;
             foreach (TimingPoint tp in list) {

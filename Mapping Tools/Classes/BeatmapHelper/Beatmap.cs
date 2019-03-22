@@ -11,7 +11,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public Dictionary<string, TValue> Editor { get; set; }
         public Dictionary<string, TValue> Metadata { get; set; }
         public Dictionary<string, TValue> Difficulty { get; set; }
-        public List<Colour> Colours { get; set; }
+        public List<Colour> ComboColours { get; set; }
+        public Dictionary<string, Colour> SpecialColours { get; set; }
         public Timing BeatmapTiming { get; set; }
         public List<string> Events { get; set; }
         public List<HitObject> HitObjects { get; set; }
@@ -34,7 +35,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Editor = new Dictionary<string, TValue>();
             Metadata = new Dictionary<string, TValue>();
             Difficulty = new Dictionary<string, TValue>();
-            Colours = new List<Colour>();
+            ComboColours = new List<Colour>();
+            SpecialColours = new Dictionary<string, Colour>();
             Events = new List<string>();
             HitObjects = new List<HitObject>();
 
@@ -44,7 +46,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             FillDictionary(Difficulty, difficultyLines);
 
             foreach (string line in colourLines) {
-                Colours.Add(new Colour(line));
+                if (line.Substring(0, 5) == "Combo") {
+                    ComboColours.Add(new Colour(line));
+                } else {
+                    SpecialColours[line.Split(':')[0].Trim()] = new Colour(line);
+                }
             }
             foreach (string line in eventsLines) {
                 Events.Add(line);
@@ -145,11 +151,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 lines.Add(tp.GetLine());
             }
             lines.Add("");
-            if (Colours.Count() > 0) {
+            if (ComboColours.Count() > 0) {
                 lines.Add("");
                 lines.Add("[Colours]");
-                foreach (Colour c in Colours) {
-                    lines.Add(c.GetLine());
+                for (int i = 0; i < ComboColours.Count; i++) {
+                    lines.Add("Combo" + (i + 1) + " : " + ComboColours[i].ToString());
+                }
+                foreach (KeyValuePair<string, Colour> specialColour in SpecialColours) {
+                    lines.Add(specialColour.Key + " : " + specialColour.Value.ToString());
                 }
             }
             lines.Add("");
