@@ -120,7 +120,7 @@ namespace Mapping_Tools.Views {
             }
 
             // Add the new SV changes
-            timingPointsChanges = timingPointsChanges.OrderBy(o => o.TP.Offset).ToList();
+            timingPointsChanges = timingPointsChanges.OrderBy(o => o.MyTP.Offset).ToList();
             foreach (TimingPointsChange c in timingPointsChanges) {
                 c.AddChange(timing.TimingPoints, timing);
             }

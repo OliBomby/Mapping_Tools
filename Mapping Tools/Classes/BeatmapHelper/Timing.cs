@@ -1,5 +1,6 @@
 ﻿using Mapping_Tools.Classes.MathUtil;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -208,6 +209,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                     if( values.Length < 6 ) {
                         break;
                     }
+                    BitArray b = new BitArray(new int[] { int.Parse(values[7]) });
+                    bool kiai = b[0];
+                    bool omit = b[3];
                     timingPoints.Add(new TimingPoint(
                         ParseDouble(values[0]),
                         ParseDouble(values[1]),
@@ -216,7 +220,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                         int.Parse(values[4]),
                         ParseDouble(values[5]),
                         values[6] == "1",
-                        values[7] == "1"));
+                        kiai,
+                        omit));
                 }
                 else {
                     if( lines[currentLine] == "[TimingPoints]" ) {
@@ -241,10 +246,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             TimingPoint firstTP = TimingPoints.First();
             if( firstTP.Inherited ) {
                 return new TimingPoint(firstTP.Offset - firstTP.MpB * firstTP.Meter * 10, firstTP.MpB,
-                                        firstTP.Meter, firstTP.SampleSet, firstTP.SampleIndex, firstTP.Volume, firstTP.Inherited, false);
+                                        firstTP.Meter, firstTP.SampleSet, firstTP.SampleIndex, firstTP.Volume, firstTP.Inherited, false, false);
             }
             else {
-                return new TimingPoint(0, 1000, firstTP.Meter, firstTP.SampleSet, firstTP.SampleIndex, firstTP.Volume, firstTP.Inherited, false);
+                return new TimingPoint(0, 1000, firstTP.Meter, firstTP.SampleSet, firstTP.SampleIndex, firstTP.Volume, firstTP.Inherited, false, false);
             }
 
         }

@@ -132,7 +132,7 @@ namespace Mapping_Tools.Classes.Tools {
             List<TimingPoint> redlines = timing.GetAllRedlines();
             for (int i = 0; i < redlines.Count; i++) {
                 TimingPoint tp = redlines[i];
-                timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, meter: true, inherited: true));
+                timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, meter: true, inherited: true, omitFirstBarLine: true));
                 UpdateProgressbar(worker, (double)i / redlines.Count, 5, maxStages);
             }
             // Add SV changes for taiko and mania
@@ -236,7 +236,7 @@ namespace Mapping_Tools.Classes.Tools {
 
 
             // Add the new timingpoints
-            timingPointsChanges = timingPointsChanges.OrderBy(o => o.TP.Offset).ToList();
+            timingPointsChanges = timingPointsChanges.OrderBy(o => o.MyTP.Offset).ToList();
             List<TimingPoint> newTimingPoints = new List<TimingPoint>();
 
             for (int i = 0; i < timingPointsChanges.Count; i++) {

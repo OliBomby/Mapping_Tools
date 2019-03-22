@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Globalization;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
@@ -12,7 +13,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public double Volume { get; set; }
         public bool Inherited { get; set; } // True is red line
         public bool Kiai { get; set; }
-        public TimingPoint(double Offset, double MpB, int Meter, int SampleSet, int SampleIndex, double Volume, bool Inherited, bool Kiai) {
+        public bool OmitFirstBarLine { get; set; }
+        public TimingPoint(double Offset, double MpB, int Meter, int SampleSet, int SampleIndex, double Volume, bool Inherited, bool Kiai, bool OmitFirstBarLine) {
             this.Offset = Offset;
             this.MpB = MpB;
             this.Meter = Meter;
@@ -21,15 +23,17 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             this.Volume = Volume;
             this.Inherited = Inherited;
             this.Kiai = Kiai;
+            this.OmitFirstBarLine = OmitFirstBarLine;
         }
 
         public string GetLine() {
+            int style = GetIntFromBitArray(new BitArray(new bool[] { Kiai, false, false, OmitFirstBarLine }));
             return Math.Round(Offset) + "," + MpB.ToString(CultureInfo.InvariantCulture) + "," + Meter + "," + SampleSet + "," + SampleIndex + ","
-                + Math.Round(Volume) + "," + Convert.ToInt32(Inherited) + "," + Convert.ToInt32(Kiai);
+                + Math.Round(Volume) + "," + Convert.ToInt32(Inherited) + "," + style;
         }
 
         public TimingPoint Copy() {
-            return new TimingPoint(Offset, MpB, Meter, SampleSet, SampleIndex, Volume, Inherited, Kiai);
+            return new TimingPoint(Offset, MpB, Meter, SampleSet, SampleIndex, Volume, Inherited, Kiai, OmitFirstBarLine);
         }
 
         public bool ResnapSelf(Timing timing, int snap1, int snap2) {
@@ -40,7 +44,18 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public bool Equals(TimingPoint tp) {
-            if( tp.Inherited && !Inherited ) {
+            return MpB == tp.MpB &&
+                Meter == tp.Meter &&
+                SampleSet == tp.SampleSet &&
+                SampleIndex == tp.SampleIndex &&
+                Volume == tp.Volume &&
+                Inherited == tp.Inherited &&
+                Kiai == tp.Kiai &&
+                OmitFirstBarLine == OmitFirstBarLine;
+        }
+
+        public bool SameEffect(TimingPoint tp) {
+            if (tp.Inherited && !Inherited) {
                 return MpB == -100 && Meter == tp.Meter && SampleSet == tp.SampleSet && SampleIndex == tp.SampleIndex && Volume == tp.Volume && Kiai == tp.Kiai;
             }
             return MpB == tp.MpB && Meter == tp.Meter && SampleSet == tp.SampleSet && SampleIndex == tp.SampleIndex && Volume == tp.Volume && Kiai == tp.Kiai;
@@ -53,6 +68,15 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             else {
                 return -100 / MpB;
             }
+        }
+
+        private int GetIntFromBitArray(BitArray bitArray) {
+            if (bitArray.Length > 32)
+                throw new ArgumentException("Argument length shall be at most 32 bits.");
+
+            int[] array = new int[1];
+            bitArray.CopyTo(array, 0);
+            return array[0];
         }
     }
 }
