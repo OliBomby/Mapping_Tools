@@ -243,6 +243,7 @@ namespace Mapping_Tools.Classes.Tools {
 
             // Replace the old timingpoints
             timing.TimingPoints = newTimingPoints;
+            beatmap.GiveObjectsGreenlines();
 
             // Complete progressbar
             if (worker != null && worker.WorkerReportsProgress) {

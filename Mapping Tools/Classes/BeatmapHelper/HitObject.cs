@@ -70,6 +70,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             // 213,192,78,128,0,378:0:0:0:0:
 
             Line = line;
+            BodyHitsounds = new List<TimingPoint>();
+            TimelineObjects = new List<TimelineObject>();
         }
 
         public void MoveTime(double deltaTime) {
@@ -107,8 +109,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
             // Change
             TemporalLength += deltaTime;
-            TimelineObjects.Last().Time = Math.Floor(Time + TemporalLength);
             EndTime = Math.Floor(Time + TemporalLength);
+            if (TimelineObjects.Count > 0) { TimelineObjects.Last().Time = EndTime; };
             BodyHitsounds.RemoveAll(s => s.Offset >= EndTime);
             return deltaTime != 0;
         }
