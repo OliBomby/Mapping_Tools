@@ -79,6 +79,13 @@ namespace Mapping_Tools.Views {
             MapCleaner.CleanMap(editorTo.Beatmap, MapCleaner.Arguments.BasicResnap);
             MapCleaner.CleanMap(editorFrom.Beatmap, MapCleaner.Arguments.BasicResnap);
 
+            // replace:
+            // sampleset timingpointchanges will only have influence on sliderbodies with special hitsounding
+            // samplsesets will be put on hitobjects (sliderbodies from hitobjects)
+            // hitsounds will be put on hitobjects (sliderbodies from hitobjects)
+            // customindices will be replaced by tlo hitsounds and sliderbody hitsounds
+            // volume will be replaced by tlo and sliderbody hitsounds or just all timingpoints and clean after
+
             // Save the file
             editorTo.SaveFile();
 
