@@ -35,113 +35,6 @@ namespace Mapping_Tools.Views {
                 backgroundLoader.RunWorkerAsync(GetArgumentsFromWindow());
         }
 
-        private void BackgroundLoader_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
-            if( e.Error != null ) {
-            }
-            else {
-                FillTimeLine();
-            }
-        }
-
-        private void FillTimeLine() {
-            if (TL != null) {
-                TL.mainCanvas.Children.Clear();
-            }
-            try {
-                TL = new TimeLine((int)MainWindow.AppWindow.ActualWidth, 100, EndTime_monitor);
-                foreach (double timing_s in TimingpointsAdded) {
-                    TL.AddElement(timing_s, 1);
-                }
-                foreach (double timing_s in TimingpointsChanged) {
-                    TL.AddElement(timing_s, 2);
-                }
-                foreach (double timing_s in TimingpointsRemoved) {
-                    TL.AddElement(timing_s, 3);
-                }
-                tl_host.Children.Add(TL);
-            } catch (Exception ex) {
-                Console.WriteLine(ex.Message);
-                return;
-            } finally {
-
-            }
-        }
-
-        private void BackgroundLoader_ProgressChanged(object sender, ProgressChangedEventArgs e) {
-            loader_progress.Value = e.ProgressPercentage;
-        }
-
-        private void BackgroundLoader_DoWork(object sender, DoWorkEventArgs e) {
-            var bgw = sender as BackgroundWorker;
-            Monitor_Program((Arguments) e.Argument, bgw);
-        }
-
-        private void Monitor_Program(Arguments arguments, BackgroundWorker worker) {
-            Editor editor = new Editor(arguments.Path);
-
-            List<TimingPoint> originalTimingPoints = new List<TimingPoint>();
-            foreach (TimingPoint tp in editor.Beatmap.BeatmapTiming.TimingPoints) { originalTimingPoints.Add(tp.Copy()); }
-
-            MapCleaner.CleanMap(editor.Beatmap, arguments.CleanerArguments, worker);
-            List<TimingPoint> newTimingPoints = editor.Beatmap.BeatmapTiming.TimingPoints;
-
-            Monitor_Differences(originalTimingPoints, newTimingPoints);
-        }
-
-        private void Monitor_Differences(List<TimingPoint> originalTimingPoints, List<TimingPoint> newTimingPoints) {
-            // Take note of all the changes
-            TimingpointsChanged = new List<double>();
-
-            var originalInNew = (from first in originalTimingPoints
-                                 join second in newTimingPoints
-                                 on first.Offset equals second.Offset
-                                 select first).ToList();
-
-            var newInOriginal = (from first in originalTimingPoints
-                                 join second in newTimingPoints
-                                 on first.Offset equals second.Offset
-                                 select second).ToList();
-
-            for (int i = 0; i < originalInNew.Count(); i++) {
-                if (originalInNew[i] != newInOriginal[i]) {
-                    TimingpointsChanged.Add(originalInNew[i].Offset);
-                }
-            }
-
-            List<double> originalOffsets = new List<double>();
-            List<double> newOffsets = new List<double>();
-            originalTimingPoints.ForEach(o => originalOffsets.Add(o.Offset));
-            newTimingPoints.ForEach(o => newOffsets.Add(o.Offset));
-
-            TimingpointsRemoved = originalOffsets.Except(newOffsets).ToList();
-            TimingpointsAdded = newOffsets.Except(originalOffsets).ToList();
-            double endTimeOriginal = originalTimingPoints.Last().Offset;
-            double endTimeNew = newTimingPoints.Last().Offset;
-            EndTime_monitor = endTimeOriginal > endTimeNew ? endTimeOriginal : endTimeNew;
-        }
-
-        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
-            var bgw = sender as BackgroundWorker;
-            e.Result = Run_Program((Arguments) e.Argument, bgw, e);
-        }
-
-        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
-            BackgroundLoader_RunWorkerCompleted(sender, e);
-
-            if( e.Error != null ) {
-                MessageBox.Show(e.Error.Message);
-            }
-            else {
-                MessageBox.Show(e.Result.ToString());
-                progress.Value = 0;
-            }
-            start.IsEnabled = true;
-        }
-
-        private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
-            progress.Value = e.ProgressPercentage;
-        }
-
         private void Start_Click(object sender, RoutedEventArgs e) {
             Arguments arguments = GetArgumentsFromWindow();
 
@@ -150,8 +43,7 @@ namespace Mapping_Tools.Views {
             string destinationDirectory = MainWindow.AppWindow.BackupPath;
             try {
                 File.Copy(fileToCopy, Path.Combine(destinationDirectory, now.ToString("yyyy-MM-dd HH-mm-ss") + "___" + System.IO.Path.GetFileName(fileToCopy)));
-            }
-            catch( Exception ex ) {
+            } catch (Exception ex) {
                 MessageBox.Show(ex.Message);
                 return;
             }
@@ -159,6 +51,43 @@ namespace Mapping_Tools.Views {
             backgroundWorker.RunWorkerAsync(arguments);
 
             start.IsEnabled = false;
+        }
+
+        private void BackgroundLoader_DoWork(object sender, DoWorkEventArgs e) {
+            var bgw = sender as BackgroundWorker;
+            Monitor_Program((Arguments)e.Argument, bgw);
+        }
+
+        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
+            var bgw = sender as BackgroundWorker;
+            e.Result = Run_Program((Arguments) e.Argument, bgw, e);
+        }
+
+        private void BackgroundLoader_ProgressChanged(object sender, ProgressChangedEventArgs e) {
+            loader_progress.Value = e.ProgressPercentage;
+        }
+
+        private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
+            progress.Value = e.ProgressPercentage;
+        }
+
+        private void BackgroundLoader_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
+            if (e.Error != null) {
+            } else {
+                FillTimeLine();
+            }
+        }
+
+        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
+            if( e.Error != null ) {
+                MessageBox.Show(e.Error.Message);
+            }
+            else {
+                FillTimeLine();
+                MessageBox.Show(e.Result.ToString());
+                progress.Value = 0;
+            }
+            start.IsEnabled = true;
         }
 
         private struct Arguments {
@@ -180,6 +109,18 @@ namespace Mapping_Tools.Views {
                                                                          int.Parse(Snap1.Text.Split('/')[1]), int.Parse(Snap2.Text.Split('/')[1]),
                                                                          (bool)RemoveUnclickableHitsounds.IsChecked));
             return arguments;
+        }
+
+        private void Monitor_Program(Arguments arguments, BackgroundWorker worker) {
+            Editor editor = new Editor(arguments.Path);
+
+            List<TimingPoint> originalTimingPoints = new List<TimingPoint>();
+            foreach (TimingPoint tp in editor.Beatmap.BeatmapTiming.TimingPoints) { originalTimingPoints.Add(tp.Copy()); }
+
+            MapCleaner.CleanMap(editor.Beatmap, arguments.CleanerArguments, worker);
+            List<TimingPoint> newTimingPoints = editor.Beatmap.BeatmapTiming.TimingPoints;
+
+            Monitor_Differences(originalTimingPoints, newTimingPoints);
         }
 
         private string Run_Program(Arguments arguments, BackgroundWorker worker, DoWorkEventArgs e) {
@@ -220,6 +161,62 @@ namespace Mapping_Tools.Views {
                 message += " objects!";
             }
             return message;
+        }
+
+        private void Monitor_Differences(List<TimingPoint> originalTimingPoints, List<TimingPoint> newTimingPoints) {
+            // Take note of all the changes
+            TimingpointsChanged = new List<double>();
+
+            var originalInNew = (from first in originalTimingPoints
+                                 join second in newTimingPoints
+                                 on first.Offset equals second.Offset
+                                 select first).ToList();
+
+            var newInOriginal = (from first in originalTimingPoints
+                                 join second in newTimingPoints
+                                 on first.Offset equals second.Offset
+                                 select second).ToList();
+
+            for (int i = 0; i < originalInNew.Count(); i++) {
+                if (originalInNew[i] != newInOriginal[i]) {
+                    TimingpointsChanged.Add(originalInNew[i].Offset);
+                }
+            }
+
+            List<double> originalOffsets = new List<double>();
+            List<double> newOffsets = new List<double>();
+            originalTimingPoints.ForEach(o => originalOffsets.Add(o.Offset));
+            newTimingPoints.ForEach(o => newOffsets.Add(o.Offset));
+
+            TimingpointsRemoved = originalOffsets.Except(newOffsets).ToList();
+            TimingpointsAdded = newOffsets.Except(originalOffsets).ToList();
+            double endTimeOriginal = originalTimingPoints.Last().Offset;
+            double endTimeNew = newTimingPoints.Last().Offset;
+            EndTime_monitor = endTimeOriginal > endTimeNew ? endTimeOriginal : endTimeNew;
+        }
+
+        private void FillTimeLine() {
+            if (TL != null) {
+                TL.mainCanvas.Children.Clear();
+            }
+            try {
+                TL = new TimeLine((int)MainWindow.AppWindow.ActualWidth, 100, EndTime_monitor);
+                foreach (double timing_s in TimingpointsAdded) {
+                    TL.AddElement(timing_s, 1);
+                }
+                foreach (double timing_s in TimingpointsChanged) {
+                    TL.AddElement(timing_s, 2);
+                }
+                foreach (double timing_s in TimingpointsRemoved) {
+                    TL.AddElement(timing_s, 3);
+                }
+                tl_host.Children.Add(TL);
+            } catch (Exception ex) {
+                Console.WriteLine(ex.Message);
+                return;
+            } finally {
+
+            }
         }
     }
 }
