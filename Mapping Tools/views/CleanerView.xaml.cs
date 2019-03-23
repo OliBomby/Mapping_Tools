@@ -18,7 +18,7 @@ namespace Mapping_Tools.Views {
         List<double> TimingpointsRemoved;
         List<double> TimingpointsAdded;
         List<double> TimingpointsChanged;
-        double EndTime_monitor, EndOffset_monitor;
+        double EndTime_monitor;
         TimeLine TL;
 
         public CleanerView() {
@@ -66,7 +66,7 @@ namespace Mapping_Tools.Views {
         }
 
         private void BackgroundLoader_ProgressChanged(object sender, ProgressChangedEventArgs e) {
-            progress.Value = e.ProgressPercentage;
+            loader_progress.Value = e.ProgressPercentage;
         }
 
         private void BackgroundLoader_DoWork(object sender, DoWorkEventArgs e) {
@@ -77,40 +77,45 @@ namespace Mapping_Tools.Views {
         private void Monitor_Program(Arguments arguments, BackgroundWorker worker) {
             Editor editor = new Editor(arguments.Path);
 
-            List<TimingPoint> original = new List<TimingPoint>();
-            foreach (TimingPoint tp in editor.Beatmap.BeatmapTiming.TimingPoints) { original.Add(tp.Copy()); }
+            List<TimingPoint> originalTimingPoints = new List<TimingPoint>();
+            foreach (TimingPoint tp in editor.Beatmap.BeatmapTiming.TimingPoints) { originalTimingPoints.Add(tp.Copy()); }
 
             MapCleaner.CleanMap(editor.Beatmap, arguments.CleanerArguments, worker);
             List<TimingPoint> newTimingPoints = editor.Beatmap.BeatmapTiming.TimingPoints;
 
+            Monitor_Differences(originalTimingPoints, newTimingPoints);
+        }
+
+        private void Monitor_Differences(List<TimingPoint> originalTimingPoints, List<TimingPoint> newTimingPoints) {
             // Take note of all the changes
             TimingpointsChanged = new List<double>();
 
-            var originalInNew = ( from first in original
-                                  join second in newTimingPoints
-                                  on first.Offset equals second.Offset
-                                  select first ).ToList();
+            var originalInNew = (from first in originalTimingPoints
+                                 join second in newTimingPoints
+                                 on first.Offset equals second.Offset
+                                 select first).ToList();
 
-            var newInOriginal = ( from first in original
-                                  join second in newTimingPoints
-                                  on first.Offset equals second.Offset
-                                  select second ).ToList();
+            var newInOriginal = (from first in originalTimingPoints
+                                 join second in newTimingPoints
+                                 on first.Offset equals second.Offset
+                                 select second).ToList();
 
-            for( int i = 0; i < originalInNew.Count(); i++ ) {
-                if( originalInNew[i] != newInOriginal[i] ) {
+            for (int i = 0; i < originalInNew.Count(); i++) {
+                if (originalInNew[i] != newInOriginal[i]) {
                     TimingpointsChanged.Add(originalInNew[i].Offset);
                 }
             }
 
             List<double> originalOffsets = new List<double>();
             List<double> newOffsets = new List<double>();
-            original.ForEach(o => originalOffsets.Add(o.Offset));
+            originalTimingPoints.ForEach(o => originalOffsets.Add(o.Offset));
             newTimingPoints.ForEach(o => newOffsets.Add(o.Offset));
 
             TimingpointsRemoved = originalOffsets.Except(newOffsets).ToList();
             TimingpointsAdded = newOffsets.Except(originalOffsets).ToList();
-            EndTime_monitor = editor.Beatmap.HitObjects.Last().EndTime;
-            EndOffset_monitor = editor.Beatmap.BeatmapTiming.TimingPoints.Last().Offset;
+            double endTimeOriginal = originalTimingPoints.Last().Offset;
+            double endTimeNew = newTimingPoints.Last().Offset;
+            EndTime_monitor = endTimeOriginal > endTimeNew ? endTimeOriginal : endTimeNew;
         }
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
@@ -119,6 +124,8 @@ namespace Mapping_Tools.Views {
         }
 
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
+            BackgroundLoader_RunWorkerCompleted(sender, e);
+
             if( e.Error != null ) {
                 MessageBox.Show(e.Error.Message);
             }
@@ -148,7 +155,6 @@ namespace Mapping_Tools.Views {
             }
 
             backgroundWorker.RunWorkerAsync(arguments);
-            backgroundLoader.RunWorkerAsync(arguments);
 
             start.IsEnabled = false;
         }
@@ -177,8 +183,14 @@ namespace Mapping_Tools.Views {
         private string Run_Program(Arguments arguments, BackgroundWorker worker, DoWorkEventArgs e) {
             Editor editor = new Editor(arguments.Path);
 
+            List<TimingPoint> orgininalTimingPoints = new List<TimingPoint>();
+            foreach (TimingPoint tp in editor.Beatmap.BeatmapTiming.TimingPoints) { orgininalTimingPoints.Add(tp.Copy()); }
             int oldTimingPointsCount = editor.Beatmap.BeatmapTiming.TimingPoints.Count;
+
             int objectsResnapped = MapCleaner.CleanMap(editor.Beatmap, arguments.CleanerArguments, worker);
+
+            List<TimingPoint> newTimingPoints = editor.Beatmap.BeatmapTiming.TimingPoints;
+            Monitor_Differences(orgininalTimingPoints, newTimingPoints);
 
             // Save the file
             editor.SaveFile();
