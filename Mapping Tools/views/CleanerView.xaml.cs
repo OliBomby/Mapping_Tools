@@ -39,29 +39,31 @@ namespace Mapping_Tools.Views {
             if( e.Error != null ) {
             }
             else {
-                if( TL != null ) {
-                    TL.mainCanvas.Children.Clear();
-                }
-                try {
-                    TL = new TimeLine((int) MainWindow.AppWindow.ActualWidth, 100, EndTime_monitor);
-                    foreach( Double timing_s in TimingpointsAdded ) {
-                        TL.AddElement(timing_s, 1);
-                    }
-                    foreach( Double timing_s in TimingpointsChanged ) {
-                        TL.AddElement(timing_s, 2);
-                    }
-                    foreach( Double timing_s in TimingpointsRemoved ) {
-                        TL.AddElement(timing_s, 3);
-                    }
-                    tl_host.Children.Add(TL);
-                }
-                catch( Exception ex ) {
-                    Console.WriteLine(ex.Message);
-                    return;
-                }
-                finally {
+                FillTimeLine();
+            }
+        }
 
+        private void FillTimeLine() {
+            if (TL != null) {
+                TL.mainCanvas.Children.Clear();
+            }
+            try {
+                TL = new TimeLine((int)MainWindow.AppWindow.ActualWidth, 100, EndTime_monitor);
+                foreach (double timing_s in TimingpointsAdded) {
+                    TL.AddElement(timing_s, 1);
                 }
+                foreach (double timing_s in TimingpointsChanged) {
+                    TL.AddElement(timing_s, 2);
+                }
+                foreach (double timing_s in TimingpointsRemoved) {
+                    TL.AddElement(timing_s, 3);
+                }
+                tl_host.Children.Add(TL);
+            } catch (Exception ex) {
+                Console.WriteLine(ex.Message);
+                return;
+            } finally {
+
             }
         }
 
