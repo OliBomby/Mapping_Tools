@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
-    class Beatmap {
+    public class Beatmap {
         public Dictionary<string, TValue> General { get; set; }
         public Dictionary<string, TValue> Editor { get; set; }
         public Dictionary<string, TValue> Metadata { get; set; }

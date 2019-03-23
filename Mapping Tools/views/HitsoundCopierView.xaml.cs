@@ -76,8 +76,8 @@ namespace Mapping_Tools.Views {
             Editor editorFrom = new Editor(arg.PathFrom);
 
             // Clean both for the resnaps
-            MapCleaner.CleanMap(editorTo.Beatmap, MapCleaner.Arguments.BasicResnap(arg.Path));
-            MapCleaner.CleanMap(editorFrom.Beatmap, MapCleaner.Arguments.BasicResnap(arg.PathFrom));
+            MapCleaner.CleanMap(editorTo.Beatmap, MapCleaner.Arguments.BasicResnap);
+            MapCleaner.CleanMap(editorFrom.Beatmap, MapCleaner.Arguments.BasicResnap);
 
             // Save the file
             editorTo.SaveFile();

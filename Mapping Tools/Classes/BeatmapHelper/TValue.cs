@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
-    class TValue {
+    public class TValue {
         public string StringValue { get; set; }
         public dynamic Value { get => GetValue(); set => SetValue(value); }
 

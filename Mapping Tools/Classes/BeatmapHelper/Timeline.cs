@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
-    class Timeline {
+    public class Timeline {
         public List<TimelineObject> TimeLineObjects { get; set; }
 
         public Timeline(List<HitObject> hitObjects, Timing timing) {

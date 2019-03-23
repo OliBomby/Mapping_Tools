@@ -7,9 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.Tools {
-    class MapCleaner {
+    public class MapCleaner {
         public struct Arguments {
-            public string Path;
             public bool VolumeSliders;
             public bool SamplesetSliders;
             public bool VolumeSpinners;
@@ -20,9 +19,8 @@ namespace Mapping_Tools.Classes.Tools {
             public int Snap2;
             public bool RemoveUnclickableHitsounds;
 
-            public Arguments(string path, bool volumeSliders, bool samplesetSliders, bool volumeSpinners, bool removeSliderendMuting, bool resnapObjects, bool resnapBookmarks,
+            public Arguments(bool volumeSliders, bool samplesetSliders, bool volumeSpinners, bool removeSliderendMuting, bool resnapObjects, bool resnapBookmarks,
                              int snap1, int snap2, bool removeUnclickableHitsounds) {
-                Path = path;
                 VolumeSliders = volumeSliders;
                 SamplesetSliders = samplesetSliders;
                 VolumeSpinners = volumeSpinners;
@@ -34,9 +32,7 @@ namespace Mapping_Tools.Classes.Tools {
                 RemoveUnclickableHitsounds = removeUnclickableHitsounds;
             }
 
-            public static Arguments BasicResnap(string path) {
-                return new Arguments(path, true, true, true, false, true, false, 16, 12, false);
-            }
+            public static readonly Arguments BasicResnap = new Arguments(true, true, true, false, true, false, 16, 12, false);
         }
 
         /// <summary>

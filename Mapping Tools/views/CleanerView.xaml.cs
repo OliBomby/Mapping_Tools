@@ -32,18 +32,7 @@ namespace Mapping_Tools.Views {
 
         private void CompileTimeLine(string fileToCopy) {
             if( fileToCopy != "" || fileToCopy != null)
-                backgroundLoader.RunWorkerAsync(new List<string> {
-                    fileToCopy, VolumeSliders.IsChecked.ToString(), SamplesetSliders.IsChecked.ToString(),
-                    VolumeSpinners.IsChecked.ToString(), RemoveSliderendMuting.IsChecked.ToString(),
-                    ResnapObjects.IsChecked.ToString(), ResnapBookmarks.IsChecked.ToString(), Snap1.Text, Snap2.Text, RemoveUnclickableHitsounds.IsChecked.ToString()
-            });
-        }
-
-        private void UpdateLoaderProgress(BackgroundWorker worker, double fraction, int stage, int maxStages) {
-            // Update progressbar
-            if( worker != null && worker.WorkerReportsProgress ) {
-                worker.ReportProgress((int) ( ( fraction + stage ) / maxStages * 100 ));
-            }
+                backgroundLoader.RunWorkerAsync(GetArgumentsFromWindow());
         }
 
         private void BackgroundLoader_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
@@ -82,16 +71,16 @@ namespace Mapping_Tools.Views {
 
         private void BackgroundLoader_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
-            Monitor_Program((MapCleaner.Arguments) e.Argument, bgw);
+            Monitor_Program((Arguments) e.Argument, bgw);
         }
 
-        private void Monitor_Program(MapCleaner.Arguments arguments, BackgroundWorker worker) {
+        private void Monitor_Program(Arguments arguments, BackgroundWorker worker) {
             Editor editor = new Editor(arguments.Path);
 
             List<TimingPoint> original = new List<TimingPoint>();
             foreach (TimingPoint tp in editor.Beatmap.BeatmapTiming.TimingPoints) { original.Add(tp.Copy()); }
 
-            MapCleaner.CleanMap(editor.Beatmap, arguments, worker);
+            MapCleaner.CleanMap(editor.Beatmap, arguments.CleanerArguments, worker);
             List<TimingPoint> newTimingPoints = editor.Beatmap.BeatmapTiming.TimingPoints;
 
             // Take note of all the changes
@@ -126,7 +115,7 @@ namespace Mapping_Tools.Views {
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
-            e.Result = Run_Program((MapCleaner.Arguments) e.Argument, bgw, e);
+            e.Result = Run_Program((Arguments) e.Argument, bgw, e);
         }
 
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
@@ -145,8 +134,10 @@ namespace Mapping_Tools.Views {
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
+            Arguments arguments = GetArgumentsFromWindow();
+
             DateTime now = DateTime.Now;
-            string fileToCopy = MainWindow.AppWindow.currentMap.Text;
+            string fileToCopy = arguments.Path;
             string destinationDirectory = MainWindow.AppWindow.BackupPath;
             try {
                 File.Copy(fileToCopy, Path.Combine(destinationDirectory, now.ToString("yyyy-MM-dd HH-mm-ss") + "___" + System.IO.Path.GetFileName(fileToCopy)));
@@ -156,23 +147,38 @@ namespace Mapping_Tools.Views {
                 return;
             }
 
-            MapCleaner.Arguments arguments = new MapCleaner.Arguments(fileToCopy, (bool) VolumeSliders.IsChecked, (bool) SamplesetSliders.IsChecked,
-                                                                      (bool) VolumeSpinners.IsChecked, (bool) RemoveSliderendMuting.IsChecked,
-                                                                      (bool) ResnapObjects.IsChecked, (bool) ResnapBookmarks.IsChecked,
-                                                                      int.Parse(Snap1.Text.Split('/')[1]), int.Parse(Snap2.Text.Split('/')[1]),
-                                                                      (bool) RemoveUnclickableHitsounds.IsChecked);
-
             backgroundWorker.RunWorkerAsync(arguments);
             backgroundLoader.RunWorkerAsync(arguments);
 
             start.IsEnabled = false;
         }
 
-        private string Run_Program(MapCleaner.Arguments arguments, BackgroundWorker worker, DoWorkEventArgs e) {
+        private struct Arguments {
+            public string Path;
+            public MapCleaner.Arguments CleanerArguments;
+
+            public Arguments(string path, MapCleaner.Arguments cleanerArguments) {
+                Path = path;
+                CleanerArguments = cleanerArguments;
+            }
+        }
+
+        private Arguments GetArgumentsFromWindow() {
+            string fileToCopy = MainWindow.AppWindow.currentMap.Text;
+            Arguments arguments = new Arguments(fileToCopy,
+                                                new MapCleaner.Arguments((bool)VolumeSliders.IsChecked, (bool)SamplesetSliders.IsChecked,
+                                                                         (bool)VolumeSpinners.IsChecked, (bool)RemoveSliderendMuting.IsChecked,
+                                                                         (bool)ResnapObjects.IsChecked, (bool)ResnapBookmarks.IsChecked,
+                                                                         int.Parse(Snap1.Text.Split('/')[1]), int.Parse(Snap2.Text.Split('/')[1]),
+                                                                         (bool)RemoveUnclickableHitsounds.IsChecked));
+            return arguments;
+        }
+
+        private string Run_Program(Arguments arguments, BackgroundWorker worker, DoWorkEventArgs e) {
             Editor editor = new Editor(arguments.Path);
 
             int oldTimingPointsCount = editor.Beatmap.BeatmapTiming.TimingPoints.Count;
-            int objectsResnapped = MapCleaner.CleanMap(editor.Beatmap, arguments, worker);
+            int objectsResnapped = MapCleaner.CleanMap(editor.Beatmap, arguments.CleanerArguments, worker);
 
             // Save the file
             editor.SaveFile();
