@@ -87,6 +87,19 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
+        public void MoveEndTime(Timing timing, double deltaTime) {
+            if (IsSlider) {
+                double deltaLength = (-10000 * timing.SliderMultiplier * deltaTime / Repeat) / (Redline.MpB * SV);  // Divide by repeats because the endtime is multiplied by repeats
+                PixelLength += deltaLength; // Change the pixellength to match the new time
+            }
+
+            // Change
+            TemporalLength += deltaTime;
+            EndTime = Math.Floor(Time + TemporalLength);
+            if (TimelineObjects.Count > 0) { TimelineObjects.Last().Time = EndTime; };
+            BodyHitsounds.RemoveAll(s => s.Offset >= EndTime);
+        }
+
         public void Move(Vector2 delta) {
             Pos += delta;
             CurvePoints.ForEach(o => o += delta);
@@ -100,18 +113,38 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public bool ResnapEnd(Timing timing, int snap1, int snap2) {
+            if (Repeat > 1) { return ResnapEndClassic(timing, snap1, snap2); }
+
             double newTime = timing.Resnap(EndTime, snap1, snap2);
             double deltaTime = newTime - EndTime;
-            if (IsSlider) {
-                double deltaLength = (-10000 * timing.SliderMultiplier * deltaTime / Repeat) / (Redline.MpB * SV);  // Divide by repeats because the endtime is multiplied by repeats
-                PixelLength += deltaLength; // Change the pixellength to match the new time
+            MoveEndTime(timing, deltaTime);
+
+            return deltaTime != 0;
+        }
+
+        public bool ResnapEndClassic(Timing timing, int snap1, int snap2) {
+            // Temporal length is n times a snap divisor length
+            TimingPoint tp = timing.GetRedlineAtTime(Time);
+
+            double d1 = tp.MpB / snap1;
+            double remainder1 = TemporalLength % d1;
+
+            double d2 = tp.MpB / snap2;
+            double remainder2 = TemporalLength % d2;
+
+            double d = remainder1 < remainder2 ? d1 : d2;
+            double remainder = remainder1 < remainder2 ? remainder1 : remainder2;
+
+            double newTemporalLength = TemporalLength;
+            if (remainder < 0.5 * d) {
+                newTemporalLength = TemporalLength - remainder;
+            } else {
+                newTemporalLength = TemporalLength - remainder + d;
             }
 
-            // Change
-            TemporalLength += deltaTime;
-            EndTime = Math.Floor(Time + TemporalLength);
-            if (TimelineObjects.Count > 0) { TimelineObjects.Last().Time = EndTime; };
-            BodyHitsounds.RemoveAll(s => s.Offset >= EndTime);
+            double deltaTime = newTemporalLength - TemporalLength;
+            MoveEndTime(timing, deltaTime);
+
             return deltaTime != 0;
         }
 
