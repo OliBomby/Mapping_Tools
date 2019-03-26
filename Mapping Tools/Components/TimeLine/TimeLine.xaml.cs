@@ -27,8 +27,8 @@ namespace Mapping_Tools.Components.TimeLine {
             TimeLineWidth = w - 100;
             TimeLineHeight = h;
             StartSeconds = 0;
-            EndSeconds = seconds;
-            IntervalSeconds = (int) Math.Round(seconds / 20.0);
+            EndSeconds = Math.Max(seconds, 20);
+            IntervalSeconds = (int) Math.Round(EndSeconds / 20.0);
 
             Setup();
         }
@@ -39,7 +39,7 @@ namespace Mapping_Tools.Components.TimeLine {
             TimeLineWidth = w - 60;
             TimeLineHeight = h;
             StartSeconds = 0;
-            EndSeconds = (int) seconds / 1000;
+            EndSeconds = Math.Max((int) seconds / 1000, 20);
             IntervalSeconds = (int) Math.Round(EndSeconds / 20.0);
 
             Setup();
@@ -63,7 +63,7 @@ namespace Mapping_Tools.Components.TimeLine {
             TElements.Add(te);
             mainCanvas.Children.Add(te);
 
-            int seconds = (int) d_seconds / 1000;
+            double seconds = d_seconds / 1000;
             Canvas.SetTop(te, ElementTop);
             Canvas.SetLeft(te, ( TimeLineWidth * ( seconds - StartSeconds ) / ( EndSeconds - StartSeconds ) ) - 1);
         }

@@ -44,7 +44,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public bool Equals(TimingPoint tp) {
-            return MpB == tp.MpB &&
+            return Offset == tp.Offset &&
+                MpB == tp.MpB &&
                 Meter == tp.Meter &&
                 SampleSet == tp.SampleSet &&
                 SampleIndex == tp.SampleIndex &&

@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -33,7 +34,7 @@ namespace Mapping_Tools.Components.TimeLine {
             InitializeComponent();
 
             Action = action;
-            this.Seconds = (int) seconds / 1000;
+            this.Seconds = (int) Math.Round(seconds / 1000);
             this.Parent = parent;
             rectOuter.Height = height;
             rectInner.Height = height;

@@ -177,10 +177,19 @@ namespace Mapping_Tools.Views {
                                  on first.Offset equals second.Offset
                                  select second).ToList();
 
-            for (int i = 0; i < originalInNew.Count(); i++) {
-                if (originalInNew[i] != newInOriginal[i]) {
+            /*for (int i = 0; i < originalInNew.Count(); i++) {
+                if (! originalInNew[i].Equals(newInOriginal[i])) {
                     TimingpointsChanged.Add(originalInNew[i].Offset);
                 }
+            }*/
+            foreach (TimingPoint tp in originalInNew) {
+                bool different = true;
+                List<TimingPoint> newTPs = newInOriginal.Where(o => o.Offset == tp.Offset).ToList();
+                if (newTPs.Count == 0) { different = false; }
+                foreach (TimingPoint newTP in newTPs) {
+                    if (tp.Equals(newTP)) { different = false; }
+                }
+                if (different) { TimingpointsChanged.Add(tp.Offset); }
             }
 
             List<double> originalOffsets = new List<double>();
@@ -210,6 +219,7 @@ namespace Mapping_Tools.Views {
                 foreach (double timing_s in TimingpointsRemoved) {
                     TL.AddElement(timing_s, 3);
                 }
+                tl_host.Children.Clear();
                 tl_host.Children.Add(TL);
             } catch (Exception ex) {
                 Console.WriteLine(ex.Message);

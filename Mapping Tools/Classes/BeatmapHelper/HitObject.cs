@@ -115,7 +115,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public bool ResnapEnd(Timing timing, int snap1, int snap2) {
             if (Repeat > 1) { return ResnapEndClassic(timing, snap1, snap2); }
 
-            double newTime = timing.Resnap(EndTime, snap1, snap2);
+            double newTime = Math.Floor(timing.Resnap(EndTime, snap1, snap2));
             double deltaTime = newTime - EndTime;
             MoveEndTime(timing, deltaTime);
 
