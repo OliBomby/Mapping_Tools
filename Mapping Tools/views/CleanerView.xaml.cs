@@ -176,12 +176,7 @@ namespace Mapping_Tools.Views {
                                  join second in newTimingPoints
                                  on first.Offset equals second.Offset
                                  select second).ToList();
-
-            /*for (int i = 0; i < originalInNew.Count(); i++) {
-                if (! originalInNew[i].Equals(newInOriginal[i])) {
-                    TimingpointsChanged.Add(originalInNew[i].Offset);
-                }
-            }*/
+            
             foreach (TimingPoint tp in originalInNew) {
                 bool different = true;
                 List<TimingPoint> newTPs = newInOriginal.Where(o => o.Offset == tp.Offset).ToList();
