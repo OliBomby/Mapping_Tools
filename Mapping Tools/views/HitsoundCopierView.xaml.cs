@@ -14,7 +14,7 @@ using Mapping_Tools.Classes.Tools;
 
 namespace Mapping_Tools.Views {
     /// <summary>
-    /// Interaktionslogik für UserControl1.xaml
+    /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
     public partial class HitsoundCopierView :UserControl {
         private BackgroundWorker backgroundWorker;
@@ -75,9 +75,12 @@ namespace Mapping_Tools.Views {
             Editor editorTo = new Editor(arg.Path);
             Editor editorFrom = new Editor(arg.PathFrom);
 
+            Beatmap beatmapTo = editorTo.Beatmap;
+            Beatmap beatmapFrom = editorFrom.Beatmap;
+
             // Clean both for the resnaps
-            MapCleaner.CleanMap(editorTo.Beatmap, MapCleaner.Arguments.BasicResnap);
-            MapCleaner.CleanMap(editorFrom.Beatmap, MapCleaner.Arguments.BasicResnap);
+            MapCleaner.CleanMap(beatmapTo, MapCleaner.Arguments.BasicResnap);
+            MapCleaner.CleanMap(beatmapFrom, MapCleaner.Arguments.BasicResnap);
 
             // replace:
             // sampleset timingpointchanges will only have influence on sliderbodies with special hitsounding
@@ -85,48 +88,48 @@ namespace Mapping_Tools.Views {
             // hitsounds will be put on hitobjects (sliderbodies from hitobjects)
             // customindices will be replaced by tlo hitsounds and sliderbody hitsounds
             // volume will be replaced by tlo and sliderbody hitsounds or just all timingpoints and clean after
-            
-            /* Pseudocode
+
+            int modeTo = beatmapTo.General["Mode"].Value;
             List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
             
             foreach (HitObject ho in editorFrom.Beatmap.HitObjects) {
                 // Copy the timingpoitns for sliderbodies
-                foreach (TimingPoint tp in ho.BodyTimingPoints) {
-                    if (tp.ThisTimingPointIsInABody(editorTo.Beatmap) {
-                        timingPointsChanges.Add(new TimingPointsChange(tp, sampleset:true, customindex:true, volume:true));
+                foreach (TimingPoint tp in ho.BodyHitsounds) {
+                    if (tp.ThisTimingPointIsInABody(editorTo.Beatmap)) {
+                        timingPointsChanges.Add(new TimingPointsChange(tp, sampleset:true, index:true, volume:true));
                     }
                 }
                 
                 // Copy the samplesets and hitsounds for sliderbodies
                 if (ho.IsSlider) {
-                    HitObject toho = FindTheSliderWithTheSameTime(BeatmapTo, ho);
+                    HitObject toho = FindTheSliderWithTheSameTime(editorTo.Beatmap, ho);
                     if (toho != null) {
                         toho.Hitsounds = ho.Hitsounds;
-                        toho.Sampleset = ho.Sampleset;
-                        toho.Additions = ho.Additions;
+                        toho.SampleSet = ho.SampleSet;
+                        toho.AdditionSet = ho.AdditionSet;
                     }
                 }
             }
             
-            TimeLine timeLineTo = editorTo.Beatmap.GetTimeLine();
-            TimeLine timeLineFrom = editorFrom.Beatmap.GetTimeLine();\
+            Timeline timeLineTo = editorTo.Beatmap.GetTimeline();
+            Timeline timeLineFrom = editorFrom.Beatmap.GetTimeline();
             
-            foreach (TimeLineObject tlofrom in timeLineFrom.TimeLineObjects) {
-                TimeLineObject tlo = FindTheTLOWithTheSameTime(timeLineTo, tlofrom);
-                if (totlo != null) {
+            foreach (TimelineObject tloFrom in timeLineFrom.TimeLineObjects) {
+                TimelineObject tlo = FindTheTLOWithTheSameTime(timeLineTo, tloFrom);
+                if (tlo != null) {
                     // literally the code in map cleaner that puts tlo hitsounds onto hitobjects
                     // Could probably be abstracted and use a case switch
                     if (tlo.Origin.IsCircle) {
-                       tlo.Origin.SampleSet = tlo.FenoSampleSet;
-                       tlo.Origin.AdditionSet = tlo.FenoAdditionSet;
-                        if (mode == 3) {
-                            tlo.Origin.CustomIndex = tlo.FenoCustomIndex;
-                            tlo.Origin.SampleVolume = tlo.FenoSampleVolume;
+                       tlo.Origin.SampleSet = tloFrom.FenoSampleSet;
+                       tlo.Origin.AdditionSet = tloFrom.FenoAdditionSet;
+                        if (modeTo == 3) {
+                            tlo.Origin.CustomIndex = tloFrom.FenoCustomIndex;
+                            tlo.Origin.SampleVolume = tloFrom.FenoSampleVolume;
                         }
                     } else if (tlo.Origin.IsSlider) {
-                        tlo.Origin.EdgeHitsounds[tlo.Repeat] = tlo.GetHitsounds();
-                        tlo.Origin.EdgeSampleSets[tlo.Repeat] = tlo.FenoSampleSet;
-                        tlo.Origin.EdgeAdditionSets[tlo.Repeat] = tlo.FenoAdditionSet;
+                        tlo.Origin.EdgeHitsounds[tlo.Repeat] = tloFrom.GetHitsounds();
+                        tlo.Origin.EdgeSampleSets[tlo.Repeat] = tloFrom.FenoSampleSet;
+                        tlo.Origin.EdgeAdditionSets[tlo.Repeat] = tloFrom.FenoAdditionSet;
                         tlo.Origin.SliderExtras = true;
                         if (tlo.Origin.EdgeAdditionSets[tlo.Repeat] == tlo.Origin.EdgeSampleSets[tlo.Repeat])  // Simplify additions to auto
                         {
@@ -134,30 +137,29 @@ namespace Mapping_Tools.Views {
                         }
                     } else if (tlo.Origin.IsSpinner) {
                         if (tlo.Repeat == 1) {
-                            tlo.Origin.SampleSet = tlo.FenoSampleSet;
-                            tlo.Origin.AdditionSet = tlo.FenoAdditionSet;
+                            tlo.Origin.SampleSet = tloFrom.FenoSampleSet;
+                            tlo.Origin.AdditionSet = tloFrom.FenoAdditionSet;
                         }
                     } else if (tlo.Origin.IsHoldNote) {
                         if (tlo.Repeat == 0) {
-                            tlo.Origin.SampleSet = tlo.FenoSampleSet;
-                            tlo.Origin.AdditionSet = tlo.FenoAdditionSet;
-                            tlo.Origin.CustomIndex = tlo.FenoCustomIndex;
-                            tlo.Origin.SampleVolume = tlo.FenoSampleVolume;
+                            tlo.Origin.SampleSet = tloFrom.FenoSampleSet;
+                            tlo.Origin.AdditionSet = tloFrom.FenoAdditionSet;
+                            tlo.Origin.CustomIndex = tloFrom.FenoCustomIndex;
+                            tlo.Origin.SampleVolume = tloFrom.FenoSampleVolume;
                         }
                     }
                     if (tlo.Origin.AdditionSet == tlo.Origin.SampleSet)  // Simplify additions to auto
                     {
                         tlo.Origin.AdditionSet = 0;
                     }
-                    if (mode == 0 && tlo.HasHitsound) // Add greenlines for custom indexes and volumes
+                    if (modeTo == 0 && tloFrom.HasHitsound) // Add greenlines for custom indexes and volumes
                     {
-                        TimingPoint tp = tlo.Origin.TP.Copy();
-                        tp.Offset = tlo.Time;
-                        tp.SampleIndex = tlo.FenoCustomIndex;
-                        tp.Volume = tlo.FenoSampleVolume;
-                        bool ind = !(tlo.Filename != "" && (tlo.IsCircle || tlo.IsHoldnoteHead || tlo.IsSpinnerEnd));  // Index doesnt have to change if custom is overridden by Filename
-                        bool vol = !(tp.Volume == 5 && arguments.RemoveSliderendMuting && (tlo.IsSliderEnd || tlo.IsSpinnerEnd));  // Remove volume change if sliderend muting or spinnerend muting
-                        timingPointsChanges.Add(new TimingPointsChange(tp, volume: vol, index: ind));
+                        TimingPoint tp = tloFrom.Origin.TP.Copy();
+                        tp.Offset = tloFrom.Time;
+                        tp.SampleIndex = tloFrom.FenoCustomIndex;
+                        tp.Volume = tloFrom.FenoSampleVolume;
+                        bool ind = !(tloFrom.Filename != "" && (tloFrom.IsCircle || tloFrom.IsHoldnoteHead || tloFrom.IsSpinnerEnd));  // Index doesnt have to change if custom is overridden by Filename
+                        timingPointsChanges.Add(new TimingPointsChange(tp, volume: true, index: ind));
                     }
                 }
             }
@@ -165,7 +167,7 @@ namespace Mapping_Tools.Views {
             // apply timingpointschanges and give timingpoints to hitobject again
             
             MapCleaner.CleanMap(editorTo.Beatmap, MapCleaner.Arguments.BasicResnap);
-            */
+            
             
             // Save the file
             editorTo.SaveFile();
