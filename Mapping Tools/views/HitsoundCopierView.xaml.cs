@@ -88,7 +88,7 @@ namespace Mapping_Tools.Views {
             // hitsounds will be put on hitobjects (sliderbodies from hitobjects)
             // customindices will be replaced by tlo hitsounds and sliderbody hitsounds
             // volume will be replaced by tlo and sliderbody hitsounds or just all timingpoints and clean after
-
+            /*
             int modeTo = beatmapTo.General["Mode"].Value;
             List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
             
@@ -167,7 +167,7 @@ namespace Mapping_Tools.Views {
             // apply timingpointschanges and give timingpoints to hitobject again
             
             MapCleaner.CleanMap(editorTo.Beatmap, MapCleaner.Arguments.BasicResnap);
-            
+            */
             
             // Save the file
             editorTo.SaveFile();
