@@ -95,7 +95,7 @@ namespace Mapping_Tools.Views {
                     LayersList.Items.Add(item);
                 }
             } catch (Exception ex) {
-                MessageBox.Show(ex.StackTrace);
+                MessageBox.Show(ex.Message);
             }
         }
 
