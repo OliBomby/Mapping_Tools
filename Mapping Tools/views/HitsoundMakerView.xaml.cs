@@ -52,7 +52,7 @@ namespace Mapping_Tools.Views {
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
-            backgroundWorker.RunWorkerAsync(new Arguments("", baseBeatmap, hitsoundLayers));
+            backgroundWorker.RunWorkerAsync(new Arguments(MainWindow.AppWindow.ExportPath, baseBeatmap, defaultSound, hitsoundLayers));
             start.IsEnabled = false;
         }
 
@@ -102,11 +102,13 @@ namespace Mapping_Tools.Views {
         private struct Arguments {
             public string ExportFolder;
             public Beatmap BaseBeatmap;
+            public Sound DefaultSound;
             public List<HitsoundLayer> HitsoundLayers;
-            public Arguments(string exportFolder, Beatmap baseBeatmap, List<HitsoundLayer> hitsoundLayers)
+            public Arguments(string exportFolder, Beatmap baseBeatmap, Sound defaultSound, List<HitsoundLayer> hitsoundLayers)
             {
                 ExportFolder = exportFolder;
                 BaseBeatmap = baseBeatmap;
+                DefaultSound = defaultSound;
                 HitsoundLayers = hitsoundLayers;
             }
         }

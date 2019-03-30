@@ -21,6 +21,7 @@ namespace Mapping_Tools {
         public bool SessionhasAdminRights;
         public string AppDataPath;
         public string BackupPath;
+        public string ExportPath;
 
         public MainWindow() {
             Setup();
@@ -45,11 +46,13 @@ namespace Mapping_Tools {
             string appCommon = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
             AppDataPath = Path.Combine(appCommon, "Mapping-Tools");
             BackupPath = Path.Combine(AppDataPath, "Backups");
-            
-            if( !Directory.Exists(AppDataPath) ) {
+            ExportPath = Path.Combine(AppDataPath, "Exports");
+
+            if ( !Directory.Exists(AppDataPath) ) {
                 try {
                     Directory.CreateDirectory(AppDataPath);
                     Directory.CreateDirectory(BackupPath);
+                    Directory.CreateDirectory(ExportPath);
                 }
                 catch( Exception ex ) {
                     MessageBox.Show(ex.Message);
