@@ -93,12 +93,12 @@ namespace Mapping_Tools {
         }
 
         private void OpenBeatmap(object sender, RoutedEventArgs e) {
-            string path = BeatmapFinder.FileDialog();
+            string path = FileFinder.BeatmapFileDialog();
             if (path != "") { SetCurrentMap(path); }
         }
 
         private void OpenCurrentBeatmap(object sender, RoutedEventArgs e) {
-            string path = BeatmapFinder.CurrentBeatmap();
+            string path = FileFinder.CurrentBeatmap();
             if (path != "") { SetCurrentMap(path); }
         }
 
@@ -161,10 +161,19 @@ namespace Mapping_Tools {
         }
 
         //Method for loading the hitsound copier
-        private void LoadCopier(object sender, RoutedEventArgs e) {
+        private void LoadHSCopier(object sender, RoutedEventArgs e) {
             DataContext = new HitsoundCopierVM();
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Hitsound Copier";
+            this.MinWidth = 100;
+            this.MinHeight = 100;
+        }
+
+        //Method for loading the hitsound copier
+        private void LoadHSMaker(object sender, RoutedEventArgs e) {
+            DataContext = new HitsoundMakerVM();
+            TextBlock txt = this.FindName("header") as TextBlock;
+            txt.Text = "Mapping Tools - Hitsound Maker";
             this.MinWidth = 100;
             this.MinHeight = 100;
         }

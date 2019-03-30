@@ -1,0 +1,111 @@
+﻿<UserControl x:Class="Mapping_Tools.Views.HitsoundMakerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Mapping_Tools.Views"
+             xmlns:cm="clr-namespace:System.ComponentModel;assembly=System"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             d:DesignHeight="550" Width="759.5">
+    <Grid Name="MasterGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid Name="FirstGrid" Grid.Row="0" Grid.Column="0" Margin="0,0,204,0">
+            <StackPanel Grid.Row="0" Margin="0,0,10,0">
+                <TextBlock FontSize="40" TextWrapping="NoWrap" FontWeight="Bold" Foreground="#FF5F5E5E" Height="61"><Run Text="Hitsound "/><Run Text="Maker"/><LineBreak/><Run/><LineBreak/><Run/></TextBlock>
+                <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="500" TextWrapping="Wrap" Foreground="#FFD6D6D6" Margin="10,0,0,5" Text="Import arbitrary hitsound layers and create a hitsound difficulty."/>
+                <ComboBox x:Name="ImportModeBox" Margin="10,10,0,0" VerticalAlignment="Stretch" SelectedIndex="0" Cursor="Hand">
+                    <ComboBoxItem Content="Base map + Volumes" HorizontalAlignment="Left" Cursor="Hand"/>
+                    <ComboBoxItem Content="Hitsound layer" HorizontalAlignment="Left" Cursor="Hand"/>
+                </ComboBox>
+                <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="200" Foreground="#FFD6D6D6" Margin="10,10,0,0"><Run Text="Stack X coordinate:"/></TextBlock>
+                <TextBox x:Name="XCoordBox" Height="23" Width="170" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#FFD6D6D6" Text="" Margin="10,0,0,0"/>
+                <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="200" Foreground="#FFD6D6D6" Margin="10,10,0,0"><Run Text="Stack Y coordinate:"/></TextBlock>
+                <TextBox x:Name="YCoordBox" Height="23" Width="170" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#FFD6D6D6" Text="" Margin="10,0,0,0"/>
+                <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="200" Foreground="#FFD6D6D6" Margin="10,10,0,0"><Run Text="Hitsound Info:"/></TextBlock>
+                <ComboBox x:Name="SampleSetBox" Margin="10,10,0,0" VerticalAlignment="Stretch" SelectedIndex="1" Cursor="Hand">
+                    <ComboBoxItem Content="Normal" HorizontalAlignment="Left" Cursor="Hand"/>
+                    <ComboBoxItem Content="Soft" HorizontalAlignment="Left" Cursor="Hand"/>
+                    <ComboBoxItem Content="Drum" HorizontalAlignment="Left" Cursor="Hand"/>
+                </ComboBox>
+                <ComboBox x:Name="HitsoundBox" Margin="10,10,0,0" VerticalAlignment="Stretch" SelectedIndex="1" Cursor="Hand">
+                    <ComboBoxItem Content="Normal" HorizontalAlignment="Left" Cursor="Hand"/>
+                    <ComboBoxItem Content="Whistle" HorizontalAlignment="Left" Cursor="Hand"/>
+                    <ComboBoxItem Content="Finish" HorizontalAlignment="Left" Cursor="Hand"/>
+                    <ComboBoxItem Content="Clap" HorizontalAlignment="Left" Cursor="Hand"/>
+                </ComboBox>
+                <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="200" Foreground="#FFD6D6D6" Margin="10,10,0,0"><Run Text="Hitsound sample:"/></TextBlock>
+                <TextBox x:Name="SamplePathBox" Height="23" Width="170" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#FFD6D6D6" Text="" Margin="10,0,0,0"/>
+                <Button Content="Browse" Click="SampleBrowse_Click" Margin="10,10,0,0"/>
+                <Button Content="Import Layer" Click="ImportLayer_Click" Margin="10,10,0,0"/>
+            </StackPanel>
+        </Grid>
+        <Grid Name="SecoundGrid" Grid.Row="1" Grid.Column="0">
+            <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+                <Button Width="Auto" Height="Auto" x:Name="start" Cursor="Hand" Click="Start_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}">
+                    <Button.Style>
+                        <Style TargetType="{x:Type Button}">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border
+                                    x:Name="border"
+                                    CornerRadius="3"
+                                    TextBlock.Foreground="White">
+                                            <Grid Background="Transparent">
+                                                <ContentPresenter/>
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="true">
+                                                <Setter TargetName="border" Property="Background" Value="#404040"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Button.Style>
+                    <materialDesign:PackIcon Width="100" Height="100" Cursor="Hand" Kind="Play" Foreground="#FFD6D6D6"/>
+                </Button >
+            </StackPanel>
+        </Grid>
+        <Grid Margin="0,0,0,0" Name="ThirdGrid" Grid.Row="2" Grid.Column="0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Column="0">
+                    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" Orientation="Horizontal">
+                        <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Foreground="#FF5F5E5E"/>
+                        <ProgressBar x:Name="loader_progress" Foreground="#FF838383" Background="{x:Null}" BorderBrush="{x:Null}"/>
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Column="1">
+                    <DockPanel>
+                        <ProgressBar x:Name="progress" Margin="20,0,20,0" Height="20" Foreground="#FF838383" Background="{x:Null}" BorderBrush="{x:Null}"/>
+                    </DockPanel>
+                </Grid>
+            </Grid>
+        </Grid>
+        <ListView x:Name="LayersList" VerticalContentAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Auto" Margin="556,10,10,177"/>
+    </Grid>
+    <UserControl.Resources>
+        <cm:BackgroundWorker x:Key="backgroundWorker"
+         DoWork="BackgroundWorker_DoWork"
+         RunWorkerCompleted="BackgroundWorker_RunWorkerCompleted"
+         WorkerReportsProgress="True"
+         ProgressChanged="BackgroundWorker_ProgressChanged"/>
+    </UserControl.Resources>
+</UserControl>

@@ -188,12 +188,12 @@ namespace Mapping_Tools.Views {
         }
 
         private void Browse_Click(object sender, RoutedEventArgs e) {
-            string path = BeatmapFinder.FileDialog();
+            string path = FileFinder.BeatmapFileDialog();
             if (path != "") { PathBox.Text = path; }
         }
 
         private void Current_Map_Click(object sender, RoutedEventArgs e) {
-            string path = BeatmapFinder.CurrentBeatmap();
+            string path = FileFinder.CurrentBeatmap();
             if (path != "") { PathBox.Text = path; }
         }
     }

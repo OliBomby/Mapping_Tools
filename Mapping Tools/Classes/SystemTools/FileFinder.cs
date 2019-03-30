@@ -1,11 +1,33 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Windows.Forms;
 
 namespace Mapping_Tools.Classes.SystemTools
 {
-    public class BeatmapFinder
+    public class FileFinder
     {
         public static string FileDialog() {
+            OpenFileDialog openFileDialog = new OpenFileDialog {
+                RestoreDirectory = true,
+                CheckFileExists = true
+            };
+            openFileDialog.ShowDialog();
+            return openFileDialog.FileName;
+        }
+
+        public static string AudioFileDialog() {
+            OpenFileDialog openFileDialog = new OpenFileDialog {
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                Filter = "Audio files (*.wav)|*.wav",
+                FilterIndex = 1,
+                RestoreDirectory = true,
+                CheckFileExists = true
+            };
+            openFileDialog.ShowDialog();
+            return openFileDialog.FileName;
+        }
+
+        public static string BeatmapFileDialog() {
             OpenFileDialog openFileDialog = new OpenFileDialog {
                 InitialDirectory = MainWindow.AppWindow.settingsManager.GetSongsPath(),
                 Filter = "Osu files (*.osu)|*.osu",
