@@ -18,5 +18,16 @@ namespace Mapping_Tools.Views {
                 return 0;
             } 
         }
+
+        public static double GetInt(this TextBox textBox) {
+            try {
+                DataTable dt = new DataTable();
+                string text = textBox.Text.Replace(",", ".");
+                var v = dt.Compute(text, "");
+                return Convert.ToInt32(v);
+            } catch {
+                return 0;
+            }
+        }
     }
 }

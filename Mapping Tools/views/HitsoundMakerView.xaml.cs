@@ -7,6 +7,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SliderPathStuff;
 using Mapping_Tools.Classes.SystemTools;
@@ -18,17 +19,21 @@ namespace Mapping_Tools.Views {
     /// </summary>
     public partial class HitsoundMakerView :UserControl {
         private BackgroundWorker backgroundWorker;
+        private Beatmap baseBeatmap;
+        private Sound defaultSound;
+        private List<HitsoundLayer> hitsoundLayers;
 
         public HitsoundMakerView() {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
-            backgroundWorker = (BackgroundWorker) FindResource("backgroundWorker") ;
+            backgroundWorker = (BackgroundWorker) FindResource("backgroundWorker");
+            hitsoundLayers = new List<HitsoundLayer>();
         }
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
-            e.Result = Copy_Hitsounds((Arguments) e.Argument, bgw, e);
+            e.Result = Make_Hitsounds((Arguments) e.Argument, bgw, e);
         }
 
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
@@ -47,43 +52,67 @@ namespace Mapping_Tools.Views {
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
-            DateTime now = DateTime.Now;
-            string fileToCopy = MainWindow.AppWindow.currentMap.Text;
-            string destinationDirectory = MainWindow.AppWindow.BackupPath;
-            try {
-                File.Copy(fileToCopy, Path.Combine(destinationDirectory, now.ToString("yyyy-MM-dd HH-mm-ss") + "___" + System.IO.Path.GetFileName(fileToCopy)));
-            }
-            catch( Exception ex ) {
-                MessageBox.Show(ex.Message);
-                return;
-            }
-            backgroundWorker.RunWorkerAsync(new Arguments(fileToCopy, fileToCopy));
+            backgroundWorker.RunWorkerAsync(new Arguments("", baseBeatmap, hitsoundLayers));
             start.IsEnabled = false;
         }
 
-        private struct Arguments {
-            public string Path;
-            public string PathFrom;
-            public Arguments(string path, string pathFrom)
-            {
-                Path = path;
-                PathFrom = pathFrom;
+        private void SampleBrowse_Click(object sender, RoutedEventArgs e) {
+            string path = FileFinder.AudioFileDialog();
+            if (path != "") { SamplePathBox.Text = path; }
+        }
+
+        private void Import_Click(object sender, RoutedEventArgs e) {
+            try {
+                if (ImportModeBox.Text == "Base Beatmap + Volumes") {
+                    Editor editor = new Editor(MainWindow.AppWindow.currentMap.Text);
+                    baseBeatmap = editor.Beatmap;
+                    BaseBeatmapCheck.IsChecked = true;
+                }
+                else if (ImportModeBox.Text == "Default Sound") {
+                    defaultSound = new Sound(SampleSetBox.SelectedIndex + 1, 0, SamplePathBox.Text, int.MaxValue);
+                    DefaultSoundCheck.IsChecked = true;
+                }
+                else {
+                    Editor editor = new Editor(MainWindow.AppWindow.currentMap.Text);
+                    HitsoundLayer layer = new HitsoundLayer(SampleSetBox.SelectedIndex + 1, HitsoundBox.SelectedIndex, SamplePathBox.Text, hitsoundLayers.Count);
+
+                    bool xIgnore = XCoordBox.Text == "";
+                    bool yIgnore = YCoordBox.Text == "";
+                    double x = XCoordBox.GetDouble();
+                    double y = YCoordBox.GetDouble();
+
+                    foreach (HitObject ho in editor.Beatmap.HitObjects) {
+                        if ((Math.Abs(ho.Pos.X - x) < 3 || xIgnore) && (Math.Abs(ho.Pos.Y - y) < 3 || yIgnore)) {
+                            layer.Times.Add(ho.Time);
+                        }
+                    }
+
+                    hitsoundLayers.Add(layer);
+
+                    TextBlock item = new TextBlock {
+                        Text = String.Format("{0} Sounds, {1} Sampleset, {2} Hitsound, {3}", layer.Times.Count, SampleSetBox.Text, HitsoundBox.Text, layer.SamplePath)
+                    };
+                    LayersList.Items.Add(item);
+                }
+            } catch (Exception ex) {
+                MessageBox.Show(ex.StackTrace);
             }
         }
 
-        private string Copy_Hitsounds(Arguments arg, BackgroundWorker worker, DoWorkEventArgs e) {
-            Editor editorTo = new Editor(arg.Path);
-            Editor editorFrom = new Editor(arg.PathFrom);
+        private struct Arguments {
+            public string ExportFolder;
+            public Beatmap BaseBeatmap;
+            public List<HitsoundLayer> HitsoundLayers;
+            public Arguments(string exportFolder, Beatmap baseBeatmap, List<HitsoundLayer> hitsoundLayers)
+            {
+                ExportFolder = exportFolder;
+                BaseBeatmap = baseBeatmap;
+                HitsoundLayers = hitsoundLayers;
+            }
+        }
 
-            Beatmap beatmapTo = editorTo.Beatmap;
-            Beatmap beatmapFrom = editorFrom.Beatmap;
-
-            // Clean both for the resnaps
-            MapCleaner.CleanMap(beatmapTo, MapCleaner.Arguments.BasicResnap);
-            MapCleaner.CleanMap(beatmapFrom, MapCleaner.Arguments.BasicResnap);
+        private string Make_Hitsounds(Arguments arg, BackgroundWorker worker, DoWorkEventArgs e) {
             
-            // Save the file
-            editorTo.SaveFile();
 
             // Complete progressbar
             if (worker != null && worker.WorkerReportsProgress) {
@@ -98,15 +127,6 @@ namespace Mapping_Tools.Views {
 
         private void Print(string str) {
             Console.WriteLine(str);
-        }
-
-        private void SampleBrowse_Click(object sender, RoutedEventArgs e) {
-            string path = FileFinder.AudioFileDialog();
-            if (path != "") { SamplePathBox.Text = path; }
-        }
-
-        private void ImportLayer_Click(object sender, RoutedEventArgs e) {
-            MessageBox.Show("Totally didn't do anything", "Pranked");
         }
     }
 }

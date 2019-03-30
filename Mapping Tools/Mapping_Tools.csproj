@@ -122,6 +122,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Classes\HitsoundStuff\HitsoundLayer.cs" />
+    <Compile Include="Classes\HitsoundStuff\Sound.cs" />
     <Compile Include="Classes\MathUtil\Extensions.cs" />
     <Compile Include="Classes\MathUtil\BezierCurve.cs" />
     <Compile Include="Classes\MathUtil\BezierCurveCubic.cs" />

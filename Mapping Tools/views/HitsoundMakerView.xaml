@@ -22,13 +22,14 @@
                 <TextBlock FontSize="40" TextWrapping="NoWrap" FontWeight="Bold" Foreground="#FF5F5E5E" Height="61"><Run Text="Hitsound "/><Run Text="Maker"/><LineBreak/><Run/><LineBreak/><Run/></TextBlock>
                 <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="500" TextWrapping="Wrap" Foreground="#FFD6D6D6" Margin="10,0,0,5" Text="Import arbitrary hitsound layers and create a hitsound difficulty."/>
                 <ComboBox x:Name="ImportModeBox" Margin="10,10,0,0" VerticalAlignment="Stretch" SelectedIndex="0" Cursor="Hand">
-                    <ComboBoxItem Content="Base map + Volumes" HorizontalAlignment="Left" Cursor="Hand"/>
+                    <ComboBoxItem Content="Base Beatmap + Volumes" HorizontalAlignment="Left" Cursor="Hand"/>
+                    <ComboBoxItem Content="Default Sound" HorizontalAlignment="Left" Cursor="Hand"/>
                     <ComboBoxItem Content="Hitsound layer" HorizontalAlignment="Left" Cursor="Hand"/>
                 </ComboBox>
                 <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="200" Foreground="#FFD6D6D6" Margin="10,10,0,0"><Run Text="Stack X coordinate:"/></TextBlock>
-                <TextBox x:Name="XCoordBox" Height="23" Width="170" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#FFD6D6D6" Text="" Margin="10,0,0,0"/>
+                <TextBox x:Name="XCoordBox" Height="23" Width="536" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#FFD6D6D6" Text="" Margin="10,0,0,0"/>
                 <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="200" Foreground="#FFD6D6D6" Margin="10,10,0,0"><Run Text="Stack Y coordinate:"/></TextBlock>
-                <TextBox x:Name="YCoordBox" Height="23" Width="170" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#FFD6D6D6" Text="" Margin="10,0,0,0"/>
+                <TextBox x:Name="YCoordBox" Height="23" Width="536" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#FFD6D6D6" Text="" Margin="10,0,0,0"/>
                 <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="200" Foreground="#FFD6D6D6" Margin="10,10,0,0"><Run Text="Hitsound Info:"/></TextBlock>
                 <ComboBox x:Name="SampleSetBox" Margin="10,10,0,0" VerticalAlignment="Stretch" SelectedIndex="1" Cursor="Hand">
                     <ComboBoxItem Content="Normal" HorizontalAlignment="Left" Cursor="Hand"/>
@@ -42,9 +43,9 @@
                     <ComboBoxItem Content="Clap" HorizontalAlignment="Left" Cursor="Hand"/>
                 </ComboBox>
                 <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="200" Foreground="#FFD6D6D6" Margin="10,10,0,0"><Run Text="Hitsound sample:"/></TextBlock>
-                <TextBox x:Name="SamplePathBox" Height="23" Width="170" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#FFD6D6D6" Text="" Margin="10,0,0,0"/>
+                <TextBox x:Name="SamplePathBox" Height="23" Width="536" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#FFD6D6D6" Text="" Margin="10,0,0,0"/>
                 <Button Content="Browse" Click="SampleBrowse_Click" Margin="10,10,0,0"/>
-                <Button Content="Import Layer" Click="ImportLayer_Click" Margin="10,10,0,0"/>
+                <Button Content="Import" Click="Import_Click" Margin="10,10,0,0"/>
             </StackPanel>
         </Grid>
         <Grid Name="SecoundGrid" Grid.Row="1" Grid.Column="0">
@@ -99,7 +100,9 @@
                 </Grid>
             </Grid>
         </Grid>
-        <ListView x:Name="LayersList" VerticalContentAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Auto" Margin="556,10,10,177"/>
+        <ListView x:Name="LayersList" VerticalContentAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Auto" HorizontalAlignment="Right" Margin="0,10,10,177" Width="189"/>
+        <CheckBox x:Name="BaseBeatmapCheck" Content="Base Beatmap" Foreground="#FF838383" HorizontalAlignment="Right" Margin="0,298,10,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="DefaultSoundCheck" Content="Default Sound" Foreground="#FF838383" HorizontalAlignment="Right" Margin="0,321,12,0" VerticalAlignment="Top"/>
     </Grid>
     <UserControl.Resources>
         <cm:BackgroundWorker x:Key="backgroundWorker"
