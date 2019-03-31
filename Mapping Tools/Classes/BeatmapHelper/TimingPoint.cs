@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Mapping_Tools.Classes.MathUtil;
+using System;
 using System.Collections;
 using System.Globalization;
 
@@ -27,7 +28,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public string GetLine() {
-            int style = GetIntFromBitArray(new BitArray(new bool[] { Kiai, false, false, OmitFirstBarLine }));
+            int style = MathHelper.GetIntFromBitArray(new BitArray(new bool[] { Kiai, false, false, OmitFirstBarLine }));
             return Math.Round(Offset) + "," + MpB.ToString(CultureInfo.InvariantCulture) + "," + Meter + "," + SampleSet + "," + SampleIndex + ","
                 + Math.Round(Volume) + "," + Convert.ToInt32(Inherited) + "," + style;
         }
@@ -69,15 +70,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             else {
                 return -100 / MpB;
             }
-        }
-
-        private int GetIntFromBitArray(BitArray bitArray) {
-            if (bitArray.Length > 32)
-                throw new ArgumentException("Argument length shall be at most 32 bits.");
-
-            int[] array = new int[1];
-            bitArray.CopyTo(array, 0);
-            return array[0];
         }
     }
 }

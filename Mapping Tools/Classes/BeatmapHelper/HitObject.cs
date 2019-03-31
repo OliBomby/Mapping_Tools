@@ -242,7 +242,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public int GetObjectType() {
             BitArray cs = new BitArray(new int[] { ComboSkip });
-            return GetIntFromBitArray(new BitArray(new bool[] { IsCircle, IsSlider, NewCombo, IsSpinner, cs[0], cs[1], cs[2], IsHoldNote }));
+            return MathHelper.GetIntFromBitArray(new BitArray(new bool[] { IsCircle, IsSlider, NewCombo, IsSpinner, cs[0], cs[1], cs[2], IsHoldNote }));
         }
 
         public void SetObjectType(int type) {
@@ -251,12 +251,12 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             IsSlider = b[1];
             NewCombo = b[2];
             IsSpinner = b[3];
-            ComboSkip = GetIntFromBitArray(new BitArray(new bool[] { b[4], b[5], b[6] }));
+            ComboSkip = MathHelper.GetIntFromBitArray(new BitArray(new bool[] { b[4], b[5], b[6] }));
             IsHoldNote = b[7];
         }
 
         public int GetHitsounds() {
-            return GetIntFromBitArray(new BitArray(new bool[] { Normal, Whistle, Finish, Clap }));
+            return MathHelper.GetIntFromBitArray(new BitArray(new bool[] { Normal, Whistle, Finish, Clap }));
         }
 
         public void SetHitsounds(int hitsounds) {
@@ -308,15 +308,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             CurvePoints = controlPoints.GetRange(1, controlPoints.Count - 1);
             SliderType = sliderPath.Type;
             PixelLength = sliderPath.Distance;
-        }
-
-        private int GetIntFromBitArray(BitArray bitArray) {
-            if (bitArray.Length > 32)
-                throw new ArgumentException("Argument length shall be at most 32 bits.");
-
-            int[] array = new int[1];
-            bitArray.CopyTo(array, 0);
-            return array[0];
         }
 
         private double ParseDouble(string d) {

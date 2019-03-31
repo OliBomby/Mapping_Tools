@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Mapping_Tools.Classes.MathUtil;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -84,16 +85,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public int GetHitsounds() {
-            return GetIntFromBitArray(new BitArray(new bool[] { Normal, Whistle, Finish, Clap }));
-        }
-
-        private int GetIntFromBitArray(BitArray bitArray) {
-            if( bitArray.Length > 32 )
-                throw new ArgumentException("Argument length shall be at most 32 bits.");
-
-            int[] array = new int[1];
-            bitArray.CopyTo(array, 0);
-            return array[0];
+            return MathHelper.GetIntFromBitArray(new BitArray(new bool[] { Normal, Whistle, Finish, Clap }));
         }
     }
 }

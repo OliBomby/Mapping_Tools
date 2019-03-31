@@ -7,6 +7,7 @@
  */
 
 using System;
+using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Mapping_Tools.Classes.MathUtil {
@@ -278,6 +279,15 @@ namespace Mapping_Tools.Classes.MathUtil {
 
             double diff = Math.Abs(a - b);
             return diff <= tolerance;
+        }
+
+        public static int GetIntFromBitArray(BitArray bitArray) {
+            if (bitArray.Length > 32)
+                throw new ArgumentException("Argument length shall be at most 32 bits.");
+
+            int[] array = new int[1];
+            bitArray.CopyTo(array, 0);
+            return array[0];
         }
     }
 }
