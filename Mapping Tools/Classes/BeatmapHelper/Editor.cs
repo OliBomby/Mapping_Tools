@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Windows;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
@@ -21,7 +22,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             // Get contents of the file
             string[] linesz = new string[0];
             try {
-                linesz = System.IO.File.ReadAllLines(path);
+                linesz = File.ReadAllLines(path);
             }
             catch(Exception ex) {
                 MessageBox.Show(ex.Message + "ABC");
@@ -46,20 +47,24 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return markedObjects;
         }
 
-        public void SaveFile(string path, List<string> lines) {
-            System.IO.File.WriteAllLines(path, lines);
-        }
-
         public void SaveFile(string path) {
-            System.IO.File.WriteAllLines(path, Beatmap.GetLines());
+            SaveFile(path, Beatmap.GetLines());
         }
 
         public void SaveFile(List<string> lines) {
-            System.IO.File.WriteAllLines(Path, lines);
+            SaveFile(Path, lines);
         }
 
         public void SaveFile() {
-            System.IO.File.WriteAllLines(Path, Beatmap.GetLines());
+            SaveFile(Path, Beatmap.GetLines());
+        }
+
+        public static void SaveFile(string path, List<string> lines) {
+            if (!File.Exists(path)) {
+                File.Create(path).Dispose();
+            }
+
+            File.WriteAllLines(path, lines);
         }
     }
 }

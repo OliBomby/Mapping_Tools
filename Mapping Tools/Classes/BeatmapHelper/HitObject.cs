@@ -74,6 +74,19 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             TimelineObjects = new List<TimelineObject>();
         }
 
+        public HitObject(double time, int hitsounds, int sampleSet, int additions) {
+            // Basic hitsoundind circle
+            Pos = new Vector2(256, 192);
+            Time = time;
+            SetObjectType(5);
+            SetHitsounds(hitsounds);
+            SampleSet = sampleSet;
+            AdditionSet = additions;
+            CustomIndex = 0;
+            SampleVolume = 0;
+            Filename = "";
+        }
+
         public void MoveTime(double deltaTime) {
             Time += deltaTime;
             EndTime += deltaTime;

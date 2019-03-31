@@ -17,7 +17,6 @@ namespace Mapping_Tools.Classes.SystemTools
 
         public static string AudioFileDialog() {
             OpenFileDialog openFileDialog = new OpenFileDialog {
-                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
                 Filter = "Audio files (*.wav)|*.wav",
                 FilterIndex = 1,
                 RestoreDirectory = true,

@@ -13,12 +13,13 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="295.151"/>
+            <RowDefinition Height="172.849"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Grid Name="FirstGrid" Grid.Row="0" Grid.Column="0" Margin="0,0,204,0">
-            <StackPanel Grid.Row="0" Margin="0,0,10,0">
+        <Grid Name="FirstGrid" Grid.Row="0" Grid.Column="0" Margin="0,0,304,0" Grid.RowSpan="2">
+            <StackPanel Grid.Row="0" HorizontalAlignment="Left" Width="446">
                 <TextBlock FontSize="40" TextWrapping="NoWrap" FontWeight="Bold" Foreground="#FF5F5E5E" Height="61"><Run Text="Hitsound "/><Run Text="Maker"/><LineBreak/><Run/><LineBreak/><Run/></TextBlock>
                 <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="500" TextWrapping="Wrap" Foreground="#FFD6D6D6" Margin="10,0,0,5" Text="Import arbitrary hitsound layers and create a hitsound difficulty."/>
                 <ComboBox x:Name="ImportModeBox" Margin="10,10,0,0" VerticalAlignment="Stretch" SelectedIndex="0" Cursor="Hand">
@@ -48,7 +49,7 @@
                 <Button Content="Import" Click="Import_Click" Margin="10,10,0,0"/>
             </StackPanel>
         </Grid>
-        <Grid Name="SecoundGrid" Grid.Row="1" Grid.Column="0">
+        <Grid Name="SecoundGrid" Grid.Row="2" Grid.Column="0">
             <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Right">
                 <Button Width="Auto" Height="Auto" x:Name="start" Cursor="Hand" Click="Start_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}">
                     <Button.Style>
@@ -78,7 +79,7 @@
                 </Button >
             </StackPanel>
         </Grid>
-        <Grid Margin="0,0,0,0" Name="ThirdGrid" Grid.Row="2" Grid.Column="0">
+        <Grid Margin="0,0,0,0" Name="ThirdGrid" Grid.Row="3" Grid.Column="0">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -100,9 +101,12 @@
                 </Grid>
             </Grid>
         </Grid>
-        <ListView x:Name="LayersList" VerticalContentAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Auto" HorizontalAlignment="Right" Margin="0,10,10,177" Width="189"/>
-        <CheckBox x:Name="BaseBeatmapCheck" Content="Base Beatmap" Foreground="#FF838383" HorizontalAlignment="Right" Margin="0,298,10,0" VerticalAlignment="Top"/>
-        <CheckBox x:Name="DefaultSoundCheck" Content="Default Sound" Foreground="#FF838383" HorizontalAlignment="Right" Margin="0,321,12,0" VerticalAlignment="Top"/>
+        <ListView x:Name="LayersList" VerticalContentAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Auto" HorizontalAlignment="Right" Margin="0,10,10,4" Width="432"/>
+        <CheckBox x:Name="BaseBeatmapCheck" Content="Base Beatmap" Foreground="#FF838383" HorizontalAlignment="Right" Margin="0,2.849,10,0" VerticalAlignment="Top" Grid.Row="1"/>
+        <CheckBox x:Name="DefaultSoundCheck" Content="Default Sound" Foreground="#FF838383" HorizontalAlignment="Right" Margin="0,25.849,12,0" VerticalAlignment="Top" Grid.Row="1"/>
+        <Button Content="Delete Layer" HorizontalAlignment="Right" Margin="0,58.849,10,0" VerticalAlignment="Top" Width="116" Click="Delete_Click" Grid.Row="1"/>
+        <Button Content="Raise Layer" HorizontalAlignment="Right" Margin="0,95.849,10,0" VerticalAlignment="Top" Width="116" Click="Raise_Click" Grid.Row="1"/>
+        <Button Content="Lower Layer" HorizontalAlignment="Right" Margin="0,132.849,10,0" VerticalAlignment="Top" Width="116" Click="Lower_Click" Grid.Row="1"/>
     </Grid>
     <UserControl.Resources>
         <cm:BackgroundWorker x:Key="backgroundWorker"

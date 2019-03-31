@@ -94,6 +94,9 @@
     <Reference Include="MaterialDesignThemes.Wpf, Version=2.5.0.1205, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MaterialDesignThemes.2.5.0.1205\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
     </Reference>
+    <Reference Include="NAudio, Version=1.8.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NAudio.1.8.5\lib\net35\NAudio.dll</HintPath>
+    </Reference>
     <Reference Include="OsuMemoryDataProvider">
       <HintPath>..\packages\OsuMemoryDataProvider.dll</HintPath>
     </Reference>
@@ -122,8 +125,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Classes\HitsoundStuff\CompleteHitsounds.cs" />
+    <Compile Include="Classes\HitsoundStuff\CustomIndex.cs" />
+    <Compile Include="Classes\HitsoundStuff\Hitsound.cs" />
+    <Compile Include="Classes\HitsoundStuff\HitsoundConverter.cs" />
+    <Compile Include="Classes\HitsoundStuff\HitsoundExporter.cs" />
     <Compile Include="Classes\HitsoundStuff\HitsoundLayer.cs" />
-    <Compile Include="Classes\HitsoundStuff\Sound.cs" />
+    <Compile Include="Classes\HitsoundStuff\Sample.cs" />
+    <Compile Include="Classes\HitsoundStuff\SamplePackage.cs" />
     <Compile Include="Classes\MathUtil\Extensions.cs" />
     <Compile Include="Classes\MathUtil\BezierCurve.cs" />
     <Compile Include="Classes\MathUtil\BezierCurveCubic.cs" />

@@ -36,21 +36,23 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 bool whistle = p.Samples.Any(o => o.Hitsound == 1);
                 bool finish = p.Samples.Any(o => o.Hitsound == 2);
                 bool clap = p.Samples.Any(o => o.Hitsound == 3);
-
+                
                 // Check if package fits in any CustomIndex or if any CustomIndex can be modified to fit the package
                 int index = -1;
                 CustomIndex pci = p.GetCustomIndex();
+
                 foreach (CustomIndex ci in ch.CustomIndices) {
                     if (ci.CheckSupport(pci)) {
                         index = ci.Index;
                     } else if (ci.CheckCanSupport(pci)) {
-                        ci.Merge(pci);
+                        ci.MergeWith(pci);
                         index = ci.Index;
                     }
                 }
                 if (index == -1) {
+                    Console.WriteLine("new ci");
                     CustomIndex ci = new CustomIndex(ch.CustomIndices.Count + 1);
-                    ci.Merge(pci);
+                    ci.MergeWith(pci);
                     index = ci.Index;
                     ch.CustomIndices.Add(ci);
                 }

@@ -170,6 +170,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return lines;
         }
 
+        public string GetFileName() {
+            return String.Format("{0} - {1} ({2}) [{3}].osu", Metadata["Artist"].StringValue, Metadata["Title"].StringValue, Metadata["Creator"].StringValue, Metadata["Version"].StringValue);
+        }
+
         private void AddDictionaryToLines(Dictionary<string, TValue> dict, List<string> lines) {
             foreach (KeyValuePair<string, TValue> kvp in dict) {
                 lines.Add(kvp.Key + ":" + kvp.Value.StringValue);

@@ -48,7 +48,7 @@ namespace Mapping_Tools {
             BackupPath = Path.Combine(AppDataPath, "Backups");
             ExportPath = Path.Combine(AppDataPath, "Exports");
 
-            if ( !Directory.Exists(AppDataPath) ) {
+            if ( !Directory.Exists(AppDataPath) || !Directory.Exists(BackupPath) || !Directory.Exists(ExportPath)) {
                 try {
                     Directory.CreateDirectory(AppDataPath);
                     Directory.CreateDirectory(BackupPath);

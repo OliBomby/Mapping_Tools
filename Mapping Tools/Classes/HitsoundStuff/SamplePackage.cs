@@ -51,7 +51,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             HashSet<string> whistles = new HashSet<string>(Samples.Where(o => o.Hitsound == 1).Select(o => o.SamplePath));
             HashSet<string> finishes = new HashSet<string>(Samples.Where(o => o.Hitsound == 2).Select(o => o.SamplePath));
             HashSet<string> claps = new HashSet<string>(Samples.Where(o => o.Hitsound == 3).Select(o => o.SamplePath));
-
+            
             CustomIndex ci = new CustomIndex();
 
             if (sampleSet == 1) {

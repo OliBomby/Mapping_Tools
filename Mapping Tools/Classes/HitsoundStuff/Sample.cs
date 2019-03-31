@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
-    public struct Sample {
+    public class Sample {
         public int SampleSet;
         public int Hitsound;
         public string SamplePath;

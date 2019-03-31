@@ -29,5 +29,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public int GetHitsounds() {
             return MathHelper.GetIntFromBitArray(new BitArray(new bool[] { false, Whistle, Finish, Clap }));
         }
+
+        public void SetTime(double time) {
+            Time = time;
+        }
     }
 }

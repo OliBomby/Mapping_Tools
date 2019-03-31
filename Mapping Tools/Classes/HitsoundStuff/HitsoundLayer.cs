@@ -27,5 +27,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             SamplePath = samplePath;
             Priority = priority;
         }
+
+        public void SetPriority(int priority) {
+            Priority = priority;
+        }
     }
 }

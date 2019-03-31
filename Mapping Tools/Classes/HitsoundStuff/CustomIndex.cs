@@ -14,6 +14,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         public CustomIndex(int index) {
             Index = index;
+            Samples = new Dictionary<string, HashSet<string>>();
             foreach (string key in AllKeys) {
                 Samples[key] = new HashSet<string>();
             }
@@ -21,6 +22,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         public CustomIndex() {
             Index = -1;
+            Samples = new Dictionary<string, HashSet<string>>();
             foreach (string key in AllKeys) {
                 Samples[key] = new HashSet<string>();
             }
@@ -28,12 +30,23 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         public static bool CheckSupport(HashSet<string> s1, HashSet<string> s2) {
             // s2 fits in s1 or s2 is empty
-            return s2.Count > 0 ? s1 == s2 : true;
+            /*foreach (string s in s1) {
+                Console.WriteLine("s1: "+ s);
+            }
+
+            foreach (string s in s2) {
+                Console.WriteLine("s2: " + s);
+            }
+
+            Console.WriteLine("s1 equal s2: " + (s1.SetEquals(s2)));
+            */
+
+            return s2.Count > 0 ? s1.SetEquals(s2) : true;
         }
 
         public static bool CheckCanSupport(HashSet<string> s1, HashSet<string> s2) {
             // s2 fits in s1 or s1 is empty or s2 is empty
-            return s1.Count > 0 && s2.Count > 0 ? s1 == s2 : true;
+            return s1.Count > 0 && s2.Count > 0 ? s1.SetEquals(s2) : true;
         }
 
         public bool CheckSupport(CustomIndex other) {
