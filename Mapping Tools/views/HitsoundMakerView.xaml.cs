@@ -20,7 +20,7 @@ namespace Mapping_Tools.Views {
     public partial class HitsoundMakerView :UserControl {
         private BackgroundWorker backgroundWorker;
         private Beatmap baseBeatmap;
-        private Sound defaultSound;
+        private Sample defaultSound;
         private List<HitsoundLayer> hitsoundLayers;
 
         public HitsoundMakerView() {
@@ -69,7 +69,7 @@ namespace Mapping_Tools.Views {
                     BaseBeatmapCheck.IsChecked = true;
                 }
                 else if (ImportModeBox.Text == "Default Sound") {
-                    defaultSound = new Sound(SampleSetBox.SelectedIndex + 1, 0, SamplePathBox.Text, int.MaxValue);
+                    defaultSound = new Sample(SampleSetBox.SelectedIndex + 1, 0, SamplePathBox.Text, int.MaxValue);
                     DefaultSoundCheck.IsChecked = true;
                 }
                 else {
@@ -102,9 +102,9 @@ namespace Mapping_Tools.Views {
         private struct Arguments {
             public string ExportFolder;
             public Beatmap BaseBeatmap;
-            public Sound DefaultSound;
+            public Sample DefaultSound;
             public List<HitsoundLayer> HitsoundLayers;
-            public Arguments(string exportFolder, Beatmap baseBeatmap, Sound defaultSound, List<HitsoundLayer> hitsoundLayers)
+            public Arguments(string exportFolder, Beatmap baseBeatmap, Sample defaultSound, List<HitsoundLayer> hitsoundLayers)
             {
                 ExportFolder = exportFolder;
                 BaseBeatmap = baseBeatmap;
