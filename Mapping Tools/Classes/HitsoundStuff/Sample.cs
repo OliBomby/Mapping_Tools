@@ -17,5 +17,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             SamplePath = samplePath;
             Priority = priority;
         }
+
+        public Sample(HitsoundLayer hl) {
+            SampleSet = hl.SampleSet;
+            Hitsound = hl.Hitsound;
+            SamplePath = hl.SamplePath;
+            Priority = hl.Priority;
+        }
     }
 }

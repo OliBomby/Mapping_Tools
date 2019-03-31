@@ -20,7 +20,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         public CustomIndex() {
-            Index = 0;
+            Index = -1;
             foreach (string key in AllKeys) {
                 Samples[key] = new HashSet<string>();
             }
