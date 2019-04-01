@@ -67,14 +67,14 @@ namespace Mapping_Tools.Views {
 
         private void Import_Click(object sender, RoutedEventArgs e) {
             try {
-                if (ImportModeBox.Text == "Base Beatmap + Volumes") {
+                if (ImportModeBox.Text == "Base Beatmap") {
                     Editor editor = new Editor(MainWindow.AppWindow.currentMap.Text);
                     baseBeatmap = editor.Beatmap;
                     BaseBeatmapCheck.IsChecked = true;
                 }
-                else if (ImportModeBox.Text == "Default Sound") {
+                else if (ImportModeBox.Text == "Default Sample") {
                     defaultSample = new Sample(SampleSetBox.SelectedIndex + 1, 0, SamplePathBox.Text, int.MaxValue-1);
-                    DefaultSoundCheck.IsChecked = true;
+                    DefaultSampleCheck.IsChecked = true;
                 }
                 else {
                     Editor editor = new Editor(MainWindow.AppWindow.currentMap.Text);
@@ -97,6 +97,8 @@ namespace Mapping_Tools.Views {
                         Text = String.Format("{0} Sounds, {1} Sampleset, {2} Hitsound, {3}", layer.Times.Count, SampleSetBox.Text, HitsoundBox.Text, layer.SamplePath)
                     };
                     LayersList.Items.Add(item);
+
+                    LayersList.SelectedIndex = LayersList.Items.IndexOf(item);
                 }
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message);
@@ -104,45 +106,55 @@ namespace Mapping_Tools.Views {
         }
 
         private void Delete_Click(object sender, RoutedEventArgs e) {
-            int index = LayersList.SelectedIndex;
-            if (index < 0 || index > LayersList.Items.Count - 1) { return; }
-            hitsoundLayers.RemoveAt(index);
-            LayersList.Items.RemoveAt(index);
-            LayersList.SelectedIndex = Math.Max(index - 1, 0);
+            try {
+                int index = LayersList.SelectedIndex;
+                if (index < 0 || index > LayersList.Items.Count - 1) { return; }
 
-            RecalculatePriorities();
+                hitsoundLayers.RemoveAt(index);
+                LayersList.Items.RemoveAt(index);
+
+                LayersList.SelectedIndex = Math.Max(index - 1, 0);
+
+                RecalculatePriorities();
+            } catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
         }
 
         private void Raise_Click(object sender, RoutedEventArgs e) {
-            int index = LayersList.SelectedIndex;
-            if (index == 0) { return; }
+            try {
+                int index = LayersList.SelectedIndex;
+                if (index <= 0) { return; }
 
-            var layer = hitsoundLayers[index];
-            hitsoundLayers.RemoveAt(index);
-            hitsoundLayers.Insert(index - 1, layer);
+                var layer = hitsoundLayers[index];
+                hitsoundLayers.RemoveAt(index);
+                hitsoundLayers.Insert(index - 1, layer);
 
-            var item = LayersList.Items[index];
-            LayersList.Items.RemoveAt(index);
-            LayersList.Items.Insert(index - 1, item);
-            LayersList.SelectedIndex = index - 1;
+                var item = LayersList.Items[index];
+                LayersList.Items.RemoveAt(index);
+                LayersList.Items.Insert(index - 1, item);
 
-            RecalculatePriorities();
+                LayersList.SelectedIndex = index - 1;
+
+                RecalculatePriorities();
+            } catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
         }
 
         private void Lower_Click(object sender, RoutedEventArgs e) {
-            int index = LayersList.SelectedIndex;
-            if (index == LayersList.Items.Count - 1) { return; }
+            try {
+                int index = LayersList.SelectedIndex;
+                if (index >= LayersList.Items.Count - 1) { return; }
 
-            var layer = hitsoundLayers[index];
-            hitsoundLayers.RemoveAt(index);
-            hitsoundLayers.Insert(index + 1, layer);
+                var layer = hitsoundLayers[index];
+                hitsoundLayers.RemoveAt(index);
+                hitsoundLayers.Insert(index + 1, layer);
 
-            var item = LayersList.Items[index];
-            LayersList.Items.RemoveAt(index);
-            LayersList.Items.Insert(index + 1, item);
-            LayersList.SelectedIndex = index + 1;
+                var item = LayersList.Items[index];
+                LayersList.Items.RemoveAt(index);
+                LayersList.Items.Insert(index + 1, item);
 
-            RecalculatePriorities();
+                LayersList.SelectedIndex = index + 1;
+
+                RecalculatePriorities();
+            } catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
         }
 
         private void RecalculatePriorities() {
@@ -166,32 +178,23 @@ namespace Mapping_Tools.Views {
         }
 
         private void Make_Hitsounds(Arguments arg, BackgroundWorker worker, DoWorkEventArgs e) {
+            // Convert the multiple layers into packages that have the samples from all the layers at one specific time
             List<SamplePackage> samplePackages = HitsoundConverter.MixLayers(arg.HitsoundLayers, arg.DefaultSample);
 
-            Console.WriteLine("I packaged hitsounds");
+            // Convert the packages to hitsounds that fit on an osu standard map
             CompleteHitsounds completeHitsounds = HitsoundConverter.ConvertPackages(samplePackages);
-
-            Console.WriteLine("I converted packages");
-            Console.WriteLine("i made this many customindices: " + completeHitsounds.CustomIndices.Count);
 
             // Delete all files in the export folder before filling it again
             DirectoryInfo di = new DirectoryInfo(arg.ExportFolder);
             foreach (FileInfo file in di.GetFiles()) {
                 file.Delete();
             }
-
-            Console.WriteLine("I removed files");
-
-            try {
-                HitsoundExporter.ExportHitsounds(arg.ExportFolder, arg.BaseBeatmap, completeHitsounds);
-            }catch(Exception ex) {
-
-                Console.WriteLine(ex.Message);
-                Console.WriteLine(ex.StackTrace);
-            }
             
+            // Export the hitsound .osu and sound samples
+            HitsoundExporter.ExportHitsounds(arg.ExportFolder, arg.BaseBeatmap, completeHitsounds);
+            
+            // Open export folder
             Process.Start(arg.ExportFolder);
-            Console.WriteLine("I exported");
 
             // Complete progressbar
             if (worker != null && worker.WorkerReportsProgress) {

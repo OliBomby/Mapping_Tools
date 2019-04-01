@@ -6,50 +6,81 @@
              xmlns:local="clr-namespace:Mapping_Tools.Views"
              xmlns:cm="clr-namespace:System.ComponentModel;assembly=System"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             mc:Ignorable="d" 
-             d:DesignHeight="550" Width="759.5">
+             mc:Ignorable="d" Width="759.5" Height="576.736">
     <Grid Name="MasterGrid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="260"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="295.151"/>
-            <RowDefinition Height="172.849"/>
+            <RowDefinition Height="60"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="90"/>
         </Grid.RowDefinitions>
-        <Grid Name="FirstGrid" Grid.Row="0" Grid.Column="0" Margin="0,0,304,0" Grid.RowSpan="2">
-            <StackPanel Grid.Row="0" HorizontalAlignment="Left" Width="446">
-                <TextBlock FontSize="40" TextWrapping="NoWrap" FontWeight="Bold" Foreground="#FF5F5E5E" Height="61"><Run Text="Hitsound "/><Run Text="Maker"/><LineBreak/><Run/><LineBreak/><Run/></TextBlock>
-                <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="500" TextWrapping="Wrap" Foreground="#FFD6D6D6" Margin="10,0,0,5" Text="Import arbitrary hitsound layers and create a hitsound difficulty."/>
-                <ComboBox x:Name="ImportModeBox" Margin="10,10,0,0" VerticalAlignment="Stretch" SelectedIndex="0" Cursor="Hand">
-                    <ComboBoxItem Content="Base Beatmap + Volumes" HorizontalAlignment="Left" Cursor="Hand"/>
-                    <ComboBoxItem Content="Default Sound" HorizontalAlignment="Left" Cursor="Hand"/>
-                    <ComboBoxItem Content="Hitsound layer" HorizontalAlignment="Left" Cursor="Hand"/>
-                </ComboBox>
-                <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="200" Foreground="#FFD6D6D6" Margin="10,10,0,0"><Run Text="Stack X coordinate:"/></TextBlock>
-                <TextBox x:Name="XCoordBox" Height="23" Width="536" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#FFD6D6D6" Text="" Margin="10,0,0,0"/>
-                <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="200" Foreground="#FFD6D6D6" Margin="10,10,0,0"><Run Text="Stack Y coordinate:"/></TextBlock>
-                <TextBox x:Name="YCoordBox" Height="23" Width="536" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#FFD6D6D6" Text="" Margin="10,0,0,0"/>
-                <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="200" Foreground="#FFD6D6D6" Margin="10,10,0,0"><Run Text="Hitsound Info:"/></TextBlock>
-                <ComboBox x:Name="SampleSetBox" Margin="10,10,0,0" VerticalAlignment="Stretch" SelectedIndex="1" Cursor="Hand">
-                    <ComboBoxItem Content="Normal" HorizontalAlignment="Left" Cursor="Hand"/>
-                    <ComboBoxItem Content="Soft" HorizontalAlignment="Left" Cursor="Hand"/>
-                    <ComboBoxItem Content="Drum" HorizontalAlignment="Left" Cursor="Hand"/>
-                </ComboBox>
-                <ComboBox x:Name="HitsoundBox" Margin="10,10,0,0" VerticalAlignment="Stretch" SelectedIndex="1" Cursor="Hand">
-                    <ComboBoxItem Content="Normal" HorizontalAlignment="Left" Cursor="Hand"/>
-                    <ComboBoxItem Content="Whistle" HorizontalAlignment="Left" Cursor="Hand"/>
-                    <ComboBoxItem Content="Finish" HorizontalAlignment="Left" Cursor="Hand"/>
-                    <ComboBoxItem Content="Clap" HorizontalAlignment="Left" Cursor="Hand"/>
-                </ComboBox>
-                <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="200" Foreground="#FFD6D6D6" Margin="10,10,0,0"><Run Text="Hitsound sample:"/></TextBlock>
-                <TextBox x:Name="SamplePathBox" Height="23" Width="536" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#FFD6D6D6" Text="" Margin="10,0,0,0"/>
-                <Button Content="Browse" Click="SampleBrowse_Click" Margin="10,10,0,0"/>
-                <Button Content="Import" Click="Import_Click" Margin="10,10,0,0"/>
-            </StackPanel>
+        <Grid Name="TitleGrid" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+            <TextBlock FontSize="40" TextWrapping="NoWrap" FontWeight="Bold" Foreground="#FF5F5E5E" Height="61"><Run Text="Hitsound Maker"/></TextBlock>
         </Grid>
-        <Grid Name="SecoundGrid" Grid.Row="2" Grid.Column="0">
+        <Grid Name="FirstGrid" Grid.Row="1" Grid.Column="0" Margin="0,0,0,0" Grid.ColumnSpan="2">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="60"/>
+                </Grid.RowDefinitions>
+                <GridSplitter HorizontalAlignment="Right" 
+                  VerticalAlignment="Stretch" 
+                  Grid.Column="1" Grid.RowSpan="2" 
+                  ResizeBehavior="PreviousAndNext"
+                  Width="3" Background="#FFBCBCBC"/>
+
+                <StackPanel Grid.Column="0" Grid.RowSpan="2" HorizontalAlignment="Stretch" CanVerticallyScroll="True" Margin="0,0,10,0">
+                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6"><Run Text="Importing mode:"/></TextBlock>
+                    <ComboBox x:Name="ImportModeBox" Margin="0,10,0,0" HorizontalAlignment="Stretch" SelectedIndex="0" Cursor="Hand">
+                        <ComboBoxItem Content="Base Beatmap" HorizontalAlignment="Left" Cursor="Hand"/>
+                        <ComboBoxItem Content="Default Sample" HorizontalAlignment="Left" Cursor="Hand"/>
+                        <ComboBoxItem Content="Hitsound Layer" HorizontalAlignment="Left" Cursor="Hand"/>
+                    </ComboBox>
+                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Stack X coordinate:"/></TextBlock>
+                    <TextBox x:Name="XCoordBox" Height="23" HorizontalAlignment="Stretch" TextWrapping="Wrap" Foreground="#FFD6D6D6" Text="" Margin="0,0,0,0"/>
+                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Stack Y coordinate:"/></TextBlock>
+                    <TextBox x:Name="YCoordBox" Height="23" HorizontalAlignment="Stretch" TextWrapping="Wrap" Foreground="#FFD6D6D6" Text="" Margin="0,0,0,0"/>
+                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Hitsound info:"/></TextBlock>
+                    <ComboBox x:Name="SampleSetBox" Margin="0,10,0,0" HorizontalAlignment="Stretch" SelectedIndex="1" Cursor="Hand">
+                        <ComboBoxItem Content="Normal" HorizontalAlignment="Left" Cursor="Hand"/>
+                        <ComboBoxItem Content="Soft" HorizontalAlignment="Left" Cursor="Hand"/>
+                        <ComboBoxItem Content="Drum" HorizontalAlignment="Left" Cursor="Hand"/>
+                    </ComboBox>
+                    <ComboBox x:Name="HitsoundBox" Margin="0,10,0,0" HorizontalAlignment="Stretch" SelectedIndex="1" Cursor="Hand">
+                        <ComboBoxItem Content="Normal" HorizontalAlignment="Left" Cursor="Hand"/>
+                        <ComboBoxItem Content="Whistle" HorizontalAlignment="Left" Cursor="Hand"/>
+                        <ComboBoxItem Content="Finish" HorizontalAlignment="Left" Cursor="Hand"/>
+                        <ComboBoxItem Content="Clap" HorizontalAlignment="Left" Cursor="Hand"/>
+                    </ComboBox>
+                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Hitsound sample:"/></TextBlock>
+                    <TextBox x:Name="SamplePathBox" Height="23" HorizontalAlignment="Stretch" TextWrapping="Wrap" Foreground="#FFD6D6D6" Text="" Margin="0,0,0,0"/>
+                    <Button Content="Browse" HorizontalAlignment="Stretch" Click="SampleBrowse_Click" Margin="0,10,0,0"/>
+                    <Button Content="Import" HorizontalAlignment="Stretch" Click="Import_Click" FontWeight="Bold" Margin="0,15,0,0"/>
+                </StackPanel>
+
+                <ListView x:Name="LayersList" Grid.Row="0" Grid.Column="2" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                <StackPanel Grid.Column="2" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,0,10">
+                    <Button Content="Raise Layer" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="116" Click="Raise_Click"/>
+                    <Button Content="Lower Layer" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" Width="116" Click="Lower_Click"/>
+                    <Button Content="Delete Layer" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" Width="116" Click="Delete_Click"/>
+                </StackPanel>
+            </Grid>
+
+        </Grid>
+        <Grid Name="SecoundGrid" Grid.Row="2" Grid.Column="1">
+            <StackPanel>
+                <CheckBox x:Name="BaseBeatmapCheck" Content="Base Beatmap" Foreground="#FF838383" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                <CheckBox x:Name="DefaultSampleCheck" Content="Default Sample" Foreground="#FF838383" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top"/>
+            </StackPanel>
+
             <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Right">
                 <Button Width="Auto" Height="Auto" x:Name="start" Cursor="Hand" Click="Start_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}">
                     <Button.Style>
@@ -79,7 +110,7 @@
                 </Button >
             </StackPanel>
         </Grid>
-        <Grid Margin="0,0,0,0" Name="ThirdGrid" Grid.Row="3" Grid.Column="0">
+        <Grid Margin="0,0,0,0" Name="ThirdGrid" Grid.Row="2" Grid.Column="0">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -101,12 +132,6 @@
                 </Grid>
             </Grid>
         </Grid>
-        <ListView x:Name="LayersList" VerticalContentAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Auto" HorizontalAlignment="Right" Margin="0,10,10,4" Width="432"/>
-        <CheckBox x:Name="BaseBeatmapCheck" Content="Base Beatmap" Foreground="#FF838383" HorizontalAlignment="Right" Margin="0,2.849,10,0" VerticalAlignment="Top" Grid.Row="1"/>
-        <CheckBox x:Name="DefaultSoundCheck" Content="Default Sound" Foreground="#FF838383" HorizontalAlignment="Right" Margin="0,25.849,12,0" VerticalAlignment="Top" Grid.Row="1"/>
-        <Button Content="Delete Layer" HorizontalAlignment="Right" Margin="0,58.849,10,0" VerticalAlignment="Top" Width="116" Click="Delete_Click" Grid.Row="1"/>
-        <Button Content="Raise Layer" HorizontalAlignment="Right" Margin="0,95.849,10,0" VerticalAlignment="Top" Width="116" Click="Raise_Click" Grid.Row="1"/>
-        <Button Content="Lower Layer" HorizontalAlignment="Right" Margin="0,132.849,10,0" VerticalAlignment="Top" Width="116" Click="Lower_Click" Grid.Row="1"/>
     </Grid>
     <UserControl.Resources>
         <cm:BackgroundWorker x:Key="backgroundWorker"

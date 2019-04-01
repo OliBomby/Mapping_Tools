@@ -50,7 +50,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     }
                 }
                 if (index == -1) {
-                    Console.WriteLine("new ci");
                     CustomIndex ci = new CustomIndex(ch.CustomIndices.Count + 1);
                     ci.MergeWith(pci);
                     index = ci.Index;

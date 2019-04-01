@@ -56,16 +56,16 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             // Export the sample files
             foreach (CustomIndex ci in ch.CustomIndices) {
                 foreach (KeyValuePair<string, HashSet<string>> kvp in ci.Samples) {
-                    Console.WriteLine(kvp.Key + kvp.Value.Count);
                     if (kvp.Value.Count == 0) {
                         continue;
                     }
-                    Console.WriteLine("im adding a sample " + kvp.Key + ci.Index);
                     var mixer = new WaveMixerStream32 { AutoStop = true };
 
                     foreach (string path in kvp.Value) {
-                        var wav = new WaveFileReader(path);
-                        mixer.AddInputStream(new WaveChannel32(wav));
+                        try {
+                            var wav = new WaveFileReader(path);
+                            mixer.AddInputStream(new WaveChannel32(wav));
+                        } catch (Exception) { }
                     }
 
                     if (ci.Index == 1) {
