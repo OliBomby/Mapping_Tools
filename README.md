@@ -17,5 +17,6 @@ Collection of tools for manipulating osu! beatmaps
 - [MaterialDesignInXamlToolkit](https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit)
 - [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)
 - [AutoUpdater.NET](https://github.com/ravibpatel/AutoUpdater.NET)
+- [NAudio](https://github.com/naudio/NAudio)
 - [OsuMemoryDataProvider](https://github.com/Piotrekol)
 - [Some classes from osu! Lazer](https://github.com/ppy/osu)
