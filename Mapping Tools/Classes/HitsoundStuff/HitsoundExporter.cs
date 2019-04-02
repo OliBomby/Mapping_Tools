@@ -54,7 +54,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             beatmap.Metadata["Version"] = new TValue("Hitsounds");
 
             // Save the file to the export folder
-            Editor.SaveFile(Path.Combine(exportFolder, beatmap.GetFileName()), beatmap.GetLines());
+            editor.SaveFile(Path.Combine(exportFolder, beatmap.GetFileName()));
 
             // Export the sample files
             foreach (CustomIndex ci in ch.CustomIndices) {
