@@ -57,7 +57,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     index = ci.Index;
                     ch.CustomIndices.Add(ci);
                 }
-
+                
                 ch.Hitsounds.Add(new Hitsound(p.Time, sampleSet, additions, index, whistle, finish, clap));
             }
             return ch;

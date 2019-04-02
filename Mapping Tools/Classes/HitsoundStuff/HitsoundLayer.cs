@@ -20,10 +20,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public string SampleSetString { get => GetSampleSetString(); }
 
         private string GetSampleSetString() {
-            if (Hitsound == 0) { return "Auto"; }
-            else if (Hitsound == 1) { return "Normal"; }
-            else if (Hitsound == 1) { return "Soft"; }
-            else if (Hitsound == 1) { return "Drum"; }
+            if (SampleSet == 0) { return "Auto"; }
+            else if (SampleSet == 1) { return "Normal"; }
+            else if (SampleSet == 2) { return "Soft"; }
+            else if (SampleSet == 3) { return "Drum"; }
             else { return "None"; }
         }
 
@@ -32,8 +32,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         private string GetHitsoundString() {
             if (Hitsound == 0) { return "Normal"; }
             else if (Hitsound == 1) { return "Whistle"; }
-            else if (Hitsound == 1) { return "Finish"; }
-            else if (Hitsound == 1) { return "Clap"; }
+            else if (Hitsound == 2) { return "Finish"; }
+            else if (Hitsound == 3) { return "Clap"; }
             else { return "None"; }
         }
 
