@@ -44,9 +44,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 foreach (CustomIndex ci in ch.CustomIndices) {
                     if (ci.CheckSupport(pci)) {
                         index = ci.Index;
+                        break;
                     } else if (ci.CheckCanSupport(pci)) {
                         ci.MergeWith(pci);
                         index = ci.Index;
+                        break;
                     }
                 }
                 if (index == -1) {

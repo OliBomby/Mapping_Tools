@@ -199,6 +199,7 @@
     <Compile Include="Viewmodels\SliderMergerVM.cs" />
     <Compile Include="Viewmodels\PreferencesVM.cs" />
     <Compile Include="Viewmodels\StandardVM.cs" />
+    <Compile Include="ViewSettings\HitsoundMakerSettings.cs" />
     <Compile Include="Views\Extensions.cs" />
     <Compile Include="Views\HitsoundMakerView.xaml.cs">
       <DependentUpon>HitsoundMakerView.xaml</DependentUpon>

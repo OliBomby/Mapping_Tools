@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
@@ -7,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
@@ -22,14 +24,16 @@ namespace Mapping_Tools.Views {
         private BackgroundWorker backgroundWorker;
         private string baseBeatmap;
         private Sample defaultSample;
-        private List<HitsoundLayer> hitsoundLayers;
+        private ObservableCollection<HitsoundLayer> hitsoundLayers;
 
         public HitsoundMakerView() {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
             backgroundWorker = (BackgroundWorker) FindResource("backgroundWorker");
-            hitsoundLayers = new List<HitsoundLayer>();
+
+            hitsoundLayers = new ObservableCollection<HitsoundLayer>();
+            LayersList.ItemsSource = hitsoundLayers;
         }
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
@@ -56,7 +60,7 @@ namespace Mapping_Tools.Views {
                 MessageBox.Show("Please import a base beatmap and default hitsound first.");
                 return;
             }
-            backgroundWorker.RunWorkerAsync(new Arguments(MainWindow.AppWindow.ExportPath, baseBeatmap, defaultSample, hitsoundLayers));
+            backgroundWorker.RunWorkerAsync(new Arguments(MainWindow.AppWindow.ExportPath, baseBeatmap, defaultSample, hitsoundLayers.ToList()));
             start.IsEnabled = false;
         }
 
@@ -76,28 +80,11 @@ namespace Mapping_Tools.Views {
                     DefaultSampleCheck.IsChecked = true;
                 }
                 else {
-                    Editor editor = new Editor(MainWindow.AppWindow.currentMap.Text);
-                    HitsoundLayer layer = new HitsoundLayer(SampleSetBox.SelectedIndex + 1, HitsoundBox.SelectedIndex, SamplePathBox.Text, LayersList.Items.Count);
-
-                    bool xIgnore = XCoordBox.Text == "";
-                    bool yIgnore = YCoordBox.Text == "";
-                    double x = XCoordBox.GetDouble();
-                    double y = YCoordBox.GetDouble();
-
-                    foreach (HitObject ho in editor.Beatmap.HitObjects) {
-                        if ((Math.Abs(ho.Pos.X - x) < 3 || xIgnore) && (Math.Abs(ho.Pos.Y - y) < 3 || yIgnore)) {
-                            layer.Times.Add(ho.Time);
-                        }
-                    }
+                    HitsoundLayer layer = new HitsoundLayer("name", MainWindow.AppWindow.GetCurrentMap(), new Vector2(XCoordBox.GetDouble(), YCoordBox.GetDouble()),
+                                            SampleSetBox.SelectedIndex + 1, HitsoundBox.SelectedIndex, SamplePathBox.Text, LayersList.Items.Count);
 
                     hitsoundLayers.Add(layer);
-
-                    TextBlock item = new TextBlock {
-                        Text = String.Format("{0} Sounds, {1} Sampleset, {2} Hitsound, {3}", layer.Times.Count, SampleSetBox.Text, HitsoundBox.Text, layer.SamplePath)
-                    };
-                    LayersList.Items.Add(item);
-
-                    LayersList.SelectedIndex = LayersList.Items.IndexOf(item);
+                    LayersList.SelectedIndex = LayersList.Items.IndexOf(layer);
                 }
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message);
@@ -107,10 +94,9 @@ namespace Mapping_Tools.Views {
         private void Delete_Click(object sender, RoutedEventArgs e) {
             try {
                 int index = LayersList.SelectedIndex;
-                if (index < 0 || index > LayersList.Items.Count - 1) { return; }
+                if (index < 0 || index > hitsoundLayers.Count - 1) { return; }
 
                 hitsoundLayers.RemoveAt(index);
-                LayersList.Items.RemoveAt(index);
 
                 LayersList.SelectedIndex = Math.Max(index - 1, 0);
 
@@ -123,13 +109,9 @@ namespace Mapping_Tools.Views {
                 int index = LayersList.SelectedIndex;
                 if (index <= 0) { return; }
 
-                var layer = hitsoundLayers[index];
+                var item = hitsoundLayers[index];
                 hitsoundLayers.RemoveAt(index);
-                hitsoundLayers.Insert(index - 1, layer);
-
-                var item = LayersList.Items[index];
-                LayersList.Items.RemoveAt(index);
-                LayersList.Items.Insert(index - 1, item);
+                hitsoundLayers.Insert(index - 1, item);
 
                 LayersList.SelectedIndex = index - 1;
 
@@ -140,15 +122,11 @@ namespace Mapping_Tools.Views {
         private void Lower_Click(object sender, RoutedEventArgs e) {
             try {
                 int index = LayersList.SelectedIndex;
-                if (index >= LayersList.Items.Count - 1) { return; }
+                if (index >= hitsoundLayers.Count - 1) { return; }
 
-                var layer = hitsoundLayers[index];
+                var item = hitsoundLayers[index];
                 hitsoundLayers.RemoveAt(index);
-                hitsoundLayers.Insert(index + 1, layer);
-
-                var item = LayersList.Items[index];
-                LayersList.Items.RemoveAt(index);
-                LayersList.Items.Insert(index + 1, item);
+                hitsoundLayers.Insert(index + 1, item);
 
                 LayersList.SelectedIndex = index + 1;
 
@@ -157,7 +135,7 @@ namespace Mapping_Tools.Views {
         }
 
         private void RecalculatePriorities() {
-            for (int i = 0; i < LayersList.Items.Count; i++) {
+            for (int i = 0; i < hitsoundLayers.Count; i++) {
                 hitsoundLayers[i].SetPriority(i);
             }
         }

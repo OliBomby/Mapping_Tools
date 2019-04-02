@@ -91,9 +91,9 @@ namespace Mapping_Tools.Views {
                 HitObject ho = markedObjects[i];
                 if (ho.IsSlider) {
                     double oldSpatialLength = ho.PixelLength;
-                    double newSpatialLength = arg.SpatialLength != 0 ? ho.GetSliderPath(fullLength: true).Distance * arg.SpatialLength : oldSpatialLength;
+                    double newSpatialLength = arg.SpatialLength != -1 ? ho.GetSliderPath(fullLength: true).Distance * arg.SpatialLength : oldSpatialLength;
                     double oldTemporalLength = timing.CalculateSliderTemporalLength(ho.Time, ho.PixelLength);
-                    double newTemporalLength = arg.TemporalLength != 0 ? timing.GetMpBAtTime(ho.Time) * arg.TemporalLength : oldTemporalLength;
+                    double newTemporalLength = arg.TemporalLength != -1 ? timing.GetMpBAtTime(ho.Time) * arg.TemporalLength : oldTemporalLength;
                     double oldSV = timing.GetSVAtTime(ho.Time);
                     double newSV = oldSV / ((newSpatialLength / oldSpatialLength) / (newTemporalLength / oldTemporalLength));
                     ho.SV = newSV;

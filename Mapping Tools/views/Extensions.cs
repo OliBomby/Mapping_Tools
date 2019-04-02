@@ -15,7 +15,7 @@ namespace Mapping_Tools.Views {
                 var v = dt.Compute(text, "");
                 return Convert.ToDouble(v);
             } catch {
-                return 0;
+                return -1;
             } 
         }
 
@@ -26,7 +26,7 @@ namespace Mapping_Tools.Views {
                 var v = dt.Compute(text, "");
                 return Convert.ToInt32(v);
             } catch {
-                return 0;
+                return -1;
             }
         }
     }
