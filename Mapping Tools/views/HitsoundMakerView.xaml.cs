@@ -20,7 +20,7 @@ namespace Mapping_Tools.Views {
     /// </summary>
     public partial class HitsoundMakerView :UserControl {
         private BackgroundWorker backgroundWorker;
-        private Beatmap baseBeatmap;
+        private string baseBeatmap;
         private Sample defaultSample;
         private List<HitsoundLayer> hitsoundLayers;
 
@@ -68,8 +68,7 @@ namespace Mapping_Tools.Views {
         private void Import_Click(object sender, RoutedEventArgs e) {
             try {
                 if (ImportModeBox.Text == "Base Beatmap") {
-                    Editor editor = new Editor(MainWindow.AppWindow.currentMap.Text);
-                    baseBeatmap = editor.Beatmap;
+                    baseBeatmap = MainWindow.AppWindow.currentMap.Text;
                     BaseBeatmapCheck.IsChecked = true;
                 }
                 else if (ImportModeBox.Text == "Default Sample") {
@@ -165,10 +164,10 @@ namespace Mapping_Tools.Views {
 
         private struct Arguments {
             public string ExportFolder;
-            public Beatmap BaseBeatmap;
+            public string BaseBeatmap;
             public Sample DefaultSample;
             public List<HitsoundLayer> HitsoundLayers;
-            public Arguments(string exportFolder, Beatmap baseBeatmap, Sample defaultSample, List<HitsoundLayer> hitsoundLayers)
+            public Arguments(string exportFolder, string baseBeatmap, Sample defaultSample, List<HitsoundLayer> hitsoundLayers)
             {
                 ExportFolder = exportFolder;
                 BaseBeatmap = baseBeatmap;
@@ -180,25 +179,31 @@ namespace Mapping_Tools.Views {
         private void Make_Hitsounds(Arguments arg, BackgroundWorker worker, DoWorkEventArgs e) {
             // Convert the multiple layers into packages that have the samples from all the layers at one specific time
             List<SamplePackage> samplePackages = HitsoundConverter.MixLayers(arg.HitsoundLayers, arg.DefaultSample);
+            UpdateProgressBar(worker, 20);
 
             // Convert the packages to hitsounds that fit on an osu standard map
             CompleteHitsounds completeHitsounds = HitsoundConverter.ConvertPackages(samplePackages);
+            UpdateProgressBar(worker, 40);
 
             // Delete all files in the export folder before filling it again
             DirectoryInfo di = new DirectoryInfo(arg.ExportFolder);
             foreach (FileInfo file in di.GetFiles()) {
                 file.Delete();
             }
-            
+            UpdateProgressBar(worker, 60);
+
             // Export the hitsound .osu and sound samples
             HitsoundExporter.ExportHitsounds(arg.ExportFolder, arg.BaseBeatmap, completeHitsounds);
-            
+            UpdateProgressBar(worker, 80);
+
             // Open export folder
             Process.Start(arg.ExportFolder);
+            UpdateProgressBar(worker, 100);
+        }
 
-            // Complete progressbar
+        private void UpdateProgressBar(BackgroundWorker worker, int progress) {
             if (worker != null && worker.WorkerReportsProgress) {
-                worker.ReportProgress(100);
+                worker.ReportProgress(progress);
             }
         }
     }

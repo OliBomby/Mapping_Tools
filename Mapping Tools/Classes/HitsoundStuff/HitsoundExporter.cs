@@ -10,24 +10,27 @@ using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     class HitsoundExporter {
-        public static void ExportHitsounds(string exportFolder, Beatmap baseBeatmap, CompleteHitsounds ch) {
+        public static void ExportHitsounds(string exportFolder, string baseBeatmap, CompleteHitsounds ch) {
+            Editor editor = new Editor(baseBeatmap);
+            Beatmap beatmap = editor.Beatmap;
+
             // Resnap all hitsounds
             foreach (Hitsound h in ch.Hitsounds) {
-                h.SetTime(Math.Floor(baseBeatmap.BeatmapTiming.Resnap(h.Time, 16, 12)));
+                h.SetTime(Math.Floor(beatmap.BeatmapTiming.Resnap(h.Time, 16, 12)));
             }
 
             // Make new timingpoints
             List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
 
             // Add redlines
-            List<TimingPoint> redlines = baseBeatmap.BeatmapTiming.GetAllRedlines();
+            List<TimingPoint> redlines = beatmap.BeatmapTiming.GetAllRedlines();
             foreach (TimingPoint tp in redlines) {
                 timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, meter: true, inherited: true, omitFirstBarLine: true));
             }
 
             // Add hitsound stuff
             foreach (Hitsound h in ch.Hitsounds) {
-                TimingPoint tp = baseBeatmap.BeatmapTiming.GetTimingPointAtTime(h.Time + 5);
+                TimingPoint tp = beatmap.BeatmapTiming.GetTimingPointAtTime(h.Time + 5);
                 tp.Offset = h.Time;
                 tp.SampleIndex = h.CustomIndex;
                 timingPointsChanges.Add(new TimingPointsChange(tp, index: true, volume: true));
@@ -39,19 +42,19 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             foreach (TimingPointsChange c in timingPointsChanges) {
                 c.AddChange(newTimingPoints);
             }
-            baseBeatmap.BeatmapTiming.TimingPoints = newTimingPoints;
+            beatmap.BeatmapTiming.TimingPoints = newTimingPoints;
 
             // Replace all hitobjects with the hitsounds
-            baseBeatmap.HitObjects.Clear();
+            beatmap.HitObjects.Clear();
             foreach (Hitsound h in ch.Hitsounds) {
-                baseBeatmap.HitObjects.Add(new HitObject(h.Time, h.GetHitsounds(), h.SampleSet, h.Additions));
+                beatmap.HitObjects.Add(new HitObject(h.Time, h.GetHitsounds(), h.SampleSet, h.Additions));
             }
 
             // Change version to hitsounds
-            baseBeatmap.Metadata["Version"] = new TValue("Hitsounds");
+            beatmap.Metadata["Version"] = new TValue("Hitsounds");
 
             // Save the file to the export folder
-            Editor.SaveFile(Path.Combine(exportFolder, baseBeatmap.GetFileName()), baseBeatmap.GetLines());
+            Editor.SaveFile(Path.Combine(exportFolder, beatmap.GetFileName()), beatmap.GetLines());
 
             // Export the sample files
             foreach (CustomIndex ci in ch.CustomIndices) {
