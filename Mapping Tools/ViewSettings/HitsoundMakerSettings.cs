@@ -7,8 +7,14 @@ using System.Threading.Tasks;
 
 namespace Mapping_Tools.ViewSettings {
     public class HitsoundMakerSettings {
-        public string baseBeatmap;
-        public Sample defaultSample;
-        public List<HitsoundLayer> hitsoundLayers;
+        public string BaseBeatmap;
+        public Sample DefaultSample;
+        public List<HitsoundLayer> HitsoundLayers;
+
+        public HitsoundMakerSettings(string baseBeatmap, Sample defaultSample, List<HitsoundLayer> hitsoundLayers) {
+            BaseBeatmap = baseBeatmap;
+            DefaultSample = defaultSample;
+            HitsoundLayers = hitsoundLayers;
+        }
     }
 }

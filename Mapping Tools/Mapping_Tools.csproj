@@ -225,6 +225,7 @@
     <Compile Include="Views\SliderMergerView.xaml.cs">
       <DependentUpon>SliderMergerView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\ViewCollection.cs" />
     <Page Include="Components\TimeLine\TimeLine.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

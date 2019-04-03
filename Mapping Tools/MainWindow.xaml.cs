@@ -11,6 +11,7 @@ using Mapping_Tools.Classes.SystemTools;
 using AutoUpdaterDotNET;
 using Newtonsoft.Json;
 using System.Security.Principal;
+using Mapping_Tools.Views;
 
 namespace Mapping_Tools {
     public partial class MainWindow :Window {
@@ -18,6 +19,7 @@ namespace Mapping_Tools {
         private double widthWin, heightWin; //Set default sizes of window
         public static MainWindow AppWindow { get; set; }
         public SettingsManager settingsManager;
+        public ViewCollection Views;
         public bool SessionhasAdminRights;
         public string AppDataPath;
         public string BackupPath;
@@ -27,12 +29,13 @@ namespace Mapping_Tools {
             Setup();
             InitializeComponent();
             AppWindow = this;
-            widthWin = ActualWidth; //Set width to window
-            heightWin = ActualHeight; //Set height to window
-            DataContext = new StandardVM(); //Generate Standard view model to show on startup
+            widthWin = ActualWidth; // Set width to window
+            heightWin = ActualHeight; // Set height to window
+            Views = new ViewCollection(); // Make a ViewCollection object
+            DataContext = new StandardVM(); // Generate Standard view model to show on startup
             settingsManager = new SettingsManager();
             if (settingsManager.GetRecentMaps().Count > 0) {
-                SetCurrentMap(settingsManager.GetRecentMaps()[0][0]); } //Set currentmap to previously opened map
+                SetCurrentMap(settingsManager.GetRecentMaps()[0][0]); } // Set currentmap to previously opened map
         }
 
         private void Setup() {
@@ -121,7 +124,7 @@ namespace Mapping_Tools {
 
         //Method for loading the cleaner interface 
         private void LoadCleaner(object sender, RoutedEventArgs e) {
-            DataContext = new CleanerVM();
+            DataContext = Views.GetMapCleaner();
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Map Cleaner";
@@ -132,7 +135,7 @@ namespace Mapping_Tools {
 
         //Method for loading the merger interface
         private void LoadMerger(object sender, RoutedEventArgs e) {
-            DataContext = new SliderMergerVM();
+            DataContext = Views.GetSliderMerger();
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Slider Merger";
@@ -143,7 +146,7 @@ namespace Mapping_Tools {
 
         //Method for loading the completionator interface
         private void LoadCompletionator(object sender, RoutedEventArgs e) {
-            DataContext = new SliderCompletionatorVM();
+            DataContext = Views.GetSliderCompletionator();
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Slider Completionator";
@@ -154,7 +157,7 @@ namespace Mapping_Tools {
 
         //Method for loading the snapping tools interface
         private void LoadSnappingTools(object sender, RoutedEventArgs e) {
-            DataContext = new SnappingToolsVM();
+            DataContext = Views.GetSnappingTools();
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Snapping Tools";
@@ -165,16 +168,16 @@ namespace Mapping_Tools {
 
         //Method for loading the hitsound copier
         private void LoadHSCopier(object sender, RoutedEventArgs e) {
-            DataContext = new HitsoundCopierVM();
+            DataContext = Views.GetHitsoundCopier();
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Hitsound Copier";
             this.MinWidth = 100;
             this.MinHeight = 100;
         }
 
-        //Method for loading the hitsound copier
+        //Method for loading the hitsound maker
         private void LoadHSMaker(object sender, RoutedEventArgs e) {
-            DataContext = new HitsoundMakerVM();
+            DataContext = Views.GetHitsoundMaker();
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Hitsound Maker";
             this.MinWidth = 100;
@@ -183,7 +186,7 @@ namespace Mapping_Tools {
 
         //Method for loading the standard interface
         private void LoadStartup(object sender, RoutedEventArgs e) {
-            DataContext = new StandardVM();
+            DataContext = Views.GetStandard();
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools";
             this.MinWidth = 100;
@@ -192,7 +195,7 @@ namespace Mapping_Tools {
 
         //Method for loading the preferences
         private void LoadPreferences(object sender, RoutedEventArgs e) {
-            DataContext = new PreferencesVM();
+            DataContext = Views.GetPreferences();
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Preferences";
             this.MinWidth = 100;
