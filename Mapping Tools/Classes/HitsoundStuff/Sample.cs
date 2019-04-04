@@ -6,10 +6,20 @@ using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     public class Sample {
-        public int SampleSet;
-        public int Hitsound;
-        public string SamplePath;
-        public int Priority;
+        public int SampleSet { get; set; }
+        public int Hitsound { get; set; }
+        public string SamplePath { get; set; }
+        public int Priority { get; set; }
+
+        public int SampleSetComboBoxIndex { get => GetSampleSetComboBoxIndex(); set => SetSampleSetComboBoxIndex(value); }
+
+        private void SetSampleSetComboBoxIndex(int value) {
+            SampleSet = value + 1;
+        }
+
+        private int GetSampleSetComboBoxIndex() {
+            return SampleSet - 1;
+        }
 
         public Sample() {
             SampleSet = 0;

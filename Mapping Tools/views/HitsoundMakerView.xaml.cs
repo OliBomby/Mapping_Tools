@@ -76,17 +76,40 @@ namespace Mapping_Tools.Views {
         private void SampleBrowse_Click(object sender, RoutedEventArgs e) {
             string path = FileFinder.AudioFileDialog();
             if (path != "") { SamplePathBox.Text = path; }
+
+        }
+
+        private void DefaultSampleBrowse_Click(object sender, RoutedEventArgs e) {
+            string path = FileFinder.AudioFileDialog();
+            if (path != "") {
+                Settings.DefaultSample.SamplePath = path;
+                DefaultSamplePathBox.Text = path;
+            }
+        }
+
+        private void BaseBeatmapBrowse_Click(object sender, RoutedEventArgs e) {
+            string path = FileFinder.BeatmapFileDialog();
+            if (path != "") {
+                Settings.BaseBeatmap = path;
+                BaseBeatmapPathBox.Text = path;
+            }
+        }
+
+        private void BaseBeatmapLoad_Click(object sender, RoutedEventArgs e) {
+            string path = FileFinder.CurrentBeatmap();
+            if (path != "") {
+                Settings.BaseBeatmap = path;
+                BaseBeatmapPathBox.Text = path;
+            }
         }
 
         private void Import_Click(object sender, RoutedEventArgs e) {
             try {
                 if (ImportModeBox.Text == "Base Beatmap") {
                     Settings.BaseBeatmap = MainWindow.AppWindow.currentMap.Text;
-                    BaseBeatmapCheck.IsChecked = true;
                 }
                 else if (ImportModeBox.Text == "Default Sample") {
                     Settings.DefaultSample = new Sample(SampleSetBox.SelectedIndex + 1, 0, SamplePathBox.Text, int.MaxValue-1);
-                    DefaultSampleCheck.IsChecked = true;
                 }
                 else {
                     HitsoundLayer layer = new HitsoundLayer("name", MainWindow.AppWindow.GetCurrentMap(), XCoordBox.GetDouble(), YCoordBox.GetDouble(),
@@ -109,6 +132,7 @@ namespace Mapping_Tools.Views {
                     Settings.HitsoundLayers.Add(layer);
                     LayersList.SelectedIndex = LayersList.Items.IndexOf(layer);
                 }
+                RecalculatePriorities();
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message);
             }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +14,8 @@ namespace Mapping_Tools.ViewSettings {
         public ObservableCollection<HitsoundLayer> HitsoundLayers { get; set; }
 
         public HitsoundMakerSettings() {
+            BaseBeatmap = "";
+            DefaultSample = new Sample(0, 0, "", int.MaxValue);
             HitsoundLayers = new ObservableCollection<HitsoundLayer>();
         }
 
