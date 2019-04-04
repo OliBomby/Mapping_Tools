@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
-        Title="Window1" Height="510" Width="350"
+        Title="Window1" Height="510" Width="400"
         WindowStyle="None"
         ResizeMode="CanResize"
         AllowsTransparency="False"
@@ -42,9 +42,14 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="30"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="30"/>
                 </Grid.ColumnDefinitions>
                 <TextBox Grid.Column="0" x:Name="BeatmapPathBox" Height="23" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="" Margin="0,0,5,0"/>
-                <Button Grid.Column="1" Width="Auto" Height="Auto" Cursor="Hand" Click="BeatmapBrowse_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
+                <Button Grid.Column="1" Width="Auto" Height="Auto" Cursor="Hand" Click="BeatmapLoad_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
+                    <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Download" Foreground="#FFD6D6D6"/>
+                </Button >
+                <Button Grid.Column="3" Width="Auto" Height="Auto" Cursor="Hand" Click="BeatmapBrowse_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
                     <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="#FFD6D6D6"/>
                 </Button >
             </Grid>

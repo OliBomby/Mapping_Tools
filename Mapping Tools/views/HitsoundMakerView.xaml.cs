@@ -39,6 +39,7 @@ namespace Mapping_Tools.Views {
 
             LayersList.ItemsSource = Settings.HitsoundLayers;
             DataContext = Settings;
+            LayersList.SelectedIndex = 0;
         }
 
         public HitsoundMakerSettings GetSettings() {
@@ -73,10 +74,25 @@ namespace Mapping_Tools.Views {
             start.IsEnabled = false;
         }
 
-        private void SampleBrowse_Click(object sender, RoutedEventArgs e) {
+        private void SelectedDefaultSampleBrowse_Click(object sender, RoutedEventArgs e) {
             string path = FileFinder.AudioFileDialog();
-            if (path != "") { SamplePathBox.Text = path; }
+            if (path != "") {
+                Settings.HitsoundLayers[LayersList.SelectedIndex].SamplePath = path;
+            }
+        }
 
+        private void SelectedBaseBeatmapBrowse_Click(object sender, RoutedEventArgs e) {
+            string path = FileFinder.BeatmapFileDialog();
+            if (path != "") {
+                Settings.HitsoundLayers[LayersList.SelectedIndex].Path = path;
+            }
+        }
+
+        private void SelectedBaseBeatmapLoad_Click(object sender, RoutedEventArgs e) {
+            string path = FileFinder.CurrentBeatmap();
+            if (path != "") {
+                Settings.HitsoundLayers[LayersList.SelectedIndex].Path = path;
+            }
         }
 
         private void DefaultSampleBrowse_Click(object sender, RoutedEventArgs e) {
@@ -103,24 +119,8 @@ namespace Mapping_Tools.Views {
             }
         }
 
-        private void Import_Click(object sender, RoutedEventArgs e) {
-            try {
-                if (ImportModeBox.Text == "Base Beatmap") {
-                    Settings.BaseBeatmap = MainWindow.AppWindow.currentMap.Text;
-                }
-                else if (ImportModeBox.Text == "Default Sample") {
-                    Settings.DefaultSample = new Sample(SampleSetBox.SelectedIndex + 1, 0, SamplePathBox.Text, int.MaxValue-1);
-                }
-                else {
-                    HitsoundLayer layer = new HitsoundLayer("name", MainWindow.AppWindow.GetCurrentMap(), XCoordBox.GetDouble(), YCoordBox.GetDouble(),
-                                            SampleSetBox.SelectedIndex + 1, HitsoundBox.SelectedIndex, SamplePathBox.Text, LayersList.Items.Count);
-
-                    Settings.HitsoundLayers.Add(layer);
-                    LayersList.SelectedIndex = LayersList.Items.IndexOf(layer);
-                }
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message);
-            }
+        private void ReloadFromSource_Click(object sender, RoutedEventArgs e) {
+            Settings.HitsoundLayers[LayersList.SelectedIndex].ImportMap();
         }
 
         private void Add_Click(object sender, RoutedEventArgs e) {

@@ -37,6 +37,11 @@ namespace Mapping_Tools.Views {
             if (path != "") { BeatmapPathBox.Text = path; }
         }
 
+        private void BeatmapLoad_Click(object sender, RoutedEventArgs e) {
+            string path = FileFinder.CurrentBeatmap();
+            if (path != "") { BeatmapPathBox.Text = path; }
+        }
+
         private void SampleBrowse_Click(object sender, RoutedEventArgs e) {
             string path = FileFinder.AudioFileDialog();
             if (path != "") { SamplePathBox.Text = path; }

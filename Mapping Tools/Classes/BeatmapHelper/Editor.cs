@@ -25,7 +25,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 linesz = File.ReadAllLines(path);
             }
             catch(Exception ex) {
-                MessageBox.Show(ex.Message + "ABC");
+                MessageBox.Show(ex.Message);
             }
             var lines = new List<string>(linesz);
             return lines;
