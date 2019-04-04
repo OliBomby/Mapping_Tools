@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:Mapping_Tools.Views"
              xmlns:cm="clr-namespace:System.ComponentModel;assembly=System"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             mc:Ignorable="d" Width="759.5" Height="576.736" Loaded="Window_Loaded">
+             mc:Ignorable="d" Width="759.5" Height="576.736">
     <Grid Name="MasterGrid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -29,7 +29,7 @@
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="35"/>
                 </Grid.RowDefinitions>
                 <GridSplitter HorizontalAlignment="Right" 
                   VerticalAlignment="Stretch" 
@@ -83,17 +83,17 @@
                         </GridView>
                     </ListView.View>
                 </ListView>
-                <StackPanel Grid.Column="2" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,0,10">
-                    <Button Width="Auto" Height="Auto" Cursor="Hand" Click="Import_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
+                <StackPanel Grid.Column="2" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" >
+                    <Button Width="Auto" Height="Auto" Cursor="Hand" Click="Add_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
                         <materialDesign:PackIcon Width="35" Height="35" Cursor="Hand" Kind="Plus" Foreground="#FFD6D6D6"/>
                     </Button >
-                    <Button Width="Auto" Height="Auto" Cursor="Hand" Click="Delete_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Margin="10,0,0,0" Style="{StaticResource IconButton}">
+                    <Button Width="Auto" Height="Auto" Cursor="Hand" Click="Delete_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
                         <materialDesign:PackIcon Width="35" Height="35" Cursor="Hand" Kind="Minus" Foreground="#FFD6D6D6"/>
                     </Button >
-                    <Button Width="Auto" Height="Auto" Cursor="Hand" Click="Raise_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Margin="10,0,0,0" Style="{StaticResource IconButton}">
+                    <Button Width="Auto" Height="Auto" Cursor="Hand" Click="Raise_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
                         <materialDesign:PackIcon Width="35" Height="35" Cursor="Hand" Kind="KeyboardArrowUp" Foreground="#FFD6D6D6"/>
                     </Button >
-                    <Button Width="Auto" Height="Auto" Cursor="Hand" Click="Lower_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Margin="10,0,0,0" Style="{StaticResource IconButton}">
+                    <Button Width="Auto" Height="Auto" Cursor="Hand" Click="Lower_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
                         <materialDesign:PackIcon Width="35" Height="35" Cursor="Hand" Kind="KeyboardArrowDown" Foreground="#FFD6D6D6"/>
                     </Button >
                 </StackPanel>
@@ -108,7 +108,7 @@
 
             <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Right">
                 <Button Width="Auto" Height="Auto" x:Name="start" Cursor="Hand" Click="Start_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
-                    <materialDesign:PackIcon Width="100" Height="100" Cursor="Hand" Kind="Play" Foreground="#FFD6D6D6"/>
+                    <materialDesign:PackIcon Width="90" Height="90" Cursor="Hand" Kind="Play" Foreground="#FFD6D6D6"/>
                 </Button >
             </StackPanel>
         </Grid>
@@ -116,20 +116,21 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
                     <RowDefinition Height="20"/>
                 </Grid.RowDefinitions>
-                <Grid Grid.Column="0">
+                <Grid Grid.Column="0" Grid.Row="1">
                     <StackPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" Orientation="Horizontal">
                         <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Foreground="#FF5F5E5E"/>
                         <ProgressBar x:Name="loader_progress" Foreground="#FF838383" Background="{x:Null}" BorderBrush="{x:Null}"/>
                     </StackPanel>
                 </Grid>
-                <Grid Grid.Column="1">
+                <Grid Grid.Column="1" Grid.Row="1">
                     <DockPanel>
-                        <ProgressBar x:Name="progress" Margin="20,0,20,0" Height="20" Foreground="#FF838383" Background="{x:Null}" BorderBrush="{x:Null}"/>
+                        <ProgressBar x:Name="progress" Margin="5,0,5,0" Height="20" Foreground="#FF838383" Background="{x:Null}" BorderBrush="{x:Null}"/>
                     </DockPanel>
                 </Grid>
             </Grid>

@@ -226,6 +226,9 @@
       <DependentUpon>SliderMergerView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ViewCollection.cs" />
+    <Compile Include="Views\HitsoundLayerImportWindow.xaml.cs">
+      <DependentUpon>HitsoundLayerImportWindow.xaml</DependentUpon>
+    </Compile>
     <Page Include="Components\TimeLine\TimeLine.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -287,6 +290,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\SliderMergerView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\HitsoundLayerImportWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
