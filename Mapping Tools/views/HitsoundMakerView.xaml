@@ -84,9 +84,18 @@
                     </ListView.View>
                 </ListView>
                 <StackPanel Grid.Column="2" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,0,10">
-                    <Button Content="Raise Layer" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="116" Click="Raise_Click"/>
-                    <Button Content="Lower Layer" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" Width="116" Click="Lower_Click"/>
-                    <Button Content="Delete Layer" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" Width="116" Click="Delete_Click"/>
+                    <Button Width="Auto" Height="Auto" Cursor="Hand" Click="Import_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
+                        <materialDesign:PackIcon Width="35" Height="35" Cursor="Hand" Kind="Plus" Foreground="#FFD6D6D6"/>
+                    </Button >
+                    <Button Width="Auto" Height="Auto" Cursor="Hand" Click="Delete_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Margin="10,0,0,0" Style="{StaticResource IconButton}">
+                        <materialDesign:PackIcon Width="35" Height="35" Cursor="Hand" Kind="Minus" Foreground="#FFD6D6D6"/>
+                    </Button >
+                    <Button Width="Auto" Height="Auto" Cursor="Hand" Click="Raise_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Margin="10,0,0,0" Style="{StaticResource IconButton}">
+                        <materialDesign:PackIcon Width="35" Height="35" Cursor="Hand" Kind="KeyboardArrowUp" Foreground="#FFD6D6D6"/>
+                    </Button >
+                    <Button Width="Auto" Height="Auto" Cursor="Hand" Click="Lower_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Margin="10,0,0,0" Style="{StaticResource IconButton}">
+                        <materialDesign:PackIcon Width="35" Height="35" Cursor="Hand" Kind="KeyboardArrowDown" Foreground="#FFD6D6D6"/>
+                    </Button >
                 </StackPanel>
             </Grid>
 
@@ -98,30 +107,7 @@
             </StackPanel>
 
             <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Right">
-                <Button Width="Auto" Height="Auto" x:Name="start" Cursor="Hand" Click="Start_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}">
-                    <Button.Style>
-                        <Style TargetType="{x:Type Button}">
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border
-                                    x:Name="border"
-                                    CornerRadius="3"
-                                    TextBlock.Foreground="White">
-                                            <Grid Background="Transparent">
-                                                <ContentPresenter/>
-                                            </Grid>
-                                        </Border>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="true">
-                                                <Setter TargetName="border" Property="Background" Value="#404040"/>
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </Button.Style>
+                <Button Width="Auto" Height="Auto" x:Name="start" Cursor="Hand" Click="Start_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
                     <materialDesign:PackIcon Width="100" Height="100" Cursor="Hand" Kind="Play" Foreground="#FFD6D6D6"/>
                 </Button >
             </StackPanel>
