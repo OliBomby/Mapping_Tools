@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:Mapping_Tools.Views"
              xmlns:cm="clr-namespace:System.ComponentModel;assembly=System"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             mc:Ignorable="d" Width="759.5" Height="576.736">
+             mc:Ignorable="d" Width="759.5" Height="576.736" Loaded="Window_Loaded">
     <Grid Name="MasterGrid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -75,11 +75,11 @@
                     </ListView.Resources>
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn Header="Name" Width="120" DisplayMemberBinding="{Binding Name}" />
-                            <GridViewColumn Header="Amount" Width="90" DisplayMemberBinding="{Binding Times.Count}" />
-                            <GridViewColumn Header="SampleSet" Width="120" DisplayMemberBinding="{Binding SampleSetString}" />
-                            <GridViewColumn Header="Hitsound" Width="120" DisplayMemberBinding="{Binding HitsoundString}" />
-                            <GridViewColumn Header="Sample Path" Width="1000" DisplayMemberBinding="{Binding SamplePath}" />
+                            <GridViewColumn Header="_Name" Width="120" DisplayMemberBinding="{Binding Name}" />
+                            <GridViewColumn Header="_Amount" Width="90" DisplayMemberBinding="{Binding Times.Count}" />
+                            <GridViewColumn Header="_SampleSet" Width="120" DisplayMemberBinding="{Binding SampleSetString}" />
+                            <GridViewColumn Header="_Hitsound" Width="120" DisplayMemberBinding="{Binding HitsoundString}" />
+                            <GridViewColumn Header="_Sample Path" Width="1000" DisplayMemberBinding="{Binding SamplePath}" />
                         </GridView>
                     </ListView.View>
                 </ListView>

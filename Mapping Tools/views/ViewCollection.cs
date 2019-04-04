@@ -7,6 +7,12 @@ using System.Windows.Controls;
 
 namespace Mapping_Tools.Views {
     public class ViewCollection {
+        public void SaveSettings() {
+            if (HitsoundMaker != null) {
+                MainWindow.AppWindow.settingsManager.settings.HitsoundMakerSettings = ((HitsoundMakerView)HitsoundMaker).GetSettings();
+            }
+        }
+
         private UserControl Standard;
         public UserControl GetStandard() {
             if (Standard == null) {

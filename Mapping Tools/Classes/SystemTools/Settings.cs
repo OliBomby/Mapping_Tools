@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Mapping_Tools.ViewSettings;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,11 +8,13 @@ namespace Mapping_Tools.Classes.SystemTools {
         public List<String[]> RecentMaps;
         public string OsuPath;
         public string SongsPath;
+        public HitsoundMakerSettings HitsoundMakerSettings;
 
         public Settings() {
             RecentMaps = new List<String[]>();
             OsuPath = "";
             SongsPath = "";
+            HitsoundMakerSettings = new HitsoundMakerSettings();
         }
 
         public void AddRecentMaps(String path, DateTime date) {

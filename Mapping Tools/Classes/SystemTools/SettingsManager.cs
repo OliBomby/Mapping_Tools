@@ -12,7 +12,7 @@ namespace Mapping_Tools.Classes.SystemTools {
             NullValueHandling = NullValueHandling.Ignore
         };
 
-        private Settings settings;
+        public Settings settings;
 
         public SettingsManager() {
             bool instanceComplete = File.Exists(JSONPath) ? LoadFromJSON() : CreateJSON();

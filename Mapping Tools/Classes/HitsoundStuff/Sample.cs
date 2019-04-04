@@ -11,6 +11,13 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public string SamplePath;
         public int Priority;
 
+        public Sample() {
+            SampleSet = 0;
+            Hitsound = 0;
+            SamplePath = "";
+            Priority = 0;
+        }
+
         public Sample(int sampleSet, int hitsound, string samplePath, int priority) {
             SampleSet = sampleSet;
             Hitsound = hitsound;

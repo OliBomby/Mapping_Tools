@@ -275,6 +275,7 @@ namespace Mapping_Tools {
 
         //Close window
         private void CloseWin(object sender, RoutedEventArgs e) {
+            Views.SaveSettings();
             settingsManager.WriteToJSON(false);
             this.Close();
         }

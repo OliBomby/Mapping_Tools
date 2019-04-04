@@ -15,6 +15,7 @@ using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SliderPathStuff;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.ViewSettings;
 
 namespace Mapping_Tools.Views {
     /// <summary>
@@ -33,6 +34,25 @@ namespace Mapping_Tools.Views {
             backgroundWorker = (BackgroundWorker) FindResource("backgroundWorker");
 
             hitsoundLayers = new ObservableCollection<HitsoundLayer>();
+            LayersList.ItemsSource = hitsoundLayers;
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e) {
+            if (MainWindow.AppWindow.settingsManager.settings.HitsoundMakerSettings != null) {
+                SetSettings(MainWindow.AppWindow.settingsManager.settings.HitsoundMakerSettings);
+            }
+        }
+
+        public HitsoundMakerSettings GetSettings() {
+            return new HitsoundMakerSettings(baseBeatmap, defaultSample, hitsoundLayers.ToList());
+        }
+
+        public void SetSettings(HitsoundMakerSettings settings) {
+            baseBeatmap = settings.BaseBeatmap;
+            BaseBeatmapCheck.IsChecked = baseBeatmap != null;
+            defaultSample = settings.DefaultSample;
+            DefaultSampleCheck.IsChecked = defaultSample != null;
+            hitsoundLayers = new ObservableCollection<HitsoundLayer>(settings.HitsoundLayers);
             LayersList.ItemsSource = hitsoundLayers;
         }
 
@@ -80,7 +100,7 @@ namespace Mapping_Tools.Views {
                     DefaultSampleCheck.IsChecked = true;
                 }
                 else {
-                    HitsoundLayer layer = new HitsoundLayer("name", MainWindow.AppWindow.GetCurrentMap(), new Vector2(XCoordBox.GetDouble(), YCoordBox.GetDouble()),
+                    HitsoundLayer layer = new HitsoundLayer("name", MainWindow.AppWindow.GetCurrentMap(), XCoordBox.GetDouble(), YCoordBox.GetDouble(),
                                             SampleSetBox.SelectedIndex + 1, HitsoundBox.SelectedIndex, SamplePathBox.Text, LayersList.Items.Count);
 
                     hitsoundLayers.Add(layer);

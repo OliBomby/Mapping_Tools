@@ -11,6 +11,10 @@ namespace Mapping_Tools.ViewSettings {
         public Sample DefaultSample;
         public List<HitsoundLayer> HitsoundLayers;
 
+        public HitsoundMakerSettings() {
+            HitsoundLayers = new List<HitsoundLayer>();
+        }
+
         public HitsoundMakerSettings(string baseBeatmap, Sample defaultSample, List<HitsoundLayer> hitsoundLayers) {
             BaseBeatmap = baseBeatmap;
             DefaultSample = defaultSample;

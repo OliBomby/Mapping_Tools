@@ -30,7 +30,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
             // Add hitsound stuff
             foreach (Hitsound h in ch.Hitsounds) {
-                TimingPoint tp = beatmap.BeatmapTiming.GetTimingPointAtTime(h.Time + 5);
+                TimingPoint tp = beatmap.BeatmapTiming.GetTimingPointAtTime(h.Time + 5).Copy();
                 tp.Offset = h.Time;
                 tp.SampleIndex = h.CustomIndex;
                 timingPointsChanges.Add(new TimingPointsChange(tp, index: true, volume: true));

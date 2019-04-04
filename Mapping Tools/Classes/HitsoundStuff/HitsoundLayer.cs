@@ -10,7 +10,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
     public class HitsoundLayer {
         public string Name { get; set; }
         public string Path { get; set; }
-        public Vector2 Pos { get; set; }
+        public double X { get; set; }
+        public double Y { get; set; }
         public int SampleSet { get; set; }
         public int Hitsound { get; set; }
         public string SamplePath { get; set; }
@@ -37,55 +38,67 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             else { return "None"; }
         }
 
-        public HitsoundLayer(string name, string path, Vector2 pos) {
-            Name = name;
-            Path = path;
-            Pos = pos;
-            ImportMap(path, pos);
+        public HitsoundLayer() {
+            Name = "";
+            Path = "";
+            X = -1;
+            Y = -1;
+            Times = new List<double>();
         }
 
-        public HitsoundLayer(string name, string path, Vector2 pos, int priority) {
+        public HitsoundLayer(string name, string path, double x, double y) {
             Name = name;
             Path = path;
-            Pos = pos;
+            X = x;
+            Y = y;
+            ImportMap(path, x, y);
+        }
+
+        public HitsoundLayer(string name, string path, double x, double y, int priority) {
+            Name = name;
+            Path = path;
+            X = x;
+            Y = y;
             Priority = priority;
-            ImportMap(path, pos);
+            ImportMap(path, x, y);
         }
 
-        public HitsoundLayer(string name, string path, Vector2 pos, int sampleSet, int hitsound, string samplePath) {
+        public HitsoundLayer(string name, string path, double x, double y, int sampleSet, int hitsound, string samplePath) {
             Name = name;
             Path = path;
-            Pos = pos;
+            X = x;
+            Y = y;
             SampleSet = sampleSet;
             Hitsound = hitsound;
             SamplePath = samplePath;
-            ImportMap(path, pos);
+            ImportMap(path, x, y);
         }
 
-        public HitsoundLayer(string name, string path, Vector2 pos, int sampleSet, int hitsound, string samplePath, int priority) {
+        public HitsoundLayer(string name, string path, double x, double y, int sampleSet, int hitsound, string samplePath, int priority) {
             Name = name;
             Path = path;
-            Pos = pos;
+            X = x;
+            Y = y;
             SampleSet = sampleSet;
             Hitsound = hitsound;
             SamplePath = samplePath;
             Priority = priority;
-            ImportMap(path, pos);
+            ImportMap(path, x, y);
         }
 
         public void SetPriority(int priority) {
             Priority = priority;
         }
 
-        public void ImportMap(string path, Vector2 pos) {
+        public void ImportMap(string path, double x, double y) {
             Times = new List<double>();
             Editor editor = new Editor(path);
 
-            bool xIgnore = pos.X == -1;
-            bool yIgnore = pos.Y == -1;
+            bool xIgnore = x == -1;
+            bool yIgnore = y == -1;
 
             foreach (HitObject ho in editor.Beatmap.HitObjects) {
-                if ((Math.Abs(ho.Pos.X - pos.X) < 3 || xIgnore) && (Math.Abs(ho.Pos.Y - pos.Y) < 3 || yIgnore)) {
+                if ((Math.Abs(ho.Pos.X - x) < 3 || xIgnore) && (Math.Abs(ho.Pos.Y - y) < 3 || yIgnore)) {
                     Times.Add(ho.Time);
                 }
             }
