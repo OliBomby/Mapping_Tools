@@ -50,7 +50,7 @@
                     <Button Style="{DynamicResource MaterialDesignRaisedDarkButton}" Content="{materialDesign:PackIcon WindowCLose}" Click="CloseWin" Background="{x:Null}" BorderBrush="{x:Null}" HorizontalAlignment="Right"  Height="35" Foreground="#FFD6D6D6"/>
                 </StackPanel>
             </Grid>
-            <Grid x:Name="SecoundGrid" Grid.Column="0" Grid.Row="1">
+            <Grid x:Name="SecondGrid" Grid.Column="0" Grid.Row="1">
                 <Menu Foreground="#FFD6D6D6" >
                     <MenuItem Height="31" Header="_File" Padding="12,0,0,0" MinWidth="50">
                         <MenuItem Header="_Open Beatmap" Click="OpenBeatmap"/>
@@ -73,6 +73,11 @@
                     <MenuItem Height="31" Header="_About" Padding="12,0,0,0" MinWidth="67">
                         <MenuItem Header="_Github" Click="OpenGitHub"/>
                         <MenuItem Header="_Info" Click="OpenInfo"/>
+                    </MenuItem>
+                    <MenuItem x:Name="project" Visibility="Collapsed" Height="31" Header="_Project" Padding="12,0,0,0" MinWidth="67">
+                        <MenuItem Header="_Create new Project" Click="CreateHSProject"/>
+                        <MenuItem Header="_Save Project" Click="SaveHSProject"/>
+                        <MenuItem Header="_Load Project" Click="LoadHSProject"/>
                     </MenuItem>
                 </Menu>
             </Grid>

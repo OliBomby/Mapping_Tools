@@ -76,6 +76,7 @@ namespace Mapping_Tools.Classes.SystemTools {
 
             return true;
         }
+
         public bool AddRecentMaps(String path, DateTime date, bool doLoading) {
             settings.AddRecentMaps(path, date);
 

@@ -12,6 +12,9 @@ using AutoUpdaterDotNET;
 using Newtonsoft.Json;
 using System.Security.Principal;
 using Mapping_Tools.Views;
+using Mapping_Tools.Classes.SystemTools.HitsoundMaker;
+using System.Windows.Forms;
+using System.Drawing;
 
 namespace Mapping_Tools {
     public partial class MainWindow :Window {
@@ -19,10 +22,12 @@ namespace Mapping_Tools {
         private double widthWin, heightWin; //Set default sizes of window
         public static MainWindow AppWindow { get; set; }
         public SettingsManager settingsManager;
+        public ProjectManager projectmanager;
         public ViewCollection Views;
         public bool SessionhasAdminRights;
         public string AppDataPath;
         public string BackupPath;
+        public string HSProjectPath;
         public string ExportPath;
 
         public MainWindow() {
@@ -34,8 +39,11 @@ namespace Mapping_Tools {
             Views = new ViewCollection(); // Make a ViewCollection object
             DataContext = new StandardVM(); // Generate Standard view model to show on startup
             settingsManager = new SettingsManager();
-            if (settingsManager.GetRecentMaps().Count > 0) {
-                SetCurrentMap(settingsManager.GetRecentMaps()[0][0]); } // Set currentmap to previously opened map
+            projectmanager = new ProjectManager();
+
+            if( settingsManager.GetRecentMaps().Count > 0 ) {
+                SetCurrentMap(settingsManager.GetRecentMaps()[0][0]);
+            } // Set currentmap to previously opened map
         }
 
         private void Setup() {
@@ -50,16 +58,16 @@ namespace Mapping_Tools {
             AppDataPath = Path.Combine(appCommon, "Mapping-Tools");
             BackupPath = Path.Combine(AppDataPath, "Backups");
             ExportPath = Path.Combine(AppDataPath, "Exports");
+            HSProjectPath = Path.Combine(AppDataPath, "Hitsounding_Projects");
 
-            if ( !Directory.Exists(AppDataPath) || !Directory.Exists(BackupPath) || !Directory.Exists(ExportPath)) {
-                try {
-                    Directory.CreateDirectory(AppDataPath);
-                    Directory.CreateDirectory(BackupPath);
-                    Directory.CreateDirectory(ExportPath);
-                }
-                catch( Exception ex ) {
-                    MessageBox.Show(ex.Message);
-                }
+            try {
+                Directory.CreateDirectory(AppDataPath);
+                Directory.CreateDirectory(BackupPath);
+                Directory.CreateDirectory(ExportPath);
+                Directory.CreateDirectory(HSProjectPath);
+            }
+            catch( Exception ex ) {
+                System.Windows.MessageBox.Show(ex.Message);
             }
         }
 
@@ -70,7 +78,7 @@ namespace Mapping_Tools {
                 WindowsPrincipal principal = new WindowsPrincipal(user);
                 isAdmin = principal.IsInRole(WindowsBuiltInRole.Administrator);
             }
-            catch( UnauthorizedAccessException) {
+            catch( UnauthorizedAccessException ) {
                 isAdmin = false;
             }
             catch( Exception ) {
@@ -88,7 +96,7 @@ namespace Mapping_Tools {
                 DownloadURL = json.url
             };
         }
-          
+
         public void SetCurrentMap(string path) {
             currentMap.Text = path;
             settingsManager.AddRecentMaps(path, DateTime.Now, true);
@@ -100,12 +108,12 @@ namespace Mapping_Tools {
 
         private void OpenBeatmap(object sender, RoutedEventArgs e) {
             string path = FileFinder.BeatmapFileDialog();
-            if (path != "") { SetCurrentMap(path); }
+            if( path != "" ) { SetCurrentMap(path); }
         }
 
         private void OpenCurrentBeatmap(object sender, RoutedEventArgs e) {
             string path = FileFinder.CurrentBeatmap();
-            if (path != "") { SetCurrentMap(path); }
+            if( path != "" ) { SetCurrentMap(path); }
         }
 
         private void SaveBackup(object sender, RoutedEventArgs e) {
@@ -116,10 +124,10 @@ namespace Mapping_Tools {
                 File.Copy(fileToCopy, Path.Combine(destinationDirectory, now.ToString("yyyy-MM-dd HH-mm-ss") + "___" + System.IO.Path.GetFileName(fileToCopy)));
             }
             catch( Exception ex ) {
-                MessageBox.Show(ex.Message);
+                System.Windows.MessageBox.Show(ex.Message);
                 return;
             }
-            MessageBox.Show("Beatmap successfully copied!");
+            System.Windows.MessageBox.Show("Beatmap successfully copied!");
         }
 
         //Method for loading the cleaner interface 
@@ -128,6 +136,9 @@ namespace Mapping_Tools {
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Map Cleaner";
+
+            System.Windows.Controls.MenuItem menuitem = this.FindName("project") as System.Windows.Controls.MenuItem;
+            menuitem.Visibility = Visibility.Collapsed;
 
             MinWidth = 630;
             MinHeight = 560;
@@ -140,6 +151,9 @@ namespace Mapping_Tools {
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Slider Merger";
 
+            System.Windows.Controls.MenuItem menuitem = this.FindName("project") as System.Windows.Controls.MenuItem;
+            menuitem.Visibility = Visibility.Collapsed;
+
             this.MinWidth = 400;
             this.MinHeight = 380;
         }
@@ -150,6 +164,9 @@ namespace Mapping_Tools {
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Slider Completionator";
+
+            System.Windows.Controls.MenuItem menuitem = this.FindName("project") as System.Windows.Controls.MenuItem;
+            menuitem.Visibility = Visibility.Collapsed;
 
             this.MinWidth = 400;
             this.MinHeight = 380;
@@ -162,6 +179,9 @@ namespace Mapping_Tools {
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Snapping Tools";
 
+            System.Windows.Controls.MenuItem menuitem = this.FindName("project") as System.Windows.Controls.MenuItem;
+            menuitem.Visibility = Visibility.Collapsed;
+
             this.MinWidth = 400;
             this.MinHeight = 380;
         }
@@ -169,8 +189,13 @@ namespace Mapping_Tools {
         //Method for loading the hitsound copier
         private void LoadHSCopier(object sender, RoutedEventArgs e) {
             DataContext = Views.GetHitsoundCopier();
+
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Hitsound Copier";
+
+            System.Windows.Controls.MenuItem menuitem = this.FindName("project") as System.Windows.Controls.MenuItem;
+            menuitem.Visibility = Visibility.Collapsed;
+
             this.MinWidth = 100;
             this.MinHeight = 100;
         }
@@ -178,8 +203,13 @@ namespace Mapping_Tools {
         //Method for loading the hitsound maker
         private void LoadHSMaker(object sender, RoutedEventArgs e) {
             DataContext = Views.GetHitsoundMaker();
+
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Hitsound Maker";
+
+            System.Windows.Controls.MenuItem menuitem = this.FindName("project") as System.Windows.Controls.MenuItem;
+            menuitem.Visibility = Visibility.Visible;
+
             this.MinWidth = 100;
             this.MinHeight = 100;
         }
@@ -187,8 +217,13 @@ namespace Mapping_Tools {
         //Method for loading the standard interface
         private void LoadStartup(object sender, RoutedEventArgs e) {
             DataContext = Views.GetStandard();
+
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools";
+
+            System.Windows.Controls.MenuItem menuitem = this.FindName("project") as System.Windows.Controls.MenuItem;
+            menuitem.Visibility = Visibility.Collapsed;
+
             this.MinWidth = 100;
             this.MinHeight = 100;
         }
@@ -196,10 +231,71 @@ namespace Mapping_Tools {
         //Method for loading the preferences
         private void LoadPreferences(object sender, RoutedEventArgs e) {
             DataContext = Views.GetPreferences();
+
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Preferences";
+
+            System.Windows.Controls.MenuItem menuitem = this.FindName("project") as System.Windows.Controls.MenuItem;
+            menuitem.Visibility = Visibility.Collapsed;
+
             this.MinWidth = 100;
             this.MinHeight = 100;
+        }
+
+        private void CreateHSProject(object sender, RoutedEventArgs e) {
+            String value = "";
+            if( InputBox("New Hitsounding Project", "Please specify project name:", ref value) == System.Windows.Forms.DialogResult.OK ) {
+                projectmanager.CreateProject(value);
+            }
+        }
+
+        public static DialogResult InputBox(string title, string promptText, ref string value) {
+            Form form = new Form();
+            System.Windows.Forms.Label label = new System.Windows.Forms.Label();
+            System.Windows.Forms.TextBox textBox = new System.Windows.Forms.TextBox();
+            System.Windows.Forms.Button buttonOk = new System.Windows.Forms.Button();
+            System.Windows.Forms.Button buttonCancel = new System.Windows.Forms.Button();
+
+            form.Text = title;
+            label.Text = promptText;
+            textBox.Text = value;
+
+            buttonOk.Text = "OK";
+            buttonCancel.Text = "Cancel";
+            buttonOk.DialogResult = System.Windows.Forms.DialogResult.OK;
+            buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+
+            label.SetBounds(9, 20, 372, 13);
+            textBox.SetBounds(12, 36, 372, 20);
+            buttonOk.SetBounds(228, 72, 75, 23);
+            buttonCancel.SetBounds(309, 72, 75, 23);
+
+            label.AutoSize = true;
+            textBox.Anchor = textBox.Anchor | AnchorStyles.Right;
+            buttonOk.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            buttonCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+
+            form.ClientSize = new System.Drawing.Size(396, 107);
+            form.Controls.AddRange(new System.Windows.Forms.Control[] { label, textBox, buttonOk, buttonCancel });
+            form.ClientSize = new System.Drawing.Size(Math.Max(300, label.Right + 10), form.ClientSize.Height);
+            form.FormBorderStyle = FormBorderStyle.FixedDialog;
+            form.StartPosition = FormStartPosition.CenterScreen;
+            form.MinimizeBox = false;
+            form.MaximizeBox = false;
+            form.AcceptButton = buttonOk;
+            form.CancelButton = buttonCancel;
+
+            DialogResult dialogResult = form.ShowDialog();
+            value = textBox.Text;
+            return dialogResult;
+        }
+
+        private void LoadHSProject(object sender, RoutedEventArgs e) {
+
+        }
+
+        private void SaveHSProject(object sender, RoutedEventArgs e) {
+
         }
 
         //Open backup folder in file explorer
@@ -208,7 +304,7 @@ namespace Mapping_Tools {
                 Process.Start(BackupPath);
             }
             catch( Exception ex ) {
-                MessageBox.Show(ex.Message);
+                System.Windows.Forms.MessageBox.Show(ex.Message);
                 return;
             }
         }
@@ -220,12 +316,12 @@ namespace Mapping_Tools {
 
         //Open info screen
         private void OpenInfo(object sender, RoutedEventArgs e) {
-            MessageBox.Show("Mapping Tools v. 1.0\nmade by\nOliBomby\nPotoofu");
+            System.Windows.MessageBox.Show("Mapping Tools v. 1.0\nmade by\nOliBomby\nPotoofu");
         }
 
         //Change top right icons on changed window state and set state variable
         private void Window_StateChanged(object sender, EventArgs e) {
-            Button bt = this.FindName("toggle_button") as Button;
+            System.Windows.Controls.Button bt = this.FindName("toggle_button") as System.Windows.Controls.Button;
 
             switch( this.WindowState ) {
                 case WindowState.Maximized:
@@ -245,7 +341,7 @@ namespace Mapping_Tools {
 
         //Clickevent for top right maximize/minimize button
         private void ToggleWin(object sender, RoutedEventArgs e) {
-            Button bt = this.FindName("toggle_button") as Button;
+            System.Windows.Controls.Button bt = this.FindName("toggle_button") as System.Windows.Controls.Button;
             if( isMaximized ) {
                 this.WindowState = WindowState.Normal;
                 Width = widthWin;
@@ -283,7 +379,7 @@ namespace Mapping_Tools {
         //Enable drag control of window and set icons when docked
         private void DragWin(object sender, MouseButtonEventArgs e) {
             if( e.ChangedButton == MouseButton.Left ) {
-                Button bt = this.FindName("toggle_button") as Button;
+                System.Windows.Controls.Button bt = this.FindName("toggle_button") as System.Windows.Controls.Button;
                 if( WindowState == WindowState.Maximized ) {
                     var point = PointToScreen(e.MouseDevice.GetPosition(this));
 
