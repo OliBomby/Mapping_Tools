@@ -123,6 +123,12 @@ namespace Mapping_Tools.Views {
             Settings.HitsoundLayers[LayersList.SelectedIndex].ImportMap();
         }
 
+        private void ReloadAllFromSource_Click(object sender, RoutedEventArgs e) {
+            foreach (HitsoundLayer hl in Settings.HitsoundLayers) {
+                hl.ImportMap();
+            }
+        }
+
         private void Add_Click(object sender, RoutedEventArgs e) {
             try {
                 HitsoundLayerImportWindow importWindow = new HitsoundLayerImportWindow(Settings.HitsoundLayers.Count);
