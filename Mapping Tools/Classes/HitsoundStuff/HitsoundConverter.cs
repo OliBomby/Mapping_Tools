@@ -29,6 +29,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public static CompleteHitsounds ConvertPackages(List<SamplePackage> packages) {
             CompleteHitsounds ch = new CompleteHitsounds();
 
+            int lastIndex = -1;
             foreach (SamplePackage p in packages) {
                 int sampleSet = p.GetSampleSet();
                 int additions = p.GetAdditions();
@@ -41,16 +42,36 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 int index = -1;
                 CustomIndex pci = p.GetCustomIndex();
 
-                foreach (CustomIndex ci in ch.CustomIndices) {
-                    if (ci.CheckSupport(pci)) {
-                        index = ci.Index;
-                        break;
-                    } else if (ci.CheckCanSupport(pci)) {
-                        ci.MergeWith(pci);
-                        index = ci.Index;
-                        break;
+                // Check if the package fits in the previous package's customindex first to reduce greenline usage
+                if (lastIndex != -1) {
+                    CustomIndex lastCustomIndex = ch.CustomIndices.Find(o => o.Index == lastIndex);
+                    if (lastCustomIndex.CheckSupport(pci)) {
+                        index = lastCustomIndex.Index;
                     }
                 }
+
+                // Check if the package fits in any customindex "out of the box"
+                if (index == -1) {
+                    foreach (CustomIndex ci in ch.CustomIndices) {
+                        if (ci.CheckSupport(pci)) {
+                            index = ci.Index;
+                            break;
+                        }
+                    }
+                }
+
+                // Check if the package fits in any customindex after adding some samples
+                if (index == -1) {
+                    foreach (CustomIndex ci in ch.CustomIndices) {
+                        if (ci.CheckCanSupport(pci)) {
+                            ci.MergeWith(pci);
+                            index = ci.Index;
+                            break;
+                        }
+                    }
+                }
+
+                // If the package still didn't fit in any customindex, make a new customindex
                 if (index == -1) {
                     CustomIndex ci = new CustomIndex(ch.CustomIndices.Count + 1);
                     ci.MergeWith(pci);
@@ -59,6 +80,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 }
                 
                 ch.Hitsounds.Add(new Hitsound(p.Time, sampleSet, additions, index, whistle, finish, clap));
+                lastIndex = index;
             }
             return ch;
         }
