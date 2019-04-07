@@ -1,4 +1,5 @@
 ﻿using Mapping_Tools.Classes.HitsoundStuff;
+using Mapping_Tools.ViewSettings;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ using System.Windows;
 
 namespace Mapping_Tools.Classes.SystemTools.HitsoundMaker {
     public class ProjectManager {
-        public List<String> ProjectPaths = new List<string>();
+        public List<string> ProjectNames = new List<string>();
         public Project CurrentProject;
         private static readonly JsonSerializer Serializer = new JsonSerializer {
             NullValueHandling = NullValueHandling.Ignore
@@ -23,34 +24,28 @@ namespace Mapping_Tools.Classes.SystemTools.HitsoundMaker {
 
         public void GetProjects() {
             try {
-                String[] str = Directory.GetDirectories(MainWindow.AppWindow.HSProjectPath)
-                                            .Select(Path.GetFileName)
-                                            .ToArray<String>();
-
-                foreach( String folder in str ) {
-                    ProjectPaths.Add(Path.Combine(MainWindow.AppWindow.HSProjectPath, folder));
-                }
+                ProjectNames = Directory.GetDirectories(MainWindow.AppWindow.HSProjectPath)
+                                            .Select(Path.GetFileName).ToList();
             }
-            catch( Exception e ) {
+            catch( Exception ) {
                 MessageBox.Show("Projects could not be loaded!");
             }
         }
 
-        public void LoadProject(string baseBeatmap, Sample defaultSample, ObservableCollection<HitsoundLayer> hitsoundLayers, String projectpath) {
-            CurrentProject = new Project(baseBeatmap, defaultSample, hitsoundLayers, projectpath);
-            LoadFromJSON(Path.Combine(projectpath, "data.json"));
+        public void LoadProject(string name, HitsoundMakerSettings settings) {
+            CurrentProject = new Project(name, settings);
+            LoadFromJSON(CurrentProject.GetJSONPath());
         }
 
-        public void CreateProject(String name) {
+        public void CreateProject(string name) {
             try {
-                String path = Path.Combine(MainWindow.AppWindow.HSProjectPath, name);
-                Directory.CreateDirectory(path);
-                Directory.CreateDirectory(Path.Combine(path, "Exports"));
-                Directory.CreateDirectory(Path.Combine(path, "Samples"));
+                CurrentProject = new Project(name);
 
-                CurrentProject = new Project(path);
-
-                String jsonPath = Path.Combine(path, "data.json");
+                Directory.CreateDirectory(CurrentProject.GetProjectPath());
+                Directory.CreateDirectory(CurrentProject.GetExportPath());
+                Directory.CreateDirectory(CurrentProject.GetSamplePath());
+                
+                string jsonPath = CurrentProject.GetJSONPath();
 
                 if( !File.Exists(jsonPath) ) {
                     CreateJSON(jsonPath);
@@ -64,7 +59,7 @@ namespace Mapping_Tools.Classes.SystemTools.HitsoundMaker {
         public void SaveProject(bool doLoading) {
             if( CurrentProject != null ) {
                 try {
-                    String jsonPath = Path.Combine(CurrentProject.ProjectPath, "data.json");
+                    string jsonPath = CurrentProject.GetJSONPath();
                     WriteToJSON(jsonPath, doLoading);
                 }
                 catch( Exception ex ) {
@@ -92,7 +87,7 @@ namespace Mapping_Tools.Classes.SystemTools.HitsoundMaker {
             }
         }
 
-        private void LoadFromJSON(String jsonPath) {
+        private void LoadFromJSON(string jsonPath) {
             try {
                 using( StreamReader sr = new StreamReader(jsonPath) )
                 using( JsonReader reader = new JsonTextReader(sr) ) {
@@ -107,7 +102,7 @@ namespace Mapping_Tools.Classes.SystemTools.HitsoundMaker {
             }
         }
 
-        private void CreateJSON(String jsonPath) {
+        private void CreateJSON(string jsonPath) {
             try {
                 using( StreamWriter sw = new StreamWriter(jsonPath) )
                 using( JsonWriter writer = new JsonTextWriter(sw) ) {

@@ -1,4 +1,5 @@
 ﻿using Mapping_Tools.Classes.HitsoundStuff;
+using Mapping_Tools.ViewSettings;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,34 +10,33 @@ using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.SystemTools.HitsoundMaker {
     public class Project {
-        public String ProjectPath;
-        public String SamplePath;
-        public String ExportPath;
-        public String JSONPath;
-        public string BaseBeatmap { get; set; }
-        public Sample DefaultSample { get; set; }
-        public ObservableCollection<HitsoundLayer> HitsoundLayers { get; set; }
+        public string Name;
+        public HitsoundMakerSettings Settings { get; set; }
 
-        public Project(String projectpath) {
-            BaseBeatmap = "";
-            DefaultSample = new Sample(0, 0, "", int.MaxValue);
-            HitsoundLayers = new ObservableCollection<HitsoundLayer>();
-            SetDefaultPaths(projectpath);
+        public Project(string name) {
+            Name = name;
+            Settings = new HitsoundMakerSettings();
         }
 
-        private void SetDefaultPaths(String projectpath) {
-            ProjectPath = projectpath;
-            SamplePath = Path.Combine(ProjectPath, "Samples");
-            ExportPath = Path.Combine(ProjectPath, "Exports");
-            JSONPath = Path.Combine(ProjectPath, "config.json");
+        public Project(string name, HitsoundMakerSettings settings) {
+            Name = name;
+            Settings = settings;
         }
 
-        public Project(string baseBeatmap, Sample defaultSample, ObservableCollection<HitsoundLayer> hitsoundLayers, String projectpath) {
-            BaseBeatmap = baseBeatmap;
-            DefaultSample = defaultSample;
-            HitsoundLayers = hitsoundLayers;
-            ProjectPath = projectpath;
-            SetDefaultPaths(projectpath);
+        public string GetSamplePath() {
+            return Path.Combine(GetProjectPath(), "Samples");
+        }
+
+        public string GetExportPath() {
+            return Path.Combine(GetProjectPath(), "Export");
+        }
+
+        public string GetJSONPath() {
+            return Path.Combine(GetProjectPath(), "config.json");
+        }
+
+        public string GetProjectPath() {
+            return Path.Combine(MainWindow.AppWindow.HSProjectPath, Name);
         }
     }
 }
