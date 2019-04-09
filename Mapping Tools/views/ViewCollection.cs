@@ -37,6 +37,14 @@ namespace Mapping_Tools.Views {
             return MapCleaner;
         }
 
+        private UserControl PropertyTransformer;
+        public UserControl GetPropertyTransformer() {
+            if (PropertyTransformer == null) {
+                PropertyTransformer = new PropertyTransformerView();
+            }
+            return PropertyTransformer;
+        }
+
         private UserControl HitsoundCopier;
         public UserControl GetHitsoundCopier() {
             if (HitsoundCopier == null) {

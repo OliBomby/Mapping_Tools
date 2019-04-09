@@ -144,6 +144,20 @@ namespace Mapping_Tools {
             MinHeight = 560;
         }
 
+        //Method for loading the property transformer
+        private void LoadPropertyTransformer(object sender, RoutedEventArgs e) {
+            DataContext = Views.GetPropertyTransformer();
+
+            TextBlock txt = this.FindName("header") as TextBlock;
+            txt.Text = "Mapping Tools - Property Transformer";
+
+            System.Windows.Controls.MenuItem menuitem = this.FindName("project") as System.Windows.Controls.MenuItem;
+            menuitem.Visibility = Visibility.Collapsed;
+
+            MinWidth = 630;
+            MinHeight = 560;
+        }
+
         //Method for loading the merger interface
         private void LoadMerger(object sender, RoutedEventArgs e) {
             DataContext = Views.GetSliderMerger();
