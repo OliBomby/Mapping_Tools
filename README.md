@@ -6,6 +6,7 @@ Collection of tools for manipulating osu! beatmaps
 - [Slider Merger]() by [OliBomby](https://github.com/OliBomby) 
 - [Slider Completionator]() by [OliBomby](https://github.com/OliBomby) 
 - [Hitsound Maker]() by [OliBomby](https://github.com/OliBomby) 
+- [Property Transformer]() by [OliBomby](https://github.com/OliBomby) 
 
 ## Future implementations
 - Snapping Tools (Geo-Triangle & Drafting Compass)
