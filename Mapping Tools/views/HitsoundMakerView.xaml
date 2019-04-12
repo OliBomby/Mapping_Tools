@@ -101,6 +101,11 @@
                             <Setter Property="HorizontalContentAlignment" Value="Left" />
                         </Style>
                     </ListView.Resources>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListViewItem}"  BasedOn="{StaticResource {x:Type ListViewItem}}">
+                            <EventSetter Event="MouseDoubleClick" Handler="HitsoundLayer_MouseDoubleClick"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Header="_Name" Width="120" DisplayMemberBinding="{Binding Name}" />

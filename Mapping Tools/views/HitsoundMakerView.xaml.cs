@@ -9,6 +9,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
@@ -127,6 +128,10 @@ namespace Mapping_Tools.Views {
             foreach (HitsoundLayer hl in Settings.HitsoundLayers) {
                 hl.ImportMap();
             }
+        }
+
+        void HitsoundLayer_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
+            Console.WriteLine(sender);           
         }
 
         private void Add_Click(object sender, RoutedEventArgs e) {
