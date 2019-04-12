@@ -26,11 +26,24 @@ namespace Mapping_Tools.Views {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
+
+            if ((bool) FiltersBox.IsChecked) {
+                FiltersBox_Checked();
+            } else {
+                FiltersBox_Unchecked();
+            }
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
             try {
                 bool clip = (bool)ClipBox.IsChecked;
+                bool filter = (bool)FiltersBox.IsChecked;
+                double match = MatchBox.GetDouble(defaultValue: -1);
+                bool filterMatch = match != -1 && filter;
+                double min = MinBox.GetDouble(defaultValue: -1);
+                double max = MaxBox.GetDouble(defaultValue: -1);
+                bool filterRange = min != -1 && max != -1 && filter;
+
                 double tpom = TPOffsetMultiplierBox.GetDouble(defaultValue: 1);
                 double tpoo = TPOffsetOffsetBox.GetDouble(defaultValue: 0);
                 double tpbpmm = TPBPMMultiplierBox.GetDouble(defaultValue: 1);
@@ -53,44 +66,56 @@ namespace Mapping_Tools.Views {
                 foreach (TimingPoint tp in beatmap.BeatmapTiming.TimingPoints) {
                     // Offset
                     if (tpom != 1 || tpoo != 0) {
-                        tp.Offset = Math.Round(tp.Offset * tpom + tpoo);
+                        if (!filter || ((!filterMatch || Precision.AlmostEquals(tp.Offset, match, 0.01)) && (!filterRange || (tp.Offset >= min && tp.Offset <= max)))) {
+                            tp.Offset = Math.Round(tp.Offset * tpom + tpoo);
+                        }
                     }
 
                     // BPM
                     if (tpbpmm != 1 || tpbpmo != 0) {
                         if (tp.Inherited) {
-                            double newBPM = tp.GetBPM() * tpbpmm + tpbpmo;
-                            newBPM = clip ? MathHelper.Clamp(newBPM, 15, 10000) : newBPM;  // Clip the value if specified
-                            tp.MpB = 60000 / newBPM;
+                            if (!filter || ((!filterMatch || Precision.AlmostEquals(tp.GetBPM(), match, 0.01)) && (!filterRange || (tp.Offset >= min && tp.Offset <= max)))) {
+                                double newBPM = tp.GetBPM() * tpbpmm + tpbpmo;
+                                newBPM = clip ? MathHelper.Clamp(newBPM, 15, 10000) : newBPM;  // Clip the value if specified
+                                tp.MpB = 60000 / newBPM;
+                            }
                         }
                     }
 
                     // Slider Velocity
                     if (tpsvm != 1 || tpsvo != 0) {
-                        TimingPoint tpchanger = tp.Copy();
-                        double newSV = beatmap.BeatmapTiming.GetSVMultiplierAtTime(tp.Offset) * tpsvm + tpsvo;
-                        newSV = clip ? MathHelper.Clamp(newSV, 0.1, 10) : newSV;  // Clip the value if specified
-                        tpchanger.MpB = -100 / newSV;
-                        timingPointsChanges.Add(new TimingPointsChange(tpchanger, mpb: true));
+                        if (!filter || ((!filterMatch || Precision.AlmostEquals(beatmap.BeatmapTiming.GetSVMultiplierAtTime(tp.Offset), match, 0.01)) && (!filterRange || (tp.Offset >= min && tp.Offset <= max)))) {
+                            TimingPoint tpchanger = tp.Copy();
+                            double newSV = beatmap.BeatmapTiming.GetSVMultiplierAtTime(tp.Offset) * tpsvm + tpsvo;
+                            newSV = clip ? MathHelper.Clamp(newSV, 0.1, 10) : newSV;  // Clip the value if specified
+                            tpchanger.MpB = -100 / newSV;
+                            timingPointsChanges.Add(new TimingPointsChange(tpchanger, mpb: true));
+                        }
                     }
 
                     // Index
                     if (tpim != 1 || tpio != 0) {
-                        int newIndex = (int)Math.Round(tp.SampleIndex * tpim + tpio);
-                        tp.SampleIndex = clip ? MathHelper.Clamp(newIndex, 0, 99) : newIndex;
+                        if (!filter || ((!filterMatch || Precision.AlmostEquals(tp.SampleIndex, match, 0.01)) && (!filterRange || (tp.Offset >= min && tp.Offset <= max)))) {
+                            int newIndex = (int)Math.Round(tp.SampleIndex * tpim + tpio);
+                            tp.SampleIndex = clip ? MathHelper.Clamp(newIndex, 0, 99) : newIndex;
+                        }
                     }
 
                     // Volume
                     if (tpvm != 1 || tpvo != 0) {
-                        int newVolume = (int)Math.Round(tp.Volume * tpvm + tpvo);
-                        tp.Volume = clip ? MathHelper.Clamp(newVolume, 5, 100) : newVolume;
+                        if (!filter || ((!filterMatch || Precision.AlmostEquals(tp.Volume, match, 0.01)) && (!filterRange || (tp.Offset >= min && tp.Offset <= max)))) {
+                            int newVolume = (int)Math.Round(tp.Volume * tpvm + tpvo);
+                            tp.Volume = clip ? MathHelper.Clamp(newVolume, 5, 100) : newVolume;
+                        }
                     }
                 }
 
                 // Hitobject Time
                 if (hotm != 1 || hoto != 0) {
                     foreach (HitObject ho in beatmap.HitObjects) {
-                        ho.Time = Math.Round(ho.Time * hotm + hoto);
+                        if (!filter || ((!filterMatch || Precision.AlmostEquals(ho.Time, match, 0.01)) && (!filterRange || (ho.Time >= min && ho.Time <= max)))) {
+                            ho.Time = Math.Round(ho.Time * hotm + hoto);
+                        }
                     }
                 }
                 
@@ -99,7 +124,11 @@ namespace Mapping_Tools.Views {
                     List<double> newBookmarks = new List<double>();
                     List<double> bookmarks = beatmap.GetBookmarks();
                     foreach (double bookmark in bookmarks) {
-                        newBookmarks.Add(Math.Round(bookmark * btm + bto));
+                        if (!filter || ((!filterMatch || Precision.AlmostEquals(bookmark, match, 0.01)) && (!filterRange || (bookmark >= min && bookmark <= max)))) {
+                            newBookmarks.Add(Math.Round(bookmark * btm + bto));
+                        } else {
+                            newBookmarks.Add(bookmark);
+                        }
                     }
                     beatmap.SetBookmarks(newBookmarks);
                 }
@@ -115,6 +144,16 @@ namespace Mapping_Tools.Views {
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        private void FiltersBox_Checked(object sender=null, RoutedEventArgs e=null) {
+            MatchBox.Visibility = Visibility.Visible;
+            RangePanel.Visibility = Visibility.Visible;
+        }
+
+        private void FiltersBox_Unchecked(object sender=null, RoutedEventArgs e=null) {
+            MatchBox.Visibility = Visibility.Collapsed;
+            RangePanel.Visibility = Visibility.Collapsed;
         }
     }
 }
