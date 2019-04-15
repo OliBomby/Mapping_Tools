@@ -195,7 +195,7 @@
                         </Style>
                     </ListView.Resources>
                     <ListView.ItemContainerStyle>
-                        <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource {x:Type ListViewItem}}">
+                        <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MaterialDesignGridViewItem}">
                             <EventSetter Event="MouseDoubleClick" Handler="HitsoundLayer_MouseDoubleClick"/>
                         </Style>
                     </ListView.ItemContainerStyle>
@@ -203,8 +203,8 @@
                         <GridView>
                             <GridViewColumn Header="_Name" Width="120" DisplayMemberBinding="{Binding Name}" />
                             <GridViewColumn Header="_Amount" Width="90" DisplayMemberBinding="{Binding Times.Count}" />
-                            <GridViewColumn Header="_SampleSet" Width="120" DisplayMemberBinding="{Binding SampleSetString}" />
-                            <GridViewColumn Header="_Hitsound" Width="120" DisplayMemberBinding="{Binding HitsoundString}" />
+                            <GridViewColumn Header="_SampleSet" Width="90" DisplayMemberBinding="{Binding SampleSetString}" />
+                            <GridViewColumn Header="_Hitsound" Width="90" DisplayMemberBinding="{Binding HitsoundString}" />
                             <GridViewColumn Header="_Sample Path" Width="1000" DisplayMemberBinding="{Binding SamplePath}" />
                         </GridView>
                     </ListView.View>

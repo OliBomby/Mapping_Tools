@@ -17,6 +17,7 @@ using Mapping_Tools.Classes.SliderPathStuff;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.ViewSettings;
+using NAudio.Wave;
 
 namespace Mapping_Tools.Views {
     /// <summary>
@@ -131,7 +132,18 @@ namespace Mapping_Tools.Views {
         }
 
         void HitsoundLayer_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
-            Console.WriteLine(sender);           
+            try {
+                int index = LayersList.SelectedIndex;
+                if (index < 0 || index > Settings.HitsoundLayers.Count - 1) { return; }
+                WaveStream mainOutputStream = new WaveFileReader(Settings.HitsoundLayers[index].SamplePath);
+                WaveChannel32 volumeStream = new WaveChannel32(mainOutputStream);
+
+                WaveOutEvent player = new WaveOutEvent();
+
+                player.Init(volumeStream);
+
+                player.Play();
+            } catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
         }
 
         private void Add_Click(object sender, RoutedEventArgs e) {
