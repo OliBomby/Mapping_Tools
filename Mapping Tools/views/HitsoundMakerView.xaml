@@ -97,16 +97,114 @@
                 
                 <ListView x:Name="LayersList" Grid.Row="0" Grid.Column="2" Margin="10,0,0,0" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                     <ListView.Resources>
-                        <Style TargetType="{x:Type GridViewColumnHeader}">
-                            <Setter Property="HorizontalContentAlignment" Value="Left" />
+                        <Style x:Key="GridViewColumnHeaderGripper"
+                               TargetType="{x:Type Thumb}">
+                            <Setter Property="Canvas.Right"
+                                    Value="-9" />
+                            <Setter Property="Width"
+                                    Value="18" />
+                            <Setter Property="Height"
+                                    Value="{Binding Path=ActualHeight,RelativeSource={RelativeSource TemplatedParent}}" />
+                            <Setter Property="Padding"
+                                    Value="0" />
+                            <Setter Property="Background"
+                                    Value="#FF707070" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Thumb}">
+                                        <Border Padding="{TemplateBinding Padding}"
+                                                Background="Transparent">
+                                            <Rectangle HorizontalAlignment="Center"
+                                                       Width="1"
+                                                       Fill="{TemplateBinding Background}" />
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+
+                        <Style x:Key="{x:Type GridViewColumnHeader}"
+                               TargetType="{x:Type GridViewColumnHeader}">
+                            <Setter Property="HorizontalContentAlignment"
+                                    Value="Left" />
+                            <Setter Property="VerticalContentAlignment"
+                                    Value="Center" />
+                            <Setter Property="Background"
+                                    Value="Transparent" />
+                            <Setter Property="BorderBrush"
+                                    Value="Transparent" />
+                            <Setter Property="BorderThickness"
+                                    Value="0" />
+                            <Setter Property="Padding"
+                                    Value="5,0,2,0" />
+                            <Setter Property="Foreground"
+                                    Value="#FFD6D6D6" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type GridViewColumnHeader}">
+                                        <Grid SnapsToDevicePixels="true">
+                                            <Border Name="HeaderBorder"
+                                                    BorderThickness="0,1,0,1"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    Background="{TemplateBinding Background}">
+                                                <Grid>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition MaxHeight="7" />
+                                                        <RowDefinition />
+                                                    </Grid.RowDefinitions>
+                                                    <Rectangle Name="UpperHighlight"
+                                                               Visibility="Collapsed"
+                                                               Fill="#FFE3F7FF" />
+                                                    <Border Grid.RowSpan="2"
+                                                            Padding="{TemplateBinding Padding}">
+                                                        <ContentPresenter Name="HeaderContent"
+                                                                          Margin="0,0,0,1"
+                                                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                                          RecognizesAccessKey="True"
+                                                                          SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                                    </Border>
+                                                </Grid>
+                                            </Border>
+                                            <Border Name="HeaderHoverBorder"
+                                                    BorderThickness="1,0,1,1"
+                                                    Margin="1,1,0,0" />
+                                            <Border Name="HeaderPressBorder"
+                                                    BorderThickness="1,1,1,0"
+                                                    Margin="1,0,0,1" />
+                                            <Canvas>
+                                                <Thumb x:Name="PART_HeaderGripper"
+                                                       Style="{StaticResource GridViewColumnHeaderGripper}" />
+                                            </Canvas>
+                                        </Grid>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="Height"
+                                                     Value="Auto">
+                                                <Setter Property="MinHeight"
+                                                        Value="20" />
+                                            </Trigger>
+                                            <Trigger Property="IsEnabled"
+                                                     Value="false">
+                                                <Setter Property="Foreground"
+                                                        Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
                         </Style>
                     </ListView.Resources>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MaterialDesignGridViewItem}">
+                            <EventSetter Event="MouseDoubleClick" Handler="HitsoundLayer_MouseDoubleClick"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Header="_Name" Width="120" DisplayMemberBinding="{Binding Name}" />
                             <GridViewColumn Header="_Amount" Width="90" DisplayMemberBinding="{Binding Times.Count}" />
-                            <GridViewColumn Header="_SampleSet" Width="120" DisplayMemberBinding="{Binding SampleSetString}" />
-                            <GridViewColumn Header="_Hitsound" Width="120" DisplayMemberBinding="{Binding HitsoundString}" />
+                            <GridViewColumn Header="_SampleSet" Width="90" DisplayMemberBinding="{Binding SampleSetString}" />
+                            <GridViewColumn Header="_Hitsound" Width="90" DisplayMemberBinding="{Binding HitsoundString}" />
                             <GridViewColumn Header="_Sample Path" Width="1000" DisplayMemberBinding="{Binding SamplePath}" />
                         </GridView>
                     </ListView.View>

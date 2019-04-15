@@ -9,6 +9,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
@@ -16,6 +17,7 @@ using Mapping_Tools.Classes.SliderPathStuff;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.ViewSettings;
+using NAudio.Wave;
 
 namespace Mapping_Tools.Views {
     /// <summary>
@@ -127,6 +129,21 @@ namespace Mapping_Tools.Views {
             foreach (HitsoundLayer hl in Settings.HitsoundLayers) {
                 hl.ImportMap();
             }
+        }
+
+        void HitsoundLayer_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
+            try {
+                int index = LayersList.SelectedIndex;
+                if (index < 0 || index > Settings.HitsoundLayers.Count - 1) { return; }
+                WaveStream mainOutputStream = new WaveFileReader(Settings.HitsoundLayers[index].SamplePath);
+                WaveChannel32 volumeStream = new WaveChannel32(mainOutputStream);
+
+                WaveOutEvent player = new WaveOutEvent();
+
+                player.Init(volumeStream);
+
+                player.Play();
+            } catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
         }
 
         private void Add_Click(object sender, RoutedEventArgs e) {
