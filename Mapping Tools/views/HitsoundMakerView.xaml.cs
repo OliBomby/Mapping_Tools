@@ -146,12 +146,21 @@ namespace Mapping_Tools.Views {
 
         private void Delete_Click(object sender, RoutedEventArgs e) {
             try {
-                int index = LayersList.SelectedIndex;
-                if (index < 0 || index > Settings.HitsoundLayers.Count - 1) { return; }
+                // Ask for confirmation
+                MessageBoxResult messageBoxResult = MessageBox.Show("Are you sure?", "Delete Confirmation", MessageBoxButton.YesNo);
+                if (messageBoxResult != MessageBoxResult.Yes) { return; }
 
-                Settings.HitsoundLayers.RemoveAt(index);
-
-                LayersList.SelectedIndex = Math.Max(index - 1, 0);
+                var selected = LayersList.SelectedItems;
+                if (selected.Count == 0 || selected == null) { return; }
+                int index = LayersList.Items.IndexOf(selected[0]);
+                List<HitsoundLayer> removeList = new List<HitsoundLayer>();
+                foreach (var item in selected) {
+                    removeList.Add((HitsoundLayer)item);
+                }
+                foreach (HitsoundLayer hsl in removeList) {
+                    Settings.HitsoundLayers.Remove(hsl);
+                }
+                LayersList.SelectedIndex = Math.Max(Math.Min(index - 1, Settings.HitsoundLayers.Count - 1), 0);
 
                 RecalculatePriorities();
             } catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
