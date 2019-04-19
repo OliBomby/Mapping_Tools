@@ -38,7 +38,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public bool ResnapSelf(Timing timing, int snap1, int snap2) {
-            double newTime = Math.Floor(timing.Resnap(Offset, snap1, snap2));
+            double newTime = timing.Resnap(Offset, snap1, snap2);
             double deltaTime = newTime - Offset;
             Offset += deltaTime;
             return deltaTime != 0;

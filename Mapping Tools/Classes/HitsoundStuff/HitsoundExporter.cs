@@ -16,7 +16,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
             // Resnap all hitsounds
             foreach (Hitsound h in ch.Hitsounds) {
-                h.SetTime(Math.Floor(beatmap.BeatmapTiming.Resnap(h.Time, 16, 12)));
+                h.SetTime(beatmap.BeatmapTiming.Resnap(h.Time, 16, 12));
             }
 
             // Make new timingpoints

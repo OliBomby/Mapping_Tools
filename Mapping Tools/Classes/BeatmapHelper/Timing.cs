@@ -28,7 +28,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
-        public double Resnap(double time, int divisor2, int divisor3) {
+        public double Resnap(double time, int divisor2, int divisor3, bool floor=true) {
             TimingPoint beforeTP = GetRedlineAtTime(time);
             TimingPoint afterTP = GetRedlineAfterTime(time);
 
@@ -49,10 +49,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             if( afterTP != null && Precision.DefinitelyBigger(newTime, afterTP.Offset) ) {
                 newTime = afterTP.Offset;
             }
-            return newTime;
+            if (floor) {
+                return Math.Floor(newTime);
+            } else {
+                return newTime;
+            }
         }
 
-        public double ResnapInRange(double time, int divisor2, int divisor3, HitObject ho) {
+        public double ResnapInRange(double time, int divisor2, int divisor3, HitObject ho, bool floor=true) {
             TimingPoint beforeTP = GetRedlineAtTime(time);
             TimingPoint afterTP = GetRedlineAfterTime(time);
 
@@ -78,7 +82,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             {
                 newTime = time;
             }
-            return newTime;
+            if (floor) {
+                return Math.Floor(newTime);
+            } else {
+                return newTime;
+            }
         }
 
         public double GetTimingPointEffectiveRange(TimingPoint ttp) {
