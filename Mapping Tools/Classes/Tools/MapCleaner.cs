@@ -106,7 +106,7 @@ namespace Mapping_Tools.Classes.Tools {
                 List<double> bookmarks = beatmap.GetBookmarks();
                 for (int i = 0; i < bookmarks.Count; i++) {
                     double bookmark = bookmarks[i];
-                    newBookmarks.Add(Math.Floor(timing.Resnap(bookmark, arguments.Snap1, arguments.Snap2)));
+                    newBookmarks.Add(timing.Resnap(bookmark, arguments.Snap1, arguments.Snap2));
                     UpdateProgressbar(worker, (double)i / bookmarks.Count, 4, maxStages);
                 }
                 beatmap.SetBookmarks(newBookmarks);

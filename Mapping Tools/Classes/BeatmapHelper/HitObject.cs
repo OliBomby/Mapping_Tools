@@ -119,7 +119,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public bool ResnapSelf(Timing timing, int snap1, int snap2) {
-            double newTime = Math.Floor(timing.Resnap(Time, snap1, snap2));
+            double newTime = GetResnappedTime(timing, snap1, snap2);
             double deltaTime = newTime - Time;
             MoveTime(deltaTime);
             return deltaTime != 0;
@@ -128,7 +128,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public bool ResnapEnd(Timing timing, int snap1, int snap2) {
             if (Repeat > 1) { return ResnapEndClassic(timing, snap1, snap2); }
 
-            double newTime = Math.Floor(timing.Resnap(EndTime, snap1, snap2));
+            double newTime = timing.Resnap(EndTime, snap1, snap2);
             double deltaTime = newTime - EndTime;
             MoveEndTime(timing, deltaTime);
 
@@ -159,6 +159,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             MoveEndTime(timing, deltaTime);
 
             return deltaTime != 0;
+        }
+
+        public double GetResnappedTime(Timing timing, int snap1, int snap2, bool floor=true) {
+            return timing.Resnap(Time, snap1, snap2, floor);
         }
 
         public void SetLine(string line) {
