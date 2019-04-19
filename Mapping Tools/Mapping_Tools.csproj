@@ -203,6 +203,9 @@
     <Compile Include="Viewmodels\StandardVM.cs" />
     <Compile Include="ViewSettings\HitsoundMakerSettings.cs" />
     <Compile Include="Views\Extensions.cs" />
+    <Compile Include="Views\TimingHelperView.xaml.cs">
+      <DependentUpon>TimingHelperView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\PropertyTransformerView.xaml.cs">
       <DependentUpon>PropertyTransformerView.xaml</DependentUpon>
     </Compile>
@@ -266,6 +269,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\TimingHelperView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\PropertyTransformerView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

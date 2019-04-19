@@ -23,6 +23,7 @@
                 <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="400" TextWrapping="Wrap" Foreground="#FFD6D6D6" Text="Place bookmarks and greenlines on the exact time of sounds and this tool will fix the timing to properly snap those sounds."/>
                 <CheckBox x:Name="BookmarkBox" Content="Cover bookmarks" IsChecked="True" Margin="0,20,0,0"/>
                 <CheckBox x:Name="GreenlinesBox" Content="Cover greenlines" IsChecked="True"/>
+                <CheckBox x:Name="RedlinesBox" Content="Cover redlines" IsChecked="True"/>
                 <CheckBox x:Name="OmitBarlineBox" Content="Omit first barline on new redlines" IsChecked="True"/>
             </StackPanel>
             <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Right">
