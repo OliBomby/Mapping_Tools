@@ -200,6 +200,20 @@ namespace Mapping_Tools {
             this.MinHeight = 380;
         }
 
+        //Method for loading the timing helper interface
+        private void LoadTimingHelper(object sender, RoutedEventArgs e) {
+            DataContext = Views.GetTimingHelper();
+
+            TextBlock txt = this.FindName("header") as TextBlock;
+            txt.Text = "Mapping Tools - TimingHelper";
+
+            System.Windows.Controls.MenuItem menuitem = this.FindName("project") as System.Windows.Controls.MenuItem;
+            menuitem.Visibility = Visibility.Collapsed;
+
+            this.MinWidth = 400;
+            this.MinHeight = 380;
+        }
+
         //Method for loading the hitsound copier
         private void LoadHSCopier(object sender, RoutedEventArgs e) {
             DataContext = Views.GetHitsoundCopier();

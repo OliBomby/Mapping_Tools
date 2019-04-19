@@ -84,5 +84,13 @@ namespace Mapping_Tools.Views {
             }
             return SnappingTools;
         }
+
+        private UserControl TimingHelper;
+        public UserControl GetTimingHelper() {
+            if (TimingHelper == null) {
+                TimingHelper = new TimingHelperView();
+            }
+            return TimingHelper;
+        }
     }
 }
