@@ -95,7 +95,8 @@
                     <Button Grid.Row="2" Margin="0,5,0,10" Content="Reload all from source" FontWeight="Bold" FontSize="16" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="ReloadAllFromSource_Click"/>
                 </Grid>
                 
-                <ListView x:Name="LayersList" Grid.Row="0" Grid.Column="2" Margin="10,0,0,0" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <ListView x:Name="LayersList" Grid.Row="0" Grid.Column="2" Margin="10,0,0,0" ScrollViewer.VerticalScrollBarVisibility="Visible"
+                          ScrollViewer.HorizontalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                     <ListView.Resources>
                         <Style x:Key="GridViewColumnHeaderGripper"
                                TargetType="{x:Type Thumb}">
