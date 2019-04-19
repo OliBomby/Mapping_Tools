@@ -1,0 +1,82 @@
+﻿<UserControl x:Class="Mapping_Tools.Views.TimingHelperView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Mapping_Tools.Views"
+             xmlns:cm="clr-namespace:System.ComponentModel;assembly=System"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" Width="759.5">
+    <Grid Name="MasterGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid Name="FirstGrid" Grid.Row="0" Grid.Column="0" Margin="0,0,0,0">
+            <StackPanel Grid.Row="0" Margin="0,0,10,0">
+                <TextBlock FontSize="40" TextWrapping="NoWrap" FontWeight="Bold" Foreground="#FF5F5E5E"><Run Text="Timing Helper"/><LineBreak/><Run/></TextBlock>
+                <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="400" TextWrapping="Wrap" Foreground="#FFD6D6D6" Text="Place bookmarks and greenlines on the exact time of sounds and this tool will fix the timing to properly snap those sounds."/>
+                <CheckBox x:Name="BookmarkBox" Content="Cover bookmarks" IsChecked="True" Margin="0,20,0,0"/>
+                <CheckBox x:Name="GreenlinesBox" Content="Cover greenlines" IsChecked="True"/>
+                <CheckBox x:Name="OmitBarlineBox" Content="Omit first barline on new redlines" IsChecked="True"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Right">
+                <TextBlock FontSize="40"  TextWrapping="NoWrap" Text="Signatures" FontWeight="Bold" Foreground="#FF5F5E5E"/>
+                <ComboBox FontSize="20" x:Name="Snap1" Cursor="Hand" SelectedIndex="4" Foreground="#FFD6D6D6">
+                    <ComboBoxItem Content="1/1" Cursor="Hand"/>
+                    <ComboBoxItem Content="1/2" Cursor="Hand"/>
+                    <ComboBoxItem Content="1/4" Cursor="Hand"/>
+                    <ComboBoxItem Content="1/8" Cursor="Hand"/>
+                    <ComboBoxItem Content="1/16" Cursor="Hand"/>
+                </ComboBox>
+                <ComboBox FontSize="20" x:Name="Snap2" Cursor="Hand" SelectedIndex="3" Foreground="#FFD6D6D6">
+                    <ComboBoxItem Content="1/1" Cursor="Hand"/>
+                    <ComboBoxItem Content="1/3" Cursor="Hand"/>
+                    <ComboBoxItem Content="1/6" Cursor="Hand"/>
+                    <ComboBoxItem Content="1/12" Cursor="Hand"/>
+                </ComboBox>
+            </StackPanel>
+        </Grid>
+        <Grid Name="SecoundGrid" Grid.Row="1" Grid.Column="0">
+            <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+                <Button Width="Auto" Height="Auto" x:Name="start" Cursor="Hand" Click="Start_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
+                    <materialDesign:PackIcon Width="100" Height="100" Cursor="Hand" Kind="Play" Foreground="#FFD6D6D6"/>
+                </Button >
+            </StackPanel>
+        </Grid>
+        <Grid Margin="0,0,0,0" Name="ThirdGrid" Grid.Row="2" Grid.Column="0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Column="0">
+                    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" Orientation="Horizontal">
+                        <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Foreground="#FF5F5E5E"/>
+                        <ProgressBar x:Name="loader_progress" Foreground="#FF838383" Background="{x:Null}" BorderBrush="{x:Null}"/>
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Column="1">
+                    <DockPanel>
+                        <ProgressBar x:Name="progress" Margin="20,0,20,0" Height="20" Foreground="#FF838383" Background="{x:Null}" BorderBrush="{x:Null}"/>
+                    </DockPanel>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+    <UserControl.Resources>
+        <cm:BackgroundWorker x:Key="backgroundWorker"
+         DoWork="BackgroundWorker_DoWork"
+         RunWorkerCompleted="BackgroundWorker_RunWorkerCompleted"
+         WorkerReportsProgress="True"
+         ProgressChanged="BackgroundWorker_ProgressChanged"/>
+    </UserControl.Resources>
+</UserControl>
