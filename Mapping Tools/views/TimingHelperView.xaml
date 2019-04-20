@@ -23,19 +23,23 @@
                 <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="400" TextWrapping="Wrap" Foreground="#FFD6D6D6" Text="Place bookmarks and greenlines on the exact time of sounds and this tool will fix the timing to properly snap those sounds."/>
                 <CheckBox x:Name="BookmarkBox" Content="Cover bookmarks" IsChecked="True" Margin="0,20,0,0"/>
                 <CheckBox x:Name="GreenlinesBox" Content="Cover greenlines" IsChecked="True"/>
-                <CheckBox x:Name="RedlinesBox" Content="Cover redlines" IsChecked="True"/>
+                <CheckBox x:Name="RedlinesBox" Content="Cover redlines" IsChecked="False"/>
                 <CheckBox x:Name="OmitBarlineBox" Content="Omit first barline on new redlines" IsChecked="True"/>
+                <TextBlock Text="Leniency (ms):" Margin="0,10,0,0"/>
+                <TextBox x:Name="LeniencyBox" Text="3" Width="400" HorizontalAlignment="Left"/>
+                <TextBlock Text="Beats between every marker (leave empty for auto):" Margin="0,10,0,0"/>
+                <TextBox x:Name="TemporalBox" Text="" Width="400" HorizontalAlignment="Left"/>
             </StackPanel>
             <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Right">
                 <TextBlock FontSize="40"  TextWrapping="NoWrap" Text="Signatures" FontWeight="Bold" Foreground="#FF5F5E5E"/>
-                <ComboBox FontSize="20" x:Name="Snap1" Cursor="Hand" SelectedIndex="4" Foreground="#FFD6D6D6">
+                <ComboBox FontSize="20" x:Name="Snap1" Cursor="Hand" SelectedIndex="2" Foreground="#FFD6D6D6">
                     <ComboBoxItem Content="1/1" Cursor="Hand"/>
                     <ComboBoxItem Content="1/2" Cursor="Hand"/>
                     <ComboBoxItem Content="1/4" Cursor="Hand"/>
                     <ComboBoxItem Content="1/8" Cursor="Hand"/>
                     <ComboBoxItem Content="1/16" Cursor="Hand"/>
                 </ComboBox>
-                <ComboBox FontSize="20" x:Name="Snap2" Cursor="Hand" SelectedIndex="3" Foreground="#FFD6D6D6">
+                <ComboBox FontSize="20" x:Name="Snap2" Cursor="Hand" SelectedIndex="1" Foreground="#FFD6D6D6">
                     <ComboBoxItem Content="1/1" Cursor="Hand"/>
                     <ComboBoxItem Content="1/3" Cursor="Hand"/>
                     <ComboBoxItem Content="1/6" Cursor="Hand"/>
