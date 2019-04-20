@@ -57,8 +57,9 @@ namespace Mapping_Tools.Views {
                 MessageBox.Show(ex.Message);
                 return;
             }
-            backgroundWorker.RunWorkerAsync(new Arguments(fileToCopy, (bool)BookmarkBox.IsChecked, (bool)GreenlinesBox.IsChecked, 
+            backgroundWorker.RunWorkerAsync(new Arguments(fileToCopy, (bool)BookmarkBox.IsChecked, (bool)GreenlinesBox.IsChecked,
                                                           (bool)RedlinesBox.IsChecked, (bool)OmitBarlineBox.IsChecked,
+                                                          LeniencyBox.GetDouble(defaultValue: 3), TemporalBox.GetDouble(),
                                                           int.Parse(Snap1.Text.Split('/')[1]), int.Parse(Snap2.Text.Split('/')[1])));
             start.IsEnabled = false;
         }
@@ -69,15 +70,19 @@ namespace Mapping_Tools.Views {
             public bool Greenlines;
             public bool Redlines;
             public bool OmitBarline;
+            public double Leniency;
+            public double BeatsBetween;
             public int Snap1;
             public int Snap2;
-            public Arguments(string path, bool bookmarks, bool greenlines, bool redlines, bool omitBarline, int snap1, int snap2)
+            public Arguments(string path, bool bookmarks, bool greenlines, bool redlines, bool omitBarline, double leniency, double beatsBetween, int snap1, int snap2)
             {
                 Path = path;
                 Bookmarks = bookmarks;
                 Greenlines = greenlines;
                 Redlines = redlines;
                 OmitBarline = omitBarline;
+                Leniency = leniency;
+                BeatsBetween = beatsBetween;
                 Snap1 = snap1;
                 Snap2 = snap2;
             }
@@ -93,46 +98,129 @@ namespace Mapping_Tools.Views {
             Timing timing = beatmap.BeatmapTiming;
 
             // Get all the times to snap
-            List<double> times = new List<double>();
+            List<Marker> markers = new List<Marker>();
             if (arg.Bookmarks) {
-                times.AddRange(beatmap.GetBookmarks());
+                foreach (double time in beatmap.GetBookmarks()) {
+                    markers.Add(new Marker(time));
+                }
             }
             if (arg.Greenlines) {
                 // Get the offsets of greenlines
-                times.AddRange(beatmap.BeatmapTiming.TimingPoints.Where(o => o.Inherited == false).Select(o => o.Offset));
+                foreach (TimingPoint tp in timing.TimingPoints) {
+                    if (tp.Inherited == false) {
+                        markers.Add(new Marker(tp.Offset));
+                    }
+                }
             }
             if (arg.Redlines) {
                 // Get the offsets of redlines
-                times.AddRange(beatmap.BeatmapTiming.TimingPoints.Where(o => o.Inherited == true).Select(o => o.Offset));
+                foreach (TimingPoint tp in timing.TimingPoints) {
+                    if (tp.Inherited == true) {
+                        markers.Add(new Marker(tp.Offset));
+                    }
+                }
             }
 
-            // Loop through all the times
-            for (int i = 0; i < times.Count; i++) {
-                // Get the info of the time
-                double time = times[i];
-                double resnappedTime = timing.Resnap(time, arg.Snap1, arg.Snap2, false);
+            // Update progressbar
+            if (worker != null && worker.WorkerReportsProgress) {
+                worker.ReportProgress(20);
+            }
 
-                TimingPoint redline = timing.GetRedlineAtTime(resnappedTime - 10);
+            // Sort the markers
+            markers = markers.OrderBy(o => o.Time).ToList();
+
+            // Calculate the beats between time and the last time or redline for each time
+            // Time the same is 0
+            // Time a little after is smallest snap
+            for (int i = 0; i < markers.Count; i++) {
+                Marker marker = markers[i];
+                double time = marker.Time;
+
+                // Get the redline
+                TimingPoint redline = timing.GetRedlineAtTime(time - 1);
+
+                // Resnap to that redline only
+                double resnappedTime = timing.Resnap(time, arg.Snap1, arg.Snap2, false, redline);
+
+                // Calculate beats from the redline
                 double beatsFromRedline = (resnappedTime - redline.Offset) / redline.MpB;
 
                 // Avoid problems
-                if (time == redline.Offset) {
-                    continue;
-                }
                 if (MathHelper.ApproximatelyEquivalent(beatsFromRedline, 0, 0.0001)) {
                     beatsFromRedline = 1 / Math.Max(arg.Snap1, arg.Snap2);
                 }
+                if (time == redline.Offset) {
+                    beatsFromRedline = 0;
+                }
 
-                double mpbOld = redline.MpB;
-                double mpb = GetMpB(time, beatsFromRedline, redline);
+                // Initialize the beats from last marker
+                double beatsFromLastMarker = beatsFromRedline;
 
                 // Get the times between redline and this time
-                List<double> timesBefore = times.Where(o => o < time && o > redline.Offset).ToList();
+                List<Marker> timesBefore = markers.Where(o => o.Time < time && o.Time > redline.Offset).ToList();
 
-                // For each their beatsFromRedline must stay the same AND their time must be within 3-6 ms of their resnapped time
+                if (timesBefore.Count > 0) {
+                    // Get the last time info
+                    double lastTime = timesBefore.Last().Time;
+                    double resnappedTimeL = timing.Resnap(lastTime, arg.Snap1, arg.Snap2, false);
+
+                    // Change the beats from last marker
+                    beatsFromLastMarker = (resnappedTime - resnappedTimeL) / redline.MpB;
+
+                    // Avoid problems
+                    if (MathHelper.ApproximatelyEquivalent(beatsFromLastMarker, 0, 0.0001)) {
+                        beatsFromLastMarker = 1f / Math.Max(arg.Snap1, arg.Snap2);
+                    }
+                    if (lastTime == time) {
+                        beatsFromLastMarker = 0;
+                    }
+                }
+
+                // Set the variable
+                marker.BeatsFromLastMarker = beatsFromLastMarker;
+            }
+
+            // Update progressbar
+            if (worker != null && worker.WorkerReportsProgress) {
+                worker.ReportProgress(40);
+            }
+
+            // Loop through all the markers
+            for (int i = 0; i < markers.Count; i++) {
+                Marker marker = markers[i];
+                double time = marker.Time;
+                double beatsFromLastMarker = arg.BeatsBetween != -1 ? arg.BeatsBetween : marker.BeatsFromLastMarker;
+
+                // Skip if 0 beats from last marker
+                if (beatsFromLastMarker == 0) {
+                    continue;
+                }
+
+                // Get the redline
+                TimingPoint redline = timing.GetRedlineAtTime(time - 1);
+
+                // Resnap to that redline only
+                double resnappedTime = timing.Resnap(time, arg.Snap1, arg.Snap2, false, redline);
+
+                // Get the times between redline and this time
+                List<Marker> markersBefore = markers.Where(o => o.Time < time && o.Time > redline.Offset).ToList();
+
+                // Calculate MpB
+                // Add up all the beatsFromLastMarker from timesBefore and use time from redline
+                double mpbOld = redline.MpB;
+
+                double beatsFromRedline = beatsFromLastMarker;
+                foreach (Marker markerB in markersBefore) {
+                    beatsFromRedline += markerB.BeatsFromLastMarker;
+                }
+                double mpb = GetMpB(time - redline.Offset, beatsFromRedline, arg.Leniency);
+
+                // For each their beatsFromRedline must stay the same AND their time must be within leniency of their resnapped time
                 // If any of these times becomes incompatible, place a new anchor on the last time and not change the previous redline
                 bool canChangeRedline = true;
-                foreach (double timeB in timesBefore) {
+                foreach (Marker markerB in markersBefore) {
+                    double timeB = markerB.Time;
+
                     // Get the beatsFromRedline after changing mpb
                     redline.MpB = mpb;
                     double resnappedTimeBA = timing.Resnap(timeB, arg.Snap1, arg.Snap2, false);
@@ -144,19 +232,18 @@ namespace Mapping_Tools.Views {
                     double beatsFromRedlineBB = (resnappedTimeBB - redline.Offset) / redline.MpB;
 
                     // Check changes
-                    if (MathHelper.ApproximatelyEquivalent(beatsFromRedlineBA, beatsFromRedlineBB, 0.1) && IsSnapped(timeB, resnappedTimeBA)){
+                    if (MathHelper.ApproximatelyEquivalent(beatsFromRedlineBA, beatsFromRedlineBB, 0.01) && IsSnapped(timeB, resnappedTimeBA, arg.Leniency)){
                         continue;
                     }
                     canChangeRedline = false;
                 }
 
+                // Make changes
                 if (canChangeRedline) {
                     redline.MpB = mpb;
                 } else {
                     // Get the last time info
-                    double lastTime = timesBefore.Last();
-                    double resnappedTimeL = timing.Resnap(lastTime, arg.Snap1, arg.Snap2, false);
-                    double beatsFromRedlineL = (resnappedTimeL - redline.Offset) / redline.MpB;
+                    double lastTime = markersBefore.Last().Time;
 
                     // Make new redline
                     TimingPoint newRedline = redline.Copy();
@@ -164,11 +251,8 @@ namespace Mapping_Tools.Views {
                     newRedline.OmitFirstBarLine = arg.OmitBarline; // Set omit of that's the argument
                     timing.TimingPoints.Insert(timing.TimingPoints.IndexOf(redline) + 1, newRedline);
 
-                    // BeatsFromRedline of the last time is subtracted
-                    beatsFromRedline = beatsFromRedline - beatsFromRedlineL;
-
                     // Set the MpB
-                    newRedline.MpB = GetMpB(time, beatsFromRedline, newRedline);
+                    newRedline.MpB = GetMpB(time - lastTime, beatsFromLastMarker, arg.Leniency);
 
                     // Update the counter
                     RedlinesAdded++;
@@ -176,7 +260,7 @@ namespace Mapping_Tools.Views {
 
                 // Update progressbar
                 if (worker != null && worker.WorkerReportsProgress) {
-                    worker.ReportProgress(i * 100 / times.Count);
+                    worker.ReportProgress(i * 60 / markers.Count + 40);
                 }
             }
             
@@ -199,35 +283,35 @@ namespace Mapping_Tools.Views {
             return message;
         }
 
-        private double GetMpB(double time, double beatsFromRedline, TimingPoint redline) {
+        private double GetMpB(double timeFromRedline, double beatsFromRedline, double leniency) {
             // Will make human-like BPM values like integers, halves and tenths
             // If that doesn't work (like the time is really far from the redline) it will try thousandths
             
             // Exact MpB and BPM
-            double mpb = (time - redline.Offset) / beatsFromRedline;
+            double mpb = timeFromRedline / beatsFromRedline;
             double bpm = 60000 / mpb;
 
             // Round bpm
             double mpbInteger = 60000 / Math.Round(bpm);
-            if (IsSnapped(time, redline.Offset + mpbInteger * beatsFromRedline)) {
+            if (IsSnapped(timeFromRedline, mpbInteger * beatsFromRedline, leniency)) {
                 return mpbInteger;
             }
 
             // Halves bpm
             double mpbHalves = 60000 / (Math.Round(bpm * 2) / 2);
-            if (IsSnapped(time, redline.Offset + mpbHalves * beatsFromRedline)) {
+            if (IsSnapped(timeFromRedline, mpbHalves * beatsFromRedline, leniency)) {
                 return mpbHalves;
             }
 
             // Tenths bpm
             double mpbTenths = 60000 / (Math.Round(bpm * 10) / 10);
-            if (IsSnapped(time, redline.Offset + mpbTenths * beatsFromRedline)) {
+            if (IsSnapped(timeFromRedline, mpbTenths * beatsFromRedline, leniency)) {
                 return mpbTenths;
             }
 
             // Thousandths bpm
             double mpbThousandths = 60000 / (Math.Round(bpm * 1000) / 1000);
-            if (IsSnapped(time, redline.Offset + mpbThousandths * beatsFromRedline)) {
+            if (IsSnapped(timeFromRedline, mpbThousandths * beatsFromRedline, leniency)) {
                 return mpbThousandths;
             }
 
@@ -235,16 +319,22 @@ namespace Mapping_Tools.Views {
             return mpb;
         }
 
-        private bool IsSnapped(double time, double resnappedTime, double threshold = 3) {
-            if (Math.Abs(resnappedTime - time) <= threshold) {
+        private bool IsSnapped(double time, double resnappedTime, double leniency = 3) {
+            if (Math.Abs(resnappedTime - time) <= leniency) {
                 return true;
             } else {
                 return false;
             }
         }
 
-        private void Print(string str) {
-            Console.WriteLine(str);
+        private class Marker {
+            public double Time { get; set; }
+            public double BeatsFromLastMarker { get; set; }
+
+            public Marker(double time) {
+                Time = time;
+                BeatsFromLastMarker = 0;
+            }
         }
     }
 }

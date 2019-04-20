@@ -28,9 +28,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
-        public double Resnap(double time, int divisor2, int divisor3, bool floor=true) {
-            TimingPoint beforeTP = GetRedlineAtTime(time);
-            TimingPoint afterTP = GetRedlineAfterTime(time);
+        public double Resnap(double time, int divisor2, int divisor3, bool floor=true, TimingPoint tp=null) {
+            TimingPoint beforeTP = tp ?? GetRedlineAtTime(time);
+            TimingPoint afterTP = tp == null ? GetRedlineAfterTime(time) : null;
 
             double newTime2 = GetNearestTimeMeter(time, beforeTP, divisor2);
             double snapDistance2 = Math.Abs(time - newTime2);
