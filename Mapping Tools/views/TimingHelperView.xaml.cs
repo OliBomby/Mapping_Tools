@@ -28,7 +28,7 @@ namespace Mapping_Tools.Views {
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
-            e.Result = Copy_Hitsounds((Arguments) e.Argument, bgw, e);
+            e.Result = Adjust_Timing((Arguments) e.Argument, bgw, e);
         }
 
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
@@ -88,7 +88,7 @@ namespace Mapping_Tools.Views {
             }
         }
 
-        private string Copy_Hitsounds(Arguments arg, BackgroundWorker worker, DoWorkEventArgs e) {
+        private string Adjust_Timing(Arguments arg, BackgroundWorker worker, DoWorkEventArgs e) {
             // Count
             int RedlinesAdded = 0;
 
@@ -213,7 +213,7 @@ namespace Mapping_Tools.Views {
                 foreach (Marker markerB in markersBefore) {
                     beatsFromRedline += markerB.BeatsFromLastMarker;
                 }
-                double mpb = GetMpB(time - redline.Offset, beatsFromRedline, arg.Leniency);
+                double mpb = GetMpB(time - redline.Offset, beatsFromRedline, 0.5);
 
                 // For each their beatsFromRedline must stay the same AND their time must be within leniency of their resnapped time
                 // If any of these times becomes incompatible, place a new anchor on the last time and not change the previous redline
@@ -252,7 +252,7 @@ namespace Mapping_Tools.Views {
                     timing.TimingPoints.Insert(timing.TimingPoints.IndexOf(redline) + 1, newRedline);
 
                     // Set the MpB
-                    newRedline.MpB = GetMpB(time - lastTime, beatsFromLastMarker, arg.Leniency);
+                    newRedline.MpB = GetMpB(time - lastTime, beatsFromLastMarker, 0.5);
 
                     // Update the counter
                     RedlinesAdded++;
