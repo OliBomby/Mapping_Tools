@@ -202,47 +202,33 @@ namespace Mapping_Tools.Views {
                 // Resnap to that redline only
                 double resnappedTime = timing.Resnap(time, arg.Snap1, arg.Snap2, false, redline);
 
-                // Get the times between redline and this time
+                // Get the times between redline and this time including this time
                 List<Marker> markersBefore = markers.Where(o => o.Time < time && o.Time > redline.Offset).ToList();
+                markersBefore.Add(marker);
 
                 // Calculate MpB
-                // Add up all the beatsFromLastMarker from timesBefore and use time from redline
-                double mpbOld = redline.MpB;
-
-                double beatsFromRedline = beatsFromLastMarker;
+                // Average MpB from timesBefore and use time from redline
+                double mpb = 0;
+                double beatsFromRedline = 0;
                 foreach (Marker markerB in markersBefore) {
                     beatsFromRedline += markerB.BeatsFromLastMarker;
+                    mpb += GetMpB(markerB.Time - redline.Offset, beatsFromRedline, 0);
                 }
-                double mpb = GetMpB(time - redline.Offset, beatsFromRedline, 0.5);
+                mpb /= markersBefore.Count;
 
-                // For each their beatsFromRedline must stay the same AND their time must be within leniency of their resnapped time
-                // If any of these times becomes incompatible, place a new anchor on the last time and not change the previous redline
-                bool canChangeRedline = true;
-                foreach (Marker markerB in markersBefore) {
-                    double timeB = markerB.Time;
-
-                    // Get the beatsFromRedline after changing mpb
-                    redline.MpB = mpb;
-                    double resnappedTimeBA = timing.Resnap(timeB, arg.Snap1, arg.Snap2, false);
-                    double beatsFromRedlineBA = (resnappedTimeBA - redline.Offset) / redline.MpB;
-
-                    // Get the beatsFromRedline before changing mpb
-                    redline.MpB = mpbOld;
-                    double resnappedTimeBB = timing.Resnap(timeB, arg.Snap1, arg.Snap2, false);
-                    double beatsFromRedlineBB = (resnappedTimeBB - redline.Offset) / redline.MpB;
-
-                    // Check changes
-                    if (MathHelper.ApproximatelyEquivalent(beatsFromRedlineBA, beatsFromRedlineBB, 0.01) && IsSnapped(timeB, resnappedTimeBA, arg.Leniency)){
-                        continue;
-                    }
-                    canChangeRedline = false;
-                }
+                // Check if this MpB doesn't make the markers go offsnap too far
+                bool canChangeRedline = CheckMpB(mpb, markersBefore, redline, arg);
 
                 // Make changes
                 if (canChangeRedline) {
+                    // Round the MpB to human values first
+                    mpb = HumanRoundMpB(mpb, markersBefore, redline, arg);
+
+                    // Change the MpB of the redline
                     redline.MpB = mpb;
                 } else {
-                    // Get the last time info
+                    // Get the last time info and not the current
+                    markersBefore.Remove(marker);
                     double lastTime = markersBefore.Last().Time;
 
                     // Make new redline
@@ -252,7 +238,7 @@ namespace Mapping_Tools.Views {
                     timing.TimingPoints.Insert(timing.TimingPoints.IndexOf(redline) + 1, newRedline);
 
                     // Set the MpB
-                    newRedline.MpB = GetMpB(time - lastTime, beatsFromLastMarker, 0.5);
+                    newRedline.MpB = GetMpB(time - lastTime, beatsFromLastMarker, arg.Leniency);
 
                     // Update the counter
                     RedlinesAdded++;
@@ -283,6 +269,70 @@ namespace Mapping_Tools.Views {
             return message;
         }
 
+        private bool CheckMpB(double mpbNew, List<Marker> markers, TimingPoint redline, Arguments arg) {
+            // For each their beatsFromRedline must stay the same AND their time must be within leniency of their resnapped time
+            // If any of these times becomes incompatible, place a new anchor on the last time and not change the previous redline
+            double mpbOld = redline.MpB;
+            double beatsFromRedline = 0;
+            bool canChangeRedline = true;
+            foreach (Marker markerB in markers) {
+                double timeB = markerB.Time;
+                beatsFromRedline += markerB.BeatsFromLastMarker;
+
+                // Get the beatsFromRedline after changing mpb
+                redline.MpB = mpbNew;
+                double resnappedTimeBA = redline.Offset + redline.MpB * beatsFromRedline;
+                double beatsFromRedlineBA = (resnappedTimeBA - redline.Offset) / redline.MpB;
+
+                // Change MpB back so the redline doesn't get changed
+                redline.MpB = mpbOld;
+
+                // Check changes
+                if (MathHelper.ApproximatelyEquivalent(beatsFromRedlineBA, beatsFromRedline, 0.1) && IsSnapped(timeB, resnappedTimeBA, arg.Leniency)) {
+                    continue;
+                }
+                canChangeRedline = false;
+            }
+            return canChangeRedline;
+        }
+
+        private double HumanRoundMpB(double mpb, List<Marker> markers, TimingPoint redline, Arguments arg) {
+            double bpm = 60000 / mpb;
+
+            // Round bpm
+            double mpbInteger = 60000 / Math.Round(bpm);
+            if (CheckMpB(mpbInteger, markers, redline, arg)) {
+                return mpbInteger;
+            }
+
+            // Halves bpm
+            double mpbHalves = 60000 / (Math.Round(bpm * 2) / 2);
+            if (CheckMpB(mpbHalves, markers, redline, arg)) {
+                return mpbHalves;
+            }
+
+            // Tenths bpm
+            double mpbTenths = 60000 / (Math.Round(bpm * 10) / 10);
+            if (CheckMpB(mpbTenths, markers, redline, arg)) {
+                return mpbTenths;
+            }
+
+            // Hundredths bpm
+            double mpbHundredths = 60000 / (Math.Round(bpm * 100) / 100);
+            if (CheckMpB(mpbHundredths, markers, redline, arg)) {
+                return mpbHundredths;
+            }
+
+            // Thousandths bpm
+            double mpbThousandths = 60000 / (Math.Round(bpm * 1000) / 1000);
+            if (CheckMpB(mpbThousandths, markers, redline, arg)) {
+                return mpbThousandths;
+            }
+
+            // Return exact bpm
+            return mpb;
+        }
+
         private double GetMpB(double timeFromRedline, double beatsFromRedline, double leniency) {
             // Will make human-like BPM values like integers, halves and tenths
             // If that doesn't work (like the time is really far from the redline) it will try thousandths
@@ -307,6 +357,12 @@ namespace Mapping_Tools.Views {
             double mpbTenths = 60000 / (Math.Round(bpm * 10) / 10);
             if (IsSnapped(timeFromRedline, mpbTenths * beatsFromRedline, leniency)) {
                 return mpbTenths;
+            }
+
+            // Hundredths bpm
+            double mpbHundredths = 60000 / (Math.Round(bpm * 100) / 100);
+            if (IsSnapped(timeFromRedline, mpbHundredths * beatsFromRedline, leniency)) {
+                return mpbHundredths;
             }
 
             // Thousandths bpm
