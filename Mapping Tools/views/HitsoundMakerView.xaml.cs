@@ -252,7 +252,7 @@ namespace Mapping_Tools.Views {
         private void Startish_Click(object sender, RoutedEventArgs e) {
             try {
                 // Convert the multiple layers into packages that have the samples from all the layers at one specific time
-                List<SamplePackage> samplePackages = HitsoundConverter.MixLayers(Settings.HitsoundLayers.ToList(), Settings.DefaultSample);
+                List<SamplePackage> samplePackages = HitsoundConverter.ZipLayers(Settings.HitsoundLayers.ToList(), Settings.DefaultSample);
 
                 // Convert the packages to hitsounds that fit on an osu standard map
                 CompleteHitsounds completeHitsounds = HitsoundConverter.ConvertPackages(samplePackages);
@@ -288,7 +288,7 @@ namespace Mapping_Tools.Views {
 
         private void Make_Hitsounds(Arguments arg, BackgroundWorker worker, DoWorkEventArgs e) {
             // Convert the multiple layers into packages that have the samples from all the layers at one specific time
-            List<SamplePackage> samplePackages = HitsoundConverter.MixLayers(arg.HitsoundLayers, arg.DefaultSample);
+            List<SamplePackage> samplePackages = HitsoundConverter.ZipLayers(arg.HitsoundLayers, arg.DefaultSample);
             UpdateProgressBar(worker, 20);
 
             // Convert the packages to hitsounds that fit on an osu standard map
