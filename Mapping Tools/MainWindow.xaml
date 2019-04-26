@@ -62,9 +62,9 @@
                         <MenuItem Header="_Property Transformer" Click="LoadPropertyTransformer"/>
                         <MenuItem Header="_Slider Merger" Click="LoadMerger"/>
                         <MenuItem Header="_Slider Completionator" Click="LoadCompletionator"/>
-                        <MenuItem Header="_Snapping Tools" Click="LoadSnappingTools"/>
+                        <MenuItem Header="_Snapping Tools WIP" Click="LoadSnappingTools"/>
                         <MenuItem Header="_Timing Helper" Click="LoadTimingHelper"/>
-                        <MenuItem Header="_Hitsound Copier" Click="LoadHSCopier"/>
+                        <MenuItem Header="_Hitsound Copier WIP" Click="LoadHSCopier"/>
                         <MenuItem Header="_Hitsound Maker" Click="LoadHSMaker"/>
                     </MenuItem>
                     <MenuItem Height="31" Header="_Options" Padding="12,0,0,0" MinWidth="80">
