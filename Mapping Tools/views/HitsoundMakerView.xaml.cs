@@ -42,6 +42,7 @@ namespace Mapping_Tools.Views {
             LayersList.ItemsSource = Settings.HitsoundLayers;
             DataContext = Settings;
             LayersList.SelectedIndex = 0;
+            Num_Layers_Changed();
         }
 
         public HitsoundMakerSettings GetSettings() {
@@ -77,58 +78,74 @@ namespace Mapping_Tools.Views {
         }
 
         private void SelectedDefaultSampleBrowse_Click(object sender, RoutedEventArgs e) {
-            string path = FileFinder.AudioFileDialog();
-            if (path != "") {
-                Settings.HitsoundLayers[LayersList.SelectedIndex].SamplePath = path;
-            }
+            try {
+                string path = FileFinder.AudioFileDialog();
+                if (path != "") {
+                    Settings.HitsoundLayers[LayersList.SelectedIndex].SamplePath = path;
+                }
+            } catch (Exception) { }
         }
 
         private void SelectedBaseBeatmapBrowse_Click(object sender, RoutedEventArgs e) {
-            string path = FileFinder.BeatmapFileDialog();
-            if (path != "") {
-                Settings.HitsoundLayers[LayersList.SelectedIndex].Path = path;
-            }
+            try {
+                string path = FileFinder.BeatmapFileDialog();
+                if (path != "") {
+                    Settings.HitsoundLayers[LayersList.SelectedIndex].Path = path;
+                    }
+            } catch (Exception) { }
         }
 
         private void SelectedBaseBeatmapLoad_Click(object sender, RoutedEventArgs e) {
-            string path = FileFinder.CurrentBeatmap();
-            if (path != "") {
-                Settings.HitsoundLayers[LayersList.SelectedIndex].Path = path;
-            }
+            try {
+                string path = FileFinder.CurrentBeatmap();
+                if (path != "") {
+                    Settings.HitsoundLayers[LayersList.SelectedIndex].Path = path;
+                    }
+            } catch (Exception) { }
         }
 
         private void DefaultSampleBrowse_Click(object sender, RoutedEventArgs e) {
-            string path = FileFinder.AudioFileDialog();
-            if (path != "") {
-                Settings.DefaultSample.SamplePath = path;
-                DefaultSamplePathBox.Text = path;
-            }
+            try {
+                string path = FileFinder.AudioFileDialog();
+                if (path != "") {
+                    Settings.DefaultSample.SamplePath = path;
+                    DefaultSamplePathBox.Text = path;
+                    }
+            } catch (Exception) { }
         }
 
         private void BaseBeatmapBrowse_Click(object sender, RoutedEventArgs e) {
-            string path = FileFinder.BeatmapFileDialog();
-            if (path != "") {
-                Settings.BaseBeatmap = path;
-                BaseBeatmapPathBox.Text = path;
-            }
+            try {
+                string path = FileFinder.BeatmapFileDialog();
+                if (path != "") {
+                    Settings.BaseBeatmap = path;
+                    BaseBeatmapPathBox.Text = path;
+                    }
+            } catch (Exception) { }
         }
 
         private void BaseBeatmapLoad_Click(object sender, RoutedEventArgs e) {
-            string path = FileFinder.CurrentBeatmap();
-            if (path != "") {
-                Settings.BaseBeatmap = path;
-                BaseBeatmapPathBox.Text = path;
-            }
+            try {
+                string path = FileFinder.CurrentBeatmap();
+                if (path != "") {
+                    Settings.BaseBeatmap = path;
+                    BaseBeatmapPathBox.Text = path;
+                    }
+            } catch (Exception) { }
         }
 
         private void ReloadFromSource_Click(object sender, RoutedEventArgs e) {
-            Settings.HitsoundLayers[LayersList.SelectedIndex].ImportMap();
+            try {
+                Settings.HitsoundLayers[LayersList.SelectedIndex].ImportMap();
+            } catch (Exception) { }
         }
 
         private void ReloadAllFromSource_Click(object sender, RoutedEventArgs e) {
-            foreach (HitsoundLayer hl in Settings.HitsoundLayers) {
-                hl.ImportMap();
-            }
+            try {
+                foreach (HitsoundLayer hl in Settings.HitsoundLayers) {
+                    hl.ImportMap();
+                }
+            } catch (Exception) { }
         }
 
         void HitsoundLayer_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
@@ -146,6 +163,17 @@ namespace Mapping_Tools.Views {
             } catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
         }
 
+        private void Num_Layers_Changed() {
+            if (Settings.HitsoundLayers.Count == 0) {
+                FirstGrid.ColumnDefinitions[0].Width = new GridLength(0);
+                EditPanel.IsEnabled = false;
+            } else if (FirstGrid.ColumnDefinitions[0].Width.Value < 100) {
+                FirstGrid.ColumnDefinitions[0].Width = new GridLength(1, GridUnitType.Star);
+                FirstGrid.ColumnDefinitions[2].Width = new GridLength(2, GridUnitType.Star);
+                EditPanel.IsEnabled = true;
+            }
+        }
+
         private void Add_Click(object sender, RoutedEventArgs e) {
             try {
                 HitsoundLayerImportWindow importWindow = new HitsoundLayerImportWindow(Settings.HitsoundLayers.Count);
@@ -156,6 +184,7 @@ namespace Mapping_Tools.Views {
                     LayersList.SelectedIndex = LayersList.Items.IndexOf(layer);
                 }
                 RecalculatePriorities();
+                Num_Layers_Changed();
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message);
             }
@@ -180,6 +209,7 @@ namespace Mapping_Tools.Views {
                 LayersList.SelectedIndex = Math.Max(Math.Min(index - 1, Settings.HitsoundLayers.Count - 1), 0);
 
                 RecalculatePriorities();
+                Num_Layers_Changed();
             } catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
         }
 
