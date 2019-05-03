@@ -33,6 +33,7 @@
                     <materialDesign:PackIcon Width="100" Height="100" Cursor="Hand" Kind="Play" Foreground="#FFD6D6D6"/>
                 </Button >
             </StackPanel>
+            <StackPanel x:Name="graph_host"/>
         </Grid>
         <Grid Margin="0,0,0,0" Name="ThirdGrid" Grid.Row="2" Grid.Column="0">
             <Grid>

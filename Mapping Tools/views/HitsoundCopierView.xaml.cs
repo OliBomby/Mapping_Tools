@@ -11,6 +11,7 @@ using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SliderPathStuff;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Components.Graph;
 
 namespace Mapping_Tools.Views {
     /// <summary>
@@ -24,6 +25,8 @@ namespace Mapping_Tools.Views {
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
             backgroundWorker = (BackgroundWorker) FindResource("backgroundWorker") ;
+
+            graph_host.Children.Add(new Graph());
         }
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
