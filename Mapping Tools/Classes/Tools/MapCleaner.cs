@@ -109,6 +109,8 @@ namespace Mapping_Tools.Classes.Tools {
                     newBookmarks.Add(timing.Resnap(bookmark, arguments.Snap1, arguments.Snap2));
                     UpdateProgressbar(worker, (double)i / bookmarks.Count, 4, maxStages);
                 }
+                // Remove duplicate bookmarks
+                newBookmarks = newBookmarks.Distinct().ToList();
                 beatmap.SetBookmarks(newBookmarks);
             }
 
