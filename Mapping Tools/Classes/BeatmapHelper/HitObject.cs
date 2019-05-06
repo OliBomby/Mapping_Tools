@@ -101,14 +101,22 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public void MoveEndTime(Timing timing, double deltaTime) {
+            if (Repeat == 0) { return; }
+
+            ChangeTemporalTime(timing, deltaTime / Repeat);
+        }
+
+        public void ChangeTemporalTime(Timing timing, double deltaTemporalTime) {
+            if (Repeat == 0) { return; }
+
             if (IsSlider) {
-                double deltaLength = (-10000 * timing.SliderMultiplier * deltaTime / Repeat) / (Redline.MpB * SV);  // Divide by repeats because the endtime is multiplied by repeats
+                double deltaLength = (-10000 * timing.SliderMultiplier * deltaTemporalTime) / (Redline.MpB * SV);  // Divide by repeats because the endtime is multiplied by repeats
                 PixelLength += deltaLength; // Change the pixellength to match the new time
             }
 
             // Change
-            TemporalLength += deltaTime;
-            EndTime = Math.Floor(Time + TemporalLength);
+            TemporalLength += deltaTemporalTime;
+            EndTime = Math.Floor(Time + TemporalLength * Repeat);
             if (TimelineObjects.Count > 0) { TimelineObjects.Last().Time = EndTime; };
             BodyHitsounds.RemoveAll(s => s.Offset >= EndTime);
         }
@@ -156,7 +164,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
 
             double deltaTime = newTemporalLength - TemporalLength;
-            MoveEndTime(timing, deltaTime);
+            ChangeTemporalTime(timing, deltaTime);
 
             return deltaTime != 0;
         }
@@ -360,6 +368,26 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                     return "C";
             }
             return "B";
+        }
+
+        public void Debug() {
+            Console.WriteLine("temporal length: " + TemporalLength);
+            foreach (TimingPoint tp in BodyHitsounds) {
+                Console.WriteLine("bodyhitsound:");
+                Console.WriteLine("volume: " + tp.Volume);
+                Console.WriteLine("sampleset: " + tp.SampleSet);
+                Console.WriteLine("index: " + tp.SampleIndex);
+            }
+            foreach (TimelineObject tlo in TimelineObjects) {
+                Console.WriteLine("timelineobject:");
+                Console.WriteLine("time: " + tlo.Time);
+                Console.WriteLine("repeat: " + tlo.Repeat);
+                Console.WriteLine("index: " + tlo.CustomIndex);
+                Console.WriteLine("volume: " + tlo.SampleVolume);
+                Console.WriteLine("filename: " + tlo.Filename);
+                Console.WriteLine("feno index: " + tlo.FenoCustomIndex);
+                Console.WriteLine("feno volume: " + tlo.FenoSampleVolume);
+            }
         }
     }
 }
