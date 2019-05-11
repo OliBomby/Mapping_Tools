@@ -183,6 +183,9 @@
     <Compile Include="Classes\Tools\BezierConverter.cs" />
     <Compile Include="Classes\Tools\CircleBezierPreset.cs" />
     <Compile Include="Classes\Tools\MapCleaner.cs" />
+    <Compile Include="Components\Graph\Anchor.xaml.cs">
+      <DependentUpon>Anchor.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Components\Graph\Graph.xaml.cs">
       <DependentUpon>Graph.xaml</DependentUpon>
     </Compile>
@@ -240,6 +243,10 @@
     <Compile Include="Views\HitsoundLayerImportWindow.xaml.cs">
       <DependentUpon>HitsoundLayerImportWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="Components\Graph\Anchor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Components\Graph\Graph.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

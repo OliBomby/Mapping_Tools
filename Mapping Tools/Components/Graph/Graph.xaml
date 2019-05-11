@@ -6,17 +6,10 @@
              xmlns:local="clr-namespace:Mapping_Tools.Components.Graph"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <Canvas x:Name="mainCanvas">
-        <Rectangle
-                Name="rect"
-                Width="50"
-                Height="50"
-                Canvas.Left="0"
-                Canvas.Top="0"
-                Fill="Red"
-                MouseLeftButtonDown="rect_MouseLeftButtonDown"
-                MouseLeftButtonUp="rect_MouseLeftButtonUp"
-                MouseMove="rect_MouseMove"
-                />
+    <Canvas x:Name="mainCanvas"
+                Background="DarkSlateGray"
+                MouseLeftButtonDown="ThisMouseLeftButtonDown"
+                LayoutUpdated="ThisLayoutUpdated">
+        <Polyline Name="line" Stroke="White" StrokeThickness="1"/>
     </Canvas>
 </UserControl>

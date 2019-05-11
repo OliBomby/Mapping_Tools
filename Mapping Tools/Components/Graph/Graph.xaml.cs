@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Mapping_Tools.Classes.MathUtil;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,78 +19,75 @@ namespace Mapping_Tools.Components.Graph {
     /// Interaction logic for UserControl1.xaml
     /// </summary>
     public partial class Graph : UserControl {
-        Point? dragStart = null;
-        bool Draggin = false;
-        private bool _isRectDragInProg;
+        public List<Anchor> anchors;
 
         public Graph() {
             InitializeComponent();
+            anchors = new List<Anchor>();
+        }
 
-            void mouseDown(object sender, MouseButtonEventArgs args) {
-                var element = (UIElement)sender;
-                //dragStart = args.GetPosition(element);
-                Console.WriteLine("mousedown");
-                Console.WriteLine(dragStart);
-                Draggin = true;
-                element.CaptureMouse();
-            }
-            void mouseUp(object sender, MouseButtonEventArgs args) {
-                var element = (UIElement)sender;
-                //dragStart = null;
-                Draggin = false;
-                Console.WriteLine("mouseup");
-                element.ReleaseMouseCapture();
-            }
-            void mouseMove(object sender, MouseEventArgs args) {
-                //Console.WriteLine("mousemove");
-                if (Draggin && args.LeftButton == MouseButtonState.Pressed) {
-                    var element = (UIElement)sender;
-                    var p2 = args.MouseDevice.GetPosition(mainCanvas);
-                    Console.WriteLine(p2);
-                    Canvas.SetLeft(element, p2.X - 10);
-                    Canvas.SetTop(element, p2.Y - 10);
+        private void ThisMouseLeftButtonDown(object sender, MouseButtonEventArgs e) {
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)) {
+                // Create an anchor right on the cursor
+                Anchor anchor = new Anchor(this) {
+                    Width = 10,
+                    Height = 10,
+                    Dragging = true
+                };
+                anchor.CaptureMouse();
+
+                // Get the position of the mouse relative to the Canvas
+                Point mousePos = e.GetPosition(mainCanvas);
+
+                // Center the object on the mouse
+                double left = MathHelper.Clamp(mousePos.X - anchor.Width / 2, 0, mainCanvas.ActualWidth - anchor.Width);
+                double top = MathHelper.Clamp(mousePos.Y - anchor.Height / 2, 0, mainCanvas.ActualHeight - anchor.Height);
+                Canvas.SetLeft(anchor, left);
+                Canvas.SetTop(anchor, top);
+
+                // Find the correct index to insert this anchor
+                int index = anchors.Count;
+                if (index >= 2) {
+                    // Find the 2 nearest anchors
+                    double distance1 = double.PositiveInfinity;
+                    double distance2 = double.PositiveInfinity;
+                    Anchor anchor1 = anchors[0];
+                    Anchor anchor2 = anchors[1];
+                    foreach (Anchor a in anchors) {
+                        double dist = Distance(a.GetPosition(), mousePos);
+                        if (dist < distance1) {
+                            distance1 = dist;
+                            anchor1 = a;
+                            continue;
+                        }
+                        if (dist < distance2) {
+                            distance2 = dist;
+                            anchor2 = a;
+                        }
+                    }
+                    index = anchors.IndexOf(anchor1);
+                    if (anchors.IndexOf(anchor2) > index) {
+                        index += 1;
+                    }
                 }
-            }
-            void enableDrag(UIElement element) {
-                element.MouseDown += mouseDown;
-                element.MouseMove += mouseMove;
-                element.MouseUp += mouseUp;
-            }
 
-            var shapes = new UIElement[] {
-            new Ellipse() { Fill = Brushes.DarkKhaki, Width = 100, Height = 100 },
-            new Rectangle() { Fill = Brushes.LawnGreen, Width = 200, Height = 100 },
-            };
-
-
-            foreach (var shape in shapes) {
-                enableDrag(shape);
-                //mainCanvas.Children.Add(shape);
+                mainCanvas.Children.Insert(index + 1, anchor);  // + 1 because there is already a PolyLine object in the canvas that has to stay at index 0
+                anchors.Insert(index, anchor);
             }
-            mainCanvas.MouseMove += mouseMove;
+            e.Handled = true;
         }
 
-        private void rect_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) {
-            _isRectDragInProg = true;
-            rect.CaptureMouse();
+        private void ThisLayoutUpdated(object sender, EventArgs e) {
+            PointCollection pointCollection = new PointCollection(anchors.Count);
+            foreach (Anchor a in anchors) {
+                pointCollection.Add(a.GetPosition());
+            }
+            line.Points = pointCollection;
         }
 
-        private void rect_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
-            _isRectDragInProg = false;
-            rect.ReleaseMouseCapture();
-        }
-
-        private void rect_MouseMove(object sender, MouseEventArgs e) {
-            if (!_isRectDragInProg) return;
-
-            // get the position of the mouse relative to the Canvas
-            var mousePos = e.GetPosition(mainCanvas);
-
-            // center the rect on the mouse
-            double left = mousePos.X - (rect.ActualWidth / 2);
-            double top = mousePos.Y - (rect.ActualHeight / 2);
-            Canvas.SetLeft(rect, left);
-            Canvas.SetTop(rect, top);
+        private double Distance(Point p1, Point p2) {
+            Vector d = p2 - p1;
+            return d.Length;
         }
     }
 }

@@ -27,13 +27,15 @@
                 <Button Content="Get current map" d:LayoutOverrides="Height" Click="Current_Map_Click"/>
             </StackPanel>
         </Grid>
+        <Grid Name="fuckGrid" Grid.Row="1" Grid.Column="0">
+            <WrapPanel x:Name="graph_host"/>
+        </Grid>
         <Grid Name="SecoundGrid" Grid.Row="1" Grid.Column="0">
             <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Right">
                 <Button Width="Auto" Height="Auto" x:Name="start" Cursor="Hand" Click="Start_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
                     <materialDesign:PackIcon Width="100" Height="100" Cursor="Hand" Kind="Play" Foreground="#FFD6D6D6"/>
                 </Button >
             </StackPanel>
-            <StackPanel x:Name="graph_host"/>
         </Grid>
         <Grid Margin="0,0,0,0" Name="ThirdGrid" Grid.Row="2" Grid.Column="0">
             <Grid>

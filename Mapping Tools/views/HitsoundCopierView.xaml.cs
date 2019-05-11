@@ -26,7 +26,7 @@ namespace Mapping_Tools.Views {
             Height = MainWindow.AppWindow.content_views.Height;
             backgroundWorker = (BackgroundWorker) FindResource("backgroundWorker") ;
 
-            graph_host.Children.Add(new Graph());
+            graph_host.Children.Add(new Graph() { Width = 300, Height = 300 });
         }
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
