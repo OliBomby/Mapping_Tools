@@ -1,4 +1,5 @@
 ﻿using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SliderPathStuff;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,16 @@ namespace Mapping_Tools.Components.Graph {
             anchors = new List<Anchor>();
         }
 
+        public void RemoveAnchor(Anchor anchor) {
+            mainCanvas.Children.Remove(anchor);
+            anchors.Remove(anchor);
+            AnchorsUpdated(this, null);
+        }
+
+        public void RemoveAnchor(int index) {
+            RemoveAnchor(anchors[index]);
+        }
+
         private void ThisMouseLeftButtonDown(object sender, MouseButtonEventArgs e) {
             if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)) {
                 // Create an anchor right on the cursor
@@ -35,6 +46,7 @@ namespace Mapping_Tools.Components.Graph {
                     Dragging = true
                 };
                 anchor.CaptureMouse();
+                anchor.Changed += AnchorsUpdated;
 
                 // Get the position of the mouse relative to the Canvas
                 Point mousePos = e.GetPosition(mainCanvas);
@@ -48,46 +60,57 @@ namespace Mapping_Tools.Components.Graph {
                 // Find the correct index to insert this anchor
                 int index = anchors.Count;
                 if (index >= 2) {
-                    // Find the 2 nearest anchors
-                    double distance1 = double.PositiveInfinity;
-                    double distance2 = double.PositiveInfinity;
-                    Anchor anchor1 = anchors[0];
-                    Anchor anchor2 = anchors[1];
-                    foreach (Anchor a in anchors) {
-                        double dist = Distance(a.GetPosition(), mousePos);
-                        if (dist < distance1) {
-                            distance1 = dist;
-                            anchor1 = a;
-                            continue;
+                    // Find the nearest line segment
+                    double nearest = double.PositiveInfinity;
+                    for (int i = 0; i < anchors.Count - 1; i++) {
+                        Classes.MathUtil.LineSegment line = new Classes.MathUtil.LineSegment(anchors[i].GetVector(), anchors[i + 1].GetVector());
+                        double dist = Classes.MathUtil.LineSegment.Distance(line, new Vector2(mousePos));
+
+                        if (dist < nearest) {
+                            nearest = dist;
+                            index = i + 1;
                         }
-                        if (dist < distance2) {
-                            distance2 = dist;
-                            anchor2 = a;
-                        }
-                    }
-                    index = anchors.IndexOf(anchor1);
-                    if (anchors.IndexOf(anchor2) > index) {
-                        index += 1;
                     }
                 }
 
-                mainCanvas.Children.Insert(index + 1, anchor);  // + 1 because there is already a PolyLine object in the canvas that has to stay at index 0
+                mainCanvas.Children.Insert(index + 2, anchor);  // + 1 because there is already a PolyLine object in the canvas that has to stay at index 0
                 anchors.Insert(index, anchor);
             }
             e.Handled = true;
         }
 
-        private void ThisLayoutUpdated(object sender, EventArgs e) {
+        private void AnchorsUpdated(object sender, EventArgs e) {
             PointCollection pointCollection = new PointCollection(anchors.Count);
             foreach (Anchor a in anchors) {
                 pointCollection.Add(a.GetPosition());
             }
             line.Points = pointCollection;
+
+            SliderPath path = new SliderPath(PathType.PerfectCurve, GetAnchorVectors().ToArray());
+            List<Vector2> calculatedPath = new List<Vector2>();
+            path.GetPathToProgress(calculatedPath, 0, 1);
+
+            PointCollection pathCollection = new PointCollection();
+            foreach (Vector2 v in calculatedPath) {
+                pathCollection.Add(new Point(v.X, v.Y));
+            }
+            pathLine.Points = pathCollection;
         }
 
         private double Distance(Point p1, Point p2) {
             Vector d = p2 - p1;
             return d.Length;
+        }
+
+        private List<Vector2> GetAnchorVectors() {
+            List<Vector2> convertedAnchors = new List<Vector2>(anchors.Count * 2);
+            foreach (Anchor a in anchors) {
+                convertedAnchors.Add(a.GetVector());
+                if (a.Red) {  // Red anchors count double
+                    convertedAnchors.Add(a.GetVector());
+                }
+            }
+            return convertedAnchors;
         }
     }
 }

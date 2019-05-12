@@ -8,8 +8,8 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <Canvas x:Name="mainCanvas"
                 Background="DarkSlateGray"
-                MouseLeftButtonDown="ThisMouseLeftButtonDown"
-                LayoutUpdated="ThisLayoutUpdated">
-        <Polyline Name="line" Stroke="White" StrokeThickness="1"/>
+                MouseLeftButtonDown="ThisMouseLeftButtonDown">
+        <Polyline Name="line" Stroke="Gray" StrokeThickness="1"/>
+        <Polyline Name="pathLine" Stroke="White" StrokeThickness="1" StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
     </Canvas>
 </UserControl>
