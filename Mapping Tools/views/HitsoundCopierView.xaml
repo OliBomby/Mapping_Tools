@@ -22,7 +22,7 @@
                 <TextBlock FontSize="40" TextWrapping="NoWrap" FontWeight="Bold" Foreground="#FF5F5E5E"><Run Text="Hitsound Copier"/><LineBreak/><Run/></TextBlock>
                 <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="500" TextWrapping="Wrap" Foreground="#FFD6D6D6"><Run Text="Copy hitsounds from one map to the other."/><LineBreak/><Run Text="This will replace all the hitsounds"/><Run Text="."/><LineBreak/><Run Text="5% volume will be preserved"/><Run Text="."/></TextBlock>
                 <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="200" Foreground="#FFD6D6D6" Margin="10,26,0,0"><Run Text="Copy Hitsounds From:"/></TextBlock>
-                <TextBox x:Name="PathBox" Height="23" Width="170" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#FFD6D6D6" Text="" Margin="10,0,0,0"/>
+                <TextBox x:Name="PathBox" Width="170" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#FFD6D6D6" Text="" Margin="10,0,0,0"/>
                 <Button Content="Browse" Click="Browse_Click"/>
                 <Button Content="Get current map" d:LayoutOverrides="Height" Click="Current_Map_Click"/>
             </StackPanel>

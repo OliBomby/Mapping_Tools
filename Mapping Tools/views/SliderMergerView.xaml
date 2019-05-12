@@ -22,7 +22,7 @@
                 <TextBlock FontSize="40" TextWrapping="NoWrap" Text="Info" FontWeight="Bold" Foreground="#FF5F5E5E"/>
                 <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="500" TextWrapping="Wrap" Foreground="#FFD6D6D6"><Run Text="In order for 2 sliders to merge, "/><Run Text="place the second slider on top of the last anchor of the first slider"/><Run Text=". This program will automatically convert "/><Run Text="any type of "/><Run Text="slider into "/><Run Text="a "/><Run Text="Beziér"/><Run Text=" slider for the "/><Run Text="purpose of "/><Run Text="merging"/><Run Text="."/></TextBlock>
                 <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="200" Foreground="#FFD6D6D6" Margin="10,26,0,0"><Run Text="Merge connection leniency:"/></TextBlock>
-                <TextBox x:Name="LeniencyBox" Height="23" Width="170" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#FFD6D6D6" Text="2" Margin="10,0,0,0"/>
+                <TextBox x:Name="LeniencyBox" Width="170" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#FFD6D6D6" Text="2" Margin="10,0,0,0"/>
                 <CheckBox x:Name="ReqBookmBox" FontSize="14"  Foreground="#FFD6D6D6" IsChecked="True" Content="Require bookmarks" Margin="10,26,0,0"/>
             </StackPanel>
         </Grid>

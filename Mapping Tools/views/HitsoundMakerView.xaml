@@ -45,7 +45,7 @@
                 </Grid.RowDefinitions>
                 <StackPanel x:Name="EditPanel" Grid.Row="0" Grid.RowSpan="2" DataContext="{Binding SelectedItem, ElementName=LayersList}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CanVerticallyScroll="True">
                     <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,20,0,0"><Run Text="Name:"/></TextBlock>
-                    <TextBox x:Name="SelectedNameBox" Height="23" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="{Binding Name, Mode=TwoWay}"/>
+                    <TextBox x:Name="SelectedNameBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="{Binding Name, Mode=TwoWay}"/>
                     <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Source beatmap:"/></TextBlock>
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -54,7 +54,7 @@
                             <ColumnDefinition Width="5"/>
                             <ColumnDefinition Width="30"/>
                         </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0" x:Name="SelectedBaseBeatmapPathBox" Height="23" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="{Binding Path, Mode=TwoWay}" Margin="0,0,5,0"/>
+                        <TextBox Grid.Column="0" x:Name="SelectedBaseBeatmapPathBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="{Binding Path, Mode=TwoWay}" Margin="0,0,5,0"/>
                         <Button Grid.Column="1" Width="Auto" Height="Auto" Cursor="Hand" Click="SelectedBaseBeatmapLoad_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
                             <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Download" Foreground="#FFD6D6D6"/>
                         </Button >
@@ -68,15 +68,15 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="30"/>
                         </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0" x:Name="SelectedDefaultSamplePathBox" Height="23" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="{Binding SamplePath, Mode=TwoWay}" Margin="0,0,5,0"/>
+                        <TextBox Grid.Column="0" x:Name="SelectedDefaultSamplePathBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="{Binding SamplePath, Mode=TwoWay}" Margin="0,0,5,0"/>
                         <Button Grid.Column="1" Width="Auto" Height="Auto" Cursor="Hand" Click="SelectedDefaultSampleBrowse_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
                             <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="#FFD6D6D6"/>
                         </Button >
                     </Grid>
                     <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Stack X coordinate:"/></TextBlock>
-                    <TextBox x:Name="SelectedXCoordBox" Height="23" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="{Binding X, Mode=TwoWay}"/>
+                    <TextBox x:Name="SelectedXCoordBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="{Binding X, Mode=TwoWay}"/>
                     <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Stack Y coordinate:"/></TextBlock>
-                    <TextBox x:Name="SelectedYCoordBox" Height="23" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="{Binding Y, Mode=TwoWay}"/>
+                    <TextBox x:Name="SelectedYCoordBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="{Binding Y, Mode=TwoWay}"/>
                     <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Hitsound info:"/></TextBlock>
                     <ComboBox x:Name="SelectedSampleSetBox" Margin="0,10,0,0" HorizontalAlignment="Stretch" Text="{Binding SampleSetString, Mode=TwoWay}" Cursor="Hand">
                         <ComboBoxItem Content="Normal" HorizontalAlignment="Left" Cursor="Hand"/>
@@ -252,7 +252,7 @@
                                 <ColumnDefinition Width="30"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock FontSize="14" Foreground="#FFD6D6D6" Margin="0,8,0,0"><Run Text="Base beatmap:"/></TextBlock>
-                            <TextBox Grid.Column="1" x:Name="BaseBeatmapPathBox" Height="23" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="{Binding BaseBeatmap, Mode=TwoWay}" Margin="5,0,5,0"/>
+                            <TextBox Grid.Column="1" x:Name="BaseBeatmapPathBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="{Binding BaseBeatmap, Mode=TwoWay}" Margin="5,0,5,0"/>
                             <Button Grid.Column="2" Width="Auto" Height="Auto" Cursor="Hand" Click="BaseBeatmapLoad_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
                                 <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Download" Foreground="#FFD6D6D6"/>
                             </Button >
@@ -268,11 +268,11 @@
                                 <ColumnDefinition Width="30"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock FontSize="14" Foreground="#FFD6D6D6" Margin="0,8,0,0"><Run Text="Default sample:"/></TextBlock>
-                            <TextBox Grid.Column="1" x:Name="DefaultSamplePathBox" Height="23" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="{Binding SamplePath, Mode=TwoWay}" Margin="5,0,5,0"/>
+                            <TextBox Grid.Column="1" x:Name="DefaultSamplePathBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="{Binding SamplePath, Mode=TwoWay}" Margin="5,0,5,0"/>
                             <Button Grid.Column="3" Width="Auto" Height="Auto" Cursor="Hand" Click="DefaultSampleBrowse_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
                                 <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="#FFD6D6D6"/>
                             </Button >
-                            <ComboBox Grid.Column="2" x:Name="DefaultSampleSetBox" Width="70" Margin="0,0,5,6" SelectedIndex="{Binding SampleSetComboBoxIndex, Mode=TwoWay}" Cursor="Hand">
+                            <ComboBox Grid.Column="2" x:Name="DefaultSampleSetBox" Width="70" Margin="0,0,5,0" SelectedIndex="{Binding SampleSetComboBoxIndex, Mode=TwoWay}" Cursor="Hand">
                                 <ComboBoxItem Content="Normal" HorizontalAlignment="Left" Cursor="Hand"/>
                                 <ComboBoxItem Content="Soft" HorizontalAlignment="Left" Cursor="Hand"/>
                                 <ComboBoxItem Content="Drum" HorizontalAlignment="Left" Cursor="Hand"/>

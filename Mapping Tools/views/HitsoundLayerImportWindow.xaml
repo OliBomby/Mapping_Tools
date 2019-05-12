@@ -36,7 +36,7 @@
         <StackPanel Grid.Row="0" Grid.RowSpan="2" HorizontalAlignment="Stretch" CanVerticallyScroll="True" CanHorizontallyScroll="True" Margin="10">
             <TextBlock FontSize="30" FontWeight="Bold" HorizontalAlignment="Left" MaxWidth="150" Foreground="#FFD6D6D6"><Run Text="Add layer"/></TextBlock>
             <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,20,0,0"><Run Text="Name:"/></TextBlock>
-            <TextBox x:Name="NameBox" Height="23" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text=""/>
+            <TextBox x:Name="NameBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text=""/>
             <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Source beatmap:"/></TextBlock>
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -45,7 +45,7 @@
                     <ColumnDefinition Width="5"/>
                     <ColumnDefinition Width="30"/>
                 </Grid.ColumnDefinitions>
-                <TextBox Grid.Column="0" x:Name="BeatmapPathBox" Height="23" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="" Margin="0,0,5,0"/>
+                <TextBox Grid.Column="0" x:Name="BeatmapPathBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="" Margin="0,0,5,0"/>
                 <Button Grid.Column="1" Width="Auto" Height="Auto" Cursor="Hand" Click="BeatmapLoad_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
                     <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Download" Foreground="#FFD6D6D6"/>
                 </Button >
@@ -59,15 +59,15 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="30"/>
                 </Grid.ColumnDefinitions>
-                <TextBox Grid.Column="0" x:Name="SamplePathBox" Height="23" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="" Margin="0,0,5,0"/>
+                <TextBox Grid.Column="0" x:Name="SamplePathBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="" Margin="0,0,5,0"/>
                 <Button Grid.Column="1" Width="Auto" Height="Auto" Cursor="Hand" Click="SampleBrowse_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
                     <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="#FFD6D6D6"/>
                 </Button >
             </Grid>
             <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Stack X coordinate:"/></TextBlock>
-            <TextBox x:Name="XCoordBox" Height="23" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text=""/>
+            <TextBox x:Name="XCoordBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text=""/>
             <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Stack Y coordinate:"/></TextBlock>
-            <TextBox x:Name="YCoordBox" Height="23" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text=""/>
+            <TextBox x:Name="YCoordBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text=""/>
             <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Hitsound info:"/></TextBlock>
             <ComboBox x:Name="SampleSetBox" Margin="0,10,0,0" HorizontalAlignment="Stretch" SelectedIndex="0" Cursor="Hand">
                 <ComboBoxItem Content="Normal" HorizontalAlignment="Left" Cursor="Hand"/>
