@@ -6,7 +6,7 @@ using System.Windows;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     class Editor {
-        string Path { get; set; }
+        string BeatmapPath { get; set; }
         public Beatmap Beatmap { get; set; }
 
         public Editor(List<string> lines) {
@@ -14,8 +14,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public Editor(string path) {
-            Path = path;
-            Beatmap = new Beatmap(ReadFile(Path));
+            BeatmapPath = path;
+            Beatmap = new Beatmap(ReadFile(BeatmapPath));
         }
 
         public List<string> ReadFile(string path) {
@@ -52,11 +52,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public void SaveFile(List<string> lines) {
-            SaveFile(Path, lines);
+            SaveFile(BeatmapPath, lines);
         }
 
         public void SaveFile() {
-            SaveFile(Path, Beatmap.GetLines());
+            SaveFile(BeatmapPath, Beatmap.GetLines());
         }
 
         public static void SaveFile(string path, List<string> lines) {
