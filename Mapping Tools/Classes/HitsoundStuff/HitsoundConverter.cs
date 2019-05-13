@@ -33,6 +33,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 // Check if package fits in any CustomIndex or if any CustomIndex can be modified to fit the package
                 int index = -1;
                 CustomIndex pci = p.GetCustomIndex();
+                pci.CleanInvalids();
 
                 // Check if the package fits in any customindex "out of the box"
                 if (index == -1) {
@@ -77,6 +78,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 // Check if package fits in any CustomIndex or if any CustomIndex can be modified to fit the package
                 int index = -1;
                 CustomIndex pci = p.GetCustomIndex();
+                pci.CleanInvalids();
 
                 // Check if the package fits in the previous package's customindex first to reduce greenline usage
                 if (lastIndex != -1) {

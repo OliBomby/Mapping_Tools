@@ -63,12 +63,18 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         continue;
                     }
                     var mixer = new WaveMixerStream32 { AutoStop = true };
+                    int soundsAdded = 0;
 
                     foreach (string path in kvp.Value) {
                         try {
                             var wav = new WaveFileReader(path);
                             mixer.AddInputStream(new WaveChannel32(wav));
+                            soundsAdded++;
                         } catch (Exception) { }
+                    }
+
+                    if (soundsAdded == 0) {
+                        continue;
                     }
 
                     if (ci.Index == 1) {

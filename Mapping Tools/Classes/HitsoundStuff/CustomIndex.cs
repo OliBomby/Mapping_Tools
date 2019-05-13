@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -70,6 +71,18 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 ci.Samples[key].UnionWith(other.Samples[key]);
             }
             return ci;
+        }
+
+        public void CleanInvalids() {
+            // Replace all invalid paths with "" and remove the invalid path if another valid path is also in the hashset
+            foreach (HashSet<string> paths in Samples.Values) {
+                if (paths.Any(o => File.Exists(o))) {
+                    paths.RemoveWhere(o => !File.Exists(o));
+                } else if (paths.Count > 0) {
+                    paths.Clear();
+                    paths.Add("");  // This "" is here to prevent this hashset from getting new paths
+                }
+            }
         }
     }
 }
