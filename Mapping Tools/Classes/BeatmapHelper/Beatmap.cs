@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
@@ -171,7 +173,12 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public string GetFileName() {
-            return String.Format("{0} - {1} ({2}) [{3}].osu", Metadata["Artist"].StringValue, Metadata["Title"].StringValue, Metadata["Creator"].StringValue, Metadata["Version"].StringValue);
+            string fileName = String.Format("{0} - {1} ({2}) [{3}].osu", Metadata["Artist"].StringValue, Metadata["Title"].StringValue, Metadata["Creator"].StringValue, Metadata["Version"].StringValue);
+
+            string regexSearch = new string(Path.GetInvalidFileNameChars());
+            Regex r = new Regex(string.Format("[{0}]", Regex.Escape(regexSearch)));
+            fileName = r.Replace(fileName, "");
+            return fileName;
         }
 
         private void AddDictionaryToLines(Dictionary<string, TValue> dict, List<string> lines) {
