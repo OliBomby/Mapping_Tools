@@ -62,17 +62,17 @@ namespace Mapping_Tools.Views {
         }
 
         private struct Arguments {
-            public string Path;
+            public string PathTo;
             public string PathFrom;
-            public Arguments(string path, string pathFrom)
+            public Arguments(string pathTo, string pathFrom)
             {
-                Path = path;
+                PathTo = pathTo;
                 PathFrom = pathFrom;
             }
         }
 
         private string Copy_Hitsounds(Arguments arg, BackgroundWorker worker, DoWorkEventArgs e) {
-            Editor editorTo = new Editor(arg.Path);
+            Editor editorTo = new Editor(arg.PathTo);
             Editor editorFrom = new Editor(arg.PathFrom);
 
             Beatmap beatmapTo = editorTo.Beatmap;
