@@ -48,7 +48,7 @@ namespace Mapping_Tools.Views {
 
         private void Start_Click(object sender, RoutedEventArgs e) {
             DateTime now = DateTime.Now;
-            string fileToCopy = MainWindow.AppWindow.currentMap.Text;
+            string fileToCopy = BeatmapToBox.Text;
             string destinationDirectory = MainWindow.AppWindow.BackupPath;
             try {
                 File.Copy(fileToCopy, Path.Combine(destinationDirectory, now.ToString("yyyy-MM-dd HH-mm-ss") + "___" + System.IO.Path.GetFileName(fileToCopy)));
@@ -57,118 +57,202 @@ namespace Mapping_Tools.Views {
                 MessageBox.Show(ex.Message);
                 return;
             }
-            backgroundWorker.RunWorkerAsync(new Arguments(fileToCopy, PathBox.Text));
+            backgroundWorker.RunWorkerAsync(new Arguments(fileToCopy, BeatmapFromBox.Text, CopyModeBox.SelectedIndex, LeniencyBox.GetDouble(5), 
+                                                          (bool)CopyHitsoundsBox.IsChecked, (bool)CopyBodyBox.IsChecked, (bool)CopySamplesetBox.IsChecked, (bool)CopyVolumeBox.IsChecked));
             start.IsEnabled = false;
         }
 
         private struct Arguments {
             public string PathTo;
             public string PathFrom;
-            public Arguments(string pathTo, string pathFrom)
+            public int CopyMode;
+            public double TemporalLeniency;
+            public bool CopyHitsounds;
+            public bool CopyBodyHitsounds;
+            public bool CopySamplesets;
+            public bool CopyVolumes;
+            public Arguments(string pathTo, string pathFrom, int copyMode, double temporalLeniency, bool copyHitsounds, bool copyBodyHitsounds, bool copySamplesets, bool copyVolumes)
             {
                 PathTo = pathTo;
                 PathFrom = pathFrom;
+                CopyMode = copyMode;
+                TemporalLeniency = temporalLeniency;
+                CopyHitsounds = copyHitsounds;
+                CopyBodyHitsounds = copyBodyHitsounds;
+                CopySamplesets = copySamplesets;
+                CopyVolumes = copyVolumes;
             }
         }
 
         private string Copy_Hitsounds(Arguments arg, BackgroundWorker worker, DoWorkEventArgs e) {
+            int mode = arg.CopyMode;
+            double temporalLeniency = arg.TemporalLeniency;
+            bool copyHitsounds = arg.CopyHitsounds;
+            bool copySliderbodychanges = arg.CopyBodyHitsounds;
+            bool copyVolumes = arg.CopyVolumes;
+            bool copySamplesets = arg.CopySamplesets;
+
             Editor editorTo = new Editor(arg.PathTo);
             Editor editorFrom = new Editor(arg.PathFrom);
 
             Beatmap beatmapTo = editorTo.Beatmap;
             Beatmap beatmapFrom = editorFrom.Beatmap;
 
-            // Clean both for the resnaps
-            MapCleaner.CleanMap(beatmapTo, MapCleaner.Arguments.BasicResnap);
-            MapCleaner.CleanMap(beatmapFrom, MapCleaner.Arguments.BasicResnap);
+            if (mode == 0) {
+                foreach (HitObject ho in beatmapTo.HitObjects) {
+                    // Remove all hitsounds
+                    ho.Clap = false;
+                    ho.Whistle = false;
+                    ho.Finish = false;
+                    ho.Clap = false;
+                    ho.SampleSet = 0;
+                    ho.AdditionSet = 0;
+                    ho.CustomIndex = 0;
+                    ho.SampleVolume = 0;
+                    ho.Filename = "";
 
-            // replace:
-            // sampleset timingpointchanges will only have influence on sliderbodies with special hitsounding
-            // samplsesets will be put on hitobjects (sliderbodies from hitobjects)
-            // hitsounds will be put on hitobjects (sliderbodies from hitobjects)
-            // customindices will be replaced by tlo hitsounds and sliderbody hitsounds
-            // volume will be replaced by tlo and sliderbody hitsounds or just all timingpoints and clean after
-            /*
-            int modeTo = beatmapTo.General["Mode"].Value;
-            List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
-            
-            foreach (HitObject ho in editorFrom.Beatmap.HitObjects) {
-                // Copy the timingpoitns for sliderbodies
-                foreach (TimingPoint tp in ho.BodyHitsounds) {
-                    if (tp.ThisTimingPointIsInABody(editorTo.Beatmap)) {
-                        timingPointsChanges.Add(new TimingPointsChange(tp, sampleset:true, index:true, volume:true));
+                    if (ho.IsSlider) {
+                        // Remove edge hitsounds
+                        ho.EdgeHitsounds = ho.EdgeHitsounds.Select(o => 0).ToArray();
+                        ho.EdgeSampleSets = ho.EdgeSampleSets.Select(o => 0).ToArray();
+                        ho.EdgeAdditionSets = ho.EdgeAdditionSets.Select(o => 0).ToArray();
+                        ho.SliderExtras = false;
                     }
                 }
-                
-                // Copy the samplesets and hitsounds for sliderbodies
-                if (ho.IsSlider) {
-                    HitObject toho = FindTheSliderWithTheSameTime(editorTo.Beatmap, ho);
-                    if (toho != null) {
-                        toho.Hitsounds = ho.Hitsounds;
-                        toho.SampleSet = ho.SampleSet;
-                        toho.AdditionSet = ho.AdditionSet;
+
+                // Every defined hitsound and sampleset on hitsound gets copied to their copyTo destination
+                // Timelines
+                Timeline tlTo = beatmapTo.GetTimeline();
+                Timeline tlFrom = beatmapFrom.GetTimeline();
+
+                if (copyHitsounds) {
+                    foreach (TimelineObject tloFrom in tlFrom.TimeLineObjects) {
+                        TimelineObject tloTo = tlTo.GetNearestTLO(tloFrom.Time, true);
+
+                        if (tloTo != null && Math.Abs(tloFrom.Time - tloTo.Time) <= temporalLeniency) {
+                            // Copy to this tlo
+                            tloTo.SampleSet = tloFrom.SampleSet;
+                            tloTo.AdditionSet = tloFrom.AdditionSet;
+                            tloTo.Normal = tloFrom.Normal;
+                            tloTo.Whistle = tloFrom.Whistle;
+                            tloTo.Finish = tloFrom.Finish;
+                            tloTo.Clap = tloFrom.Clap;
+                            tloTo.CustomIndex = tloFrom.CustomIndex;
+                            tloTo.SampleVolume = tloFrom.SampleVolume;
+                            tloTo.Filename = tloFrom.Filename;
+
+                            // Copy sliderbody hitsounds
+                            if (tloTo.IsSliderHead && tloFrom.IsSliderHead && copySliderbodychanges) {
+                                tloTo.Origin.Hitsounds = tloFrom.Origin.Hitsounds;
+                                tloTo.Origin.SampleSet = tloFrom.Origin.SampleSet;
+                                tloTo.Origin.AdditionSet = tloFrom.Origin.AdditionSet;
+                            }
+
+                            tloTo.HitsoundsToOrigin();
+
+                            tloTo.canCopy = false;
+                        }
+                        tloFrom.canCopy = false;
                     }
+                }
+
+                // Volumes and samplesets and customindices greenlines get copied with timingpointchanges and allafter enabled
+                List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
+
+                foreach (TimingPoint tp in beatmapFrom.BeatmapTiming.TimingPoints) {
+                    TimingPointsChange tpc = new TimingPointsChange(tp, sampleset: copySamplesets, index: copySamplesets, volume: copyVolumes);
+                    timingPointsChanges.Add(tpc);
+                }
+
+                // Apply the greenline changes
+                foreach (TimingPointsChange c in timingPointsChanges) {
+                    c.AddChange(beatmapTo.BeatmapTiming.TimingPoints, true);
+                }
+            } 
+            else {
+                // Smarty mode
+                // Copy the defined hitsounds literally (not feno, that will be reserved for cleaner). Only the tlo that have been defined by copyFrom get overwritten.
+                Timeline tlTo = beatmapTo.GetTimeline();
+                Timeline tlFrom = beatmapFrom.GetTimeline();
+
+                List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
+
+                if (copyHitsounds) {
+                    foreach (TimelineObject tloFrom in tlFrom.TimeLineObjects) {
+                        TimelineObject tloTo = tlTo.GetNearestTLO(tloFrom.Time, true);
+
+                        if (tloTo != null && Math.Abs(tloFrom.Time - tloTo.Time) <= temporalLeniency) {
+                            // Copy to this tlo
+                            tloTo.SampleSet = tloFrom.SampleSet;
+                            tloTo.AdditionSet = tloFrom.AdditionSet;
+                            tloTo.Normal = tloFrom.Normal;
+                            tloTo.Whistle = tloFrom.Whistle;
+                            tloTo.Finish = tloFrom.Finish;
+                            tloTo.Clap = tloFrom.Clap;
+                            tloTo.CustomIndex = tloFrom.CustomIndex;
+                            tloTo.SampleVolume = tloFrom.SampleVolume;
+                            tloTo.Filename = tloFrom.Filename;
+
+                            // Copy sliderbody hitsounds
+                            if (tloTo.IsSliderHead && tloFrom.IsSliderHead && copySliderbodychanges) {
+                                tloTo.Origin.Hitsounds = tloFrom.Origin.Hitsounds;
+                                tloTo.Origin.SampleSet = tloFrom.Origin.SampleSet;
+                                tloTo.Origin.AdditionSet = tloFrom.Origin.AdditionSet;
+                            }
+
+                            tloTo.HitsoundsToOrigin();
+
+                            // Add timingpointschange to copy timingpoint hitsounds
+                            TimingPoint tp = tloFrom.Origin.HitsoundTP.Copy();
+                            tp.Offset = tloTo.Time;
+                            timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: copySamplesets, index: copySamplesets, volume: copyVolumes));
+
+                            tloTo.canCopy = false;
+                        }
+                        tloFrom.canCopy = false;
+                    }
+
+                    // Timingpointchange all the undefined tlo from copyFrom
+                    foreach (TimelineObject tloTo in tlTo.TimeLineObjects) {
+                        if (tloTo.canCopy) {
+                            TimingPoint tp = tloTo.Origin.HitsoundTP.Copy();
+                            tp.Offset = tloTo.Time;
+                            timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: copySamplesets, index: copySamplesets, volume: copyVolumes));
+                        }
+                    }
+                }
+
+                if (copySliderbodychanges) {
+                    // Remove timingpoints in beatmapTo that are in a sliderbody/spinnerbody for both beatmapTo and BeatmapFrom
+                    foreach (HitObject ho in beatmapTo.HitObjects) {
+                        foreach (TimingPoint tp in ho.BodyHitsounds) {
+                            // Every timingpoint in a body in beatmapTo
+                            if (beatmapFrom.HitObjects.Any(o => o.Time < tp.Offset && o.EndTime > tp.Offset)) {
+                                // Timingpoint is in a body for both beatmaps
+                                beatmapTo.BeatmapTiming.TimingPoints.Remove(tp);
+                            }
+                        }
+                    }
+
+                    // Get timingpointschanges for every timingpoint from beatmapFrom that is in a sliderbody/spinnerbody for both beatmapTo and BeatmapFrom
+                    foreach (HitObject ho in beatmapFrom.HitObjects) {
+                        foreach (TimingPoint tp in ho.BodyHitsounds) {
+                            // Every timingpoint in a body in beatmapFrom
+                            if (beatmapTo.HitObjects.Any(o => o.Time < tp.Offset && o.EndTime > tp.Offset)) {
+                                // Timingpoint is in a body for both beatmaps
+                                timingPointsChanges.Add(new TimingPointsChange(tp.Copy(), sampleset: copySamplesets, index: copySamplesets, volume: copyVolumes));
+                            }
+                        }
+                    }
+                }
+
+                // Apply the greenline changes
+                timingPointsChanges = timingPointsChanges.OrderBy(o => o.MyTP.Offset).ToList();
+                foreach (TimingPointsChange c in timingPointsChanges) {
+                    c.AddChange(beatmapTo.BeatmapTiming.TimingPoints, false);
                 }
             }
-            
-            Timeline timeLineTo = editorTo.Beatmap.GetTimeline();
-            Timeline timeLineFrom = editorFrom.Beatmap.GetTimeline();
-            
-            foreach (TimelineObject tloFrom in timeLineFrom.TimeLineObjects) {
-                TimelineObject tlo = FindTheTLOWithTheSameTime(timeLineTo, tloFrom);
-                if (tlo != null) {
-                    // literally the code in map cleaner that puts tlo hitsounds onto hitobjects
-                    // Could probably be abstracted and use a case switch
-                    if (tlo.Origin.IsCircle) {
-                       tlo.Origin.SampleSet = tloFrom.FenoSampleSet;
-                       tlo.Origin.AdditionSet = tloFrom.FenoAdditionSet;
-                        if (modeTo == 3) {
-                            tlo.Origin.CustomIndex = tloFrom.FenoCustomIndex;
-                            tlo.Origin.SampleVolume = tloFrom.FenoSampleVolume;
-                        }
-                    } else if (tlo.Origin.IsSlider) {
-                        tlo.Origin.EdgeHitsounds[tlo.Repeat] = tloFrom.GetHitsounds();
-                        tlo.Origin.EdgeSampleSets[tlo.Repeat] = tloFrom.FenoSampleSet;
-                        tlo.Origin.EdgeAdditionSets[tlo.Repeat] = tloFrom.FenoAdditionSet;
-                        tlo.Origin.SliderExtras = true;
-                        if (tlo.Origin.EdgeAdditionSets[tlo.Repeat] == tlo.Origin.EdgeSampleSets[tlo.Repeat])  // Simplify additions to auto
-                        {
-                            tlo.Origin.EdgeAdditionSets[tlo.Repeat] = 0;
-                        }
-                    } else if (tlo.Origin.IsSpinner) {
-                        if (tlo.Repeat == 1) {
-                            tlo.Origin.SampleSet = tloFrom.FenoSampleSet;
-                            tlo.Origin.AdditionSet = tloFrom.FenoAdditionSet;
-                        }
-                    } else if (tlo.Origin.IsHoldNote) {
-                        if (tlo.Repeat == 0) {
-                            tlo.Origin.SampleSet = tloFrom.FenoSampleSet;
-                            tlo.Origin.AdditionSet = tloFrom.FenoAdditionSet;
-                            tlo.Origin.CustomIndex = tloFrom.FenoCustomIndex;
-                            tlo.Origin.SampleVolume = tloFrom.FenoSampleVolume;
-                        }
-                    }
-                    if (tlo.Origin.AdditionSet == tlo.Origin.SampleSet)  // Simplify additions to auto
-                    {
-                        tlo.Origin.AdditionSet = 0;
-                    }
-                    if (modeTo == 0 && tloFrom.HasHitsound) // Add greenlines for custom indexes and volumes
-                    {
-                        TimingPoint tp = tloFrom.Origin.TP.Copy();
-                        tp.Offset = tloFrom.Time;
-                        tp.SampleIndex = tloFrom.FenoCustomIndex;
-                        tp.Volume = tloFrom.FenoSampleVolume;
-                        bool ind = !(tloFrom.Filename != "" && (tloFrom.IsCircle || tloFrom.IsHoldnoteHead || tloFrom.IsSpinnerEnd));  // Index doesnt have to change if custom is overridden by Filename
-                        timingPointsChanges.Add(new TimingPointsChange(tp, volume: true, index: ind));
-                    }
-                }
-            }
-            
-            // apply timingpointschanges and give timingpoints to hitobject again
-            
-            MapCleaner.CleanMap(editorTo.Beatmap, MapCleaner.Arguments.BasicResnap);
-            */
-            
+
             // Save the file
             editorTo.SaveFile();
 
@@ -183,18 +267,40 @@ namespace Mapping_Tools.Views {
             return message;
         }
 
-        private void Print(string str) {
-            Console.WriteLine(str);
+        private void BeatmapFromBrowse_Click(object sender, RoutedEventArgs e) {
+            try {
+                string path = FileFinder.BeatmapFileDialog();
+                if (path != "") {
+                    BeatmapFromBox.Text = path;
+                }
+            } catch (Exception) { }
         }
 
-        private void Browse_Click(object sender, RoutedEventArgs e) {
-            string path = FileFinder.BeatmapFileDialog();
-            if (path != "") { PathBox.Text = path; }
+        private void BeatmapFromLoad_Click(object sender, RoutedEventArgs e) {
+            try {
+                string path = FileFinder.CurrentBeatmap();
+                if (path != "") {
+                    BeatmapFromBox.Text = path;
+                }
+            } catch (Exception) { }
         }
 
-        private void Current_Map_Click(object sender, RoutedEventArgs e) {
-            string path = FileFinder.CurrentBeatmap();
-            if (path != "") { PathBox.Text = path; }
+        private void BeatmapToBrowse_Click(object sender, RoutedEventArgs e) {
+            try {
+                string path = FileFinder.BeatmapFileDialog();
+                if (path != "") {
+                    BeatmapToBox.Text = path;
+                }
+            } catch (Exception) { }
+        }
+
+        private void BeatmapToLoad_Click(object sender, RoutedEventArgs e) {
+            try {
+                string path = FileFinder.CurrentBeatmap();
+                if (path != "") {
+                    BeatmapToBox.Text = path;
+                }
+            } catch (Exception) { }
         }
     }
 }

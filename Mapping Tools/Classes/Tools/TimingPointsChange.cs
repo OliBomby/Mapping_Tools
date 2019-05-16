@@ -92,6 +92,18 @@ namespace Mapping_Tools.Classes.Tools {
             if (addingTimingPoint != null && (prevTimingPoint == null || !addingTimingPoint.SameEffect(prevTimingPoint) || Inherited)) {
                 list.Add(addingTimingPoint);
             }
+
+            if (allAfter) // Change every timingpoint after
+            {
+                foreach (TimingPoint tp in list) {
+                    if (tp.Offset > MyTP.Offset) {
+                        if (Sampleset) { tp.SampleSet = MyTP.SampleSet; }
+                        if (Index) { tp.SampleIndex = MyTP.SampleIndex; }
+                        if (Volume) { tp.Volume = MyTP.Volume; }
+                        if (Kiai) { tp.Kiai = MyTP.Kiai; }
+                    }
+                }
+            }
         }
 
         public void AddChangeOld(List<TimingPoint> list, Timing timing, bool allAfter=false) {

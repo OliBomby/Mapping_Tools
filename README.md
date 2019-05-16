@@ -8,6 +8,7 @@ Collection of tools for manipulating osu! beatmaps
 - [Hitsound Maker]() by [OliBomby](https://github.com/OliBomby) 
 - [Property Transformer]() by [OliBomby](https://github.com/OliBomby) 
 - [Timing Helper]() by [OliBomby](https://github.com/OliBomby) 
+- [Hitsound Copier]() by [OliBomby](https://github.com/OliBomby) 
 
 ## Future implementations
 - Snapping Tools (Geo-Triangle & Drafting Compass)

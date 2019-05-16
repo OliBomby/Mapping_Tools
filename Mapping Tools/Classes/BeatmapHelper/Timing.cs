@@ -95,7 +95,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                     return tp.Offset;
                 }
             }
-            return 1E99; // Being the last timingpoint, the effective range is infinite (very big)
+            return double.PositiveInfinity; // Being the last timingpoint, the effective range is infinite (very big)
         }
 
         public TimingPoint GetTimingPointAtTime(double time) {
@@ -157,7 +157,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             double lastSV = -100;
             foreach( TimingPoint tp in TimingPoints ) {
                 if( Precision.DefinitelyBigger(tp.Offset, time) ) {
-                    return lastSV;
+                    return MathHelper.Clamp(lastSV, -1000, -10);
                 }
                 if( !tp.Inherited ) {
                     lastSV = tp.MpB;
@@ -166,7 +166,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                     lastSV = -100;
                 }
             }
-            return lastSV;
+            return MathHelper.Clamp(lastSV, -1000, -10);
         }
 
         public double CalculateSliderTemporalLength(double time, double length) {

@@ -40,6 +40,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public int FenoCustomIndex { get; set; }
         public double FenoSampleVolume { get; set; }
 
+        // Special for hitsound copier
+        public bool canCopy = true;
+
         public TimelineObject(HitObject origin, double time, int objectType, int repeat, int hitsounds, int sampleset, int additionset) {
             Origin = origin;
             Time = time;
@@ -86,6 +89,22 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public int GetHitsounds() {
             return MathHelper.GetIntFromBitArray(new BitArray(new bool[] { Normal, Whistle, Finish, Clap }));
+        }
+
+        public void HitsoundsToOrigin() {
+            if (Origin.IsCircle || (Origin.IsSpinner && Repeat == 1) || (Origin.IsHoldNote && Repeat == 0)) {
+                Origin.Hitsounds = GetHitsounds();
+                Origin.SampleSet = SampleSet;
+                Origin.AdditionSet = AdditionSet;
+                Origin.CustomIndex = CustomIndex;
+                Origin.SampleVolume = SampleVolume;
+                Origin.Filename = Filename;
+            } else if (Origin.IsSlider) {
+                Origin.EdgeHitsounds[Repeat] = GetHitsounds();
+                Origin.EdgeSampleSets[Repeat] = SampleSet;
+                Origin.EdgeAdditionSets[Repeat] = AdditionSet;
+                Origin.SliderExtras = true;
+            }
         }
     }
 }

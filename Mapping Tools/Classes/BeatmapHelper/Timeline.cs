@@ -98,5 +98,26 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 }
             }
         }
+
+        public TimelineObject GetNearestTLO(double time, bool needCopyable = false) {
+            if (TimeLineObjects.Count == 0) {
+                return null;
+            }
+
+            TimelineObject closest = null;
+            double dist = double.PositiveInfinity;
+            foreach (TimelineObject tlo in TimeLineObjects) {
+                double d = Math.Abs(tlo.Time - time);
+                if (d < dist) {
+                    if (needCopyable && !tlo.canCopy)
+                        continue;
+                    closest = tlo;
+                    dist = d;
+                } else {
+                    return closest;
+                }
+            }
+            return closest;
+        }
     }
 }

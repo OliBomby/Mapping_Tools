@@ -7,27 +7,66 @@
              xmlns:cm="clr-namespace:System.ComponentModel;assembly=System"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
-             d:DesignHeight="450" Width="759.5">
+             d:DesignHeight="650" Width="759.5">
     <Grid Name="MasterGrid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="150"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Grid Name="FirstGrid" Grid.Row="0" Grid.Column="0" Margin="0,0,204,0">
+        <Grid Name="FirstGrid" Grid.Row="0" Grid.Column="0" Margin="0,0,0,0">
             <StackPanel Grid.Row="0" Margin="0,0,10,0">
-                <TextBlock FontSize="40" TextWrapping="NoWrap" FontWeight="Bold" Foreground="#FF5F5E5E"><Run Text="Hitsound Copier"/><LineBreak/><Run/></TextBlock>
-                <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="500" TextWrapping="Wrap" Foreground="#FFD6D6D6"><Run Text="Copy hitsounds from one map to the other."/><LineBreak/><Run Text="This will replace all the hitsounds"/><Run Text="."/><LineBreak/><Run Text="5% volume will be preserved"/><Run Text="."/></TextBlock>
-                <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="200" Foreground="#FFD6D6D6" Margin="10,26,0,0"><Run Text="Copy Hitsounds From:"/></TextBlock>
-                <TextBox x:Name="PathBox" Width="170" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#FFD6D6D6" Text="" Margin="10,0,0,0"/>
-                <Button Content="Browse" Click="Browse_Click"/>
-                <Button Content="Get current map" d:LayoutOverrides="Height" Click="Current_Map_Click"/>
+                <TextBlock FontSize="40" TextWrapping="NoWrap" FontWeight="Bold" Foreground="#FF5F5E5E"><Run Text="Hitsound Copier"/></TextBlock>
+                <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,20,0,0"><Run Text="Copy hitsounds from:"/></TextBlock>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="30"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="30"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" x:Name="BeatmapFromBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="" Margin="0,0,5,0"/>
+                    <Button Grid.Column="1" Width="Auto" Height="Auto" Cursor="Hand" Click="BeatmapFromLoad_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
+                        <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Download" Foreground="#FFD6D6D6"/>
+                    </Button >
+                    <Button Grid.Column="3" Width="Auto" Height="Auto" Cursor="Hand" Click="BeatmapFromBrowse_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
+                        <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="#FFD6D6D6"/>
+                    </Button >
+                </Grid>
+                <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Copy hitsounds to:"/></TextBlock>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="30"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="30"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" x:Name="BeatmapToBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="" Margin="0,0,5,0"/>
+                    <Button Grid.Column="1" Width="Auto" Height="Auto" Cursor="Hand" Click="BeatmapToLoad_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
+                        <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Download" Foreground="#FFD6D6D6"/>
+                    </Button >
+                    <Button Grid.Column="3" Width="Auto" Height="Auto" Cursor="Hand" Click="BeatmapToBrowse_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
+                        <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="#FFD6D6D6"/>
+                    </Button >
+                </Grid>
+                <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Copying mode:"/></TextBlock>
+                <ComboBox x:Name="CopyModeBox" Margin="0,10,0,0" HorizontalAlignment="Stretch" SelectedIndex="0" Cursor="Hand">
+                    <ComboBoxItem Content="Overwrite everything" HorizontalAlignment="Left" Cursor="Hand"/>
+                    <ComboBoxItem Content="Overwrite only defined" HorizontalAlignment="Left" Cursor="Hand"/>
+                </ComboBox>
+                <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Temporal leniency:"/></TextBlock>
+                <TextBox x:Name="LeniencyBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="5"/>
+                <CheckBox x:Name="CopyHitsoundsBox" IsChecked="True" Content="Copy hitsounds" Foreground="#FFD6D6D6" Margin="0,10,0,0"/>
+                <CheckBox x:Name="CopyBodyBox" IsChecked="True" Content="Copy sliderbody hitsounds" Foreground="#FFD6D6D6"/>
+                <CheckBox x:Name="CopySamplesetBox" IsChecked="True" Content="Copy samplesets" Foreground="#FFD6D6D6"/>
+                <CheckBox x:Name="CopyVolumeBox" IsChecked="True" Content="Copy volumes" Foreground="#FFD6D6D6"/>
             </StackPanel>
         </Grid>
-        <Grid Name="SecoundGrid" Grid.Row="1" Grid.Column="0">
+        <Grid Name="SecoundGrid" Grid.Row="1" Grid.Column="1">
             <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Right">
                 <Button Width="Auto" Height="Auto" x:Name="start" Cursor="Hand" Click="Start_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
                     <materialDesign:PackIcon Width="100" Height="100" Cursor="Hand" Kind="Play" Foreground="#FFD6D6D6"/>

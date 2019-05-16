@@ -148,10 +148,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             TimingPoint tp = timing.GetRedlineAtTime(Time);
 
             double d1 = tp.MpB / snap1;
-            double remainder1 = TemporalLength % d1;
+            double remainder1 = (TemporalLength + 0.0001) % d1;
 
             double d2 = tp.MpB / snap2;
-            double remainder2 = TemporalLength % d2;
+            double remainder2 = (TemporalLength + 0.0001) % d2;
 
             double d = remainder1 < remainder2 ? d1 : d2;
             double remainder = remainder1 < remainder2 ? remainder1 : remainder2;
