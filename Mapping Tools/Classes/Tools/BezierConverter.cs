@@ -18,8 +18,8 @@ namespace Mapping_Tools.Classes.Tools
 
         private static List<Vector2> GetPoints(string str)
         {
-            List<Vector2> points = new List<Vector2>();
             string[] strPoints = str.Split('|');
+            List<Vector2> points = new List<Vector2>(strPoints.Length);
             foreach (string strPoint in strPoints)
             {
                 string[] strCoords = strPoint.Split(':');

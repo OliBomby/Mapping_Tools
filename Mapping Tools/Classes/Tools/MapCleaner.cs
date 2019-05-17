@@ -102,8 +102,8 @@ namespace Mapping_Tools.Classes.Tools {
 
             if (arguments.ResnapBookmarks) {
                 // Resnap the bookmarks
-                List<double> newBookmarks = new List<double>();
                 List<double> bookmarks = beatmap.GetBookmarks();
+                List<double> newBookmarks = new List<double>(bookmarks.Count);
                 for (int i = 0; i < bookmarks.Count; i++) {
                     double bookmark = bookmarks[i];
                     newBookmarks.Add(timing.Resnap(bookmark, arguments.Snap1, arguments.Snap2));
