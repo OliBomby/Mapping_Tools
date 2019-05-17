@@ -31,17 +31,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return lines;
         }
 
-        public List<HitObject> GetBookmarkedObjects() {
-            return GetBookmarkedObjects(Beatmap);
-        }
-
-        public List<HitObject> GetBookmarkedObjects(Beatmap beatmap)
-        {
-            List<double> bookmarks = beatmap.GetBookmarks();
-            List<HitObject> markedObjects = beatmap.HitObjects.FindAll(ho => bookmarks.Exists(o => (ho.Time <= o && o <= ho.EndTime)));
-            return markedObjects;
-        }
-
         public void SaveFile(string path) {
             SaveFile(path, Beatmap.GetLines());
         }
