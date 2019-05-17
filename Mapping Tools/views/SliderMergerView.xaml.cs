@@ -77,7 +77,8 @@ namespace Mapping_Tools.Views {
             bool mergeLast = false;
 
             Editor editor = new Editor(arg.Path);
-            List<HitObject> markedObjects = arg.RequireBookmarks ? editor.GetBookmarkedObjects() : editor.Beatmap.HitObjects;
+            Beatmap beatmap = editor.Beatmap;
+            List<HitObject> markedObjects = arg.RequireBookmarks ? beatmap.GetBookmarkedObjects() : beatmap.HitObjects;
 
             for (int i = 0; i < markedObjects.Count - 1; i++) {
                 HitObject ho1 = markedObjects[i];
@@ -88,7 +89,7 @@ namespace Mapping_Tools.Views {
                     SliderPath sp2 = BezierConverter.ConvertToBezier(ho2.SliderPath);
                     SliderPath mergedPath = new SliderPath(PathType.Bezier, sp1.ControlPoints.Concat(sp2.ControlPoints).ToArray(), ho1.PixelLength + ho2.PixelLength);
                     ho1.SliderPath = mergedPath;
-                    editor.Beatmap.HitObjects.Remove(ho2);
+                    beatmap.HitObjects.Remove(ho2);
                     markedObjects.Remove(ho2);
                     slidersMerged++;
                     if(!mergeLast) { slidersMerged++; }

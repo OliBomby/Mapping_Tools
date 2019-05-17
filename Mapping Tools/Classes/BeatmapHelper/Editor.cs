@@ -37,13 +37,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public List<HitObject> GetBookmarkedObjects(Beatmap beatmap)
         {
-            List<HitObject> markedObjects = new List<HitObject>();
             List<double> bookmarks = beatmap.GetBookmarks();
-            foreach (HitObject ho in beatmap.HitObjects)
-            {
-                if (!bookmarks.Exists(o => (ho.Time <= o && o <= ho.EndTime))) { continue; }
-                markedObjects.Add(ho);
-            }
+            List<HitObject> markedObjects = beatmap.HitObjects.FindAll(ho => bookmarks.Exists(o => (ho.Time <= o && o <= ho.EndTime)));
             return markedObjects;
         }
 

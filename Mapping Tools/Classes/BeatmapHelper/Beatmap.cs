@@ -87,17 +87,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public List<HitObject> GetHitObjectsWithRangeInRange(double start, double end) {
-            List<HitObject> list = new List<HitObject>();
-            foreach (HitObject ho in HitObjects) {
-                if (!(ho.EndTime <= start)) {
-                    if (ho.Time >= end) // Range is after the range
-                    {
-                        break;
-                    }
-                    list.Add(ho);
-                }
-            }
-            return list;
+            return HitObjects.FindAll(o => o.EndTime >= start && o.Time <= end);
         }
 
         public Timeline GetTimeline() {
@@ -119,6 +109,16 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             if (bookmarks.Count > 0) {
                 Editor["Bookmarks"] = new TValue(string.Join(",", bookmarks.Select(d => Math.Round(d))));
             }
+        }
+
+        /// <summary>
+        /// Returns all hit objects that have a bookmark in their range
+        /// </summary>
+        /// <returns>A list of hit objects that have a bookmark in their range</returns>
+        public List<HitObject> GetBookmarkedObjects() {
+            List<double> bookmarks = GetBookmarks();
+            List<HitObject> markedObjects = HitObjects.FindAll(ho => bookmarks.Exists(o => (ho.Time <= o && o <= ho.EndTime)));
+            return markedObjects;
         }
 
         public List<string> GetLines() {

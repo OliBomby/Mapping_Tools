@@ -54,19 +54,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             TimeLineObjects = timeLineObjects;
         }
 
-        public Timeline GetTimeLineObjectsInRange(double start, double end) {
-            List<TimelineObject> list = new List<TimelineObject>();
-            foreach (TimelineObject tlo in TimeLineObjects) {
-                if (tlo.Time >= start) {
-                    if (tlo.Time < end) {
-                        list.Add(tlo);
-                    }
-                    else {
-                        break;
-                    }
-                }
-            }
-            return new Timeline(list);
+        public List<TimelineObject> GetTimeLineObjectsInRange(double start, double end) {
+            return TimeLineObjects.FindAll(o => o.Time >= start && o.Time <= end);
         }
 
         public void GiveTimingPoints(Timing timing) {

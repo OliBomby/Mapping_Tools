@@ -84,8 +84,9 @@ namespace Mapping_Tools.Views {
             int slidersCompleted = 0;
 
             Editor editor = new Editor(arg.Path);
-            Timing timing = editor.Beatmap.BeatmapTiming;
-            List<HitObject> markedObjects = arg.RequireBookmarks ? editor.GetBookmarkedObjects() : editor.Beatmap.HitObjects;
+            Beatmap beatmap = editor.Beatmap;
+            Timing timing = beatmap.BeatmapTiming;
+            List<HitObject> markedObjects = arg.RequireBookmarks ? beatmap.GetBookmarkedObjects() : beatmap.HitObjects;
 
             for(int i = 0; i < markedObjects.Count; i++) {
                 HitObject ho = markedObjects[i];
@@ -108,7 +109,7 @@ namespace Mapping_Tools.Views {
             // Reconstruct SV
             List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
             // Add Hitobject stuff
-            foreach (HitObject ho in editor.Beatmap.HitObjects)
+            foreach (HitObject ho in beatmap.HitObjects)
             {
                 if (ho.IsSlider) // SV changes
                 {
