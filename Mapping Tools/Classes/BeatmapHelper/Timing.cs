@@ -28,6 +28,16 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
+        public double GetNearestMultiple(double duration, double divisor) {
+            double remainder = duration % divisor;
+
+            if (remainder < 0.5 * divisor) {
+                return duration - remainder;
+            } else {
+                return duration - remainder + divisor;
+            }
+        }
+
         public double Resnap(double time, int divisor2, int divisor3, bool floor=true, TimingPoint tp=null) {
             TimingPoint beforeTP = tp ?? GetRedlineAtTime(time);
             TimingPoint afterTP = tp == null ? GetRedlineAfterTime(time) : null;
@@ -38,13 +48,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             double newTime3 = GetNearestTimeMeter(time, beforeTP, divisor3);
             double snapDistance3 = Math.Abs(time - newTime3);
 
-            double newTime = time;
-            if( snapDistance3 < snapDistance2 ) {
-                newTime = newTime3;
-            }
-            else {
-                newTime = newTime2;
-            }
+            double newTime = snapDistance3 < snapDistance2 ? newTime3 : newTime2;
 
             if( afterTP != null && Precision.DefinitelyBigger(newTime, afterTP.Offset) ) {
                 newTime = afterTP.Offset;
@@ -66,15 +70,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             double newTime3 = GetNearestTimeMeter(time, beforeTP, divisor3);
             double snapDistance3 = snapDistance3 = Math.Abs(time - newTime3);
 
-            double newTime = time;
-            if( snapDistance3 < snapDistance2 ) {
-                newTime = newTime3;
-            }
-            else {
-                newTime = newTime2;
-            }
+            double newTime = snapDistance3 < snapDistance2 ? newTime3 : newTime2;
 
-            if( afterTP != null && Precision.DefinitelyBigger(newTime, afterTP.Offset) ) {
+            if ( afterTP != null && Precision.DefinitelyBigger(newTime, afterTP.Offset) ) {
                 newTime = afterTP.Offset;
             }
 

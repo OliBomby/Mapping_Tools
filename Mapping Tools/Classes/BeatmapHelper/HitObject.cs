@@ -147,21 +147,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             // Temporal length is n times a snap divisor length
             TimingPoint tp = timing.GetRedlineAtTime(Time);
 
-            double d1 = tp.MpB / snap1;
-            double remainder1 = (TemporalLength + 0.0001) % d1;
+            double newTemporalLength1 = timing.GetNearestMultiple(TemporalLength, tp.MpB / snap1);
+            double snapDistance1 = Math.Abs(TemporalLength - newTemporalLength1);
 
-            double d2 = tp.MpB / snap2;
-            double remainder2 = (TemporalLength + 0.0001) % d2;
+            double newTemporalLength2 = timing.GetNearestMultiple(TemporalLength, tp.MpB / snap2);
+            double snapDistance2 = Math.Abs(TemporalLength - newTemporalLength2);
 
-            double d = remainder1 < remainder2 ? d1 : d2;
-            double remainder = remainder1 < remainder2 ? remainder1 : remainder2;
-
-            double newTemporalLength = TemporalLength;
-            if (remainder < 0.5 * d) {
-                newTemporalLength = TemporalLength - remainder;
-            } else {
-                newTemporalLength = TemporalLength - remainder + d;
-            }
+            double newTemporalLength = snapDistance1 < snapDistance2 ? newTemporalLength1 : newTemporalLength2;
 
             double deltaTime = newTemporalLength - TemporalLength;
             ChangeTemporalTime(timing, deltaTime);
