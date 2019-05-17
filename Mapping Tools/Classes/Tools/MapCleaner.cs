@@ -43,22 +43,20 @@ namespace Mapping_Tools.Classes.Tools {
         /// <param name="worker">The BackgroundWorker for updating progress.</param>
         /// <returns>Number of resnapped objects.</returns>
         public static int CleanMap(Beatmap beatmap, Arguments arguments, BackgroundWorker worker = null) {
+            UpdateProgressBar(worker, 0);
+
             Timing timing = beatmap.BeatmapTiming;
             Timeline timeline = beatmap.GetTimeline();
 
             int mode = beatmap.General["Mode"].Value;
             int objectsResnapped = 0;
 
-            // Count total stages
-            int maxStages = 11;
-
             // Collect Kiai toggles and SV changes for mania/taiko
             List<TimingPoint> kiaiToggles = new List<TimingPoint>();
             List<TimingPoint> svChanges = new List<TimingPoint>();
             bool lastKiai = false;
             double lastSV = -100;
-            for (int i = 0; i < timing.TimingPoints.Count; i++) {
-                TimingPoint tp = timing.TimingPoints[i];
+            foreach (TimingPoint tp in timing.TimingPoints) {
                 if (tp.Kiai != lastKiai) {
                     kiaiToggles.Add(tp.Copy());
                     lastKiai = tp.Kiai;
@@ -71,47 +69,44 @@ namespace Mapping_Tools.Classes.Tools {
                         lastSV = tp.MpB;
                     }
                 }
-                UpdateProgressbar(worker, (double)i / timing.TimingPoints.Count, 0, maxStages);
             }
+            UpdateProgressBar(worker, 9);
 
             // Resnap shit
             if (arguments.ResnapObjects) {
                 // Resnap all objects
-                for (int i = 0; i < beatmap.HitObjects.Count; i++) {
-                    HitObject ho = beatmap.HitObjects[i];
+                foreach (HitObject ho in beatmap.HitObjects) {
                     bool resnapped = ho.ResnapSelf(timing, arguments.Snap1, arguments.Snap2);
                     if (resnapped) {
                         objectsResnapped += 1;
                     }
                     ho.ResnapEnd(timing, arguments.Snap1, arguments.Snap2);
-                    UpdateProgressbar(worker, (double)i / beatmap.HitObjects.Count, 1, maxStages);
                 }
+                UpdateProgressBar(worker, 18);
 
-                // Resnap Kiai toggles and SV changes
-                for (int i = 0; i < kiaiToggles.Count; i++) {
-                    TimingPoint tp = kiaiToggles[i];
+                // Resnap Kiai toggles
+                foreach (TimingPoint tp in kiaiToggles) {
                     tp.ResnapSelf(timing, arguments.Snap1, arguments.Snap2);
-                    UpdateProgressbar(worker, (double)i / kiaiToggles.Count, 2, maxStages);
                 }
-                for (int i = 0; i < svChanges.Count; i++) {
-                    TimingPoint tp = svChanges[i];
+                UpdateProgressBar(worker, 27);
+
+                // Resnap SV changes
+                foreach (TimingPoint tp in svChanges) {
                     tp.ResnapSelf(timing, arguments.Snap1, arguments.Snap2);
-                    UpdateProgressbar(worker, (double)i / svChanges.Count, 3, maxStages);
                 }
+                UpdateProgressBar(worker, 36);
             }
 
             if (arguments.ResnapBookmarks) {
                 // Resnap the bookmarks
                 List<double> bookmarks = beatmap.GetBookmarks();
-                List<double> newBookmarks = new List<double>(bookmarks.Count);
-                for (int i = 0; i < bookmarks.Count; i++) {
-                    double bookmark = bookmarks[i];
-                    newBookmarks.Add(timing.Resnap(bookmark, arguments.Snap1, arguments.Snap2));
-                    UpdateProgressbar(worker, (double)i / bookmarks.Count, 4, maxStages);
-                }
+                List<double> newBookmarks = bookmarks.Select(o => timing.Resnap(o, arguments.Snap1, arguments.Snap2)).ToList();
+
                 // Remove duplicate bookmarks
                 newBookmarks = newBookmarks.Distinct().ToList();
                 beatmap.SetBookmarks(newBookmarks);
+
+                UpdateProgressBar(worker, 45);
             }
 
             // Maybe mute unclickable timelineobjects
@@ -126,30 +121,30 @@ namespace Mapping_Tools.Classes.Tools {
 
             // Make new timingpoints
             List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
+
             // Add redlines
             List<TimingPoint> redlines = timing.GetAllRedlines();
-            for (int i = 0; i < redlines.Count; i++) {
-                TimingPoint tp = redlines[i];
+            foreach (TimingPoint tp in redlines) {
                 timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, meter: true, inherited: true, omitFirstBarLine: true));
-                UpdateProgressbar(worker, (double)i / redlines.Count, 5, maxStages);
             }
+            UpdateProgressBar(worker, 54);
+
             // Add SV changes for taiko and mania
             if (mode == 1 || mode == 3) {
-                for (int i = 0; i < svChanges.Count; i++) {
-                    TimingPoint tp = svChanges[i];
+                foreach (TimingPoint tp in svChanges) {
                     timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true));
-                    UpdateProgressbar(worker, (double)i / svChanges.Count, 6, maxStages);
                 }
             }
+            UpdateProgressBar(worker, 63);
+
             // Add Kiai toggles
-            for (int i = 0; i < kiaiToggles.Count; i++) {
-                TimingPoint tp = kiaiToggles[i];
+            foreach (TimingPoint tp in kiaiToggles) {
                 timingPointsChanges.Add(new TimingPointsChange(tp, kiai: true));
-                UpdateProgressbar(worker, (double)i / kiaiToggles.Count, 7, maxStages);
             }
+            UpdateProgressBar(worker, 72);
+
             // Add Hitobject stuff
-            for (int i = 0; i < beatmap.HitObjects.Count; i++) {
-                HitObject ho = beatmap.HitObjects[i];
+            foreach (HitObject ho in beatmap.HitObjects) {
                 if (ho.IsSlider) // SV changes
                 {
                     TimingPoint tp = ho.TP.Copy();
@@ -180,11 +175,11 @@ namespace Mapping_Tools.Classes.Tools {
                     tp.Offset = ho.Time;
                     timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: true));
                 }
-                UpdateProgressbar(worker, (double)i / beatmap.HitObjects.Count, 8, maxStages);
             }
+            UpdateProgressBar(worker, 81);
+
             // Add timeline hitsounds
-            for (int i = 0; i < timeline.TimeLineObjects.Count; i++) {
-                TimelineObject tlo = timeline.TimeLineObjects[i];
+            foreach (TimelineObject tlo in timeline.TimeLineObjects) {
                 // Change the samplesets in the hitobjects
                 if (tlo.Origin.IsCircle) {
                     tlo.Origin.SampleSet = tlo.FenoSampleSet;
@@ -229,18 +224,16 @@ namespace Mapping_Tools.Classes.Tools {
                     bool vol = !(tp.Volume == 5 && arguments.RemoveSliderendMuting && (tlo.IsSliderEnd || tlo.IsSpinnerEnd));  // Remove volume change if sliderend muting or spinnerend muting
                     timingPointsChanges.Add(new TimingPointsChange(tp, volume: vol, index: ind));
                 }
-                UpdateProgressbar(worker, (double)i / timeline.TimeLineObjects.Count, 9, maxStages);
             }
+            UpdateProgressBar(worker, 90);
 
 
             // Add the new timingpoints
             timingPointsChanges = timingPointsChanges.OrderBy(o => o.MyTP.Offset).ToList();
             List<TimingPoint> newTimingPoints = new List<TimingPoint>();
 
-            for (int i = 0; i < timingPointsChanges.Count; i++) {
-                TimingPointsChange c = timingPointsChanges[i];
+            foreach (TimingPointsChange c in timingPointsChanges) {
                 c.AddChange(newTimingPoints);
-                UpdateProgressbar(worker, (double)i / timingPointsChanges.Count, 10, maxStages);
             }
 
             // Replace the old timingpoints
@@ -248,17 +241,14 @@ namespace Mapping_Tools.Classes.Tools {
             beatmap.GiveObjectsGreenlines();
 
             // Complete progressbar
-            if (worker != null && worker.WorkerReportsProgress) {
-                worker.ReportProgress(100);
-            }
+            UpdateProgressBar(worker, 100);
 
             return objectsResnapped;
         }
 
-        private static void UpdateProgressbar(BackgroundWorker worker, double fraction, int stage, int maxStages) {
-            // Update progressbar
+        private static void UpdateProgressBar(BackgroundWorker worker, int progress) {
             if (worker != null && worker.WorkerReportsProgress) {
-                worker.ReportProgress((int)((fraction + stage) / maxStages * 100));
+                worker.ReportProgress(progress);
             }
         }
     }
