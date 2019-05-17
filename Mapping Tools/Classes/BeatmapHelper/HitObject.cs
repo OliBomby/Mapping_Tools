@@ -134,8 +134,15 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public bool ResnapEnd(Timing timing, int snap1, int snap2) {
-            if (Repeat > 1) { return ResnapEndClassic(timing, snap1, snap2); }
+            // If there is a redline in the sliderbody then the sliderend gets snapped to a tick of the latest redline
+            if (timing.TimingPoints.Any(o => o.Inherited && o.Offset < EndTime && o.Offset > Time)) {
+                return ResnapEndTime(timing, snap1, snap2);
+            } else {
+                return ResnapEndClassic(timing, snap1, snap2);
+            }
+        }
 
+        public bool ResnapEndTime(Timing timing, int snap1, int snap2) {
             double newTime = timing.Resnap(EndTime, snap1, snap2);
             double deltaTime = newTime - EndTime;
             MoveEndTime(timing, deltaTime);
