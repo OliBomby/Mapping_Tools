@@ -1,4 +1,5 @@
-﻿using Mapping_Tools.Classes.MathUtil;
+﻿using Mapping_Tools.Classes.HitsoundStuff;
+using Mapping_Tools.Classes.MathUtil;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -89,6 +90,22 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public int GetHitsounds() {
             return MathHelper.GetIntFromBitArray(new BitArray(new bool[] { Normal, Whistle, Finish, Clap }));
+        }
+
+        public List<Tuple<int, int, int>> GetPlayingHitsounds(int mode = 0) {
+            List<Tuple<int, int, int>> samples = new List<Tuple<int, int, int>>();
+            bool normal = mode != 3 || Normal || !(Whistle || Finish || Clap);
+
+            if (normal)
+                samples.Add(new Tuple<int, int, int> (FenoSampleSet, 0, FenoCustomIndex));
+            if (Whistle)
+                samples.Add(new Tuple<int, int, int>(FenoAdditionSet, 1, FenoCustomIndex));
+            if (Finish)
+                samples.Add(new Tuple<int, int, int>(FenoAdditionSet, 2, FenoCustomIndex));
+            if (Clap)
+                samples.Add(new Tuple<int, int, int>(FenoAdditionSet, 3, FenoCustomIndex));
+
+            return samples;
         }
 
         public void HitsoundsToOrigin() {

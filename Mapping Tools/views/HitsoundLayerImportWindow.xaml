@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
-        Title="Window1" Height="510" Width="400"
+        Title="Window1" Height="540" Width="400"
         WindowStyle="None"
         ResizeMode="CanResize"
         AllowsTransparency="False"
@@ -33,54 +33,106 @@
             </StackPanel>
         </Grid>
 
-        <StackPanel Grid.Row="0" Grid.RowSpan="2" HorizontalAlignment="Stretch" CanVerticallyScroll="True" CanHorizontallyScroll="True" Margin="10">
-            <TextBlock FontSize="30" FontWeight="Bold" HorizontalAlignment="Left" MaxWidth="150" Foreground="#FFD6D6D6"><Run Text="Add layer"/></TextBlock>
-            <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,20,0,0"><Run Text="Name:"/></TextBlock>
-            <TextBox x:Name="NameBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text=""/>
-            <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Source beatmap:"/></TextBlock>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="30"/>
-                    <ColumnDefinition Width="5"/>
-                    <ColumnDefinition Width="30"/>
-                </Grid.ColumnDefinitions>
-                <TextBox Grid.Column="0" x:Name="BeatmapPathBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="" Margin="0,0,5,0"/>
-                <Button Grid.Column="1" Width="Auto" Height="Auto" Cursor="Hand" Click="BeatmapLoad_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
-                    <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Download" Foreground="#FFD6D6D6"/>
-                </Button >
-                <Button Grid.Column="3" Width="Auto" Height="Auto" Cursor="Hand" Click="BeatmapBrowse_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
-                    <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="#FFD6D6D6"/>
-                </Button >
-            </Grid>
-            <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Hitsound sample:"/></TextBlock>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="30"/>
-                </Grid.ColumnDefinitions>
-                <TextBox Grid.Column="0" x:Name="SamplePathBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="" Margin="0,0,5,0"/>
-                <Button Grid.Column="1" Width="Auto" Height="Auto" Cursor="Hand" Click="SampleBrowse_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
-                    <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="#FFD6D6D6"/>
-                </Button >
-            </Grid>
-            <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Stack X coordinate:"/></TextBlock>
-            <TextBox x:Name="XCoordBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text=""/>
-            <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Stack Y coordinate:"/></TextBlock>
-            <TextBox x:Name="YCoordBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text=""/>
-            <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Hitsound info:"/></TextBlock>
-            <ComboBox x:Name="SampleSetBox" Margin="0,10,0,0" HorizontalAlignment="Stretch" SelectedIndex="0" Cursor="Hand">
-                <ComboBoxItem Content="Normal" HorizontalAlignment="Left" Cursor="Hand"/>
-                <ComboBoxItem Content="Soft" HorizontalAlignment="Left" Cursor="Hand"/>
-                <ComboBoxItem Content="Drum" HorizontalAlignment="Left" Cursor="Hand"/>
-            </ComboBox>
-            <ComboBox x:Name="HitsoundBox" Margin="0,10,0,0" HorizontalAlignment="Stretch" SelectedIndex="0" Cursor="Hand">
-                <ComboBoxItem Content="Normal" HorizontalAlignment="Left" Cursor="Hand"/>
-                <ComboBoxItem Content="Whistle" HorizontalAlignment="Left" Cursor="Hand"/>
-                <ComboBoxItem Content="Finish" HorizontalAlignment="Left" Cursor="Hand"/>
-                <ComboBoxItem Content="Clap" HorizontalAlignment="Left" Cursor="Hand"/>
-            </ComboBox>
-        </StackPanel>
+        <TabControl x:Name="Tabs" Grid.Row="1" Background="Transparent" BorderThickness="0">
+            <TabControl.Resources>
+                <Style TargetType="TabItem">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="TabItem">
+                                <Grid Name="Panel">
+                                    <ContentPresenter x:Name="ContentSite"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        ContentSource="Header"
+                                        Margin="10,2"/>
+                                </Grid>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="Panel" Property="Background" Value="#696999" />
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="False">
+                                        <Setter TargetName="Panel" Property="Background" Value="#494969" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </TabControl.Resources>
+
+            <TabItem Header="Add layer" Background="Transparent" Foreground="#FFD6D6D6">
+                <StackPanel HorizontalAlignment="Stretch" CanVerticallyScroll="True" CanHorizontallyScroll="True" Margin="10">
+                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Name:"/></TextBlock>
+                    <TextBox x:Name="NameBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text=""/>
+                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Source beatmap:"/></TextBlock>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="30"/>
+                            <ColumnDefinition Width="5"/>
+                            <ColumnDefinition Width="30"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" x:Name="BeatmapPathBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="" Margin="0,0,5,0"/>
+                        <Button Grid.Column="1" Width="Auto" Height="Auto" Cursor="Hand" Click="BeatmapLoad_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
+                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Download" Foreground="#FFD6D6D6"/>
+                        </Button >
+                        <Button Grid.Column="3" Width="Auto" Height="Auto" Cursor="Hand" Click="BeatmapBrowse_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
+                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="#FFD6D6D6"/>
+                        </Button >
+                    </Grid>
+                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Hitsound sample:"/></TextBlock>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="30"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" x:Name="SamplePathBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="" Margin="0,0,5,0"/>
+                        <Button Grid.Column="1" Width="Auto" Height="Auto" Cursor="Hand" Click="SampleBrowse_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
+                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="#FFD6D6D6"/>
+                        </Button >
+                    </Grid>
+                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Stack X coordinate:"/></TextBlock>
+                    <TextBox x:Name="XCoordBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text=""/>
+                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Stack Y coordinate:"/></TextBlock>
+                    <TextBox x:Name="YCoordBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text=""/>
+                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Hitsound info:"/></TextBlock>
+                    <ComboBox x:Name="SampleSetBox" Margin="0,10,0,0" HorizontalAlignment="Stretch" SelectedIndex="0" Cursor="Hand">
+                        <ComboBoxItem Content="Normal" HorizontalAlignment="Left" Cursor="Hand"/>
+                        <ComboBoxItem Content="Soft" HorizontalAlignment="Left" Cursor="Hand"/>
+                        <ComboBoxItem Content="Drum" HorizontalAlignment="Left" Cursor="Hand"/>
+                    </ComboBox>
+                    <ComboBox x:Name="HitsoundBox" Margin="0,10,0,0" HorizontalAlignment="Stretch" SelectedIndex="0" Cursor="Hand">
+                        <ComboBoxItem Content="Normal" HorizontalAlignment="Left" Cursor="Hand"/>
+                        <ComboBoxItem Content="Whistle" HorizontalAlignment="Left" Cursor="Hand"/>
+                        <ComboBoxItem Content="Finish" HorizontalAlignment="Left" Cursor="Hand"/>
+                        <ComboBoxItem Content="Clap" HorizontalAlignment="Left" Cursor="Hand"/>
+                    </ComboBox>
+                </StackPanel>
+            </TabItem>
+            <TabItem Header="Add complete hitsounds" Background="Transparent" Foreground="#FFD6D6D6">
+                <StackPanel CanVerticallyScroll="True" CanHorizontallyScroll="True" Margin="10">
+                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Name:"/></TextBlock>
+                    <TextBox x:Name="NameBox2" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text=""/>
+                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Source beatmap:"/></TextBlock>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="30"/>
+                            <ColumnDefinition Width="5"/>
+                            <ColumnDefinition Width="30"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" x:Name="BeatmapPathBox2" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="" Margin="0,0,5,0"/>
+                        <Button Grid.Column="1" Width="Auto" Height="Auto" Cursor="Hand" Click="BeatmapLoad2_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
+                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Download" Foreground="#FFD6D6D6"/>
+                        </Button >
+                        <Button Grid.Column="3" Width="Auto" Height="Auto" Cursor="Hand" Click="BeatmapBrowse2_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
+                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="#FFD6D6D6"/>
+                        </Button >
+                    </Grid>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+        
 
         <Grid Background="#FF2B2B2B" Grid.Row="2">
             <Grid.ColumnDefinitions>

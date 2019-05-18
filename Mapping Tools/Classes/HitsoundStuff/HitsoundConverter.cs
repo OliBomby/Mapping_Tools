@@ -1,11 +1,71 @@
-﻿using System;
+﻿using Mapping_Tools.Classes.BeatmapHelper;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     class HitsoundConverter {
+        public static readonly List<string> SampleSets = new List<string> {"auto", "normal", "soft", "drum"};
+
+        public static readonly List<string> Hitsounds = new List<string> { "normal", "whistle", "finish", "clap" };
+
+        /// <summary>
+        /// Extract every used sample in a beatmap and return them as hitsound layers
+        /// </summary>
+        /// <param name="path">The path to the beatmap</param>
+        /// <returns>The hitsound layers</returns>
+        public static List<HitsoundLayer> LayersFromHitsounds(string path) {
+            Editor editor = new Editor(path);
+            Beatmap beatmap = editor.Beatmap;
+            Timeline timeline = beatmap.GetTimeline();
+
+            int mode = beatmap.General["Mode"].Value;
+            string mapDir = editor.GetBeatmapFolder();
+
+            List<HitsoundLayer> hitsoundLayers = new List<HitsoundLayer>();
+            HashSet<string> paths = new HashSet<string>();
+
+            foreach (TimelineObject tlo in timeline.TimeLineObjects) {
+                List<Tuple<int, int, int>> samples = tlo.GetPlayingHitsounds();
+                
+                foreach (Tuple<int, int, int> sample in samples) {
+                    int sampleSet = sample.Item1;
+                    int hitsound = sample.Item2;
+                    int index = sample.Item3;
+
+                    string filename = GetFileName(sampleSet, hitsound, index);
+                    string samplePath = Path.Combine(mapDir, filename);
+
+                    // Simplify path if it doesn't exist
+                    filename = File.Exists(samplePath) ? filename : GetFileName(sampleSet, hitsound, -1);
+                    samplePath = Path.Combine(mapDir, filename);
+
+                    if (paths.Contains(samplePath)) {
+                        // Find hitsound layer with this path and add this time
+                        HitsoundLayer layer = hitsoundLayers.Find(o => o.SamplePath == samplePath);
+                        layer.Times.Add(tlo.Time);
+                    } else {
+                        // Add new hitsound layer with this path
+                        HitsoundLayer layer = new HitsoundLayer(filename, path, sample.Item1, sample.Item2, samplePath);
+                        layer.Times.Add(tlo.Time);
+                        hitsoundLayers.Add(layer);
+                        paths.Add(samplePath);
+                    }
+                }
+            }
+            return hitsoundLayers;
+        }
+
+        public static string GetFileName(int sampleSet, int hitsound, int index) {
+            if (index == 1) {
+                return String.Format("{0}-hit{1}.wav", SampleSets[sampleSet], Hitsounds[hitsound]);
+            }
+            return String.Format("{0}-hit{1}{2}.wav", SampleSets[sampleSet], Hitsounds[hitsound], index);
+        }
+
         public static List<SamplePackage> ZipLayers(List<HitsoundLayer> layers, Sample defaultSample) {
             List<SamplePackage> packages = new List<SamplePackage>();
             foreach (HitsoundLayer hl in layers) {

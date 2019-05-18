@@ -2,6 +2,7 @@
 using Mapping_Tools.Classes.SystemTools;
 using MaterialDesignThemes.Wpf;
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -13,23 +14,28 @@ namespace Mapping_Tools.Views {
     public partial class HitsoundLayerImportWindow : Window {
         private double widthWin, heightWin; //Set default sizes of window
         private int index;
-        public HitsoundLayer HitsoundLayer;
+        public List<HitsoundLayer> HitsoundLayers;
 
         public HitsoundLayerImportWindow() {
             InitializeComponent();
             widthWin = ActualWidth; // Set width to window
             heightWin = ActualHeight; // Set height to window
+            HitsoundLayers = new List<HitsoundLayer>();
             index = 0;
             BeatmapPathBox.Text = MainWindow.AppWindow.GetCurrentMap();
+            BeatmapPathBox2.Text = MainWindow.AppWindow.GetCurrentMap();
         }
 
         public HitsoundLayerImportWindow(int i) {
             InitializeComponent();
             widthWin = ActualWidth; // Set width to window
             heightWin = ActualHeight; // Set height to window
+            HitsoundLayers = new List<HitsoundLayer>();
             index = i;
             NameBox.Text = String.Format("Layer {0}", index + 1);
+            NameBox2.Text = String.Format("Layer {0}", index + 1);
             BeatmapPathBox.Text = MainWindow.AppWindow.GetCurrentMap();
+            BeatmapPathBox2.Text = MainWindow.AppWindow.GetCurrentMap();
         }
 
         private void BeatmapBrowse_Click(object sender, RoutedEventArgs e) {
@@ -42,15 +48,33 @@ namespace Mapping_Tools.Views {
             if (path != "") { BeatmapPathBox.Text = path; }
         }
 
+        private void BeatmapBrowse2_Click(object sender, RoutedEventArgs e) {
+            string path = FileFinder.BeatmapFileDialog();
+            if (path != "") { BeatmapPathBox2.Text = path; }
+        }
+
+        private void BeatmapLoad2_Click(object sender, RoutedEventArgs e) {
+            string path = FileFinder.CurrentBeatmap();
+            if (path != "") { BeatmapPathBox2.Text = path; }
+        }
+
         private void SampleBrowse_Click(object sender, RoutedEventArgs e) {
             string path = FileFinder.AudioFileDialog();
             if (path != "") { SamplePathBox.Text = path; }
         }
 
         private void Add_Click(object sender, RoutedEventArgs e) {
-            HitsoundLayer layer = new HitsoundLayer(NameBox.Text, BeatmapPathBox.Text, XCoordBox.GetDouble(), YCoordBox.GetDouble(),
+            if (Tabs.SelectedIndex == 0) {
+                // Import one layer
+                HitsoundLayer layer = new HitsoundLayer(NameBox.Text, BeatmapPathBox.Text, XCoordBox.GetDouble(), YCoordBox.GetDouble(),
                                             SampleSetBox.SelectedIndex + 1, HitsoundBox.SelectedIndex, SamplePathBox.Text, index);
-            HitsoundLayer = layer;
+                HitsoundLayers.Add(layer);
+            } else {
+                // Import complete hitsounds
+                HitsoundLayers = HitsoundConverter.LayersFromHitsounds(BeatmapPathBox2.Text);
+                HitsoundLayers.ForEach(o => o.Name = String.Format("{0}: {1}", NameBox2.Text, o.Name));
+            }
+            
             Close();
         }
 

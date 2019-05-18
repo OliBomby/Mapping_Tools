@@ -50,5 +50,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
             File.WriteAllLines(path, lines);
         }
+
+        public string GetBeatmapFolder() {
+            return Directory.GetParent(BeatmapPath).FullName;
+        }
     }
 }

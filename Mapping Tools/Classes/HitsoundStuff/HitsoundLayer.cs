@@ -1,4 +1,5 @@
-﻿using Mapping_Tools.Classes.BeatmapHelper;
+﻿
+using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using System;
 using System.Collections.Generic;
@@ -158,6 +159,17 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Path = "";
             X = -1;
             Y = -1;
+            Times = new List<double>();
+        }
+
+        public HitsoundLayer(string name, string path, int sampleSet, int hitsound, string samplePath) {
+            Name = name;
+            Path = path;
+            X = -1;
+            Y = -1;
+            SampleSet = sampleSet;
+            Hitsound = hitsound;
+            SamplePath = samplePath;
             Times = new List<double>();
         }
 

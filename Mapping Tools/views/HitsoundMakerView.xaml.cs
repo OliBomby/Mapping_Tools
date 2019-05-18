@@ -152,7 +152,7 @@ namespace Mapping_Tools.Views {
             try {
                 int index = LayersList.SelectedIndex;
                 if (index < 0 || index > Settings.HitsoundLayers.Count - 1) { return; }
-                WaveStream mainOutputStream = new WaveFileReader(Settings.HitsoundLayers[index].SamplePath);
+                WaveStream mainOutputStream = new MediaFoundationReader(Settings.HitsoundLayers[index].SamplePath);
                 WaveChannel32 volumeStream = new WaveChannel32(mainOutputStream);
 
                 WaveOutEvent player = new WaveOutEvent();
@@ -178,11 +178,13 @@ namespace Mapping_Tools.Views {
             try {
                 HitsoundLayerImportWindow importWindow = new HitsoundLayerImportWindow(Settings.HitsoundLayers.Count);
                 importWindow.ShowDialog();
-                HitsoundLayer layer = importWindow.HitsoundLayer;
-                if (layer != null) {
-                    Settings.HitsoundLayers.Add(layer);
-                    LayersList.SelectedIndex = LayersList.Items.IndexOf(layer);
+                foreach (HitsoundLayer layer in importWindow.HitsoundLayers) {
+                    if (layer != null) {
+                        Settings.HitsoundLayers.Add(layer);
+                        LayersList.SelectedIndex = LayersList.Items.IndexOf(layer);
+                    }
                 }
+                
                 RecalculatePriorities();
                 Num_Layers_Changed();
             } catch (Exception ex) {
