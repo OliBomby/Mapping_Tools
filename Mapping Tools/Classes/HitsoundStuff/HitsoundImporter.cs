@@ -115,7 +115,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return String.Format("{0}-hit{1}{2}.wav", HitsoundConverter.SampleSets[sampleSet], HitsoundConverter.Hitsounds[hitsound], index);
         }
 
-        public static List<HitsoundLayer> ImportMIDI(string path, string sampleFolder="") {
+        public static List<HitsoundLayer> ImportMIDI(string path, bool keysounds, string sampleFolder="") {
             List<HitsoundLayer> hitsoundLayers = new List<HitsoundLayer>();
 
             var strictMode = false;
@@ -124,8 +124,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
             for (int n = 0; n < mf.Tracks; n++) {
                 foreach (var midiEvent in mf.Events[n]) {
-                    Console.WriteLine(midiEvent);
-
                     if (midiEvent.CommandCode == MidiCommandCode.PatchChange) {
                         PatchChangeEvent patchChange = (PatchChangeEvent)midiEvent;
                         channelInstruments[patchChange.Channel] = patchChange.Patch;
@@ -136,12 +134,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     }
                     
                     NoteOnEvent on = (NoteOnEvent)midiEvent;
+                    
+                    string instrument = on.Channel == 10 ? "Percussion" : PatchChangeEvent.GetPatchName(channelInstruments[on.Channel]);
 
-                    int instrument = channelInstruments[on.Channel];
-                    string instrumentName = on.Channel == 10 ? "Percussion" : PatchChangeEvent.GetPatchName(instrument);
-
-                    string name = String.Format("{0}, {1}", instrumentName, on.NoteName);
-                    string filename = String.Format("{0}\\{1}.wav", instrumentName, on.NoteName);
+                    string name = keysounds || on.Channel == 10 ? String.Format("{0}, {1}", instrument, on.NoteName) : instrument;
+                    string filename = keysounds || on.Channel == 10 ? String.Format("{0}\\{1}.wav", instrument, on.NoteName) : String.Format("{0}.wav", instrument);
 
                     // Find the hitsoundlayer with this path
                     HitsoundLayer layer = hitsoundLayers.Find(o => o.Name == name);
