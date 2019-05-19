@@ -15,6 +15,17 @@ namespace Mapping_Tools.Classes.SystemTools
             return openFileDialog.FileName;
         }
 
+        public static string MIDIFileDialog() {
+            OpenFileDialog openFileDialog = new OpenFileDialog {
+                Filter = "MIDI files (*.mid)|*.mid",
+                FilterIndex = 1,
+                RestoreDirectory = true,
+                CheckFileExists = true
+            };
+            openFileDialog.ShowDialog();
+            return openFileDialog.FileName;
+        }
+
         public static string AudioFileDialog() {
             OpenFileDialog openFileDialog = new OpenFileDialog {
                 Filter = "Audio files (*.wav)|*.wav",

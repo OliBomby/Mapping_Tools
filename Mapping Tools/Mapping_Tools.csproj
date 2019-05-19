@@ -130,6 +130,7 @@
     <Compile Include="Classes\HitsoundStuff\Hitsound.cs" />
     <Compile Include="Classes\HitsoundStuff\HitsoundConverter.cs" />
     <Compile Include="Classes\HitsoundStuff\HitsoundExporter.cs" />
+    <Compile Include="Classes\HitsoundStuff\HitsoundImporter.cs" />
     <Compile Include="Classes\HitsoundStuff\HitsoundLayer.cs" />
     <Compile Include="Classes\HitsoundStuff\Sample.cs" />
     <Compile Include="Classes\HitsoundStuff\SamplePackage.cs" />

@@ -1,5 +1,6 @@
 ﻿using Mapping_Tools.Classes.BeatmapHelper;
 using NAudio.Wave;
+using NAudio.Midi;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -112,6 +113,52 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 return String.Format("{0}-hit{1}.wav", HitsoundConverter.SampleSets[sampleSet], HitsoundConverter.Hitsounds[hitsound]);
             }
             return String.Format("{0}-hit{1}{2}.wav", HitsoundConverter.SampleSets[sampleSet], HitsoundConverter.Hitsounds[hitsound], index);
+        }
+
+        public static List<HitsoundLayer> ImportMIDI(string path, string sampleFolder="") {
+            List<HitsoundLayer> hitsoundLayers = new List<HitsoundLayer>();
+
+            var strictMode = false;
+            var mf = new MidiFile(path, strictMode);
+            Dictionary<int, int> channelInstruments = new Dictionary<int, int>();
+
+            for (int n = 0; n < mf.Tracks; n++) {
+                foreach (var midiEvent in mf.Events[n]) {
+                    Console.WriteLine(midiEvent);
+
+                    if (midiEvent.CommandCode == MidiCommandCode.PatchChange) {
+                        PatchChangeEvent patchChange = (PatchChangeEvent)midiEvent;
+                        channelInstruments[patchChange.Channel] = patchChange.Patch;
+                        continue;
+                    }
+                    else if (!MidiEvent.IsNoteOn(midiEvent)) {
+                        continue;
+                    }
+                    
+                    NoteOnEvent on = (NoteOnEvent)midiEvent;
+
+                    int instrument = channelInstruments[on.Channel];
+                    string instrumentName = on.Channel == 10 ? "Percussion" : PatchChangeEvent.GetPatchName(instrument);
+
+                    string name = String.Format("{0}, {1}", instrumentName, on.NoteName);
+                    string filename = String.Format("{0}\\{1}.wav", instrumentName, on.NoteName);
+
+                    // Find the hitsoundlayer with this path
+                    HitsoundLayer layer = hitsoundLayers.Find(o => o.Name == name);
+
+                    if (layer != null) {
+                        // Find hitsound layer with this path and add this time
+                        layer.Times.Add(on.AbsoluteTime);
+                    } else {
+                        // Add new hitsound layer with this path
+                        HitsoundLayer newLayer = new HitsoundLayer(name, path, 1, 0, Path.Combine(sampleFolder, filename));
+                        newLayer.Times.Add(on.AbsoluteTime);
+                        hitsoundLayers.Add(newLayer);
+                    }
+                }
+            }
+
+            return hitsoundLayers;
         }
     }
 }

@@ -58,6 +58,11 @@ namespace Mapping_Tools.Views {
             if (path != "") { BeatmapPathBox2.Text = path; }
         }
 
+        private void MIDIBrowse3_Click(object sender, RoutedEventArgs e) {
+            string path = FileFinder.MIDIFileDialog();
+            if (path != "") { BeatmapPathBox3.Text = path; }
+        }
+
         private void SampleBrowse_Click(object sender, RoutedEventArgs e) {
             string path = FileFinder.AudioFileDialog();
             if (path != "") { SamplePathBox.Text = path; }
@@ -69,10 +74,14 @@ namespace Mapping_Tools.Views {
                 HitsoundLayer layer = new HitsoundLayer(NameBox.Text, BeatmapPathBox.Text, XCoordBox.GetDouble(), YCoordBox.GetDouble(),
                                             SampleSetBox.SelectedIndex + 1, HitsoundBox.SelectedIndex, SamplePathBox.Text, index);
                 HitsoundLayers.Add(layer);
-            } else {
+            } else if (Tabs.SelectedIndex == 1) {
                 // Import complete hitsounds
-                HitsoundLayers = HitsoundConverter.LayersFromHitsounds(BeatmapPathBox2.Text);
+                HitsoundLayers = HitsoundImporter.LayersFromHitsounds(BeatmapPathBox2.Text);
                 HitsoundLayers.ForEach(o => o.Name = String.Format("{0}: {1}", NameBox2.Text, o.Name));
+            } else {
+                // Import MIDI
+                HitsoundLayers = HitsoundImporter.ImportMIDI(BeatmapPathBox3.Text, SampleFolderBox3.Text);
+                HitsoundLayers.ForEach(o => o.Name = String.Format("{0}: {1}", NameBox3.Text, o.Name));
             }
             
             Close();
