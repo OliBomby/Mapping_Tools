@@ -20,10 +20,14 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
             // Read all samples
             foreach (string samplePath in samplePaths) {
-                WaveStream wave = new MediaFoundationReader(samplePath);
-                byte[] buffer = new byte[20000];
-                wave.Read(buffer, 0, Math.Min((int)wave.Length, 20000));
-                audios.Add(buffer);
+                try {
+                    WaveStream wave = new MediaFoundationReader(samplePath);
+                    byte[] buffer = new byte[20000];
+                    wave.Read(buffer, 0, Math.Min((int)wave.Length, 20000));
+                    audios.Add(buffer);
+                } catch (Exception) {
+                    audios.Add(Encoding.UTF8.GetBytes(samplePath));
+                }
             }
 
             for (int i = 0; i < audios.Count; i++) {
@@ -54,6 +58,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             List<HitsoundLayer> hitsoundLayers = new List<HitsoundLayer>();
 
             foreach (TimelineObject tlo in timeline.TimeLineObjects) {
+                if (!tlo.HasHitsound) { continue; }
+
                 List<Tuple<int, int, int>> samples = tlo.GetPlayingHitsounds();
                 
                 foreach (Tuple<int, int, int> sample in samples) {
