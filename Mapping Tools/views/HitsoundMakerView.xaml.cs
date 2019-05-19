@@ -262,7 +262,7 @@ namespace Mapping_Tools.Views {
                 int samples = 0;
                 foreach (CustomIndex ci in completeHitsounds.CustomIndices) {
                     foreach (HashSet<string> h in ci.Samples.Values) {
-                        if (h.Count > 0) {
+                        if (h.Any(o => File.Exists(o))) {
                             samples++;
                         }
                     }

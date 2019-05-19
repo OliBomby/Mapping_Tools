@@ -1,4 +1,5 @@
 ﻿using Mapping_Tools.Classes.BeatmapHelper;
+using NAudio.Wave;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +13,30 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         public static readonly List<string> Hitsounds = new List<string> { "normal", "whistle", "finish", "clap" };
 
+        public static Dictionary<string, string> AnalyzeSamples(string dir) {
+            string[] samplePaths = Directory.GetFiles(dir, "*.wav", SearchOption.TopDirectoryOnly);
+            List<byte[]> audios = new List<byte[]>(samplePaths.Length);
+            Dictionary<string, string> dict = new Dictionary<string, string>();
+
+            // Read all samples
+            foreach (string samplePath in samplePaths) {
+                WaveStream wave = new MediaFoundationReader(samplePath);
+                byte[] buffer = new byte[20000];
+                wave.Read(buffer, 0, Math.Min((int)wave.Length, 20000));
+                audios.Add(buffer);
+            }
+
+            for (int i = 0; i < audios.Count; i++) {
+                for (int k = 0; k < audios.Count; k++) {
+                    if (audios[i].SequenceEqual(audios[k])) {
+                        dict[samplePaths[i]] = samplePaths[k];
+                        break;
+                    }
+                }
+            }
+            return dict;
+        }
+
         /// <summary>
         /// Extract every used sample in a beatmap and return them as hitsound layers
         /// </summary>
@@ -24,9 +49,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
             int mode = beatmap.General["Mode"].Value;
             string mapDir = editor.GetBeatmapFolder();
+            Dictionary<string, string> firstSamples = AnalyzeSamples(mapDir);
 
             List<HitsoundLayer> hitsoundLayers = new List<HitsoundLayer>();
-            HashSet<string> paths = new HashSet<string>();
 
             foreach (TimelineObject tlo in timeline.TimeLineObjects) {
                 List<Tuple<int, int, int>> samples = tlo.GetPlayingHitsounds();
@@ -40,19 +65,25 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     string samplePath = Path.Combine(mapDir, filename);
 
                     // Simplify path if it doesn't exist
-                    filename = File.Exists(samplePath) ? filename : GetFileName(sampleSet, hitsound, -1);
-                    samplePath = Path.Combine(mapDir, filename);
+                    if (firstSamples.Keys.Contains(samplePath)) {
+                        samplePath = firstSamples[samplePath];
+                        filename = Path.GetFileName(samplePath);
+                    } else {
+                        filename = GetFileName(sampleSet, hitsound, -1);
+                        samplePath = Path.Combine(mapDir, filename);
+                    }
 
-                    if (paths.Contains(samplePath)) {
+                    // Find the hitsoundlayer with this path
+                    HitsoundLayer layer = hitsoundLayers.Find(o => o.SamplePath == samplePath);
+
+                    if (layer != null) {
                         // Find hitsound layer with this path and add this time
-                        HitsoundLayer layer = hitsoundLayers.Find(o => o.SamplePath == samplePath);
                         layer.Times.Add(tlo.Time);
                     } else {
                         // Add new hitsound layer with this path
-                        HitsoundLayer layer = new HitsoundLayer(filename, path, sample.Item1, sample.Item2, samplePath);
-                        layer.Times.Add(tlo.Time);
-                        hitsoundLayers.Add(layer);
-                        paths.Add(samplePath);
+                        HitsoundLayer newLayer = new HitsoundLayer(filename, path, sample.Item1, sample.Item2, samplePath);
+                        newLayer.Times.Add(tlo.Time);
+                        hitsoundLayers.Add(newLayer);
                     }
                 }
             }
