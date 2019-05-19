@@ -218,32 +218,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         public void ImportMap() {
-            Times = new List<double>();
-            Editor editor = new Editor(Path);
-
-            bool xIgnore = X == -1;
-            bool yIgnore = Y == -1;
-
-            foreach (HitObject ho in editor.Beatmap.HitObjects) {
-                if ((Math.Abs(ho.Pos.X - X) < 3 || xIgnore) && (Math.Abs(ho.Pos.Y - Y) < 3 || yIgnore)) {
-                    Times.Add(ho.Time);
-                }
-            }
+            Times = HitsoundImporter.TimesFromStack(Path, X, Y);
             NotifyPropertyChanged("Times");
         }
 
         public void ImportMap(string path, double x, double y) {
-            Times = new List<double>();
-            Editor editor = new Editor(path);
-
-            bool xIgnore = x == -1;
-            bool yIgnore = y == -1;
-
-            foreach (HitObject ho in editor.Beatmap.HitObjects) {
-                if ((Math.Abs(ho.Pos.X - x) < 3 || xIgnore) && (Math.Abs(ho.Pos.Y - y) < 3 || yIgnore)) {
-                    Times.Add(ho.Time);
-                }
-            }
+            Times = HitsoundImporter.TimesFromStack(path, x, y);
             NotifyPropertyChanged("Times");
         }
     }
