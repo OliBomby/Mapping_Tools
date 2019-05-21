@@ -1,5 +1,6 @@
 ﻿using Mapping_Tools.Classes.BeatmapHelper;
 using NAudio.Wave;
+using NAudio.Vorbis;
 using NAudio.Midi;
 using System;
 using System.Collections.Generic;
@@ -36,7 +37,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             // Read all samples
             foreach (string samplePath in samplePaths) {
                 try {
-                    WaveStream wave = new MediaFoundationReader(samplePath);
+                    WaveStream wave = new VorbisWaveReader(samplePath);
                     byte[] buffer = new byte[20000];
                     wave.Read(buffer, 0, Math.Min((int)wave.Length, 20000));
                     audios.Add(buffer);

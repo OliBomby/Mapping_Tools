@@ -1,6 +1,7 @@
 ﻿using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.Tools;
 using NAudio.Wave;
+using NAudio.Vorbis;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -67,7 +68,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
                     foreach (string path in kvp.Value) {
                         try {
-                            var wav = new WaveFileReader(path);
+                            var wav = new VorbisWaveReader(path);
                             mixer.AddInputStream(new WaveChannel32(wav));
                             soundsAdded++;
                         } catch (Exception) { }

@@ -18,6 +18,7 @@ using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.ViewSettings;
 using NAudio.Wave;
+using NAudio.Vorbis;
 
 namespace Mapping_Tools.Views {
     /// <summary>
@@ -152,7 +153,7 @@ namespace Mapping_Tools.Views {
             try {
                 int index = LayersList.SelectedIndex;
                 if (index < 0 || index > Settings.HitsoundLayers.Count - 1) { return; }
-                WaveStream mainOutputStream = new MediaFoundationReader(Settings.HitsoundLayers[index].SamplePath);
+                WaveStream mainOutputStream = new VorbisWaveReader(Settings.HitsoundLayers[index].SamplePath);
                 WaveChannel32 volumeStream = new WaveChannel32(mainOutputStream);
 
                 WaveOutEvent player = new WaveOutEvent();
