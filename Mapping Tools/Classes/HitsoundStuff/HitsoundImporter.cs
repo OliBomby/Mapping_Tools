@@ -26,8 +26,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         public static Dictionary<string, string> AnalyzeSamples(string dir) {
-            string[] samplePaths = Directory.GetFiles(dir, "*.wav", SearchOption.TopDirectoryOnly);
-            List<byte[]> audios = new List<byte[]>(samplePaths.Length);
+            var extList = new string[] { ".wav", ".ogg" };
+            List<string> samplePaths = Directory.GetFiles(dir, "*.*", SearchOption.TopDirectoryOnly)
+                .Where(n => extList.Contains(Path.GetExtension(n), StringComparer.OrdinalIgnoreCase))
+                        .ToList();
+            List<byte[]> audios = new List<byte[]>(samplePaths.Count);
             Dictionary<string, string> dict = new Dictionary<string, string>();
 
             // Read all samples
@@ -45,7 +48,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             for (int i = 0; i < audios.Count; i++) {
                 for (int k = 0; k < audios.Count; k++) {
                     if (audios[i].SequenceEqual(audios[k])) {
-                        dict[samplePaths[i]] = samplePaths[k];
+                        dict[Path.GetFileNameWithoutExtension(samplePaths[i])] = Path.GetFileName(samplePaths[k]);
                         break;
                     }
                 }
@@ -80,16 +83,15 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     int index = sample.Item3;
 
                     string filename = tlo.Filename ?? GetFileName(sampleSet, hitsound, index);
-                    string samplePath = Path.Combine(mapDir, filename);
+                    string extLess = Path.GetFileNameWithoutExtension(filename);
 
                     // Simplify path if it doesn't exist
-                    if (firstSamples.Keys.Contains(samplePath)) {
-                        samplePath = firstSamples[samplePath];
-                        filename = Path.GetFileName(samplePath);
+                    if (firstSamples.Keys.Contains(extLess)) {
+                        filename = firstSamples[extLess];
                     } else {
                         filename = GetFileName(sampleSet, hitsound, -1);
-                        samplePath = Path.Combine(mapDir, filename);
                     }
+                    string samplePath = Path.Combine(mapDir, filename);
 
                     // Find the hitsoundlayer with this path
                     HitsoundLayer layer = hitsoundLayers.Find(o => o.SamplePath == samplePath);
