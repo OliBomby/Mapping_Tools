@@ -99,7 +99,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         layer.Times.Add(tlo.Time);
                     } else {
                         // Add new hitsound layer with this path
-                        HitsoundLayer newLayer = new HitsoundLayer(filename, path, sample.Item1, sample.Item2, samplePath);
+                        HitsoundLayer newLayer = new HitsoundLayer(filename, "Hitsounds", path, sample.Item1, sample.Item2, samplePath);
                         newLayer.Times.Add(tlo.Time);
                         hitsoundLayers.Add(newLayer);
                     }
@@ -148,7 +148,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         layer.Times.Add(on.AbsoluteTime);
                     } else {
                         // Add new hitsound layer with this path
-                        HitsoundLayer newLayer = new HitsoundLayer(name, path, 1, 0, Path.Combine(sampleFolder, filename));
+                        HitsoundLayer newLayer = new HitsoundLayer(name, "MIDI", path, 1, 0, Path.Combine(sampleFolder, filename)) {
+                            Keysound = keysounds
+                        };
                         newLayer.Times.Add(on.AbsoluteTime);
                         hitsoundLayers.Add(newLayer);
                     }

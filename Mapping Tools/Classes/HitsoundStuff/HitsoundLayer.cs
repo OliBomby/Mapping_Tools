@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     public class HitsoundLayer : INotifyPropertyChanged {
@@ -17,6 +18,34 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 if (name != value) {
                     name = value;
                     NotifyPropertyChanged("Name");
+                }
+            }
+        }
+
+        private string importType;
+        public string ImportType {
+            get { return importType; }
+            set {
+                if (importType != value) {
+                    importType = value;
+                    NotifyPropertyChanged("ImportType");
+                    NotifyPropertyChanged("CoordinateVisibility");
+                    NotifyPropertyChanged("KeysoundVisibility");
+                }
+            }
+        }
+        
+        public Visibility CoordinateVisibility { get { if (ImportType == "Stack") { return Visibility.Visible; } else { return Visibility.Collapsed; } } }
+
+        public Visibility KeysoundVisibility { get { if (ImportType == "MIDI") { return Visibility.Visible; } else { return Visibility.Collapsed; } } }
+
+        private bool keysound;
+        public bool Keysound {
+            get { return keysound; }
+            set {
+                if (keysound != value) {
+                    keysound = value;
+                    NotifyPropertyChanged("Keysound");
                 }
             }
         }
@@ -162,9 +191,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Times = new List<double>();
         }
 
-        public HitsoundLayer(string name, string path, int sampleSet, int hitsound, string samplePath) {
+        public HitsoundLayer(string name, string importType, string path, int sampleSet, int hitsound, string samplePath) {
             Name = name;
             Path = path;
+            ImportType = importType;
             X = -1;
             Y = -1;
             SampleSet = sampleSet;
@@ -173,56 +203,93 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Times = new List<double>();
         }
 
-        public HitsoundLayer(string name, string path, double x, double y) {
+        public HitsoundLayer(string name, string importType, string path, double x, double y) {
             Name = name;
             Path = path;
+            ImportType = importType;
             X = x;
             Y = y;
-            ImportMap(path, x, y);
+            Times = new List<double>();
+            Import();
         }
 
-        public HitsoundLayer(string name, string path, double x, double y, int priority) {
+        public HitsoundLayer(string name, string importType, string path, double x, double y, int priority) {
             Name = name;
             Path = path;
+            ImportType = importType;
             X = x;
             Y = y;
             Priority = priority;
-            ImportMap(path, x, y);
+            Times = new List<double>();
+            Import();
         }
 
-        public HitsoundLayer(string name, string path, double x, double y, int sampleSet, int hitsound, string samplePath) {
+        public HitsoundLayer(string name, string importType, string path, double x, double y, int sampleSet, int hitsound, string samplePath) {
             Name = name;
             Path = path;
+            ImportType = importType;
             X = x;
             Y = y;
             SampleSet = sampleSet;
             Hitsound = hitsound;
             SamplePath = samplePath;
-            ImportMap(path, x, y);
+            Times = new List<double>();
+            Import();
         }
 
-        public HitsoundLayer(string name, string path, double x, double y, int sampleSet, int hitsound, string samplePath, int priority) {
+        public HitsoundLayer(string name, string importType, string path, double x, double y, int sampleSet, int hitsound, string samplePath, int priority) {
             Name = name;
             Path = path;
+            ImportType = importType;
             X = x;
             Y = y;
             SampleSet = sampleSet;
             Hitsound = hitsound;
             SamplePath = samplePath;
             Priority = priority;
-            ImportMap(path, x, y);
+            Times = new List<double>();
+            Import();
         }
 
         public void SetPriority(int priority) {
             Priority = priority;
         }
 
-        public void ImportMap() {
-            Times = HitsoundImporter.TimesFromStack(Path, X, Y);
-            NotifyPropertyChanged("Times");
+        public void Import() {
+            if (ImportType == "Stack") {
+                ImportStack(Path, x, y);
+            } else if (ImportType == "Hitsounds") {
+                // Import complete hitsounds
+                try {
+                    string name = Name.Split(':')[0];
+                } catch (IndexOutOfRangeException) {
+                    return;
+                }
+                List<HitsoundLayer> layers = HitsoundImporter.LayersFromHitsounds(Path);
+                layers.ForEach(o => o.Name = String.Format("{0}: {1}", name, o.Name));
+
+                HitsoundLayer sameLayer = layers.Find(o => o.Name == Name);
+                if (sameLayer != null) {
+                    Times = sameLayer.Times;
+                }
+            } else if (ImportType == "MIDI"){
+                // Import MIDI
+                try {
+                    string name = Name.Split(':')[0];
+                } catch (IndexOutOfRangeException) {
+                    return;
+                }
+                List<HitsoundLayer> layers = HitsoundImporter.ImportMIDI(Path, Keysound);
+                layers.ForEach(o => o.Name = String.Format("{0}: {1}", name, o.Name));
+
+                HitsoundLayer sameLayer = layers.Find(o => o.Name == Name);
+                if (sameLayer != null) {
+                    Times = sameLayer.Times;
+                }
+            }
         }
 
-        public void ImportMap(string path, double x, double y) {
+        public void ImportStack(string path, double x, double y) {
             Times = HitsoundImporter.TimesFromStack(path, x, y);
             NotifyPropertyChanged("Times");
         }

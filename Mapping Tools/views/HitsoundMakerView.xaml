@@ -40,13 +40,43 @@
             <Grid Grid.RowSpan="2" Grid.Column="0" Margin="0,0,10,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="50"/>
-                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <StackPanel x:Name="EditPanel" Grid.Row="0" Grid.RowSpan="2" DataContext="{Binding SelectedItem, ElementName=LayersList}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CanVerticallyScroll="True">
-                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,20,0,0"><Run Text="Name:"/></TextBlock>
+                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Name:"/></TextBlock>
                     <TextBox x:Name="SelectedNameBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="{Binding Name, Mode=TwoWay}"/>
-                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Source beatmap:"/></TextBlock>
+                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Hitsound sample:"/></TextBlock>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="30"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" x:Name="SelectedDefaultSamplePathBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="{Binding SamplePath, Mode=TwoWay}" Margin="0,0,5,0"/>
+                        <Button Grid.Column="1" Width="Auto" Height="Auto" Cursor="Hand" Click="SelectedDefaultSampleBrowse_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
+                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="#FFD6D6D6"/>
+                        </Button >
+                    </Grid>
+
+                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Hitsound info:"/></TextBlock>
+                    <ComboBox x:Name="SelectedSampleSetBox" Margin="0,10,0,0" HorizontalAlignment="Stretch" Text="{Binding SampleSetString, Mode=TwoWay}" Cursor="Hand">
+                        <ComboBoxItem Content="Normal" HorizontalAlignment="Left" Cursor="Hand"/>
+                        <ComboBoxItem Content="Soft" HorizontalAlignment="Left" Cursor="Hand"/>
+                        <ComboBoxItem Content="Drum" HorizontalAlignment="Left" Cursor="Hand"/>
+                    </ComboBox>
+                    <ComboBox x:Name="SelectedHitsoundBox" Margin="0,10,0,0" HorizontalAlignment="Stretch" Text="{Binding HitsoundString, Mode=TwoWay}" Cursor="Hand">
+                        <ComboBoxItem Content="Normal" HorizontalAlignment="Left" Cursor="Hand"/>
+                        <ComboBoxItem Content="Whistle" HorizontalAlignment="Left" Cursor="Hand"/>
+                        <ComboBoxItem Content="Finish" HorizontalAlignment="Left" Cursor="Hand"/>
+                        <ComboBoxItem Content="Clap" HorizontalAlignment="Left" Cursor="Hand"/>
+                    </ComboBox>
+                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,20,0,0"><Run Text="Import type:"/></TextBlock>
+                    <ComboBox x:Name="ImportTypeBox" Margin="0,10,0,0" HorizontalAlignment="Stretch" Text="{Binding ImportType, Mode=TwoWay}" Cursor="Hand">
+                        <ComboBoxItem Content="Stack" HorizontalAlignment="Left" Cursor="Hand"/>
+                        <ComboBoxItem Content="Hitsounds" HorizontalAlignment="Left" Cursor="Hand"/>
+                        <ComboBoxItem Content="MIDI" HorizontalAlignment="Left" Cursor="Hand"/>
+                    </ComboBox>
+                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Source:"/></TextBlock>
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -62,33 +92,11 @@
                             <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="#FFD6D6D6"/>
                         </Button >
                     </Grid>
-                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Hitsound sample:"/></TextBlock>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="30"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0" x:Name="SelectedDefaultSamplePathBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="{Binding SamplePath, Mode=TwoWay}" Margin="0,0,5,0"/>
-                        <Button Grid.Column="1" Width="Auto" Height="Auto" Cursor="Hand" Click="SelectedDefaultSampleBrowse_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
-                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="#FFD6D6D6"/>
-                        </Button >
-                    </Grid>
-                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Stack X coordinate:"/></TextBlock>
-                    <TextBox x:Name="SelectedXCoordBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="{Binding X, Mode=TwoWay}"/>
-                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Stack Y coordinate:"/></TextBlock>
-                    <TextBox x:Name="SelectedYCoordBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="{Binding Y, Mode=TwoWay}"/>
-                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Hitsound info:"/></TextBlock>
-                    <ComboBox x:Name="SelectedSampleSetBox" Margin="0,10,0,0" HorizontalAlignment="Stretch" Text="{Binding SampleSetString, Mode=TwoWay}" Cursor="Hand">
-                        <ComboBoxItem Content="Normal" HorizontalAlignment="Left" Cursor="Hand"/>
-                        <ComboBoxItem Content="Soft" HorizontalAlignment="Left" Cursor="Hand"/>
-                        <ComboBoxItem Content="Drum" HorizontalAlignment="Left" Cursor="Hand"/>
-                    </ComboBox>
-                    <ComboBox x:Name="SelectedHitsoundBox" Margin="0,10,0,0" HorizontalAlignment="Stretch" Text="{Binding HitsoundString, Mode=TwoWay}" Cursor="Hand">
-                        <ComboBoxItem Content="Normal" HorizontalAlignment="Left" Cursor="Hand"/>
-                        <ComboBoxItem Content="Whistle" HorizontalAlignment="Left" Cursor="Hand"/>
-                        <ComboBoxItem Content="Finish" HorizontalAlignment="Left" Cursor="Hand"/>
-                        <ComboBoxItem Content="Clap" HorizontalAlignment="Left" Cursor="Hand"/>
-                    </ComboBox>
+                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0" Visibility="{Binding CoordinateVisibility, Mode=OneWay}"><Run Text="Stack X coordinate:"/></TextBlock>
+                    <TextBox x:Name="SelectedXCoordBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Visibility="{Binding CoordinateVisibility, Mode=OneWay}" Text="{Binding X, Mode=TwoWay}"/>
+                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0" Visibility="{Binding CoordinateVisibility, Mode=OneWay}"><Run Text="Stack Y coordinate:"/></TextBlock>
+                    <TextBox x:Name="SelectedYCoordBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Visibility="{Binding CoordinateVisibility, Mode=OneWay}" Text="{Binding Y, Mode=TwoWay}"/>
+                    <CheckBox Content="Keysound import" Margin="0,10,0,0" IsChecked="{Binding Keysound, Mode=TwoWay}" Visibility="{Binding KeysoundVisibility, Mode=OneWay}"/>
                 </StackPanel>
                 <Button Grid.Row="1" Margin="0,5,0,0" Content="Reload layer from source" FontWeight="Bold" FontSize="16" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="ReloadFromSource_Click"/>
                 <Button Grid.Row="2" Margin="0,5,0,10" Content="Reload all from source" FontWeight="Bold" FontSize="16" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="ReloadAllFromSource_Click"/>

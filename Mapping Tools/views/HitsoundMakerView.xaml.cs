@@ -136,14 +136,14 @@ namespace Mapping_Tools.Views {
 
         private void ReloadFromSource_Click(object sender, RoutedEventArgs e) {
             try {
-                Settings.HitsoundLayers[LayersList.SelectedIndex].ImportMap();
+                Settings.HitsoundLayers[LayersList.SelectedIndex].Import();
             } catch (Exception) { }
         }
 
         private void ReloadAllFromSource_Click(object sender, RoutedEventArgs e) {
             try {
                 foreach (HitsoundLayer hl in Settings.HitsoundLayers) {
-                    hl.ImportMap();
+                    hl.Import();
                 }
             } catch (Exception) { }
         }
