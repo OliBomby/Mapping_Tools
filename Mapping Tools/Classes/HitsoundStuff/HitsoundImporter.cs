@@ -79,7 +79,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     int hitsound = sample.Item2;
                     int index = sample.Item3;
 
-                    string filename = GetFileName(sampleSet, hitsound, index);
+                    string filename = tlo.Filename ?? GetFileName(sampleSet, hitsound, index);
                     string samplePath = Path.Combine(mapDir, filename);
 
                     // Simplify path if it doesn't exist
