@@ -108,6 +108,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     }
                 }
             }
+
+            // Sort layers by name
+            hitsoundLayers = hitsoundLayers.OrderBy(o => o.Name).ToList();
+
             return hitsoundLayers;
         }
 
@@ -159,6 +163,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     }
                 }
             }
+
+            // Sort the times
+            hitsoundLayers.ForEach(o => o.Times = o.Times.OrderBy(t => t).ToList());
+
+            // Sort layers by name
+            hitsoundLayers = hitsoundLayers.OrderBy(o => o.Name).ToList();
 
             return hitsoundLayers;
         }
