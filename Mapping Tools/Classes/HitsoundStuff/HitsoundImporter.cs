@@ -93,6 +93,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         filename = GetFileName(sampleSet, hitsound, -1);
                     }
                     string samplePath = Path.Combine(mapDir, filename);
+                    extLess = Path.GetFileNameWithoutExtension(filename);
 
                     // Find the hitsoundlayer with this path
                     HitsoundLayer layer = hitsoundLayers.Find(o => o.SamplePath == samplePath);
@@ -102,7 +103,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         layer.Times.Add(tlo.Time);
                     } else {
                         // Add new hitsound layer with this path
-                        HitsoundLayer newLayer = new HitsoundLayer(filename, "Hitsounds", path, sample.Item1, sample.Item2, samplePath);
+                        HitsoundLayer newLayer = new HitsoundLayer(extLess, "Hitsounds", path, sample.Item1, sample.Item2, samplePath);
                         newLayer.Times.Add(tlo.Time);
                         hitsoundLayers.Add(newLayer);
                     }
