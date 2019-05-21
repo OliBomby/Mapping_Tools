@@ -79,12 +79,29 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     }
 
                     if (ci.Index == 1) {
-                        WaveFileWriter.CreateWaveFile(Path.Combine(exportFolder, kvp.Key + ".wav"), new Wave32To16Stream(mixer));
+                        CreateWaveFile(Path.Combine(exportFolder, kvp.Key + ".wav"), new Wave32To16Stream(mixer));
                     } else {
-                        WaveFileWriter.CreateWaveFile(Path.Combine(exportFolder, kvp.Key + ci.Index + ".wav"), new Wave32To16Stream(mixer));
+                        CreateWaveFile(Path.Combine(exportFolder, kvp.Key + ci.Index + ".wav"), new Wave32To16Stream(mixer));
                     }
                 }
             }
+        }
+
+        private static void CreateWaveFile(string filename, IWaveProvider sourceProvider) {
+            try {
+                using (var writer = new WaveFileWriter(filename, sourceProvider.WaveFormat)) {
+                    var buffer = new byte[sourceProvider.WaveFormat.AverageBytesPerSecond * 4];
+                    while (true) {
+                        int bytesRead = sourceProvider.Read(buffer, 0, buffer.Length);
+                        if (bytesRead == 0) {
+                            // end of source provider
+                            break;
+                        }
+                        // Write will throw exception if WAV file becomes too large
+                        writer.Write(buffer, 0, bytesRead);
+                    }
+                }
+            } catch (Exception) { }
         }
     }
 }
