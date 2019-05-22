@@ -68,8 +68,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
                     foreach (string path in kvp.Value) {
                         try {
-                            var wav = new VorbisWaveReader(path);
-                            mixer.AddInputStream(new WaveChannel32(wav));
+                            WaveStream wave = Path.GetExtension(path) == ".ogg" ? (WaveStream)new VorbisWaveReader(path) : new MediaFoundationReader(path);
+                            mixer.AddInputStream(new WaveChannel32(wave));
                             soundsAdded++;
                         } catch (Exception) { }
                     }

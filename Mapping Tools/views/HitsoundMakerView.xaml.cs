@@ -153,7 +153,8 @@ namespace Mapping_Tools.Views {
             try {
                 int index = LayersList.SelectedIndex;
                 if (index < 0 || index > Settings.HitsoundLayers.Count - 1) { return; }
-                WaveStream mainOutputStream = new VorbisWaveReader(Settings.HitsoundLayers[index].SamplePath);
+                string path = Settings.HitsoundLayers[index].SamplePath;
+                WaveStream mainOutputStream = Path.GetExtension(path) == ".ogg" ? (WaveStream) new VorbisWaveReader(path) : new MediaFoundationReader(path);
                 WaveChannel32 volumeStream = new WaveChannel32(mainOutputStream);
 
                 WaveOutEvent player = new WaveOutEvent();

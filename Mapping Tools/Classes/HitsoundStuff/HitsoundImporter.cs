@@ -37,7 +37,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             // Read all samples
             foreach (string samplePath in samplePaths) {
                 try {
-                    WaveStream wave = new VorbisWaveReader(samplePath);
+                    WaveStream wave = Path.GetExtension(samplePath) == ".ogg" ? (WaveStream)new VorbisWaveReader(samplePath) : new MediaFoundationReader(samplePath);
                     byte[] buffer = new byte[20000];
                     wave.Read(buffer, 0, Math.Min((int)wave.Length, 20000));
                     audios.Add(buffer);
