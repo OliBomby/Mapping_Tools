@@ -9,10 +9,36 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Mapping_Tools.ViewSettings {
-    public class HitsoundMakerSettings{
-        public string BaseBeatmap { get; set; }
-        public Sample DefaultSample { get; set; }
+    public class HitsoundMakerSettings : INotifyPropertyChanged {
+        private string baseBeatmap;
+        public string BaseBeatmap {
+            get { return baseBeatmap; }
+            set {
+                if (baseBeatmap != value) {
+                    baseBeatmap = value;
+                    NotifyPropertyChanged("BaseBeatmap");
+                }
+            }
+        }
+        
+        private Sample defaultSample;
+        public Sample DefaultSample {
+            get { return defaultSample; }
+            set {
+                if (defaultSample != value) {
+                    defaultSample = value;
+                    NotifyPropertyChanged("DefaultSample");
+                }
+            }
+        }
+
         public ObservableCollection<HitsoundLayer> HitsoundLayers { get; set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void NotifyPropertyChanged(string propName) {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+        }
 
         public HitsoundMakerSettings() {
             BaseBeatmap = "";

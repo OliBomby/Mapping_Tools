@@ -28,6 +28,11 @@ namespace Mapping_Tools.Views {
         private BackgroundWorker backgroundWorker;
         private HitsoundMakerSettings Settings;
 
+        private bool suppressEvents = false;
+
+        private List<HitsoundLayer> selectedLayers;
+        private HitsoundLayer selectedLayer;
+
         public HitsoundMakerView() {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
@@ -39,11 +44,11 @@ namespace Mapping_Tools.Views {
             } else {
                 Settings = new HitsoundMakerSettings();
             }
-
-            LayersList.ItemsSource = Settings.HitsoundLayers;
+            
             DataContext = Settings;
             LayersList.SelectedIndex = 0;
             Num_Layers_Changed();
+            GetSelectedLayers();
         }
 
         public HitsoundMakerSettings GetSettings() {
@@ -69,6 +74,21 @@ namespace Mapping_Tools.Views {
             progress.Value = e.ProgressPercentage;
         }
 
+        private void GetSelectedLayers() {
+            selectedLayers = new List<HitsoundLayer>();
+
+            if (LayersList.SelectedItems.Count == 0) {
+                selectedLayer = null;
+                return;
+            }
+
+            foreach (HitsoundLayer hsl in LayersList.SelectedItems) {
+                selectedLayers.Add(hsl);
+            }
+
+            selectedLayer = selectedLayers[0];
+        }
+
         private void Start_Click(object sender, RoutedEventArgs e) {
             if (Settings.BaseBeatmap == null || Settings.DefaultSample == null) {
                 MessageBox.Show("Please import a base beatmap and default hitsound first.");
@@ -78,30 +98,30 @@ namespace Mapping_Tools.Views {
             start.IsEnabled = false;
         }
 
-        private void SelectedDefaultSampleBrowse_Click(object sender, RoutedEventArgs e) {
+        private void SelectedSamplePathBrowse_Click(object sender, RoutedEventArgs e) {
             try {
                 string path = FileFinder.AudioFileDialog();
                 if (path != "") {
-                    Settings.HitsoundLayers[LayersList.SelectedIndex].SamplePath = path;
+                    SelectedSamplePathBox.Text = path;
                 }
             } catch (Exception) { }
         }
 
-        private void SelectedBaseBeatmapBrowse_Click(object sender, RoutedEventArgs e) {
+        private void SelectedSourcePathBrowse_Click(object sender, RoutedEventArgs e) {
             try {
                 string path = FileFinder.BeatmapFileDialog();
                 if (path != "") {
-                    Settings.HitsoundLayers[LayersList.SelectedIndex].Path = path;
+                    SelectedSourcePathBox.Text = path;
                     }
             } catch (Exception) { }
         }
 
-        private void SelectedBaseBeatmapLoad_Click(object sender, RoutedEventArgs e) {
+        private void SelectedSourcePathLoad_Click(object sender, RoutedEventArgs e) {
             try {
                 string path = FileFinder.CurrentBeatmap();
                 if (path != "") {
-                    Settings.HitsoundLayers[LayersList.SelectedIndex].Path = path;
-                    }
+                    SelectedSourcePathBox.Text = path;
+                }
             } catch (Exception) { }
         }
 
@@ -120,7 +140,6 @@ namespace Mapping_Tools.Views {
                 string path = FileFinder.BeatmapFileDialog();
                 if (path != "") {
                     Settings.BaseBeatmap = path;
-                    BaseBeatmapPathBox.Text = path;
                     }
             } catch (Exception) { }
         }
@@ -130,30 +149,93 @@ namespace Mapping_Tools.Views {
                 string path = FileFinder.CurrentBeatmap();
                 if (path != "") {
                     Settings.BaseBeatmap = path;
-                    BaseBeatmapPathBox.Text = path;
                     }
             } catch (Exception) { }
         }
 
         private void ReloadFromSource_Click(object sender, RoutedEventArgs e) {
             try {
-                Settings.HitsoundLayers[LayersList.SelectedIndex].Import();
-            } catch (Exception) { }
-        }
-
-        private void ReloadAllFromSource_Click(object sender, RoutedEventArgs e) {
-            try {
-                foreach (HitsoundLayer hl in Settings.HitsoundLayers) {
+                foreach (HitsoundLayer hl in selectedLayers) {
                     hl.Import();
                 }
             } catch (Exception) { }
         }
 
+        private void LayersList_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            GetSelectedLayers();
+            UpdateEditingField();
+        }
+
+        private void UpdateEditingField() {
+            suppressEvents = true;
+
+            // Populate the editing fields
+            if (selectedLayers.TrueForAll(o => o.Name == selectedLayer.Name)) {
+                SelectedNameBox.Text = selectedLayer.Name;
+            } else {
+                SelectedNameBox.Text = "";
+            }
+            if (selectedLayers.TrueForAll(o => o.SamplePath == selectedLayer.SamplePath)) {
+                SelectedSamplePathBox.Text = selectedLayer.SamplePath;
+            } else {
+                SelectedSamplePathBox.Text = "";
+            }
+            if (selectedLayers.TrueForAll(o => o.SampleSet == selectedLayer.SampleSet)) {
+                SelectedSampleSetBox.Text = selectedLayer.SampleSetString;
+            } else {
+                SelectedSampleSetBox.Text = "";
+            }
+            if (selectedLayers.TrueForAll(o => o.Hitsound == selectedLayer.Hitsound)) {
+                SelectedHitsoundBox.Text = selectedLayer.HitsoundString;
+            } else {
+                SelectedHitsoundBox.Text = "";
+            }
+            if (selectedLayers.TrueForAll(o => o.ImportType == selectedLayer.ImportType)) {
+                ImportTypeBox.Text = selectedLayer.ImportType;
+            } else {
+                ImportTypeBox.Text = "";
+            }
+            if (selectedLayers.TrueForAll(o => o.Path == selectedLayer.Path)) {
+                SelectedSourcePathBox.Text = selectedLayer.Path;
+            } else {
+                SelectedSourcePathBox.Text = "";
+            }
+            if (selectedLayers.TrueForAll(o => o.X == selectedLayer.X)) {
+                SelectedXCoordBox.Text = selectedLayer.X.ToString();
+            } else {
+                SelectedXCoordBox.Text = "";
+            }
+            if (selectedLayers.TrueForAll(o => o.Y == selectedLayer.Y)) {
+                SelectedYCoordBox.Text = selectedLayer.Y.ToString();
+            } else {
+                SelectedYCoordBox.Text = "";
+            }
+            if (selectedLayers.TrueForAll(o => o.Keysound == selectedLayer.Keysound)) {
+                KeysoundBox.IsChecked = selectedLayer.Keysound;
+            } else {
+                KeysoundBox.IsChecked = null;
+            }
+
+            // Update visibility
+            if (selectedLayers.Any(o => o.ImportType == "Stack")) {
+                SelectedCoordinatePanel.Visibility = Visibility.Visible;
+            } else {
+                SelectedCoordinatePanel.Visibility = Visibility.Collapsed;
+            }
+            if (selectedLayers.Any(o => o.ImportType == "MIDI")) {
+                KeysoundBox.Visibility = Visibility.Visible;
+            } else {
+                KeysoundBox.Visibility = Visibility.Collapsed;
+            }
+
+            suppressEvents = false;
+        }
+
         void HitsoundLayer_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
             try {
-                int index = LayersList.SelectedIndex;
-                if (index < 0 || index > Settings.HitsoundLayers.Count - 1) { return; }
-                string path = Settings.HitsoundLayers[index].SamplePath;
+                string path = selectedLayer.SamplePath;
                 WaveStream mainOutputStream = Path.GetExtension(path) == ".ogg" ? (WaveStream) new VorbisWaveReader(path) : new MediaFoundationReader(path);
                 WaveChannel32 volumeStream = new WaveChannel32(mainOutputStream);
 
@@ -162,7 +244,7 @@ namespace Mapping_Tools.Views {
                 player.Init(volumeStream);
 
                 player.Play();
-            } catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
+            } catch (Exception) { }
         }
 
         private void Num_Layers_Changed() {
@@ -180,15 +262,18 @@ namespace Mapping_Tools.Views {
             try {
                 HitsoundLayerImportWindow importWindow = new HitsoundLayerImportWindow(Settings.HitsoundLayers.Count);
                 importWindow.ShowDialog();
+
+                LayersList.SelectedItems.Clear();
                 foreach (HitsoundLayer layer in importWindow.HitsoundLayers) {
                     if (layer != null) {
                         Settings.HitsoundLayers.Add(layer);
-                        LayersList.SelectedIndex = LayersList.Items.IndexOf(layer);
+                        LayersList.SelectedItems.Add(layer);
                     }
                 }
                 
                 RecalculatePriorities();
                 Num_Layers_Changed();
+                GetSelectedLayers();
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message);
             }
@@ -200,50 +285,108 @@ namespace Mapping_Tools.Views {
                 MessageBoxResult messageBoxResult = MessageBox.Show("Are you sure?", "Delete Confirmation", MessageBoxButton.YesNo);
                 if (messageBoxResult != MessageBoxResult.Yes) { return; }
 
-                var selected = LayersList.SelectedItems;
-                if (selected.Count == 0 || selected == null) { return; }
-                int index = LayersList.Items.IndexOf(selected[0]);
-                List<HitsoundLayer> removeList = new List<HitsoundLayer>();
-                foreach (var item in selected) {
-                    removeList.Add((HitsoundLayer)item);
-                }
-                foreach (HitsoundLayer hsl in removeList) {
+                if (selectedLayers.Count == 0 || selectedLayers == null) { return; }
+
+                suppressEvents = true;
+
+                int index = Settings.HitsoundLayers.IndexOf(selectedLayer);
+
+                foreach (HitsoundLayer hsl in selectedLayers) {
                     Settings.HitsoundLayers.Remove(hsl);
                 }
+                suppressEvents = false;
+
                 LayersList.SelectedIndex = Math.Max(Math.Min(index - 1, Settings.HitsoundLayers.Count - 1), 0);
 
                 RecalculatePriorities();
                 Num_Layers_Changed();
+
             } catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
         }
 
         private void Raise_Click(object sender, RoutedEventArgs e) {
             try {
-                int index = LayersList.SelectedIndex;
-                if (index <= 0) { return; }
+                suppressEvents = true;
 
-                var item = Settings.HitsoundLayers[index];
-                Settings.HitsoundLayers.RemoveAt(index);
-                Settings.HitsoundLayers.Insert(index - 1, item);
+                int selectedIndex = Settings.HitsoundLayers.IndexOf(selectedLayer);
+                List<HitsoundLayer> moveList = new List<HitsoundLayer>();
+                foreach (HitsoundLayer hsl in selectedLayers) {
+                    moveList.Add(hsl);
+                }
 
-                LayersList.SelectedIndex = index - 1;
+                foreach (HitsoundLayer hsl in Settings.HitsoundLayers) {
+                    if (moveList.Contains(hsl)) {
+                        moveList.Remove(hsl);
+                    }
+                    else
+                        break;
+                }
+
+                foreach (HitsoundLayer hsl in moveList) {
+                    int index = Settings.HitsoundLayers.IndexOf(hsl);
+
+                    //Dont move left if it is the first item in the list or it is not in the list
+                    if (index <= 0)
+                        continue;
+
+                    //Swap with this item with the one to its left
+                    Settings.HitsoundLayers.Remove(hsl);
+                    Settings.HitsoundLayers.Insert(index - 1, hsl);
+                }
+
+                LayersList.SelectedItems.Clear();
+                foreach (HitsoundLayer hsl in selectedLayers) {
+                    LayersList.SelectedItems.Add(hsl);
+                }
+
+                suppressEvents = false;
 
                 RecalculatePriorities();
+                GetSelectedLayers();
             } catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
         }
 
         private void Lower_Click(object sender, RoutedEventArgs e) {
             try {
-                int index = LayersList.SelectedIndex;
-                if (index >= Settings.HitsoundLayers.Count - 1) { return; }
+                suppressEvents = true;
 
-                var item = Settings.HitsoundLayers[index];
-                Settings.HitsoundLayers.RemoveAt(index);
-                Settings.HitsoundLayers.Insert(index + 1, item);
+                int selectedIndex = Settings.HitsoundLayers.IndexOf(selectedLayer);
+                List<HitsoundLayer> moveList = new List<HitsoundLayer>();
+                foreach (HitsoundLayer hsl in selectedLayers) {
+                    moveList.Add(hsl);
+                }
 
-                LayersList.SelectedIndex = index + 1;
+                for (int i = Settings.HitsoundLayers.Count - 1; i >= 0; i--) {
+                    HitsoundLayer hsl = Settings.HitsoundLayers[i];
+                    if (moveList.Contains(hsl)) {
+                        moveList.Remove(hsl);
+                    }
+                    else
+                        break;
+                }
+
+                for (int i = moveList.Count - 1; i >= 0; i--) {
+                    HitsoundLayer hsl = moveList[i];
+                    int index = Settings.HitsoundLayers.IndexOf(hsl);
+
+                    //Dont move left if it is the first item in the list or it is not in the list
+                    if (index >= Settings.HitsoundLayers.Count - 1)
+                        continue;
+
+                    //Swap with this item with the one to its left
+                    Settings.HitsoundLayers.Remove(hsl);
+                    Settings.HitsoundLayers.Insert(index + 1, hsl);
+                }
+
+                LayersList.SelectedItems.Clear();
+                foreach (HitsoundLayer hsl in selectedLayers) {
+                    LayersList.SelectedItems.Add(hsl);
+                }
+
+                suppressEvents = false;
 
                 RecalculatePriorities();
+                GetSelectedLayers();
             } catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
         }
 
@@ -318,6 +461,87 @@ namespace Mapping_Tools.Views {
         private void UpdateProgressBar(BackgroundWorker worker, int progress) {
             if (worker != null && worker.WorkerReportsProgress) {
                 worker.ReportProgress(progress);
+            }
+        }
+
+        private void SelectedNameBox_TextChanged(object sender, TextChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            string t = (sender as TextBox).Text;
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.Name = t;
+            }
+        }
+
+        private void SelectedSamplePathBox_TextChanged(object sender, TextChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            string t = (sender as TextBox).Text;
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.SamplePath = t;
+            }
+        }
+
+        private void SelectedSampleSetBox_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            string t = ((sender as ComboBox).SelectedItem as ComboBoxItem).Content.ToString();
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.SampleSetString = t;
+            }
+        }
+
+        private void SelectedHitsoundBox_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            string t = ((sender as ComboBox).SelectedItem as ComboBoxItem).Content.ToString();
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.HitsoundString = t;
+            }
+        }
+
+        private void ImportTypeBox_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            string t = ((sender as ComboBox).SelectedItem as ComboBoxItem).Content.ToString();
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.ImportType = t;
+            }
+        }
+
+        private void SelectedSourcePathBox_TextChanged(object sender, TextChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            string t = (sender as TextBox).Text;
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.Path = t;
+            }
+        }
+
+        private void SelectedXCoordBox_TextChanged(object sender, TextChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            double t = (sender as TextBox).GetDouble(-1);
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.X = t;
+            }
+        }
+
+        private void SelectedYCoordBox_TextChanged(object sender, TextChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            double t = (sender as TextBox).GetDouble(-1);
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.Y = t;
+            }
+        }
+
+        private void KeysoundBox_Changed(object sender, RoutedEventArgs e) {
+            if (suppressEvents) return;
+
+            bool t = (bool)(sender as CheckBox).IsChecked;
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.Keysound = t;
             }
         }
     }
