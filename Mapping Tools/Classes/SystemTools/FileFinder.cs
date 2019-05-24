@@ -28,7 +28,7 @@ namespace Mapping_Tools.Classes.SystemTools
 
         public static string AudioFileDialog() {
             OpenFileDialog openFileDialog = new OpenFileDialog {
-                Filter = "Audio files (*.wav)|*.wav",
+                Filter = "Audio files (*.wav;*.ogg)|*.wav;*.ogg",
                 FilterIndex = 1,
                 RestoreDirectory = true,
                 CheckFileExists = true
