@@ -90,14 +90,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public void MoveTime(double deltaTime) {
             Time += deltaTime;
             EndTime += deltaTime;
-            // Move its sliderbodyhitsounds
-            foreach (TimingPoint tp in BodyHitsounds) {
-                tp.Offset += deltaTime;
-            }
+
             // Move its timelineobjects
             foreach (TimelineObject tlo in TimelineObjects) {
                 tlo.Time += deltaTime;
             }
+
+            BodyHitsounds.RemoveAll(s => s.Offset >= EndTime || s.Offset <= Time);
         }
 
         public void MoveEndTime(Timing timing, double deltaTime) {
