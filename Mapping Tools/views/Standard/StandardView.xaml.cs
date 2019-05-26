@@ -16,6 +16,7 @@ namespace Mapping_Tools.Views {
                 }
             }
         }
+
         public class MyItem {
             public string Path { get; set; }
 

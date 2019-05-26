@@ -54,16 +54,15 @@
                 <Viewbox MaxWidth="150" HorizontalAlignment="Left" Grid.Row="0">
                     <TextBlock Foreground="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}">Recent</TextBlock>
                 </Viewbox>
-                <Viewbox HorizontalAlignment="Left" Grid.Row="1" VerticalAlignment="Top">
-                    <ListView x:Name="recentList" Foreground="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}" MouseDoubleClick="RecentList_MouseDoubleClick">
-                        <ListView.View>
-                            <GridView>
-                                <GridViewColumn Header="Path" DisplayMemberBinding="{Binding Path}"/>
-                                <GridViewColumn Header="Date" DisplayMemberBinding="{Binding Date}"/>
-                            </GridView>
-                        </ListView.View>
-                    </ListView>
-                </Viewbox>
+                <ListView x:Name="recentList" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                          Foreground="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}" MouseDoubleClick="RecentList_MouseDoubleClick">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Path" DisplayMemberBinding="{Binding Path}"/>
+                            <GridViewColumn Header="Date" DisplayMemberBinding="{Binding Date}"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
             </Grid>
         </Grid>
         <Grid Margin="40,0,0,0" Grid.Column="1">
@@ -78,21 +77,24 @@
                 <TextBlock Foreground="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}">New stuff</TextBlock>
             </Viewbox>
             <Grid VerticalAlignment="Top" Grid.Row="1">
-                <ListView x:Name="NewsList" VerticalContentAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListView x:Name="NewsList" VerticalContentAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
                     <ListViewItem>
-                        <TextBlock>MIDI importing for Hitsound Maker</TextBlock>
+                        <TextBlock>MIDI importing</TextBlock>
                     </ListViewItem>
                     <ListViewItem>
-                        <TextBlock>Complete hitsounds importing for Hitsound Maker</TextBlock>
+                        <TextBlock>Complete hitsounds importing</TextBlock>
                     </ListViewItem>
                     <ListViewItem>
-                        <TextBlock>Editing multiple layers at the same time in Hitsound Maker</TextBlock>
+                        <TextBlock>Editing multiple layers at the same time</TextBlock>
                     </ListViewItem>
                     <ListViewItem>
-                        <TextBlock>Hitsound Copier is complete</TextBlock>
+                        <TextBlock>Saving/Loading projects</TextBlock>
                     </ListViewItem>
                     <ListViewItem>
-                        <TextBlock>Improved resnapping in Map Cleaner</TextBlock>
+                        <TextBlock>Added Hitsound Copier</TextBlock>
+                    </ListViewItem>
+                    <ListViewItem>
+                        <TextBlock>Improved resnapping</TextBlock>
                     </ListViewItem>
                 </ListView>
             </Grid>
