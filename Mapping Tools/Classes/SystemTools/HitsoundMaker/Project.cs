@@ -1,5 +1,5 @@
 ﻿using Mapping_Tools.Classes.HitsoundStuff;
-using Mapping_Tools.ViewSettings;
+using Mapping_Tools.Viewmodels;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,14 +11,14 @@ using System.Threading.Tasks;
 namespace Mapping_Tools.Classes.SystemTools.HitsoundMaker {
     public class Project {
         public string Name;
-        public HitsoundMakerSettings Settings { get; set; }
+        public HitsoundMakerVM Settings { get; set; }
 
         public Project(string name) {
             Name = name;
-            Settings = new HitsoundMakerSettings();
+            Settings = new HitsoundMakerVM();
         }
 
-        public Project(string name, HitsoundMakerSettings settings) {
+        public Project(string name, HitsoundMakerVM settings) {
             Name = name;
             Settings = settings;
         }

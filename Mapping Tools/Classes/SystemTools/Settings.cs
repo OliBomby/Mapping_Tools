@@ -1,4 +1,4 @@
-﻿using Mapping_Tools.ViewSettings;
+﻿using Mapping_Tools.Viewmodels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,13 +8,13 @@ namespace Mapping_Tools.Classes.SystemTools {
         public List<String[]> RecentMaps;
         public string OsuPath;
         public string SongsPath;
-        public HitsoundMakerSettings HitsoundMakerSettings;
+        public HitsoundMakerVM HitsoundMakerVM;
 
         public Settings() {
             RecentMaps = new List<String[]>();
             OsuPath = "";
             SongsPath = "";
-            HitsoundMakerSettings = new HitsoundMakerSettings();
+            HitsoundMakerVM = new HitsoundMakerVM();
         }
 
         public void AddRecentMaps(String path, DateTime date) {

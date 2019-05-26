@@ -16,7 +16,7 @@ using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SliderPathStuff;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
-using Mapping_Tools.ViewSettings;
+using Mapping_Tools.Viewmodels;
 using NAudio.Wave;
 using NAudio.Vorbis;
 
@@ -26,7 +26,7 @@ namespace Mapping_Tools.Views {
     /// </summary>
     public partial class HitsoundMakerView : UserControl {
         private BackgroundWorker backgroundWorker;
-        private HitsoundMakerSettings Settings;
+        private HitsoundMakerVM Settings;
 
         private bool suppressEvents = false;
 
@@ -39,10 +39,10 @@ namespace Mapping_Tools.Views {
             Height = MainWindow.AppWindow.content_views.Height;
             backgroundWorker = (BackgroundWorker) FindResource("backgroundWorker");
             
-            if (MainWindow.AppWindow.settingsManager.settings.HitsoundMakerSettings != null) {
-                Settings = MainWindow.AppWindow.settingsManager.settings.HitsoundMakerSettings;
+            if (MainWindow.AppWindow.settingsManager.settings.HitsoundMakerVM != null) {
+                Settings = MainWindow.AppWindow.settingsManager.settings.HitsoundMakerVM;
             } else {
-                Settings = new HitsoundMakerSettings();
+                Settings = new HitsoundMakerVM();
             }
             
             DataContext = Settings;
@@ -51,11 +51,11 @@ namespace Mapping_Tools.Views {
             GetSelectedLayers();
         }
 
-        public HitsoundMakerSettings GetSettings() {
+        public HitsoundMakerVM GetSettings() {
             return Settings;
         }
 
-        public void SetSettings(HitsoundMakerSettings settings) {
+        public void SetSettings(HitsoundMakerVM settings) {
             Settings = settings;
             DataContext = Settings;
             LayersList.SelectedIndex = 0;

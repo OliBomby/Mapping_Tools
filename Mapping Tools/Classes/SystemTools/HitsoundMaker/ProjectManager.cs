@@ -1,6 +1,6 @@
 ﻿using Mapping_Tools.Classes.HitsoundStuff;
+using Mapping_Tools.Viewmodels;
 using Mapping_Tools.Views;
-using Mapping_Tools.ViewSettings;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -33,7 +33,7 @@ namespace Mapping_Tools.Classes.SystemTools.HitsoundMaker {
             }
         }
 
-        public void LoadProject(string name, HitsoundMakerSettings settings) {
+        public void LoadProject(string name, HitsoundMakerVM settings) {
             CurrentProject = new Project(name, settings);
             LoadFromJSON(CurrentProject.GetJSONPath());
         }
@@ -98,7 +98,7 @@ namespace Mapping_Tools.Classes.SystemTools.HitsoundMaker {
                     using (StreamReader fs = new StreamReader(path))
                     using (JsonReader reader = new JsonTextReader(fs)) {
                         HitsoundMakerView view = (HitsoundMakerView)MainWindow.AppWindow.Views.GetHitsoundMaker();
-                        view.SetSettings(Serializer.Deserialize<HitsoundMakerSettings>(reader));
+                        view.SetSettings(Serializer.Deserialize<HitsoundMakerVM>(reader));
                     }
                 } catch (Exception ex) {
                     Console.WriteLine(ex.StackTrace);

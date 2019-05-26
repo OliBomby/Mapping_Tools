@@ -9,7 +9,7 @@ namespace Mapping_Tools.Views {
     public class ViewCollection {
         public void SaveSettings() {
             if (HitsoundMaker != null) {
-                MainWindow.AppWindow.settingsManager.settings.HitsoundMakerSettings = ((HitsoundMakerView)HitsoundMaker).GetSettings();
+                MainWindow.AppWindow.settingsManager.settings.HitsoundMakerVM = ((HitsoundMakerView)HitsoundMaker).GetSettings();
             }
         }
 

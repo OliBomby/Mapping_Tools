@@ -208,40 +208,39 @@
     <Compile Include="Viewmodels\SliderMergerVM.cs" />
     <Compile Include="Viewmodels\PreferencesVM.cs" />
     <Compile Include="Viewmodels\StandardVM.cs" />
-    <Compile Include="ViewSettings\HitsoundMakerSettings.cs" />
     <Compile Include="Views\Extensions.cs" />
-    <Compile Include="Views\TimingHelperView.xaml.cs">
+    <Compile Include="Views\TimingHelper\TimingHelperView.xaml.cs">
       <DependentUpon>TimingHelperView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\PropertyTransformerView.xaml.cs">
+    <Compile Include="Views\PropertyTransformer\PropertyTransformerView.xaml.cs">
       <DependentUpon>PropertyTransformerView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\HitsoundMakerView.xaml.cs">
+    <Compile Include="Views\HitsoundMaker\HitsoundMakerView.xaml.cs">
       <DependentUpon>HitsoundMakerView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\HitsoundCopierView.xaml.cs">
+    <Compile Include="Views\HitsoundCopier\HitsoundCopierView.xaml.cs">
       <DependentUpon>HitsoundCopierView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\SnappingToolsView.xaml.cs">
+    <Compile Include="Views\SnappingTools\SnappingToolsView.xaml.cs">
       <DependentUpon>SnappingToolsView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\SliderCompletionatorView.xaml.cs">
+    <Compile Include="Views\SliderCompletionator\SliderCompletionatorView.xaml.cs">
       <DependentUpon>SliderCompletionatorView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\PreferencesView.xaml.cs">
+    <Compile Include="Views\Preferences\PreferencesView.xaml.cs">
       <DependentUpon>PreferencesView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\StandardView.xaml.cs">
+    <Compile Include="Views\Standard\StandardView.xaml.cs">
       <DependentUpon>StandardView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\CleanerView.xaml.cs">
+    <Compile Include="Views\MapCleaner\CleanerView.xaml.cs">
       <DependentUpon>CleanerView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\SliderMergerView.xaml.cs">
+    <Compile Include="Views\SliderMerger\SliderMergerView.xaml.cs">
       <DependentUpon>SliderMergerView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ViewCollection.cs" />
-    <Compile Include="Views\HitsoundLayerImportWindow.xaml.cs">
+    <Compile Include="Views\HitsoundMaker\HitsoundLayerImportWindow.xaml.cs">
       <DependentUpon>HitsoundLayerImportWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="Components\TimeLine\TimeLine.xaml">
@@ -276,47 +275,47 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Views\TimingHelperView.xaml">
+    <Page Include="Views\TimingHelper\TimingHelperView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\PropertyTransformerView.xaml">
+    <Page Include="Views\PropertyTransformer\PropertyTransformerView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\HitsoundMakerView.xaml">
+    <Page Include="Views\HitsoundMaker\HitsoundMakerView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\HitsoundCopierView.xaml">
+    <Page Include="Views\HitsoundCopier\HitsoundCopierView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\SnappingToolsView.xaml">
+    <Page Include="Views\SnappingTools\SnappingToolsView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\SliderCompletionatorView.xaml">
+    <Page Include="Views\SliderCompletionator\SliderCompletionatorView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\PreferencesView.xaml">
+    <Page Include="Views\Preferences\PreferencesView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\StandardView.xaml">
+    <Page Include="Views\Standard\StandardView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\CleanerView.xaml">
+    <Page Include="Views\MapCleaner\CleanerView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\SliderMergerView.xaml">
+    <Page Include="Views\SliderMerger\SliderMergerView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\HitsoundLayerImportWindow.xaml">
+    <Page Include="Views\HitsoundMaker\HitsoundLayerImportWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
