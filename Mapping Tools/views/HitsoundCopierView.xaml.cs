@@ -269,7 +269,7 @@ namespace Mapping_Tools.Views {
 
         private void BeatmapFromBrowse_Click(object sender, RoutedEventArgs e) {
             try {
-                string path = FileFinder.BeatmapFileDialog();
+                string path = IOHelper.BeatmapFileDialog();
                 if (path != "") {
                     BeatmapFromBox.Text = path;
                 }
@@ -278,7 +278,7 @@ namespace Mapping_Tools.Views {
 
         private void BeatmapFromLoad_Click(object sender, RoutedEventArgs e) {
             try {
-                string path = FileFinder.CurrentBeatmap();
+                string path = IOHelper.CurrentBeatmap();
                 if (path != "") {
                     BeatmapFromBox.Text = path;
                 }
@@ -287,7 +287,7 @@ namespace Mapping_Tools.Views {
 
         private void BeatmapToBrowse_Click(object sender, RoutedEventArgs e) {
             try {
-                string path = FileFinder.BeatmapFileDialog();
+                string path = IOHelper.BeatmapFileDialog();
                 if (path != "") {
                     BeatmapToBox.Text = path;
                 }
@@ -296,7 +296,7 @@ namespace Mapping_Tools.Views {
 
         private void BeatmapToLoad_Click(object sender, RoutedEventArgs e) {
             try {
-                string path = FileFinder.CurrentBeatmap();
+                string path = IOHelper.CurrentBeatmap();
                 if (path != "") {
                     BeatmapToBox.Text = path;
                 }

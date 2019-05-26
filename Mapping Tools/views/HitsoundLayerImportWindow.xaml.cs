@@ -39,32 +39,32 @@ namespace Mapping_Tools.Views {
         }
 
         private void BeatmapBrowse_Click(object sender, RoutedEventArgs e) {
-            string path = FileFinder.BeatmapFileDialog();
+            string path = IOHelper.BeatmapFileDialog();
             if (path != "") { BeatmapPathBox.Text = path; }
         }
 
         private void BeatmapLoad_Click(object sender, RoutedEventArgs e) {
-            string path = FileFinder.CurrentBeatmap();
+            string path = IOHelper.CurrentBeatmap();
             if (path != "") { BeatmapPathBox.Text = path; }
         }
 
         private void BeatmapBrowse2_Click(object sender, RoutedEventArgs e) {
-            string path = FileFinder.BeatmapFileDialog();
+            string path = IOHelper.BeatmapFileDialog();
             if (path != "") { BeatmapPathBox2.Text = path; }
         }
 
         private void BeatmapLoad2_Click(object sender, RoutedEventArgs e) {
-            string path = FileFinder.CurrentBeatmap();
+            string path = IOHelper.CurrentBeatmap();
             if (path != "") { BeatmapPathBox2.Text = path; }
         }
 
         private void MIDIBrowse3_Click(object sender, RoutedEventArgs e) {
-            string path = FileFinder.MIDIFileDialog();
+            string path = IOHelper.MIDIFileDialog();
             if (path != "") { BeatmapPathBox3.Text = path; }
         }
 
         private void SampleBrowse_Click(object sender, RoutedEventArgs e) {
-            string path = FileFinder.AudioFileDialog();
+            string path = IOHelper.AudioFileDialog();
             if (path != "") { SamplePathBox.Text = path; }
         }
 

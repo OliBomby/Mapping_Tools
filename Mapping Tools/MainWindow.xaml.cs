@@ -58,7 +58,7 @@ namespace Mapping_Tools {
             AppDataPath = Path.Combine(appCommon, "Mapping-Tools");
             BackupPath = Path.Combine(AppDataPath, "Backups");
             ExportPath = Path.Combine(AppDataPath, "Exports");
-            HSProjectPath = Path.Combine(AppDataPath, "Hitsounding_Projects");
+            HSProjectPath = Path.Combine(AppDataPath, "Hitsounding Projects");
 
             try {
                 Directory.CreateDirectory(AppDataPath);
@@ -107,12 +107,12 @@ namespace Mapping_Tools {
         }
 
         private void OpenBeatmap(object sender, RoutedEventArgs e) {
-            string path = FileFinder.BeatmapFileDialog();
+            string path = IOHelper.BeatmapFileDialog();
             if( path != "" ) { SetCurrentMap(path); }
         }
 
         private void OpenCurrentBeatmap(object sender, RoutedEventArgs e) {
-            string path = FileFinder.CurrentBeatmap();
+            string path = IOHelper.CurrentBeatmap();
             if( path != "" ) { SetCurrentMap(path); }
         }
 
@@ -319,11 +319,11 @@ namespace Mapping_Tools {
         }
 
         private void LoadHSProject(object sender, RoutedEventArgs e) {
-
+            projectmanager.LoadProject();
         }
 
         private void SaveHSProject(object sender, RoutedEventArgs e) {
-
+            projectmanager.SaveProject();
         }
 
         //Open backup folder in file explorer

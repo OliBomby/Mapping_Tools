@@ -4,8 +4,34 @@ using System.Windows.Forms;
 
 namespace Mapping_Tools.Classes.SystemTools
 {
-    public class FileFinder
+    public class IOHelper
     {
+        public static string SaveProjectDialog(string initialDirectory = "") {
+            bool restore = initialDirectory == "";
+
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog {
+                Filter = "JSON File|*.json",
+                Title = "Save a project",
+                InitialDirectory = initialDirectory,
+                RestoreDirectory = restore
+            };
+            saveFileDialog1.ShowDialog();
+            return saveFileDialog1.FileName;
+        }
+
+        public static string LoadProjectDialog(string initialDirectory = "") {
+            bool restore = initialDirectory == "";
+
+            OpenFileDialog saveFileDialog1 = new OpenFileDialog {
+                Filter = "JSON File|*.json",
+                Title = "Open a project",
+                InitialDirectory = initialDirectory,
+                RestoreDirectory = restore
+            };
+            saveFileDialog1.ShowDialog();
+            return saveFileDialog1.FileName;
+        }
+
         public static string FileDialog() {
             OpenFileDialog openFileDialog = new OpenFileDialog {
                 RestoreDirectory = true,

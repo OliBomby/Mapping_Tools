@@ -55,6 +55,13 @@ namespace Mapping_Tools.Views {
             return Settings;
         }
 
+        public void SetSettings(HitsoundMakerSettings settings) {
+            Settings = settings;
+            DataContext = Settings;
+            LayersList.SelectedIndex = 0;
+            Num_Layers_Changed();
+        }
+
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
             Make_Hitsounds((Arguments) e.Argument, bgw, e);
@@ -100,7 +107,7 @@ namespace Mapping_Tools.Views {
 
         private void SelectedSamplePathBrowse_Click(object sender, RoutedEventArgs e) {
             try {
-                string path = FileFinder.AudioFileDialog();
+                string path = IOHelper.AudioFileDialog();
                 if (path != "") {
                     SelectedSamplePathBox.Text = path;
                 }
@@ -109,7 +116,7 @@ namespace Mapping_Tools.Views {
 
         private void SelectedSourcePathBrowse_Click(object sender, RoutedEventArgs e) {
             try {
-                string path = FileFinder.BeatmapFileDialog();
+                string path = IOHelper.BeatmapFileDialog();
                 if (path != "") {
                     SelectedSourcePathBox.Text = path;
                     }
@@ -118,7 +125,7 @@ namespace Mapping_Tools.Views {
 
         private void SelectedSourcePathLoad_Click(object sender, RoutedEventArgs e) {
             try {
-                string path = FileFinder.CurrentBeatmap();
+                string path = IOHelper.CurrentBeatmap();
                 if (path != "") {
                     SelectedSourcePathBox.Text = path;
                 }
@@ -127,7 +134,7 @@ namespace Mapping_Tools.Views {
 
         private void DefaultSampleBrowse_Click(object sender, RoutedEventArgs e) {
             try {
-                string path = FileFinder.AudioFileDialog();
+                string path = IOHelper.AudioFileDialog();
                 if (path != "") {
                     Settings.DefaultSample.SamplePath = path;
                     DefaultSamplePathBox.Text = path;
@@ -137,7 +144,7 @@ namespace Mapping_Tools.Views {
 
         private void BaseBeatmapBrowse_Click(object sender, RoutedEventArgs e) {
             try {
-                string path = FileFinder.BeatmapFileDialog();
+                string path = IOHelper.BeatmapFileDialog();
                 if (path != "") {
                     Settings.BaseBeatmap = path;
                     }
@@ -146,7 +153,7 @@ namespace Mapping_Tools.Views {
 
         private void BaseBeatmapLoad_Click(object sender, RoutedEventArgs e) {
             try {
-                string path = FileFinder.CurrentBeatmap();
+                string path = IOHelper.CurrentBeatmap();
                 if (path != "") {
                     Settings.BaseBeatmap = path;
                     }
@@ -169,6 +176,8 @@ namespace Mapping_Tools.Views {
         }
 
         private void UpdateEditingField() {
+            if (selectedLayer == null) { return; }
+
             suppressEvents = true;
 
             // Populate the editing fields

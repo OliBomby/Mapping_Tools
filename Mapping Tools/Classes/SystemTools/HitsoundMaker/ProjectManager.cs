@@ -1,4 +1,5 @@
 ﻿using Mapping_Tools.Classes.HitsoundStuff;
+using Mapping_Tools.Views;
 using Mapping_Tools.ViewSettings;
 using Newtonsoft.Json;
 using System;
@@ -56,7 +57,7 @@ namespace Mapping_Tools.Classes.SystemTools.HitsoundMaker {
             }
         }
 
-        public void SaveProject(bool doLoading) {
+        public void SaveProject2(bool doLoading) {
             if( CurrentProject != null ) {
                 try {
                     string jsonPath = CurrentProject.GetJSONPath();
@@ -64,6 +65,46 @@ namespace Mapping_Tools.Classes.SystemTools.HitsoundMaker {
                 }
                 catch( Exception ex ) {
                     MessageBox.Show(ex.Message);
+                }
+            }
+        }
+
+        public void SaveProject() {
+            string path = IOHelper.SaveProjectDialog(MainWindow.AppWindow.HSProjectPath);
+
+            // If the file name is not an empty string open it for saving.  
+            if (path != "") {
+                try {
+                    using (StreamWriter fs = new StreamWriter(path))
+                    using (JsonWriter writer = new JsonTextWriter(fs)) {
+                        HitsoundMakerView view = (HitsoundMakerView)MainWindow.AppWindow.Views.GetHitsoundMaker();
+                        Serializer.Serialize(writer, view.GetSettings());
+                    }
+                } catch (Exception ex) {
+                    Console.WriteLine(ex.StackTrace);
+                    Console.WriteLine(ex.Message);
+
+                    MessageBox.Show("Project could not be saved!");
+                }
+            }
+        }
+
+        public void LoadProject() {
+            string path = IOHelper.LoadProjectDialog(MainWindow.AppWindow.HSProjectPath);
+
+            // If the file name is not an empty string open it for saving.  
+            if (path != "") {
+                try {
+                    using (StreamReader fs = new StreamReader(path))
+                    using (JsonReader reader = new JsonTextReader(fs)) {
+                        HitsoundMakerView view = (HitsoundMakerView)MainWindow.AppWindow.Views.GetHitsoundMaker();
+                        view.SetSettings(Serializer.Deserialize<HitsoundMakerSettings>(reader));
+                    }
+                } catch (Exception ex) {
+                    Console.WriteLine(ex.StackTrace);
+                    Console.WriteLine(ex.Message);
+
+                    MessageBox.Show("Project could not be loaded!");
                 }
             }
         }

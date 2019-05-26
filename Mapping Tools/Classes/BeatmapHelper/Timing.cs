@@ -50,7 +50,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
             double newTime = snapDistance3 < snapDistance2 ? newTime3 : newTime2;
 
-            if( afterTP != null && Precision.DefinitelyBigger(newTime, afterTP.Offset) ) {
+            if( afterTP != null && newTime >= afterTP.Offset - 20 ) {
                 newTime = afterTP.Offset;
             }
             if (floor) {
