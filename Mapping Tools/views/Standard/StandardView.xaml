@@ -30,13 +30,13 @@
             <Viewbox HorizontalAlignment="Left" Grid.Row="1" VerticalAlignment="Top">
                 <ListView Foreground="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
                     <ListViewItem>
-                        1. Open a beatmap from [File] -> [Open Beatmap/Open Current Beatmap] to select a file from your system OR the currently in-game selected map
+                        1. Open a beatmap from [File] -> [Open beatmap/Open current beatmap] to select a file from your system OR the currently in-game selected beatmap
                     </ListViewItem>
                     <ListViewItem>
                         2. Select a tool that you want to use from [Tools]
                     </ListViewItem>
                     <ListViewItem>
-                        3. Tune the parameters to what you want to achieve
+                        3. Configure your tool
                     </ListViewItem>
                     <ListViewItem>
                         4. Click on the white button in the bottom right to run the program
@@ -80,19 +80,19 @@
             <Grid VerticalAlignment="Top" Grid.Row="1">
                 <ListView x:Name="NewsList" VerticalContentAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                     <ListViewItem>
-                        <TextBlock>User configuration implemented in backend</TextBlock>
+                        <TextBlock>MIDI importing for Hitsound Maker</TextBlock>
                     </ListViewItem>
                     <ListViewItem>
-                        <TextBlock>Slidermerger 2.0 is almost ready</TextBlock>
+                        <TextBlock>Complete hitsounds importing for Hitsound Maker</TextBlock>
                     </ListViewItem>
                     <ListViewItem>
-                        <TextBlock>Timeline code added</TextBlock>
+                        <TextBlock>Editing multiple layers at the same time in Hitsound Maker</TextBlock>
                     </ListViewItem>
                     <ListViewItem>
-                        <TextBlock>Slider merger added</TextBlock>
+                        <TextBlock>Hitsound Copier is complete</TextBlock>
                     </ListViewItem>
                     <ListViewItem>
-                        <TextBlock>Mapping Tools launched</TextBlock>
+                        <TextBlock>Improved resnapping in Map Cleaner</TextBlock>
                     </ListViewItem>
                 </ListView>
             </Grid>
