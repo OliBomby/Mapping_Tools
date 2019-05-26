@@ -162,10 +162,26 @@ namespace Mapping_Tools.Views {
 
         private void ReloadFromSource_Click(object sender, RoutedEventArgs e) {
             try {
-                foreach (HitsoundLayer hl in selectedLayers) {
-                    hl.Import();
+                HashSet<string> paths = new HashSet<string>(selectedLayers.Select(o => o.Path));
+                List<HitsoundLayer> layers = new List<HitsoundLayer>();
+
+                if (selectedLayers.Any(o => o.ImportType == "Hitsounds")) {
+                    foreach (string path in paths) {
+                        layers.AddRange(HitsoundImporter.LayersFromHitsounds(path));
+                    }
                 }
-            } catch (Exception) { }
+                if (selectedLayers.Any(o => o.ImportType == "MIDI")) {
+                    foreach (string path in paths) {
+                        layers.AddRange(HitsoundImporter.ImportMIDI(path, true));
+                    }
+                }
+
+                foreach (HitsoundLayer hl in selectedLayers) {
+                    try {
+                        hl.Import(layers);
+                    } catch (Exception) { }
+                }
+            } catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
         }
 
         private void LayersList_SelectionChanged(object sender, SelectionChangedEventArgs e) {

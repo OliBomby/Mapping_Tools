@@ -255,43 +255,41 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Priority = priority;
         }
 
-        public void Import() {
+        public void Import(List<HitsoundLayer> layers = null) {
             if (ImportType == "Stack") {
                 ImportStack(Path, x, y);
             } else if (ImportType == "Hitsounds") {
                 // Import complete hitsounds
                 try {
-                    string name = Name.Split(':')[0];
+                    string name = Name.Split(':').Last().TrimStart();
                 } catch (IndexOutOfRangeException) {
                     return;
                 }
-                List<HitsoundLayer> layers = HitsoundImporter.LayersFromHitsounds(Path);
-                layers.ForEach(o => o.Name = String.Format("{0}: {1}", name, o.Name));
+                layers = layers ?? HitsoundImporter.LayersFromHitsounds(Path);
 
-                HitsoundLayer sameLayer = layers.Find(o => o.Name == Name);
+                HitsoundLayer sameLayer = layers.Find(o => o.Name.Contains(name));
                 if (sameLayer != null) {
                     Times = sameLayer.Times;
                 }
             } else if (ImportType == "MIDI"){
                 // Import MIDI
                 try {
-                    string name = Name.Split(':')[0];
+                    string name = Name.Split(':').Last().TrimStart();
                 } catch (IndexOutOfRangeException) {
                     return;
                 }
-                List<HitsoundLayer> layers = HitsoundImporter.ImportMIDI(Path, Keysound);
-                layers.ForEach(o => o.Name = String.Format("{0}: {1}", name, o.Name));
+                layers = layers ?? HitsoundImporter.ImportMIDI(Path, Keysound);
 
-                HitsoundLayer sameLayer = layers.Find(o => o.Name == Name);
+                HitsoundLayer sameLayer = layers.Find(o => o.Name.Contains(name));
                 if (sameLayer != null) {
                     Times = sameLayer.Times;
                 }
             }
+            NotifyPropertyChanged("Times");
         }
 
         public void ImportStack(string path, double x, double y) {
             Times = HitsoundImporter.TimesFromStack(path, x, y);
-            NotifyPropertyChanged("Times");
         }
     }
 }

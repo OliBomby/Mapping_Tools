@@ -38,8 +38,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             foreach (string samplePath in samplePaths) {
                 try {
                     WaveStream wave = Path.GetExtension(samplePath) == ".ogg" ? (WaveStream)new VorbisWaveReader(samplePath) : new MediaFoundationReader(samplePath);
-                    byte[] buffer = new byte[20000];
-                    wave.Read(buffer, 0, Math.Min((int)wave.Length, 20000));
+                    byte[] buffer = new byte[2000];
+                    wave.Read(buffer, 0, Math.Min((int)wave.Length, 2000));
                     audios.Add(buffer);
                 } catch (Exception) {
                     audios.Add(Encoding.UTF8.GetBytes(samplePath));
