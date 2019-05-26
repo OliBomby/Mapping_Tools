@@ -53,12 +53,12 @@
             <Grid x:Name="SecondGrid" Grid.Column="0" Grid.Row="1">
                 <Menu Foreground="#FFD6D6D6" >
                     <MenuItem Height="31" Header="_File" Padding="12,0,0,0" MinWidth="50">
-                        <MenuItem Header="_Open Beatmap" Click="OpenBeatmap"/>
-                        <MenuItem Header="_Open Current Beatmap" Click="OpenCurrentBeatmap"/>
-                        <MenuItem Header="_Generate Backup" Click="SaveBackup"/>
+                        <MenuItem Header="_Open beatmap" Click="OpenBeatmap"/>
+                        <MenuItem Header="_Open current beatmap" Click="OpenCurrentBeatmap"/>
+                        <MenuItem Header="_Generate backup" Click="SaveBackup"/>
                     </MenuItem>
                     <MenuItem Height="31" Header="_Tools" Padding="12,0,0,0" MinWidth="65">
-                        <MenuItem Header="_General Cleaner" Click="LoadCleaner"/>
+                        <MenuItem Header="_Map Cleaner" Click="LoadCleaner"/>
                         <MenuItem Header="_Property Transformer" Click="LoadPropertyTransformer"/>
                         <MenuItem Header="_Slider Merger" Click="LoadMerger"/>
                         <MenuItem Header="_Slider Completionator" Click="LoadCompletionator"/>
@@ -69,16 +69,16 @@
                     </MenuItem>
                     <MenuItem Height="31" Header="_Options" Padding="12,0,0,0" MinWidth="80">
                         <MenuItem Header="_Preferences" Click="LoadPreferences"/>
-                        <MenuItem Header="_Get Started" Click="LoadStartup"/>
-                        <MenuItem Header="_Open Backup Folder" Click="OpenBackups"/>
+                        <MenuItem Header="_Get started" Click="LoadStartup"/>
+                        <MenuItem Header="_Open backups folder" Click="OpenBackups"/>
                     </MenuItem>
                     <MenuItem Height="31" Header="_About" Padding="12,0,0,0" MinWidth="67">
                         <MenuItem Header="_Github" Click="OpenGitHub"/>
                         <MenuItem Header="_Info" Click="OpenInfo"/>
                     </MenuItem>
                     <MenuItem x:Name="project" Visibility="Collapsed" Height="31" Header="_Project" Padding="12,0,0,0" MinWidth="67">
-                        <MenuItem Header="_Save Project" Click="SaveHSProject"/>
-                        <MenuItem Header="_Load Project" Click="LoadHSProject"/>
+                        <MenuItem Header="_Save project" Click="SaveHSProject"/>
+                        <MenuItem Header="_Load project" Click="LoadHSProject"/>
                     </MenuItem>
                 </Menu>
             </Grid>
