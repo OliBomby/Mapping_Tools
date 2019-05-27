@@ -10,10 +10,7 @@ namespace Mapping_Tools.Views {
     public static class Extensions {
         public static double GetDouble(this TextBox textBox, double defaultValue=-1) {
             try {
-                DataTable dt = new DataTable();
-                string text = textBox.Text.Replace(",", ".");
-                var v = dt.Compute(text, "");
-                return Convert.ToDouble(v);
+                return ParseDouble(textBox.Text);
             } catch {
                 return defaultValue;
             } 
@@ -28,6 +25,13 @@ namespace Mapping_Tools.Views {
             } catch {
                 return defaultValue;
             }
+        }
+
+        public static double ParseDouble(string str) {
+            DataTable dt = new DataTable();
+            string text = str.Replace(",", ".");
+            var v = dt.Compute(text, "");
+            return Convert.ToDouble(v);
         }
     }
 }

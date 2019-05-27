@@ -33,6 +33,8 @@ namespace Mapping_Tools.Viewmodels {
 
         public ObservableCollection<HitsoundLayer> HitsoundLayers { get; set; }
 
+        public string EditTimes { get; set; }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public void NotifyPropertyChanged(string propName) {

@@ -19,6 +19,7 @@ using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Viewmodels;
 using NAudio.Wave;
 using NAudio.Vorbis;
+using System.Text;
 
 namespace Mapping_Tools.Views {
     /// <summary>
@@ -241,6 +242,16 @@ namespace Mapping_Tools.Views {
                 KeysoundBox.IsChecked = selectedLayer.Keysound;
             } else {
                 KeysoundBox.IsChecked = null;
+            }
+            if (selectedLayers.TrueForAll(o => o.Times == selectedLayer.Times)) {
+                var accumulator = new StringBuilder(selectedLayer.Times.Count * 2); // Rough guess for capacity of StringBuilder
+                foreach (double d in selectedLayer.Times) {
+                    accumulator.Append(d).Append(",");
+                }
+                accumulator.Remove(accumulator.Length - 1, 1);
+                TimesBox.Text = accumulator.ToString();
+            } else {
+                TimesBox.Text = "";
             }
 
             // Update visibility
@@ -532,6 +543,7 @@ namespace Mapping_Tools.Views {
             foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
                 hitsoundLayer.ImportType = t;
             }
+            UpdateEditingField();
         }
 
         private void SelectedSourcePathBox_TextChanged(object sender, TextChangedEventArgs e) {
@@ -568,6 +580,19 @@ namespace Mapping_Tools.Views {
             foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
                 hitsoundLayer.Keysound = t;
             }
+        }
+
+        private void TimesBox_TextChanged(object sender, TextChangedEventArgs e) {
+            if (suppressEvents) return;
+            if ((sender as TextBox).GetBindingExpression(TextBox.TextProperty).HasValidationError) return;
+
+            try {
+                List<double> t = (sender as TextBox).Text.Split(',').Select(o => double.Parse(o)).OrderBy(o => o).ToList();
+
+                foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                    hitsoundLayer.Times = t;
+                }
+            } catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
         }
     }
 }

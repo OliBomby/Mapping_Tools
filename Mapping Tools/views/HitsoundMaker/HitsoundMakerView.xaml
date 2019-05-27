@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:Mapping_Tools.Views"
              xmlns:cm="clr-namespace:System.ComponentModel;assembly=System"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
              mc:Ignorable="d" Width="900" Height="700">
     <Grid Name="MasterGrid">
         <Grid.ColumnDefinitions>
@@ -99,6 +100,16 @@
                             <TextBox x:Name="SelectedYCoordBox" TextChanged="SelectedYCoordBox_TextChanged" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6"/>
                         </StackPanel>
                         <CheckBox x:Name="KeysoundBox" Checked="KeysoundBox_Changed" Unchecked="KeysoundBox_Changed" Content="Keysound import" Margin="0,10,0,0"/>
+                        <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Times:"/></TextBlock>
+                        <TextBox x:Name="TimesBox" Margin="0,0,0,20" TextWrapping="Wrap" TextChanged="TimesBox_TextChanged">
+                            <TextBox.Text>
+                                <Binding Path="EditTimes" UpdateSourceTrigger="PropertyChanged">
+                                    <Binding.ValidationRules>
+                                        <domain:ParsableDoubleListValidationRule ValidatesOnTargetUpdated="True" />
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </TextBox.Text>
+                        </TextBox>
                     </StackPanel>
                 </ScrollViewer>
                 

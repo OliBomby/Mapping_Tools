@@ -190,6 +190,7 @@
     <Compile Include="Classes\Tools\BezierConverter.cs" />
     <Compile Include="Classes\Tools\CircleBezierPreset.cs" />
     <Compile Include="Classes\Tools\MapCleaner.cs" />
+    <Compile Include="Components\Domain\ParsableDoubleListValidationRule.cs" />
     <Compile Include="Components\TimeLine\TimeLine.xaml.cs">
       <DependentUpon>TimeLine.xaml</DependentUpon>
     </Compile>
