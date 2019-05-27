@@ -93,8 +93,17 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 }
             }
         }
-        
-        public List<double> Times { get; set; }
+
+        private List<double> times;
+        public List<double> Times {
+            get { return times; }
+            set {
+                if (times != value) {
+                    times = value;
+                    NotifyPropertyChanged("Times");
+                }
+            }
+        }
 
         private int priority;
         public int Priority {
