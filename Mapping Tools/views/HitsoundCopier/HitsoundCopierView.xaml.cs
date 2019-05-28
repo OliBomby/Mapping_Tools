@@ -47,16 +47,9 @@ namespace Mapping_Tools.Views {
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
-            DateTime now = DateTime.Now;
             string fileToCopy = BeatmapToBox.Text;
-            string destinationDirectory = MainWindow.AppWindow.BackupPath;
-            try {
-                File.Copy(fileToCopy, Path.Combine(destinationDirectory, now.ToString("yyyy-MM-dd HH-mm-ss") + "___" + System.IO.Path.GetFileName(fileToCopy)));
-            }
-            catch( Exception ex ) {
-                MessageBox.Show(ex.Message);
-                return;
-            }
+            IOHelper.SaveMapBackup(fileToCopy);
+
             backgroundWorker.RunWorkerAsync(new Arguments(fileToCopy, BeatmapFromBox.Text, CopyModeBox.SelectedIndex, LeniencyBox.GetDouble(5), 
                                                           (bool)CopyHitsoundsBox.IsChecked, (bool)CopyBodyBox.IsChecked, (bool)CopySamplesetBox.IsChecked, (bool)CopyVolumeBox.IsChecked));
             start.IsEnabled = false;

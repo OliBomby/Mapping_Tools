@@ -47,16 +47,9 @@ namespace Mapping_Tools.Views {
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
-            DateTime now = DateTime.Now;
             string fileToCopy = MainWindow.AppWindow.currentMap.Text;
-            string destinationDirectory = MainWindow.AppWindow.BackupPath;
-            try {
-                File.Copy(fileToCopy, Path.Combine(destinationDirectory, now.ToString("yyyy-MM-dd HH-mm-ss") + "___" + System.IO.Path.GetFileName(fileToCopy)));
-            }
-            catch( Exception ex ) {
-                MessageBox.Show(ex.Message);
-                return;
-            }
+            IOHelper.SaveMapBackup(fileToCopy);
+
             backgroundWorker.RunWorkerAsync(new Arguments(fileToCopy, (bool)BookmarkBox.IsChecked, (bool)GreenlinesBox.IsChecked,
                                                           (bool)RedlinesBox.IsChecked, (bool)OmitBarlineBox.IsChecked,
                                                           LeniencyBox.GetDouble(defaultValue: 3), TemporalBox.GetDouble(),

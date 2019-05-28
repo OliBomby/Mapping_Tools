@@ -10,6 +10,7 @@ using System.Windows.Controls;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Components.TimeLine;
+using Mapping_Tools.Classes.SystemTools;
 
 namespace Mapping_Tools.Views {
     public partial class CleanerView :UserControl {
@@ -37,16 +38,9 @@ namespace Mapping_Tools.Views {
 
         private void Start_Click(object sender, RoutedEventArgs e) {
             Arguments arguments = GetArgumentsFromWindow();
-
-            DateTime now = DateTime.Now;
+            
             string fileToCopy = arguments.Path;
-            string destinationDirectory = MainWindow.AppWindow.BackupPath;
-            try {
-                File.Copy(fileToCopy, Path.Combine(destinationDirectory, now.ToString("yyyy-MM-dd HH-mm-ss") + "___" + System.IO.Path.GetFileName(fileToCopy)));
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message);
-                return;
-            }
+            IOHelper.SaveMapBackup(fileToCopy);
 
             backgroundWorker.RunWorkerAsync(arguments);
 

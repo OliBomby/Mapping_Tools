@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SliderPathStuff;
+using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
 
 namespace Mapping_Tools.Views {
@@ -46,16 +47,9 @@ namespace Mapping_Tools.Views {
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
-            DateTime now = DateTime.Now;
             string fileToCopy = MainWindow.AppWindow.currentMap.Text;
-            string destinationDirectory = MainWindow.AppWindow.BackupPath;
-            try {
-                File.Copy(fileToCopy, Path.Combine(destinationDirectory, now.ToString("yyyy-MM-dd HH-mm-ss") + "___" + System.IO.Path.GetFileName(fileToCopy)));
-            }
-            catch( Exception ex ) {
-                MessageBox.Show(ex.Message);
-                return;
-            }
+            IOHelper.SaveMapBackup(fileToCopy);
+
             backgroundWorker.RunWorkerAsync(new Arguments(fileToCopy, LeniencyBox.GetDouble(), (bool) ReqBookmBox.IsChecked));
             start.IsEnabled = false;
         }

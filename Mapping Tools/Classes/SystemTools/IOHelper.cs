@@ -6,6 +6,16 @@ namespace Mapping_Tools.Classes.SystemTools
 {
     public class IOHelper
     {
+        public static void SaveMapBackup(string fileToCopy) {
+            DateTime now = DateTime.Now;
+            string destinationDirectory = MainWindow.AppWindow.BackupPath;
+            try {
+                File.Copy(fileToCopy, Path.Combine(destinationDirectory, now.ToString("yyyy-MM-dd HH-mm-ss") + "___" + Path.GetFileName(fileToCopy)));
+            } catch (Exception ex) {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
         public static string SaveProjectDialog(string initialDirectory = "") {
             bool restore = initialDirectory == "";
 
