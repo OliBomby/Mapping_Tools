@@ -8,13 +8,11 @@ namespace Mapping_Tools.Classes.SystemTools {
         public List<String[]> RecentMaps;
         public string OsuPath;
         public string SongsPath;
-        public HitsoundMakerVM HitsoundMakerVM;
 
         public Settings() {
             RecentMaps = new List<String[]>();
             OsuPath = "";
             SongsPath = "";
-            HitsoundMakerVM = new HitsoundMakerVM();
         }
 
         public void AddRecentMaps(String path, DateTime date) {

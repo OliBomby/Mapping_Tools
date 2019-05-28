@@ -19,6 +19,8 @@ namespace Mapping_Tools.Classes.SystemTools.HitsoundMaker {
             NullValueHandling = NullValueHandling.Ignore
         };
 
+        public static readonly string DefaultProjectPath = Path.Combine(MainWindow.AppWindow.AppDataPath, "hsmakerproject.json");
+
         public ProjectManager() {
             GetProjects();
         }
@@ -89,9 +91,53 @@ namespace Mapping_Tools.Classes.SystemTools.HitsoundMaker {
             }
         }
 
+        public void SaveProjectDefault() {
+            SaveProject(DefaultProjectPath);
+        }
+
+        public void SaveProject(string path) {
+            // If the file name is not an empty string open it for saving.  
+            if (path != "") {
+                try {
+                    using (StreamWriter fs = new StreamWriter(path))
+                    using (JsonWriter writer = new JsonTextWriter(fs)) {
+                        HitsoundMakerView view = (HitsoundMakerView)MainWindow.AppWindow.Views.GetHitsoundMaker();
+                        Serializer.Serialize(writer, view.GetSettings());
+                    }
+                } catch (Exception ex) {
+                    Console.WriteLine(ex.StackTrace);
+                    Console.WriteLine(ex.Message);
+
+                    MessageBox.Show("Project could not be saved!");
+                }
+            }
+        }
+
         public void LoadProject() {
             string path = IOHelper.LoadProjectDialog(MainWindow.AppWindow.HSProjectPath);
 
+            // If the file name is not an empty string open it for saving.  
+            if (path != "") {
+                try {
+                    using (StreamReader fs = new StreamReader(path))
+                    using (JsonReader reader = new JsonTextReader(fs)) {
+                        HitsoundMakerView view = (HitsoundMakerView)MainWindow.AppWindow.Views.GetHitsoundMaker();
+                        view.SetSettings(Serializer.Deserialize<HitsoundMakerVM>(reader));
+                    }
+                } catch (Exception ex) {
+                    Console.WriteLine(ex.StackTrace);
+                    Console.WriteLine(ex.Message);
+
+                    MessageBox.Show("Project could not be loaded!");
+                }
+            }
+        }
+
+        public void LoadProjectDefault() {
+            LoadProject(DefaultProjectPath);
+        }
+
+        public void LoadProject(string path) {
             // If the file name is not an empty string open it for saving.  
             if (path != "") {
                 try {

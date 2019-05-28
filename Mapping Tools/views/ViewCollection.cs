@@ -9,7 +9,7 @@ namespace Mapping_Tools.Views {
     public class ViewCollection {
         public void SaveSettings() {
             if (HitsoundMaker != null) {
-                MainWindow.AppWindow.settingsManager.settings.HitsoundMakerVM = ((HitsoundMakerView)HitsoundMaker).GetSettings();
+                MainWindow.AppWindow.projectmanager.SaveProjectDefault();
             }
         }
 
@@ -57,6 +57,7 @@ namespace Mapping_Tools.Views {
         public UserControl GetHitsoundMaker() {
             if (HitsoundMaker == null) {
                 HitsoundMaker = new HitsoundMakerView();
+                MainWindow.AppWindow.projectmanager.LoadProjectDefault();
             }
             return HitsoundMaker;
         }

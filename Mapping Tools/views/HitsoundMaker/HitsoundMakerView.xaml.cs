@@ -39,13 +39,7 @@ namespace Mapping_Tools.Views {
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
             backgroundWorker = (BackgroundWorker) FindResource("backgroundWorker");
-            
-            if (MainWindow.AppWindow.settingsManager.settings.HitsoundMakerVM != null) {
-                Settings = MainWindow.AppWindow.settingsManager.settings.HitsoundMakerVM;
-            } else {
-                Settings = new HitsoundMakerVM();
-            }
-            
+            Settings = new HitsoundMakerVM();
             DataContext = Settings;
             LayersList.SelectedIndex = 0;
             Num_Layers_Changed();
