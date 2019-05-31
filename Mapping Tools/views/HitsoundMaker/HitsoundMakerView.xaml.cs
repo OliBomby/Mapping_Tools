@@ -167,7 +167,7 @@ namespace Mapping_Tools.Views {
                 }
                 if (selectedLayers.Any(o => o.ImportType == "MIDI")) {
                     foreach (string path in paths) {
-                        layers.AddRange(HitsoundImporter.ImportMIDI(path, true));
+                        layers.AddRange(HitsoundImporter.ImportMIDI(path));
                     }
                 }
 
@@ -232,10 +232,25 @@ namespace Mapping_Tools.Views {
             } else {
                 SelectedYCoordBox.Text = "";
             }
-            if (selectedLayers.TrueForAll(o => o.Keysound == selectedLayer.Keysound)) {
-                KeysoundBox.IsChecked = selectedLayer.Keysound;
+            if (selectedLayers.TrueForAll(o => o.Instrument == selectedLayer.Instrument)) {
+                SelectedInstrumentBox.Text = selectedLayer.Instrument.ToString();
             } else {
-                KeysoundBox.IsChecked = null;
+                SelectedInstrumentBox.Text = "";
+            }
+            if (selectedLayers.TrueForAll(o => o.Note == selectedLayer.Note)) {
+                SelectedNoteBox.Text = selectedLayer.Note.ToString();
+            } else {
+                SelectedNoteBox.Text = "";
+            }
+            if (selectedLayers.TrueForAll(o => o.Length == selectedLayer.Length)) {
+                SelectedLengthBox.Text = selectedLayer.Length.ToString();
+            } else {
+                SelectedLengthBox.Text = "";
+            }
+            if (selectedLayers.TrueForAll(o => o.Velocity == selectedLayer.Velocity)) {
+                SelectedVelocityBox.Text = selectedLayer.Velocity.ToString();
+            } else {
+                SelectedVelocityBox.Text = "";
             }
             if (selectedLayers.TrueForAll(o => o.Times == selectedLayer.Times)) {
                 var accumulator = new StringBuilder(selectedLayer.Times.Count * 2); // Rough guess for capacity of StringBuilder
@@ -255,9 +270,9 @@ namespace Mapping_Tools.Views {
                 SelectedCoordinatePanel.Visibility = Visibility.Collapsed;
             }
             if (selectedLayers.Any(o => o.ImportType == "MIDI")) {
-                KeysoundBox.Visibility = Visibility.Visible;
+                SelectedMIDIPanel.Visibility = Visibility.Visible;
             } else {
-                KeysoundBox.Visibility = Visibility.Collapsed;
+                SelectedMIDIPanel.Visibility = Visibility.Collapsed;
             }
 
             suppressEvents = false;
@@ -567,15 +582,6 @@ namespace Mapping_Tools.Views {
             }
         }
 
-        private void KeysoundBox_Changed(object sender, RoutedEventArgs e) {
-            if (suppressEvents) return;
-
-            bool t = (bool)(sender as CheckBox).IsChecked;
-            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
-                hitsoundLayer.Keysound = t;
-            }
-        }
-
         private void TimesBox_TextChanged(object sender, TextChangedEventArgs e) {
             if (suppressEvents) return;
             if ((sender as TextBox).GetBindingExpression(TextBox.TextProperty).HasValidationError) return;
@@ -587,6 +593,42 @@ namespace Mapping_Tools.Views {
                     hitsoundLayer.Times = t;
                 }
             } catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
+        }
+
+        private void SelectedInstrumentBox_TextChanged(object sender, TextChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            int t = (sender as TextBox).GetInt(-1);
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.Instrument = t;
+            }
+        }
+
+        private void SelectedNoteBox_TextChanged(object sender, TextChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            int t = (sender as TextBox).GetInt(-1);
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.Note = t;
+            }
+        }
+
+        private void SelectedLengthBox_TextChanged(object sender, TextChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            int t = (sender as TextBox).GetInt(-1);
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.Length = t;
+            }
+        }
+
+        private void SelectedVelocityBox_TextChanged(object sender, TextChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            int t = (sender as TextBox).GetInt(-1);
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.Velocity = t;
+            }
         }
     }
 }

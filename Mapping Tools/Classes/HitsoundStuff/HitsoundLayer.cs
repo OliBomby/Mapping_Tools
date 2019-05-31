@@ -39,17 +39,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         public Visibility KeysoundVisibility { get { if (ImportType == "MIDI") { return Visibility.Visible; } else { return Visibility.Collapsed; } } }
 
-        private bool keysound;
-        public bool Keysound {
-            get { return keysound; }
-            set {
-                if (keysound != value) {
-                    keysound = value;
-                    NotifyPropertyChanged("Keysound");
-                }
-            }
-        }
-
         private double x;
         public double X {
             get { return x; }
@@ -68,6 +57,50 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 if (y != value) {
                     y = value;
                     NotifyPropertyChanged("Y");
+                }
+            }
+        }
+
+        private double instrument;
+        public double Instrument {
+            get { return instrument; }
+            set {
+                if (instrument != value) {
+                    instrument = value;
+                    NotifyPropertyChanged("Instrument");
+                }
+            }
+        }
+
+        private double note;
+        public double Note {
+            get { return note; }
+            set {
+                if (note != value) {
+                    note = value;
+                    NotifyPropertyChanged("Note");
+                }
+            }
+        }
+
+        private double length;
+        public double Length {
+            get { return length; }
+            set {
+                if (length != value) {
+                    length = value;
+                    NotifyPropertyChanged("Length");
+                }
+            }
+        }
+
+        private double velocity;
+        public double Velocity {
+            get { return velocity; }
+            set {
+                if (velocity != value) {
+                    velocity = value;
+                    NotifyPropertyChanged("Velocity");
                 }
             }
         }
@@ -269,30 +302,24 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 ImportStack(Path, x, y);
             } else if (ImportType == "Hitsounds") {
                 // Import complete hitsounds
-                try {
-                    string name = Name.Split(':').Last().TrimStart();
-                } catch (IndexOutOfRangeException) {
-                    return;
-                }
                 layers = layers ?? HitsoundImporter.LayersFromHitsounds(Path);
-
-                HitsoundLayer sameLayer = layers.Find(o => o.Name.Contains(name));
+                
+                HitsoundLayer sameLayer = layers.Find(o => o.Path == Path);
                 if (sameLayer != null) {
                     Times = sameLayer.Times;
                 }
+
             } else if (ImportType == "MIDI"){
                 // Import MIDI
-                try {
-                    string name = Name.Split(':').Last().TrimStart();
-                } catch (IndexOutOfRangeException) {
-                    return;
-                }
-                layers = layers ?? HitsoundImporter.ImportMIDI(Path, Keysound);
+                layers = layers ?? HitsoundImporter.ImportMIDI(Path);
 
-                HitsoundLayer sameLayer = layers.Find(o => o.Name.Contains(name));
-                if (sameLayer != null) {
-                    Times = sameLayer.Times;
+                List<HitsoundLayer> sameLayer = layers.FindAll(o => Instrument == o.Instrument && (Note == -1 || Note == o.Note) && (Length == -1 || Length == o.Length)
+                                                                                               && (Velocity == -1 || Velocity == o.Velocity));
+                Times.Clear();
+                foreach (HitsoundLayer hsl in sameLayer) {
+                    Times.AddRange(hsl.Times);
                 }
+                Times.OrderBy(o => o);
             }
             NotifyPropertyChanged("Times");
         }

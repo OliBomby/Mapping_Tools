@@ -123,7 +123,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return String.Format("{0}-hit{1}{2}.wav", HitsoundConverter.SampleSets[sampleSet], HitsoundConverter.Hitsounds[hitsound], index);
         }
 
-        public static List<HitsoundLayer> ImportMIDI(string path, bool keysounds, string sampleFolder="") {
+        public static List<HitsoundLayer> ImportMIDI(string path, bool keysounds=true, bool lengths=true, bool velocities=true, string sampleSource="") {
             List<HitsoundLayer> hitsoundLayers = new List<HitsoundLayer>();
 
             var strictMode = false;
@@ -142,23 +142,45 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     }
                     
                     NoteOnEvent on = (NoteOnEvent)midiEvent;
-                    
-                    string instrument = on.Channel == 10 ? "Percussion" : PatchChangeEvent.GetPatchName(channelInstruments[on.Channel]);
 
-                    string name = keysounds || on.Channel == 10 ? String.Format("{0}, {1}", instrument, on.NoteName) : instrument;
-                    string filename = keysounds || on.Channel == 10 ? String.Format("{0}\\{1}.wav", instrument, on.NoteName) : String.Format("{0}.wav", instrument);
+                    bool keys = keysounds || on.Channel == 10;
+
+                    int instrument = on.Channel != 10 ? channelInstruments[on.Channel] : -1;
+                    int key = keysounds ? on.NoteNumber : -1;
+                    int length = lengths ? on.NoteLength : -1;
+                    int velocity = velocities ? on.Velocity : -1;
+
+                    string instrumentName = instrument == -1 ? "Percussion" : PatchChangeEvent.GetPatchName(instrument);
+                    string keyName = on.NoteName;
+
+                    string name = instrumentName;
+                    if (keysounds)
+                        name += "," + keyName;
+                    if (lengths)
+                        name += "," + length;
+                    if (velocities)
+                        name += "," + velocity;
+                    
+                    string filename = Path.GetExtension(sampleSource) == ".sf2" ?
+                        sampleSource + "?" + Path.Combine(new string[4] { instrument.ToString(), key.ToString(), length.ToString(), velocity.ToString() }):
+                        Path.Combine(new string[5] { sampleSource, instrument.ToString(), key.ToString(), length.ToString(), velocity.ToString() + ".wav" });
+                    
 
                     // Find the hitsoundlayer with this path
-                    HitsoundLayer layer = hitsoundLayers.Find(o => o.Name == name);
+                    HitsoundLayer layer = hitsoundLayers.Find(o => o.SamplePath == filename);
 
                     if (layer != null) {
                         // Find hitsound layer with this path and add this time
                         layer.Times.Add(on.AbsoluteTime);
                     } else {
                         // Add new hitsound layer with this path
-                        HitsoundLayer newLayer = new HitsoundLayer(name, "MIDI", path, 1, 0, Path.Combine(sampleFolder, filename)) {
-                            Keysound = keysounds
+                        HitsoundLayer newLayer = new HitsoundLayer(name, "MIDI", path, 1, 0, filename) {
+                            Instrument = instrument,
+                            Note = key,
+                            Length = length,
+                            Velocity = velocity
                         };
+
                         newLayer.Times.Add(on.AbsoluteTime);
                         hitsoundLayers.Add(newLayer);
                     }

@@ -16,12 +16,9 @@ namespace Mapping_Tools.Views {
             } 
         }
 
-        public static double GetInt(this TextBox textBox, int defaultValue = -1) {
+        public static int GetInt(this TextBox textBox, int defaultValue = -1) {
             try {
-                DataTable dt = new DataTable();
-                string text = textBox.Text.Replace(",", ".");
-                var v = dt.Compute(text, "");
-                return Convert.ToInt32(v);
+                return ParseInt(textBox.Text);
             } catch {
                 return defaultValue;
             }
@@ -32,6 +29,13 @@ namespace Mapping_Tools.Views {
             string text = str.Replace(",", ".");
             var v = dt.Compute(text, "");
             return Convert.ToDouble(v);
+        }
+
+        public static int ParseInt(string str) {
+            DataTable dt = new DataTable();
+            string text = str.Replace(",", ".");
+            var v = dt.Compute(text, "");
+            return Convert.ToInt32(v);
         }
     }
 }
