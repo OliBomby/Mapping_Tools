@@ -6,16 +6,18 @@ namespace Mapping_Tools.Components.TimeLine {
     /// Interaction logic for TimelineMark.xaml
     /// </summary>
     public partial class TimeLineMark :UserControl {
-        public int Time { get; set; }
+        public double Time { get; set; }
 
-        public TimeLineMark(int seconds) {
+        public TimeLineMark(double m_seconds) {
             InitializeComponent();
-            Time = seconds;
-            string m = ( Time / 60 ).ToString();
+            Time = m_seconds;
+
+            TimeSpan ts = TimeSpan.FromMilliseconds(m_seconds);
+            String m = ts.Minutes.ToString();
             if( m.Length < 2 )
                 m = "0" + m;
-            string s = ( Time % 60 ).ToString();
-            if( s.Length < 2 )
+            String s = ts.Seconds.ToString();
+            if( s.Length < 2)
                 s = "0" + s;
             this.text.Text = m + ":" + s;
         }

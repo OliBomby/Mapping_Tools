@@ -12,60 +12,38 @@ namespace Mapping_Tools.Components.TimeLine {
     public partial class TimeLine :UserControl {
         List<TimeLineMark> TMarks = new List<TimeLineMark>();
         List<TimeLineElement> TElements = new List<TimeLineElement>();
-        int TimeLineWidth;
-        int TimeLineHeight;
-        int TimeLineInnerHeight;
-        int ElementTop;
-        int Spacing;
-        int StartSeconds;
-        int EndSeconds;
-        int IntervalSeconds;
+        double TimeLineWidth;
+        double TimeLineHeight;
+        double TimeLineInnerHeight;
+        double ElementTop;
+        double Spacing;
+        double StartMSeconds;
+        double EndMSeconds;
+        double IntervalMSeconds;
 
-        public TimeLine(int w, int h, int seconds) {
+        public TimeLine(double w, double h, double m_seconds) {
             InitializeComponent();
 
-            TimeLineWidth = w - 100;
+            TimeLineWidth = w - 110;
             TimeLineHeight = h;
-            StartSeconds = 0;
-            EndSeconds = Math.Max(seconds, 20);
-            IntervalSeconds = (int) Math.Round(EndSeconds / 20.0);
-
-            Setup();
-        }
-
-        public TimeLine(int w, int h, double seconds) {
-            InitializeComponent();
-
-            TimeLineWidth = w - 60;
-            TimeLineHeight = h;
-            StartSeconds = 0;
-            EndSeconds = Math.Max((int) seconds / 1000, 20);
-            IntervalSeconds = (int) Math.Round(EndSeconds / 20.0);
+            StartMSeconds = 0;
+            EndMSeconds = Math.Max(m_seconds, 20);
+            IntervalMSeconds = EndMSeconds / 10.0;
 
             Setup();
         }
 
         public static void RecalculateTimeLine(TimeLine tl) {
-            tl.TimeLineWidth = (int) MainWindow.AppWindow.ActualWidth;
+            tl.TimeLineWidth = MainWindow.AppWindow.ActualWidth;
         }
 
-        public void AddElement(int seconds, int action) {
-            TimeLineElement te = new TimeLineElement(this, TimeLineInnerHeight, seconds, action);
+        public void AddElement(double m_seconds, double action) {
+            TimeLineElement te = new TimeLineElement(this, TimeLineInnerHeight, m_seconds, action);
             TElements.Add(te);
             mainCanvas.Children.Add(te);
 
             Canvas.SetTop(te, ElementTop);
-            Canvas.SetLeft(te, ( TimeLineWidth * ( seconds - StartSeconds ) / ( EndSeconds - StartSeconds ) ) - 1);
-        }
-
-        public void AddElement(double d_seconds, int action) {
-            TimeLineElement te = new TimeLineElement(this, TimeLineInnerHeight, d_seconds, action);
-            TElements.Add(te);
-            mainCanvas.Children.Add(te);
-
-            double seconds = d_seconds / 1000;
-            Canvas.SetTop(te, ElementTop);
-            Canvas.SetLeft(te, ( TimeLineWidth * ( seconds - StartSeconds ) / ( EndSeconds - StartSeconds ) ) - 1);
+            Canvas.SetLeft(te, ( TimeLineWidth * ( m_seconds - StartMSeconds ) / ( EndMSeconds - StartMSeconds ) ) - 1);
         }
 
         private void GenerateMarkerElements() {
@@ -74,26 +52,26 @@ namespace Mapping_Tools.Components.TimeLine {
                 TElements.Add(te);
                 mainCanvas.Children.Add(te);
                 Canvas.SetTop(te, ElementTop);
-                Canvas.SetLeft(te, ( TimeLineWidth * ( tMark_s.Time - StartSeconds ) / ( EndSeconds - StartSeconds ) ) - 1);
+                Canvas.SetLeft(te, ( TimeLineWidth * ( tMark_s.Time - StartMSeconds ) / ( EndMSeconds - StartMSeconds ) ) - 1);
             }
         }
 
         private void Setup() {
             // Create first mark
-            TimeLineMark tmStart = new TimeLineMark(StartSeconds);
+            TimeLineMark tmStart = new TimeLineMark(StartMSeconds);
             TMarks.Add(tmStart);
             mainCanvas.Children.Add(tmStart);
 
             // Create middle marks
-            int intervalCount = ( ( EndSeconds - StartSeconds ) / IntervalSeconds ) - 1;
+            double intervalCount = ( ( EndMSeconds - StartMSeconds ) / IntervalMSeconds ) - 1;
             for( int i = 1; i <= intervalCount; i++ ) {
-                TimeLineMark tm = new TimeLineMark(StartSeconds + ( IntervalSeconds * i ));
+                TimeLineMark tm = new TimeLineMark(StartMSeconds + ( IntervalMSeconds * i ));
                 TMarks.Add(tm);
                 mainCanvas.Children.Add(tm);
             }
 
             // Create last mark
-            TimeLineMark tmEnd = new TimeLineMark(EndSeconds);
+            TimeLineMark tmEnd = new TimeLineMark(EndMSeconds);
             TMarks.Add(tmEnd);
             mainCanvas.Children.Add(tmEnd);
 

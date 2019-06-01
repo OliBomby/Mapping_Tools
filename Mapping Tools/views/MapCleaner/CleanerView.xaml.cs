@@ -198,7 +198,7 @@ namespace Mapping_Tools.Views {
                 TL.mainCanvas.Children.Clear();
             }
             try {
-                TL = new TimeLine((int)MainWindow.AppWindow.ActualWidth, 100, EndTime_monitor);
+                TL = new TimeLine(MainWindow.AppWindow.ActualWidth, 100.0, EndTime_monitor);
                 foreach (double timing_s in TimingpointsAdded) {
                     TL.AddElement(timing_s, 1);
                 }

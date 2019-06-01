@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -9,39 +11,24 @@ namespace Mapping_Tools.Components.TimeLine {
     /// </summary>
     public partial class TimeLineElement :UserControl {
         new TimeLine Parent;
-        int Seconds;
-        int Action;
+        double Milliseconds;
+        double Action;
         string Display = "";
         SolidColorBrush Inner;
         SolidColorBrush Outer;
         /// <summary>
         /// Creates the visual TimelineElement
         /// </summary>
-        public TimeLineElement(TimeLine parent, int height, int seconds, int action) {
+        public TimeLineElement(TimeLine parent, double height, double m_seconds, double action) {
             InitializeComponent();
             Action = action;
-            Seconds = seconds;
+            Milliseconds = m_seconds;
             Parent = parent;
             rectOuter.Height = height;
             rectInner.Height = height;
 
             SetupColour();
 
-            SetupTooltip();
-        }
-
-        public TimeLineElement(TimeLine parent, int height, double seconds, int action) {
-            InitializeComponent();
-
-            Action = action;
-            this.Seconds = (int) Math.Round(seconds / 1000);
-            this.Parent = parent;
-            rectOuter.Height = height;
-            rectInner.Height = height;
-
-            SetupColour();
-
-            // Create friendly time for tooltip text
             SetupTooltip();
         }
 
@@ -98,14 +85,20 @@ namespace Mapping_Tools.Components.TimeLine {
 
         // Creates tooltip from seconds value
         private void SetupTooltip() {
-            string m = ( Seconds / 60 ).ToString();
-            if( m.Length < 2 )
-                m = "0" + m;
-            string s = ( ( Seconds ) % 60 ).ToString();
-            if( s.Length < 2 )
-                s = "0" + s;
-            Display = m + ":" + s;
-            mainCanvas.ToolTip = Display;
+            TimeSpan ts = TimeSpan.FromMilliseconds(Milliseconds);
+
+            mainCanvas.ToolTip = ts.TotalMilliseconds;
+        }
+        //Open osu at timestamp
+        private void OpenLink(object sender, RoutedEventArgs e) {
+            ProcessStartInfo ProcessInfo;
+            Process Process;
+
+            ProcessInfo = new ProcessStartInfo("cmd.exe", "/K " + "start osu://edit/" + Milliseconds);
+            ProcessInfo.CreateNoWindow = true;
+            ProcessInfo.UseShellExecute = false;
+
+            Process = Process.Start(ProcessInfo);
         }
     }
 }
