@@ -95,6 +95,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
                     foreach (string path in kvp.Value) {
                         try {
+                            string p = path.Split('?')[0];
                             WaveStream wave = Path.GetExtension(path) == ".ogg" ? (WaveStream)new VorbisWaveReader(path) : new MediaFoundationReader(path);
                             mixer.AddInputStream(new WaveChannel32(wave));
                             soundsAdded++;
