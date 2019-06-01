@@ -64,6 +64,54 @@
                 <CheckBox x:Name="CopyBodyBox" IsChecked="True" Content="Copy sliderbody hitsounds" Foreground="#FFD6D6D6"/>
                 <CheckBox x:Name="CopySamplesetBox" IsChecked="True" Content="Copy samplesets" Foreground="#FFD6D6D6"/>
                 <CheckBox x:Name="CopyVolumeBox" IsChecked="True" Content="Copy volumes" Foreground="#FFD6D6D6"/>
+                <CheckBox x:Name="MuteSliderendBox" IsChecked="False" Content="Mute sliderends" Foreground="#FFD6D6D6"
+                    Checked="MuteSliderendBox_Checked" Unchecked="MuteSliderendBox_Unchecked"
+                    ToolTip="Mute sliderends or spinnerends that have no defined hitsounds in the map you're copying from."/>
+                <StackPanel x:Name="SliderendMutingConfigPanel" Visibility="Collapsed">
+                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Sliderend muting filter:"/></TextBlock>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="50"/>
+                            <ColumnDefinition Width="5"/>
+                            <ColumnDefinition Width="50"/>
+                            <ColumnDefinition Width="5"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <ComboBox x:Name="MutedSnap1" Grid.Column="0" Cursor="Hand" SelectedIndex="2" Foreground="#FFD6D6D6" 
+                        ToolTip="Minimum snap of sliderend to be eligible for muting.">
+                            <ComboBoxItem Content="1/1" Cursor="Hand"/>
+                            <ComboBoxItem Content="1/2" Cursor="Hand"/>
+                            <ComboBoxItem Content="1/4" Cursor="Hand"/>
+                            <ComboBoxItem Content="1/8" Cursor="Hand"/>
+                            <ComboBoxItem Content="1/16" Cursor="Hand"/>
+                        </ComboBox>
+                        <ComboBox x:Name="MutedSnap2" Grid.Column="2" Cursor="Hand" SelectedIndex="2" Foreground="#FFD6D6D6"
+                        ToolTip="Minimum snap of sliderend to be eligible for muting.">
+                            <ComboBoxItem Content="1/1" Cursor="Hand"/>
+                            <ComboBoxItem Content="1/3" Cursor="Hand"/>
+                            <ComboBoxItem Content="1/6" Cursor="Hand"/>
+                            <ComboBoxItem Content="1/12" Cursor="Hand"/>
+                        </ComboBox>
+                        <TextBox x:Name="MutedMinLengthBox" Grid.Column="4" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" 
+                        Text="1/2" ToolTip="Minimum length of slider in beats to be eligible for sliderend muting."/>
+                    </Grid>
+                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Muted config:"/></TextBlock>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="5"/>
+                            <ColumnDefinition Width="70"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" x:Name="MutedCustomIndexBox" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text=""
+                            ToolTip="Custom index for the muted sliderend. Leave empty for no change."/>
+                        <ComboBox Grid.Column="2" x:Name="MutedSampleSetBox" SelectedIndex="1" Cursor="Hand"
+                            ToolTip="Sampleset of the muted sliderend.">
+                            <ComboBoxItem Content="Normal" Cursor="Hand"/>
+                            <ComboBoxItem Content="Soft" Cursor="Hand"/>
+                            <ComboBoxItem Content="Drum" Cursor="Hand"/>
+                        </ComboBox>
+                    </Grid>
+                </StackPanel>
             </StackPanel>
         </Grid>
         <Grid Name="SecoundGrid" Grid.Row="1" Grid.Column="1">

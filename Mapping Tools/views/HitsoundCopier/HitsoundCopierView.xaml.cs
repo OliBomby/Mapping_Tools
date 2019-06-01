@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.SliderPathStuff;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
 
@@ -23,7 +20,7 @@ namespace Mapping_Tools.Views {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
-            backgroundWorker = (BackgroundWorker) FindResource("backgroundWorker") ;
+            backgroundWorker = (BackgroundWorker) FindResource("backgroundWorker");
         }
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
@@ -51,7 +48,10 @@ namespace Mapping_Tools.Views {
             IOHelper.SaveMapBackup(fileToCopy);
 
             backgroundWorker.RunWorkerAsync(new Arguments(fileToCopy, BeatmapFromBox.Text, CopyModeBox.SelectedIndex, LeniencyBox.GetDouble(5), 
-                                                          (bool)CopyHitsoundsBox.IsChecked, (bool)CopyBodyBox.IsChecked, (bool)CopySamplesetBox.IsChecked, (bool)CopyVolumeBox.IsChecked));
+                                                          (bool)CopyHitsoundsBox.IsChecked, (bool)CopyBodyBox.IsChecked, (bool)CopySamplesetBox.IsChecked,
+                                                          (bool)CopyVolumeBox.IsChecked, (bool)MuteSliderendBox.IsChecked,
+                                                          int.Parse(MutedSnap1.Text.Split('/')[1]), int.Parse(MutedSnap2.Text.Split('/')[1]),
+                                                          MutedMinLengthBox.GetDouble(0), MutedCustomIndexBox.GetInt(-1), MutedSampleSetBox.SelectedIndex + 1));
             start.IsEnabled = false;
         }
 
@@ -64,7 +64,14 @@ namespace Mapping_Tools.Views {
             public bool CopyBodyHitsounds;
             public bool CopySamplesets;
             public bool CopyVolumes;
-            public Arguments(string pathTo, string pathFrom, int copyMode, double temporalLeniency, bool copyHitsounds, bool copyBodyHitsounds, bool copySamplesets, bool copyVolumes)
+            public bool MuteSliderends;
+            public int Snap1;
+            public int Snap2;
+            public double MinLength;
+            public int MutedIndex;
+            public int MutedSampleset;
+            public Arguments(string pathTo, string pathFrom, int copyMode, double temporalLeniency, bool copyHitsounds, bool copyBodyHitsounds, bool copySamplesets, bool copyVolumes,
+                bool muteSliderends, int snap1, int snap2, double minLength, int mutedIndex, int mutedSampleset)
             {
                 PathTo = pathTo;
                 PathFrom = pathFrom;
@@ -74,6 +81,12 @@ namespace Mapping_Tools.Views {
                 CopyBodyHitsounds = copyBodyHitsounds;
                 CopySamplesets = copySamplesets;
                 CopyVolumes = copyVolumes;
+                MuteSliderends = muteSliderends;
+                Snap1 = snap1;
+                Snap2 = snap2;
+                MinLength = minLength;
+                MutedIndex = mutedIndex;
+                MutedSampleset = mutedSampleset;
             }
         }
 
@@ -84,12 +97,16 @@ namespace Mapping_Tools.Views {
             bool copySliderbodychanges = arg.CopyBodyHitsounds;
             bool copyVolumes = arg.CopyVolumes;
             bool copySamplesets = arg.CopySamplesets;
+            bool muteSliderends = arg.MuteSliderends;
+            bool doMutedIndex = arg.MutedIndex >= 0;
 
             Editor editorTo = new Editor(arg.PathTo);
             Editor editorFrom = new Editor(arg.PathFrom);
 
             Beatmap beatmapTo = editorTo.Beatmap;
             Beatmap beatmapFrom = editorFrom.Beatmap;
+
+            Timeline processedTimeline;
 
             if (mode == 0) {
                 foreach (HitObject ho in beatmapTo.HitObjects) {
@@ -161,6 +178,8 @@ namespace Mapping_Tools.Views {
                 foreach (TimingPointsChange c in timingPointsChanges) {
                     c.AddChange(beatmapTo.BeatmapTiming.TimingPoints, true);
                 }
+
+                processedTimeline = tlTo;
             } 
             else {
                 // Smarty mode
@@ -244,6 +263,44 @@ namespace Mapping_Tools.Views {
                 foreach (TimingPointsChange c in timingPointsChanges) {
                     c.AddChange(beatmapTo.BeatmapTiming.TimingPoints, false);
                 }
+                
+                processedTimeline = tlTo;
+            }
+
+            if (muteSliderends) {
+                List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
+                processedTimeline.GiveTimingPoints(beatmapTo.BeatmapTiming);
+
+                foreach (TimelineObject tloTo in processedTimeline.TimeLineObjects) {
+                    if (FilterMuteTLO(tloTo, beatmapTo, arg)) {
+                        // Set volume to 5%, remove all hitsounds, apply customindex and sampleset
+                        tloTo.SampleSet = arg.MutedSampleset;
+                        tloTo.AdditionSet = 0;
+                        tloTo.Normal = false;
+                        tloTo.Whistle = false;
+                        tloTo.Finish = false;
+                        tloTo.Clap = false;
+
+                        tloTo.HitsoundsToOrigin();
+
+                        // Add timingpointschange to copy timingpoint hitsounds
+                        TimingPoint tp = tloTo.Origin.HitsoundTP.Copy();
+                        tp.Offset = tloTo.Time;
+                        tp.Volume = 5;
+                        tp.SampleIndex = arg.MutedIndex;
+                        timingPointsChanges.Add(new TimingPointsChange(tp, index: doMutedIndex, volume: true));
+                    } else {
+                        // Add timingpointschange to preserve index and volume
+                        TimingPoint tp = tloTo.Origin.HitsoundTP.Copy();
+                        tp.Offset = tloTo.Time;
+                        timingPointsChanges.Add(new TimingPointsChange(tp, index: doMutedIndex, volume: true));
+                    }
+                }
+
+                // Apply the greenline changes
+                foreach (TimingPointsChange c in timingPointsChanges) {
+                    c.AddChange(beatmapTo.BeatmapTiming.TimingPoints, false);
+                }
             }
 
             // Save the file
@@ -258,6 +315,32 @@ namespace Mapping_Tools.Views {
             string message = "";
             message += "Done!";
             return message;
+        }
+
+        private bool FilterMuteTLO(TimelineObject tloTo, Beatmap beatmapTo, Arguments arg) {
+            // Check whether it's defined
+            if (!tloTo.canCopy)
+                return false;
+
+            // Check type
+            if (!(tloTo.IsSliderEnd || tloTo.IsSpinnerEnd))
+                return false;
+
+            // Check filter snap
+            // It's at least snap x or worse if the time is not a multiple of snap x / 2
+            TimingPoint redline = beatmapTo.BeatmapTiming.GetRedlineAtTime(tloTo.Time - 1);
+            double resnappedTime = beatmapTo.BeatmapTiming.Resnap(tloTo.Time, arg.Snap1, arg.Snap2, false, redline);
+            double beatsFromRedline = (resnappedTime - redline.Offset) / redline.MpB;
+            double dist1 = beatsFromRedline * arg.Snap1 / (arg.Snap1 == 1 ? 4 : 2);
+            double dist2 = beatsFromRedline * arg.Snap2 / (arg.Snap2 == 1 ? 4 : arg.Snap2 == 3 ? 3 : 2);
+            if (Precision.AlmostEquals(dist1 % 1, 0, 0.1) || Precision.AlmostEquals(dist2 % 1, 0, 0.1))
+                return false;
+
+            // Check filter temporal length
+            if (!Precision.AlmostBigger(tloTo.Origin.TemporalLength, arg.MinLength * redline.MpB))
+                return false;
+
+            return true;
         }
 
         private void BeatmapFromBrowse_Click(object sender, RoutedEventArgs e) {
@@ -294,6 +377,18 @@ namespace Mapping_Tools.Views {
                     BeatmapToBox.Text = path;
                 }
             } catch (Exception) { }
+        }
+
+        private void MuteSliderendBox_Checked(object sender, RoutedEventArgs e) {
+            if (SliderendMutingConfigPanel == null)
+                return;
+            SliderendMutingConfigPanel.Visibility = Visibility.Visible;
+        }
+
+        private void MuteSliderendBox_Unchecked(object sender, RoutedEventArgs e) {
+            if (SliderendMutingConfigPanel == null)
+                return;
+            SliderendMutingConfigPanel.Visibility = Visibility.Collapsed;
         }
     }
 }
