@@ -40,12 +40,12 @@ namespace Mapping_Tools.Views {
                 IOHelper.SaveMapBackup(fileToCopy);
 
                 bool clip = (bool)ClipBox.IsChecked;
-                bool filter = (bool)FiltersBox.IsChecked;
+                bool doFilter = (bool)FiltersBox.IsChecked;
                 double match = MatchBox.GetDouble(defaultValue: -1);
-                bool filterMatch = match != -1 && filter;
+                bool doFilterMatch = match != -1 && doFilter;
                 double min = MinBox.GetDouble(defaultValue: -1);
                 double max = MaxBox.GetDouble(defaultValue: -1);
-                bool filterRange = min != -1 && max != -1 && filter;
+                bool doFilterRange = min != -1 && max != -1 && doFilter;
 
                 double tpom = TPOffsetMultiplierBox.GetDouble(defaultValue: 1);
                 double tpoo = TPOffsetOffsetBox.GetDouble(defaultValue: 0);
@@ -69,7 +69,7 @@ namespace Mapping_Tools.Views {
                 foreach (TimingPoint tp in beatmap.BeatmapTiming.TimingPoints) {
                     // Offset
                     if (tpom != 1 || tpoo != 0) {
-                        if (!filter || ((!filterMatch || Precision.AlmostEquals(tp.Offset, match, 0.01)) && (!filterRange || (tp.Offset >= min && tp.Offset <= max)))) {
+                        if (!doFilter || ((!doFilterMatch || Precision.AlmostEquals(tp.Offset, match, 0.01)) && (!doFilterRange || (tp.Offset >= min && tp.Offset <= max)))) {
                             tp.Offset = Math.Round(tp.Offset * tpom + tpoo);
                         }
                     }
@@ -77,7 +77,7 @@ namespace Mapping_Tools.Views {
                     // BPM
                     if (tpbpmm != 1 || tpbpmo != 0) {
                         if (tp.Inherited) {
-                            if (!filter || ((!filterMatch || Precision.AlmostEquals(tp.GetBPM(), match, 0.01)) && (!filterRange || (tp.Offset >= min && tp.Offset <= max)))) {
+                            if (!doFilter || ((!doFilterMatch || Precision.AlmostEquals(tp.GetBPM(), match, 0.01)) && (!doFilterRange || (tp.Offset >= min && tp.Offset <= max)))) {
                                 double newBPM = tp.GetBPM() * tpbpmm + tpbpmo;
                                 newBPM = clip ? MathHelper.Clamp(newBPM, 15, 10000) : newBPM;  // Clip the value if specified
                                 tp.MpB = 60000 / newBPM;
@@ -87,7 +87,7 @@ namespace Mapping_Tools.Views {
 
                     // Slider Velocity
                     if (tpsvm != 1 || tpsvo != 0) {
-                        if (!filter || ((!filterMatch || Precision.AlmostEquals(beatmap.BeatmapTiming.GetSVMultiplierAtTime(tp.Offset), match, 0.01)) && (!filterRange || (tp.Offset >= min && tp.Offset <= max)))) {
+                        if (!doFilter || ((!doFilterMatch || Precision.AlmostEquals(beatmap.BeatmapTiming.GetSVMultiplierAtTime(tp.Offset), match, 0.01)) && (!doFilterRange || (tp.Offset >= min && tp.Offset <= max)))) {
                             TimingPoint tpchanger = tp.Copy();
                             double newSV = beatmap.BeatmapTiming.GetSVMultiplierAtTime(tp.Offset) * tpsvm + tpsvo;
                             newSV = clip ? MathHelper.Clamp(newSV, 0.1, 10) : newSV;  // Clip the value if specified
@@ -98,7 +98,7 @@ namespace Mapping_Tools.Views {
 
                     // Index
                     if (tpim != 1 || tpio != 0) {
-                        if (!filter || ((!filterMatch || Precision.AlmostEquals(tp.SampleIndex, match, 0.01)) && (!filterRange || (tp.Offset >= min && tp.Offset <= max)))) {
+                        if (!doFilter || ((!doFilterMatch || Precision.AlmostEquals(tp.SampleIndex, match, 0.01)) && (!doFilterRange || (tp.Offset >= min && tp.Offset <= max)))) {
                             int newIndex = (int)Math.Round(tp.SampleIndex * tpim + tpio);
                             tp.SampleIndex = clip ? MathHelper.Clamp(newIndex, 0, 99) : newIndex;
                         }
@@ -106,7 +106,7 @@ namespace Mapping_Tools.Views {
 
                     // Volume
                     if (tpvm != 1 || tpvo != 0) {
-                        if (!filter || ((!filterMatch || Precision.AlmostEquals(tp.Volume, match, 0.01)) && (!filterRange || (tp.Offset >= min && tp.Offset <= max)))) {
+                        if (!doFilter || ((!doFilterMatch || Precision.AlmostEquals(tp.Volume, match, 0.01)) && (!doFilterRange || (tp.Offset >= min && tp.Offset <= max)))) {
                             int newVolume = (int)Math.Round(tp.Volume * tpvm + tpvo);
                             tp.Volume = clip ? MathHelper.Clamp(newVolume, 5, 100) : newVolume;
                         }
@@ -116,7 +116,7 @@ namespace Mapping_Tools.Views {
                 // Hitobject Time
                 if (hotm != 1 || hoto != 0) {
                     foreach (HitObject ho in beatmap.HitObjects) {
-                        if (!filter || ((!filterMatch || Precision.AlmostEquals(ho.Time, match, 0.01)) && (!filterRange || (ho.Time >= min && ho.Time <= max)))) {
+                        if (!doFilter || ((!doFilterMatch || Precision.AlmostEquals(ho.Time, match, 0.01)) && (!doFilterRange || (ho.Time >= min && ho.Time <= max)))) {
                             ho.Time = Math.Round(ho.Time * hotm + hoto);
                         }
                     }
@@ -127,7 +127,7 @@ namespace Mapping_Tools.Views {
                     List<double> newBookmarks = new List<double>();
                     List<double> bookmarks = beatmap.GetBookmarks();
                     foreach (double bookmark in bookmarks) {
-                        if (!filter || ((!filterMatch || Precision.AlmostEquals(bookmark, match, 0.01)) && (!filterRange || (bookmark >= min && bookmark <= max)))) {
+                        if (!doFilter || ((!doFilterMatch || Precision.AlmostEquals(bookmark, match, 0.01)) && (!doFilterRange || (bookmark >= min && bookmark <= max)))) {
                             newBookmarks.Add(Math.Round(bookmark * btm + bto));
                         } else {
                             newBookmarks.Add(bookmark);
