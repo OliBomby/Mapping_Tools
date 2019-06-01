@@ -313,8 +313,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 // Import MIDI
                 layers = layers ?? HitsoundImporter.ImportMIDI(Path);
 
-                List<HitsoundLayer> sameLayer = layers.FindAll(o => Instrument == o.Instrument && (Note == -1 || Note == o.Note) && (Length == -1 || Length == o.Length)
-                                                                                               && (Velocity == -1 || Velocity == o.Velocity));
+                List<HitsoundLayer> sameLayer = layers.FindAll(o => (Instrument == -1 || Instrument == o.Instrument) && (Note == -1 || Note == o.Note)
+                                                                 && (Length == -1 || Length == o.Length) && (Velocity == -1 || Velocity == o.Velocity));
                 Times.Clear();
                 foreach (HitsoundLayer hsl in sameLayer) {
                     Times.AddRange(hsl.Times);
