@@ -148,9 +148,10 @@
                             <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="#FFD6D6D6"/>
                         </Button >
                     </Grid>
-                    <CheckBox x:Name="KeysoundBox3" Content="Include keysounds" IsChecked="True" Margin="0,10,0,0"/>
-                    <CheckBox x:Name="LengthBox3" Content="Include lengths" IsChecked="False"/>
-                    <CheckBox x:Name="VelocityBox3" Content="Include velocities" IsChecked="False"/>
+                    <CheckBox x:Name="InstrumentBox3" Content="Discriminate instruments" IsChecked="True" Margin="0,10,0,0"/>
+                    <CheckBox x:Name="KeysoundBox3" Content="Discriminate keysounds" IsChecked="True"/>
+                    <CheckBox x:Name="LengthBox3" Content="Discriminate lengths" IsChecked="False"/>
+                    <CheckBox x:Name="VelocityBox3" Content="Discriminate velocities" IsChecked="False"/>
                 </StackPanel>
             </TabItem>
         </TabControl>

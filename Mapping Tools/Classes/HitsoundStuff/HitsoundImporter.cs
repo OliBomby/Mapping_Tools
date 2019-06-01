@@ -125,7 +125,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return String.Format("{0}-hit{1}{2}.wav", HitsoundConverter.SampleSets[sampleSet], HitsoundConverter.Hitsounds[hitsound], index);
         }
 
-        public static List<HitsoundLayer> ImportMIDI(string path, bool keysounds=true, bool lengths=true, bool velocities=true, string sampleSource="") {
+        public static List<HitsoundLayer> ImportMIDI(string path, bool instruments=true, bool keysounds=true, bool lengths=true, bool velocities=true, string sampleSource="") {
             List<HitsoundLayer> hitsoundLayers = new List<HitsoundLayer>();
 
             var strictMode = false;
@@ -148,11 +148,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     bool keys = keysounds || on.Channel == 10;
 
                     int instrument = on.Channel != 10 ? channelInstruments[on.Channel] : PercussionIndex;
+                    instrument = instruments ? instrument : -1;
                     int key = keysounds ? on.NoteNumber : -1;
                     int length = lengths ? on.NoteLength : -1;
                     int velocity = velocities ? on.Velocity : -1;
-
-                    string instrumentName = instrument == PercussionIndex ? "Percussion" : PatchChangeEvent.GetPatchName(instrument);
+                    
+                    string instrumentName = instrument >= 0 && instrument <= 127 ? PatchChangeEvent.GetPatchName(instrument) : instrument == PercussionIndex ? "Percussion" : "Undefined";
                     string keyName = on.NoteName;
 
                     string name = instrumentName;
