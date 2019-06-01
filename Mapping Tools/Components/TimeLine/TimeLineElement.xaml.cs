@@ -13,7 +13,6 @@ namespace Mapping_Tools.Components.TimeLine {
         new TimeLine Parent;
         double Milliseconds;
         double Action;
-        string Display = "";
         SolidColorBrush Inner;
         SolidColorBrush Outer;
         /// <summary>
@@ -87,16 +86,28 @@ namespace Mapping_Tools.Components.TimeLine {
         private void SetupTooltip() {
             TimeSpan ts = TimeSpan.FromMilliseconds(Milliseconds);
 
-            mainCanvas.ToolTip = ts.TotalMilliseconds;
+            String m = ts.Minutes.ToString();
+            if (m.Length < 2)
+                m = "0" + m;
+            String s = ts.Seconds.ToString();
+            if (s.Length < 2)
+                s = "0" + s;
+            String ms = ts.Milliseconds.ToString();
+            if (ms.Length < 2)
+                ms = "0" + ms;
+
+            mainCanvas.ToolTip = String.Format("{0}:{1}:{2}", m, s, ms);
         }
+
         //Open osu at timestamp
         private void OpenLink(object sender, RoutedEventArgs e) {
             ProcessStartInfo ProcessInfo;
             Process Process;
 
-            ProcessInfo = new ProcessStartInfo("cmd.exe", "/K " + "start osu://edit/" + Milliseconds);
-            ProcessInfo.CreateNoWindow = true;
-            ProcessInfo.UseShellExecute = false;
+            ProcessInfo = new ProcessStartInfo("cmd.exe", "/K " + "start osu://edit/" + Math.Round(Milliseconds)) {
+                CreateNoWindow = true,
+                UseShellExecute = false
+            };
 
             Process = Process.Start(ProcessInfo);
         }

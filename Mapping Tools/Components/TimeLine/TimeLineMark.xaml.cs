@@ -19,7 +19,8 @@ namespace Mapping_Tools.Components.TimeLine {
             String s = ts.Seconds.ToString();
             if( s.Length < 2)
                 s = "0" + s;
-            this.text.Text = m + ":" + s;
+
+            text.Text = String.Format("{0}:{1}", m, s);
         }
     }
 }
