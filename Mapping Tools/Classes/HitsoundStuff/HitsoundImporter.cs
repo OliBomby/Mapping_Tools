@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     class HitsoundImporter {
-        public static readonly int PERCUSSIONINDEX = 128;
+        public static readonly int PercussionIndex = 128;
 
         public static List<double> TimesFromStack(string path, double x, double y) {
             List<double> times = new List<double>();
@@ -147,12 +147,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
                     bool keys = keysounds || on.Channel == 10;
 
-                    int instrument = on.Channel != 10 ? channelInstruments[on.Channel] : PERCUSSIONINDEX;
+                    int instrument = on.Channel != 10 ? channelInstruments[on.Channel] : PercussionIndex;
                     int key = keysounds ? on.NoteNumber : -1;
                     int length = lengths ? on.NoteLength : -1;
                     int velocity = velocities ? on.Velocity : -1;
 
-                    string instrumentName = instrument == PERCUSSIONINDEX ? "Percussion" : PatchChangeEvent.GetPatchName(instrument);
+                    string instrumentName = instrument == PercussionIndex ? "Percussion" : PatchChangeEvent.GetPatchName(instrument);
                     string keyName = on.NoteName;
 
                     string name = instrumentName;

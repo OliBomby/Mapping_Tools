@@ -51,8 +51,13 @@ namespace Mapping_Tools.Views {
         }
 
         public void SetSettings(HitsoundMakerVM settings) {
+            suppressEvents = true;
+
             Settings = settings;
             DataContext = Settings;
+
+            suppressEvents = false;
+
             LayersList.SelectedIndex = 0;
             Num_Layers_Changed();
         }
@@ -452,7 +457,7 @@ namespace Mapping_Tools.Views {
                 int samples = 0;
                 foreach (CustomIndex ci in completeHitsounds.CustomIndices) {
                     foreach (HashSet<string> h in ci.Samples.Values) {
-                        if (h.Any(o => File.Exists(o))) {
+                        if (h.Any(o => HitsoundExporter.ValidateSamplePath(o))) {
                             samples++;
                         }
                     }
