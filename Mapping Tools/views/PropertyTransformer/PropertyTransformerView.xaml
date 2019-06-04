@@ -30,9 +30,9 @@
                         <Setter Property="FontSize" Value="24"/>
                     </Style>
                 </StackPanel.Resources>
-                <TextBlock Text="Timing Points:" FontWeight="Bold"/>
+                <TextBlock Text="Timingpoints:" FontWeight="Bold"/>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="New Offset = Offset " MinWidth="350"/>
+                    <TextBlock Text="New offset = Offset " MinWidth="350"/>
                     <TextBlock Text="x "/>
                     <TextBox x:Name="TPOffsetMultiplierBox" Text="1" MinWidth="120"/>
                     <TextBlock Text=" + "/>
@@ -46,21 +46,21 @@
                     <TextBox x:Name="TPBPMOffsetBox" Text="0" MinWidth="120"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="New Slider Velocity = SV " MinWidth="350"/>
+                    <TextBlock Text="New slider velocity = SV " MinWidth="350"/>
                     <TextBlock Text="x "/>
                     <TextBox x:Name="TPSVMultiplierBox" Text="1" MinWidth="120"/>
                     <TextBlock Text=" + "/>
                     <TextBox x:Name="TPSVOffsetBox" Text="0" MinWidth="120"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="New Custom Index = Index " MinWidth="350"/>
+                    <TextBlock Text="New custom index = Index " MinWidth="350"/>
                     <TextBlock Text="x "/>
                     <TextBox x:Name="TPIndexMultiplierBox" Text="1" MinWidth="120"/>
                     <TextBlock Text=" + "/>
                     <TextBox x:Name="TPIndexOffsetBox" Text="0" MinWidth="120"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="New Volume = Volume " MinWidth="350"/>
+                    <TextBlock Text="New volume = Volume " MinWidth="350"/>
                     <TextBlock Text="x "/>
                     <TextBox x:Name="TPVolumeMultiplierBox" Text="1" MinWidth="120"/>
                     <TextBlock Text=" + "/>
@@ -69,14 +69,14 @@
                 <TextBlock Text=""/>
                 <TextBlock Text="Other:" FontWeight="Bold"/>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="New Hitobject Time = Time " MinWidth="350"/>
+                    <TextBlock Text="New hitobject time = Time " MinWidth="350"/>
                     <TextBlock Text="x "/>
                     <TextBox x:Name="HOTimeMultiplierBox" Text="1" MinWidth="120"/>
                     <TextBlock Text=" + "/>
                     <TextBox x:Name="HOTimeOffsetBox" Text="0" MinWidth="120"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="New Bookmark Time = Time " MinWidth="350"/>
+                    <TextBlock Text="New bookmark time = Time " MinWidth="350"/>
                     <TextBlock Text="x "/>
                     <TextBox x:Name="BookTimeMultiplierBox" Text="1" MinWidth="120"/>
                     <TextBlock Text=" + "/>
@@ -98,8 +98,8 @@
                     <RowDefinition Height="40"/>
                 </Grid.RowDefinitions>
                 <StackPanel Grid.Row="0" Margin="0,0,0,20" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-                    <CheckBox x:Name="ClipBox" Content="Clip Parameters" ToolTip="Clips the parameters to stay within bounds. (Volume: 5-100 etc)" IsChecked="True" FontSize="20"/>
-                    <CheckBox x:Name="FiltersBox" Content="Enable Filters" IsChecked="False" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Bottom" Checked="FiltersBox_Checked" Unchecked="FiltersBox_Unchecked"/>
+                    <CheckBox x:Name="ClipBox" Content="Clip properties" ToolTip="Clips the parameters to stay within bounds. (Volume: 5-100 etc)" IsChecked="True" FontSize="20"/>
+                    <CheckBox x:Name="FiltersBox" Content="Enable filters" IsChecked="False" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Bottom" Checked="FiltersBox_Checked" Unchecked="FiltersBox_Unchecked"/>
                     <TextBox x:Name="MatchBox" Text="" ToolTip="Parameters must match this value to be changed." MinWidth="120"/>
                     <StackPanel x:Name="RangePanel" Orientation="Horizontal">
                         <TextBox x:Name="MinBox" Text="" ToolTip="Minimum time in milliseconds of the object for the parameters to be changed." MinWidth="120"/>
