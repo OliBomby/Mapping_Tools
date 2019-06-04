@@ -45,7 +45,7 @@ namespace Mapping_Tools.Views {
                 bool doFilterMatch = match != -1 && doFilter;
                 double min = MinBox.GetDouble(defaultValue: double.MinValue);
                 double max = MaxBox.GetDouble(defaultValue: double.MaxValue);
-                bool doFilterRange = (min != double.MinValue || max != double.MaxValue) && doFilter;
+                bool doFilterRange = (min != double.NegativeInfinity || max != double.PositiveInfinity) && doFilter;
 
                 double tpom = TPOffsetMultiplierBox.GetDouble(defaultValue: 1);
                 double tpoo = TPOffsetOffsetBox.GetDouble(defaultValue: 0);
@@ -100,7 +100,7 @@ namespace Mapping_Tools.Views {
                     if (tpim != 1 || tpio != 0) {
                         if (!doFilter || ((!doFilterMatch || Precision.AlmostEquals(tp.SampleIndex, match, 0.01)) && (!doFilterRange || (tp.Offset >= min && tp.Offset <= max)))) {
                             int newIndex = (int)Math.Round(tp.SampleIndex * tpim + tpio);
-                            tp.SampleIndex = clip ? MathHelper.Clamp(newIndex, 0, 99) : newIndex;
+                            tp.SampleIndex = clip ? MathHelper.Clamp(newIndex, 0, 100) : newIndex;
                         }
                     }
 
