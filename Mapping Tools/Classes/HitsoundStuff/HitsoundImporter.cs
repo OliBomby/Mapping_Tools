@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     class HitsoundImporter {
-        public static readonly int PercussionIndex = 128;
+        public const int PercussionIndex = 128;
 
         public static List<double> TimesFromStack(string path, double x, double y) {
             List<double> times = new List<double>();
