@@ -43,9 +43,9 @@ namespace Mapping_Tools.Views {
                 bool doFilter = (bool)FiltersBox.IsChecked;
                 double match = MatchBox.GetDouble(defaultValue: -1);
                 bool doFilterMatch = match != -1 && doFilter;
-                double min = MinBox.GetDouble(defaultValue: -1);
-                double max = MaxBox.GetDouble(defaultValue: -1);
-                bool doFilterRange = min != -1 && max != -1 && doFilter;
+                double min = MinBox.GetDouble(defaultValue: double.MinValue);
+                double max = MaxBox.GetDouble(defaultValue: double.MaxValue);
+                bool doFilterRange = (min != double.MinValue || max != double.MaxValue) && doFilter;
 
                 double tpom = TPOffsetMultiplierBox.GetDouble(defaultValue: 1);
                 double tpoo = TPOffsetOffsetBox.GetDouble(defaultValue: 0);
