@@ -50,7 +50,7 @@ namespace Mapping_Tools.Views {
             string fileToCopy = MainWindow.AppWindow.currentMap.Text;
             IOHelper.SaveMapBackup(fileToCopy);
 
-            backgroundWorker.RunWorkerAsync(new Arguments(fileToCopy, LeniencyBox.GetDouble(), (bool) ReqBookmBox.IsChecked));
+            backgroundWorker.RunWorkerAsync(new Arguments(fileToCopy, LeniencyBox.GetDouble(0), (bool) ReqBookmBox.IsChecked));
             start.IsEnabled = false;
         }
 
