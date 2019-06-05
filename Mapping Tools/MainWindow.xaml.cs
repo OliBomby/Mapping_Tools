@@ -12,7 +12,7 @@ using AutoUpdaterDotNET;
 using Newtonsoft.Json;
 using System.Security.Principal;
 using Mapping_Tools.Views;
-using Mapping_Tools.Classes.SystemTools.HitsoundMaker;
+using Mapping_Tools.Classes.SystemTools.HitsoundStudio;
 using System.Windows.Forms;
 using System.Drawing;
 
@@ -228,12 +228,12 @@ namespace Mapping_Tools {
             this.MinHeight = 100;
         }
 
-        //Method for loading the hitsound maker
+        //Method for loading the hitsound studio
         private void LoadHSMaker(object sender, RoutedEventArgs e) {
-            DataContext = Views.GetHitsoundMaker();
+            DataContext = Views.GetHitsoundStudio();
 
             TextBlock txt = this.FindName("header") as TextBlock;
-            txt.Text = "Mapping Tools - Hitsound Maker";
+            txt.Text = "Mapping Tools - Hitsound Studio";
 
             System.Windows.Controls.MenuItem menuitem = this.FindName("project") as System.Windows.Controls.MenuItem;
             menuitem.Visibility = Visibility.Visible;

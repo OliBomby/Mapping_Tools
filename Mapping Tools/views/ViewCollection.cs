@@ -8,7 +8,7 @@ using System.Windows.Controls;
 namespace Mapping_Tools.Views {
     public class ViewCollection {
         public void SaveSettings() {
-            if (HitsoundMaker != null) {
+            if (HitsoundStudio != null) {
                 MainWindow.AppWindow.projectmanager.SaveProjectDefault();
             }
         }
@@ -53,13 +53,13 @@ namespace Mapping_Tools.Views {
             return HitsoundCopier;
         }
 
-        private UserControl HitsoundMaker;
-        public UserControl GetHitsoundMaker() {
-            if (HitsoundMaker == null) {
-                HitsoundMaker = new HitsoundMakerView();
+        private UserControl HitsoundStudio;
+        public UserControl GetHitsoundStudio() {
+            if (HitsoundStudio == null) {
+                HitsoundStudio = new HitsoundStudioView();
                 MainWindow.AppWindow.projectmanager.LoadProjectDefault();
             }
-            return HitsoundMaker;
+            return HitsoundStudio;
         }
 
         private UserControl SliderCompletionator;

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Mapping_Tools.Views.HitsoundMakerView"
+﻿<UserControl x:Class="Mapping_Tools.Views.HitsoundStudioView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -19,7 +19,7 @@
             <RowDefinition Height="90"/>
         </Grid.RowDefinitions>
         <Grid Name="TitleGrid" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
-            <TextBlock FontSize="40" TextWrapping="NoWrap" FontWeight="Bold" Foreground="#FF5F5E5E" Height="61"><Run Text="Hitsound Maker"/></TextBlock>
+            <TextBlock FontSize="40" TextWrapping="NoWrap" FontWeight="Bold" Foreground="#FF5F5E5E" Height="61"><Run Text="Hitsound Studio"/></TextBlock>
         </Grid>
         <Grid Name="FirstGrid" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>

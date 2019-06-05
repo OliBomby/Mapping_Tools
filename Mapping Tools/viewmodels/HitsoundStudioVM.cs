@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Mapping_Tools.Viewmodels {
-    public class HitsoundMakerVM : INotifyPropertyChanged {
+    public class HitsoundStudioVM : INotifyPropertyChanged {
         private string baseBeatmap;
         public string BaseBeatmap {
             get { return baseBeatmap; }
@@ -41,13 +41,13 @@ namespace Mapping_Tools.Viewmodels {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
         }
 
-        public HitsoundMakerVM() {
+        public HitsoundStudioVM() {
             BaseBeatmap = "";
             DefaultSample = new Sample(0, 0, "", int.MaxValue);
             HitsoundLayers = new ObservableCollection<HitsoundLayer>();
         }
 
-        public HitsoundMakerVM(string baseBeatmap, Sample defaultSample, ObservableCollection<HitsoundLayer> hitsoundLayers) {
+        public HitsoundStudioVM(string baseBeatmap, Sample defaultSample, ObservableCollection<HitsoundLayer> hitsoundLayers) {
             BaseBeatmap = baseBeatmap;
             DefaultSample = defaultSample;
             HitsoundLayers = hitsoundLayers;

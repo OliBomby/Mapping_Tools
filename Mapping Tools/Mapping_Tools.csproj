@@ -183,8 +183,8 @@
     <Compile Include="Classes\SliderPathStuff\SliderPath.cs" />
     <Compile Include="Classes\BeatmapHelper\TValue.cs" />
     <Compile Include="Classes\SystemTools\IOHelper.cs" />
-    <Compile Include="Classes\SystemTools\HitsoundMaker\Project.cs" />
-    <Compile Include="Classes\SystemTools\HitsoundMaker\ProjectManager.cs" />
+    <Compile Include="Classes\SystemTools\HitsoundStudio\Project.cs" />
+    <Compile Include="Classes\SystemTools\HitsoundStudio\ProjectManager.cs" />
     <Compile Include="Classes\SystemTools\Settings.cs" />
     <Compile Include="Classes\SystemTools\SettingsManager.cs" />
     <Compile Include="Classes\Tools\BezierConverter.cs" />
@@ -202,7 +202,7 @@
     </Compile>
     <Compile Include="Classes\Tools\TimingPointsChange.cs" />
     <Compile Include="Viewmodels\CleanerVM.cs" />
-    <Compile Include="Viewmodels\HitsoundMakerVM.cs" />
+    <Compile Include="Viewmodels\HitsoundStudioVM.cs" />
     <Compile Include="Viewmodels\HitsoundCopierVM.cs" />
     <Compile Include="Viewmodels\SnappingToolsVM.cs" />
     <Compile Include="Viewmodels\SliderCompletionatorVM.cs" />
@@ -216,7 +216,7 @@
     <Compile Include="Views\PropertyTransformer\PropertyTransformerView.xaml.cs">
       <DependentUpon>PropertyTransformerView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\HitsoundMaker\HitsoundMakerView.xaml.cs">
+    <Compile Include="Views\HitsoundStudio\HitsoundMakerView.xaml.cs">
       <DependentUpon>HitsoundMakerView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\HitsoundCopier\HitsoundCopierView.xaml.cs">
@@ -241,7 +241,7 @@
       <DependentUpon>SliderMergerView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ViewCollection.cs" />
-    <Compile Include="Views\HitsoundMaker\HitsoundLayerImportWindow.xaml.cs">
+    <Compile Include="Views\HitsoundStudio\HitsoundLayerImportWindow.xaml.cs">
       <DependentUpon>HitsoundLayerImportWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="Components\TimeLine\TimeLine.xaml">
@@ -284,7 +284,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\HitsoundMaker\HitsoundMakerView.xaml">
+    <Page Include="Views\HitsoundStudio\HitsoundMakerView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -316,7 +316,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\HitsoundMaker\HitsoundLayerImportWindow.xaml">
+    <Page Include="Views\HitsoundStudio\HitsoundLayerImportWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

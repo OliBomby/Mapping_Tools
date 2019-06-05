@@ -65,7 +65,7 @@
                         <MenuItem Header="_Snapping Tools WIP" Click="LoadSnappingTools"/>
                         <MenuItem Header="_Timing Helper" Click="LoadTimingHelper"/>
                         <MenuItem Header="_Hitsound Copier" Click="LoadHSCopier"/>
-                        <MenuItem Header="_Hitsound Maker" Click="LoadHSMaker"/>
+                        <MenuItem Header="_Hitsound Studio" Click="LoadHSMaker"/>
                     </MenuItem>
                     <MenuItem Height="31" Header="_Options" Padding="12,0,0,0" MinWidth="80">
                         <MenuItem Header="_Preferences" Click="LoadPreferences"/>
@@ -136,8 +136,8 @@
         <DataTemplate DataType="{x:Type viewmodels:HitsoundCopierVM}">
             <views:HitsoundCopierView DataContext="{Binding}"/>
         </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodels:HitsoundMakerVM}">
-            <views:HitsoundMakerView DataContext="{Binding}"/>
+        <DataTemplate DataType="{x:Type viewmodels:HitsoundStudioVM}">
+            <views:HitsoundStudioView DataContext="{Binding}"/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type viewmodels:PreferencesVM}">
             <views:PreferencesView DataContext="{Binding}"/>

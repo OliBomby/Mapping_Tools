@@ -8,17 +8,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mapping_Tools.Classes.SystemTools.HitsoundMaker {
+namespace Mapping_Tools.Classes.SystemTools.HitsoundStudio {
     public class Project {
         public string Name;
-        public HitsoundMakerVM Settings { get; set; }
+        public HitsoundStudioVM Settings { get; set; }
 
         public Project(string name) {
             Name = name;
-            Settings = new HitsoundMakerVM();
+            Settings = new HitsoundStudioVM();
         }
 
-        public Project(string name, HitsoundMakerVM settings) {
+        public Project(string name, HitsoundStudioVM settings) {
             Name = name;
             Settings = settings;
         }

@@ -5,7 +5,7 @@ Collection of tools for manipulating osu! beatmaps
 - [Map Cleaner](https://github.com/OliBomby/Map-Cleaner) by [OliBomby](https://github.com/OliBomby) 
 - [Slider Merger]() by [OliBomby](https://github.com/OliBomby) 
 - [Slider Completionator]() by [OliBomby](https://github.com/OliBomby) 
-- [Hitsound Maker]() by [OliBomby](https://github.com/OliBomby) 
+- [Hitsound Studio]() by [OliBomby](https://github.com/OliBomby) 
 - [Property Transformer]() by [OliBomby](https://github.com/OliBomby) 
 - [Timing Helper]() by [OliBomby](https://github.com/OliBomby) 
 - [Hitsound Copier]() by [OliBomby](https://github.com/OliBomby) 

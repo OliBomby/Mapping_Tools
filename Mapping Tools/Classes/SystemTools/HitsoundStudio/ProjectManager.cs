@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Mapping_Tools.Classes.SystemTools.HitsoundMaker {
+namespace Mapping_Tools.Classes.SystemTools.HitsoundStudio {
     public class ProjectManager {
         public List<string> ProjectNames = new List<string>();
         public Project CurrentProject;
@@ -35,7 +35,7 @@ namespace Mapping_Tools.Classes.SystemTools.HitsoundMaker {
             }
         }
 
-        public void LoadProject(string name, HitsoundMakerVM settings) {
+        public void LoadProject(string name, HitsoundStudioVM settings) {
             CurrentProject = new Project(name, settings);
             LoadFromJSON(CurrentProject.GetJSONPath());
         }
@@ -79,7 +79,7 @@ namespace Mapping_Tools.Classes.SystemTools.HitsoundMaker {
                 try {
                     using (StreamWriter fs = new StreamWriter(path))
                     using (JsonWriter writer = new JsonTextWriter(fs)) {
-                        HitsoundMakerView view = (HitsoundMakerView)MainWindow.AppWindow.Views.GetHitsoundMaker();
+                        HitsoundStudioView view = (HitsoundStudioView)MainWindow.AppWindow.Views.GetHitsoundStudio();
                         Serializer.Serialize(writer, view.GetSettings());
                     }
                 } catch (Exception ex) {
@@ -101,7 +101,7 @@ namespace Mapping_Tools.Classes.SystemTools.HitsoundMaker {
                 try {
                     using (StreamWriter fs = new StreamWriter(path))
                     using (JsonWriter writer = new JsonTextWriter(fs)) {
-                        HitsoundMakerView view = (HitsoundMakerView)MainWindow.AppWindow.Views.GetHitsoundMaker();
+                        HitsoundStudioView view = (HitsoundStudioView)MainWindow.AppWindow.Views.GetHitsoundStudio();
                         Serializer.Serialize(writer, view.GetSettings());
                     }
                 } catch (Exception ex) {
@@ -121,8 +121,8 @@ namespace Mapping_Tools.Classes.SystemTools.HitsoundMaker {
                 try {
                     using (StreamReader fs = new StreamReader(path))
                     using (JsonReader reader = new JsonTextReader(fs)) {
-                        HitsoundMakerView view = (HitsoundMakerView)MainWindow.AppWindow.Views.GetHitsoundMaker();
-                        view.SetSettings(Serializer.Deserialize<HitsoundMakerVM>(reader));
+                        HitsoundStudioView view = (HitsoundStudioView)MainWindow.AppWindow.Views.GetHitsoundStudio();
+                        view.SetSettings(Serializer.Deserialize<HitsoundStudioVM>(reader));
                     }
                 } catch (Exception ex) {
                     Console.WriteLine(ex.StackTrace);
@@ -143,8 +143,8 @@ namespace Mapping_Tools.Classes.SystemTools.HitsoundMaker {
                 try {
                     using (StreamReader fs = new StreamReader(path))
                     using (JsonReader reader = new JsonTextReader(fs)) {
-                        HitsoundMakerView view = (HitsoundMakerView)MainWindow.AppWindow.Views.GetHitsoundMaker();
-                        view.SetSettings(Serializer.Deserialize<HitsoundMakerVM>(reader));
+                        HitsoundStudioView view = (HitsoundStudioView)MainWindow.AppWindow.Views.GetHitsoundStudio();
+                        view.SetSettings(Serializer.Deserialize<HitsoundStudioVM>(reader));
                     }
                 } catch (Exception ex) {
                     Console.WriteLine(ex.StackTrace);

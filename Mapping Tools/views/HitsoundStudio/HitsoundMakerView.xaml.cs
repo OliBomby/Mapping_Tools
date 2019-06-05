@@ -25,32 +25,32 @@ namespace Mapping_Tools.Views {
     /// <summary>
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
-    public partial class HitsoundMakerView : UserControl {
+    public partial class HitsoundStudioView : UserControl {
         private BackgroundWorker backgroundWorker;
-        private HitsoundMakerVM Settings;
+        private HitsoundStudioVM Settings;
 
         private bool suppressEvents = false;
 
         private List<HitsoundLayer> selectedLayers;
         private HitsoundLayer selectedLayer;
 
-        public HitsoundMakerView() {
+        public HitsoundStudioView() {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
             backgroundWorker = (BackgroundWorker) FindResource("backgroundWorker");
-            Settings = new HitsoundMakerVM();
+            Settings = new HitsoundStudioVM();
             DataContext = Settings;
             LayersList.SelectedIndex = 0;
             Num_Layers_Changed();
             GetSelectedLayers();
         }
 
-        public HitsoundMakerVM GetSettings() {
+        public HitsoundStudioVM GetSettings() {
             return Settings;
         }
 
-        public void SetSettings(HitsoundMakerVM settings) {
+        public void SetSettings(HitsoundStudioVM settings) {
             suppressEvents = true;
 
             Settings = settings;
