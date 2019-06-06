@@ -101,15 +101,7 @@ namespace Mapping_Tools.Components.TimeLine {
 
         //Open osu at timestamp
         private void OpenLink(object sender, RoutedEventArgs e) {
-            ProcessStartInfo ProcessInfo;
-            Process Process;
-
-            ProcessInfo = new ProcessStartInfo("cmd.exe", "/K " + "start osu://edit/" + Math.Round(Milliseconds)) {
-                CreateNoWindow = true,
-                UseShellExecute = false
-            };
-
-            Process = Process.Start(ProcessInfo);
+            Process.Start("osu://edit/" + Math.Round(Milliseconds));
         }
     }
 }
