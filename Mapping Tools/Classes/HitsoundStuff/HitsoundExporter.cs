@@ -91,19 +91,24 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         continue;
                     }
                     var mixer = new WaveMixerStream32 { AutoStop = true };
+                    var waveChannels = new List<WaveChannel32>();
                     int soundsAdded = 0;
 
                     foreach (string path in kvp.Value) {
                         try {
                             string p = path.Split('?')[0];
                             WaveStream wave = Path.GetExtension(path) == ".ogg" ? (WaveStream)new VorbisWaveReader(path) : new MediaFoundationReader(path);
-                            mixer.AddInputStream(new WaveChannel32(wave));
+                            waveChannels.Add(new WaveChannel32(wave));
                             soundsAdded++;
                         } catch (Exception) { }
                     }
-
                     if (soundsAdded == 0) {
                         continue;
+                    }
+
+                    foreach (var waveChannel in waveChannels) {
+                        waveChannel.Volume = (float)(1 / Math.Sqrt(soundsAdded));
+                        mixer.AddInputStream(waveChannel);
                     }
 
                     if (ci.Index == 1) {
