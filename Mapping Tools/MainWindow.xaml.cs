@@ -426,7 +426,8 @@ namespace Mapping_Tools {
                     WindowState = WindowState.Normal;
                     bt.Content = new PackIcon { Kind = PackIconKind.WindowMaximize };
                 }
-                this.DragMove();
+                if (e.LeftButton == MouseButtonState.Pressed)
+                    this.DragMove();
                 //bt.Content = new PackIcon { Kind = PackIconKind.WindowRestore };
             }
         }
