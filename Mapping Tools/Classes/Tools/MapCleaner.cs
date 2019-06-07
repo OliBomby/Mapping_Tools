@@ -12,19 +12,19 @@ namespace Mapping_Tools.Classes.Tools {
             public bool VolumeSliders;
             public bool SamplesetSliders;
             public bool VolumeSpinners;
-            public bool RemoveSliderendMuting;
+            public bool RemoveMuting;
             public bool ResnapObjects;
             public bool ResnapBookmarks;
             public int Snap1;
             public int Snap2;
             public bool RemoveUnclickableHitsounds;
 
-            public Arguments(bool volumeSliders, bool samplesetSliders, bool volumeSpinners, bool removeSliderendMuting, bool resnapObjects, bool resnapBookmarks,
+            public Arguments(bool volumeSliders, bool samplesetSliders, bool volumeSpinners, bool removeMuting, bool resnapObjects, bool resnapBookmarks,
                              int snap1, int snap2, bool removeUnclickableHitsounds) {
                 VolumeSliders = volumeSliders;
                 SamplesetSliders = samplesetSliders;
                 VolumeSpinners = volumeSpinners;
-                RemoveSliderendMuting = removeSliderendMuting;
+                RemoveMuting = removeMuting;
                 ResnapObjects = resnapObjects;
                 ResnapBookmarks = resnapBookmarks;
                 Snap1 = snap1;
@@ -158,8 +158,10 @@ namespace Mapping_Tools.Classes.Tools {
                 bool ind = (ho.IsSlider && arguments.SamplesetSliders);
                 bool samplesetActuallyChanged = false;
                 foreach (TimingPoint tp in ho.BodyHitsounds) {
-                    if (tp.Volume == 5 && arguments.RemoveSliderendMuting) {
-                        vol = false; }  // Removing sliderbody silencing
+                    if (tp.Volume == 5 && arguments.RemoveMuting) {
+                        vol = false;  // Removing sliderbody silencing
+                        ind = false;  // Removing silent custom index
+                    }
                     timingPointsChanges.Add(new TimingPointsChange(tp, volume: vol, index: ind, sampleset: sam));
                     if (tp.SampleSet != ho.HitsoundTP.SampleSet) {
                         samplesetActuallyChanged = arguments.SamplesetSliders && ho.SampleSet == 0; }  // True for sampleset change in sliderbody
@@ -220,8 +222,10 @@ namespace Mapping_Tools.Classes.Tools {
                     tp.Offset = tlo.Time;
                     tp.SampleIndex = tlo.FenoCustomIndex;
                     tp.Volume = tlo.FenoSampleVolume;
-                    bool ind = !(tlo.Filename != "" && (tlo.IsCircle || tlo.IsHoldnoteHead || tlo.IsSpinnerEnd));  // Index doesnt have to change if custom is overridden by Filename
-                    bool vol = !(tp.Volume == 5 && arguments.RemoveSliderendMuting && (tlo.IsSliderEnd || tlo.IsSpinnerEnd));  // Remove volume change if sliderend muting or spinnerend muting
+                    bool doUnmute = tlo.FenoSampleVolume == 5 && arguments.RemoveMuting;
+                    bool usesFilename = tlo.Filename != "" && (tlo.IsCircle || tlo.IsHoldnoteHead || tlo.IsSpinnerEnd);
+                    bool ind = !usesFilename && !doUnmute;  // Index doesnt have to change if custom is overridden by Filename
+                    bool vol = !doUnmute;  // Remove volume change muted
                     timingPointsChanges.Add(new TimingPointsChange(tp, volume: vol, index: ind));
                 }
             }

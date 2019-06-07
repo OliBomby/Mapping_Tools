@@ -98,7 +98,7 @@ namespace Mapping_Tools.Views {
             string fileToCopy = MainWindow.AppWindow.currentMap.Text;
             Arguments arguments = new Arguments(fileToCopy,
                                                 new MapCleaner.Arguments((bool)VolumeSliders.IsChecked, (bool)SamplesetSliders.IsChecked,
-                                                                         (bool)VolumeSpinners.IsChecked, (bool)RemoveSliderendMuting.IsChecked,
+                                                                         (bool)VolumeSpinners.IsChecked, (bool)RemoveMuting.IsChecked,
                                                                          (bool)ResnapObjects.IsChecked, (bool)ResnapBookmarks.IsChecked,
                                                                          int.Parse(Snap1.Text.Split('/')[1]), int.Parse(Snap2.Text.Split('/')[1]),
                                                                          (bool)RemoveUnclickableHitsounds.IsChecked));

@@ -73,9 +73,9 @@
                                 Resnap Bookmarks
                     </TextBlock>
                 </CheckBox>
-                <CheckBox FontSize="20" x:Name="RemoveSliderendMuting" Cursor="Hand" Foreground="#FFD6D6D6">
+                <CheckBox FontSize="20" x:Name="RemoveMuting" Cursor="Hand" Foreground="#FFD6D6D6">
                     <TextBlock>
-                            Remove sliderend muting
+                            Remove muting
                     </TextBlock>
                 </CheckBox>
                 <CheckBox FontSize="20" x:Name="RemoveUnclickableHitsounds" Cursor="Hand" Foreground="#FFD6D6D6">
