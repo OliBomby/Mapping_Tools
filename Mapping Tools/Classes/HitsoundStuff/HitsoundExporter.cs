@@ -65,9 +65,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
 
             // Replace the old timingpoints
-            List<TimingPoint> newTimingPoints = new List<TimingPoint>();
-            newTimingPoints = TimingPointsChange.ApplyChanges(newTimingPoints, timingPointsChanges);
-            beatmap.BeatmapTiming.TimingPoints = newTimingPoints;
+            beatmap.BeatmapTiming.TimingPoints.Clear();
+            TimingPointsChange.ApplyChanges(beatmap.BeatmapTiming, timingPointsChanges);
 
             // Replace all hitobjects with the hitsounds
             beatmap.HitObjects.Clear();

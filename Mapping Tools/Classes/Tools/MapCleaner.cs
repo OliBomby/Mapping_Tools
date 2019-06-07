@@ -230,14 +230,10 @@ namespace Mapping_Tools.Classes.Tools {
                 }
             }
             UpdateProgressBar(worker, 90);
-
-
-            // Add the new timingpoints
-            List<TimingPoint> newTimingPoints = new List<TimingPoint>();
-            newTimingPoints = TimingPointsChange.ApplyChanges(newTimingPoints, timingPointsChanges);
-
+            
             // Replace the old timingpoints
-            timing.TimingPoints = newTimingPoints;
+            timing.TimingPoints.Clear();
+            TimingPointsChange.ApplyChanges(timing, timingPointsChanges);
             beatmap.GiveObjectsGreenlines();
 
             // Complete progressbar

@@ -110,7 +110,7 @@ namespace Mapping_Tools.Views {
             }
 
             // Add the new SV changes
-            timing.TimingPoints = TimingPointsChange.ApplyChanges(timing.TimingPoints, timingPointsChanges);
+            TimingPointsChange.ApplyChanges(timing, timingPointsChanges);
 
             // Save the file
             editor.SaveFile();

@@ -175,7 +175,7 @@ namespace Mapping_Tools.Views {
                 }
 
                 // Apply the timingpoint changes
-                beatmapTo.BeatmapTiming.TimingPoints = TimingPointsChange.ApplyChanges(beatmapTo.BeatmapTiming.TimingPoints, timingPointsChanges, true);
+                TimingPointsChange.ApplyChanges(beatmapTo.BeatmapTiming, timingPointsChanges, true);
 
                 processedTimeline = tlTo;
             } 
@@ -257,7 +257,7 @@ namespace Mapping_Tools.Views {
                 }
 
                 // Apply the timingpoint changes
-                beatmapTo.BeatmapTiming.TimingPoints = TimingPointsChange.ApplyChanges(beatmapTo.BeatmapTiming.TimingPoints, timingPointsChanges, false);
+                TimingPointsChange.ApplyChanges(beatmapTo.BeatmapTiming, timingPointsChanges, false);
 
                 processedTimeline = tlTo;
             }
@@ -296,7 +296,7 @@ namespace Mapping_Tools.Views {
                 }
                 
                 // Apply the timingpoint changes
-                beatmapTo.BeatmapTiming.TimingPoints = TimingPointsChange.ApplyChanges(beatmapTo.BeatmapTiming.TimingPoints, timingPointsChanges, false);
+                TimingPointsChange.ApplyChanges(beatmapTo.BeatmapTiming, timingPointsChanges, false);
             }
 
             // Save the file

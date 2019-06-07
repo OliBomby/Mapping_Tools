@@ -17,6 +17,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             SliderMultiplier = GetSliderMultiplier(lines);
         }
 
+        public void Sort() {
+            TimingPoints = TimingPoints.OrderBy(o => o.Offset).ToList();
+        }
+
         public double GetNearestTimeMeter(double time, TimingPoint tp, int divisor) {
             double d = tp.MpB / divisor;
             double remainder = ( time - tp.Offset ) % d;

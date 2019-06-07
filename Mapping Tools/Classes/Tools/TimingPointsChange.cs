@@ -106,12 +106,12 @@ namespace Mapping_Tools.Classes.Tools {
             }
         }
 
-        public static List<TimingPoint> ApplyChanges(List<TimingPoint> list, List<TimingPointsChange> timingPointsChanges, bool allAfter = false) {
+        public static void ApplyChanges(Timing timing, List<TimingPointsChange> timingPointsChanges, bool allAfter = false) {
             timingPointsChanges = timingPointsChanges.OrderBy(o => o.MyTP.Offset).ToList();
             foreach (TimingPointsChange c in timingPointsChanges) {
-                c.AddChange(list, allAfter);
+                c.AddChange(timing.TimingPoints, allAfter);
             }
-            return list.OrderBy(o => o.Offset).ToList();
+            timing.Sort();
         }
 
         public void AddChangeOld(List<TimingPoint> list, Timing timing, bool allAfter=false) {
