@@ -54,7 +54,7 @@
                     </Button >
                 </Grid>
                 <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Copying mode:"/></TextBlock>
-                <ComboBox x:Name="CopyModeBox" Margin="0,10,0,0" HorizontalAlignment="Stretch" SelectedIndex="0" Cursor="Hand">
+                <ComboBox x:Name="CopyModeBox" Margin="0,10,0,0" HorizontalAlignment="Stretch" SelectedIndex="1" Cursor="Hand">
                     <ComboBoxItem Content="Overwrite everything" HorizontalAlignment="Left" Cursor="Hand"/>
                     <ComboBoxItem Content="Overwrite only defined" HorizontalAlignment="Left" Cursor="Hand"/>
                 </ComboBox>

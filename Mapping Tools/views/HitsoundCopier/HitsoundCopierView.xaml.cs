@@ -174,10 +174,8 @@ namespace Mapping_Tools.Views {
                     timingPointsChanges.Add(tpc);
                 }
 
-                // Apply the greenline changes
-                foreach (TimingPointsChange c in timingPointsChanges) {
-                    c.AddChange(beatmapTo.BeatmapTiming.TimingPoints, true);
-                }
+                // Apply the timingpoint changes
+                beatmapTo.BeatmapTiming.TimingPoints = TimingPointsChange.ApplyChanges(beatmapTo.BeatmapTiming.TimingPoints, timingPointsChanges, true);
 
                 processedTimeline = tlTo;
             } 
@@ -258,17 +256,15 @@ namespace Mapping_Tools.Views {
                     }
                 }
 
-                // Apply the greenline changes
-                timingPointsChanges = timingPointsChanges.OrderBy(o => o.MyTP.Offset).ToList();
-                foreach (TimingPointsChange c in timingPointsChanges) {
-                    c.AddChange(beatmapTo.BeatmapTiming.TimingPoints, false);
-                }
-                
+                // Apply the timingpoint changes
+                beatmapTo.BeatmapTiming.TimingPoints = TimingPointsChange.ApplyChanges(beatmapTo.BeatmapTiming.TimingPoints, timingPointsChanges, false);
+
                 processedTimeline = tlTo;
             }
 
             if (muteSliderends) {
                 List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
+                beatmapTo.GiveObjectsGreenlines();
                 processedTimeline.GiveTimingPoints(beatmapTo.BeatmapTiming);
 
                 foreach (TimelineObject tloTo in processedTimeline.TimeLineObjects) {
@@ -293,14 +289,14 @@ namespace Mapping_Tools.Views {
                         // Add timingpointschange to preserve index and volume
                         TimingPoint tp = tloTo.Origin.HitsoundTP.Copy();
                         tp.Offset = tloTo.Time;
+                        tp.SampleIndex = tloTo.FenoCustomIndex;
+                        tp.Volume = tloTo.FenoSampleVolume;
                         timingPointsChanges.Add(new TimingPointsChange(tp, index: doMutedIndex, volume: true));
                     }
                 }
-
-                // Apply the greenline changes
-                foreach (TimingPointsChange c in timingPointsChanges) {
-                    c.AddChange(beatmapTo.BeatmapTiming.TimingPoints, false);
-                }
+                
+                // Apply the timingpoint changes
+                beatmapTo.BeatmapTiming.TimingPoints = TimingPointsChange.ApplyChanges(beatmapTo.BeatmapTiming.TimingPoints, timingPointsChanges, false);
             }
 
             // Save the file
@@ -338,7 +334,10 @@ namespace Mapping_Tools.Views {
             double beatsFromRedline = (resnappedTime - redline.Offset) / redline.MpB;
             double dist1 = beatsFromRedline * arg.Snap1 / (arg.Snap1 == 1 ? 4 : 2);
             double dist2 = beatsFromRedline * arg.Snap2 / (arg.Snap2 == 1 ? 4 : arg.Snap2 == 3 ? 3 : 2);
-            if (Precision.AlmostEquals(dist1 % 1, 0, 0.1) || Precision.AlmostEquals(dist2 % 1, 0, 0.1))
+            dist1 = dist1 % 1;
+            dist2 = dist2 % 1;
+            if (Precision.AlmostEquals(dist1, 0, 1E-7) || Precision.AlmostEquals(dist1, 1, 1E-7) ||
+                Precision.AlmostEquals(dist2, 0, 1E-7) || Precision.AlmostEquals(dist2, 1, 1E-7))
                 return false;
 
             // Check filter temporal length

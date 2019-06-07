@@ -136,9 +136,7 @@ namespace Mapping_Tools.Views {
                     beatmap.SetBookmarks(newBookmarks);
                 }
 
-                foreach (TimingPointsChange c in timingPointsChanges) {
-                    c.AddChange(beatmap.BeatmapTiming.TimingPoints);
-                }
+                beatmap.BeatmapTiming.TimingPoints = TimingPointsChange.ApplyChanges(beatmap.BeatmapTiming.TimingPoints, timingPointsChanges);
 
                 // Save the file
                 editor.SaveFile();

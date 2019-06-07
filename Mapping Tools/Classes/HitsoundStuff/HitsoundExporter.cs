@@ -65,11 +65,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
 
             // Replace the old timingpoints
-            timingPointsChanges = timingPointsChanges.OrderBy(o => o.MyTP.Offset).ToList();
             List<TimingPoint> newTimingPoints = new List<TimingPoint>();
-            foreach (TimingPointsChange c in timingPointsChanges) {
-                c.AddChange(newTimingPoints);
-            }
+            newTimingPoints = TimingPointsChange.ApplyChanges(newTimingPoints, timingPointsChanges);
             beatmap.BeatmapTiming.TimingPoints = newTimingPoints;
 
             // Replace all hitobjects with the hitsounds
