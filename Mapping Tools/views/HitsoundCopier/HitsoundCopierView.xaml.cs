@@ -326,6 +326,11 @@ namespace Mapping_Tools.Views {
             if (!(tloTo.IsSliderEnd || tloTo.IsSpinnerEnd))
                 return false;
 
+            // Check repeats
+            if (tloTo.Repeat != 1) {
+                return false;
+            }
+
             // Check filter snap
             // It's at least snap x or worse if the time is not a multiple of snap x / 2
             TimingPoint redline = beatmapTo.BeatmapTiming.GetRedlineAtTime(tloTo.Time - 1);
