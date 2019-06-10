@@ -1,21 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
-using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.HitsoundStuff;
-using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.SliderPathStuff;
 using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Viewmodels;
 using NAudio.Wave;
 using NAudio.Vorbis;
@@ -286,7 +279,7 @@ namespace Mapping_Tools.Views {
         void HitsoundLayer_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
             try {
                 string path = selectedLayer.SamplePath;
-                WaveStream mainOutputStream = Path.GetExtension(path) == ".ogg" ? (WaveStream) new VorbisWaveReader(path) : new MediaFoundationReader(path);
+                WaveStream mainOutputStream = SampleImporter.ImportSample(path);
                 WaveChannel32 volumeStream = new WaveChannel32(mainOutputStream);
 
                 WaveOutEvent player = new WaveOutEvent();

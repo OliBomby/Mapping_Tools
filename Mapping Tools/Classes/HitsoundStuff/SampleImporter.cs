@@ -1,4 +1,6 @@
-﻿using System;
+﻿using NAudio.Vorbis;
+using NAudio.Wave;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -32,6 +34,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 return false;
 
             return true;
+        }
+
+        public static WaveStream ImportSample(string path) {
+            string p = path.Split('?')[0];
+            return Path.GetExtension(path) == ".ogg" ? (WaveStream)new VorbisWaveReader(p) : new MediaFoundationReader(p);
         }
     }
 }
