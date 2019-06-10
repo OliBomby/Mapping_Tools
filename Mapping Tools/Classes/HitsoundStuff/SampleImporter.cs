@@ -38,7 +38,14 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         public static WaveStream ImportSample(string path) {
             string p = path.Split('?')[0];
-            return Path.GetExtension(path) == ".ogg" ? (WaveStream)new VorbisWaveReader(p) : new MediaFoundationReader(p);
+            if (Path.GetExtension(p) == ".sf2") {
+                // do stuff
+                return null;
+            } else if (Path.GetExtension(p) == ".ogg") {
+                return new VorbisWaveReader(p);
+            } else {
+                return new MediaFoundationReader(p);
+            }
         }
     }
 }
