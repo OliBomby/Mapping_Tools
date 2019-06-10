@@ -230,7 +230,7 @@ namespace Mapping_Tools {
         }
 
         //Method for loading the hitsound studio
-        private void LoadHSMaker(object sender, RoutedEventArgs e) {
+        private void LoadHSStudio(object sender, RoutedEventArgs e) {
             DataContext = Views.GetHitsoundStudio();
 
             TextBlock txt = this.FindName("header") as TextBlock;

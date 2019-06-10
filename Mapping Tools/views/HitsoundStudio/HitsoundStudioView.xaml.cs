@@ -457,7 +457,7 @@ namespace Mapping_Tools.Views {
                 int samples = 0;
                 foreach (CustomIndex ci in completeHitsounds.CustomIndices) {
                     foreach (HashSet<string> h in ci.Samples.Values) {
-                        if (h.Any(o => HitsoundExporter.ValidateSamplePath(o))) {
+                        if (h.Any(o => SampleImporter.ValidateSamplePath(o))) {
                             samples++;
                         }
                     }

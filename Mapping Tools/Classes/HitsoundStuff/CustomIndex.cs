@@ -76,8 +76,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public void CleanInvalids() {
             // Replace all invalid paths with "" and remove the invalid path if another valid path is also in the hashset
             foreach (HashSet<string> paths in Samples.Values) {
-                if (paths.Any(o => HitsoundExporter.ValidateSamplePath(o))) {
-                    paths.RemoveWhere(o => !HitsoundExporter.ValidateSamplePath(o));
+                if (paths.Any(o => SampleImporter.ValidateSamplePath(o))) {
+                    paths.RemoveWhere(o => !SampleImporter.ValidateSamplePath(o));
                 } else if (paths.Count > 0) {
                     paths.Clear();
                     paths.Add("");  // This "" is here to prevent this hashset from getting new paths

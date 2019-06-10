@@ -131,6 +131,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Classes\HitsoundStuff\SampleImporter.cs" />
     <Compile Include="Classes\HitsoundStuff\CompleteHitsounds.cs" />
     <Compile Include="Classes\HitsoundStuff\CustomIndex.cs" />
     <Compile Include="Classes\HitsoundStuff\Hitsound.cs" />
@@ -216,8 +217,8 @@
     <Compile Include="Views\PropertyTransformer\PropertyTransformerView.xaml.cs">
       <DependentUpon>PropertyTransformerView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\HitsoundStudio\HitsoundMakerView.xaml.cs">
-      <DependentUpon>HitsoundMakerView.xaml</DependentUpon>
+    <Compile Include="Views\HitsoundStudio\HitsoundStudioView.xaml.cs">
+      <DependentUpon>HitsoundStudioView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\HitsoundCopier\HitsoundCopierView.xaml.cs">
       <DependentUpon>HitsoundCopierView.xaml</DependentUpon>
@@ -284,7 +285,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\HitsoundStudio\HitsoundMakerView.xaml">
+    <Page Include="Views\HitsoundStudio\HitsoundStudioView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
