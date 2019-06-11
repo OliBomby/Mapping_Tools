@@ -42,54 +42,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             string p = split[0];
             if (Path.GetExtension(p) == ".sf2") {
                 int[] args = split[1].Split('\\').Select(o => int.Parse(o)).ToArray();
-                
-                SoundFont soundFont = new SoundFont(p);
-                Console.WriteLine(soundFont.FileInfo.ToString());
 
-                foreach (Zone z in soundFont.Instruments[4].Zones) {
-                    Console.WriteLine("Zone:");
-                    foreach (Generator g in z.Generators) {
-                        Console.WriteLine(g.ToString());
-                        Console.WriteLine(g.SampleHeader);
+                SoundFont sf2 = new SoundFont(p);
 
-                        if (g.SampleHeader != null) {
-                            SampleHeader s = g.SampleHeader;
-
-                            if (s.OriginalPitch == args[1]) {
-                                Console.WriteLine("yeet found it");
-                                int length = (int)(s.End - s.Start);
-                                Console.WriteLine("length: " + length);
-                                byte[] buffer = new byte[length];
-                                Array.Copy(soundFont.SampleData, s.Start, buffer, 0, length);
-                                return new RawSourceWaveStream(buffer, 0, length, new WaveFormat((int)s.SampleRate, 2));
-                            }
-                        }
-                    }
-                }
-
-                Console.WriteLine("Instruments:");
-                foreach (Instrument i in soundFont.Instruments) {
-                    Console.WriteLine(i.Name);
-                    foreach (Zone z in i.Zones) {
-                        Console.WriteLine("Zone:");
-                        foreach (Generator g in z.Generators) {
-                            Console.WriteLine(g.ToString());
-                            Console.WriteLine(g.SampleHeader);
-
-                            if (g.SampleHeader != null) {
-                                SampleHeader s = g.SampleHeader;
-
-                                if (s.OriginalPitch == args[1]) {
-                                    Console.WriteLine("yeet found it");
-                                    int length = (int)(s.End - s.Start);
-                                    Console.WriteLine("length: " + length);
-                                    byte[] buffer = new byte[length];
-                                    Array.Copy(soundFont.SampleData, s.Start, buffer, 0, length);
-                                    return new RawSourceWaveStream(buffer, 0, length, new WaveFormat((int)s.SampleRate, 2));
-                                }
-                            }
-                        }
-                    }
+                foreach (var preset in sf2.Presets) {
+                    Console.WriteLine("Processing " + preset.Name);
+                    ImportPreset(sf2, preset);
                 }
 
                 return null;
@@ -98,6 +56,35 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             } else {
                 return new MediaFoundationReader(p);
             }
+        }
+
+        private static void ImportPreset(SoundFont sf2, Preset preset) {
+            foreach (var pzone in preset.Zones) { // perc. bank likely has more than one instrument here.
+                var i = pzone.Instrument();
+                var kr = pzone.KeyRange(); // FIXME: where should I use it?
+                if (i == null)
+                    continue; // FIXME: is it possible?
+
+                var vr = pzone.VelocityRange();
+
+                // an Instrument contains a set of zones that contain sample headers.
+                foreach (var izone in i.Zones) {
+                    var ikr = izone.KeyRange();
+                    var ivr = izone.VelocityRange();
+                    var sh = izone.SampleHeader();
+                    if (sh == null)
+                        continue; // FIXME: is it possible?
+
+                    // FIXME: sample data must become monoral (panpot neutral)
+                    var xs = ReadSample(sh, sf2.SampleData);
+                }
+            }
+        }
+
+        private static WaveStream ReadSample(SampleHeader sh, byte[] sample) {
+            // Indices in sf2 are numbers of samples, not byte length. So double them.
+            int length = (int)(sh.End - sh.Start) * 2;
+            return new RawSourceWaveStream(sample, (int)sh.Start * 2, length, new WaveFormat((int)sh.SampleRate, 16, 1));
         }
     }
 }
