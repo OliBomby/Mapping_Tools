@@ -207,6 +207,14 @@ namespace Mapping_Tools.Classes.MathUtil {
         }
 
         /// <summary>
+        /// Rounds the coordinates to integer values.
+        /// </summary>
+        public void Round() {
+            X = Math.Round(X);
+            Y = Math.Round(Y);
+        }
+
+        /// <summary>
         /// Defines a unit-length Vector2 that points towards the X-axis.
         /// </summary>
         public static readonly Vector2 UnitX = new Vector2(1, 0);

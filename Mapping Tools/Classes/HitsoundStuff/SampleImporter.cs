@@ -59,6 +59,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         private static void ImportPreset(SoundFont sf2, Preset preset) {
+            /*
             foreach (var pzone in preset.Zones) { // perc. bank likely has more than one instrument here.
                 var i = pzone.Instrument();
                 var kr = pzone.KeyRange(); // FIXME: where should I use it?
@@ -78,7 +79,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     // FIXME: sample data must become monoral (panpot neutral)
                     var xs = ReadSample(sh, sf2.SampleData);
                 }
-            }
+            }*/
+            return;
         }
 
         private static WaveStream ReadSample(SampleHeader sh, byte[] sample) {
