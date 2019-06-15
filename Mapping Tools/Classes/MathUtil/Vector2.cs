@@ -175,7 +175,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         {
             get
             {
-                return ((int)Y).ToString();
+                return ((int)Math.Round(Y)).ToString();
             }
         }
 
