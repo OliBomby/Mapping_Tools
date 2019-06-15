@@ -11,8 +11,6 @@ using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     class HitsoundImporter {
-        public const int PercussionIndex = 128;
-
         public static List<double> TimesFromStack(string path, double x, double y) {
             List<double> times = new List<double>();
             Editor editor = new Editor(path);
@@ -98,7 +96,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     extLess = Path.GetFileNameWithoutExtension(filename);
 
                     // Find the hitsoundlayer with this path
-                    HitsoundLayer layer = hitsoundLayers.Find(o => o.SamplePath == samplePath);
+                    HitsoundLayer layer = hitsoundLayers.Find(o => o.SampleArgs.Path == samplePath);
 
                     if (layer != null) {
                         // Find hitsound layer with this path and add this time
@@ -125,18 +123,19 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return String.Format("{0}-hit{1}{2}.wav", HitsoundConverter.SampleSets[sampleSet], HitsoundConverter.Hitsounds[hitsound], index);
         }
 
-        public static List<HitsoundLayer> ImportMIDI(string path, bool instruments=true, bool keysounds=true, bool lengths=true, bool velocities=true, string sampleSource="") {
+        public static List<HitsoundLayer> ImportMIDI(string path, bool patches=true, bool keysounds=true, bool lengths=true, bool velocities=true, string sampleSource="") {
             List<HitsoundLayer> hitsoundLayers = new List<HitsoundLayer>();
 
             var strictMode = false;
             var mf = new MidiFile(path, strictMode);
-            Dictionary<int, int> channelInstruments = new Dictionary<int, int>();
+            Dictionary<int, int> channelBanks = new Dictionary<int, int>();
+            Dictionary<int, int> channelPatches = new Dictionary<int, int>();
 
             for (int n = 0; n < mf.Tracks; n++) {
                 foreach (var midiEvent in mf.Events[n]) {
                     if (midiEvent.CommandCode == MidiCommandCode.PatchChange) {
                         PatchChangeEvent patchChange = (PatchChangeEvent)midiEvent;
-                        channelInstruments[patchChange.Channel] = patchChange.Patch;
+                        channelPatches[patchChange.Channel] = patchChange.Patch;
                         continue;
                     }
                     else if (!MidiEvent.IsNoteOn(midiEvent)) {
@@ -147,13 +146,14 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
                     bool keys = keysounds || on.Channel == 10;
 
-                    int instrument = on.Channel != 10 ? channelInstruments[on.Channel] : PercussionIndex;
-                    instrument = instruments ? instrument : -1;
+                    int bank = on.Channel == 10 ? 128 : -1;
+                    int patch = patches ? channelPatches[on.Channel] : -1;
+                    int instrument = -1;
                     int key = keysounds ? on.NoteNumber : -1;
                     int length = lengths ? on.NoteLength : -1;
                     int velocity = velocities ? on.Velocity : -1;
                     
-                    string instrumentName = instrument >= 0 && instrument <= 127 ? PatchChangeEvent.GetPatchName(instrument) : instrument == PercussionIndex ? "Percussion" : "Undefined";
+                    string instrumentName = patch >= 0 && patch <= 127 ? PatchChangeEvent.GetPatchName(patch) : on.Channel == 10 ? "Percussion" : "Undefined";
                     string keyName = on.NoteName;
 
                     string name = instrumentName;
@@ -165,12 +165,13 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         name += "," + velocity;
                     
                     string filename = Path.GetExtension(sampleSource) == ".sf2" ?
-                        sampleSource + "?" + Path.Combine(new string[4] { instrument.ToString(), key.ToString(), length.ToString(), velocity.ToString() }):
-                        Path.Combine(new string[5] { sampleSource, instrument.ToString(), key.ToString(), length.ToString(), velocity.ToString() + ".wav" });
-                    
+                        sampleSource :
+                        Path.Combine(new string[5] { sampleSource, patch.ToString(), key.ToString(), length.ToString(), velocity.ToString() + ".wav" });
+
+                    SampleGeneratingArgs args = new SampleGeneratingArgs(filename, bank, patch, instrument, key, length, velocity);
 
                     // Find the hitsoundlayer with this path
-                    HitsoundLayer layer = hitsoundLayers.Find(o => o.SamplePath == filename);
+                    HitsoundLayer layer = hitsoundLayers.Find(o => o.SampleArgs == );
 
                     if (layer != null) {
                         // Find hitsound layer with this path and add this time
@@ -178,7 +179,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     } else {
                         // Add new hitsound layer with this path
                         HitsoundLayer newLayer = new HitsoundLayer(name, "MIDI", path, 1, 0, filename) {
-                            Instrument = instrument,
+                            Instrument = patch,
                             Note = key,
                             Length = length,
                             Velocity = velocity

@@ -61,50 +61,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
-        private double instrument;
-        public double Instrument {
-            get { return instrument; }
-            set {
-                if (instrument != value) {
-                    instrument = value;
-                    NotifyPropertyChanged("Instrument");
-                }
-            }
-        }
-
-        private double note;
-        public double Note {
-            get { return note; }
-            set {
-                if (note != value) {
-                    note = value;
-                    NotifyPropertyChanged("Note");
-                }
-            }
-        }
-
-        private double length;
-        public double Length {
-            get { return length; }
-            set {
-                if (length != value) {
-                    length = value;
-                    NotifyPropertyChanged("Length");
-                }
-            }
-        }
-
-        private double velocity;
-        public double Velocity {
-            get { return velocity; }
-            set {
-                if (velocity != value) {
-                    velocity = value;
-                    NotifyPropertyChanged("Velocity");
-                }
-            }
-        }
-
         private int sampleSet;
         public int SampleSet {
             get { return sampleSet; }
@@ -160,13 +116,13 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
-        private string samplePath;
-        public string SamplePath {
-            get { return samplePath; }
+        private SampleGeneratingArgs sampleArgs;
+        public SampleGeneratingArgs SampleArgs {
+            get { return sampleArgs; }
             set {
-                if (samplePath != value) {
-                    samplePath = value;
-                    NotifyPropertyChanged("SamplePath");
+                if (sampleArgs != value) {
+                    sampleArgs = value;
+                    NotifyPropertyChanged("SampleArgs");
                 }
             }
         }
@@ -230,6 +186,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Path = "";
             X = -1;
             Y = -1;
+            SampleArgs = new SampleGeneratingArgs();
             Times = new List<double>();
         }
 
@@ -241,7 +198,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Y = -1;
             SampleSet = sampleSet;
             Hitsound = hitsound;
-            SamplePath = samplePath;
+            SampleArgs = new SampleGeneratingArgs(samplePath);
             Times = new List<double>();
         }
 
@@ -252,6 +209,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             X = x;
             Y = y;
             Times = new List<double>();
+            SampleArgs = new SampleGeneratingArgs();
             Import();
         }
 
@@ -263,6 +221,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Y = y;
             Priority = priority;
             Times = new List<double>();
+            SampleArgs = new SampleGeneratingArgs();
             Import();
         }
 
@@ -274,7 +233,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Y = y;
             SampleSet = sampleSet;
             Hitsound = hitsound;
-            SamplePath = samplePath;
+            SampleArgs = new SampleGeneratingArgs(samplePath);
             Times = new List<double>();
             Import();
         }
@@ -287,7 +246,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Y = y;
             SampleSet = sampleSet;
             Hitsound = hitsound;
-            SamplePath = samplePath;
+            SampleArgs = new SampleGeneratingArgs(samplePath);
             Priority = priority;
             Times = new List<double>();
             Import();
@@ -313,8 +272,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 // Import MIDI
                 layers = layers ?? HitsoundImporter.ImportMIDI(Path);
 
-                List<HitsoundLayer> sameLayer = layers.FindAll(o => (Instrument == -1 || Instrument == o.Instrument) && (Note == -1 || Note == o.Note)
-                                                                 && (Length == -1 || Length == o.Length) && (Velocity == -1 || Velocity == o.Velocity));
+                List<HitsoundLayer> sameLayer = layers.FindAll(o => (SampleArgs.Instrument == -1 || SampleArgs.Instrument == o.SampleArgs.Instrument) && (SampleArgs.Key == -1 || SampleArgs.Key == o.SampleArgs.Key)
+                                                                 && (SampleArgs.Length == -1 || SampleArgs.Length == o.SampleArgs.Length) && (SampleArgs.Velocity == -1 || SampleArgs.Velocity == o.SampleArgs.Velocity));
                 Times.Clear();
                 foreach (HitsoundLayer hsl in sameLayer) {
                     Times.AddRange(hsl.Times);

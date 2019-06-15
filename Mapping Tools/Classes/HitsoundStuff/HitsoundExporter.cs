@@ -1,7 +1,7 @@
 ﻿using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.Tools;
 using NAudio.Wave;
-using NAudio.Vorbis;
+using NAudio.Wave.SampleProviders;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -60,14 +60,14 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     if (kvp.Value.Count == 0) {
                         continue;
                     }
-                    var mixer = new WaveMixerStream32 { AutoStop = true };
-                    var waveChannels = new List<WaveChannel32>();
+                    var samples = new List<ISampleProvider>();
                     int soundsAdded = 0;
 
                     foreach (string path in kvp.Value) {
                         try {
-                            WaveStream wave = SampleImporter.ImportSample(path);
-                            waveChannels.Add(new WaveChannel32(wave));
+                            var wave = SampleImporter.ImportSample(path);
+                            var volume = new VolumeSampleProvider(wave);
+                            samples.Add(volume);
                             soundsAdded++;
                         } catch (Exception) { }
                     }
@@ -75,15 +75,16 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         continue;
                     }
 
-                    foreach (var waveChannel in waveChannels) {
-                        waveChannel.Volume = (float)(1 / Math.Sqrt(soundsAdded));
-                        mixer.AddInputStream(waveChannel);
+                    var mixer = new MixingSampleProvider(samples);
+                    
+                    foreach (var sample in mixer.MixerInputs) {
+                        ((VolumeSampleProvider)sample).Volume = (float)(1 / Math.Sqrt(soundsAdded));
                     }
 
                     if (ci.Index == 1) {
-                        CreateWaveFile(Path.Combine(exportFolder, kvp.Key + ".wav"), new Wave32To16Stream(mixer));
+                        CreateWaveFile(Path.Combine(exportFolder, kvp.Key + ".wav"), mixer.ToWaveProvider16());
                     } else {
-                        CreateWaveFile(Path.Combine(exportFolder, kvp.Key + ci.Index + ".wav"), new Wave32To16Stream(mixer));
+                        CreateWaveFile(Path.Combine(exportFolder, kvp.Key + ci.Index + ".wav"), mixer.ToWaveProvider16());
                     }
                 }
             }

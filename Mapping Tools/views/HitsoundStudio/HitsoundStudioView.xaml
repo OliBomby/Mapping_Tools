@@ -102,8 +102,8 @@
                         <StackPanel x:Name="SelectedMIDIPanel">
                             <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Instrument:"/></TextBlock>
                             <TextBox x:Name="SelectedInstrumentBox" TextChanged="SelectedInstrumentBox_TextChanged" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6"/>
-                            <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Note:"/></TextBlock>
-                            <TextBox x:Name="SelectedNoteBox" TextChanged="SelectedNoteBox_TextChanged" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6"/>
+                            <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Key:"/></TextBlock>
+                            <TextBox x:Name="SelectedKeyBox" TextChanged="SelectedKeyBox_TextChanged" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6"/>
                             <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Length:"/></TextBlock>
                             <TextBox x:Name="SelectedLengthBox" TextChanged="SelectedLengthBox_TextChanged" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6"/>
                             <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Velocity:"/></TextBlock>
