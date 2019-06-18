@@ -171,7 +171,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     SampleGeneratingArgs args = new SampleGeneratingArgs(filename, bank, patch, instrument, key, length, velocity);
 
                     // Find the hitsoundlayer with this path
-                    HitsoundLayer layer = hitsoundLayers.Find(o => o.SampleArgs == );
+                    HitsoundLayer layer = hitsoundLayers.Find(o => o.SampleArgs == args);
 
                     if (layer != null) {
                         // Find hitsound layer with this path and add this time
@@ -179,10 +179,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     } else {
                         // Add new hitsound layer with this path
                         HitsoundLayer newLayer = new HitsoundLayer(name, "MIDI", path, 1, 0, filename) {
-                            Instrument = patch,
-                            Note = key,
-                            Length = length,
-                            Velocity = velocity
+                            SampleArgs = args
                         };
 
                         newLayer.Times.Add(on.AbsoluteTime);

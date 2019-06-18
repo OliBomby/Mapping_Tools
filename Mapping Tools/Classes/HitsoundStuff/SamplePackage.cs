@@ -47,10 +47,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             int sampleSet = GetSampleSet();
             int additions = GetAdditions();
 
-            HashSet<string> normals = new HashSet<string>(Samples.Where(o => o.Hitsound == 0).Select(o => o.SamplePath));
-            HashSet<string> whistles = new HashSet<string>(Samples.Where(o => o.Hitsound == 1).Select(o => o.SamplePath));
-            HashSet<string> finishes = new HashSet<string>(Samples.Where(o => o.Hitsound == 2).Select(o => o.SamplePath));
-            HashSet<string> claps = new HashSet<string>(Samples.Where(o => o.Hitsound == 3).Select(o => o.SamplePath));
+            HashSet<SampleGeneratingArgs> normals = new HashSet<SampleGeneratingArgs>(Samples.Where(o => o.Hitsound == 0).Select(o => o.SampleArgs));
+            HashSet<SampleGeneratingArgs> whistles = new HashSet<SampleGeneratingArgs>(Samples.Where(o => o.Hitsound == 1).Select(o => o.SampleArgs));
+            HashSet<SampleGeneratingArgs> finishes = new HashSet<SampleGeneratingArgs>(Samples.Where(o => o.Hitsound == 2).Select(o => o.SampleArgs));
+            HashSet<SampleGeneratingArgs> claps = new HashSet<SampleGeneratingArgs>(Samples.Where(o => o.Hitsound == 3).Select(o => o.SampleArgs));
             
             CustomIndex ci = new CustomIndex();
 

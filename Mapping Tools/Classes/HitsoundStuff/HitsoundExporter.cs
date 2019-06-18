@@ -56,36 +56,31 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
             // Export the sample files
             foreach (CustomIndex ci in ch.CustomIndices) {
-                foreach (KeyValuePair<string, HashSet<string>> kvp in ci.Samples) {
+                foreach (KeyValuePair<string, HashSet<SampleGeneratingArgs>> kvp in ci.Samples) {
                     if (kvp.Value.Count == 0) {
                         continue;
                     }
                     var samples = new List<ISampleProvider>();
                     int soundsAdded = 0;
 
-                    foreach (string path in kvp.Value) {
+                    foreach (SampleGeneratingArgs generator in kvp.Value) {
                         try {
-                            var wave = SampleImporter.ImportSample(path);
-                            var volume = new VolumeSampleProvider(wave);
-                            samples.Add(volume);
+                            var wave = SampleImporter.ImportSample(generator);
+                            samples.Add(wave);
                             soundsAdded++;
                         } catch (Exception) { }
                     }
                     if (soundsAdded == 0) {
                         continue;
                     }
-
-                    var mixer = new MixingSampleProvider(samples);
                     
-                    foreach (var sample in mixer.MixerInputs) {
-                        ((VolumeSampleProvider)sample).Volume = (float)(1 / Math.Sqrt(soundsAdded));
-                    }
+                    var mixer = new MixingSampleProvider(samples);
+                    VolumeSampleProvider volumed = new VolumeSampleProvider(mixer) {
+                        Volume = 1 / (float)Math.Sqrt(soundsAdded)
+                    };
 
-                    if (ci.Index == 1) {
-                        CreateWaveFile(Path.Combine(exportFolder, kvp.Key + ".wav"), mixer.ToWaveProvider16());
-                    } else {
-                        CreateWaveFile(Path.Combine(exportFolder, kvp.Key + ci.Index + ".wav"), mixer.ToWaveProvider16());
-                    }
+                    string filename = ci.Index == 1 ? kvp.Key + ".wav" : kvp.Key + ci.Index + ".wav";
+                    CreateWaveFile(Path.Combine(exportFolder, filename), volumed.ToWaveProvider16());
                 }
             }
         }

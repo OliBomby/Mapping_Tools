@@ -129,7 +129,7 @@ namespace Mapping_Tools.Views {
             try {
                 string path = IOHelper.AudioFileDialog();
                 if (path != "") {
-                    Settings.DefaultSample.SamplePath = path;
+                    Settings.DefaultSample.SampleArgs.Path = path;
                     DefaultSamplePathBox.Text = path;
                     }
             } catch (Exception) { }
@@ -454,8 +454,8 @@ namespace Mapping_Tools.Views {
 
                 int samples = 0;
                 foreach (CustomIndex ci in completeHitsounds.CustomIndices) {
-                    foreach (HashSet<string> h in ci.Samples.Values) {
-                        if (h.Any(o => SampleImporter.ValidateSamplePath(o))) {
+                    foreach (HashSet<SampleGeneratingArgs> h in ci.Samples.Values) {
+                        if (h.Any(o => SampleImporter.ValidateSampleArgs(o))) {
                             samples++;
                         }
                     }

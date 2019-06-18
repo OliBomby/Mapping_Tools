@@ -14,7 +14,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
     class SampleImporter {
         public static readonly string[] ValidSamplePathExtensions = new string[] { ".wav", ".ogg", ".mp3" };
 
-        public static bool ValidateSamplePath(string path) {
+        public static bool ValidateSampleArgs(string path) {
             if (path == "")
                 return false;
 
@@ -36,6 +36,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 return false;
 
             return true;
+        }
+
+        public static bool ValidateSampleArgs(SampleGeneratingArgs args) {
+            return ValidateSampleArgs(args.Path);
         }
 
         public static ISampleProvider ImportSample(SampleGeneratingArgs args) {
@@ -98,9 +102,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     Console.WriteLine(sh.SFSampleLink);
 
 
-                    double dist = Math.Abs(args[2] - sh.OriginalPitch);
+                    double dist = Math.Abs(args.Key - sh.OriginalPitch);
 
-                    if (dist < bdist || args[2] == -1) {
+                    if (dist < bdist || args.Key == -1) {
                         closest = sh;
                         bdist = dist;
                     }
@@ -114,7 +118,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return wave;
         }
 
-        private static ISampleProvider GenerateSample(SampleHeader sh, byte[] sample, int[] args) {
+        private static ISampleProvider GenerateSample(SampleHeader sh, byte[] sample, SampleGeneratingArgs args) {
             Console.WriteLine("generating: " + sh.SampleName);
 
             // Indices in sf2 are numbers of samples, not byte length. So double them.
@@ -134,7 +138,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
             ISampleProvider output = new Pcm16BitToSampleProvider(new RawSourceWaveStream(buffer, 0, numberOfBytes, new WaveFormat((int)sh.SampleRate, 16, 1)));
 
-            int correction = args[2] - sh.OriginalPitch;
+            int correction = args.Key - sh.OriginalPitch;
             Console.WriteLine("correction: " + correction);
             return PitchShift(output, correction);
         }

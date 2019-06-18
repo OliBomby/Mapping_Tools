@@ -8,7 +8,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
     public class Sample {
         public int SampleSet { get; set; }
         public int Hitsound { get; set; }
-        public string SamplePath { get; set; }
+        public SampleGeneratingArgs SampleArgs { get; set; }
         public int Priority { get; set; }
 
         public int SampleSetComboBoxIndex { get => GetSampleSetComboBoxIndex(); set => SetSampleSetComboBoxIndex(value); }
@@ -24,21 +24,21 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public Sample() {
             SampleSet = 0;
             Hitsound = 0;
-            SamplePath = "";
+            SampleArgs = new SampleGeneratingArgs();
             Priority = 0;
         }
 
-        public Sample(int sampleSet, int hitsound, string samplePath, int priority) {
+        public Sample(int sampleSet, int hitsound, SampleGeneratingArgs samplePath, int priority) {
             SampleSet = sampleSet;
             Hitsound = hitsound;
-            SamplePath = samplePath;
+            SampleArgs = samplePath;
             Priority = priority;
         }
 
         public Sample(HitsoundLayer hl) {
             SampleSet = hl.SampleSet;
             Hitsound = hl.Hitsound;
-            SamplePath = hl.SamplePath;
+            SampleArgs = hl.SampleArgs;
             Priority = hl.Priority;
         }
     }
