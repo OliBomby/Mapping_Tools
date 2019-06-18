@@ -85,7 +85,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     int hitsound = sample.Item2;
                     int index = sample.Item3;
 
-                    string filename = tlo.Filename ?? GetFileName(sampleSet, hitsound, index);
+                    string filename = tlo.Filename != null && tlo.Filename != "" ? tlo.Filename : GetFileName(sampleSet, hitsound, index);
                     string extLess = Path.GetFileNameWithoutExtension(filename);
 
                     // Simplify path if it doesn't exist
