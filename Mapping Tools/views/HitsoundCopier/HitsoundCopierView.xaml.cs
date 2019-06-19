@@ -382,17 +382,5 @@ namespace Mapping_Tools.Views {
                 }
             } catch (Exception) { }
         }
-
-        private void MuteSliderendBox_Checked(object sender, RoutedEventArgs e) {
-            if (SliderendMutingConfigPanel == null)
-                return;
-            SliderendMutingConfigPanel.Visibility = Visibility.Visible;
-        }
-
-        private void MuteSliderendBox_Unchecked(object sender, RoutedEventArgs e) {
-            if (SliderendMutingConfigPanel == null)
-                return;
-            SliderendMutingConfigPanel.Visibility = Visibility.Collapsed;
-        }
     }
 }

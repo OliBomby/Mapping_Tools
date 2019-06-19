@@ -99,12 +99,16 @@
                 </Grid.RowDefinitions>
                 <StackPanel Grid.Row="0" Margin="0,0,0,20" HorizontalAlignment="Left" VerticalAlignment="Bottom">
                     <CheckBox x:Name="ClipBox" Content="Clip properties" ToolTip="Clips the parameters to stay within bounds. (Volume: 5-100 etc)" IsChecked="True" FontSize="20"/>
-                    <CheckBox x:Name="FiltersBox" Content="Enable filters" IsChecked="False" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Bottom" Checked="FiltersBox_Checked" Unchecked="FiltersBox_Unchecked"/>
-                    <TextBox x:Name="MatchBox" Text="" ToolTip="Parameters must match this value to be changed." MinWidth="120"/>
-                    <StackPanel x:Name="RangePanel" Orientation="Horizontal">
-                        <TextBox x:Name="MinBox" Text="" ToolTip="Minimum time in milliseconds of the object for the parameters to be changed." MinWidth="120"/>
-                        <TextBlock Text=" To " Margin="0,0,0,0" FontSize="20"/>
-                        <TextBox x:Name="MaxBox" Text="" ToolTip="Maximum time in milliseconds of the object for the parameters to be changed." MinWidth="120"/>
+                    <CheckBox x:Name="FiltersBox" Content="Enable filters" IsChecked="False" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+                    <StackPanel Visibility="{Binding Path=IsChecked, ElementName=FiltersBox, UpdateSourceTrigger=PropertyChanged,  
+                                 Converter={StaticResource BooleanToVisibilityConverter}, 
+                                 FallbackValue=Collapsed}">
+                        <TextBox x:Name="MatchBox" Text="" ToolTip="Parameters must match this value to be changed." MinWidth="120"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox x:Name="MinBox" Text="" ToolTip="Minimum time in milliseconds of the object for the parameters to be changed." MinWidth="120"/>
+                            <TextBlock Text=" To " Margin="0,0,0,0" FontSize="20"/>
+                            <TextBox x:Name="MaxBox" Text="" ToolTip="Maximum time in milliseconds of the object for the parameters to be changed." MinWidth="120"/>
+                        </StackPanel>
                     </StackPanel>
                 </StackPanel>
                 <Grid Grid.Row="1">

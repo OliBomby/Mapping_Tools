@@ -25,12 +25,6 @@ namespace Mapping_Tools.Views {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
-
-            if ((bool) FiltersBox.IsChecked) {
-                FiltersBox_Checked();
-            } else {
-                FiltersBox_Unchecked();
-            }
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
@@ -145,16 +139,6 @@ namespace Mapping_Tools.Views {
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message);
             }
-        }
-
-        private void FiltersBox_Checked(object sender=null, RoutedEventArgs e=null) {
-            MatchBox.Visibility = Visibility.Visible;
-            RangePanel.Visibility = Visibility.Visible;
-        }
-
-        private void FiltersBox_Unchecked(object sender=null, RoutedEventArgs e=null) {
-            MatchBox.Visibility = Visibility.Collapsed;
-            RangePanel.Visibility = Visibility.Collapsed;
         }
     }
 }

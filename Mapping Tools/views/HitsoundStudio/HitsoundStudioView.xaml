@@ -44,7 +44,7 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <ScrollViewer Grid.Row="0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                    <StackPanel x:Name="EditPanel">
+                    <StackPanel x:Name="EditPanel" Margin="0,0,0,20">
                         <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Name:"/></TextBlock>
                         <TextBox x:Name="SelectedNameBox" TextChanged="SelectedNameBox_TextChanged" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6"/>
                         <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Hitsound sample:"/></TextBlock>
@@ -71,6 +71,20 @@
                             <ComboBoxItem Content="Finish" HorizontalAlignment="Left" Cursor="Hand"/>
                             <ComboBoxItem Content="Clap" HorizontalAlignment="Left" Cursor="Hand"/>
                         </ComboBox>
+                        <CheckBox x:Name="ShowTimesBox" Content="Show times" FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"/>
+                        <StackPanel Visibility="{Binding Path=IsChecked, ElementName=ShowTimesBox, UpdateSourceTrigger=PropertyChanged,  
+                                 Converter={StaticResource BooleanToVisibilityConverter}, 
+                                 FallbackValue=Collapsed}">
+                            <TextBox x:Name="TimesBox" TextWrapping="Wrap" TextChanged="TimesBox_TextChanged">
+                                <TextBox.Text>
+                                    <Binding Path="EditTimes" UpdateSourceTrigger="PropertyChanged">
+                                        <Binding.ValidationRules>
+                                            <domain:ParsableDoubleListValidationRule ValidatesOnTargetUpdated="True" />
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
+                        </StackPanel>
                         <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,20,0,0"><Run Text="Import type:"/></TextBlock>
                         <ComboBox x:Name="ImportTypeBox" SelectionChanged="ImportTypeBox_SelectionChanged" Margin="0,10,0,0" HorizontalAlignment="Stretch" Cursor="Hand">
                             <ComboBoxItem Content="Stack" HorizontalAlignment="Left" Cursor="Hand"/>
@@ -113,20 +127,9 @@
                             <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Velocity:"/></TextBlock>
                             <TextBox x:Name="SelectedVelocityBox" TextChanged="SelectedVelocityBox_TextChanged" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6"/>
                         </StackPanel>
-                        <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Times:"/></TextBlock>
-                        <TextBox x:Name="TimesBox" Margin="0,0,0,20" TextWrapping="Wrap" TextChanged="TimesBox_TextChanged">
-                            <TextBox.Text>
-                                <Binding Path="EditTimes" UpdateSourceTrigger="PropertyChanged">
-                                    <Binding.ValidationRules>
-                                        <domain:ParsableDoubleListValidationRule ValidatesOnTargetUpdated="True" />
-                                    </Binding.ValidationRules>
-                                </Binding>
-                            </TextBox.Text>
-                        </TextBox>
+                        <Button Grid.Row="1" Margin="0,10,0,0" Content="Reload from source" FontWeight="Bold" FontSize="16" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="ReloadFromSource_Click"/>
                     </StackPanel>
                 </ScrollViewer>
-                
-                <Button Grid.Row="1" Margin="0,5,0,10" Content="Reload from source" FontWeight="Bold" FontSize="16" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="ReloadFromSource_Click"/>
             </Grid>
 
             <ListView x:Name="LayersList" Grid.Row="0" Grid.Column="2" Margin="10,0,0,0" ScrollViewer.VerticalScrollBarVisibility="Visible"

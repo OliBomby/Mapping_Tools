@@ -65,9 +65,10 @@
                 <CheckBox x:Name="CopySamplesetBox" IsChecked="True" Content="Copy samplesets" Foreground="#FFD6D6D6"/>
                 <CheckBox x:Name="CopyVolumeBox" IsChecked="True" Content="Copy volumes" Foreground="#FFD6D6D6"/>
                 <CheckBox x:Name="MuteSliderendBox" IsChecked="False" Content="Mute sliderends" Foreground="#FFD6D6D6"
-                    Checked="MuteSliderendBox_Checked" Unchecked="MuteSliderendBox_Unchecked"
                     ToolTip="Mute sliderends or spinnerends that have no defined hitsounds in the map you're copying from."/>
-                <StackPanel x:Name="SliderendMutingConfigPanel" Visibility="Collapsed">
+                <StackPanel Visibility="{Binding Path=IsChecked, ElementName=MuteSliderendBox, UpdateSourceTrigger=PropertyChanged,  
+                                 Converter={StaticResource BooleanToVisibilityConverter}, 
+                                 FallbackValue=Collapsed}">
                     <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Sliderend muting filter:"/></TextBlock>
                     <Grid>
                         <Grid.ColumnDefinitions>
