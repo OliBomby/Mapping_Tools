@@ -471,7 +471,16 @@ namespace Mapping_Tools.Views {
                     }
                 }
 
-                MessageBox.Show(String.Format("Number of sample indices: {0}, Number of samples: {1}", completeHitsounds.CustomIndices.Count, samples));
+                int greenlines = 0;
+                int lastIndex = -1;
+                foreach (Hitsound hit in completeHitsounds.Hitsounds) {
+                    if (hit.CustomIndex != lastIndex) {
+                        lastIndex = hit.CustomIndex;
+                        greenlines++;
+                    }
+                }
+
+                MessageBox.Show(String.Format("Number of sample indices: {0}, Number of samples: {1}, Number of greenlines: {2}", completeHitsounds.CustomIndices.Count, samples, greenlines));
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message);
             }
