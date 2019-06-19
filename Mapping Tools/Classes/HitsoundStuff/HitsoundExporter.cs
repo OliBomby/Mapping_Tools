@@ -74,6 +74,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         continue;
                     }
                     
+                    // TODO: Add something that converts all samplerates to the highest sample rate
                     var mixer = new MixingSampleProvider(samples);
                     VolumeSampleProvider volumed = new VolumeSampleProvider(mixer) {
                         Volume = 1 / (float)Math.Sqrt(soundsAdded)

@@ -182,73 +182,85 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         public HitsoundLayer() {
-            Name = "";
-            Path = "";
-            X = -1;
-            Y = -1;
-            SampleArgs = new SampleGeneratingArgs();
-            Times = new List<double>();
+            name = "";
+            path = "";
+            x = -1;
+            y = -1;
+            sampleArgs = new SampleGeneratingArgs();
+            times = new List<double>();
         }
 
         public HitsoundLayer(string name, string importType, string path, int sampleSet, int hitsound, string samplePath) {
-            Name = name;
-            Path = path;
-            ImportType = importType;
-            X = -1;
-            Y = -1;
-            SampleSet = sampleSet;
-            Hitsound = hitsound;
-            SampleArgs = new SampleGeneratingArgs(samplePath);
-            Times = new List<double>();
+            this.name = name;
+            this.path = path;
+            this.importType = importType;
+            x = -1;
+            y = -1;
+            this.sampleSet = sampleSet;
+            this.hitsound = hitsound;
+            sampleArgs = new SampleGeneratingArgs(samplePath);
+            times = new List<double>();
+        }
+
+        public HitsoundLayer(string name, string importType, string path, int sampleSet, int hitsound, SampleGeneratingArgs samplePath) {
+            this.name = name;
+            this.path = path;
+            this.importType = importType;
+            x = -1;
+            y = -1;
+            this.sampleSet = sampleSet;
+            this.hitsound = hitsound;
+            sampleArgs = samplePath;
+            times = new List<double>();
         }
 
         public HitsoundLayer(string name, string importType, string path, double x, double y) {
-            Name = name;
-            Path = path;
-            ImportType = importType;
-            X = x;
-            Y = y;
-            Times = new List<double>();
-            SampleArgs = new SampleGeneratingArgs();
+            this.name = name;
+            this.path = path;
+            this.importType = importType;
+            this.x = x;
+            this.y = y;
+            times = new List<double>();
+            sampleArgs = new SampleGeneratingArgs();
             Import();
         }
 
         public HitsoundLayer(string name, string importType, string path, double x, double y, int priority) {
-            Name = name;
-            Path = path;
-            ImportType = importType;
-            X = x;
-            Y = y;
-            Priority = priority;
-            Times = new List<double>();
-            SampleArgs = new SampleGeneratingArgs();
+            this.name = name;
+            this.path = path;
+            this.importType = importType;
+            this.x = x;
+            this.y = y;
+            this.priority = priority;
+            times = new List<double>();
+            sampleArgs = new SampleGeneratingArgs();
             Import();
         }
 
         public HitsoundLayer(string name, string importType, string path, double x, double y, int sampleSet, int hitsound, string samplePath) {
-            Name = name;
-            Path = path;
-            ImportType = importType;
-            X = x;
-            Y = y;
-            SampleSet = sampleSet;
-            Hitsound = hitsound;
-            SampleArgs = new SampleGeneratingArgs(samplePath);
-            Times = new List<double>();
+            this.name = name;
+            this.path = path;
+            this.importType = importType;
+            this.x = x;
+            this.y = y;
+            this.sampleSet = sampleSet;
+            this.hitsound = hitsound;
+            sampleArgs = new SampleGeneratingArgs(samplePath);
+            times = new List<double>();
             Import();
         }
 
         public HitsoundLayer(string name, string importType, string path, double x, double y, int sampleSet, int hitsound, string samplePath, int priority) {
-            Name = name;
-            Path = path;
-            ImportType = importType;
-            X = x;
-            Y = y;
-            SampleSet = sampleSet;
-            Hitsound = hitsound;
-            SampleArgs = new SampleGeneratingArgs(samplePath);
-            Priority = priority;
-            Times = new List<double>();
+            this.name = name;
+            this.path = path;
+            this.importType = importType;
+            this.x = x;
+            this.y = y;
+            this.sampleSet = sampleSet;
+            this.hitsound = hitsound;
+            sampleArgs = new SampleGeneratingArgs(samplePath);
+            this.priority = priority;
+            times = new List<double>();
             Import();
         }
 

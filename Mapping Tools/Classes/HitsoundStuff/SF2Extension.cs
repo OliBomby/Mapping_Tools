@@ -22,6 +22,15 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return g != null ? g.LowByteAmount : (byte)0;
         }
 
+        public static byte Key(this Zone zone) {
+            var sh = zone.SampleHeader();
+            if (sh == null)
+                return 0;
+
+            byte over = zone.OverridingRootKey();
+            return over != 0 ? over : sh.OriginalPitch;
+        }
+
         public static int SampleModes(this Zone zone) {
             var g = SelectByGenerator(zone, GeneratorEnum.SampleModes);
             return g != null ? g.UInt16Amount : (ushort)0;

@@ -49,9 +49,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 ISampleProvider wave = null;
 
                 foreach (var preset in sf2.Presets) {
-                    Console.WriteLine("Preset: " + preset.Name);
-                    Console.WriteLine("Preset num: " + preset.PatchNumber);
-                    Console.WriteLine("Preset bank: " + preset.Bank);
+                    //Console.WriteLine("Preset: " + preset.Name);
+                    //Console.WriteLine("Preset num: " + preset.PatchNumber);
+                    //Console.WriteLine("Preset bank: " + preset.Bank);
                     if (preset.PatchNumber != args.Patch && args.Patch != -1) {
                         continue;
                     }
@@ -62,6 +62,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     wave = ImportPreset(sf2, preset, args);
                 }
 
+                GC.Collect();
                 return wave;
             } else if (Path.GetExtension(path) == ".ogg") {
                 return new VorbisWaveReader(path);
@@ -73,6 +74,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         private static ISampleProvider ImportPreset(SoundFont sf2, Preset preset, SampleGeneratingArgs args) {
             ISampleProvider wave = null;
 
+            Zone closest = null;
+            int bdist = int.MaxValue;
             for (int index = 0; index < preset.Zones.Length; index++) { // perc. bank likely has more than one instrument here.
                 var pzone = preset.Zones[index];
 
@@ -80,55 +83,74 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 if (i == null)
                     continue;
 
-                Console.WriteLine("Instrument: " + pzone.Instrument().Name);
+                //if (index < 4) {
+                //    Console.WriteLine("Instrument: " + pzone.Instrument().Name);
+                //}
 
                 if (index != args.Instrument && args.Instrument != -1) {
                     continue;
                 }
 
-                SampleHeader closest = null;
-                double bdist = double.PositiveInfinity;
                 // an Instrument contains a set of zones that contain sample headers.
                 foreach (var izone in i.Zones) {
                     var sh = izone.SampleHeader();
                     if (sh == null)
                         continue;
 
-                    Console.WriteLine(sh.SampleName);
-                    Console.WriteLine(sh.OriginalPitch);
-                    Console.WriteLine(sh.PitchCorrection);
-                    Console.WriteLine(sh.SampleLink);
-                    Console.WriteLine(sh.SampleRate);
-                    Console.WriteLine(sh.SFSampleLink);
+                    //Console.WriteLine(sh.SampleName);
+                    //Console.WriteLine(izone.Key());
+                    //Console.WriteLine(sh.SampleRate);
+                    //Console.WriteLine(sh.Start);
 
+                    // Requested key/velocity must also fit in the key/velocity range of the sample
+                    ushort keyRange = izone.KeyRange();
+                    byte keyLow = (byte)keyRange;
+                    byte keyHigh = (byte)(keyRange >> 8);
+                    if (!(args.Key >= keyLow && args.Key <= keyHigh) && args.Key != -1) {
+                        continue;
+                    }
+                    ushort velRange = izone.VelocityRange();
+                    byte velLow = (byte)keyRange;
+                    byte velHigh = (byte)(keyRange >> 8);
+                    if (!(args.Velocity >= velLow && args.Velocity <= velHigh) && args.Velocity != -1) {
+                        continue;
+                    }
 
-                    double dist = Math.Abs(args.Key - sh.OriginalPitch);
+                    // Get the closest key possible
+                    int dist = Math.Abs(args.Key - izone.Key());
 
                     if (dist < bdist || args.Key == -1) {
-                        closest = sh;
+                        closest = izone;
                         bdist = dist;
                     }
                 }
-                if (closest != null && false) {
-                    wave = GenerateSample(closest, sf2.SampleData, args);
-                    return wave;
-                }
+            }
+            Console.WriteLine("closest: " + closest);
+            if (closest != null) {
+                wave = GenerateSample(closest, sf2.SampleData, args);
+                return wave;
             }
 
             return wave;
         }
 
-        private static ISampleProvider GenerateSample(SampleHeader sh, byte[] sample, SampleGeneratingArgs args) {
-            Console.WriteLine("generating: " + sh.SampleName);
+        private static ISampleProvider GenerateSample(Zone izone, byte[] sample, SampleGeneratingArgs args) {
+            // read the sample mode to apply the correct lengthening algorithm
+            // find out what unit that midi length is actually in
+            // add volume sample provider for the velocity argument
+
+            var sh = izone.SampleHeader();
+            byte key = izone.Key();
+            //Console.WriteLine("generating: " + sh.SampleName);
 
             // Indices in sf2 are numbers of samples, not byte length. So double them.
             int length = (int)(sh.End - sh.Start);
             int loopLength = (int)(sh.EndLoop - sh.StartLoop);
 
-            Console.WriteLine("length: " + length);
-            Console.WriteLine("loop length: " + loopLength);
+            //Console.WriteLine("length: " + length);
+            //Console.WriteLine("loop length: " + loopLength);
 
-            double lengthInSeconds = 1;
+            double lengthInSeconds = 10;
             double numberOfSamples = lengthInSeconds * sh.SampleRate;
 
             int numberOfBytes = (int)(Math.Min(numberOfSamples, length) * 2);
@@ -138,16 +160,14 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
             ISampleProvider output = new Pcm16BitToSampleProvider(new RawSourceWaveStream(buffer, 0, numberOfBytes, new WaveFormat((int)sh.SampleRate, 16, 1)));
 
-            int correction = args.Key - sh.OriginalPitch;
-            Console.WriteLine("correction: " + correction);
+            int correction = args.Key - key;
+            //Console.WriteLine("correction: " + correction);
             return PitchShift(output, correction);
         }
 
         private static ISampleProvider PitchShift(ISampleProvider sample, int correction) {
-            float factor = (float)Math.Pow(2, correction / 12);
-            SmbPitchShiftingSampleProvider shifter = new SmbPitchShiftingSampleProvider(sample) {
-                PitchFactor = factor
-            };
+            float factor = (float)Math.Pow(2, correction / 12f);
+            SmbPitchShiftingSampleProvider shifter = new SmbPitchShiftingSampleProvider(sample, 512, 4, factor);
             return shifter;
         }
     }

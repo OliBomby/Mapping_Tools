@@ -100,7 +100,11 @@
                             <TextBox x:Name="SelectedYCoordBox" TextChanged="SelectedYCoordBox_TextChanged" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6"/>
                         </StackPanel>
                         <StackPanel x:Name="SelectedMIDIPanel">
-                            <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Instrument:"/></TextBlock>
+                            <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Bank:"/></TextBlock>
+                            <TextBox x:Name="SelectedBankBox" TextChanged="SelectedBankBox_TextChanged" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6"/>
+                            <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Patch:"/></TextBlock>
+                            <TextBox x:Name="SelectedPatchBox" TextChanged="SelectedPatchBox_TextChanged" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6"/>
+                            <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Instrument #:"/></TextBlock>
                             <TextBox x:Name="SelectedInstrumentBox" TextChanged="SelectedInstrumentBox_TextChanged" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6"/>
                             <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Key:"/></TextBlock>
                             <TextBox x:Name="SelectedKeyBox" TextChanged="SelectedKeyBox_TextChanged" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6"/>
@@ -237,7 +241,7 @@
                         <GridViewColumn Header="_Amount" Width="90" DisplayMemberBinding="{Binding Times.Count}" />
                         <GridViewColumn Header="_SampleSet" Width="90" DisplayMemberBinding="{Binding SampleSetString}" />
                         <GridViewColumn Header="_Hitsound" Width="90" DisplayMemberBinding="{Binding HitsoundString}" />
-                        <GridViewColumn Header="_Sample Path" Width="1000" DisplayMemberBinding="{Binding SamplePath}" />
+                        <GridViewColumn Header="_Sample Path" Width="1000" DisplayMemberBinding="{Binding SampleArgs.Path}" />
                     </GridView>
                 </ListView.View>
             </ListView>
@@ -300,7 +304,7 @@
                                 <ColumnDefinition Width="30"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock FontSize="14" Foreground="#FFD6D6D6" Margin="0,8,0,0"><Run Text="Default sample:"/></TextBlock>
-                            <TextBox Grid.Column="1" x:Name="DefaultSamplePathBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="{Binding SamplePath, Mode=TwoWay}" Margin="5,0,5,0"/>
+                            <TextBox Grid.Column="1" x:Name="DefaultSamplePathBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="{Binding SampleArgs.Path, Mode=TwoWay}" Margin="5,0,5,0"/>
                             <Button Grid.Column="3" Width="Auto" Height="Auto" Cursor="Hand" Click="DefaultSampleBrowse_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
                                 <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="#FFD6D6D6"/>
                             </Button >

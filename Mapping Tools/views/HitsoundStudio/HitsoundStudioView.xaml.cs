@@ -230,6 +230,16 @@ namespace Mapping_Tools.Views {
             } else {
                 SelectedYCoordBox.Text = "";
             }
+            if (selectedLayers.TrueForAll(o => o.SampleArgs.Bank == selectedLayer.SampleArgs.Bank)) {
+                SelectedBankBox.Text = selectedLayer.SampleArgs.Bank.ToString();
+            } else {
+                SelectedBankBox.Text = "";
+            }
+            if (selectedLayers.TrueForAll(o => o.SampleArgs.Patch == selectedLayer.SampleArgs.Patch)) {
+                SelectedPatchBox.Text = selectedLayer.SampleArgs.Patch.ToString();
+            } else {
+                SelectedPatchBox.Text = "";
+            }
             if (selectedLayers.TrueForAll(o => o.SampleArgs.Instrument == selectedLayer.SampleArgs.Instrument)) {
                 SelectedInstrumentBox.Text = selectedLayer.SampleArgs.Instrument.ToString();
             } else {
@@ -287,7 +297,7 @@ namespace Mapping_Tools.Views {
                 player.PlaybackStopped += PlayerStopped;
 
                 player.Play();
-            } catch (Exception) { }
+            } catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
         }
 
         void PlayerStopped(object sender, StoppedEventArgs e) {
@@ -596,6 +606,24 @@ namespace Mapping_Tools.Views {
                     hitsoundLayer.Times = t;
                 }
             } catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
+        }
+
+        private void SelectedBankBox_TextChanged(object sender, TextChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            int t = (sender as TextBox).GetInt(-1);
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.SampleArgs.Bank = t;
+            }
+        }
+
+        private void SelectedPatchBox_TextChanged(object sender, TextChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            int t = (sender as TextBox).GetInt(-1);
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.SampleArgs.Patch = t;
+            }
         }
 
         private void SelectedInstrumentBox_TextChanged(object sender, TextChangedEventArgs e) {

@@ -104,15 +104,35 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
+        public override bool Equals(object obj) {
+            if (!(obj is SampleGeneratingArgs)) {
+                return false;
+            }
+
+            return Equals((SampleGeneratingArgs)obj);
+        }
+
         public bool Equals(SampleGeneratingArgs other) {
-            return
-                Path == other.Path &&
+            // Equality method can ignore bank, patch etc when path is not a soundfont because then those variables have no effect on how a sample gets generated
+            if (System.IO.Path.GetExtension(Path) == ".sf2" && System.IO.Path.GetExtension(other.Path) == ".sf2") {
+                return Path == other.Path &&
                 Bank == other.Bank &&
                 Patch == other.Patch &&
                 Instrument == other.Instrument &&
                 Key == other.Key &&
                 Length == other.Length &&
                 Velocity == other.Velocity;
+            } else {
+                return Path == other.Path;
+            }
+        }
+
+        public static bool operator ==(SampleGeneratingArgs left, object right) {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(SampleGeneratingArgs left, object right) {
+            return !left.Equals(right);
         }
     }
 }
