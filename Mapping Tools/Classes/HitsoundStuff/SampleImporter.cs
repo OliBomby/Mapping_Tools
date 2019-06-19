@@ -150,7 +150,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             //Console.WriteLine("length: " + length);
             //Console.WriteLine("loop length: " + loopLength);
 
-            double lengthInSeconds = 10;
+            double lengthInSeconds = args.Length / 1000;
             double numberOfSamples = lengthInSeconds * sh.SampleRate;
 
             int numberOfBytes = (int)(Math.Min(numberOfSamples, length) * 2);

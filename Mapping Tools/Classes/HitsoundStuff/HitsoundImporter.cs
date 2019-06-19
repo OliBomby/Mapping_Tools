@@ -123,7 +123,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return String.Format("{0}-hit{1}{2}.wav", HitsoundConverter.SampleSets[sampleSet], HitsoundConverter.Hitsounds[hitsound], index);
         }
 
-        public static List<HitsoundLayer> ImportMIDI(string path, bool instruments=true, bool keysounds=true, bool lengths=true, bool velocities=true) {
+        public static List<HitsoundLayer> ImportMIDI(string path, bool instruments=true, bool keysounds=true, bool lengths=true, double lengthRoughness=1, bool velocities=true) {
             List<HitsoundLayer> hitsoundLayers = new List<HitsoundLayer>();
 
             var strictMode = false;
@@ -155,7 +155,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     }
                     else if (midiEvent is NoteOnEvent on) {
                         double time = CalculateTime(on.AbsoluteTime, tempos, cumulativeTime, mf.DeltaTicksPerQuarterNote);
-                        double length = CalculateTime(on.OffEvent.AbsoluteTime, tempos, cumulativeTime, mf.DeltaTicksPerQuarterNote) - time;
+                        double length = on.OffEvent != null ? CalculateTime(on.OffEvent.AbsoluteTime, tempos, cumulativeTime, mf.DeltaTicksPerQuarterNote) - time : -1;
+                        length = RoundLength(length, lengthRoughness);
 
                         bool keys = keysounds || on.Channel == 10;
 
@@ -206,6 +207,19 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             hitsoundLayers = hitsoundLayers.OrderBy(o => o.Name).ToList();
 
             return hitsoundLayers;
+        }
+
+        private static double RoundLength(double length, double roughness) {
+            if (length == -1) {
+                return length;
+            }
+
+            var mult = length / roughness;
+            var round = Math.Round(mult);
+            if (round == 0) {
+                round = 0.25;
+            }
+            return round * roughness;
         }
 
         private static double CalculateTime(long absoluteTime, List<TempoEvent> tempos, List<double> cumulativeTime, int dtpq) {
