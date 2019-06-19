@@ -175,7 +175,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         {
             get
             {
-                return ((int)Y).ToString();
+                return ((int)Math.Round(Y)).ToString();
             }
         }
 
@@ -204,6 +204,14 @@ namespace Mapping_Tools.Classes.MathUtil {
             double scale = MathHelper.InverseSqrtFast(X * X + Y * Y);
             X *= scale;
             Y *= scale;
+        }
+
+        /// <summary>
+        /// Rounds the coordinates to integer values.
+        /// </summary>
+        public void Round() {
+            X = Math.Round(X);
+            Y = Math.Round(Y);
         }
 
         /// <summary>

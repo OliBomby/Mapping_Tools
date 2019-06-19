@@ -79,16 +79,22 @@ namespace Mapping_Tools.Views {
                 HitObject ho2 = markedObjects[i + 1];
                 if (ho1.IsSlider && ho2.IsSlider && (ho1.CurvePoints.Last() - ho2.Pos).Length <= arg.Leniency) {
                     ho2.Move(ho1.CurvePoints.Last() - ho2.Pos);
+
                     SliderPath sp1 = BezierConverter.ConvertToBezier(ho1.SliderPath);
                     SliderPath sp2 = BezierConverter.ConvertToBezier(ho2.SliderPath);
-                    SliderPath mergedPath = new SliderPath(PathType.Bezier, sp1.ControlPoints.Concat(sp2.ControlPoints).ToArray(), ho1.PixelLength + ho2.PixelLength);
+                    Vector2[] mergedAnchors = sp1.ControlPoints.Concat(sp2.ControlPoints).ToArray();
+                    mergedAnchors.Round();
+
+                    SliderPath mergedPath = new SliderPath(PathType.Bezier, mergedAnchors, ho1.PixelLength + ho2.PixelLength);
                     ho1.SliderPath = mergedPath;
+
                     beatmap.HitObjects.Remove(ho2);
                     markedObjects.Remove(ho2);
+                    i--;
+
                     slidersMerged++;
                     if(!mergeLast) { slidersMerged++; }
                     mergeLast = true;
-                    i--;
                 } else {
                     mergeLast = false;
                 }

@@ -21,5 +21,11 @@ namespace Mapping_Tools.Classes.MathUtil {
             newList.AddRange(list);
             return newList;
         }
+
+        public static void Round(this IEnumerable<Vector2> list) {
+            foreach (var v in list) {
+                v.Round();
+            }
+        }
     }
 }
