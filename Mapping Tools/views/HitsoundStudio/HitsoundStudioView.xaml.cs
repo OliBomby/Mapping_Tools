@@ -74,6 +74,82 @@ namespace Mapping_Tools.Views {
             progress.Value = e.ProgressPercentage;
         }
 
+        private struct Arguments {
+            public string ExportFolder;
+            public string BaseBeatmap;
+            public Sample DefaultSample;
+            public List<HitsoundLayer> HitsoundLayers;
+            public Arguments(string exportFolder, string baseBeatmap, Sample defaultSample, List<HitsoundLayer> hitsoundLayers) {
+                ExportFolder = exportFolder;
+                BaseBeatmap = baseBeatmap;
+                DefaultSample = defaultSample;
+                HitsoundLayers = hitsoundLayers;
+            }
+        }
+
+        private void Make_Hitsounds(Arguments arg, BackgroundWorker worker, DoWorkEventArgs e) {
+            // Convert the multiple layers into packages that have the samples from all the layers at one specific time
+            List<SamplePackage> samplePackages = HitsoundConverter.ZipLayers(arg.HitsoundLayers, arg.DefaultSample);
+            UpdateProgressBar(worker, 20);
+
+            // Convert the packages to hitsounds that fit on an osu standard map
+            CompleteHitsounds completeHitsounds = HitsoundConverter.GetCompleteHitsounds(samplePackages);
+            UpdateProgressBar(worker, 40);
+
+            // Delete all files in the export folder before filling it again
+            DirectoryInfo di = new DirectoryInfo(arg.ExportFolder);
+            foreach (FileInfo file in di.GetFiles()) {
+                file.Delete();
+            }
+            UpdateProgressBar(worker, 60);
+
+            // Export the hitsound .osu and sound samples
+            HitsoundExporter.ExportCompleteHitsounds(arg.ExportFolder, arg.BaseBeatmap, completeHitsounds);
+            UpdateProgressBar(worker, 80);
+
+            // Open export folder
+            Process.Start(arg.ExportFolder);
+            UpdateProgressBar(worker, 100);
+        }
+
+        private void UpdateProgressBar(BackgroundWorker worker, int progress) {
+            if (worker != null && worker.WorkerReportsProgress) {
+                worker.ReportProgress(progress);
+            }
+        }
+
+        private void Startish_Click(object sender, RoutedEventArgs e) {
+            try {
+                // Convert the multiple layers into packages that have the samples from all the layers at one specific time
+                List<SamplePackage> samplePackages = HitsoundConverter.ZipLayers(Settings.HitsoundLayers.ToList(), Settings.DefaultSample);
+
+                // Convert the packages to hitsounds that fit on an osu standard map
+                CompleteHitsounds completeHitsounds = HitsoundConverter.GetCompleteHitsounds(samplePackages);
+
+                int samples = 0;
+                foreach (CustomIndex ci in completeHitsounds.CustomIndices) {
+                    foreach (HashSet<SampleGeneratingArgs> h in ci.Samples.Values) {
+                        if (h.Any(o => SampleImporter.ValidateSampleArgs(o))) {
+                            samples++;
+                        }
+                    }
+                }
+
+                int greenlines = 0;
+                int lastIndex = -1;
+                foreach (Hitsound hit in completeHitsounds.Hitsounds) {
+                    if (hit.CustomIndex != lastIndex) {
+                        lastIndex = hit.CustomIndex;
+                        greenlines++;
+                    }
+                }
+
+                MessageBox.Show(String.Format("Number of sample indices: {0}, Number of samples: {1}, Number of greenlines: {2}", completeHitsounds.CustomIndices.Count, samples, greenlines));
+            } catch (Exception ex) {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
         private void GetSelectedLayers() {
             selectedLayers = new List<HitsoundLayer>();
 
@@ -451,83 +527,6 @@ namespace Mapping_Tools.Views {
         private void RecalculatePriorities() {
             for (int i = 0; i < Settings.HitsoundLayers.Count; i++) {
                 Settings.HitsoundLayers[i].SetPriority(i);
-            }
-        }
-
-        private void Startish_Click(object sender, RoutedEventArgs e) {
-            try {
-                // Convert the multiple layers into packages that have the samples from all the layers at one specific time
-                List<SamplePackage> samplePackages = HitsoundConverter.ZipLayers(Settings.HitsoundLayers.ToList(), Settings.DefaultSample);
-
-                // Convert the packages to hitsounds that fit on an osu standard map
-                CompleteHitsounds completeHitsounds = HitsoundConverter.GetCompleteHitsounds(samplePackages);
-
-                int samples = 0;
-                foreach (CustomIndex ci in completeHitsounds.CustomIndices) {
-                    foreach (HashSet<SampleGeneratingArgs> h in ci.Samples.Values) {
-                        if (h.Any(o => SampleImporter.ValidateSampleArgs(o))) {
-                            samples++;
-                        }
-                    }
-                }
-
-                int greenlines = 0;
-                int lastIndex = -1;
-                foreach (Hitsound hit in completeHitsounds.Hitsounds) {
-                    if (hit.CustomIndex != lastIndex) {
-                        lastIndex = hit.CustomIndex;
-                        greenlines++;
-                    }
-                }
-
-                MessageBox.Show(String.Format("Number of sample indices: {0}, Number of samples: {1}, Number of greenlines: {2}", completeHitsounds.CustomIndices.Count, samples, greenlines));
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-        private struct Arguments {
-            public string ExportFolder;
-            public string BaseBeatmap;
-            public Sample DefaultSample;
-            public List<HitsoundLayer> HitsoundLayers;
-            public Arguments(string exportFolder, string baseBeatmap, Sample defaultSample, List<HitsoundLayer> hitsoundLayers)
-            {
-                ExportFolder = exportFolder;
-                BaseBeatmap = baseBeatmap;
-                DefaultSample = defaultSample;
-                HitsoundLayers = hitsoundLayers;
-            }
-        }
-
-        private void Make_Hitsounds(Arguments arg, BackgroundWorker worker, DoWorkEventArgs e) {
-            // Convert the multiple layers into packages that have the samples from all the layers at one specific time
-            List<SamplePackage> samplePackages = HitsoundConverter.ZipLayers(arg.HitsoundLayers, arg.DefaultSample);
-            UpdateProgressBar(worker, 20);
-
-            // Convert the packages to hitsounds that fit on an osu standard map
-            CompleteHitsounds completeHitsounds = HitsoundConverter.GetCompleteHitsounds(samplePackages);
-            UpdateProgressBar(worker, 40);
-
-            // Delete all files in the export folder before filling it again
-            DirectoryInfo di = new DirectoryInfo(arg.ExportFolder);
-            foreach (FileInfo file in di.GetFiles()) {
-                file.Delete();
-            }
-            UpdateProgressBar(worker, 60);
-
-            // Export the hitsound .osu and sound samples
-            HitsoundExporter.ExportCompleteHitsounds(arg.ExportFolder, arg.BaseBeatmap, completeHitsounds);
-            UpdateProgressBar(worker, 80);
-
-            // Open export folder
-            Process.Start(arg.ExportFolder);
-            UpdateProgressBar(worker, 100);
-        }
-
-        private void UpdateProgressBar(BackgroundWorker worker, int progress) {
-            if (worker != null && worker.WorkerReportsProgress) {
-                worker.ReportProgress(progress);
             }
         }
 

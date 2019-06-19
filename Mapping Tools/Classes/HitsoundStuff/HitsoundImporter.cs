@@ -132,6 +132,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Console.WriteLine("Format {0}, Tracks {1}, Delta Ticks Per Quarter Note {2}",
                 mf.FileFormat, mf.Tracks, mf.DeltaTicksPerQuarterNote);
 
+            List<TempoEvent> tempos = mf.Events[0].OfType<TempoEvent>().ToList();
+            List<double> cumulativeTime = CalculateCumulativeTime(tempos, mf.DeltaTicksPerQuarterNote);
+
             Dictionary<int, int> channelBanks = new Dictionary<int, int>();
             Dictionary<int, int> channelPatches = new Dictionary<int, int>();
 
@@ -150,22 +153,20 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                             channelBanks[co.Channel] = co.ControllerValue + (channelBanks.ContainsKey(co.Channel) ? channelBanks[co.Channel] >> 8 * 128 : 0);
                         }
                     }
-                    else if (midiEvent is TempoEvent te) {
-                        Console.WriteLine(te.Channel);
-                        Console.WriteLine(te.MicrosecondsPerQuarterNote);
-                        Console.WriteLine(te.Tempo);
-                    }
                     else if (midiEvent is NoteOnEvent on) {
+                        double time = CalculateTime(on.AbsoluteTime, tempos, cumulativeTime, mf.DeltaTicksPerQuarterNote);
+                        double length = CalculateTime(on.OffEvent.AbsoluteTime, tempos, cumulativeTime, mf.DeltaTicksPerQuarterNote) - time;
+
                         bool keys = keysounds || on.Channel == 10;
 
                         int bank = instruments ? on.Channel == 10 ? 128 : channelBanks.ContainsKey(on.Channel) ? channelBanks[on.Channel] : 0 : -1;
                         int patch = instruments && channelPatches.ContainsKey(on.Channel) ? channelPatches[on.Channel] : -1;
                         int instrument = -1;
                         int key = keys ? on.NoteNumber : -1;
-                        int length = lengths ? on.NoteLength : -1;
+                        length = lengths ? length : -1;
                         int velocity = velocities ? on.Velocity : -1;
 
-                        string filename = "";
+                        string filename = String.Format("{0}\\{1}\\{2}\\{3}\\{4}\\{5}.wav", bank, patch, instrument, key, length, velocity);
 
                         string instrumentName = patch >= 0 && patch <= 127 ? PatchChangeEvent.GetPatchName(patch) : on.Channel == 10 ? "Percussion" : "Undefined";
                         string keyName = on.NoteName;
@@ -186,13 +187,13 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
                         if (layer != null) {
                             // Find hitsound layer with this path and add this time
-                            layer.Times.Add(on.AbsoluteTime);
+                            layer.Times.Add(time);
                         } else {
                             // Add new hitsound layer with this path
                             HitsoundLayer newLayer = new HitsoundLayer(name, "MIDI", path, 1, 0, args);
                             hitsoundLayers.Add(newLayer);
 
-                            newLayer.Times.Add(on.AbsoluteTime);
+                            newLayer.Times.Add(time);
                         }
                     }
                 }
@@ -205,6 +206,42 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             hitsoundLayers = hitsoundLayers.OrderBy(o => o.Name).ToList();
 
             return hitsoundLayers;
+        }
+
+        private static double CalculateTime(long absoluteTime, List<TempoEvent> tempos, List<double> cumulativeTime, int dtpq) {
+            TempoEvent prev = null;
+            double prevTime = 0;
+            for (int i = 0; i < tempos.Count; i++) {
+                if (tempos[i].AbsoluteTime <= absoluteTime) {
+                    prev = tempos[i];
+                    prevTime = cumulativeTime[i];
+                } else {
+                    break;
+                }
+            }
+
+            double deltaTime = prev.MicrosecondsPerQuarterNote / 1000d * (absoluteTime - prev.AbsoluteTime) / dtpq;
+            return prevTime + deltaTime;
+        }
+
+        private static List<double> CalculateCumulativeTime(List<TempoEvent> tempos, int dtpq) {
+            // Time is in miliseconds
+            List<double> times = new List<double>(tempos.Count);
+
+            TempoEvent last = null;
+            foreach (TempoEvent te in tempos) {
+                if (last == null) {
+                    times.Add(te.AbsoluteTime);
+                } else {
+                    long deltaTicks = te.AbsoluteTime - last.AbsoluteTime;
+                    double deltaTime = last.MicrosecondsPerQuarterNote / 1000d * deltaTicks / dtpq;
+
+                    times.Add(times.Last() + deltaTime);
+                }
+
+                last = te;
+            }
+            return times;
         }
     }
 }
