@@ -64,7 +64,7 @@ namespace Mapping_Tools.Views {
         }
 
         private void SampleBrowse_Click(object sender, RoutedEventArgs e) {
-            string path = IOHelper.AudioFileDialog();
+            string path = IOHelper.SampleFileDialog();
             if (path != "") { SamplePathBox.Text = path; }
         }
 
@@ -80,7 +80,7 @@ namespace Mapping_Tools.Views {
                 HitsoundLayers.ForEach(o => o.Name = String.Format("{0}: {1}", NameBox2.Text, o.Name));
             } else {
                 // Import MIDI
-                HitsoundLayers = HitsoundImporter.ImportMIDI(BeatmapPathBox3.Text, (bool)InstrumentBox3.IsChecked, (bool)KeysoundBox3.IsChecked, (bool)LengthBox3.IsChecked, (bool)VelocityBox3.IsChecked, SampleFolderBox3.Text);
+                HitsoundLayers = HitsoundImporter.ImportMIDI(BeatmapPathBox3.Text, (bool)InstrumentBox3.IsChecked, (bool)KeysoundBox3.IsChecked, (bool)LengthBox3.IsChecked, (bool)VelocityBox3.IsChecked);
                 HitsoundLayers.ForEach(o => o.Name = String.Format("{0}: {1}", NameBox3.Text, o.Name));
             }
             

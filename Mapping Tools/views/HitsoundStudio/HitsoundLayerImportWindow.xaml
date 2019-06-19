@@ -135,8 +135,6 @@
                 <StackPanel CanVerticallyScroll="True" CanHorizontallyScroll="True" Margin="10">
                     <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Name:"/></TextBlock>
                     <TextBox x:Name="NameBox3" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text=""/>
-                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Samples path:"/></TextBlock>
-                    <TextBox x:Name="SampleFolderBox3" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Text="" ToolTip="Input the path to a SoundFont file or to a folder containing samples."/>
                     <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Source MIDI:"/></TextBlock>
                     <Grid>
                         <Grid.ColumnDefinitions>

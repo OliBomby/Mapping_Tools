@@ -1,7 +1,7 @@
 ﻿using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.Tools;
 using NAudio.Wave;
-using NAudio.Vorbis;
+using NAudio.Wave.SampleProviders;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,12 +12,20 @@ using System.Text.RegularExpressions;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     class HitsoundExporter {
-        public static void ExportHitsounds(string exportFolder, string baseBeatmap, CompleteHitsounds ch) {
+        public static void ExportCompleteHitsounds(string exportFolder, string baseBeatmap, CompleteHitsounds ch) {
+            // Export the beatmap with all hitsounds
+            ExportHitsounds(ch.Hitsounds, baseBeatmap, exportFolder);
+
+            // Export the sample files
+            ExportCustomIndices(ch.CustomIndices, exportFolder);
+        }
+
+        public static void ExportHitsounds(List<Hitsound> hitsounds, string baseBeatmap, string exportFolder) {
             Editor editor = new Editor(baseBeatmap);
             Beatmap beatmap = editor.Beatmap;
 
             // Resnap all hitsounds
-            foreach (Hitsound h in ch.Hitsounds) {
+            foreach (Hitsound h in hitsounds) {
                 h.SetTime(beatmap.BeatmapTiming.Resnap(h.Time, 16, 12));
             }
 
@@ -31,7 +39,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
 
             // Add hitsound stuff
-            foreach (Hitsound h in ch.Hitsounds) {
+            foreach (Hitsound h in hitsounds) {
                 TimingPoint tp = beatmap.BeatmapTiming.GetTimingPointAtTime(h.Time + 5).Copy();
                 tp.Offset = h.Time;
                 tp.SampleIndex = h.CustomIndex;
@@ -44,7 +52,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
             // Replace all hitobjects with the hitsounds
             beatmap.HitObjects.Clear();
-            foreach (Hitsound h in ch.Hitsounds) {
+            foreach (Hitsound h in hitsounds) {
                 beatmap.HitObjects.Add(new HitObject(h.Time, h.GetHitsounds(), h.SampleSet, h.Additions));
             }
 
@@ -53,21 +61,20 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
             // Save the file to the export folder
             editor.SaveFile(Path.Combine(exportFolder, beatmap.GetFileName()));
+        }
 
-            // Export the sample files
-            foreach (CustomIndex ci in ch.CustomIndices) {
-                foreach (KeyValuePair<string, HashSet<string>> kvp in ci.Samples) {
+        public static void ExportCustomIndices(List<CustomIndex> customIndices, string exportFolder) {
+            foreach (CustomIndex ci in customIndices) {
+                foreach (KeyValuePair<string, HashSet<SampleGeneratingArgs>> kvp in ci.Samples) {
                     if (kvp.Value.Count == 0) {
                         continue;
                     }
-                    var mixer = new WaveMixerStream32 { AutoStop = true };
-                    var waveChannels = new List<WaveChannel32>();
+                    var samples = new List<ISampleProvider>();
                     int soundsAdded = 0;
 
-                    foreach (string path in kvp.Value) {
+                    foreach (SampleGeneratingArgs generator in kvp.Value) {
                         try {
-                            WaveStream wave = SampleImporter.ImportSample(path);
-                            waveChannels.Add(new WaveChannel32(wave));
+                            samples.Add(SampleImporter.ImportSample(generator));
                             soundsAdded++;
                         } catch (Exception) { }
                     }
@@ -75,17 +82,43 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         continue;
                     }
 
-                    foreach (var waveChannel in waveChannels) {
-                        waveChannel.Volume = (float)(1 / Math.Sqrt(soundsAdded));
-                        mixer.AddInputStream(waveChannel);
-                    }
+                    int maxSampleRate = samples.Max(o => o.WaveFormat.SampleRate);
+                    int maxChannels = samples.Max(o => o.WaveFormat.Channels);
+                    IEnumerable<ISampleProvider> sameFormatSamples = samples.Select(o => (ISampleProvider)new WdlResamplingSampleProvider(SetChannels(o, maxChannels), maxSampleRate));
 
-                    if (ci.Index == 1) {
-                        CreateWaveFile(Path.Combine(exportFolder, kvp.Key + ".wav"), new Wave32To16Stream(mixer));
-                    } else {
-                        CreateWaveFile(Path.Combine(exportFolder, kvp.Key + ci.Index + ".wav"), new Wave32To16Stream(mixer));
-                    }
+                    var mixer = new MixingSampleProvider(sameFormatSamples);
+
+                    VolumeSampleProvider volumed = new VolumeSampleProvider(mixer) {
+                        Volume = 1 / (float)Math.Sqrt(soundsAdded)
+                    };
+
+                    string filename = ci.Index == 1 ? kvp.Key + ".wav" : kvp.Key + ci.Index + ".wav";
+                    CreateWaveFile(Path.Combine(exportFolder, filename), volumed.ToWaveProvider16());
                 }
+            }
+        }
+
+        private static ISampleProvider SetChannels(ISampleProvider sampleProvider, int channels) {
+            if (channels == 1) {
+                return MakeMono(sampleProvider);
+            } else {
+                return MakeStereo(sampleProvider);
+            }
+        }
+
+        private static ISampleProvider MakeStereo(ISampleProvider sampleProvider) {
+            if (sampleProvider.WaveFormat.Channels == 1) {
+                return new MonoToStereoSampleProvider(sampleProvider);
+            } else {
+                return sampleProvider;
+            }
+        }
+
+        private static ISampleProvider MakeMono(ISampleProvider sampleProvider) {
+            if (sampleProvider.WaveFormat.Channels == 2) {
+                return new StereoToMonoSampleProvider(sampleProvider);
+            } else {
+                return sampleProvider;
             }
         }
 
@@ -103,7 +136,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         writer.Write(buffer, 0, bytesRead);
                     }
                 }
-            } catch (Exception) { }
+            } catch (IndexOutOfRangeException) { }
         }
     }
 }

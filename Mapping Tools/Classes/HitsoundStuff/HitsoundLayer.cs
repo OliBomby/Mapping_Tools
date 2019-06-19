@@ -61,50 +61,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
-        private double instrument;
-        public double Instrument {
-            get { return instrument; }
-            set {
-                if (instrument != value) {
-                    instrument = value;
-                    NotifyPropertyChanged("Instrument");
-                }
-            }
-        }
-
-        private double note;
-        public double Note {
-            get { return note; }
-            set {
-                if (note != value) {
-                    note = value;
-                    NotifyPropertyChanged("Note");
-                }
-            }
-        }
-
-        private double length;
-        public double Length {
-            get { return length; }
-            set {
-                if (length != value) {
-                    length = value;
-                    NotifyPropertyChanged("Length");
-                }
-            }
-        }
-
-        private double velocity;
-        public double Velocity {
-            get { return velocity; }
-            set {
-                if (velocity != value) {
-                    velocity = value;
-                    NotifyPropertyChanged("Velocity");
-                }
-            }
-        }
-
         private int sampleSet;
         public int SampleSet {
             get { return sampleSet; }
@@ -160,13 +116,13 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
-        private string samplePath;
-        public string SamplePath {
-            get { return samplePath; }
+        private SampleGeneratingArgs sampleArgs;
+        public SampleGeneratingArgs SampleArgs {
+            get { return sampleArgs; }
             set {
-                if (samplePath != value) {
-                    samplePath = value;
-                    NotifyPropertyChanged("SamplePath");
+                if (sampleArgs != value) {
+                    sampleArgs = value;
+                    NotifyPropertyChanged("SampleArgs");
                 }
             }
         }
@@ -226,70 +182,85 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         public HitsoundLayer() {
-            Name = "";
-            Path = "";
-            X = -1;
-            Y = -1;
-            Times = new List<double>();
+            name = "";
+            path = "";
+            x = -1;
+            y = -1;
+            sampleArgs = new SampleGeneratingArgs();
+            times = new List<double>();
         }
 
         public HitsoundLayer(string name, string importType, string path, int sampleSet, int hitsound, string samplePath) {
-            Name = name;
-            Path = path;
-            ImportType = importType;
-            X = -1;
-            Y = -1;
-            SampleSet = sampleSet;
-            Hitsound = hitsound;
-            SamplePath = samplePath;
-            Times = new List<double>();
+            this.name = name;
+            this.path = path;
+            this.importType = importType;
+            x = -1;
+            y = -1;
+            this.sampleSet = sampleSet;
+            this.hitsound = hitsound;
+            sampleArgs = new SampleGeneratingArgs(samplePath);
+            times = new List<double>();
+        }
+
+        public HitsoundLayer(string name, string importType, string path, int sampleSet, int hitsound, SampleGeneratingArgs samplePath) {
+            this.name = name;
+            this.path = path;
+            this.importType = importType;
+            x = -1;
+            y = -1;
+            this.sampleSet = sampleSet;
+            this.hitsound = hitsound;
+            sampleArgs = samplePath;
+            times = new List<double>();
         }
 
         public HitsoundLayer(string name, string importType, string path, double x, double y) {
-            Name = name;
-            Path = path;
-            ImportType = importType;
-            X = x;
-            Y = y;
-            Times = new List<double>();
+            this.name = name;
+            this.path = path;
+            this.importType = importType;
+            this.x = x;
+            this.y = y;
+            times = new List<double>();
+            sampleArgs = new SampleGeneratingArgs();
             Import();
         }
 
         public HitsoundLayer(string name, string importType, string path, double x, double y, int priority) {
-            Name = name;
-            Path = path;
-            ImportType = importType;
-            X = x;
-            Y = y;
-            Priority = priority;
-            Times = new List<double>();
+            this.name = name;
+            this.path = path;
+            this.importType = importType;
+            this.x = x;
+            this.y = y;
+            this.priority = priority;
+            times = new List<double>();
+            sampleArgs = new SampleGeneratingArgs();
             Import();
         }
 
         public HitsoundLayer(string name, string importType, string path, double x, double y, int sampleSet, int hitsound, string samplePath) {
-            Name = name;
-            Path = path;
-            ImportType = importType;
-            X = x;
-            Y = y;
-            SampleSet = sampleSet;
-            Hitsound = hitsound;
-            SamplePath = samplePath;
-            Times = new List<double>();
+            this.name = name;
+            this.path = path;
+            this.importType = importType;
+            this.x = x;
+            this.y = y;
+            this.sampleSet = sampleSet;
+            this.hitsound = hitsound;
+            sampleArgs = new SampleGeneratingArgs(samplePath);
+            times = new List<double>();
             Import();
         }
 
         public HitsoundLayer(string name, string importType, string path, double x, double y, int sampleSet, int hitsound, string samplePath, int priority) {
-            Name = name;
-            Path = path;
-            ImportType = importType;
-            X = x;
-            Y = y;
-            SampleSet = sampleSet;
-            Hitsound = hitsound;
-            SamplePath = samplePath;
-            Priority = priority;
-            Times = new List<double>();
+            this.name = name;
+            this.path = path;
+            this.importType = importType;
+            this.x = x;
+            this.y = y;
+            this.sampleSet = sampleSet;
+            this.hitsound = hitsound;
+            sampleArgs = new SampleGeneratingArgs(samplePath);
+            this.priority = priority;
+            times = new List<double>();
             Import();
         }
 
@@ -313,8 +284,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 // Import MIDI
                 layers = layers ?? HitsoundImporter.ImportMIDI(Path);
 
-                List<HitsoundLayer> sameLayer = layers.FindAll(o => (Instrument == -1 || Instrument == o.Instrument) && (Note == -1 || Note == o.Note)
-                                                                 && (Length == -1 || Length == o.Length) && (Velocity == -1 || Velocity == o.Velocity));
+                List<HitsoundLayer> sameLayer = layers.FindAll(o => (SampleArgs.Instrument == -1 || SampleArgs.Instrument == o.SampleArgs.Instrument) && (SampleArgs.Key == -1 || SampleArgs.Key == o.SampleArgs.Key)
+                                                                 && (SampleArgs.Length == -1 || SampleArgs.Length == o.SampleArgs.Length) && (SampleArgs.Velocity == -1 || SampleArgs.Velocity == o.SampleArgs.Velocity));
                 Times.Clear();
                 foreach (HitsoundLayer hsl in sameLayer) {
                     Times.AddRange(hsl.Times);

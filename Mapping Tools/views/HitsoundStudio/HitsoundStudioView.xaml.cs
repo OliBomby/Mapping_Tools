@@ -100,7 +100,7 @@ namespace Mapping_Tools.Views {
 
         private void SelectedSamplePathBrowse_Click(object sender, RoutedEventArgs e) {
             try {
-                string path = IOHelper.AudioFileDialog();
+                string path = IOHelper.SampleFileDialog();
                 if (path != "") {
                     SelectedSamplePathBox.Text = path;
                 }
@@ -127,9 +127,9 @@ namespace Mapping_Tools.Views {
 
         private void DefaultSampleBrowse_Click(object sender, RoutedEventArgs e) {
             try {
-                string path = IOHelper.AudioFileDialog();
+                string path = IOHelper.SampleFileDialog();
                 if (path != "") {
-                    Settings.DefaultSample.SamplePath = path;
+                    Settings.DefaultSample.SampleArgs.Path = path;
                     DefaultSamplePathBox.Text = path;
                     }
             } catch (Exception) { }
@@ -195,8 +195,8 @@ namespace Mapping_Tools.Views {
             } else {
                 SelectedNameBox.Text = "";
             }
-            if (selectedLayers.TrueForAll(o => o.SamplePath == selectedLayer.SamplePath)) {
-                SelectedSamplePathBox.Text = selectedLayer.SamplePath;
+            if (selectedLayers.TrueForAll(o => o.SampleArgs.Path == selectedLayer.SampleArgs.Path)) {
+                SelectedSamplePathBox.Text = selectedLayer.SampleArgs.Path;
             } else {
                 SelectedSamplePathBox.Text = "";
             }
@@ -230,23 +230,33 @@ namespace Mapping_Tools.Views {
             } else {
                 SelectedYCoordBox.Text = "";
             }
-            if (selectedLayers.TrueForAll(o => o.Instrument == selectedLayer.Instrument)) {
-                SelectedInstrumentBox.Text = selectedLayer.Instrument.ToString();
+            if (selectedLayers.TrueForAll(o => o.SampleArgs.Bank == selectedLayer.SampleArgs.Bank)) {
+                SelectedBankBox.Text = selectedLayer.SampleArgs.Bank.ToString();
+            } else {
+                SelectedBankBox.Text = "";
+            }
+            if (selectedLayers.TrueForAll(o => o.SampleArgs.Patch == selectedLayer.SampleArgs.Patch)) {
+                SelectedPatchBox.Text = selectedLayer.SampleArgs.Patch.ToString();
+            } else {
+                SelectedPatchBox.Text = "";
+            }
+            if (selectedLayers.TrueForAll(o => o.SampleArgs.Instrument == selectedLayer.SampleArgs.Instrument)) {
+                SelectedInstrumentBox.Text = selectedLayer.SampleArgs.Instrument.ToString();
             } else {
                 SelectedInstrumentBox.Text = "";
             }
-            if (selectedLayers.TrueForAll(o => o.Note == selectedLayer.Note)) {
-                SelectedNoteBox.Text = selectedLayer.Note.ToString();
+            if (selectedLayers.TrueForAll(o => o.SampleArgs.Key == selectedLayer.SampleArgs.Key)) {
+                SelectedKeyBox.Text = selectedLayer.SampleArgs.Key.ToString();
             } else {
-                SelectedNoteBox.Text = "";
+                SelectedKeyBox.Text = "";
             }
-            if (selectedLayers.TrueForAll(o => o.Length == selectedLayer.Length)) {
-                SelectedLengthBox.Text = selectedLayer.Length.ToString();
+            if (selectedLayers.TrueForAll(o => o.SampleArgs.Length == selectedLayer.SampleArgs.Length)) {
+                SelectedLengthBox.Text = selectedLayer.SampleArgs.Length.ToString();
             } else {
                 SelectedLengthBox.Text = "";
             }
-            if (selectedLayers.TrueForAll(o => o.Velocity == selectedLayer.Velocity)) {
-                SelectedVelocityBox.Text = selectedLayer.Velocity.ToString();
+            if (selectedLayers.TrueForAll(o => o.SampleArgs.Velocity == selectedLayer.SampleArgs.Velocity)) {
+                SelectedVelocityBox.Text = selectedLayer.SampleArgs.Velocity.ToString();
             } else {
                 SelectedVelocityBox.Text = "";
             }
@@ -278,16 +288,21 @@ namespace Mapping_Tools.Views {
 
         void HitsoundLayer_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
             try {
-                string path = selectedLayer.SamplePath;
-                WaveStream mainOutputStream = SampleImporter.ImportSample(path);
-                WaveChannel32 volumeStream = new WaveChannel32(mainOutputStream);
+                SampleGeneratingArgs args = selectedLayer.SampleArgs;
+                var mainOutputStream = SampleImporter.ImportSample(args);
 
                 WaveOutEvent player = new WaveOutEvent();
 
-                player.Init(volumeStream);
+                player.Init(mainOutputStream);
+                player.PlaybackStopped += PlayerStopped;
 
                 player.Play();
-            } catch (Exception) { }
+            } catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
+        }
+
+        void PlayerStopped(object sender, StoppedEventArgs e) {
+            ((WaveOutEvent)sender).Dispose();
+            GC.Collect();
         }
 
         private void Num_Layers_Changed() {
@@ -445,18 +460,27 @@ namespace Mapping_Tools.Views {
                 List<SamplePackage> samplePackages = HitsoundConverter.ZipLayers(Settings.HitsoundLayers.ToList(), Settings.DefaultSample);
 
                 // Convert the packages to hitsounds that fit on an osu standard map
-                CompleteHitsounds completeHitsounds = HitsoundConverter.ConvertPackages(samplePackages);
+                CompleteHitsounds completeHitsounds = HitsoundConverter.GetCompleteHitsounds(samplePackages);
 
                 int samples = 0;
                 foreach (CustomIndex ci in completeHitsounds.CustomIndices) {
-                    foreach (HashSet<string> h in ci.Samples.Values) {
-                        if (h.Any(o => SampleImporter.ValidateSamplePath(o))) {
+                    foreach (HashSet<SampleGeneratingArgs> h in ci.Samples.Values) {
+                        if (h.Any(o => SampleImporter.ValidateSampleArgs(o))) {
                             samples++;
                         }
                     }
                 }
 
-                MessageBox.Show(String.Format("Number of sample indices: {0}, Number of samples: {1}", completeHitsounds.CustomIndices.Count, samples));
+                int greenlines = 0;
+                int lastIndex = -1;
+                foreach (Hitsound hit in completeHitsounds.Hitsounds) {
+                    if (hit.CustomIndex != lastIndex) {
+                        lastIndex = hit.CustomIndex;
+                        greenlines++;
+                    }
+                }
+
+                MessageBox.Show(String.Format("Number of sample indices: {0}, Number of samples: {1}, Number of greenlines: {2}", completeHitsounds.CustomIndices.Count, samples, greenlines));
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message);
             }
@@ -482,7 +506,7 @@ namespace Mapping_Tools.Views {
             UpdateProgressBar(worker, 20);
 
             // Convert the packages to hitsounds that fit on an osu standard map
-            CompleteHitsounds completeHitsounds = HitsoundConverter.ConvertPackages(samplePackages);
+            CompleteHitsounds completeHitsounds = HitsoundConverter.GetCompleteHitsounds(samplePackages);
             UpdateProgressBar(worker, 40);
 
             // Delete all files in the export folder before filling it again
@@ -493,7 +517,7 @@ namespace Mapping_Tools.Views {
             UpdateProgressBar(worker, 60);
 
             // Export the hitsound .osu and sound samples
-            HitsoundExporter.ExportHitsounds(arg.ExportFolder, arg.BaseBeatmap, completeHitsounds);
+            HitsoundExporter.ExportCompleteHitsounds(arg.ExportFolder, arg.BaseBeatmap, completeHitsounds);
             UpdateProgressBar(worker, 80);
 
             // Open export folder
@@ -521,7 +545,7 @@ namespace Mapping_Tools.Views {
 
             string t = (sender as TextBox).Text;
             foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
-                hitsoundLayer.SamplePath = t;
+                hitsoundLayer.SampleArgs.Path = t;
             }
         }
 
@@ -593,21 +617,39 @@ namespace Mapping_Tools.Views {
             } catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
         }
 
+        private void SelectedBankBox_TextChanged(object sender, TextChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            int t = (sender as TextBox).GetInt(-1);
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.SampleArgs.Bank = t;
+            }
+        }
+
+        private void SelectedPatchBox_TextChanged(object sender, TextChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            int t = (sender as TextBox).GetInt(-1);
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.SampleArgs.Patch = t;
+            }
+        }
+
         private void SelectedInstrumentBox_TextChanged(object sender, TextChangedEventArgs e) {
             if (suppressEvents) return;
 
             int t = (sender as TextBox).GetInt(-1);
             foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
-                hitsoundLayer.Instrument = t;
+                hitsoundLayer.SampleArgs.Instrument = t;
             }
         }
 
-        private void SelectedNoteBox_TextChanged(object sender, TextChangedEventArgs e) {
+        private void SelectedKeyBox_TextChanged(object sender, TextChangedEventArgs e) {
             if (suppressEvents) return;
 
             int t = (sender as TextBox).GetInt(-1);
             foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
-                hitsoundLayer.Note = t;
+                hitsoundLayer.SampleArgs.Key = t;
             }
         }
 
@@ -616,7 +658,7 @@ namespace Mapping_Tools.Views {
 
             int t = (sender as TextBox).GetInt(-1);
             foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
-                hitsoundLayer.Length = t;
+                hitsoundLayer.SampleArgs.Length = t;
             }
         }
 
@@ -625,7 +667,7 @@ namespace Mapping_Tools.Views {
 
             int t = (sender as TextBox).GetInt(-1);
             foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
-                hitsoundLayer.Velocity = t;
+                hitsoundLayer.SampleArgs.Velocity = t;
             }
         }
     }

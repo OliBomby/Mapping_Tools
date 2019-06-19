@@ -43,7 +43,7 @@ namespace Mapping_Tools.Viewmodels {
 
         public HitsoundStudioVM() {
             BaseBeatmap = "";
-            DefaultSample = new Sample(0, 0, "", int.MaxValue);
+            DefaultSample = new Sample() { Priority = int.MaxValue};
             HitsoundLayers = new ObservableCollection<HitsoundLayer>();
         }
 
