@@ -64,7 +64,7 @@ namespace Mapping_Tools.Views {
         }
 
         private void SampleBrowse_Click(object sender, RoutedEventArgs e) {
-            string path = IOHelper.AudioFileDialog();
+            string path = IOHelper.SampleFileDialog();
             if (path != "") { SamplePathBox.Text = path; }
         }
 

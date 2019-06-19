@@ -100,7 +100,7 @@ namespace Mapping_Tools.Views {
 
         private void SelectedSamplePathBrowse_Click(object sender, RoutedEventArgs e) {
             try {
-                string path = IOHelper.AudioFileDialog();
+                string path = IOHelper.SampleFileDialog();
                 if (path != "") {
                     SelectedSamplePathBox.Text = path;
                 }
@@ -127,7 +127,7 @@ namespace Mapping_Tools.Views {
 
         private void DefaultSampleBrowse_Click(object sender, RoutedEventArgs e) {
             try {
-                string path = IOHelper.AudioFileDialog();
+                string path = IOHelper.SampleFileDialog();
                 if (path != "") {
                     Settings.DefaultSample.SampleArgs.Path = path;
                     DefaultSamplePathBox.Text = path;
@@ -508,7 +508,7 @@ namespace Mapping_Tools.Views {
             UpdateProgressBar(worker, 60);
 
             // Export the hitsound .osu and sound samples
-            HitsoundExporter.ExportHitsounds(arg.ExportFolder, arg.BaseBeatmap, completeHitsounds);
+            HitsoundExporter.ExportCompleteHitsounds(arg.ExportFolder, arg.BaseBeatmap, completeHitsounds);
             UpdateProgressBar(worker, 80);
 
             // Open export folder
