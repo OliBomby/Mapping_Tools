@@ -30,101 +30,106 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return packages;
         }
 
-        public static CompleteHitsounds ConvertPackages(List<SamplePackage> packages) {
-            CompleteHitsounds ch = new CompleteHitsounds();
+        public static List<CustomIndex> GetCustomIndices(List<SamplePackage> packages) {
+            return packages.Select(o => o.GetCustomIndex()).ToList();
+        }
 
-            foreach (SamplePackage p in packages) {
-                // Check if package fits in any CustomIndex or if any CustomIndex can be modified to fit the package
-                int index = -1;
-                CustomIndex pci = p.GetCustomIndex();
-                pci.CleanInvalids();
+        /// <summary>
+        /// Makes a new smaller list of CustomIndices which still fits every CustomIndex
+        /// </summary>
+        /// <param name="customIndices">The CustomIndices that it has to support</param>
+        /// <returns></returns>
+        public static List<CustomIndex> OptimizeCustomIndices(List<CustomIndex> customIndices) {
+            List<CustomIndex> newCustomIndices = new List<CustomIndex>();
 
-                // Check if the package fits in any customindex "out of the box"
-                if (index == -1) {
-                    foreach (CustomIndex ci in ch.CustomIndices) {
-                        if (ci.CheckSupport(pci)) {
-                            index = ci.Index;
-                            break;
-                        }
-                    }
-                }
+            // Try merging together CustomIndices as much as possible
+            foreach (CustomIndex ci in customIndices) {
+                CustomIndex mergingWith = newCustomIndices.Find(o => o.CanMerge(ci));
 
-                // Check if the package fits in any customindex after adding some samples
-                if (index == -1) {
-                    foreach (CustomIndex ci in ch.CustomIndices) {
-                        if (ci.CheckCanSupport(pci)) {
-                            ci.MergeWith(pci);
-                            index = ci.Index;
-                            break;
-                        }
-                    }
-                }
-
-                // If the package still didn't fit in any customindex, make a new customindex
-                if (index == -1) {
-                    CustomIndex ci = new CustomIndex(ch.CustomIndices.Count + 1);
-                    ci.MergeWith(pci);
-                    index = ci.Index;
-                    ch.CustomIndices.Add(ci);
+                if (mergingWith != null) {
+                    mergingWith.MergeWith(ci);
+                } else {
+                    // There is no CustomIndex to merge with so add a new one
+                    newCustomIndices.Add(ci.Copy());
                 }
             }
 
-            // Loop again to add hitsounds after adding customindices so greenline usage can be optimized
-            int lastIndex = -1;
-            foreach (SamplePackage p in packages) {
-                int sampleSet = p.GetSampleSet();
-                int additions = p.GetAdditions();
+            // Remove any CustomIndices that might be obsolete
+            newCustomIndices.RemoveAll(o => !IsUsefull(o, newCustomIndices.Except(new CustomIndex[] { o }).ToList(), customIndices));
 
-                bool whistle = p.Samples.Any(o => o.Hitsound == 1);
-                bool finish = p.Samples.Any(o => o.Hitsound == 2);
-                bool clap = p.Samples.Any(o => o.Hitsound == 3);
+            return newCustomIndices;
+        }
 
-                // Check if package fits in any CustomIndex or if any CustomIndex can be modified to fit the package
-                int index = -1;
-                CustomIndex pci = p.GetCustomIndex();
-                pci.CleanInvalids();
-
-                // Check if the package fits in the previous package's customindex first to reduce greenline usage
-                if (lastIndex != -1) {
-                    CustomIndex lastCustomIndex = ch.CustomIndices.Find(o => o.Index == lastIndex);
-                    if (lastCustomIndex.CheckSupport(pci)) {
-                        index = lastCustomIndex.Index;
-                    }
-                }
-                
-                // Check if the package fits in any customindex "out of the box"
-                if (index == -1) {
-                    foreach (CustomIndex ci in ch.CustomIndices) {
-                        if (ci.CheckSupport(pci)) {
-                            index = ci.Index;
-                            break;
-                        }
-                    }
-                }
-                
-                // Check if the package fits in any customindex after adding some samples
-                if (index == -1) {
-                    foreach (CustomIndex ci in ch.CustomIndices) {
-                        if (ci.CheckCanSupport(pci)) {
-                            ci.MergeWith(pci);
-                            index = ci.Index;
-                            break;
-                        }
-                    }
-                }
-
-                // If the package still didn't fit in any customindex, make a new customindex
-                if (index == -1) {
-                    CustomIndex ci = new CustomIndex(ch.CustomIndices.Count + 1);
-                    ci.MergeWith(pci);
-                    index = ci.Index;
-                    ch.CustomIndices.Add(ci);
-                }
-
-                ch.Hitsounds.Add(new Hitsound(p.Time, sampleSet, additions, index, whistle, finish, clap));
-                lastIndex = index;
+        private static bool IsUsefull(CustomIndex subject, List<CustomIndex> otherCustomIndices, List<CustomIndex> supportedCustomIndices) {
+            // Subject is usefull if it can fit a CustomIndex that no other can fit
+            if (supportedCustomIndices.Any(ci => subject.Fits(ci) && !otherCustomIndices.Any(o => o.Fits(ci)))) {
+                return true;
             }
-            return ch;
+            return false;
+        }
+
+        public static void GiveCustomIndicesIndices(List<CustomIndex> customIndices) {
+            for (int i = 0; i < customIndices.Count; i++) {
+                customIndices[i].Index = i + 1;  // osu! CustomIndices start from 1
+            }
+        }
+
+        /// <summary>
+        /// Gets hitsounds of out SamplePackages
+        /// </summary>
+        /// <param name="packages">The SamplePackages to get hitsounds out of</param>
+        /// <param name="customIndices">The CustomIndices that fit all the packages</param>
+        /// <returns></returns>
+        public static List<Hitsound> GetHitsounds(List<SamplePackage> packages, List<CustomIndex> customIndices) {
+            List<Hitsound> hitsounds = new List<Hitsound>(packages.Count);
+
+            int index = 0;
+            while (index < packages.Count) {
+                // Find CustomIndex that fits the most packages from here
+                CustomIndex bestCustomIndex = null;
+                int bestFits = 0;
+
+                foreach (CustomIndex ci in customIndices) {
+                    int fits = NumSupportedPackages(packages, index, ci);
+
+                    if (fits > bestFits) {
+                        bestCustomIndex = ci;
+                        bestFits = fits;
+                    }
+                }
+
+                if (bestFits == 0) {
+                    throw new Exception("Custom indices can't fit the sample packages.");
+                } else {
+                    // Add all the fitted packages as hitsounds
+                    for (int i = 0; i < bestFits; i++) {
+                        hitsounds.Add(packages[index + i].GetHitsound(bestCustomIndex.Index));
+                    }
+                    index += bestFits;
+                }
+            }
+            return hitsounds;
+        }
+
+        private static int NumSupportedPackages(List<SamplePackage> packages, int index, CustomIndex ci) {
+            int supported = 0;
+            while (index < packages.Count) {
+                if (ci.Fits(packages[index++])) {
+                    supported++;
+                } else {
+                    return supported;
+                }
+            }
+            return supported;
+        }
+
+        public static CompleteHitsounds GetCompleteHitsounds(List<SamplePackage> packages) {
+            var customIndices = OptimizeCustomIndices(GetCustomIndices(packages));
+            GiveCustomIndicesIndices(customIndices);
+
+            var hitsounds = GetHitsounds(packages, customIndices);
+
+            return new CompleteHitsounds(hitsounds, customIndices);
         }
     }
 }

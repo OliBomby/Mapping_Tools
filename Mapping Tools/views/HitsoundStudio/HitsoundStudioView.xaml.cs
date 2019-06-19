@@ -460,7 +460,7 @@ namespace Mapping_Tools.Views {
                 List<SamplePackage> samplePackages = HitsoundConverter.ZipLayers(Settings.HitsoundLayers.ToList(), Settings.DefaultSample);
 
                 // Convert the packages to hitsounds that fit on an osu standard map
-                CompleteHitsounds completeHitsounds = HitsoundConverter.ConvertPackages(samplePackages);
+                CompleteHitsounds completeHitsounds = HitsoundConverter.GetCompleteHitsounds(samplePackages);
 
                 int samples = 0;
                 foreach (CustomIndex ci in completeHitsounds.CustomIndices) {
@@ -497,7 +497,7 @@ namespace Mapping_Tools.Views {
             UpdateProgressBar(worker, 20);
 
             // Convert the packages to hitsounds that fit on an osu standard map
-            CompleteHitsounds completeHitsounds = HitsoundConverter.ConvertPackages(samplePackages);
+            CompleteHitsounds completeHitsounds = HitsoundConverter.GetCompleteHitsounds(samplePackages);
             UpdateProgressBar(worker, 40);
 
             // Delete all files in the export folder before filling it again

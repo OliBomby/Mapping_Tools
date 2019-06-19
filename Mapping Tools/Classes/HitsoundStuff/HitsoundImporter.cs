@@ -123,7 +123,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return String.Format("{0}-hit{1}{2}.wav", HitsoundConverter.SampleSets[sampleSet], HitsoundConverter.Hitsounds[hitsound], index);
         }
 
-        public static List<HitsoundLayer> ImportMIDI(string path, bool instruments=true, bool keysounds=true, bool lengths=true, bool velocities=true, string sampleSource="") {
+        public static List<HitsoundLayer> ImportMIDI(string path, bool instruments=true, bool keysounds=true, bool lengths=true, bool velocities=true) {
             List<HitsoundLayer> hitsoundLayers = new List<HitsoundLayer>();
 
             var strictMode = false;
@@ -165,6 +165,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         int length = lengths ? on.NoteLength : -1;
                         int velocity = velocities ? on.Velocity : -1;
 
+                        string filename = "";
+
                         string instrumentName = patch >= 0 && patch <= 127 ? PatchChangeEvent.GetPatchName(patch) : on.Channel == 10 ? "Percussion" : "Undefined";
                         string keyName = on.NoteName;
 
@@ -176,9 +178,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         if (velocities)
                             name += "," + velocity;
 
-                        string filename = Path.GetExtension(sampleSource) == ".sf2" ?
-                            sampleSource :
-                            Path.Combine(new string[5] { sampleSource, patch.ToString(), key.ToString(), length.ToString(), velocity.ToString() + ".wav" });
 
                         SampleGeneratingArgs args = new SampleGeneratingArgs(filename, bank, patch, instrument, key, length, velocity);
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
@@ -127,11 +128,23 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
-        public static bool operator ==(SampleGeneratingArgs left, object right) {
+        public override int GetHashCode() {
+            var hashCode = 881410169;
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Path);
+            hashCode = hashCode * -1521134295 + Bank.GetHashCode();
+            hashCode = hashCode * -1521134295 + Patch.GetHashCode();
+            hashCode = hashCode * -1521134295 + Instrument.GetHashCode();
+            hashCode = hashCode * -1521134295 + Key.GetHashCode();
+            hashCode = hashCode * -1521134295 + Length.GetHashCode();
+            hashCode = hashCode * -1521134295 + Velocity.GetHashCode();
+            return hashCode;
+        }
+
+        public static bool operator ==(SampleGeneratingArgs left, SampleGeneratingArgs right) {
             return left.Equals(right);
         }
 
-        public static bool operator !=(SampleGeneratingArgs left, object right) {
+        public static bool operator !=(SampleGeneratingArgs left, SampleGeneratingArgs right) {
             return !left.Equals(right);
         }
     }

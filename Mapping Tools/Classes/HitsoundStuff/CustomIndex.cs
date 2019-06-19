@@ -39,7 +39,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return s1.Count > 0 && s2.Count > 0 ? s1.SetEquals(s2) : true;
         }
 
-        public bool CheckSupport(CustomIndex other) {
+        public bool Fits(CustomIndex other) {
             // Every non-empty set from other == set from self
             // True until false
             bool support = true;
@@ -49,7 +49,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return support;
         }
 
-        public bool CheckCanSupport(CustomIndex other) {
+        public bool Fits(SamplePackage other) {
+            return Fits(other.GetCustomIndex());
+        }
+
+        public bool CanMerge(CustomIndex other) {
             // Every non-empty set from other == non-empty set from self
             // True until false
             bool support = true;
@@ -70,6 +74,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             foreach (string key in AllKeys) {
                 ci.Samples[key].UnionWith(other.Samples[key]);
             }
+            return ci;
+        }
+
+        public CustomIndex Copy() {
+            CustomIndex ci = new CustomIndex(Index);
+            ci.MergeWith(this);
             return ci;
         }
 

@@ -77,5 +77,16 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
             return ci;
         }
+
+        public Hitsound GetHitsound(int index) {
+            int sampleSet = GetSampleSet();
+            int additions = GetAdditions();
+
+            bool whistle = Samples.Any(o => o.Hitsound == 1);
+            bool finish = Samples.Any(o => o.Hitsound == 2);
+            bool clap = Samples.Any(o => o.Hitsound == 3);
+
+            return new Hitsound(Time, sampleSet, additions, index, whistle, finish, clap);
+        }
     }
 }
