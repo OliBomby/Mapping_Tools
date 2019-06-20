@@ -84,7 +84,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     var mixer = new MixingSampleProvider(sameFormatSamples);
 
                     VolumeSampleProvider volumed = new VolumeSampleProvider(mixer) {
-                        Volume = 1 / (float)Math.Sqrt(soundsAdded)
+                        Volume = samples.Count > 1 ? 0.8f : 1f
                     };
 
                     string filename = ci.Index == 1 ? kvp.Key + ".wav" : kvp.Key + ci.Index + ".wav";

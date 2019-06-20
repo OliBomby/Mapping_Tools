@@ -105,7 +105,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
-        public bool FunctionallyEquals(SampleGeneratingArgs other) {
+        public bool Equals(SampleGeneratingArgs other) {
             // Equality method can ignore bank, patch etc when path is not a soundfont because then those variables have no effect on how a sample gets generated
             if (System.IO.Path.GetExtension(Path) == ".sf2" && System.IO.Path.GetExtension(other.Path) == ".sf2") {
                 return Path == other.Path &&
@@ -128,7 +128,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return Equals((SampleGeneratingArgs)obj);
         }
 
-        public bool Equals(SampleGeneratingArgs other) {
+        public bool ExactlyEquals(SampleGeneratingArgs other) {
             return Path == other.Path &&
             Bank == other.Bank &&
             Patch == other.Patch &&

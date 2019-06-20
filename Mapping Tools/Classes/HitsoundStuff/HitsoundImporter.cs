@@ -189,7 +189,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         SampleGeneratingArgs args = new SampleGeneratingArgs(filename, bank, patch, instrument, key, length, velocity);
 
                         // Find the hitsoundlayer with this path
-                        HitsoundLayer layer = hitsoundLayers.Find(o => o.SampleArgs == args);
+                        HitsoundLayer layer = hitsoundLayers.Find(o => o.SampleArgs.ExactlyEquals(args));
 
                         if (layer != null) {
                             // Find hitsound layer with this path and add this time

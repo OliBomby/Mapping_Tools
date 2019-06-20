@@ -13,6 +13,7 @@ using Mapping_Tools.Viewmodels;
 using NAudio.Wave;
 using NAudio.Vorbis;
 using System.Text;
+using System.Globalization;
 
 namespace Mapping_Tools.Views {
     /// <summary>
@@ -339,7 +340,7 @@ namespace Mapping_Tools.Views {
             if (selectedLayers.TrueForAll(o => o.Times == selectedLayer.Times)) {
                 var accumulator = new StringBuilder(selectedLayer.Times.Count * 2); // Rough guess for capacity of StringBuilder
                 foreach (double d in selectedLayer.Times) {
-                    accumulator.Append(d).Append(",");
+                    accumulator.Append(d.ToString(CultureInfo.InvariantCulture)).Append(",");
                 }
                 accumulator.Remove(accumulator.Length - 1, 1);
                 TimesBox.Text = accumulator.ToString();
