@@ -151,6 +151,7 @@
                     <CheckBox x:Name="LengthBox3" Content="Discriminate lengths" IsChecked="False"/>
                     <TextBox
                         x:Name="LengthRoughnessBox3"
+                        ToolTip="Exponential ceiling. 1 = standard ceiling, 5 = extreme ceiling"
                         Style="{StaticResource MaterialDesignFilledTextFieldTextBox}"
                         Margin="0,8,0,8"
                         materialDesign:HintAssist.Hint="Length rounding roughness"
@@ -158,6 +159,15 @@
                                  Converter={StaticResource BooleanToVisibilityConverter}, 
                                  FallbackValue=Collapsed}" />
                     <CheckBox x:Name="VelocityBox3" Content="Discriminate velocities" IsChecked="False"/>
+                    <TextBox
+                        x:Name="VelocityRoughnessBox3"
+                        ToolTip="Liniar ceiling. 1 = intervals of 1, 5 = intervals of 5"
+                        Style="{StaticResource MaterialDesignFilledTextFieldTextBox}"
+                        Margin="0,8,0,8"
+                        materialDesign:HintAssist.Hint="Velocity rounding roughness"
+                        Visibility="{Binding Path=IsChecked, ElementName=VelocityBox3, UpdateSourceTrigger=PropertyChanged,  
+                                 Converter={StaticResource BooleanToVisibilityConverter}, 
+                                 FallbackValue=Collapsed}" />
                 </StackPanel>
             </TabItem>
         </TabControl>

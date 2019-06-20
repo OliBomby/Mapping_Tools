@@ -24,11 +24,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Editor editor = new Editor(baseBeatmap);
             Beatmap beatmap = editor.Beatmap;
 
-            // Resnap all hitsounds
-            foreach (Hitsound h in hitsounds) {
-                h.SetTime(beatmap.BeatmapTiming.Resnap(h.Time, 16, 12));
-            }
-
             // Make new timingpoints
             List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
 

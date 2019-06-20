@@ -17,6 +17,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return g != null ? g.UInt16Amount : (ushort)0;
         }
 
+        public static byte Velocity(this Zone zone) {
+            var g = SelectByGenerator(zone, GeneratorEnum.Velocity);
+            return g != null ? g.LowByteAmount : (byte)127;
+        }
+
         public static byte OverridingRootKey(this Zone zone) {
             var g = SelectByGenerator(zone, GeneratorEnum.OverridingRootKey);
             return g != null ? g.LowByteAmount : (byte)0;

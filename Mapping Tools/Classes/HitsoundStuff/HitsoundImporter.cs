@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Globalization;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     class HitsoundImporter {
@@ -123,7 +124,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return String.Format("{0}-hit{1}{2}.wav", HitsoundConverter.SampleSets[sampleSet], HitsoundConverter.Hitsounds[hitsound], index);
         }
 
-        public static List<HitsoundLayer> ImportMIDI(string path, bool instruments=true, bool keysounds=true, bool lengths=true, double lengthRoughness=1, bool velocities=true) {
+        public static List<HitsoundLayer> ImportMIDI(string path, bool instruments=true, bool keysounds=true, bool lengths=true, double lengthRoughness=1, bool velocities=true, double velocityRoughness=1) {
             List<HitsoundLayer> hitsoundLayers = new List<HitsoundLayer>();
 
             var strictMode = false;
@@ -153,7 +154,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                             channelBanks[co.Channel] = co.ControllerValue + (channelBanks.ContainsKey(co.Channel) ? channelBanks[co.Channel] >> 8 * 128 : 0);
                         }
                     }
-                    else if (midiEvent is NoteOnEvent on) {
+                    else if (MidiEvent.IsNoteOn(midiEvent)) {
+                        var on = midiEvent as NoteOnEvent;
+
                         double time = CalculateTime(on.AbsoluteTime, tempos, cumulativeTime, mf.DeltaTicksPerQuarterNote);
                         double length = on.OffEvent != null ? CalculateTime(on.OffEvent.AbsoluteTime, tempos, cumulativeTime, mf.DeltaTicksPerQuarterNote) - time : -1;
                         length = RoundLength(length, lengthRoughness);
@@ -166,8 +169,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         int key = keys ? on.NoteNumber : -1;
                         length = lengths ? length : -1;
                         int velocity = velocities ? on.Velocity : -1;
+                        velocity = (int)RoundVelocity(velocity, velocityRoughness);
 
-                        string filename = String.Format("{0}\\{1}\\{2}\\{3}\\{4}\\{5}.wav", bank, patch, instrument, key, length, velocity);
+                        string lengthString = Math.Round(length).ToString(CultureInfo.InvariantCulture);
+                        string filename = String.Format("{0}\\{1}\\{2}\\{3}\\{4}\\{5}.wav", bank, patch, instrument, key, lengthString, velocity);
 
                         string instrumentName = patch >= 0 && patch <= 127 ? PatchChangeEvent.GetPatchName(patch) : on.Channel == 10 ? "Percussion" : "Undefined";
                         string keyName = on.NoteName;
@@ -176,7 +181,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         if (keysounds)
                             name += "," + keyName;
                         if (lengths)
-                            name += "," + length;
+                            name += "," + lengthString;
                         if (velocities)
                             name += "," + velocity;
 
@@ -199,6 +204,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     }
                 }
             }
+            // Stretch the velocities to reach 127
+            int maxVelocity = hitsoundLayers.Max(o => o.SampleArgs.Velocity);
+            foreach (var hsl in hitsoundLayers) {
+                hsl.SampleArgs.Velocity = (int)Math.Round(hsl.SampleArgs.Velocity / (float)maxVelocity * 127);
+            }
 
             // Sort the times
             hitsoundLayers.ForEach(o => o.Times = o.Times.OrderBy(t => t).ToList());
@@ -209,17 +219,24 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return hitsoundLayers;
         }
 
-        private static double RoundLength(double length, double roughness) {
+        private static double RoundVelocity(double length, double roughness) {
             if (length == -1) {
                 return length;
             }
 
             var mult = length / roughness;
             var round = Math.Round(mult);
-            if (round == 0) {
-                round = 0.25;
-            }
             return round * roughness;
+        }
+
+        private static double RoundLength(double length, double roughness) {
+            if (length == -1) {
+                return length;
+            }
+
+            var mult = Math.Pow(length, 1 / roughness);
+            var round = Math.Ceiling(mult);
+            return Math.Pow(round, roughness);
         }
 
         private static double CalculateTime(long absoluteTime, List<TempoEvent> tempos, List<double> cumulativeTime, int dtpq) {

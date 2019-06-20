@@ -106,13 +106,13 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     ushort keyRange = izone.KeyRange();
                     byte keyLow = (byte)keyRange;
                     byte keyHigh = (byte)(keyRange >> 8);
-                    if (!(args.Key >= keyLow && args.Key <= keyHigh) && args.Key != -1) {
+                    if (!(args.Key >= keyLow && args.Key <= keyHigh) && args.Key != -1 && keyRange != 0) {
                         continue;
                     }
                     ushort velRange = izone.VelocityRange();
                     byte velLow = (byte)keyRange;
                     byte velHigh = (byte)(keyRange >> 8);
-                    if (!(args.Velocity >= velLow && args.Velocity <= velHigh) && args.Velocity != -1) {
+                    if (!(args.Velocity >= velLow && args.Velocity <= velHigh) && args.Velocity != -1 && velRange != 0) {
                         continue;
                     }
 
@@ -135,40 +135,133 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         private static ISampleProvider GenerateSample(Zone izone, byte[] sample, SampleGeneratingArgs args) {
-            // read the sample mode to apply the correct lengthening algorithm
-            // find out what unit that midi length is actually in
-            // add volume sample provider for the velocity argument
-
+            // Read the sample mode to apply the correct lengthening algorithm
+            // Add volume sample provider for the velocity argument
+            
             var sh = izone.SampleHeader();
+            int sampleMode = izone.SampleModes();
+
             byte key = izone.Key();
-            //Console.WriteLine("generating: " + sh.SampleName);
+            int correction = args.Key != -1 ? args.Key - key : 0;
+            byte velocity = izone.Velocity();
+            float volumeCorrection = args.Velocity != -1 ? (float)args.Velocity / velocity : 1f;
 
-            // Indices in sf2 are numbers of samples, not byte length. So double them.
-            int length = (int)(sh.End - sh.Start);
-            int loopLength = (int)(sh.EndLoop - sh.StartLoop);
+            var output = GetSampleWithLength(sh, sampleMode, sample, args);
+            output = PitchShift(output, correction);
+            output = VolumeChange(output, volumeCorrection);
+            output = new DelayFadeOutSampleProvider(output);
+            (output as DelayFadeOutSampleProvider).BeginFadeOut(args.Length, args.Length * 0.2);
 
-            //Console.WriteLine("length: " + length);
-            //Console.WriteLine("loop length: " + loopLength);
-
-            double lengthInSeconds = args.Length / 1000;
-            double numberOfSamples = lengthInSeconds * sh.SampleRate;
-
-            int numberOfBytes = (int)(Math.Min(numberOfSamples, length) * 2);
-
-            byte[] buffer = new byte[numberOfBytes];
-            Array.Copy(sample, (int)sh.Start * 2, buffer, 0, numberOfBytes);
-
-            ISampleProvider output = new Pcm16BitToSampleProvider(new RawSourceWaveStream(buffer, 0, numberOfBytes, new WaveFormat((int)sh.SampleRate, 16, 1)));
-
-            int correction = args.Key - key;
-            //Console.WriteLine("correction: " + correction);
-            return PitchShift(output, correction);
+            return output;
         }
 
         private static ISampleProvider PitchShift(ISampleProvider sample, int correction) {
             float factor = (float)Math.Pow(2, correction / 12f);
             SmbPitchShiftingSampleProvider shifter = new SmbPitchShiftingSampleProvider(sample, 512, 4, factor);
             return shifter;
+        }
+
+        private static ISampleProvider VolumeChange(ISampleProvider sample, float mult) {
+            return new VolumeSampleProvider(sample) { Volume = mult };
+        }
+
+        private static ISampleProvider GetSampleWithLength(SampleHeader sh, int sampleMode, byte[] sample, SampleGeneratingArgs args) {
+            if (sampleMode == 0 || sampleMode == 2) {
+                // Don't loop
+                return GetSampleWithoutLoop(sh, sample, args);
+            } else if (sampleMode == 1) {
+                // Loop continuously
+                return GetSampleContinuous(sh, sample, args);
+            } else {
+                // Loops for the duration of key depression then proceed to play the remainder of the sample
+                return GetSampleRemainder(sh, sample, args);
+            }
+        }
+
+        private static ISampleProvider GetSampleWithoutLoop(SampleHeader sh, byte[] sample, SampleGeneratingArgs args) {
+            // Indices in sf2 are numbers of samples, not byte length. So double them
+            int length = (int)(sh.End - sh.Start);
+
+            double lengthInSeconds = args.Length / 1000 * 1.2;
+            int numberOfSamples = args.Length != -1 ? (int)(lengthInSeconds * sh.SampleRate) : length;
+
+            int numberOfBytes = Math.Min(numberOfSamples, length) * 2;
+            byte[] buffer = new byte[numberOfBytes];
+            Array.Copy(sample, (int)sh.Start * 2, buffer, 0, numberOfBytes);
+
+            return BufferToSampleProvider(buffer, sh.SampleRate);
+        }
+
+        private static ISampleProvider GetSampleContinuous(SampleHeader sh, byte[] sample, SampleGeneratingArgs args) {
+            // Indices in sf2 are numbers of samples, not byte length. So double them
+            int length = (int)(sh.End - sh.Start);
+            int lengthBytes = length * 2;
+            int loopLength = (int)(sh.EndLoop - sh.StartLoop);
+            int loopLengthBytes = loopLength * 2;
+
+            double lengthInSeconds = args.Length / 1000 * 1.2;
+            int numberOfSamples = args.Length != -1 ? (int)(lengthInSeconds * sh.SampleRate) : length;
+            int numberOfLoopSamples = numberOfSamples - length;
+
+            if (numberOfLoopSamples < 0) {
+                return GetSampleWithoutLoop(sh, sample, args);
+            }
+
+            int numberOfBytes = numberOfSamples * 2;
+            int numberOfSampleBytes = length * 2;
+            int numberOfLoopBytes = numberOfLoopSamples * 2;
+
+            byte[] buffer = new byte[numberOfBytes];
+
+            Array.Copy(sample, (int)sh.Start * 2, buffer, 0, lengthBytes);
+            for (int i = 0; i < (numberOfLoopSamples + loopLength - 1) / loopLength; i++) {
+                Array.Copy(sample, (int)sh.StartLoop * 2, buffer, lengthBytes + i * loopLengthBytes, Math.Min(loopLengthBytes, numberOfBytes - (lengthBytes + i * loopLengthBytes)));
+            }
+
+            return BufferToSampleProvider(buffer, sh.SampleRate);
+        }
+
+        private static ISampleProvider GetSampleRemainder(SampleHeader sh, byte[] sample, SampleGeneratingArgs args) {
+            // Indices in sf2 are numbers of samples, not byte length. So double them
+            int length = (int)(sh.End - sh.Start);
+            int lengthBytes = length * 2;
+            int loopLength = (int)(sh.EndLoop - sh.StartLoop);
+            int loopLengthBytes = loopLength * 2;
+
+            int lengthFirstHalf = (int)sh.StartLoop - (int)sh.Start;
+            int lengthFirstHalfBytes = lengthFirstHalf * 2;
+
+            int lengthSecondHalf = (int)sh.End - (int)sh.EndLoop;
+            int lengthSecondHalfBytes = lengthSecondHalf * 2;
+
+            double lengthInSeconds = args.Length / 1000 * 1.2;
+            int numberOfSamples = args.Length != -1 ? (int)(lengthInSeconds * sh.SampleRate) : length;
+            numberOfSamples += lengthSecondHalf;
+            int numberOfLoopSamples = numberOfSamples - lengthFirstHalf - lengthSecondHalf;
+
+            if (numberOfLoopSamples < loopLength) {
+                return GetSampleWithoutLoop(sh, sample, args);
+            }
+
+            int numberOfBytes = numberOfSamples * 2;
+            int numberOfSampleBytes = length * 2;
+            int numberOfLoopBytes = numberOfLoopSamples * 2;
+
+            byte[] buffer = new byte[numberOfBytes];
+            byte[] bufferLoop = new byte[numberOfLoopBytes];
+
+            Array.Copy(sample, (int)sh.Start * 2, buffer, 0, lengthFirstHalfBytes);
+            for (int i = 0; i < (numberOfLoopSamples + loopLength - 1) / loopLength; i++) {
+                Array.Copy(sample, (int)sh.StartLoop * 2, bufferLoop, i * loopLengthBytes, Math.Min(loopLengthBytes, numberOfLoopBytes - i * loopLengthBytes));
+            }
+            bufferLoop.CopyTo(buffer, lengthFirstHalfBytes);
+            Array.Copy(sample, (int)sh.Start * 2, buffer, lengthFirstHalfBytes + numberOfLoopBytes, lengthSecondHalfBytes);
+
+            return BufferToSampleProvider(buffer, sh.SampleRate);
+        }
+
+        private static ISampleProvider BufferToSampleProvider(byte[] buffer, uint sampleRate) {
+            return new Pcm16BitToSampleProvider(new RawSourceWaveStream(buffer, 0, buffer.Length, new WaveFormat((int)sampleRate, 16, 1)));
         }
     }
 }
