@@ -12,27 +12,13 @@ using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     class SampleImporter {
-        public static readonly string[] ValidSamplePathExtensions = new string[] { ".wav", ".ogg", ".mp3" };
+        public static readonly string[] ValidSamplePathExtensions = new string[] { ".wav", ".ogg", ".mp3", ".sf2" };
 
         public static bool ValidateSampleArgs(string path) {
-            if (path == "")
+            if (!File.Exists(path))
                 return false;
 
-            string[] split = path.Split('?');
-            string first = split[0];
-
-            if (!File.Exists(first))
-                return false;
-
-            if (Path.GetExtension(first) == ".sf2") {
-                if (split.Length < 2)
-                    return false;
-
-                if (!Regex.IsMatch(split[1], @"[0-9]+(\\[0-9]+){4}"))
-                    return false;
-            } else if (split.Length > 1)
-                return false;
-            else if (!ValidSamplePathExtensions.Contains(Path.GetExtension(first)))
+            else if (!ValidSamplePathExtensions.Contains(Path.GetExtension(path)))
                 return false;
 
             return true;

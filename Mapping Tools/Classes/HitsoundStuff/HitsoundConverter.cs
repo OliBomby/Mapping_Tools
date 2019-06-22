@@ -31,7 +31,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         public static List<CustomIndex> GetCustomIndices(List<SamplePackage> packages) {
-            return packages.Select(o => o.GetCustomIndex()).ToList();
+            var indices = packages.Select(o => o.GetCustomIndex()).ToList();
+            indices.ForEach(o => o.CleanInvalids());
+            return indices;
         }
 
         /// <summary>

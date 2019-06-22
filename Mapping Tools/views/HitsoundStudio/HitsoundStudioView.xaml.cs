@@ -69,6 +69,7 @@ namespace Mapping_Tools.Views {
                 progress.Value = 0;
             }
             start.IsEnabled = true;
+            startish.IsEnabled = true;
         }
 
         private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
@@ -80,11 +81,13 @@ namespace Mapping_Tools.Views {
             public string BaseBeatmap;
             public Sample DefaultSample;
             public List<HitsoundLayer> HitsoundLayers;
-            public Arguments(string exportFolder, string baseBeatmap, Sample defaultSample, List<HitsoundLayer> hitsoundLayers) {
+            public bool Debug;
+            public Arguments(string exportFolder, string baseBeatmap, Sample defaultSample, List<HitsoundLayer> hitsoundLayers, bool debug) {
                 ExportFolder = exportFolder;
                 BaseBeatmap = baseBeatmap;
                 DefaultSample = defaultSample;
                 HitsoundLayers = hitsoundLayers;
+                Debug = debug;
             }
         }
 
@@ -97,19 +100,45 @@ namespace Mapping_Tools.Views {
             CompleteHitsounds completeHitsounds = HitsoundConverter.GetCompleteHitsounds(samplePackages);
             UpdateProgressBar(worker, 40);
 
-            // Delete all files in the export folder before filling it again
-            DirectoryInfo di = new DirectoryInfo(arg.ExportFolder);
-            foreach (FileInfo file in di.GetFiles()) {
-                file.Delete();
+            if (arg.Debug) {
+                int samples = 0;
+                foreach (CustomIndex ci in completeHitsounds.CustomIndices) {
+                    foreach (HashSet<SampleGeneratingArgs> h in ci.Samples.Values) {
+                        if (h.Any(o => SampleImporter.ValidateSampleArgs(o))) {
+                            samples++;
+                        }
+                    }
+                }
+                UpdateProgressBar(worker, 60);
+
+                int greenlines = 0;
+                int lastIndex = -1;
+                foreach (Hitsound hit in completeHitsounds.Hitsounds) {
+                    if (hit.CustomIndex != lastIndex) {
+                        lastIndex = hit.CustomIndex;
+                        greenlines++;
+                    }
+                }
+                UpdateProgressBar(worker, 100);
+
+                MessageBox.Show(String.Format("Number of sample indices: {0}, Number of samples: {1}, Number of greenlines: {2}", completeHitsounds.CustomIndices.Count, samples, greenlines));
+            } 
+            else {
+                // Delete all files in the export folder before filling it again
+                DirectoryInfo di = new DirectoryInfo(arg.ExportFolder);
+                foreach (FileInfo file in di.GetFiles()) {
+                    file.Delete();
+                }
+                UpdateProgressBar(worker, 60);
+
+                // Export the hitsound .osu and sound samples
+                HitsoundExporter.ExportCompleteHitsounds(arg.ExportFolder, arg.BaseBeatmap, completeHitsounds);
+                UpdateProgressBar(worker, 80);
+
+                // Open export folder
+                Process.Start(arg.ExportFolder);
             }
-            UpdateProgressBar(worker, 60);
 
-            // Export the hitsound .osu and sound samples
-            HitsoundExporter.ExportCompleteHitsounds(arg.ExportFolder, arg.BaseBeatmap, completeHitsounds);
-            UpdateProgressBar(worker, 80);
-
-            // Open export folder
-            Process.Start(arg.ExportFolder);
             UpdateProgressBar(worker, 100);
         }
 
@@ -120,35 +149,17 @@ namespace Mapping_Tools.Views {
         }
 
         private void Startish_Click(object sender, RoutedEventArgs e) {
-            try {
-                // Convert the multiple layers into packages that have the samples from all the layers at one specific time
-                List<SamplePackage> samplePackages = HitsoundConverter.ZipLayers(Settings.HitsoundLayers.ToList(), Settings.DefaultSample);
+            backgroundWorker.RunWorkerAsync(new Arguments(MainWindow.AppWindow.ExportPath, Settings.BaseBeatmap, Settings.DefaultSample, Settings.HitsoundLayers.ToList(), true));
+            startish.IsEnabled = false;
+        }
 
-                // Convert the packages to hitsounds that fit on an osu standard map
-                CompleteHitsounds completeHitsounds = HitsoundConverter.GetCompleteHitsounds(samplePackages);
-
-                int samples = 0;
-                foreach (CustomIndex ci in completeHitsounds.CustomIndices) {
-                    foreach (HashSet<SampleGeneratingArgs> h in ci.Samples.Values) {
-                        if (h.Any(o => SampleImporter.ValidateSampleArgs(o))) {
-                            samples++;
-                        }
-                    }
-                }
-
-                int greenlines = 0;
-                int lastIndex = -1;
-                foreach (Hitsound hit in completeHitsounds.Hitsounds) {
-                    if (hit.CustomIndex != lastIndex) {
-                        lastIndex = hit.CustomIndex;
-                        greenlines++;
-                    }
-                }
-
-                MessageBox.Show(String.Format("Number of sample indices: {0}, Number of samples: {1}, Number of greenlines: {2}", completeHitsounds.CustomIndices.Count, samples, greenlines));
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message);
+        private void Start_Click(object sender, RoutedEventArgs e) {
+            if (Settings.BaseBeatmap == null || Settings.DefaultSample == null) {
+                MessageBox.Show("Please import a base beatmap and default hitsound first.");
+                return;
             }
+            backgroundWorker.RunWorkerAsync(new Arguments(MainWindow.AppWindow.ExportPath, Settings.BaseBeatmap, Settings.DefaultSample, Settings.HitsoundLayers.ToList(), false));
+            start.IsEnabled = false;
         }
 
         private void GetSelectedLayers() {
@@ -164,15 +175,6 @@ namespace Mapping_Tools.Views {
             }
 
             selectedLayer = selectedLayers[0];
-        }
-
-        private void Start_Click(object sender, RoutedEventArgs e) {
-            if (Settings.BaseBeatmap == null || Settings.DefaultSample == null) {
-                MessageBox.Show("Please import a base beatmap and default hitsound first.");
-                return;
-            }
-            backgroundWorker.RunWorkerAsync(new Arguments(MainWindow.AppWindow.ExportPath, Settings.BaseBeatmap, Settings.DefaultSample, Settings.HitsoundLayers.ToList()));
-            start.IsEnabled = false;
         }
 
         private void SelectedSamplePathBrowse_Click(object sender, RoutedEventArgs e) {
