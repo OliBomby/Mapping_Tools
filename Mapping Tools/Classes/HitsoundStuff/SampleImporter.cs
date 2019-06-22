@@ -149,8 +149,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             var output = GetSampleWithLength(sh, sampleMode, sample, args);
             output = PitchShift(output, correction);
             output = VolumeChange(output, volumeCorrection);
-            output = new DelayFadeOutSampleProvider(output);
-            (output as DelayFadeOutSampleProvider).BeginFadeOut(args.Length, 300);
 
             return output;
         }
@@ -189,7 +187,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             byte[] buffer = new byte[numberOfBytes];
             Array.Copy(sample, (int)sh.Start * 2, buffer, 0, numberOfBytes);
 
-            return BufferToSampleProvider(buffer, sh.SampleRate);
+            var output = BufferToSampleProvider(buffer, sh.SampleRate);
+
+            output = new DelayFadeOutSampleProvider(output);
+            (output as DelayFadeOutSampleProvider).BeginFadeOut(args.Length, 300);
+
+            return output;
         }
 
         private static ISampleProvider GetSampleContinuous(SampleHeader sh, byte[] sample, SampleGeneratingArgs args) {
@@ -218,7 +221,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 Array.Copy(sample, (int)sh.StartLoop * 2, buffer, lengthBytes + i * loopLengthBytes, Math.Min(loopLengthBytes, numberOfBytes - (lengthBytes + i * loopLengthBytes)));
             }
 
-            return BufferToSampleProvider(buffer, sh.SampleRate);
+            var output = BufferToSampleProvider(buffer, sh.SampleRate);
+
+            output = new DelayFadeOutSampleProvider(output);
+            (output as DelayFadeOutSampleProvider).BeginFadeOut(args.Length, 300);
+
+            return output;
         }
 
         private static ISampleProvider GetSampleRemainder(SampleHeader sh, byte[] sample, SampleGeneratingArgs args) {
@@ -234,7 +242,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             int lengthSecondHalf = (int)sh.End - (int)sh.EndLoop;
             int lengthSecondHalfBytes = lengthSecondHalf * 2;
 
-            double lengthInSeconds = (args.Length / 1000 + 0.6);
+            double lengthInSeconds = args.Length / 1000;
             int numberOfSamples = args.Length != -1 ? (int)Math.Ceiling(lengthInSeconds * sh.SampleRate) : length;
             numberOfSamples += lengthSecondHalf;
             int numberOfLoopSamples = numberOfSamples - lengthFirstHalf - lengthSecondHalf;
