@@ -14,7 +14,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             List<SamplePackage> packages = new List<SamplePackage>();
             foreach (HitsoundLayer hl in layers) {
                 foreach (double t in hl.Times) {
-                    SamplePackage packageOnTime = packages.Find(o => Math.Abs(o.Time - t) < 5);
+                    SamplePackage packageOnTime = packages.Find(o => Math.Abs(o.Time - t) < 10);
                     if (packageOnTime != null) {
                         packageOnTime.Samples.Add(new Sample(hl));
                     } else {

@@ -153,10 +153,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             // Temporal length is n times a snap divisor length
             TimingPoint tp = timing.GetRedlineAtTime(Time);
 
-            double newTemporalLength1 = timing.GetNearestMultiple(TemporalLength, tp.MpB / snap1);
+            double newTemporalLength1 = Timing.GetNearestMultiple(TemporalLength, tp.MpB / snap1);
             double snapDistance1 = Math.Abs(TemporalLength - newTemporalLength1);
 
-            double newTemporalLength2 = timing.GetNearestMultiple(TemporalLength, tp.MpB / snap2);
+            double newTemporalLength2 = Timing.GetNearestMultiple(TemporalLength, tp.MpB / snap2);
             double snapDistance2 = Math.Abs(TemporalLength - newTemporalLength2);
 
             double newTemporalLength = snapDistance1 < snapDistance2 ? newTemporalLength1 : newTemporalLength2;

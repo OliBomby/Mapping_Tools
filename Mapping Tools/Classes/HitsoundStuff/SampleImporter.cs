@@ -182,7 +182,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             // Indices in sf2 are numbers of samples, not byte length. So double them
             int length = (int)(sh.End - sh.Start);
 
-            double lengthInSeconds = (args.Length / 1000) + 0.5;
+            double lengthInSeconds = (args.Length / 1000) + 0.6;
             int numberOfSamples = args.Length != -1 ? (int)Math.Ceiling(lengthInSeconds * sh.SampleRate) : length;
 
             int numberOfBytes = Math.Min(numberOfSamples, length) * 2;
@@ -199,7 +199,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             int loopLength = (int)(sh.EndLoop - sh.StartLoop);
             int loopLengthBytes = loopLength * 2;
 
-            double lengthInSeconds = (args.Length / 1000) + 0.5;
+            double lengthInSeconds = (args.Length / 1000) + 0.6;
             int numberOfSamples = args.Length != -1 ? (int)Math.Ceiling(lengthInSeconds * sh.SampleRate) : length;
             int numberOfLoopSamples = numberOfSamples - length;
 
@@ -234,7 +234,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             int lengthSecondHalf = (int)sh.End - (int)sh.EndLoop;
             int lengthSecondHalfBytes = lengthSecondHalf * 2;
 
-            double lengthInSeconds = (args.Length / 1000 + 0.5);
+            double lengthInSeconds = (args.Length / 1000 + 0.6);
             int numberOfSamples = args.Length != -1 ? (int)Math.Ceiling(lengthInSeconds * sh.SampleRate) : length;
             numberOfSamples += lengthSecondHalf;
             int numberOfLoopSamples = numberOfSamples - lengthFirstHalf - lengthSecondHalf;

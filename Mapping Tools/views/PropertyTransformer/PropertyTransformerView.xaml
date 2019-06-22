@@ -98,7 +98,7 @@
                     <RowDefinition Height="40"/>
                 </Grid.RowDefinitions>
                 <StackPanel Grid.Row="0" Margin="0,0,0,20" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-                    <CheckBox x:Name="ClipBox" Content="Clip properties" ToolTip="Clips the parameters to stay within bounds. (Volume: 5-100 etc)" IsChecked="True" FontSize="20"/>
+                    <CheckBox x:Name="ClipBox" Content="Clip properties" ToolTip="Clips the parameters to stay within bounds. (Volume: 5-100 etc)" IsChecked="False" FontSize="20"/>
                     <CheckBox x:Name="FiltersBox" Content="Enable filters" IsChecked="False" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
                     <StackPanel Visibility="{Binding Path=IsChecked, ElementName=FiltersBox, UpdateSourceTrigger=PropertyChanged,  
                                  Converter={StaticResource BooleanToVisibilityConverter}, 

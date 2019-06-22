@@ -50,7 +50,7 @@ namespace Mapping_Tools.Views {
             string fileToCopy = MainWindow.AppWindow.currentMap.Text;
             IOHelper.SaveMapBackup(fileToCopy);
 
-            backgroundWorker.RunWorkerAsync(new Arguments(fileToCopy, (bool)BookmarkBox.IsChecked, (bool)GreenlinesBox.IsChecked,
+            backgroundWorker.RunWorkerAsync(new Arguments(fileToCopy, (bool)ObjectsBox.IsChecked, (bool)BookmarkBox.IsChecked, (bool)GreenlinesBox.IsChecked,
                                                           (bool)RedlinesBox.IsChecked, (bool)OmitBarlineBox.IsChecked,
                                                           LeniencyBox.GetDouble(defaultValue: 3), TemporalBox.GetDouble(),
                                                           int.Parse(Snap1.Text.Split('/')[1]), int.Parse(Snap2.Text.Split('/')[1])));
@@ -59,6 +59,7 @@ namespace Mapping_Tools.Views {
 
         private struct Arguments {
             public string Path;
+            public bool Objects;
             public bool Bookmarks;
             public bool Greenlines;
             public bool Redlines;
@@ -67,9 +68,10 @@ namespace Mapping_Tools.Views {
             public double BeatsBetween;
             public int Snap1;
             public int Snap2;
-            public Arguments(string path, bool bookmarks, bool greenlines, bool redlines, bool omitBarline, double leniency, double beatsBetween, int snap1, int snap2)
+            public Arguments(string path, bool objects, bool bookmarks, bool greenlines, bool redlines, bool omitBarline, double leniency, double beatsBetween, int snap1, int snap2)
             {
                 Path = path;
+                Objects = objects;
                 Bookmarks = bookmarks;
                 Greenlines = greenlines;
                 Redlines = redlines;
@@ -92,6 +94,11 @@ namespace Mapping_Tools.Views {
 
             // Get all the times to snap
             List<Marker> markers = new List<Marker>();
+            if (arg.Objects) {
+                foreach (HitObject ho in beatmap.HitObjects) {
+                    markers.Add(new Marker(ho.Time));
+                }
+            }
             if (arg.Bookmarks) {
                 foreach (double time in beatmap.GetBookmarks()) {
                     markers.Add(new Marker(time));
@@ -129,7 +136,6 @@ namespace Mapping_Tools.Views {
                 Marker marker = markers[i];
                 double time = marker.Time;
 
-                // Get the redline
                 TimingPoint redline = timing.GetRedlineAtTime(time - 1);
 
                 // Resnap to that redline only
@@ -173,6 +179,12 @@ namespace Mapping_Tools.Views {
                 marker.BeatsFromLastMarker = beatsFromLastMarker;
             }
 
+            // Remove redlines except the first redline
+            if (!arg.Redlines) {
+                var first = timing.TimingPoints.FirstOrDefault(o => o.Inherited);
+                timing.TimingPoints.RemoveAll(o => o.Inherited && o != first);
+            }
+
             // Update progressbar
             if (worker != null && worker.WorkerReportsProgress) {
                 worker.ReportProgress(40);
@@ -182,18 +194,15 @@ namespace Mapping_Tools.Views {
             for (int i = 0; i < markers.Count; i++) {
                 Marker marker = markers[i];
                 double time = marker.Time;
+
+                TimingPoint redline = timing.GetRedlineAtTime(time - 1);
+
                 double beatsFromLastMarker = arg.BeatsBetween != -1 ? arg.BeatsBetween : marker.BeatsFromLastMarker;
 
                 // Skip if 0 beats from last marker
                 if (beatsFromLastMarker == 0) {
                     continue;
                 }
-
-                // Get the redline
-                TimingPoint redline = timing.GetRedlineAtTime(time - 1);
-
-                // Resnap to that redline only
-                double resnappedTime = timing.Resnap(time, arg.Snap1, arg.Snap2, false, redline);
 
                 // Get the times between redline and this time including this time
                 List<Marker> markersBefore = markers.Where(o => o.Time < time && o.Time > redline.Offset).ToList();
@@ -226,9 +235,15 @@ namespace Mapping_Tools.Views {
 
                     // Make new redline
                     TimingPoint newRedline = redline.Copy();
+                    TimingPoint lastHitsounds = timing.GetTimingPointAtTime(lastTime + 5);
                     newRedline.Offset = lastTime;
-                    newRedline.OmitFirstBarLine = arg.OmitBarline; // Set omit of that's the argument
-                    timing.TimingPoints.Insert(timing.TimingPoints.IndexOf(redline) + 1, newRedline);
+                    newRedline.OmitFirstBarLine = arg.OmitBarline; // Set omit to the argument
+                    newRedline.Kiai = lastHitsounds.Kiai;
+                    newRedline.SampleIndex = lastHitsounds.SampleIndex;
+                    newRedline.SampleSet = lastHitsounds.SampleSet;
+                    newRedline.Volume = lastHitsounds.Volume;
+                    timing.TimingPoints.Add(newRedline);
+                    timing.Sort();
 
                     // Set the MpB
                     newRedline.MpB = GetMpB(time - lastTime, beatsFromLastMarker, arg.Leniency);

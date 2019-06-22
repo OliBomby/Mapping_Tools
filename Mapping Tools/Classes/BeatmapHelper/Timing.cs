@@ -21,7 +21,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             TimingPoints = TimingPoints.OrderBy(o => o.Offset).ToList();
         }
 
-        public double GetNearestTimeMeter(double time, TimingPoint tp, int divisor) {
+        public static double GetNearestTimeMeter(double time, TimingPoint tp, int divisor) {
             double d = tp.MpB / divisor;
             double remainder = ( time - tp.Offset ) % d;
             if( remainder < 0.5 * d ) {
@@ -32,7 +32,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
-        public double GetNearestMultiple(double duration, double divisor) {
+        public static double GetNearestMultiple(double duration, double divisor) {
             double remainder = duration % divisor;
 
             if (remainder < 0.5 * divisor) {
@@ -54,7 +54,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
             double newTime = snapDistance3 < snapDistance2 ? newTime3 : newTime2;
 
-            if( afterTP != null && newTime >= afterTP.Offset - 20 ) {
+            if( afterTP != null && newTime >= afterTP.Offset - 10 ) {
                 newTime = afterTP.Offset;
             }
             if (floor) {
@@ -253,7 +253,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             // The value in the greenline will be used as the milliseconds per beat, so for example a 1x SV slider will be 600 bpm.
             // The timeline will work like a redline on 0 offset and 1000 milliseconds per beat
 
-            TimingPoint firstTP = TimingPoints.First();
+            TimingPoint firstTP = TimingPoints.FirstOrDefault();
             if( firstTP.Inherited ) {
                 return new TimingPoint(firstTP.Offset - firstTP.MpB * firstTP.Meter * 10, firstTP.MpB,
                                         firstTP.Meter, firstTP.SampleSet, firstTP.SampleIndex, firstTP.Volume, firstTP.Inherited, false, false);

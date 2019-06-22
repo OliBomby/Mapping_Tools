@@ -271,6 +271,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 }
 
                 last = te;
+                //Console.WriteLine(String.Format("{0},359.842,4,2,1,100,1,0", (int)times.Last(), (last.MicrosecondsPerQuarterNote / 1000f).ToString(CultureInfo.InvariantCulture)));
             }
             return times;
         }
