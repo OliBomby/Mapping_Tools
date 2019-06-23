@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:Mapping_Tools.Views"
              xmlns:cm="clr-namespace:System.ComponentModel;assembly=System"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
              mc:Ignorable="d" Width="900" Height="700">
     <Grid Name="MasterGrid">
         <Grid.ColumnDefinitions>
@@ -34,7 +35,7 @@
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="New offset = Offset " MinWidth="350"/>
                     <TextBlock Text="x "/>
-                    <TextBox x:Name="TPOffsetMultiplierBox" Text="1" MinWidth="120"/>
+                    <TextBox x:Name="TPOffsetMultiplierBox" Text="{Binding Path=TimingpointOffsetMultiplier, Mode=TwoWay, Converter={StaticResource S2DConverter}, ConverterParameter=1}" MinWidth="120"/>
                     <TextBlock Text=" + "/>
                     <TextBox x:Name="TPOffsetOffsetBox" Text="0" MinWidth="120"/>
                 </StackPanel>
@@ -132,6 +133,7 @@
         </Grid>
     </Grid>
     <UserControl.Resources>
+        <domain:StringToDoubleConverter x:Key="S2DConverter"/>
         <cm:BackgroundWorker x:Key="backgroundWorker"
          DoWork="BackgroundWorker_DoWork"
          RunWorkerCompleted="BackgroundWorker_RunWorkerCompleted"

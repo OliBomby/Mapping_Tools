@@ -191,10 +191,12 @@
     <Compile Include="Classes\SystemTools\HitsoundStudio\ProjectManager.cs" />
     <Compile Include="Classes\SystemTools\Settings.cs" />
     <Compile Include="Classes\SystemTools\SettingsManager.cs" />
+    <Compile Include="Classes\SystemTools\TypeConverters.cs" />
     <Compile Include="Classes\Tools\BezierConverter.cs" />
     <Compile Include="Classes\Tools\CircleBezierPreset.cs" />
     <Compile Include="Classes\Tools\MapCleaner.cs" />
     <Compile Include="Components\Domain\ParsableDoubleListValidationRule.cs" />
+    <Compile Include="Components\Domain\StringToDoubleConverter.cs" />
     <Compile Include="Components\TimeLine\TimeLine.xaml.cs">
       <DependentUpon>TimeLine.xaml</DependentUpon>
     </Compile>
@@ -208,6 +210,7 @@
     <Compile Include="Viewmodels\CleanerVM.cs" />
     <Compile Include="Viewmodels\HitsoundStudioVM.cs" />
     <Compile Include="Viewmodels\HitsoundCopierVM.cs" />
+    <Compile Include="Viewmodels\PropertyTransformerVM.cs" />
     <Compile Include="Viewmodels\SnappingToolsVM.cs" />
     <Compile Include="Viewmodels\SliderCompletionatorVM.cs" />
     <Compile Include="Viewmodels\SliderMergerVM.cs" />
