@@ -30,6 +30,24 @@ namespace Mapping_Tools.Views {
             backgroundWorker = (BackgroundWorker)FindResource("backgroundWorker");
         }
 
+        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
+            var bgw = sender as BackgroundWorker;
+        }
+
+        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
+            if (e.Error != null) {
+                MessageBox.Show(e.Error.Message);
+            } else {
+                MessageBox.Show(e.Result.ToString());
+                progress.Value = 0;
+            }
+            start.IsEnabled = true;
+        }
+
+        private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
+            progress.Value = e.ProgressPercentage;
+        }
+
         private void Start_Click(object sender, RoutedEventArgs e) {
             try {
                 // Backup

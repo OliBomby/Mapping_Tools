@@ -51,7 +51,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 if (line.Substring(0, 5) == "Combo") {
                     ComboColours.Add(new Colour(line));
                 } else {
-                    SpecialColours[line.Split(':')[0].Trim()] = new Colour(line);
+                    SpecialColours[SplitKeyValue(line)[0].Trim()] = new Colour(line);
                 }
             }
             foreach (string line in eventsLines) {
@@ -189,9 +189,15 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         private void FillDictionary(Dictionary<string, TValue> dict, string[] lines) {
             foreach (string line in lines) {
-                string[] split = line.Split(':');
+                string[] split = SplitKeyValue(line);
+                Console.WriteLine(split[0]);
+                Console.WriteLine(split[1]);
                 dict[split[0]] = new TValue(split[1]);
             }
+        }
+
+        private string[] SplitKeyValue(string line) {
+            return line.Split(new[] { ':' }, 2);
         }
 
         private string[] GetCategoryLines(List<string> lines, string category) {
