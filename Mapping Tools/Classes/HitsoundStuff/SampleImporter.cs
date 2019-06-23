@@ -307,5 +307,29 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         private static ISampleProvider BufferToSampleProvider(byte[] buffer, uint sampleRate) {
             return new Pcm16BitToSampleProvider(new RawSourceWaveStream(buffer, 0, buffer.Length, new WaveFormat((int)sampleRate, 16, 1)));
         }
+
+        public static ISampleProvider SetChannels(ISampleProvider sampleProvider, int channels) {
+            if (channels == 1) {
+                return MakeMono(sampleProvider);
+            } else {
+                return MakeStereo(sampleProvider);
+            }
+        }
+
+        public static ISampleProvider MakeStereo(ISampleProvider sampleProvider) {
+            if (sampleProvider.WaveFormat.Channels == 1) {
+                return new MonoToStereoSampleProvider(sampleProvider);
+            } else {
+                return sampleProvider;
+            }
+        }
+
+        public static ISampleProvider MakeMono(ISampleProvider sampleProvider) {
+            if (sampleProvider.WaveFormat.Channels == 2) {
+                return new StereoToMonoSampleProvider(sampleProvider);
+            } else {
+                return sampleProvider;
+            }
+        }
     }
 }

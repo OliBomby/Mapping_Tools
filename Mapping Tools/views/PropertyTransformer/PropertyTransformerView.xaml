@@ -131,4 +131,11 @@
             </Grid>
         </Grid>
     </Grid>
+    <UserControl.Resources>
+        <cm:BackgroundWorker x:Key="backgroundWorker"
+         DoWork="BackgroundWorker_DoWork"
+         RunWorkerCompleted="BackgroundWorker_RunWorkerCompleted"
+         WorkerReportsProgress="True"
+         ProgressChanged="BackgroundWorker_ProgressChanged"/>
+    </UserControl.Resources>
 </UserControl>

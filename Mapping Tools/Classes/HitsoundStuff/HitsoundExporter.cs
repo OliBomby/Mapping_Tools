@@ -89,7 +89,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
                     int maxSampleRate = samples.Max(o => o.WaveFormat.SampleRate);
                     int maxChannels = samples.Max(o => o.WaveFormat.Channels);
-                    IEnumerable<ISampleProvider> sameFormatSamples = samples.Select(o => (ISampleProvider)new WdlResamplingSampleProvider(SetChannels(o, maxChannels), maxSampleRate));
+                    IEnumerable<ISampleProvider> sameFormatSamples = samples.Select(o => (ISampleProvider)new WdlResamplingSampleProvider(SampleImporter.SetChannels(o, maxChannels), maxSampleRate));
 
                     var mixer = new MixingSampleProvider(sameFormatSamples);
 
@@ -100,30 +100,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     string filename = ci.Index == 1 ? kvp.Key + ".wav" : kvp.Key + ci.Index + ".wav";
                     CreateWaveFile(Path.Combine(exportFolder, filename), volumed.ToWaveProvider16());
                 }
-            }
-        }
-
-        private static ISampleProvider SetChannels(ISampleProvider sampleProvider, int channels) {
-            if (channels == 1) {
-                return MakeMono(sampleProvider);
-            } else {
-                return MakeStereo(sampleProvider);
-            }
-        }
-
-        private static ISampleProvider MakeStereo(ISampleProvider sampleProvider) {
-            if (sampleProvider.WaveFormat.Channels == 1) {
-                return new MonoToStereoSampleProvider(sampleProvider);
-            } else {
-                return sampleProvider;
-            }
-        }
-
-        private static ISampleProvider MakeMono(ISampleProvider sampleProvider) {
-            if (sampleProvider.WaveFormat.Channels == 2) {
-                return new StereoToMonoSampleProvider(sampleProvider);
-            } else {
-                return sampleProvider;
             }
         }
 

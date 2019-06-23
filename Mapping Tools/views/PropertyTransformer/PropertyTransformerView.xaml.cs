@@ -21,10 +21,13 @@ namespace Mapping_Tools.Views {
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
     public partial class PropertyTransformerView : UserControl {
+        private BackgroundWorker backgroundWorker;
+
         public PropertyTransformerView() {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
+            backgroundWorker = (BackgroundWorker)FindResource("backgroundWorker");
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
