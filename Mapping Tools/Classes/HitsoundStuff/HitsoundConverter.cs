@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NAudio.Wave;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -30,9 +31,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return packages;
         }
 
-        public static List<CustomIndex> GetCustomIndices(List<SamplePackage> packages) {
+        public static List<CustomIndex> GetCustomIndices(List<SamplePackage> packages, Dictionary<SampleGeneratingArgs, ISampleProvider> loadedSamples = null) {
             var indices = packages.Select(o => o.GetCustomIndex()).ToList();
-            indices.ForEach(o => o.CleanInvalids());
+            indices.ForEach(o => o.CleanInvalids(loadedSamples));
             return indices;
         }
 
@@ -125,8 +126,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return supported;
         }
 
-        public static CompleteHitsounds GetCompleteHitsounds(List<SamplePackage> packages) {
-            var customIndices = OptimizeCustomIndices(GetCustomIndices(packages));
+        public static CompleteHitsounds GetCompleteHitsounds(List<SamplePackage> packages, Dictionary<SampleGeneratingArgs, ISampleProvider> loadedSamples = null) {
+            var customIndices = OptimizeCustomIndices(GetCustomIndices(packages, loadedSamples));
             GiveCustomIndicesIndices(customIndices);
 
             var hitsounds = GetHitsounds(packages, customIndices);

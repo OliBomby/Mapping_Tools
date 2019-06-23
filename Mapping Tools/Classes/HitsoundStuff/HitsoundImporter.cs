@@ -174,7 +174,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         string lengthString = Math.Round(length).ToString(CultureInfo.InvariantCulture);
                         string filename = String.Format("{0}\\{1}\\{2}\\{3}\\{4}\\{5}.wav", bank, patch, instrument, key, lengthString, velocity);
 
-                        string instrumentName = patch >= 0 && patch <= 127 ? PatchChangeEvent.GetPatchName(patch) : on.Channel == 10 ? "Percussion" : "Undefined";
+                        string instrumentName = on.Channel == 10 ? "Percussion" : patch >= 0 && patch <= 127 ? PatchChangeEvent.GetPatchName(patch) : "Undefined";
                         string keyName = on.NoteName;
 
                         string name = instrumentName;

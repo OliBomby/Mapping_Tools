@@ -28,26 +28,55 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return ValidateSampleArgs(args.Path);
         }
 
+        public static bool ValidateSampleArgs(SampleGeneratingArgs args, Dictionary<SampleGeneratingArgs, ISampleProvider> loadedSamples) {
+            if (loadedSamples == null)
+                return ValidateSampleArgs(args);
+            return loadedSamples.ContainsKey(args) && loadedSamples[args] != null;
+        }
+
+        public static Dictionary<SampleGeneratingArgs, ISampleProvider> ImportSamples(IEnumerable<SampleGeneratingArgs> argsList) {
+            var samples = new Dictionary<SampleGeneratingArgs, ISampleProvider>();
+            var seperatedByPath = new Dictionary<string, HashSet<SampleGeneratingArgs>>();
+
+            foreach (var args in argsList) {
+                if (seperatedByPath.TryGetValue(args.Path, out HashSet<SampleGeneratingArgs> value)) {
+                    value.Add(args);
+                } else {
+                    seperatedByPath.Add(args.Path, new HashSet<SampleGeneratingArgs>() { args });
+                }
+            }
+
+            foreach (var pair in seperatedByPath) {
+                var path = pair.Key;
+                if (!ValidateSampleArgs(path))
+                    continue;
+                try {
+                    if (Path.GetExtension(path) == ".sf2") {
+                        var sf2 = new SoundFont(path);
+                        foreach (var args in pair.Value) {
+                            var sample = ImportFromSoundFont(args, sf2);
+                            samples.Add(args, sample);
+                        }
+                    } else if (Path.GetExtension(path) == ".ogg") {
+                        foreach (var args in pair.Value) {
+                            samples.Add(args, new VorbisWaveReader(path));
+                        }
+                    } else {
+                        foreach (var args in pair.Value) {
+                            samples.Add(args, new AudioFileReader(path));
+                        }
+                    }
+                } catch (Exception ex) { Console.WriteLine(ex.Message); }
+                GC.Collect();
+            }
+            return samples;
+        }
+
         public static ISampleProvider ImportSample(SampleGeneratingArgs args) {
             string path = args.Path;
             if (Path.GetExtension(path) == ".sf2") {
                 SoundFont sf2 = new SoundFont(path);
-                ISampleProvider wave = null;
-
-                foreach (var preset in sf2.Presets) {
-                    //Console.WriteLine("Preset: " + preset.Name);
-                    //Console.WriteLine("Preset num: " + preset.PatchNumber);
-                    //Console.WriteLine("Preset bank: " + preset.Bank);
-                    if (preset.PatchNumber != args.Patch && args.Patch != -1) {
-                        continue;
-                    }
-                    if (preset.Bank != args.Bank && args.Bank != -1) {
-                        continue;
-                    }
-
-                    wave = ImportPreset(sf2, preset, args);
-                }
-
+                ISampleProvider wave = ImportFromSoundFont(args, sf2);
                 GC.Collect();
                 return wave;
             } else if (Path.GetExtension(path) == ".ogg") {
@@ -55,6 +84,25 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             } else {
                 return new AudioFileReader(path);
             }
+        }
+
+        public static ISampleProvider ImportFromSoundFont(SampleGeneratingArgs args, SoundFont sf2) {
+            ISampleProvider wave = null;
+
+            foreach (var preset in sf2.Presets) {
+                //Console.WriteLine("Preset: " + preset.Name);
+                //Console.WriteLine("Preset num: " + preset.PatchNumber);
+                //Console.WriteLine("Preset bank: " + preset.Bank);
+                if (preset.PatchNumber != args.Patch && args.Patch != -1) {
+                    continue;
+                }
+                if (preset.Bank != args.Bank && args.Bank != -1) {
+                    continue;
+                }
+
+                wave = ImportPreset(sf2, preset, args);
+            }
+            return wave;
         }
 
         private static ISampleProvider ImportPreset(SoundFont sf2, Preset preset, SampleGeneratingArgs args) {
@@ -141,7 +189,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         private static ISampleProvider PitchShift(ISampleProvider sample, int correction) {
             float factor = (float)Math.Pow(2, correction / 12f);
-            SmbPitchShiftingSampleProvider shifter = new SmbPitchShiftingSampleProvider(sample, 512, 4, factor);
+            SmbPitchShiftingSampleProvider shifter = new SmbPitchShiftingSampleProvider(sample, 1024, 4, factor);
             return shifter;
         }
 
@@ -166,17 +214,19 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             // Indices in sf2 are numbers of samples, not byte length. So double them
             int length = (int)(sh.End - sh.Start);
 
-            double lengthInSeconds = (args.Length / 1000) + 0.6;
-            int numberOfSamples = args.Length != -1 ? (int)Math.Ceiling(lengthInSeconds * sh.SampleRate) : length;
+            double lengthInSeconds = args.Length != -1 ? (args.Length / 1000) + 0.4 : length / (double)sh.SampleRate;
+            lengthInSeconds = Math.Min(lengthInSeconds, length / (double)sh.SampleRate);
 
-            int numberOfBytes = Math.Min(numberOfSamples, length) * 2;
+            int numberOfSamples = (int)Math.Ceiling(lengthInSeconds * sh.SampleRate);
+            int numberOfBytes = numberOfSamples * 2;
+
             byte[] buffer = new byte[numberOfBytes];
             Array.Copy(sample, (int)sh.Start * 2, buffer, 0, numberOfBytes);
 
             var output = BufferToSampleProvider(buffer, sh.SampleRate);
 
             output = new DelayFadeOutSampleProvider(output);
-            (output as DelayFadeOutSampleProvider).BeginFadeOut(args.Length, 300);
+            (output as DelayFadeOutSampleProvider).BeginFadeOut((lengthInSeconds - 0.4) * 1000, 300);
 
             return output;
         }
@@ -188,8 +238,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             int loopLength = (int)(sh.EndLoop - sh.StartLoop);
             int loopLengthBytes = loopLength * 2;
 
-            double lengthInSeconds = (args.Length / 1000) + 0.6;
-            int numberOfSamples = args.Length != -1 ? (int)Math.Ceiling(lengthInSeconds * sh.SampleRate) : length;
+            double lengthInSeconds = args.Length != -1 ? (args.Length / 1000) + 0.4 : length / (double)sh.SampleRate + 0.4;
+            int numberOfSamples = (int)Math.Ceiling(lengthInSeconds * sh.SampleRate);
             int numberOfLoopSamples = numberOfSamples - length;
 
             if (numberOfLoopSamples < 0) {
@@ -210,7 +260,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             var output = BufferToSampleProvider(buffer, sh.SampleRate);
 
             output = new DelayFadeOutSampleProvider(output);
-            (output as DelayFadeOutSampleProvider).BeginFadeOut(args.Length, 300);
+            (output as DelayFadeOutSampleProvider).BeginFadeOut((lengthInSeconds - 0.4) * 1000, 300);
 
             return output;
         }
@@ -227,9 +277,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
             int lengthSecondHalf = (int)sh.End - (int)sh.EndLoop;
             int lengthSecondHalfBytes = lengthSecondHalf * 2;
-
-            double lengthInSeconds = args.Length / 1000;
-            int numberOfSamples = args.Length != -1 ? (int)Math.Ceiling(lengthInSeconds * sh.SampleRate) : length;
+            
+            double lengthInSeconds = args.Length != -1 ? (args.Length / 1000) : length / (double)sh.SampleRate;
+            int numberOfSamples = (int)Math.Ceiling(lengthInSeconds * sh.SampleRate);
             numberOfSamples += lengthSecondHalf;
             int numberOfLoopSamples = numberOfSamples - lengthFirstHalf - lengthSecondHalf;
 

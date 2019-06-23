@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NAudio.Wave;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -83,13 +84,14 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return ci;
         }
 
-        public void CleanInvalids() {
+        public void CleanInvalids(Dictionary<SampleGeneratingArgs, ISampleProvider> loadedSamples = null) {
             // Replace all invalid paths with "" and remove the invalid path if another valid path is also in the hashset
             foreach (HashSet<SampleGeneratingArgs> paths in Samples.Values) {
-                if (paths.Any(o => SampleImporter.ValidateSampleArgs(o))) {
-                    paths.RemoveWhere(o => !SampleImporter.ValidateSampleArgs(o));
-                } else if (paths.Count > 0) {
-                    paths.Clear();
+                int initialCount = paths.Count;
+                int removed = paths.RemoveWhere(o => !SampleImporter.ValidateSampleArgs(o, loadedSamples));
+
+                if (paths.Count == 0 && initialCount != 0) {
+                    // All the paths where invalid and it didn't just start out empty
                     paths.Add(new SampleGeneratingArgs());  // This "" is here to prevent this hashset from getting new paths
                 }
             }

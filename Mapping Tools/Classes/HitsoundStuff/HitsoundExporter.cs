@@ -12,12 +12,12 @@ using System.Text.RegularExpressions;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     class HitsoundExporter {
-        public static void ExportCompleteHitsounds(string exportFolder, string baseBeatmap, CompleteHitsounds ch) {
+        public static void ExportCompleteHitsounds(string exportFolder, string baseBeatmap, CompleteHitsounds ch, Dictionary<SampleGeneratingArgs, ISampleProvider> loadedSamples = null) {
             // Export the beatmap with all hitsounds
             ExportHitsounds(ch.Hitsounds, baseBeatmap, exportFolder);
 
             // Export the sample files
-            ExportCustomIndices(ch.CustomIndices, exportFolder);
+            ExportCustomIndices(ch.CustomIndices, exportFolder, loadedSamples);
         }
 
         public static void ExportHitsounds(List<Hitsound> hitsounds, string baseBeatmap, string exportFolder) {
@@ -58,7 +58,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             editor.SaveFile(Path.Combine(exportFolder, beatmap.GetFileName()));
         }
 
-        public static void ExportCustomIndices(List<CustomIndex> customIndices, string exportFolder) {
+        public static void ExportCustomIndices(List<CustomIndex> customIndices, string exportFolder, Dictionary<SampleGeneratingArgs, ISampleProvider> loadedSamples=null) {
             foreach (CustomIndex ci in customIndices) {
                 foreach (KeyValuePair<string, HashSet<SampleGeneratingArgs>> kvp in ci.Samples) {
                     if (kvp.Value.Count == 0) {
@@ -67,11 +67,21 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     var samples = new List<ISampleProvider>();
                     int soundsAdded = 0;
 
-                    foreach (SampleGeneratingArgs generator in kvp.Value) {
-                        try {
-                            samples.Add(SampleImporter.ImportSample(generator));
-                            soundsAdded++;
-                        } catch (Exception) { }
+                    if (loadedSamples != null) {
+                        foreach (SampleGeneratingArgs args in kvp.Value) {
+                            if (SampleImporter.ValidateSampleArgs(args, loadedSamples)) {
+                                samples.Add(loadedSamples[args]);
+                                soundsAdded++;
+                            }
+                        }
+                    } else {
+                        foreach (SampleGeneratingArgs args in kvp.Value) {
+                            try {
+                                samples.Add(SampleImporter.ImportSample(args));
+                                soundsAdded++;
+                            } catch (Exception) { }
+                        }
+
                     }
                     if (soundsAdded == 0) {
                         continue;
