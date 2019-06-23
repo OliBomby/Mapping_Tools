@@ -190,8 +190,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         private void FillDictionary(Dictionary<string, TValue> dict, string[] lines) {
             foreach (string line in lines) {
                 string[] split = SplitKeyValue(line);
-                Console.WriteLine(split[0]);
-                Console.WriteLine(split[1]);
                 dict[split[0]] = new TValue(split[1]);
             }
         }
