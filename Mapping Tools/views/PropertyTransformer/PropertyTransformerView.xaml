@@ -8,20 +8,16 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" Width="900" Height="700">
     <Grid Name="MasterGrid">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="260"/>
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="54"/>
+            <RowDefinition Height="84"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="90"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Grid Name="TitleGrid" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
-            <TextBlock FontSize="40" TextWrapping="NoWrap" FontWeight="Bold" Foreground="#FF5F5E5E" Height="61"><Run Text="Property Transformer"/></TextBlock>
+        <Grid Name="TitleGrid" Grid.Row="0">
+            <TextBlock FontSize="40" TextWrapping="NoWrap" FontWeight="Bold" Foreground="#FF5F5E5E" Height="61" VerticalAlignment="Top"><Run Text="Property Transformer"/></TextBlock>
         </Grid>
-        <Grid Name="FirstGrid" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
-            <StackPanel Margin="0,30,0,0">
+        <Grid Name="FirstGrid" Grid.Row="1">
+            <StackPanel>
                 <StackPanel.Resources>
                     <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
                         <Setter Property="FontSize" Value="24"/>
@@ -82,22 +78,8 @@
                     <TextBlock Text=" + "/>
                     <TextBox x:Name="BookTimeOffsetBox" Text="0" MinWidth="120"/>
                 </StackPanel>
-            </StackPanel>
-        </Grid>
-        <Grid Name="SecoundGrid" Grid.Row="2" Grid.Column="1">
-            <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal">
-                <Button Width="Auto" Height="Auto" x:Name="start" Cursor="Hand" Click="Start_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
-                    <materialDesign:PackIcon Width="90" Height="90" Cursor="Hand" Kind="Play" Foreground="#FFD6D6D6"/>
-                </Button >
-            </StackPanel>
-        </Grid>
-        <Grid Margin="0,0,0,0" Name="ThirdGrid" Grid.Row="1" Grid.Column="0" Grid.RowSpan="2">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="40"/>
-                </Grid.RowDefinitions>
-                <StackPanel Grid.Row="0" Margin="0,0,0,20" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+
+                <StackPanel Margin="0,20,0,0">
                     <CheckBox x:Name="ClipBox" Content="Clip properties" ToolTip="Clips the parameters to stay within bounds. (Volume: 5-100 etc)" IsChecked="False" FontSize="20"/>
                     <CheckBox x:Name="FiltersBox" Content="Enable filters" IsChecked="False" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
                     <StackPanel Visibility="{Binding Path=IsChecked, ElementName=FiltersBox, UpdateSourceTrigger=PropertyChanged,  
@@ -106,28 +88,30 @@
                         <TextBox x:Name="MatchBox" Text="" ToolTip="Parameters must match this value to be changed." MinWidth="120"/>
                         <StackPanel Orientation="Horizontal">
                             <TextBox x:Name="MinBox" Text="" ToolTip="Minimum time in milliseconds of the object for the parameters to be changed." MinWidth="120"/>
-                            <TextBlock Text=" To " Margin="0,0,0,0" FontSize="20"/>
+                            <TextBlock Text=" To " FontSize="20"/>
                             <TextBox x:Name="MaxBox" Text="" ToolTip="Maximum time in milliseconds of the object for the parameters to be changed." MinWidth="120"/>
                         </StackPanel>
                     </StackPanel>
                 </StackPanel>
-                <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid Grid.Column="0" Grid.Row="1">
-                        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" Orientation="Horizontal">
-                            <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Foreground="#FF5F5E5E"/>
-                            <ProgressBar x:Name="loader_progress" Foreground="#FF838383" Background="{x:Null}" BorderBrush="{x:Null}"/>
-                        </StackPanel>
-                    </Grid>
-                    <Grid Grid.Column="1" Grid.Row="1">
-                        <DockPanel>
-                            <ProgressBar x:Name="progress" Margin="5,0,5,0" Height="20" Foreground="#FF838383" Background="{x:Null}" BorderBrush="{x:Null}"/>
-                        </DockPanel>
-                    </Grid>
-                </Grid>
+            </StackPanel>
+            <WrapPanel VerticalAlignment="Bottom" HorizontalAlignment="Right">
+                <Button Width="Auto" Height="Auto" x:Name="start" Cursor="Hand" Click="Start_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
+                    <materialDesign:PackIcon Width="90" Height="90" Cursor="Hand" Kind="Play" Foreground="#FFD6D6D6"/>
+                </Button >
+            </WrapPanel>
+        </Grid>
+        <Grid Name="SecondGrid" Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Foreground="#FF5F5E5E"/>
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <ProgressBar x:Name="progress" Margin="20,0,20,0" Height="20" Foreground="#FF838383" Background="{x:Null}" BorderBrush="{x:Null}"/>
             </Grid>
         </Grid>
     </Grid>

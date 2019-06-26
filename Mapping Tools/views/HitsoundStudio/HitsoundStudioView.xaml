@@ -263,7 +263,7 @@
                 </Button >
             </StackPanel>
         </Grid>
-        <Grid Name="SecoundGrid" Grid.Row="2" Grid.Column="1">
+        <Grid Name="SecondGrid" Grid.Row="2" Grid.Column="1">
             <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal">
                 <Button Width="Auto" Height="Auto" x:Name="startish" Cursor="Hand" Click="Startish_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
                     <materialDesign:PackIcon Width="90" Height="90" Cursor="Hand" Kind="QuestionMark" Foreground="#FFD6D6D6"/>
@@ -273,7 +273,7 @@
                 </Button >
             </StackPanel>
         </Grid>
-        <Grid Margin="0,0,0,0" Name="ThirdGrid" Grid.Row="2" Grid.Column="0">
+        <Grid Name="ThirdGrid" Grid.Row="2" Grid.Column="0">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>

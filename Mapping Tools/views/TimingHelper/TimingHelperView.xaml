@@ -13,12 +13,11 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid Name="FirstGrid" Grid.Row="0" Grid.Column="0" Margin="0,0,0,0">
-            <StackPanel Grid.Row="0" Margin="0,0,10,0">
+            <StackPanel>
                 <TextBlock FontSize="40" TextWrapping="NoWrap" FontWeight="Bold" Foreground="#FF5F5E5E"><Run Text="Timing Helper"/><LineBreak/><Run/></TextBlock>
                 <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="400" TextWrapping="Wrap" Foreground="#FFD6D6D6" Text="Place bookmarks and greenlines on the exact time of sounds and this tool will fix the timing to properly snap those sounds."/>
                 <CheckBox x:Name="ObjectsBox" Content="Cover objects" IsChecked="True" Margin="0,20,0,0"/>
@@ -31,7 +30,7 @@
                 <TextBlock Text="Beats between every marker (leave empty for auto):" Margin="0,10,0,0"/>
                 <TextBox x:Name="TemporalBox" Text="" Width="400" HorizontalAlignment="Left"/>
             </StackPanel>
-            <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Right">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Right">
                 <TextBlock FontSize="40"  TextWrapping="NoWrap" Text="Signatures" FontWeight="Bold" Foreground="#FF5F5E5E"/>
                 <ComboBox FontSize="20" x:Name="Snap1" Cursor="Hand" SelectedIndex="2" Foreground="#FFD6D6D6">
                     <ComboBoxItem Content="1/1" Cursor="Hand"/>
@@ -47,34 +46,25 @@
                     <ComboBoxItem Content="1/12" Cursor="Hand"/>
                 </ComboBox>
             </StackPanel>
-        </Grid>
-        <Grid Name="SecoundGrid" Grid.Row="1" Grid.Column="0">
-            <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+
+            <WrapPanel VerticalAlignment="Bottom" HorizontalAlignment="Right">
                 <Button Width="Auto" Height="Auto" x:Name="start" Cursor="Hand" Click="Start_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
                     <materialDesign:PackIcon Width="100" Height="100" Cursor="Hand" Kind="Play" Foreground="#FFD6D6D6"/>
                 </Button >
-            </StackPanel>
+            </WrapPanel>
         </Grid>
-        <Grid Margin="0,0,0,0" Name="ThirdGrid" Grid.Row="2" Grid.Column="0">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="20"/>
-                </Grid.RowDefinitions>
-                <Grid Grid.Column="0">
-                    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" Orientation="Horizontal">
-                        <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Foreground="#FF5F5E5E"/>
-                        <ProgressBar x:Name="loader_progress" Foreground="#FF838383" Background="{x:Null}" BorderBrush="{x:Null}"/>
-                    </StackPanel>
-                </Grid>
-                <Grid Grid.Column="1">
-                    <DockPanel>
-                        <ProgressBar x:Name="progress" Margin="20,0,20,0" Height="20" Foreground="#FF838383" Background="{x:Null}" BorderBrush="{x:Null}"/>
-                    </DockPanel>
-                </Grid>
+        <Grid Name="SecondGrid" Grid.Row="1" Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Foreground="#FF5F5E5E"/>
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <ProgressBar x:Name="progress" Margin="20,0,20,0" Height="20" Foreground="#FF838383" Background="{x:Null}" BorderBrush="{x:Null}"/>
             </Grid>
         </Grid>
     </Grid>
