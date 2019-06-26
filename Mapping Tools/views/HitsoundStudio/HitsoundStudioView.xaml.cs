@@ -355,7 +355,8 @@ namespace Mapping_Tools.Views {
                 foreach (double d in selectedLayer.Times) {
                     accumulator.Append(d.ToString(CultureInfo.InvariantCulture)).Append(",");
                 }
-                accumulator.Remove(accumulator.Length - 1, 1);
+                if (accumulator.Length > 0)
+                    accumulator.Remove(accumulator.Length - 1, 1);
                 TimesBox.Text = accumulator.ToString();
             } else {
                 TimesBox.Text = "";
@@ -622,7 +623,7 @@ namespace Mapping_Tools.Views {
             if ((sender as TextBox).GetBindingExpression(TextBox.TextProperty).HasValidationError) return;
 
             try {
-                List<double> t = (sender as TextBox).Text.Split(',').Select(o => double.Parse(o)).OrderBy(o => o).ToList();
+                List<double> t = (sender as TextBox).Text.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(o => double.Parse(o)).OrderBy(o => o).ToList();
 
                 foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
                     hitsoundLayer.Times = t;
