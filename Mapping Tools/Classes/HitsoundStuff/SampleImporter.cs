@@ -101,6 +101,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 }
 
                 wave = ImportPreset(sf2, preset, args);
+                if (wave != null)
+                    break;
             }
             return wave;
         }
@@ -226,7 +228,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             var output = BufferToSampleProvider(buffer, sh.SampleRate);
 
             output = new DelayFadeOutSampleProvider(output);
-            (output as DelayFadeOutSampleProvider).BeginFadeOut((lengthInSeconds - 0.4) * 1000, 300);
+            if (lengthInSeconds <= 0.4) {
+                (output as DelayFadeOutSampleProvider).BeginFadeOut((lengthInSeconds * 0.7) * 1000, (lengthInSeconds * 0.2) * 1000);
+            } else {
+                (output as DelayFadeOutSampleProvider).BeginFadeOut((lengthInSeconds - 0.4) * 1000, 300);
+            }
 
             return output;
         }
