@@ -124,7 +124,7 @@ namespace Mapping_Tools.Views {
                 MessageBox.Show(String.Format("Number of sample indices: {0}, Number of samples: {1}, Number of greenlines: {2}", completeHitsounds.CustomIndices.Count, samples, greenlines));
             } 
             else {
-                Dictionary<SampleGeneratingArgs, ISampleProvider> loadedSamples = SampleImporter.ImportSamples(arg.HitsoundLayers.Select(o => o.SampleArgs));
+                var loadedSamples = SampleImporter.ImportSamples(arg.HitsoundLayers.Select(o => o.SampleArgs));
                 UpdateProgressBar(worker, 20);
 
                 // Convert the multiple layers into packages that have the samples from all the layers at one specific time
@@ -379,7 +379,7 @@ namespace Mapping_Tools.Views {
         void HitsoundLayer_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
             try {
                 SampleGeneratingArgs args = selectedLayer.SampleArgs;
-                var mainOutputStream = SampleImporter.ImportSample(args);
+                var mainOutputStream = SampleImporter.ImportSample(args).GetSampleProvider();
 
                 WaveOutEvent player = new WaveOutEvent();
 

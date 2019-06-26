@@ -84,7 +84,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return ci;
         }
 
-        public void CleanInvalids(Dictionary<SampleGeneratingArgs, ISampleProvider> loadedSamples = null) {
+        public void CleanInvalids(Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null) {
             // Replace all invalid paths with "" and remove the invalid path if another valid path is also in the hashset
             foreach (HashSet<SampleGeneratingArgs> paths in Samples.Values) {
                 int initialCount = paths.Count;

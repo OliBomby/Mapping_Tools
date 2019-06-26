@@ -143,6 +143,7 @@
     <Compile Include="Classes\HitsoundStuff\HitsoundLayer.cs" />
     <Compile Include="Classes\HitsoundStuff\Sample.cs" />
     <Compile Include="Classes\HitsoundStuff\SamplePackage.cs" />
+    <Compile Include="Classes\HitsoundStuff\SampleSoundGenerator.cs" />
     <Compile Include="Classes\HitsoundStuff\SF2Extension.cs" />
     <Compile Include="Classes\MathUtil\Extensions.cs" />
     <Compile Include="Classes\MathUtil\BezierCurve.cs" />

@@ -12,7 +12,7 @@ using System.Text.RegularExpressions;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     class HitsoundExporter {
-        public static void ExportCompleteHitsounds(string exportFolder, string baseBeatmap, CompleteHitsounds ch, Dictionary<SampleGeneratingArgs, ISampleProvider> loadedSamples = null) {
+        public static void ExportCompleteHitsounds(string exportFolder, string baseBeatmap, CompleteHitsounds ch, Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null) {
             // Export the beatmap with all hitsounds
             ExportHitsounds(ch.Hitsounds, baseBeatmap, exportFolder);
 
@@ -58,7 +58,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             editor.SaveFile(Path.Combine(exportFolder, beatmap.GetFileName()));
         }
 
-        public static void ExportCustomIndices(List<CustomIndex> customIndices, string exportFolder, Dictionary<SampleGeneratingArgs, ISampleProvider> loadedSamples=null) {
+        public static void ExportCustomIndices(List<CustomIndex> customIndices, string exportFolder, Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples=null) {
             foreach (CustomIndex ci in customIndices) {
                 foreach (KeyValuePair<string, HashSet<SampleGeneratingArgs>> kvp in ci.Samples) {
                     if (kvp.Value.Count == 0) {
@@ -70,14 +70,14 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     if (loadedSamples != null) {
                         foreach (SampleGeneratingArgs args in kvp.Value) {
                             if (SampleImporter.ValidateSampleArgs(args, loadedSamples)) {
-                                samples.Add(loadedSamples[args]);
+                                samples.Add(loadedSamples[args].GetSampleProvider());
                                 soundsAdded++;
                             }
                         }
                     } else {
                         foreach (SampleGeneratingArgs args in kvp.Value) {
                             try {
-                                samples.Add(SampleImporter.ImportSample(args));
+                                samples.Add(SampleImporter.ImportSample(args).GetSampleProvider());
                                 soundsAdded++;
                             } catch (Exception) { }
                         }
