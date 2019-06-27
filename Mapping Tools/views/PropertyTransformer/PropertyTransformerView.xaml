@@ -95,11 +95,11 @@
                     <StackPanel Visibility="{Binding Path=EnableFilters, UpdateSourceTrigger=PropertyChanged,  
                                  Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
                         <TextBox x:Name="MatchBox" Text="{Binding Path=MatchFilter, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=-1}"
-                            ToolTip="Parameters must match this value to be changed." MinWidth="120"/>
+                            ToolTip="Parameters must match this value to be changed." HorizontalAlignment="Left" Width="272"/>
                         <StackPanel Orientation="Horizontal">
                             <TextBox x:Name="MinBox" Text="{Binding Path=MinTimeFilter, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=-1}"
                                 ToolTip="Minimum time in milliseconds of the object for the parameters to be changed." MinWidth="120"/>
-                            <TextBlock Text=" To " FontSize="20"/>
+                            <TextBlock Text=" To " FontSize="20" VerticalAlignment="Center"/>
                             <TextBox x:Name="MaxBox" Text="{Binding Path=MaxTimeFilter, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=-1}"
                                 ToolTip="Maximum time in milliseconds of the object for the parameters to be changed." MinWidth="120"/>
                         </StackPanel>

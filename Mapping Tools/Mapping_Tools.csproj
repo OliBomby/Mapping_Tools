@@ -132,6 +132,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Classes\HitsoundStuff\DelayFadeOutSampleProvider.cs" />
+    <Compile Include="Classes\HitsoundStuff\HitsoundLayerExtension.cs" />
     <Compile Include="Classes\HitsoundStuff\SampleGeneratingArgs.cs" />
     <Compile Include="Classes\HitsoundStuff\SampleImporter.cs" />
     <Compile Include="Classes\HitsoundStuff\CompleteHitsounds.cs" />
