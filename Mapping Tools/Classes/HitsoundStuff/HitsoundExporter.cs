@@ -72,7 +72,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         foreach (SampleGeneratingArgs args in kvp.Value) {
                             if (SampleImporter.ValidateSampleArgs(args, loadedSamples)) {
                                 var sample = loadedSamples[args];
-                                samples.Add(SampleImporter.ImportSample(args).GetSampleProvider());
+                                samples.Add(sample.GetSampleProvider());
                                 volumes.Add(sample.VolumeCorrection != -1 ? sample.VolumeCorrection : 1f);
                                 soundsAdded++;
                             }
