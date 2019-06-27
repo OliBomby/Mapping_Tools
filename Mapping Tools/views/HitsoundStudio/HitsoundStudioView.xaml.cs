@@ -380,11 +380,11 @@ namespace Mapping_Tools.Views {
         void HitsoundLayer_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
             try {
                 SampleGeneratingArgs args = selectedLayer.SampleArgs;
-                var mainOutputStream = SampleImporter.ImportSample(args).GetSampleProvider();
+                var mainOutputStream = SampleImporter.ImportSample(args);
 
                 WaveOutEvent player = new WaveOutEvent();
 
-                player.Init(mainOutputStream);
+                player.Init(mainOutputStream.GetSampleProvider());
                 player.PlaybackStopped += PlayerStopped;
 
                 player.Play();

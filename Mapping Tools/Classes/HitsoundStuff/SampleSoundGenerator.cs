@@ -27,7 +27,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         public ISampleProvider GetSampleProvider() {
             Wave.Position = 0;
-            ISampleProvider output = new Pcm16BitToSampleProvider(Wave);
+            ISampleProvider output = WaveToSampleProvider(Wave);
 
             if (FadeStart != -1 && FadeLength != -1) {
                 output = new DelayFadeOutSampleProvider(output);
@@ -40,6 +40,24 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 output = SampleImporter.VolumeChange(output, VolumeCorrection);
             }
             return output;
+        }
+
+        private static ISampleProvider WaveToSampleProvider(WaveStream wave) {
+            if (wave.WaveFormat.Encoding == WaveFormatEncoding.Pcm) {
+                switch (wave.WaveFormat.BitsPerSample) {
+                    case 8:
+                        return new Pcm8BitToSampleProvider(wave);
+                    case 16:
+                        return new Pcm16BitToSampleProvider(wave);
+                    case 24:
+                        return new Pcm24BitToSampleProvider(wave);
+                    case 32:
+                        return new Pcm32BitToSampleProvider(wave);
+                }
+            } else if (wave.WaveFormat.Encoding == WaveFormatEncoding.IeeeFloat) {
+                return new WaveToSampleProvider(wave);
+            }
+            return null;
         }
     }
 }
