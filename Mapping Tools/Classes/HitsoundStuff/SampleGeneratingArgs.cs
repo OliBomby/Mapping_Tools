@@ -105,6 +105,14 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
+        public override string ToString() {
+            if (System.IO.Path.GetExtension(Path) == ".sf2") {
+                return String.Format("{0} {1},{2},{3},{4},{5},{6}", Path, Bank, Patch, Instrument, Key, Length, Velocity);
+            } else {
+                return Path.ToString();
+            }
+        }
+
         public bool Equals(SampleGeneratingArgs other) {
             // Equality method can ignore bank, patch etc when path is not a soundfont because then those variables have no effect on how a sample gets generated
             if (System.IO.Path.GetExtension(Path) == ".sf2" && System.IO.Path.GetExtension(other.Path) == ".sf2") {
