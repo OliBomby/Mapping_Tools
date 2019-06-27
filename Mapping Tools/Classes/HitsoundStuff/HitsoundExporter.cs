@@ -12,7 +12,7 @@ using System.Text.RegularExpressions;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     class HitsoundExporter {
-        public static void ExportCompleteHitsounds(string exportFolder, string baseBeatmap, CompleteHitsounds ch, Dictionary<SampleGeneratingArgs, ISampleProvider> loadedSamples = null) {
+        public static void ExportCompleteHitsounds(string exportFolder, string baseBeatmap, CompleteHitsounds ch, Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null) {
             // Export the beatmap with all hitsounds
             ExportHitsounds(ch.Hitsounds, baseBeatmap, exportFolder);
 
@@ -58,31 +58,36 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             editor.SaveFile(Path.Combine(exportFolder, beatmap.GetFileName()));
         }
 
-        public static void ExportCustomIndices(List<CustomIndex> customIndices, string exportFolder, Dictionary<SampleGeneratingArgs, ISampleProvider> loadedSamples=null) {
+        public static void ExportCustomIndices(List<CustomIndex> customIndices, string exportFolder, Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples=null) {
             foreach (CustomIndex ci in customIndices) {
                 foreach (KeyValuePair<string, HashSet<SampleGeneratingArgs>> kvp in ci.Samples) {
                     if (kvp.Value.Count == 0) {
                         continue;
                     }
                     var samples = new List<ISampleProvider>();
+                    var volumes = new List<float>();
                     int soundsAdded = 0;
-
+                    
                     if (loadedSamples != null) {
                         foreach (SampleGeneratingArgs args in kvp.Value) {
                             if (SampleImporter.ValidateSampleArgs(args, loadedSamples)) {
-                                samples.Add(loadedSamples[args]);
+                                var sample = loadedSamples[args];
+                                samples.Add(sample.GetSampleProvider());
+                                volumes.Add(sample.VolumeCorrection != -1 ? sample.VolumeCorrection : 1f);
                                 soundsAdded++;
                             }
                         }
                     } else {
                         foreach (SampleGeneratingArgs args in kvp.Value) {
                             try {
-                                samples.Add(SampleImporter.ImportSample(args));
+                                var sample = SampleImporter.ImportSample(args);
+                                samples.Add(sample.GetSampleProvider());
+                                volumes.Add(sample.VolumeCorrection != -1 ? sample.VolumeCorrection : 1f);
                                 soundsAdded++;
                             } catch (Exception) { }
                         }
-
                     }
+
                     if (soundsAdded == 0) {
                         continue;
                     }
@@ -94,7 +99,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     var mixer = new MixingSampleProvider(sameFormatSamples);
 
                     VolumeSampleProvider volumed = new VolumeSampleProvider(mixer) {
-                        Volume = samples.Count > 1 ? 0.8f : 1f
+                        Volume = 1 / (float)Math.Sqrt(soundsAdded * volumes.Average())
                     };
 
                     string filename = ci.Index == 1 ? kvp.Key + ".wav" : kvp.Key + ci.Index + ".wav";

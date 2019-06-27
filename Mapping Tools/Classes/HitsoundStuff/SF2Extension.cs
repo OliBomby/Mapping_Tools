@@ -7,6 +7,70 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return g?.Instrument;
         }
 
+        public static ushort StartAddressOffset(this Zone zone) {
+            var g = SelectByGenerator(zone, GeneratorEnum.StartAddressOffset);
+            return g != null ? g.UInt16Amount : (ushort)0;
+        }
+
+        public static ushort StartAddressCoarseOffset(this Zone zone) {
+            var g = SelectByGenerator(zone, GeneratorEnum.StartAddressCoarseOffset);
+            return g != null ? g.UInt16Amount : (ushort)0;
+        }
+
+        public static int FullStartAddressOffset(this Zone zone) {
+            var g = StartAddressOffset(zone);
+            var gc = StartAddressCoarseOffset(zone);
+            return g + 32768 * gc;
+        }
+
+        public static ushort EndAddressOffset(this Zone zone) {
+            var g = SelectByGenerator(zone, GeneratorEnum.EndAddressOffset);
+            return g != null ? g.UInt16Amount : (ushort)0;
+        }
+
+        public static ushort EndAddressCoarseOffset(this Zone zone) {
+            var g = SelectByGenerator(zone, GeneratorEnum.EndAddressCoarseOffset);
+            return g != null ? g.UInt16Amount : (ushort)0;
+        }
+
+        public static int FullEndAddressOffset(this Zone zone) {
+            var g = EndAddressOffset(zone);
+            var gc = EndAddressCoarseOffset(zone);
+            return g + 32768 * gc;
+        }
+
+        public static ushort StartLoopAddressOffset(this Zone zone) {
+            var g = SelectByGenerator(zone, GeneratorEnum.StartLoopAddressOffset);
+            return g != null ? g.UInt16Amount : (ushort)0;
+        }
+
+        public static ushort StartLoopAddressCoarseOffset(this Zone zone) {
+            var g = SelectByGenerator(zone, GeneratorEnum.StartLoopAddressCoarseOffset);
+            return g != null ? g.UInt16Amount : (ushort)0;
+        }
+
+        public static int FullStartLoopAddressOffset(this Zone zone) {
+            var g = StartLoopAddressOffset(zone);
+            var gc = StartLoopAddressCoarseOffset(zone);
+            return g + 32768 * gc;
+        }
+
+        public static ushort EndLoopAddressOffset(this Zone zone) {
+            var g = SelectByGenerator(zone, GeneratorEnum.EndLoopAddressOffset);
+            return g != null ? g.UInt16Amount : (ushort)0;
+        }
+
+        public static ushort EndLoopAddressCoarseOffset(this Zone zone) {
+            var g = SelectByGenerator(zone, GeneratorEnum.EndLoopAddressCoarseOffset);
+            return g != null ? g.UInt16Amount : (ushort)0;
+        }
+
+        public static int FullEndLoopAddressOffset(this Zone zone) {
+            var g = EndLoopAddressOffset(zone);
+            var gc = EndLoopAddressCoarseOffset(zone);
+            return g + 32768 * gc;
+        }
+
         public static ushort KeyRange(this Zone zone) {
             var g = SelectByGenerator(zone, GeneratorEnum.KeyRange);
             return g != null ? g.UInt16Amount : (ushort)0;

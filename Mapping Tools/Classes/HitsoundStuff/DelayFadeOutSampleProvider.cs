@@ -6,6 +6,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
     /// </summary>
     public class DelayFadeOutSampleProvider : ISampleProvider {
         enum FadeState {
+            Waiting,
             Silence,
             FadingIn,
             FullVolume,
@@ -53,6 +54,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 fadeOutDelaySamples = (int)((fadeAfterMilliseconds * source.WaveFormat.SampleRate) / 1000);
                 fadeOutDelayPosition = 0;
 
+                fadeState = FadeState.Waiting;
                 //fadeState = FadeState.FadingOut;
             }
         }
@@ -68,10 +70,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             int sourceSamplesRead = source.Read(buffer, offset, count);
 
             lock (lockObject) {
-                if (fadeOutDelaySamples > 0) {
+                if (fadeState == FadeState.Waiting) {
                     fadeOutDelayPosition += sourceSamplesRead / WaveFormat.Channels;
                     if (fadeOutDelayPosition >= fadeOutDelaySamples) {
-                        fadeSamplePosition = - sourceSamplesRead + fadeOutDelaySamples - fadeOutDelayPosition;
+                        fadeSamplePosition = fadeOutDelayPosition - sourceSamplesRead - fadeOutDelaySamples;
                         fadeOutDelaySamples = 0;
                         fadeState = FadeState.FadingOut;
                     }

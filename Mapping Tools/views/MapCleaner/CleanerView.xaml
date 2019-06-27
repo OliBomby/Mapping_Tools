@@ -8,61 +8,31 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" Width="759.5">
     <Grid Name="MasterGrid">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Grid Name="FirstGrid" Grid.Row="0" Grid.Column="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
-            <Grid Grid.Row="0" VerticalAlignment="Center">
-                <StackPanel Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Left">
-                    <TextBlock FontSize="40" TextWrapping="NoWrap" Text="General" FontWeight="Bold" Foreground="#FF5F5E5E" />
-                    <CheckBox FontSize="20" x:Name="VolumeSliders" Cursor="Hand" IsChecked="True" Foreground="#FFD6D6D6">
-                        <TextBlock>
-                            Map uses volume changes in sliders
-                        </TextBlock>
-                    </CheckBox>
-                    <CheckBox FontSize="20" Name="SamplesetSliders" Cursor="Hand" IsChecked="True" Foreground="#FFD6D6D6">
-                        <TextBlock>
-                            Map uses sampleset changes in sliders
-                        </TextBlock>
-                    </CheckBox>
-                    <CheckBox FontSize="20" x:Name="VolumeSpinners" Cursor="Hand" IsChecked="True" Foreground="#FFD6D6D6">
-                        <TextBlock>
-                            Map uses volume changes in spinners
-                        </TextBlock>
-                    </CheckBox>
-                </StackPanel>
-                <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Right">
-                    <TextBlock FontSize="40"  TextWrapping="NoWrap" Text="Signatures" FontWeight="Bold" Foreground="#FF5F5E5E"/>
-                    <ComboBox FontSize="20" x:Name="Snap1" Cursor="Hand" SelectedIndex="4" Foreground="#FFD6D6D6">
-                        <ComboBoxItem Content="1/1" Cursor="Hand"/>
-                        <ComboBoxItem Content="1/2" Cursor="Hand"/>
-                        <ComboBoxItem Content="1/4" Cursor="Hand"/>
-                        <ComboBoxItem Content="1/8" Cursor="Hand"/>
-                        <ComboBoxItem Content="1/16" Cursor="Hand"/>
-                    </ComboBox>
-                    <ComboBox FontSize="20" x:Name="Snap2" Cursor="Hand" SelectedIndex="3" Foreground="#FFD6D6D6">
-                        <ComboBoxItem Content="1/1" Cursor="Hand"/>
-                        <ComboBoxItem Content="1/3" Cursor="Hand"/>
-                        <ComboBoxItem Content="1/6" Cursor="Hand"/>
-                        <ComboBoxItem Content="1/12" Cursor="Hand"/>
-                    </ComboBox>
-                </StackPanel>
-            </Grid>
-            <StackPanel Margin="0,20,0,0" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Left">
-                <TextBlock FontSize="40" TextWrapping="NoWrap" Text="Other" FontWeight="Bold" Foreground="#FF5F5E5E"/>
+        <Grid Name="FirstGrid" Grid.Row="0">
+            <StackPanel>
+                <TextBlock FontSize="40" TextWrapping="NoWrap" Text="General" FontWeight="Bold" Foreground="#FF5F5E5E" />
+                <CheckBox FontSize="20" x:Name="VolumeSliders" Cursor="Hand" IsChecked="True" Foreground="#FFD6D6D6">
+                    <TextBlock>
+                        Map uses volume changes in sliders
+                    </TextBlock>
+                </CheckBox>
+                <CheckBox FontSize="20" Name="SamplesetSliders" Cursor="Hand" IsChecked="True" Foreground="#FFD6D6D6">
+                    <TextBlock>
+                        Map uses sampleset changes in sliders
+                    </TextBlock>
+                </CheckBox>
+                <CheckBox FontSize="20" x:Name="VolumeSpinners" Cursor="Hand" IsChecked="True" Foreground="#FFD6D6D6">
+                    <TextBlock>
+                        Map uses volume changes in spinners
+                    </TextBlock>
+                </CheckBox>
+
+                <TextBlock FontSize="40" Margin="0,10,0,0" TextWrapping="NoWrap" Text="Other" FontWeight="Bold" Foreground="#FF5F5E5E"/>
                 <CheckBox FontSize="20" x:Name="ResnapObjects" Cursor="Hand" Foreground="#FFD6D6D6">
                     <TextBlock>
                             Resnap Objects
@@ -84,37 +54,44 @@
                     </TextBlock>
                 </CheckBox>
             </StackPanel>
-        </Grid>
-        <Grid Name="SecoundGrid" Grid.Row="1" Grid.Column="0">
-            <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+                <StackPanel HorizontalAlignment="Right">
+                    <TextBlock FontSize="40"  TextWrapping="NoWrap" Text="Signatures" FontWeight="Bold" Foreground="#FF5F5E5E"/>
+                    <ComboBox FontSize="20" x:Name="Snap1" Cursor="Hand" SelectedIndex="4" Foreground="#FFD6D6D6">
+                        <ComboBoxItem Content="1/1" Cursor="Hand"/>
+                        <ComboBoxItem Content="1/2" Cursor="Hand"/>
+                        <ComboBoxItem Content="1/4" Cursor="Hand"/>
+                        <ComboBoxItem Content="1/8" Cursor="Hand"/>
+                        <ComboBoxItem Content="1/16" Cursor="Hand"/>
+                    </ComboBox>
+                <ComboBox FontSize="20" x:Name="Snap2" Cursor="Hand" SelectedIndex="3" Foreground="#FFD6D6D6">
+                    <ComboBoxItem Content="1/1" Cursor="Hand"/>
+                    <ComboBoxItem Content="1/3" Cursor="Hand"/>
+                    <ComboBoxItem Content="1/6" Cursor="Hand"/>
+                    <ComboBoxItem Content="1/12" Cursor="Hand"/>
+                </ComboBox>
+            </StackPanel>
+            <WrapPanel Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Right">
                 <Button Width="Auto" Height="Auto" x:Name="start" Cursor="Hand" Click="Start_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
                     <materialDesign:PackIcon Width="100" Height="100" Cursor="Hand" Kind="Play" Foreground="#FFD6D6D6"/>
                 </Button >
-            </StackPanel>
+            </WrapPanel>
         </Grid>
-        <Grid Margin="0,0,0,0" Name="ThirdGrid" Grid.Row="2" Grid.Column="0">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="20"/>
-                </Grid.RowDefinitions>
-                <Grid Grid.Column="0">
-                    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" Orientation="Horizontal">
-                        <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Foreground="#FF5F5E5E"/>
-                        <ProgressBar x:Name="loader_progress" Foreground="#FF838383" Background="{x:Null}" BorderBrush="{x:Null}"/>
-                    </StackPanel>
-                </Grid>
-                <Grid Grid.Column="1">
-                    <DockPanel>
-                        <ProgressBar x:Name="progress" Margin="20,0,20,0" Height="20" Foreground="#FF838383" Background="{x:Null}" BorderBrush="{x:Null}"/>
-                    </DockPanel>
-                </Grid>
+        <Grid Name="SecondGrid" Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Foreground="#FF5F5E5E"/>
+                    <ProgressBar x:Name="loader_progress" Foreground="#FF838383" Background="{x:Null}" BorderBrush="{x:Null}"/>
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <ProgressBar x:Name="progress" Margin="20,0,20,0" Height="20" Foreground="#FF838383" Background="{x:Null}" BorderBrush="{x:Null}"/>
             </Grid>
         </Grid>
-        <Grid Name="FourthGrid" Grid.Row="3" Grid.Column="0">
+        <Grid Name="FourthGrid" Grid.Row="2">
             <StackPanel x:Name="tl_host"/>
         </Grid>
     </Grid>

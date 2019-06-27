@@ -15,7 +15,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             List<SamplePackage> packages = new List<SamplePackage>();
             foreach (HitsoundLayer hl in layers) {
                 foreach (double t in hl.Times) {
-                    SamplePackage packageOnTime = packages.Find(o => Math.Abs(o.Time - t) < 10);
+                    SamplePackage packageOnTime = packages.Find(o => Math.Abs(o.Time - t) < 15);
                     if (packageOnTime != null) {
                         packageOnTime.Samples.Add(new Sample(hl));
                     } else {
@@ -31,7 +31,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return packages;
         }
 
-        public static List<CustomIndex> GetCustomIndices(List<SamplePackage> packages, Dictionary<SampleGeneratingArgs, ISampleProvider> loadedSamples = null) {
+        public static List<CustomIndex> GetCustomIndices(List<SamplePackage> packages, Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null) {
             var indices = packages.Select(o => o.GetCustomIndex()).ToList();
             indices.ForEach(o => o.CleanInvalids(loadedSamples));
             return indices;
@@ -126,7 +126,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return supported;
         }
 
-        public static CompleteHitsounds GetCompleteHitsounds(List<SamplePackage> packages, Dictionary<SampleGeneratingArgs, ISampleProvider> loadedSamples = null) {
+        public static CompleteHitsounds GetCompleteHitsounds(List<SamplePackage> packages, Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null) {
             var customIndices = OptimizeCustomIndices(GetCustomIndices(packages, loadedSamples));
             GiveCustomIndicesIndices(customIndices);
 
