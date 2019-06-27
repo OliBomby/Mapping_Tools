@@ -8,6 +8,14 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
              mc:Ignorable="d" Width="900" Height="700">
+    <UserControl.Resources>
+        <domain:DoubleToStringConverter x:Key="D2SConverter"/>
+        <cm:BackgroundWorker x:Key="backgroundWorker"
+         DoWork="BackgroundWorker_DoWork"
+         RunWorkerCompleted="BackgroundWorker_RunWorkerCompleted"
+         WorkerReportsProgress="True"
+         ProgressChanged="BackgroundWorker_ProgressChanged"/>
+    </UserControl.Resources>
     <Grid Name="MasterGrid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -35,53 +43,53 @@
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="New offset = Offset " MinWidth="350"/>
                     <TextBlock Text="x "/>
-                    <TextBox x:Name="TPOffsetMultiplierBox" Text="{Binding Path=TimingpointOffsetMultiplier, Mode=TwoWay, Converter={StaticResource S2DConverter}, ConverterParameter=1}" MinWidth="120"/>
+                    <TextBox x:Name="TPOffsetMultiplierBox" Text="{Binding Path=TimingpointOffsetMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1}" MinWidth="120"/>
                     <TextBlock Text=" + "/>
-                    <TextBox x:Name="TPOffsetOffsetBox" Text="0" MinWidth="120"/>
+                    <TextBox x:Name="TPOffsetOffsetBox" Text="{Binding Path=TimingpointOffsetOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0}" MinWidth="120"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="New BPM = BPM " MinWidth="350"/>
                     <TextBlock Text="x "/>
-                    <TextBox x:Name="TPBPMMultiplierBox" Text="1" MinWidth="120"/>
+                    <TextBox x:Name="TPBPMMultiplierBox" Text="{Binding Path=TimingpointBPMMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1}" MinWidth="120"/>
                     <TextBlock Text=" + "/>
-                    <TextBox x:Name="TPBPMOffsetBox" Text="0" MinWidth="120"/>
+                    <TextBox x:Name="TPBPMOffsetBox" Text="{Binding Path=TimingpointBPMOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0}" MinWidth="120"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="New slider velocity = SV " MinWidth="350"/>
                     <TextBlock Text="x "/>
-                    <TextBox x:Name="TPSVMultiplierBox" Text="1" MinWidth="120"/>
+                    <TextBox x:Name="TPSVMultiplierBox" Text="{Binding Path=TimingpointSVMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1}" MinWidth="120"/>
                     <TextBlock Text=" + "/>
-                    <TextBox x:Name="TPSVOffsetBox" Text="0" MinWidth="120"/>
+                    <TextBox x:Name="TPSVOffsetBox" Text="{Binding Path=TimingpointSVOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0}" MinWidth="120"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="New custom index = Index " MinWidth="350"/>
                     <TextBlock Text="x "/>
-                    <TextBox x:Name="TPIndexMultiplierBox" Text="1" MinWidth="120"/>
+                    <TextBox x:Name="TPIndexMultiplierBox" Text="{Binding Path=TimingpointIndexMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1}" MinWidth="120"/>
                     <TextBlock Text=" + "/>
-                    <TextBox x:Name="TPIndexOffsetBox" Text="0" MinWidth="120"/>
+                    <TextBox x:Name="TPIndexOffsetBox" Text="{Binding Path=TimingpointIndexOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0}" MinWidth="120"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="New volume = Volume " MinWidth="350"/>
                     <TextBlock Text="x "/>
-                    <TextBox x:Name="TPVolumeMultiplierBox" Text="1" MinWidth="120"/>
+                    <TextBox x:Name="TPVolumeMultiplierBox" Text="{Binding Path=TimingpointVolumeMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1}" MinWidth="120"/>
                     <TextBlock Text=" + "/>
-                    <TextBox x:Name="TPVolumeOffsetBox" Text="0" MinWidth="120"/>
+                    <TextBox x:Name="TPVolumeOffsetBox" Text="{Binding Path=TimingpointVolumeOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0}" MinWidth="120"/>
                 </StackPanel>
                 <TextBlock Text=""/>
                 <TextBlock Text="Other:" FontWeight="Bold"/>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="New hitobject time = Time " MinWidth="350"/>
                     <TextBlock Text="x "/>
-                    <TextBox x:Name="HOTimeMultiplierBox" Text="1" MinWidth="120"/>
+                    <TextBox x:Name="HOTimeMultiplierBox" Text="{Binding Path=HitObjectTimeMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1}" MinWidth="120"/>
                     <TextBlock Text=" + "/>
-                    <TextBox x:Name="HOTimeOffsetBox" Text="0" MinWidth="120"/>
+                    <TextBox x:Name="HOTimeOffsetBox" Text="{Binding Path=HitObjectTimeOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0}" MinWidth="120"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="New bookmark time = Time " MinWidth="350"/>
                     <TextBlock Text="x "/>
-                    <TextBox x:Name="BookTimeMultiplierBox" Text="1" MinWidth="120"/>
+                    <TextBox x:Name="BookTimeMultiplierBox" Text="{Binding Path=BookmarkTimeMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1}" MinWidth="120"/>
                     <TextBlock Text=" + "/>
-                    <TextBox x:Name="BookTimeOffsetBox" Text="0" MinWidth="120"/>
+                    <TextBox x:Name="BookTimeOffsetBox" Text="{Binding Path=BookmarkTimeOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0}" MinWidth="120"/>
                 </StackPanel>
             </StackPanel>
         </Grid>
@@ -99,16 +107,20 @@
                     <RowDefinition Height="40"/>
                 </Grid.RowDefinitions>
                 <StackPanel Grid.Row="0" Margin="0,0,0,20" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-                    <CheckBox x:Name="ClipBox" Content="Clip properties" ToolTip="Clips the parameters to stay within bounds. (Volume: 5-100 etc)" IsChecked="False" FontSize="20"/>
-                    <CheckBox x:Name="FiltersBox" Content="Enable filters" IsChecked="False" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
-                    <StackPanel Visibility="{Binding Path=IsChecked, ElementName=FiltersBox, UpdateSourceTrigger=PropertyChanged,  
-                                 Converter={StaticResource BooleanToVisibilityConverter}, 
-                                 FallbackValue=Collapsed}">
-                        <TextBox x:Name="MatchBox" Text="" ToolTip="Parameters must match this value to be changed." MinWidth="120"/>
+                    <CheckBox x:Name="ClipBox" Content="Clip properties" ToolTip="Clips the parameters to stay within bounds. (Volume: 5-100 etc)"
+                        IsChecked="{Binding Path=ClipProperties, Mode=TwoWay}" FontSize="20"/>
+                    <CheckBox x:Name="FiltersBox" Content="Enable filters" IsChecked="{Binding Path=EnableFilters, Mode=TwoWay}"
+                        FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+                    <StackPanel Visibility="{Binding Path=EnableFilters, UpdateSourceTrigger=PropertyChanged,  
+                                 Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
+                        <TextBox x:Name="MatchBox" Text="{Binding Path=MatchFilter, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=-1}"
+                            ToolTip="Parameters must match this value to be changed." MinWidth="120"/>
                         <StackPanel Orientation="Horizontal">
-                            <TextBox x:Name="MinBox" Text="" ToolTip="Minimum time in milliseconds of the object for the parameters to be changed." MinWidth="120"/>
-                            <TextBlock Text=" To " Margin="0,0,0,0" FontSize="20"/>
-                            <TextBox x:Name="MaxBox" Text="" ToolTip="Maximum time in milliseconds of the object for the parameters to be changed." MinWidth="120"/>
+                            <TextBox x:Name="MinBox" Text="{Binding Path=MinTimeFilter, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=-1}"
+                                ToolTip="Minimum time in milliseconds of the object for the parameters to be changed." MinWidth="120"/>
+                            <TextBlock Text=" To " FontSize="20"/>
+                            <TextBox x:Name="MaxBox" Text="{Binding Path=MaxTimeFilter, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=-1}"
+                                ToolTip="Maximum time in milliseconds of the object for the parameters to be changed." MinWidth="120"/>
                         </StackPanel>
                     </StackPanel>
                 </StackPanel>
@@ -132,12 +144,4 @@
             </Grid>
         </Grid>
     </Grid>
-    <UserControl.Resources>
-        <domain:StringToDoubleConverter x:Key="S2DConverter"/>
-        <cm:BackgroundWorker x:Key="backgroundWorker"
-         DoWork="BackgroundWorker_DoWork"
-         RunWorkerCompleted="BackgroundWorker_RunWorkerCompleted"
-         WorkerReportsProgress="True"
-         ProgressChanged="BackgroundWorker_ProgressChanged"/>
-    </UserControl.Resources>
 </UserControl>
