@@ -275,92 +275,26 @@ namespace Mapping_Tools.Views {
         }
 
         private void UpdateEditingField() {
-            if (selectedLayer == null) { return; }
+            if (selectedLayers.Count == 0) { return; }
 
             suppressEvents = true;
 
             // Populate the editing fields
-            if (selectedLayers.TrueForAll(o => o.Name == selectedLayer.Name)) {
-                SelectedNameBox.Text = selectedLayer.Name;
-            } else {
-                SelectedNameBox.Text = "";
-            }
-            if (selectedLayers.TrueForAll(o => o.SampleArgs.Path == selectedLayer.SampleArgs.Path)) {
-                SelectedSamplePathBox.Text = selectedLayer.SampleArgs.Path;
-            } else {
-                SelectedSamplePathBox.Text = "";
-            }
-            if (selectedLayers.TrueForAll(o => o.SampleSet == selectedLayer.SampleSet)) {
-                SelectedSampleSetBox.Text = selectedLayer.SampleSetString;
-            } else {
-                SelectedSampleSetBox.Text = "";
-            }
-            if (selectedLayers.TrueForAll(o => o.Hitsound == selectedLayer.Hitsound)) {
-                SelectedHitsoundBox.Text = selectedLayer.HitsoundString;
-            } else {
-                SelectedHitsoundBox.Text = "";
-            }
-            if (selectedLayers.TrueForAll(o => o.ImportType == selectedLayer.ImportType)) {
-                ImportTypeBox.Text = selectedLayer.ImportType;
-            } else {
-                ImportTypeBox.Text = "";
-            }
-            if (selectedLayers.TrueForAll(o => o.Path == selectedLayer.Path)) {
-                SelectedSourcePathBox.Text = selectedLayer.Path;
-            } else {
-                SelectedSourcePathBox.Text = "";
-            }
-            if (selectedLayers.TrueForAll(o => o.X == selectedLayer.X)) {
-                SelectedXCoordBox.Text = selectedLayer.X.ToString();
-            } else {
-                SelectedXCoordBox.Text = "";
-            }
-            if (selectedLayers.TrueForAll(o => o.Y == selectedLayer.Y)) {
-                SelectedYCoordBox.Text = selectedLayer.Y.ToString();
-            } else {
-                SelectedYCoordBox.Text = "";
-            }
-            if (selectedLayers.TrueForAll(o => o.SampleArgs.Bank == selectedLayer.SampleArgs.Bank)) {
-                SelectedBankBox.Text = selectedLayer.SampleArgs.Bank.ToString();
-            } else {
-                SelectedBankBox.Text = "";
-            }
-            if (selectedLayers.TrueForAll(o => o.SampleArgs.Patch == selectedLayer.SampleArgs.Patch)) {
-                SelectedPatchBox.Text = selectedLayer.SampleArgs.Patch.ToString();
-            } else {
-                SelectedPatchBox.Text = "";
-            }
-            if (selectedLayers.TrueForAll(o => o.SampleArgs.Instrument == selectedLayer.SampleArgs.Instrument)) {
-                SelectedInstrumentBox.Text = selectedLayer.SampleArgs.Instrument.ToString();
-            } else {
-                SelectedInstrumentBox.Text = "";
-            }
-            if (selectedLayers.TrueForAll(o => o.SampleArgs.Key == selectedLayer.SampleArgs.Key)) {
-                SelectedKeyBox.Text = selectedLayer.SampleArgs.Key.ToString();
-            } else {
-                SelectedKeyBox.Text = "";
-            }
-            if (selectedLayers.TrueForAll(o => o.SampleArgs.Length == selectedLayer.SampleArgs.Length)) {
-                SelectedLengthBox.Text = selectedLayer.SampleArgs.Length.ToString();
-            } else {
-                SelectedLengthBox.Text = "";
-            }
-            if (selectedLayers.TrueForAll(o => o.SampleArgs.Velocity == selectedLayer.SampleArgs.Velocity)) {
-                SelectedVelocityBox.Text = selectedLayer.SampleArgs.Velocity.ToString();
-            } else {
-                SelectedVelocityBox.Text = "";
-            }
-            if (selectedLayers.TrueForAll(o => o.Times == selectedLayer.Times)) {
-                var accumulator = new StringBuilder(selectedLayer.Times.Count * 2); // Rough guess for capacity of StringBuilder
-                foreach (double d in selectedLayer.Times) {
-                    accumulator.Append(d.ToString(CultureInfo.InvariantCulture)).Append(",");
-                }
-                if (accumulator.Length > 0)
-                    accumulator.Remove(accumulator.Length - 1, 1);
-                TimesBox.Text = accumulator.ToString();
-            } else {
-                TimesBox.Text = "";
-            }
+            SelectedNameBox.Text = selectedLayers.AllToStringOrDefault(o => o.Name);
+            SelectedSamplePathBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Path);
+            SelectedSampleSetBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleSetString);
+            SelectedHitsoundBox.Text = selectedLayers.AllToStringOrDefault(o => o.HitsoundString);
+            ImportTypeBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportType);
+            SelectedSourcePathBox.Text = selectedLayers.AllToStringOrDefault(o => o.Path);
+            SelectedXCoordBox.Text = selectedLayers.AllToStringOrDefault(o => o.X, CultureInfo.InvariantCulture);
+            SelectedYCoordBox.Text = selectedLayers.AllToStringOrDefault(o => o.Y, CultureInfo.InvariantCulture);
+            SelectedBankBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Bank);
+            SelectedPatchBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Patch);
+            SelectedInstrumentBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Instrument);
+            SelectedKeyBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Key);
+            SelectedLengthBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Length, CultureInfo.InvariantCulture);
+            SelectedVelocityBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Velocity);
+            TimesBox.Text = selectedLayers.AllToStringOrDefault(o => o.Times, HitsoundLayerExtension.DoubleListToStringConverter);
 
             // Update visibility
             if (selectedLayers.Any(o => o.ImportType == "Stack")) {
