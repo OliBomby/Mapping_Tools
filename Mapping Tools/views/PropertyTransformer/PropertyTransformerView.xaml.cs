@@ -1,18 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.SliderPathStuff;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Viewmodels;
@@ -34,11 +27,12 @@ namespace Mapping_Tools.Views {
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
+            e.Result = TransformProperties((PropertyTransformerVM)e.Argument, bgw, e);
         }
 
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
             if (e.Error != null) {
-                MessageBox.Show(e.Error.Message);
+                MessageBox.Show(String.Format("{0}:{1}{2}", e.Error.Message, Environment.NewLine, e.Error.StackTrace), "Error");
             } else {
                 MessageBox.Show(e.Result.ToString());
                 progress.Value = 0;
@@ -50,118 +44,133 @@ namespace Mapping_Tools.Views {
             progress.Value = e.ProgressPercentage;
         }
 
-        private void Start_Click(object sender, RoutedEventArgs e) {
-            try {
-                // Backup
-                string fileToCopy = MainWindow.AppWindow.currentMap.Text;
-                IOHelper.SaveMapBackup(fileToCopy);
+        private bool Filter(double value, double time, bool doMatch, bool doRange, double match, double min, double max) {
+            return (!doMatch || Precision.AlmostEquals(value, match, 0.01)) && (!doRange || (time >= min && time <= max));
+        }
 
-                bool clip = (bool)ClipBox.IsChecked;
-                bool doFilter = (bool)FiltersBox.IsChecked;
-                double match = MatchBox.GetDouble(defaultValue: -1);
-                bool doFilterMatch = match != -1 && doFilter;
-                double min = MinBox.GetDouble(defaultValue: double.MinValue);
-                double max = MaxBox.GetDouble(defaultValue: double.MaxValue);
-                bool doFilterRange = (min != double.NegativeInfinity || max != double.PositiveInfinity) && doFilter;
-
-                double tpom = TPOffsetMultiplierBox.GetDouble(defaultValue: 1);
-                double tpoo = TPOffsetOffsetBox.GetDouble(defaultValue: 0);
-                double tpbpmm = TPBPMMultiplierBox.GetDouble(defaultValue: 1);
-                double tpbpmo = TPBPMOffsetBox.GetDouble(defaultValue: 0);
-                double tpsvm = TPSVMultiplierBox.GetDouble(defaultValue: 1);
-                double tpsvo = TPSVOffsetBox.GetDouble(defaultValue: 0);
-                double tpim = TPIndexMultiplierBox.GetDouble(defaultValue: 1);
-                double tpio = TPIndexOffsetBox.GetDouble(defaultValue: 0);
-                double tpvm = TPVolumeMultiplierBox.GetDouble(defaultValue: 1);
-                double tpvo = TPVolumeOffsetBox.GetDouble(defaultValue: 0);
-                double hotm = HOTimeMultiplierBox.GetDouble(defaultValue: 1);
-                double hoto = HOTimeOffsetBox.GetDouble(defaultValue: 0);
-                double btm = BookTimeMultiplierBox.GetDouble(defaultValue: 1);
-                double bto = BookTimeOffsetBox.GetDouble(defaultValue: 0);
-
-                Editor editor = new Editor(MainWindow.AppWindow.GetCurrentMap());
-                Beatmap beatmap = editor.Beatmap;
-
-                List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
-                foreach (TimingPoint tp in beatmap.BeatmapTiming.TimingPoints) {
-                    // Offset
-                    if (tpom != 1 || tpoo != 0) {
-                        if (!doFilter || ((!doFilterMatch || Precision.AlmostEquals(tp.Offset, match, 0.01)) && (!doFilterRange || (tp.Offset >= min && tp.Offset <= max)))) {
-                            tp.Offset = Math.Round(tp.Offset * tpom + tpoo);
-                        }
-                    }
-
-                    // BPM
-                    if (tpbpmm != 1 || tpbpmo != 0) {
-                        if (tp.Inherited) {
-                            if (!doFilter || ((!doFilterMatch || Precision.AlmostEquals(tp.GetBPM(), match, 0.01)) && (!doFilterRange || (tp.Offset >= min && tp.Offset <= max)))) {
-                                double newBPM = tp.GetBPM() * tpbpmm + tpbpmo;
-                                newBPM = clip ? MathHelper.Clamp(newBPM, 15, 10000) : newBPM;  // Clip the value if specified
-                                tp.MpB = 60000 / newBPM;
-                            }
-                        }
-                    }
-
-                    // Slider Velocity
-                    if (tpsvm != 1 || tpsvo != 0) {
-                        if (!doFilter || ((!doFilterMatch || Precision.AlmostEquals(beatmap.BeatmapTiming.GetSVMultiplierAtTime(tp.Offset), match, 0.01)) && (!doFilterRange || (tp.Offset >= min && tp.Offset <= max)))) {
-                            TimingPoint tpchanger = tp.Copy();
-                            double newSV = beatmap.BeatmapTiming.GetSVMultiplierAtTime(tp.Offset) * tpsvm + tpsvo;
-                            newSV = clip ? MathHelper.Clamp(newSV, 0.1, 10) : newSV;  // Clip the value if specified
-                            tpchanger.MpB = -100 / newSV;
-                            timingPointsChanges.Add(new TimingPointsChange(tpchanger, mpb: true));
-                        }
-                    }
-
-                    // Index
-                    if (tpim != 1 || tpio != 0) {
-                        if (!doFilter || ((!doFilterMatch || Precision.AlmostEquals(tp.SampleIndex, match, 0.01)) && (!doFilterRange || (tp.Offset >= min && tp.Offset <= max)))) {
-                            int newIndex = (int)Math.Round(tp.SampleIndex * tpim + tpio);
-                            tp.SampleIndex = clip ? MathHelper.Clamp(newIndex, 0, 100) : newIndex;
-                        }
-                    }
-
-                    // Volume
-                    if (tpvm != 1 || tpvo != 0) {
-                        if (!doFilter || ((!doFilterMatch || Precision.AlmostEquals(tp.Volume, match, 0.01)) && (!doFilterRange || (tp.Offset >= min && tp.Offset <= max)))) {
-                            int newVolume = (int)Math.Round(tp.Volume * tpvm + tpvo);
-                            tp.Volume = clip ? MathHelper.Clamp(newVolume, 5, 100) : newVolume;
-                        }
-                    }
-                }
-
-                // Hitobject Time
-                if (hotm != 1 || hoto != 0) {
-                    foreach (HitObject ho in beatmap.HitObjects) {
-                        if (!doFilter || ((!doFilterMatch || Precision.AlmostEquals(ho.Time, match, 0.01)) && (!doFilterRange || (ho.Time >= min && ho.Time <= max)))) {
-                            ho.Time = Math.Round(ho.Time * hotm + hoto);
-                        }
-                    }
-                }
-                
-                // Bookmark Time
-                if (btm != 1 || bto != 0) {
-                    List<double> newBookmarks = new List<double>();
-                    List<double> bookmarks = beatmap.GetBookmarks();
-                    foreach (double bookmark in bookmarks) {
-                        if (!doFilter || ((!doFilterMatch || Precision.AlmostEquals(bookmark, match, 0.01)) && (!doFilterRange || (bookmark >= min && bookmark <= max)))) {
-                            newBookmarks.Add(Math.Round(bookmark * btm + bto));
-                        } else {
-                            newBookmarks.Add(bookmark);
-                        }
-                    }
-                    beatmap.SetBookmarks(newBookmarks);
-                }
-
-                TimingPointsChange.ApplyChanges(beatmap.BeatmapTiming, timingPointsChanges);
-
-                // Save the file
-                editor.SaveFile();
-
-                MessageBox.Show("Done!");
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message);
+        private void UpdateProgressBar(BackgroundWorker worker, int progress) {
+            if (worker != null && worker.WorkerReportsProgress) {
+                worker.ReportProgress(progress);
             }
+        }
+
+        private string TransformProperties(PropertyTransformerVM vm, BackgroundWorker worker, DoWorkEventArgs e) {
+            bool doFilterMatch = vm.MatchFilter != -1 && vm.EnableFilters;
+            bool doFilterRange = (vm.MinTimeFilter != -1 || vm.MaxTimeFilter != -1) && vm.EnableFilters;
+            double min = vm.MinTimeFilter == -1 ? double.NegativeInfinity : vm.MinTimeFilter;
+            double max = vm.MaxTimeFilter == -1 ? double.PositiveInfinity : vm.MaxTimeFilter;
+
+            Editor editor = new Editor(vm.MapPath);
+            Beatmap beatmap = editor.Beatmap;
+
+            // Count all the total amount of things to loop through
+            int loops = 0;
+            int totalLoops = beatmap.BeatmapTiming.TimingPoints.Count;
+            if (vm.HitObjectTimeMultiplier != 1 || vm.HitObjectTimeOffset != 0)
+                totalLoops += beatmap.HitObjects.Count;
+            if (vm.BookmarkTimeMultiplier != 1 || vm.BookmarkTimeOffset != 0)
+                totalLoops += beatmap.GetBookmarks().Count;
+
+            List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
+            foreach (TimingPoint tp in beatmap.BeatmapTiming.TimingPoints) {
+                // Offset
+                if (vm.TimingpointOffsetMultiplier != 1 || vm.TimingpointOffsetOffset != 0) {
+                    if (Filter(tp.Offset, tp.Offset, doFilterMatch, doFilterRange, vm.MatchFilter, min, max)) {
+                        tp.Offset = Math.Round(tp.Offset * vm.TimingpointOffsetMultiplier + vm.TimingpointOffsetOffset);
+                    }
+                }
+
+                // BPM
+                if (vm.TimingpointBPMMultiplier != 1 || vm.TimingpointBPMOffset != 0) {
+                    if (tp.Inherited) {
+                        if (Filter(tp.GetBPM(), tp.Offset, doFilterMatch, doFilterRange, vm.MatchFilter, min, max)) {
+                            double newBPM = tp.GetBPM() * vm.TimingpointBPMMultiplier + vm.TimingpointBPMOffset;
+                            newBPM = vm.ClipProperties ? MathHelper.Clamp(newBPM, 15, 10000) : newBPM;  // Clip the value if specified
+                            tp.MpB = 60000 / newBPM;
+                        }
+                    }
+                }
+
+                // Slider Velocity
+                if (vm.TimingpointSVMultiplier != 1 || vm.TimingpointSVOffset != 0) {
+                    if (Filter(beatmap.BeatmapTiming.GetSVMultiplierAtTime(tp.Offset), tp.Offset, doFilterMatch, doFilterRange, vm.MatchFilter, min, max)) {
+                        TimingPoint tpchanger = tp.Copy();
+                        double newSV = beatmap.BeatmapTiming.GetSVMultiplierAtTime(tp.Offset) * vm.TimingpointSVMultiplier + vm.TimingpointSVOffset;
+                        newSV = vm.ClipProperties ? MathHelper.Clamp(newSV, 0.1, 10) : newSV;  // Clip the value if specified
+                        tpchanger.MpB = -100 / newSV;
+                        timingPointsChanges.Add(new TimingPointsChange(tpchanger, mpb: true));
+                    }
+                }
+
+                // Index
+                if (vm.TimingpointIndexMultiplier != 1 || vm.TimingpointIndexOffset != 0) {
+                    if (Filter(tp.SampleIndex, tp.Offset, doFilterMatch, doFilterRange, vm.MatchFilter, min, max)) {
+                        int newIndex = (int)Math.Round(tp.SampleIndex * vm.TimingpointIndexMultiplier + vm.TimingpointIndexOffset);
+                        tp.SampleIndex = vm.ClipProperties ? MathHelper.Clamp(newIndex, 0, 100) : newIndex;
+                    }
+                }
+
+                // Volume
+                if (vm.TimingpointVolumeMultiplier != 1 || vm.TimingpointVolumeOffset != 0) {
+                    if (Filter(tp.Volume, tp.Offset, doFilterMatch, doFilterRange, vm.MatchFilter, min, max)) {
+                        int newVolume = (int)Math.Round(tp.Volume * vm.TimingpointVolumeMultiplier + vm.TimingpointVolumeOffset);
+                        tp.Volume = vm.ClipProperties ? MathHelper.Clamp(newVolume, 5, 100) : newVolume;
+                    }
+                }
+
+                // Update progress bar
+                loops++;
+                UpdateProgressBar(worker, loops * 100 / totalLoops);
+            }
+
+            // Hitobject Time
+            if (vm.HitObjectTimeMultiplier != 1 || vm.HitObjectTimeOffset != 0) {
+                foreach (HitObject ho in beatmap.HitObjects) {
+                    if (Filter(ho.Time, ho.Time, doFilterMatch, doFilterRange, vm.MatchFilter, min, max)) {
+                        ho.Time = Math.Round(ho.Time * vm.HitObjectTimeMultiplier + vm.HitObjectTimeOffset);
+                    }
+
+                    // Update progress bar
+                    loops++;
+                    UpdateProgressBar(worker, loops * 100 / totalLoops);
+                }
+            }
+
+            // Bookmark Time
+            if (vm.BookmarkTimeMultiplier != 1 || vm.BookmarkTimeOffset != 0) {
+                List<double> newBookmarks = new List<double>();
+                List<double> bookmarks = beatmap.GetBookmarks();
+                foreach (double bookmark in bookmarks) {
+                    if (Filter(bookmark, bookmark, doFilterMatch, doFilterRange, vm.MatchFilter, min, max)) {
+                        newBookmarks.Add(Math.Round(bookmark * vm.BookmarkTimeMultiplier + vm.BookmarkTimeOffset));
+                    } else {
+                        newBookmarks.Add(bookmark);
+                    }
+
+                    // Update progress bar
+                    loops++;
+                    UpdateProgressBar(worker, loops * 100 / totalLoops);
+                }
+                beatmap.SetBookmarks(newBookmarks);
+            }
+
+            TimingPointsChange.ApplyChanges(beatmap.BeatmapTiming, timingPointsChanges);
+
+            // Save the file
+            editor.SaveFile();
+
+            return "Done!";
+        }
+
+        private void Start_Click(object sender, RoutedEventArgs e) {
+            // Backup
+            string fileToCopy = MainWindow.AppWindow.currentMap.Text;
+            IOHelper.SaveMapBackup(fileToCopy);
+
+            ((PropertyTransformerVM)DataContext).MapPath = fileToCopy;
+            backgroundWorker.RunWorkerAsync(DataContext);
+
+            start.IsEnabled = false;
         }
     }
 }

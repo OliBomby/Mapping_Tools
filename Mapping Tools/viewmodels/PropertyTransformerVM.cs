@@ -212,6 +212,8 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
+        public string MapPath;
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public void NotifyPropertyChanged(string propName) {
