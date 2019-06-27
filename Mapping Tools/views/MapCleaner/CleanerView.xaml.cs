@@ -74,8 +74,7 @@ namespace Mapping_Tools.Views {
 
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
             if( e.Error != null ) {
-                MessageBox.Show(e.Error.Message);
-                Console.WriteLine(e.Error.StackTrace);
+                MessageBox.Show(String.Format("{0}:{1}{2}", e.Error.Message, Environment.NewLine, e.Error.StackTrace), "Error");
             }
             else {
                 FillTimeLine();

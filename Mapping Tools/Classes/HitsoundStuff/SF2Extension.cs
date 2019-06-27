@@ -7,6 +7,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return g?.Instrument;
         }
 
+        public static ushort StartAddressOffset(this Zone zone) {
+            var g = SelectByGenerator(zone, GeneratorEnum.StartAddressOffset);
+            return g != null ? g.UInt16Amount : (ushort)0;
+        }
+
         public static ushort KeyRange(this Zone zone) {
             var g = SelectByGenerator(zone, GeneratorEnum.KeyRange);
             return g != null ? g.UInt16Amount : (ushort)0;
