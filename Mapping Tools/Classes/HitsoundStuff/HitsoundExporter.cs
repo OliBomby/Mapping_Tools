@@ -65,24 +65,29 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         continue;
                     }
                     var samples = new List<ISampleProvider>();
+                    var volumes = new List<float>();
                     int soundsAdded = 0;
-
+                    
                     if (loadedSamples != null) {
                         foreach (SampleGeneratingArgs args in kvp.Value) {
                             if (SampleImporter.ValidateSampleArgs(args, loadedSamples)) {
-                                samples.Add(loadedSamples[args].GetSampleProvider());
+                                var sample = loadedSamples[args];
+                                samples.Add(SampleImporter.ImportSample(args).GetSampleProvider());
+                                volumes.Add(sample.VolumeCorrection != -1 ? sample.VolumeCorrection : 1f);
                                 soundsAdded++;
                             }
                         }
                     } else {
                         foreach (SampleGeneratingArgs args in kvp.Value) {
                             try {
-                                samples.Add(SampleImporter.ImportSample(args).GetSampleProvider());
+                                var sample = SampleImporter.ImportSample(args);
+                                samples.Add(sample.GetSampleProvider());
+                                volumes.Add(sample.VolumeCorrection != -1 ? sample.VolumeCorrection : 1f);
                                 soundsAdded++;
                             } catch (Exception) { }
                         }
-
                     }
+
                     if (soundsAdded == 0) {
                         continue;
                     }
@@ -94,7 +99,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     var mixer = new MixingSampleProvider(sameFormatSamples);
 
                     VolumeSampleProvider volumed = new VolumeSampleProvider(mixer) {
-                        Volume = samples.Count > 1 ? 0.8f : 1f
+                        Volume = 1 / (float)Math.Sqrt(soundsAdded * volumes.Average())
                     };
 
                     string filename = ci.Index == 1 ? kvp.Key + ".wav" : kvp.Key + ci.Index + ".wav";
