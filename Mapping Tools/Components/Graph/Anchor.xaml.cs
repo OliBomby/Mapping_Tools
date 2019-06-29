@@ -20,6 +20,10 @@ namespace Mapping_Tools.Components.Graph {
     /// </summary>
     public partial class Anchor : UserControl {
         public bool Dragging;
+        public bool MovableX { get; set; }
+        public bool MovableY { get; set; }
+        public bool Editable { get; set; }
+        public bool ClipBounds { get; set; }
 
         private bool red;
         public bool Red { get => GetRed(); set => SetRed(value); }
@@ -41,11 +45,38 @@ namespace Mapping_Tools.Components.Graph {
         public Anchor(Graph parent) {
             InitializeComponent();
             ParentGraph = parent;
+            Width = 10;
+            Height = 10;
+            Dragging = false;
+            MovableX = true;
+            MovableY = true;
+            Editable = true;
+            ClipBounds = false;
             UpdateColour();
         }
 
         public Point GetPosition() {
             return new Point(Canvas.GetLeft(this) + Width / 2, Canvas.GetTop(this) + Height / 2);
+        }
+
+        public void SetPosition(Point pos) {
+            double left = pos.X;
+            double top = pos.Y;
+
+            if (ClipBounds) {
+                left = MathHelper.Clamp(left, 0, ParentGraph.ActualWidth);
+                top = MathHelper.Clamp(top, 0, ParentGraph.ActualHeight);
+            }
+
+            left -= Width / 2;
+            top -= Height / 2;
+
+            if (MovableX)
+                Canvas.SetLeft(this, left);
+            if (MovableY)
+                Canvas.SetTop(this, top);
+
+            Changed?.Invoke(this, e);
         }
 
         public Vector2 GetVector() {
@@ -62,7 +93,7 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private void ThisLeftMouseDown(object sender, MouseButtonEventArgs e) {
-            if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)) {
+            if ((Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)) && Editable) {
                 Red = true;
             }
             Dragging = true;
@@ -71,6 +102,11 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private void ThisMouseRightButtonDown(object sender, MouseButtonEventArgs e) {
+            if (!Editable) {
+                e.Handled = true;
+                return;
+            }
+
             if (Red) {
                 Red = false;
                 return;
@@ -93,16 +129,13 @@ namespace Mapping_Tools.Components.Graph {
                 var mousePos = e.GetPosition(ParentGraph);
 
                 // Center the object on the mouse
-                double left = MathHelper.Clamp(mousePos.X - Width / 2, 0, ParentGraph.ActualWidth - Width);
-                double top = MathHelper.Clamp(mousePos.Y - Height / 2, 0, ParentGraph.ActualHeight - Height);
-                Canvas.SetLeft(this, left);
-                Canvas.SetTop(this, top);
+                SetPosition(mousePos);
 
                 // Look for red anchors
-                if (!Red) {
-                    int i = ParentGraph.anchors.IndexOf(this);
-                    bool nextOverlap = i + 1 < ParentGraph.anchors.Count - 1 && i + 1 >= 0 && ParentGraph.anchors[i + 1].GetVector() == GetVector() && !ParentGraph.anchors[i + 1].Red;
-                    bool prevOverlap = i - 1 < ParentGraph.anchors.Count - 1 && i - 1 >= 0 && ParentGraph.anchors[i - 1].GetVector() == GetVector() && !ParentGraph.anchors[i - 1].Red;
+                if (!Red && Editable) {
+                    int i = ParentGraph.Anchors.IndexOf(this);
+                    bool nextOverlap = i + 1 < ParentGraph.Anchors.Count - 1 && i + 1 >= 0 && ParentGraph.Anchors[i + 1].GetVector() == GetVector() && !ParentGraph.Anchors[i + 1].Red;
+                    bool prevOverlap = i - 1 < ParentGraph.Anchors.Count - 1 && i - 1 >= 0 && ParentGraph.Anchors[i - 1].GetVector() == GetVector() && !ParentGraph.Anchors[i - 1].Red;
                     if (prevOverlap) {
                         Red = true;
                         ParentGraph.RemoveAnchor(i - 1);

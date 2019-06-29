@@ -24,9 +24,18 @@ namespace Mapping_Tools.Views {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
-            backgroundWorker = (BackgroundWorker) FindResource("backgroundWorker") ;
+            backgroundWorker = (BackgroundWorker) FindResource("backgroundWorker");
 
-            graph_host.Children.Add(new Graph() { Width = 300, Height = 300 });
+            var firstAnchor = new Anchor(graph) { Editable = false};
+            firstAnchor.SetPosition(new Point(0, 300));
+            firstAnchor.MovableX = false;
+            firstAnchor.ClipBounds = true;
+            var lastAnchor = new Anchor(graph) { Editable = false};
+            lastAnchor.SetPosition(new Point(300, 0));
+            lastAnchor.MovableX = false;
+            lastAnchor.ClipBounds = true;
+            graph.AddAnchor(firstAnchor);
+            graph.AddAnchor(lastAnchor);
         }
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {

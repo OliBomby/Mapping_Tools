@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:Mapping_Tools.Views"
              xmlns:cm="clr-namespace:System.ComponentModel;assembly=System"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:graph="clr-namespace:Mapping_Tools.Components.Graph"
              mc:Ignorable="d" 
              d:DesignHeight="450" Width="759.5">
     <Grid Name="MasterGrid">
@@ -28,7 +29,7 @@
             </StackPanel>
         </Grid>
         <Grid Name="fuckGrid" Grid.Row="1" Grid.Column="0">
-            <WrapPanel x:Name="graph_host"/>
+            <graph:Graph x:Name="graph" Width="300" Height="300"/>
         </Grid>
         <Grid Name="SecoundGrid" Grid.Row="1" Grid.Column="0">
             <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Right">

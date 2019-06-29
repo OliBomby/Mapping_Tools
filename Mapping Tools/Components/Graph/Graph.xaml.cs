@@ -20,50 +20,50 @@ namespace Mapping_Tools.Components.Graph {
     /// Interaction logic for UserControl1.xaml
     /// </summary>
     public partial class Graph : UserControl {
-        public List<Anchor> anchors;
+        public List<Anchor> Anchors;
+        public double XMin { get; set; }
+        public double YMin { get; set; }
+        public double XMax { get; set; }
+        public double YMax { get; set; }
+
 
         public Graph() {
             InitializeComponent();
-            anchors = new List<Anchor>();
+            Anchors = new List<Anchor>();
+            XMin = 0;
+            YMin = 0;
+            XMax = 1;
+            YMax = 1;
         }
 
         public void RemoveAnchor(Anchor anchor) {
             mainCanvas.Children.Remove(anchor);
-            anchors.Remove(anchor);
+            Anchors.Remove(anchor);
             AnchorsUpdated(this, null);
         }
 
         public void RemoveAnchor(int index) {
-            RemoveAnchor(anchors[index]);
+            RemoveAnchor(Anchors[index]);
         }
 
         private void ThisMouseLeftButtonDown(object sender, MouseButtonEventArgs e) {
             if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)) {
                 // Create an anchor right on the cursor
-                Anchor anchor = new Anchor(this) {
-                    Width = 10,
-                    Height = 10,
-                    Dragging = true
-                };
-                anchor.CaptureMouse();
-                anchor.Changed += AnchorsUpdated;
+                Anchor anchor = new Anchor(this);
 
                 // Get the position of the mouse relative to the Canvas
                 Point mousePos = e.GetPosition(mainCanvas);
 
                 // Center the object on the mouse
-                double left = MathHelper.Clamp(mousePos.X - anchor.Width / 2, 0, mainCanvas.ActualWidth - anchor.Width);
-                double top = MathHelper.Clamp(mousePos.Y - anchor.Height / 2, 0, mainCanvas.ActualHeight - anchor.Height);
-                Canvas.SetLeft(anchor, left);
-                Canvas.SetTop(anchor, top);
+                anchor.SetPosition(mousePos);
 
                 // Find the correct index to insert this anchor
-                int index = anchors.Count;
+                int index = Anchors.Count;
                 if (index >= 2) {
                     // Find the nearest line segment
                     double nearest = double.PositiveInfinity;
-                    for (int i = 0; i < anchors.Count - 1; i++) {
-                        Classes.MathUtil.LineSegment line = new Classes.MathUtil.LineSegment(anchors[i].GetVector(), anchors[i + 1].GetVector());
+                    for (int i = 0; i < Anchors.Count - 1; i++) {
+                        Classes.MathUtil.LineSegment line = new Classes.MathUtil.LineSegment(Anchors[i].GetVector(), Anchors[i + 1].GetVector());
                         double dist = Classes.MathUtil.LineSegment.Distance(line, new Vector2(mousePos));
 
                         if (dist < nearest) {
@@ -73,20 +73,19 @@ namespace Mapping_Tools.Components.Graph {
                     }
                 }
 
-                mainCanvas.Children.Insert(index + 2, anchor);  // + 1 because there is already a PolyLine object in the canvas that has to stay at index 0
-                anchors.Insert(index, anchor);
+                AddAnchor(anchor, index);
             }
             e.Handled = true;
         }
 
-        private void AnchorsUpdated(object sender, EventArgs e) {
-            PointCollection pointCollection = new PointCollection(anchors.Count);
-            foreach (Anchor a in anchors) {
+        private void AnchorsUpdated(object sender=null, EventArgs e=null) {
+            PointCollection pointCollection = new PointCollection(Anchors.Count);
+            foreach (Anchor a in Anchors) {
                 pointCollection.Add(a.GetPosition());
             }
             line.Points = pointCollection;
 
-            SliderPath path = new SliderPath(PathType.PerfectCurve, GetAnchorVectors().ToArray());
+            SliderPath path = new SliderPath(PathType.Bezier, GetAnchorVectorsCanvas().ToArray());
             List<Vector2> calculatedPath = new List<Vector2>();
             path.GetPathToProgress(calculatedPath, 0, 1);
 
@@ -102,15 +101,46 @@ namespace Mapping_Tools.Components.Graph {
             return d.Length;
         }
 
-        private List<Vector2> GetAnchorVectors() {
-            List<Vector2> convertedAnchors = new List<Vector2>(anchors.Count * 2);
-            foreach (Anchor a in anchors) {
+        private List<Vector2> GetAnchorVectorsCanvas() {
+            List<Vector2> convertedAnchors = new List<Vector2>(Anchors.Count * 2);
+            foreach (Anchor a in Anchors) {
                 convertedAnchors.Add(a.GetVector());
                 if (a.Red) {  // Red anchors count double
                     convertedAnchors.Add(a.GetVector());
                 }
             }
             return convertedAnchors;
+        }
+
+        public List<Vector2> GetAnchorVectors() {
+            List<Vector2> convertedAnchors = new List<Vector2>(Anchors.Count * 2);
+            foreach (Anchor a in Anchors) {
+                var v = a.GetVector();
+                v.X = v.X / mainCanvas.ActualWidth * XMax + XMin;
+                v.Y = (1 - v.Y / mainCanvas.ActualHeight) * YMax + XMin;
+
+                convertedAnchors.Add(v);
+                if (a.Red) {  // Red anchors count double
+                    convertedAnchors.Add(v);
+                }
+            }
+            return convertedAnchors;
+        }
+
+        public List<Vector2> GetGraph() {
+            SliderPath path = new SliderPath(PathType.Bezier, GetAnchorVectors().ToArray());
+            List<Vector2> calculatedPath = new List<Vector2>();
+            path.GetPathToProgress(calculatedPath, 0, 1);
+            return calculatedPath;
+        }
+
+        public void AddAnchor(Anchor anchor, int? index=null) {
+            int insertIndex = index ?? Anchors.Count;
+
+            anchor.Changed += AnchorsUpdated;
+            mainCanvas.Children.Insert(insertIndex + 2, anchor);  // + 1 because there is already a PolyLine object in the canvas that has to stay at index 0
+            Anchors.Insert(insertIndex, anchor);
+            AnchorsUpdated();
         }
     }
 }
