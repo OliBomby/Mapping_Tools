@@ -17,6 +17,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public Dictionary<string, Colour> SpecialColours { get; set; }
         public Timing BeatmapTiming { get; set; }
         public List<string> Events { get; set; }
+        public List<string> BackgroundAndVideoEvents { get; set; }
+        public List<string> BreakPeriods { get; set; }
+        public List<string> StoryboardLayer0 { get; set; }
+        public List<string> StoryboardLayer1 { get; set; }
+        public List<string> StoryboardLayer2 { get; set; }
+        public List<string> StoryboardLayer3 { get; set; }
+        public List<StoryboardSoundSample> StoryboardSoundSamples { get; set; }
         public List<HitObject> HitObjects { get; set; }
         public List<double> Bookmarks { get => GetBookmarks(); set => SetBookmarks(value); }
 
@@ -30,6 +37,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             List<string> metadataLines = GetCategoryLines(lines, "[Metadata]");
             List<string> difficultyLines = GetCategoryLines(lines, "[Difficulty]");
             List<string> eventsLines = GetCategoryLines(lines, "[Events]");
+            List<string> BackgroundAndVideoEventsLines = GetCategoryLines(lines, "//Background and Video events", new[] { "[", "//" });
+            List<string> BreakPeriodsLines = GetCategoryLines(lines, "//Break Periods", new[] { "[", "//" });
+            List<string> StoryboardLayer0Lines = GetCategoryLines(lines, "//Storyboard Layer 0 (Background)", new[] { "[", "//" });
+            List<string> StoryboardLayer1Lines = GetCategoryLines(lines, "//Storyboard Layer 1 (Fail)", new[] { "[", "//" });
+            List<string> StoryboardLayer2Lines = GetCategoryLines(lines, "//Storyboard Layer 2 (Pass)", new[] { "[", "//" });
+            List<string> StoryboardLayer3Lines = GetCategoryLines(lines, "//Storyboard Layer 3 (Foreground)", new[] { "[", "//" });
+            List<string> StoryboardSoundSamplesLines = GetCategoryLines(lines, "//Storyboard Sound Samples", new[] { "[", "//" });
             List<string> colourLines = GetCategoryLines(lines, "[Colours]");
             List<string> hitobjectLines = GetCategoryLines(lines, "[HitObjects]");
 
@@ -40,6 +54,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             ComboColours = new List<Colour>();
             SpecialColours = new Dictionary<string, Colour>();
             Events = new List<string>();
+            BackgroundAndVideoEvents = new List<string>();
+            BreakPeriods = new List<string>();
+            StoryboardLayer0 = new List<string>();
+            StoryboardLayer1 = new List<string>();
+            StoryboardLayer2 = new List<string>();
+            StoryboardLayer3 = new List<string>();
+            StoryboardSoundSamples = new List<StoryboardSoundSample>();
             HitObjects = new List<HitObject>();
 
             FillDictionary(General, generalLines);
@@ -56,6 +77,27 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
             foreach (string line in eventsLines) {
                 Events.Add(line);
+            }
+            foreach (string line in BackgroundAndVideoEventsLines) {
+                BackgroundAndVideoEvents.Add(line);
+            }
+            foreach (string line in BreakPeriodsLines) {
+                BreakPeriods.Add(line);
+            }
+            foreach (string line in StoryboardLayer0Lines) {
+                StoryboardLayer0.Add(line);
+            }
+            foreach (string line in StoryboardLayer1Lines) {
+                StoryboardLayer1.Add(line);
+            }
+            foreach (string line in StoryboardLayer2Lines) {
+                StoryboardLayer2.Add(line);
+            }
+            foreach (string line in StoryboardLayer3Lines) {
+                StoryboardLayer3.Add(line);
+            }
+            foreach (string line in StoryboardSoundSamplesLines) {
+                StoryboardSoundSamples.Add(new StoryboardSoundSample(line));
             }
             foreach (string line in hitobjectLines) {
                 HitObjects.Add(new HitObject(line));
@@ -141,8 +183,33 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             AddDictionaryToLines(Difficulty, lines);
             lines.Add("");
             lines.Add("[Events]");
-            foreach (string line in Events) {
+            lines.Add("//Background and Video events");
+            foreach (string line in BackgroundAndVideoEvents) {
                 lines.Add(line);
+            }
+            lines.Add("//Break Periods");
+            foreach (string line in BreakPeriods) {
+                lines.Add(line);
+            }
+            lines.Add("//Storyboard Layer 0 (Background)");
+            foreach (string line in StoryboardLayer0) {
+                lines.Add(line);
+            }
+            lines.Add("//Storyboard Layer 1 (Fail)");
+            foreach (string line in StoryboardLayer1) {
+                lines.Add(line);
+            }
+            lines.Add("//Storyboard Layer 2 (Pass)");
+            foreach (string line in StoryboardLayer2) {
+                lines.Add(line);
+            }
+            lines.Add("//Storyboard Layer 3 (Foreground)");
+            foreach (string line in StoryboardLayer3) {
+                lines.Add(line);
+            }
+            lines.Add("//Storyboard Sound Samples");
+            foreach (StoryboardSoundSample sbss in StoryboardSoundSamples) {
+                lines.Add(sbss.GetLine());
             }
             lines.Add("");
             lines.Add("[TimingPoints]");
@@ -198,13 +265,16 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return line.Split(new[] { ':' }, 2);
         }
 
-        private List<string> GetCategoryLines(List<string> lines, string category) {
+        private List<string> GetCategoryLines(List<string> lines, string category, string[] categoryIdentifiers=null) {
+            if (categoryIdentifiers == null)
+                categoryIdentifiers = new[] { "[" };
+
             List<string> categoryLines = new List<string>();
             bool atCategory = false;
 
             foreach (string line in lines) {
                 if (atCategory && line != "") {
-                    if (line[0] == '[') // Reached another category
+                    if (categoryIdentifiers.Any(o => line.StartsWith(o))) // Reached another category
                     {
                         break;
                     }
