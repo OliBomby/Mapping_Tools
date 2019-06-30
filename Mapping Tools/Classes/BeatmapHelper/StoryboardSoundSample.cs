@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
-    public class StoryboardSample {
+    public class StoryboardSoundSample {
         public enum Layers {
             Background = 0,
             Fail = 1,
@@ -21,14 +21,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public double Volume { get; set; }
 
         // Sample,56056,0,"soft-hitnormal.wav",30
-        public StoryboardSample(double time, int layer, string filePath, double volume) {
+        public StoryboardSoundSample(double time, int layer, string filePath, double volume) {
             Time = time;
             Layer = layer;
             FilePath = filePath;
             Volume = volume;
         }
 
-        public StoryboardSample(string line) {
+        public StoryboardSoundSample(string line) {
             string[] values = line.Split(',');
 
             if (values[0] != "Sample") {
