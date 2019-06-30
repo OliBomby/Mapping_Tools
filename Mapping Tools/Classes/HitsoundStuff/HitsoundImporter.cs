@@ -27,9 +27,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return times;
         }
 
-        public static Dictionary<string, string> AnalyzeSamples(string dir) {
-            var extList = new string[] { ".wav", ".ogg" };
-            List<string> samplePaths = Directory.GetFiles(dir, "*.*", SearchOption.TopDirectoryOnly)
+        public static Dictionary<string, string> AnalyzeSamples(string dir, bool extended=false) {
+            var extList = new string[] { ".wav", ".ogg", ".mp3" };
+            List<string> samplePaths = Directory.GetFiles(dir, "*.*", extended ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly)
                 .Where(n => extList.Contains(Path.GetExtension(n), StringComparer.OrdinalIgnoreCase))
                         .ToList();
             List<byte[]> audios = new List<byte[]>(samplePaths.Count);
@@ -50,7 +50,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             for (int i = 0; i < audios.Count; i++) {
                 for (int k = 0; k < audios.Count; k++) {
                     if (audios[i].SequenceEqual(audios[k])) {
-                        dict[Path.GetFileNameWithoutExtension(samplePaths[i])] = Path.GetFileName(samplePaths[k]);
+                        string samplePath = samplePaths[i];
+                        string fullPathExtLess = Path.Combine(Path.GetDirectoryName(samplePath), Path.GetFileNameWithoutExtension(samplePath));
+                        dict[fullPathExtLess] = samplePaths[k];
                         break;
                     }
                 }
@@ -80,16 +82,15 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 List<string> samples = tlo.GetPlayingFilenames();
 
                 foreach (string filename in samples) {
-                    string usingFilename = filename;
-                    string extLess = Path.GetFileNameWithoutExtension(filename);
+                    string samplePath = Path.Combine(mapDir, filename);
+                    string fullPathExtLess = Path.Combine(Path.GetDirectoryName(samplePath), Path.GetFileNameWithoutExtension(samplePath));
 
                     // Get the first occurence of this sound to not get duplicated
-                    if (firstSamples.Keys.Contains(extLess)) {
-                        usingFilename = firstSamples[extLess];
+                    if (firstSamples.Keys.Contains(fullPathExtLess)) {
+                        samplePath = firstSamples[fullPathExtLess];
                     }
-
-                    string samplePath = Path.Combine(mapDir, usingFilename);
-                    extLess = Path.GetFileNameWithoutExtension(usingFilename);
+                    
+                    string extLessFilename = Path.GetFileNameWithoutExtension(samplePath);
 
                     // Find the hitsoundlayer with this path
                     HitsoundLayer layer = hitsoundLayers.Find(o => o.SampleArgs.Path == samplePath);
@@ -99,7 +100,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         layer.Times.Add(tlo.Time);
                     } else {
                         // Add new hitsound layer with this path
-                        HitsoundLayer newLayer = new HitsoundLayer(extLess, "Hitsounds", path, GetSamplesetFromFilename(filename), GetHitsoundFromFilename(filename), samplePath);
+                        HitsoundLayer newLayer = new HitsoundLayer(extLessFilename, "Hitsounds", path, GetSamplesetFromFilename(filename), GetHitsoundFromFilename(filename), samplePath);
                         newLayer.Times.Add(tlo.Time);
                         hitsoundLayers.Add(newLayer);
                     }

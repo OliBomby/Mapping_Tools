@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
@@ -272,6 +274,9 @@ namespace Mapping_Tools.Views {
                 beatmapTo.GiveObjectsGreenlines();
                 processedTimeline.GiveTimingPoints(beatmapTo.BeatmapTiming);
 
+                string mapDir = editorTo.GetBeatmapFolder();
+                Dictionary<string, string> firstSamples = HitsoundImporter.AnalyzeSamples(mapDir, true);
+
                 var samplesTo = new HashSet<StoryboardSoundSample>(beatmapTo.StoryboardSoundSamples);
 
                 foreach (StoryboardSoundSample sampleFrom in beatmapFrom.StoryboardSoundSamples) {
@@ -279,10 +284,25 @@ namespace Mapping_Tools.Views {
                         List<TimelineObject> tloHere = processedTimeline.TimeLineObjects.FindAll(o => Math.Abs(o.Time - sampleFrom.Time) <= temporalLeniency);
                         HashSet<string> samplesHere = new HashSet<string>();
                         foreach (TimelineObject tlo in tloHere) {
-                            samplesHere.UnionWith(tlo.GetPlayingFilenames());
+                            foreach (string filename in tlo.GetPlayingFilenames()) {
+                                string samplePath = Path.Combine(mapDir, filename);
+                                string fullPathExtLess = Path.Combine(Path.GetDirectoryName(samplePath), Path.GetFileNameWithoutExtension(samplePath));
+
+                                if (firstSamples.Keys.Contains(fullPathExtLess)) {
+                                    samplePath = firstSamples[fullPathExtLess];
+                                }
+                                samplesHere.Add(samplePath);
+                            }
                         }
 
-                        if (samplesHere.Contains(sampleFrom.FilePath))
+                        string sbSamplePath = Path.Combine(mapDir, sampleFrom.FilePath);
+                        string sbFullPathExtLess = Path.Combine(Path.GetDirectoryName(sbSamplePath), Path.GetFileNameWithoutExtension(sbSamplePath));
+
+                        if (firstSamples.Keys.Contains(sbFullPathExtLess)) {
+                            sbSamplePath = firstSamples[sbFullPathExtLess];
+                        }
+
+                        if (samplesHere.Contains(sbSamplePath))
                             continue;
                     }
 
