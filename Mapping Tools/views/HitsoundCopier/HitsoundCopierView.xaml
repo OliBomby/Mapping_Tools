@@ -59,12 +59,15 @@
                 <CheckBox x:Name="CopyBodyBox" IsChecked="True" Content="Copy sliderbody hitsounds" Foreground="#FFD6D6D6"/>
                 <CheckBox x:Name="CopySamplesetBox" IsChecked="True" Content="Copy samplesets" Foreground="#FFD6D6D6"/>
                 <CheckBox x:Name="CopyVolumeBox" IsChecked="True" Content="Copy volumes" Foreground="#FFD6D6D6"/>
-                <CheckBox x:Name="CopyStoryboardedSamplesBox" IsChecked="False" Content="Copy storyboardedSamples" Foreground="#FFD6D6D6"/>
+                <CheckBox x:Name="CopyStoryboardedSamplesBox" IsChecked="False" Content="Copy storyboarded samples" Foreground="#FFD6D6D6"/>
+                <CheckBox x:Name="IgnoreHitsoundSatisfiedSamplesBox" IsChecked="True" Content="Ignore samples satisfied by hitsounds"
+                    ToolTip="Don't copy storyboarded samples that are already played by the hitsounds" Foreground="#FFD6D6D6" Margin="20,0,0,0"
+                    Visibility="{Binding Path=IsChecked, ElementName=CopyStoryboardedSamplesBox, UpdateSourceTrigger=PropertyChanged,  
+                                 Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"/>
                 <CheckBox x:Name="MuteSliderendBox" IsChecked="False" Content="Mute sliderends" Foreground="#FFD6D6D6"
                     ToolTip="Mute sliderends or spinnerends that have no defined hitsounds in the map you're copying from."/>
                 <StackPanel Visibility="{Binding Path=IsChecked, ElementName=MuteSliderendBox, UpdateSourceTrigger=PropertyChanged,  
-                                 Converter={StaticResource BooleanToVisibilityConverter}, 
-                                 FallbackValue=Collapsed}">
+                                 Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
                     <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Sliderend muting filter:"/></TextBlock>
                     <Grid>
                         <Grid.ColumnDefinitions>

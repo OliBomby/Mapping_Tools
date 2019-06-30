@@ -77,24 +77,19 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             foreach (TimelineObject tlo in timeline.TimeLineObjects) {
                 if (!tlo.HasHitsound) { continue; }
 
-                List<Tuple<int, int, int>> samples = tlo.GetPlayingHitsounds();
+                List<string> samples = tlo.GetPlayingFilenames();
 
-                foreach (Tuple<int, int, int> sample in samples) {
-                    int sampleSet = sample.Item1;
-                    int hitsound = sample.Item2;
-                    int index = sample.Item3;
-
-                    string filename = tlo.Filename != null && tlo.Filename != "" ? tlo.Filename : GetFileName(sampleSet, hitsound, index);
+                foreach (string filename in samples) {
+                    string usingFilename = filename;
                     string extLess = Path.GetFileNameWithoutExtension(filename);
 
-                    // Simplify path if it doesn't exist
+                    // Get the first occurence of this sound to not get duplicated
                     if (firstSamples.Keys.Contains(extLess)) {
-                        filename = firstSamples[extLess];
-                    } else {
-                        filename = GetFileName(sampleSet, hitsound, -1);
+                        usingFilename = firstSamples[extLess];
                     }
-                    string samplePath = Path.Combine(mapDir, filename);
-                    extLess = Path.GetFileNameWithoutExtension(filename);
+
+                    string samplePath = Path.Combine(mapDir, usingFilename);
+                    extLess = Path.GetFileNameWithoutExtension(usingFilename);
 
                     // Find the hitsoundlayer with this path
                     HitsoundLayer layer = hitsoundLayers.Find(o => o.SampleArgs.Path == samplePath);
@@ -104,7 +99,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         layer.Times.Add(tlo.Time);
                     } else {
                         // Add new hitsound layer with this path
-                        HitsoundLayer newLayer = new HitsoundLayer(extLess, "Hitsounds", path, sample.Item1, sample.Item2, samplePath);
+                        HitsoundLayer newLayer = new HitsoundLayer(extLess, "Hitsounds", path, GetSamplesetFromFilename(filename), GetHitsoundFromFilename(filename), samplePath);
                         newLayer.Times.Add(tlo.Time);
                         hitsoundLayers.Add(newLayer);
                     }
@@ -117,11 +112,39 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return hitsoundLayers;
         }
 
-        public static string GetFileName(int sampleSet, int hitsound, int index) {
-            if (index == 1) {
-                return String.Format("{0}-hit{1}.wav", HitsoundConverter.SampleSets[sampleSet], HitsoundConverter.Hitsounds[hitsound]);
+        public static int GetSamplesetFromFilename(string filename) {
+            string[] split = filename.Split('-');
+            if (split.Length < 1)
+                return 0;
+            string sampleset = split[0];
+            switch (sampleset) {
+                case "auto":
+                    return 0;
+                case "normal":
+                    return 1;
+                case "soft":
+                    return 2;
+                case "drum":
+                    return 3;
+                default:
+                    return 0;
             }
-            return String.Format("{0}-hit{1}{2}.wav", HitsoundConverter.SampleSets[sampleSet], HitsoundConverter.Hitsounds[hitsound], index);
+        }
+
+        public static int GetHitsoundFromFilename(string filename) {
+            string[] split = filename.Split('-');
+            if (split.Length < 2)
+                return 0;
+            string hitsound = split[1];
+            if (hitsound.Contains("hitnormal"))
+                return 0;
+            if (hitsound.Contains("hitwhistle"))
+                return 1;
+            if (hitsound.Contains("hitfinish"))
+                return 2;
+            if (hitsound.Contains("hitclap"))
+                return 3;
+            return 0;
         }
 
         public static List<HitsoundLayer> ImportMIDI(string path, bool instruments=true, bool keysounds=true, bool lengths=true, double lengthRoughness=1, bool velocities=true, double velocityRoughness=1) {

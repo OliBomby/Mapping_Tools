@@ -108,6 +108,23 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return samples;
         }
 
+        public List<string> GetPlayingFilenames(int mode = 0) {
+            List<string> samples = new List<string>();
+            bool normal = mode != 3 || Normal || !(Whistle || Finish || Clap);
+            bool useFilename = Filename != null && Filename != "" && (IsCircle || IsHoldnoteHead);
+
+            if (normal)
+                samples.Add(GetFileName(FenoSampleSet, 0, FenoCustomIndex));
+            if (Whistle)
+                samples.Add(GetFileName(FenoAdditionSet, 1, FenoCustomIndex));
+            if (Finish)
+                samples.Add(GetFileName(FenoAdditionSet, 2, FenoCustomIndex));
+            if (Clap)
+                samples.Add(GetFileName(FenoAdditionSet, 3, FenoCustomIndex));
+
+            return useFilename ? new List<string>() { Filename } : samples;
+        }
+
         public void HitsoundsToOrigin() {
             if (Origin.IsCircle || (Origin.IsSpinner && Repeat == 1) || (Origin.IsHoldNote && Repeat == 0)) {
                 Origin.Hitsounds = GetHitsounds();
@@ -122,6 +139,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 Origin.EdgeAdditionSets[Repeat] = AdditionSet;
                 Origin.SliderExtras = true;
             }
+        }
+
+        public static string GetFileName(int sampleSet, int hitsound, int index) {
+            if (index == 1) {
+                return String.Format("{0}-hit{1}.wav", HitsoundConverter.SampleSets[sampleSet], HitsoundConverter.Hitsounds[hitsound]);
+            }
+            return String.Format("{0}-hit{1}{2}.wav", HitsoundConverter.SampleSets[sampleSet], HitsoundConverter.Hitsounds[hitsound], index);
         }
     }
 }
