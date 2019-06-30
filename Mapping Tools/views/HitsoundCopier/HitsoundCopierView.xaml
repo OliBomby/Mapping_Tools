@@ -59,6 +59,7 @@
                 <CheckBox x:Name="CopyBodyBox" IsChecked="True" Content="Copy sliderbody hitsounds" Foreground="#FFD6D6D6"/>
                 <CheckBox x:Name="CopySamplesetBox" IsChecked="True" Content="Copy samplesets" Foreground="#FFD6D6D6"/>
                 <CheckBox x:Name="CopyVolumeBox" IsChecked="True" Content="Copy volumes" Foreground="#FFD6D6D6"/>
+                <CheckBox x:Name="CopyStoryboardedSamplesBox" IsChecked="False" Content="Copy storyboardedSamples" Foreground="#FFD6D6D6"/>
                 <CheckBox x:Name="MuteSliderendBox" IsChecked="False" Content="Mute sliderends" Foreground="#FFD6D6D6"
                     ToolTip="Mute sliderends or spinnerends that have no defined hitsounds in the map you're copying from."/>
                 <StackPanel Visibility="{Binding Path=IsChecked, ElementName=MuteSliderendBox, UpdateSourceTrigger=PropertyChanged,  

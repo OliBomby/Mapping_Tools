@@ -49,7 +49,7 @@ namespace Mapping_Tools.Views {
 
             backgroundWorker.RunWorkerAsync(new Arguments(fileToCopy, BeatmapFromBox.Text, CopyModeBox.SelectedIndex, LeniencyBox.GetDouble(5), 
                                                           (bool)CopyHitsoundsBox.IsChecked, (bool)CopyBodyBox.IsChecked, (bool)CopySamplesetBox.IsChecked,
-                                                          (bool)CopyVolumeBox.IsChecked, (bool)MuteSliderendBox.IsChecked,
+                                                          (bool)CopyVolumeBox.IsChecked, (bool)CopyStoryboardedSamplesBox.IsChecked, (bool)MuteSliderendBox.IsChecked,
                                                           int.Parse(MutedSnap1.Text.Split('/')[1]), int.Parse(MutedSnap2.Text.Split('/')[1]),
                                                           MutedMinLengthBox.GetDouble(0), MutedCustomIndexBox.GetInt(-1), MutedSampleSetBox.SelectedIndex + 1));
             start.IsEnabled = false;
@@ -64,6 +64,7 @@ namespace Mapping_Tools.Views {
             public bool CopyBodyHitsounds;
             public bool CopySamplesets;
             public bool CopyVolumes;
+            public bool CopyStoryboardedSamples;
             public bool MuteSliderends;
             public int Snap1;
             public int Snap2;
@@ -71,7 +72,7 @@ namespace Mapping_Tools.Views {
             public int MutedIndex;
             public int MutedSampleset;
             public Arguments(string pathTo, string pathFrom, int copyMode, double temporalLeniency, bool copyHitsounds, bool copyBodyHitsounds, bool copySamplesets, bool copyVolumes,
-                bool muteSliderends, int snap1, int snap2, double minLength, int mutedIndex, int mutedSampleset)
+                bool copyStoryboardedSamples, bool muteSliderends, int snap1, int snap2, double minLength, int mutedIndex, int mutedSampleset)
             {
                 PathTo = pathTo;
                 PathFrom = pathFrom;
@@ -81,6 +82,7 @@ namespace Mapping_Tools.Views {
                 CopyBodyHitsounds = copyBodyHitsounds;
                 CopySamplesets = copySamplesets;
                 CopyVolumes = copyVolumes;
+                CopyStoryboardedSamples = copyStoryboardedSamples;
                 MuteSliderends = muteSliderends;
                 Snap1 = snap1;
                 Snap2 = snap2;
@@ -96,6 +98,7 @@ namespace Mapping_Tools.Views {
             bool copyHitsounds = arg.CopyHitsounds;
             bool copySliderbodychanges = arg.CopyBodyHitsounds;
             bool copyVolumes = arg.CopyVolumes;
+            bool copySBSamples = arg.CopyStoryboardedSamples;
             bool copySamplesets = arg.CopySamplesets;
             bool muteSliderends = arg.MuteSliderends;
             bool doMutedIndex = arg.MutedIndex >= 0;
@@ -260,6 +263,17 @@ namespace Mapping_Tools.Views {
                 TimingPointsChange.ApplyChanges(beatmapTo.BeatmapTiming, timingPointsChanges, false);
 
                 processedTimeline = tlTo;
+            }
+
+            if (copySBSamples) {
+                foreach (StoryboardSoundSample sampleFrom in beatmapFrom.StoryboardSoundSamples) {
+                    // Add the StoryboardSoundSamples from beatmapFrom to beatmapTo if it doesn't already have the sample
+                    if (!beatmapTo.StoryboardSoundSamples.Contains(sampleFrom)) {
+                        beatmapTo.StoryboardSoundSamples.Add(sampleFrom);
+                    }
+                }
+                // Sort the storyboarded samples
+                beatmapTo.StoryboardSoundSamples.OrderBy(o => o.Time);
             }
 
             if (muteSliderends) {

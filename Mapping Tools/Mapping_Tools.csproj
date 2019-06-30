@@ -131,6 +131,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Classes\BeatmapHelper\StoryboardSoundSample.cs" />
     <Compile Include="Classes\HitsoundStuff\DelayFadeOutSampleProvider.cs" />
     <Compile Include="Classes\HitsoundStuff\HitsoundLayerExtension.cs" />
     <Compile Include="Classes\HitsoundStuff\SampleGeneratingArgs.cs" />

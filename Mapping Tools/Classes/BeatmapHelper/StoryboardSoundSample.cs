@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
-    public class StoryboardSoundSample {
+    public class StoryboardSoundSample : IEquatable<StoryboardSoundSample> {
         public enum Layers {
             Background = 0,
             Fail = 1,
@@ -47,6 +47,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public string GetLine() {
             return String.Format("Sample,{0},{1},\"{2}\",{3}", Math.Round(Time), Layer, FilePath, Math.Round(Volume));
+        }
+
+        public bool Equals(StoryboardSoundSample other) {
+            return
+                Time == other.Time &&
+                Layer == other.Layer &&
+                FilePath == other.FilePath &&
+                Volume == other.Volume;
         }
     }
 }
