@@ -25,13 +25,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             // Load up all the shit
             BeatmapTiming = new Timing(lines);
 
-            string[] generalLines = GetCategoryLines(lines, "[General]");
-            string[] editorLines = GetCategoryLines(lines, "[Editor]");
-            string[] metadataLines = GetCategoryLines(lines, "[Metadata]");
-            string[] difficultyLines = GetCategoryLines(lines, "[Difficulty]");
-            string[] eventsLines = GetCategoryLines(lines, "[Events]");
-            string[] colourLines = GetCategoryLines(lines, "[Colours]");
-            string[] hitobjectLines = GetCategoryLines(lines, "[HitObjects]");
+            List<string> generalLines = GetCategoryLines(lines, "[General]");
+            List<string> editorLines = GetCategoryLines(lines, "[Editor]");
+            List<string> metadataLines = GetCategoryLines(lines, "[Metadata]");
+            List<string> difficultyLines = GetCategoryLines(lines, "[Difficulty]");
+            List<string> eventsLines = GetCategoryLines(lines, "[Events]");
+            List<string> colourLines = GetCategoryLines(lines, "[Colours]");
+            List<string> hitobjectLines = GetCategoryLines(lines, "[HitObjects]");
 
             General = new Dictionary<string, TValue>();
             Editor = new Dictionary<string, TValue>();
@@ -187,7 +187,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
-        private void FillDictionary(Dictionary<string, TValue> dict, string[] lines) {
+        private void FillDictionary(Dictionary<string, TValue> dict, List<string> lines) {
             foreach (string line in lines) {
                 string[] split = SplitKeyValue(line);
                 dict[split[0]] = new TValue(split[1]);
@@ -198,7 +198,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return line.Split(new[] { ':' }, 2);
         }
 
-        private string[] GetCategoryLines(List<string> lines, string category) {
+        private List<string> GetCategoryLines(List<string> lines, string category) {
             List<string> categoryLines = new List<string>();
             bool atCategory = false;
 
@@ -216,7 +216,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                     }
                 }
             }
-            return categoryLines.ToArray();
+            return categoryLines;
         }
     }
 }
