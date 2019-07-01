@@ -245,15 +245,15 @@ namespace Mapping_Tools.Views {
 
         private void ReloadFromSource_Click(object sender, RoutedEventArgs e) {
             try {
-                HashSet<string> paths = new HashSet<string>(selectedLayers.Select(o => o.Path));
+                HashSet<string> paths = new HashSet<string>(selectedLayers.Select(o => o.ImportArgs.Path));
                 List<HitsoundLayer> layers = new List<HitsoundLayer>();
 
-                if (selectedLayers.Any(o => o.ImportType == "Hitsounds")) {
+                if (selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Hitsounds)) {
                     foreach (string path in paths) {
                         layers.AddRange(HitsoundImporter.LayersFromHitsounds(path));
                     }
                 }
-                if (selectedLayers.Any(o => o.ImportType == "MIDI")) {
+                if (selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.MIDI)) {
                     foreach (string path in paths) {
                         layers.AddRange(HitsoundImporter.ImportMIDI(path));
                     }
@@ -284,10 +284,10 @@ namespace Mapping_Tools.Views {
             SelectedSamplePathBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Path);
             SelectedSampleSetBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleSetString);
             SelectedHitsoundBox.Text = selectedLayers.AllToStringOrDefault(o => o.HitsoundString);
-            ImportTypeBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportType);
-            SelectedSourcePathBox.Text = selectedLayers.AllToStringOrDefault(o => o.Path);
-            SelectedXCoordBox.Text = selectedLayers.AllToStringOrDefault(o => o.X, CultureInfo.InvariantCulture);
-            SelectedYCoordBox.Text = selectedLayers.AllToStringOrDefault(o => o.Y, CultureInfo.InvariantCulture);
+            ImportTypeBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.ImportType);
+            SelectedSourcePathBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.Path);
+            SelectedXCoordBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.X, CultureInfo.InvariantCulture);
+            SelectedYCoordBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.Y, CultureInfo.InvariantCulture);
             SelectedBankBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Bank);
             SelectedPatchBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Patch);
             SelectedInstrumentBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Instrument);
@@ -297,12 +297,12 @@ namespace Mapping_Tools.Views {
             TimesBox.Text = selectedLayers.AllToStringOrDefault(o => o.Times, HitsoundLayerExtension.DoubleListToStringConverter);
 
             // Update visibility
-            if (selectedLayers.Any(o => o.ImportType == "Stack")) {
+            if (selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Stack)) {
                 SelectedCoordinatePanel.Visibility = Visibility.Visible;
             } else {
                 SelectedCoordinatePanel.Visibility = Visibility.Collapsed;
             }
-            if (selectedLayers.Any(o => o.ImportType == "MIDI")) {
+            if (selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.MIDI)) {
                 SelectedMIDIPanel.Visibility = Visibility.Visible;
             } else {
                 SelectedMIDIPanel.Visibility = Visibility.Collapsed;
@@ -519,8 +519,10 @@ namespace Mapping_Tools.Views {
             if (suppressEvents) return;
 
             string t = ((sender as ComboBox).SelectedItem as ComboBoxItem).Content.ToString();
+            var converter = new Components.Domain.ImportTypeToStringConverter();
+            ImportType type = (ImportType)converter.ConvertBack(t, null, null, null);
             foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
-                hitsoundLayer.ImportType = t;
+                hitsoundLayer.ImportArgs.ImportType = type;
             }
             UpdateEditingField();
         }
@@ -530,7 +532,7 @@ namespace Mapping_Tools.Views {
 
             string t = (sender as TextBox).Text;
             foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
-                hitsoundLayer.Path = t;
+                hitsoundLayer.ImportArgs.Path = t;
             }
         }
 
@@ -539,7 +541,7 @@ namespace Mapping_Tools.Views {
 
             double t = (sender as TextBox).GetDouble(-1);
             foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
-                hitsoundLayer.X = t;
+                hitsoundLayer.ImportArgs.X = t;
             }
         }
 
@@ -548,7 +550,7 @@ namespace Mapping_Tools.Views {
 
             double t = (sender as TextBox).GetDouble(-1);
             foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
-                hitsoundLayer.Y = t;
+                hitsoundLayer.ImportArgs.Y = t;
             }
         }
 

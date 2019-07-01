@@ -134,6 +134,8 @@
     <Compile Include="Classes\BeatmapHelper\StoryboardSoundSample.cs" />
     <Compile Include="Classes\HitsoundStuff\DelayFadeOutSampleProvider.cs" />
     <Compile Include="Classes\HitsoundStuff\HitsoundLayerExtension.cs" />
+    <Compile Include="Classes\HitsoundStuff\ImportType.cs" />
+    <Compile Include="Classes\HitsoundStuff\LayerImportArgs.cs" />
     <Compile Include="Classes\HitsoundStuff\SampleGeneratingArgs.cs" />
     <Compile Include="Classes\HitsoundStuff\SampleImporter.cs" />
     <Compile Include="Classes\HitsoundStuff\CompleteHitsounds.cs" />
@@ -198,6 +200,7 @@
     <Compile Include="Classes\Tools\BezierConverter.cs" />
     <Compile Include="Classes\Tools\CircleBezierPreset.cs" />
     <Compile Include="Classes\Tools\MapCleaner.cs" />
+    <Compile Include="Components\Domain\ImportTypeToStringConverter.cs" />
     <Compile Include="Components\Domain\ParsableDoubleListValidationRule.cs" />
     <Compile Include="Components\Domain\DoubleToStringConverter.cs" />
     <Compile Include="Components\TimeLine\TimeLine.xaml.cs">

@@ -100,7 +100,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         layer.Times.Add(tlo.Time);
                     } else {
                         // Add new hitsound layer with this path
-                        HitsoundLayer newLayer = new HitsoundLayer(extLessFilename, "Hitsounds", path, GetSamplesetFromFilename(filename), GetHitsoundFromFilename(filename), samplePath);
+                        HitsoundLayer newLayer = new HitsoundLayer(extLessFilename, ImportType.Hitsounds, path, GetSamplesetFromFilename(filename), GetHitsoundFromFilename(filename), samplePath);
                         newLayer.Times.Add(tlo.Time);
                         hitsoundLayers.Add(newLayer);
                     }
@@ -220,7 +220,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                             layer.Times.Add(time);
                         } else {
                             // Add new hitsound layer with this path
-                            HitsoundLayer newLayer = new HitsoundLayer(name, "MIDI", path, 1, 0, args);
+                            HitsoundLayer newLayer = new HitsoundLayer(name, ImportType.MIDI, path, 1, 0, args);
                             hitsoundLayers.Add(newLayer);
 
                             newLayer.Times.Add(time);
