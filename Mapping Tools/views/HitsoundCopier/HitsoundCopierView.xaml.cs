@@ -271,6 +271,10 @@ namespace Mapping_Tools.Views {
             }
 
             if (copySBSamples) {
+                if (mode == 0) {
+                    beatmapTo.StoryboardSoundSamples.Clear();
+                }
+
                 beatmapTo.GiveObjectsGreenlines();
                 processedTimeline.GiveTimingPoints(beatmapTo.BeatmapTiming);
 
