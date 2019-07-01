@@ -1,4 +1,5 @@
-﻿using Mapping_Tools.Classes.MathUtil;
+﻿using Mapping_Tools.Classes.HitsoundStuff;
+using Mapping_Tools.Classes.MathUtil;
 using System;
 using System.Collections;
 using System.Globalization;
@@ -9,13 +10,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public double Offset { get; set; }
         public double MpB { get; set; }
         public int Meter { get; set; }
-        public int SampleSet { get; set; }
+        public SampleSet SampleSet { get; set; }
         public int SampleIndex { get; set; }
         public double Volume { get; set; }
         public bool Inherited { get; set; } // True is red line
         public bool Kiai { get; set; }
         public bool OmitFirstBarLine { get; set; }
-        public TimingPoint(double Offset, double MpB, int Meter, int SampleSet, int SampleIndex, double Volume, bool Inherited, bool Kiai, bool OmitFirstBarLine) {
+        public TimingPoint(double Offset, double MpB, int Meter, SampleSet SampleSet, int SampleIndex, double Volume, bool Inherited, bool Kiai, bool OmitFirstBarLine) {
             this.Offset = Offset;
             this.MpB = MpB;
             this.Meter = Meter;
@@ -29,7 +30,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public string GetLine() {
             int style = MathHelper.GetIntFromBitArray(new BitArray(new bool[] { Kiai, false, false, OmitFirstBarLine }));
-            return Math.Round(Offset) + "," + MpB.ToString(CultureInfo.InvariantCulture) + "," + Meter + "," + SampleSet + "," + SampleIndex + ","
+            return Math.Round(Offset) + "," + MpB.ToString(CultureInfo.InvariantCulture) + "," + Meter + "," + (int)SampleSet + "," + SampleIndex + ","
                 + Math.Round(Volume) + "," + Convert.ToInt32(Inherited) + "," + style;
         }
 

@@ -53,7 +53,7 @@ namespace Mapping_Tools.Views {
                                                           (bool)CopyHitsoundsBox.IsChecked, (bool)CopyBodyBox.IsChecked, (bool)CopySamplesetBox.IsChecked,
                                                           (bool)CopyVolumeBox.IsChecked, (bool)CopyStoryboardedSamplesBox.IsChecked, (bool)IgnoreHitsoundSatisfiedSamplesBox.IsChecked, (bool)MuteSliderendBox.IsChecked,
                                                           int.Parse(MutedSnap1.Text.Split('/')[1]), int.Parse(MutedSnap2.Text.Split('/')[1]),
-                                                          MutedMinLengthBox.GetDouble(0), MutedCustomIndexBox.GetInt(-1), MutedSampleSetBox.SelectedIndex + 1));
+                                                          MutedMinLengthBox.GetDouble(0), MutedCustomIndexBox.GetInt(-1), (SampleSet)(MutedSampleSetBox.SelectedIndex + 1)));
             start.IsEnabled = false;
         }
 
@@ -73,9 +73,9 @@ namespace Mapping_Tools.Views {
             public int Snap2;
             public double MinLength;
             public int MutedIndex;
-            public int MutedSampleset;
+            public SampleSet MutedSampleset;
             public Arguments(string pathTo, string pathFrom, int copyMode, double temporalLeniency, bool copyHitsounds, bool copyBodyHitsounds, bool copySamplesets, bool copyVolumes,
-                bool copyStoryboardedSamples, bool ignoreHitsoundSatisfiedSamples, bool muteSliderends, int snap1, int snap2, double minLength, int mutedIndex, int mutedSampleset)
+                bool copyStoryboardedSamples, bool ignoreHitsoundSatisfiedSamples, bool muteSliderends, int snap1, int snap2, double minLength, int mutedIndex, SampleSet mutedSampleset)
             {
                 PathTo = pathTo;
                 PathFrom = pathFrom;
@@ -132,8 +132,8 @@ namespace Mapping_Tools.Views {
                     if (ho.IsSlider) {
                         // Remove edge hitsounds
                         ho.EdgeHitsounds = ho.EdgeHitsounds.Select(o => 0).ToArray();
-                        ho.EdgeSampleSets = ho.EdgeSampleSets.Select(o => 0).ToArray();
-                        ho.EdgeAdditionSets = ho.EdgeAdditionSets.Select(o => 0).ToArray();
+                        ho.EdgeSampleSets = ho.EdgeSampleSets.Select(o => SampleSet.Auto).ToArray();
+                        ho.EdgeAdditionSets = ho.EdgeAdditionSets.Select(o => SampleSet.Auto).ToArray();
                         ho.SliderExtras = false;
                     }
                 }

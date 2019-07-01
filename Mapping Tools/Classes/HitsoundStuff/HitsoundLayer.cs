@@ -22,8 +22,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
-        private int sampleSet;
-        public int SampleSet {
+        private SampleSet sampleSet;
+        public SampleSet SampleSet {
             get { return sampleSet; }
             set {
                 if (sampleSet != value) {
@@ -33,8 +33,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
-        private int hitsound;
-        public int Hitsound {
+        private Hitsound hitsound;
+        public Hitsound Hitsound {
             get { return hitsound; }
             set {
                 if (hitsound != value) {
@@ -91,49 +91,33 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public string SampleSetString { get => GetSampleSetString(); set => SetSampleSetString(value); }
 
         private void SetSampleSetString(string value) {
-            if (value == "Auto") { SampleSet = 0; }
-            else if (value == "Normal") { SampleSet = 1; }
-            else if (value == "Soft") { SampleSet = 2; }
-            else if (value == "Drum") { SampleSet = 3; }
-            else { SampleSet = 4; }
+            SampleSet =  (SampleSet)Enum.Parse(typeof(SampleSet), value);
             NotifyPropertyChanged("SampleSetString");
         }
 
         private string GetSampleSetString() {
-            if (SampleSet == 0) { return "Auto"; }
-            else if (SampleSet == 1) { return "Normal"; }
-            else if (SampleSet == 2) { return "Soft"; }
-            else if (SampleSet == 3) { return "Drum"; }
-            else { return "None"; }
+            return SampleSet.ToString();
         }
 
         public string HitsoundString { get => GetHitsoundString(); set => SetHitsoundString(value); }
 
         private void SetHitsoundString(string value) {
-            if (value == "Normal") { Hitsound = 0; }
-            else if (value == "Whistle") { Hitsound = 1; }
-            else if (value == "Finish") { Hitsound = 2; }
-            else if (value == "Clap") { Hitsound = 3; }
-            else { Hitsound = 4; }
+            Hitsound = (Hitsound)Enum.Parse(typeof(Hitsound), value);
             NotifyPropertyChanged("HitsoundString");
         }
 
         private string GetHitsoundString() {
-            if (Hitsound == 0) { return "Normal"; }
-            else if (Hitsound == 1) { return "Whistle"; }
-            else if (Hitsound == 2) { return "Finish"; }
-            else if (Hitsound == 3) { return "Clap"; }
-            else { return "None"; }
+            return Hitsound.ToString();
         }
 
         public int SampleSetComboBoxIndex { get => GetSampleSetComboBoxIndex(); set => SetSampleSetComboBoxIndex(value); }
 
         private void SetSampleSetComboBoxIndex(int value) {
-            SampleSet = value + 1;
+            SampleSet = (SampleSet)(value + 1);
         }
 
         private int GetSampleSetComboBoxIndex() {
-            return SampleSet - 1;
+            return (int)SampleSet - 1;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -144,12 +128,14 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         public HitsoundLayer() {
             Name = "";
+            SampleSet = SampleSet.Normal;
+            Hitsound = Hitsound.Normal;
             importArgs = new LayerImportArgs();
             sampleArgs = new SampleGeneratingArgs();
             Times = new List<double>();
         }
 
-        public HitsoundLayer(string name, ImportType importType, string path, int sampleSet, int hitsound, string samplePath) {
+        public HitsoundLayer(string name, ImportType importType, string path, SampleSet sampleSet, Hitsound hitsound, string samplePath) {
             Name = name;
             SampleSet = sampleSet;
             Hitsound = hitsound;
@@ -158,7 +144,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Times = new List<double>();
         }
 
-        public HitsoundLayer(string name, ImportType importType, string path, int sampleSet, int hitsound, SampleGeneratingArgs sampleArgs) {
+        public HitsoundLayer(string name, ImportType importType, string path, SampleSet sampleSet, Hitsound hitsound, SampleGeneratingArgs sampleArgs) {
             Name = name;
             SampleSet = sampleSet;
             Hitsound = hitsound;
@@ -167,7 +153,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Times = new List<double>();
         }
 
-        public HitsoundLayer(string name, ImportType importType, string path, double x, double y, int sampleSet, int hitsound, string samplePath) {
+        public HitsoundLayer(string name, ImportType importType, string path, double x, double y, SampleSet sampleSet, Hitsound hitsound, string samplePath) {
             Name = name;
             SampleSet = sampleSet;
             Hitsound = hitsound;
@@ -177,7 +163,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Import();
         }
 
-        public HitsoundLayer(string name, ImportType importType, string path, double x, double y, int sampleSet, int hitsound, string samplePath, int priority) {
+        public HitsoundLayer(string name, ImportType importType, string path, double x, double y, SampleSet sampleSet, Hitsound hitsound, string samplePath, int priority) {
             Name = name;
             SampleSet = sampleSet;
             Hitsound = hitsound;

@@ -7,10 +7,6 @@ using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     class HitsoundConverter {
-        public static readonly List<string> SampleSets = new List<string> {"auto", "normal", "soft", "drum"};
-
-        public static readonly List<string> Hitsounds = new List<string> { "normal", "whistle", "finish", "clap" };
-
         public static List<SamplePackage> ZipLayers(List<HitsoundLayer> layers, Sample defaultSample) {
             List<SamplePackage> packages = new List<SamplePackage>();
             foreach (HitsoundLayer hl in layers) {
@@ -83,8 +79,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// <param name="packages">The SamplePackages to get hitsounds out of</param>
         /// <param name="customIndices">The CustomIndices that fit all the packages</param>
         /// <returns></returns>
-        public static List<Hitsound> GetHitsounds(List<SamplePackage> packages, List<CustomIndex> customIndices) {
-            List<Hitsound> hitsounds = new List<Hitsound>(packages.Count);
+        public static List<HitsoundEvent> GetHitsounds(List<SamplePackage> packages, List<CustomIndex> customIndices) {
+            List<HitsoundEvent> hitsounds = new List<HitsoundEvent>(packages.Count);
 
             int index = 0;
             while (index < packages.Count) {

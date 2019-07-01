@@ -22,8 +22,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public bool IsHoldnoteHead { get; set; } = false;
         public bool IsHoldnoteEnd { get; set; } = false;
 
-        public int SampleSet { get; set; }
-        public int AdditionSet { get; set; }
+        public SampleSet SampleSet { get; set; }
+        public SampleSet AdditionSet { get; set; }
         public bool Normal { get; set; }
         public bool Whistle { get; set; }
         public bool Finish { get; set; }
@@ -36,15 +36,15 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public string Filename { get; set; }
 
         // Special combined with greenline
-        public int FenoSampleSet { get; set; }
-        public int FenoAdditionSet { get; set; }
+        public SampleSet FenoSampleSet { get; set; }
+        public SampleSet FenoAdditionSet { get; set; }
         public int FenoCustomIndex { get; set; }
         public double FenoSampleVolume { get; set; }
 
         // Special for hitsound copier
         public bool canCopy = true;
 
-        public TimelineObject(HitObject origin, double time, int objectType, int repeat, int hitsounds, int sampleset, int additionset) {
+        public TimelineObject(HitObject origin, double time, int objectType, int repeat, int hitsounds, SampleSet sampleset, SampleSet additionset) {
             Origin = origin;
             Time = time;
 
@@ -92,18 +92,18 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return MathHelper.GetIntFromBitArray(new BitArray(new bool[] { Normal, Whistle, Finish, Clap }));
         }
 
-        public List<Tuple<int, int, int>> GetPlayingHitsounds(int mode = 0) {
-            List<Tuple<int, int, int>> samples = new List<Tuple<int, int, int>>();
+        public List<Tuple<SampleSet, Hitsound, int>> GetPlayingHitsounds(int mode = 0) {
+            List<Tuple<SampleSet, Hitsound, int>> samples = new List<Tuple<SampleSet, Hitsound, int>>();
             bool normal = mode != 3 || Normal || !(Whistle || Finish || Clap);
 
             if (normal)
-                samples.Add(new Tuple<int, int, int> (FenoSampleSet, 0, FenoCustomIndex));
+                samples.Add(new Tuple<SampleSet, Hitsound, int>(FenoSampleSet, Hitsound.Normal, FenoCustomIndex));
             if (Whistle)
-                samples.Add(new Tuple<int, int, int>(FenoAdditionSet, 1, FenoCustomIndex));
+                samples.Add(new Tuple<SampleSet, Hitsound, int>(FenoAdditionSet, Hitsound.Whistle, FenoCustomIndex));
             if (Finish)
-                samples.Add(new Tuple<int, int, int>(FenoAdditionSet, 2, FenoCustomIndex));
+                samples.Add(new Tuple<SampleSet, Hitsound, int>(FenoAdditionSet, Hitsound.Finish, FenoCustomIndex));
             if (Clap)
-                samples.Add(new Tuple<int, int, int>(FenoAdditionSet, 3, FenoCustomIndex));
+                samples.Add(new Tuple<SampleSet, Hitsound, int>(FenoAdditionSet, Hitsound.Clap, FenoCustomIndex));
 
             return samples;
         }
@@ -114,13 +114,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             bool useFilename = Filename != null && Filename != "" && (IsCircle || IsHoldnoteHead);
 
             if (normal)
-                samples.Add(GetFileName(FenoSampleSet, 0, FenoCustomIndex));
+                samples.Add(GetFileName(FenoSampleSet, Hitsound.Normal, FenoCustomIndex));
             if (Whistle)
-                samples.Add(GetFileName(FenoAdditionSet, 1, FenoCustomIndex));
+                samples.Add(GetFileName(FenoAdditionSet, Hitsound.Whistle, FenoCustomIndex));
             if (Finish)
-                samples.Add(GetFileName(FenoAdditionSet, 2, FenoCustomIndex));
+                samples.Add(GetFileName(FenoAdditionSet, Hitsound.Finish, FenoCustomIndex));
             if (Clap)
-                samples.Add(GetFileName(FenoAdditionSet, 3, FenoCustomIndex));
+                samples.Add(GetFileName(FenoAdditionSet, Hitsound.Clap, FenoCustomIndex));
 
             return useFilename ? new List<string>() { Filename } : samples;
         }
@@ -141,11 +141,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
-        public static string GetFileName(int sampleSet, int hitsound, int index) {
+        public static string GetFileName(SampleSet sampleSet, Hitsound hitsound, int index) {
             if (index == 1) {
-                return String.Format("{0}-hit{1}.wav", HitsoundConverter.SampleSets[sampleSet], HitsoundConverter.Hitsounds[hitsound]);
+                return String.Format("{0}-hit{1}.wav", sampleSet.ToString().ToLower(), hitsound.ToString().ToLower());
             }
-            return String.Format("{0}-hit{1}{2}.wav", HitsoundConverter.SampleSets[sampleSet], HitsoundConverter.Hitsounds[hitsound], index);
+            return String.Format("{0}-hit{1}{2}.wav", sampleSet.ToString().ToLower(), hitsound.ToString().ToLower(), index);
         }
     }
 }

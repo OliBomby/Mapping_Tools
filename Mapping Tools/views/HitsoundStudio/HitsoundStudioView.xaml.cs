@@ -113,7 +113,7 @@ namespace Mapping_Tools.Views {
 
                 int greenlines = 0;
                 int lastIndex = -1;
-                foreach (Hitsound hit in completeHitsounds.Hitsounds) {
+                foreach (HitsoundEvent hit in completeHitsounds.Hitsounds) {
                     if (hit.CustomIndex != lastIndex) {
                         lastIndex = hit.CustomIndex;
                         greenlines++;
@@ -519,8 +519,7 @@ namespace Mapping_Tools.Views {
             if (suppressEvents) return;
 
             string t = ((sender as ComboBox).SelectedItem as ComboBoxItem).Content.ToString();
-            var converter = new Components.Domain.ImportTypeToStringConverter();
-            ImportType type = (ImportType)converter.ConvertBack(t, null, null, null);
+            ImportType type = (ImportType)Enum.Parse(typeof(ImportType), t);
             foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
                 hitsoundLayer.ImportArgs.ImportType = type;
             }

@@ -72,7 +72,7 @@ namespace Mapping_Tools.Views {
             if (Tabs.SelectedIndex == 0) {
                 // Import one layer
                 HitsoundLayer layer = new HitsoundLayer(NameBox.Text, ImportType.Stack, BeatmapPathBox.Text, XCoordBox.GetDouble(), YCoordBox.GetDouble(),
-                                            SampleSetBox.SelectedIndex + 1, HitsoundBox.SelectedIndex, SamplePathBox.Text, index);
+                                            (SampleSet)(SampleSetBox.SelectedIndex + 1), (Hitsound)HitsoundBox.SelectedIndex, SamplePathBox.Text, index);
                 HitsoundLayers.Add(layer);
             } else if (Tabs.SelectedIndex == 1) {
                 // Import complete hitsounds

@@ -1,4 +1,5 @@
-﻿using Mapping_Tools.Classes.MathUtil;
+﻿using Mapping_Tools.Classes.HitsoundStuff;
+using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SliderPathStuff;
 using System;
 using System.Collections;
@@ -31,8 +32,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public bool Clap { get; set; }
 
         public string Extras { get => GetExtras(); set => SetExtras(value); }
-        public int SampleSet { get; set; }
-        public int AdditionSet { get; set; }
+        public SampleSet SampleSet { get; set; }
+        public SampleSet AdditionSet { get; set; }
         public int CustomIndex { get; set; }
         public double SampleVolume { get; set; }
         public string Filename { get; set; }
@@ -43,8 +44,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public int Repeat { get; set; }
         public double PixelLength { get; set; }
         public int[] EdgeHitsounds { get; set; }
-        public int[] EdgeSampleSets { get; set; }
-        public int[] EdgeAdditionSets { get; set; }
+        public SampleSet[] EdgeSampleSets { get; set; }
+        public SampleSet[] EdgeAdditionSets { get; set; }
 
         public bool SliderExtras { get; set; }
 
@@ -74,7 +75,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             TimelineObjects = new List<TimelineObject>();
         }
 
-        public HitObject(double time, int hitsounds, int sampleSet, int additions) {
+        public HitObject(double time, int hitsounds, SampleSet sampleSet, SampleSet additions) {
             // Basic hitsoundind circle
             Pos = new Vector2(256, 192);
             Time = time;
@@ -203,15 +204,15 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 PixelLength = ParseDouble(values[7]);
                 if (SliderExtras) {
                     EdgeHitsounds = values[8].Split('|').Select(p => int.Parse(p)).ToArray();
-                    EdgeSampleSets = values[9].Split('|').Select(p => int.Parse(p.Split(':')[0])).ToArray();
-                    EdgeAdditionSets = values[9].Split('|').Select(p => int.Parse(p.Split(':')[1])).ToArray();
+                    EdgeSampleSets = values[9].Split('|').Select(p => (SampleSet)int.Parse(p.Split(':')[0])).ToArray();
+                    EdgeAdditionSets = values[9].Split('|').Select(p => (SampleSet)int.Parse(p.Split(':')[1])).ToArray();
 
                     Extras = values[10];
                 }
                 else {
                     EdgeHitsounds = new int[Repeat + 1];
-                    EdgeSampleSets = new int[Repeat + 1];
-                    EdgeAdditionSets = new int[Repeat + 1];
+                    EdgeSampleSets = new SampleSet[Repeat + 1];
+                    EdgeAdditionSets = new SampleSet[Repeat + 1];
                 }
             }
             else if (IsSpinner) {
@@ -242,8 +243,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
                     string rett = "";
                     for (int i = 0; i < EdgeSampleSets.Count(); i++) {
-                        rett += "|" + EdgeSampleSets[i];
-                        rett += ":" + EdgeAdditionSets[i];
+                        rett += "|" + (int)EdgeSampleSets[i];
+                        rett += ":" + (int)EdgeAdditionSets[i];
                     }
                     string edgeAd = rett.Substring(1);
 
@@ -292,11 +293,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public string GetExtras() {
             if (IsHoldNote) {
-                return string.Join(":", new string[] { Math.Round(EndTime).ToString(), SampleSet.ToString(), AdditionSet.ToString(),
+                return string.Join(":", new string[] { Math.Round(EndTime).ToString(), ((int)SampleSet).ToString(), ((int)AdditionSet).ToString(),
                                                         CustomIndex.ToString(), SampleVolume.ToString(), Filename });
             }
             else {
-                return string.Join(":", new string[] { SampleSet.ToString(), AdditionSet.ToString(),
+                return string.Join(":", new string[] { ((SampleSet)SampleSet).ToString(), ((SampleSet)AdditionSet).ToString(),
                                                         CustomIndex.ToString(), SampleVolume.ToString(), Filename });
             }
         }
@@ -310,8 +311,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 Repeat = 1;
                 i += 1;
             }
-            SampleSet = int.Parse(split[i]);
-            AdditionSet = int.Parse(split[i + 1]);
+            SampleSet = (SampleSet)int.Parse(split[i]);
+            AdditionSet = (SampleSet)int.Parse(split[i + 1]);
             CustomIndex = int.Parse(split[i + 2]);
             SampleVolume = double.Parse(split[i + 3]);
             Filename = split[i + 4];

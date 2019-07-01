@@ -113,38 +113,38 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return hitsoundLayers;
         }
 
-        public static int GetSamplesetFromFilename(string filename) {
+        public static SampleSet GetSamplesetFromFilename(string filename) {
             string[] split = filename.Split('-');
             if (split.Length < 1)
                 return 0;
             string sampleset = split[0];
             switch (sampleset) {
                 case "auto":
-                    return 0;
+                    return SampleSet.Auto;
                 case "normal":
-                    return 1;
+                    return SampleSet.Normal;
                 case "soft":
-                    return 2;
+                    return SampleSet.Soft;
                 case "drum":
-                    return 3;
+                    return SampleSet.Drum;
                 default:
-                    return 0;
+                    return SampleSet.Soft;
             }
         }
 
-        public static int GetHitsoundFromFilename(string filename) {
+        public static Hitsound GetHitsoundFromFilename(string filename) {
             string[] split = filename.Split('-');
             if (split.Length < 2)
                 return 0;
             string hitsound = split[1];
             if (hitsound.Contains("hitnormal"))
-                return 0;
+                return Hitsound.Normal;
             if (hitsound.Contains("hitwhistle"))
-                return 1;
+                return Hitsound.Whistle;
             if (hitsound.Contains("hitfinish"))
-                return 2;
+                return Hitsound.Finish;
             if (hitsound.Contains("hitclap"))
-                return 3;
+                return Hitsound.Clap;
             return 0;
         }
 
@@ -220,7 +220,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                             layer.Times.Add(time);
                         } else {
                             // Add new hitsound layer with this path
-                            HitsoundLayer newLayer = new HitsoundLayer(name, ImportType.MIDI, path, 1, 0, args);
+                            HitsoundLayer newLayer = new HitsoundLayer(name, ImportType.MIDI, path, SampleSet.Normal, Hitsound.Normal, args);
                             hitsoundLayers.Add(newLayer);
 
                             newLayer.Times.Add(time);

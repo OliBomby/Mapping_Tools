@@ -133,6 +133,7 @@
     </ApplicationDefinition>
     <Compile Include="Classes\BeatmapHelper\StoryboardSoundSample.cs" />
     <Compile Include="Classes\HitsoundStuff\DelayFadeOutSampleProvider.cs" />
+    <Compile Include="Classes\HitsoundStuff\Hitsound.cs" />
     <Compile Include="Classes\HitsoundStuff\HitsoundLayerExtension.cs" />
     <Compile Include="Classes\HitsoundStuff\ImportType.cs" />
     <Compile Include="Classes\HitsoundStuff\LayerImportArgs.cs" />
@@ -140,13 +141,14 @@
     <Compile Include="Classes\HitsoundStuff\SampleImporter.cs" />
     <Compile Include="Classes\HitsoundStuff\CompleteHitsounds.cs" />
     <Compile Include="Classes\HitsoundStuff\CustomIndex.cs" />
-    <Compile Include="Classes\HitsoundStuff\Hitsound.cs" />
+    <Compile Include="Classes\HitsoundStuff\HitsoundEvent.cs" />
     <Compile Include="Classes\HitsoundStuff\HitsoundConverter.cs" />
     <Compile Include="Classes\HitsoundStuff\HitsoundExporter.cs" />
     <Compile Include="Classes\HitsoundStuff\HitsoundImporter.cs" />
     <Compile Include="Classes\HitsoundStuff\HitsoundLayer.cs" />
     <Compile Include="Classes\HitsoundStuff\Sample.cs" />
     <Compile Include="Classes\HitsoundStuff\SamplePackage.cs" />
+    <Compile Include="Classes\HitsoundStuff\SampleSet.cs" />
     <Compile Include="Classes\HitsoundStuff\SampleSoundGenerator.cs" />
     <Compile Include="Classes\HitsoundStuff\SF2Extension.cs" />
     <Compile Include="Classes\MathUtil\Extensions.cs" />

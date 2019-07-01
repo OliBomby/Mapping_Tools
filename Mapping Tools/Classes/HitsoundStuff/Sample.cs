@@ -1,24 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Mapping_Tools.Classes.HitsoundStuff {
+﻿namespace Mapping_Tools.Classes.HitsoundStuff {
     public class Sample {
-        public int SampleSet { get; set; }
-        public int Hitsound { get; set; }
+        public SampleSet SampleSet { get; set; }
+        public Hitsound Hitsound { get; set; }
         public SampleGeneratingArgs SampleArgs { get; set; }
         public int Priority { get; set; }
 
         public int SampleSetComboBoxIndex { get => GetSampleSetComboBoxIndex(); set => SetSampleSetComboBoxIndex(value); }
 
         private void SetSampleSetComboBoxIndex(int value) {
-            SampleSet = value + 1;
+            SampleSet = (SampleSet)value + 1;
         }
 
         private int GetSampleSetComboBoxIndex() {
-            return SampleSet - 1;
+            return (int)SampleSet - 1;
         }
 
         public Sample() {
@@ -28,7 +22,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Priority = 0;
         }
 
-        public Sample(int sampleSet, int hitsound, SampleGeneratingArgs samplePath, int priority) {
+        public Sample(SampleSet sampleSet, Hitsound hitsound, SampleGeneratingArgs samplePath, int priority) {
             SampleSet = sampleSet;
             Hitsound = hitsound;
             SampleArgs = samplePath;

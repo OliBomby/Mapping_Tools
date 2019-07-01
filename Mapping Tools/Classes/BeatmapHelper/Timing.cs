@@ -1,4 +1,5 @@
-﻿using Mapping_Tools.Classes.MathUtil;
+﻿using Mapping_Tools.Classes.HitsoundStuff;
+using Mapping_Tools.Classes.MathUtil;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -226,7 +227,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                         ParseDouble(values[0]),
                         ParseDouble(values[1]),
                         int.Parse(values[2]),
-                        int.Parse(values[3]),
+                        (SampleSet)int.Parse(values[3]),
                         int.Parse(values[4]),
                         ParseDouble(values[5]),
                         values[6] == "1",

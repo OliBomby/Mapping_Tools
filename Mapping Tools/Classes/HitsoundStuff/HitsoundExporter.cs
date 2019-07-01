@@ -20,7 +20,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             ExportCustomIndices(ch.CustomIndices, exportFolder, loadedSamples);
         }
 
-        public static void ExportHitsounds(List<Hitsound> hitsounds, string baseBeatmap, string exportFolder) {
+        public static void ExportHitsounds(List<HitsoundEvent> hitsounds, string baseBeatmap, string exportFolder) {
             Editor editor = new Editor(baseBeatmap);
             Beatmap beatmap = editor.Beatmap;
 
@@ -34,7 +34,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
 
             // Add hitsound stuff
-            foreach (Hitsound h in hitsounds) {
+            foreach (HitsoundEvent h in hitsounds) {
                 TimingPoint tp = beatmap.BeatmapTiming.GetTimingPointAtTime(h.Time + 5).Copy();
                 tp.Offset = h.Time;
                 tp.SampleIndex = h.CustomIndex;
@@ -47,7 +47,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
             // Replace all hitobjects with the hitsounds
             beatmap.HitObjects.Clear();
-            foreach (Hitsound h in hitsounds) {
+            foreach (HitsoundEvent h in hitsounds) {
                 beatmap.HitObjects.Add(new HitObject(h.Time, h.GetHitsounds(), h.SampleSet, h.Additions));
             }
 
