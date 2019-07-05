@@ -153,27 +153,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Times = new List<double>();
         }
 
-        public HitsoundLayer(string name, ImportType importType, string path, double x, double y, SampleSet sampleSet, Hitsound hitsound, string samplePath) {
-            Name = name;
-            SampleSet = sampleSet;
-            Hitsound = hitsound;
-            importArgs = new LayerImportArgs(importType) { Path = path, X = x, Y = y };
-            sampleArgs = new SampleGeneratingArgs(samplePath);
-            Times = new List<double>();
-            Import();
-        }
-
-        public HitsoundLayer(string name, ImportType importType, string path, double x, double y, SampleSet sampleSet, Hitsound hitsound, string samplePath, int priority) {
-            Name = name;
-            SampleSet = sampleSet;
-            Hitsound = hitsound;
-            Priority = priority;
-            importArgs = new LayerImportArgs(importType) { Path = path, X = x, Y = y };
-            sampleArgs = new SampleGeneratingArgs(samplePath);
-            Times = new List<double>();
-            Import();
-        }
-
         public void SetPriority(int priority) {
             Priority = priority;
         }

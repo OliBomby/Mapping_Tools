@@ -16,7 +16,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             SamplePath = "";
             Bank = -1;
             Patch = -1;
-            Instrument = -1;
             Key = -1;
             Length = -1;
             LengthRoughness = 1;
@@ -32,7 +31,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             SamplePath = "";
             Bank = -1;
             Patch = -1;
-            Instrument = -1;
             Key = -1;
             Length = -1;
             LengthRoughness = 1;
@@ -195,7 +193,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 SamplePath == other.SamplePath &&
                 Bank == other.Bank &&
                 Patch == other.Patch &&
-                Instrument == other.Instrument &&
                 Key == other.Key &&
                 Length == other.Length &&
                 LengthRoughness == other.LengthRoughness &&
@@ -218,7 +215,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 return Path == other.Path &&
                     Bank == other.Bank &&
                     Patch == other.Patch &&
-                    Instrument == other.Instrument &&
                     Key == other.Key &&
                     Length == other.Length &&
                     LengthRoughness == other.LengthRoughness &&

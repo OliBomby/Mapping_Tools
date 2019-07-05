@@ -71,8 +71,15 @@ namespace Mapping_Tools.Views {
         private void Add_Click(object sender, RoutedEventArgs e) {
             if (Tabs.SelectedIndex == 0) {
                 // Import one layer
-                HitsoundLayer layer = new HitsoundLayer(NameBox.Text, ImportType.Stack, BeatmapPathBox.Text, XCoordBox.GetDouble(), YCoordBox.GetDouble(),
-                                            (SampleSet)(SampleSetBox.SelectedIndex + 1), (Hitsound)HitsoundBox.SelectedIndex, SamplePathBox.Text, index);
+                string path = BeatmapPathBox.Text;
+                double x = XCoordBox.GetDouble();
+                double y = YCoordBox.GetDouble();
+
+                HitsoundLayer layer = new HitsoundLayer(NameBox.Text, ImportType.Stack, path, (SampleSet)(SampleSetBox.SelectedIndex + 1), (Hitsound)HitsoundBox.SelectedIndex, SamplePathBox.Text);
+                layer.ImportArgs.X = x;
+                layer.ImportArgs.Y = y;
+                layer.Times = HitsoundImporter.TimesFromStack(path, x, y);
+
                 HitsoundLayers.Add(layer);
             } else if (Tabs.SelectedIndex == 1) {
                 // Import complete hitsounds
