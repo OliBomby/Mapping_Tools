@@ -125,17 +125,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
-        private int instrument;
-        public int Instrument {
-            get { return instrument; }
-            set {
-                if (instrument != value) {
-                    instrument = value;
-                    NotifyPropertyChanged("Instrument");
-                }
-            }
-        }
-
         private int key;
         public int Key {
             get { return key; }
@@ -252,31 +241,17 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         public override int GetHashCode() {
             var hashCode = -421944398;
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(path);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Path);
-            hashCode = hashCode * -1521134295 + importType.GetHashCode();
             hashCode = hashCode * -1521134295 + ImportType.GetHashCode();
-            hashCode = hashCode * -1521134295 + x.GetHashCode();
             hashCode = hashCode * -1521134295 + X.GetHashCode();
-            hashCode = hashCode * -1521134295 + y.GetHashCode();
             hashCode = hashCode * -1521134295 + Y.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(samplePath);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(SamplePath);
-            hashCode = hashCode * -1521134295 + bank.GetHashCode();
             hashCode = hashCode * -1521134295 + Bank.GetHashCode();
-            hashCode = hashCode * -1521134295 + patch.GetHashCode();
             hashCode = hashCode * -1521134295 + Patch.GetHashCode();
-            hashCode = hashCode * -1521134295 + instrument.GetHashCode();
-            hashCode = hashCode * -1521134295 + Instrument.GetHashCode();
-            hashCode = hashCode * -1521134295 + key.GetHashCode();
             hashCode = hashCode * -1521134295 + Key.GetHashCode();
-            hashCode = hashCode * -1521134295 + length.GetHashCode();
             hashCode = hashCode * -1521134295 + Length.GetHashCode();
-            hashCode = hashCode * -1521134295 + lengthRoughness.GetHashCode();
             hashCode = hashCode * -1521134295 + LengthRoughness.GetHashCode();
-            hashCode = hashCode * -1521134295 + velocity.GetHashCode();
             hashCode = hashCode * -1521134295 + Velocity.GetHashCode();
-            hashCode = hashCode * -1521134295 + velocityRoughness.GetHashCode();
             hashCode = hashCode * -1521134295 + VelocityRoughness.GetHashCode();
             return hashCode;
         }

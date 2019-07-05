@@ -309,7 +309,6 @@ namespace Mapping_Tools.Views {
             SelectedImportSamplePathBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.SamplePath);
             SelectedImportBankBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.Bank);
             SelectedImportPatchBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.Patch);
-            SelectedImportInstrumentBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.Instrument);
             SelectedImportKeyBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.Key);
             SelectedImportLengthBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.Length, CultureInfo.InvariantCulture);
             SelectedImportLengthRoughnessBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.LengthRoughness, CultureInfo.InvariantCulture);
@@ -681,15 +680,6 @@ namespace Mapping_Tools.Views {
             int t = (sender as TextBox).GetInt(-1);
             foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
                 hitsoundLayer.ImportArgs.Patch = t;
-            }
-        }
-
-        private void SelectedImportInstrumentBox_TextChanged(object sender, TextChangedEventArgs e) {
-            if (suppressEvents) return;
-
-            int t = (sender as TextBox).GetInt(-1);
-            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
-                hitsoundLayer.ImportArgs.Instrument = t;
             }
         }
 

@@ -152,8 +152,6 @@
                                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Bank"/>
                                 <TextBox x:Name="SelectedImportPatchBox" TextChanged="SelectedImportPatchBox_TextChanged"
                                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Patch"/>
-                                <TextBox x:Name="SelectedImportInstrumentBox" TextChanged="SelectedImportInstrumentBox_TextChanged"
-                                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Instrument"/>
                                 <TextBox x:Name="SelectedImportKeyBox" TextChanged="SelectedImportKeyBox_TextChanged"
                                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Key"/>
                                 <TextBox x:Name="SelectedImportLengthBox" TextChanged="SelectedImportLengthBox_TextChanged"
