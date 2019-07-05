@@ -75,7 +75,8 @@ namespace Mapping_Tools.Views {
                 double x = XCoordBox.GetDouble();
                 double y = YCoordBox.GetDouble();
 
-                HitsoundLayer layer = new HitsoundLayer(NameBox.Text, ImportType.Stack, path, (SampleSet)(SampleSetBox.SelectedIndex + 1), (Hitsound)HitsoundBox.SelectedIndex, SamplePathBox.Text);
+                HitsoundLayer layer = new HitsoundLayer(NameBox.Text, ImportType.Stack, (SampleSet)(SampleSetBox.SelectedIndex + 1), (Hitsound)HitsoundBox.SelectedIndex, SamplePathBox.Text);
+                layer.ImportArgs.Path = path;
                 layer.ImportArgs.X = x;
                 layer.ImportArgs.Y = y;
                 layer.Times = HitsoundImporter.TimesFromStack(path, x, y);

@@ -135,20 +135,29 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Times = new List<double>();
         }
 
-        public HitsoundLayer(string name, ImportType importType, string path, SampleSet sampleSet, Hitsound hitsound, string samplePath) {
+        public HitsoundLayer(string name, ImportType importType, SampleSet sampleSet, Hitsound hitsound, string samplePath) {
             Name = name;
             SampleSet = sampleSet;
             Hitsound = hitsound;
-            importArgs = new LayerImportArgs(importType) { Path = path };
+            importArgs = new LayerImportArgs(importType);
             sampleArgs = new SampleGeneratingArgs(samplePath);
             Times = new List<double>();
         }
 
-        public HitsoundLayer(string name, ImportType importType, string path, SampleSet sampleSet, Hitsound hitsound, SampleGeneratingArgs sampleArgs) {
+        public HitsoundLayer(string name, ImportType importType, SampleSet sampleSet, Hitsound hitsound, SampleGeneratingArgs sampleArgs) {
             Name = name;
             SampleSet = sampleSet;
             Hitsound = hitsound;
-            importArgs = new LayerImportArgs(importType) { Path = path };
+            importArgs = new LayerImportArgs(importType);
+            this.sampleArgs = sampleArgs;
+            Times = new List<double>();
+        }
+
+        public HitsoundLayer(string name, SampleSet sampleSet, Hitsound hitsound, SampleGeneratingArgs sampleArgs, LayerImportArgs importArgs) {
+            Name = name;
+            SampleSet = sampleSet;
+            Hitsound = hitsound;
+            this.importArgs = importArgs;
             this.sampleArgs = sampleArgs;
             Times = new List<double>();
         }

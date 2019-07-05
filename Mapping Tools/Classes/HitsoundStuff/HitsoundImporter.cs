@@ -91,17 +91,19 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     }
                     
                     string extLessFilename = Path.GetFileNameWithoutExtension(samplePath);
+                    var importArgs = new LayerImportArgs(ImportType.Hitsounds) { Path = path, SamplePath = samplePath };
 
                     // Find the hitsoundlayer with this path
-                    HitsoundLayer layer = hitsoundLayers.Find(o => o.SampleArgs.Path == samplePath);
+                    HitsoundLayer layer = hitsoundLayers.Find(o => o.ImportArgs == importArgs);
 
                     if (layer != null) {
                         // Find hitsound layer with this path and add this time
                         layer.Times.Add(tlo.Time);
                     } else {
                         // Add new hitsound layer with this path
-                        HitsoundLayer newLayer = new HitsoundLayer(extLessFilename, ImportType.Hitsounds, path, GetSamplesetFromFilename(filename), GetHitsoundFromFilename(filename), samplePath);
+                        HitsoundLayer newLayer = new HitsoundLayer(extLessFilename, GetSamplesetFromFilename(filename), GetHitsoundFromFilename(filename), new SampleGeneratingArgs(samplePath), importArgs);
                         newLayer.Times.Add(tlo.Time);
+
                         hitsoundLayers.Add(newLayer);
                     }
                 }
@@ -210,20 +212,30 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                             name += "," + velocity;
 
 
-                        SampleGeneratingArgs args = new SampleGeneratingArgs(filename, bank, patch, instrument, key, length, velocity);
+                        var sampleArgs = new SampleGeneratingArgs(filename, bank, patch, instrument, key, length, velocity);
+                        var importArgs = new LayerImportArgs(ImportType.MIDI) {
+                            Path = path,
+                            Bank = bank,
+                            Patch = patch,
+                            Key = key,
+                            Length = length,
+                            LengthRoughness = lengthRoughness,
+                            Velocity = velocity,
+                            VelocityRoughness = velocityRoughness
+                        };
 
                         // Find the hitsoundlayer with this path
-                        HitsoundLayer layer = hitsoundLayers.Find(o => o.SampleArgs.ExactlyEquals(args));
+                        HitsoundLayer layer = hitsoundLayers.Find(o => o.ImportArgs == importArgs);
 
                         if (layer != null) {
                             // Find hitsound layer with this path and add this time
                             layer.Times.Add(time);
                         } else {
                             // Add new hitsound layer with this path
-                            HitsoundLayer newLayer = new HitsoundLayer(name, ImportType.MIDI, path, SampleSet.Normal, Hitsound.Normal, args);
-                            hitsoundLayers.Add(newLayer);
-
+                            HitsoundLayer newLayer = new HitsoundLayer(name, SampleSet.Normal, Hitsound.Normal, sampleArgs, importArgs);
                             newLayer.Times.Add(time);
+
+                            hitsoundLayers.Add(newLayer);
                         }
                     }
                 }

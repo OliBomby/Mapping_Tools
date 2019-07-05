@@ -167,8 +167,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
-        private int velocityRoughness;
-        public int VelocityRoughness {
+        private double velocityRoughness;
+        public double VelocityRoughness {
             get { return velocityRoughness; }
             set {
                 if (velocityRoughness != value) {

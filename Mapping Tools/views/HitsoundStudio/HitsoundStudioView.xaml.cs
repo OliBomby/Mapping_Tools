@@ -313,7 +313,7 @@ namespace Mapping_Tools.Views {
             SelectedImportLengthBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.Length, CultureInfo.InvariantCulture);
             SelectedImportLengthRoughnessBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.LengthRoughness, CultureInfo.InvariantCulture);
             SelectedImportVelocityBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.Velocity);
-            SelectedImportVelocityRoughnessBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.VelocityRoughness);
+            SelectedImportVelocityRoughnessBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.VelocityRoughness, CultureInfo.InvariantCulture);
 
 
             // Update visibility
@@ -722,7 +722,7 @@ namespace Mapping_Tools.Views {
         private void SelectedImportVelocityRoughnessBox_TextChanged(object sender, TextChangedEventArgs e) {
             if (suppressEvents) return;
 
-            int t = (sender as TextBox).GetInt(1);
+            double t = (sender as TextBox).GetDouble(1);
             foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
                 hitsoundLayer.ImportArgs.VelocityRoughness = t;
             }
