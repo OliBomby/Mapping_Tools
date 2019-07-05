@@ -79,7 +79,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             foreach (TimelineObject tlo in timeline.TimeLineObjects) {
                 if (!tlo.HasHitsound) { continue; }
 
-                List<string> samples = tlo.GetPlayingFilenames();
+                List<string> samples = tlo.GetPlayingFilenames(mode);
 
                 foreach (string filename in samples) {
                     string samplePath = Path.Combine(mapDir, filename);

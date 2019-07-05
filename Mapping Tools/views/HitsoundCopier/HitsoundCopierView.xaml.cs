@@ -97,7 +97,7 @@ namespace Mapping_Tools.Views {
         }
 
         private string Copy_Hitsounds(Arguments arg, BackgroundWorker worker, DoWorkEventArgs e) {
-            int mode = arg.CopyMode;
+            int copyMode = arg.CopyMode;
             double temporalLeniency = arg.TemporalLeniency;
             bool copyHitsounds = arg.CopyHitsounds;
             bool copySliderbodychanges = arg.CopyBodyHitsounds;
@@ -116,7 +116,7 @@ namespace Mapping_Tools.Views {
 
             Timeline processedTimeline;
 
-            if (mode == 0) {
+            if (copyMode == 0) {
                 foreach (HitObject ho in beatmapTo.HitObjects) {
                     // Remove all hitsounds
                     ho.Clap = false;
@@ -271,7 +271,7 @@ namespace Mapping_Tools.Views {
             }
 
             if (copySBSamples) {
-                if (mode == 0) {
+                if (copyMode == 0) {
                     beatmapTo.StoryboardSoundSamples.Clear();
                 }
 
@@ -282,13 +282,14 @@ namespace Mapping_Tools.Views {
                 Dictionary<string, string> firstSamples = HitsoundImporter.AnalyzeSamples(mapDir, true);
 
                 var samplesTo = new HashSet<StoryboardSoundSample>(beatmapTo.StoryboardSoundSamples);
+                int mode = beatmapTo.General["Mode"].Value;
 
                 foreach (StoryboardSoundSample sampleFrom in beatmapFrom.StoryboardSoundSamples) {
                     if (ignoreHSSBSamples) {
                         List<TimelineObject> tloHere = processedTimeline.TimeLineObjects.FindAll(o => Math.Abs(o.Time - sampleFrom.Time) <= temporalLeniency);
                         HashSet<string> samplesHere = new HashSet<string>();
                         foreach (TimelineObject tlo in tloHere) {
-                            foreach (string filename in tlo.GetPlayingFilenames()) {
+                            foreach (string filename in tlo.GetPlayingFilenames(mode)) {
                                 string samplePath = Path.Combine(mapDir, filename);
                                 string fullPathExtLess = Path.Combine(Path.GetDirectoryName(samplePath), Path.GetFileNameWithoutExtension(samplePath));
 
