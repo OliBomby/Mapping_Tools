@@ -197,20 +197,29 @@ namespace Mapping_Tools.Views {
             } catch (Exception) { }
         }
 
-        private void SelectedSourcePathBrowse_Click(object sender, RoutedEventArgs e) {
+        private void SelectedImportSamplePathBrowse_Click(object sender, RoutedEventArgs e) {
+            try {
+                string path = IOHelper.SampleFileDialog();
+                if (path != "") {
+                    SelectedImportSamplePathBox.Text = path;
+                }
+            } catch (Exception) { }
+        }
+
+        private void SelectedImportPathBrowse_Click(object sender, RoutedEventArgs e) {
             try {
                 string path = IOHelper.BeatmapFileDialog();
                 if (path != "") {
-                    SelectedSourcePathBox.Text = path;
+                    SelectedImportPathBox.Text = path;
                     }
             } catch (Exception) { }
         }
 
-        private void SelectedSourcePathLoad_Click(object sender, RoutedEventArgs e) {
+        private void SelectedImportPathLoad_Click(object sender, RoutedEventArgs e) {
             try {
                 string path = IOHelper.CurrentBeatmap();
                 if (path != "") {
-                    SelectedSourcePathBox.Text = path;
+                    SelectedImportPathBox.Text = path;
                 }
             } catch (Exception) { }
         }
@@ -281,31 +290,58 @@ namespace Mapping_Tools.Views {
 
             // Populate the editing fields
             SelectedNameBox.Text = selectedLayers.AllToStringOrDefault(o => o.Name);
-            SelectedSamplePathBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Path);
             SelectedSampleSetBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleSetString);
             SelectedHitsoundBox.Text = selectedLayers.AllToStringOrDefault(o => o.HitsoundString);
-            ImportTypeBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.ImportType);
-            SelectedSourcePathBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.Path);
-            SelectedXCoordBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.X, CultureInfo.InvariantCulture);
-            SelectedYCoordBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.Y, CultureInfo.InvariantCulture);
-            SelectedBankBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Bank);
-            SelectedPatchBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Patch);
-            SelectedInstrumentBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Instrument);
-            SelectedKeyBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Key);
-            SelectedLengthBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Length, CultureInfo.InvariantCulture);
-            SelectedVelocityBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Velocity);
             TimesBox.Text = selectedLayers.AllToStringOrDefault(o => o.Times, HitsoundLayerExtension.DoubleListToStringConverter);
 
+            SelectedSamplePathBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Path);
+            SelectedSampleBankBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Bank);
+            SelectedSamplePatchBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Patch);
+            SelectedSampleInstrumentBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Instrument);
+            SelectedSampleKeyBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Key);
+            SelectedSampleLengthBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Length, CultureInfo.InvariantCulture);
+            SelectedSampleVelocityBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Velocity);
+
+            SelectedImportTypeBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.ImportType);
+            SelectedImportPathBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.Path);
+            SelectedImportXCoordBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.X, CultureInfo.InvariantCulture);
+            SelectedImportYCoordBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.Y, CultureInfo.InvariantCulture);
+            SelectedImportSamplePathBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.SamplePath);
+            SelectedImportBankBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.Bank);
+            SelectedImportPatchBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.Patch);
+            SelectedImportInstrumentBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.Instrument);
+            SelectedImportKeyBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.Key);
+            SelectedImportLengthBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.Length, CultureInfo.InvariantCulture);
+            SelectedImportLengthRoughnessBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.LengthRoughness, CultureInfo.InvariantCulture);
+            SelectedImportVelocityBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.Velocity);
+            SelectedImportVelocityRoughnessBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.VelocityRoughness);
+
+
             // Update visibility
-            if (selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Stack)) {
-                SelectedCoordinatePanel.Visibility = Visibility.Visible;
+            if (selectedLayers.Any(o => o.SampleArgs.UsesSoundFont)) {
+                SoundFontArgsPanel.Visibility = Visibility.Visible;
             } else {
-                SelectedCoordinatePanel.Visibility = Visibility.Collapsed;
+                SoundFontArgsPanel.Visibility = Visibility.Collapsed;
+            }
+            if (selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Stack)) {
+                SelectedStackPanel.Visibility = Visibility.Visible;
+            } else {
+                SelectedStackPanel.Visibility = Visibility.Collapsed;
+            }
+            if (selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Hitsounds)) {
+                SelectedHitsoundsPanel.Visibility = Visibility.Visible;
+            } else {
+                SelectedHitsoundsPanel.Visibility = Visibility.Collapsed;
             }
             if (selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.MIDI)) {
                 SelectedMIDIPanel.Visibility = Visibility.Visible;
             } else {
                 SelectedMIDIPanel.Visibility = Visibility.Collapsed;
+            }
+            if (selectedLayers.Any(o => o.ImportArgs.CanImport)) {
+                ImportArgsPanel.Visibility = Visibility.Visible;
+            } else {
+                ImportArgsPanel.Visibility = Visibility.Collapsed;
             }
 
             suppressEvents = false;
@@ -488,15 +524,6 @@ namespace Mapping_Tools.Views {
             }
         }
 
-        private void SelectedSamplePathBox_TextChanged(object sender, TextChangedEventArgs e) {
-            if (suppressEvents) return;
-
-            string t = (sender as TextBox).Text;
-            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
-                hitsoundLayer.SampleArgs.Path = t;
-            }
-        }
-
         private void SelectedSampleSetBox_SelectionChanged(object sender, SelectionChangedEventArgs e) {
             if (suppressEvents) return;
 
@@ -515,44 +542,6 @@ namespace Mapping_Tools.Views {
             }
         }
 
-        private void ImportTypeBox_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-            if (suppressEvents) return;
-
-            string t = ((sender as ComboBox).SelectedItem as ComboBoxItem).Content.ToString();
-            ImportType type = (ImportType)Enum.Parse(typeof(ImportType), t);
-            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
-                hitsoundLayer.ImportArgs.ImportType = type;
-            }
-            UpdateEditingField();
-        }
-
-        private void SelectedSourcePathBox_TextChanged(object sender, TextChangedEventArgs e) {
-            if (suppressEvents) return;
-
-            string t = (sender as TextBox).Text;
-            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
-                hitsoundLayer.ImportArgs.Path = t;
-            }
-        }
-
-        private void SelectedXCoordBox_TextChanged(object sender, TextChangedEventArgs e) {
-            if (suppressEvents) return;
-
-            double t = (sender as TextBox).GetDouble(-1);
-            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
-                hitsoundLayer.ImportArgs.X = t;
-            }
-        }
-
-        private void SelectedYCoordBox_TextChanged(object sender, TextChangedEventArgs e) {
-            if (suppressEvents) return;
-
-            double t = (sender as TextBox).GetDouble(-1);
-            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
-                hitsoundLayer.ImportArgs.Y = t;
-            }
-        }
-
         private void TimesBox_TextChanged(object sender, TextChangedEventArgs e) {
             if (suppressEvents) return;
             if ((sender as TextBox).GetBindingExpression(TextBox.TextProperty).HasValidationError) return;
@@ -566,7 +555,17 @@ namespace Mapping_Tools.Views {
             } catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
         }
 
-        private void SelectedBankBox_TextChanged(object sender, TextChangedEventArgs e) {
+        private void SelectedSamplePathBox_TextChanged(object sender, TextChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            string t = (sender as TextBox).Text;
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.SampleArgs.Path = t;
+            }
+            UpdateEditingField();
+        }
+
+        private void SelectedSampleBankBox_TextChanged(object sender, TextChangedEventArgs e) {
             if (suppressEvents) return;
 
             int t = (sender as TextBox).GetInt(-1);
@@ -575,7 +574,7 @@ namespace Mapping_Tools.Views {
             }
         }
 
-        private void SelectedPatchBox_TextChanged(object sender, TextChangedEventArgs e) {
+        private void SelectedSamplePatchBox_TextChanged(object sender, TextChangedEventArgs e) {
             if (suppressEvents) return;
 
             int t = (sender as TextBox).GetInt(-1);
@@ -584,7 +583,7 @@ namespace Mapping_Tools.Views {
             }
         }
 
-        private void SelectedInstrumentBox_TextChanged(object sender, TextChangedEventArgs e) {
+        private void SelectedSampleInstrumentBox_TextChanged(object sender, TextChangedEventArgs e) {
             if (suppressEvents) return;
 
             int t = (sender as TextBox).GetInt(-1);
@@ -593,7 +592,7 @@ namespace Mapping_Tools.Views {
             }
         }
 
-        private void SelectedKeyBox_TextChanged(object sender, TextChangedEventArgs e) {
+        private void SelectedSampleKeyBox_TextChanged(object sender, TextChangedEventArgs e) {
             if (suppressEvents) return;
 
             int t = (sender as TextBox).GetInt(-1);
@@ -602,21 +601,140 @@ namespace Mapping_Tools.Views {
             }
         }
 
-        private void SelectedLengthBox_TextChanged(object sender, TextChangedEventArgs e) {
+        private void SelectedSampleLengthBox_TextChanged(object sender, TextChangedEventArgs e) {
             if (suppressEvents) return;
 
-            int t = (sender as TextBox).GetInt(-1);
+            double t = (sender as TextBox).GetDouble(-1);
             foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
                 hitsoundLayer.SampleArgs.Length = t;
             }
         }
 
-        private void SelectedVelocityBox_TextChanged(object sender, TextChangedEventArgs e) {
+        private void SelectedSampleVelocityBox_TextChanged(object sender, TextChangedEventArgs e) {
             if (suppressEvents) return;
 
             int t = (sender as TextBox).GetInt(-1);
             foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
                 hitsoundLayer.SampleArgs.Velocity = t;
+            }
+        }
+
+        private void SelectedImportTypeBox_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            string t = ((sender as ComboBox).SelectedItem as ComboBoxItem).Content.ToString();
+            ImportType type = (ImportType)Enum.Parse(typeof(ImportType), t);
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.ImportArgs.ImportType = type;
+            }
+            UpdateEditingField();
+        }
+
+        private void SelectedImportPathBox_TextChanged(object sender, TextChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            string t = (sender as TextBox).Text;
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.ImportArgs.Path = t;
+            }
+        }
+
+        private void SelectedImportXCoordBox_TextChanged(object sender, TextChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            double t = (sender as TextBox).GetDouble(-1);
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.ImportArgs.X = t;
+            }
+        }
+
+        private void SelectedImportYCoordBox_TextChanged(object sender, TextChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            double t = (sender as TextBox).GetDouble(-1);
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.ImportArgs.Y = t;
+            }
+        }
+
+        private void SelectedImportSamplePathBox_TextChanged(object sender, TextChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            string t = (sender as TextBox).Text;
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.ImportArgs.SamplePath = t;
+            }
+        }
+
+        private void SelectedImportBankBox_TextChanged(object sender, TextChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            int t = (sender as TextBox).GetInt(-1);
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.ImportArgs.Bank = t;
+            }
+        }
+
+        private void SelectedImportPatchBox_TextChanged(object sender, TextChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            int t = (sender as TextBox).GetInt(-1);
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.ImportArgs.Patch = t;
+            }
+        }
+
+        private void SelectedImportInstrumentBox_TextChanged(object sender, TextChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            int t = (sender as TextBox).GetInt(-1);
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.ImportArgs.Instrument = t;
+            }
+        }
+
+        private void SelectedImportKeyBox_TextChanged(object sender, TextChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            int t = (sender as TextBox).GetInt(-1);
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.ImportArgs.Key = t;
+            }
+        }
+
+        private void SelectedImportLengthBox_TextChanged(object sender, TextChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            int t = (sender as TextBox).GetInt(-1);
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.ImportArgs.Length = t;
+            }
+        }
+
+        private void SelectedImportVelocityBox_TextChanged(object sender, TextChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            int t = (sender as TextBox).GetInt(-1);
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.ImportArgs.Velocity = t;
+            }
+        }
+
+        private void SelectedImportLengthRoughnessBox_TextChanged(object sender, TextChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            double t = (sender as TextBox).GetDouble(1);
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.ImportArgs.LengthRoughness = t;
+            }
+        }
+
+        private void SelectedImportVelocityRoughnessBox_TextChanged(object sender, TextChangedEventArgs e) {
+            if (suppressEvents) return;
+
+            int t = (sender as TextBox).GetInt(1);
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.ImportArgs.VelocityRoughness = t;
             }
         }
     }

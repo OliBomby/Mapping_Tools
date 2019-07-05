@@ -45,37 +45,27 @@
                 </Grid.RowDefinitions>
                 <ScrollViewer Grid.Row="0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                     <StackPanel x:Name="EditPanel" Margin="0,0,0,20">
-                        <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Name:"/></TextBlock>
-                        <TextBox x:Name="SelectedNameBox" TextChanged="SelectedNameBox_TextChanged" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6"/>
-                        <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Hitsound sample:"/></TextBlock>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="30"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" x:Name="SelectedSamplePathBox" TextChanged="SelectedSamplePathBox_TextChanged" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Margin="0,0,5,0"/>
-                            <Button Grid.Column="1" Width="Auto" Height="Auto" Cursor="Hand" Click="SelectedSamplePathBrowse_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
-                                <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="#FFD6D6D6"/>
-                            </Button >
-                        </Grid>
+                        <TextBlock FontSize="14"><Run Text="General"/></TextBlock>
+                        <TextBox x:Name="SelectedNameBox" TextChanged="SelectedNameBox_TextChanged"
+                            Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Name"/>
 
-                        <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Hitsound info:"/></TextBlock>
-                        <ComboBox x:Name="SelectedSampleSetBox" SelectionChanged="SelectedSampleSetBox_SelectionChanged" Margin="0,10,0,0" HorizontalAlignment="Stretch" Cursor="Hand">
+                        <ComboBox x:Name="SelectedSampleSetBox" SelectionChanged="SelectedSampleSetBox_SelectionChanged" Cursor="Hand" Margin="0,10,0,0"
+                            Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="SampleSet">
                             <ComboBoxItem Content="Normal" HorizontalAlignment="Left" Cursor="Hand"/>
                             <ComboBoxItem Content="Soft" HorizontalAlignment="Left" Cursor="Hand"/>
                             <ComboBoxItem Content="Drum" HorizontalAlignment="Left" Cursor="Hand"/>
                         </ComboBox>
-                        <ComboBox x:Name="SelectedHitsoundBox" SelectionChanged="SelectedHitsoundBox_SelectionChanged" Margin="0,10,0,0" HorizontalAlignment="Stretch" Cursor="Hand">
+                        <ComboBox x:Name="SelectedHitsoundBox" SelectionChanged="SelectedHitsoundBox_SelectionChanged" Cursor="Hand" Margin="0,10,0,0"
+                            Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Hitsound">
                             <ComboBoxItem Content="Normal" HorizontalAlignment="Left" Cursor="Hand"/>
                             <ComboBoxItem Content="Whistle" HorizontalAlignment="Left" Cursor="Hand"/>
                             <ComboBoxItem Content="Finish" HorizontalAlignment="Left" Cursor="Hand"/>
                             <ComboBoxItem Content="Clap" HorizontalAlignment="Left" Cursor="Hand"/>
                         </ComboBox>
-                        <CheckBox x:Name="ShowTimesBox" Content="Show times" FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"/>
+                        <CheckBox x:Name="ShowTimesBox" Content="Show times" Margin="0,10,0,0"/>
                         <StackPanel Visibility="{Binding Path=IsChecked, ElementName=ShowTimesBox, UpdateSourceTrigger=PropertyChanged,  
-                                 Converter={StaticResource BooleanToVisibilityConverter}, 
-                                 FallbackValue=Collapsed}">
-                            <TextBox x:Name="TimesBox" TextWrapping="Wrap" TextChanged="TimesBox_TextChanged">
+                                 Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
+                            <TextBox x:Name="TimesBox" TextChanged="TimesBox_TextChanged" TextWrapping="Wrap" materialDesign:HintAssist.Hint="Times">
                                 <TextBox.Text>
                                     <Binding Path="EditTimes" UpdateSourceTrigger="PropertyChanged">
                                         <Binding.ValidationRules>
@@ -85,49 +75,98 @@
                                 </TextBox.Text>
                             </TextBox>
                         </StackPanel>
-                        <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,20,0,0"><Run Text="Import type:"/></TextBlock>
-                        <ComboBox x:Name="ImportTypeBox" SelectionChanged="ImportTypeBox_SelectionChanged" Margin="0,10,0,0" HorizontalAlignment="Stretch" Cursor="Hand">
-                            <ComboBoxItem Content="Stack" HorizontalAlignment="Left" Cursor="Hand"/>
-                            <ComboBoxItem Content="Hitsounds" HorizontalAlignment="Left" Cursor="Hand"/>
-                            <ComboBoxItem Content="MIDI" HorizontalAlignment="Left" Cursor="Hand"/>
-                        </ComboBox>
-                        <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Source:"/></TextBlock>
+
+                        <TextBlock FontSize="14" Margin="0,20,0,0"><Run Text="Hitsound sample:"/></TextBlock>
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="30"/>
-                                <ColumnDefinition Width="5"/>
-                                <ColumnDefinition Width="30"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" x:Name="SelectedSourcePathBox" TextChanged="SelectedSourcePathBox_TextChanged" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6" Margin="0,0,5,0"/>
-                            <Button Grid.Column="1" Width="Auto" Height="Auto" Cursor="Hand" Click="SelectedSourcePathLoad_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
-                                <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Download" Foreground="#FFD6D6D6"/>
-                            </Button >
-                            <Button Grid.Column="3" Width="Auto" Height="Auto" Cursor="Hand" Click="SelectedSourcePathBrowse_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
+                            <TextBox Grid.Column="0" x:Name="SelectedSamplePathBox" TextChanged="SelectedSamplePathBox_TextChanged" Margin="0,0,5,0"
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Path"/>
+                            <Button Grid.Column="1" Width="Auto" Height="Auto" Cursor="Hand" Click="SelectedSamplePathBrowse_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
                                 <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="#FFD6D6D6"/>
                             </Button >
                         </Grid>
-                        <StackPanel x:Name="SelectedCoordinatePanel">
-                            <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Stack X coordinate:"/></TextBlock>
-                            <TextBox x:Name="SelectedXCoordBox" TextChanged="SelectedXCoordBox_TextChanged" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6"/>
-                            <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Stack Y coordinate:"/></TextBlock>
-                            <TextBox x:Name="SelectedYCoordBox" TextChanged="SelectedYCoordBox_TextChanged" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6"/>
+                        <StackPanel x:Name="SoundFontArgsPanel">
+                            <TextBox x:Name="SelectedSampleBankBox" TextChanged="SelectedSampleBankBox_TextChanged"
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Bank"/>
+                            <TextBox x:Name="SelectedSamplePatchBox" TextChanged="SelectedSamplePatchBox_TextChanged"
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Patch"/>
+                            <TextBox x:Name="SelectedSampleInstrumentBox" TextChanged="SelectedSampleInstrumentBox_TextChanged"
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Instrument"/>
+                            <TextBox x:Name="SelectedSampleKeyBox" TextChanged="SelectedSampleKeyBox_TextChanged"
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Key"/>
+                            <TextBox x:Name="SelectedSampleLengthBox" TextChanged="SelectedSampleLengthBox_TextChanged"
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Length"/>
+                            <TextBox x:Name="SelectedSampleVelocityBox" TextChanged="SelectedSampleVelocityBox_TextChanged"
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Velocity"/>
                         </StackPanel>
-                        <StackPanel x:Name="SelectedMIDIPanel">
-                            <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Bank:"/></TextBlock>
-                            <TextBox x:Name="SelectedBankBox" TextChanged="SelectedBankBox_TextChanged" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6"/>
-                            <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Patch:"/></TextBlock>
-                            <TextBox x:Name="SelectedPatchBox" TextChanged="SelectedPatchBox_TextChanged" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6"/>
-                            <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Instrument #:"/></TextBlock>
-                            <TextBox x:Name="SelectedInstrumentBox" TextChanged="SelectedInstrumentBox_TextChanged" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6"/>
-                            <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Key:"/></TextBlock>
-                            <TextBox x:Name="SelectedKeyBox" TextChanged="SelectedKeyBox_TextChanged" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6"/>
-                            <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Length:"/></TextBlock>
-                            <TextBox x:Name="SelectedLengthBox" TextChanged="SelectedLengthBox_TextChanged" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6"/>
-                            <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="#FFD6D6D6" Margin="0,10,0,0"><Run Text="Velocity:"/></TextBlock>
-                            <TextBox x:Name="SelectedVelocityBox" TextChanged="SelectedVelocityBox_TextChanged" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="#FFD6D6D6"/>
+
+                        <TextBlock FontSize="14" Margin="0,20,0,0"><Run Text="Import info"/></TextBlock>
+                        <ComboBox x:Name="SelectedImportTypeBox" SelectionChanged="SelectedImportTypeBox_SelectionChanged" Cursor="Hand" Margin="0,5,0,0"
+                            Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Import type">
+                            <ComboBoxItem Content="None" HorizontalAlignment="Left" Cursor="Hand"/>
+                            <ComboBoxItem Content="Stack" HorizontalAlignment="Left" Cursor="Hand"/>
+                            <ComboBoxItem Content="Hitsounds" HorizontalAlignment="Left" Cursor="Hand"/>
+                            <ComboBoxItem Content="MIDI" HorizontalAlignment="Left" Cursor="Hand"/>
+                        </ComboBox>
+                        <StackPanel x:Name="ImportArgsPanel">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="30"/>
+                                    <ColumnDefinition Width="5"/>
+                                    <ColumnDefinition Width="30"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0" x:Name="SelectedImportPathBox" TextChanged="SelectedImportPathBox_TextChanged" Margin="0,0,5,0"
+                                    Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Source path"/>
+                                <Button Grid.Column="1" Width="Auto" Height="Auto" Cursor="Hand" Click="SelectedImportPathLoad_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
+                                    <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Download" Foreground="#FFD6D6D6"/>
+                                </Button >
+                                <Button Grid.Column="3" Width="Auto" Height="Auto" Cursor="Hand" Click="SelectedImportPathBrowse_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
+                                    <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="#FFD6D6D6"/>
+                                </Button >
+                            </Grid>
+                            <StackPanel x:Name="SelectedStackPanel">
+                                <TextBox x:Name="SelectedImportXCoordBox" TextChanged="SelectedImportXCoordBox_TextChanged"
+                                    Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="X coordinate"/>
+                                <TextBox x:Name="SelectedImportYCoordBox" TextChanged="SelectedImportYCoordBox_TextChanged"
+                                    Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Y coordinate"/>
+                            </StackPanel>
+                            <StackPanel x:Name="SelectedHitsoundsPanel">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="30"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" x:Name="SelectedImportSamplePathBox" TextChanged="SelectedImportSamplePathBox_TextChanged" Margin="0,0,5,0"
+                                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Sample path"/>
+                                    <Button Grid.Column="1" Width="Auto" Height="Auto" Cursor="Hand" Click="SelectedImportSamplePathBrowse_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
+                                        <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="#FFD6D6D6"/>
+                                    </Button >
+                                </Grid>
+                            </StackPanel>
+                            <StackPanel x:Name="SelectedMIDIPanel">
+                                <TextBox x:Name="SelectedImportBankBox" TextChanged="SelectedImportBankBox_TextChanged"
+                                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Bank"/>
+                                <TextBox x:Name="SelectedImportPatchBox" TextChanged="SelectedImportPatchBox_TextChanged"
+                                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Patch"/>
+                                <TextBox x:Name="SelectedImportInstrumentBox" TextChanged="SelectedImportInstrumentBox_TextChanged"
+                                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Instrument"/>
+                                <TextBox x:Name="SelectedImportKeyBox" TextChanged="SelectedImportKeyBox_TextChanged"
+                                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Key"/>
+                                <TextBox x:Name="SelectedImportLengthBox" TextChanged="SelectedImportLengthBox_TextChanged"
+                                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Length"/>
+                                <TextBox x:Name="SelectedImportLengthRoughnessBox" TextChanged="SelectedImportLengthRoughnessBox_TextChanged"
+                                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Length roughness"/>
+                                <TextBox x:Name="SelectedImportVelocityBox" TextChanged="SelectedImportVelocityBox_TextChanged"
+                                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Velocity"/>
+                                <TextBox x:Name="SelectedImportVelocityRoughnessBox" TextChanged="SelectedImportVelocityRoughnessBox_TextChanged"
+                                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Velocity roughness"/>
+                            </StackPanel>
+                            <Button Margin="0,10,0,0" Content="Reload from source" FontWeight="Bold" FontSize="16" Click="ReloadFromSource_Click"/>
                         </StackPanel>
-                        <Button Grid.Row="1" Margin="0,10,0,0" Content="Reload from source" FontWeight="Bold" FontSize="16" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="ReloadFromSource_Click"/>
                     </StackPanel>
                 </ScrollViewer>
             </Grid>

@@ -28,6 +28,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Velocity = velocity;
         }
 
+        public bool UsesSoundFont { get { return System.IO.Path.GetExtension(Path) == ".sf2"; } }
+
         private string path;
         public string Path {
             get { return path; }
