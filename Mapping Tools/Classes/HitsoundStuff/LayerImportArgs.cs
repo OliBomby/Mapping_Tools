@@ -185,7 +185,30 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
         }
 
-        public bool ExactlyEquals(LayerImportArgs other) {
+        public ImportReloadingArgs GetImportReloadingArgs() {
+            return new ImportReloadingArgs(ImportType, Path, X, Y, LengthRoughness, VelocityRoughness);
+        }
+
+        public bool ReloadCompatible(LayerImportArgs o) {
+            if (ImportType != o.ImportType)
+                return false;
+
+            switch (ImportType) {
+                case ImportType.Stack:
+                    return Path == o.Path && (X == -1 || X == o.X) && (Y == -1 || Y == o.Y);
+                case ImportType.Hitsounds:
+                    return Path == o.Path && SamplePath == o.SamplePath;
+                case ImportType.MIDI:
+                    return Path == o.Path && (Bank == -1 || Bank == o.Bank) && (Patch == -1 || Patch == o.Patch) && (Key == -1 || Key == o.Key)
+                                          && (Length == -1 || Length == o.Length) && (Velocity == -1 || Velocity == o.Velocity);
+                case ImportType.None:
+                    return true;
+                default:
+                    return Equals(o);
+            }
+        }
+
+        public bool Equals(LayerImportArgs other) {
             return Path == other.Path &&
                 ImportType == other.ImportType &&
                 X == other.X &&
@@ -198,33 +221,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 LengthRoughness == other.LengthRoughness &&
                 Velocity == other.Velocity &&
                 VelocityRoughness == other.VelocityRoughness;
-        }
-
-        public bool Equals(LayerImportArgs other) {
-            // Functionally equals
-            if (ImportType != other.ImportType)
-                return false;
-            if (ImportType == ImportType.Stack) {
-                return Path == other.Path &&
-                    X == other.X &&
-                    Y == other.Y;
-            } else if (ImportType == ImportType.Hitsounds) {
-                return Path == other.path &&
-                    SamplePath == other.SamplePath;
-            } else if (ImportType == ImportType.MIDI) {
-                return Path == other.Path &&
-                    Bank == other.Bank &&
-                    Patch == other.Patch &&
-                    Key == other.Key &&
-                    Length == other.Length &&
-                    LengthRoughness == other.LengthRoughness &&
-                    Velocity == other.Velocity &&
-                    VelocityRoughness == other.VelocityRoughness;
-            } else if (ImportType == ImportType.None) {
-                return true;
-            } else {
-                return ExactlyEquals(other);
-            }
         }
 
         public override bool Equals(object obj) {

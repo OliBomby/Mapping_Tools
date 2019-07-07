@@ -71,20 +71,16 @@ namespace Mapping_Tools.Views {
         private void Add_Click(object sender, RoutedEventArgs e) {
             if (Tabs.SelectedIndex == 0) {
                 // Import one layer
-                string path = BeatmapPathBox.Text;
-                double x = XCoordBox.GetDouble();
-                double y = YCoordBox.GetDouble();
-
-                HitsoundLayer layer = new HitsoundLayer(NameBox.Text, ImportType.Stack, (SampleSet)(SampleSetBox.SelectedIndex + 1), (Hitsound)HitsoundBox.SelectedIndex, SamplePathBox.Text);
-                layer.ImportArgs.Path = path;
-                layer.ImportArgs.X = x;
-                layer.ImportArgs.Y = y;
-                layer.Times = HitsoundImporter.TimesFromStack(path, x, y);
+                HitsoundLayer layer = HitsoundImporter.ImportStack(BeatmapPathBox.Text, XCoordBox.GetDouble(), YCoordBox.GetDouble());
+                layer.Name = NameBox.Text;
+                layer.SampleSet = (SampleSet)(SampleSetBox.SelectedIndex + 1);
+                layer.Hitsound = (Hitsound)HitsoundBox.SelectedIndex;
+                layer.SampleArgs.Path = SamplePathBox.Text;
 
                 HitsoundLayers.Add(layer);
             } else if (Tabs.SelectedIndex == 1) {
                 // Import complete hitsounds
-                HitsoundLayers = HitsoundImporter.LayersFromHitsounds(BeatmapPathBox2.Text);
+                HitsoundLayers = HitsoundImporter.ImportHitsounds(BeatmapPathBox2.Text);
                 HitsoundLayers.ForEach(o => o.Name = String.Format("{0}: {1}", NameBox2.Text, o.Name));
             } else {
                 // Import MIDI

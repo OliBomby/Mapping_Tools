@@ -166,35 +166,15 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Priority = priority;
         }
 
-        public void Import(List<HitsoundLayer> layers = null) {
-            if (ImportArgs.ImportType == ImportType.Stack) {
-                ImportStack(ImportArgs.Path, ImportArgs.X, ImportArgs.Y);
-            } else if (ImportArgs.ImportType == ImportType.Hitsounds) {
-                // Import complete hitsounds
-                layers = layers ?? HitsoundImporter.LayersFromHitsounds(ImportArgs.Path);
-                
-                HitsoundLayer sameLayer = layers.Find(o => o.ImportArgs.Path == ImportArgs.Path);
-                if (sameLayer != null) {
-                    Times = sameLayer.Times;
-                }
+        public void Reload(List<HitsoundLayer> layers) {
+            List<HitsoundLayer> sameLayer = layers.FindAll(o => ImportArgs.ReloadCompatible(o.ImportArgs));
 
-            } else if (ImportArgs.ImportType == ImportType.MIDI) {
-                // Import MIDI
-                layers = layers ?? HitsoundImporter.ImportMIDI(ImportArgs.Path);
-
-                List<HitsoundLayer> sameLayer = layers.FindAll(o => (SampleArgs.Instrument == -1 || SampleArgs.Instrument == o.SampleArgs.Instrument) && (SampleArgs.Key == -1 || SampleArgs.Key == o.SampleArgs.Key)
-                                                                 && (SampleArgs.Length == -1 || SampleArgs.Length == o.SampleArgs.Length) && (SampleArgs.Velocity == -1 || SampleArgs.Velocity == o.SampleArgs.Velocity));
-                Times.Clear();
-                foreach (HitsoundLayer hsl in sameLayer) {
-                    Times.AddRange(hsl.Times);
-                }
-                Times.OrderBy(o => o);
+            Times.Clear();
+            foreach (HitsoundLayer hsl in sameLayer) {
+                Times.AddRange(hsl.Times);
             }
+            Times.OrderBy(o => o);
             NotifyPropertyChanged("Times");
-        }
-
-        public void ImportStack(string path, double x, double y) {
-            Times = HitsoundImporter.TimesFromStack(path, x, y);
         }
     }
 }

@@ -27,6 +27,16 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return times;
         }
 
+        public static HitsoundLayer ImportStack(string path, double x, double y) {
+            HitsoundLayer layer = new HitsoundLayer();
+            layer.ImportArgs.ImportType = ImportType.Stack;
+            layer.ImportArgs.Path = path;
+            layer.ImportArgs.X = x;
+            layer.ImportArgs.Y = y;
+            layer.Times = TimesFromStack(path, x, y);
+            return layer;
+        }
+
         public static Dictionary<string, string> AnalyzeSamples(string dir, bool extended=false) {
             var extList = new string[] { ".wav", ".ogg", ".mp3" };
             List<string> samplePaths = Directory.GetFiles(dir, "*.*", extended ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly)
@@ -65,7 +75,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// </summary>
         /// <param name="path">The path to the beatmap</param>
         /// <returns>The hitsound layers</returns>
-        public static List<HitsoundLayer> LayersFromHitsounds(string path) {
+        public static List<HitsoundLayer> ImportHitsounds(string path) {
             Editor editor = new Editor(path);
             Beatmap beatmap = editor.Beatmap;
             Timeline timeline = beatmap.GetTimeline();
@@ -253,6 +263,19 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             hitsoundLayers = hitsoundLayers.OrderBy(o => o.Name).ToList();
 
             return hitsoundLayers;
+        }
+
+        public static List<HitsoundLayer> ImportReloading(ImportReloadingArgs reloadingArgs) {
+            switch (reloadingArgs.ImportType) {
+                case ImportType.Stack:
+                    return new List<HitsoundLayer>() { ImportStack(reloadingArgs.Path, reloadingArgs.X, reloadingArgs.Y) };
+                case ImportType.Hitsounds:
+                    return ImportHitsounds(reloadingArgs.Path);
+                case ImportType.MIDI:
+                    return ImportMIDI(reloadingArgs.Path, lengthRoughness: reloadingArgs.LengthRoughness, velocityRoughness: reloadingArgs.VelocityRoughness);
+                default:
+                    return new List<HitsoundLayer>();
+            }
         }
 
         private static double RoundVelocity(double length, double roughness) {

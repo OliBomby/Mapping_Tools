@@ -254,24 +254,24 @@ namespace Mapping_Tools.Views {
 
         private void ReloadFromSource_Click(object sender, RoutedEventArgs e) {
             try {
-                HashSet<string> paths = new HashSet<string>(selectedLayers.Select(o => o.ImportArgs.Path));
-                List<HitsoundLayer> layers = new List<HitsoundLayer>();
+                var seperatedByImportArgsForReloading = new Dictionary<ImportReloadingArgs, List<HitsoundLayer>>(new ImportReloadingArgsComparer());
 
-                if (selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Hitsounds)) {
-                    foreach (string path in paths) {
-                        layers.AddRange(HitsoundImporter.LayersFromHitsounds(path));
-                    }
-                }
-                if (selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.MIDI)) {
-                    foreach (string path in paths) {
-                        layers.AddRange(HitsoundImporter.ImportMIDI(path));
+                foreach (var layer in selectedLayers) {
+                    var reloadingArgs = layer.ImportArgs.GetImportReloadingArgs();
+                    if (seperatedByImportArgsForReloading.TryGetValue(reloadingArgs, out List<HitsoundLayer> value)) {
+                        value.Add(layer);
+                    } else {
+                        seperatedByImportArgsForReloading.Add(reloadingArgs, new List<HitsoundLayer>() { layer });
                     }
                 }
 
-                foreach (HitsoundLayer hl in selectedLayers) {
-                    try {
-                        hl.Import(layers);
-                    } catch (Exception) { }
+                foreach (var pair in seperatedByImportArgsForReloading) {
+                    var reloadingArgs = pair.Key;
+                    var layers = pair.Value;
+
+                    var importedLayers = HitsoundImporter.ImportReloading(reloadingArgs);
+
+                    layers.ForEach(o => o.Reload(importedLayers));
                 }
             } catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
         }

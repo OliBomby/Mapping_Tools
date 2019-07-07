@@ -135,6 +135,8 @@
     <Compile Include="Classes\HitsoundStuff\DelayFadeOutSampleProvider.cs" />
     <Compile Include="Classes\HitsoundStuff\Hitsound.cs" />
     <Compile Include="Classes\HitsoundStuff\HitsoundLayerExtension.cs" />
+    <Compile Include="Classes\HitsoundStuff\ImportReloadingArgs.cs" />
+    <Compile Include="Classes\HitsoundStuff\ImportReloadingArgsComparer.cs" />
     <Compile Include="Classes\HitsoundStuff\ImportType.cs" />
     <Compile Include="Classes\HitsoundStuff\LayerImportArgs.cs" />
     <Compile Include="Classes\HitsoundStuff\SampleGeneratingArgs.cs" />
