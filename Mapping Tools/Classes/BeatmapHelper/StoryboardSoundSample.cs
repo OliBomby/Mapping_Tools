@@ -38,7 +38,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Time = ParseDouble(values[1]);
             Layer = int.Parse(values[2]);
             FilePath = values[3].Trim('"');
-            Volume = values.Length >= 5 ? ParseDouble(values[4]) : 100;
+            Volume = values.Length >= 5 && values[4] != "" ? ParseDouble(values[4]) : 100;
         }
 
         private double ParseDouble(string d) {
