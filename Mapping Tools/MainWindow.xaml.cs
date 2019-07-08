@@ -54,8 +54,8 @@ namespace Mapping_Tools {
             AutoUpdater.Start("https://osu-mappingtools.potoofu.moe/Updater/updater.json");
             */
 
-            string appCommon = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-            AppDataPath = Path.Combine(appCommon, "Mapping-Tools");
+            string appCommon = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            AppDataPath = Path.Combine(appCommon, "Mapping Tools");
             ExportPath = Path.Combine(AppDataPath, "Exports");
             HSProjectPath = Path.Combine(AppDataPath, "Hitsounding Projects");
 
