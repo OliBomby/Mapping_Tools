@@ -19,7 +19,7 @@ namespace Mapping_Tools.Classes.SystemTools.HitsoundStudio {
             NullValueHandling = NullValueHandling.Ignore
         };
 
-        public static readonly string DefaultProjectPath = Path.Combine(MainWindow.AppWindow.AppDataPath, "hsmakerproject.json");
+        public static readonly string DefaultProjectPath = Path.Combine(MainWindow.AppDataPath, "hsmakerproject.json");
 
         public ProjectManager() {
             GetProjects();
@@ -27,7 +27,7 @@ namespace Mapping_Tools.Classes.SystemTools.HitsoundStudio {
 
         public void GetProjects() {
             try {
-                ProjectNames = Directory.GetDirectories(MainWindow.AppWindow.HSProjectPath)
+                ProjectNames = Directory.GetDirectories(MainWindow.HSProjectPath)
                                             .Select(Path.GetFileName).ToList();
             }
             catch( Exception ) {
@@ -72,7 +72,7 @@ namespace Mapping_Tools.Classes.SystemTools.HitsoundStudio {
         }
 
         public void SaveProject() {
-            string path = IOHelper.SaveProjectDialog(MainWindow.AppWindow.HSProjectPath);
+            string path = IOHelper.SaveProjectDialog(MainWindow.HSProjectPath);
 
             // If the file name is not an empty string open it for saving.  
             if (path != "") {
@@ -114,7 +114,7 @@ namespace Mapping_Tools.Classes.SystemTools.HitsoundStudio {
         }
 
         public void LoadProject() {
-            string path = IOHelper.LoadProjectDialog(MainWindow.AppWindow.HSProjectPath);
+            string path = IOHelper.LoadProjectDialog(MainWindow.HSProjectPath);
 
             // If the file name is not an empty string open it for saving.  
             if (path != "") {

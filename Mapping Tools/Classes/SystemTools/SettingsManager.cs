@@ -7,7 +7,7 @@ using System.Windows;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public class SettingsManager {
-        private static readonly string JSONPath = Path.Combine(MainWindow.AppWindow.AppDataPath, "config.json");
+        private static readonly string JSONPath = Path.Combine(MainWindow.AppDataPath, "config.json");
         private static readonly JsonSerializer Serializer = new JsonSerializer {
             NullValueHandling = NullValueHandling.Ignore
         };
@@ -103,7 +103,7 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
 
             if (settings.BackupsPath == "") {
-                settings.BackupsPath = Path.Combine(MainWindow.AppWindow.AppDataPath, "Backups");
+                settings.BackupsPath = Path.Combine(MainWindow.AppDataPath, "Backups");
                 Directory.CreateDirectory(settings.BackupsPath);
             }
         }

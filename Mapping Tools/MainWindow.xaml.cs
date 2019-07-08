@@ -26,9 +26,10 @@ namespace Mapping_Tools {
         public ProjectManager projectmanager;
         public ViewCollection Views;
         public bool SessionhasAdminRights;
-        public string AppDataPath;
-        public string HSProjectPath;
-        public string ExportPath;
+
+        public static string AppDataPath;
+        public static string HSProjectPath;
+        public static string ExportPath;
 
         public MainWindow() {
             Setup();

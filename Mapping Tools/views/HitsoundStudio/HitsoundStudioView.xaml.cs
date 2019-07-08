@@ -160,7 +160,7 @@ namespace Mapping_Tools.Views {
         }
 
         private void Startish_Click(object sender, RoutedEventArgs e) {
-            backgroundWorker.RunWorkerAsync(new Arguments(MainWindow.AppWindow.ExportPath, Settings.BaseBeatmap, Settings.DefaultSample, Settings.HitsoundLayers.ToList(), true));
+            backgroundWorker.RunWorkerAsync(new Arguments(MainWindow.ExportPath, Settings.BaseBeatmap, Settings.DefaultSample, Settings.HitsoundLayers.ToList(), true));
             startish.IsEnabled = false;
         }
 
@@ -169,7 +169,7 @@ namespace Mapping_Tools.Views {
                 MessageBox.Show("Please import a base beatmap and default hitsound first.");
                 return;
             }
-            backgroundWorker.RunWorkerAsync(new Arguments(MainWindow.AppWindow.ExportPath, Settings.BaseBeatmap, Settings.DefaultSample, Settings.HitsoundLayers.ToList(), false));
+            backgroundWorker.RunWorkerAsync(new Arguments(MainWindow.ExportPath, Settings.BaseBeatmap, Settings.DefaultSample, Settings.HitsoundLayers.ToList(), false));
             start.IsEnabled = false;
         }
 

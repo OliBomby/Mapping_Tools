@@ -36,7 +36,7 @@ namespace Mapping_Tools.Classes.SystemTools.HitsoundStudio {
         }
 
         public string GetProjectPath() {
-            return Path.Combine(MainWindow.AppWindow.HSProjectPath, Name);
+            return Path.Combine(MainWindow.HSProjectPath, Name);
         }
     }
 }
