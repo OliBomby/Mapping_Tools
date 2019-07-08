@@ -297,7 +297,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                                                         CustomIndex.ToString(), SampleVolume.ToString(), Filename });
             }
             else {
-                return string.Join(":", new string[] { ((SampleSet)SampleSet).ToString(), ((SampleSet)AdditionSet).ToString(),
+                return string.Join(":", new string[] { ((int)SampleSet).ToString(), ((int)AdditionSet).ToString(),
                                                         CustomIndex.ToString(), SampleVolume.ToString(), Filename });
             }
         }

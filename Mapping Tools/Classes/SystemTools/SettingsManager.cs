@@ -101,6 +101,11 @@ namespace Mapping_Tools.Classes.SystemTools {
             if (settings.SongsPath == "") {
                 settings.SongsPath = Path.Combine(settings.OsuPath, "Songs");
             }
+
+            if (settings.BackupsPath == "") {
+                settings.BackupsPath = Path.Combine(MainWindow.AppWindow.AppDataPath, "Backups");
+                Directory.CreateDirectory(settings.BackupsPath);
+            }
         }
 
         private string FindByDisplayName(RegistryKey parentKey, string name) {
@@ -126,6 +131,14 @@ namespace Mapping_Tools.Classes.SystemTools {
 
         public string GetSongsPath() {
             return settings.SongsPath;
+        }
+
+        public string GetBackupsPath() {
+            return settings.BackupsPath;
+        }
+
+        public bool GetMakeBackups() {
+            return settings.MakeBackups;
         }
     }
 }

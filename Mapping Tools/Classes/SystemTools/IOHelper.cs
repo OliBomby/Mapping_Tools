@@ -1,19 +1,40 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Forms;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace Mapping_Tools.Classes.SystemTools
 {
     public class IOHelper
     {
-        public static void SaveMapBackup(string fileToCopy) {
+        public static bool SaveMapBackup(string fileToCopy, bool forced=false) {
+            if (!MainWindow.AppWindow.settingsManager.GetMakeBackups() && !forced)
+                return false;
+
             DateTime now = DateTime.Now;
-            string destinationDirectory = MainWindow.AppWindow.BackupPath;
+            string destinationDirectory = MainWindow.AppWindow.settingsManager.GetBackupsPath();
             try {
                 File.Copy(fileToCopy, Path.Combine(destinationDirectory, now.ToString("yyyy-MM-dd HH-mm-ss") + "___" + Path.GetFileName(fileToCopy)));
+                return true;
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message);
+                return false;
             }
+        }
+
+        public static string FolderDialog(string initialDirectory = "") {
+            bool restore = initialDirectory == "";
+
+            CommonOpenFileDialog dialog = new CommonOpenFileDialog {
+                IsFolderPicker = true,
+                InitialDirectory = initialDirectory,
+                RestoreDirectory = restore
+            };
+
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok) {
+                return dialog.FileName;
+            }
+            return "";
         }
 
         public static string SaveProjectDialog(string initialDirectory = "") {

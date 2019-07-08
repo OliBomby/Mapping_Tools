@@ -27,7 +27,6 @@ namespace Mapping_Tools {
         public ViewCollection Views;
         public bool SessionhasAdminRights;
         public string AppDataPath;
-        public string BackupPath;
         public string HSProjectPath;
         public string ExportPath;
 
@@ -57,13 +56,11 @@ namespace Mapping_Tools {
 
             string appCommon = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
             AppDataPath = Path.Combine(appCommon, "Mapping-Tools");
-            BackupPath = Path.Combine(AppDataPath, "Backups");
             ExportPath = Path.Combine(AppDataPath, "Exports");
             HSProjectPath = Path.Combine(AppDataPath, "Hitsounding Projects");
 
             try {
                 Directory.CreateDirectory(AppDataPath);
-                Directory.CreateDirectory(BackupPath);
                 Directory.CreateDirectory(ExportPath);
                 Directory.CreateDirectory(HSProjectPath);
             }
@@ -118,17 +115,9 @@ namespace Mapping_Tools {
         }
 
         private void SaveBackup(object sender, RoutedEventArgs e) {
-            DateTime now = DateTime.Now;
-            string fileToCopy = currentMap.Text;
-            string destinationDirectory = BackupPath;
-            try {
-                File.Copy(fileToCopy, Path.Combine(destinationDirectory, now.ToString("yyyy-MM-dd HH-mm-ss") + "___" + System.IO.Path.GetFileName(fileToCopy)));
-            }
-            catch( Exception ex ) {
-                System.Windows.MessageBox.Show(ex.Message);
-                return;
-            }
-            System.Windows.MessageBox.Show("Beatmap successfully copied!");
+            bool result = IOHelper.SaveMapBackup(GetCurrentMap(), forced: true);
+            if (result)
+                System.Windows.MessageBox.Show("Beatmap successfully copied!");
         }
 
         //Method for loading the cleaner interface 
@@ -330,7 +319,7 @@ namespace Mapping_Tools {
         //Open backup folder in file explorer
         private void OpenBackups(object sender, RoutedEventArgs e) {
             try {
-                Process.Start(BackupPath);
+                Process.Start(settingsManager.GetBackupsPath());
             }
             catch( Exception ex ) {
                 System.Windows.Forms.MessageBox.Show(ex.Message);
