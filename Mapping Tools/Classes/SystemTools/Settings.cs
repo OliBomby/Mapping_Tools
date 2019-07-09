@@ -76,5 +76,11 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
             RecentMaps.Insert(0, new string[] { path, date.ToString()});
         }
+
+        public void CopyTo(Settings other) {
+            foreach (var prop in typeof(Settings).GetProperties()) {
+                prop.SetValue(other, prop.GetValue(this));
+            }
+        }
     }
 }

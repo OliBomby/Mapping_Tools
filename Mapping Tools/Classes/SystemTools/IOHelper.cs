@@ -8,11 +8,11 @@ namespace Mapping_Tools.Classes.SystemTools
     public class IOHelper
     {
         public static bool SaveMapBackup(string fileToCopy, bool forced=false) {
-            if (!MainWindow.AppWindow.settingsManager.GetMakeBackups() && !forced)
+            if (!SettingsManager.GetMakeBackups() && !forced)
                 return false;
 
             DateTime now = DateTime.Now;
-            string destinationDirectory = MainWindow.AppWindow.settingsManager.GetBackupsPath();
+            string destinationDirectory = SettingsManager.GetBackupsPath();
             try {
                 File.Copy(fileToCopy, Path.Combine(destinationDirectory, now.ToString("yyyy-MM-dd HH-mm-ss") + "___" + Path.GetFileName(fileToCopy)));
                 return true;
@@ -107,7 +107,7 @@ namespace Mapping_Tools.Classes.SystemTools
 
         public static string BeatmapFileDialog() {
             OpenFileDialog openFileDialog = new OpenFileDialog {
-                InitialDirectory = MainWindow.AppWindow.settingsManager.GetSongsPath(),
+                InitialDirectory = SettingsManager.GetSongsPath(),
                 Filter = "Osu files (*.osu)|*.osu",
                 FilterIndex = 1,
                 RestoreDirectory = true,
@@ -122,7 +122,7 @@ namespace Mapping_Tools.Classes.SystemTools
             var reader = OsuMemoryDataProvider.DataProvider.Instance;
             string folder = reader.GetMapFolderName();
             string filename = reader.GetOsuFileName();
-            string songs = MainWindow.AppWindow.settingsManager.GetSongsPath(); 
+            string songs = SettingsManager.GetSongsPath(); 
             string path = Path.Combine(songs, folder, filename);
 
             if (songs == "" || folder == "" || filename == "") { return ""; }

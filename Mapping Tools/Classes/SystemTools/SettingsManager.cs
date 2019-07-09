@@ -6,24 +6,25 @@ using System.IO;
 using System.Windows;
 
 namespace Mapping_Tools.Classes.SystemTools {
-    public class SettingsManager {
+    public static class SettingsManager {
         private static readonly string JSONPath = Path.Combine(MainWindow.AppDataPath, "config.json");
         private static readonly JsonSerializer Serializer = new JsonSerializer {
             NullValueHandling = NullValueHandling.Ignore
         };
 
-        public Settings settings;
+        public static readonly Settings Settings = new Settings();
 
-        public SettingsManager() {
+        public static void LoadConfig() {
             bool instanceComplete = File.Exists(JSONPath) ? LoadFromJSON() : CreateJSON();
             DefaultPaths();
         }
 
-        private bool LoadFromJSON() {
+        private static bool LoadFromJSON() {
             try {
                 using( StreamReader sr = new StreamReader(JSONPath) )
                 using( JsonReader reader = new JsonTextReader(sr) ) {
-                    settings = Serializer.Deserialize<Settings>(reader);
+                    Settings newSettings = Serializer.Deserialize<Settings>(reader);
+                    newSettings.CopyTo(Settings);
                 }
             }
             catch( Exception ex ) {
@@ -36,13 +37,11 @@ namespace Mapping_Tools.Classes.SystemTools {
             return true;
         }
 
-        private bool CreateJSON() {
+        private static bool CreateJSON() {
             try {
-                settings = new Settings();
-
                 using( StreamWriter sw = new StreamWriter(JSONPath) )
                 using( JsonWriter writer = new JsonTextWriter(sw) ) {
-                    Serializer.Serialize(writer, settings);
+                    Serializer.Serialize(writer, Settings);
                 }
             }
             catch( Exception ex ) {
@@ -55,11 +54,11 @@ namespace Mapping_Tools.Classes.SystemTools {
             return true;
         }
 
-        public bool WriteToJSON(bool doLoading) {
+        public static bool WriteToJSON(bool doLoading=false) {
             try {
                 using( StreamWriter sw = new StreamWriter(JSONPath) )
                 using( JsonWriter writer = new JsonTextWriter(sw) ) {
-                    Serializer.Serialize(writer, settings);
+                    Serializer.Serialize(writer, Settings);
                 }
             }
             catch( Exception ex ) {
@@ -77,17 +76,12 @@ namespace Mapping_Tools.Classes.SystemTools {
             return true;
         }
 
-        public bool AddRecentMaps(String path, DateTime date, bool doLoading) {
-            settings.AddRecentMaps(path, date);
-
-            if( WriteToJSON(doLoading) )
-                return true;
-            else
-                return false;
+        public static void AddRecentMap(string path, DateTime date) {
+            Settings.AddRecentMaps(path, date);
         }
 
-        public void DefaultPaths() {
-            if (settings.OsuPath == "") {
+        public static void DefaultPaths() {
+            if (Settings.OsuPath == "") {
                 RegistryKey regKey;
                 try {
                     regKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall");
@@ -95,20 +89,20 @@ namespace Mapping_Tools.Classes.SystemTools {
                     regKey = null;
                 }
                 if (regKey != null)
-                    settings.OsuPath = FindByDisplayName(regKey, "osu!");
+                    Settings.OsuPath = FindByDisplayName(regKey, "osu!");
             }
 
-            if (settings.SongsPath == "") {
-                settings.SongsPath = Path.Combine(settings.OsuPath, "Songs");
+            if (Settings.SongsPath == "") {
+                Settings.SongsPath = Path.Combine(Settings.OsuPath, "Songs");
             }
 
-            if (settings.BackupsPath == "") {
-                settings.BackupsPath = Path.Combine(MainWindow.AppDataPath, "Backups");
-                Directory.CreateDirectory(settings.BackupsPath);
+            if (Settings.BackupsPath == "") {
+                Settings.BackupsPath = Path.Combine(MainWindow.AppDataPath, "Backups");
+                Directory.CreateDirectory(Settings.BackupsPath);
             }
         }
 
-        private string FindByDisplayName(RegistryKey parentKey, string name) {
+        private static string FindByDisplayName(RegistryKey parentKey, string name) {
             string[] nameList = parentKey.GetSubKeyNames();
             for (int i = 0; i < nameList.Length; i++) {
                 RegistryKey regKey = parentKey.OpenSubKey(nameList[i]);
@@ -121,24 +115,24 @@ namespace Mapping_Tools.Classes.SystemTools {
             return "";
         }
 
-        public List<string[]> GetRecentMaps() {
-            return settings.RecentMaps;
+        public static List<string[]> GetRecentMaps() {
+            return Settings.RecentMaps;
         }
 
-        public string GetOsuPath() {
-            return settings.OsuPath;
+        public static string GetOsuPath() {
+            return Settings.OsuPath;
         }
 
-        public string GetSongsPath() {
-            return settings.SongsPath;
+        public static string GetSongsPath() {
+            return Settings.SongsPath;
         }
 
-        public string GetBackupsPath() {
-            return settings.BackupsPath;
+        public static string GetBackupsPath() {
+            return Settings.BackupsPath;
         }
 
-        public bool GetMakeBackups() {
-            return settings.MakeBackups;
+        public static bool GetMakeBackups() {
+            return Settings.MakeBackups;
         }
     }
 }

@@ -18,32 +18,32 @@ using System.Drawing;
 using System.Reflection;
 
 namespace Mapping_Tools {
-    public partial class MainWindow :Window {
+    public partial class MainWindow : Window {
         private bool isMaximized = false; //Check for window state
         private double widthWin, heightWin; //Set default sizes of window
-        public static MainWindow AppWindow { get; set; }
-        public SettingsManager settingsManager;
         public ProjectManager projectmanager;
         public ViewCollection Views;
         public bool SessionhasAdminRights;
 
-        public static string AppDataPath;
-        public static string HSProjectPath;
-        public static string ExportPath;
+        public static MainWindow AppWindow { get; set; }
+        private static readonly string appCommon = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        public static readonly string AppDataPath = Path.Combine(appCommon, "Mapping Tools");
+        public static readonly string HSProjectPath = Path.Combine(AppDataPath, "Hitsounding Projects");
+        public static readonly string ExportPath = Path.Combine(AppDataPath, "Exports");
 
         public MainWindow() {
             Setup();
             InitializeComponent();
+            SettingsManager.LoadConfig();
             AppWindow = this;
             widthWin = ActualWidth; // Set width to window
             heightWin = ActualHeight; // Set height to window
             Views = new ViewCollection(); // Make a ViewCollection object
             DataContext = new StandardVM(); // Generate Standard view model to show on startup
-            settingsManager = new SettingsManager();
             projectmanager = new ProjectManager();
 
-            if( settingsManager.GetRecentMaps().Count > 0 ) {
-                SetCurrentMap(settingsManager.GetRecentMaps()[0][0]);
+            if(SettingsManager.GetRecentMaps().Count > 0 ) {
+                SetCurrentMap(SettingsManager.GetRecentMaps()[0][0]);
             } // Set currentmap to previously opened map
         }
 
@@ -54,11 +54,6 @@ namespace Mapping_Tools {
             AutoUpdater.ParseUpdateInfoEvent += AutoUpdaterOnParseUpdateInfoEvent;
             AutoUpdater.Start("https://osu-mappingtools.potoofu.moe/Updater/updater.json");
             */
-
-            string appCommon = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            AppDataPath = Path.Combine(appCommon, "Mapping Tools");
-            ExportPath = Path.Combine(AppDataPath, "Exports");
-            HSProjectPath = Path.Combine(AppDataPath, "Hitsounding Projects");
 
             try {
                 Directory.CreateDirectory(AppDataPath);
@@ -98,7 +93,7 @@ namespace Mapping_Tools {
 
         public void SetCurrentMap(string path) {
             currentMap.Text = path;
-            settingsManager.AddRecentMaps(path, DateTime.Now, true);
+            SettingsManager.AddRecentMap(path, DateTime.Now);
         }
 
         public string GetCurrentMap() {
@@ -320,7 +315,7 @@ namespace Mapping_Tools {
         //Open backup folder in file explorer
         private void OpenBackups(object sender, RoutedEventArgs e) {
             try {
-                Process.Start(settingsManager.GetBackupsPath());
+                Process.Start(SettingsManager.GetBackupsPath());
             }
             catch( Exception ex ) {
                 System.Windows.Forms.MessageBox.Show(ex.Message);
@@ -392,7 +387,7 @@ namespace Mapping_Tools {
         //Close window
         private void CloseWin(object sender, RoutedEventArgs e) {
             Views.SaveSettings();
-            settingsManager.WriteToJSON(false);
+            SettingsManager.WriteToJSON(false);
             this.Close();
         }
 

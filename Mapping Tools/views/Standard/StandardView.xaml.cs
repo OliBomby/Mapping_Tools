@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using Mapping_Tools.Classes.SystemTools;
+using System.Windows.Controls;
 
 namespace Mapping_Tools.Views {
     public partial class StandardView :UserControl {
@@ -9,8 +10,8 @@ namespace Mapping_Tools.Views {
         }
 
         public void SetRecentList() {
-            if( MainWindow.AppWindow.settingsManager.GetRecentMaps().Count > 0 ) {
-                foreach( string[] s in MainWindow.AppWindow.settingsManager.GetRecentMaps() ) {
+            if (SettingsManager.GetRecentMaps().Count > 0) {
+                foreach (string[] s in SettingsManager.GetRecentMaps()) {
                     // Populate listview in the component
                     recentList.Items.Add(new MyItem { Path = s[0], Date = s[1] });
                 }

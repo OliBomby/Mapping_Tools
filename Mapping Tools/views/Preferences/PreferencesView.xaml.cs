@@ -14,7 +14,7 @@ namespace Mapping_Tools.Views
         public PreferencesView()
         {
             InitializeComponent();
-            DataContext = MainWindow.AppWindow.settingsManager.settings;
+            DataContext = SettingsManager.Settings;
         }
 
         private void MakeDark(object sender, RoutedEventArgs e) {
@@ -29,7 +29,7 @@ namespace Mapping_Tools.Views
             string path = IOHelper.FolderDialog();
             if (!string.IsNullOrWhiteSpace(path)) {
                 OsuPathBox.Text = path;
-                MainWindow.AppWindow.settingsManager.settings.OsuPath = path;
+                SettingsManager.Settings.OsuPath = path;
             }
         }
 
@@ -37,7 +37,7 @@ namespace Mapping_Tools.Views
             string path = IOHelper.FolderDialog();
             if (!string.IsNullOrWhiteSpace(path)) {
                 SongsPathBox.Text = path;
-                MainWindow.AppWindow.settingsManager.settings.SongsPath = path;
+                SettingsManager.Settings.SongsPath = path;
             }
         }
 
@@ -45,28 +45,30 @@ namespace Mapping_Tools.Views
             string path = IOHelper.FolderDialog();
             if (!string.IsNullOrWhiteSpace(path)) {
                 BackupsPathBox.Text = path;
-                MainWindow.AppWindow.settingsManager.settings.BackupsPath = path;
+                SettingsManager.Settings.BackupsPath = path;
             }
         }
 
         private void OsuPathBox_TextChanged(object sender, TextChangedEventArgs e) {
-            MainWindow.AppWindow.settingsManager.settings.OsuPath = OsuPathBox.Text;
+            SettingsManager.Settings.OsuPath = OsuPathBox.Text;
         }
 
         private void SongsPathBox_TextChanged(object sender, TextChangedEventArgs e) {
-            MainWindow.AppWindow.settingsManager.settings.SongsPath = SongsPathBox.Text;
+            SettingsManager.Settings.SongsPath = SongsPathBox.Text;
+            Console.WriteLine(SettingsManager.GetSongsPath());
+            Console.WriteLine(((Settings)DataContext).SongsPath);
         }
 
         private void BackupsPathBox_TextChanged(object sender, TextChangedEventArgs e) {
-            MainWindow.AppWindow.settingsManager.settings.BackupsPath = BackupsPathBox.Text;
+            SettingsManager.Settings.BackupsPath = BackupsPathBox.Text;
         }
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e) {
-            MainWindow.AppWindow.settingsManager.settings.MakeBackups = true;
+            SettingsManager.Settings.MakeBackups = true;
         }
 
         private void CheckBox_Unchecked(object sender, RoutedEventArgs e) {
-            MainWindow.AppWindow.settingsManager.settings.MakeBackups = false;
+            SettingsManager.Settings.MakeBackups = false;
         }
     }
 }
