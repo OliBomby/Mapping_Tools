@@ -24,7 +24,7 @@
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="true">
-                                    <Setter TargetName="border" Property="Background" Value="#404040"/>
+                                    <Setter TargetName="border" Property="Background" Value="{DynamicResource MaterialDesignSelection}"/>
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>

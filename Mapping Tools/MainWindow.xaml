@@ -19,7 +19,8 @@
         TextElement.FontWeight="Medium"
         TextElement.FontSize="14"
         ShowInTaskbar="True"
-        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
+        Background="{DynamicResource MaterialDesignPaper}"
         >
     <WindowChrome.WindowChrome>
         <WindowChrome 
