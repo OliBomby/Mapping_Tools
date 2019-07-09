@@ -8,34 +8,40 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <StackPanel>
+        <StackPanel Margin="0,0,100,0">
             <TextBlock Foreground="{DynamicResource PrimaryHueMidBrush}" FontSize="50"><Run Text="Preferences"/></TextBlock>
             <Grid Margin="0,20,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBox x:Name="OsuPathBox" Text="{Binding OsuPath, Mode=TwoWay}" MinWidth="220"
+                <TextBox x:Name="OsuPathBox" Text="{Binding OsuPath, Mode=TwoWay}" MinWidth="220" Margin="0,0,5,0"
                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="osu! folder"/>
-                <Button Grid.Column="1" Content="Browse" Margin="10,0,0,0" Click="Button_Click"/>
+                <Button Grid.Column="1" Cursor="Hand" Click="Button_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
+                    <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                </Button >
             </Grid>
             <Grid Margin="0,10,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBox x:Name="SongsPathBox" Text="{Binding SongsPath, Mode=TwoWay}" MinWidth="220"
+                <TextBox x:Name="SongsPathBox" Text="{Binding SongsPath, Mode=TwoWay}" MinWidth="220" Margin="0,0,5,0"
                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Songs folder"/>
-                <Button Grid.Column="1" Content="Browse" Margin="10,0,0,0" Click="Button_Click_1"/>
+                <Button Grid.Column="1" Cursor="Hand" Click="Button_Click_1" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
+                    <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                </Button >
             </Grid>
             <Grid Margin="0,10,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBox x:Name="BackupsPathBox" Text="{Binding BackupsPath, Mode=TwoWay}" MinWidth="220"
+                <TextBox x:Name="BackupsPathBox" Text="{Binding BackupsPath, Mode=TwoWay}" MinWidth="220" Margin="0,0,5,0"
                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Backups folder"/>
-                <Button Grid.Column="1" Content="Browse" Margin="10,0,0,0" Click="Button_Click_2"/>
+                <Button Grid.Column="1" Cursor="Hand" Click="Button_Click_2" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
+                    <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                </Button >
             </Grid>
             <CheckBox Content="Make automatic backups" IsChecked="{Binding MakeBackups, Mode=TwoWay}" Margin="0,5,0,0"/>
             <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
