@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public class Settings : INotifyPropertyChanged {
-        public List<String[]> RecentMaps;
+        public List<String[]> RecentMaps { get; set; }
 
         private string osuPath;
         public string OsuPath {

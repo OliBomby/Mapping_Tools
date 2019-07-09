@@ -25,7 +25,9 @@ namespace Mapping_Tools.Views {
         }
 
         private void RecentList_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e) {
-            MainWindow.AppWindow.SetCurrentMap(((MyItem)recentList.SelectedItem).Path);
+            var selectedItem = (MyItem)recentList.SelectedItem;
+            if (selectedItem != null)
+                MainWindow.AppWindow.SetCurrentMap(selectedItem.Path);
         }
     }
 }

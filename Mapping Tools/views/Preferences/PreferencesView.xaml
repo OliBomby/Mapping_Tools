@@ -15,7 +15,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="100"/>
                 </Grid.ColumnDefinitions>
-                <TextBox x:Name="OsuPathBox" Text="{Binding OsuPath, Mode=OneTime}" TextChanged="OsuPathBox_TextChanged" MinWidth="220"
+                <TextBox x:Name="OsuPathBox" Text="{Binding OsuPath, Mode=TwoWay}" MinWidth="220"
                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="osu! folder"/>
                 <Button Grid.Column="1" Content="Browse" Margin="10,0,0,0" Click="Button_Click"/>
             </Grid>
@@ -24,7 +24,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="100"/>
                 </Grid.ColumnDefinitions>
-                <TextBox x:Name="SongsPathBox" Text="{Binding SongsPath, Mode=OneTime}" TextChanged="SongsPathBox_TextChanged" MinWidth="220"
+                <TextBox x:Name="SongsPathBox" Text="{Binding SongsPath, Mode=TwoWay}" MinWidth="220"
                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Songs folder"/>
                 <Button Grid.Column="1" Content="Browse" Margin="10,0,0,0" Click="Button_Click_1"/>
             </Grid>
@@ -33,11 +33,11 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="100"/>
                 </Grid.ColumnDefinitions>
-                <TextBox x:Name="BackupsPathBox" Text="{Binding BackupsPath, Mode=OneTime}" TextChanged="BackupsPathBox_TextChanged" MinWidth="220"
+                <TextBox x:Name="BackupsPathBox" Text="{Binding BackupsPath, Mode=TwoWay}" MinWidth="220"
                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Backups folder"/>
                 <Button Grid.Column="1" Content="Browse" Margin="10,0,0,0" Click="Button_Click_2"/>
             </Grid>
-            <CheckBox Content="Make automatic backups" IsChecked="{Binding MakeBackups, Mode=OneTime}" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" Margin="0,5,0,0"/>
+            <CheckBox Content="Make automatic backups" IsChecked="{Binding MakeBackups, Mode=TwoWay}" Margin="0,5,0,0"/>
             <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
                 <TextBlock Text="Light"/>
                 <ToggleButton Margin="8,0,16,0" IsChecked="True" Checked="MakeDark" Unchecked="MakeLight"/>
