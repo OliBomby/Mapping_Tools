@@ -30,29 +30,27 @@
 
     <Grid>
         <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="35"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="1*"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="35"/>
             </Grid.RowDefinitions>
 
-            <Grid x:Name="FirstGrid" VerticalAlignment="Top" Grid.Column="0" Grid.Row="0">
-                <StackPanel WindowChrome.IsHitTestVisibleInChrome="true" Height="35" VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Horizontal">
-                    <Image Margin="10,0,0,0" HorizontalAlignment="Left" Source="data/map_cleaner.png" Height="35"/>
-                    <TextBlock Name="header" HorizontalAlignment="Left" Height="35" Text="Mapping Tools" Foreground="#FF5F5E5E" Padding="0,13,0,0"/>
+            <Grid x:Name="FirstGrid" Grid.Row="0">
+                <StackPanel WindowChrome.IsHitTestVisibleInChrome="true" HorizontalAlignment="Left" Orientation="Horizontal">
+                    <Image Margin="10,0,0,0" Source="data/map_cleaner.png" Height="35"/>
+                    <TextBlock Name="header" Text="Mapping Tools" Foreground="{DynamicResource MaterialDesignBody}" Padding="0,13,0,0" FontWeight="Normal"/>
                 </StackPanel>
-                <StackPanel WindowChrome.IsHitTestVisibleInChrome="true" Height="35" VerticalAlignment="Top" HorizontalAlignment="Right" Orientation="Horizontal">
-                    <Button Style="{DynamicResource MaterialDesignRaisedDarkButton}" Content="{materialDesign:PackIcon WindowMinimize}" Click="MinimizeWin" BorderBrush="{x:Null}" Background="{x:Null}" HorizontalAlignment="Right" Height="35" Panel.ZIndex="1" Foreground="#FFD6D6D6"/>
-                    <Button x:Name="toggle_button" Style="{DynamicResource MaterialDesignRaisedDarkButton}" Content="{materialDesign:PackIcon WindowMaximize}" Click="ToggleWin" BorderBrush="{x:Null}" Background="{x:Null}" HorizontalAlignment="Right" Height="35" Foreground="#FFD6D6D6"/>
-                    <Button Style="{DynamicResource MaterialDesignRaisedDarkButton}" Content="{materialDesign:PackIcon WindowCLose}" Click="CloseWin" Background="{x:Null}" BorderBrush="{x:Null}" HorizontalAlignment="Right"  Height="35" Foreground="#FFD6D6D6"/>
+                <StackPanel WindowChrome.IsHitTestVisibleInChrome="true" HorizontalAlignment="Right" Orientation="Horizontal">
+                    <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowMinimize}" Click="MinimizeWin" Panel.ZIndex="1" Foreground="{DynamicResource MaterialDesignBody}"/>
+                    <Button x:Name="toggle_button" Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowMaximize}" Click="ToggleWin" Foreground="{DynamicResource MaterialDesignBody}"/>
+                    <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowCLose}" Click="CloseWin" Foreground="{DynamicResource MaterialDesignBody}"/>
                 </StackPanel>
             </Grid>
             <Grid x:Name="SecondGrid" Grid.Column="0" Grid.Row="1">
-                <Menu Foreground="#FFD6D6D6" >
+                <Menu Foreground="{DynamicResource MaterialDesignBody}" >
                     <MenuItem Height="31" Header="_File" Padding="12,0,0,0" MinWidth="50">
                         <MenuItem Header="_Open beatmap" Click="OpenBeatmap"/>
                         <MenuItem Header="_Open current beatmap" Click="OpenCurrentBeatmap"/>
@@ -87,25 +85,19 @@
             <Grid x:Name="ThirdGrid" Grid.Row="2">
                 <ContentControl Margin="20" Name="content_views" Content="{Binding}"></ContentControl>
             </Grid>
-            <Grid x:Name="ForthGrid" Grid.Row="3" Margin="0,1,0,0" RenderTransformOrigin="0.5,0.5" Background="#FF2B2B2B">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <Grid Grid.Column="0">
-                        <StackPanel HorizontalAlignment="Left" Height="35" VerticalAlignment="Bottom" Orientation="Horizontal">
-                            <TextBlock Padding="10,10,0,0" HorizontalAlignment="Left" Height="35" Text="Current Map:" Foreground="#FF5F5E5E"/>
-                        </StackPanel>
-                    </Grid>
-                    <Grid Grid.Column="1">
-                        <Viewbox Margin="0,0,20,0" HorizontalAlignment="Left" Height ="35">
-                            <TextBlock x:FieldModifier="public" Name="currentMap" TextWrapping="Wrap" Padding="10,10,0,0" Height="35" Foreground="#FF5F5E5E"/>
-                        </Viewbox>
-                    </Grid>
+            <Border Margin="10,0,10,0" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource MaterialDesignDivider}" Grid.Row="3" />
+            <Grid x:Name="ForthGrid" Grid.Row="4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0">
+                    <TextBlock Padding="10,10,0,0" Text="Current Map:" Foreground="{DynamicResource MaterialDesignBody}" FontWeight="Normal"/>
+                </Grid>
+                <Grid Grid.Column="1">
+                    <Viewbox Margin="0,0,20,0" HorizontalAlignment="Left">
+                        <TextBlock x:FieldModifier="public" Name="currentMap" Height="35" TextWrapping="Wrap" Padding="10,10,0,0" Foreground="{DynamicResource MaterialDesignBody}" FontWeight="Normal"/>
+                    </Viewbox>
                 </Grid>
             </Grid>
         </Grid>
