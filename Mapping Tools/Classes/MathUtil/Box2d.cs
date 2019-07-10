@@ -187,7 +187,7 @@ namespace Mapping_Tools.Classes.MathUtil {
             }
         }
 
-        private static string listSeparator = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
+        private static readonly string listSeparator = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
         /// <summary>
         /// Returns a <see cref="System.String"/> describing the current instance.
         /// </summary>

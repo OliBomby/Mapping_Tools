@@ -148,7 +148,7 @@ namespace Mapping_Tools.Classes.MathUtil {
             return !left.Equals(right);
         }
 
-        private static string listSeparator = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
+        private static readonly string listSeparator = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
         /// <summary>
         /// Returns a System.String that represents the current Line.
         /// </summary>

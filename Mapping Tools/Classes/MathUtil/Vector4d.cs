@@ -1308,7 +1308,7 @@ namespace Mapping_Tools.Classes.MathUtil {
             return new Vector4(v4d.X, v4d.Y, v4d.Z, v4d.W);
         }
 
-        private static string listSeparator = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
+        private static readonly string listSeparator = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
         /// <summary>
         /// Returns a System.String that represents the current Vector4d.
         /// </summary>

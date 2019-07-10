@@ -780,7 +780,7 @@ namespace Mapping_Tools.Classes.MathUtil {
             return new Vector2(v2d.X, v2d.Y);
         }
 
-        private static string listSeparator = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
+        private static readonly string listSeparator = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
         /// <summary>
         /// Returns a System.String that represents the current instance.
         /// </summary>

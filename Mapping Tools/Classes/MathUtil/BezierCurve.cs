@@ -15,7 +15,7 @@ namespace Mapping_Tools.Classes.MathUtil {
     /// </summary>
     [Serializable]
     public struct BezierCurve {
-        private List<Vector2> points;
+        private readonly List<Vector2> points;
 
         /// <summary>
         /// The parallel value.

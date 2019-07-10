@@ -1129,7 +1129,7 @@ namespace Mapping_Tools.Classes.MathUtil {
             return new Vector3(v3d.X, v3d.Y, v3d.Z);
         }
 
-        private static string listSeparator = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
+        private static readonly string listSeparator = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
         /// <summary>
         /// Returns a System.String that represents the current Vector3.
         /// </summary>
