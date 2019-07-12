@@ -228,6 +228,20 @@ namespace Mapping_Tools {
             this.MinHeight = 100;
         }
 
+        //Method for loading the hitsound studio
+        private void LoadHSPlacer(object sender, RoutedEventArgs e) {
+            DataContext = Views.GetHitsoundPlacer();
+
+            TextBlock txt = this.FindName("header") as TextBlock;
+            txt.Text = "Mapping Tools - Hitsound Placer";
+
+            System.Windows.Controls.MenuItem menuitem = this.FindName("project") as System.Windows.Controls.MenuItem;
+            menuitem.Visibility = Visibility.Collapsed;
+
+            this.MinWidth = 100;
+            this.MinHeight = 100;
+        }
+
         //Method for loading the standard interface
         private void LoadStartup(object sender, RoutedEventArgs e) {
             DataContext = Views.GetStandard();

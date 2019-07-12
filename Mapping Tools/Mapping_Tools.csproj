@@ -233,6 +233,9 @@
     <Compile Include="Viewmodels\PreferencesVM.cs" />
     <Compile Include="Viewmodels\StandardVM.cs" />
     <Compile Include="Views\Extensions.cs" />
+    <Compile Include="Views\HitsoundPlacer\HitsoundPlacer.xaml.cs">
+      <DependentUpon>HitsoundPlacer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\TimingHelper\TimingHelperView.xaml.cs">
       <DependentUpon>TimingHelperView.xaml</DependentUpon>
     </Compile>
@@ -299,6 +302,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\HitsoundPlacer\HitsoundPlacer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\TimingHelper\TimingHelperView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
