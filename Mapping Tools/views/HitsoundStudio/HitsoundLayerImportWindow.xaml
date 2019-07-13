@@ -64,70 +64,78 @@
 
             <TabItem Header="Import layer stack" Background="Transparent">
                 <StackPanel HorizontalAlignment="Stretch" CanVerticallyScroll="True" CanHorizontallyScroll="True" Margin="10">
-                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,10,0,0"><Run Text="Name:"/></TextBlock>
-                    <TextBox x:Name="NameBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="{DynamicResource MaterialDesignBody}" Text=""/>
-                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,10,0,0"><Run Text="Hitsound sample:"/></TextBlock>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0" x:Name="SamplePathBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="{DynamicResource MaterialDesignBody}" Text="" Margin="0,0,5,0"/>
-                        <Button Grid.Column="1" Cursor="Hand" Click="SampleBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
-                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
-                        </Button >
-                    </Grid>
-                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,10,0,0"><Run Text="Hitsound info:"/></TextBlock>
-                    <ComboBox x:Name="SampleSetBox" Margin="0,10,0,0" HorizontalAlignment="Stretch" SelectedIndex="0" Cursor="Hand" Foreground="{DynamicResource MaterialDesignBody}">
+                    <TextBox x:Name="NameBox" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,5,0,0"
+                            Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Name"/>
+                    <ComboBox x:Name="SampleSetBox" SelectedIndex="0" Cursor="Hand" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,5,0,0"
+                            Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Sampleset">
                         <ComboBoxItem Content="Normal" HorizontalAlignment="Left" Cursor="Hand"/>
                         <ComboBoxItem Content="Soft" HorizontalAlignment="Left" Cursor="Hand"/>
                         <ComboBoxItem Content="Drum" HorizontalAlignment="Left" Cursor="Hand"/>
                     </ComboBox>
-                    <ComboBox x:Name="HitsoundBox" Margin="0,10,0,0" HorizontalAlignment="Stretch" SelectedIndex="0" Cursor="Hand" Foreground="{DynamicResource MaterialDesignBody}">
+                    <ComboBox x:Name="HitsoundBox" SelectedIndex="0" Cursor="Hand" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,5,0,0"
+                            Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Hitsound">
                         <ComboBoxItem Content="Normal" HorizontalAlignment="Left" Cursor="Hand"/>
                         <ComboBoxItem Content="Whistle" HorizontalAlignment="Left" Cursor="Hand"/>
                         <ComboBoxItem Content="Finish" HorizontalAlignment="Left" Cursor="Hand"/>
                         <ComboBoxItem Content="Clap" HorizontalAlignment="Left" Cursor="Hand"/>
                     </ComboBox>
-                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,20,0,0"><Run Text="Source beatmap:"/></TextBlock>
-                    <Grid>
+                    <Grid Margin="0,15,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" x:Name="SamplePathBox" Foreground="{DynamicResource MaterialDesignBody}"
+                            Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Hitsound sample"/>
+                        <Button Grid.Column="1" Cursor="Hand" Click="SampleBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
+                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                        </Button >
+                    </Grid>
+                    <Grid Margin="0,15,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="5"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0" x:Name="BeatmapPathBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,0,5,0"/>
-                        <Button Grid.Column="1" Cursor="Hand" Click="BeatmapLoad_Click" Style="{StaticResource IconButton}">
+                        <TextBox Grid.Column="0" x:Name="BeatmapPathBox" Foreground="{DynamicResource MaterialDesignBody}"
+                            Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Source beatmap"/>
+                        <Button Grid.Column="1" Cursor="Hand" Click="BeatmapLoad_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
                             <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Download" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                         </Button >
-                        <Button Grid.Column="3" Cursor="Hand" Click="BeatmapBrowse_Click" Style="{StaticResource IconButton}">
+                        <Button Grid.Column="3" Cursor="Hand" Click="BeatmapBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
                             <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                         </Button >
                     </Grid>
-                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,10,0,0"><Run Text="Stack X coordinate:"/></TextBlock>
-                    <TextBox x:Name="XCoordBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="{DynamicResource MaterialDesignBody}"/>
-                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,10,0,0"><Run Text="Stack Y coordinate:"/></TextBlock>
-                    <TextBox x:Name="YCoordBox" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="{DynamicResource MaterialDesignBody}"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="5"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" x:Name="XCoordBox" Foreground="{DynamicResource MaterialDesignBody}"
+                                    Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="X coordinate"/>
+                        <TextBox Grid.Column="2" x:Name="YCoordBox" Foreground="{DynamicResource MaterialDesignBody}"
+                                    Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Y coordinate"/>
+                    </Grid>
                 </StackPanel>
             </TabItem>
             <TabItem Header="Import hitsounds" Background="Transparent">
                 <StackPanel CanVerticallyScroll="True" CanHorizontallyScroll="True" Margin="10">
-                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,10,0,0"><Run Text="Name:"/></TextBlock>
-                    <TextBox x:Name="NameBox2" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="{DynamicResource MaterialDesignBody}" Text=""/>
-                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,10,0,0"><Run Text="Source beatmap:"/></TextBlock>
-                    <Grid>
+                    <TextBox x:Name="NameBox2" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,5,0,0"
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Name"/>
+                    <Grid Margin="0,15,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="5"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0" x:Name="BeatmapPathBox2" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,0,5,0"/>
-                        <Button Grid.Column="1" Cursor="Hand" Click="BeatmapLoad2_Click" Style="{StaticResource IconButton}">
+                        <TextBox Grid.Column="0" x:Name="BeatmapPathBox2" Foreground="{DynamicResource MaterialDesignBody}"
+                            Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Source beatmap"/>
+                        <Button Grid.Column="1" Cursor="Hand" Click="BeatmapLoad2_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
                             <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Download" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                         </Button >
-                        <Button Grid.Column="3" Cursor="Hand" Click="BeatmapBrowse2_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
+                        <Button Grid.Column="3" Cursor="Hand" Click="BeatmapBrowse2_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
                             <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                         </Button >
                     </Grid>
@@ -135,20 +143,20 @@
             </TabItem>
             <TabItem Header="Import MIDI" Background="Transparent">
                 <StackPanel CanVerticallyScroll="True" CanHorizontallyScroll="True" Margin="10">
-                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,10,0,0"><Run Text="Name:"/></TextBlock>
-                    <TextBox x:Name="NameBox3" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="{DynamicResource MaterialDesignBody}" Text=""/>
-                    <TextBlock FontSize="14" HorizontalAlignment="Stretch" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,10,0,0"><Run Text="Source MIDI:"/></TextBlock>
-                    <Grid>
+                    <TextBox x:Name="NameBox3" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,5,0,0"
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Name"/>
+                    <Grid Margin="0,15,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0" x:Name="BeatmapPathBox3" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Foreground="{DynamicResource MaterialDesignBody}" Text="" Margin="0,0,5,0"/>
-                        <Button Grid.Column="1" Cursor="Hand" Click="MIDIBrowse3_Click" Style="{StaticResource IconButton}">
+                        <TextBox Grid.Column="0" x:Name="BeatmapPathBox3" Foreground="{DynamicResource MaterialDesignBody}"
+                            Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Source MIDI"/>
+                        <Button Grid.Column="1" Cursor="Hand" Click="MIDIBrowse3_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
                             <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                         </Button >
                     </Grid>
-                    <CheckBox x:Name="InstrumentBox3" Content="Discriminate instruments" IsChecked="True" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,10,0,0"/>
+                    <CheckBox x:Name="InstrumentBox3" Content="Discriminate instruments" IsChecked="True" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,15,0,0"/>
                     <CheckBox x:Name="KeysoundBox3" Content="Discriminate keysounds" IsChecked="True" Foreground="{DynamicResource MaterialDesignBody}"/>
                     <CheckBox x:Name="LengthBox3" Content="Discriminate lengths" IsChecked="False" Foreground="{DynamicResource MaterialDesignBody}"/>
                     <TextBox
@@ -182,19 +190,10 @@
                     <ColumnDefinition Width="1*"/>
                     <ColumnDefinition Width="1*"/>
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="Add" Click="Add_Click" FontWeight="Bold" Margin="0,0,10,0"/>
+                <Button Grid.Column="0" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="Accept" Click="Add_Click" FontWeight="Bold" Margin="0,0,10,0"/>
                 <Button Grid.Column="1" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="Cancel" Click="Cancel_Click" FontWeight="Bold" Margin="10,0,0,0"/>
             </Grid>
         </materialDesign:ColorZone>
-
-        <Border Name="window_border" BorderThickness="1" Grid.RowSpan="3" Grid.ColumnSpan="2" Background="{x:Null}" BorderBrush="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}">
-            <Border.Effect>
-                <DropShadowEffect BlurRadius="20" 
-                                  Color="{DynamicResource {x:Static SystemColors.HotTrackColorKey}}" 
-                                  Opacity="1" 
-                                  ShadowDepth="0.1" />
-            </Border.Effect>
-        </Border>
     </Grid>
     <Window.Resources>
     </Window.Resources>
