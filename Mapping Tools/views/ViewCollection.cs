@@ -37,6 +37,14 @@ namespace Mapping_Tools.Views {
             return MapCleaner;
         }
 
+        private UserControl HitsoundPlacer;
+        public UserControl GetHitsoundPlacer() {
+            if (HitsoundPlacer == null) {
+                HitsoundPlacer = new HitsoundPlacerView();
+            }
+            return HitsoundPlacer;
+        }
+
         private UserControl PropertyTransformer;
         public UserControl GetPropertyTransformer() {
             if (PropertyTransformer == null) {
