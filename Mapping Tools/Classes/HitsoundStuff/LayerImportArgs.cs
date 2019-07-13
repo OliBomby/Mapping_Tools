@@ -92,7 +92,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         private string samplePath;
         public string SamplePath {
-            get { return path; }
+            get { return samplePath; }
             set {
                 if (samplePath != value) {
                     samplePath = value;
