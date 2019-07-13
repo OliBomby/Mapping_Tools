@@ -29,7 +29,7 @@
 
         <Grid VerticalAlignment="Top" Grid.Row="0">
             <StackPanel WindowChrome.IsHitTestVisibleInChrome="true" Height="35" VerticalAlignment="Top" HorizontalAlignment="Right" Orientation="Horizontal">
-                <Button Style="{DynamicResource MaterialDesignRaisedButton}" Content="{materialDesign:PackIcon WindowCLose}" Click="CloseWin" Background="{x:Null}" BorderBrush="{x:Null}" HorizontalAlignment="Right"  Height="35" Foreground="#FFD6D6D6"/>
+                <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowCLose}" Click="CloseWin" HorizontalAlignment="Right" Height="35" Foreground="{DynamicResource MaterialDesignBody}"/>
             </StackPanel>
         </Grid>
 
