@@ -11,15 +11,12 @@ namespace Mapping_Tools.Views {
     /// <summary>
     /// Interaction logic for Window1.xaml
     /// </summary>
-    public partial class HitsoundLayerImportWindow : Window {
-        private double widthWin, heightWin; //Set default sizes of window
-        private int index;
+    public partial class HitsoundLayerImportWindow : UserControl {
+        private readonly int index;
         public List<HitsoundLayer> HitsoundLayers;
 
         public HitsoundLayerImportWindow() {
             InitializeComponent();
-            widthWin = ActualWidth; // Set width to window
-            heightWin = ActualHeight; // Set height to window
             HitsoundLayers = new List<HitsoundLayer>();
             index = 0;
             BeatmapPathBox.Text = MainWindow.AppWindow.GetCurrentMap();
@@ -28,12 +25,10 @@ namespace Mapping_Tools.Views {
 
         public HitsoundLayerImportWindow(int i) {
             InitializeComponent();
-            widthWin = ActualWidth; // Set width to window
-            heightWin = ActualHeight; // Set height to window
             HitsoundLayers = new List<HitsoundLayer>();
             index = i;
-            NameBox.Text = String.Format("Layer {0}", index + 1);
-            NameBox2.Text = String.Format("Layer {0}", index + 1);
+            NameBox.Text = string.Format("Layer {0}", index + 1);
+            NameBox2.Text = string.Format("Layer {0}", index + 1);
             BeatmapPathBox.Text = MainWindow.AppWindow.GetCurrentMap();
             BeatmapPathBox2.Text = MainWindow.AppWindow.GetCurrentMap();
         }
@@ -81,48 +76,18 @@ namespace Mapping_Tools.Views {
             } else if (Tabs.SelectedIndex == 1) {
                 // Import complete hitsounds
                 HitsoundLayers = HitsoundImporter.ImportHitsounds(BeatmapPathBox2.Text);
-                HitsoundLayers.ForEach(o => o.Name = String.Format("{0}: {1}", NameBox2.Text, o.Name));
+                HitsoundLayers.ForEach(o => o.Name = string.Format("{0}: {1}", NameBox2.Text, o.Name));
             } else {
                 // Import MIDI
                 HitsoundLayers = HitsoundImporter.ImportMIDI(BeatmapPathBox3.Text, (bool)InstrumentBox3.IsChecked, (bool)KeysoundBox3.IsChecked, (bool)LengthBox3.IsChecked, LengthRoughnessBox3.GetDouble(2), (bool)VelocityBox3.IsChecked, VelocityRoughnessBox3.GetDouble(10));
-                HitsoundLayers.ForEach(o => o.Name = String.Format("{0}: {1}", NameBox3.Text, o.Name));
+                HitsoundLayers.ForEach(o => o.Name = string.Format("{0}: {1}", NameBox3.Text, o.Name));
             }
-            
-            Close();
+
+            DialogHost.CloseDialogCommand.Execute(sender, MainWindow.AppWindow);
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e) {
-            Close();
-        }
-
-        //Close window
-        private void CloseWin(object sender, RoutedEventArgs e) {
-            Close();
-        }
-
-        //Enable drag control of window and set icons when docked
-        private void DragWin(object sender, MouseButtonEventArgs e) {
-            if (e.ChangedButton == MouseButton.Left) {
-                Button bt = this.FindName("toggle_button") as Button;
-                if (WindowState == WindowState.Maximized) {
-                    var point = PointToScreen(e.MouseDevice.GetPosition(this));
-
-                    if (point.X <= RestoreBounds.Width / 2)
-                        Left = 0;
-
-                    else if (point.X >= RestoreBounds.Width)
-                        Left = point.X - (RestoreBounds.Width - (this.ActualWidth - point.X));
-
-                    else
-                        Left = point.X - (RestoreBounds.Width / 2);
-
-                    Top = point.Y - (((FrameworkElement)sender).ActualHeight / 2);
-                    WindowState = WindowState.Normal;
-                    bt.Content = new PackIcon { Kind = PackIconKind.WindowMaximize };
-                }
-                this.DragMove();
-                //bt.Content = new PackIcon { Kind = PackIconKind.WindowRestore };
-            }
+            DialogSession.Close();
         }
     }
 }

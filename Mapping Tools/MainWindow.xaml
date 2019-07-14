@@ -27,89 +27,6 @@
             CaptionHeight="35"
             ResizeBorderThickness="5" />
     </WindowChrome.WindowChrome>
-
-    <Grid>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="35"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="35"/>
-            </Grid.RowDefinitions>
-
-            <Grid x:Name="FirstGrid" Grid.Row="0">
-                <StackPanel WindowChrome.IsHitTestVisibleInChrome="true" HorizontalAlignment="Left" Orientation="Horizontal">
-                    <Image Margin="10,0,0,0" Source="data/map_cleaner.png" Height="35"/>
-                    <TextBlock Name="header" Text="Mapping Tools" Foreground="{DynamicResource MaterialDesignBody}" Padding="0,13,0,0" FontWeight="Normal"/>
-                </StackPanel>
-                <StackPanel WindowChrome.IsHitTestVisibleInChrome="true" HorizontalAlignment="Right" Orientation="Horizontal">
-                    <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowMinimize}" Click="MinimizeWin" Panel.ZIndex="1" Foreground="{DynamicResource MaterialDesignBody}"/>
-                    <Button x:Name="toggle_button" Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowMaximize}" Click="ToggleWin" Foreground="{DynamicResource MaterialDesignBody}"/>
-                    <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowCLose}" Click="CloseWin" Foreground="{DynamicResource MaterialDesignBody}"/>
-                </StackPanel>
-            </Grid>
-            <Grid x:Name="SecondGrid" Grid.Column="0" Grid.Row="1">
-                <Menu Foreground="{DynamicResource MaterialDesignBody}" >
-                    <MenuItem Height="31" Header="_File" Padding="12,0,0,0" MinWidth="50">
-                        <MenuItem Header="_Open beatmap" Click="OpenBeatmap"/>
-                        <MenuItem Header="_Open current beatmap" Click="OpenCurrentBeatmap"/>
-                        <MenuItem Header="_Generate backup" Click="SaveBackup"/>
-                    </MenuItem>
-                    <MenuItem Height="31" Header="_Tools" Padding="12,0,0,0" MinWidth="65">
-                        <MenuItem Header="_Map Cleaner" Click="LoadCleaner"/>
-                        <MenuItem Header="_Property Transformer" Click="LoadPropertyTransformer"/>
-                        <MenuItem Header="_Slider Merger" Click="LoadMerger"/>
-                        <MenuItem Header="_Slider Completionator" Click="LoadCompletionator"/>
-                        <MenuItem Header="_Snapping Tools WIP" Click="LoadSnappingTools"/>
-                        <MenuItem Header="_Timing Helper" Click="LoadTimingHelper"/>
-                        <MenuItem Header="_Hitsound Copier" Click="LoadHSCopier"/>
-                        <MenuItem Header="_Hitsound Studio" Click="LoadHSStudio"/>
-                    </MenuItem>
-                    <MenuItem Height="31" Header="_Options" Padding="12,0,0,0" MinWidth="80">
-                        <MenuItem Header="_Preferences" Click="LoadPreferences"/>
-                        <MenuItem Header="_Get started" Click="LoadStartup"/>
-                        <MenuItem Header="_Open backups folder" Click="OpenBackups"/>
-                    </MenuItem>
-                    <MenuItem Height="31" Header="_About" Padding="12,0,0,0" MinWidth="67">
-                        <MenuItem Header="_Github" Click="OpenGitHub"/>
-                        <MenuItem Header="_Info" Click="OpenInfo"/>
-                    </MenuItem>
-                    <MenuItem x:Name="project" Visibility="Collapsed" Height="31" Header="_Project" Padding="12,0,0,0" MinWidth="67">
-                        <MenuItem Header="_Save project" Click="SaveHSProject"/>
-                        <MenuItem Header="_Load project" Click="LoadHSProject"/>
-                    </MenuItem>
-                </Menu>
-            </Grid>
-
-            <Grid x:Name="ThirdGrid" Grid.Row="2">
-                <ContentControl Margin="20" Name="content_views" Content="{Binding}"></ContentControl>
-            </Grid>
-            <Border Margin="10,0,10,0" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource MaterialDesignDivider}" Grid.Row="3" />
-            <Grid x:Name="ForthGrid" Grid.Row="4">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Grid Grid.Column="0">
-                    <TextBlock Padding="10,10,0,0" Text="Current Map:" Foreground="{DynamicResource MaterialDesignBody}" FontWeight="Normal"/>
-                </Grid>
-                <Grid Grid.Column="1">
-                    <Viewbox Margin="0,0,20,0" HorizontalAlignment="Left">
-                        <TextBlock x:FieldModifier="public" Name="currentMap" Height="35" TextWrapping="Wrap" Padding="10,10,0,0" Foreground="{DynamicResource MaterialDesignBody}" FontWeight="Normal"/>
-                    </Viewbox>
-                </Grid>
-            </Grid>
-        </Grid>
-        <Border Name="window_border" BorderThickness="1" Background="{x:Null}" BorderBrush="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}">
-            <Border.Effect>
-                <DropShadowEffect BlurRadius="20" 
-                                  Color="{DynamicResource {x:Static SystemColors.HotTrackColorKey}}" 
-                                  Opacity="1" 
-                                  ShadowDepth="0.1" />
-            </Border.Effect>
-        </Border>
-    </Grid>
     <Window.Resources>
         <DataTemplate DataType="{x:Type viewmodels:StandardVM}">
             <views:StandardView DataContext="{Binding}"/>
@@ -136,4 +53,89 @@
             <views:PreferencesView DataContext="{Binding}"/>
         </DataTemplate>
     </Window.Resources>
+
+    <materialDesign:DialogHost Identifier="RootDialog">
+        <Grid>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="35"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="35"/>
+                </Grid.RowDefinitions>
+
+                <Grid x:Name="FirstGrid" Grid.Row="0">
+                    <StackPanel WindowChrome.IsHitTestVisibleInChrome="true" HorizontalAlignment="Left" Orientation="Horizontal">
+                        <Image Margin="10,0,0,0" Source="data/map_cleaner.png" Height="35"/>
+                        <TextBlock Name="header" Text="Mapping Tools" Foreground="{DynamicResource MaterialDesignBody}" Padding="0,13,0,0" FontWeight="Normal"/>
+                    </StackPanel>
+                    <StackPanel WindowChrome.IsHitTestVisibleInChrome="true" HorizontalAlignment="Right" Orientation="Horizontal">
+                        <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowMinimize}" Click="MinimizeWin" Panel.ZIndex="1" Foreground="{DynamicResource MaterialDesignBody}"/>
+                        <Button x:Name="toggle_button" Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowMaximize}" Click="ToggleWin" Foreground="{DynamicResource MaterialDesignBody}"/>
+                        <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowCLose}" Click="CloseWin" Foreground="{DynamicResource MaterialDesignBody}"/>
+                    </StackPanel>
+                </Grid>
+                <Grid x:Name="SecondGrid" Grid.Column="0" Grid.Row="1">
+                    <Menu Foreground="{DynamicResource MaterialDesignBody}" >
+                        <MenuItem Height="31" Header="_File" Padding="12,0,0,0" MinWidth="50">
+                            <MenuItem Header="_Open beatmap" Click="OpenBeatmap"/>
+                            <MenuItem Header="_Open current beatmap" Click="OpenCurrentBeatmap"/>
+                            <MenuItem Header="_Generate backup" Click="SaveBackup"/>
+                        </MenuItem>
+                        <MenuItem Height="31" Header="_Tools" Padding="12,0,0,0" MinWidth="65">
+                            <MenuItem Header="_Map Cleaner" Click="LoadCleaner"/>
+                            <MenuItem Header="_Property Transformer" Click="LoadPropertyTransformer"/>
+                            <MenuItem Header="_Slider Merger" Click="LoadMerger"/>
+                            <MenuItem Header="_Slider Completionator" Click="LoadCompletionator"/>
+                            <MenuItem Header="_Snapping Tools WIP" Click="LoadSnappingTools"/>
+                            <MenuItem Header="_Timing Helper" Click="LoadTimingHelper"/>
+                            <MenuItem Header="_Hitsound Copier" Click="LoadHSCopier"/>
+                            <MenuItem Header="_Hitsound Studio" Click="LoadHSStudio"/>
+                        </MenuItem>
+                        <MenuItem Height="31" Header="_Options" Padding="12,0,0,0" MinWidth="80">
+                            <MenuItem Header="_Preferences" Click="LoadPreferences"/>
+                            <MenuItem Header="_Get started" Click="LoadStartup"/>
+                            <MenuItem Header="_Open backups folder" Click="OpenBackups"/>
+                        </MenuItem>
+                        <MenuItem Height="31" Header="_About" Padding="12,0,0,0" MinWidth="67">
+                            <MenuItem Header="_Github" Click="OpenGitHub"/>
+                            <MenuItem Header="_Info" Click="OpenInfo"/>
+                        </MenuItem>
+                        <MenuItem x:Name="project" Visibility="Collapsed" Height="31" Header="_Project" Padding="12,0,0,0" MinWidth="67">
+                            <MenuItem Header="_Save project" Click="SaveHSProject"/>
+                            <MenuItem Header="_Load project" Click="LoadHSProject"/>
+                        </MenuItem>
+                    </Menu>
+                </Grid>
+
+                <Grid x:Name="ThirdGrid" Grid.Row="2">
+                    <ContentControl Margin="20" Name="content_views" Content="{Binding}"></ContentControl>
+                </Grid>
+                <Border Margin="10,0,10,0" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource MaterialDesignDivider}" Grid.Row="3" />
+                <Grid x:Name="ForthGrid" Grid.Row="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0">
+                        <TextBlock Padding="10,10,0,0" Text="Current Map:" Foreground="{DynamicResource MaterialDesignBody}" FontWeight="Normal"/>
+                    </Grid>
+                    <Grid Grid.Column="1">
+                        <Viewbox Margin="0,0,20,0" HorizontalAlignment="Left">
+                            <TextBlock x:FieldModifier="public" Name="currentMap" Height="35" TextWrapping="Wrap" Padding="10,10,0,0" Foreground="{DynamicResource MaterialDesignBody}" FontWeight="Normal"/>
+                        </Viewbox>
+                    </Grid>
+                </Grid>
+            </Grid>
+            <Border Name="window_border" BorderThickness="1" Background="{x:Null}" BorderBrush="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="20" 
+                                  Color="{DynamicResource {x:Static SystemColors.HotTrackColorKey}}" 
+                                  Opacity="1" 
+                                  ShadowDepth="0.1" />
+                </Border.Effect>
+            </Border>
+        </Grid>
+    </materialDesign:DialogHost>
 </Window>

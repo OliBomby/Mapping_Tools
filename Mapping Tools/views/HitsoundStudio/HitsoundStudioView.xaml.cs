@@ -11,16 +11,15 @@ using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Viewmodels;
 using NAudio.Wave;
-using NAudio.Vorbis;
-using System.Text;
 using System.Globalization;
+using MaterialDesignThemes.Wpf;
 
 namespace Mapping_Tools.Views {
     /// <summary>
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
     public partial class HitsoundStudioView : UserControl {
-        private BackgroundWorker backgroundWorker;
+        private readonly BackgroundWorker backgroundWorker;
         private HitsoundStudioVM Settings;
 
         private bool suppressEvents = false;
@@ -63,7 +62,7 @@ namespace Mapping_Tools.Views {
 
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
             if( e.Error != null ) {
-                MessageBox.Show(String.Format("{0}:{1}{2}", e.Error.Message, Environment.NewLine, e.Error.StackTrace), "Error");
+                MessageBox.Show(string.Format("{0}:{1}{2}", e.Error.Message, Environment.NewLine, e.Error.StackTrace), "Error");
             }
             else {
                 progress.Value = 0;
@@ -376,10 +375,15 @@ namespace Mapping_Tools.Views {
             }
         }
 
-        private void Add_Click(object sender, RoutedEventArgs e) {
+        private async void Add_Click(object sender, RoutedEventArgs e) {
             try {
+                var result = await DialogHost.Show(myControl, delegate (object sender2, DialogOpenedEventArgs args)
+                {
+                    args.Session.Close(false);
+                });
+
                 HitsoundLayerImportWindow importWindow = new HitsoundLayerImportWindow(Settings.HitsoundLayers.Count);
-                importWindow.ShowDialog();
+                await DialogHost.Show(importWindow, "RootDialog");
 
                 LayersList.SelectedItems.Clear();
                 foreach (HitsoundLayer layer in importWindow.HitsoundLayers) {
