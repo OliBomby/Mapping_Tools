@@ -123,7 +123,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public void Move(Vector2 delta) {
             Pos += delta;
-            CurvePoints.ForEach(o => o += delta);
+            if (IsSlider) {
+                CurvePoints.ForEach(o => o += delta);
+            }
         }
 
         public bool ResnapSelf(Timing timing, int snap1, int snap2) {
@@ -148,6 +150,21 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             MoveEndTime(timing, deltaTime);
 
             return deltaTime != 0;
+        }
+
+        public bool ResnapPosition(int mode, int circleSize) {
+            if (mode == 3) {
+                // Resnap X to the middle of the columns and Y to 192
+                double dist = 512d / circleSize;
+                double hdist = dist / 2;
+
+                double dX = Math.Floor(Math.Round((Pos.X - hdist) / dist) * dist + hdist) - Pos.X;
+                double dY = 192 - Pos.Y;
+                Move(new Vector2(dX, dY));
+
+                return dX != 0 || dY != 0;
+            }
+            return false;
         }
 
         public bool ResnapEndClassic(Timing timing, int snap1, int snap2) {

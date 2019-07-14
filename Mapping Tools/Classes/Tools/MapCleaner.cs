@@ -49,6 +49,7 @@ namespace Mapping_Tools.Classes.Tools {
             Timeline timeline = beatmap.GetTimeline();
 
             int mode = beatmap.General["Mode"].Value;
+            int circleSize = beatmap.Difficulty["CircleSize"].Value;
             int objectsResnapped = 0;
 
             // Collect Kiai toggles and SV changes for mania/taiko
@@ -81,6 +82,7 @@ namespace Mapping_Tools.Classes.Tools {
                         objectsResnapped += 1;
                     }
                     ho.ResnapEnd(timing, arguments.Snap1, arguments.Snap2);
+                    ho.ResnapPosition(mode, circleSize);
                 }
                 UpdateProgressBar(worker, 18);
 
@@ -216,7 +218,7 @@ namespace Mapping_Tools.Classes.Tools {
                 {
                     tlo.Origin.AdditionSet = 0;
                 }
-                if (mode == 0 && tlo.HasHitsound) // Add greenlines for custom indexes and volumes
+                if (tlo.HasHitsound) // Add greenlines for custom indexes and volumes
                 {
                     TimingPoint tp = tlo.Origin.TP.Copy();
                     tp.Offset = tlo.Time;
