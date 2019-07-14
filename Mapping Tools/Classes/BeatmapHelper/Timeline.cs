@@ -60,9 +60,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public void GiveTimingPoints(Timing timing) {
             foreach (TimelineObject tlo in TimeLineObjects) {
-                TimingPoint tp = timing.GetTimingPointAtTime(tlo.Time + 5); // +5 for the weird offset in hitsounding greenlines
+                TimingPoint hstp = timing.GetTimingPointAtTime(tlo.Time + 5); // +5 for the weird offset in hitsounding greenlines
+                tlo.HitsoundTP = hstp;
                 if (tlo.SampleSet == 0) {
-                    tlo.FenoSampleSet = tp.SampleSet;
+                    tlo.FenoSampleSet = hstp.SampleSet;
                 }
                 else {
                     tlo.FenoSampleSet = tlo.SampleSet;
@@ -74,17 +75,22 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                     tlo.FenoAdditionSet = tlo.AdditionSet;
                 }
                 if (tlo.CustomIndex == 0) {
-                    tlo.FenoCustomIndex = tp.SampleIndex;
+                    tlo.FenoCustomIndex = hstp.SampleIndex;
                 }
                 else {
                     tlo.FenoCustomIndex = tlo.CustomIndex;
                 }
                 if (tlo.SampleVolume == 0) {
-                    tlo.FenoSampleVolume = tp.Volume;
+                    tlo.FenoSampleVolume = hstp.Volume;
                 }
                 else {
                     tlo.FenoSampleVolume = tlo.SampleVolume;
                 }
+
+                TimingPoint tp = timing.GetTimingPointAtTime(tlo.Time);
+                tlo.TP = tp;
+                TimingPoint red = timing.GetRedlineAtTime(tlo.Time);
+                tlo.Redline = tp;
             }
         }
 

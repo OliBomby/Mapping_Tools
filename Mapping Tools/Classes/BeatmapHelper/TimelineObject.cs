@@ -36,6 +36,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public string Filename { get; set; }
 
         // Special combined with greenline
+        public TimingPoint TP { get; set; }
+        public TimingPoint HitsoundTP { get; set; }
+        public TimingPoint Redline { get; set; }
         public SampleSet FenoSampleSet { get; set; }
         public SampleSet FenoAdditionSet { get; set; }
         public int FenoCustomIndex { get; set; }

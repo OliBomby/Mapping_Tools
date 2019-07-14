@@ -221,7 +221,7 @@ namespace Mapping_Tools.Views {
                             tloTo.HitsoundsToOrigin();
 
                             // Add timingpointschange to copy timingpoint hitsounds
-                            TimingPoint tp = tloFrom.Origin.HitsoundTP.Copy();
+                            TimingPoint tp = tloFrom.HitsoundTP.Copy();
                             tp.Offset = tloTo.Time;
                             timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: copySamplesets, index: copySamplesets, volume: copyVolumes));
 
@@ -233,7 +233,7 @@ namespace Mapping_Tools.Views {
                     // Timingpointchange all the undefined tlo from copyFrom
                     foreach (TimelineObject tloTo in tlTo.TimeLineObjects) {
                         if (tloTo.canCopy) {
-                            TimingPoint tp = tloTo.Origin.HitsoundTP.Copy();
+                            TimingPoint tp = tloTo.HitsoundTP.Copy();
                             tp.Offset = tloTo.Time;
                             timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: copySamplesets, index: copySamplesets, volume: copyVolumes));
                         }
@@ -338,14 +338,14 @@ namespace Mapping_Tools.Views {
                         tloTo.HitsoundsToOrigin();
 
                         // Add timingpointschange to copy timingpoint hitsounds
-                        TimingPoint tp = tloTo.Origin.HitsoundTP.Copy();
+                        TimingPoint tp = tloTo.HitsoundTP.Copy();
                         tp.Offset = tloTo.Time;
                         tp.Volume = 5;
                         tp.SampleIndex = arg.MutedIndex;
                         timingPointsChanges.Add(new TimingPointsChange(tp, index: doMutedIndex, volume: true));
                     } else {
                         // Add timingpointschange to preserve index and volume
-                        TimingPoint tp = tloTo.Origin.HitsoundTP.Copy();
+                        TimingPoint tp = tloTo.HitsoundTP.Copy();
                         tp.Offset = tloTo.Time;
                         tp.SampleIndex = tloTo.FenoCustomIndex;
                         tp.Volume = tloTo.FenoSampleVolume;
