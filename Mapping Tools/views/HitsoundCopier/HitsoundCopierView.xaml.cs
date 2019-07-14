@@ -392,8 +392,8 @@ namespace Mapping_Tools.Views {
             double beatsFromRedline = (resnappedTime - redline.Offset) / redline.MpB;
             double dist1 = beatsFromRedline * arg.Snap1 / (arg.Snap1 == 1 ? 4 : 2);
             double dist2 = beatsFromRedline * arg.Snap2 / (arg.Snap2 == 1 ? 4 : arg.Snap2 == 3 ? 3 : 2);
-            dist1 = dist1 % 1;
-            dist2 = dist2 % 1;
+            dist1 %= 1;
+            dist2 %= 1;
             if (Precision.AlmostEquals(dist1, 0, 1E-7) || Precision.AlmostEquals(dist1, 1, 1E-7) ||
                 Precision.AlmostEquals(dist2, 0, 1E-7) || Precision.AlmostEquals(dist2, 1, 1E-7))
                 return false;
