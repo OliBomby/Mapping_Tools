@@ -13,14 +13,20 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public double Time { get; set; }
         public int Repeat { get; set; }
 
-        public bool IsCircle { get; set; } = false;
-        public bool IsSliderHead { get; set; } = false;
-        public bool IsSliderRepeat { get; set; } = false;
-        public bool IsSliderEnd { get; set; } = false;
-        public bool IsSpinnerHead { get; set; } = false;
-        public bool IsSpinnerEnd { get; set; } = false;
-        public bool IsHoldnoteHead { get; set; } = false;
-        public bool IsHoldnoteEnd { get; set; } = false;
+        public int ObjectType { get; set; }
+        private BitArray TypeArray { get => new BitArray(new int[] { ObjectType }); }
+        public bool IsCircle { get => TypeArray[0]; }
+        public bool IsSlider { get => TypeArray[1]; }
+        public bool IsSpinner { get => TypeArray[3]; }
+        public bool IsHoldNote { get => TypeArray[7]; }
+        public bool IsSliderHead { get => IsSlider && Repeat == 0; }
+        public bool IsSliderRepeat { get => IsSlider && Repeat != 0 && Repeat != Origin.Repeat; }
+        public bool IsSliderEnd { get => IsSlider && Repeat == Origin.Repeat; }
+        public bool IsSpinnerHead { get => IsSpinner && Repeat == 0; }
+        public bool IsSpinnerEnd { get => IsSpinner && Repeat == 1; }
+        public bool IsHoldnoteHead { get => IsHoldNote && Repeat == 0; }
+        public bool IsHoldnoteEnd { get => IsHoldNote && Repeat == 1; }
+
         public SampleSet SampleSet { get; set; }
         public SampleSet AdditionSet { get; set; }
         public bool Normal { get; set; }
@@ -28,8 +34,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public bool Finish { get; set; }
         public bool Clap { get; set; }
 
-        public bool HasHitsound { get; set; }
-        public bool CanFilename { get => IsCircle || IsHoldnoteHead; }
+        public bool HasHitsound { get => IsCircle || IsSliderHead || IsHoldnoteHead || IsSliderEnd || IsSpinnerEnd || IsSliderRepeat; }
+        public bool CanCustoms { get => IsCircle || IsHoldnoteHead; }
 
         public int CustomIndex { get; set; }
         public double SampleVolume { get; set; }
@@ -60,35 +66,16 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             SampleSet = sampleset;
             AdditionSet = additionset;
 
-            BitArray c = new BitArray(new int[] { objectType });
-            IsCircle = c[0];
-            bool isSlider = c[1];
-            bool isSpinner = c[3];
-            bool isHoldNote = c[7];
-
-            if( repeat == 0 ) {
-                IsSliderHead = isSlider;
-                IsSpinnerHead = isSpinner;
-                IsHoldnoteHead = isHoldNote;
-
-                if( IsCircle || isHoldNote ) // Can have custom index/volume/filename
-                {
-                    CustomIndex = origin.CustomIndex;
-                    SampleVolume = origin.SampleVolume;
-                    Filename = origin.Filename;
-                }
-            }
-            else if( repeat == origin.Repeat ) {
-                IsSliderEnd = isSlider;
-                IsSpinnerEnd = isSpinner;
-                IsHoldnoteEnd = isHoldNote;
-            }
-            else {
-                IsSliderRepeat = isSlider;
-            }
-            HasHitsound = IsCircle || IsSliderHead || IsHoldnoteHead || IsSliderEnd || IsSpinnerEnd || IsSliderRepeat;
+            ObjectType = objectType;
 
             Repeat = repeat;
+
+            if ( IsCircle || IsHoldnoteHead ) // Can have custom index/volume/filename
+            {
+                CustomIndex = origin.CustomIndex;
+                SampleVolume = origin.SampleVolume;
+                Filename = origin.Filename;
+            }
         }
 
         public int GetHitsounds() {
