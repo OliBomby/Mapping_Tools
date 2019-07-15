@@ -12,23 +12,21 @@ using AutoUpdaterDotNET;
 using Newtonsoft.Json;
 using System.Security.Principal;
 using Mapping_Tools.Views;
-using Mapping_Tools.Classes.SystemTools.HitsoundStudio;
 using System.Windows.Forms;
 using System.Drawing;
 using System.Reflection;
+using System.Linq;
 
 namespace Mapping_Tools {
     public partial class MainWindow : Window {
         private bool isMaximized = false; //Check for window state
         private double widthWin, heightWin; //Set default sizes of window
-        public ProjectManager projectmanager;
         public ViewCollection Views;
         public bool SessionhasAdminRights;
 
         public static MainWindow AppWindow { get; set; }
         private static readonly string appCommon = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         public static readonly string AppDataPath = Path.Combine(appCommon, "Mapping Tools");
-        public static readonly string HSProjectPath = Path.Combine(AppDataPath, "Hitsounding Projects");
         public static readonly string ExportPath = Path.Combine(AppDataPath, "Exports");
 
         public MainWindow() {
@@ -40,11 +38,11 @@ namespace Mapping_Tools {
             heightWin = ActualHeight; // Set height to window
             Views = new ViewCollection(); // Make a ViewCollection object
             DataContext = new StandardVM(); // Generate Standard view model to show on startup
-            projectmanager = new ProjectManager();
 
             if(SettingsManager.GetRecentMaps().Count > 0 ) {
                 SetCurrentMap(SettingsManager.GetRecentMaps()[0][0]);
             } // Set currentmap to previously opened map
+            ViewChanged();
         }
 
         private void Setup() {
@@ -58,7 +56,6 @@ namespace Mapping_Tools {
             try {
                 Directory.CreateDirectory(AppDataPath);
                 Directory.CreateDirectory(ExportPath);
-                Directory.CreateDirectory(HSProjectPath);
             }
             catch( Exception ex ) {
                 System.Windows.MessageBox.Show(ex.Message);
@@ -123,8 +120,7 @@ namespace Mapping_Tools {
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Map Cleaner";
 
-            System.Windows.Controls.MenuItem menuitem = this.FindName("project") as System.Windows.Controls.MenuItem;
-            menuitem.Visibility = Visibility.Collapsed;
+            ViewChanged();
 
             MinWidth = 630;
             MinHeight = 560;
@@ -137,8 +133,7 @@ namespace Mapping_Tools {
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Property Transformer";
 
-            System.Windows.Controls.MenuItem menuitem = this.FindName("project") as System.Windows.Controls.MenuItem;
-            menuitem.Visibility = Visibility.Collapsed;
+            ViewChanged();
 
             MinWidth = 630;
             MinHeight = 560;
@@ -151,8 +146,7 @@ namespace Mapping_Tools {
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Slider Merger";
 
-            System.Windows.Controls.MenuItem menuitem = this.FindName("project") as System.Windows.Controls.MenuItem;
-            menuitem.Visibility = Visibility.Collapsed;
+            ViewChanged();
 
             this.MinWidth = 400;
             this.MinHeight = 380;
@@ -165,8 +159,7 @@ namespace Mapping_Tools {
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Slider Completionator";
 
-            System.Windows.Controls.MenuItem menuitem = this.FindName("project") as System.Windows.Controls.MenuItem;
-            menuitem.Visibility = Visibility.Collapsed;
+            ViewChanged();
 
             this.MinWidth = 400;
             this.MinHeight = 380;
@@ -179,8 +172,7 @@ namespace Mapping_Tools {
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Snapping Tools";
 
-            System.Windows.Controls.MenuItem menuitem = this.FindName("project") as System.Windows.Controls.MenuItem;
-            menuitem.Visibility = Visibility.Collapsed;
+            ViewChanged();
 
             this.MinWidth = 400;
             this.MinHeight = 380;
@@ -193,8 +185,7 @@ namespace Mapping_Tools {
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - TimingHelper";
 
-            System.Windows.Controls.MenuItem menuitem = this.FindName("project") as System.Windows.Controls.MenuItem;
-            menuitem.Visibility = Visibility.Collapsed;
+            ViewChanged();
 
             this.MinWidth = 400;
             this.MinHeight = 380;
@@ -207,8 +198,7 @@ namespace Mapping_Tools {
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Hitsound Copier";
 
-            System.Windows.Controls.MenuItem menuitem = this.FindName("project") as System.Windows.Controls.MenuItem;
-            menuitem.Visibility = Visibility.Collapsed;
+            ViewChanged();
 
             this.MinWidth = 100;
             this.MinHeight = 100;
@@ -221,22 +211,20 @@ namespace Mapping_Tools {
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Hitsound Studio";
 
-            System.Windows.Controls.MenuItem menuitem = this.FindName("project") as System.Windows.Controls.MenuItem;
-            menuitem.Visibility = Visibility.Visible;
+            ViewChanged();
 
             this.MinWidth = 100;
             this.MinHeight = 100;
         }
 
-        //Method for loading the hitsound studio
-        private void LoadHSPlacer(object sender, RoutedEventArgs e) {
-            DataContext = Views.GetHitsoundPlacer();
+        //Method for loading the hitsound preview helper
+        private void LoadHSPreviewHelper(object sender, RoutedEventArgs e) {
+            DataContext = Views.GetHitsoundPreviewHelper();
 
             TextBlock txt = this.FindName("header") as TextBlock;
-            txt.Text = "Mapping Tools - Hitsound Placer";
+            txt.Text = "Mapping Tools - Hitsound Preview Helper";
 
-            System.Windows.Controls.MenuItem menuitem = this.FindName("project") as System.Windows.Controls.MenuItem;
-            menuitem.Visibility = Visibility.Collapsed;
+            ViewChanged();
 
             this.MinWidth = 100;
             this.MinHeight = 100;
@@ -249,8 +237,7 @@ namespace Mapping_Tools {
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools";
 
-            System.Windows.Controls.MenuItem menuitem = this.FindName("project") as System.Windows.Controls.MenuItem;
-            menuitem.Visibility = Visibility.Collapsed;
+            ViewChanged();
 
             this.MinWidth = 100;
             this.MinHeight = 100;
@@ -263,18 +250,18 @@ namespace Mapping_Tools {
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Preferences";
 
-            System.Windows.Controls.MenuItem menuitem = this.FindName("project") as System.Windows.Controls.MenuItem;
-            menuitem.Visibility = Visibility.Collapsed;
+            ViewChanged();
 
             this.MinWidth = 100;
             this.MinHeight = 100;
         }
 
-        private void CreateHSProject(object sender, RoutedEventArgs e) {
-            String value = "";
-            if( InputBox("New Hitsounding Project", "Please specify project name:", ref value) == System.Windows.Forms.DialogResult.OK ) {
-                projectmanager.CreateProject(value);
-            }
+        private void ViewChanged() {
+            System.Windows.Controls.MenuItem menuitem = this.FindName("project") as System.Windows.Controls.MenuItem;
+            bool isSavable = DataContext.GetType().GetInterfaces().Any(x =>
+                              x.IsGenericType &&
+                              x.GetGenericTypeDefinition() == typeof(ISavable<>));
+            menuitem.Visibility = isSavable ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public static DialogResult InputBox(string title, string promptText, ref string value) {
@@ -318,12 +305,18 @@ namespace Mapping_Tools {
             return dialogResult;
         }
 
-        private void LoadHSProject(object sender, RoutedEventArgs e) {
-            projectmanager.LoadProject();
+        private void LoadProject(object sender, RoutedEventArgs e) {
+            if (!ProjectManager.IsSavable(DataContext))
+                return;
+            dynamic data = DataContext;
+            ProjectManager.LoadProject(data, true);
         }
 
-        private void SaveHSProject(object sender, RoutedEventArgs e) {
-            projectmanager.SaveProject();
+        private void SaveProject(object sender, RoutedEventArgs e) {
+            if (!ProjectManager.IsSavable(DataContext))
+                return;
+            dynamic data = DataContext;
+            ProjectManager.SaveProject(data, true);
         }
 
         //Open backup folder in file explorer
@@ -400,7 +393,7 @@ namespace Mapping_Tools {
 
         //Close window
         private void CloseWin(object sender, RoutedEventArgs e) {
-            Views.SaveSettings();
+            Views.AutoSaveSettings();
             SettingsManager.WriteToJSON(false);
             this.Close();
         }

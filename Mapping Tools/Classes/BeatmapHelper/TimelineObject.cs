@@ -21,7 +21,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public bool IsSpinnerEnd { get; set; } = false;
         public bool IsHoldnoteHead { get; set; } = false;
         public bool IsHoldnoteEnd { get; set; } = false;
-
         public SampleSet SampleSet { get; set; }
         public SampleSet AdditionSet { get; set; }
         public bool Normal { get; set; }
@@ -30,6 +29,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public bool Clap { get; set; }
 
         public bool HasHitsound { get; set; }
+        public bool CanFilename { get => IsCircle || IsHoldnoteHead; }
 
         public int CustomIndex { get; set; }
         public double SampleVolume { get; set; }
@@ -93,6 +93,27 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public int GetHitsounds() {
             return MathHelper.GetIntFromBitArray(new BitArray(new bool[] { Normal, Whistle, Finish, Clap }));
+        }
+
+        public void SetHitsound(Hitsound hitsound) {
+            Normal = false;
+            Whistle = false;
+            Finish = false;
+            Clap = false;
+            switch (hitsound) {
+                case Hitsound.Normal:
+                    Normal = true;
+                    return;
+                case Hitsound.Whistle:
+                    Whistle = true;
+                    return;
+                case Hitsound.Finish:
+                    Finish = true;
+                    return;
+                case Hitsound.Clap:
+                    Clap = true;
+                    return;
+            }
         }
 
         public List<Tuple<SampleSet, Hitsound, int>> GetPlayingHitsounds(int mode = 0) {

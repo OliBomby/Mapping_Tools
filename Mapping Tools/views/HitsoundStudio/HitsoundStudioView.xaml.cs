@@ -19,7 +19,7 @@ namespace Mapping_Tools.Views {
     /// <summary>
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
-    public partial class HitsoundStudioView : UserControl {
+    public partial class HitsoundStudioView : UserControl, ISavable<HitsoundStudioVM> {
         private BackgroundWorker backgroundWorker;
         private HitsoundStudioVM Settings;
 
@@ -27,6 +27,10 @@ namespace Mapping_Tools.Views {
 
         private List<HitsoundLayer> selectedLayers;
         private HitsoundLayer selectedLayer;
+
+        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "hsstudioproject.json");
+
+        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Hitsound Studio Projects");
 
         public HitsoundStudioView() {
             InitializeComponent();
@@ -38,22 +42,7 @@ namespace Mapping_Tools.Views {
             LayersList.SelectedIndex = 0;
             Num_Layers_Changed();
             GetSelectedLayers();
-        }
-
-        public HitsoundStudioVM GetSettings() {
-            return Settings;
-        }
-
-        public void SetSettings(HitsoundStudioVM settings) {
-            suppressEvents = true;
-
-            Settings = settings;
-            DataContext = Settings;
-
-            suppressEvents = false;
-
-            LayersList.SelectedIndex = 0;
-            Num_Layers_Changed();
+            ProjectManager.LoadProject(this, message: false);
         }
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
@@ -726,6 +715,22 @@ namespace Mapping_Tools.Views {
             foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
                 hitsoundLayer.ImportArgs.VelocityRoughness = t;
             }
+        }
+
+        public HitsoundStudioVM GetSaveData() {
+            return Settings;
+        }
+
+        public void SetSaveData(HitsoundStudioVM saveData) {
+            suppressEvents = true;
+
+            Settings = saveData;
+            DataContext = Settings;
+
+            suppressEvents = false;
+
+            LayersList.SelectedIndex = 0;
+            Num_Layers_Changed();
         }
     }
 }

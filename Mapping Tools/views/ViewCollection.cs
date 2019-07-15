@@ -4,16 +4,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Reflection;
+using Mapping_Tools.Classes.SystemTools;
 
 namespace Mapping_Tools.Views {
     public class ViewCollection {
-        public void SaveSettings() {
-            if (HitsoundStudio != null) {
-                MainWindow.AppWindow.projectmanager.SaveProjectDefault();
+        public void AutoSaveSettings() {
+            foreach (var prop in typeof(ViewCollection).GetProperties(BindingFlags.NonPublic | BindingFlags.Instance)) {
+                var value = prop.GetValue(this);
+                if (value == null)
+                    continue;
+                if (ProjectManager.IsSavable(value)) {
+                    dynamic v = prop.GetValue(this);
+                    ProjectManager.SaveProject(v);
+                }
             }
         }
 
-        private UserControl Standard;
+        private UserControl Standard { get; set; }
         public UserControl GetStandard() {
             if (Standard == null) {
                 Standard = new StandardView();
@@ -21,7 +29,7 @@ namespace Mapping_Tools.Views {
             return Standard;
         }
 
-        private UserControl Preferences;
+        private UserControl Preferences { get; set; }
         public UserControl GetPreferences() {
             if (Preferences == null) {
                 Preferences = new PreferencesView();
@@ -29,7 +37,7 @@ namespace Mapping_Tools.Views {
             return Preferences;
         }
 
-        private UserControl MapCleaner;
+        private UserControl MapCleaner { get; set; }
         public UserControl GetMapCleaner() {
             if (MapCleaner == null) {
                 MapCleaner = new CleanerView();
@@ -37,15 +45,15 @@ namespace Mapping_Tools.Views {
             return MapCleaner;
         }
 
-        private UserControl HitsoundPlacer;
-        public UserControl GetHitsoundPlacer() {
-            if (HitsoundPlacer == null) {
-                HitsoundPlacer = new HitsoundPlacerView();
+        private UserControl HitsoundPreviewHelper { get; set; }
+        public UserControl GetHitsoundPreviewHelper() {
+            if (HitsoundPreviewHelper == null) {
+                HitsoundPreviewHelper = new HitsoundPreviewHelperView();
             }
-            return HitsoundPlacer;
+            return HitsoundPreviewHelper;
         }
 
-        private UserControl PropertyTransformer;
+        private UserControl PropertyTransformer { get; set; }
         public UserControl GetPropertyTransformer() {
             if (PropertyTransformer == null) {
                 PropertyTransformer = new PropertyTransformerView();
@@ -53,7 +61,7 @@ namespace Mapping_Tools.Views {
             return PropertyTransformer;
         }
 
-        private UserControl HitsoundCopier;
+        private UserControl HitsoundCopier { get; set; }
         public UserControl GetHitsoundCopier() {
             if (HitsoundCopier == null) {
                 HitsoundCopier = new HitsoundCopierView();
@@ -61,16 +69,15 @@ namespace Mapping_Tools.Views {
             return HitsoundCopier;
         }
 
-        private UserControl HitsoundStudio;
+        private UserControl HitsoundStudio { get; set; }
         public UserControl GetHitsoundStudio() {
             if (HitsoundStudio == null) {
                 HitsoundStudio = new HitsoundStudioView();
-                MainWindow.AppWindow.projectmanager.LoadProjectDefault();
             }
             return HitsoundStudio;
         }
 
-        private UserControl SliderCompletionator;
+        private UserControl SliderCompletionator { get; set; }
         public UserControl GetSliderCompletionator() {
             if (SliderCompletionator == null) {
                 SliderCompletionator = new SliderCompletionatorView();
@@ -78,7 +85,7 @@ namespace Mapping_Tools.Views {
             return SliderCompletionator;
         }
 
-        private UserControl SliderMerger;
+        private UserControl SliderMerger { get; set; }
         public UserControl GetSliderMerger() {
             if (SliderMerger == null) {
                 SliderMerger = new SliderMergerView();
@@ -86,7 +93,7 @@ namespace Mapping_Tools.Views {
             return SliderMerger;
         }
 
-        private UserControl SnappingTools;
+        private UserControl SnappingTools { get; set; }
         public UserControl GetSnappingTools() {
             if (SnappingTools == null) {
                 SnappingTools = new SnappingToolsView();
@@ -94,7 +101,7 @@ namespace Mapping_Tools.Views {
             return SnappingTools;
         }
 
-        private UserControl TimingHelper;
+        private UserControl TimingHelper { get; set; }
         public UserControl GetTimingHelper() {
             if (TimingHelper == null) {
                 TimingHelper = new TimingHelperView();

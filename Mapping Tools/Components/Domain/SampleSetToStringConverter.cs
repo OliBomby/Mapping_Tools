@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 
 namespace Mapping_Tools.Components.Domain {
-    class ImportTypeToStringConverter : IValueConverter {
+    class SampleSetToStringConverter : IValueConverter {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
-            return ((ImportType)value).ToString();
+            return ((SampleSet)value).ToString();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
             string str = value.ToString();
-            return Enum.Parse(typeof(ImportType), str);
+            return Enum.Parse(typeof(SampleSet), str);
         }
     }
 }
