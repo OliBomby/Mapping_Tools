@@ -95,36 +95,19 @@
                     </DataGrid.Columns>
                 </DataGrid>
 
-                <materialDesign:PopupBox
-                    Grid.Row="2"
-                    Style="{StaticResource MaterialDesignMultiFloatingActionPopupBox}"
-                    PlacementMode="LeftAndAlignMiddles"
-                    UnfurlOrientation="Horizontal"
-                    Margin="10"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Bottom">
-                    <StackPanel
+                <StackPanel
+                        Grid.Row="2"
+                        Margin="5"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom"
                         Orientation="Horizontal">
-                        <Button
-                            ToolTip="Add an item"
-                            Command="{Binding AddCommand}">
-                            <materialDesign:PackIcon
-                                Kind="Plus"
-                                Width="24"
-                                Height="24"
-                                Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" />
-                        </Button>
-                        <Button
-                            ToolTip="Remove selected items"
-                            Command="{Binding RemoveCommand}">
-                            <materialDesign:PackIcon
-                                Kind="Trashcan"
-                                Width="24"
-                                Height="24"
-                                Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" />
-                        </Button>
-                    </StackPanel>
-                </materialDesign:PopupBox>
+                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add an item" Command="{Binding AddCommand}" Margin="5">
+                        <materialDesign:PackIcon Kind="Plus" Height="24" Width="24" />
+                    </Button>
+                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove selected items" Command="{Binding RemoveCommand}" Margin="5">
+                        <materialDesign:PackIcon Kind="Trashcan" Height="24" Width="24" />
+                    </Button>
+                </StackPanel>
             </Grid>
 
             <WrapPanel VerticalAlignment="Bottom" HorizontalAlignment="Right">

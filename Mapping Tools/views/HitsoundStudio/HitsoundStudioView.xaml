@@ -207,16 +207,16 @@
                 </ListView.View>
             </ListView>
             <StackPanel Grid.Column="2" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Click="Add_Click" Margin="5">
+                <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Import layers" Click="Add_Click" Margin="5">
                     <materialDesign:PackIcon Kind="Plus" Height="24" Width="24" />
                 </Button>
-                <Button Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Click="Delete_Click" Margin="5">
-                    <materialDesign:PackIcon Kind="Minus" Height="24" Width="24" />
+                <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove selected layers" Click="Delete_Click" Margin="5">
+                    <materialDesign:PackIcon Kind="Trashcan" Height="24" Width="24" />
                 </Button>
-                <Button Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Click="Raise_Click" Margin="5">
+                <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Raise selected layers" Click="Raise_Click" Margin="5">
                     <materialDesign:PackIcon Kind="KeyboardArrowUp" Height="24" Width="24" />
                 </Button>
-                <Button Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Click="Lower_Click" Margin="5">
+                <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Lower selected layers" Click="Lower_Click" Margin="5">
                     <materialDesign:PackIcon Kind="KeyboardArrowDown" Height="24" Width="24" />
                 </Button>
             </StackPanel>
