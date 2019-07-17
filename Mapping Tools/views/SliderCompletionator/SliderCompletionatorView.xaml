@@ -24,11 +24,15 @@
                 <CheckBox x:Name="ReqBookmBox" FontSize="14"  Foreground="#FFD6D6D6" IsChecked="True" Content="Require bookmarks" Margin="10,26,0,0"/>
             </StackPanel>
 
-            <WrapPanel VerticalAlignment="Bottom" HorizontalAlignment="Right">
-                <Button Width="Auto" Height="Auto" x:Name="start" Cursor="Hand" Click="Start_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
-                    <materialDesign:PackIcon Width="100" Height="100" Cursor="Hand" Kind="Play" Foreground="#FFD6D6D6"/>
-                </Button >
-            </WrapPanel>
+            <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
+                <Button
+                    x:Name="start"
+                    Style="{StaticResource MaterialDesignFloatingActionButton}"
+                    Click="Start_Click">
+                    <materialDesign:PackIcon
+                        Kind="Play" Height="36" Width="36" />
+                </Button>
+            </Viewbox>
         </Grid>
         <Grid Name="SecondGrid" Grid.Row="1" Grid.Column="0">
             <Grid.ColumnDefinitions>

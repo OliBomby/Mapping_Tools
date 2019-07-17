@@ -222,13 +222,25 @@
             </StackPanel>
         </Grid>
         <Grid Name="SecondGrid" Grid.Row="2" Grid.Column="1">
-            <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal">
-                <Button Width="Auto" Height="Auto" x:Name="startish" Cursor="Hand" Click="Startish_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
-                    <materialDesign:PackIcon Width="90" Height="90" Cursor="Hand" Kind="QuestionMark" Foreground="#FFD6D6D6"/>
-                </Button >
-                <Button Width="Auto" Height="Auto" x:Name="start" Cursor="Hand" Click="Start_Click" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Style="{StaticResource IconButton}">
-                    <materialDesign:PackIcon Width="90" Height="90" Cursor="Hand" Kind="Play" Foreground="#FFD6D6D6"/>
-                </Button >
+            <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Right" Orientation="Horizontal">
+                <Viewbox Margin="10">
+                    <Button
+                    x:Name="startish"
+                    Style="{StaticResource MaterialDesignFloatingActionButton}"
+                    Click="Startish_Click">
+                        <materialDesign:PackIcon
+                        Kind="QuestionMark" Height="36" Width="36" />
+                    </Button>
+                </Viewbox>
+                <Viewbox Margin="10">
+                    <Button
+                    x:Name="start"
+                    Style="{StaticResource MaterialDesignFloatingActionButton}"
+                    Click="Start_Click">
+                    <materialDesign:PackIcon
+                        Kind="Play" Height="36" Width="36" />
+                    </Button>
+                </Viewbox>
             </StackPanel>
         </Grid>
         <Grid Name="ThirdGrid" Grid.Row="2" Grid.Column="0">

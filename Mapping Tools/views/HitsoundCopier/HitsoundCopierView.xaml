@@ -113,11 +113,15 @@
                     </Grid>
                 </StackPanel>
             </StackPanel>
-            <WrapPanel VerticalAlignment="Bottom" HorizontalAlignment="Right">
-                <Button x:Name="start" Cursor="Hand" Click="Start_Click" Style="{StaticResource IconButton}">
-                    <materialDesign:PackIcon Width="100" Height="100" Cursor="Hand" Kind="Play" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
-                </Button >
-            </WrapPanel>
+            <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
+                <Button
+                    x:Name="start"
+                    Style="{StaticResource MaterialDesignFloatingActionButton}"
+                    Click="Start_Click">
+                    <materialDesign:PackIcon
+                        Kind="Play" Height="36" Width="36" />
+                </Button>
+            </Viewbox>
         </Grid>
         <Grid Name="SecondGrid" Grid.Row="1">
             <Grid.ColumnDefinitions>
