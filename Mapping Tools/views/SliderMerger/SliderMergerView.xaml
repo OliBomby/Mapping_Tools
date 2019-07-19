@@ -15,11 +15,13 @@
         </Grid.RowDefinitions>
         <Grid Name="FirstGrid" Grid.Row="0">
             <StackPanel>
-                <TextBlock FontSize="40" TextWrapping="NoWrap" Text="Info" FontWeight="Bold" Foreground="#FF5F5E5E"/>
-                <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="500" TextWrapping="Wrap" Foreground="#FFD6D6D6"><Run Text="In order for 2 sliders to merge, "/><Run Text="place the second slider on top of the last anchor of the first slider"/><Run Text=". This program will automatically convert "/><Run Text="any type of "/><Run Text="slider into "/><Run Text="a "/><Run Text="Beziér"/><Run Text=" slider for the "/><Run Text="purpose of "/><Run Text="merging"/><Run Text="."/></TextBlock>
-                <TextBlock FontSize="14" HorizontalAlignment="Left" MaxWidth="200" Foreground="#FFD6D6D6" Margin="0,26,0,0"><Run Text="Merge connection leniency:"/></TextBlock>
-                <TextBox x:Name="LeniencyBox" Width="170" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="#FFD6D6D6" Text="2"/>
-                <CheckBox x:Name="ReqBookmBox" FontSize="14"  Foreground="#FFD6D6D6" IsChecked="True" Content="Require bookmarks" Margin="0,26,0,0"/>
+                <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}"
+                    ToolTip="In order for 2 sliders to merge, place the second slider on top of the last anchor of the first slider. This program will automatically convert any type of slider into a Beziér slider for the purpose of merging.">
+                    <Run Text="Slider Merger"/></TextBlock>
+                
+                <TextBox x:Name="LeniencyBox" Width="258" HorizontalAlignment="Left" Text="2" Margin="0,20,0,0"
+                    Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Merge connection leniency"/>
+                <CheckBox x:Name="ReqBookmBox" FontSize="14" IsChecked="True" Content="Require bookmarks" Margin="0,26,0,0"/>
             </StackPanel>
 
             <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
@@ -39,7 +41,7 @@
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
                 <WrapPanel VerticalAlignment="Bottom">
-                    <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Foreground="#FF5F5E5E"/>
+                    <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Opacity="0.58"/>
                 </WrapPanel>
             </Grid>
             <Grid Grid.Column="1">

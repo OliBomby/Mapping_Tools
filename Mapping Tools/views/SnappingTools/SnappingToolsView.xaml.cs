@@ -28,8 +28,8 @@ namespace Mapping_Tools.Views {
         }
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
-            var bgw = sender as BackgroundWorker;
-            e.Result = Complete_Sliders((Arguments) e.Argument, bgw, e);
+            //var bgw = sender as BackgroundWorker;
+            //e.Result = Complete_Sliders((Arguments) e.Argument, bgw, e);
         }
 
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
@@ -51,91 +51,7 @@ namespace Mapping_Tools.Views {
             string fileToCopy = MainWindow.AppWindow.currentMap.Text;
             IOHelper.SaveMapBackup(fileToCopy);
 
-            backgroundWorker.RunWorkerAsync(new Arguments(fileToCopy, TemporalBox.GetDouble(), SpatialBox.GetDouble(), (bool) ReqBookmBox.IsChecked));
             start.IsEnabled = false;
-        }
-
-        private struct Arguments {
-            public string Path;
-            public double TemporalLength;
-            public double SpatialLength;
-            public bool RequireBookmarks;
-            public Arguments(string path, double temporal, double spatial, bool requireBookmarks)
-            {
-                Path = path;
-                TemporalLength = temporal;
-                SpatialLength = spatial;
-                RequireBookmarks = requireBookmarks;
-            }
-        }
-
-        private string Complete_Sliders(Arguments arg, BackgroundWorker worker, DoWorkEventArgs e) {
-            int slidersCompleted = 0;
-
-            Editor editor = new Editor(arg.Path);
-            Beatmap beatmap = editor.Beatmap;
-            Timing timing = beatmap.BeatmapTiming;
-            List<HitObject> markedObjects = arg.RequireBookmarks ? beatmap.GetBookmarkedObjects() : beatmap.HitObjects;
-
-            for(int i = 0; i < markedObjects.Count; i++) {
-                HitObject ho = markedObjects[i];
-                if (ho.IsSlider) {
-                    double oldSpatialLength = ho.PixelLength;
-                    double newSpatialLength = arg.SpatialLength != 0 ? ho.GetSliderPath(fullLength: true).Distance * arg.SpatialLength : oldSpatialLength;
-                    double oldTemporalLength = timing.CalculateSliderTemporalLength(ho.Time, ho.PixelLength);
-                    double newTemporalLength = arg.TemporalLength != 0 ? timing.GetMpBAtTime(ho.Time) * arg.TemporalLength : oldTemporalLength;
-                    double oldSV = timing.GetSVAtTime(ho.Time);
-                    double newSV = oldSV / ((newSpatialLength / oldSpatialLength) / (newTemporalLength / oldTemporalLength));
-                    ho.SV = newSV;
-                    ho.PixelLength = newSpatialLength;
-                    slidersCompleted++;
-                }
-                if (worker != null && worker.WorkerReportsProgress) {
-                    worker.ReportProgress(i / markedObjects.Count);
-                }
-            }
-
-            // Reconstruct SV
-            List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
-            // Add Hitobject stuff
-            foreach (HitObject ho in beatmap.HitObjects)
-            {
-                if (ho.IsSlider) // SV changes
-                {
-                    TimingPoint tp = ho.TP.Copy();
-                    tp.Offset = ho.Time;
-                    tp.MpB = ho.SV;
-                    timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true));
-                }
-            }
-
-            // Add the new SV changes
-            TimingPointsChange.ApplyChanges(timing, timingPointsChanges);
-
-            // Save the file
-            editor.SaveFile();
-
-            // Complete progressbar
-            if (worker != null && worker.WorkerReportsProgress)
-            {
-                worker.ReportProgress(100);
-            }
-
-            // Make an accurate message
-            string message = "";
-            if (Math.Abs(slidersCompleted) == 1)
-            {
-                message += "Successfully completed " + slidersCompleted + " slider!";
-            }
-            else
-            {
-                message += "Successfully completed " + slidersCompleted + " sliders!";
-            }
-            return message;
-        }
-
-        private void Print(string str) {
-            Console.WriteLine(str);
         }
     }
 }

@@ -18,12 +18,12 @@
     </UserControl.Resources>
     <Grid Name="MasterGrid">
         <Grid.RowDefinitions>
-            <RowDefinition Height="84"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid Name="TitleGrid" Grid.Row="0">
-            <TextBlock FontSize="40" TextWrapping="NoWrap" FontWeight="Bold" Foreground="#FF5F5E5E" Height="61" VerticalAlignment="Top"><Run Text="Property Transformer"/></TextBlock>
+            <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}" Margin="0,0,0,10"><Run Text="Property Transformer"/></TextBlock>
         </Grid>
         <Grid Name="FirstGrid" Grid.Row="1">
             <StackPanel>
@@ -71,8 +71,7 @@
                     <TextBlock Text=" + "/>
                     <TextBox x:Name="TPVolumeOffsetBox" Text="{Binding Path=TimingpointVolumeOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0}" MinWidth="120"/>
                 </StackPanel>
-                <TextBlock Text=""/>
-                <TextBlock Text="Other:" FontWeight="Bold"/>
+                <TextBlock Text="Other:" FontWeight="Bold" Margin="0,10,0,0"/>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="New hitobject time = Time " MinWidth="350"/>
                     <TextBlock Text="x "/>
@@ -123,11 +122,11 @@
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
                 <WrapPanel VerticalAlignment="Bottom">
-                    <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Foreground="#FF5F5E5E"/>
+                    <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Opacity="0.58"/>
                 </WrapPanel>
             </Grid>
             <Grid Grid.Column="1">
-                <ProgressBar x:Name="progress" Margin="20,0,20,0" Height="20" Foreground="#FF838383" Background="{x:Null}" BorderBrush="{x:Null}"/>
+                <ProgressBar x:Name="progress" Margin="20,0,20,0" Height="20" Background="{x:Null}" BorderBrush="{x:Null}"/>
             </Grid>
         </Grid>
     </Grid>

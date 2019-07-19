@@ -6,98 +6,87 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Grid.Row="1">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="0.7*"/>
-            <ColumnDefinition Width="0.3*"/>
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="0.5*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="0.3*"/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="250"/>
+        </Grid.ColumnDefinitions>
 
-        <Grid Grid.Column="0" Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+        <Grid Grid.Row="0" Grid.Column="0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="0.2*"/>
-                <RowDefinition Height="0.3*"/>
-                <RowDefinition Height="0.5*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <Viewbox MaxWidth="300" HorizontalAlignment="Left" Grid.Row="0">
-                <TextBlock Foreground="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}">Getting started</TextBlock>
-            </Viewbox>
-            <Viewbox HorizontalAlignment="Left" Grid.Row="1" VerticalAlignment="Top">
-                <ListView Foreground="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}">
-                    <ListViewItem>
-                        1. Open a beatmap from [File] -> [Open beatmap/Open current beatmap] to select a file from your system OR the currently in-game selected beatmap
-                    </ListViewItem>
-                    <ListViewItem>
-                        2. Select a tool that you want to use from [Tools]
-                    </ListViewItem>
-                    <ListViewItem>
-                        3. Configure your tool
-                    </ListViewItem>
-                    <ListViewItem>
-                        4. Click on the white button in the bottom right to run the program
-                    </ListViewItem>
-                </ListView>
-            </Viewbox>
-            <Grid Grid.Row="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="0.3*"/>
-                    <RowDefinition Height="0.7*"/>
-                </Grid.RowDefinitions>
-                <Viewbox MaxWidth="150" HorizontalAlignment="Left" Grid.Row="0">
-                    <TextBlock Foreground="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}">Recent</TextBlock>
-                </Viewbox>
-                <ListView x:Name="recentList" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
-                          Foreground="{DynamicResource {x:Static SystemColors.ScrollBarBrushKey}}" MouseDoubleClick="RecentList_MouseDoubleClick">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="Path" DisplayMemberBinding="{Binding Path}"/>
-                            <GridViewColumn Header="Date" DisplayMemberBinding="{Binding Date}"/>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
-            </Grid>
+            <TextBlock Grid.Row="0" FontSize="40" Foreground="{DynamicResource PrimaryHueMidBrush}"><Run Text="Getting started"/></TextBlock>
+
+            <ListView HorizontalAlignment="Left" Grid.Row="1" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <ListViewItem>
+                    1. Open a beatmap -> [Open beatmap/Open current beatmap] to select a file from your system OR the currently in-game selected beatmap
+                </ListViewItem>
+                <ListViewItem>
+                    2. Select a tool that you want to use from [Tools]
+                </ListViewItem>
+                <ListViewItem>
+                    3. Configure your tool
+                </ListViewItem>
+                <ListViewItem>
+                    4. Click the play button in the bottom right to run the program
+                </ListViewItem>
+            </ListView>
         </Grid>
-        <Grid Margin="40,0,0,0" Grid.Column="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+
+        <GridSplitter Grid.Row="0" Grid.Column="1" Margin="10" Width="1" ResizeBehavior="PreviousAndNext" VerticalAlignment="Stretch" BorderBrush="{DynamicResource MaterialDesignDivider}"/>
+
+        <Grid Grid.Row="0" Grid.Column="2">
             <Grid.RowDefinitions>
-                <RowDefinition Height="0.2*"/>
-                <RowDefinition Height="0.8*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Viewbox MaxWidth="190" HorizontalAlignment="Left" Grid.Row="0">
-                <TextBlock Foreground="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}">New stuff</TextBlock>
-            </Viewbox>
-            <Grid VerticalAlignment="Top" Grid.Row="1">
-                <ListView x:Name="NewsList" VerticalContentAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
-                    <ListViewItem>
-                        <TextBlock>MIDI importing</TextBlock>
-                    </ListViewItem>
-                    <ListViewItem>
-                        <TextBlock>Complete hitsounds importing</TextBlock>
-                    </ListViewItem>
-                    <ListViewItem>
-                        <TextBlock>Editing multiple layers at the same time</TextBlock>
-                    </ListViewItem>
-                    <ListViewItem>
-                        <TextBlock>Saving/Loading projects</TextBlock>
-                    </ListViewItem>
-                    <ListViewItem>
-                        <TextBlock>Added Hitsound Copier</TextBlock>
-                    </ListViewItem>
-                    <ListViewItem>
-                        <TextBlock>Improved resnapping</TextBlock>
-                    </ListViewItem>
-                </ListView>
-            </Grid>
+            <TextBlock Grid.Row="0" FontSize="40" Foreground="{DynamicResource PrimaryHueMidBrush}"><Run Text="New stuff"/></TextBlock>
+            <ListView Grid.Row="1" x:Name="NewsList" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                <ListViewItem>
+                    <TextBlock>MIDI importing</TextBlock>
+                </ListViewItem>
+                <ListViewItem>
+                    <TextBlock>Complete hitsounds importing</TextBlock>
+                </ListViewItem>
+                <ListViewItem>
+                    <TextBlock>Editing multiple layers at the same time</TextBlock>
+                </ListViewItem>
+                <ListViewItem>
+                    <TextBlock>Saving/Loading projects</TextBlock>
+                </ListViewItem>
+                <ListViewItem>
+                    <TextBlock>Added Hitsound Copier</TextBlock>
+                </ListViewItem>
+                <ListViewItem>
+                    <TextBlock>Improved resnapping</TextBlock>
+                </ListViewItem>
+            </ListView>
+        </Grid>
+
+        <GridSplitter Grid.Row="1" Grid.ColumnSpan="3" Margin="10" Height="1" ResizeBehavior="PreviousAndNext" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource MaterialDesignDivider}"/>
+
+        <Grid Grid.Row="2" Grid.ColumnSpan="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" FontSize="40" Foreground="{DynamicResource PrimaryHueMidBrush}"><Run Text="Recent"/></TextBlock>
+            <ListView Grid.Row="1" x:Name="recentList" MouseDoubleClick="RecentList_MouseDoubleClick">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Path" DisplayMemberBinding="{Binding Path}"/>
+                        <GridViewColumn Header="Date" DisplayMemberBinding="{Binding Date}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
         </Grid>
     </Grid>
 </UserControl>
