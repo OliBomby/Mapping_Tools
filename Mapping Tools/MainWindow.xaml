@@ -10,7 +10,7 @@
         xmlns:views="clr-namespace:Mapping_Tools.Views"
         xmlns:viewmodels="clr-namespace:Mapping_Tools.Viewmodels"
         mc:Ignorable="d"
-        Title="Beatmap Cleaner 2.0.0"  
+        Title="Mapping Tools"  
         WindowStyle="None"
         ResizeMode="CanResize"
         AllowsTransparency="False"
