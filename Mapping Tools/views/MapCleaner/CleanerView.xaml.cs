@@ -63,9 +63,9 @@ namespace Mapping_Tools.Views {
 
         private struct Arguments {
             public string Path;
-            public MapCleaner.Arguments CleanerArguments;
+            public SliderTickRemover.Arguments CleanerArguments;
 
-            public Arguments(string path, MapCleaner.Arguments cleanerArguments) {
+            public Arguments(string path, SliderTickRemover.Arguments cleanerArguments) {
                 Path = path;
                 CleanerArguments = cleanerArguments;
             }
@@ -74,7 +74,7 @@ namespace Mapping_Tools.Views {
         private Arguments GetArgumentsFromWindow() {
             string fileToCopy = MainWindow.AppWindow.currentMap.Text;
             Arguments arguments = new Arguments(fileToCopy,
-                                                new MapCleaner.Arguments((bool)VolumeSliders.IsChecked, (bool)SamplesetSliders.IsChecked,
+                                                new SliderTickRemover.Arguments((bool)VolumeSliders.IsChecked, (bool)SamplesetSliders.IsChecked,
                                                                          (bool)VolumeSpinners.IsChecked, (bool)RemoveMuting.IsChecked,
                                                                          (bool)ResnapObjects.IsChecked, (bool)ResnapBookmarks.IsChecked,
                                                                          int.Parse(Snap1.Text.Split('/')[1]), int.Parse(Snap2.Text.Split('/')[1]),
@@ -89,7 +89,7 @@ namespace Mapping_Tools.Views {
             foreach (TimingPoint tp in editor.Beatmap.BeatmapTiming.TimingPoints) { orgininalTimingPoints.Add(tp.Copy()); }
             int oldTimingPointsCount = editor.Beatmap.BeatmapTiming.TimingPoints.Count;
 
-            int objectsResnapped = MapCleaner.CleanMap(editor.Beatmap, arguments.CleanerArguments, worker);
+            int objectsResnapped = SliderTickRemover.CleanMap(editor.Beatmap, arguments.CleanerArguments, worker);
 
             List<TimingPoint> newTimingPoints = editor.Beatmap.BeatmapTiming.TimingPoints;
             Monitor_Differences(orgininalTimingPoints, newTimingPoints);
