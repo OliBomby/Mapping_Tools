@@ -34,7 +34,6 @@
                 <RowDefinition Height="35"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="1*"/>
-                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="35"/>
             </Grid.RowDefinitions>
 
@@ -85,30 +84,24 @@
             <Grid x:Name="ThirdGrid" Grid.Row="2">
                 <ContentControl Margin="20" Name="content_views" Content="{Binding}"></ContentControl>
             </Grid>
-            <Border Margin="10,0,10,0" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource MaterialDesignDivider}" Grid.Row="3" />
-            <Grid x:Name="ForthGrid" Grid.Row="4">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Grid Grid.Column="0">
-                    <TextBlock Padding="10,10,0,0" Text="Current Map:" Foreground="{DynamicResource MaterialDesignBody}" FontWeight="Normal" Opacity="0.8"/>
+            <materialDesign:ColorZone Mode="PrimaryDark" Grid.Row="3">
+                <Grid x:Name="ForthGrid">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0">
+                        <TextBlock Padding="10,10,0,0" Text="Current Map:" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontWeight="Normal"/>
+                    </Grid>
+                    <Grid Grid.Column="1">
+                        <Viewbox Margin="0,0,20,0" HorizontalAlignment="Left">
+                            <TextBlock x:FieldModifier="public" Name="currentMap" Height="35" TextWrapping="Wrap" Padding="10,10,0,0" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontWeight="Normal"/>
+                        </Viewbox>
+                    </Grid>
                 </Grid>
-                <Grid Grid.Column="1">
-                    <Viewbox Margin="0,0,20,0" HorizontalAlignment="Left">
-                        <TextBlock x:FieldModifier="public" Name="currentMap" Height="35" TextWrapping="Wrap" Padding="10,10,0,0" Foreground="{DynamicResource MaterialDesignBody}" FontWeight="Normal" Opacity="0.8"/>
-                    </Viewbox>
-                </Grid>
-            </Grid>
+            </materialDesign:ColorZone>
         </Grid>
-        <Border Name="window_border" BorderThickness="1" Background="{x:Null}" BorderBrush="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}">
-            <Border.Effect>
-                <DropShadowEffect BlurRadius="20" 
-                                  Color="{DynamicResource {x:Static SystemColors.HotTrackColorKey}}" 
-                                  Opacity="1" 
-                                  ShadowDepth="0.1" />
-            </Border.Effect>
-        </Border>
+        <Border Name="window_border" BorderThickness="1" Background="{x:Null}" BorderBrush="{DynamicResource PrimaryHueDarkBrush}"/>
     </Grid>
     <Window.Resources>
         <DataTemplate DataType="{x:Type viewmodels:StandardVM}">

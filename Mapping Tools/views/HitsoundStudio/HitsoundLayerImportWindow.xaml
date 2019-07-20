@@ -20,6 +20,8 @@
             CaptionHeight="35"
             ResizeBorderThickness="5" />
     </WindowChrome.WindowChrome>
+    <Window.Resources>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -194,7 +196,7 @@
                 <Button Grid.Column="1" Style="{StaticResource MaterialDesignRaisedDarkButton}" Content="Cancel" Click="Cancel_Click" FontWeight="Bold" Margin="10,0,0,0"/>
             </Grid>
         </materialDesign:ColorZone>
+
+        <Border Name="window_border" BorderThickness="1" Grid.RowSpan="3" Background="{x:Null}" BorderBrush="{DynamicResource PrimaryHueDarkBrush}"/>
     </Grid>
-    <Window.Resources>
-    </Window.Resources>
 </Window>
