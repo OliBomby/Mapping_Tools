@@ -73,7 +73,6 @@
             <Grid Grid.Column="0">
                 <WrapPanel VerticalAlignment="Bottom">
                     <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Opacity="0.58"/>
-                    <ProgressBar x:Name="loader_progress" Background="{x:Null}" BorderBrush="{x:Null}"/>
                 </WrapPanel>
             </Grid>
             <Grid Grid.Column="1">
@@ -90,11 +89,5 @@
          RunWorkerCompleted="BackgroundWorker_RunWorkerCompleted"
          WorkerReportsProgress="True"
          ProgressChanged="BackgroundWorker_ProgressChanged"/>
-
-        <cm:BackgroundWorker x:Key="backgroundLoader"
-         DoWork="BackgroundLoader_DoWork"
-         RunWorkerCompleted="BackgroundLoader_RunWorkerCompleted"
-         WorkerReportsProgress="True"
-         ProgressChanged="BackgroundLoader_ProgressChanged"/>
     </UserControl.Resources>
 </UserControl>

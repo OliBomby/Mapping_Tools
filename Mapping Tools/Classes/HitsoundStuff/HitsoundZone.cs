@@ -20,13 +20,13 @@ namespace Mapping_Tools.Classes.HitsoundStuff
         private Hitsound _hitsound;
 
         public HitsoundZone() {
-            IsSelected = false;
-            Name = "";
-            Filename = "";
-            XPos = -1;
-            YPos = -1;
-            SampleSet = SampleSet.Auto;
-            Hitsound = Hitsound.Normal;
+            _isSelected = false;
+            _name = "";
+            _filename = "";
+            _xPos = -1;
+            _yPos = -1;
+            _sampleSet = SampleSet.Auto;
+            _hitsound = Hitsound.Normal;
         }
 
         public double Distance(Vector2 pos) {

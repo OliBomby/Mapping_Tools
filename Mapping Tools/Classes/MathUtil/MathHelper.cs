@@ -142,7 +142,7 @@ namespace Mapping_Tools.Classes.MathUtil {
                 int i = *(int*) &x;              // Read bits as integer.
                 i = 0x5f375a86 - ( i >> 1 );      // Make an initial guess for Newton-Raphson approximation
                 x = *(double*) &i;                // Convert bits back to double
-                x = x * ( 1.5f - xhalf * x * x ); // Perform left single Newton-Raphson step.
+                x *= ( 1.5f - xhalf * x * x ); // Perform left single Newton-Raphson step.
                 return x;
             }
         }

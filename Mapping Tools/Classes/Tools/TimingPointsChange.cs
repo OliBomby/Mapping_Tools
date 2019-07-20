@@ -63,7 +63,6 @@ namespace Mapping_Tools.Classes.Tools {
                     addingTimingPoint.Inherited = true;
                 }
                 onTimingPoints.Add(addingTimingPoint);
-                onHasRed = true;
             }
             if (!Inherited && (onTimingPoints.Count == 0 || (MpB && !onHasGreen))) {
                 // Make new greenline (based on prev)
@@ -76,7 +75,6 @@ namespace Mapping_Tools.Classes.Tools {
                     if (prevTimingPoint.Inherited) { addingTimingPoint.MpB = -100; }
                 }
                 onTimingPoints.Add(addingTimingPoint);
-                onHasGreen = true;
             }
 
             foreach (TimingPoint on in onTimingPoints) {
@@ -114,7 +112,7 @@ namespace Mapping_Tools.Classes.Tools {
             timing.Sort();
         }
 
-        public void AddChangeOld(List<TimingPoint> list, Timing timing, bool allAfter=false) {
+        public void AddChangeOld(List<TimingPoint> list, bool allAfter=false) {
             TimingPoint prev = null;
             TimingPoint on = null;
             foreach (TimingPoint tp in list) {

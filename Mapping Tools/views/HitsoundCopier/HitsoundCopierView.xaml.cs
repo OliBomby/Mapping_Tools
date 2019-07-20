@@ -16,7 +16,7 @@ namespace Mapping_Tools.Views {
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
     public partial class HitsoundCopierView :UserControl {
-        private BackgroundWorker backgroundWorker;
+        private readonly BackgroundWorker backgroundWorker;
 
         public HitsoundCopierView() {
             InitializeComponent();
@@ -96,7 +96,7 @@ namespace Mapping_Tools.Views {
             }
         }
 
-        private string Copy_Hitsounds(Arguments arg, BackgroundWorker worker, DoWorkEventArgs e) {
+        private string Copy_Hitsounds(Arguments arg, BackgroundWorker worker, DoWorkEventArgs _) {
             int copyMode = arg.CopyMode;
             double temporalLeniency = arg.TemporalLeniency;
             bool copyHitsounds = arg.CopyHitsounds;

@@ -73,7 +73,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             double snapDistance2 = Math.Abs(time - newTime2);
 
             double newTime3 = GetNearestTimeMeter(time, beforeTP, divisor3);
-            double snapDistance3 = snapDistance3 = Math.Abs(time - newTime3);
+            double snapDistance3 = Math.Abs(time - newTime3);
 
             double newTime = snapDistance3 < snapDistance2 ? newTime3 : newTime2;
 

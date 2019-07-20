@@ -18,7 +18,7 @@ namespace Mapping_Tools.Views {
     /// Interaktionslogik für UserControl1.xaml
     /// </summary>
     public partial class SliderCompletionatorView :UserControl {
-        private BackgroundWorker backgroundWorker;
+        private readonly BackgroundWorker backgroundWorker;
 
         public SliderCompletionatorView() {
             InitializeComponent();
@@ -69,7 +69,7 @@ namespace Mapping_Tools.Views {
             }
         }
 
-        private string Complete_Sliders(Arguments arg, BackgroundWorker worker, DoWorkEventArgs e) {
+        private string Complete_Sliders(Arguments arg, BackgroundWorker worker, DoWorkEventArgs _) {
             int slidersCompleted = 0;
 
             Editor editor = new Editor(arg.Path);
@@ -132,10 +132,6 @@ namespace Mapping_Tools.Views {
                 message += "Successfully completed " + slidersCompleted + " sliders!";
             }
             return message;
-        }
-
-        private void Print(string str) {
-            Console.WriteLine(str);
         }
     }
 }

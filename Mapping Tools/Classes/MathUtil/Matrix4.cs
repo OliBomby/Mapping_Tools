@@ -54,12 +54,12 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <summary>
         /// The identity matrix.
         /// </summary>
-        public static readonly Matrix4 Identity = new Matrix4(Vector4.UnitX, Vector4.UnitY, Vector4.UnitZ, Vector4.UnitW);
+        public static Matrix4 Identity { get => new Matrix4(Vector4.UnitX, Vector4.UnitY, Vector4.UnitZ, Vector4.UnitW); }
 
         /// <summary>
         /// The zero matrix.
         /// </summary>
-        public static readonly Matrix4 Zero = new Matrix4(Vector4.Zero, Vector4.Zero, Vector4.Zero, Vector4.Zero);
+        public static Matrix4 Zero { get => new Matrix4(Vector4.Zero, Vector4.Zero, Vector4.Zero, Vector4.Zero); }
 
         /// <summary>
         /// Constructs a new instance.

@@ -10,16 +10,16 @@ namespace Mapping_Tools.Components.TimeLine {
     /// Interaction logic for Timeline.xaml
     /// </summary>
     public partial class TimeLine :UserControl {
-        List<TimeLineMark> TMarks = new List<TimeLineMark>();
-        List<TimeLineElement> TElements = new List<TimeLineElement>();
+        readonly List<TimeLineMark> TMarks = new List<TimeLineMark>();
+        readonly List<TimeLineElement> TElements = new List<TimeLineElement>();
         double TimeLineWidth;
-        double TimeLineHeight;
+        readonly double TimeLineHeight;
         double TimeLineInnerHeight;
         double ElementTop;
         double Spacing;
-        double StartMSeconds;
-        double EndMSeconds;
-        double IntervalMSeconds;
+        readonly double StartMSeconds;
+        readonly double EndMSeconds;
+        readonly double IntervalMSeconds;
 
         public TimeLine(double w, double h, double m_seconds) {
             InitializeComponent();
@@ -38,7 +38,7 @@ namespace Mapping_Tools.Components.TimeLine {
         }
 
         public void AddElement(double m_seconds, double action) {
-            TimeLineElement te = new TimeLineElement(this, TimeLineInnerHeight, m_seconds, action);
+            TimeLineElement te = new TimeLineElement(TimeLineInnerHeight, m_seconds, action);
             TElements.Add(te);
             mainCanvas.Children.Add(te);
 
@@ -48,7 +48,7 @@ namespace Mapping_Tools.Components.TimeLine {
 
         private void GenerateMarkerElements() {
             foreach( TimeLineMark tMark_s in TMarks ) {
-                TimeLineElement te = new TimeLineElement(this, TimeLineInnerHeight, tMark_s.Time, 0);
+                TimeLineElement te = new TimeLineElement(TimeLineInnerHeight, tMark_s.Time, 0);
                 TElements.Add(te);
                 mainCanvas.Children.Add(te);
                 Canvas.SetTop(te, ElementTop);

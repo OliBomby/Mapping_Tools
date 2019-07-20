@@ -6,7 +6,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public double Green { get; set; }
         public double Blue { get; set; }
 
-        public Colour(int i, double r, double g, double b) {
+        public Colour(double r, double g, double b) {
             Red = r;
             Green = g;
             Blue = b;

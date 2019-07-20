@@ -26,7 +26,7 @@ namespace Mapping_Tools.Classes.MathUtil {
     /// <summary>
     /// Represents a 2x2 matrix
     /// </summary>
-    public struct Matrix2 :IEquatable<Matrix2> {
+    public struct Matrix2 : IEquatable<Matrix2> {
         /// <summary>
         /// Top row of the matrix.
         /// </summary>
@@ -40,12 +40,12 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <summary>
         /// The identity matrix.
         /// </summary>
-        public static readonly Matrix2 Identity = new Matrix2(Vector2.UnitX, Vector2.UnitY);
+        public static Matrix2 Identity { get => new Matrix2(Vector2.UnitX, Vector2.UnitY); }
 
         /// <summary>
         /// The zero matrix.
         /// </summary>
-        public static readonly Matrix2 Zero = new Matrix2(Vector2.Zero, Vector2.Zero);
+        public static Matrix2 Zero { get => new Matrix2(Vector2.Zero, Vector2.Zero); }
 
         /// <summary>
         /// Constructs a new instance.

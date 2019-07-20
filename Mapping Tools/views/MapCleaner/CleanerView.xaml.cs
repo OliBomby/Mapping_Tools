@@ -15,7 +15,6 @@ using Mapping_Tools.Classes.SystemTools;
 namespace Mapping_Tools.Views {
     public partial class CleanerView :UserControl {
         private readonly BackgroundWorker backgroundWorker;
-        private readonly BackgroundWorker backgroundLoader;
         List<double> TimingpointsRemoved;
         List<double> TimingpointsAdded;
         List<double> TimingpointsChanged;
@@ -27,13 +26,7 @@ namespace Mapping_Tools.Views {
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
 
-            backgroundWorker = ( (BackgroundWorker) this.FindResource("backgroundWorker") );
-            backgroundLoader = ( (BackgroundWorker) this.FindResource("backgroundLoader") );
-        }
-
-        private void CompileTimeLine(string fileToCopy) {
-            if( fileToCopy != "" || fileToCopy != null)
-                backgroundLoader.RunWorkerAsync(GetArgumentsFromWindow());
+            backgroundWorker = ( (BackgroundWorker) FindResource("backgroundWorker") );
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
@@ -47,29 +40,13 @@ namespace Mapping_Tools.Views {
             start.IsEnabled = false;
         }
 
-        private void BackgroundLoader_DoWork(object sender, DoWorkEventArgs e) {
-            var bgw = sender as BackgroundWorker;
-            Monitor_Program((Arguments)e.Argument, bgw);
-        }
-
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
             e.Result = Run_Program((Arguments) e.Argument, bgw, e);
         }
 
-        private void BackgroundLoader_ProgressChanged(object sender, ProgressChangedEventArgs e) {
-            loader_progress.Value = e.ProgressPercentage;
-        }
-
         private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
             progress.Value = e.ProgressPercentage;
-        }
-
-        private void BackgroundLoader_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
-            if (e.Error != null) {
-            } else {
-                FillTimeLine();
-            }
         }
 
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
@@ -117,7 +94,7 @@ namespace Mapping_Tools.Views {
             Monitor_Differences(originalTimingPoints, newTimingPoints);
         }
 
-        private string Run_Program(Arguments arguments, BackgroundWorker worker, DoWorkEventArgs e) {
+        private string Run_Program(Arguments arguments, BackgroundWorker worker, DoWorkEventArgs _) {
             Editor editor = new Editor(arguments.Path);
 
             List<TimingPoint> orgininalTimingPoints = new List<TimingPoint>();

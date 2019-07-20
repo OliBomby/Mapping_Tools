@@ -13,18 +13,20 @@ namespace Mapping_Tools.Classes.SystemTools {
         };
 
         public static readonly Settings Settings = new Settings();
+        public static bool InstanceComplete = false;
 
         public static void LoadConfig() {
-            bool instanceComplete = File.Exists(JSONPath) ? LoadFromJSON() : CreateJSON();
+            InstanceComplete = File.Exists(JSONPath) ? LoadFromJSON() : CreateJSON();
             DefaultPaths();
         }
 
         private static bool LoadFromJSON() {
             try {
-                using( StreamReader sr = new StreamReader(JSONPath) )
-                using( JsonReader reader = new JsonTextReader(sr) ) {
-                    Settings newSettings = Serializer.Deserialize<Settings>(reader);
-                    newSettings.CopyTo(Settings);
+                using( StreamReader sr = new StreamReader(JSONPath)) {
+                    using (JsonReader reader = new JsonTextReader(sr)) {
+                        Settings newSettings = Serializer.Deserialize<Settings>(reader);
+                        newSettings.CopyTo(Settings);
+                    }
                 }
             }
             catch( Exception ex ) {
@@ -39,9 +41,10 @@ namespace Mapping_Tools.Classes.SystemTools {
 
         private static bool CreateJSON() {
             try {
-                using( StreamWriter sw = new StreamWriter(JSONPath) )
-                using( JsonWriter writer = new JsonTextWriter(sw) ) {
-                    Serializer.Serialize(writer, Settings);
+                using( StreamWriter sw = new StreamWriter(JSONPath)) {
+                    using (JsonWriter writer = new JsonTextWriter(sw)) {
+                        Serializer.Serialize(writer, Settings);
+                    }
                 }
             }
             catch( Exception ex ) {
@@ -56,9 +59,10 @@ namespace Mapping_Tools.Classes.SystemTools {
 
         public static bool WriteToJSON(bool doLoading=false) {
             try {
-                using( StreamWriter sw = new StreamWriter(JSONPath) )
-                using( JsonWriter writer = new JsonTextWriter(sw) ) {
-                    Serializer.Serialize(writer, Settings);
+                using( StreamWriter sw = new StreamWriter(JSONPath)) {
+                    using (JsonWriter writer = new JsonTextWriter(sw)) {
+                        Serializer.Serialize(writer, Settings);
+                    }
                 }
             }
             catch( Exception ex ) {

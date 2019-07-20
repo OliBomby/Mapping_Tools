@@ -253,8 +253,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
 
             int numberOfBytes = numberOfSamples * 2;
-            int numberOfSampleBytes = length * 2;
-            int numberOfLoopBytes = numberOfLoopSamples * 2;
 
             byte[] buffer = new byte[numberOfBytes];
 
@@ -279,7 +277,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             int endLoop = (int)sh.EndLoop + izone.FullEndLoopAddressOffset();
 
             int length = end - start;
-            int lengthBytes = length * 2;
             int loopLength = endLoop - startLoop;
             int loopLengthBytes = loopLength * 2;
 
@@ -299,7 +296,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
 
             int numberOfBytes = numberOfSamples * 2;
-            int numberOfSampleBytes = length * 2;
             int numberOfLoopBytes = numberOfLoopSamples * 2;
 
             byte[] buffer = new byte[numberOfBytes];
@@ -313,10 +309,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Array.Copy(sample, start * 2, buffer, lengthFirstHalfBytes + numberOfLoopBytes, lengthSecondHalfBytes);
 
             return new SampleSoundGenerator(BufferToWaveStream(buffer, sh.SampleRate));
-        }
-
-        private static ISampleProvider BufferToSampleProvider(byte[] buffer, uint sampleRate) {
-            return new Pcm16BitToSampleProvider(new RawSourceWaveStream(buffer, 0, buffer.Length, new WaveFormat((int)sampleRate, 16, 1)));
         }
 
         private static WaveStream BufferToWaveStream(byte[] buffer, uint sampleRate) {

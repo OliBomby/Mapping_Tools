@@ -53,7 +53,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <summary>
         /// The zero matrix
         /// </summary>
-        public static readonly Matrix4x3 Zero = new Matrix4x3(Vector3.Zero, Vector3.Zero, Vector3.Zero, Vector3.Zero);
+        public static Matrix4x3 Zero { get => new Matrix4x3(Vector3.Zero, Vector3.Zero, Vector3.Zero, Vector3.Zero); }
 
         /// <summary>
         /// Constructs a new instance.

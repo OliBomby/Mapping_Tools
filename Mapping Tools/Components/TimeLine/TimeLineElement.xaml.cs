@@ -10,19 +10,17 @@ namespace Mapping_Tools.Components.TimeLine {
     /// Interaction logic for TimelineElement.xaml
     /// </summary>
     public partial class TimeLineElement :UserControl {
-        new TimeLine Parent;
-        double Milliseconds;
-        double Action;
+        readonly double Milliseconds;
+        readonly double Action;
         SolidColorBrush Inner;
         SolidColorBrush Outer;
         /// <summary>
         /// Creates the visual TimelineElement
         /// </summary>
-        public TimeLineElement(TimeLine parent, double height, double m_seconds, double action) {
+        public TimeLineElement(double height, double m_seconds, double action) {
             InitializeComponent();
             Action = action;
             Milliseconds = m_seconds;
-            Parent = parent;
             rectOuter.Height = height;
             rectInner.Height = height;
 

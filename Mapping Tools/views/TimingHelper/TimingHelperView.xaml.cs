@@ -17,7 +17,7 @@ namespace Mapping_Tools.Views {
     /// Interactielogica voor TimingHelperView.xaml
     /// </summary>
     public partial class TimingHelperView :UserControl {
-        private BackgroundWorker backgroundWorker;
+        private readonly BackgroundWorker backgroundWorker;
 
         public TimingHelperView() {
             InitializeComponent();
@@ -83,7 +83,7 @@ namespace Mapping_Tools.Views {
             }
         }
 
-        private string Adjust_Timing(Arguments arg, BackgroundWorker worker, DoWorkEventArgs e) {
+        private string Adjust_Timing(Arguments arg, BackgroundWorker worker, DoWorkEventArgs _) {
             // Count
             int RedlinesAdded = 0;
 

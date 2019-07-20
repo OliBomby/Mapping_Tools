@@ -9,7 +9,7 @@ namespace Mapping_Tools.Classes.Tools
 {
     public static class BezierConverter
     {
-        private static List<CircleBezierPreset> CirclePresets = new List<CircleBezierPreset> {
+        private static readonly List<CircleBezierPreset> CirclePresets = new List<CircleBezierPreset> {
             new CircleBezierPreset(0.4993379862754501, GetPoints("1.0:0.0|1.0:0.2549893626632736|0.8778997558480327:0.47884446188920726")),
             new CircleBezierPreset(1.7579419829169447, GetPoints("1.0:0.0|1.0:0.6263026|0.42931178:1.0990661|-0.18605515:0.9825393")),
             new CircleBezierPreset(3.1385246920140215, GetPoints("1.0:0.0|1.0:0.87084764|0.002304826:1.5033062|-0.9973236:0.8739115|-0.9999953:0.0030679568")),
@@ -103,7 +103,6 @@ namespace Mapping_Tools.Classes.Tools
                     for (int i = n; i > j; i--)
                     {
                         arc[i] = arc[i] * (float)tf + arc[i - 1] * (float)(1 - tf);
-                        var v = arc[i];
                     }
                 }
                 arcLength = Math.Atan2(arc.Last()[1], arc.Last()[0]);

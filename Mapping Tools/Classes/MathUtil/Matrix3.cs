@@ -48,12 +48,12 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <summary>
         /// The identity matrix.
         /// </summary>
-        public static readonly Matrix3 Identity = new Matrix3(Vector3.UnitX, Vector3.UnitY, Vector3.UnitZ);
+        public static Matrix3 Identity { get => new Matrix3(Vector3.UnitX, Vector3.UnitY, Vector3.UnitZ); }
 
         /// <summary>
         /// The zero matrix.
         /// </summary>
-        public static readonly Matrix3 Zero = new Matrix3(Vector3.Zero, Vector3.Zero, Vector3.Zero);
+        public static Matrix3 Zero { get => new Matrix3(Vector3.Zero, Vector3.Zero, Vector3.Zero); }
 
 
 

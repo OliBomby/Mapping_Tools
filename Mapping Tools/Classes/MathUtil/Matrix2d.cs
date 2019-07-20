@@ -40,12 +40,12 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <summary>
         /// The identity matrix.
         /// </summary>
-        public static readonly Matrix2d Identity = new Matrix2d(Vector2d.UnitX, Vector2d.UnitY);
+        public static Matrix2d Identity { get => new Matrix2d(Vector2d.UnitX, Vector2d.UnitY); }
 
         /// <summary>
         /// The zero matrix.
         /// </summary>
-        public static readonly Matrix2d Zero = new Matrix2d(Vector2d.Zero, Vector2d.Zero);
+        public static Matrix2d Zero { get => new Matrix2d(Vector2d.Zero, Vector2d.Zero); }
 
         /// <summary>
         /// Constructs a new instance.

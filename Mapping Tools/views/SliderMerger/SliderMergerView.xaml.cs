@@ -17,7 +17,7 @@ namespace Mapping_Tools.Views {
     /// Interaktionslogik für UserControl1.xaml
     /// </summary>
     public partial class SliderMergerView :UserControl {
-        private BackgroundWorker backgroundWorker;
+        private readonly BackgroundWorker backgroundWorker;
 
         public SliderMergerView() {
             InitializeComponent();
@@ -66,7 +66,7 @@ namespace Mapping_Tools.Views {
             }
         }
 
-        private string Merge_Sliders(Arguments arg, BackgroundWorker worker, DoWorkEventArgs e) {
+        private string Merge_Sliders(Arguments arg, BackgroundWorker worker, DoWorkEventArgs _) {
             int slidersMerged = 0;
             bool mergeLast = false;
 
@@ -123,10 +123,6 @@ namespace Mapping_Tools.Views {
                 message += "Successfully merged " + slidersMerged + " sliders!";
             }
             return message;
-        }
-
-        private void Print(string str) {
-            Console.WriteLine(str);
         }
     }
 }

@@ -253,6 +253,14 @@ namespace Mapping_Tools.Classes.SliderPathStuff {
             return obj is SliderPath other && Equals(other);
         }
 
+        public static bool operator ==(SliderPath left, SliderPath right) {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(SliderPath left, SliderPath right) {
+            return !left.Equals(right);
+        }
+
         public override int GetHashCode()
         {
             var hashCode = -1383746172;

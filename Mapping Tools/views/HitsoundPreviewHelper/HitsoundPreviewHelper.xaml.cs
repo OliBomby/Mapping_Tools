@@ -17,7 +17,7 @@ namespace Mapping_Tools.Views {
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
     public partial class HitsoundPreviewHelperView : UserControl, ISavable<HitsoundPreviewHelperVM> {
-        private BackgroundWorker backgroundWorker;
+        private readonly BackgroundWorker backgroundWorker;
 
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "hspreviewproject.json");
 
@@ -68,7 +68,7 @@ namespace Mapping_Tools.Views {
             }
         }
 
-        private string PlaceHitsounds(Arguments arg, BackgroundWorker worker, DoWorkEventArgs e) {
+        private string PlaceHitsounds(Arguments arg, BackgroundWorker worker, DoWorkEventArgs _) {
             if (arg.Zones.Count == 0)
                 return "There are no zones!";
 

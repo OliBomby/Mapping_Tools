@@ -24,9 +24,10 @@ namespace Mapping_Tools.Classes.SystemTools {
             // If the file name is not an empty string open it for saving.  
             if (path != "") {
                 try {
-                    using (StreamWriter fs = new StreamWriter(path))
-                    using (JsonWriter writer = new JsonTextWriter(fs)) {
-                        Serializer.Serialize(writer, view.GetSaveData());
+                    using (StreamWriter fs = new StreamWriter(path)) {
+                        using (JsonWriter writer = new JsonTextWriter(fs)) {
+                            Serializer.Serialize(writer, view.GetSaveData());
+                        }
                     }
                 } catch (Exception ex) {
                     Console.WriteLine(ex.StackTrace);
@@ -45,9 +46,10 @@ namespace Mapping_Tools.Classes.SystemTools {
             // If the file name is not an empty string open it for saving.  
             if (path != "") {
                 try {
-                    using (StreamReader fs = new StreamReader(path))
-                    using (JsonReader reader = new JsonTextReader(fs)) {
-                        view.SetSaveData(Serializer.Deserialize<T>(reader));
+                    using (StreamReader fs = new StreamReader(path)) {
+                        using (JsonReader reader = new JsonTextReader(fs)) {
+                            view.SetSaveData(Serializer.Deserialize<T>(reader));
+                        }
                     }
                 } catch (Exception ex) {
                     Console.WriteLine(ex.StackTrace);

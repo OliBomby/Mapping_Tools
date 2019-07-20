@@ -92,7 +92,7 @@ namespace Mapping_Tools.Classes.MathUtil {
                 return r;
             }
 
-            Vector2 perpendicular = new Vector2();
+            Vector2 perpendicular;
 
             if( t == 0.0f ) {
                 perpendicular = FirstControlPoint - StartAnchor;

@@ -733,8 +733,8 @@ namespace Mapping_Tools.Classes.MathUtil {
         public static void Mirror(ref Vector2 left, ref Line right, out Vector2 result)
         {
             double temp = -2 * (right.A * left.X + right.B * left.Y - right.C) / (Math.Pow(right.A, 2) + Math.Pow(right.B, 2));
-            double x = 2 * right.A + left.X;
-            double y = 2 * right.B + left.Y;
+            double x = temp * right.A + left.X;
+            double y = temp * right.B + left.Y;
             result = new Vector2(x, y);
         }
 
@@ -759,8 +759,8 @@ namespace Mapping_Tools.Classes.MathUtil {
         public static void Snap(ref Vector2 left, ref Line right, out Vector2 result)
         {
             double temp = -1 * (right.A * left.X + right.B * left.Y - right.C) / (Math.Pow(right.A, 2) + Math.Pow(right.B, 2));
-            double x = right.A + left.X;
-            double y = right.B + left.Y;
+            double x = temp * right.A + left.X;
+            double y = temp * right.B + left.Y;
             result = new Vector2(x, y);
         }
 

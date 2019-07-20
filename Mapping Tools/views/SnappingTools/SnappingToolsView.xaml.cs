@@ -18,7 +18,7 @@ namespace Mapping_Tools.Views {
     /// Interaktionslogik für UserControl1.xaml
     /// </summary>
     public partial class SnappingToolsView :UserControl {
-        private BackgroundWorker backgroundWorker;
+        private readonly BackgroundWorker backgroundWorker;
 
         public SnappingToolsView() {
             InitializeComponent();
@@ -28,8 +28,7 @@ namespace Mapping_Tools.Views {
         }
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
-            //var bgw = sender as BackgroundWorker;
-            //e.Result = Complete_Sliders((Arguments) e.Argument, bgw, e);
+            e.Result = "bruh";
         }
 
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
@@ -52,6 +51,7 @@ namespace Mapping_Tools.Views {
             IOHelper.SaveMapBackup(fileToCopy);
 
             start.IsEnabled = false;
+            backgroundWorker.RunWorkerAsync();
         }
     }
 }

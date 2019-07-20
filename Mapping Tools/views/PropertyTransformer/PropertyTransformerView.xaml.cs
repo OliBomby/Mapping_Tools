@@ -15,7 +15,7 @@ namespace Mapping_Tools.Views {
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
     public partial class PropertyTransformerView : UserControl {
-        private BackgroundWorker backgroundWorker;
+        private readonly BackgroundWorker backgroundWorker;
 
         public PropertyTransformerView() {
             InitializeComponent();
@@ -54,7 +54,7 @@ namespace Mapping_Tools.Views {
             }
         }
 
-        private string TransformProperties(PropertyTransformerVM vm, BackgroundWorker worker, DoWorkEventArgs e) {
+        private string TransformProperties(PropertyTransformerVM vm, BackgroundWorker worker, DoWorkEventArgs _) {
             bool doFilterMatch = vm.MatchFilter != -1 && vm.EnableFilters;
             bool doFilterRange = (vm.MinTimeFilter != -1 || vm.MaxTimeFilter != -1) && vm.EnableFilters;
             double min = vm.MinTimeFilter == -1 ? double.NegativeInfinity : vm.MinTimeFilter;

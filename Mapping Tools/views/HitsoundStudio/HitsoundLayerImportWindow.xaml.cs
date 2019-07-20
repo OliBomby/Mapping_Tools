@@ -12,14 +12,11 @@ namespace Mapping_Tools.Views {
     /// Interaction logic for Window1.xaml
     /// </summary>
     public partial class HitsoundLayerImportWindow : Window {
-        private double widthWin, heightWin; //Set default sizes of window
-        private int index;
+        private readonly int index;
         public List<HitsoundLayer> HitsoundLayers;
 
         public HitsoundLayerImportWindow() {
             InitializeComponent();
-            widthWin = ActualWidth; // Set width to window
-            heightWin = ActualHeight; // Set height to window
             HitsoundLayers = new List<HitsoundLayer>();
             index = 0;
             BeatmapPathBox.Text = MainWindow.AppWindow.GetCurrentMap();
@@ -28,8 +25,6 @@ namespace Mapping_Tools.Views {
 
         public HitsoundLayerImportWindow(int i) {
             InitializeComponent();
-            widthWin = ActualWidth; // Set width to window
-            heightWin = ActualHeight; // Set height to window
             HitsoundLayers = new List<HitsoundLayer>();
             index = i;
             NameBox.Text = String.Format("Layer {0}", index + 1);

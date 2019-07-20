@@ -20,7 +20,7 @@ namespace Mapping_Tools.Views {
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
     public partial class HitsoundStudioView : UserControl, ISavable<HitsoundStudioVM> {
-        private BackgroundWorker backgroundWorker;
+        private readonly BackgroundWorker backgroundWorker;
         private HitsoundStudioVM Settings;
 
         private bool suppressEvents = false;
@@ -80,7 +80,7 @@ namespace Mapping_Tools.Views {
             }
         }
 
-        private void Make_Hitsounds(Arguments arg, BackgroundWorker worker, DoWorkEventArgs e) {
+        private void Make_Hitsounds(Arguments arg, BackgroundWorker worker, DoWorkEventArgs _) {
             if (arg.Debug) {
                 // Convert the multiple layers into packages that have the samples from all the layers at one specific time
                 List<SamplePackage> samplePackages = HitsoundConverter.ZipLayers(arg.HitsoundLayers, arg.DefaultSample);
