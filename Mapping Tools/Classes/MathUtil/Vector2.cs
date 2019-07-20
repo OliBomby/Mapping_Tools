@@ -158,7 +158,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         }
 
         /// <summary>
-        /// Returns a System.String that represents the X coordinate of the current Vector2.
+        /// Returns a System.string that represents the X coordinate of the current Vector2.
         /// </summary>
         /// <returns></returns>
         public string StringX {
@@ -168,7 +168,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         }
 
         /// <summary>
-        /// Returns a System.String that represents the X coordinate of the current Vector2.
+        /// Returns a System.string that represents the X coordinate of the current Vector2.
         /// </summary>
         /// <returns></returns>
         public string StringY
@@ -961,11 +961,11 @@ namespace Mapping_Tools.Classes.MathUtil {
 
         private static readonly string listSeparator = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
         /// <summary>
-        /// Returns a System.String that represents the current Vector2.
+        /// Returns a System.string that represents the current Vector2.
         /// </summary>
         /// <returns></returns>
         public override string ToString() {
-            return String.Format("({0}{2} {1})", X, Y, listSeparator);
+            return string.Format("({0}{2} {1})", X, Y, listSeparator);
         }
 
         /// <summary>

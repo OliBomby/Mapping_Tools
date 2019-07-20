@@ -622,11 +622,11 @@ namespace Mapping_Tools.Classes.MathUtil {
         }
 
         /// <summary>
-        /// Returns a System.String that represents the current Quaterniond.
+        /// Returns a System.string that represents the current Quaterniond.
         /// </summary>
         /// <returns></returns>
         public override string ToString() {
-            return String.Format("V: {0}, W: {1}", Xyz, W);
+            return string.Format("V: {0}, W: {1}", Xyz, W);
         }
 
         /// <summary>
@@ -1209,7 +1209,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         }
 
         /// <summary>Returns the fully qualified type name of this instance.</summary>
-        /// <returns>A System.String containing left fully qualified type name.</returns>
+        /// <returns>A System.string containing left fully qualified type name.</returns>
         public override string ToString()
         {
             return string.Format("({0}, {1}, {2}, {3})", W, X, Y, Z);

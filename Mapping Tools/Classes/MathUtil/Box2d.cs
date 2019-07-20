@@ -189,11 +189,11 @@ namespace Mapping_Tools.Classes.MathUtil {
 
         private static readonly string listSeparator = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
         /// <summary>
-        /// Returns a <see cref="System.String"/> describing the current instance.
+        /// Returns a <see cref="System.string"/> describing the current instance.
         /// </summary>
         /// <returns></returns>
         public override string ToString() {
-            return String.Format("({0}{4} {1}) - ({2}{4} {3})", Left, Top, Right, Bottom, listSeparator);
+            return string.Format("({0}{4} {1}) - ({2}{4} {3})", Left, Top, Right, Bottom, listSeparator);
         }
     }
 }

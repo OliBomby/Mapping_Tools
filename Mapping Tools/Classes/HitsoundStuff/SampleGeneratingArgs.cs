@@ -109,7 +109,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         public override string ToString() {
             if (System.IO.Path.GetExtension(Path) == ".sf2") {
-                return String.Format("{0} {1},{2},{3},{4},{5},{6}", Path, Bank, Patch, Instrument, Key, Length, Velocity);
+                return string.Format("{0} {1},{2},{3},{4},{5},{6}", Path, Bank, Patch, Instrument, Key, Length, Velocity);
             } else {
                 return Path.ToString();
             }

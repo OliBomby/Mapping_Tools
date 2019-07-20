@@ -46,7 +46,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public string GetLine() {
-            return String.Format("Sample,{0},{1},\"{2}\",{3}", Math.Round(Time), Layer, FilePath, Math.Round(Volume));
+            return string.Format("Sample,{0},{1},\"{2}\",{3}", Math.Round(Time), Layer, FilePath, Math.Round(Volume));
         }
 
         public bool Equals(StoryboardSoundSample other) {

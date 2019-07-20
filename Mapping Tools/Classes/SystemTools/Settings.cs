@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public class Settings : INotifyPropertyChanged {
-        public List<String[]> RecentMaps { get; set; }
+        public List<string[]> RecentMaps { get; set; }
 
         private string osuPath;
         public string OsuPath {
@@ -58,14 +58,14 @@ namespace Mapping_Tools.Classes.SystemTools {
         }
 
         public Settings() {
-            RecentMaps = new List<String[]>();
+            RecentMaps = new List<string[]>();
             OsuPath = "";
             SongsPath = "";
             BackupsPath = "";
             MakeBackups = true;
         }
 
-        public void AddRecentMaps(String path, DateTime date) {
+        public void AddRecentMaps(string path, DateTime date) {
             RecentMaps.RemoveAll(o => o[0] == path);
             if( RecentMaps.Count > 4 ) {
                 try {

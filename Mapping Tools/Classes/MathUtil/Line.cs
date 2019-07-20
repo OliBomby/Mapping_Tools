@@ -150,11 +150,11 @@ namespace Mapping_Tools.Classes.MathUtil {
 
         private static readonly string listSeparator = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
         /// <summary>
-        /// Returns a System.String that represents the current Line.
+        /// Returns a System.string that represents the current Line.
         /// </summary>
         /// <returns></returns>
         public override string ToString() {
-            return String.Format("({0}{3} {1}{3} {2})", A, B, C, listSeparator);
+            return string.Format("({0}{3} {1}{3} {2})", A, B, C, listSeparator);
         }
 
         /// <summary>

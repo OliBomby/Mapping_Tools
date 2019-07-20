@@ -20,15 +20,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public List<string> ReadFile(string path) {
             // Get contents of the file
-            string[] linesz = new string[0];
-            try {
-                linesz = File.ReadAllLines(path);
-            }
-            catch(Exception ex) {
-                MessageBox.Show(ex.Message);
-            }
-            var lines = new List<string>(linesz);
-            return lines;
+            var lines = File.ReadAllLines(path);
+            return new List<string>(lines);
         }
 
         public void SaveFile(string path) {

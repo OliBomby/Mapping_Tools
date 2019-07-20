@@ -51,7 +51,7 @@ namespace Mapping_Tools.Views {
 
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
             if( e.Error != null ) {
-                MessageBox.Show(String.Format("{0}:{1}{2}", e.Error.Message, Environment.NewLine, e.Error.StackTrace), "Error");
+                MessageBox.Show(string.Format("{0}:{1}{2}", e.Error.Message, Environment.NewLine, e.Error.StackTrace), "Error");
             }
             else {
                 FillTimeLine();
@@ -80,18 +80,6 @@ namespace Mapping_Tools.Views {
                                                                          int.Parse(Snap1.Text.Split('/')[1]), int.Parse(Snap2.Text.Split('/')[1]),
                                                                          (bool)RemoveUnclickableHitsounds.IsChecked));
             return arguments;
-        }
-
-        private void Monitor_Program(Arguments arguments, BackgroundWorker worker) {
-            Editor editor = new Editor(arguments.Path);
-
-            List<TimingPoint> originalTimingPoints = new List<TimingPoint>();
-            foreach (TimingPoint tp in editor.Beatmap.BeatmapTiming.TimingPoints) { originalTimingPoints.Add(tp.Copy()); }
-
-            MapCleaner.CleanMap(editor.Beatmap, arguments.CleanerArguments, worker);
-            List<TimingPoint> newTimingPoints = editor.Beatmap.BeatmapTiming.TimingPoints;
-
-            Monitor_Differences(originalTimingPoints, newTimingPoints);
         }
 
         private string Run_Program(Arguments arguments, BackgroundWorker worker, DoWorkEventArgs _) {

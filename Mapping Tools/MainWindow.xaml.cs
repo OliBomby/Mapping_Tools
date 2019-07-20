@@ -338,7 +338,7 @@ namespace Mapping_Tools {
         //Open info screen
         private void OpenInfo(object sender, RoutedEventArgs e) {
             Version version = Assembly.GetEntryAssembly().GetName().Version;
-            System.Windows.MessageBox.Show(String.Format("Mapping Tools {0}\n\nMade by:\nOliBomby\nPotoofu", version.ToString()), "Info");
+            System.Windows.MessageBox.Show(string.Format("Mapping Tools {0}\n\nMade by:\nOliBomby\nPotoofu", version.ToString()), "Info");
         }
 
         //Change top right icons on changed window state and set state variable

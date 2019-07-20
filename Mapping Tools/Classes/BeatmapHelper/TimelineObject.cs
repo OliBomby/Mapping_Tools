@@ -154,9 +154,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public static string GetFileName(SampleSet sampleSet, Hitsound hitsound, int index) {
             if (index == 1) {
-                return String.Format("{0}-hit{1}.wav", sampleSet.ToString().ToLower(), hitsound.ToString().ToLower());
+                return string.Format("{0}-hit{1}.wav", sampleSet.ToString().ToLower(), hitsound.ToString().ToLower());
             }
-            return String.Format("{0}-hit{1}{2}.wav", sampleSet.ToString().ToLower(), hitsound.ToString().ToLower(), index);
+            return string.Format("{0}-hit{1}{2}.wav", sampleSet.ToString().ToLower(), hitsound.ToString().ToLower(), index);
         }
     }
 }

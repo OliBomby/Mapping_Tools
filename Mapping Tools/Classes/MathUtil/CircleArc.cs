@@ -189,11 +189,11 @@ namespace Mapping_Tools.Classes.MathUtil {
 
         private static readonly string listSeparator = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
         /// <summary>
-        /// Returns a System.String that represents the current CircleArc.
+        /// Returns a System.string that represents the current CircleArc.
         /// </summary>
         /// <returns></returns>
         public override string ToString() {
-            return String.Format("({1}{0} {2}{0} {3}{0} {4}{0} {5}{0} {6})", listSeparator, Centre, Radius, ThetaStart, ThetaRange, Dir, Stable);
+            return string.Format("({1}{0} {2}{0} {3}{0} {4}{0} {5}{0} {6})", listSeparator, Centre, Radius, ThetaStart, ThetaRange, Dir, Stable);
         }
         
 

@@ -27,8 +27,8 @@ namespace Mapping_Tools.Views {
             InitializeComponent();
             HitsoundLayers = new List<HitsoundLayer>();
             index = i;
-            NameBox.Text = String.Format("Layer {0}", index + 1);
-            NameBox2.Text = String.Format("Layer {0}", index + 1);
+            NameBox.Text = string.Format("Layer {0}", index + 1);
+            NameBox2.Text = string.Format("Layer {0}", index + 1);
             BeatmapPathBox.Text = MainWindow.AppWindow.GetCurrentMap();
             BeatmapPathBox2.Text = MainWindow.AppWindow.GetCurrentMap();
         }
@@ -76,11 +76,11 @@ namespace Mapping_Tools.Views {
             } else if (Tabs.SelectedIndex == 1) {
                 // Import complete hitsounds
                 HitsoundLayers = HitsoundImporter.ImportHitsounds(BeatmapPathBox2.Text);
-                HitsoundLayers.ForEach(o => o.Name = String.Format("{0}: {1}", NameBox2.Text, o.Name));
+                HitsoundLayers.ForEach(o => o.Name = string.Format("{0}: {1}", NameBox2.Text, o.Name));
             } else {
                 // Import MIDI
                 HitsoundLayers = HitsoundImporter.ImportMIDI(BeatmapPathBox3.Text, (bool)InstrumentBox3.IsChecked, (bool)KeysoundBox3.IsChecked, (bool)LengthBox3.IsChecked, LengthRoughnessBox3.GetDouble(2), (bool)VelocityBox3.IsChecked, VelocityRoughnessBox3.GetDouble(10));
-                HitsoundLayers.ForEach(o => o.Name = String.Format("{0}: {1}", NameBox3.Text, o.Name));
+                HitsoundLayers.ForEach(o => o.Name = string.Format("{0}: {1}", NameBox3.Text, o.Name));
             }
             
             Close();

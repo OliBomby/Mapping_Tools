@@ -1131,11 +1131,11 @@ namespace Mapping_Tools.Classes.MathUtil {
 
         private static readonly string listSeparator = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
         /// <summary>
-        /// Returns a System.String that represents the current Vector3.
+        /// Returns a System.string that represents the current Vector3.
         /// </summary>
         /// <returns></returns>
         public override string ToString() {
-            return String.Format("({0}{3} {1}{3} {2})", X, Y, Z, listSeparator);
+            return string.Format("({0}{3} {1}{3} {2})", X, Y, Z, listSeparator);
         }
 
         /// <summary>

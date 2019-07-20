@@ -632,11 +632,11 @@ namespace Mapping_Tools.Classes.MathUtil {
         }
 
         /// <summary>
-        /// Returns a System.String that represents the current Quaternion.
+        /// Returns a System.string that represents the current Quaternion.
         /// </summary>
         /// <returns></returns>
         public override string ToString() {
-            return String.Format("V: {0}, W: {1}", Xyz, W);
+            return string.Format("V: {0}, W: {1}", Xyz, W);
         }
 
         /// <summary>

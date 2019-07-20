@@ -52,7 +52,7 @@ namespace Mapping_Tools.Views {
 
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
             if( e.Error != null ) {
-                MessageBox.Show(String.Format("{0}:{1}{2}", e.Error.Message, Environment.NewLine, e.Error.StackTrace), "Error");
+                MessageBox.Show(string.Format("{0}:{1}{2}", e.Error.Message, Environment.NewLine, e.Error.StackTrace), "Error");
             }
             else {
                 progress.Value = 0;
@@ -110,7 +110,7 @@ namespace Mapping_Tools.Views {
                 }
                 UpdateProgressBar(worker, 100);
 
-                MessageBox.Show(String.Format("Number of sample indices: {0}, Number of samples: {1}, Number of greenlines: {2}", completeHitsounds.CustomIndices.Count, samples, greenlines));
+                MessageBox.Show(string.Format("Number of sample indices: {0}, Number of samples: {1}, Number of greenlines: {2}", completeHitsounds.CustomIndices.Count, samples, greenlines));
             } 
             else {
                 var loadedSamples = SampleImporter.ImportSamples(arg.HitsoundLayers.Select(o => o.SampleArgs));

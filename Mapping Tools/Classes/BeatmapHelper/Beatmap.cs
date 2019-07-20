@@ -240,7 +240,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public string GetFileName() {
-            string fileName = String.Format("{0} - {1} ({2}) [{3}].osu", Metadata["Artist"].StringValue, Metadata["Title"].StringValue, Metadata["Creator"].StringValue, Metadata["Version"].StringValue);
+            string fileName = string.Format("{0} - {1} ({2}) [{3}].osu", Metadata["Artist"].StringValue, Metadata["Title"].StringValue, Metadata["Creator"].StringValue, Metadata["Version"].StringValue);
 
             string regexSearch = new string(Path.GetInvalidFileNameChars());
             Regex r = new Regex(string.Format("[{0}]", Regex.Escape(regexSearch)));

@@ -609,11 +609,11 @@ namespace Mapping_Tools.Classes.MathUtil {
         }
 
         /// <summary>
-        /// Returns a System.String that represents the current Matrix4.
+        /// Returns a System.string that represents the current Matrix4.
         /// </summary>
         /// <returns>The string representation of the matrix.</returns>
         public override string ToString() {
-            return String.Format("{0}\n{1}", Row0, Row1);
+            return string.Format("{0}\n{1}", Row0, Row1);
         }
 
         /// <summary>

@@ -13,14 +13,14 @@ namespace Mapping_Tools.Components.TimeLine {
             Time = m_seconds;
 
             TimeSpan ts = TimeSpan.FromMilliseconds(m_seconds);
-            String m = ts.Minutes.ToString();
+            string m = ts.Minutes.ToString();
             if( m.Length < 2 )
                 m = "0" + m;
-            String s = ts.Seconds.ToString();
+            string s = ts.Seconds.ToString();
             if( s.Length < 2)
                 s = "0" + s;
 
-            text.Text = String.Format("{0}:{1}", m, s);
+            text.Text = string.Format("{0}:{1}", m, s);
         }
     }
 }

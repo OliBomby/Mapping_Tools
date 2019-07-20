@@ -84,17 +84,17 @@ namespace Mapping_Tools.Components.TimeLine {
         private void SetupTooltip() {
             TimeSpan ts = TimeSpan.FromMilliseconds(Milliseconds);
 
-            String m = ts.Minutes.ToString();
+            string m = ts.Minutes.ToString();
             if (m.Length < 2)
                 m = "0" + m;
-            String s = ts.Seconds.ToString();
+            string s = ts.Seconds.ToString();
             if (s.Length < 2)
                 s = "0" + s;
-            String ms = ts.Milliseconds.ToString();
+            string ms = ts.Milliseconds.ToString();
             if (ms.Length < 2)
                 ms = "0" + ms;
 
-            mainCanvas.ToolTip = String.Format("{0}:{1}:{2}", m, s, ms);
+            mainCanvas.ToolTip = string.Format("{0}:{1}:{2}", m, s, ms);
         }
 
         //Open osu at timestamp

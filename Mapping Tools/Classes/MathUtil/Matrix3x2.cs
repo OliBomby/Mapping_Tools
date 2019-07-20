@@ -572,11 +572,11 @@ namespace Mapping_Tools.Classes.MathUtil {
         }
 
         /// <summary>
-        /// Returns a System.String that represents the current Matrix3d.
+        /// Returns a System.string that represents the current Matrix3d.
         /// </summary>
         /// <returns>The string representation of the matrix.</returns>
         public override string ToString() {
-            return String.Format("{0}\n{1}\n{2}", Row0, Row1, Row2);
+            return string.Format("{0}\n{1}\n{2}", Row0, Row1, Row2);
         }
 
         /// <summary>

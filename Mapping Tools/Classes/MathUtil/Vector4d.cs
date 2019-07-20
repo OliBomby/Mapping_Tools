@@ -1310,11 +1310,11 @@ namespace Mapping_Tools.Classes.MathUtil {
 
         private static readonly string listSeparator = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
         /// <summary>
-        /// Returns a System.String that represents the current Vector4d.
+        /// Returns a System.string that represents the current Vector4d.
         /// </summary>
         /// <returns></returns>
         public override string ToString() {
-            return String.Format("({0}{4} {1}{4} {2}{4} {3})", X, Y, Z, W, listSeparator);
+            return string.Format("({0}{4} {1}{4} {2}{4} {3})", X, Y, Z, W, listSeparator);
         }
 
         /// <summary>

@@ -804,7 +804,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         }
 
         /// <summary>
-        /// Returns a System.String that represents the current Matrix4.
+        /// Returns a System.string that represents the current Matrix4.
         /// </summary>
         /// <returns>The string representation of the matrix.</returns>
         public override string ToString() {

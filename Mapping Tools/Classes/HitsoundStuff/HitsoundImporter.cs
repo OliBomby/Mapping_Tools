@@ -208,7 +208,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         velocity = (int)RoundVelocity(velocity, velocityRoughness);
 
                         string lengthString = Math.Round(length).ToString(CultureInfo.InvariantCulture);
-                        string filename = String.Format("{0}\\{1}\\{2}\\{3}\\{4}\\{5}.wav", bank, patch, instrument, key, lengthString, velocity);
+                        string filename = string.Format("{0}\\{1}\\{2}\\{3}\\{4}\\{5}.wav", bank, patch, instrument, key, lengthString, velocity);
 
                         string instrumentName = on.Channel == 10 ? "Percussion" : patch >= 0 && patch <= 127 ? PatchChangeEvent.GetPatchName(patch) : "Undefined";
                         string keyName = on.NoteName;
@@ -330,7 +330,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 }
 
                 last = te;
-                //Console.WriteLine(String.Format("{0},359.842,4,2,1,100,1,0", (int)times.Last(), (last.MicrosecondsPerQuarterNote / 1000f).ToString(CultureInfo.InvariantCulture)));
+                //Console.WriteLine(string.Format("{0},359.842,4,2,1,100,1,0", (int)times.Last(), (last.MicrosecondsPerQuarterNote / 1000f).ToString(CultureInfo.InvariantCulture)));
             }
             return times;
         }
