@@ -117,26 +117,7 @@ namespace Mapping_Tools.Views {
             Timeline processedTimeline;
 
             if (copyMode == 0) {
-                foreach (HitObject ho in beatmapTo.HitObjects) {
-                    // Remove all hitsounds
-                    ho.Clap = false;
-                    ho.Whistle = false;
-                    ho.Finish = false;
-                    ho.Clap = false;
-                    ho.SampleSet = 0;
-                    ho.AdditionSet = 0;
-                    ho.CustomIndex = 0;
-                    ho.SampleVolume = 0;
-                    ho.Filename = "";
-
-                    if (ho.IsSlider) {
-                        // Remove edge hitsounds
-                        ho.EdgeHitsounds = ho.EdgeHitsounds.Select(o => 0).ToArray();
-                        ho.EdgeSampleSets = ho.EdgeSampleSets.Select(o => SampleSet.Auto).ToArray();
-                        ho.EdgeAdditionSets = ho.EdgeAdditionSets.Select(o => SampleSet.Auto).ToArray();
-                        ho.SliderExtras = false;
-                    }
-                }
+                ResetHitObjectHitsounds(beatmapTo);
 
                 // Every defined hitsound and sampleset on hitsound gets copied to their copyTo destination
                 // Timelines
@@ -144,34 +125,7 @@ namespace Mapping_Tools.Views {
                 Timeline tlFrom = beatmapFrom.GetTimeline();
 
                 if (copyHitsounds) {
-                    foreach (TimelineObject tloFrom in tlFrom.TimeLineObjects) {
-                        TimelineObject tloTo = tlTo.GetNearestTLO(tloFrom.Time, true);
-
-                        if (tloTo != null && Math.Abs(tloFrom.Time - tloTo.Time) <= temporalLeniency) {
-                            // Copy to this tlo
-                            tloTo.SampleSet = tloFrom.SampleSet;
-                            tloTo.AdditionSet = tloFrom.AdditionSet;
-                            tloTo.Normal = tloFrom.Normal;
-                            tloTo.Whistle = tloFrom.Whistle;
-                            tloTo.Finish = tloFrom.Finish;
-                            tloTo.Clap = tloFrom.Clap;
-                            tloTo.CustomIndex = tloFrom.CustomIndex;
-                            tloTo.SampleVolume = tloFrom.SampleVolume;
-                            tloTo.Filename = tloFrom.Filename;
-
-                            // Copy sliderbody hitsounds
-                            if (tloTo.IsSliderHead && tloFrom.IsSliderHead && copySliderbodychanges) {
-                                tloTo.Origin.Hitsounds = tloFrom.Origin.Hitsounds;
-                                tloTo.Origin.SampleSet = tloFrom.Origin.SampleSet;
-                                tloTo.Origin.AdditionSet = tloFrom.Origin.AdditionSet;
-                            }
-
-                            tloTo.HitsoundsToOrigin();
-
-                            tloTo.canCopy = false;
-                        }
-                        tloFrom.canCopy = false;
-                    }
+                    CopyHitsounds(arg, tlFrom, tlTo);
                 }
 
                 // Volumes and samplesets and customindices greenlines get copied with timingpointchanges and allafter enabled
@@ -196,48 +150,7 @@ namespace Mapping_Tools.Views {
                 List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
 
                 if (copyHitsounds) {
-                    foreach (TimelineObject tloFrom in tlFrom.TimeLineObjects) {
-                        TimelineObject tloTo = tlTo.GetNearestTLO(tloFrom.Time, true);
-
-                        if (tloTo != null && Math.Abs(tloFrom.Time - tloTo.Time) <= temporalLeniency) {
-                            // Copy to this tlo
-                            tloTo.SampleSet = tloFrom.SampleSet;
-                            tloTo.AdditionSet = tloFrom.AdditionSet;
-                            tloTo.Normal = tloFrom.Normal;
-                            tloTo.Whistle = tloFrom.Whistle;
-                            tloTo.Finish = tloFrom.Finish;
-                            tloTo.Clap = tloFrom.Clap;
-                            tloTo.CustomIndex = tloFrom.CustomIndex;
-                            tloTo.SampleVolume = tloFrom.SampleVolume;
-                            tloTo.Filename = tloFrom.Filename;
-
-                            // Copy sliderbody hitsounds
-                            if (tloTo.IsSliderHead && tloFrom.IsSliderHead && copySliderbodychanges) {
-                                tloTo.Origin.Hitsounds = tloFrom.Origin.Hitsounds;
-                                tloTo.Origin.SampleSet = tloFrom.Origin.SampleSet;
-                                tloTo.Origin.AdditionSet = tloFrom.Origin.AdditionSet;
-                            }
-
-                            tloTo.HitsoundsToOrigin();
-
-                            // Add timingpointschange to copy timingpoint hitsounds
-                            TimingPoint tp = tloFrom.HitsoundTP.Copy();
-                            tp.Offset = tloTo.Time;
-                            timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: copySamplesets, index: copySamplesets, volume: copyVolumes));
-
-                            tloTo.canCopy = false;
-                        }
-                        tloFrom.canCopy = false;
-                    }
-
-                    // Timingpointchange all the undefined tlo from copyFrom
-                    foreach (TimelineObject tloTo in tlTo.TimeLineObjects) {
-                        if (tloTo.canCopy) {
-                            TimingPoint tp = tloTo.HitsoundTP.Copy();
-                            tp.Offset = tloTo.Time;
-                            timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: copySamplesets, index: copySamplesets, volume: copyVolumes));
-                        }
-                    }
+                    CopyHitsounds(arg, tlFrom, tlTo, timingPointsChanges);
                 }
 
                 if (copySliderbodychanges) {
@@ -369,6 +282,93 @@ namespace Mapping_Tools.Views {
             string message = "";
             message += "Done!";
             return message;
+        }
+
+        private void CopyHitsounds(Arguments arg, Timeline tlFrom, Timeline tlTo) {
+            foreach (TimelineObject tloFrom in tlFrom.TimeLineObjects) {
+                TimelineObject tloTo = tlTo.GetNearestTLO(tloFrom.Time, true);
+
+                if (tloTo != null && Math.Abs(tloFrom.Time - tloTo.Time) <= arg.TemporalLeniency) {
+                    // Copy to this tlo
+                    CopyHitsounds(arg, tloFrom, tloTo);
+                }
+                tloFrom.canCopy = false;
+            }
+        }
+
+        private void CopyHitsounds(Arguments arg, Timeline tlFrom, Timeline tlTo, List<TimingPointsChange> timingPointsChanges) {
+            foreach (TimelineObject tloFrom in tlFrom.TimeLineObjects) {
+                TimelineObject tloTo = tlTo.GetNearestTLO(tloFrom.Time, true);
+
+                if (tloTo != null && Math.Abs(tloFrom.Time - tloTo.Time) <= arg.TemporalLeniency) {
+                    // Copy to this tlo
+                    CopyHitsounds(arg, tloFrom, tloTo);
+
+                    // Add timingpointschange to copy timingpoint hitsounds
+                    TimingPoint tp = tloFrom.HitsoundTP.Copy();
+                    tp.Offset = tloTo.Time;
+                    timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: arg.CopySamplesets, index: arg.CopySamplesets, volume: arg.CopyVolumes));
+                }
+                tloFrom.canCopy = false;
+            }
+
+            // Timingpointchange all the undefined tlo from copyFrom
+            foreach (TimelineObject tloTo in tlTo.TimeLineObjects) {
+                if (tloTo.canCopy) {
+                    TimingPoint tp = tloTo.HitsoundTP.Copy();
+                    tp.Offset = tloTo.Time;
+                    timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: arg.CopySamplesets, index: arg.CopySamplesets, volume: arg.CopyVolumes));
+                }
+            }
+        }
+
+        private void CopyHitsounds(Arguments arg, TimelineObject tloFrom, TimelineObject tloTo) {
+            // Copy to this tlo
+            tloTo.SampleSet = tloFrom.SampleSet;
+            tloTo.AdditionSet = tloFrom.AdditionSet;
+            tloTo.Normal = tloFrom.Normal;
+            tloTo.Whistle = tloFrom.Whistle;
+            tloTo.Finish = tloFrom.Finish;
+            tloTo.Clap = tloFrom.Clap;
+
+            if (tloTo.CanCustoms) {
+                tloTo.CustomIndex = tloFrom.CustomIndex;
+                tloTo.SampleVolume = tloFrom.SampleVolume;
+                tloTo.Filename = tloFrom.Filename;
+            }
+
+            // Copy sliderbody hitsounds
+            if (tloTo.IsSliderHead && tloFrom.IsSliderHead && arg.CopyBodyHitsounds) {
+                tloTo.Origin.Hitsounds = tloFrom.Origin.Hitsounds;
+                tloTo.Origin.SampleSet = tloFrom.Origin.SampleSet;
+                tloTo.Origin.AdditionSet = tloFrom.Origin.AdditionSet;
+            }
+
+            tloTo.HitsoundsToOrigin();
+            tloTo.canCopy = false;
+        }
+
+        private void ResetHitObjectHitsounds(Beatmap beatmap) {
+            foreach (HitObject ho in beatmap.HitObjects) {
+                // Remove all hitsounds
+                ho.Clap = false;
+                ho.Whistle = false;
+                ho.Finish = false;
+                ho.Clap = false;
+                ho.SampleSet = 0;
+                ho.AdditionSet = 0;
+                ho.CustomIndex = 0;
+                ho.SampleVolume = 0;
+                ho.Filename = "";
+
+                if (ho.IsSlider) {
+                    // Remove edge hitsounds
+                    ho.EdgeHitsounds = ho.EdgeHitsounds.Select(o => 0).ToArray();
+                    ho.EdgeSampleSets = ho.EdgeSampleSets.Select(o => SampleSet.Auto).ToArray();
+                    ho.EdgeAdditionSets = ho.EdgeAdditionSets.Select(o => SampleSet.Auto).ToArray();
+                    ho.SliderExtras = false;
+                }
+            }
         }
 
         private bool FilterMuteTLO(TimelineObject tloTo, Beatmap beatmapTo, Arguments arg) {
