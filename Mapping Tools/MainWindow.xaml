@@ -66,8 +66,8 @@
                         <MenuItem Header="_Hitsound Preview Helper" Click="LoadHSPreviewHelper"/>
                     </MenuItem>
                     <MenuItem Height="31" Header="_Options" Padding="12,0,0,0" MinWidth="80">
-                        <MenuItem Header="_Preferences" Click="LoadPreferences"/>
                         <MenuItem Header="_Get started" Click="LoadStartup"/>
+                        <MenuItem Header="_Preferences" Click="LoadPreferences"/>
                         <MenuItem Header="_Open backups folder" Click="OpenBackups"/>
                     </MenuItem>
                     <MenuItem Height="31" Header="_About" Padding="12,0,0,0" MinWidth="67">
