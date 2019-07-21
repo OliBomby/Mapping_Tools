@@ -389,7 +389,7 @@ namespace Mapping_Tools.Views {
         private void Delete_Click(object sender, RoutedEventArgs e) {
             try {
                 // Ask for confirmation
-                MessageBoxResult messageBoxResult = MessageBox.Show("Are you sure?", "Delete Confirmation", MessageBoxButton.YesNo);
+                MessageBoxResult messageBoxResult = MessageBox.Show("Are you sure?", "Confirm deletion", MessageBoxButton.YesNo);
                 if (messageBoxResult != MessageBoxResult.Yes) { return; }
 
                 if (selectedLayers.Count == 0 || selectedLayers == null) { return; }

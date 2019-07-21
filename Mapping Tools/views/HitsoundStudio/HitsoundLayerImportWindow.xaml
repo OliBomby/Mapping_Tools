@@ -64,6 +64,36 @@
                 </Style>
             </TabControl.Resources>
 
+            <TabItem Header="Simple layer" Background="Transparent">
+                <StackPanel HorizontalAlignment="Stretch" CanVerticallyScroll="True" CanHorizontallyScroll="True" Margin="10">
+                    <TextBox x:Name="NameBox0" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,5,0,0"
+                            Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Name"/>
+                    <ComboBox x:Name="SampleSetBox0" SelectedIndex="0" Cursor="Hand" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,5,0,0"
+                            Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Sampleset">
+                        <ComboBoxItem Content="Normal" HorizontalAlignment="Left" Cursor="Hand"/>
+                        <ComboBoxItem Content="Soft" HorizontalAlignment="Left" Cursor="Hand"/>
+                        <ComboBoxItem Content="Drum" HorizontalAlignment="Left" Cursor="Hand"/>
+                    </ComboBox>
+                    <ComboBox x:Name="HitsoundBox0" SelectedIndex="0" Cursor="Hand" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,5,0,0"
+                            Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Hitsound">
+                        <ComboBoxItem Content="Normal" HorizontalAlignment="Left" Cursor="Hand"/>
+                        <ComboBoxItem Content="Whistle" HorizontalAlignment="Left" Cursor="Hand"/>
+                        <ComboBoxItem Content="Finish" HorizontalAlignment="Left" Cursor="Hand"/>
+                        <ComboBoxItem Content="Clap" HorizontalAlignment="Left" Cursor="Hand"/>
+                    </ComboBox>
+                    <Grid Margin="0,15,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" x:Name="SamplePathBox0" Foreground="{DynamicResource MaterialDesignBody}"
+                            Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Hitsound sample"/>
+                        <Button Grid.Column="1" Cursor="Hand" Click="SampleBrowse0_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
+                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                        </Button >
+                    </Grid>
+                </StackPanel>
+            </TabItem>
             <TabItem Header="Import layer stack" Background="Transparent">
                 <StackPanel HorizontalAlignment="Stretch" CanVerticallyScroll="True" CanHorizontallyScroll="True" Margin="10">
                     <TextBox x:Name="NameBox" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,5,0,0"
