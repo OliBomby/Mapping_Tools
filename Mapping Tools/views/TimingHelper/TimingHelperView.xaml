@@ -25,7 +25,12 @@
                 <CheckBox x:Name="RedlinesBox" Content="Cover redlines" IsChecked="True"/>
                 <CheckBox x:Name="OmitBarlineBox" Content="Omit first barline on new redlines" IsChecked="True"/>
 
-                <TextBlock Text="Signatures" Margin="0,20,0,0" Style="{StaticResource MaterialDesignSubheadingTextBlock}"/>
+                <TextBox x:Name="LeniencyBox" Text="3" Width="400" HorizontalAlignment="Left" Margin="0,20,0,0"
+                    Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Leniency (ms)"/>
+                <TextBox x:Name="TemporalBox" Text="" Width="400" HorizontalAlignment="Left" Margin="0,10,0,0"
+                    Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Beats between every marker" ToolTip="Leave empty for auto."/>
+
+                <TextBlock Text="Signatures" Margin="0,20,0,0" FontSize="14" FontWeight="Bold"/>
                 <ComboBox FontSize="14" x:Name="Snap1" Cursor="Hand" SelectedIndex="4" Width="60" HorizontalAlignment="Left">
                     <ComboBoxItem Content="1/1" Cursor="Hand"/>
                     <ComboBoxItem Content="1/2" Cursor="Hand"/>
@@ -39,11 +44,6 @@
                     <ComboBoxItem Content="1/6" Cursor="Hand"/>
                     <ComboBoxItem Content="1/12" Cursor="Hand"/>
                 </ComboBox>
-
-                <TextBox x:Name="LeniencyBox" Text="3" Width="400" HorizontalAlignment="Left" Margin="0,20,0,0"
-                    Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Leniency (ms)"/>
-                <TextBox x:Name="TemporalBox" Text="" Width="400" HorizontalAlignment="Left" Margin="0,10,0,0"
-                    Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Beats between every marker (leave empty for auto)"/>
             </StackPanel>
 
             <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">

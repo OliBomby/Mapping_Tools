@@ -16,31 +16,31 @@
         <Grid Name="FirstGrid" Grid.Row="0">
             <StackPanel>
                 <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}" Margin="0,0,0,10"><Run Text="Map Cleaner"/></TextBlock>
-                <CheckBox FontSize="14" x:Name="ResnapObjects" Cursor="Hand" Foreground="#FFD6D6D6">
+                <CheckBox FontSize="14" x:Name="ResnapObjects" Cursor="Hand">
                     Resnap Objects
                 </CheckBox>
-                <CheckBox FontSize="14" x:Name="ResnapBookmarks" Cursor="Hand" Foreground="#FFD6D6D6">
+                <CheckBox FontSize="14" x:Name="ResnapBookmarks" Cursor="Hand">
                     Resnap Bookmarks
                 </CheckBox>
-                <CheckBox FontSize="14" x:Name="RemoveMuting" Cursor="Hand" Foreground="#FFD6D6D6">
+                <CheckBox FontSize="14" x:Name="RemoveMuting" Cursor="Hand">
                     Remove muting
                 </CheckBox>
-                <CheckBox FontSize="14" x:Name="RemoveUnclickableHitsounds" Cursor="Hand" Foreground="#FFD6D6D6">
+                <CheckBox FontSize="14" x:Name="RemoveUnclickableHitsounds" Cursor="Hand">
                     Mute unclickable hitsounds
                 </CheckBox>
 
-                <TextBlock Text="Map info:" Margin="0,20,0,0" Style="{StaticResource MaterialDesignSubheadingTextBlock}"/>
-                <CheckBox FontSize="14" x:Name="VolumeSliders" Cursor="Hand" IsChecked="True" Foreground="#FFD6D6D6">
+                <TextBlock Text="Map info:" Margin="0,20,0,0" FontSize="14" FontWeight="Bold"/>
+                <CheckBox FontSize="14" x:Name="VolumeSliders" Cursor="Hand" IsChecked="True">
                     Map uses volume changes in sliders
                 </CheckBox>
-                <CheckBox FontSize="14" Name="SamplesetSliders" Cursor="Hand" IsChecked="True" Foreground="#FFD6D6D6">
+                <CheckBox FontSize="14" Name="SamplesetSliders" Cursor="Hand" IsChecked="True">
                     Map uses sampleset changes in sliders
                 </CheckBox>
-                <CheckBox FontSize="14" x:Name="VolumeSpinners" Cursor="Hand" IsChecked="True" Foreground="#FFD6D6D6">
+                <CheckBox FontSize="14" x:Name="VolumeSpinners" Cursor="Hand" IsChecked="True">
                     Map uses volume changes in spinners
                 </CheckBox>
 
-                <TextBlock Text="Signatures" Margin="0,20,0,0" Style="{StaticResource MaterialDesignSubheadingTextBlock}"/>
+                <TextBlock Text="Signatures" Margin="0,20,0,0" FontSize="14" FontWeight="Bold"/>
                 <ComboBox FontSize="14" x:Name="Snap1" Cursor="Hand" SelectedIndex="4" Width="60" HorizontalAlignment="Left">
                     <ComboBoxItem Content="1/1" Cursor="Hand"/>
                     <ComboBoxItem Content="1/2" Cursor="Hand"/>
