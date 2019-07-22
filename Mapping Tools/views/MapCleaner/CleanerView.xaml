@@ -17,10 +17,10 @@
             <StackPanel>
                 <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}" Margin="0,0,0,10"><Run Text="Map Cleaner"/></TextBlock>
                 <CheckBox FontSize="14" x:Name="ResnapObjects" Cursor="Hand">
-                    Resnap Objects
+                    Resnap objects
                 </CheckBox>
                 <CheckBox FontSize="14" x:Name="ResnapBookmarks" Cursor="Hand">
-                    Resnap Bookmarks
+                    Resnap bookmarks
                 </CheckBox>
                 <CheckBox FontSize="14" x:Name="RemoveMuting" Cursor="Hand">
                     Remove muting

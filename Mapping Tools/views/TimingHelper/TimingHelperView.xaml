@@ -23,7 +23,7 @@
                 <CheckBox x:Name="BookmarkBox" Content="Cover bookmarks" IsChecked="True"/>
                 <CheckBox x:Name="GreenlinesBox" Content="Cover greenlines" IsChecked="True"/>
                 <CheckBox x:Name="RedlinesBox" Content="Cover redlines" IsChecked="True"/>
-                <CheckBox x:Name="OmitBarlineBox" Content="Omit first barline on new redlines" IsChecked="True"/>
+                <CheckBox x:Name="OmitBarlineBox" Content="Omit first barline on new redlines" IsChecked="False"/>
 
                 <TextBox x:Name="LeniencyBox" Text="3" Width="400" HorizontalAlignment="Left" Margin="0,20,0,0"
                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Leniency (ms)"/>
