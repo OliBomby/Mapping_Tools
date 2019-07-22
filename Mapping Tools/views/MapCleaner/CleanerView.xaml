@@ -29,7 +29,7 @@
                     Mute unclickable hitsounds
                 </CheckBox>
 
-                <TextBlock Text="Map info:" Margin="0,20,0,0" FontSize="14" FontWeight="Bold"/>
+                <TextBlock Text="Map info" Margin="0,20,0,0" FontSize="14" FontWeight="Bold"/>
                 <CheckBox FontSize="14" x:Name="VolumeSliders" Cursor="Hand" IsChecked="True">
                     Map uses volume changes in sliders
                 </CheckBox>
