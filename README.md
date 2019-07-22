@@ -9,17 +9,17 @@ Collection of tools for manipulating osu! beatmaps
 - [Property Transformer]() by [OliBomby](https://github.com/OliBomby) 
 - [Timing Helper]() by [OliBomby](https://github.com/OliBomby) 
 - [Hitsound Copier]() by [OliBomby](https://github.com/OliBomby) 
+- [Hitsound Preview Helper]() by [OliBomby](https://github.com/OliBomby) 
 
 ## Future implementations
 - Snapping Tools (Geo-Triangle & Drafting Compass)
-- Better feedback for users on errors (and logs)
-- Autoupdates and installer
-- More clear instructions on startup / in a helping page
+- Sliderator (tool for making variable velocity sliders)
 
 ## Used libraries
 - [MaterialDesignInXamlToolkit](https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit)
 - [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)
 - [AutoUpdater.NET](https://github.com/ravibpatel/AutoUpdater.NET)
 - [NAudio](https://github.com/naudio/NAudio)
+- [NAudio Vorbis](https://github.com/naudio/Vorbis)
 - [OsuMemoryDataProvider](https://github.com/Piotrekol)
-- [Some classes from osu! Lazer](https://github.com/ppy/osu)
+- [Microsoft Windows API Code Pack](https://github.com/aybe/Windows-API-Code-Pack-1.1)
