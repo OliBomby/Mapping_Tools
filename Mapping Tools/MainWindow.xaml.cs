@@ -183,7 +183,7 @@ namespace Mapping_Tools {
             DataContext = Views.GetTimingHelper();
 
             TextBlock txt = this.FindName("header") as TextBlock;
-            txt.Text = "Mapping Tools - TimingHelper";
+            txt.Text = "Mapping Tools - Timing Helper";
 
             ViewChanged();
 
