@@ -1,6 +1,6 @@
 # Mapping_Tools
 Collection of tools for manipulating osu! beatmaps
-![alt text](https://i.imgur.com/CGQBZIa.png)
+![alt text](https://i.imgur.com/ERZBdmv.png)
 Logo by [Karoo](https://osu.ppy.sh/users/1882522)
 
 ## Tools included
