@@ -157,6 +157,28 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
+        private double sbSampleTimeMultiplier;
+        public double SBSampleTimeMultiplier {
+            get { return sbSampleTimeMultiplier; }
+            set {
+                if (sbSampleTimeMultiplier != value) {
+                    sbSampleTimeMultiplier = value;
+                    NotifyPropertyChanged("SBSampleTimeMultiplier");
+                }
+            }
+        }
+
+        private double sbSampleTimeOffset;
+        public double SBSampleTimeOffset {
+            get { return sbSampleTimeOffset; }
+            set {
+                if (sbSampleTimeOffset != value) {
+                    sbSampleTimeOffset = value;
+                    NotifyPropertyChanged("SBSampleTimeOffset");
+                }
+            }
+        }
+
         private bool clipProperties;
         public bool ClipProperties {
             get { return clipProperties; }
@@ -235,6 +257,8 @@ namespace Mapping_Tools.Viewmodels {
             HitObjectTimeOffset = 0;
             BookmarkTimeMultiplier = 1;
             BookmarkTimeOffset = 0;
+            SBSampleTimeMultiplier = 1;
+            SBSampleTimeOffset = 0;
 
             ClipProperties = false;
             EnableFilters = false;

@@ -70,6 +70,8 @@ namespace Mapping_Tools.Views {
                 totalLoops += beatmap.HitObjects.Count;
             if (vm.BookmarkTimeMultiplier != 1 || vm.BookmarkTimeOffset != 0)
                 totalLoops += beatmap.GetBookmarks().Count;
+            if (vm.SBSampleTimeMultiplier != 1 || vm.SBSampleTimeOffset != 0)
+                totalLoops += beatmap.StoryboardSoundSamples.Count;
 
             List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
             foreach (TimingPoint tp in beatmap.BeatmapTiming.TimingPoints) {
@@ -152,6 +154,19 @@ namespace Mapping_Tools.Views {
                     UpdateProgressBar(worker, loops * 100 / totalLoops);
                 }
                 beatmap.SetBookmarks(newBookmarks);
+            }
+
+            // Storyboarded sample Time
+            if (vm.SBSampleTimeMultiplier != 1 || vm.SBSampleTimeOffset != 0) {
+                foreach (StoryboardSoundSample ss in beatmap.StoryboardSoundSamples) {
+                    if (Filter(ss.Time, ss.Time, doFilterMatch, doFilterRange, vm.MatchFilter, min, max)) {
+                        ss.Time = Math.Round(ss.Time * vm.SBSampleTimeMultiplier + vm.SBSampleTimeOffset);
+                    }
+
+                    // Update progress bar
+                    loops++;
+                    UpdateProgressBar(worker, loops * 100 / totalLoops);
+                }
             }
 
             TimingPointsChange.ApplyChanges(beatmap.BeatmapTiming, timingPointsChanges);

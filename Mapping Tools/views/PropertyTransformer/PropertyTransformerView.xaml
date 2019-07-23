@@ -86,6 +86,13 @@
                     <TextBlock Text=" + "/>
                     <TextBox x:Name="BookTimeOffsetBox" Text="{Binding Path=BookmarkTimeOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0}" MinWidth="120"/>
                 </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="New SB sample time = Time " MinWidth="350"/>
+                    <TextBlock Text="x "/>
+                    <TextBox x:Name="SBSampleTimeMultiplierBox" Text="{Binding Path=SBSampleTimeMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1}" MinWidth="120"/>
+                    <TextBlock Text=" + "/>
+                    <TextBox x:Name="SBSampleTimeOffsetBox" Text="{Binding Path=SBSampleTimeOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0}" MinWidth="120"/>
+                </StackPanel>
                 <StackPanel Margin="0,20,0,0">
                     <CheckBox x:Name="ClipBox" Content="Clip properties" ToolTip="Clips the parameters to stay within bounds. (Volume: 5-100 etc)"
                         IsChecked="{Binding Path=ClipProperties, Mode=TwoWay}" FontSize="20"/>
