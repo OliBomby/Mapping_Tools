@@ -92,12 +92,21 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 List<string> samples = tlo.GetPlayingFilenames(mode);
 
                 foreach (string filename in samples) {
+                    bool isFilename = tlo.UsesFilename;
+                    SampleSet sampleSet = isFilename ? tlo.FenoSampleSet : GetSamplesetFromFilename(filename);
+                    Hitsound hitsound = isFilename ? Hitsound.Normal : GetHitsoundFromFilename(filename);
+
                     string samplePath = Path.Combine(mapDir, filename);
                     string fullPathExtLess = Path.Combine(Path.GetDirectoryName(samplePath), Path.GetFileNameWithoutExtension(samplePath));
 
                     // Get the first occurence of this sound to not get duplicated
                     if (firstSamples.Keys.Contains(fullPathExtLess)) {
                         samplePath = firstSamples[fullPathExtLess];
+                    } else {
+                        // Sample doesn't exist
+                        if (!isFilename) {
+                            samplePath = Path.Combine(Path.GetDirectoryName(samplePath), string.Format("{0}-hit{1}-1.wav", sampleSet.ToString().ToLower(), hitsound.ToString().ToLower()));
+                        }
                     }
                     
                     string extLessFilename = Path.GetFileNameWithoutExtension(samplePath);
@@ -111,7 +120,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         layer.Times.Add(tlo.Time);
                     } else {
                         // Add new hitsound layer with this path
-                        HitsoundLayer newLayer = new HitsoundLayer(extLessFilename, GetSamplesetFromFilename(filename), GetHitsoundFromFilename(filename), new SampleGeneratingArgs(samplePath), importArgs);
+                        HitsoundLayer newLayer = new HitsoundLayer(extLessFilename, sampleSet, hitsound, new SampleGeneratingArgs(samplePath), importArgs);
                         newLayer.Times.Add(tlo.Time);
 
                         hitsoundLayers.Add(newLayer);
@@ -128,7 +137,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public static SampleSet GetSamplesetFromFilename(string filename) {
             string[] split = filename.Split('-');
             if (split.Length < 1)
-                return 0;
+                return SampleSet.Soft;
             string sampleset = split[0];
             switch (sampleset) {
                 case "auto":
@@ -147,7 +156,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public static Hitsound GetHitsoundFromFilename(string filename) {
             string[] split = filename.Split('-');
             if (split.Length < 2)
-                return 0;
+                return Hitsound.Normal;
             string hitsound = split[1];
             if (hitsound.Contains("hitnormal"))
                 return Hitsound.Normal;
@@ -157,7 +166,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 return Hitsound.Finish;
             if (hitsound.Contains("hitclap"))
                 return Hitsound.Clap;
-            return 0;
+            return Hitsound.Normal;
         }
 
         public static List<HitsoundLayer> ImportMIDI(string path, bool instruments=true, bool keysounds=true, bool lengths=true, double lengthRoughness=1, bool velocities=true, double velocityRoughness=1) {

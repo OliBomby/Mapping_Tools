@@ -81,15 +81,16 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// <returns></returns>
         public static List<HitsoundEvent> GetHitsounds(List<SamplePackage> packages, List<CustomIndex> customIndices) {
             List<HitsoundEvent> hitsounds = new List<HitsoundEvent>(packages.Count);
+            List<CustomIndex> packageCustomIndices = GetCustomIndices(packages);
 
             int index = 0;
-            while (index < packages.Count) {
+            while (index < packageCustomIndices.Count) {
                 // Find CustomIndex that fits the most packages from here
                 CustomIndex bestCustomIndex = null;
                 int bestFits = 0;
 
                 foreach (CustomIndex ci in customIndices) {
-                    int fits = NumSupportedPackages(packages, index, ci);
+                    int fits = NumSupportedPackages(packageCustomIndices, index, ci);
 
                     if (fits > bestFits) {
                         bestCustomIndex = ci;
@@ -110,10 +111,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return hitsounds;
         }
 
-        private static int NumSupportedPackages(List<SamplePackage> packages, int index, CustomIndex ci) {
+        private static int NumSupportedPackages(List<CustomIndex> packageCustomIndices, int i, CustomIndex ci) {
             int supported = 0;
-            while (index < packages.Count) {
-                if (ci.Fits(packages[index++])) {
+            int index = i;
+            while (index < packageCustomIndices.Count) {
+                if (ci.Fits(packageCustomIndices[index++])) {
                     supported++;
                 } else {
                     return supported;

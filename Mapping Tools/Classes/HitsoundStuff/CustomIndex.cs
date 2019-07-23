@@ -50,10 +50,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return support;
         }
 
-        public bool Fits(SamplePackage other) {
-            return Fits(other.GetCustomIndex());
-        }
-
         public bool CanMerge(CustomIndex other) {
             // Every non-empty set from other == non-empty set from self
             // True until false

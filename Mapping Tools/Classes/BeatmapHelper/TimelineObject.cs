@@ -35,6 +35,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public bool Clap { get; set; }
 
         public bool HasHitsound { get => IsCircle || IsSliderHead || IsHoldnoteHead || IsSliderEnd || IsSpinnerEnd || IsSliderRepeat; }
+        public bool UsesFilename { get => Filename != null && Filename != "" && (IsCircle || IsHoldnoteHead); }
         public bool CanCustoms { get => IsCircle || IsHoldnoteHead; }
 
         public int CustomIndex { get; set; }
@@ -101,6 +102,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                     Clap = true;
                     return;
             }
+        }
+
+        public bool PlaysNormal(int mode) {
+            return mode != 3 || Normal || !(Whistle || Finish || Clap);
         }
 
         public List<Tuple<SampleSet, Hitsound, int>> GetPlayingHitsounds(int mode = 0) {
