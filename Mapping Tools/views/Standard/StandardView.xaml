@@ -51,6 +51,15 @@
             <TextBlock Grid.Row="0" FontSize="40" Foreground="{DynamicResource PrimaryHueMidBrush}"><Run Text="New stuff"/></TextBlock>
             <ListView Grid.Row="1" x:Name="NewsList" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
                 <ListViewItem>
+                    <TextBlock>SB sample time for Property Transformer</TextBlock>
+                </ListViewItem>
+                <ListViewItem>
+                    <TextBlock>Hitsound Preview Helper</TextBlock>
+                </ListViewItem>
+                <ListViewItem>
+                    <TextBlock>SoundFont importing</TextBlock>
+                </ListViewItem>
+                <ListViewItem>
                     <TextBlock>MIDI importing</TextBlock>
                 </ListViewItem>
                 <ListViewItem>
@@ -64,9 +73,6 @@
                 </ListViewItem>
                 <ListViewItem>
                     <TextBlock>Added Hitsound Copier</TextBlock>
-                </ListViewItem>
-                <ListViewItem>
-                    <TextBlock>Improved resnapping</TextBlock>
                 </ListViewItem>
             </ListView>
         </Grid>
