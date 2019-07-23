@@ -52,8 +52,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
 
             // Change version to hitsounds
-            beatmap.Metadata["Version"] = new TValue("Hitsounds");
+            beatmap.General["StackLeniency: "] = new TValue("0.0");
             beatmap.General["Mode"] = new TValue("0");
+            beatmap.Metadata["Version"] = new TValue("Hitsounds");
             beatmap.Difficulty["CircleSize"] = new TValue("4");
 
             // Save the file to the export folder
