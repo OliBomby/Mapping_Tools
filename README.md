@@ -1,5 +1,7 @@
 # Mapping_Tools
 Collection of tools for manipulating osu! beatmaps
+![alt text](https://i.imgur.com/CGQBZIa.png)
+Logo by [Karoo](https://osu.ppy.sh/users/1882522)
 
 ## Tools included
 - [Map Cleaner](https://github.com/OliBomby/Map-Cleaner) by [OliBomby](https://github.com/OliBomby) 
