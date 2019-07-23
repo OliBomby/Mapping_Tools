@@ -48,10 +48,10 @@ namespace Mapping_Tools {
         private void Setup() {
             SessionhasAdminRights = IsUserAdministrator() ? true : false;
 
-            /*
+            
             AutoUpdater.ParseUpdateInfoEvent += AutoUpdaterOnParseUpdateInfoEvent;
-            AutoUpdater.Start("https://osu-mappingtools.potoofu.moe/Updater/updater.json");
-            */
+            AutoUpdater.Start("https://mappingtools.seira.moe/current/updater.json");
+            
 
             try {
                 Directory.CreateDirectory(AppDataPath);
