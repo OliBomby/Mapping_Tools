@@ -28,6 +28,33 @@
             ResizeBorderThickness="5" />
     </WindowChrome.WindowChrome>
 
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type viewmodels:StandardVM}">
+            <views:StandardView DataContext="{Binding}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:CleanerVM}">
+            <views:CleanerView DataContext="{Binding}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:SliderMergerVM}">
+            <views:SliderMergerView DataContext="{Binding}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:SliderCompletionatorVM}">
+            <views:SliderCompletionatorView DataContext="{Binding}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:SnappingToolsVM}">
+            <views:SnappingToolsView DataContext="{Binding}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:HitsoundCopierVM}">
+            <views:HitsoundCopierView DataContext="{Binding}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:HitsoundStudioVM}">
+            <views:HitsoundStudioView DataContext="{Binding}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:PreferencesVM}">
+            <views:PreferencesView DataContext="{Binding}"/>
+        </DataTemplate>
+    </Window.Resources>
+
     <Grid>
         <Grid>
             <Grid.RowDefinitions>
@@ -39,8 +66,12 @@
 
             <Grid x:Name="FirstGrid" Grid.Row="0">
                 <StackPanel WindowChrome.IsHitTestVisibleInChrome="true" HorizontalAlignment="Left" Orientation="Horizontal">
-                    <Image Margin="10,0,0,0" Source="data/map_cleaner.png" Height="35"/>
-                    <TextBlock Name="header" Text="Mapping Tools" Foreground="{DynamicResource MaterialDesignBody}" Padding="0,13,0,0" FontWeight="Normal"/>
+                    <materialDesign:ColorZone Width="24" Height="24" Margin="9,6,0,0" Mode="Inverted">
+                        <materialDesign:ColorZone.OpacityMask>
+                            <ImageBrush ImageSource="data/mt_logo_white_24.png"/>
+                        </materialDesign:ColorZone.OpacityMask>
+                    </materialDesign:ColorZone>
+                    <TextBlock Name="header" Text="Mapping Tools" Foreground="{DynamicResource MaterialDesignBody}" Margin="8,11,0,0" FontWeight="Normal"/>
                 </StackPanel>
                 <StackPanel WindowChrome.IsHitTestVisibleInChrome="true" HorizontalAlignment="Right" Orientation="Horizontal">
                     <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowMinimize}" Click="MinimizeWin" Panel.ZIndex="1" Foreground="{DynamicResource MaterialDesignBody}"/>
@@ -103,30 +134,4 @@
         </Grid>
         <Border Name="window_border" BorderThickness="1" Background="{x:Null}" BorderBrush="{DynamicResource PrimaryHueDarkBrush}"/>
     </Grid>
-    <Window.Resources>
-        <DataTemplate DataType="{x:Type viewmodels:StandardVM}">
-            <views:StandardView DataContext="{Binding}"/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodels:CleanerVM}">
-            <views:CleanerView DataContext="{Binding}"/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodels:SliderMergerVM}">
-            <views:SliderMergerView DataContext="{Binding}"/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodels:SliderCompletionatorVM}">
-            <views:SliderCompletionatorView DataContext="{Binding}"/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodels:SnappingToolsVM}">
-            <views:SnappingToolsView DataContext="{Binding}"/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodels:HitsoundCopierVM}">
-            <views:HitsoundCopierView DataContext="{Binding}"/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodels:HitsoundStudioVM}">
-            <views:HitsoundStudioView DataContext="{Binding}"/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodels:PreferencesVM}">
-            <views:PreferencesView DataContext="{Binding}"/>
-        </DataTemplate>
-    </Window.Resources>
 </Window>
