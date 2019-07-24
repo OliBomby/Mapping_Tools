@@ -3,7 +3,7 @@ Collection of tools for manipulating osu! beatmaps
 
 <p align="center">
   <img src="https://i.imgur.com/ERZBdmv.png" alt="Mapping Tools logo"/>
-  Logo by <a href="https://osu.ppy.sh/users/1882522">Karoo</a>
+  <br/>Logo by <a href="https://osu.ppy.sh/users/1882522">Karoo</a>
 </p>
 
 ## Tools included
