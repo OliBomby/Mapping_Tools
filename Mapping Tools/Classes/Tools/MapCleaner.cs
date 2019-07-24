@@ -49,7 +49,7 @@ namespace Mapping_Tools.Classes.Tools {
             Timeline timeline = beatmap.GetTimeline();
 
             int mode = beatmap.General["Mode"].Value;
-            int circleSize = beatmap.Difficulty["CircleSize"].Value;
+            double circleSize = beatmap.Difficulty["CircleSize"].Value;
             int objectsResnapped = 0;
 
             // Collect Kiai toggles and SV changes for mania/taiko

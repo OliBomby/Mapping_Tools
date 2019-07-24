@@ -152,10 +152,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return deltaTime != 0;
         }
 
-        public bool ResnapPosition(int mode, int circleSize) {
+        public bool ResnapPosition(int mode, double circleSize) {
             if (mode == 3) {
                 // Resnap X to the middle of the columns and Y to 192
-                double dist = 512d / circleSize;
+                double dist = 512d / Math.Round(circleSize);
                 double hdist = dist / 2;
 
                 double dX = Math.Floor(Math.Round((Pos.X - hdist) / dist) * dist + hdist) - Pos.X;
