@@ -330,6 +330,10 @@ namespace Mapping_Tools {
             }
         }
 
+        private void OpenWebsite(object sender, RoutedEventArgs e) {
+            Process.Start("https://mappingtools.seira.moe/");
+        }
+
         //Open project in browser
         private void OpenGitHub(object sender, RoutedEventArgs e) {
             Process.Start("https://github.com/Potoofu/Mapping_Tools");
