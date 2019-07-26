@@ -288,7 +288,7 @@ namespace Mapping_Tools.Views {
             foreach (TimelineObject tloFrom in tlFrom.TimeLineObjects) {
                 TimelineObject tloTo = tlTo.GetNearestTLO(tloFrom.Time, true);
 
-                if (tloTo != null && Math.Abs(tloFrom.Time - tloTo.Time) <= arg.TemporalLeniency) {
+                if (tloTo != null && Math.Abs(Math.Round(tloFrom.Time) - Math.Round(tloTo.Time)) <= arg.TemporalLeniency) {
                     // Copy to this tlo
                     CopyHitsounds(arg, tloFrom, tloTo);
                 }
@@ -300,7 +300,7 @@ namespace Mapping_Tools.Views {
             foreach (TimelineObject tloFrom in tlFrom.TimeLineObjects) {
                 TimelineObject tloTo = tlTo.GetNearestTLO(tloFrom.Time, true);
 
-                if (tloTo != null && Math.Abs(tloFrom.Time - tloTo.Time) <= arg.TemporalLeniency) {
+                if (tloTo != null && Math.Abs(Math.Round(tloFrom.Time) - Math.Round(tloTo.Time)) <= arg.TemporalLeniency) {
                     // Copy to this tlo
                     CopyHitsounds(arg, tloFrom, tloTo);
 
