@@ -1,8 +1,11 @@
 # Mapping_Tools
 Collection of tools for manipulating osu! beatmaps
 
-<p align="center">
-  <img src="https://i.imgur.com/ERZBdmv.png" alt="Mapping Tools logo"/>
+[Website](https://mappingtools.seira.moe/)
+
+
+<p align="left">
+  <img src="https://i.imgur.com/7JqvlNY.png" alt="Mapping Tools logo"/>
   <br/>Logo by <a href="https://osu.ppy.sh/users/1882522">Karoo</a>
 </p>
 
