@@ -52,7 +52,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
 
             // Change version to hitsounds
-            beatmap.General["StackLeniency: "] = new TValue("0.0");
+            beatmap.General["StackLeniency"] = new TValue("0.0");
             beatmap.General["Mode"] = new TValue("0");
             beatmap.Metadata["Version"] = new TValue("Hitsounds");
             beatmap.Difficulty["CircleSize"] = new TValue("4");
