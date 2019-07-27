@@ -23,7 +23,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" FontSize="40" Foreground="{DynamicResource PrimaryHueMidBrush}"><Run Text="Getting started"/></TextBlock>
+            <TextBlock Grid.Row="0" FontSize="40" Foreground="{DynamicResource PrimaryHueMidBrush}"><Run Text="Get started"/></TextBlock>
 
             <ListView HorizontalAlignment="Left" Grid.Row="1" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <ListViewItem>
@@ -51,28 +51,7 @@
             <TextBlock Grid.Row="0" FontSize="40" Foreground="{DynamicResource PrimaryHueMidBrush}"><Run Text="New stuff"/></TextBlock>
             <ListView Grid.Row="1" x:Name="NewsList" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
                 <ListViewItem>
-                    <TextBlock>SB sample time for Property Transformer</TextBlock>
-                </ListViewItem>
-                <ListViewItem>
-                    <TextBlock>Hitsound Preview Helper</TextBlock>
-                </ListViewItem>
-                <ListViewItem>
-                    <TextBlock>SoundFont importing</TextBlock>
-                </ListViewItem>
-                <ListViewItem>
-                    <TextBlock>MIDI importing</TextBlock>
-                </ListViewItem>
-                <ListViewItem>
-                    <TextBlock>Complete hitsounds importing</TextBlock>
-                </ListViewItem>
-                <ListViewItem>
-                    <TextBlock>Editing multiple layers at the same time</TextBlock>
-                </ListViewItem>
-                <ListViewItem>
-                    <TextBlock>Saving/Loading projects</TextBlock>
-                </ListViewItem>
-                <ListViewItem>
-                    <TextBlock>Added Hitsound Copier</TextBlock>
+                    <TextBlock>Release 1.0</TextBlock>
                 </ListViewItem>
             </ListView>
         </Grid>
