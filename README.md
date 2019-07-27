@@ -1,4 +1,4 @@
-# Mapping_Tools
+# Mapping Tools
 Collection of tools for manipulating osu! beatmaps
 
 [Website](https://mappingtools.seira.moe/)
