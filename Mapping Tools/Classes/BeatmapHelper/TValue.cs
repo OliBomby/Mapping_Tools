@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,12 +15,12 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public dynamic GetValue() {
-            if( double.TryParse(StringValue, out double d) ) {
+            if( double.TryParse(StringValue, NumberStyles.Any, CultureInfo.InvariantCulture, out double d) ) {
                 if( StringValue.Split('.').Count() > 1 ) {
                     return d;
                 }
                 else {
-                    return int.Parse(StringValue);
+                    return int.Parse(StringValue, CultureInfo.InvariantCulture);
                 }
             }
             else {
