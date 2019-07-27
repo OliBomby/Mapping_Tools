@@ -336,7 +336,7 @@ namespace Mapping_Tools {
 
         //Open project in browser
         private void OpenGitHub(object sender, RoutedEventArgs e) {
-            Process.Start("https://github.com/Potoofu/Mapping_Tools");
+            Process.Start("https://github.com/OliBomby/Mapping_Tools");
         }
 
         //Open info screen
