@@ -16,6 +16,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.Reflection;
 using System.Linq;
+using System.Net.Http;
 
 namespace Mapping_Tools {
     public partial class MainWindow : Window {
@@ -25,6 +26,7 @@ namespace Mapping_Tools {
         public bool SessionhasAdminRights;
 
         public static MainWindow AppWindow { get; set; }
+        public static readonly HttpClient HttpClient = new HttpClient();
         private static readonly string appCommon = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         public static readonly string AppDataPath = Path.Combine(appCommon, "Mapping Tools");
         public static readonly string ExportPath = Path.Combine(AppDataPath, "Exports");

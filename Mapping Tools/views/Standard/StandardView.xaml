@@ -14,7 +14,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
         <Grid Grid.Row="0" Grid.Column="0">
@@ -48,11 +48,16 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" FontSize="40" Foreground="{DynamicResource PrimaryHueMidBrush}"><Run Text="New stuff"/></TextBlock>
-            <ListView Grid.Row="1" x:Name="NewsList" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
-                <ListViewItem>
-                    <TextBlock>Release 1.0</TextBlock>
-                </ListViewItem>
+            <TextBlock Grid.Row="0" FontSize="40" Foreground="{DynamicResource PrimaryHueMidBrush}"><Run Text="Changelog"/></TextBlock>
+            <ListView Grid.Row="1" x:Name="ChangelogList" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <TextBlock Text="{Binding Title}" TextWrapping="Wrap" FontWeight="Bold" />
+                            <TextBlock Text="{Binding Text}" TextWrapping="Wrap" Margin="10,0,0,0"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
             </ListView>
         </Grid>
 
