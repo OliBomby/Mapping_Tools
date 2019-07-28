@@ -48,9 +48,12 @@ namespace Mapping_Tools {
         private void Setup() {
             SessionhasAdminRights = IsUserAdministrator() ? true : false;
 
-            
-            AutoUpdater.ParseUpdateInfoEvent += AutoUpdaterOnParseUpdateInfoEvent;
-            AutoUpdater.Start("https://mappingtools.seira.moe/current/updater.json");
+            try {
+                AutoUpdater.ParseUpdateInfoEvent += AutoUpdaterOnParseUpdateInfoEvent;
+                AutoUpdater.Start("https://mappingtools.seira.moe/current/updater.json");
+            } catch(Exception ex) {
+                Console.WriteLine(ex.Message);
+            }
             
 
             try {
@@ -79,13 +82,17 @@ namespace Mapping_Tools {
         }
 
         private void AutoUpdaterOnParseUpdateInfoEvent(ParseUpdateInfoEventArgs args) {
-            dynamic json = JsonConvert.DeserializeObject(args.RemoteData);
-            args.UpdateInfo = new UpdateInfoEventArgs {
-                CurrentVersion = json.version,
-                ChangelogURL = json.changelog,
-                Mandatory = json.mandatory,
-                DownloadURL = json.url
-            };
+            try {
+                dynamic json = JsonConvert.DeserializeObject(args.RemoteData);
+                args.UpdateInfo = new UpdateInfoEventArgs {
+                    CurrentVersion = json.version,
+                    ChangelogURL = json.changelog,
+                    Mandatory = json.mandatory,
+                    DownloadURL = json.url
+                };
+            } catch (Exception ex) {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         public void SetCurrentMap(string path) {
