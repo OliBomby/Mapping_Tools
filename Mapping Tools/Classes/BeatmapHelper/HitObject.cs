@@ -124,7 +124,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public void Move(Vector2 delta) {
             Pos += delta;
             if (IsSlider) {
-                CurvePoints.ForEach(o => o += delta);
+                foreach (var o in CurvePoints) {
+                    o.X += delta.X;
+                    o.Y += delta.Y;
+                }
             }
         }
 
