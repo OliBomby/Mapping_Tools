@@ -79,6 +79,22 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
+        public Hitsound GetHitsound() {
+            if (Normal) {
+                return Hitsound.Normal;
+            }
+            if (Whistle) {
+                return Hitsound.Whistle;
+            }
+            if (Finish) {
+                return Hitsound.Finish;
+            }
+            if (Clap) {
+                return Hitsound.Clap;
+            }
+            return Hitsound.Normal;
+        }
+
         public int GetHitsounds() {
             return MathHelper.GetIntFromBitArray(new BitArray(new bool[] { Normal, Whistle, Finish, Clap }));
         }
