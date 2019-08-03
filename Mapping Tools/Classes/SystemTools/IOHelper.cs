@@ -105,13 +105,15 @@ namespace Mapping_Tools.Classes.SystemTools
             return openFileDialog.FileName;
         }
 
-        public static string BeatmapFileDialog() {
+        public static string BeatmapFileDialog(bool multiselect=false) {
+            string path = MainWindow.AppWindow.GetCurrentMap();
             OpenFileDialog openFileDialog = new OpenFileDialog {
-                InitialDirectory = SettingsManager.GetSongsPath(),
+                InitialDirectory = path != "" ? Directory.GetParent(path).FullName : SettingsManager.GetSongsPath(),
                 Filter = "Osu files (*.osu)|*.osu",
                 FilterIndex = 1,
                 RestoreDirectory = true,
-                CheckFileExists = true
+                CheckFileExists = true,
+                Multiselect = multiselect
             };
             openFileDialog.ShowDialog();
             return openFileDialog.FileName;

@@ -47,5 +47,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public string GetBeatmapFolder() {
             return Directory.GetParent(BeatmapPath).FullName;
         }
+
+        public static string GetBeatmapFolder(string path)
+        {
+            return Directory.GetParent(path).FullName;
+        }
     }
 }
