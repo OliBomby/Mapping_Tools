@@ -36,10 +36,13 @@ namespace Mapping_Tools {
             InitializeComponent();
             SettingsManager.LoadConfig();
             AppWindow = this;
-            IsMaximized = !SettingsManager.Settings.MainWindowMaximized;
+            IsMaximized = SettingsManager.Settings.MainWindowMaximized;
             WidthWin = SettingsManager.Settings.MainWindowWidth ?? Width;
             HeightWin = SettingsManager.Settings.MainWindowHeight ?? Height;
+            IsMaximized = !IsMaximized;
             ToggleWin(this, null);
+            WidthWin = SettingsManager.Settings.MainWindowWidth ?? Width;
+            HeightWin = SettingsManager.Settings.MainWindowHeight ?? Height;
             Views = new ViewCollection(); // Make a ViewCollection object
             DataContext = new StandardVM(); // Generate Standard view model to show on startup
 

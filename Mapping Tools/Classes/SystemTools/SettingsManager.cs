@@ -141,8 +141,13 @@ namespace Mapping_Tools.Classes.SystemTools {
 
         internal static void UpdateSettings() {
             Settings.MainWindowMaximized = MainWindow.AppWindow.IsMaximized;
-            Settings.MainWindowWidth = MainWindow.AppWindow.WidthWin;
-            Settings.MainWindowHeight = MainWindow.AppWindow.HeightWin;
+            if (MainWindow.AppWindow.IsMaximized) {
+                Settings.MainWindowWidth = MainWindow.AppWindow.WidthWin;
+                Settings.MainWindowHeight = MainWindow.AppWindow.HeightWin;
+            } else{
+                Settings.MainWindowWidth = MainWindow.AppWindow.Width;
+                Settings.MainWindowHeight = MainWindow.AppWindow.Height;
+            }
         }
     }
 }
