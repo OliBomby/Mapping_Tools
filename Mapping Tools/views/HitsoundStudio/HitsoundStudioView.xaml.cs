@@ -340,13 +340,19 @@ namespace Mapping_Tools.Views {
                 SampleGeneratingArgs args = selectedLayer.SampleArgs;
                 var mainOutputStream = SampleImporter.ImportSample(args);
 
+                if (mainOutputStream == null) {
+                    MessageBox.Show("Could not load the specified sample.");
+                    return;
+                }
+
                 WaveOutEvent player = new WaveOutEvent();
 
                 player.Init(mainOutputStream.GetSampleProvider());
                 player.PlaybackStopped += PlayerStopped;
 
                 player.Play();
-            } catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
+            } catch (DirectoryNotFoundException) { MessageBox.Show("Could not find the specified sample."); }
+            catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
         }
 
         void PlayerStopped(object sender, StoppedEventArgs e) {
