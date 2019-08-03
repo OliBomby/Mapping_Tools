@@ -180,6 +180,15 @@ namespace Mapping_Tools.Classes.MathUtil {
         }
 
         /// <summary>
+        /// Adds a Vector2 to this Vector2.
+        /// </summary>
+        public void Offset(Vector2 other)
+        {
+            X += other.X;
+            Y += other.Y;
+        }
+
+        /// <summary>
         /// Returns a copy of the Vector2 scaled to unit length.
         /// </summary>
         /// <returns></returns>
