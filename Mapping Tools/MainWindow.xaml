@@ -13,6 +13,8 @@
         Title="Mapping Tools"  
         WindowStyle="None"
         ResizeMode="CanResize"
+        Width="1500"
+        Height="800"
         AllowsTransparency="False"
         WindowStartupLocation="CenterScreen"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
