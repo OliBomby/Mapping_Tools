@@ -178,7 +178,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Console.WriteLine("Format {0}, Tracks {1}, Delta Ticks Per Quarter Note {2}",
                 mf.FileFormat, mf.Tracks, mf.DeltaTicksPerQuarterNote);
 
-            List<TempoEvent> tempos = mf.Events[0].OfType<TempoEvent>().ToList();
+            List<TempoEvent> tempos = new List<TempoEvent>();
+            foreach (var track in mf.Events) {
+                tempos.AddRange(track.OfType<TempoEvent>());
+            }
+            tempos = tempos.OrderBy(o => o.AbsoluteTime).ToList();
+
             List<double> cumulativeTime = CalculateCumulativeTime(tempos, mf.DeltaTicksPerQuarterNote);
 
             Dictionary<int, int> channelBanks = new Dictionary<int, int>();
@@ -317,6 +322,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 } else {
                     break;
                 }
+            }
+            if (prev == null) {
+                return absoluteTime;
             }
 
             double deltaTime = prev.MicrosecondsPerQuarterNote / 1000d * (absoluteTime - prev.AbsoluteTime) / dtpq;
