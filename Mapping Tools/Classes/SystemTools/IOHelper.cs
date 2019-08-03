@@ -105,7 +105,7 @@ namespace Mapping_Tools.Classes.SystemTools
             return openFileDialog.FileName;
         }
 
-        public static string BeatmapFileDialog(bool multiselect=false) {
+        public static string[] BeatmapFileDialog(bool multiselect=false) {
             string path = MainWindow.AppWindow.GetCurrentMap();
             OpenFileDialog openFileDialog = new OpenFileDialog {
                 InitialDirectory = path != "" ? Directory.GetParent(path).FullName : SettingsManager.GetSongsPath(),
@@ -116,7 +116,7 @@ namespace Mapping_Tools.Classes.SystemTools
                 Multiselect = multiselect
             };
             openFileDialog.ShowDialog();
-            return openFileDialog.FileName;
+            return openFileDialog.FileNames;
         }
 
         public static string CurrentBeatmap() {

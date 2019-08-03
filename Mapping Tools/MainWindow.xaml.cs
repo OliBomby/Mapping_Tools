@@ -112,8 +112,8 @@ namespace Mapping_Tools {
         }
 
         private void OpenBeatmap(object sender, RoutedEventArgs e) {
-            string path = IOHelper.BeatmapFileDialog();
-            if( path != "" ) { SetCurrentMap(path); }
+            string[] paths = IOHelper.BeatmapFileDialog();
+            if( paths.Length != 0 ) { SetCurrentMap(paths[0]); }
         }
 
         private void OpenCurrentBeatmap(object sender, RoutedEventArgs e) {

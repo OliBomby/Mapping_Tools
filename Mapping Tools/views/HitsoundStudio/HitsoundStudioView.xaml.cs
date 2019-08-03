@@ -197,9 +197,9 @@ namespace Mapping_Tools.Views {
 
         private void SelectedImportPathBrowse_Click(object sender, RoutedEventArgs e) {
             try {
-                string path = IOHelper.BeatmapFileDialog();
-                if (path != "") {
-                    SelectedImportPathBox.Text = path;
+                string[] paths = IOHelper.BeatmapFileDialog();
+                if (paths.Length != 0) {
+                    SelectedImportPathBox.Text = paths[0];
                     }
             } catch (Exception) { }
         }
@@ -225,9 +225,9 @@ namespace Mapping_Tools.Views {
 
         private void BaseBeatmapBrowse_Click(object sender, RoutedEventArgs e) {
             try {
-                string path = IOHelper.BeatmapFileDialog();
-                if (path != "") {
-                    Settings.BaseBeatmap = path;
+                string[] paths = IOHelper.BeatmapFileDialog();
+                if (paths.Length != 0) {
+                    Settings.BaseBeatmap = paths[0];
                     }
             } catch (Exception) { }
         }

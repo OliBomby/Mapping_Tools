@@ -35,8 +35,8 @@ namespace Mapping_Tools.Views {
         }
 
         private void BeatmapBrowse_Click(object sender, RoutedEventArgs e) {
-            string path = IOHelper.BeatmapFileDialog();
-            if (path != "") { BeatmapPathBox.Text = path; }
+            string[] paths = IOHelper.BeatmapFileDialog();
+            if (paths.Length != 0) { BeatmapPathBox.Text = paths[0]; }
         }
 
         private void BeatmapLoad_Click(object sender, RoutedEventArgs e) {
@@ -45,8 +45,8 @@ namespace Mapping_Tools.Views {
         }
 
         private void BeatmapBrowse2_Click(object sender, RoutedEventArgs e) {
-            string path = IOHelper.BeatmapFileDialog();
-            if (path != "") { BeatmapPathBox2.Text = path; }
+            string[] paths = IOHelper.BeatmapFileDialog();
+            if (paths.Length != 0) { BeatmapPathBox2.Text = string.Join("|", paths); }
         }
 
         private void BeatmapLoad2_Click(object sender, RoutedEventArgs e) {
@@ -85,7 +85,9 @@ namespace Mapping_Tools.Views {
                 else if (Tabs.SelectedIndex == 2)
                 {
                     // Import complete hitsounds
-                    HitsoundLayers = HitsoundImporter.ImportHitsounds(BeatmapPathBox2.Text);
+                    foreach (string path in BeatmapPathBox2.Text.Split('|')) {
+                        HitsoundLayers.AddRange(HitsoundImporter.ImportHitsounds(path));
+                    }
                     HitsoundLayers.ForEach(o => o.Name = string.Format("{0}: {1}", NameBox2.Text, o.Name));
                 }
                 else if (Tabs.SelectedIndex == 3)
