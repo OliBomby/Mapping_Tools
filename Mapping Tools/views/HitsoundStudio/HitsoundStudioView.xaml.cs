@@ -113,7 +113,8 @@ namespace Mapping_Tools.Views {
                 MessageBox.Show(string.Format("Number of sample indices: {0}, Number of samples: {1}, Number of greenlines: {2}", completeHitsounds.CustomIndices.Count, samples, greenlines));
             } 
             else {
-                var loadedSamples = SampleImporter.ImportSamples(arg.HitsoundLayers.Select(o => o.SampleArgs));
+                var allSampleArgs = arg.HitsoundLayers.Select(o => o.SampleArgs).Concat(new SampleGeneratingArgs[] { arg.DefaultSample.SampleArgs });
+                var loadedSamples = SampleImporter.ImportSamples(allSampleArgs);
                 UpdateProgressBar(worker, 20);
 
                 // Convert the multiple layers into packages that have the samples from all the layers at one specific time
@@ -197,9 +198,9 @@ namespace Mapping_Tools.Views {
 
         private void SelectedImportPathBrowse_Click(object sender, RoutedEventArgs e) {
             try {
-                string path = IOHelper.BeatmapFileDialog();
-                if (path != "") {
-                    SelectedImportPathBox.Text = path;
+                string[] paths = IOHelper.BeatmapFileDialog();
+                if (paths.Length != 0) {
+                    SelectedImportPathBox.Text = paths[0];
                     }
             } catch (Exception) { }
         }
@@ -225,9 +226,9 @@ namespace Mapping_Tools.Views {
 
         private void BaseBeatmapBrowse_Click(object sender, RoutedEventArgs e) {
             try {
-                string path = IOHelper.BeatmapFileDialog();
-                if (path != "") {
-                    Settings.BaseBeatmap = path;
+                string[] paths = IOHelper.BeatmapFileDialog();
+                if (paths.Length != 0) {
+                    Settings.BaseBeatmap = paths[0];
                     }
             } catch (Exception) { }
         }
@@ -340,13 +341,21 @@ namespace Mapping_Tools.Views {
                 SampleGeneratingArgs args = selectedLayer.SampleArgs;
                 var mainOutputStream = SampleImporter.ImportSample(args);
 
+                if (mainOutputStream == null) {
+                    MessageBox.Show("Could not load the specified sample.");
+                    return;
+                }
+
                 WaveOutEvent player = new WaveOutEvent();
 
                 player.Init(mainOutputStream.GetSampleProvider());
                 player.PlaybackStopped += PlayerStopped;
 
                 player.Play();
-            } catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
+            }
+            catch (FileNotFoundException) { MessageBox.Show("Could not find the specified sample."); }
+            catch (DirectoryNotFoundException) { MessageBox.Show("Could not find the specified sample's directory."); }
+            catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
         }
 
         void PlayerStopped(object sender, StoppedEventArgs e) {

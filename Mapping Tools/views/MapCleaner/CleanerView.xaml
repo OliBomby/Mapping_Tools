@@ -15,8 +15,23 @@
         </Grid.RowDefinitions>
         <Grid Name="FirstGrid" Grid.Row="0">
             <StackPanel>
-                <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}" Margin="0,0,0,10"><Run Text="Map Cleaner"/></TextBlock>
-                <CheckBox FontSize="14" x:Name="ResnapObjects" Cursor="Hand">
+              <StackPanel Orientation="Horizontal">
+                <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
+                  <Run Text="Map Cleaner"/>
+                </TextBlock>
+                <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom">
+                  <materialDesign:PopupBox.ToggleContent>
+                    <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
+                  </materialDesign:PopupBox.ToggleContent>
+                  <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
+                    It cleans the current map of useless greenlines and it also lets you do some other stuff regarding the whole map.
+                    <LineBreak/>
+                    Map cleaner cleans useless greenline stuff by storing all the influences of the timingpoints and then removing all the timingpoints and then rebuilding all the timingpoints in a good way. This means the greenlines automatically get resnapped to the objects that use them.
+                  </TextBlock>
+                </materialDesign:PopupBox>
+              </StackPanel>
+              
+                <CheckBox FontSize="14" x:Name="ResnapObjects" Cursor="Hand" Margin="0,10,0,0">
                     Resnap objects
                 </CheckBox>
                 <CheckBox FontSize="14" x:Name="ResnapBookmarks" Cursor="Hand">

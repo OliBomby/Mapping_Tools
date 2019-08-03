@@ -138,5 +138,16 @@ namespace Mapping_Tools.Classes.SystemTools {
         public static bool GetMakeBackups() {
             return Settings.MakeBackups;
         }
+
+        internal static void UpdateSettings() {
+            Settings.MainWindowMaximized = MainWindow.AppWindow.IsMaximized;
+            if (MainWindow.AppWindow.IsMaximized) {
+                Settings.MainWindowWidth = MainWindow.AppWindow.WidthWin;
+                Settings.MainWindowHeight = MainWindow.AppWindow.HeightWin;
+            } else{
+                Settings.MainWindowWidth = MainWindow.AppWindow.Width;
+                Settings.MainWindowHeight = MainWindow.AppWindow.Height;
+            }
+        }
     }
 }

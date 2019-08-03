@@ -7,6 +7,10 @@ namespace Mapping_Tools.Classes.SystemTools {
     public class Settings : INotifyPropertyChanged {
         public List<string[]> RecentMaps { get; set; }
 
+        public double? MainWindowWidth { get; set; }
+        public double? MainWindowHeight { get; set; }
+        public bool MainWindowMaximized { get; set; }
+
         private string osuPath;
         public string OsuPath {
             get { return osuPath; }
@@ -59,6 +63,9 @@ namespace Mapping_Tools.Classes.SystemTools {
 
         public Settings() {
             RecentMaps = new List<string[]>();
+            MainWindowWidth = null;
+            MainWindowHeight = null;
+            MainWindowMaximized = false;
             OsuPath = "";
             SongsPath = "";
             BackupsPath = "";

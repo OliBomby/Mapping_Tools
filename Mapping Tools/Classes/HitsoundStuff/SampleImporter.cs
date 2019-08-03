@@ -34,6 +34,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return loadedSamples.ContainsKey(args) && loadedSamples[args] != null;
         }
 
+        public static WaveStream OpenSample(string path) {
+            return Path.GetExtension(path) == ".ogg" ? (WaveStream)new VorbisWaveReader(path) : new MediaFoundationReader(path);
+        }
+
         public static Dictionary<SampleGeneratingArgs, SampleSoundGenerator> ImportSamples(IEnumerable<SampleGeneratingArgs> argsList) {
             var samples = new Dictionary<SampleGeneratingArgs, SampleSoundGenerator>();
             var seperatedByPath = new Dictionary<string, HashSet<SampleGeneratingArgs>>();

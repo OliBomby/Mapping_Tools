@@ -20,8 +20,8 @@ using System.Net.Http;
 
 namespace Mapping_Tools {
     public partial class MainWindow : Window {
-        private bool isMaximized = false; //Check for window state
-        private double widthWin, heightWin; //Set default sizes of window
+        public bool IsMaximized; //Check for window state
+        public double WidthWin, HeightWin; //Set default sizes of window
         public ViewCollection Views;
         public bool SessionhasAdminRights;
 
@@ -36,8 +36,13 @@ namespace Mapping_Tools {
             InitializeComponent();
             SettingsManager.LoadConfig();
             AppWindow = this;
-            widthWin = ActualWidth; // Set width to window
-            heightWin = ActualHeight; // Set height to window
+            IsMaximized = SettingsManager.Settings.MainWindowMaximized;
+            WidthWin = SettingsManager.Settings.MainWindowWidth ?? Width;
+            HeightWin = SettingsManager.Settings.MainWindowHeight ?? Height;
+            IsMaximized = !IsMaximized;
+            ToggleWin(this, null);
+            WidthWin = SettingsManager.Settings.MainWindowWidth ?? Width;
+            HeightWin = SettingsManager.Settings.MainWindowHeight ?? Height;
             Views = new ViewCollection(); // Make a ViewCollection object
             DataContext = new StandardVM(); // Generate Standard view model to show on startup
 
@@ -107,8 +112,8 @@ namespace Mapping_Tools {
         }
 
         private void OpenBeatmap(object sender, RoutedEventArgs e) {
-            string path = IOHelper.BeatmapFileDialog();
-            if( path != "" ) { SetCurrentMap(path); }
+            string[] paths = IOHelper.BeatmapFileDialog();
+            if( paths.Length != 0 ) { SetCurrentMap(paths[0]); }
         }
 
         private void OpenCurrentBeatmap(object sender, RoutedEventArgs e) {
@@ -361,14 +366,14 @@ namespace Mapping_Tools {
             switch( this.WindowState ) {
                 case WindowState.Maximized:
                     bt.Content = new PackIcon { Kind = PackIconKind.WindowRestore };
-                    isMaximized = true;
+                    IsMaximized = true;
                     window_border.BorderThickness = new Thickness(0);
                     break;
                 case WindowState.Minimized:
                     break;
                 case WindowState.Normal:
                     window_border.BorderThickness = new Thickness(1);
-                    isMaximized = false;
+                    IsMaximized = false;
                     bt.Content = new PackIcon { Kind = PackIconKind.WindowMaximize };
                     break;
             }
@@ -377,24 +382,24 @@ namespace Mapping_Tools {
         //Clickevent for top right maximize/minimize button
         private void ToggleWin(object sender, RoutedEventArgs e) {
             System.Windows.Controls.Button bt = this.FindName("toggle_button") as System.Windows.Controls.Button;
-            if( isMaximized ) {
+            if( IsMaximized ) {
                 this.WindowState = WindowState.Normal;
-                Width = widthWin;
-                Height = heightWin;
-                isMaximized = false;
+                Width = WidthWin;
+                Height = HeightWin;
+                IsMaximized = false;
                 window_border.BorderThickness = new Thickness(1);
                 bt.Content = new PackIcon { Kind = PackIconKind.WindowMaximize };
             }
             else {
-                widthWin = ActualWidth;
-                heightWin = ActualHeight;
+                WidthWin = ActualWidth;
+                HeightWin = ActualHeight;
                 this.Left = SystemParameters.WorkArea.Left;
                 this.Top = SystemParameters.WorkArea.Top;
                 this.Height = SystemParameters.WorkArea.Height;
                 this.Width = SystemParameters.WorkArea.Width;
                 window_border.BorderThickness = new Thickness(0);
                 //this.WindowState = WindowState.Maximized;
-                isMaximized = true;
+                IsMaximized = true;
                 bt.Content = new PackIcon { Kind = PackIconKind.WindowRestore };
             }
         }
@@ -407,6 +412,7 @@ namespace Mapping_Tools {
         //Close window
         private void CloseWin(object sender, RoutedEventArgs e) {
             Views.AutoSaveSettings();
+            SettingsManager.UpdateSettings();
             SettingsManager.WriteToJSON(false);
             this.Close();
         }

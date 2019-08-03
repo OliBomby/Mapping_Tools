@@ -15,10 +15,20 @@
         </Grid.RowDefinitions>
         <Grid Name="FirstGrid" Grid.Row="0">
             <StackPanel>
-                <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}"
-                    ToolTip="Change the length and duration of marked sliders and this tool will automatically handle the SV for you.">
-                    <Run Text="Slider Completionator"/></TextBlock>
-
+              <StackPanel Orientation="Horizontal">
+                <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
+                  <Run Text="Slider Completionator"/>
+                </TextBlock>
+                <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom">
+                  <materialDesign:PopupBox.ToggleContent>
+                    <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
+                  </materialDesign:PopupBox.ToggleContent>
+                  <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
+                    Change the length and duration of marked sliders and this tool will automatically handle the SV for you.
+                  </TextBlock>
+                </materialDesign:PopupBox>
+              </StackPanel>
+              
                 <TextBox x:Name="TemporalBox" Width="258" HorizontalAlignment="Left" Margin="0,20,0,0"
                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Temporal length (beats)"/>
                 <TextBox x:Name="SpatialBox" Width="258" HorizontalAlignment="Left" Margin="0,20,0,0" Text="1"
