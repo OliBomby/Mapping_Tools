@@ -42,29 +42,36 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             List<string> samplePaths = Directory.GetFiles(dir, "*.*", extended ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly)
                 .Where(n => extList.Contains(Path.GetExtension(n), StringComparer.OrdinalIgnoreCase))
                         .ToList();
-            List<byte[]> audios = new List<byte[]>(samplePaths.Count);
+
             Dictionary<string, string> dict = new Dictionary<string, string>();
+            
+            // Compare all samples to find ones with the same data
+            for (int i = 0; i < samplePaths.Count; i++) {
+                long thisLength = new FileInfo(samplePaths[i]).Length;
+                for (int k = 0; k < samplePaths.Count; k++) {
+                    if (samplePaths[i] != samplePaths[k]) {
+                        long otherLength = new FileInfo(samplePaths[k]).Length;
+                        
+                        if (thisLength != otherLength) { continue; }
 
-            // Read all samples
-            foreach (string samplePath in samplePaths) {
-                try {
-                    WaveStream wave = Path.GetExtension(samplePath) == ".ogg" ? (WaveStream)new VorbisWaveReader(samplePath) : new MediaFoundationReader(samplePath);
-                    byte[] buffer = new byte[2000];
-                    wave.Read(buffer, 0, Math.Min((int)wave.Length, 2000));
-                    audios.Add(buffer);
-                } catch (Exception) {
-                    audios.Add(Encoding.UTF8.GetBytes(samplePath));
-                }
-            }
+                        var thisWave = SampleImporter.OpenSample(samplePaths[i]);
+                        var otherWave = SampleImporter.OpenSample(samplePaths[k]);
+                        
+                        if (thisWave.Length != otherWave.Length) { continue; }
 
-            for (int i = 0; i < audios.Count; i++) {
-                for (int k = 0; k < audios.Count; k++) {
-                    if (audios[i].SequenceEqual(audios[k])) {
-                        string samplePath = samplePaths[i];
-                        string fullPathExtLess = Path.Combine(Path.GetDirectoryName(samplePath), Path.GetFileNameWithoutExtension(samplePath));
-                        dict[fullPathExtLess] = samplePaths[k];
-                        break;
+                        byte[] thisBuffer = new byte[thisWave.Length];
+                        thisWave.Read(thisBuffer, 0, (int)thisWave.Length);
+
+                        byte[] otherBuffer = new byte[otherWave.Length];
+                        otherWave.Read(otherBuffer, 0, (int)otherWave.Length);
+                        
+                        if (!thisBuffer.SequenceEqual(otherBuffer)) { continue; }
                     }
+                    
+                    string samplePath = samplePaths[i];
+                    string fullPathExtLess = Path.Combine(Path.GetDirectoryName(samplePath), Path.GetFileNameWithoutExtension(samplePath));
+                    dict[fullPathExtLess] = samplePaths[k];
+                    break;
                 }
             }
             return dict;

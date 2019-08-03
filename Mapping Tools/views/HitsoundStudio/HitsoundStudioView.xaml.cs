@@ -351,7 +351,9 @@ namespace Mapping_Tools.Views {
                 player.PlaybackStopped += PlayerStopped;
 
                 player.Play();
-            } catch (DirectoryNotFoundException) { MessageBox.Show("Could not find the specified sample."); }
+            }
+            catch (FileNotFoundException) { MessageBox.Show("Could not find the specified sample."); }
+            catch (DirectoryNotFoundException) { MessageBox.Show("Could not find the specified sample's directory."); }
             catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
         }
 
