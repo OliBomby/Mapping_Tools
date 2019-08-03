@@ -182,6 +182,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             foreach (var track in mf.Events) {
                 tempos.AddRange(track.OfType<TempoEvent>());
             }
+            tempos = tempos.OrderBy(o => o.AbsoluteTime).ToList();
+
             List<double> cumulativeTime = CalculateCumulativeTime(tempos, mf.DeltaTicksPerQuarterNote);
 
             Dictionary<int, int> channelBanks = new Dictionary<int, int>();
