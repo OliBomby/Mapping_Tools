@@ -15,7 +15,24 @@
         </Grid.RowDefinitions>
         <Grid Name="FirstGrid" Grid.Row="0">
             <StackPanel Grid.Row="0" Margin="0,0,120,0">
-                <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}"><Run Text="Hitsound Copier"/></TextBlock>
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
+                    <Run Text="Hitsound Copier"/>
+                  </TextBlock>
+                  <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom">
+                    <materialDesign:PopupBox.ToggleContent>
+                      <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
+                    </materialDesign:PopupBox.ToggleContent>
+                    <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
+                      Copies hitsounds from A to B.
+                      <LineBreak/>
+                      There are 2 modes. First mode is overwrite everything. This will basically first remove the hitsounds from the map you’re copying to and then copy the hitsounds.
+                      <LineBreak/>
+                      Second mode is copying only the defined hitsounds. A defined hitsound is when there is something there in the map you’re copying from. This mode will copy over all the hitsounds from the map you’re copying from. Anything in the map you’re copying to that has not been defined in the map you’re copying from will not change. For instance muted sliderends will remain there.
+                    </TextBlock>
+                  </materialDesign:PopupBox>
+                </StackPanel>
+              
                 <Grid Margin="0,20,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>

@@ -15,9 +15,23 @@
         </Grid.RowDefinitions>
         <Grid Name="FirstGrid" Grid.Row="0">
             <StackPanel>
-                <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}"
-                    ToolTip="In order for 2 sliders to merge, place the second slider on top of the last anchor of the first slider. This program will automatically convert any type of slider into a Beziér slider for the purpose of merging.">
-                    <Run Text="Slider Merger"/></TextBlock>
+              <StackPanel Orientation="Horizontal">
+                <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
+                  <Run Text="Slider Merger"/>
+                </TextBlock>
+                <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom">
+                  <materialDesign:PopupBox.ToggleContent>
+                    <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
+                  </materialDesign:PopupBox.ToggleContent>
+                  <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
+                    Merge 2 or more sliders into one big slider. The pixel length of the resulting slider is the sum of the pixel lengths of the sliders that made it up.
+                    <LineBreak/>
+                    This program will automatically convert any type of slider into a Beziér slider for the purpose of merging.
+                    <LineBreak/>
+                    In order for 2 sliders to merge, place the second slider on top of the last anchor of the first slider.
+                  </TextBlock>
+                </materialDesign:PopupBox>
+              </StackPanel>
                 
                 <TextBox x:Name="LeniencyBox" Width="258" HorizontalAlignment="Left" Text="2" Margin="0,20,0,0"
                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Merge connection leniency"/>

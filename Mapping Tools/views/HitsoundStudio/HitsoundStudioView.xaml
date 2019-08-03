@@ -31,7 +31,21 @@
             <RowDefinition Height="90"/>
         </Grid.RowDefinitions>
         <Grid Name="TitleGrid" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
-            <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}"><Run Text="Hitsound Studio"/></TextBlock>
+          <StackPanel Orientation="Horizontal">
+            <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
+              <Run Text="Hitsound Studio"/>
+            </TextBlock>
+            <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom">
+              <materialDesign:PopupBox.ToggleContent>
+                <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
+              </materialDesign:PopupBox.ToggleContent>
+              <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
+                Hitsound Studio is the tool that lets you import data from multiple outside sources and convert them to osu! standard hitsounds in the form of a hitsounding difficulty that can you copy to other beatmaps.
+              <LineBreak/>
+                It represents hitsounds as a list of layers (hitsound layers). One layer contains a unique sound, the sampleset and hitsound that accompany that sound and a list of times that sound has to be played.
+              </TextBlock>
+            </materialDesign:PopupBox>
+          </StackPanel>
         </Grid>
         <Grid Name="FirstGrid" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
