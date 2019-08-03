@@ -70,30 +70,41 @@ namespace Mapping_Tools.Views {
         }
 
         private void Add_Click(object sender, RoutedEventArgs e) {
-            if (Tabs.SelectedIndex == 1) {
-                // Import one layer
-                HitsoundLayer layer = HitsoundImporter.ImportStack(BeatmapPathBox.Text, XCoordBox.GetDouble(), YCoordBox.GetDouble());
-                layer.Name = NameBox.Text;
-                layer.SampleSet = (SampleSet)(SampleSetBox.SelectedIndex + 1);
-                layer.Hitsound = (Hitsound)HitsoundBox.SelectedIndex;
-                layer.SampleArgs.Path = SamplePathBox.Text;
+            try {
+                if (Tabs.SelectedIndex == 1)
+                {
+                    // Import one layer
+                    HitsoundLayer layer = HitsoundImporter.ImportStack(BeatmapPathBox.Text, XCoordBox.GetDouble(), YCoordBox.GetDouble());
+                    layer.Name = NameBox.Text;
+                    layer.SampleSet = (SampleSet)(SampleSetBox.SelectedIndex + 1);
+                    layer.Hitsound = (Hitsound)HitsoundBox.SelectedIndex;
+                    layer.SampleArgs.Path = SamplePathBox.Text;
 
-                HitsoundLayers.Add(layer);
-            } else if (Tabs.SelectedIndex == 2) {
-                // Import complete hitsounds
-                HitsoundLayers = HitsoundImporter.ImportHitsounds(BeatmapPathBox2.Text);
-                HitsoundLayers.ForEach(o => o.Name = string.Format("{0}: {1}", NameBox2.Text, o.Name));
-            } else if (Tabs.SelectedIndex == 3) {
-                // Import MIDI
-                HitsoundLayers = HitsoundImporter.ImportMIDI(BeatmapPathBox3.Text, (bool)InstrumentBox3.IsChecked, (bool)KeysoundBox3.IsChecked, (bool)LengthBox3.IsChecked, LengthRoughnessBox3.GetDouble(2), (bool)VelocityBox3.IsChecked, VelocityRoughnessBox3.GetDouble(10));
-                HitsoundLayers.ForEach(o => o.Name = string.Format("{0}: {1}", NameBox3.Text, o.Name));
-            } else {
-                // Import none
-                HitsoundLayer layer = new HitsoundLayer(NameBox0.Text, ImportType.None, (SampleSet)(SampleSetBox0.SelectedIndex + 1), (Hitsound)HitsoundBox0.SelectedIndex, SamplePathBox0.Text);
-                HitsoundLayers.Add(layer);
+                    HitsoundLayers.Add(layer);
+                }
+                else if (Tabs.SelectedIndex == 2)
+                {
+                    // Import complete hitsounds
+                    HitsoundLayers = HitsoundImporter.ImportHitsounds(BeatmapPathBox2.Text);
+                    HitsoundLayers.ForEach(o => o.Name = string.Format("{0}: {1}", NameBox2.Text, o.Name));
+                }
+                else if (Tabs.SelectedIndex == 3)
+                {
+                    // Import MIDI
+                    HitsoundLayers = HitsoundImporter.ImportMIDI(BeatmapPathBox3.Text, (bool)InstrumentBox3.IsChecked, (bool)KeysoundBox3.IsChecked, (bool)LengthBox3.IsChecked, LengthRoughnessBox3.GetDouble(2), (bool)VelocityBox3.IsChecked, VelocityRoughnessBox3.GetDouble(10));
+                    HitsoundLayers.ForEach(o => o.Name = string.Format("{0}: {1}", NameBox3.Text, o.Name));
+                }
+                else
+                {
+                    // Import none
+                    HitsoundLayer layer = new HitsoundLayer(NameBox0.Text, ImportType.None, (SampleSet)(SampleSetBox0.SelectedIndex + 1), (Hitsound)HitsoundBox0.SelectedIndex, SamplePathBox0.Text);
+                    HitsoundLayers.Add(layer);
+                }
+
+                Close();
+            } catch (Exception ex) {
+                MessageBox.Show(string.Format("{0}{1}{2}", ex.Message, Environment.NewLine, ex.StackTrace), "Error");
             }
-            
-            Close();
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e) {
