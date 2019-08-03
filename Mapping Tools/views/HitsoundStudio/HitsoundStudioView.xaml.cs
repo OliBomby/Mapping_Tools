@@ -113,7 +113,8 @@ namespace Mapping_Tools.Views {
                 MessageBox.Show(string.Format("Number of sample indices: {0}, Number of samples: {1}, Number of greenlines: {2}", completeHitsounds.CustomIndices.Count, samples, greenlines));
             } 
             else {
-                var loadedSamples = SampleImporter.ImportSamples(arg.HitsoundLayers.Select(o => o.SampleArgs));
+                var allSampleArgs = arg.HitsoundLayers.Select(o => o.SampleArgs).Concat(new SampleGeneratingArgs[] { arg.DefaultSample.SampleArgs });
+                var loadedSamples = SampleImporter.ImportSamples(allSampleArgs);
                 UpdateProgressBar(worker, 20);
 
                 // Convert the multiple layers into packages that have the samples from all the layers at one specific time
