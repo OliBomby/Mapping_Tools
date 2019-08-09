@@ -7,6 +7,11 @@ using System.Windows.Controls;
 
 namespace Mapping_Tools.Views {
     public partial class StandardView :UserControl {
+        private static readonly Dictionary<string, string> jankReplacements = new Dictionary<string, string>() {
+            { @"<br/>", "\n" },
+            { @"<br>", "\n" }
+        };
+
         public StandardView() {
             InitializeComponent();
 
@@ -36,7 +41,7 @@ namespace Mapping_Tools.Views {
                     ChangelogList.Items.Add(new ChangelogItem {
                         ID = dict["_id"],
                         Title = dict["title"],
-                        Text = dict["text"],
+                        Text = JankParse((string)dict["text"], jankReplacements),
                         Date = dict["date"],
                         Author = dict["author"],
                         Type = dict["type"] });
@@ -44,6 +49,14 @@ namespace Mapping_Tools.Views {
             } catch (Exception ex) {
                 Console.WriteLine(ex.Message);
             }
+        }
+
+        private static string JankParse(string text, Dictionary<string, string> replacements) {
+            string result = text;
+            foreach (KeyValuePair<string, string> kvp in replacements) {
+                result = result.Replace(kvp.Key, kvp.Value);
+            }
+            return result;
         }
 
         public void SetRecentList() {
