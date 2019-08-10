@@ -33,10 +33,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 output = new DelayFadeOutSampleProvider(output);
                 (output as DelayFadeOutSampleProvider).BeginFadeOut(FadeStart * 1000, FadeLength * 1000);
             }
-            if (KeyCorrection != -1) {
+            if (KeyCorrection != -1 && KeyCorrection != 0) {
                 output = SampleImporter.PitchShift(output, KeyCorrection);
             }
-            if (VolumeCorrection != -1) {
+            if (VolumeCorrection != -1 && VolumeCorrection != 1) {
                 output = SampleImporter.VolumeChange(output, VolumeCorrection);
             }
             return output;
