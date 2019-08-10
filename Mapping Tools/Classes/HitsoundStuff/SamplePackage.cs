@@ -7,15 +7,18 @@ using System.Threading.Tasks;
 namespace Mapping_Tools.Classes.HitsoundStuff {
     public class SamplePackage {
         public double Time;
+        public double Volume;
         public HashSet<Sample> Samples;
 
         public SamplePackage(double time, HashSet<Sample> samples) {
             Time = time;
+            Volume = 1;
             Samples = samples;
         }
 
         public SamplePackage(double time) {
             Time = time;
+            Volume = 1;
             Samples = new HashSet<Sample>();
         }
 

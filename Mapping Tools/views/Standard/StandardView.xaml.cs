@@ -33,8 +33,10 @@ namespace Mapping_Tools.Views {
             try {
                 var values = new Dictionary<string, string>();
                 var content = new FormUrlEncodedContent(values);
-                var response = await MainWindow.HttpClient.PostAsync("https://mappingtools.seira.moe/changelog/logs/", content);
-                var responseString = await response.Content.ReadAsStringAsync();
+                var responseString = "";
+                using (HttpResponseMessage response = await MainWindow.HttpClient.PostAsync("https://mappingtools.seira.moe/changelog/logs/", content)) {
+                    responseString = await response.Content.ReadAsStringAsync();
+                }
                 dynamic json = JsonConvert.DeserializeObject(responseString);
 
                 foreach (dynamic dict in json) {
@@ -44,7 +46,8 @@ namespace Mapping_Tools.Views {
                         Text = JankParse((string)dict["text"], jankReplacements),
                         Date = dict["date"],
                         Author = dict["author"],
-                        Type = dict["type"] });
+                        Type = dict["type"]
+                    });
                 }
             } catch (Exception ex) {
                 Console.WriteLine(ex.Message);

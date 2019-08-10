@@ -285,6 +285,7 @@ namespace Mapping_Tools.Views {
             TimesBox.Text = selectedLayers.AllToStringOrDefault(o => o.Times, HitsoundLayerExtension.DoubleListToStringConverter);
 
             SelectedSamplePathBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Path);
+            SelectedSampleVolumeBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Volume * 100, CultureInfo.InvariantCulture);
             SelectedSampleBankBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Bank);
             SelectedSamplePatchBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Patch);
             SelectedSampleInstrumentBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Instrument);
@@ -562,6 +563,16 @@ namespace Mapping_Tools.Views {
             UpdateEditingField();
         }
 
+        private void SelectedSampleVolumeBox_TextChanged(object sender, RoutedEventArgs e) {
+            if (suppressEvents) return;
+
+            double t = (sender as TextBox).GetDouble(100);
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.SampleArgs.Volume = t / 100;
+            }
+            UpdateEditingField();
+        }
+
         private void SelectedSampleBankBox_TextChanged(object sender, TextChangedEventArgs e) {
             if (suppressEvents) return;
 
@@ -607,13 +618,14 @@ namespace Mapping_Tools.Views {
             }
         }
 
-        private void SelectedSampleVelocityBox_TextChanged(object sender, TextChangedEventArgs e) {
+        private void SelectedSampleVelocityBox_TextChanged(object sender, RoutedEventArgs e) {
             if (suppressEvents) return;
 
-            int t = (sender as TextBox).GetInt(-1);
+            int t = (sender as TextBox).GetInt(127);
             foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
                 hitsoundLayer.SampleArgs.Velocity = t;
             }
+            UpdateEditingField();
         }
 
         private void SelectedImportTypeBox_SelectionChanged(object sender, SelectionChangedEventArgs e) {

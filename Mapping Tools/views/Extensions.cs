@@ -25,17 +25,19 @@ namespace Mapping_Tools.Views {
         }
 
         public static double ParseDouble(string str) {
-            DataTable dt = new DataTable();
-            string text = str.Replace(",", ".");
-            var v = dt.Compute(text, "");
-            return Convert.ToDouble(v);
+            using (DataTable dt = new DataTable()) {
+                string text = str.Replace(",", ".");
+                var v = dt.Compute(text, "");
+                return Convert.ToDouble(v);
+            }
         }
 
         public static int ParseInt(string str) {
-            DataTable dt = new DataTable();
-            string text = str.Replace(",", ".");
-            var v = dt.Compute(text, "");
-            return Convert.ToInt32(v);
+            using (DataTable dt = new DataTable()) {
+                string text = str.Replace(",", ".");
+                var v = dt.Compute(text, "");
+                return Convert.ToInt32(v);
+            }
         }
     }
 }

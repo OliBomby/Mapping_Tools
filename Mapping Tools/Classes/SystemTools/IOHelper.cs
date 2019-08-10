@@ -25,14 +25,14 @@ namespace Mapping_Tools.Classes.SystemTools
         public static string FolderDialog(string initialDirectory = "") {
             bool restore = initialDirectory == "";
 
-            CommonOpenFileDialog dialog = new CommonOpenFileDialog {
+            using (CommonOpenFileDialog dialog = new CommonOpenFileDialog {
                 IsFolderPicker = true,
                 InitialDirectory = initialDirectory,
                 RestoreDirectory = restore
-            };
-
-            if (dialog.ShowDialog() == CommonFileDialogResult.Ok) {
-                return dialog.FileName;
+            }) {
+                if (dialog.ShowDialog() == CommonFileDialogResult.Ok) {
+                    return dialog.FileName;
+                }
             }
             return "";
         }
@@ -40,83 +40,90 @@ namespace Mapping_Tools.Classes.SystemTools
         public static string SaveProjectDialog(string initialDirectory = "") {
             bool restore = initialDirectory == "";
 
-            SaveFileDialog saveFileDialog1 = new SaveFileDialog {
+            using (SaveFileDialog saveFileDialog1 = new SaveFileDialog {
                 Filter = "JSON File|*.json",
                 Title = "Save a project",
                 InitialDirectory = initialDirectory,
                 RestoreDirectory = restore
-            };
-            saveFileDialog1.ShowDialog();
-            return saveFileDialog1.FileName;
+            }) {
+                saveFileDialog1.ShowDialog();
+                return saveFileDialog1.FileName;
+            }
         }
 
         public static string LoadProjectDialog(string initialDirectory = "") {
             bool restore = initialDirectory == "";
 
-            OpenFileDialog saveFileDialog1 = new OpenFileDialog {
+            using (OpenFileDialog saveFileDialog1 = new OpenFileDialog {
                 Filter = "JSON File|*.json",
                 Title = "Open a project",
                 InitialDirectory = initialDirectory,
                 RestoreDirectory = restore
-            };
-            saveFileDialog1.ShowDialog();
-            return saveFileDialog1.FileName;
+            }) {
+                saveFileDialog1.ShowDialog();
+                return saveFileDialog1.FileName;
+            }
         }
 
         public static string FileDialog() {
-            OpenFileDialog openFileDialog = new OpenFileDialog {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog {
                 RestoreDirectory = true,
                 CheckFileExists = true
-            };
-            openFileDialog.ShowDialog();
-            return openFileDialog.FileName;
+            }) {
+                openFileDialog.ShowDialog();
+                return openFileDialog.FileName;
+            }
         }
 
         public static string MIDIFileDialog() {
-            OpenFileDialog openFileDialog = new OpenFileDialog {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog {
                 Filter = "MIDI files (*.mid)|*.mid",
                 FilterIndex = 1,
                 RestoreDirectory = true,
                 CheckFileExists = true
-            };
-            openFileDialog.ShowDialog();
-            return openFileDialog.FileName;
+            }) {
+                openFileDialog.ShowDialog();
+                return openFileDialog.FileName;
+            }
         }
 
         public static string SampleFileDialog() {
-            OpenFileDialog openFileDialog = new OpenFileDialog {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog {
                 Filter = "Audio files (*.wav;*.ogg)|*.wav;*.ogg|SoundFont files (*.sf2)|*.sf2",
                 FilterIndex = 1,
                 RestoreDirectory = true,
                 CheckFileExists = true
-            };
-            openFileDialog.ShowDialog();
-            return openFileDialog.FileName;
+            }) {
+                openFileDialog.ShowDialog();
+                return openFileDialog.FileName;
+            }
         }
 
         public static string AudioFileDialog() {
-            OpenFileDialog openFileDialog = new OpenFileDialog {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog {
                 Filter = "Audio files (*.wav;*.ogg)|*.wav;*.ogg",
                 FilterIndex = 1,
                 RestoreDirectory = true,
                 CheckFileExists = true
-            };
-            openFileDialog.ShowDialog();
-            return openFileDialog.FileName;
+            }) {
+                openFileDialog.ShowDialog();
+                return openFileDialog.FileName;
+            }
         }
 
         public static string[] BeatmapFileDialog(bool multiselect=false) {
             string path = MainWindow.AppWindow.GetCurrentMap();
-            OpenFileDialog openFileDialog = new OpenFileDialog {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog {
                 InitialDirectory = path != "" ? Directory.GetParent(path).FullName : SettingsManager.GetSongsPath(),
                 Filter = "Osu files (*.osu)|*.osu",
                 FilterIndex = 1,
                 RestoreDirectory = true,
                 CheckFileExists = true,
                 Multiselect = multiselect
-            };
-            openFileDialog.ShowDialog();
-            return openFileDialog.FileNames;
+            }) {
+                openFileDialog.ShowDialog();
+                return openFileDialog.FileNames;
+            }
         }
 
         public static string CurrentBeatmap() {

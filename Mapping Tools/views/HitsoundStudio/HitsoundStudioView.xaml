@@ -117,6 +117,8 @@
                                 <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                             </Button >
                         </Grid>
+                        <TextBox x:Name="SelectedSampleVolumeBox" LostFocus="SelectedSampleVolumeBox_TextChanged" Margin="0,5,0,0"
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Volume %"/>
                         <StackPanel x:Name="SoundFontArgsPanel">
                             <TextBox x:Name="SelectedSampleBankBox" TextChanged="SelectedSampleBankBox_TextChanged" Margin="0,5,0,0"
                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Bank"/>
@@ -128,7 +130,7 @@
                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Key"/>
                             <TextBox x:Name="SelectedSampleLengthBox" TextChanged="SelectedSampleLengthBox_TextChanged" Margin="0,5,0,0"
                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Length"/>
-                            <TextBox x:Name="SelectedSampleVelocityBox" TextChanged="SelectedSampleVelocityBox_TextChanged" Margin="0,5,0,0"
+                            <TextBox x:Name="SelectedSampleVelocityBox" LostFocus="SelectedSampleVelocityBox_TextChanged" Margin="0,5,0,0"
                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Velocity"/>
                         </StackPanel>
 

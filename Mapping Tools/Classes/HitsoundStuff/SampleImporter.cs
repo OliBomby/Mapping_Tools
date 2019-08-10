@@ -63,11 +63,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         }
                     } else if (Path.GetExtension(path) == ".ogg") {
                         foreach (var args in pair.Value) {
-                            samples.Add(args, new SampleSoundGenerator(new VorbisWaveReader(path)));
+                            samples.Add(args, ImportFromVorbis(args));
                         }
                     } else {
                         foreach (var args in pair.Value) {
-                            samples.Add(args, new SampleSoundGenerator(new AudioFileReader(path)));
+                            samples.Add(args, ImportFromAudio(args));
                         }
                     }
                 } catch (Exception ex) { Console.WriteLine(ex.Message); }
@@ -84,10 +84,24 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 GC.Collect();
                 return wave;
             } else if (Path.GetExtension(path) == ".ogg") {
-                return new SampleSoundGenerator(new VorbisWaveReader(path));
+                return ImportFromVorbis(args);
             } else {
-                return new SampleSoundGenerator(new AudioFileReader(path));
+                return ImportFromAudio(args);
             }
+        }
+
+        public static SampleSoundGenerator ImportFromAudio(SampleGeneratingArgs args) {
+            var generator = new SampleSoundGenerator(new AudioFileReader(args.Path)) {
+                VolumeCorrection = (float)args.Volume
+            };
+            return generator;
+        }
+
+        public static SampleSoundGenerator ImportFromVorbis(SampleGeneratingArgs args) {
+            var generator = new SampleSoundGenerator(new VorbisWaveReader(args.Path)) {
+                VolumeCorrection = (float)args.Volume
+            };
+            return generator;
         }
 
         public static SampleSoundGenerator ImportFromSoundFont(SampleGeneratingArgs args, SoundFont sf2) {

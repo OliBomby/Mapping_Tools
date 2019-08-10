@@ -54,18 +54,19 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         
                         if (thisLength != otherLength) { continue; }
 
-                        var thisWave = SampleImporter.OpenSample(samplePaths[i]);
-                        var otherWave = SampleImporter.OpenSample(samplePaths[k]);
-                        
-                        if (thisWave.Length != otherWave.Length) { continue; }
+                        using (var thisWave = SampleImporter.OpenSample(samplePaths[i])) {
+                            using (var otherWave = SampleImporter.OpenSample(samplePaths[k])) {
+                                if (thisWave.Length != otherWave.Length) { continue; }
 
-                        byte[] thisBuffer = new byte[thisWave.Length];
-                        thisWave.Read(thisBuffer, 0, (int)thisWave.Length);
+                                byte[] thisBuffer = new byte[thisWave.Length];
+                                thisWave.Read(thisBuffer, 0, (int)thisWave.Length);
 
-                        byte[] otherBuffer = new byte[otherWave.Length];
-                        otherWave.Read(otherBuffer, 0, (int)otherWave.Length);
-                        
-                        if (!thisBuffer.SequenceEqual(otherBuffer)) { continue; }
+                                byte[] otherBuffer = new byte[otherWave.Length];
+                                otherWave.Read(otherBuffer, 0, (int)otherWave.Length);
+
+                                if (!thisBuffer.SequenceEqual(otherBuffer)) { continue; }
+                            }
+                        }
                     }
                     
                     string samplePath = samplePaths[i];

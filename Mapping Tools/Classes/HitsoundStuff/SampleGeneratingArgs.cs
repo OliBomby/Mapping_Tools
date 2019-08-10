@@ -12,14 +12,17 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         public SampleGeneratingArgs() {
             Path = "";
+            volume = 1;
         }
 
         public SampleGeneratingArgs(string path) {
             Path = path;
+            volume = 1;
         }
 
         public SampleGeneratingArgs(string path, int bank, int patch, int instrument, int key, double length, int velocity) {
             Path = path;
+            volume = 1;
             Bank = bank;
             Patch = patch;
             Instrument = instrument;
@@ -37,6 +40,18 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 if (path != value) {
                     path = value;
                     NotifyPropertyChanged("Path");
+                }
+            }
+        }
+
+        private double volume;
+        public double Volume {
+            get { return volume; }
+            set {
+                if (volume != value) {
+                    volume = value;
+                    NotifyPropertyChanged("Volume");
+                    NotifyPropertyChanged("Velocity");
                 }
             }
         }
@@ -96,12 +111,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
-        private int velocity;
         public int Velocity {
-            get { return velocity; }
+            get { return (int)(Volume * 127); }
             set {
-                if (velocity != value) {
-                    velocity = value;
+                if (Velocity != value) {
+                    Volume = value / 127;
                     NotifyPropertyChanged("Velocity");
                 }
             }
@@ -111,7 +125,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             if (System.IO.Path.GetExtension(Path) == ".sf2") {
                 return string.Format("{0} {1},{2},{3},{4},{5},{6}", Path, Bank, Patch, Instrument, Key, Length, Velocity);
             } else {
-                return Path.ToString();
+                return string.Format("{0} {1}%", Path, Volume * 100);
             }
         }
 
@@ -123,10 +137,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 Patch == other.Patch &&
                 Instrument == other.Instrument &&
                 Key == other.Key &&
-                Length == other.Length &&
-                Velocity == other.Velocity;
+                Length == other.Length;
             } else {
-                return Path == other.Path;
+                return Path == other.Path &&
+                Volume == other.Volume;
             }
         }
 
@@ -140,24 +154,24 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         public bool ExactlyEquals(SampleGeneratingArgs other) {
             return Path == other.Path &&
+            Volume == other.Volume &&
             Bank == other.Bank &&
             Patch == other.Patch &&
             Instrument == other.Instrument &&
             Key == other.Key &&
-            Length == other.Length &&
-            Velocity == other.Velocity;
+            Length == other.Length;
         }
 
         public override int GetHashCode() {
             var hashCode = 881410169;
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Path);
+            hashCode = hashCode * -1521134295 + Volume.GetHashCode();
             if (System.IO.Path.GetExtension(Path) == ".sf2") {
                 hashCode = hashCode * -1521134295 + Bank.GetHashCode();
                 hashCode = hashCode * -1521134295 + Patch.GetHashCode();
                 hashCode = hashCode * -1521134295 + Instrument.GetHashCode();
                 hashCode = hashCode * -1521134295 + Key.GetHashCode();
                 hashCode = hashCode * -1521134295 + Length.GetHashCode();
-                hashCode = hashCode * -1521134295 + Velocity.GetHashCode();
             }
             return hashCode;
         }
