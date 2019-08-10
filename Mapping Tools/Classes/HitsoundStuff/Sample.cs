@@ -60,10 +60,14 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         public Sample(HitsoundLayer hl) {
-            _sampleArgs = hl.SampleArgs;
+            _sampleArgs = hl.SampleArgs.Copy();
             _priority = hl.Priority;
             _sampleSet = hl.SampleSet;
             _hitsound = hl.Hitsound;
+        }
+
+        public override string ToString() {
+            return string.Format("{0}, priority: {1}, sampleset: {2}, hitsound: {3}", SampleArgs, Priority, SampleSet, Hitsound);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

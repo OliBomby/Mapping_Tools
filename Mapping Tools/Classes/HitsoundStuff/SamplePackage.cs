@@ -89,7 +89,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             bool finish = Samples.Any(o => o.Hitsound == Hitsound.Finish);
             bool clap = Samples.Any(o => o.Hitsound == Hitsound.Clap);
 
-            return new HitsoundEvent(Time, sampleSet, additions, index, whistle, finish, clap);
+            return new HitsoundEvent(Time, Volume, sampleSet, additions, index, whistle, finish, clap);
         }
     }
 }

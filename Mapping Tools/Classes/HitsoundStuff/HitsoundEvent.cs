@@ -7,8 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
-    public struct HitsoundEvent {
+    public class HitsoundEvent {
         public double Time;
+        public double Volume;
         public SampleSet SampleSet;
         public SampleSet Additions;
         public int CustomIndex;
@@ -16,8 +17,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public bool Finish;
         public bool Clap;
 
-        public HitsoundEvent(double time, SampleSet sampleSet, SampleSet additions, int customIndex, bool whistle, bool finish, bool clap) {
+        public HitsoundEvent(double time, double volume, SampleSet sampleSet, SampleSet additions, int customIndex, bool whistle, bool finish, bool clap) {
             Time = time;
+            Volume = volume;
             SampleSet = sampleSet;
             Additions = additions;
             CustomIndex = customIndex;
@@ -28,10 +30,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         public int GetHitsounds() {
             return MathHelper.GetIntFromBitArray(new BitArray(new bool[] { false, Whistle, Finish, Clap }));
-        }
-
-        public void SetTime(double time) {
-            Time = time;
         }
     }
 }

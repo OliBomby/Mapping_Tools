@@ -92,5 +92,19 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 }
             }
         }
+
+        public override string ToString() {
+            var accumulator = new StringBuilder();
+            foreach (KeyValuePair<string, HashSet<SampleGeneratingArgs>> kvp in Samples) {
+                var sampleList = new StringBuilder();
+                foreach (var sga in kvp.Value) {
+                    sampleList.Append(string.Format("{0}|", sga.ToString()));
+                }
+                if (sampleList.Length > 0)
+                    sampleList.Remove(sampleList.Length - 1, 1);
+                accumulator.Append(string.Format("{0}: [{1}]", kvp.Key, sampleList.ToString()));
+            }
+            return accumulator.ToString();
+        }
     }
 }

@@ -38,6 +38,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 TimingPoint tp = beatmap.BeatmapTiming.GetTimingPointAtTime(h.Time + 5).Copy();
                 tp.Offset = h.Time;
                 tp.SampleIndex = h.CustomIndex;
+                tp.Volume = Math.Round(tp.Volume * h.Volume);
                 timingPointsChanges.Add(new TimingPointsChange(tp, index: true, volume: true));
             }
 

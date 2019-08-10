@@ -167,6 +167,7 @@
     <Compile Include="Classes\HitsoundStuff\SampleSet.cs" />
     <Compile Include="Classes\HitsoundStuff\SampleSoundGenerator.cs" />
     <Compile Include="Classes\HitsoundStuff\SF2Extension.cs" />
+    <Compile Include="Classes\HitsoundStuff\VolumeBalancingArgs.cs" />
     <Compile Include="Classes\MathUtil\Extensions.cs" />
     <Compile Include="Classes\MathUtil\BezierCurve.cs" />
     <Compile Include="Classes\MathUtil\BezierCurveCubic.cs" />

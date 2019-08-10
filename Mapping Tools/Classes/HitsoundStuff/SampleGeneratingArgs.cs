@@ -20,6 +20,16 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             volume = 1;
         }
 
+        public SampleGeneratingArgs(string path, double volume, int bank, int patch, int instrument, int key, double length) {
+            this.path = path;
+            this.volume = volume;
+            this.bank = bank;
+            this.patch = patch;
+            this.instrument = instrument;
+            this.key = key;
+            this.length = length;
+        }
+
         public SampleGeneratingArgs(string path, int bank, int patch, int instrument, int key, double length, int velocity) {
             Path = path;
             volume = 1;
@@ -112,10 +122,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         public int Velocity {
-            get { return (int)(Volume * 127); }
+            get { return (int)Math.Round(Volume * 127); }
             set {
                 if (Velocity != value) {
-                    Volume = value / 127;
+                    Volume = value / 127d;
                     NotifyPropertyChanged("Velocity");
                 }
             }
@@ -127,6 +137,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             } else {
                 return string.Format("{0} {1}%", Path, Volume * 100);
             }
+        }
+
+        public SampleGeneratingArgs Copy() {
+            return new SampleGeneratingArgs(Path, Volume, Bank, Patch, Instrument, Key, Length);
         }
 
         public bool Equals(SampleGeneratingArgs other) {

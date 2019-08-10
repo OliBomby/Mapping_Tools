@@ -27,6 +27,22 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return packages;
         }
 
+        public static void BalanceVolumes(List<SamplePackage> packages, VolumeBalancingArgs args) {
+            foreach (SamplePackage package in packages) {
+                double maxVolume = package.Samples.Max(o => o.SampleArgs.Volume);
+                double sampleMultiplier = 1 / maxVolume;
+                package.Volume = maxVolume;
+                foreach (Sample sample in package.Samples) {
+                    double newVolume = sample.SampleArgs.Volume * sampleMultiplier;
+                    if (Math.Abs(newVolume - 1) > args.Roughness && !args.AllwaysFullVolume) {
+                        sample.SampleArgs.Volume = args.Roughness * Math.Round(newVolume / args.Roughness);
+                    } else {
+                        sample.SampleArgs.Volume = 1;
+                    }
+                }
+            }
+        }
+
         public static List<CustomIndex> GetCustomIndices(List<SamplePackage> packages, Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null) {
             var indices = packages.Select(o => o.GetCustomIndex()).ToList();
             indices.ForEach(o => o.CleanInvalids(loadedSamples));
