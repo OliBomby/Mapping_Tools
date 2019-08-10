@@ -18,6 +18,9 @@
                  RunWorkerCompleted="BackgroundWorker_RunWorkerCompleted"
                  WorkerReportsProgress="True"
                  ProgressChanged="BackgroundWorker_ProgressChanged"/>
+            <domain:DoubleToStringConverter x:Key="D2SConverter"/>
+            <domain:SampleSetToStringConverter x:Key="SS2SConverter"/>
+            <domain:HitsoundToStringConverter x:Key="HS2SConverter"/>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid Name="MasterGrid">
@@ -295,7 +298,7 @@
                             <Button Grid.Column="3" Cursor="Hand" Click="DefaultSampleBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
                                 <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                             </Button >
-                            <ComboBox Grid.Column="2" x:Name="DefaultSampleSetBox" Width="70" VerticalAlignment="Stretch" Margin="0,0,5,0" SelectedIndex="{Binding SampleSetComboBoxIndex, Mode=TwoWay}" Cursor="Hand">
+                            <ComboBox Grid.Column="2" x:Name="DefaultSampleSetBox" Width="70" VerticalAlignment="Stretch" Margin="0,0,5,0" SelectedValue="{Binding SampleSet, Mode=TwoWay, Converter={StaticResource SS2SConverter}}" SelectedValuePath="Content" Cursor="Hand">
                                 <ComboBoxItem Content="Normal" Cursor="Hand"/>
                                 <ComboBoxItem Content="Soft" Cursor="Hand"/>
                                 <ComboBoxItem Content="Drum" Cursor="Hand"/>
