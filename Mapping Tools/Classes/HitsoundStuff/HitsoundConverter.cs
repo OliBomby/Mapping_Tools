@@ -21,7 +21,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
             // Packages without a hitnormal sample
             foreach (SamplePackage p in packages.Where(o => !o.Samples.Any(s => s.Hitsound == 0))) {
-                p.Samples.Add(defaultSample);
+                p.Samples.Add(defaultSample.Copy());
             }
             packages = packages.OrderBy(o => o.Time).ToList();
             return packages;

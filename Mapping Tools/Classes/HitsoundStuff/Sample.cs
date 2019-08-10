@@ -52,8 +52,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             _hitsound = Hitsound.Normal;
         }
 
-        public Sample(SampleSet sampleSet, Hitsound hitsound, SampleGeneratingArgs samplePath, int priority) {
-            _sampleArgs = samplePath;
+        public Sample(SampleSet sampleSet, Hitsound hitsound, SampleGeneratingArgs sampleArgs, int priority) {
+            _sampleArgs = sampleArgs;
             _priority = priority;
             _sampleSet = sampleSet;
             _hitsound = hitsound;
@@ -64,6 +64,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             _priority = hl.Priority;
             _sampleSet = hl.SampleSet;
             _hitsound = hl.Hitsound;
+        }
+
+        public Sample Copy() {
+            return new Sample(SampleSet, Hitsound, SampleArgs.Copy(), Priority);
         }
 
         public override string ToString() {

@@ -220,6 +220,7 @@
     <Compile Include="Classes\Tools\CircleBezierPreset.cs" />
     <Compile Include="Classes\Tools\MapCleaner.cs" />
     <Compile Include="Components\Domain\CommandImplementation.cs" />
+    <Compile Include="Components\Domain\VolumeToPercentageConverter.cs" />
     <Compile Include="Components\Domain\HitsoundToStringConverter.cs" />
     <Compile Include="Components\Domain\SampleSetToStringConverter.cs" />
     <Compile Include="Components\Domain\ImportTypeToStringConverter.cs" />
