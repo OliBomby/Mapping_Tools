@@ -240,6 +240,7 @@
     <Compile Include="Viewmodels\HitsoundPreviewHelperVM.cs" />
     <Compile Include="Viewmodels\HitsoundStudioVM.cs" />
     <Compile Include="Viewmodels\HitsoundCopierVM.cs" />
+    <Compile Include="Viewmodels\MetadataManagerVM.cs" />
     <Compile Include="Viewmodels\PropertyTransformerVM.cs" />
     <Compile Include="Viewmodels\SnappingToolsVM.cs" />
     <Compile Include="Viewmodels\SliderCompletionatorVM.cs" />
@@ -249,6 +250,9 @@
     <Compile Include="Views\Extensions.cs" />
     <Compile Include="Views\HitsoundPreviewHelper\HitsoundPreviewHelper.xaml.cs">
       <DependentUpon>HitsoundPreviewHelper.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\MetadataManager\MetadataManagerView.xaml.cs">
+      <DependentUpon>MetadataManagerView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TimingHelper\TimingHelperView.xaml.cs">
       <DependentUpon>TimingHelperView.xaml</DependentUpon>
@@ -317,6 +321,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\HitsoundPreviewHelper\HitsoundPreviewHelper.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\MetadataManager\MetadataManagerView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

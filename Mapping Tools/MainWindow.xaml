@@ -90,6 +90,7 @@
                     </MenuItem>
                     <MenuItem Height="31" Header="_Tools" Padding="12,0,0,0" MinWidth="65">
                         <MenuItem Header="_Map Cleaner" Click="LoadCleaner"/>
+                        <MenuItem Header="_Metadata Manager" Click="LoadMetadataManager"/>
                         <MenuItem Header="_Property Transformer" Click="LoadPropertyTransformer"/>
                         <MenuItem Header="_Slider Merger" Click="LoadMerger"/>
                         <MenuItem Header="_Slider Completionator" Click="LoadCompletionator"/>

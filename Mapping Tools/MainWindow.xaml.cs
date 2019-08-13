@@ -140,6 +140,19 @@ namespace Mapping_Tools {
             MinHeight = 560;
         }
 
+        //Method for loading the cleaner interface 
+        private void LoadMetadataManager(object sender, RoutedEventArgs e) {
+            DataContext = Views.GetMetadataManager();
+
+            TextBlock txt = this.FindName("header") as TextBlock;
+            txt.Text = "Mapping Tools - Metadata Manager";
+
+            ViewChanged();
+
+            MinWidth = 630;
+            MinHeight = 560;
+        }
+
         //Method for loading the property transformer
         private void LoadPropertyTransformer(object sender, RoutedEventArgs e) {
             DataContext = Views.GetPropertyTransformer();

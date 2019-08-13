@@ -45,6 +45,14 @@ namespace Mapping_Tools.Views {
             return MapCleaner;
         }
 
+        private UserControl MatadataManager { get; set; }
+        public UserControl GetMetadataManager() {
+            if (MatadataManager == null) {
+                MatadataManager = new MetadataManagerView();
+            }
+            return MatadataManager;
+        }
+
         private UserControl HitsoundPreviewHelper { get; set; }
         public UserControl GetHitsoundPreviewHelper() {
             if (HitsoundPreviewHelper == null) {
