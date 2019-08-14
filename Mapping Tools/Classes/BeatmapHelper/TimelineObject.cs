@@ -146,16 +146,20 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             bool normal = mode != 3 || Normal || !(Whistle || Finish || Clap);
             bool useFilename = Filename != null && Filename != "" && (IsCircle || IsHoldnoteHead);
 
-            if (normal)
-                samples.Add(GetFileName(FenoSampleSet, Hitsound.Normal, FenoCustomIndex));
-            if (Whistle)
-                samples.Add(GetFileName(FenoAdditionSet, Hitsound.Whistle, FenoCustomIndex));
-            if (Finish)
-                samples.Add(GetFileName(FenoAdditionSet, Hitsound.Finish, FenoCustomIndex));
-            if (Clap)
-                samples.Add(GetFileName(FenoAdditionSet, Hitsound.Clap, FenoCustomIndex));
+            if (useFilename) {
+                samples.Add(Filename);
+            } else {
+                if (normal)
+                    samples.Add(GetFileName(FenoSampleSet, Hitsound.Normal, FenoCustomIndex));
+                if (Whistle)
+                    samples.Add(GetFileName(FenoAdditionSet, Hitsound.Whistle, FenoCustomIndex));
+                if (Finish)
+                    samples.Add(GetFileName(FenoAdditionSet, Hitsound.Finish, FenoCustomIndex));
+                if (Clap)
+                    samples.Add(GetFileName(FenoAdditionSet, Hitsound.Clap, FenoCustomIndex));
+            }
 
-            return useFilename ? new List<string>() { Filename } : samples;
+            return samples;
         }
 
         public List<string> GetFirstPlayingFilenames(int mode, string mapDir, Dictionary<string, string> firstSamples) {

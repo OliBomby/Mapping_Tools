@@ -89,6 +89,45 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Filename = "";
         }
 
+        public List<string> GetPlayingBodyFilenames(double sliderTickRate) {
+            List<string> samples = new List<string>();
+            if (IsSlider) {
+                // Get sliderslide hitsounds for every timingpoint in the slider
+                SampleSet firstSampleSet = SampleSet == SampleSet.Auto ? TP.SampleSet : SampleSet;
+                samples.Add(GetSliderFilename(firstSampleSet, "slide", TP.SampleIndex));
+                if (Whistle)
+                    samples.Add(GetSliderFilename(firstSampleSet, "whistle", TP.SampleIndex));
+
+                foreach (TimingPoint bodyTP in BodyHitsounds) {
+                    SampleSet sampleSet = SampleSet == SampleSet.Auto ? bodyTP.SampleSet : SampleSet;
+                    samples.Add(GetSliderFilename(sampleSet, "slide", bodyTP.SampleIndex));
+                    if (Whistle)
+                        samples.Add(GetSliderFilename(sampleSet, "whistle", bodyTP.SampleIndex));
+                }
+
+                // Add tick samples
+                // 10 ms over tick time is tick
+                double t = Time + Redline.MpB / sliderTickRate;
+                while (t + 10 < EndTime) {
+                    TimingPoint bodyTP = Timing.GetTimingPointAtTime(t, BodyHitsounds, TP);
+                    SampleSet sampleSet = SampleSet == SampleSet.Auto ? bodyTP.SampleSet : SampleSet;
+                    samples.Add(GetSliderFilename(sampleSet, "tick", bodyTP.SampleIndex));
+                    t += Redline.MpB / sliderTickRate;
+                }
+            }
+            return samples;
+        }
+
+        private string GetSliderFilename(SampleSet sampleSet, string sampleName, int index) {
+            if (index == 0) {
+                return string.Format("{0}-slider{1}-default.wav", sampleSet.ToString().ToLower(), sampleName);
+            }
+            if (index == 1) {
+                return string.Format("{0}-slider{1}.wav", sampleSet.ToString().ToLower(), sampleName);
+            }
+            return string.Format("{0}-slider{1}{2}.wav", sampleSet.ToString().ToLower(), sampleName, index);
+        }
+
         public void MoveTime(double deltaTime) {
             Time += deltaTime;
             EndTime += deltaTime;

@@ -113,8 +113,8 @@ namespace Mapping_Tools.Views {
 
 
             foreach (string pathTo in arg.PathTo.Split('|')) {
-                Editor editorTo = new Editor(pathTo);
-                Editor editorFrom = new Editor(arg.PathFrom);
+                BeatmapEditor editorTo = new BeatmapEditor(pathTo);
+                BeatmapEditor editorFrom = new BeatmapEditor(arg.PathFrom);
 
                 Beatmap beatmapTo = editorTo.Beatmap;
                 Beatmap beatmapFrom = editorFrom.Beatmap;

@@ -72,7 +72,7 @@ namespace Mapping_Tools.Views {
             if (arg.Zones.Count == 0)
                 return "There are no zones!";
 
-            Editor editor = new Editor(arg.Path);
+            BeatmapEditor editor = new BeatmapEditor(arg.Path);
             Beatmap beatmap = editor.Beatmap;
             Timeline timeline = beatmap.GetTimeline();
 

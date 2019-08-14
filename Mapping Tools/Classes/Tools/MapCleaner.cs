@@ -53,7 +53,7 @@ namespace Mapping_Tools.Classes.Tools {
         /// <param name="arguments">The arguments for how to clean the beatmap.</param>
         /// <param name="worker">The BackgroundWorker for updating progress.</param>
         /// <returns>Number of resnapped objects.</returns>
-        public static MapCleanerResult CleanMap(Editor editor, MapCleanerArgs arguments, BackgroundWorker worker = null) {
+        public static MapCleanerResult CleanMap(BeatmapEditor editor, MapCleanerArgs arguments, BackgroundWorker worker = null) {
             UpdateProgressBar(worker, 0);
 
             Beatmap beatmap = editor.Beatmap;
@@ -61,9 +61,10 @@ namespace Mapping_Tools.Classes.Tools {
             Timeline timeline = beatmap.GetTimeline();
 
             int mode = beatmap.General["Mode"].Value;
+            double circleSize = beatmap.Difficulty["CircleSize"].Value;
+            double sliderTickRate = beatmap.Difficulty["SliderTickRate"].Value;
             string mapDir = editor.GetBeatmapFolder();
             Dictionary<string, string> firstSamples = HitsoundImporter.AnalyzeSamples(mapDir);
-            double circleSize = beatmap.Difficulty["CircleSize"].Value;
 
             int objectsResnapped = 0;
             int samplesRemoved = 0;

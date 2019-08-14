@@ -60,7 +60,7 @@ namespace Mapping_Tools.Views {
             double min = vm.MinTimeFilter == -1 ? double.NegativeInfinity : vm.MinTimeFilter;
             double max = vm.MaxTimeFilter == -1 ? double.PositiveInfinity : vm.MaxTimeFilter;
 
-            Editor editor = new Editor(vm.MapPath);
+            BeatmapEditor editor = new BeatmapEditor(vm.MapPath);
             Beatmap beatmap = editor.Beatmap;
 
             // Count all the total amount of things to loop through

@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
-    public class Beatmap {
+    public class Beatmap : ITextFile {
         public Dictionary<string, TValue> General { get; set; }
         public Dictionary<string, TValue> Editor { get; set; }
         public Dictionary<string, TValue> Metadata { get; set; }
@@ -23,6 +23,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public List<string> StoryboardLayer1 { get; set; }
         public List<string> StoryboardLayer2 { get; set; }
         public List<string> StoryboardLayer3 { get; set; }
+        public List<string> StoryboardLayer4 { get; set; }
         public List<StoryboardSoundSample> StoryboardSoundSamples { get; set; }
         public List<HitObject> HitObjects { get; set; }
         public List<double> Bookmarks { get => GetBookmarks(); set => SetBookmarks(value); }
@@ -43,6 +44,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             List<string> StoryboardLayer1Lines = GetCategoryLines(lines, "//Storyboard Layer 1 (Fail)", new[] { "[", "//" });
             List<string> StoryboardLayer2Lines = GetCategoryLines(lines, "//Storyboard Layer 2 (Pass)", new[] { "[", "//" });
             List<string> StoryboardLayer3Lines = GetCategoryLines(lines, "//Storyboard Layer 3 (Foreground)", new[] { "[", "//" });
+            List<string> StoryboardLayer4Lines = GetCategoryLines(lines, "//Storyboard Layer 4 (Overlay)", new[] { "[", "//" });
             List<string> StoryboardSoundSamplesLines = GetCategoryLines(lines, "//Storyboard Sound Samples", new[] { "[", "//" });
             List<string> colourLines = GetCategoryLines(lines, "[Colours]");
             List<string> hitobjectLines = GetCategoryLines(lines, "[HitObjects]");
@@ -60,6 +62,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             StoryboardLayer1 = new List<string>();
             StoryboardLayer2 = new List<string>();
             StoryboardLayer3 = new List<string>();
+            StoryboardLayer4 = new List<string>();
             StoryboardSoundSamples = new List<StoryboardSoundSample>();
             HitObjects = new List<HitObject>();
 
@@ -95,6 +98,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
             foreach (string line in StoryboardLayer3Lines) {
                 StoryboardLayer3.Add(line);
+            }
+            foreach (string line in StoryboardLayer4Lines) {
+                StoryboardLayer4.Add(line);
             }
             foreach (string line in StoryboardSoundSamplesLines) {
                 StoryboardSoundSamples.Add(new StoryboardSoundSample(line));
@@ -205,6 +211,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
             lines.Add("//Storyboard Layer 3 (Foreground)");
             foreach (string line in StoryboardLayer3) {
+                lines.Add(line);
+            }
+            lines.Add("//Storyboard Layer 4 (Overlay)");
+            foreach (string line in StoryboardLayer4) {
                 lines.Add(line);
             }
             lines.Add("//Storyboard Sound Samples");

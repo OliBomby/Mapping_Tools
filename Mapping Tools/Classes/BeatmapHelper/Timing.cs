@@ -112,6 +112,17 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return lastTP;
         }
 
+        public static TimingPoint GetTimingPointAtTime(double time, List<TimingPoint> timingPoints, TimingPoint firstTimingpoint) {
+            TimingPoint lastTP = firstTimingpoint;
+            foreach (TimingPoint tp in timingPoints) {
+                if (Precision.DefinitelyBigger(tp.Offset, time)) {
+                    return lastTP;
+                }
+                lastTP = tp;
+            }
+            return lastTP;
+        }
+
         public List<TimingPoint> GetTimingPointsInTimeRange(double startTime, double endTime) {
             List<TimingPoint> TPs = new List<TimingPoint>();
             foreach( TimingPoint tp in TimingPoints ) {

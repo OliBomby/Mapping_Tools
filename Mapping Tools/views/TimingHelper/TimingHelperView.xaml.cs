@@ -88,7 +88,7 @@ namespace Mapping_Tools.Views {
             int RedlinesAdded = 0;
 
             // Open beatmap
-            Editor editor = new Editor(arg.Path);
+            BeatmapEditor editor = new BeatmapEditor(arg.Path);
             Beatmap beatmap = editor.Beatmap;
             Timing timing = beatmap.BeatmapTiming;
 

@@ -68,7 +68,7 @@ namespace Mapping_Tools.Views {
             int mapsDone = 0;
 
             foreach (string path in paths) {
-                Editor editor = new Editor(path);
+                BeatmapEditor editor = new BeatmapEditor(path);
                 Beatmap beatmap = editor.Beatmap;
 
                 beatmap.Metadata["ArtistUnicode"].StringValue = arg.Artist;

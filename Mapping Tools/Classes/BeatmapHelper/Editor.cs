@@ -6,16 +6,24 @@ using System.Windows;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     public class Editor {
-        string BeatmapPath { get; set; }
-        public Beatmap Beatmap { get; set; }
+        public string Path { get; set; }
+        public ITextFile TextFile { get; set; }
+
+        public Editor() {
+
+        }
 
         public Editor(List<string> lines) {
-            Beatmap = new Beatmap(lines);
+            TextFile = new Beatmap(lines);
         }
 
         public Editor(string path) {
-            BeatmapPath = path;
-            Beatmap = new Beatmap(ReadFile(BeatmapPath));
+            Path = path;
+            if (System.IO.Path.GetExtension(path) == ".osb") {
+                TextFile = new StoryBoard(ReadFile(path));
+            } else {
+                TextFile = new Beatmap(ReadFile(path));
+            }
         }
 
         public List<string> ReadFile(string path) {
@@ -25,15 +33,15 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public void SaveFile(string path) {
-            SaveFile(path, Beatmap.GetLines());
+            SaveFile(path, TextFile.GetLines());
         }
 
         public void SaveFile(List<string> lines) {
-            SaveFile(BeatmapPath, lines);
+            SaveFile(Path, lines);
         }
 
         public void SaveFile() {
-            SaveFile(BeatmapPath, Beatmap.GetLines());
+            SaveFile(Path, TextFile.GetLines());
         }
 
         public static void SaveFile(string path, List<string> lines) {
@@ -45,7 +53,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public string GetBeatmapFolder() {
-            return Directory.GetParent(BeatmapPath).FullName;
+            return Directory.GetParent(Path).FullName;
         }
 
         public static string GetBeatmapFolder(string path)

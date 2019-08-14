@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
-        Title="Window1" Height="540" Width="400"
+        Title="Add layers" Height="540" Width="400"
         WindowStyle="None"
         ResizeMode="CanResize"
         AllowsTransparency="False"

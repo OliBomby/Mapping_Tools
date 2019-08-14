@@ -143,6 +143,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Classes\BeatmapHelper\BeatmapEditor.cs" />
+    <Compile Include="Classes\BeatmapHelper\StoryboardEditor.cs" />
+    <Compile Include="Classes\BeatmapHelper\ITextFile.cs" />
+    <Compile Include="Classes\BeatmapHelper\Storyboard.cs" />
     <Compile Include="Classes\BeatmapHelper\StoryboardSoundSample.cs" />
     <Compile Include="Classes\GenericExtensions.cs" />
     <Compile Include="Classes\HitsoundStuff\DelayFadeOutSampleProvider.cs" />

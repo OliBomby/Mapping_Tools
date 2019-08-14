@@ -62,7 +62,7 @@ namespace Mapping_Tools.Viewmodels
 
         private void ImportFromBeatmap(string importPath) {
             try {
-                Editor editor = new Editor(ImportPath);
+                BeatmapEditor editor = new BeatmapEditor(ImportPath);
                 Beatmap beatmap = editor.Beatmap;
 
                 Artist = beatmap.Metadata["ArtistUnicode"].StringValue;

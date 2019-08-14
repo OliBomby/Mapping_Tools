@@ -72,7 +72,7 @@ namespace Mapping_Tools.Views {
         private string Complete_Sliders(Arguments arg, BackgroundWorker worker, DoWorkEventArgs _) {
             int slidersCompleted = 0;
 
-            Editor editor = new Editor(arg.Path);
+            BeatmapEditor editor = new BeatmapEditor(arg.Path);
             Beatmap beatmap = editor.Beatmap;
             Timing timing = beatmap.BeatmapTiming;
             List<HitObject> markedObjects = arg.RequireBookmarks ? beatmap.GetBookmarkedObjects() : beatmap.HitObjects;

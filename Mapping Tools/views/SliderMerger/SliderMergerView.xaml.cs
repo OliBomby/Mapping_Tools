@@ -70,7 +70,7 @@ namespace Mapping_Tools.Views {
             int slidersMerged = 0;
             bool mergeLast = false;
 
-            Editor editor = new Editor(arg.Path);
+            BeatmapEditor editor = new BeatmapEditor(arg.Path);
             Beatmap beatmap = editor.Beatmap;
             List<HitObject> markedObjects = arg.RequireBookmarks ? beatmap.GetBookmarkedObjects() : beatmap.HitObjects;
 

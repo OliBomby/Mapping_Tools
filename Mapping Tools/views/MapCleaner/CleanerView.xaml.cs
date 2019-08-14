@@ -83,7 +83,7 @@ namespace Mapping_Tools.Views {
         }
 
         private string Run_Program(Arguments args, BackgroundWorker worker, DoWorkEventArgs _) {
-            Editor editor = new Editor(args.Path);
+            BeatmapEditor editor = new BeatmapEditor(args.Path);
 
             List<TimingPoint> orgininalTimingPoints = new List<TimingPoint>();
             foreach (TimingPoint tp in editor.Beatmap.BeatmapTiming.TimingPoints) { orgininalTimingPoints.Add(tp.Copy()); }
