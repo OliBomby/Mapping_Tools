@@ -63,9 +63,9 @@ namespace Mapping_Tools.Views {
 
         private struct Arguments {
             public string Path;
-            public MapCleaner.Arguments CleanerArguments;
+            public MapCleaner.MapCleanerArgs CleanerArguments;
 
-            public Arguments(string path, MapCleaner.Arguments cleanerArguments) {
+            public Arguments(string path, MapCleaner.MapCleanerArgs cleanerArguments) {
                 Path = path;
                 CleanerArguments = cleanerArguments;
             }
@@ -74,7 +74,7 @@ namespace Mapping_Tools.Views {
         private Arguments GetArgumentsFromWindow() {
             string fileToCopy = MainWindow.AppWindow.currentMap.Text;
             Arguments arguments = new Arguments(fileToCopy,
-                                                new MapCleaner.Arguments((bool)VolumeSliders.IsChecked, (bool)SamplesetSliders.IsChecked,
+                                                new MapCleaner.MapCleanerArgs((bool)VolumeSliders.IsChecked, (bool)SamplesetSliders.IsChecked,
                                                                          (bool)VolumeSpinners.IsChecked, (bool)RemoveMuting.IsChecked,
                                                                          (bool)ResnapObjects.IsChecked, (bool)ResnapBookmarks.IsChecked,
                                                                          int.Parse(Snap1.Text.Split('/')[1]), int.Parse(Snap2.Text.Split('/')[1]),
@@ -82,14 +82,14 @@ namespace Mapping_Tools.Views {
             return arguments;
         }
 
-        private string Run_Program(Arguments arguments, BackgroundWorker worker, DoWorkEventArgs _) {
-            Editor editor = new Editor(arguments.Path);
+        private string Run_Program(Arguments args, BackgroundWorker worker, DoWorkEventArgs _) {
+            Editor editor = new Editor(args.Path);
 
             List<TimingPoint> orgininalTimingPoints = new List<TimingPoint>();
             foreach (TimingPoint tp in editor.Beatmap.BeatmapTiming.TimingPoints) { orgininalTimingPoints.Add(tp.Copy()); }
             int oldTimingPointsCount = editor.Beatmap.BeatmapTiming.TimingPoints.Count;
 
-            int objectsResnapped = MapCleaner.CleanMap(editor, arguments.CleanerArguments, worker);
+            int objectsResnapped = MapCleaner.CleanMap(editor, args.CleanerArguments, worker);
 
             List<TimingPoint> newTimingPoints = editor.Beatmap.BeatmapTiming.TimingPoints;
             Monitor_Differences(orgininalTimingPoints, newTimingPoints);
@@ -98,27 +98,10 @@ namespace Mapping_Tools.Views {
             editor.SaveFile();
             
 
-            // Make an accurate message (Softwareporn)
+            // Make an accurate message
             int removed = oldTimingPointsCount - editor.Beatmap.BeatmapTiming.TimingPoints.Count;
-            string message = "";
-            if( removed < 0 ) {
-                message += "Succesfully added " + Math.Abs(removed);
-            }
-            else {
-                message += "Succesfully removed " + removed;
-            }
-            if( Math.Abs(removed) == 1 ) {
-                message += " greenline and resnapped " + objectsResnapped;
-            }
-            else {
-                message += " greenlines and resnapped " + objectsResnapped;
-            }
-            if( Math.Abs(objectsResnapped) == 1 ) {
-                message += " object!";
-            }
-            else {
-                message += " objects!";
-            }
+            string message = $"Successfully {(removed < 0 ? "added" : "removed")} {Math.Abs(removed)} {(Math.Abs(removed) == 1 ? "greenline" : "greenlines")}" +
+                (args.CleanerArguments.ResnapObjects ? $" and resnapped {objectsResnapped} {(Math.Abs(objectsResnapped) == 1 ? "object" : "objects")}" : "") + "!";
             return message;
         }
 

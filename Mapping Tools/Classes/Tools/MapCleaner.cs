@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.Tools {
     public class MapCleaner {
-        public struct Arguments {
+        public struct MapCleanerArgs {
             public bool VolumeSliders;
             public bool SamplesetSliders;
             public bool VolumeSpinners;
@@ -20,7 +20,7 @@ namespace Mapping_Tools.Classes.Tools {
             public int Snap2;
             public bool RemoveUnclickableHitsounds;
 
-            public Arguments(bool volumeSliders, bool samplesetSliders, bool volumeSpinners, bool removeMuting, bool resnapObjects, bool resnapBookmarks,
+            public MapCleanerArgs(bool volumeSliders, bool samplesetSliders, bool volumeSpinners, bool removeMuting, bool resnapObjects, bool resnapBookmarks,
                              int snap1, int snap2, bool removeUnclickableHitsounds) {
                 VolumeSliders = volumeSliders;
                 SamplesetSliders = samplesetSliders;
@@ -33,7 +33,7 @@ namespace Mapping_Tools.Classes.Tools {
                 RemoveUnclickableHitsounds = removeUnclickableHitsounds;
             }
 
-            public static readonly Arguments BasicResnap = new Arguments(true, true, true, false, true, false, 16, 12, false);
+            public static readonly MapCleanerArgs BasicResnap = new MapCleanerArgs(true, true, true, false, true, false, 16, 12, false);
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace Mapping_Tools.Classes.Tools {
         /// <param name="arguments">The arguments for how to clean the beatmap.</param>
         /// <param name="worker">The BackgroundWorker for updating progress.</param>
         /// <returns>Number of resnapped objects.</returns>
-        public static int CleanMap(Editor editor, Arguments arguments, BackgroundWorker worker = null) {
+        public static int CleanMap(Editor editor, MapCleanerArgs arguments, BackgroundWorker worker = null) {
             UpdateProgressBar(worker, 0);
 
             Beatmap beatmap = editor.Beatmap;
