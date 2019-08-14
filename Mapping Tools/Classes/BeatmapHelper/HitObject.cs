@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     public class HitObject {
@@ -250,22 +251,22 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public string[] GetValues() {
             if (IsSlider) {
-                string ret = "";
+                StringBuilder builder = new StringBuilder();
+                builder.Append(GetPathTypeString());
                 foreach (Vector2 p in CurvePoints) {
-                    ret += "|" + p.StringX;
-                    ret += ":" + p.StringY;
+                    builder.Append($"|{p.StringX}:{p.StringY}");
                 }
-                string sliderShapeString = GetPathTypeString() + ret;
+                string sliderShapeString = builder.ToString();
 
                 if (SliderExtras) {
                     string edgeHS = string.Join("|", EdgeHitsounds.Select(p => p.ToString()).ToArray());
 
-                    string rett = "";
+                    StringBuilder builder2 = new StringBuilder();
                     for (int i = 0; i < EdgeSampleSets.Count(); i++) {
-                        rett += "|" + (int)EdgeSampleSets[i];
-                        rett += ":" + (int)EdgeAdditionSets[i];
+                        builder2.Append($"|{(int)EdgeSampleSets[i]}:{(int)EdgeAdditionSets[i]}");
                     }
-                    string edgeAd = rett.Substring(1);
+                    builder2.Remove(0, 1);
+                    string edgeAd = builder2.ToString();
 
                     return new string[] { Pos.StringX, Pos.StringY, Math.Round(Time).ToString(), ObjectType.ToString(), Hitsounds.ToString(),
                                         sliderShapeString, Repeat.ToString(), PixelLength.ToString(CultureInfo.InvariantCulture), edgeHS, edgeAd, Extras };

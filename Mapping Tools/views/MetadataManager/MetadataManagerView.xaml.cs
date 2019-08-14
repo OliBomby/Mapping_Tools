@@ -53,11 +53,12 @@ namespace Mapping_Tools.Views {
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
-            foreach (string fileToCopy in BeatmapToBox.Text.Split('|')) {
+            string[] filesToCopy = ((MetadataManagerVM)DataContext).ExportPath.Split('|');
+            foreach (string fileToCopy in filesToCopy) {
                 IOHelper.SaveMapBackup(fileToCopy);
             }
 
-            backgroundWorker.RunWorkerAsync();
+            backgroundWorker.RunWorkerAsync((MetadataManagerVM)DataContext);
             start.IsEnabled = false;
         }
 
@@ -68,15 +69,22 @@ namespace Mapping_Tools.Views {
 
             foreach (string path in paths) {
                 Editor editor = new Editor(path);
+                Beatmap beatmap = editor.Beatmap;
+
+                beatmap.Metadata["ArtistUnicode"].StringValue = arg.Artist;
+                beatmap.Metadata["Artist"].StringValue = arg.RomanisedArtist;
+                beatmap.Metadata["TitleUnicode"].StringValue = arg.Title;
+                beatmap.Metadata["Title"].StringValue = arg.RomanisedTitle;
+                beatmap.Metadata["Creator"].StringValue = arg.BeatmapCreator;
+                beatmap.Metadata["Source"].StringValue = arg.Source;
+                beatmap.Metadata["Tags"].StringValue = arg.Tags;
 
                 // Save the file
                 editor.SaveFile();
 
-
-
                 // Update progressbar
                 if (worker != null && worker.WorkerReportsProgress) {
-                    worker.ReportProgress(paths.Length * 100 / mapsDone++);
+                    worker.ReportProgress(++mapsDone * 100 / paths.Length);
                 }
             }
 
@@ -86,8 +94,7 @@ namespace Mapping_Tools.Views {
             }
 
             // Make an accurate message
-            string message = "";
-            message += "Done!";
+            string message = string.Format("Successfully exported metadata to {0} {1}!", mapsDone, mapsDone == 1 ? "beatmap" : "beatmaps");
             return message;
         }
 
