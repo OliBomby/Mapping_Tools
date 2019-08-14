@@ -36,6 +36,16 @@ namespace Mapping_Tools.Classes.Tools {
             public static readonly MapCleanerArgs BasicResnap = new MapCleanerArgs(true, true, true, false, true, false, 16, 12, false);
         }
 
+        public struct MapCleanerResult {
+            public int ObjectsResnapped;
+            public int SamplesRemoved;
+
+            public MapCleanerResult(int objectsResnapped, int samplesRemoved) {
+                ObjectsResnapped = objectsResnapped;
+                SamplesRemoved = samplesRemoved;
+            }
+        }
+
         /// <summary>
         /// Cleans a map.
         /// </summary>
@@ -43,7 +53,7 @@ namespace Mapping_Tools.Classes.Tools {
         /// <param name="arguments">The arguments for how to clean the beatmap.</param>
         /// <param name="worker">The BackgroundWorker for updating progress.</param>
         /// <returns>Number of resnapped objects.</returns>
-        public static int CleanMap(Editor editor, MapCleanerArgs arguments, BackgroundWorker worker = null) {
+        public static MapCleanerResult CleanMap(Editor editor, MapCleanerArgs arguments, BackgroundWorker worker = null) {
             UpdateProgressBar(worker, 0);
 
             Beatmap beatmap = editor.Beatmap;
@@ -54,7 +64,9 @@ namespace Mapping_Tools.Classes.Tools {
             string mapDir = editor.GetBeatmapFolder();
             Dictionary<string, string> firstSamples = HitsoundImporter.AnalyzeSamples(mapDir);
             double circleSize = beatmap.Difficulty["CircleSize"].Value;
+
             int objectsResnapped = 0;
+            int samplesRemoved = 0;
 
             // Collect Kiai toggles and SV changes for mania/taiko
             List<TimingPoint> kiaiToggles = new List<TimingPoint>();
@@ -272,7 +284,7 @@ namespace Mapping_Tools.Classes.Tools {
             // Complete progressbar
             UpdateProgressBar(worker, 100);
 
-            return objectsResnapped;
+            return new MapCleanerResult(objectsResnapped, samplesRemoved);
         }
 
         private static void UpdateProgressBar(BackgroundWorker worker, int progress) {

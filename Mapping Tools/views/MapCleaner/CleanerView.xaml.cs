@@ -89,7 +89,7 @@ namespace Mapping_Tools.Views {
             foreach (TimingPoint tp in editor.Beatmap.BeatmapTiming.TimingPoints) { orgininalTimingPoints.Add(tp.Copy()); }
             int oldTimingPointsCount = editor.Beatmap.BeatmapTiming.TimingPoints.Count;
 
-            int objectsResnapped = MapCleaner.CleanMap(editor, args.CleanerArguments, worker);
+            var result = MapCleaner.CleanMap(editor, args.CleanerArguments, worker);
 
             List<TimingPoint> newTimingPoints = editor.Beatmap.BeatmapTiming.TimingPoints;
             Monitor_Differences(orgininalTimingPoints, newTimingPoints);
@@ -101,7 +101,7 @@ namespace Mapping_Tools.Views {
             // Make an accurate message
             int removed = oldTimingPointsCount - editor.Beatmap.BeatmapTiming.TimingPoints.Count;
             string message = $"Successfully {(removed < 0 ? "added" : "removed")} {Math.Abs(removed)} {(Math.Abs(removed) == 1 ? "greenline" : "greenlines")}" +
-                (args.CleanerArguments.ResnapObjects ? $" and resnapped {objectsResnapped} {(Math.Abs(objectsResnapped) == 1 ? "object" : "objects")}" : "") + "!";
+                (args.CleanerArguments.ResnapObjects ? $" and resnapped {result.ObjectsResnapped} {(result.ObjectsResnapped == 1 ? "object" : "objects")}" : "") + "!";
             return message;
         }
 
