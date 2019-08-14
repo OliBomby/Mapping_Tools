@@ -5,7 +5,7 @@ using System.IO;
 using System.Windows;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
-    class Editor {
+    public class Editor {
         string BeatmapPath { get; set; }
         public Beatmap Beatmap { get; set; }
 

@@ -1,4 +1,5 @@
 ﻿using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.HitsoundStuff;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -42,13 +43,16 @@ namespace Mapping_Tools.Classes.Tools {
         /// <param name="arguments">The arguments for how to clean the beatmap.</param>
         /// <param name="worker">The BackgroundWorker for updating progress.</param>
         /// <returns>Number of resnapped objects.</returns>
-        public static int CleanMap(Beatmap beatmap, Arguments arguments, BackgroundWorker worker = null) {
+        public static int CleanMap(Editor editor, Arguments arguments, BackgroundWorker worker = null) {
             UpdateProgressBar(worker, 0);
 
+            Beatmap beatmap = editor.Beatmap;
             Timing timing = beatmap.BeatmapTiming;
             Timeline timeline = beatmap.GetTimeline();
 
             int mode = beatmap.General["Mode"].Value;
+            string mapDir = editor.GetBeatmapFolder();
+            Dictionary<string, string> firstSamples = HitsoundImporter.AnalyzeSamples(mapDir);
             double circleSize = beatmap.Difficulty["CircleSize"].Value;
             int objectsResnapped = 0;
 
@@ -220,14 +224,41 @@ namespace Mapping_Tools.Classes.Tools {
                 }
                 if (tlo.HasHitsound) // Add greenlines for custom indexes and volumes
                 {
-                    TimingPoint tp = tlo.Origin.TP.Copy();
+                    TimingPoint tp = tlo.HitsoundTP.Copy();
+
+                    bool doUnmute = tlo.FenoSampleVolume == 5 && arguments.RemoveMuting;
+                    bool ind = !tlo.UsesFilename && !doUnmute;  // Index doesnt have to change if custom is overridden by Filename
+                    bool vol = !doUnmute;  // Remove volume change muted
+
+                    // Index doesn't have to change if the sample it plays currently is the same as the sample it would play with the previous index
+                    if (ind) {
+                        List<string> nativeSamples = tlo.GetFirstPlayingFilenames(mode, mapDir, firstSamples);
+
+                        int oldIndex = tlo.FenoCustomIndex;
+                        int newIndex = tlo.FenoCustomIndex;
+                        double latest = double.NegativeInfinity;
+                        foreach (TimingPointsChange tpc in timingPointsChanges) {
+                            if (tpc.Index && tpc.MyTP.Offset <= tlo.Time && tpc.MyTP.Offset >= latest) {
+                                newIndex = tpc.MyTP.SampleIndex;
+                                latest = tpc.MyTP.Offset;
+                            }
+                        }
+
+                        tp.SampleIndex = newIndex;
+                        tlo.GiveHitsoundTimingPoint(tp);
+                        List<string> newSamples = tlo.GetFirstPlayingFilenames(mode, mapDir, firstSamples);
+                        if (nativeSamples.SequenceEqual(newSamples)) {
+                            // Index changes dont change sound
+                            ind = false;
+                        }
+                        tp.SampleIndex = oldIndex;
+                        tlo.GiveHitsoundTimingPoint(tp);
+                    }
+
                     tp.Offset = tlo.Time;
                     tp.SampleIndex = tlo.FenoCustomIndex;
                     tp.Volume = tlo.FenoSampleVolume;
-                    bool doUnmute = tlo.FenoSampleVolume == 5 && arguments.RemoveMuting;
-                    bool usesFilename = tlo.Filename != "" && (tlo.IsCircle || tlo.IsHoldnoteHead || tlo.IsSpinnerEnd);
-                    bool ind = !usesFilename && !doUnmute;  // Index doesnt have to change if custom is overridden by Filename
-                    bool vol = !doUnmute;  // Remove volume change muted
+
                     timingPointsChanges.Add(new TimingPointsChange(tp, volume: vol, index: ind));
                 }
             }

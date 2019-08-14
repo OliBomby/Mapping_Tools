@@ -89,7 +89,7 @@ namespace Mapping_Tools.Views {
             foreach (TimingPoint tp in editor.Beatmap.BeatmapTiming.TimingPoints) { orgininalTimingPoints.Add(tp.Copy()); }
             int oldTimingPointsCount = editor.Beatmap.BeatmapTiming.TimingPoints.Count;
 
-            int objectsResnapped = MapCleaner.CleanMap(editor.Beatmap, arguments.CleanerArguments, worker);
+            int objectsResnapped = MapCleaner.CleanMap(editor, arguments.CleanerArguments, worker);
 
             List<TimingPoint> newTimingPoints = editor.Beatmap.BeatmapTiming.TimingPoints;
             Monitor_Differences(orgininalTimingPoints, newTimingPoints);
