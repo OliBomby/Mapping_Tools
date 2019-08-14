@@ -61,32 +61,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public void GiveTimingPoints(Timing timing) {
             foreach (TimelineObject tlo in TimeLineObjects) {
                 TimingPoint hstp = timing.GetTimingPointAtTime(tlo.Time + 5); // +5 for the weird offset in hitsounding greenlines
-                tlo.HitsoundTP = hstp;
-                if (tlo.SampleSet == 0) {
-                    tlo.FenoSampleSet = hstp.SampleSet;
-                }
-                else {
-                    tlo.FenoSampleSet = tlo.SampleSet;
-                }
-                if (tlo.AdditionSet == 0) {
-                    tlo.FenoAdditionSet = tlo.FenoSampleSet;
-                }
-                else {
-                    tlo.FenoAdditionSet = tlo.AdditionSet;
-                }
-                if (tlo.CustomIndex == 0) {
-                    tlo.FenoCustomIndex = hstp.SampleIndex;
-                }
-                else {
-                    tlo.FenoCustomIndex = tlo.CustomIndex;
-                }
-                if (tlo.SampleVolume == 0) {
-                    tlo.FenoSampleVolume = hstp.Volume;
-                }
-                else {
-                    tlo.FenoSampleVolume = tlo.SampleVolume;
-                }
-
+                tlo.GiveHitsoundTimingPoint(hstp);
                 TimingPoint tp = timing.GetTimingPointAtTime(tlo.Time);
                 tlo.TP = tp;
                 TimingPoint red = timing.GetRedlineAtTime(tlo.Time);

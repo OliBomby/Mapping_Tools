@@ -76,6 +76,10 @@
                 <CheckBox x:Name="CopyBodyBox" IsChecked="True" Content="Copy sliderbody hitsounds"/>
                 <CheckBox x:Name="CopySamplesetBox" IsChecked="True" Content="Copy samplesets"/>
                 <CheckBox x:Name="CopyVolumeBox" IsChecked="True" Content="Copy volumes"/>
+                <CheckBox x:Name="AlwaysPreserve5VolumeBox" IsChecked="True" Content="Always preserve 5% volume" Margin="20,0,0,0"
+                    ToolTip="Objects with 5% volume will always stay 5% volume regardless of the copying mode"
+                    Visibility="{Binding Path=IsChecked, ElementName=CopyVolumeBox, UpdateSourceTrigger=PropertyChanged,  
+                                 Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"/>
                 <CheckBox x:Name="CopyStoryboardedSamplesBox" IsChecked="False" Content="Copy storyboarded samples"/>
                 <CheckBox x:Name="IgnoreHitsoundSatisfiedSamplesBox" IsChecked="True" Content="Ignore samples satisfied by hitsounds" Margin="20,0,0,0"
                     ToolTip="Don't copy storyboarded samples that are already played by the hitsounds"

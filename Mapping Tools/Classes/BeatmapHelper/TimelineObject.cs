@@ -3,6 +3,7 @@ using Mapping_Tools.Classes.MathUtil;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -157,6 +158,51 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return useFilename ? new List<string>() { Filename } : samples;
         }
 
+        public List<string> GetFirstPlayingFilenames(int mode, string mapDir, Dictionary<string, string> firstSamples) {
+            List<string> samples = new List<string>();
+            bool normal = mode != 3 || Normal || !(Whistle || Finish || Clap);
+            bool useFilename = Filename != null && Filename != "" && (IsCircle || IsHoldnoteHead);
+
+            if (useFilename) {
+                string samplePath = Path.Combine(mapDir, Filename);
+                string fullPathExtLess = Path.Combine(Path.GetDirectoryName(samplePath), Path.GetFileNameWithoutExtension(samplePath));
+
+                // Get the first occurence of this sound to not get duplicated
+                if (firstSamples.Keys.Contains(fullPathExtLess)) {
+                    samples.Add(Path.GetFileName(firstSamples[fullPathExtLess]));
+                }
+            } else {
+                if (normal)
+                    AddFirstIdenticalFilename(FenoSampleSet, Hitsound.Normal, FenoCustomIndex, samples, useFilename, mapDir, firstSamples);
+                if (Whistle)
+                    AddFirstIdenticalFilename(FenoAdditionSet, Hitsound.Whistle, FenoCustomIndex, samples, useFilename, mapDir, firstSamples);
+                if (Finish)
+                    AddFirstIdenticalFilename(FenoAdditionSet, Hitsound.Finish, FenoCustomIndex, samples, useFilename, mapDir, firstSamples);
+                if (Clap)
+                    AddFirstIdenticalFilename(FenoAdditionSet, Hitsound.Clap, FenoCustomIndex, samples, useFilename, mapDir, firstSamples);
+            }
+
+            return samples;
+        }
+
+        private void AddFirstIdenticalFilename(SampleSet sampleSet, Hitsound hitsound, int index, List<string> samples, bool useFilename, string mapDir, Dictionary<string, string> firstSamples) {
+            string filename = GetFileName(sampleSet, hitsound, index);
+            string samplePath = Path.Combine(mapDir, filename);
+            string fullPathExtLess = Path.Combine(Path.GetDirectoryName(samplePath), Path.GetFileNameWithoutExtension(samplePath));
+
+            // Get the first occurence of this sound to not get duplicated
+            if (firstSamples.Keys.Contains(fullPathExtLess)) {
+                if (!useFilename) {
+                    samples.Add(Path.GetFileName(firstSamples[fullPathExtLess]));
+                }
+            } else {
+                // Sample doesn't exist
+                if (!useFilename) {
+                    samples.Add(GetFileName(sampleSet, hitsound, 0));
+                }
+            }
+        }
+
         public void HitsoundsToOrigin() {
             if (Origin.IsCircle || (Origin.IsSpinner && Repeat == 1) || (Origin.IsHoldNote && Repeat == 0)) {
                 Origin.Hitsounds = GetHitsounds();
@@ -170,6 +216,30 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 Origin.EdgeSampleSets[Repeat] = SampleSet;
                 Origin.EdgeAdditionSets[Repeat] = AdditionSet;
                 Origin.SliderExtras = true;
+            }
+        }
+
+        public void GiveHitsoundTimingPoint(TimingPoint hstp) {
+            HitsoundTP = hstp;
+            if (SampleSet == 0) {
+                FenoSampleSet = hstp.SampleSet;
+            } else {
+                FenoSampleSet = SampleSet;
+            }
+            if (AdditionSet == 0) {
+                FenoAdditionSet = FenoSampleSet;
+            } else {
+                FenoAdditionSet = AdditionSet;
+            }
+            if (CustomIndex == 0) {
+                FenoCustomIndex = hstp.SampleIndex;
+            } else {
+                FenoCustomIndex = CustomIndex;
+            }
+            if (SampleVolume == 0) {
+                FenoSampleVolume = hstp.Volume;
+            } else {
+                FenoSampleVolume = SampleVolume;
             }
         }
 
