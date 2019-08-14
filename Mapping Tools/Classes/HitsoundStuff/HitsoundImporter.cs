@@ -40,8 +40,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public static Dictionary<string, string> AnalyzeSamples(string dir, bool extended=false) {
             var extList = new string[] { ".wav", ".ogg", ".mp3" };
             List<string> samplePaths = Directory.GetFiles(dir, "*.*", extended ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly)
-                .Where(n => extList.Contains(Path.GetExtension(n), StringComparer.OrdinalIgnoreCase))
-                        .ToList();
+                .Where(n => extList.Contains(Path.GetExtension(n), StringComparer.OrdinalIgnoreCase)).ToList();
 
             Dictionary<string, string> dict = new Dictionary<string, string>();
             

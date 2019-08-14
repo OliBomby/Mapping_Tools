@@ -74,11 +74,12 @@ namespace Mapping_Tools.Views {
         private Arguments GetArgumentsFromWindow() {
             string fileToCopy = MainWindow.AppWindow.currentMap.Text;
             Arguments arguments = new Arguments(fileToCopy,
-                                                new MapCleaner.MapCleanerArgs((bool)VolumeSliders.IsChecked, (bool)SamplesetSliders.IsChecked,
-                                                                         (bool)VolumeSpinners.IsChecked, (bool)RemoveMuting.IsChecked,
+                                                new MapCleaner.MapCleanerArgs((bool)VolumeSliders.IsChecked, (bool)SamplesetSliders.IsChecked, (bool)VolumeSpinners.IsChecked,
                                                                          (bool)ResnapObjects.IsChecked, (bool)ResnapBookmarks.IsChecked,
-                                                                         int.Parse(Snap1.Text.Split('/')[1]), int.Parse(Snap2.Text.Split('/')[1]),
-                                                                         (bool)RemoveUnclickableHitsounds.IsChecked));
+                                                                         (bool)RemoveUnusedSamples.IsChecked,
+                                                                         (bool)RemoveMuting.IsChecked,
+                                                                         (bool)RemoveUnclickableHitsounds.IsChecked,
+                                                                         int.Parse(Snap1.Text.Split('/')[1]), int.Parse(Snap2.Text.Split('/')[1])));
             return arguments;
         }
 

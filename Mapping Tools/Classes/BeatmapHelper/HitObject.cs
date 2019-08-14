@@ -89,20 +89,24 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Filename = "";
         }
 
-        public List<string> GetPlayingBodyFilenames(double sliderTickRate) {
+        public List<string> GetPlayingBodyFilenames(double sliderTickRate, bool includeDefaults = true) {
             List<string> samples = new List<string>();
             if (IsSlider) {
                 // Get sliderslide hitsounds for every timingpoint in the slider
-                SampleSet firstSampleSet = SampleSet == SampleSet.Auto ? TP.SampleSet : SampleSet;
-                samples.Add(GetSliderFilename(firstSampleSet, "slide", TP.SampleIndex));
-                if (Whistle)
-                    samples.Add(GetSliderFilename(firstSampleSet, "whistle", TP.SampleIndex));
+                if (includeDefaults || TP.SampleIndex != 0) {
+                    SampleSet firstSampleSet = SampleSet == SampleSet.Auto ? TP.SampleSet : SampleSet;
+                    samples.Add(GetSliderFilename(firstSampleSet, "slide", TP.SampleIndex));
+                    if (Whistle)
+                        samples.Add(GetSliderFilename(firstSampleSet, "whistle", TP.SampleIndex));
+                }
 
                 foreach (TimingPoint bodyTP in BodyHitsounds) {
-                    SampleSet sampleSet = SampleSet == SampleSet.Auto ? bodyTP.SampleSet : SampleSet;
-                    samples.Add(GetSliderFilename(sampleSet, "slide", bodyTP.SampleIndex));
-                    if (Whistle)
-                        samples.Add(GetSliderFilename(sampleSet, "whistle", bodyTP.SampleIndex));
+                    if (includeDefaults || bodyTP.SampleIndex != 0) {
+                        SampleSet sampleSet = SampleSet == SampleSet.Auto ? bodyTP.SampleSet : SampleSet;
+                        samples.Add(GetSliderFilename(sampleSet, "slide", bodyTP.SampleIndex));
+                        if (Whistle)
+                            samples.Add(GetSliderFilename(sampleSet, "whistle", bodyTP.SampleIndex));
+                    }
                 }
 
                 // Add tick samples
@@ -110,8 +114,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 double t = Time + Redline.MpB / sliderTickRate;
                 while (t + 10 < EndTime) {
                     TimingPoint bodyTP = Timing.GetTimingPointAtTime(t, BodyHitsounds, TP);
-                    SampleSet sampleSet = SampleSet == SampleSet.Auto ? bodyTP.SampleSet : SampleSet;
-                    samples.Add(GetSliderFilename(sampleSet, "tick", bodyTP.SampleIndex));
+                    if (includeDefaults || bodyTP.SampleIndex != 0) {
+                        SampleSet sampleSet = SampleSet == SampleSet.Auto ? bodyTP.SampleSet : SampleSet;
+                        samples.Add(GetSliderFilename(sampleSet, "tick", bodyTP.SampleIndex));
+                    }
                     t += Redline.MpB / sliderTickRate;
                 }
             }
@@ -240,6 +246,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public void SetValues(string[] values) {
+            Console.WriteLine(values.Length);
             Pos = new Vector2(ParseDouble(values[0]), ParseDouble(values[1]));
             Time = ParseDouble(values[2]);
             ObjectType = int.Parse(values[3]);
@@ -263,10 +270,20 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 PixelLength = ParseDouble(values[7]);
                 if (SliderExtras) {
                     EdgeHitsounds = values[8].Split('|').Select(p => int.Parse(p)).ToArray();
-                    EdgeSampleSets = values[9].Split('|').Select(p => (SampleSet)int.Parse(p.Split(':')[0])).ToArray();
-                    EdgeAdditionSets = values[9].Split('|').Select(p => (SampleSet)int.Parse(p.Split(':')[1])).ToArray();
+                    if (values.Length > 9) {
+                        EdgeSampleSets = values[9].Split('|').Select(p => (SampleSet)int.Parse(p.Split(':')[0])).ToArray();
+                        EdgeAdditionSets = values[9].Split('|').Select(p => (SampleSet)int.Parse(p.Split(':')[1])).ToArray();
+                    } else {
+                        EdgeSampleSets = new SampleSet[Repeat + 1];
+                        EdgeAdditionSets = new SampleSet[Repeat + 1];
+                        for (int i = 0; i < Repeat + 1; i++) {
+                            EdgeSampleSets[i] = SampleSet.Auto;
+                            EdgeAdditionSets[i] = SampleSet.Auto;
+                        }
+                    }
 
-                    Extras = values[10];
+                    if (values.Length > 10)
+                        Extras = values[10];
                 }
                 else {
                     EdgeHitsounds = new int[Repeat + 1];
@@ -278,13 +295,15 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 EndTime = ParseDouble(values[5]);
                 TemporalLength = EndTime - Time;
                 Repeat = 1;
-                Extras = values[6];
+                if (values.Length > 6)
+                    Extras = values[6];
             }
             else {
                 Repeat = 0;
                 EndTime = Time;
                 TemporalLength = 0;
-                Extras = values[5];
+                if (values.Length > 5)
+                    Extras = values[5];
             }
         }
 
@@ -307,6 +326,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                     builder2.Remove(0, 1);
                     string edgeAd = builder2.ToString();
 
+                    if (Extras == null)
+                        return new string[] { Pos.StringX, Pos.StringY, Math.Round(Time).ToString(), ObjectType.ToString(), Hitsounds.ToString(),
+                                        sliderShapeString, Repeat.ToString(), PixelLength.ToString(CultureInfo.InvariantCulture), edgeHS, edgeAd };
                     return new string[] { Pos.StringX, Pos.StringY, Math.Round(Time).ToString(), ObjectType.ToString(), Hitsounds.ToString(),
                                         sliderShapeString, Repeat.ToString(), PixelLength.ToString(CultureInfo.InvariantCulture), edgeHS, edgeAd, Extras };
                 }
@@ -316,9 +338,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 }
             }
             else if (IsSpinner) {
+                if (Extras == null)
+                    return new string[] { Pos.StringX, Pos.StringY, Math.Round(Time).ToString(), ObjectType.ToString(), Hitsounds.ToString(), Math.Round(EndTime).ToString() };
                 return new string[] { Pos.StringX, Pos.StringY, Math.Round(Time).ToString(), ObjectType.ToString(), Hitsounds.ToString(), Math.Round(EndTime).ToString(), Extras };
             }
             else {
+                if (Extras == null)
+                    return new string[] { Pos.StringX, Pos.StringY, Math.Round(Time).ToString(), ObjectType.ToString(), Hitsounds.ToString() };
                 return new string[] { Pos.StringX, Pos.StringY, Math.Round(Time).ToString(), ObjectType.ToString(), Hitsounds.ToString(), Extras };
             }
         }

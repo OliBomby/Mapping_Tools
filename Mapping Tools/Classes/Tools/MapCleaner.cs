@@ -3,8 +3,10 @@ using Mapping_Tools.Classes.HitsoundStuff;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.Tools {
@@ -13,27 +15,28 @@ namespace Mapping_Tools.Classes.Tools {
             public bool VolumeSliders;
             public bool SamplesetSliders;
             public bool VolumeSpinners;
-            public bool RemoveMuting;
             public bool ResnapObjects;
             public bool ResnapBookmarks;
+            public bool RemoveUnusedSamples;
+            public bool RemoveMuting;
+            public bool RemoveUnclickableHitsounds;
             public int Snap1;
             public int Snap2;
-            public bool RemoveUnclickableHitsounds;
 
-            public MapCleanerArgs(bool volumeSliders, bool samplesetSliders, bool volumeSpinners, bool removeMuting, bool resnapObjects, bool resnapBookmarks,
-                             int snap1, int snap2, bool removeUnclickableHitsounds) {
+            public MapCleanerArgs(bool volumeSliders, bool samplesetSliders, bool volumeSpinners, bool resnapObjects, bool resnapBookmarks, bool removeUnusedSamples, bool removeMuting, bool removeUnclickableHitsounds, int snap1, int snap2) {
                 VolumeSliders = volumeSliders;
                 SamplesetSliders = samplesetSliders;
                 VolumeSpinners = volumeSpinners;
-                RemoveMuting = removeMuting;
                 ResnapObjects = resnapObjects;
                 ResnapBookmarks = resnapBookmarks;
+                RemoveUnusedSamples = removeUnusedSamples;
+                RemoveMuting = removeMuting;
+                RemoveUnclickableHitsounds = removeUnclickableHitsounds;
                 Snap1 = snap1;
                 Snap2 = snap2;
-                RemoveUnclickableHitsounds = removeUnclickableHitsounds;
             }
 
-            public static readonly MapCleanerArgs BasicResnap = new MapCleanerArgs(true, true, true, false, true, false, 16, 12, false);
+            public static readonly MapCleanerArgs BasicResnap = new MapCleanerArgs(true, true, true, true, false, false, false, false, 16, 12);
         }
 
         public struct MapCleanerResult {
@@ -50,10 +53,10 @@ namespace Mapping_Tools.Classes.Tools {
         /// Cleans a map.
         /// </summary>
         /// <param name="beatmap">The beatmap that is going to be cleaned.</param>
-        /// <param name="arguments">The arguments for how to clean the beatmap.</param>
+        /// <param name="args">The arguments for how to clean the beatmap.</param>
         /// <param name="worker">The BackgroundWorker for updating progress.</param>
         /// <returns>Number of resnapped objects.</returns>
-        public static MapCleanerResult CleanMap(BeatmapEditor editor, MapCleanerArgs arguments, BackgroundWorker worker = null) {
+        public static MapCleanerResult CleanMap(BeatmapEditor editor, MapCleanerArgs args, BackgroundWorker worker = null) {
             UpdateProgressBar(worker, 0);
 
             Beatmap beatmap = editor.Beatmap;
@@ -62,7 +65,6 @@ namespace Mapping_Tools.Classes.Tools {
 
             int mode = beatmap.General["Mode"].Value;
             double circleSize = beatmap.Difficulty["CircleSize"].Value;
-            double sliderTickRate = beatmap.Difficulty["SliderTickRate"].Value;
             string mapDir = editor.GetBeatmapFolder();
             Dictionary<string, string> firstSamples = HitsoundImporter.AnalyzeSamples(mapDir);
 
@@ -91,35 +93,35 @@ namespace Mapping_Tools.Classes.Tools {
             UpdateProgressBar(worker, 9);
 
             // Resnap shit
-            if (arguments.ResnapObjects) {
+            if (args.ResnapObjects) {
                 // Resnap all objects
                 foreach (HitObject ho in beatmap.HitObjects) {
-                    bool resnapped = ho.ResnapSelf(timing, arguments.Snap1, arguments.Snap2);
+                    bool resnapped = ho.ResnapSelf(timing, args.Snap1, args.Snap2);
                     if (resnapped) {
                         objectsResnapped += 1;
                     }
-                    ho.ResnapEnd(timing, arguments.Snap1, arguments.Snap2);
+                    ho.ResnapEnd(timing, args.Snap1, args.Snap2);
                     ho.ResnapPosition(mode, circleSize);
                 }
                 UpdateProgressBar(worker, 18);
 
                 // Resnap Kiai toggles
                 foreach (TimingPoint tp in kiaiToggles) {
-                    tp.ResnapSelf(timing, arguments.Snap1, arguments.Snap2);
+                    tp.ResnapSelf(timing, args.Snap1, args.Snap2);
                 }
                 UpdateProgressBar(worker, 27);
 
                 // Resnap SV changes
                 foreach (TimingPoint tp in svChanges) {
-                    tp.ResnapSelf(timing, arguments.Snap1, arguments.Snap2);
+                    tp.ResnapSelf(timing, args.Snap1, args.Snap2);
                 }
                 UpdateProgressBar(worker, 36);
             }
 
-            if (arguments.ResnapBookmarks) {
+            if (args.ResnapBookmarks) {
                 // Resnap the bookmarks
                 List<double> bookmarks = beatmap.GetBookmarks();
-                List<double> newBookmarks = bookmarks.Select(o => timing.Resnap(o, arguments.Snap1, arguments.Snap2)).ToList();
+                List<double> newBookmarks = bookmarks.Select(o => timing.Resnap(o, args.Snap1, args.Snap2)).ToList();
 
                 // Remove duplicate bookmarks
                 newBookmarks = newBookmarks.Distinct().ToList();
@@ -129,7 +131,7 @@ namespace Mapping_Tools.Classes.Tools {
             }
 
             // Maybe mute unclickable timelineobjects
-            if (arguments.RemoveUnclickableHitsounds) {
+            if (args.RemoveUnclickableHitsounds) {
                 foreach (TimelineObject tlo in timeline.TimeLineObjects) {
                     if (!(tlo.IsCircle || tlo.IsSliderHead || tlo.IsHoldnoteHead))  // Not clickable
                     {
@@ -146,7 +148,7 @@ namespace Mapping_Tools.Classes.Tools {
             foreach (TimingPoint tp in redlines) {
                 timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, meter: true, inherited: true, omitFirstBarLine: true));
             }
-            UpdateProgressBar(worker, 54);
+            UpdateProgressBar(worker, 55);
 
             // Add SV changes for taiko and mania
             if (mode == 1 || mode == 3) {
@@ -154,13 +156,13 @@ namespace Mapping_Tools.Classes.Tools {
                     timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true));
                 }
             }
-            UpdateProgressBar(worker, 63);
+            UpdateProgressBar(worker, 60);
 
             // Add Kiai toggles
             foreach (TimingPoint tp in kiaiToggles) {
                 timingPointsChanges.Add(new TimingPointsChange(tp, kiai: true));
             }
-            UpdateProgressBar(worker, 72);
+            UpdateProgressBar(worker, 65);
 
             // Add Hitobject stuff
             foreach (HitObject ho in beatmap.HitObjects) {
@@ -172,18 +174,18 @@ namespace Mapping_Tools.Classes.Tools {
                     timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true));
                 }
                 // Body hitsounds
-                bool vol = (ho.IsSlider && arguments.VolumeSliders) || (ho.IsSpinner && arguments.VolumeSpinners);
-                bool sam = (ho.IsSlider && arguments.SamplesetSliders && ho.SampleSet == 0);
-                bool ind = (ho.IsSlider && arguments.SamplesetSliders);
+                bool vol = (ho.IsSlider && args.VolumeSliders) || (ho.IsSpinner && args.VolumeSpinners);
+                bool sam = (ho.IsSlider && args.SamplesetSliders && ho.SampleSet == 0);
+                bool ind = (ho.IsSlider && args.SamplesetSliders);
                 bool samplesetActuallyChanged = false;
                 foreach (TimingPoint tp in ho.BodyHitsounds) {
-                    if (tp.Volume == 5 && arguments.RemoveMuting) {
+                    if (tp.Volume == 5 && args.RemoveMuting) {
                         vol = false;  // Removing sliderbody silencing
                         ind = false;  // Removing silent custom index
                     }
                     timingPointsChanges.Add(new TimingPointsChange(tp, volume: vol, index: ind, sampleset: sam));
                     if (tp.SampleSet != ho.HitsoundTP.SampleSet) {
-                        samplesetActuallyChanged = arguments.SamplesetSliders && ho.SampleSet == 0; }  // True for sampleset change in sliderbody
+                        samplesetActuallyChanged = args.SamplesetSliders && ho.SampleSet == 0; }  // True for sampleset change in sliderbody
                 }
                 if (ho.IsSlider && (!samplesetActuallyChanged) && ho.SampleSet == 0)  // Case can put sampleset on sliderbody
                 {
@@ -197,7 +199,7 @@ namespace Mapping_Tools.Classes.Tools {
                     timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: true));
                 }
             }
-            UpdateProgressBar(worker, 81);
+            UpdateProgressBar(worker, 75);
 
             // Add timeline hitsounds
             foreach (TimelineObject tlo in timeline.TimeLineObjects) {
@@ -239,7 +241,7 @@ namespace Mapping_Tools.Classes.Tools {
                 {
                     TimingPoint tp = tlo.HitsoundTP.Copy();
 
-                    bool doUnmute = tlo.FenoSampleVolume == 5 && arguments.RemoveMuting;
+                    bool doUnmute = tlo.FenoSampleVolume == 5 && args.RemoveMuting;
                     bool ind = !tlo.UsesFilename && !doUnmute;  // Index doesnt have to change if custom is overridden by Filename
                     bool vol = !doUnmute;  // Remove volume change muted
 
@@ -275,18 +277,110 @@ namespace Mapping_Tools.Classes.Tools {
                     timingPointsChanges.Add(new TimingPointsChange(tp, volume: vol, index: ind));
                 }
             }
-            UpdateProgressBar(worker, 90);
+            UpdateProgressBar(worker, 85);
             
             // Replace the old timingpoints
             timing.TimingPoints.Clear();
             TimingPointsChange.ApplyChanges(timing, timingPointsChanges);
             beatmap.GiveObjectsGreenlines();
 
+            UpdateProgressBar(worker, 90);
+
+            // Remove unused samples
+            if (args.RemoveUnusedSamples)
+                RemoveUnusedSamples(mapDir);
+
             // Complete progressbar
             UpdateProgressBar(worker, 100);
 
             return new MapCleanerResult(objectsResnapped, samplesRemoved);
         }
+
+        public static int RemoveUnusedSamples(string mapDir) {
+            // Collect all the used samples
+            HashSet<string> allFilenames = new HashSet<string>();
+            bool anySpinners = false;
+
+            List<string> beatmaps = Directory.GetFiles(mapDir, "*.osu", SearchOption.TopDirectoryOnly).ToList();
+            foreach (string path in beatmaps) {
+                BeatmapEditor editor = new BeatmapEditor(path);
+                Beatmap beatmap = editor.Beatmap;
+
+                int mode = beatmap.General["Mode"].Value;
+                double sliderTickRate = beatmap.Difficulty["SliderTickRate"].Value;
+
+                if (!anySpinners)
+                    anySpinners = mode == 0 && beatmap.HitObjects.Any(o => o.IsSpinner);
+
+                allFilenames.Add(beatmap.General["AudioFilename"].StringValue.Trim());
+
+                foreach (HitObject ho in beatmap.HitObjects) {
+                    allFilenames.UnionWith(ho.GetPlayingBodyFilenames(sliderTickRate, false));
+                }
+
+                foreach (TimelineObject tlo in beatmap.GetTimeline().TimeLineObjects) {
+                    allFilenames.UnionWith(tlo.GetPlayingFilenames(mode, false));
+                }
+
+                foreach (StoryboardSoundSample sbss in beatmap.StoryboardSoundSamples) {
+                    allFilenames.Add(sbss.FilePath);
+                }
+            }
+
+            List<string> storyboards = Directory.GetFiles(mapDir, "*.osb", SearchOption.TopDirectoryOnly).ToList();
+            foreach (string path in storyboards) {
+                StoryboardEditor editor = new StoryboardEditor(path);
+                StoryBoard beatmap = editor.StoryBoard;
+
+                foreach (StoryboardSoundSample sbss in beatmap.StoryboardSoundSamples) {
+                    allFilenames.Add(sbss.FilePath);
+                }
+            }
+
+            // Only if there are spinners in standard you may have spinnerspin and spinnerbonus
+            if (anySpinners)
+                allFilenames.UnionWith(new string[] { "spinnerspin", "spinnerbonus" });
+
+            // We don't do extensions in osu!
+            HashSet<string> usedFilenames = new HashSet<string>(allFilenames.Select(o => Path.GetFileNameWithoutExtension(o)));
+            foreach (string filename in usedFilenames) {
+                Console.WriteLine($"Using sample {filename}");
+            }
+
+            // Get the sound files
+            var extList = new string[] { ".wav", ".ogg", ".mp3" };
+            DirectoryInfo di = new DirectoryInfo(mapDir);
+            List<FileInfo> sampleFiles = di.GetFiles("*.*", SearchOption.TopDirectoryOnly)
+                                            .Where(n => extList.Contains(n.Extension, StringComparer.OrdinalIgnoreCase)).ToList();
+
+            int removed = 0;
+            foreach (FileInfo fi in sampleFiles) {
+                string extless = Path.GetFileNameWithoutExtension(fi.Name);
+                if (!(usedFilenames.Contains(extless) || BeatmapSkinnableSamples.Any(o => Regex.IsMatch(extless, o)))) {
+                    //fi.Delete();
+                    Console.WriteLine($"Deleting sample {fi.Name}");
+                    removed++;
+                }
+            }
+
+            return removed;
+        }
+
+        public static readonly string[] BeatmapSkinnableSamples = new string[] {
+            "count1s",
+            "count2s",
+            "count3s",
+            "gos",
+            "readys",
+            "applause",
+            "comboburst",
+            "comboburst-[0-9]+",
+            "combobreak",
+            "failsound",
+            "sectionpass",
+            "sectionfail",
+            "pause-loop"
+        };
 
         private static void UpdateProgressBar(BackgroundWorker worker, int progress) {
             if (worker != null && worker.WorkerReportsProgress) {

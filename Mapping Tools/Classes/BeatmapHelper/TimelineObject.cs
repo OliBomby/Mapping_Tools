@@ -141,28 +141,28 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return samples;
         }
 
-        public List<string> GetPlayingFilenames(int mode = 0) {
+        public List<string> GetPlayingFilenames(int mode = 0, bool includeDefaults = true) {
             List<string> samples = new List<string>();
             bool normal = mode != 3 || Normal || !(Whistle || Finish || Clap);
             bool useFilename = Filename != null && Filename != "" && (IsCircle || IsHoldnoteHead);
 
             if (useFilename) {
                 samples.Add(Filename);
-            } else {
+            } else if (includeDefaults || FenoCustomIndex != 0) {
                 if (normal)
-                    samples.Add(GetFileName(FenoSampleSet, Hitsound.Normal, FenoCustomIndex));
+                    samples.Add(GetFileName(FenoSampleSet, Hitsound.Normal, FenoCustomIndex, mode));
                 if (Whistle)
-                    samples.Add(GetFileName(FenoAdditionSet, Hitsound.Whistle, FenoCustomIndex));
+                    samples.Add(GetFileName(FenoAdditionSet, Hitsound.Whistle, FenoCustomIndex, mode));
                 if (Finish)
-                    samples.Add(GetFileName(FenoAdditionSet, Hitsound.Finish, FenoCustomIndex));
+                    samples.Add(GetFileName(FenoAdditionSet, Hitsound.Finish, FenoCustomIndex, mode));
                 if (Clap)
-                    samples.Add(GetFileName(FenoAdditionSet, Hitsound.Clap, FenoCustomIndex));
+                    samples.Add(GetFileName(FenoAdditionSet, Hitsound.Clap, FenoCustomIndex, mode));
             }
 
             return samples;
         }
 
-        public List<string> GetFirstPlayingFilenames(int mode, string mapDir, Dictionary<string, string> firstSamples) {
+        public List<string> GetFirstPlayingFilenames(int mode, string mapDir, Dictionary<string, string> firstSamples, bool includeDefaults=true) {
             List<string> samples = new List<string>();
             bool normal = mode != 3 || Normal || !(Whistle || Finish || Clap);
             bool useFilename = Filename != null && Filename != "" && (IsCircle || IsHoldnoteHead);
@@ -175,22 +175,22 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 if (firstSamples.Keys.Contains(fullPathExtLess)) {
                     samples.Add(Path.GetFileName(firstSamples[fullPathExtLess]));
                 }
-            } else {
+            } else if (includeDefaults || FenoCustomIndex != 0) {
                 if (normal)
-                    AddFirstIdenticalFilename(FenoSampleSet, Hitsound.Normal, FenoCustomIndex, samples, useFilename, mapDir, firstSamples);
+                    AddFirstIdenticalFilename(FenoSampleSet, Hitsound.Normal, FenoCustomIndex, samples, mode, useFilename, mapDir, firstSamples, includeDefaults);
                 if (Whistle)
-                    AddFirstIdenticalFilename(FenoAdditionSet, Hitsound.Whistle, FenoCustomIndex, samples, useFilename, mapDir, firstSamples);
+                    AddFirstIdenticalFilename(FenoAdditionSet, Hitsound.Whistle, FenoCustomIndex, samples, mode, useFilename, mapDir, firstSamples, includeDefaults);
                 if (Finish)
-                    AddFirstIdenticalFilename(FenoAdditionSet, Hitsound.Finish, FenoCustomIndex, samples, useFilename, mapDir, firstSamples);
+                    AddFirstIdenticalFilename(FenoAdditionSet, Hitsound.Finish, FenoCustomIndex, samples, mode, useFilename, mapDir, firstSamples, includeDefaults);
                 if (Clap)
-                    AddFirstIdenticalFilename(FenoAdditionSet, Hitsound.Clap, FenoCustomIndex, samples, useFilename, mapDir, firstSamples);
+                    AddFirstIdenticalFilename(FenoAdditionSet, Hitsound.Clap, FenoCustomIndex, samples, mode, useFilename, mapDir, firstSamples, includeDefaults);
             }
 
             return samples;
         }
 
-        private void AddFirstIdenticalFilename(SampleSet sampleSet, Hitsound hitsound, int index, List<string> samples, bool useFilename, string mapDir, Dictionary<string, string> firstSamples) {
-            string filename = GetFileName(sampleSet, hitsound, index);
+        private void AddFirstIdenticalFilename(SampleSet sampleSet, Hitsound hitsound, int index, List<string> samples, int mode, bool useFilename, string mapDir, Dictionary<string, string> firstSamples, bool includeDefaults) {
+            string filename = GetFileName(sampleSet, hitsound, index, mode);
             string samplePath = Path.Combine(mapDir, filename);
             string fullPathExtLess = Path.Combine(Path.GetDirectoryName(samplePath), Path.GetFileNameWithoutExtension(samplePath));
 
@@ -201,8 +201,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 }
             } else {
                 // Sample doesn't exist
-                if (!useFilename) {
-                    samples.Add(GetFileName(sampleSet, hitsound, 0));
+                if (!useFilename && includeDefaults) {
+                    samples.Add(GetFileName(sampleSet, hitsound, 0, mode));
                 }
             }
         }
@@ -247,14 +247,15 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
-        public static string GetFileName(SampleSet sampleSet, Hitsound hitsound, int index) {
+        public static string GetFileName(SampleSet sampleSet, Hitsound hitsound, int index, int mode) {
+            string taiko = mode == 1 ? "taiko-" : "";
             if (index == 0) {
-                return string.Format("{0}-hit-default.wav", sampleSet.ToString().ToLower(), hitsound.ToString().ToLower());
+                return string.Format("{2}{0}-hit{1}-default.wav", sampleSet.ToString().ToLower(), hitsound.ToString().ToLower(), taiko);
             }
             if (index == 1) {
-                return string.Format("{0}-hit{1}.wav", sampleSet.ToString().ToLower(), hitsound.ToString().ToLower());
+                return string.Format("{2}{0}-hit{1}.wav", sampleSet.ToString().ToLower(), hitsound.ToString().ToLower(), taiko);
             }
-            return string.Format("{0}-hit{1}{2}.wav", sampleSet.ToString().ToLower(), hitsound.ToString().ToLower(), index);
+            return string.Format("{3}{0}-hit{1}{2}.wav", sampleSet.ToString().ToLower(), hitsound.ToString().ToLower(), index, taiko);
         }
     }
 }

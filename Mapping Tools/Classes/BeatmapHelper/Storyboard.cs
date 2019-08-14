@@ -25,15 +25,16 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             // Load up all the shit
 
             List<string> eventsLines = GetCategoryLines(lines, "[Events]");
-            List<string> BackgroundAndVideoEventsLines = GetCategoryLines(lines, "//Background and Video events", new[] { "[", "//" });
-            List<string> BreakPeriodsLines = GetCategoryLines(lines, "//Break Periods", new[] { "[", "//" });
-            List<string> StoryboardLayer0Lines = GetCategoryLines(lines, "//Storyboard Layer 0 (Background)", new[] { "[", "//" });
-            List<string> StoryboardLayer1Lines = GetCategoryLines(lines, "//Storyboard Layer 1 (Fail)", new[] { "[", "//" });
-            List<string> StoryboardLayer2Lines = GetCategoryLines(lines, "//Storyboard Layer 2 (Pass)", new[] { "[", "//" });
-            List<string> StoryboardLayer3Lines = GetCategoryLines(lines, "//Storyboard Layer 3 (Foreground)", new[] { "[", "//" });
-            List<string> StoryboardLayer4Lines = GetCategoryLines(lines, "//Storyboard Layer 4 (Overlay)", new[] { "[", "//" });
-            List<string> StoryboardSoundSamplesLines = GetCategoryLines(lines, "//Storyboard Sound Samples", new[] { "[", "//" });
+            List<string> backgroundAndVideoEventsLines = GetCategoryLines(lines, "//Background and Video events", new[] { "[", "//" });
+            List<string> breakPeriodsLines = GetCategoryLines(lines, "//Break Periods", new[] { "[", "//" });
+            List<string> storyboardLayer0Lines = GetCategoryLines(lines, "//Storyboard Layer 0 (Background)", new[] { "[", "//" });
+            List<string> storyboardLayer1Lines = GetCategoryLines(lines, "//Storyboard Layer 1 (Fail)", new[] { "[", "//" });
+            List<string> storyboardLayer2Lines = GetCategoryLines(lines, "//Storyboard Layer 2 (Pass)", new[] { "[", "//" });
+            List<string> storyboardLayer3Lines = GetCategoryLines(lines, "//Storyboard Layer 3 (Foreground)", new[] { "[", "//" });
+            List<string> storyboardLayer4Lines = GetCategoryLines(lines, "//Storyboard Layer 4 (Overlay)", new[] { "[", "//" });
+            List<string> storyboardSoundSamplesLines = GetCategoryLines(lines, "//Storyboard Sound Samples", new[] { "[", "//" });
 
+            Events = new List<string>();
             BackgroundAndVideoEvents = new List<string>();
             BreakPeriods = new List<string>();
             StoryboardLayer0 = new List<string>();
@@ -46,28 +47,28 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             foreach (string line in eventsLines) {
                 Events.Add(line);
             }
-            foreach (string line in BackgroundAndVideoEventsLines) {
+            foreach (string line in backgroundAndVideoEventsLines) {
                 BackgroundAndVideoEvents.Add(line);
             }
-            foreach (string line in BreakPeriodsLines) {
+            foreach (string line in breakPeriodsLines) {
                 BreakPeriods.Add(line);
             }
-            foreach (string line in StoryboardLayer0Lines) {
+            foreach (string line in storyboardLayer0Lines) {
                 StoryboardLayer0.Add(line);
             }
-            foreach (string line in StoryboardLayer1Lines) {
+            foreach (string line in storyboardLayer1Lines) {
                 StoryboardLayer1.Add(line);
             }
-            foreach (string line in StoryboardLayer2Lines) {
+            foreach (string line in storyboardLayer2Lines) {
                 StoryboardLayer2.Add(line);
             }
-            foreach (string line in StoryboardLayer3Lines) {
+            foreach (string line in storyboardLayer3Lines) {
                 StoryboardLayer3.Add(line);
             }
-            foreach (string line in StoryboardLayer4Lines) {
+            foreach (string line in storyboardLayer4Lines) {
                 StoryboardLayer4.Add(line);
             }
-            foreach (string line in StoryboardSoundSamplesLines) {
+            foreach (string line in storyboardSoundSamplesLines) {
                 StoryboardSoundSamples.Add(new StoryboardSoundSample(line));
             }
         }

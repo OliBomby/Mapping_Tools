@@ -37,6 +37,9 @@
                 <CheckBox FontSize="14" x:Name="ResnapBookmarks" Cursor="Hand">
                     Resnap bookmarks
                 </CheckBox>
+                <CheckBox FontSize="14" x:Name="RemoveUnusedSamples" Cursor="Hand">
+                    Remove unused samples
+                </CheckBox>
                 <CheckBox FontSize="14" x:Name="RemoveMuting" Cursor="Hand">
                     Remove muting
                 </CheckBox>
