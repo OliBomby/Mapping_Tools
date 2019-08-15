@@ -127,8 +127,7 @@ namespace Mapping_Tools.Classes.SystemTools
         }
 
         public static string CurrentBeatmap() {
-            OsuMemoryDataProvider.DataProvider.Initalize();
-            var reader = OsuMemoryDataProvider.DataProvider.Instance;
+            var reader = OsuMemoryDataProvider.OsuMemoryReader.Instance;
             string folder = reader.GetMapFolderName();
             string filename = reader.GetOsuFileName();
             string songs = SettingsManager.GetSongsPath(); 
