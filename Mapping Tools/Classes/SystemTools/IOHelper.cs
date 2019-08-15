@@ -1,12 +1,17 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Forms;
+using Editor_Reader;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using OsuMemoryDataProvider;
 
 namespace Mapping_Tools.Classes.SystemTools
 {
     public class IOHelper
     {
+        private static readonly IOsuMemoryReader PioReader = OsuMemoryReader.Instance;
+        private static readonly EditorReader KarooReader = new EditorReader();
+
         public static bool SaveMapBackup(string fileToCopy, bool forced=false) {
             if (!SettingsManager.GetMakeBackups() && !forced)
                 return false;
@@ -127,15 +132,25 @@ namespace Mapping_Tools.Classes.SystemTools
         }
 
         public static string CurrentBeatmap() {
-            OsuMemoryDataProvider.DataProvider.Initalize();
-            var reader = OsuMemoryDataProvider.DataProvider.Instance;
-            string folder = reader.GetMapFolderName();
-            string filename = reader.GetOsuFileName();
-            string songs = SettingsManager.GetSongsPath(); 
-            string path = Path.Combine(songs, folder, filename);
+            string songs = SettingsManager.GetSongsPath();
 
-            if (songs == "" || folder == "" || filename == "") { return ""; }
-            return path;
+            bool inEditor = PioReader.GetCurrentStatus(out int _) == OsuMemoryStatus.EditingMap;
+            if (inEditor) {
+                KarooReader.FetchAll();
+                string folder = KarooReader.ContainingFolder;
+                string filename = KarooReader.Filename;
+                string path = Path.Combine(songs, folder, filename);
+
+                if (songs == "" || folder == "" || filename == "") { return ""; }
+                return path;
+            } else {
+                string folder = PioReader.GetMapFolderName();
+                string filename = PioReader.GetOsuFileName();
+                string path = Path.Combine(songs, folder, filename);
+
+                if (songs == "" || folder == "" || filename == "") { return ""; }
+                return path;
+            }
         }
     }
 }
