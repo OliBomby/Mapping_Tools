@@ -18,6 +18,7 @@ Collection of tools for manipulating osu! beatmaps
 - [Timing Helper]() by [OliBomby](https://github.com/OliBomby) 
 - [Hitsound Copier]() by [OliBomby](https://github.com/OliBomby) 
 - [Hitsound Preview Helper]() by [OliBomby](https://github.com/OliBomby) 
+- [Metadata Manager]() by [OliBomby](https://github.com/OliBomby)
 
 ## Future implementations
 - Snapping Tools (Geo-Triangle & Drafting Compass)
@@ -31,3 +32,4 @@ Collection of tools for manipulating osu! beatmaps
 - [NAudio Vorbis](https://github.com/naudio/Vorbis)
 - [OsuMemoryDataProvider](https://github.com/Piotrekol)
 - [Microsoft Windows API Code Pack](https://github.com/aybe/Windows-API-Code-Pack-1.1)
+- [Editor Reader](https://github.com/Karoo13/EditorReader)
