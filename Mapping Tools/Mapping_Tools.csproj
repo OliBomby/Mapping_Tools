@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="$(MSBuildExtensionsPath)/$(MSBuildToolsVersion)/Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)/$(MSBuildToolsVersion)/Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -18,7 +18,7 @@
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <PublishUrl>publish\</PublishUrl>
+    <PublishUrl>publish/</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
     <UpdateEnabled>false</UpdateEnabled>
@@ -38,7 +38,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>bin/Debug/</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -49,7 +49,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>bin/Release/</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -57,11 +57,11 @@
     <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Data\mt_icon.ico</ApplicationIcon>
+    <ApplicationIcon>Data/mt_icon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x86\Debug\</OutputPath>
+    <OutputPath>bin/x86/Debug/</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Optimize>true</Optimize>
@@ -73,7 +73,7 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\x86\Release\</OutputPath>
+    <OutputPath>bin/x86/Release/</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Optimize>true</Optimize>
@@ -92,40 +92,40 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AutoUpdater.NET, Version=1.5.4.0, Culture=neutral, PublicKeyToken=501435c91b35f4bc, processorArchitecture=MSIL">
-      <HintPath>..\packages\Autoupdater.NET.Official.1.5.4\lib\net40\AutoUpdater.NET.dll</HintPath>
+      <HintPath>../packages/Autoupdater.NET.Official.1.5.4/lib/net40/AutoUpdater.NET.dll</HintPath>
     </Reference>
     <Reference Include="EditorReader">
-      <HintPath>..\packages\EditorReader.dll</HintPath>
+      <HintPath>../packages/EditorReader.dll</HintPath>
     </Reference>
     <Reference Include="MaterialDesignColors, Version=1.2.0.325, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MaterialDesignColors.1.2.0\lib\net45\MaterialDesignColors.dll</HintPath>
+      <HintPath>../packages/MaterialDesignColors.1.2.0/lib/net45/MaterialDesignColors.dll</HintPath>
     </Reference>
     <Reference Include="MaterialDesignThemes.Wpf, Version=2.6.0.325, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MaterialDesignThemes.2.6.0\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
+      <HintPath>../packages/MaterialDesignThemes.2.6.0/lib/net45/MaterialDesignThemes.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.3.3, Culture=neutral, PublicKeyToken=8985beaab7ea3f04, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft-WindowsAPICodePack-Core.1.1.3.3\lib\net452\Microsoft.WindowsAPICodePack.dll</HintPath>
+      <HintPath>../packages/Microsoft-WindowsAPICodePack-Core.1.1.3.3/lib/net452/Microsoft.WindowsAPICodePack.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.3.3, Culture=neutral, PublicKeyToken=8985beaab7ea3f04, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft-WindowsAPICodePack-Shell.1.1.3.3\lib\net452\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+      <HintPath>../packages/Microsoft-WindowsAPICodePack-Shell.1.1.3.3/lib/net452/Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
     </Reference>
     <Reference Include="NAudio, Version=1.9.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NAudio.1.9.0\lib\net35\NAudio.dll</HintPath>
+      <HintPath>../packages/NAudio.1.9.0/lib/net35/NAudio.dll</HintPath>
     </Reference>
     <Reference Include="NAudio.Vorbis, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NAudio.Vorbis.1.0.0.0\lib\net35\NAudio.Vorbis.dll</HintPath>
+      <HintPath>../packages/NAudio.Vorbis.1.0.0.0/lib/net35/NAudio.Vorbis.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>../packages/Newtonsoft.Json.12.0.2/lib/net45/Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NVorbis, Version=0.8.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NVorbis.0.8.6\lib\net35\NVorbis.dll</HintPath>
+      <HintPath>../packages/NVorbis.0.8.6/lib/net35/NVorbis.dll</HintPath>
     </Reference>
     <Reference Include="OsuMemoryDataProvider">
-      <HintPath>..\packages\OsuMemoryDataProvider.dll</HintPath>
+      <HintPath>../packages/OsuMemoryDataProvider.dll</HintPath>
     </Reference>
     <Reference Include="ProcessMemoryDataFinder">
-      <HintPath>..\packages\ProcessMemoryDataFinder.dll</HintPath>
+      <HintPath>../packages/ProcessMemoryDataFinder.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -149,165 +149,165 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Classes\BeatmapHelper\BeatmapEditor.cs" />
-    <Compile Include="Classes\BeatmapHelper\StoryboardEditor.cs" />
-    <Compile Include="Classes\BeatmapHelper\ITextFile.cs" />
-    <Compile Include="Classes\BeatmapHelper\Storyboard.cs" />
-    <Compile Include="Classes\BeatmapHelper\StoryboardSoundSample.cs" />
-    <Compile Include="Classes\GenericExtensions.cs" />
-    <Compile Include="Classes\HitsoundStuff\DelayFadeOutSampleProvider.cs" />
-    <Compile Include="Classes\HitsoundStuff\Hitsound.cs" />
-    <Compile Include="Classes\HitsoundStuff\HitsoundLayerExtension.cs" />
-    <Compile Include="Classes\HitsoundStuff\HitsoundZone.cs" />
-    <Compile Include="Classes\HitsoundStuff\ImportReloadingArgs.cs" />
-    <Compile Include="Classes\HitsoundStuff\ImportReloadingArgsComparer.cs" />
-    <Compile Include="Classes\HitsoundStuff\ImportType.cs" />
-    <Compile Include="Classes\HitsoundStuff\LayerImportArgs.cs" />
-    <Compile Include="Classes\HitsoundStuff\SampleGeneratingArgs.cs" />
-    <Compile Include="Classes\HitsoundStuff\SampleImporter.cs" />
-    <Compile Include="Classes\HitsoundStuff\CompleteHitsounds.cs" />
-    <Compile Include="Classes\HitsoundStuff\CustomIndex.cs" />
-    <Compile Include="Classes\HitsoundStuff\HitsoundEvent.cs" />
-    <Compile Include="Classes\HitsoundStuff\HitsoundConverter.cs" />
-    <Compile Include="Classes\HitsoundStuff\HitsoundExporter.cs" />
-    <Compile Include="Classes\HitsoundStuff\HitsoundImporter.cs" />
-    <Compile Include="Classes\HitsoundStuff\HitsoundLayer.cs" />
-    <Compile Include="Classes\HitsoundStuff\Sample.cs" />
-    <Compile Include="Classes\HitsoundStuff\SamplePackage.cs" />
-    <Compile Include="Classes\HitsoundStuff\SampleSet.cs" />
-    <Compile Include="Classes\HitsoundStuff\SampleSoundGenerator.cs" />
-    <Compile Include="Classes\HitsoundStuff\SF2Extension.cs" />
-    <Compile Include="Classes\HitsoundStuff\VolumeBalancingArgs.cs" />
-    <Compile Include="Classes\MathUtil\Extensions.cs" />
-    <Compile Include="Classes\MathUtil\BezierCurve.cs" />
-    <Compile Include="Classes\MathUtil\BezierCurveCubic.cs" />
-    <Compile Include="Classes\MathUtil\BezierCurveQuadric.cs" />
-    <Compile Include="Classes\MathUtil\Box2.cs" />
-    <Compile Include="Classes\MathUtil\Box2d.cs" />
-    <Compile Include="Classes\MathUtil\CircleArc.cs" />
-    <Compile Include="Classes\MathUtil\MathHelper.cs" />
-    <Compile Include="Classes\MathUtil\Matrix2.cs" />
-    <Compile Include="Classes\MathUtil\Matrix2d.cs" />
-    <Compile Include="Classes\MathUtil\Matrix2x3.cs" />
-    <Compile Include="Classes\MathUtil\Matrix2x3d.cs" />
-    <Compile Include="Classes\MathUtil\Matrix2x4.cs" />
-    <Compile Include="Classes\MathUtil\Matrix2x4d.cs" />
-    <Compile Include="Classes\MathUtil\Matrix3.cs" />
-    <Compile Include="Classes\MathUtil\Matrix3d.cs" />
-    <Compile Include="Classes\MathUtil\Matrix3x2.cs" />
-    <Compile Include="Classes\MathUtil\Matrix3x2d.cs" />
-    <Compile Include="Classes\MathUtil\Matrix3x4.cs" />
-    <Compile Include="Classes\MathUtil\Matrix3x4d.cs" />
-    <Compile Include="Classes\MathUtil\Matrix4.cs" />
-    <Compile Include="Classes\MathUtil\Matrix4d.cs" />
-    <Compile Include="Classes\MathUtil\Matrix4x2.cs" />
-    <Compile Include="Classes\MathUtil\Matrix4x2d.cs" />
-    <Compile Include="Classes\MathUtil\Matrix4x3.cs" />
-    <Compile Include="Classes\MathUtil\Matrix4x3d.cs" />
-    <Compile Include="Classes\MathUtil\Quaternion.cs" />
-    <Compile Include="Classes\MathUtil\Quaterniond.cs" />
-    <Compile Include="Classes\MathUtil\Line.cs" />
-    <Compile Include="Classes\MathUtil\Vector2.cs" />
-    <Compile Include="Classes\MathUtil\Vector2d.cs" />
-    <Compile Include="Classes\MathUtil\Vector3.cs" />
-    <Compile Include="Classes\MathUtil\Vector3d.cs" />
-    <Compile Include="Classes\MathUtil\Vector4.cs" />
-    <Compile Include="Classes\MathUtil\Vector4d.cs" />
-    <Compile Include="Classes\SliderPathStuff\PathApproximator.cs" />
-    <Compile Include="Classes\SliderPathStuff\PathType.cs" />
-    <Compile Include="Classes\MathUtil\Precision.cs" />
-    <Compile Include="Classes\MathUtil\RNG.cs" />
-    <Compile Include="Classes\SliderPathStuff\SliderInterpreter.cs" />
-    <Compile Include="Classes\SliderPathStuff\SliderPath.cs" />
-    <Compile Include="Classes\BeatmapHelper\TValue.cs" />
-    <Compile Include="Classes\SystemTools\IOHelper.cs" />
-    <Compile Include="Classes\SystemTools\ProjectManager.cs" />
-    <Compile Include="Classes\SystemTools\ISavable.cs" />
-    <Compile Include="Classes\SystemTools\Settings.cs" />
-    <Compile Include="Classes\SystemTools\SettingsManager.cs" />
-    <Compile Include="Classes\SystemTools\TypeConverters.cs" />
-    <Compile Include="Classes\Tools\BezierConverter.cs" />
-    <Compile Include="Classes\Tools\CircleBezierPreset.cs" />
-    <Compile Include="Classes\Tools\MapCleaner.cs" />
-    <Compile Include="Components\Domain\CommandImplementation.cs" />
-    <Compile Include="Components\Domain\IsASCIIValidationRule.cs" />
-    <Compile Include="Components\Domain\VolumeToPercentageConverter.cs" />
-    <Compile Include="Components\Domain\HitsoundToStringConverter.cs" />
-    <Compile Include="Components\Domain\SampleSetToStringConverter.cs" />
-    <Compile Include="Components\Domain\ImportTypeToStringConverter.cs" />
-    <Compile Include="Components\Domain\ParsableDoubleListValidationRule.cs" />
-    <Compile Include="Components\Domain\DoubleToStringConverter.cs" />
-    <Compile Include="Components\TimeLine\TimeLine.xaml.cs">
+    <Compile Include="Classes/BeatmapHelper/BeatmapEditor.cs" />
+    <Compile Include="Classes/BeatmapHelper/StoryboardEditor.cs" />
+    <Compile Include="Classes/BeatmapHelper/ITextFile.cs" />
+    <Compile Include="Classes/BeatmapHelper/Storyboard.cs" />
+    <Compile Include="Classes/BeatmapHelper/StoryboardSoundSample.cs" />
+    <Compile Include="Classes/GenericExtensions.cs" />
+    <Compile Include="Classes/HitsoundStuff/DelayFadeOutSampleProvider.cs" />
+    <Compile Include="Classes/HitsoundStuff/Hitsound.cs" />
+    <Compile Include="Classes/HitsoundStuff/HitsoundLayerExtension.cs" />
+    <Compile Include="Classes/HitsoundStuff/HitsoundZone.cs" />
+    <Compile Include="Classes/HitsoundStuff/ImportReloadingArgs.cs" />
+    <Compile Include="Classes/HitsoundStuff/ImportReloadingArgsComparer.cs" />
+    <Compile Include="Classes/HitsoundStuff/ImportType.cs" />
+    <Compile Include="Classes/HitsoundStuff/LayerImportArgs.cs" />
+    <Compile Include="Classes/HitsoundStuff/SampleGeneratingArgs.cs" />
+    <Compile Include="Classes/HitsoundStuff/SampleImporter.cs" />
+    <Compile Include="Classes/HitsoundStuff/CompleteHitsounds.cs" />
+    <Compile Include="Classes/HitsoundStuff/CustomIndex.cs" />
+    <Compile Include="Classes/HitsoundStuff/HitsoundEvent.cs" />
+    <Compile Include="Classes/HitsoundStuff/HitsoundConverter.cs" />
+    <Compile Include="Classes/HitsoundStuff/HitsoundExporter.cs" />
+    <Compile Include="Classes/HitsoundStuff/HitsoundImporter.cs" />
+    <Compile Include="Classes/HitsoundStuff/HitsoundLayer.cs" />
+    <Compile Include="Classes/HitsoundStuff/Sample.cs" />
+    <Compile Include="Classes/HitsoundStuff/SamplePackage.cs" />
+    <Compile Include="Classes/HitsoundStuff/SampleSet.cs" />
+    <Compile Include="Classes/HitsoundStuff/SampleSoundGenerator.cs" />
+    <Compile Include="Classes/HitsoundStuff/SF2Extension.cs" />
+    <Compile Include="Classes/HitsoundStuff/VolumeBalancingArgs.cs" />
+    <Compile Include="Classes/MathUtil/Extensions.cs" />
+    <Compile Include="Classes/MathUtil/BezierCurve.cs" />
+    <Compile Include="Classes/MathUtil/BezierCurveCubic.cs" />
+    <Compile Include="Classes/MathUtil/BezierCurveQuadric.cs" />
+    <Compile Include="Classes/MathUtil/Box2.cs" />
+    <Compile Include="Classes/MathUtil/Box2d.cs" />
+    <Compile Include="Classes/MathUtil/CircleArc.cs" />
+    <Compile Include="Classes/MathUtil/MathHelper.cs" />
+    <Compile Include="Classes/MathUtil/Matrix2.cs" />
+    <Compile Include="Classes/MathUtil/Matrix2d.cs" />
+    <Compile Include="Classes/MathUtil/Matrix2x3.cs" />
+    <Compile Include="Classes/MathUtil/Matrix2x3d.cs" />
+    <Compile Include="Classes/MathUtil/Matrix2x4.cs" />
+    <Compile Include="Classes/MathUtil/Matrix2x4d.cs" />
+    <Compile Include="Classes/MathUtil/Matrix3.cs" />
+    <Compile Include="Classes/MathUtil/Matrix3d.cs" />
+    <Compile Include="Classes/MathUtil/Matrix3x2.cs" />
+    <Compile Include="Classes/MathUtil/Matrix3x2d.cs" />
+    <Compile Include="Classes/MathUtil/Matrix3x4.cs" />
+    <Compile Include="Classes/MathUtil/Matrix3x4d.cs" />
+    <Compile Include="Classes/MathUtil/Matrix4.cs" />
+    <Compile Include="Classes/MathUtil/Matrix4d.cs" />
+    <Compile Include="Classes/MathUtil/Matrix4x2.cs" />
+    <Compile Include="Classes/MathUtil/Matrix4x2d.cs" />
+    <Compile Include="Classes/MathUtil/Matrix4x3.cs" />
+    <Compile Include="Classes/MathUtil/Matrix4x3d.cs" />
+    <Compile Include="Classes/MathUtil/Quaternion.cs" />
+    <Compile Include="Classes/MathUtil/Quaterniond.cs" />
+    <Compile Include="Classes/MathUtil/Line.cs" />
+    <Compile Include="Classes/MathUtil/Vector2.cs" />
+    <Compile Include="Classes/MathUtil/Vector2d.cs" />
+    <Compile Include="Classes/MathUtil/Vector3.cs" />
+    <Compile Include="Classes/MathUtil/Vector3d.cs" />
+    <Compile Include="Classes/MathUtil/Vector4.cs" />
+    <Compile Include="Classes/MathUtil/Vector4d.cs" />
+    <Compile Include="Classes/SliderPathStuff/PathApproximator.cs" />
+    <Compile Include="Classes/SliderPathStuff/PathType.cs" />
+    <Compile Include="Classes/MathUtil/Precision.cs" />
+    <Compile Include="Classes/MathUtil/RNG.cs" />
+    <Compile Include="Classes/SliderPathStuff/SliderInterpreter.cs" />
+    <Compile Include="Classes/SliderPathStuff/SliderPath.cs" />
+    <Compile Include="Classes/BeatmapHelper/TValue.cs" />
+    <Compile Include="Classes/SystemTools/IOHelper.cs" />
+    <Compile Include="Classes/SystemTools/ProjectManager.cs" />
+    <Compile Include="Classes/SystemTools/ISavable.cs" />
+    <Compile Include="Classes/SystemTools/Settings.cs" />
+    <Compile Include="Classes/SystemTools/SettingsManager.cs" />
+    <Compile Include="Classes/SystemTools/TypeConverters.cs" />
+    <Compile Include="Classes/Tools/BezierConverter.cs" />
+    <Compile Include="Classes/Tools/CircleBezierPreset.cs" />
+    <Compile Include="Classes/Tools/MapCleaner.cs" />
+    <Compile Include="Components/Domain/CommandImplementation.cs" />
+    <Compile Include="Components/Domain/IsASCIIValidationRule.cs" />
+    <Compile Include="Components/Domain/VolumeToPercentageConverter.cs" />
+    <Compile Include="Components/Domain/HitsoundToStringConverter.cs" />
+    <Compile Include="Components/Domain/SampleSetToStringConverter.cs" />
+    <Compile Include="Components/Domain/ImportTypeToStringConverter.cs" />
+    <Compile Include="Components/Domain/ParsableDoubleListValidationRule.cs" />
+    <Compile Include="Components/Domain/DoubleToStringConverter.cs" />
+    <Compile Include="Components/TimeLine/TimeLine.xaml.cs">
       <DependentUpon>TimeLine.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Components\TimeLine\TimeLineElement.xaml.cs">
+    <Compile Include="Components/TimeLine/TimeLineElement.xaml.cs">
       <DependentUpon>TimeLineElement.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Components\TimeLine\TimeLineMark.xaml.cs">
+    <Compile Include="Components/TimeLine/TimeLineMark.xaml.cs">
       <DependentUpon>TimeLineMark.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Classes\Tools\TimingPointsChange.cs" />
-    <Compile Include="Viewmodels\CleanerVM.cs" />
-    <Compile Include="Viewmodels\HitsoundPreviewHelperVM.cs" />
-    <Compile Include="Viewmodels\HitsoundStudioVM.cs" />
-    <Compile Include="Viewmodels\HitsoundCopierVM.cs" />
-    <Compile Include="Viewmodels\MetadataManagerVM.cs" />
-    <Compile Include="Viewmodels\PropertyTransformerVM.cs" />
-    <Compile Include="Viewmodels\SnappingToolsVM.cs" />
-    <Compile Include="Viewmodels\SliderCompletionatorVM.cs" />
-    <Compile Include="Viewmodels\SliderMergerVM.cs" />
-    <Compile Include="Viewmodels\PreferencesVM.cs" />
-    <Compile Include="Viewmodels\StandardVM.cs" />
-    <Compile Include="Views\Extensions.cs" />
-    <Compile Include="Views\HitsoundPreviewHelper\HitsoundPreviewHelper.xaml.cs">
+    <Compile Include="Classes/Tools/TimingPointsChange.cs" />
+    <Compile Include="Viewmodels/CleanerVM.cs" />
+    <Compile Include="Viewmodels/HitsoundPreviewHelperVM.cs" />
+    <Compile Include="Viewmodels/HitsoundStudioVM.cs" />
+    <Compile Include="Viewmodels/HitsoundCopierVM.cs" />
+    <Compile Include="Viewmodels/MetadataManagerVM.cs" />
+    <Compile Include="Viewmodels/PropertyTransformerVM.cs" />
+    <Compile Include="Viewmodels/SnappingToolsVM.cs" />
+    <Compile Include="Viewmodels/SliderCompletionatorVM.cs" />
+    <Compile Include="Viewmodels/SliderMergerVM.cs" />
+    <Compile Include="Viewmodels/PreferencesVM.cs" />
+    <Compile Include="Viewmodels/StandardVM.cs" />
+    <Compile Include="Views/Extensions.cs" />
+    <Compile Include="Views/HitsoundPreviewHelper/HitsoundPreviewHelper.xaml.cs">
       <DependentUpon>HitsoundPreviewHelper.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\MetadataManager\MetadataManagerView.xaml.cs">
+    <Compile Include="Views/MetadataManager/MetadataManagerView.xaml.cs">
       <DependentUpon>MetadataManagerView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\TimingHelper\TimingHelperView.xaml.cs">
+    <Compile Include="Views/TimingHelper/TimingHelperView.xaml.cs">
       <DependentUpon>TimingHelperView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\PropertyTransformer\PropertyTransformerView.xaml.cs">
+    <Compile Include="Views/PropertyTransformer/PropertyTransformerView.xaml.cs">
       <DependentUpon>PropertyTransformerView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\HitsoundStudio\HitsoundStudioView.xaml.cs">
+    <Compile Include="Views/HitsoundStudio/HitsoundStudioView.xaml.cs">
       <DependentUpon>HitsoundStudioView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\HitsoundCopier\HitsoundCopierView.xaml.cs">
+    <Compile Include="Views/HitsoundCopier/HitsoundCopierView.xaml.cs">
       <DependentUpon>HitsoundCopierView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\SnappingTools\SnappingToolsView.xaml.cs">
+    <Compile Include="Views/SnappingTools/SnappingToolsView.xaml.cs">
       <DependentUpon>SnappingToolsView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\SliderCompletionator\SliderCompletionatorView.xaml.cs">
+    <Compile Include="Views/SliderCompletionator/SliderCompletionatorView.xaml.cs">
       <DependentUpon>SliderCompletionatorView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Preferences\PreferencesView.xaml.cs">
+    <Compile Include="Views/Preferences/PreferencesView.xaml.cs">
       <DependentUpon>PreferencesView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Standard\StandardView.xaml.cs">
+    <Compile Include="Views/Standard/StandardView.xaml.cs">
       <DependentUpon>StandardView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\MapCleaner\CleanerView.xaml.cs">
+    <Compile Include="Views/MapCleaner/CleanerView.xaml.cs">
       <DependentUpon>CleanerView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\SliderMerger\SliderMergerView.xaml.cs">
+    <Compile Include="Views/SliderMerger/SliderMergerView.xaml.cs">
       <DependentUpon>SliderMergerView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ViewCollection.cs" />
-    <Compile Include="Views\HitsoundStudio\HitsoundLayerImportWindow.xaml.cs">
+    <Compile Include="Views/ViewCollection.cs" />
+    <Compile Include="Views/HitsoundStudio/HitsoundLayerImportWindow.xaml.cs">
       <DependentUpon>HitsoundLayerImportWindow.xaml</DependentUpon>
     </Compile>
-    <Page Include="Components\TimeLine\TimeLine.xaml">
+    <Page Include="Components/TimeLine/TimeLine.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Components\TimeLine\TimeLineElement.xaml">
+    <Page Include="Components/TimeLine/TimeLineElement.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Components\TimeLine\TimeLineMark.xaml">
+    <Page Include="Components/TimeLine/TimeLineMark.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -319,104 +319,104 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Classes\BeatmapHelper\Beatmap.cs" />
-    <Compile Include="Classes\BeatmapHelper\Colour.cs" />
-    <Compile Include="Classes\BeatmapHelper\Editor.cs" />
-    <Compile Include="Classes\BeatmapHelper\HitObject.cs" />
-    <Compile Include="Classes\BeatmapHelper\Timeline.cs" />
-    <Compile Include="Classes\BeatmapHelper\TimelineObject.cs" />
-    <Compile Include="Classes\BeatmapHelper\Timing.cs" />
-    <Compile Include="Classes\BeatmapHelper\TimingPoint.cs" />
+    <Compile Include="Classes/BeatmapHelper/Beatmap.cs" />
+    <Compile Include="Classes/BeatmapHelper/Colour.cs" />
+    <Compile Include="Classes/BeatmapHelper/Editor.cs" />
+    <Compile Include="Classes/BeatmapHelper/HitObject.cs" />
+    <Compile Include="Classes/BeatmapHelper/Timeline.cs" />
+    <Compile Include="Classes/BeatmapHelper/TimelineObject.cs" />
+    <Compile Include="Classes/BeatmapHelper/Timing.cs" />
+    <Compile Include="Classes/BeatmapHelper/TimingPoint.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Views\HitsoundPreviewHelper\HitsoundPreviewHelper.xaml">
+    <Page Include="Views/HitsoundPreviewHelper/HitsoundPreviewHelper.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\MetadataManager\MetadataManagerView.xaml">
+    <Page Include="Views/MetadataManager/MetadataManagerView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\TimingHelper\TimingHelperView.xaml">
+    <Page Include="Views/TimingHelper/TimingHelperView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\PropertyTransformer\PropertyTransformerView.xaml">
+    <Page Include="Views/PropertyTransformer/PropertyTransformerView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\HitsoundStudio\HitsoundStudioView.xaml">
+    <Page Include="Views/HitsoundStudio/HitsoundStudioView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\HitsoundCopier\HitsoundCopierView.xaml">
+    <Page Include="Views/HitsoundCopier/HitsoundCopierView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\SnappingTools\SnappingToolsView.xaml">
+    <Page Include="Views/SnappingTools/SnappingToolsView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\SliderCompletionator\SliderCompletionatorView.xaml">
+    <Page Include="Views/SliderCompletionator/SliderCompletionatorView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Preferences\PreferencesView.xaml">
+    <Page Include="Views/Preferences/PreferencesView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Standard\StandardView.xaml">
+    <Page Include="Views/Standard/StandardView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\MapCleaner\CleanerView.xaml">
+    <Page Include="Views/MapCleaner/CleanerView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\SliderMerger\SliderMergerView.xaml">
+    <Page Include="Views/SliderMerger/SliderMergerView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\HitsoundStudio\HitsoundLayerImportWindow.xaml">
+    <Page Include="Views/HitsoundStudio/HitsoundLayerImportWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs">
+    <Compile Include="Properties/AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
+    <Compile Include="Properties/Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
+    <Compile Include="Properties/Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <EmbeddedResource Include="Properties\Resources.resx">
+    <EmbeddedResource Include="Properties/Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="packages.config" />
-    <None Include="Properties\Settings.settings">
+    <None Include="Properties/Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <AppDesigner Include="Properties\" />
+    <AppDesigner Include="Properties/" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Data\mt_icon.ico" />
+    <Resource Include="Data/mt_icon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Data\mt_logo_white_24.png" />
+    <Resource Include="Data/mt_logo_white_24.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
@@ -430,7 +430,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildToolsPath)/Microsoft.CSharp.targets" />
   <Target Name="BeforeBuild" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
