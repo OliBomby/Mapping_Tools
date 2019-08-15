@@ -343,9 +343,6 @@ namespace Mapping_Tools.Classes.Tools {
 
             // We don't do extensions in osu!
             HashSet<string> usedFilenames = new HashSet<string>(allFilenames.Select(o => Path.GetFileNameWithoutExtension(o)));
-            foreach (string filename in usedFilenames) {
-                Console.WriteLine($"Using sample {filename}");
-            }
 
             // Get the sound files
             var extList = new string[] { ".wav", ".ogg", ".mp3" };
@@ -357,8 +354,8 @@ namespace Mapping_Tools.Classes.Tools {
             foreach (FileInfo fi in sampleFiles) {
                 string extless = Path.GetFileNameWithoutExtension(fi.Name);
                 if (!(usedFilenames.Contains(extless) || BeatmapSkinnableSamples.Any(o => Regex.IsMatch(extless, o)))) {
-                    //fi.Delete();
-                    Console.WriteLine($"Deleting sample {fi.Name}");
+                    fi.Delete();
+                    //Console.WriteLine($"Deleting sample {fi.Name}");
                     removed++;
                 }
             }

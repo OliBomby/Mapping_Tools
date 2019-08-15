@@ -443,87 +443,91 @@ namespace Mapping_Tools.Views {
 
         private void Raise_Click(object sender, RoutedEventArgs e) {
             try {
-                suppressEvents = true;
+                int repeats = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) ? 10 : 1;
+                for (int n = 0; n < repeats; n++) {
+                    suppressEvents = true;
 
-                int selectedIndex = Settings.HitsoundLayers.IndexOf(selectedLayer);
-                List<HitsoundLayer> moveList = new List<HitsoundLayer>();
-                foreach (HitsoundLayer hsl in selectedLayers) {
-                    moveList.Add(hsl);
-                }
-
-                foreach (HitsoundLayer hsl in Settings.HitsoundLayers) {
-                    if (moveList.Contains(hsl)) {
-                        moveList.Remove(hsl);
+                    int selectedIndex = Settings.HitsoundLayers.IndexOf(selectedLayer);
+                    List<HitsoundLayer> moveList = new List<HitsoundLayer>();
+                    foreach (HitsoundLayer hsl in selectedLayers) {
+                        moveList.Add(hsl);
                     }
-                    else
-                        break;
+
+                    foreach (HitsoundLayer hsl in Settings.HitsoundLayers) {
+                        if (moveList.Contains(hsl)) {
+                            moveList.Remove(hsl);
+                        } else
+                            break;
+                    }
+
+                    foreach (HitsoundLayer hsl in moveList) {
+                        int index = Settings.HitsoundLayers.IndexOf(hsl);
+
+                        //Dont move left if it is the first item in the list or it is not in the list
+                        if (index <= 0)
+                            continue;
+
+                        //Swap with this item with the one to its left
+                        Settings.HitsoundLayers.Remove(hsl);
+                        Settings.HitsoundLayers.Insert(index - 1, hsl);
+                    }
+
+                    LayersList.SelectedItems.Clear();
+                    foreach (HitsoundLayer hsl in selectedLayers) {
+                        LayersList.SelectedItems.Add(hsl);
+                    }
+
+                    suppressEvents = false;
+
+                    RecalculatePriorities();
+                    GetSelectedLayers();
                 }
-
-                foreach (HitsoundLayer hsl in moveList) {
-                    int index = Settings.HitsoundLayers.IndexOf(hsl);
-
-                    //Dont move left if it is the first item in the list or it is not in the list
-                    if (index <= 0)
-                        continue;
-
-                    //Swap with this item with the one to its left
-                    Settings.HitsoundLayers.Remove(hsl);
-                    Settings.HitsoundLayers.Insert(index - 1, hsl);
-                }
-
-                LayersList.SelectedItems.Clear();
-                foreach (HitsoundLayer hsl in selectedLayers) {
-                    LayersList.SelectedItems.Add(hsl);
-                }
-
-                suppressEvents = false;
-
-                RecalculatePriorities();
-                GetSelectedLayers();
             } catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
         }
 
         private void Lower_Click(object sender, RoutedEventArgs e) {
             try {
-                suppressEvents = true;
+                int repeats = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) ? 10 : 1;
+                for (int n = 0; n < repeats; n++) {
+                    suppressEvents = true;
 
-                int selectedIndex = Settings.HitsoundLayers.IndexOf(selectedLayer);
-                List<HitsoundLayer> moveList = new List<HitsoundLayer>();
-                foreach (HitsoundLayer hsl in selectedLayers) {
-                    moveList.Add(hsl);
-                }
-
-                for (int i = Settings.HitsoundLayers.Count - 1; i >= 0; i--) {
-                    HitsoundLayer hsl = Settings.HitsoundLayers[i];
-                    if (moveList.Contains(hsl)) {
-                        moveList.Remove(hsl);
+                    int selectedIndex = Settings.HitsoundLayers.IndexOf(selectedLayer);
+                    List<HitsoundLayer> moveList = new List<HitsoundLayer>();
+                    foreach (HitsoundLayer hsl in selectedLayers) {
+                        moveList.Add(hsl);
                     }
-                    else
-                        break;
+
+                    for (int i = Settings.HitsoundLayers.Count - 1; i >= 0; i--) {
+                        HitsoundLayer hsl = Settings.HitsoundLayers[i];
+                        if (moveList.Contains(hsl)) {
+                            moveList.Remove(hsl);
+                        } else
+                            break;
+                    }
+
+                    for (int i = moveList.Count - 1; i >= 0; i--) {
+                        HitsoundLayer hsl = moveList[i];
+                        int index = Settings.HitsoundLayers.IndexOf(hsl);
+
+                        //Dont move left if it is the first item in the list or it is not in the list
+                        if (index >= Settings.HitsoundLayers.Count - 1)
+                            continue;
+
+                        //Swap with this item with the one to its left
+                        Settings.HitsoundLayers.Remove(hsl);
+                        Settings.HitsoundLayers.Insert(index + 1, hsl);
+                    }
+
+                    LayersList.SelectedItems.Clear();
+                    foreach (HitsoundLayer hsl in selectedLayers) {
+                        LayersList.SelectedItems.Add(hsl);
+                    }
+
+                    suppressEvents = false;
+
+                    RecalculatePriorities();
+                    GetSelectedLayers();
                 }
-
-                for (int i = moveList.Count - 1; i >= 0; i--) {
-                    HitsoundLayer hsl = moveList[i];
-                    int index = Settings.HitsoundLayers.IndexOf(hsl);
-
-                    //Dont move left if it is the first item in the list or it is not in the list
-                    if (index >= Settings.HitsoundLayers.Count - 1)
-                        continue;
-
-                    //Swap with this item with the one to its left
-                    Settings.HitsoundLayers.Remove(hsl);
-                    Settings.HitsoundLayers.Insert(index + 1, hsl);
-                }
-
-                LayersList.SelectedItems.Clear();
-                foreach (HitsoundLayer hsl in selectedLayers) {
-                    LayersList.SelectedItems.Add(hsl);
-                }
-
-                suppressEvents = false;
-
-                RecalculatePriorities();
-                GetSelectedLayers();
             } catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
         }
 
