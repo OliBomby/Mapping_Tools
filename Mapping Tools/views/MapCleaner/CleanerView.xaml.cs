@@ -11,6 +11,7 @@ using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Components.TimeLine;
 using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Views.Standard;
 
 namespace Mapping_Tools.Views {
     public partial class CleanerView :UserControl {
@@ -50,12 +51,13 @@ namespace Mapping_Tools.Views {
         }
 
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
-            if( e.Error != null ) {
-                MessageBox.Show(string.Format("{0}{1}{2}", e.Error.Message, Environment.NewLine, e.Error.StackTrace), "Error");
+            if (e.Error != null)
+            {
+                new MessageWindow(ErrorType.Error, eventArg: e).Show();
             }
-            else {
-                FillTimeLine();
-                MessageBox.Show(e.Result.ToString());
+            else
+            {
+                new MessageWindow(ErrorType.Success, e.Result.ToString()).Show();
                 progress.Value = 0;
             }
             start.IsEnabled = true;
@@ -84,27 +86,29 @@ namespace Mapping_Tools.Views {
         }
 
         private string Run_Program(Arguments args, BackgroundWorker worker, DoWorkEventArgs _) {
-            BeatmapEditor editor = new BeatmapEditor(args.Path);
 
-            List<TimingPoint> orgininalTimingPoints = new List<TimingPoint>();
-            foreach (TimingPoint tp in editor.Beatmap.BeatmapTiming.TimingPoints) { orgininalTimingPoints.Add(tp.Copy()); }
-            int oldTimingPointsCount = editor.Beatmap.BeatmapTiming.TimingPoints.Count;
+            throw new Exception("Because Person is dumb");
+            //BeatmapEditor editor = new BeatmapEditor(args.Path);
 
-            var result = MapCleaner.CleanMap(editor, args.CleanerArguments, worker);
+            //List<TimingPoint> orgininalTimingPoints = new List<TimingPoint>();
+            //foreach (TimingPoint tp in editor.Beatmap.BeatmapTiming.TimingPoints) { orgininalTimingPoints.Add(tp.Copy()); }
+            //int oldTimingPointsCount = editor.Beatmap.BeatmapTiming.TimingPoints.Count;
 
-            List<TimingPoint> newTimingPoints = editor.Beatmap.BeatmapTiming.TimingPoints;
-            Monitor_Differences(orgininalTimingPoints, newTimingPoints);
+            //var result = MapCleaner.CleanMap(editor, args.CleanerArguments, worker);
 
-            // Save the file
-            editor.SaveFile();
+            //List<TimingPoint> newTimingPoints = editor.Beatmap.BeatmapTiming.TimingPoints;
+            //Monitor_Differences(orgininalTimingPoints, newTimingPoints);
+
+            //// Save the file
+            //editor.SaveFile();
             
 
-            // Make an accurate message
-            int removed = oldTimingPointsCount - editor.Beatmap.BeatmapTiming.TimingPoints.Count;
-            string message = $"Successfully {(removed < 0 ? "added" : "removed")} {Math.Abs(removed)} {(Math.Abs(removed) == 1 ? "greenline" : "greenlines")}" +
-                (args.CleanerArguments.ResnapObjects ? $" and resnapped {result.ObjectsResnapped} {(result.ObjectsResnapped == 1 ? "object" : "objects")}" : "") + 
-                (args.CleanerArguments.RemoveUnusedSamples ? $" and removed {result.SamplesRemoved} unused {(result.SamplesRemoved == 1 ? "sample" : "samples")}" : "") + "!";
-            return message;
+            //// Make an accurate message
+            //int removed = oldTimingPointsCount - editor.Beatmap.BeatmapTiming.TimingPoints.Count;
+            //string message = $"Successfully {(removed < 0 ? "added" : "removed")} {Math.Abs(removed)} {(Math.Abs(removed) == 1 ? "greenline" : "greenlines")}" +
+            //    (args.CleanerArguments.ResnapObjects ? $" and resnapped {result.ObjectsResnapped} {(result.ObjectsResnapped == 1 ? "object" : "objects")}" : "") + 
+            //    (args.CleanerArguments.RemoveUnusedSamples ? $" and removed {result.SamplesRemoved} unused {(result.SamplesRemoved == 1 ? "sample" : "samples")}" : "") + "!";
+            //return message;
         }
 
         private void Monitor_Differences(List<TimingPoint> originalTimingPoints, List<TimingPoint> newTimingPoints) {

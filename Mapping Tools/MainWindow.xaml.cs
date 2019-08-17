@@ -17,6 +17,7 @@ using System.Drawing;
 using System.Reflection;
 using System.Linq;
 using System.Net.Http;
+using Mapping_Tools.Views.Standard;
 
 namespace Mapping_Tools {
     public partial class MainWindow : Window {
@@ -370,7 +371,8 @@ namespace Mapping_Tools {
         //Open info screen
         private void OpenInfo(object sender, RoutedEventArgs e) {
             Version version = Assembly.GetEntryAssembly().GetName().Version;
-            System.Windows.MessageBox.Show(string.Format("Mapping Tools {0}\n\nMade by:\nOliBomby\nPotoofu", version.ToString()), "Info");
+            
+            new MessageWindow(ErrorType.Success, $"Mapping Tools {version.ToString()}\n\nMade by:\nOliBomby\nPotoofu\nCoppertine", title: "Info").Show();
         }
 
         //Change top right icons on changed window state and set state variable

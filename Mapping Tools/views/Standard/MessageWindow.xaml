@@ -6,8 +6,8 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         Title="Message" 
-        Height="164.998" 
-        Width="293.329"
+        Height="230.248" 
+        Width="409.329"
         WindowStyle="None"
         ResizeMode="CanResize"
         AllowsTransparency="False"
@@ -25,33 +25,35 @@
 
     </Window.Resources>
     <Grid>
+        
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            
         </Grid.RowDefinitions>
 
-        <Grid VerticalAlignment="Top" Grid.Row="0">
+        <Grid VerticalAlignment="Top" Grid.Row="0" Height="31" Margin="0,0,0.2,0">
+            <Label Margin="0,0,-0.4,4.2" x:Name="MessageTitle" FontSize="17">Message</Label>
             <StackPanel WindowChrome.IsHitTestVisibleInChrome="true" Height="35" VerticalAlignment="Top" HorizontalAlignment="Right" Orientation="Horizontal">
                 <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowCLose}" Click="CloseWin" HorizontalAlignment="Right" Height="35" Foreground="{DynamicResource MaterialDesignBody}"/>
             </StackPanel>
-            <Label Margin="0,0,-0.4,4.2">Message</Label>
+
         </Grid>
         <Grid Grid.Row="1">
             <StackPanel>
-                <TextBlock HorizontalAlignment="Left" Margin="5,5,0,0" FontSize="12" FontWeight="Light" TextWrapping="Wrap" Text="Informational Message Here Because nothing else would appear if there isn't anything that would show right?" VerticalAlignment="Top" Height="Auto" Width="279"/>
-        
-                <Expander Header="Show Error Details"  VerticalAlignment="Top" HorizontalAlignment="Left" IsExpanded="False" FontSize="10" Style="{StaticResource MainViewExpander}" Foreground="White">
-                    <TextBlock Background="LightSlateGray" Height="Auto" Width="Auto">
+                <TextBlock x:Name="MessageText"  HorizontalAlignment="Left" Margin="5,5,0,0" FontSize="18" FontWeight="Light" TextWrapping="Wrap" Text="Informational Message Here Because nothing else would appear if there isn't anything that would show right?" VerticalAlignment="Top" Height="Auto" Width="Auto"/>
+
+                <Expander x:Name="ErrorExpander" Header="Show Error Details"  VerticalAlignment="Top" HorizontalAlignment="Left" IsExpanded="False" FontSize="10" Style="{StaticResource MainViewExpander}" Foreground="White">
+                    <TextBlock x:Name="ExceptionDetails" Background="LightSlateGray" Height="Auto" Width="Auto" TextWrapping="Wrap">
 
                     </TextBlock>
                 </Expander>
             </StackPanel>
         </Grid>
 
-        <!--<Border Name="window_border" BorderThickness="1" Grid.RowSpan="3" Background="{x:Null}" BorderBrush="{DynamicResource PrimaryHueDarkBrush}">
-        </Border>-->
+        <Border Name="window_border" BorderThickness="1" Grid.RowSpan="3" Background="{x:Null}" BorderBrush="{DynamicResource PrimaryHueDarkBrush}" />
     </Grid>
+    
+
 </Window>
     
 

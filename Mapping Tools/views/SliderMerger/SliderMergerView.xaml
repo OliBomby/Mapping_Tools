@@ -36,7 +36,9 @@
                 <TextBox x:Name="LeniencyBox" Width="258" HorizontalAlignment="Left" Text="2" Margin="0,20,0,0"
                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Merge connection leniency"/>
                 <CheckBox x:Name="ReqBookmBox" FontSize="14" IsChecked="True" Content="Require bookmarks" Margin="0,26,0,0"/>
+                <StackPanel x:Name="ov_host"/>
             </StackPanel>
+            
 
             <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
                 <Button
