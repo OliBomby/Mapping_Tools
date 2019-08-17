@@ -264,9 +264,11 @@ namespace Mapping_Tools.Classes.Tools {
                         List<string> newSamples = tlo.GetFirstPlayingFilenames(mode, mapDir, firstSamples);
                         if (nativeSamples.SequenceEqual(newSamples)) {
                             // Index changes dont change sound
-                            ind = false;
+                            tp.SampleIndex = newIndex;
+                        } else {
+                            tp.SampleIndex = oldIndex;
                         }
-                        tp.SampleIndex = oldIndex;
+                        
                         tlo.GiveHitsoundTimingPoint(tp);
                     }
 

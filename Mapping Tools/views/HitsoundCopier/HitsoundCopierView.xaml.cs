@@ -410,9 +410,10 @@ namespace Mapping_Tools.Views {
                             List<string> newSamples = tloTo.GetFirstPlayingFilenames(mode, mapDir, firstSamples);
                             if (nativeSamples.SequenceEqual(newSamples)) {
                                 // Sampleset changes dont change sound
-                                holdSampleset = false;
+                                tp.SampleSet = newSampleSet;
+                            } else {
+                                tp.SampleSet = oldSampleSet;
                             }
-                            tp.SampleSet = oldSampleSet;
                         }
                         if (holdIndex) {
 
@@ -431,9 +432,10 @@ namespace Mapping_Tools.Views {
                             List<string> newSamples = tloTo.GetFirstPlayingFilenames(mode, mapDir, firstSamples);
                             if (nativeSamples.SequenceEqual(newSamples)) {
                                 // Index changes dont change sound
-                                holdIndex = false;
+                                tp.SampleIndex = newIndex;
+                            } else {
+                                tp.SampleIndex = oldIndex;
                             }
-                            tp.SampleIndex = oldIndex;
                         }
                         tloTo.GiveHitsoundTimingPoint(tp);
                     }
