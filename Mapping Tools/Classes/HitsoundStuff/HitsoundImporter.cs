@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Globalization;
+using System.Windows;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     class HitsoundImporter {
@@ -43,6 +44,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 .Where(n => extList.Contains(Path.GetExtension(n), StringComparer.OrdinalIgnoreCase)).ToList();
 
             Dictionary<string, string> dict = new Dictionary<string, string>();
+            bool error = false;
             
             // Compare all samples to find ones with the same data
             for (int i = 0; i < samplePaths.Count; i++) {
@@ -53,18 +55,27 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         
                         if (thisLength != otherLength) { continue; }
 
-                        using (var thisWave = SampleImporter.OpenSample(samplePaths[i])) {
-                            using (var otherWave = SampleImporter.OpenSample(samplePaths[k])) {
-                                if (thisWave.Length != otherWave.Length) { continue; }
+                        try {
+                            using (var thisWave = SampleImporter.OpenSample(samplePaths[i])) {
+                                using (var otherWave = SampleImporter.OpenSample(samplePaths[k])) {
+                                    if (thisWave.Length != otherWave.Length) { continue; }
 
-                                byte[] thisBuffer = new byte[thisWave.Length];
-                                thisWave.Read(thisBuffer, 0, (int)thisWave.Length);
+                                    byte[] thisBuffer = new byte[thisWave.Length];
+                                    thisWave.Read(thisBuffer, 0, (int)thisWave.Length);
 
-                                byte[] otherBuffer = new byte[otherWave.Length];
-                                otherWave.Read(otherBuffer, 0, (int)otherWave.Length);
+                                    byte[] otherBuffer = new byte[otherWave.Length];
+                                    otherWave.Read(otherBuffer, 0, (int)otherWave.Length);
 
-                                if (!thisBuffer.SequenceEqual(otherBuffer)) { continue; }
+                                    if (!thisBuffer.SequenceEqual(otherBuffer)) { continue; }
+                                }
                             }
+                        } catch (Exception ex) {
+                            // Something went wrong reading the samples. I'll just assume they weren't the same
+                            if (!error) {
+                                MessageBox.Show($"Exception '{ex.Message}' while trying to analyze samples.");
+                                error = true;
+                            }
+                            continue;
                         }
                     }
                     
