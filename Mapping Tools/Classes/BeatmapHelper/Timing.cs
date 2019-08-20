@@ -19,7 +19,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public void Sort() {
-            TimingPoints = TimingPoints.OrderBy(o => o.Offset).ToList();
+            TimingPoints = TimingPoints.OrderBy(o => o.Offset).ThenByDescending(o => o.Inherited).ToList();
         }
 
         public static double GetNearestTimeMeter(double time, TimingPoint tp, int divisor) {
@@ -141,8 +141,21 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return GetRedlineAtTime(time).MpB;
         }
 
-        public TimingPoint GetRedlineAtTime(double time) {
+        public TimingPoint GetGreenlineAtTime(double time) {
             TimingPoint lastTP = GetFirstTimingPointExtended();
+            foreach (TimingPoint tp in TimingPoints) {
+                if (Precision.DefinitelyBigger(tp.Offset, time)) {
+                    return lastTP;
+                }
+                if (!tp.Inherited) {
+                    lastTP = tp;
+                }
+            }
+            return lastTP;
+        }
+
+        public TimingPoint GetRedlineAtTime(double time, TimingPoint firstTimingPoint=null) {
+            TimingPoint lastTP = firstTimingPoint ?? GetFirstTimingPointExtended();
             foreach( TimingPoint tp in TimingPoints ) {
                 if( Precision.DefinitelyBigger(tp.Offset, time) ) {
                     return lastTP;
@@ -216,6 +229,16 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 }
             }
             return redlines;
+        }
+
+        public List<TimingPoint> GetAllGreenlines() {
+            List<TimingPoint> greenlines = new List<TimingPoint>();
+            foreach (TimingPoint tp in TimingPoints) {
+                if (!tp.Inherited) {
+                    greenlines.Add(tp);
+                }
+            }
+            return greenlines;
         }
 
         public List<TimingPoint> GetTimingPoints(List<string> lines) {

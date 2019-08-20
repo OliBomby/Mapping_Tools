@@ -94,6 +94,7 @@
                         <MenuItem Header="_Property Transformer" Click="LoadPropertyTransformer"/>
                         <MenuItem Header="_Slider Merger" Click="LoadMerger"/>
                         <MenuItem Header="_Slider Completionator" Click="LoadCompletionator"/>
+                        <MenuItem Header="_Timing Copier" Click="LoadTimingCopier"/>
                         <MenuItem Header="_Timing Helper" Click="LoadTimingHelper"/>
                         <MenuItem Header="_Hitsound Copier" Click="LoadHSCopier"/>
                         <MenuItem Header="_Hitsound Studio" Click="LoadHSStudio"/>

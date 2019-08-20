@@ -88,11 +88,6 @@ namespace Mapping_Tools.Views {
                 }
             }
 
-            // Complete progressbar
-            if (worker != null && worker.WorkerReportsProgress) {
-                worker.ReportProgress(100);
-            }
-
             // Make an accurate message
             string message = string.Format("Successfully exported metadata to {0} {1}!", mapsDone, mapsDone == 1 ? "beatmap" : "beatmaps");
             return message;

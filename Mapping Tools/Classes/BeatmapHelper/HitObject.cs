@@ -246,7 +246,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public void SetValues(string[] values) {
-            Console.WriteLine(values.Length);
             Pos = new Vector2(ParseDouble(values[0]), ParseDouble(values[1]));
             Time = ParseDouble(values[2]);
             ObjectType = int.Parse(values[3]);

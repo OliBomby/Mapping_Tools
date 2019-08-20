@@ -231,6 +231,7 @@
     <Compile Include="Classes\Tools\MapCleaner.cs" />
     <Compile Include="Components\Domain\CommandImplementation.cs" />
     <Compile Include="Components\Domain\IsASCIIValidationRule.cs" />
+    <Compile Include="Components\Domain\SnapDivisorToStringConverter.cs" />
     <Compile Include="Components\Domain\VolumeToPercentageConverter.cs" />
     <Compile Include="Components\Domain\HitsoundToStringConverter.cs" />
     <Compile Include="Components\Domain\SampleSetToStringConverter.cs" />
@@ -251,6 +252,7 @@
     <Compile Include="Viewmodels\HitsoundPreviewHelperVM.cs" />
     <Compile Include="Viewmodels\HitsoundStudioVM.cs" />
     <Compile Include="Viewmodels\HitsoundCopierVM.cs" />
+    <Compile Include="Viewmodels\TimingCopierVM.cs" />
     <Compile Include="Viewmodels\MetadataManagerVM.cs" />
     <Compile Include="Viewmodels\PropertyTransformerVM.cs" />
     <Compile Include="Viewmodels\SnappingToolsVM.cs" />
@@ -259,6 +261,9 @@
     <Compile Include="Viewmodels\PreferencesVM.cs" />
     <Compile Include="Viewmodels\StandardVM.cs" />
     <Compile Include="Views\Extensions.cs" />
+    <Compile Include="Views\TimingCopier\TimingCopierView.xaml.cs">
+      <DependentUpon>TimingCopierView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\HitsoundPreviewHelper\HitsoundPreviewHelper.xaml.cs">
       <DependentUpon>HitsoundPreviewHelper.xaml</DependentUpon>
     </Compile>
@@ -331,6 +336,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\TimingCopier\TimingCopierView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\HitsoundPreviewHelper\HitsoundPreviewHelper.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
