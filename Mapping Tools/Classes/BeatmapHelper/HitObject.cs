@@ -176,24 +176,24 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
-        public bool ResnapSelf(Timing timing, int snap1, int snap2) {
-            double newTime = GetResnappedTime(timing, snap1, snap2);
+        public bool ResnapSelf(Timing timing, int snap1, int snap2, bool floor=true, TimingPoint tp=null) {
+            double newTime = GetResnappedTime(timing, snap1, snap2, floor, tp);
             double deltaTime = newTime - Time;
             MoveTime(deltaTime);
             return deltaTime != 0;
         }
 
-        public bool ResnapEnd(Timing timing, int snap1, int snap2) {
+        public bool ResnapEnd(Timing timing, int snap1, int snap2, bool floor = true, TimingPoint tp = null) {
             // If there is a redline in the sliderbody then the sliderend gets snapped to a tick of the latest redline
             if (!IsSlider || timing.TimingPoints.Any(o => o.Inherited && o.Offset <= EndTime + 20 && o.Offset > Time)) {
-                return ResnapEndTime(timing, snap1, snap2);
+                return ResnapEndTime(timing, snap1, snap2, floor, tp);
             } else {
-                return ResnapEndClassic(timing, snap1, snap2);
+                return ResnapEndClassic(timing, snap1, snap2, tp);
             }
         }
 
-        public bool ResnapEndTime(Timing timing, int snap1, int snap2) {
-            double newTime = timing.Resnap(EndTime, snap1, snap2);
+        public bool ResnapEndTime(Timing timing, int snap1, int snap2, bool floor = true, TimingPoint tp = null) {
+            double newTime = timing.Resnap(EndTime, snap1, snap2, floor, tp);
             double deltaTime = newTime - EndTime;
             MoveEndTime(timing, deltaTime);
 
@@ -215,9 +215,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return false;
         }
 
-        public bool ResnapEndClassic(Timing timing, int snap1, int snap2) {
+        public bool ResnapEndClassic(Timing timing, int snap1, int snap2, TimingPoint firstTP = null) {
             // Temporal length is n times a snap divisor length
-            TimingPoint tp = timing.GetRedlineAtTime(Time);
+            TimingPoint tp = timing.GetRedlineAtTime(Time, firstTP);
 
             double newTemporalLength1 = Timing.GetNearestMultiple(TemporalLength, tp.MpB / snap1);
             double snapDistance1 = Math.Abs(TemporalLength - newTemporalLength1);
@@ -233,8 +233,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return deltaTime != 0;
         }
 
-        public double GetResnappedTime(Timing timing, int snap1, int snap2, bool floor=true) {
-            return timing.Resnap(Time, snap1, snap2, floor);
+        public double GetResnappedTime(Timing timing, int snap1, int snap2, bool floor=true, TimingPoint tp=null) {
+            return timing.Resnap(Time, snap1, snap2, floor, tp);
         }
 
         public void SetLine(string line) {

@@ -115,14 +115,13 @@ namespace Mapping_Tools.Views {
                 if (arg.ResnapMode == "Number of beats between objects stays the same") {
                     redlines = timingTo.GetAllRedlines();
                     List<double> newBookmarks = new List<double>();
-                    Marker lastMarker = new Marker(redlines.FirstOrDefault().Offset);
+                    double lastTime = redlines.FirstOrDefault().Offset;
                     foreach (Marker marker in markers) {
                         // Get redlines between this and last marker
-                        TimingPoint redline = timingTo.GetRedlineAtTime(lastMarker.GetTime(), redlines.FirstOrDefault());
+                        TimingPoint redline = timingTo.GetRedlineAtTime(lastTime, redlines.FirstOrDefault());
 
                         double timeFromLastMarker = 0;
                         double beatsFromLastMarker = marker.BeatsFromLastMarker;
-                        double lastTime = lastMarker.GetTime();
 
                         while (true) {
                             List<TimingPoint> redlinesBetween = redlines.Where(o => o.Offset < lastTime + redline.MpB * beatsFromLastMarker && o.Offset > lastTime).ToList();
@@ -139,35 +138,36 @@ namespace Mapping_Tools.Views {
                         }
                         timeFromLastMarker += redline.MpB * beatsFromLastMarker;
 
-                        double newTime = lastMarker.GetTime() + timeFromLastMarker;
+                        double newTime = lastTime + timeFromLastMarker;
+                        marker.Time = newTime;
 
-                        // Set the variable
-                        if (marker.Object is double) {
-                            newBookmarks.Add(newTime);
-                        }
-                        else if (marker.Object is HitObject) {
-                            ((HitObject)marker.Object).Time = newTime;
-                        }
-                        else if (marker.Object is TimingPoint) {
-                            ((TimingPoint)marker.Object).Offset = newTime;
-                        }
-
-                        lastMarker = marker;
+                        lastTime = marker.Time;
                     }
                     foreach (Marker marker in markers) {
-                        double newTime = timingTo.Resnap(marker.GetTime(), 16, 12);
+                        double newTime = timingTo.Resnap(marker.Time, arg.Snap1, arg.Snap2, tp: redlines.FirstOrDefault());
 
                         // Set the variable
                         if (marker.Object is double) {
-                            newBookmarks.Add(newTime);
+                            // Don't resnap bookmarks
+                            newBookmarks.Add((double)marker.Object);
                         } else if (marker.Object is HitObject) {
                             ((HitObject)marker.Object).Time = newTime;
                         } else if (marker.Object is TimingPoint) {
                             ((TimingPoint)marker.Object).Offset = newTime;
                         }
                     }
+                    beatmapTo.SetBookmarks(newBookmarks);
                 } else if (arg.ResnapMode == "Just resnap") {
-                    MapCleaner.CleanMap(editorTo, new MapCleaner.MapCleanerArgs(true, true, true, true, false, false, false, false, arg.Snap1, arg.Snap2), worker);
+                    // Resnap hitobjects
+                    foreach (HitObject ho in beatmapTo.HitObjects) {
+                        ho.ResnapSelf(timingTo, arg.Snap1, arg.Snap2, tp: redlines.FirstOrDefault());
+                        ho.ResnapEnd(timingTo, arg.Snap1, arg.Snap2, tp: redlines.FirstOrDefault());
+                    }
+
+                    // Resnap greenlines
+                    foreach (TimingPoint tp in timingTo.GetAllGreenlines()) {
+                        tp.ResnapSelf(timingTo, arg.Snap1, arg.Snap2, tp: redlines.FirstOrDefault());
+                    }
                 } else {
                     // Don't move objects
                 }
@@ -201,30 +201,29 @@ namespace Mapping_Tools.Views {
             }
 
             // Sort the markers
-            markers.OrderBy(o => o.GetTime());
+            markers = markers.OrderBy(o => o.Time).ToList();
 
             // Calculate the beats between this marker and the last marker
             // If there is a redline in between then calculate beats from last marker to the redline and beats from redline to this marker
             // Time the same is 0
-            Marker lastMarker = new Marker(redlines.FirstOrDefault().Offset);
+            double lastTime = redlines.FirstOrDefault().Offset;
             foreach (Marker marker in markers) {
                 // Get redlines between this and last marker
-                List<TimingPoint> redlinesBetween = redlines.Where(o => o.Offset < marker.GetTime() && o.Offset > lastMarker.GetTime()).ToList();
-                TimingPoint redline = timing.GetRedlineAtTime(lastMarker.GetTime());
+                List<TimingPoint> redlinesBetween = redlines.Where(o => o.Offset < marker.Time && o.Offset > lastTime).ToList();
+                TimingPoint redline = timing.GetRedlineAtTime(lastTime);
 
                 double beatsFromLastMarker = 0;
-                double lastTime = lastMarker.GetTime();
                 foreach (TimingPoint redlineBetween in redlinesBetween) {
                     beatsFromLastMarker += (redlineBetween.Offset - lastTime) / redline.MpB;
                     redline = redlineBetween;
                     lastTime = redlineBetween.Offset;
                 }
-                beatsFromLastMarker += (marker.GetTime() - lastTime) / redline.MpB;
+                beatsFromLastMarker += (marker.Time - lastTime) / redline.MpB;
 
                 // Set the variable
                 marker.BeatsFromLastMarker = beatsFromLastMarker;
 
-                lastMarker = marker;
+                lastTime = marker.Time;
             }
 
             return markers;
@@ -234,23 +233,32 @@ namespace Mapping_Tools.Views {
         {
             public object Object { get; set; }
             public double BeatsFromLastMarker { get; set; }
-
-            public Marker(object obj) {
-                Object = obj;
-                BeatsFromLastMarker = 0;
-            }
+            public double Time { get => GetTime(); set => SetTime(value); }
 
             public double GetTime() {
                 if (Object is double) {
                     return (double)Object;
-                }
-                else if (Object is HitObject) {
+                } else if (Object is HitObject) {
                     return ((HitObject)Object).Time;
-                }
-                else if (Object is TimingPoint) {
+                } else if (Object is TimingPoint) {
                     return ((TimingPoint)Object).Offset;
                 }
-                return 0;
+                return -1;
+            }
+
+            private void SetTime(double value) {
+                if (Object is double) {
+                    Object = value;
+                } else if (Object is HitObject) {
+                    ((HitObject)Object).Time = value;
+                } else if (Object is TimingPoint) {
+                    ((TimingPoint)Object).Offset = value;
+                }
+            }
+
+            public Marker(object obj) {
+                Object = obj;
+                BeatsFromLastMarker = 0;
             }
         }
 

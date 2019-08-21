@@ -37,7 +37,7 @@
                       <LineBreak/>
                       There are 3 modes that describe how this program will handle moving objects (hitobjects/timingpoints/bookmarks) to the new timing:
                       <LineBreak/>
-                      "Number of beats between objects stays the same" will move the objects so that the number of beats between objects stays the same. Make sure everything is snapped and don't use this if your new timing is supposed to change the number of beats between objects.
+                      "Number of beats between objects stays the same" will move the objects so that the number of beats between objects stays the same. After that it will also resnap to the specified snap divisors. Make sure everything is snapped and don't use this if your new timing is supposed to change the number of beats between objects.
                       <LineBreak/>
                       "Just resnap" will snap the objects to the new timing on the specified snap divisors. This doesn't resnap bookmarks.
                       <LineBreak/>

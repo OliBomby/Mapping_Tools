@@ -38,8 +38,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return new TimingPoint(Offset, MpB, Meter, SampleSet, SampleIndex, Volume, Inherited, Kiai, OmitFirstBarLine);
         }
 
-        public bool ResnapSelf(Timing timing, int snap1, int snap2) {
-            double newTime = timing.Resnap(Offset, snap1, snap2);
+        public bool ResnapSelf(Timing timing, int snap1, int snap2, bool floor=true, TimingPoint tp=null) {
+            double newTime = timing.Resnap(Offset, snap1, snap2, floor, tp);
             double deltaTime = newTime - Offset;
             Offset += deltaTime;
             return deltaTime != 0;
