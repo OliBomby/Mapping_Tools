@@ -111,8 +111,10 @@ namespace Mapping_Tools.Views {
             bool muteSliderends = arg.MuteSliderends;
             bool doMutedIndex = arg.MutedIndex >= 0;
 
+            string[] paths = arg.PathTo.Split('|');
+            int mapsDone = 0;
 
-            foreach (string pathTo in arg.PathTo.Split('|')) {
+            foreach (string pathTo in paths) {
                 BeatmapEditor editorTo = new BeatmapEditor(pathTo);
                 BeatmapEditor editorFrom = new BeatmapEditor(arg.PathFrom);
 
@@ -342,10 +344,9 @@ namespace Mapping_Tools.Views {
                 // Save the file
                 editorTo.SaveFile();
 
-                // Complete progressbar
-                if (worker != null && worker.WorkerReportsProgress)
-                {
-                    worker.ReportProgress(100);
+                // Update progressbar
+                if (worker != null && worker.WorkerReportsProgress) {
+                    worker.ReportProgress(++mapsDone * 100 / paths.Length);
                 }
             }
 
