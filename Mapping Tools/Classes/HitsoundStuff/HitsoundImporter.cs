@@ -98,7 +98,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Beatmap beatmap = editor.Beatmap;
             Timeline timeline = beatmap.GetTimeline();
 
-            int mode = beatmap.General["Mode"].Value;
+            GameMode mode = (GameMode)beatmap.General["Mode"].Value;
             string mapDir = editor.GetBeatmapFolder();
             Dictionary<string, string> firstSamples = AnalyzeSamples(mapDir);
 

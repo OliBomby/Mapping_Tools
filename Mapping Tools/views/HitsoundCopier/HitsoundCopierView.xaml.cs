@@ -194,7 +194,7 @@ namespace Mapping_Tools.Views {
                     Timeline tlFrom = beatmapFrom.GetTimeline();
 
                     List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
-                    int mode = beatmapTo.General["Mode"].Value;
+                    GameMode mode = (GameMode)beatmapTo.General["Mode"].Value;
                     string mapDir = editorTo.GetBeatmapFolder();
                     Dictionary<string, string> firstSamples = HitsoundImporter.AnalyzeSamples(mapDir);
 
@@ -254,7 +254,7 @@ namespace Mapping_Tools.Views {
                     Dictionary<string, string> firstSamples = HitsoundImporter.AnalyzeSamples(mapDir, true);
 
                     var samplesTo = new HashSet<StoryboardSoundSample>(beatmapTo.StoryboardSoundSamples);
-                    int mode = beatmapTo.General["Mode"].Value;
+                    GameMode mode = (GameMode)beatmapTo.General["Mode"].Value;
 
                     foreach (StoryboardSoundSample sampleFrom in beatmapFrom.StoryboardSoundSamples)
                     {
@@ -368,7 +368,7 @@ namespace Mapping_Tools.Views {
             }
         }
 
-        private void CopyHitsounds(Arguments arg, Timeline tlFrom, Timeline tlTo, List<TimingPointsChange> timingPointsChanges, int mode, string mapDir, Dictionary<string, string> firstSamples) {
+        private void CopyHitsounds(Arguments arg, Timeline tlFrom, Timeline tlTo, List<TimingPointsChange> timingPointsChanges, GameMode mode, string mapDir, Dictionary<string, string> firstSamples) {
             foreach (TimelineObject tloFrom in tlFrom.TimeLineObjects) {
                 TimelineObject tloTo = tlTo.GetNearestTLO(tloFrom.Time, true);
 

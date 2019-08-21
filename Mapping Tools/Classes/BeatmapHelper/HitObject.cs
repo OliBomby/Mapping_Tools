@@ -200,8 +200,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return deltaTime != 0;
         }
 
-        public bool ResnapPosition(int mode, double circleSize) {
-            if (mode == 3) {
+        public bool ResnapPosition(GameMode mode, double circleSize) {
+            if (mode == GameMode.Mania) {
                 // Resnap X to the middle of the columns and Y to 192
                 double dist = 512d / Math.Round(circleSize);
                 double hdist = dist / 2;

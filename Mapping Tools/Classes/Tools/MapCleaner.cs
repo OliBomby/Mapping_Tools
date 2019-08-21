@@ -63,7 +63,7 @@ namespace Mapping_Tools.Classes.Tools {
             Timing timing = beatmap.BeatmapTiming;
             Timeline timeline = beatmap.GetTimeline();
 
-            int mode = beatmap.General["Mode"].Value;
+            GameMode mode = (GameMode)beatmap.General["Mode"].Value;
             double circleSize = beatmap.Difficulty["CircleSize"].Value;
             string mapDir = editor.GetBeatmapFolder();
             Dictionary<string, string> firstSamples = HitsoundImporter.AnalyzeSamples(mapDir);
@@ -151,7 +151,7 @@ namespace Mapping_Tools.Classes.Tools {
             UpdateProgressBar(worker, 55);
 
             // Add SV changes for taiko and mania
-            if (mode == 1 || mode == 3) {
+            if (mode == GameMode.Taiko || mode == GameMode.Mania) {
                 foreach (TimingPoint tp in svChanges) {
                     timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true));
                 }
@@ -207,7 +207,7 @@ namespace Mapping_Tools.Classes.Tools {
                 if (tlo.Origin.IsCircle) {
                     tlo.Origin.SampleSet = tlo.FenoSampleSet;
                     tlo.Origin.AdditionSet = tlo.FenoAdditionSet;
-                    if (mode == 3) {
+                    if (mode == GameMode.Mania) {
                         tlo.Origin.CustomIndex = tlo.FenoCustomIndex;
                         tlo.Origin.SampleVolume = tlo.FenoSampleVolume;
                     }
@@ -308,7 +308,7 @@ namespace Mapping_Tools.Classes.Tools {
                 BeatmapEditor editor = new BeatmapEditor(path);
                 Beatmap beatmap = editor.Beatmap;
 
-                int mode = beatmap.General["Mode"].Value;
+                GameMode mode = (GameMode)beatmap.General["Mode"].Value;
                 double sliderTickRate = beatmap.Difficulty["SliderTickRate"].Value;
 
                 if (!anySpinners)
