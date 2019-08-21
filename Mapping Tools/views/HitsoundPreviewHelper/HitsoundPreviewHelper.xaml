@@ -119,6 +119,9 @@
                     <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add an item" Command="{Binding AddCommand}" Margin="5">
                         <materialDesign:PackIcon Kind="Plus" Height="24" Width="24" />
                     </Button>
+                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Copy selected items" Command="{Binding CopyCommand}" Margin="5">
+                        <materialDesign:PackIcon Kind="ContentCopy" Height="24" Width="24" />
+                    </Button>
                     <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove selected items" Command="{Binding RemoveCommand}" Margin="5">
                         <materialDesign:PackIcon Kind="Trashcan" Height="24" Width="24" />
                     </Button>

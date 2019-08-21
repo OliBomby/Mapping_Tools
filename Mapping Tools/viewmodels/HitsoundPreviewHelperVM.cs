@@ -14,7 +14,7 @@ namespace Mapping_Tools.Viewmodels
 {
     public class HitsoundPreviewHelperVM : INotifyPropertyChanged
     {
-        private readonly ObservableCollection<HitsoundZone> _items;
+        private ObservableCollection<HitsoundZone> _items;
         private bool? _isAllItemsSelected;
 
         public HitsoundPreviewHelperVM() {
@@ -24,6 +24,15 @@ namespace Mapping_Tools.Viewmodels
                 _ => {
                     Items.Add(new HitsoundZone());
                 });
+            CopyCommand = new CommandImplementation(
+                _ => {
+                    int initialCount = Items.Count;
+                    for (int i = 0; i < initialCount; i++) {
+                        if (Items[i].IsSelected) {
+                            Items.Add(Items[i].Copy());
+                        }
+                    }
+                });
             RemoveCommand = new CommandImplementation(
                 _ => {
                     Items.RemoveAll(o => o.IsSelected);
@@ -31,7 +40,14 @@ namespace Mapping_Tools.Viewmodels
 
         }
 
-        public ObservableCollection<HitsoundZone> Items => _items;
+        public ObservableCollection<HitsoundZone> Items {
+            get { return _items; }
+            set {
+                if (_items == value) return;
+                _items = value;
+                OnPropertyChanged();
+            }
+        }
 
         public bool? IsAllItemsSelected {
             get { return _isAllItemsSelected; }
@@ -54,7 +70,7 @@ namespace Mapping_Tools.Viewmodels
         }
 
         public CommandImplementation AddCommand { get; }
-
+        public CommandImplementation CopyCommand { get; }
         public CommandImplementation RemoveCommand { get; }
 
         public IEnumerable<string> SampleSets {
