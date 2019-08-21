@@ -10,10 +10,6 @@ using System.Text;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     public class HitObject {
-        public string Line { get => GetLine(); set => SetLine(value); }
-
-        public string[] Values { get => GetValues(); set => SetValues(value); }
-
         public Vector2 Pos { get; set; }
 
         public double Time { get; set; }
@@ -48,10 +44,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public SampleSet[] EdgeSampleSets { get; set; }
         public SampleSet[] EdgeAdditionSets { get; set; }
 
-        public bool SliderExtras { get; set; }
+        public bool SliderExtras { get => GetSliderExtras(); }
 
-        public double TemporalLength { get; set; }
-        public double EndTime { get; set; }
+        public double TemporalLength { get; set; } // Duration of one repeat
+        public double EndTime { get; set; } // Includes all repeats
 
         // Special combined with greenline
         public double SV { get; set; }
@@ -71,7 +67,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             // 128,192,78,1,0,0:0:0:0:
             // 213,192,78,128,0,378:0:0:0:0:
 
-            Line = line;
+            SetLine(line);
             BodyHitsounds = new List<TimingPoint>();
             TimelineObjects = new List<TimelineObject>();
         }
@@ -237,24 +233,24 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return timing.Resnap(Time, snap1, snap2, floor, tp);
         }
 
+        private bool GetSliderExtras() {
+            return EdgeHitsounds.Any(o => o != 0) || EdgeSampleSets.Any(o => o != SampleSet.Auto) || EdgeAdditionSets.Any(o => o != SampleSet.Auto) || SampleSet != SampleSet.Auto || AdditionSet != SampleSet.Auto || CustomIndex != 0 || SampleVolume != 0 || Filename != "";
+        }
+
         public void SetLine(string line) {
-            Values = line.Split(',');
-        }
+            var values = line.Split(',');
 
-        public string GetLine() {
-            return string.Join(",", Values);
-        }
-
-        public void SetValues(string[] values) {
             Pos = new Vector2(ParseDouble(values[0]), ParseDouble(values[1]));
             Time = ParseDouble(values[2]);
             ObjectType = int.Parse(values[3]);
             Hitsounds = int.Parse(values[4]);
 
-            SliderExtras = IsSlider && values.Count() > 8; // Sliders remove extras and edges stuff if there are no hitsounds
+            // Sliders remove extras and edges stuff if there are no hitsounds
             if (IsSlider) {
                 string[] sliderData = values[5].Split('|');
+
                 SliderType = GetPathType(sliderData);
+
                 List<Vector2> points = new List<Vector2>();
                 for (int i = 1; i < sliderData.Length; i++) {
                     string[] spl = sliderData[i].Split(':');
@@ -267,85 +263,104 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
                 Repeat = int.Parse(values[6]);
                 PixelLength = ParseDouble(values[7]);
-                if (SliderExtras) {
-                    EdgeHitsounds = values[8].Split('|').Select(p => int.Parse(p)).ToArray();
-                    if (values.Length > 9) {
-                        EdgeSampleSets = values[9].Split('|').Select(p => (SampleSet)int.Parse(p.Split(':')[0])).ToArray();
-                        EdgeAdditionSets = values[9].Split('|').Select(p => (SampleSet)int.Parse(p.Split(':')[1])).ToArray();
-                    } else {
-                        EdgeSampleSets = new SampleSet[Repeat + 1];
-                        EdgeAdditionSets = new SampleSet[Repeat + 1];
-                        for (int i = 0; i < Repeat + 1; i++) {
-                            EdgeSampleSets[i] = SampleSet.Auto;
-                            EdgeAdditionSets[i] = SampleSet.Auto;
-                        }
-                    }
 
-                    if (values.Length > 10)
-                        Extras = values[10];
-                }
-                else {
+                // Edge hitsounds on 8
+                if (values.Length > 8) {
+                    EdgeHitsounds = values[8].Split('|').Select(p => int.Parse(p)).ToArray();
+                } else {
                     EdgeHitsounds = new int[Repeat + 1];
+                    for (int i = 0; i < Repeat + 1; i++) {
+                        EdgeHitsounds[i] = 0;
+                    }
+                }
+
+                // Edge samplesets on 9
+                if (values.Length > 9) {
+                    EdgeSampleSets = values[9].Split('|').Select(p => (SampleSet)int.Parse(p.Split(':')[0])).ToArray();
+                    EdgeAdditionSets = values[9].Split('|').Select(p => (SampleSet)int.Parse(p.Split(':')[1])).ToArray();
+                } else {
                     EdgeSampleSets = new SampleSet[Repeat + 1];
                     EdgeAdditionSets = new SampleSet[Repeat + 1];
+                    for (int i = 0; i < Repeat + 1; i++) {
+                        EdgeSampleSets[i] = SampleSet.Auto;
+                        EdgeAdditionSets[i] = SampleSet.Auto;
+                    }
                 }
-            }
-            else if (IsSpinner) {
+
+                // Extras on 10
+                if (values.Length > 10) {
+                    Extras = values[10];
+                } else {
+                    SetExtras();
+                }
+            } else if (IsSpinner) {
                 EndTime = ParseDouble(values[5]);
                 TemporalLength = EndTime - Time;
                 Repeat = 1;
-                if (values.Length > 6)
+
+                // Extras on 6
+                if (values.Length > 6) {
                     Extras = values[6];
-            }
-            else {
+                } else {
+                    SetExtras();
+                }
+            } else {
+                // Circle or hold note
                 Repeat = 0;
                 EndTime = Time;
                 TemporalLength = 0;
-                if (values.Length > 5)
+
+                // Extras on 5
+                if (values.Length > 5) {
                     Extras = values[5];
+                } else {
+                    SetExtras();
+                }
             }
         }
 
-        public string[] GetValues() {
+        public string GetLine() {
+            var values = new List<string> {
+                Pos.StringX,
+                Pos.StringY,
+                Math.Round(Time).ToString(),
+                ObjectType.ToString(),
+                Hitsounds.ToString()
+            };
+
             if (IsSlider) {
                 StringBuilder builder = new StringBuilder();
                 builder.Append(GetPathTypeString());
                 foreach (Vector2 p in CurvePoints) {
                     builder.Append($"|{p.StringX}:{p.StringY}");
                 }
-                string sliderShapeString = builder.ToString();
+                values.Add(builder.ToString());
+                values.Add(Repeat.ToString());
+                values.Add(PixelLength.ToString(CultureInfo.InvariantCulture));
 
                 if (SliderExtras) {
-                    string edgeHS = string.Join("|", EdgeHitsounds.Select(p => p.ToString()).ToArray());
+                    // Edge hitsounds, samplesets and extras
+                    values.Add(string.Join("|", EdgeHitsounds.Select(p => p.ToString())));
 
                     StringBuilder builder2 = new StringBuilder();
                     for (int i = 0; i < EdgeSampleSets.Count(); i++) {
                         builder2.Append($"|{(int)EdgeSampleSets[i]}:{(int)EdgeAdditionSets[i]}");
                     }
                     builder2.Remove(0, 1);
-                    string edgeAd = builder2.ToString();
+                    values.Add(builder2.ToString());
 
-                    if (Extras == null)
-                        return new string[] { Pos.StringX, Pos.StringY, Math.Round(Time).ToString(), ObjectType.ToString(), Hitsounds.ToString(),
-                                        sliderShapeString, Repeat.ToString(), PixelLength.ToString(CultureInfo.InvariantCulture), edgeHS, edgeAd };
-                    return new string[] { Pos.StringX, Pos.StringY, Math.Round(Time).ToString(), ObjectType.ToString(), Hitsounds.ToString(),
-                                        sliderShapeString, Repeat.ToString(), PixelLength.ToString(CultureInfo.InvariantCulture), edgeHS, edgeAd, Extras };
+                    values.Add(Extras);
                 }
-                else {
-                    return new string[] { Pos.StringX, Pos.StringY, Math.Round(Time).ToString(), ObjectType.ToString(), Hitsounds.ToString(),
-                                        sliderShapeString, Repeat.ToString(), PixelLength.ToString(CultureInfo.InvariantCulture) };
-                }
+            } else if (IsSpinner) {
+                values.Add(Math.Round(EndTime).ToString());
+                values.Add(Extras);
+            } else {
+                // It's a circle or a hold note
+                // Hold note has a difference in GetExtras
+                values.Add(Extras);
             }
-            else if (IsSpinner) {
-                if (Extras == null)
-                    return new string[] { Pos.StringX, Pos.StringY, Math.Round(Time).ToString(), ObjectType.ToString(), Hitsounds.ToString(), Math.Round(EndTime).ToString() };
-                return new string[] { Pos.StringX, Pos.StringY, Math.Round(Time).ToString(), ObjectType.ToString(), Hitsounds.ToString(), Math.Round(EndTime).ToString(), Extras };
-            }
-            else {
-                if (Extras == null)
-                    return new string[] { Pos.StringX, Pos.StringY, Math.Round(Time).ToString(), ObjectType.ToString(), Hitsounds.ToString() };
-                return new string[] { Pos.StringX, Pos.StringY, Math.Round(Time).ToString(), ObjectType.ToString(), Hitsounds.ToString(), Extras };
-            }
+
+            return string.Join(",", values);
         }
 
         public int GetObjectType() {
@@ -387,6 +402,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public void SetExtras(string extras) {
+            // Extras has an extra value at the start if it's a hold note
             string[] split = extras.Split(':');
             int i = 0;
             if (IsHoldNote) {
@@ -400,6 +416,21 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             CustomIndex = int.Parse(split[i + 2]);
             SampleVolume = double.Parse(split[i + 3]);
             Filename = split[i + 4];
+        }
+
+        public void SetExtras() {
+            // Set it to the default values
+            if (IsHoldNote) {
+                // Hold note should always have extras
+                EndTime = Time;
+                TemporalLength = 0;
+                Repeat = 1;
+            }
+            SampleSet = SampleSet.Auto;
+            AdditionSet = SampleSet.Auto;
+            CustomIndex = 0;
+            SampleVolume = 0;
+            Filename = "";
         }
 
         public SliderPath GetSliderPath(bool fullLength = false)
@@ -425,7 +456,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         private PathType GetPathType(string[] sliderData) {
             for (int i = sliderData.Length - 1; i >= 0; i--) {  // Iterating in reverse to get the last valid letter
                 char letter = sliderData[i].Count() > 0 ? sliderData[i][0] : '0';  // 0 is not a letter so it will get ignored
-                if (Char.IsLetter(letter)) {
+                if (char.IsLetter(letter)) {
                     switch (letter) {
                         case 'L':
                             return PathType.Linear;

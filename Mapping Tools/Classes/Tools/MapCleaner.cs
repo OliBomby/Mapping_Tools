@@ -190,7 +190,6 @@ namespace Mapping_Tools.Classes.Tools {
                 if (ho.IsSlider && (!samplesetActuallyChanged) && ho.SampleSet == 0)  // Case can put sampleset on sliderbody
                 {
                     ho.SampleSet = ho.HitsoundTP.SampleSet;
-                    ho.SliderExtras = true;
                 }
                 if (ho.IsSlider && samplesetActuallyChanged) // Make it start out with the right sampleset
                 {
@@ -215,7 +214,6 @@ namespace Mapping_Tools.Classes.Tools {
                     tlo.Origin.EdgeHitsounds[tlo.Repeat] = tlo.GetHitsounds();
                     tlo.Origin.EdgeSampleSets[tlo.Repeat] = tlo.FenoSampleSet;
                     tlo.Origin.EdgeAdditionSets[tlo.Repeat] = tlo.FenoAdditionSet;
-                    tlo.Origin.SliderExtras = true;
                     if (tlo.Origin.EdgeAdditionSets[tlo.Repeat] == tlo.Origin.EdgeSampleSets[tlo.Repeat])  // Simplify additions to auto
                     {
                         tlo.Origin.EdgeAdditionSets[tlo.Repeat] = 0;

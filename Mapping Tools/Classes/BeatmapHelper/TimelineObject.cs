@@ -219,7 +219,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 Origin.EdgeHitsounds[Repeat] = GetHitsounds();
                 Origin.EdgeSampleSets[Repeat] = SampleSet;
                 Origin.EdgeAdditionSets[Repeat] = AdditionSet;
-                Origin.SliderExtras = true;
             }
         }
 

@@ -491,7 +491,6 @@ namespace Mapping_Tools.Views {
                     ho.EdgeHitsounds = ho.EdgeHitsounds.Select(o => 0).ToArray();
                     ho.EdgeSampleSets = ho.EdgeSampleSets.Select(o => SampleSet.Auto).ToArray();
                     ho.EdgeAdditionSets = ho.EdgeAdditionSets.Select(o => SampleSet.Auto).ToArray();
-                    ho.SliderExtras = false;
                 }
             }
         }
