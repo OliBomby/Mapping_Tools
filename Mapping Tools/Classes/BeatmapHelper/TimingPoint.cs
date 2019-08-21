@@ -5,7 +5,7 @@ using System.Collections;
 using System.Globalization;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
-    public class TimingPoint {
+    public class TimingPoint : ITextLine {
         // Offset, Milliseconds per Beat, Meter, Sample Set, Sample Index, Volume, Inherited, Kiai Mode
         public double Offset { get; set; }
         public double MpB { get; set; }
@@ -16,6 +16,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public bool Inherited { get; set; } // True is red line
         public bool Kiai { get; set; }
         public bool OmitFirstBarLine { get; set; }
+
         public TimingPoint(double Offset, double MpB, int Meter, SampleSet SampleSet, int SampleIndex, double Volume, bool Inherited, bool Kiai, bool OmitFirstBarLine) {
             this.Offset = Offset;
             this.MpB = MpB;
@@ -28,10 +29,29 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             this.OmitFirstBarLine = OmitFirstBarLine;
         }
 
+        public TimingPoint(string line) {
+            SetLine(line);
+        }
+
         public string GetLine() {
             int style = MathHelper.GetIntFromBitArray(new BitArray(new bool[] { Kiai, false, false, OmitFirstBarLine }));
             return Math.Round(Offset) + "," + MpB.ToString(CultureInfo.InvariantCulture) + "," + Meter + "," + (int)SampleSet + "," + SampleIndex + ","
                 + Math.Round(Volume) + "," + Convert.ToInt32(Inherited) + "," + style;
+        }
+
+        public void SetLine(string line) {
+            string[] values = line.Split(',');
+            BitArray b = new BitArray(new int[] { int.Parse(values[7]) });
+
+            Offset = ParseDouble(values[0]);
+            MpB = ParseDouble(values[1]);
+            Meter = int.Parse(values[2]);
+            SampleSet = (SampleSet)int.Parse(values[3]);
+            SampleIndex = int.Parse(values[4]);
+            Volume = ParseDouble(values[5]);
+            Inherited = values[6] == "1";
+            Kiai = b[0];
+            OmitFirstBarLine = b[3];
         }
 
         public TimingPoint Copy() {
@@ -71,6 +91,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             else {
                 return -100 / MpB;
             }
+        }
+
+        private double ParseDouble(string d) {
+            return double.Parse(d, CultureInfo.InvariantCulture);
         }
     }
 }

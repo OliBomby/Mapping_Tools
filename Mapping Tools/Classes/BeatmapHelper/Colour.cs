@@ -1,7 +1,8 @@
 ﻿using System;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
-    public struct Colour {
+    public class Colour
+    {
         public double Red { get; set; }
         public double Green { get; set; }
         public double Blue { get; set; }
@@ -21,7 +22,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public override string ToString() {
-            return (int) Math.Round(Red) + "," + (int) Math.Round(Green) + "," + (int) Math.Round(Blue);
+            return (int)Math.Round(Red) + "," + (int)Math.Round(Green) + "," + (int)Math.Round(Blue);
         }
     }
 }

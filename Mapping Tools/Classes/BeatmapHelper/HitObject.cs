@@ -9,7 +9,8 @@ using System.Linq;
 using System.Text;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
-    public class HitObject {
+    public class HitObject : ITextLine
+    {
         public Vector2 Pos { get; set; }
 
         public double Time { get; set; }

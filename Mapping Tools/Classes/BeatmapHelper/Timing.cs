@@ -13,9 +13,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public List<TimingPoint> TimingPoints { get; set; }
         public double SliderMultiplier { get; set; }
 
-        public Timing(List<string> lines) {
-            TimingPoints = GetTimingPoints(lines);
-            SliderMultiplier = GetSliderMultiplier(lines);
+        public Timing(List<string> timingLines, double sliderMultiplier) {
+            TimingPoints = GetTimingPoints(timingLines);
+            SliderMultiplier = sliderMultiplier;
+            Sort();
         }
 
         public void Sort() {
@@ -208,19 +209,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return ( -10000 * temporalLength * SliderMultiplier ) / ( GetMpBAtTime(time) * sv );
         }
 
-        public double GetSliderMultiplier(List<string> lines) {
-            foreach( string line in lines ) {
-                string[] split = line.Split(':');
-                if( split.Length < 2 ) {
-                    continue;
-                }
-                else if( split[0] == "SliderMultiplier" ) {
-                    return double.Parse(split[1], CultureInfo.InvariantCulture);
-                }
-            }
-            return 1.4;
-        }
-
         public List<TimingPoint> GetAllRedlines() {
             List<TimingPoint> redlines = new List<TimingPoint>();
             foreach( TimingPoint tp in TimingPoints ) {
@@ -241,42 +229,12 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return greenlines;
         }
 
-        public List<TimingPoint> GetTimingPoints(List<string> lines) {
+        private List<TimingPoint> GetTimingPoints(List<string> timingLines) {
             List<TimingPoint> timingPoints = new List<TimingPoint>();
-            bool atTiming = false;
-            int currentLine = 0;
 
-            while( currentLine + 1 < lines.Count ) {
-                if( atTiming ) {
-                    string[] values = lines[currentLine].Split(',');
-
-                    // Check if it's already done with the TimingPoints
-                    if( values.Length < 6 ) {
-                        break;
-                    }
-                    BitArray b = new BitArray(new int[] { int.Parse(values[7]) });
-                    bool kiai = b[0];
-                    bool omit = b[3];
-                    timingPoints.Add(new TimingPoint(
-                        ParseDouble(values[0]),
-                        ParseDouble(values[1]),
-                        int.Parse(values[2]),
-                        (SampleSet)int.Parse(values[3]),
-                        int.Parse(values[4]),
-                        ParseDouble(values[5]),
-                        values[6] == "1",
-                        kiai,
-                        omit));
-                }
-                else {
-                    if( lines[currentLine] == "[TimingPoints]" ) {
-                        atTiming = true;
-                    }
-                }
-                currentLine += 1;
+            foreach (string line in timingLines) { 
+                timingPoints.Add(new TimingPoint(line));
             }
-            // Sort the timingPoints
-            TimingPoints = timingPoints.OrderBy(o => o.Offset).ToList();
 
             return timingPoints;
         }
@@ -297,10 +255,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 return new TimingPoint(0, 1000, firstTP.Meter, firstTP.SampleSet, firstTP.SampleIndex, firstTP.Volume, firstTP.Inherited, false, false);
             }
 
-        }
-
-        private double ParseDouble(string d) {
-            return double.Parse(d, CultureInfo.InvariantCulture);
         }
     }
 }

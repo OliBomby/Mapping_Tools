@@ -34,8 +34,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public void SetLines(List<string> lines) {
             // Load up all the shit
-            BeatmapTiming = new Timing(lines);
-
             List<string> generalLines = GetCategoryLines(lines, "[General]");
             List<string> editorLines = GetCategoryLines(lines, "[Editor]");
             List<string> metadataLines = GetCategoryLines(lines, "[Metadata]");
@@ -49,6 +47,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             List<string> storyboardLayer3Lines = GetCategoryLines(lines, "//Storyboard Layer 3 (Foreground)", new[] { "[", "//" });
             List<string> storyboardLayer4Lines = GetCategoryLines(lines, "//Storyboard Layer 4 (Overlay)", new[] { "[", "//" });
             List<string> storyboardSoundSamplesLines = GetCategoryLines(lines, "//Storyboard Sound Samples", new[] { "[", "//" });
+            List<string> timingLines = GetCategoryLines(lines, "[TimingPoints]");
             List<string> colourLines = GetCategoryLines(lines, "[Colours]");
             List<string> hitobjectLines = GetCategoryLines(lines, "[HitObjects]");
 
@@ -111,6 +110,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             foreach (string line in hitobjectLines) {
                 HitObjects.Add(new HitObject(line));
             }
+
+            // Set the timing object
+            BeatmapTiming = new Timing(timingLines, Difficulty["SliderMultiplier"].Value);
+
             // Sort the HitObjects
             HitObjects = HitObjects.OrderBy(o => o.Time).ToList();
 
