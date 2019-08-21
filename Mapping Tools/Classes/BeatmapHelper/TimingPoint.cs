@@ -41,17 +41,38 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public void SetLine(string line) {
             string[] values = line.Split(',');
-            BitArray b = new BitArray(new int[] { int.Parse(values[7]) });
 
-            Offset = ParseDouble(values[0]);
-            MpB = ParseDouble(values[1]);
-            Meter = int.Parse(values[2]);
-            SampleSet = (SampleSet)int.Parse(values[3]);
-            SampleIndex = int.Parse(values[4]);
-            Volume = ParseDouble(values[5]);
+            if (TryParseDouble(values[0], out double offset))
+                Offset = offset;
+            else throw new BeatmapParsingException("Failed to parse offset of timing point", line);
+
+            if (TryParseDouble(values[1], out double mpb))
+                MpB = mpb;
+            else throw new BeatmapParsingException("Failed to parse milliseconds per beat of timing point", line);
+
+            if (int.TryParse(values[2], out int meter))
+                Meter = meter;
+            else throw new BeatmapParsingException("Failed to parse meter of timing point", line);
+
+            if (Enum.TryParse(values[3], out SampleSet ss))
+                SampleSet = ss;
+            else throw new BeatmapParsingException("Failed to parse sampleset of timing point", line);
+
+            if (int.TryParse(values[4], out int ind))
+                SampleIndex = ind;
+            else throw new BeatmapParsingException("Failed to parse samle index of timing point", line);
+
+            if (TryParseDouble(values[5], out double vol))
+                Volume = vol;
+            else throw new BeatmapParsingException("Failed to parse volume of timing point", line);
+
             Inherited = values[6] == "1";
-            Kiai = b[0];
-            OmitFirstBarLine = b[3];
+
+            if (int.TryParse(values[7], out int style)) {
+                BitArray b = new BitArray(new int[] { style });
+                Kiai = b[0];
+                OmitFirstBarLine = b[3];
+            } else throw new BeatmapParsingException("Failed to style of timing point", line);
         }
 
         public TimingPoint Copy() {
@@ -93,8 +114,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
-        private double ParseDouble(string d) {
-            return double.Parse(d, CultureInfo.InvariantCulture);
+        private bool TryParseDouble(string d, out double result) {
+            return double.TryParse(d, NumberStyles.Float, CultureInfo.InvariantCulture, out result);
         }
     }
 }

@@ -488,9 +488,9 @@ namespace Mapping_Tools.Views {
 
                 if (ho.IsSlider) {
                     // Remove edge hitsounds
-                    ho.EdgeHitsounds = ho.EdgeHitsounds.Select(o => 0).ToArray();
-                    ho.EdgeSampleSets = ho.EdgeSampleSets.Select(o => SampleSet.Auto).ToArray();
-                    ho.EdgeAdditionSets = ho.EdgeAdditionSets.Select(o => SampleSet.Auto).ToArray();
+                    ho.EdgeHitsounds = ho.EdgeHitsounds.Select(o => 0).ToList();
+                    ho.EdgeSampleSets = ho.EdgeSampleSets.Select(o => SampleSet.Auto).ToList();
+                    ho.EdgeAdditionSets = ho.EdgeAdditionSets.Select(o => SampleSet.Auto).ToList();
                 }
             }
         }

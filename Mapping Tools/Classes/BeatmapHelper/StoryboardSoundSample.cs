@@ -25,24 +25,37 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public string GetLine() {
-            return string.Format("Sample,{0},{1},\"{2}\",{3}", Math.Round(Time), Layer, FilePath, Math.Round(Volume));
+            return string.Format("Sample,{0},{1},\"{2}\",{3}", Math.Round(Time), (int)Layer, FilePath, Math.Round(Volume));
         }
 
         public void SetLine(string line) {
             string[] values = line.Split(',');
 
             if (values[0] != "Sample") {
-                throw new Exception("Can not parse this line because it's not a storyboarded sample.");
+                throw new BeatmapParsingException("This line is not a storyboarded sample.", line);
             }
 
-            Time = ParseDouble(values[1]);
-            Layer = (StoryboardLayer)int.Parse(values[2]);
+            if (TryParseDouble(values[1], out double t))
+                Time = t;
+            else throw new BeatmapParsingException("Failed to parse time of storyboarded sample.", line);
+
+            if (Enum.TryParse(values[2], out StoryboardLayer layer))
+                Layer = layer;
+            else throw new BeatmapParsingException("Failed to parse layer of storyboarded sample.", line);
+
             FilePath = values[3].Trim('"');
-            Volume = values.Length >= 5 && values[4] != "" ? ParseDouble(values[4]) : 100;
+
+            if (values.Length > 4) {
+                if (TryParseDouble(values[4], out double vol))
+                    Volume = vol;
+                else throw new BeatmapParsingException("Failed to parse volume of storyboarded sample.", line);
+            }
+            else
+                Volume = 100;
         }
 
-        private double ParseDouble(string d) {
-            return double.Parse(d, CultureInfo.InvariantCulture);
+        private bool TryParseDouble(string d, out double result) {
+            return double.TryParse(d, NumberStyles.Float, CultureInfo.InvariantCulture, out result);
         }
 
         public bool Equals(StoryboardSoundSample other) {

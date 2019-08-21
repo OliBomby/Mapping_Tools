@@ -41,9 +41,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public SliderPath SliderPath { get => GetSliderPath(); set => SetSliderPath(value); }
         public int Repeat { get; set; }
         public double PixelLength { get; set; }
-        public int[] EdgeHitsounds { get; set; }
-        public SampleSet[] EdgeSampleSets { get; set; }
-        public SampleSet[] EdgeAdditionSets { get; set; }
+        public List<int> EdgeHitsounds { get; set; }
+        public List<SampleSet> EdgeSampleSets { get; set; }
+        public List<SampleSet> EdgeAdditionSets { get; set; }
 
         public bool SliderExtras { get => GetSliderExtras(); }
 
@@ -241,13 +241,27 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public void SetLine(string line) {
             var values = line.Split(',');
 
-            Pos = new Vector2(ParseDouble(values[0]), ParseDouble(values[1]));
-            Time = ParseDouble(values[2]);
-            ObjectType = int.Parse(values[3]);
-            Hitsounds = int.Parse(values[4]);
+            if (TryParseDouble(values[0], out double x) && TryParseDouble(values[1], out double y))
+                Pos = new Vector2(x, y);
+            else throw new BeatmapParsingException("Failed to parse coordinate of hit object.", line);
+
+            if (TryParseDouble(values[2], out double t))
+                Time = t;
+            else throw new BeatmapParsingException("Failed to parse time of hit object.", line);
+
+            if (int.TryParse(values[3], out int type))
+                ObjectType = type;
+            else throw new BeatmapParsingException("Failed to parse type of hit object.", line);
+
+            if (int.TryParse(values[4], out int hitsounds))
+                Hitsounds = hitsounds;
+            else throw new BeatmapParsingException("Failed to parse hitsound of hit object.", line);
 
             // Sliders remove extras and edges stuff if there are no hitsounds
             if (IsSlider) {
+                if (values.Length <= 7)
+                    throw new BeatmapParsingException("Slider object is missing values.", line);
+
                 string[] sliderData = values[5].Split('|');
 
                 SliderType = GetPathType(sliderData);
@@ -257,35 +271,48 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                     string[] spl = sliderData[i].Split(':');
                     if (spl.Length == 2) // It has to have 2 coordinates inside
                     {
-                        points.Add(new Vector2(ParseDouble(spl[0]), ParseDouble(spl[1])));
+                        if (TryParseDouble(spl[0], out double ax) && TryParseDouble(spl[1], out double ay))
+                            points.Add(new Vector2(ax, ay));
+                        else throw new BeatmapParsingException("Failed to parse coordinate of slider anchor.", line);
                     }
                 }
                 CurvePoints = points;
 
-                Repeat = int.Parse(values[6]);
-                PixelLength = ParseDouble(values[7]);
+                if (int.TryParse(values[6], out int repeat))
+                    Repeat = int.Parse(values[6]);
+                else throw new BeatmapParsingException("Failed to parse repeat number of slider.", line);
+
+                if (TryParseDouble(values[7], out double pixelLength))
+                    PixelLength = pixelLength;
+                else throw new BeatmapParsingException("Failed to parse pixel length of slider.", line);
 
                 // Edge hitsounds on 8
+                EdgeHitsounds = new List<int>(Repeat + 1);
                 if (values.Length > 8) {
-                    EdgeHitsounds = values[8].Split('|').Select(p => int.Parse(p)).ToArray();
-                } else {
-                    EdgeHitsounds = new int[Repeat + 1];
-                    for (int i = 0; i < Repeat + 1; i++) {
-                        EdgeHitsounds[i] = 0;
+                    var split = values[8].Split('|');
+                    for (int i = 0; i < Math.Min(split.Length, Repeat + 1); i++) {
+                        EdgeHitsounds.Add(int.TryParse(split[i], out int ehs) ? ehs : 0);
                     }
+                }
+                for (int i = EdgeHitsounds.Count; i < Repeat + 1; i++) {
+                    EdgeHitsounds.Add(0);
                 }
 
                 // Edge samplesets on 9
+                EdgeSampleSets = new List<SampleSet>(Repeat + 1);
+                EdgeAdditionSets = new List<SampleSet>(Repeat + 1);
                 if (values.Length > 9) {
-                    EdgeSampleSets = values[9].Split('|').Select(p => (SampleSet)int.Parse(p.Split(':')[0])).ToArray();
-                    EdgeAdditionSets = values[9].Split('|').Select(p => (SampleSet)int.Parse(p.Split(':')[1])).ToArray();
-                } else {
-                    EdgeSampleSets = new SampleSet[Repeat + 1];
-                    EdgeAdditionSets = new SampleSet[Repeat + 1];
-                    for (int i = 0; i < Repeat + 1; i++) {
-                        EdgeSampleSets[i] = SampleSet.Auto;
-                        EdgeAdditionSets[i] = SampleSet.Auto;
+                    var split = values[9].Split('|');
+                    for (int i = 0; i < Math.Min(split.Length, Repeat + 1); i++) {
+                        EdgeSampleSets.Add(int.TryParse(split[i].Split(':')[0], out int ess) ? (SampleSet)ess : SampleSet.Auto);
+                        EdgeAdditionSets.Add(int.TryParse(split[i].Split(':')[1], out int eas) ? (SampleSet)eas : SampleSet.Auto);
                     }
+                }
+                for (int i = EdgeSampleSets.Count; i < Repeat + 1; i++) {
+                    EdgeSampleSets.Add(SampleSet.Auto);
+                }
+                for (int i = EdgeAdditionSets.Count; i < Repeat + 1; i++) {
+                    EdgeAdditionSets.Add(SampleSet.Auto);
                 }
 
                 // Extras on 10
@@ -295,7 +322,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                     SetExtras();
                 }
             } else if (IsSpinner) {
-                EndTime = ParseDouble(values[5]);
+                if (values.Length <= 5)
+                    throw new BeatmapParsingException("Spinner object is missing values.", line);
+
+                if (TryParseDouble(values[5], out double et))
+                    EndTime = et;
+                else throw new BeatmapParsingException("Failed to parse end time of spinner.", line);
+
                 TemporalLength = EndTime - Time;
                 Repeat = 1;
 
@@ -407,15 +440,30 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             string[] split = extras.Split(':');
             int i = 0;
             if (IsHoldNote) {
-                EndTime = ParseDouble(split[i]);
+                if (TryParseDouble(split[i], out double et))
+                    EndTime = et;
+                else throw new BeatmapParsingException("Failed to parse end time of hold note.", extras);
                 TemporalLength = EndTime - Time;
                 Repeat = 1;
                 i += 1;
             }
-            SampleSet = (SampleSet)int.Parse(split[i]);
-            AdditionSet = (SampleSet)int.Parse(split[i + 1]);
-            CustomIndex = int.Parse(split[i + 2]);
-            SampleVolume = double.Parse(split[i + 3]);
+
+            if (int.TryParse(split[i], out int ss))
+                SampleSet = (SampleSet)ss;
+            else throw new BeatmapParsingException("Failed to parse sample set of hit object.", extras);
+
+            if (int.TryParse(split[i + 1], out int ass))
+                AdditionSet = (SampleSet)ass;
+            else throw new BeatmapParsingException("Failed to parse additional sample set of hit object.", extras);
+
+            if (int.TryParse(split[i + 2], out int ci))
+                CustomIndex = ci;
+            else throw new BeatmapParsingException("Failed to parse custom index of hit object.", extras);
+
+            if (TryParseDouble(split[i + 3], out double vol))
+                SampleVolume = vol;
+            else throw new BeatmapParsingException("Failed to parse volume of hit object.", extras);
+
             Filename = split[i + 4];
         }
 
@@ -450,8 +498,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             PixelLength = sliderPath.Distance;
         }
 
-        private double ParseDouble(string d) {
-            return double.Parse(d, CultureInfo.InvariantCulture);
+        private bool TryParseDouble(string d, out double result) {
+            return double.TryParse(d, NumberStyles.Float, CultureInfo.InvariantCulture, out result);
         }
 
         private PathType GetPathType(string[] sliderData) {
@@ -470,7 +518,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                     } 
                 }
             }
-            return PathType.Bezier;
+            // If there is no valid letter it will literally default to catmull
+            return PathType.Catmull;
         }
 
         private string GetPathTypeString() {

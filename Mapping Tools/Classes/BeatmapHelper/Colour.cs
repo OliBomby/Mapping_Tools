@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     public class Colour
@@ -16,9 +17,22 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public Colour(string line) {
             string[] split = line.Split(':');
             string[] csplit = split[1].Split(',');
-            Red = double.Parse(csplit[0]);
-            Green = double.Parse(csplit[1]);
-            Blue = double.Parse(csplit[2]);
+
+            if (TryParseDouble(csplit[0], out double r))
+                Red = r;
+            else throw new BeatmapParsingException("Failed to parse red component of colour.", line);
+
+            if (TryParseDouble(csplit[1], out double g))
+                Green = g;
+            else throw new BeatmapParsingException("Failed to parse green component of colour.", line);
+
+            if (TryParseDouble(csplit[2], out double b))
+                Blue = b;
+            else throw new BeatmapParsingException("Failed to parse blue component of colour.", line);
+        }
+
+        private bool TryParseDouble(string d, out double result) {
+            return double.TryParse(d, NumberStyles.Float, CultureInfo.InvariantCulture, out result);
         }
 
         public override string ToString() {
