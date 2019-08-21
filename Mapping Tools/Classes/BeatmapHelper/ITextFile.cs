@@ -9,5 +9,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper
     public interface ITextFile
     {
         List<string> GetLines();
+
+        void SetLines(List<string> lines);
     }
 }

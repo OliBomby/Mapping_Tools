@@ -28,8 +28,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public List<HitObject> HitObjects { get; set; }
         public List<double> Bookmarks { get => GetBookmarks(); set => SetBookmarks(value); }
 
-
         public Beatmap(List<string> lines) {
+            SetLines(lines);
+        }
+
+        public void SetLines(List<string> lines) {
             // Load up all the shit
             BeatmapTiming = new Timing(lines);
 
