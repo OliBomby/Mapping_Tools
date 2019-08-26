@@ -44,8 +44,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
-        public double Resnap(double time, int divisor2, int divisor3, bool floor=true, TimingPoint tp=null) {
-            TimingPoint beforeTP = tp ?? GetRedlineAtTime(time);
+        public double Resnap(double time, int divisor2, int divisor3, bool floor=true, TimingPoint tp=null, TimingPoint firstTP=null) {
+            TimingPoint beforeTP = tp ?? GetRedlineAtTime(time, firstTP);
             TimingPoint afterTP = tp == null ? GetRedlineAfterTime(time) : null;
 
             double newTime2 = GetNearestTimeMeter(time, beforeTP, divisor2);

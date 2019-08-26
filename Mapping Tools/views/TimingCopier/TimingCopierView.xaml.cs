@@ -120,53 +120,50 @@ namespace Mapping_Tools.Views {
                         // Get redlines between this and last marker
                         TimingPoint redline = timingTo.GetRedlineAtTime(lastTime, redlines.FirstOrDefault());
 
-                        double timeFromLastMarker = 0;
-                        double beatsFromLastMarker = marker.BeatsFromLastMarker;
-
+                        double beatsFromLastTime = marker.BeatsFromLastMarker;
                         while (true) {
-                            List<TimingPoint> redlinesBetween = redlines.Where(o => o.Offset < lastTime + redline.MpB * beatsFromLastMarker && o.Offset > lastTime).ToList();
+                            List<TimingPoint> redlinesBetween = redlines.Where(o => o.Offset <= lastTime + redline.MpB * beatsFromLastTime && o.Offset > lastTime).ToList();
 
                             if (redlinesBetween.Count == 0) break;
 
                             TimingPoint first = redlinesBetween.First();
                             double diff = first.Offset - lastTime;
-                            timeFromLastMarker += diff;
-                            beatsFromLastMarker -= diff / redline.MpB;
+                            beatsFromLastTime -= diff / redline.MpB;
 
                             redline = first;
                             lastTime = first.Offset;
                         }
-                        timeFromLastMarker += redline.MpB * beatsFromLastMarker;
 
-                        double newTime = lastTime + timeFromLastMarker;
+                        // Last time is the time of the last redline in between
+                        double newTime = lastTime + redline.MpB * beatsFromLastTime;
+                        newTime = timingTo.Resnap(newTime, arg.Snap1, arg.Snap2, firstTP: redlines.FirstOrDefault());
                         marker.Time = newTime;
 
                         lastTime = marker.Time;
                     }
-                    foreach (Marker marker in markers) {
-                        double newTime = timingTo.Resnap(marker.Time, arg.Snap1, arg.Snap2, tp: redlines.FirstOrDefault());
 
-                        // Set the variable
+                    // Add the bookmarks
+                    foreach (Marker marker in markers)
+                    {
+                        // Check whether the marker is a bookmark
                         if (marker.Object is double) {
                             // Don't resnap bookmarks
                             newBookmarks.Add((double)marker.Object);
-                        } else if (marker.Object is HitObject) {
-                            ((HitObject)marker.Object).Time = newTime;
-                        } else if (marker.Object is TimingPoint) {
-                            ((TimingPoint)marker.Object).Offset = newTime;
                         }
                     }
                     beatmapTo.SetBookmarks(newBookmarks);
                 } else if (arg.ResnapMode == "Just resnap") {
                     // Resnap hitobjects
-                    foreach (HitObject ho in beatmapTo.HitObjects) {
-                        ho.ResnapSelf(timingTo, arg.Snap1, arg.Snap2, tp: redlines.FirstOrDefault());
-                        ho.ResnapEnd(timingTo, arg.Snap1, arg.Snap2, tp: redlines.FirstOrDefault());
+                    foreach (HitObject ho in beatmapTo.HitObjects)
+                    {
+                        ho.ResnapSelf(timingTo, arg.Snap1, arg.Snap2, firstTP: redlines.FirstOrDefault());
+                        ho.ResnapEnd(timingTo, arg.Snap1, arg.Snap2, firstTP: redlines.FirstOrDefault());
                     }
 
                     // Resnap greenlines
-                    foreach (TimingPoint tp in timingTo.GetAllGreenlines()) {
-                        tp.ResnapSelf(timingTo, arg.Snap1, arg.Snap2, tp: redlines.FirstOrDefault());
+                    foreach (TimingPoint tp in timingTo.GetAllGreenlines())
+                    {
+                        tp.ResnapSelf(timingTo, arg.Snap1, arg.Snap2, firstTP: redlines.FirstOrDefault());
                     }
                 } else {
                     // Don't move objects

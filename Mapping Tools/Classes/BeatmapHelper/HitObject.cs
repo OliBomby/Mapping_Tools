@@ -160,6 +160,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             // Change
             TemporalLength += deltaTemporalTime;
             EndTime = Math.Floor(Time + TemporalLength * Repeat);
+
+            // Clean up body objects
             if (TimelineObjects.Count > 0) { TimelineObjects.Last().Time = EndTime; };
             BodyHitsounds.RemoveAll(s => s.Offset >= EndTime);
         }
@@ -173,24 +175,24 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
-        public bool ResnapSelf(Timing timing, int snap1, int snap2, bool floor=true, TimingPoint tp=null) {
-            double newTime = GetResnappedTime(timing, snap1, snap2, floor, tp);
+        public bool ResnapSelf(Timing timing, int snap1, int snap2, bool floor=true, TimingPoint tp=null, TimingPoint firstTP=null) {
+            double newTime = GetResnappedTime(timing, snap1, snap2, floor, tp, firstTP);
             double deltaTime = newTime - Time;
             MoveTime(deltaTime);
             return deltaTime != 0;
         }
 
-        public bool ResnapEnd(Timing timing, int snap1, int snap2, bool floor = true, TimingPoint tp = null) {
+        public bool ResnapEnd(Timing timing, int snap1, int snap2, bool floor = true, TimingPoint tp = null, TimingPoint firstTP=null) {
             // If there is a redline in the sliderbody then the sliderend gets snapped to a tick of the latest redline
             if (!IsSlider || timing.TimingPoints.Any(o => o.Inherited && o.Offset <= EndTime + 20 && o.Offset > Time)) {
-                return ResnapEndTime(timing, snap1, snap2, floor, tp);
+                return ResnapEndTime(timing, snap1, snap2, floor, tp, firstTP);
             } else {
-                return ResnapEndClassic(timing, snap1, snap2, tp);
+                return ResnapEndClassic(timing, snap1, snap2, firstTP);
             }
         }
 
-        public bool ResnapEndTime(Timing timing, int snap1, int snap2, bool floor = true, TimingPoint tp = null) {
-            double newTime = timing.Resnap(EndTime, snap1, snap2, floor, tp);
+        public bool ResnapEndTime(Timing timing, int snap1, int snap2, bool floor = true, TimingPoint tp = null, TimingPoint firstTP = null) {
+            double newTime = timing.Resnap(EndTime, snap1, snap2, floor, tp, firstTP);
             double deltaTime = newTime - EndTime;
             MoveEndTime(timing, deltaTime);
 
@@ -230,8 +232,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return deltaTime != 0;
         }
 
-        public double GetResnappedTime(Timing timing, int snap1, int snap2, bool floor=true, TimingPoint tp=null) {
-            return timing.Resnap(Time, snap1, snap2, floor, tp);
+        public double GetResnappedTime(Timing timing, int snap1, int snap2, bool floor=true, TimingPoint tp=null, TimingPoint firstTP=null) {
+            return timing.Resnap(Time, snap1, snap2, floor, tp, firstTP);
         }
 
         private bool GetSliderExtras() {
