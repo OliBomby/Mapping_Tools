@@ -30,9 +30,13 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public static void BalanceVolumes(List<SamplePackage> packages, VolumeBalancingArgs args) {
             foreach (SamplePackage package in packages) {
                 double maxVolume = package.Samples.Max(o => o.SampleArgs.Volume);
+                if (maxVolume == -0.01)
+                    maxVolume = 1;
                 double sampleMultiplier = 1 / maxVolume;
                 package.Volume = maxVolume;
                 foreach (Sample sample in package.Samples) {
+                    if (sample.SampleArgs.Volume == -0.01) sample.SampleArgs.Volume = 1;
+
                     double newVolume = sample.SampleArgs.Volume * sampleMultiplier;
                     if (Math.Abs(newVolume - 1) > args.Roughness && !args.AllwaysFullVolume) {
                         sample.SampleArgs.Volume = args.Roughness * Math.Round(newVolume / args.Roughness);

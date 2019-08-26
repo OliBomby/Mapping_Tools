@@ -1,5 +1,6 @@
 ﻿using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
+using System;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     public class SampleSoundGenerator {
