@@ -243,6 +243,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public void SetLine(string line) {
             var values = line.Split(',');
 
+            if (values.Length <= 4)
+                throw new BeatmapParsingException("Hit object is missing values.", line);
+
             if (TryParseDouble(values[0], out double x) && TryParseDouble(values[1], out double y))
                 Pos = new Vector2(x, y);
             else throw new BeatmapParsingException("Failed to parse coordinate of hit object.", line);

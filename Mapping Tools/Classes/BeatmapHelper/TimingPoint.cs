@@ -29,6 +29,19 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             this.OmitFirstBarLine = OmitFirstBarLine;
         }
 
+        public TimingPoint(double Offset, double MpB, int Meter, int SampleSet, int SampleIndex, double Volume, bool Inherited, int effects) {
+            this.Offset = Offset;
+            this.MpB = MpB;
+            this.Meter = Meter;
+            this.SampleSet = (SampleSet)SampleSet;
+            this.SampleIndex = SampleIndex;
+            this.Volume = Volume;
+            this.Inherited = Inherited;
+            BitArray b = new BitArray(new int[] { effects });
+            Kiai = b[0];
+            OmitFirstBarLine = b[3];
+        }
+
         public TimingPoint(string line) {
             SetLine(line);
         }
