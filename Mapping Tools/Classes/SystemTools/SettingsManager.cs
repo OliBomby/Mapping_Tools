@@ -80,8 +80,8 @@ namespace Mapping_Tools.Classes.SystemTools {
             return true;
         }
 
-        public static void AddRecentMap(string path, DateTime date) {
-            Settings.AddRecentMaps(path, date);
+        public static void AddRecentMap(string paths, DateTime date) {
+            Settings.AddRecentMap(paths, date);
         }
 
         public static void DefaultPaths() {
@@ -121,6 +121,14 @@ namespace Mapping_Tools.Classes.SystemTools {
 
         public static List<string[]> GetRecentMaps() {
             return Settings.RecentMaps;
+        }
+
+        public static string[] GetLatestCurrentMaps() {
+            if (GetRecentMaps().Count > 0) {
+                return GetRecentMaps()[0][0].Split('|');
+            } else {
+                return new[] { "" };
+            }
         }
 
         public static string GetOsuPath() {

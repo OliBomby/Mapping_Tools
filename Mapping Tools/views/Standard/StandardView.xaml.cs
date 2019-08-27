@@ -78,9 +78,14 @@ namespace Mapping_Tools.Views {
         }
 
         private void RecentList_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e) {
-            var selectedItem = (MyItem)recentList.SelectedItem;
-            if (selectedItem != null)
-                MainWindow.AppWindow.SetCurrentMap(selectedItem.Path);
+            var selectedItems = recentList.SelectedItems;
+            List<string> items = new List<string>();
+            foreach (var item in selectedItems) {
+                items.Add(((MyItem)item).Path);
+            }
+
+            if (items.Count > 0)
+                MainWindow.AppWindow.SetCurrentMaps(items.ToArray());
         }
     }
 }

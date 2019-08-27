@@ -47,8 +47,8 @@ namespace Mapping_Tools.Views {
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
-            string fileToCopy = MainWindow.AppWindow.currentMap.Text;
-            IOHelper.SaveMapBackup(fileToCopy);
+            string[] filesToCopy = MainWindow.AppWindow.GetCurrentMaps();
+            IOHelper.SaveMapBackup(filesToCopy);
 
             start.IsEnabled = false;
             backgroundWorker.RunWorkerAsync();

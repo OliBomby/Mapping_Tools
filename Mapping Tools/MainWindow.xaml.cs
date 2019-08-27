@@ -46,9 +46,7 @@ namespace Mapping_Tools {
             Views = new ViewCollection(); // Make a ViewCollection object
             DataContext = new StandardVM(); // Generate Standard view model to show on startup
 
-            if(SettingsManager.GetRecentMaps().Count > 0 ) {
-                SetCurrentMap(SettingsManager.GetRecentMaps()[0][0]);
-            } // Set currentmap to previously opened map
+            SetCurrentMaps(SettingsManager.GetLatestCurrentMaps()); // Set currentmap to previously opened map
             ViewChanged();
         }
 
@@ -102,29 +100,39 @@ namespace Mapping_Tools {
             }
         }
 
-        public void SetCurrentMap(string path) {
-            currentMap.Text = path;
-            SettingsManager.AddRecentMap(path, DateTime.Now);
+        public void SetCurrentMaps(string[] paths) {
+            currentMap.Text = string.Join("|", paths);
+            SettingsManager.AddRecentMap(currentMap.Text, DateTime.Now);
         }
 
-        public string GetCurrentMap() {
-            return currentMap.Text;
+        public void SetCurrentMapsString(string paths) {
+            currentMap.Text = paths;
+            SettingsManager.AddRecentMap(paths, DateTime.Now);
+        }
+
+        public string[] GetCurrentMaps() {
+            return currentMap.Text.Split('|');
+        }
+
+        public string GetCurrentMapsString() {
+            return string.Join("|", GetCurrentMaps());
         }
 
         private void OpenBeatmap(object sender, RoutedEventArgs e) {
-            string[] paths = IOHelper.BeatmapFileDialog();
-            if( paths.Length != 0 ) { SetCurrentMap(paths[0]); }
+            string[] paths = IOHelper.BeatmapFileDialog(true);
+            if( paths.Length != 0 ) { SetCurrentMaps(paths); }
         }
 
         private void OpenCurrentBeatmap(object sender, RoutedEventArgs e) {
             string path = IOHelper.CurrentBeatmap();
-            if( path != "" ) { SetCurrentMap(path); }
+            if( path != "" ) { SetCurrentMaps(new[] { path }); }
         }
 
         private void SaveBackup(object sender, RoutedEventArgs e) {
-            bool result = IOHelper.SaveMapBackup(GetCurrentMap(), forced: true);
+            var paths = GetCurrentMaps();
+            bool result = IOHelper.SaveMapBackup(paths, true);
             if (result)
-                System.Windows.MessageBox.Show("Beatmap successfully copied!");
+                System.Windows.MessageBox.Show($"Beatmap{(paths.Length == 1 ? "" : "s")} successfully copied!");
         }
 
         //Method for loading the cleaner interface 

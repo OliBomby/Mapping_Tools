@@ -60,10 +60,10 @@ namespace Mapping_Tools.Views {
 
         private struct Arguments
         {
-            public string Path;
+            public string[] Paths;
             public List<HitsoundZone> Zones;
-            public Arguments(string path, List<HitsoundZone> zones) {
-                Path = path;
+            public Arguments(string[] paths, List<HitsoundZone> zones) {
+                Paths = paths;
                 Zones = zones;
             }
         }
@@ -72,45 +72,49 @@ namespace Mapping_Tools.Views {
             if (arg.Zones.Count == 0)
                 return "There are no zones!";
 
-            BeatmapEditor editor = new BeatmapEditor(arg.Path);
-            Beatmap beatmap = editor.Beatmap;
-            Timeline timeline = beatmap.GetTimeline();
+            bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
 
-            for (int i = 0; i < timeline.TimelineObjects.Count; i++) {
-                var tlo = timeline.TimelineObjects[i];
+            foreach (string path in arg.Paths) {
+                BeatmapEditor editor = editorRead ? EditorReaderStuff.GetNewestVersion(path, reader) : new BeatmapEditor(path);
+                Beatmap beatmap = editor.Beatmap;
+                Timeline timeline = beatmap.GetTimeline();
 
-                var column = arg.Zones.FirstOrDefault();
-                double best = double.MaxValue;
-                foreach (var c in arg.Zones) {
-                    double dist = c.Distance(tlo.Origin.Pos);
-                    if (dist < best) {
-                        best = dist;
-                        column = c;
+                for (int i = 0; i < timeline.TimelineObjects.Count; i++) {
+                    var tlo = timeline.TimelineObjects[i];
+
+                    var column = arg.Zones.FirstOrDefault();
+                    double best = double.MaxValue;
+                    foreach (var c in arg.Zones) {
+                        double dist = c.Distance(tlo.Origin.Pos);
+                        if (dist < best) {
+                            best = dist;
+                            column = c;
+                        }
                     }
+
+
+                    tlo.Filename = column.Filename;
+                    tlo.SampleSet = column.SampleSet;
+                    tlo.AdditionSet = SampleSet.Auto;
+                    tlo.SetHitsound(column.Hitsound);
+                    tlo.HitsoundsToOrigin();
+
+                    UpdateProgressBar(worker, (int)(100f * i / beatmap.HitObjects.Count));
                 }
 
-
-                tlo.Filename = column.Filename;
-                tlo.SampleSet = column.SampleSet;
-                tlo.AdditionSet = SampleSet.Auto;
-                tlo.SetHitsound(column.Hitsound);
-                tlo.HitsoundsToOrigin();
-
-                UpdateProgressBar(worker, (int)(100f * i / beatmap.HitObjects.Count));
+                // Save the file
+                editor.SaveFile();
             }
-
-            // Save the file
-            editor.SaveFile();
 
             return "";
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
             // Backup
-            string fileToCopy = MainWindow.AppWindow.currentMap.Text;
-            IOHelper.SaveMapBackup(fileToCopy);
+            string[] filesToCopy = MainWindow.AppWindow.GetCurrentMaps();
+            IOHelper.SaveMapBackup(filesToCopy);
 
-            backgroundWorker.RunWorkerAsync(new Arguments(fileToCopy, ((HitsoundPreviewHelperVM)DataContext).Items.ToList()));
+            backgroundWorker.RunWorkerAsync(new Arguments(filesToCopy, ((HitsoundPreviewHelperVM)DataContext).Items.ToList()));
 
             start.IsEnabled = false;
         }

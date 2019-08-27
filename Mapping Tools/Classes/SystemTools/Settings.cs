@@ -72,16 +72,16 @@ namespace Mapping_Tools.Classes.SystemTools {
             MakeBackups = true;
         }
 
-        public void AddRecentMaps(string path, DateTime date) {
-            RecentMaps.RemoveAll(o => o[0] == path);
-            if( RecentMaps.Count > 4 ) {
+        public void AddRecentMap(string paths, DateTime date) {
+            RecentMaps.RemoveAll(o => o[0] == paths);
+            if( RecentMaps.Count > 19 ) {
                 try {
                     RecentMaps.Remove(RecentMaps.Last());
                 }
                 catch (ArgumentOutOfRangeException) {
                 }
             }
-            RecentMaps.Insert(0, new string[] { path, date.ToString()});
+            RecentMaps.Insert(0, new string[] { paths, date.ToString()});
         }
 
         public void CopyTo(Settings other) {

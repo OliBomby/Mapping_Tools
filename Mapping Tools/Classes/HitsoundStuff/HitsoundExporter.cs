@@ -21,7 +21,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         public static void ExportHitsounds(List<HitsoundEvent> hitsounds, string baseBeatmap, string exportFolder) {
-            BeatmapEditor editor = new BeatmapEditor(baseBeatmap);
+            BeatmapEditor editor = EditorReaderStuff.GetNewestVersion(baseBeatmap);
             Beatmap beatmap = editor.Beatmap;
 
             // Make new timingpoints

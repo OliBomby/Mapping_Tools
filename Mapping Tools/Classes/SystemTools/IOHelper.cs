@@ -26,6 +26,16 @@ namespace Mapping_Tools.Classes.SystemTools
             }
         }
 
+        public static bool SaveMapBackup(string[] filesToCopy, bool forced = false) {
+            bool result = true;
+            foreach (string fileToCopy in filesToCopy) {
+                result = SaveMapBackup(fileToCopy, forced) && result;
+                if (!result)
+                    break;
+            }
+            return result;
+        }
+
         public static string FolderDialog(string initialDirectory = "") {
             bool restore = initialDirectory == "";
 
@@ -116,7 +126,7 @@ namespace Mapping_Tools.Classes.SystemTools
         }
 
         public static string[] BeatmapFileDialog(bool multiselect=false) {
-            string path = MainWindow.AppWindow.GetCurrentMap();
+            string path = MainWindow.AppWindow.GetCurrentMaps()[0];
             using (OpenFileDialog openFileDialog = new OpenFileDialog {
                 InitialDirectory = path != "" ? Directory.GetParent(path).FullName : SettingsManager.GetSongsPath(),
                 Filter = "Osu files (*.osu)|*.osu",

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.Tools {
     public class MapCleaner {
-        public struct MapCleanerArgs {
+        public class MapCleanerArgs {
             public bool VolumeSliders;
             public bool SamplesetSliders;
             public bool VolumeSpinners;
@@ -39,13 +39,23 @@ namespace Mapping_Tools.Classes.Tools {
             public static readonly MapCleanerArgs BasicResnap = new MapCleanerArgs(true, true, true, true, false, false, false, false, 16, 12);
         }
 
-        public struct MapCleanerResult {
-            public int ObjectsResnapped;
-            public int SamplesRemoved;
+        public class MapCleanerResult {
+            public int ObjectsResnapped = 0;
+            public int SamplesRemoved = 0;
+            public int TimingPointsRemoved = 0;
+
+            public MapCleanerResult() {
+            }
 
             public MapCleanerResult(int objectsResnapped, int samplesRemoved) {
                 ObjectsResnapped = objectsResnapped;
                 SamplesRemoved = samplesRemoved;
+            }
+
+            public void Add(MapCleanerResult other) {
+                ObjectsResnapped += other.ObjectsResnapped;
+                SamplesRemoved += other.SamplesRemoved;
+                TimingPointsRemoved += other.TimingPointsRemoved;
             }
         }
 

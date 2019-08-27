@@ -48,21 +48,21 @@ namespace Mapping_Tools.Views {
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
-            string fileToCopy = MainWindow.AppWindow.currentMap.Text;
-            IOHelper.SaveMapBackup(fileToCopy);
+            string[] filesToCopy = MainWindow.AppWindow.GetCurrentMaps();
+            IOHelper.SaveMapBackup(filesToCopy);
 
-            backgroundWorker.RunWorkerAsync(new Arguments(fileToCopy, TemporalBox.GetDouble(), SpatialBox.GetDouble(), (bool) ReqBookmBox.IsChecked));
+            backgroundWorker.RunWorkerAsync(new Arguments(filesToCopy, TemporalBox.GetDouble(), SpatialBox.GetDouble(), (bool) ReqBookmBox.IsChecked));
             start.IsEnabled = false;
         }
 
         private struct Arguments {
-            public string Path;
+            public string[] Paths;
             public double TemporalLength;
             public double SpatialLength;
             public bool RequireBookmarks;
-            public Arguments(string path, double temporal, double spatial, bool requireBookmarks)
+            public Arguments(string[] paths, double temporal, double spatial, bool requireBookmarks)
             {
-                Path = path;
+                Paths = paths;
                 TemporalLength = temporal;
                 SpatialLength = spatial;
                 RequireBookmarks = requireBookmarks;
@@ -72,48 +72,52 @@ namespace Mapping_Tools.Views {
         private string Complete_Sliders(Arguments arg, BackgroundWorker worker, DoWorkEventArgs _) {
             int slidersCompleted = 0;
 
-            BeatmapEditor editor = new BeatmapEditor(arg.Path);
-            Beatmap beatmap = editor.Beatmap;
-            Timing timing = beatmap.BeatmapTiming;
-            List<HitObject> markedObjects = arg.RequireBookmarks ? beatmap.GetBookmarkedObjects() : beatmap.HitObjects;
+            bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
 
-            for(int i = 0; i < markedObjects.Count; i++) {
-                HitObject ho = markedObjects[i];
-                if (ho.IsSlider) {
-                    double oldSpatialLength = ho.PixelLength;
-                    double newSpatialLength = arg.SpatialLength != -1 ? ho.GetSliderPath(fullLength: true).Distance * arg.SpatialLength : oldSpatialLength;
-                    double oldTemporalLength = timing.CalculateSliderTemporalLength(ho.Time, ho.PixelLength);
-                    double newTemporalLength = arg.TemporalLength != -1 ? timing.GetMpBAtTime(ho.Time) * arg.TemporalLength : oldTemporalLength;
-                    double oldSV = timing.GetSVAtTime(ho.Time);
-                    double newSV = oldSV / ((newSpatialLength / oldSpatialLength) / (newTemporalLength / oldTemporalLength));
-                    ho.SV = newSV;
-                    ho.PixelLength = newSpatialLength;
-                    slidersCompleted++;
+            foreach (string path in arg.Paths) {
+                BeatmapEditor editor = editorRead ? EditorReaderStuff.GetNewestVersion(path, reader) : new BeatmapEditor(path);
+                Beatmap beatmap = editor.Beatmap;
+                Timing timing = beatmap.BeatmapTiming;
+                List<HitObject> markedObjects = arg.RequireBookmarks ? beatmap.GetBookmarkedObjects() : beatmap.HitObjects;
+
+                for (int i = 0; i < markedObjects.Count; i++) {
+                    HitObject ho = markedObjects[i];
+                    if (ho.IsSlider) {
+                        double oldSpatialLength = ho.PixelLength;
+                        double newSpatialLength = arg.SpatialLength != -1 ? ho.GetSliderPath(fullLength: true).Distance * arg.SpatialLength : oldSpatialLength;
+                        double oldTemporalLength = timing.CalculateSliderTemporalLength(ho.Time, ho.PixelLength);
+                        double newTemporalLength = arg.TemporalLength != -1 ? timing.GetMpBAtTime(ho.Time) * arg.TemporalLength : oldTemporalLength;
+                        double oldSV = timing.GetSVAtTime(ho.Time);
+                        double newSV = oldSV / ((newSpatialLength / oldSpatialLength) / (newTemporalLength / oldTemporalLength));
+                        ho.SV = newSV;
+                        ho.PixelLength = newSpatialLength;
+                        slidersCompleted++;
+                    }
+                    if (worker != null && worker.WorkerReportsProgress) {
+                        worker.ReportProgress(i / markedObjects.Count);
+                    }
                 }
-                if (worker != null && worker.WorkerReportsProgress) {
-                    worker.ReportProgress(i / markedObjects.Count);
+
+                // Reconstruct SV
+                List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
+                // Add Hitobject stuff
+                foreach (HitObject ho in beatmap.HitObjects) {
+                    if (ho.IsSlider) // SV changes
+                    {
+                        TimingPoint tp = ho.TP.Copy();
+                        tp.Offset = ho.Time;
+                        tp.MpB = ho.SV;
+                        timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true));
+                    }
                 }
+
+                // Add the new SV changes
+                TimingPointsChange.ApplyChanges(timing, timingPointsChanges);
+
+                // Save the file
+                editor.SaveFile();
             }
-
-            // Reconstruct SV
-            List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
-            // Add Hitobject stuff
-            foreach (HitObject ho in beatmap.HitObjects)
-            {
-                if (ho.IsSlider) // SV changes
-                {
-                    TimingPoint tp = ho.TP.Copy();
-                    tp.Offset = ho.Time;
-                    tp.MpB = ho.SV;
-                    timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true));
-                }
-            }
-
-            // Add the new SV changes
-            TimingPointsChange.ApplyChanges(timing, timingPointsChanges);
-
-            // Save the file
-            editor.SaveFile();
+            
 
             // Complete progressbar
             if (worker != null && worker.WorkerReportsProgress)

@@ -114,9 +114,11 @@ namespace Mapping_Tools.Views {
             string[] paths = arg.PathTo.Split('|');
             int mapsDone = 0;
 
+            bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+
             foreach (string pathTo in paths) {
-                BeatmapEditor editorTo = new BeatmapEditor(pathTo);
-                BeatmapEditor editorFrom = new BeatmapEditor(arg.PathFrom);
+                BeatmapEditor editorTo = editorRead ? EditorReaderStuff.GetNewestVersion(pathTo, reader) : new BeatmapEditor(pathTo);
+                BeatmapEditor editorFrom = editorRead ? EditorReaderStuff.GetNewestVersion(arg.PathFrom, reader) : new BeatmapEditor(arg.PathFrom);
 
                 Beatmap beatmapTo = editorTo.Beatmap;
                 Beatmap beatmapFrom = editorFrom.Beatmap;

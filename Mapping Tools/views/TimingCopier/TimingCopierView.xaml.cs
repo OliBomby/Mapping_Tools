@@ -55,9 +55,7 @@ namespace Mapping_Tools.Views {
 
         private void Start_Click(object sender, RoutedEventArgs e) {
             string filesToCopy = ((TimingCopierVM)DataContext).ExportPath;
-            foreach (string fileToCopy in filesToCopy.Split('|')) {
-                IOHelper.SaveMapBackup(fileToCopy);
-            }
+            IOHelper.SaveMapBackup(filesToCopy.Split('|'));
 
             backgroundWorker.RunWorkerAsync(DataContext);
             start.IsEnabled = false;
@@ -67,9 +65,11 @@ namespace Mapping_Tools.Views {
             string[] paths = arg.ExportPath.Split('|');
             int mapsDone = 0;
 
+            bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+
             foreach (string exportPath in paths) {
-                BeatmapEditor editorTo = new BeatmapEditor(exportPath);
-                BeatmapEditor editorFrom = new BeatmapEditor(arg.ImportPath);
+                BeatmapEditor editorTo = editorRead ? EditorReaderStuff.GetNewestVersion(exportPath, reader) : new BeatmapEditor(exportPath);
+                BeatmapEditor editorFrom = editorRead ? EditorReaderStuff.GetNewestVersion(arg.ImportPath, reader) : new BeatmapEditor(arg.ImportPath);
 
                 Beatmap beatmapTo = editorTo.Beatmap;
                 Beatmap beatmapFrom = editorFrom.Beatmap;

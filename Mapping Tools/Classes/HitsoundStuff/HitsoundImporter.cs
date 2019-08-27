@@ -10,12 +10,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Globalization;
 using System.Windows;
+using Mapping_Tools.Classes.Tools;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     class HitsoundImporter {
         public static List<double> TimesFromStack(string path, double x, double y) {
             List<double> times = new List<double>();
-            BeatmapEditor editor = new BeatmapEditor(path);
+            BeatmapEditor editor = EditorReaderStuff.GetNewestVersion(path);
 
             bool xIgnore = x == -1;
             bool yIgnore = y == -1;
@@ -94,7 +95,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// <param name="path">The path to the beatmap</param>
         /// <returns>The hitsound layers</returns>
         public static List<HitsoundLayer> ImportHitsounds(string path) {
-            BeatmapEditor editor = new BeatmapEditor(path);
+            BeatmapEditor editor = EditorReaderStuff.GetNewestVersion(path);
             Beatmap beatmap = editor.Beatmap;
             Timeline timeline = beatmap.GetTimeline();
 

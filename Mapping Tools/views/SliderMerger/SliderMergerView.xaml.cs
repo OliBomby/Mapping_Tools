@@ -47,20 +47,20 @@ namespace Mapping_Tools.Views {
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
-            string fileToCopy = MainWindow.AppWindow.currentMap.Text;
-            IOHelper.SaveMapBackup(fileToCopy);
+            string[] filesToCopy = MainWindow.AppWindow.GetCurrentMaps();
+            IOHelper.SaveMapBackup(filesToCopy);
 
-            backgroundWorker.RunWorkerAsync(new Arguments(fileToCopy, LeniencyBox.GetDouble(0), (bool) ReqBookmBox.IsChecked));
+            backgroundWorker.RunWorkerAsync(new Arguments(filesToCopy, LeniencyBox.GetDouble(0), (bool) ReqBookmBox.IsChecked));
             start.IsEnabled = false;
         }
 
         private struct Arguments {
-            public string Path;
+            public string[] Paths;
             public double Leniency;
             public bool RequireBookmarks;
-            public Arguments(string path, double leniency, bool requireBookmarks)
+            public Arguments(string[] paths, double leniency, bool requireBookmarks)
             {
-                Path = path;
+                Paths = paths;
                 Leniency = leniency;
                 RequireBookmarks = requireBookmarks;
             }
@@ -68,43 +68,48 @@ namespace Mapping_Tools.Views {
 
         private string Merge_Sliders(Arguments arg, BackgroundWorker worker, DoWorkEventArgs _) {
             int slidersMerged = 0;
-            bool mergeLast = false;
 
-            BeatmapEditor editor = new BeatmapEditor(arg.Path);
-            Beatmap beatmap = editor.Beatmap;
-            List<HitObject> markedObjects = arg.RequireBookmarks ? beatmap.GetBookmarkedObjects() : beatmap.HitObjects;
+            bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
 
-            for (int i = 0; i < markedObjects.Count - 1; i++) {
-                HitObject ho1 = markedObjects[i];
-                HitObject ho2 = markedObjects[i + 1];
-                if (ho1.IsSlider && ho2.IsSlider && (ho1.CurvePoints.Last() - ho2.Pos).Length <= arg.Leniency) {
-                    ho2.Move(ho1.CurvePoints.Last() - ho2.Pos);
+            foreach (string path in arg.Paths) {
+                BeatmapEditor editor = editorRead ? EditorReaderStuff.GetNewestVersion(path, reader) : new BeatmapEditor(path);
+                Beatmap beatmap = editor.Beatmap;
+                List<HitObject> markedObjects = arg.RequireBookmarks ? beatmap.GetBookmarkedObjects() : beatmap.HitObjects;
 
-                    SliderPath sp1 = BezierConverter.ConvertToBezier(ho1.SliderPath);
-                    SliderPath sp2 = BezierConverter.ConvertToBezier(ho2.SliderPath);
-                    Vector2[] mergedAnchors = sp1.ControlPoints.Concat(sp2.ControlPoints).ToArray();
-                    mergedAnchors.Round();
+                bool mergeLast = false;
+                for (int i = 0; i < markedObjects.Count - 1; i++) {
+                    HitObject ho1 = markedObjects[i];
+                    HitObject ho2 = markedObjects[i + 1];
+                    if (ho1.IsSlider && ho2.IsSlider && (ho1.CurvePoints.Last() - ho2.Pos).Length <= arg.Leniency) {
+                        ho2.Move(ho1.CurvePoints.Last() - ho2.Pos);
 
-                    SliderPath mergedPath = new SliderPath(PathType.Bezier, mergedAnchors, ho1.PixelLength + ho2.PixelLength);
-                    ho1.SliderPath = mergedPath;
+                        SliderPath sp1 = BezierConverter.ConvertToBezier(ho1.SliderPath);
+                        SliderPath sp2 = BezierConverter.ConvertToBezier(ho2.SliderPath);
+                        Vector2[] mergedAnchors = sp1.ControlPoints.Concat(sp2.ControlPoints).ToArray();
+                        mergedAnchors.Round();
 
-                    beatmap.HitObjects.Remove(ho2);
-                    markedObjects.Remove(ho2);
-                    i--;
+                        SliderPath mergedPath = new SliderPath(PathType.Bezier, mergedAnchors, ho1.PixelLength + ho2.PixelLength);
+                        ho1.SliderPath = mergedPath;
 
-                    slidersMerged++;
-                    if(!mergeLast) { slidersMerged++; }
-                    mergeLast = true;
-                } else {
-                    mergeLast = false;
+                        beatmap.HitObjects.Remove(ho2);
+                        markedObjects.Remove(ho2);
+                        i--;
+
+                        slidersMerged++;
+                        if (!mergeLast) { slidersMerged++; }
+                        mergeLast = true;
+                    } else {
+                        mergeLast = false;
+                    }
+                    if (worker != null && worker.WorkerReportsProgress) {
+                        worker.ReportProgress(i / markedObjects.Count);
+                    }
                 }
-                if (worker != null && worker.WorkerReportsProgress) {
-                    worker.ReportProgress(i / markedObjects.Count);
-                }
+
+                // Save the file
+                editor.SaveFile();
             }
-
-            // Save the file
-            editor.SaveFile();
+            
 
             // Complete progressbar
             if (worker != null && worker.WorkerReportsProgress)

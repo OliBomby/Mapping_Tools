@@ -139,8 +139,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             SampleSet = (SampleSet)ob.SampleSet;
             AdditionSet = (SampleSet)ob.SampleSetAdditions;
             CustomIndex = ob.CustomSampleSet;
-
-            Debug();
         }
 
         public static explicit operator HitObject(Editor_Reader.HitObject ob) {

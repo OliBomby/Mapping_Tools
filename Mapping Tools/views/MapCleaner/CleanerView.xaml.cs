@@ -32,8 +32,8 @@ namespace Mapping_Tools.Views {
         private void Start_Click(object sender, RoutedEventArgs e) {
             Arguments arguments = GetArgumentsFromWindow();
             
-            string fileToCopy = arguments.Path;
-            IOHelper.SaveMapBackup(fileToCopy);
+            string[] filesToCopy = arguments.Paths;
+            IOHelper.SaveMapBackup(filesToCopy);
 
             backgroundWorker.RunWorkerAsync(arguments);
 
@@ -62,18 +62,18 @@ namespace Mapping_Tools.Views {
         }
 
         private struct Arguments {
-            public string Path;
+            public string[] Paths;
             public MapCleaner.MapCleanerArgs CleanerArguments;
 
-            public Arguments(string path, MapCleaner.MapCleanerArgs cleanerArguments) {
-                Path = path;
+            public Arguments(string[] paths, MapCleaner.MapCleanerArgs cleanerArguments) {
+                Paths = paths;
                 CleanerArguments = cleanerArguments;
             }
         }
 
         private Arguments GetArgumentsFromWindow() {
-            string fileToCopy = MainWindow.AppWindow.currentMap.Text;
-            Arguments arguments = new Arguments(fileToCopy,
+            string[] filesToCopy = MainWindow.AppWindow.GetCurrentMaps();
+            Arguments arguments = new Arguments(filesToCopy,
                                                 new MapCleaner.MapCleanerArgs((bool)VolumeSliders.IsChecked, (bool)SamplesetSliders.IsChecked, (bool)VolumeSpinners.IsChecked,
                                                                          (bool)ResnapObjects.IsChecked, (bool)ResnapBookmarks.IsChecked,
                                                                          (bool)RemoveUnusedSamples.IsChecked,
@@ -84,25 +84,47 @@ namespace Mapping_Tools.Views {
         }
 
         private string Run_Program(Arguments args, BackgroundWorker worker, DoWorkEventArgs _) {
-            //BeatmapEditor editor = new BeatmapEditor(args.Path);
-            BeatmapEditor editor = EditorReaderStuff.GetNewestVersion(args.Path);
+            var result = new MapCleaner.MapCleanerResult();
 
-            List<TimingPoint> orgininalTimingPoints = new List<TimingPoint>();
-            foreach (TimingPoint tp in editor.Beatmap.BeatmapTiming.TimingPoints) { orgininalTimingPoints.Add(tp.Copy()); }
-            int oldTimingPointsCount = editor.Beatmap.BeatmapTiming.TimingPoints.Count;
+            bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
 
-            var result = MapCleaner.CleanMap(editor, args.CleanerArguments, worker);
+            if (args.Paths.Length == 1) {
+                BeatmapEditor editor = editorRead ? EditorReaderStuff.GetNewestVersion(args.Paths[0], reader) : new BeatmapEditor(args.Paths[0]);
 
-            List<TimingPoint> newTimingPoints = editor.Beatmap.BeatmapTiming.TimingPoints;
-            Monitor_Differences(orgininalTimingPoints, newTimingPoints);
+                List<TimingPoint> orgininalTimingPoints = new List<TimingPoint>();
+                foreach (TimingPoint tp in editor.Beatmap.BeatmapTiming.TimingPoints) { orgininalTimingPoints.Add(tp.Copy()); }
+                int oldTimingPointsCount = editor.Beatmap.BeatmapTiming.TimingPoints.Count;
 
-            // Save the file
-            editor.SaveFile();
-            
+                result.Add(MapCleaner.CleanMap(editor, args.CleanerArguments, worker));
+
+                // Update result with removed count
+                int removed = oldTimingPointsCount - editor.Beatmap.BeatmapTiming.TimingPoints.Count;
+                result.TimingPointsRemoved += removed;
+
+                List<TimingPoint> newTimingPoints = editor.Beatmap.BeatmapTiming.TimingPoints;
+                Monitor_Differences(orgininalTimingPoints, newTimingPoints);
+
+                // Save the file
+                editor.SaveFile();
+            } else {
+                foreach (string path in args.Paths) {
+                    BeatmapEditor editor = editorRead ? EditorReaderStuff.GetNewestVersion(path, reader) : new BeatmapEditor(path);
+
+                    int oldTimingPointsCount = editor.Beatmap.BeatmapTiming.TimingPoints.Count;
+
+                    result.Add(MapCleaner.CleanMap(editor, args.CleanerArguments, worker));
+
+                    // Update result with removed count
+                    int removed = oldTimingPointsCount - editor.Beatmap.BeatmapTiming.TimingPoints.Count;
+                    result.TimingPointsRemoved += removed;
+
+                    // Save the file
+                    editor.SaveFile();
+                }
+            }
 
             // Make an accurate message
-            int removed = oldTimingPointsCount - editor.Beatmap.BeatmapTiming.TimingPoints.Count;
-            string message = $"Successfully {(removed < 0 ? "added" : "removed")} {Math.Abs(removed)} {(Math.Abs(removed) == 1 ? "greenline" : "greenlines")}" +
+            string message = $"Successfully {(result.TimingPointsRemoved < 0 ? "added" : "removed")} {Math.Abs(result.TimingPointsRemoved)} {(Math.Abs(result.TimingPointsRemoved) == 1 ? "greenline" : "greenlines")}" +
                 (args.CleanerArguments.ResnapObjects ? $" and resnapped {result.ObjectsResnapped} {(result.ObjectsResnapped == 1 ? "object" : "objects")}" : "") + 
                 (args.CleanerArguments.RemoveUnusedSamples ? $" and removed {result.SamplesRemoved} unused {(result.SamplesRemoved == 1 ? "sample" : "samples")}" : "") + "!";
             return message;
