@@ -17,16 +17,16 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public bool Kiai { get; set; }
         public bool OmitFirstBarLine { get; set; }
 
-        public TimingPoint(double Offset, double MpB, int Meter, SampleSet SampleSet, int SampleIndex, double Volume, bool Inherited, bool Kiai, bool OmitFirstBarLine) {
-            this.Offset = Offset;
-            this.MpB = MpB;
-            this.Meter = Meter;
-            this.SampleSet = SampleSet;
-            this.SampleIndex = SampleIndex;
-            this.Volume = Volume;
-            this.Inherited = Inherited;
-            this.Kiai = Kiai;
-            this.OmitFirstBarLine = OmitFirstBarLine;
+        public TimingPoint(double offset, double mpb, int meter, SampleSet sampleSet, int sampleIndex, double volume, bool inherited, bool kiai, bool omitFirstBarLine) {
+            Offset = offset;
+            MpB = mpb;
+            Meter = meter;
+            SampleSet = sampleSet;
+            SampleIndex = sampleIndex;
+            Volume = volume;
+            Inherited = inherited;
+            Kiai = kiai;
+            OmitFirstBarLine = omitFirstBarLine;
         }
 
         public TimingPoint(Editor_Reader.ControlPoint cp) {
