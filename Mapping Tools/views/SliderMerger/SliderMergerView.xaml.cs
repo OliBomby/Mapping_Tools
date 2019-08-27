@@ -50,19 +50,19 @@ namespace Mapping_Tools.Views {
             string[] filesToCopy = MainWindow.AppWindow.GetCurrentMaps();
             IOHelper.SaveMapBackup(filesToCopy);
 
-            backgroundWorker.RunWorkerAsync(new Arguments(filesToCopy, LeniencyBox.GetDouble(0), (bool) ReqBookmBox.IsChecked));
+            backgroundWorker.RunWorkerAsync(new Arguments(filesToCopy, LeniencyBox.GetDouble(0), SelectionModeBox.SelectedIndex));
             start.IsEnabled = false;
         }
 
         private struct Arguments {
             public string[] Paths;
             public double Leniency;
-            public bool RequireBookmarks;
-            public Arguments(string[] paths, double leniency, bool requireBookmarks)
+            public int SelectionMode;
+            public Arguments(string[] paths, double leniency, int selectionMode)
             {
                 Paths = paths;
                 Leniency = leniency;
-                RequireBookmarks = requireBookmarks;
+                SelectionMode = selectionMode;
             }
         }
 
@@ -70,11 +70,14 @@ namespace Mapping_Tools.Views {
             int slidersMerged = 0;
 
             bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+            Console.WriteLine(editorRead);
 
             foreach (string path in arg.Paths) {
                 BeatmapEditor editor = editorRead ? EditorReaderStuff.GetNewestVersion(path, reader) : new BeatmapEditor(path);
                 Beatmap beatmap = editor.Beatmap;
-                List<HitObject> markedObjects = arg.RequireBookmarks ? beatmap.GetBookmarkedObjects() : beatmap.HitObjects;
+                List<HitObject> markedObjects = arg.SelectionMode == 0 ? EditorReaderStuff.GetSelectedObjects(editor, reader) : 
+                                                arg.SelectionMode == 1 ? beatmap.GetBookmarkedObjects() : 
+                                                                         beatmap.HitObjects;
 
                 bool mergeLast = false;
                 for (int i = 0; i < markedObjects.Count - 1; i++) {

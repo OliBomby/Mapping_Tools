@@ -51,7 +51,7 @@ namespace Mapping_Tools.Views {
             string[] filesToCopy = MainWindow.AppWindow.GetCurrentMaps();
             IOHelper.SaveMapBackup(filesToCopy);
 
-            backgroundWorker.RunWorkerAsync(new Arguments(filesToCopy, TemporalBox.GetDouble(), SpatialBox.GetDouble(), (bool) ReqBookmBox.IsChecked));
+            backgroundWorker.RunWorkerAsync(new Arguments(filesToCopy, TemporalBox.GetDouble(), SpatialBox.GetDouble(), SelectionModeBox.SelectedIndex));
             start.IsEnabled = false;
         }
 
@@ -59,13 +59,13 @@ namespace Mapping_Tools.Views {
             public string[] Paths;
             public double TemporalLength;
             public double SpatialLength;
-            public bool RequireBookmarks;
-            public Arguments(string[] paths, double temporal, double spatial, bool requireBookmarks)
+            public int SelectionMode;
+            public Arguments(string[] paths, double temporal, double spatial, int selectionMode)
             {
                 Paths = paths;
                 TemporalLength = temporal;
                 SpatialLength = spatial;
-                RequireBookmarks = requireBookmarks;
+                SelectionMode = selectionMode;
             }
         }
 
@@ -78,7 +78,9 @@ namespace Mapping_Tools.Views {
                 BeatmapEditor editor = editorRead ? EditorReaderStuff.GetNewestVersion(path, reader) : new BeatmapEditor(path);
                 Beatmap beatmap = editor.Beatmap;
                 Timing timing = beatmap.BeatmapTiming;
-                List<HitObject> markedObjects = arg.RequireBookmarks ? beatmap.GetBookmarkedObjects() : beatmap.HitObjects;
+                List<HitObject> markedObjects = arg.SelectionMode == 0 ? EditorReaderStuff.GetSelectedObjects(editor, reader) :
+                                                arg.SelectionMode == 1 ? beatmap.GetBookmarkedObjects() :
+                                                                         beatmap.HitObjects;
 
                 for (int i = 0; i < markedObjects.Count; i++) {
                     HitObject ho = markedObjects[i];

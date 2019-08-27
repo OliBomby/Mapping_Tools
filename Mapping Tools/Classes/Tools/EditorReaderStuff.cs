@@ -36,6 +36,35 @@ namespace Mapping_Tools.Classes.Tools
             }
         }
 
+        public static List<BeatmapHelper.HitObject> GetSelectedObjects(BeatmapEditor editor, EditorReader reader) {
+            try {
+                string songs = SettingsManager.GetSongsPath();
+                string folder = reader.ContainingFolder;
+                string filename = reader.Filename;
+                string memoryPath = Path.Combine(songs, folder, filename);
+
+                // Check whether the beatmap in the editor is the same as the beatmap you want
+                if (memoryPath != editor.Path)
+                    return new List<BeatmapHelper.HitObject>();
+
+                reader.FetchSelected();
+                var convertedSelected = reader.selectedObjects.Select(o => (BeatmapHelper.HitObject)o).ToList();
+                var selectedHitObjects = new List<BeatmapHelper.HitObject>(convertedSelected.Count());
+                var comparer = new HitObjectComparer();
+
+                // Get all the hit objects that are selected according to the editor reader
+                foreach (var ho in editor.Beatmap.HitObjects) {
+                    if (convertedSelected.Contains(ho, comparer)) {
+                        selectedHitObjects.Add(ho);
+                    }
+                }
+                return selectedHitObjects;
+            } catch (Exception ex) {
+                MessageBox.Show($"Exception ({ex.Message}) while editor reading.");
+                return new List<BeatmapHelper.HitObject>();
+            }
+        }
+
         /// <summary>
         /// Returns an editor for the beatmap of the specified path. If said beatmap is currently open in the editor it will update the Beatmap object with the latest values.
         /// </summary>

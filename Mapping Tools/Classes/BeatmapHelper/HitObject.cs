@@ -595,11 +595,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public void Debug() {
-            Console.WriteLine("temporal length: " + TemporalLength);
-            Console.WriteLine("is circle: " + IsCircle);
-            Console.WriteLine("is slider: " + IsSlider);
-            Console.WriteLine("is spinner: " + IsSpinner);
-            Console.WriteLine("is hold note: " + IsHoldNote);
+            Console.WriteLine(GetLine());
             foreach (TimingPoint tp in BodyHitsounds) {
                 Console.WriteLine("bodyhitsound:");
                 Console.WriteLine("volume: " + tp.Volume);
