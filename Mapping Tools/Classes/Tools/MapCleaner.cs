@@ -132,7 +132,7 @@ namespace Mapping_Tools.Classes.Tools {
 
             // Maybe mute unclickable timelineobjects
             if (args.RemoveUnclickableHitsounds) {
-                foreach (TimelineObject tlo in timeline.TimeLineObjects) {
+                foreach (TimelineObject tlo in timeline.TimelineObjects) {
                     if (!(tlo.IsCircle || tlo.IsSliderHead || tlo.IsHoldnoteHead))  // Not clickable
                     {
                         tlo.FenoSampleVolume = 5;  // 5% volume mute
@@ -201,7 +201,7 @@ namespace Mapping_Tools.Classes.Tools {
             UpdateProgressBar(worker, 75);
 
             // Add timeline hitsounds
-            foreach (TimelineObject tlo in timeline.TimeLineObjects) {
+            foreach (TimelineObject tlo in timeline.TimelineObjects) {
                 // Change the samplesets in the hitobjects
                 if (tlo.Origin.IsCircle) {
                     tlo.Origin.SampleSet = tlo.FenoSampleSet;
@@ -318,7 +318,7 @@ namespace Mapping_Tools.Classes.Tools {
                     allFilenames.UnionWith(ho.GetPlayingBodyFilenames(sliderTickRate, false));
                 }
 
-                foreach (TimelineObject tlo in beatmap.GetTimeline().TimeLineObjects) {
+                foreach (TimelineObject tlo in beatmap.GetTimeline().TimelineObjects) {
                     allFilenames.UnionWith(tlo.GetPlayingFilenames(mode, false));
                 }
 

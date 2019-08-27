@@ -104,7 +104,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
             List<HitsoundLayer> hitsoundLayers = new List<HitsoundLayer>();
 
-            foreach (TimelineObject tlo in timeline.TimeLineObjects) {
+            foreach (TimelineObject tlo in timeline.TimelineObjects) {
                 if (!tlo.HasHitsound) { continue; }
 
                 List<string> samples = tlo.GetPlayingFilenames(mode);

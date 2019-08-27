@@ -140,7 +140,7 @@ namespace Mapping_Tools.Views {
                     // Save tlo times where volume is 5%
                     if (volumeMuteTimes != null) {
                         // Timingpointchange all the undefined tlo from copyFrom
-                        foreach (TimelineObject tloTo in tlTo.TimeLineObjects) {
+                        foreach (TimelineObject tloTo in tlTo.TimelineObjects) {
                             if (tloTo.canCopy && tloTo.FenoSampleVolume == 5) {
                                 volumeMuteTimes.Add(tloTo.Time);
                             }
@@ -166,7 +166,7 @@ namespace Mapping_Tools.Views {
                         List<TimingPointsChange> timingPointsChangesMute = new List<TimingPointsChange>();
                         processedTimeline.GiveTimingPoints(beatmapTo.BeatmapTiming);
 
-                        foreach (TimelineObject tloTo in processedTimeline.TimeLineObjects) {
+                        foreach (TimelineObject tloTo in processedTimeline.TimelineObjects) {
                             if (volumeMuteTimes.Contains(tloTo.Time)) {
                                 // Add timingpointschange to copy timingpoint hitsounds
                                 TimingPoint tp = tloTo.HitsoundTP.Copy();
@@ -260,7 +260,7 @@ namespace Mapping_Tools.Views {
                     {
                         if (ignoreHSSBSamples)
                         {
-                            List<TimelineObject> tloHere = processedTimeline.TimeLineObjects.FindAll(o => Math.Abs(o.Time - sampleFrom.Time) <= temporalLeniency);
+                            List<TimelineObject> tloHere = processedTimeline.TimelineObjects.FindAll(o => Math.Abs(o.Time - sampleFrom.Time) <= temporalLeniency);
                             HashSet<string> samplesHere = new HashSet<string>();
                             foreach (TimelineObject tlo in tloHere)
                             {
@@ -305,7 +305,7 @@ namespace Mapping_Tools.Views {
                     beatmapTo.GiveObjectsGreenlines();
                     processedTimeline.GiveTimingPoints(beatmapTo.BeatmapTiming);
 
-                    foreach (TimelineObject tloTo in processedTimeline.TimeLineObjects)
+                    foreach (TimelineObject tloTo in processedTimeline.TimelineObjects)
                     {
                         if (FilterMuteTLO(tloTo, beatmapTo, arg))
                         {
@@ -357,7 +357,7 @@ namespace Mapping_Tools.Views {
         }
 
         private void CopyHitsounds(Arguments arg, Timeline tlFrom, Timeline tlTo) {
-            foreach (TimelineObject tloFrom in tlFrom.TimeLineObjects) {
+            foreach (TimelineObject tloFrom in tlFrom.TimelineObjects) {
                 TimelineObject tloTo = tlTo.GetNearestTLO(tloFrom.Time, true);
 
                 if (tloTo != null && Math.Abs(Math.Round(tloFrom.Time) - Math.Round(tloTo.Time)) <= arg.TemporalLeniency) {
@@ -369,7 +369,7 @@ namespace Mapping_Tools.Views {
         }
 
         private void CopyHitsounds(Arguments arg, Timeline tlFrom, Timeline tlTo, List<TimingPointsChange> timingPointsChanges, GameMode mode, string mapDir, Dictionary<string, string> firstSamples) {
-            foreach (TimelineObject tloFrom in tlFrom.TimeLineObjects) {
+            foreach (TimelineObject tloFrom in tlFrom.TimelineObjects) {
                 TimelineObject tloTo = tlTo.GetNearestTLO(tloFrom.Time, true);
 
                 if (tloTo != null && Math.Abs(Math.Round(tloFrom.Time) - Math.Round(tloTo.Time)) <= arg.TemporalLeniency) {
@@ -385,7 +385,7 @@ namespace Mapping_Tools.Views {
             }
 
             // Timingpointchange all the undefined tlo from copyFrom
-            foreach (TimelineObject tloTo in tlTo.TimeLineObjects) {
+            foreach (TimelineObject tloTo in tlTo.TimelineObjects) {
                 if (tloTo.canCopy) {
                     TimingPoint tp = tloTo.HitsoundTP.Copy();
                     bool holdSampleset = arg.CopySamplesets && tloTo.SampleSet == SampleSet.Auto;

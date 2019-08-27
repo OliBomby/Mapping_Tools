@@ -9,8 +9,9 @@ using System.Linq;
 using System.Text;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
-    public class HitObject : ITextLine
-    {
+    public class HitObject : ITextLine {
+        private int repeat;
+
         public Vector2 Pos { get; set; }
 
         public double Time { get; set; }
@@ -39,7 +40,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public PathType SliderType { get; set; }
         public List<Vector2> CurvePoints { get; set; }
         public SliderPath SliderPath { get => GetSliderPath(); set => SetSliderPath(value); }
-        public int Repeat { get; set; }
+        public int Repeat { get => IsSlider ? repeat : IsCircle ? 0 : 1; set => repeat = value; }
         public double PixelLength { get; set; }
         public List<int> EdgeHitsounds { get; set; }
         public List<SampleSet> EdgeSampleSets { get; set; }
@@ -48,17 +49,25 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public bool SliderExtras { get => GetSliderExtras(); }
 
         public double TemporalLength { get; set; } // Duration of one repeat
-        public double EndTime { get; set; } // Includes all repeats
+        public double EndTime { get => GetEndTime(); set => SetEndTime(value); } // Includes all repeats
+
+        private double GetEndTime() {
+            return Math.Floor(Time + TemporalLength * Repeat + Precision.DOUBLE_EPSILON);
+        }
+
+        private void SetEndTime(double value) {
+            TemporalLength = Repeat == 0 ? 0 : value / Repeat;
+        }
 
         // Special combined with greenline
         public double SV { get; set; }
         public TimingPoint TP { get; set; }
         public TimingPoint HitsoundTP { get; set; }
         public TimingPoint Redline { get; set; }
-        public List<TimingPoint> BodyHitsounds { get; set; }
+        public List<TimingPoint> BodyHitsounds = new List<TimingPoint>();
 
         // Special combined with timeline
-        public List<TimelineObject> TimelineObjects { get; set; }
+        public List<TimelineObject> TimelineObjects = new List<TimelineObject>();
 
         public HitObject(string line) {
             // Example lines:
@@ -69,8 +78,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             // 213,192,78,128,0,378:0:0:0:0:
 
             SetLine(line);
-            BodyHitsounds = new List<TimingPoint>();
-            TimelineObjects = new List<TimelineObject>();
         }
 
         public HitObject(double time, int hitsounds, SampleSet sampleSet, SampleSet additions) {
@@ -84,6 +91,60 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             CustomIndex = 0;
             SampleVolume = 0;
             Filename = "";
+        }
+
+        public HitObject(Editor_Reader.HitObject ob) {
+            PixelLength = ob.SpatialLength;
+            Time = ob.StartTime;
+            ObjectType = ob.Type;
+            EndTime = ob.EndTime;
+            Hitsounds = ob.SoundType;
+            if (IsSlider) {
+                Repeat = ob.SegmentCount;
+
+                SliderType = (PathType)ob.CurveType;
+                if (ob.sliderCurvePoints != null) {
+                    CurvePoints = new List<Vector2>(ob.sliderCurvePoints.Length / 2);
+                    for (int i = 1; i < ob.sliderCurvePoints.Length / 2; i++)
+                        CurvePoints.Add(new Vector2(ob.sliderCurvePoints[i * 2], ob.sliderCurvePoints[i * 2 + 1]));
+                }
+
+                EdgeHitsounds = new List<int>(Repeat + 1);
+                if (ob.SoundTypeList != null)
+                    EdgeHitsounds = ob.SoundTypeList.ToList();
+                for (int i = EdgeHitsounds.Count; i < Repeat + 1; i++) {
+                    EdgeHitsounds.Add(0);
+                }
+
+                EdgeSampleSets = new List<SampleSet>(Repeat + 1);
+                EdgeAdditionSets = new List<SampleSet>(Repeat + 1);
+                if (ob.SampleSetList != null)
+                    EdgeSampleSets = Array.ConvertAll(ob.SampleSetList, ss => (SampleSet)ss).ToList();
+                if (ob.SampleSetAdditionsList != null)
+                    EdgeAdditionSets = Array.ConvertAll(ob.SampleSetAdditionsList, ss => (SampleSet)ss).ToList();
+                for (int i = EdgeSampleSets.Count; i < Repeat + 1; i++) {
+                    EdgeSampleSets.Add(SampleSet.Auto);
+                }
+                for (int i = EdgeAdditionSets.Count; i < Repeat + 1; i++) {
+                    EdgeAdditionSets.Add(SampleSet.Auto);
+                }
+            } else if (IsSpinner || IsHoldNote) {
+                Repeat = 1;
+            } else {
+                Repeat = 0;
+            }
+            Pos = new Vector2(ob.X, ob.Y);
+            Filename = ob.SampleFile;
+            SampleVolume = ob.SampleVolume;
+            SampleSet = (SampleSet)ob.SampleSet;
+            AdditionSet = (SampleSet)ob.SampleSetAdditions;
+            CustomIndex = ob.CustomSampleSet;
+
+            Debug();
+        }
+
+        public static explicit operator HitObject(Editor_Reader.HitObject ob) {
+            return new HitObject(ob);
         }
 
         public List<string> GetPlayingBodyFilenames(double sliderTickRate, bool includeDefaults = true) {
@@ -159,7 +220,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
             // Change
             TemporalLength += deltaTemporalTime;
-            EndTime = Math.Floor(Time + TemporalLength * Repeat);
 
             // Clean up body objects
             if (TimelineObjects.Count > 0) { TimelineObjects.Last().Time = EndTime; };
@@ -175,14 +235,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
-        public bool ResnapSelf(Timing timing, int snap1, int snap2, bool floor=true, TimingPoint tp=null, TimingPoint firstTP=null) {
+        public bool ResnapSelf(Timing timing, int snap1, int snap2, bool floor = true, TimingPoint tp = null, TimingPoint firstTP = null) {
             double newTime = GetResnappedTime(timing, snap1, snap2, floor, tp, firstTP);
             double deltaTime = newTime - Time;
             MoveTime(deltaTime);
             return deltaTime != 0;
         }
 
-        public bool ResnapEnd(Timing timing, int snap1, int snap2, bool floor = true, TimingPoint tp = null, TimingPoint firstTP=null) {
+        public bool ResnapEnd(Timing timing, int snap1, int snap2, bool floor = true, TimingPoint tp = null, TimingPoint firstTP = null) {
             // If there is a redline in the sliderbody then the sliderend gets snapped to a tick of the latest redline
             if (!IsSlider || timing.TimingPoints.Any(o => o.Inherited && o.Offset <= EndTime + 20 && o.Offset > Time)) {
                 return ResnapEndTime(timing, snap1, snap2, floor, tp, firstTP);
@@ -232,7 +292,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return deltaTime != 0;
         }
 
-        public double GetResnappedTime(Timing timing, int snap1, int snap2, bool floor=true, TimingPoint tp=null, TimingPoint firstTP=null) {
+        public double GetResnappedTime(Timing timing, int snap1, int snap2, bool floor = true, TimingPoint tp = null, TimingPoint firstTP = null) {
             return timing.Resnap(Time, snap1, snap2, floor, tp, firstTP);
         }
 
@@ -433,8 +493,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             if (IsHoldNote) {
                 return string.Join(":", new string[] { Math.Round(EndTime).ToString(), ((int)SampleSet).ToString(), ((int)AdditionSet).ToString(),
                                                         CustomIndex.ToString(), SampleVolume.ToString(), Filename });
-            }
-            else {
+            } else {
                 return string.Join(":", new string[] { ((int)SampleSet).ToString(), ((int)AdditionSet).ToString(),
                                                         CustomIndex.ToString(), SampleVolume.ToString(), Filename });
             }
@@ -487,15 +546,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Filename = "";
         }
 
-        public SliderPath GetSliderPath(bool fullLength = false)
-        {
+        public SliderPath GetSliderPath(bool fullLength = false) {
             List<Vector2> controlPoints = new List<Vector2> { Pos };
             controlPoints.AddRange(CurvePoints);
             return fullLength ? new SliderPath(SliderType, controlPoints.ToArray()) : new SliderPath(SliderType, controlPoints.ToArray(), PixelLength);
         }
 
-        public void SetSliderPath(SliderPath sliderPath)
-        {
+        public void SetSliderPath(SliderPath sliderPath) {
             List<Vector2> controlPoints = sliderPath.ControlPoints;
             Pos = controlPoints.First();
             CurvePoints = controlPoints.GetRange(1, controlPoints.Count - 1);
@@ -520,7 +577,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                             return PathType.PerfectCurve;
                         case 'C':
                             return PathType.Catmull;
-                    } 
+                    }
                 }
             }
             // If there is no valid letter it will literally default to catmull
@@ -541,6 +598,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public void Debug() {
             Console.WriteLine("temporal length: " + TemporalLength);
+            Console.WriteLine("is circle: " + IsCircle);
+            Console.WriteLine("is slider: " + IsSlider);
+            Console.WriteLine("is spinner: " + IsSpinner);
+            Console.WriteLine("is hold note: " + IsHoldNote);
             foreach (TimingPoint tp in BodyHitsounds) {
                 Console.WriteLine("bodyhitsound:");
                 Console.WriteLine("volume: " + tp.Volume);

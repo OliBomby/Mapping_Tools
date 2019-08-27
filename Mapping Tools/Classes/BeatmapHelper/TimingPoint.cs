@@ -29,17 +29,20 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             this.OmitFirstBarLine = OmitFirstBarLine;
         }
 
-        public TimingPoint(double Offset, double MpB, int Meter, int SampleSet, int SampleIndex, double Volume, bool Inherited, int effects) {
-            this.Offset = Offset;
-            this.MpB = MpB;
-            this.Meter = Meter;
-            this.SampleSet = (SampleSet)SampleSet;
-            this.SampleIndex = SampleIndex;
-            this.Volume = Volume;
-            this.Inherited = Inherited;
-            BitArray b = new BitArray(new int[] { effects });
-            Kiai = b[0];
-            OmitFirstBarLine = b[3];
+        public TimingPoint(Editor_Reader.ControlPoint cp) {
+            MpB = cp.BeatLength;
+            Offset = cp.Offset;
+            SampleIndex = cp.CustomSamples;
+            SampleSet = (SampleSet)cp.SampleSet;
+            Meter = cp.TimeSignature;
+            Volume = cp.Volume;
+            Kiai = (cp.EffectFlags & 1) > 0;
+            OmitFirstBarLine = (cp.EffectFlags & 8) > 0;
+            Inherited = cp.TimingChange;
+        }
+
+        public static explicit operator TimingPoint(Editor_Reader.ControlPoint cp) {
+            return new TimingPoint(cp);
         }
 
         public TimingPoint(string line) {

@@ -17,6 +17,23 @@ namespace Mapping_Tools.Classes.Tools
     public static class EditorReaderStuff {
         private readonly static EditorReader editorReader = new EditorReader();
 
+        public static EditorReader GetEditorReader() {
+            return editorReader;
+        }
+
+        /// <summary>
+        /// Gets the instance of EditorReader with FetchAll. Throws an exception if the editor is not open.
+        /// </summary>
+        /// <returns></returns>
+        public static bool TryGetFullEditorReader(out EditorReader reader) {
+            reader = editorReader;
+            try {
+                editorReader.FetchAll();
+                return true;
+            } catch {
+                return false;
+            }
+        }
 
         /// <summary>
         /// Returns an editor for the beatmap of the specified path. If said beatmap is currently open in the editor it will update the Beatmap object with the latest values.
@@ -28,16 +45,11 @@ namespace Mapping_Tools.Classes.Tools
             BeatmapEditor editor = new BeatmapEditor(path);
 
             // Get a reader object that has everything fetched
-            var reader = fullReader ?? editorReader;
-            if (fullReader == null) {
-                try {
-                    reader.FetchAll();
-                } catch (Exception) {
-                    // The editor is probably not open
+            var reader = fullReader;
+            if (reader == null)
+                if (!TryGetFullEditorReader(out reader))
                     return editor;
-                }
-            }
-
+            
             // Get the path from the beatmap in memory
             string songs = SettingsManager.GetSongsPath();
             // This can only crash if the provided fullReader didn't fetch all values
@@ -65,15 +77,9 @@ namespace Mapping_Tools.Classes.Tools
 
             beatmap.SetBookmarks(reader.bookmarks.Select<int, double>(o => o).ToList());
 
-            beatmap.BeatmapTiming.TimingPoints.Clear();
-            foreach (var cp in reader.controlPoints) {
-                beatmap.BeatmapTiming.TimingPoints.Add(new TimingPoint(cp.Offset, cp.BeatLength, cp.TimeSignature, cp.SampleSet, cp.CustomSamples, cp.Volume, cp.TimingChange, cp.EffectFlags));
-            }
+            beatmap.BeatmapTiming.TimingPoints = reader.controlPoints.Select(o => (TimingPoint)o).ToList();
 
-            beatmap.HitObjects.Clear();
-            foreach (var ho in reader.hitObjects) {
-                beatmap.HitObjects.Add(new BeatmapHelper.HitObject(ho.ToString()));
-            }
+            beatmap.HitObjects = reader.hitObjects.Select(o => (BeatmapHelper.HitObject)o).ToList();
 
             beatmap.General["PreviewTime"] = new TValue(reader.PreviewTime.ToString(CultureInfo.InvariantCulture));
             beatmap.Difficulty["SliderMultiplier"] = new TValue(reader.SliderMultiplier.ToString(CultureInfo.InvariantCulture));

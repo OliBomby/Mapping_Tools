@@ -76,8 +76,8 @@ namespace Mapping_Tools.Views {
             Beatmap beatmap = editor.Beatmap;
             Timeline timeline = beatmap.GetTimeline();
 
-            for (int i = 0; i < timeline.TimeLineObjects.Count; i++) {
-                var tlo = timeline.TimeLineObjects[i];
+            for (int i = 0; i < timeline.TimelineObjects.Count; i++) {
+                var tlo = timeline.TimelineObjects[i];
 
                 var column = arg.Zones.FirstOrDefault();
                 double best = double.MaxValue;
