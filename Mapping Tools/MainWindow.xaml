@@ -130,7 +130,7 @@
                         <TextBlock Padding="10,10,0,0" Text="Current Map:" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontWeight="Normal"/>
                     </Grid>
                     <Grid Grid.Column="1">
-                        <TextBlock x:FieldModifier="public" Name="currentMap" Height="35" TextWrapping="NoWrap" Padding="10,10,0,0" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontWeight="Normal"/>
+                        <TextBlock x:FieldModifier="public" Name="currentMap" Height="35" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Padding="10,10,0,0" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontWeight="Normal"/>
                     </Grid>
                 </Grid>
             </materialDesign:ColorZone>
