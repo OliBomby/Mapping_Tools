@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Mapping_Tools.Classes.Tools
 {
@@ -49,20 +50,25 @@ namespace Mapping_Tools.Classes.Tools
             if (reader == null)
                 if (!TryGetFullEditorReader(out reader))
                     return editor;
-            
+
             // Get the path from the beatmap in memory
-            string songs = SettingsManager.GetSongsPath();
             // This can only crash if the provided fullReader didn't fetch all values
-            string folder = reader.ContainingFolder;
-            string filename = reader.Filename;
-            string memoryPath = Path.Combine(songs, folder, filename);
+            try {
+                string songs = SettingsManager.GetSongsPath();
+                string folder = reader.ContainingFolder;
+                string filename = reader.Filename;
+                string memoryPath = Path.Combine(songs, folder, filename);
 
-            // Check whether the beatmap in the editor is the same as the beatmap you want
-            if (memoryPath != path)
-                return editor;
+                // Check whether the beatmap in the editor is the same as the beatmap you want
+                if (memoryPath != path)
+                    return editor;
 
-            // Update the beatmap with memory values
-            UpdateBeatmap(editor.Beatmap, reader);
+                // Update the beatmap with memory values
+                UpdateBeatmap(editor.Beatmap, reader);
+            } catch {
+                MessageBox.Show("Exception while editor reading.");
+            }
+            
 
             return editor;
         }
