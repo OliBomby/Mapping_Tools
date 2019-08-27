@@ -68,7 +68,6 @@ namespace Mapping_Tools.Classes.Tools
             } catch {
                 MessageBox.Show("Exception while editor reading.");
             }
-            
 
             return editor;
         }
@@ -79,8 +78,6 @@ namespace Mapping_Tools.Classes.Tools
         /// <param name="beatmap">Beatmap to replace values in</param>
         /// <param name="reader">Reader that contains the values from memory</param>
         public static void UpdateBeatmap(Beatmap beatmap, EditorReader reader) {
-            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-
             beatmap.SetBookmarks(reader.bookmarks.Select<int, double>(o => o).ToList());
 
             beatmap.BeatmapTiming.TimingPoints = reader.controlPoints.Select(o => (TimingPoint)o).ToList();
