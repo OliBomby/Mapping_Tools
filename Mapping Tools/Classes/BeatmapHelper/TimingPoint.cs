@@ -2,7 +2,7 @@
 using Mapping_Tools.Classes.MathUtil;
 using System;
 using System.Collections;
-using System.Globalization;
+using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     public class TimingPoint : ITextLine {
@@ -51,8 +51,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public string GetLine() {
             int style = MathHelper.GetIntFromBitArray(new BitArray(new bool[] { Kiai, false, false, OmitFirstBarLine }));
-            return Math.Round(Offset) + "," + MpB.ToString(CultureInfo.InvariantCulture) + "," + Meter + "," + (int)SampleSet + "," + SampleIndex + ","
-                + Math.Round(Volume) + "," + Convert.ToInt32(Inherited) + "," + style;
+            return $"{Offset.ToRoundInvariant()},{MpB.ToInvariant()},{Meter.ToInvariant()},{SampleSet.ToIntInvariant()},{SampleIndex.ToInvariant()},{Volume.ToRoundInvariant()},{Convert.ToInt32(Inherited).ToInvariant()},{style.ToInvariant()}";
         }
 
         public void SetLine(string line) {
@@ -66,7 +65,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 MpB = mpb;
             else throw new BeatmapParsingException("Failed to parse milliseconds per beat of timing point", line);
 
-            if (int.TryParse(values[2], out int meter))
+            if (TryParseInt(values[2], out int meter))
                 Meter = meter;
             else throw new BeatmapParsingException("Failed to parse meter of timing point", line);
 
@@ -74,7 +73,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 SampleSet = ss;
             else throw new BeatmapParsingException("Failed to parse sampleset of timing point", line);
 
-            if (int.TryParse(values[4], out int ind))
+            if (TryParseInt(values[4], out int ind))
                 SampleIndex = ind;
             else throw new BeatmapParsingException("Failed to parse samle index of timing point", line);
 
@@ -84,7 +83,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
             Inherited = values[6] == "1";
 
-            if (int.TryParse(values[7], out int style)) {
+            if (TryParseInt(values[7], out int style)) {
                 BitArray b = new BitArray(new int[] { style });
                 Kiai = b[0];
                 OmitFirstBarLine = b[3];
@@ -128,10 +127,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             else {
                 return -100 / MpB;
             }
-        }
-
-        private bool TryParseDouble(string d, out double result) {
-            return double.TryParse(d, NumberStyles.Float, CultureInfo.InvariantCulture, out result);
         }
     }
 }

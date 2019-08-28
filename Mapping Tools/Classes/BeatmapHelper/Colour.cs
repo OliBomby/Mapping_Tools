@@ -1,5 +1,4 @@
-﻿using System;
-using System.Globalization;
+﻿using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     public class Colour
@@ -31,12 +30,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             else throw new BeatmapParsingException("Failed to parse blue component of colour.", line);
         }
 
-        private bool TryParseDouble(string d, out double result) {
-            return double.TryParse(d, NumberStyles.Float, CultureInfo.InvariantCulture, out result);
-        }
-
         public override string ToString() {
-            return (int)Math.Round(Red) + "," + (int)Math.Round(Green) + "," + (int)Math.Round(Blue);
+            return $"{Red.ToRoundInvariant()},{Green.ToRoundInvariant()},{Blue.ToRoundInvariant()}";
         }
     }
 }

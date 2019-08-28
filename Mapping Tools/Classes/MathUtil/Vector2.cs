@@ -158,28 +158,6 @@ namespace Mapping_Tools.Classes.MathUtil {
         }
 
         /// <summary>
-        /// Returns a System.string that represents the X coordinate of the current Vector2.
-        /// </summary>
-        /// <returns></returns>
-        public string StringX {
-            get {
-                return ((int)Math.Round(X)).ToString();
-            }
-        }
-
-        /// <summary>
-        /// Returns a System.string that represents the X coordinate of the current Vector2.
-        /// </summary>
-        /// <returns></returns>
-        public string StringY
-        {
-            get
-            {
-                return ((int)Math.Round(Y)).ToString();
-            }
-        }
-
-        /// <summary>
         /// Returns a copy of the Vector2 scaled to unit length.
         /// </summary>
         /// <returns></returns>

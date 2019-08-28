@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     public class StoryboardSoundSample : IEquatable<StoryboardSoundSample>, ITextLine {
@@ -25,7 +21,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public string GetLine() {
-            return string.Format("Sample,{0},{1},\"{2}\",{3}", Math.Round(Time), (int)Layer, FilePath, Math.Round(Volume));
+            return $"Sample,{Time.ToRoundInvariant()},{Layer.ToIntInvariant()},\"{FilePath}\",{Volume.ToRoundInvariant()}";
         }
 
         public void SetLine(string line) {
@@ -52,10 +48,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
             else
                 Volume = 100;
-        }
-
-        private bool TryParseDouble(string d, out double result) {
-            return double.TryParse(d, NumberStyles.Float, CultureInfo.InvariantCulture, out result);
         }
 
         public bool Equals(StoryboardSoundSample other) {
