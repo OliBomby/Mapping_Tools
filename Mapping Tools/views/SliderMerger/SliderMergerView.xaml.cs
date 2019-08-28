@@ -70,7 +70,6 @@ namespace Mapping_Tools.Views {
             int slidersMerged = 0;
 
             bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
-            Console.WriteLine(editorRead);
 
             foreach (string path in arg.Paths) {
                 var selected = new List<HitObject>();
