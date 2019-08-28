@@ -73,8 +73,8 @@ namespace Mapping_Tools {
                 System.Windows.MessageBox.Show(ex.Message);
             }
 
-            // Register virtual key code 0x60 = NumPad0 to QuickRun
-            keyboardHookManager.RegisterHotkey(0x4D, QuickRunCurrentTool);
+            // Register virtual key code 0x4D = M to QuickRun
+            keyboardHookManager.RegisterHotkey(new[] { NonInvasiveKeyboardHookLibrary.ModifierKeys.Alt, NonInvasiveKeyboardHookLibrary.ModifierKeys.Control, NonInvasiveKeyboardHookLibrary.ModifierKeys.Shift }, 0x4D, QuickRunCurrentTool);
             keyboardHookManager.Start();
         }
 
@@ -106,6 +106,7 @@ namespace Mapping_Tools {
                     }
                 }
                 SendKeys.SendWait("^{L 10}");
+                Thread.Sleep(100);
                 SendKeys.SendWait("{ENTER}");
             }
         }
