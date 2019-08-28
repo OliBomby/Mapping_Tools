@@ -16,8 +16,11 @@ namespace Mapping_Tools.Views {
     /// <summary>
     /// Interaktionslogik für UserControl1.xaml
     /// </summary>
-    public partial class SliderMergerView :UserControl {
+    public partial class SliderMergerView : UserControl, IQuickRun {
         private readonly BackgroundWorker backgroundWorker;
+        private bool canRun = true;
+
+        public event EventHandler RunFinished;
 
         public SliderMergerView() {
             InitializeComponent();
@@ -36,10 +39,12 @@ namespace Mapping_Tools.Views {
                 MessageBox.Show(string.Format("{0}{1}{2}", e.Error.Message, Environment.NewLine, e.Error.StackTrace), "Error");
             }
             else {
-                MessageBox.Show(e.Result.ToString());
+                if (e.Result.ToString() != "")
+                    MessageBox.Show(e.Result.ToString());
                 progress.Value = 0;
             }
             start.IsEnabled = true;
+            canRun = true;
         }
 
         private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
@@ -47,22 +52,34 @@ namespace Mapping_Tools.Views {
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
-            string[] filesToCopy = MainWindow.AppWindow.GetCurrentMaps();
-            IOHelper.SaveMapBackup(filesToCopy);
+            RunTool(MainWindow.AppWindow.GetCurrentMaps(), quick:false);
+        }
 
-            backgroundWorker.RunWorkerAsync(new Arguments(filesToCopy, LeniencyBox.GetDouble(0), SelectionModeBox.SelectedIndex));
+        public void QuickRun() {
+            RunTool(new[] { IOHelper.CurrentBeatmap() }, quick:true);
+        }
+
+        private void RunTool(string[] paths, bool quick=false) {
+            if (!canRun) return;
+
+            IOHelper.SaveMapBackup(paths);
+
+            backgroundWorker.RunWorkerAsync(new Arguments(paths, LeniencyBox.GetDouble(0), SelectionModeBox.SelectedIndex, quick));
             start.IsEnabled = false;
+            canRun = false;
         }
 
         private struct Arguments {
             public string[] Paths;
             public double Leniency;
             public int SelectionMode;
-            public Arguments(string[] paths, double leniency, int selectionMode)
+            public bool Quick;
+            public Arguments(string[] paths, double leniency, int selectionMode, bool quick)
             {
                 Paths = paths;
                 Leniency = leniency;
                 SelectionMode = selectionMode;
+                Quick = quick;
             }
         }
 
@@ -112,13 +129,16 @@ namespace Mapping_Tools.Views {
                 // Save the file
                 editor.SaveFile();
             }
-            
 
             // Complete progressbar
             if (worker != null && worker.WorkerReportsProgress)
             {
                 worker.ReportProgress(100);
             }
+
+            // Do stuff
+            if (arg.Quick)
+                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, editorRead));
 
             // Make an accurate message
             string message = "";
@@ -130,7 +150,7 @@ namespace Mapping_Tools.Views {
             {
                 message += "Successfully merged " + slidersMerged + " sliders!";
             }
-            return message;
+            return arg.Quick ? "" : message;
         }
     }
 }

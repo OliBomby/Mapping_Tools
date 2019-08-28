@@ -17,6 +17,9 @@ using System.Drawing;
 using System.Reflection;
 using System.Linq;
 using System.Net.Http;
+using NonInvasiveKeyboardHookLibrary;
+using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace Mapping_Tools {
     public partial class MainWindow : Window {
@@ -27,6 +30,7 @@ namespace Mapping_Tools {
 
         public static MainWindow AppWindow { get; set; }
         public static readonly HttpClient HttpClient = new HttpClient();
+        public static readonly KeyboardHookManager keyboardHookManager = new KeyboardHookManager();
         private static readonly string appCommon = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         public static readonly string AppDataPath = Path.Combine(appCommon, "Mapping Tools");
         public static readonly string ExportPath = Path.Combine(AppDataPath, "Exports");
@@ -67,6 +71,42 @@ namespace Mapping_Tools {
             }
             catch( Exception ex ) {
                 System.Windows.MessageBox.Show(ex.Message);
+            }
+
+            // Register virtual key code 0x60 = NumPad0 to QuickRun
+            keyboardHookManager.RegisterHotkey(0x4D, QuickRunCurrentTool);
+            keyboardHookManager.Start();
+        }
+
+        private void QuickRunCurrentTool() {
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                if (DataContext is IQuickRun tool) {
+                    tool.RunFinished -= Reload;
+                    tool.RunFinished += Reload;
+                    tool.QuickRun();
+                }
+            });
+        }
+
+        [DllImport("user32.dll")]
+        static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll")]
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        private void Reload(object sender, EventArgs e) {
+            if (((RunToolCompletedEventArgs)e).NeedReload) {
+                var proc = Process.GetProcessesByName("osu!").FirstOrDefault();;
+                if (proc != null) {
+                    var oldHandle = GetForegroundWindow();
+                    if (oldHandle != proc.MainWindowHandle) {
+                        SetForegroundWindow(proc.MainWindowHandle);
+                        Thread.Sleep(300);
+                    }
+                }
+                SendKeys.SendWait("^{L 10}");
+                SendKeys.SendWait("{ENTER}");
             }
         }
 
