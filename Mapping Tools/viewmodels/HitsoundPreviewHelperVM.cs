@@ -9,6 +9,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Mapping_Tools.Viewmodels
 {
@@ -22,22 +23,27 @@ namespace Mapping_Tools.Viewmodels
 
             AddCommand = new CommandImplementation(
                 _ => {
-                    Items.Add(new HitsoundZone());
+                    try {
+                        Items.Add(new HitsoundZone());
+                    } catch (Exception ex) { MessageBox.Show(ex.Message); }
                 });
             CopyCommand = new CommandImplementation(
                 _ => {
-                    int initialCount = Items.Count;
-                    for (int i = 0; i < initialCount; i++) {
-                        if (Items[i].IsSelected) {
-                            Items.Add(Items[i].Copy());
+                    try {
+                        int initialCount = Items.Count;
+                        for (int i = 0; i < initialCount; i++) {
+                            if (Items[i].IsSelected) {
+                                Items.Add(Items[i].Copy());
+                            }
                         }
-                    }
+                    } catch (Exception ex) { MessageBox.Show(ex.Message); }
                 });
             RemoveCommand = new CommandImplementation(
                 _ => {
-                    Items.RemoveAll(o => o.IsSelected);
+                    try {
+                        Items.RemoveAll(o => o.IsSelected);
+                    } catch (Exception ex) { MessageBox.Show(ex.Message); }
                 });
-
         }
 
         public ObservableCollection<HitsoundZone> Items {

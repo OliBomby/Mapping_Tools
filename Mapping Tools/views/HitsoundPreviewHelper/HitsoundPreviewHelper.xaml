@@ -61,7 +61,7 @@
                     <DataGrid.Resources>
                         <Style TargetType="DataGridRow" BasedOn="{StaticResource MaterialDesignDataGridRow}">
                             <Setter Property="IsSelected"
-                                Value="{Binding IsSelected}" />
+                                Value="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         </Style>
                     </DataGrid.Resources>
                     <DataGrid.Columns>
