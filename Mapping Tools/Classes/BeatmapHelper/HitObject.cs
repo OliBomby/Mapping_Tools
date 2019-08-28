@@ -56,7 +56,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         private void SetEndTime(double value) {
-            TemporalLength = Repeat == 0 ? 0 : value / Repeat;
+            TemporalLength = Repeat == 0 ? 0 : (value - Time) / Repeat;
         }
 
         // Special combined with greenline

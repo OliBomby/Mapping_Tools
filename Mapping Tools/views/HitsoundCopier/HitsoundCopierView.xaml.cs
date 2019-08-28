@@ -216,7 +216,9 @@ namespace Mapping_Tools.Views {
                                 if (beatmapFrom.HitObjects.Any(o => o.Time < tp.Offset && o.EndTime > tp.Offset))
                                 {
                                     // Timingpoint is in a body for both beatmaps
-                                    beatmapTo.BeatmapTiming.TimingPoints.Remove(tp);
+                                    // Don't remove redlines
+                                    if (!tp.Inherited)
+                                        beatmapTo.BeatmapTiming.TimingPoints.Remove(tp);
                                 }
                             }
                         }
