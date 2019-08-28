@@ -72,7 +72,19 @@ namespace Mapping_Tools.Classes.Tools
         /// <param name="fullReader">Reader object that has already fetched all</param>
         /// <returns>An editor for the beatmap</returns>
         public static BeatmapEditor GetNewestVersion(string path, EditorReader fullReader = null) {
+            return GetNewestVersion(path, out var _, fullReader);
+        }
+
+        /// <summary>
+        /// Returns an editor for the beatmap of the specified path. If said beatmap is currently open in the editor it will update the Beatmap object with the latest values.
+        /// </summary>
+        /// <param name="path">Path to the beatmap</param>
+        /// <param name="selected">List of selected hit objects</param>
+        /// <param name="fullReader">Reader object that has already fetched all</param>
+        /// <returns>An editor for the beatmap</returns>
+        public static BeatmapEditor GetNewestVersion(string path, out List<BeatmapHelper.HitObject> selected, EditorReader fullReader = null) {
             BeatmapEditor editor = new BeatmapEditor(path);
+            selected = new List<BeatmapHelper.HitObject>();
 
             // Get a reader object that has everything fetched
             var reader = fullReader;
@@ -93,9 +105,9 @@ namespace Mapping_Tools.Classes.Tools
                     return editor;
 
                 // Update the beatmap with memory values
-                UpdateBeatmap(editor.Beatmap, reader);
-            } catch {
-                MessageBox.Show("Exception while editor reading.");
+                selected = UpdateBeatmap(editor.Beatmap, reader);
+            } catch (Exception ex) {
+                MessageBox.Show($"Exception ({ex.Message}) while editor reading.");
             }
 
             return editor;
@@ -106,12 +118,14 @@ namespace Mapping_Tools.Classes.Tools
         /// </summary>
         /// <param name="beatmap">Beatmap to replace values in</param>
         /// <param name="reader">Reader that contains the values from memory</param>
-        public static void UpdateBeatmap(Beatmap beatmap, EditorReader reader) {
+        /// <returns>A list of selected hit objects which originate from the beatmap.</returns>
+        public static List<BeatmapHelper.HitObject> UpdateBeatmap(Beatmap beatmap, EditorReader reader) {
             beatmap.SetBookmarks(reader.bookmarks.Select<int, double>(o => o).ToList());
 
             beatmap.BeatmapTiming.TimingPoints = reader.controlPoints.Select(o => (TimingPoint)o).ToList();
 
-            beatmap.HitObjects = reader.hitObjects.Select(o => (BeatmapHelper.HitObject)o).ToList();
+            List<BeatmapHelper.HitObject> selected = new List<BeatmapHelper.HitObject>();
+            beatmap.HitObjects = reader.hitObjects.Select(o => { var nho = (BeatmapHelper.HitObject)o; if (o.IsSelected) selected.Add(nho); return nho; }).ToList();
 
             beatmap.General["PreviewTime"] = new TValue(reader.PreviewTime.ToString(CultureInfo.InvariantCulture));
             beatmap.Difficulty["SliderMultiplier"] = new TValue(reader.SliderMultiplier.ToString(CultureInfo.InvariantCulture));
@@ -126,6 +140,8 @@ namespace Mapping_Tools.Classes.Tools
 
             beatmap.CalculateSliderEndTimes();
             beatmap.GiveObjectsGreenlines();
+
+            return selected;
         }
     }
 }

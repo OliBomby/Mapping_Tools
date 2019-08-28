@@ -75,10 +75,11 @@ namespace Mapping_Tools.Views {
             bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
 
             foreach (string path in arg.Paths) {
-                BeatmapEditor editor = editorRead ? EditorReaderStuff.GetNewestVersion(path, reader) : new BeatmapEditor(path);
+                var selected = new List<HitObject>();
+                BeatmapEditor editor = editorRead ? EditorReaderStuff.GetNewestVersion(path, out selected, reader) : new BeatmapEditor(path);
                 Beatmap beatmap = editor.Beatmap;
                 Timing timing = beatmap.BeatmapTiming;
-                List<HitObject> markedObjects = arg.SelectionMode == 0 ? EditorReaderStuff.GetSelectedObjects(editor, reader) :
+                List<HitObject> markedObjects = arg.SelectionMode == 0 ? selected :
                                                 arg.SelectionMode == 1 ? beatmap.GetBookmarkedObjects() :
                                                                          beatmap.HitObjects;
 
