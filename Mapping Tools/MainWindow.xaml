@@ -85,7 +85,7 @@
                 <Menu Foreground="{DynamicResource MaterialDesignBody}" >
                     <MenuItem Height="31" Header="_File" Padding="12,0,0,0" MinWidth="50">
                         <MenuItem Header="_Open beatmap" Click="OpenBeatmap"/>
-                        <MenuItem Header="_Open current beatmap" Click="OpenCurrentBeatmap"/>
+                        <MenuItem Header="_Open current beatmap" Click="OpenGetCurrentBeatmap"/>
                         <MenuItem Header="_Generate backup" Click="SaveBackup"/>
                         <MenuItem Header="_BetterSave™ current beatmap" Click="CoolSave"/>
                     </MenuItem>

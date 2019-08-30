@@ -8,10 +8,11 @@ using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace Mapping_Tools.Views {
+
     /// <summary>
     /// Interaction logic for Window1.xaml
     /// </summary>
-    public partial class HitsoundLayerImportWindow : Window {
+    public partial class HitsoundLayerImportWindow :Window {
         private readonly int index;
         public List<HitsoundLayer> HitsoundLayers;
 
@@ -36,75 +37,72 @@ namespace Mapping_Tools.Views {
 
         private void BeatmapBrowse_Click(object sender, RoutedEventArgs e) {
             string[] paths = IOHelper.BeatmapFileDialog();
-            if (paths.Length != 0) { BeatmapPathBox.Text = paths[0]; }
+            if( paths.Length != 0 ) { BeatmapPathBox.Text = paths[0]; }
         }
 
         private void BeatmapLoad_Click(object sender, RoutedEventArgs e) {
-            string path = IOHelper.CurrentBeatmap();
-            if (path != "") { BeatmapPathBox.Text = path; }
+            string path = IOHelper.GetCurrentBeatmap();
+            if( path != "" ) { BeatmapPathBox.Text = path; }
         }
 
         private void BeatmapBrowse2_Click(object sender, RoutedEventArgs e) {
             string[] paths = IOHelper.BeatmapFileDialog();
-            if (paths.Length != 0) { BeatmapPathBox2.Text = string.Join("|", paths); }
+            if( paths.Length != 0 ) { BeatmapPathBox2.Text = string.Join("|", paths); }
         }
 
         private void BeatmapLoad2_Click(object sender, RoutedEventArgs e) {
-            string path = IOHelper.CurrentBeatmap();
-            if (path != "") { BeatmapPathBox2.Text = path; }
+            string path = IOHelper.GetCurrentBeatmap();
+            if( path != "" ) { BeatmapPathBox2.Text = path; }
         }
 
         private void MIDIBrowse3_Click(object sender, RoutedEventArgs e) {
             string path = IOHelper.MIDIFileDialog();
-            if (path != "") { BeatmapPathBox3.Text = path; }
+            if( path != "" ) { BeatmapPathBox3.Text = path; }
         }
 
         private void SampleBrowse0_Click(object sender, RoutedEventArgs e) {
             string path = IOHelper.SampleFileDialog();
-            if (path != "") { SamplePathBox0.Text = path; }
+            if( path != "" ) { SamplePathBox0.Text = path; }
         }
 
         private void SampleBrowse_Click(object sender, RoutedEventArgs e) {
             string path = IOHelper.SampleFileDialog();
-            if (path != "") { SamplePathBox.Text = path; }
+            if( path != "" ) { SamplePathBox.Text = path; }
         }
 
         private void Add_Click(object sender, RoutedEventArgs e) {
             try {
-                if (Tabs.SelectedIndex == 1)
-                {
+                if( Tabs.SelectedIndex == 1 ) {
                     // Import one layer
                     HitsoundLayer layer = HitsoundImporter.ImportStack(BeatmapPathBox.Text, XCoordBox.GetDouble(), YCoordBox.GetDouble());
                     layer.Name = NameBox.Text;
-                    layer.SampleSet = (SampleSet)(SampleSetBox.SelectedIndex + 1);
-                    layer.Hitsound = (Hitsound)HitsoundBox.SelectedIndex;
+                    layer.SampleSet = (SampleSet) ( SampleSetBox.SelectedIndex + 1 );
+                    layer.Hitsound = (Hitsound) HitsoundBox.SelectedIndex;
                     layer.SampleArgs.Path = SamplePathBox.Text;
 
                     HitsoundLayers.Add(layer);
                 }
-                else if (Tabs.SelectedIndex == 2)
-                {
+                else if( Tabs.SelectedIndex == 2 ) {
                     // Import complete hitsounds
-                    foreach (string path in BeatmapPathBox2.Text.Split('|')) {
+                    foreach( string path in BeatmapPathBox2.Text.Split('|') ) {
                         HitsoundLayers.AddRange(HitsoundImporter.ImportHitsounds(path));
                     }
                     HitsoundLayers.ForEach(o => o.Name = string.Format("{0}: {1}", NameBox2.Text, o.Name));
                 }
-                else if (Tabs.SelectedIndex == 3)
-                {
+                else if( Tabs.SelectedIndex == 3 ) {
                     // Import MIDI
-                    HitsoundLayers = HitsoundImporter.ImportMIDI(BeatmapPathBox3.Text, (bool)InstrumentBox3.IsChecked, (bool)KeysoundBox3.IsChecked, (bool)LengthBox3.IsChecked, LengthRoughnessBox3.GetDouble(2), (bool)VelocityBox3.IsChecked, VelocityRoughnessBox3.GetDouble(10));
+                    HitsoundLayers = HitsoundImporter.ImportMIDI(BeatmapPathBox3.Text, (bool) InstrumentBox3.IsChecked, (bool) KeysoundBox3.IsChecked, (bool) LengthBox3.IsChecked, LengthRoughnessBox3.GetDouble(2), (bool) VelocityBox3.IsChecked, VelocityRoughnessBox3.GetDouble(10));
                     HitsoundLayers.ForEach(o => o.Name = string.Format("{0}: {1}", NameBox3.Text, o.Name));
                 }
-                else
-                {
+                else {
                     // Import none
-                    HitsoundLayer layer = new HitsoundLayer(NameBox0.Text, ImportType.None, (SampleSet)(SampleSetBox0.SelectedIndex + 1), (Hitsound)HitsoundBox0.SelectedIndex, SamplePathBox0.Text);
+                    HitsoundLayer layer = new HitsoundLayer(NameBox0.Text, ImportType.None, (SampleSet) ( SampleSetBox0.SelectedIndex + 1 ), (Hitsound) HitsoundBox0.SelectedIndex, SamplePathBox0.Text);
                     HitsoundLayers.Add(layer);
                 }
 
                 Close();
-            } catch (Exception ex) {
+            }
+            catch( Exception ex ) {
                 MessageBox.Show(string.Format("{0}{1}{2}", ex.Message, Environment.NewLine, ex.StackTrace), "Error");
             }
         }
@@ -120,21 +118,19 @@ namespace Mapping_Tools.Views {
 
         //Enable drag control of window and set icons when docked
         private void DragWin(object sender, MouseButtonEventArgs e) {
-            if (e.ChangedButton == MouseButton.Left) {
+            if( e.ChangedButton == MouseButton.Left ) {
                 Button bt = this.FindName("toggle_button") as Button;
-                if (WindowState == WindowState.Maximized) {
+                if( WindowState == WindowState.Maximized ) {
                     var point = PointToScreen(e.MouseDevice.GetPosition(this));
 
-                    if (point.X <= RestoreBounds.Width / 2)
+                    if( point.X <= RestoreBounds.Width / 2 )
                         Left = 0;
-
-                    else if (point.X >= RestoreBounds.Width)
-                        Left = point.X - (RestoreBounds.Width - (this.ActualWidth - point.X));
-
+                    else if( point.X >= RestoreBounds.Width )
+                        Left = point.X - ( RestoreBounds.Width - ( this.ActualWidth - point.X ) );
                     else
-                        Left = point.X - (RestoreBounds.Width / 2);
+                        Left = point.X - ( RestoreBounds.Width / 2 );
 
-                    Top = point.Y - (((FrameworkElement)sender).ActualHeight / 2);
+                    Top = point.Y - ( ( (FrameworkElement) sender ).ActualHeight / 2 );
                     WindowState = WindowState.Normal;
                     bt.Content = new PackIcon { Kind = PackIconKind.WindowMaximize };
                 }

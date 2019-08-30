@@ -56,7 +56,7 @@ namespace Mapping_Tools.Views {
         }
 
         public void QuickRun() {
-            RunTool(new[] { IOHelper.CurrentBeatmap() }, quick:true);
+            RunTool(new[] { IOHelper.GetCurrentBeatmap() }, quick:true);
         }
 
         private void RunTool(string[] paths, bool quick=false) {
