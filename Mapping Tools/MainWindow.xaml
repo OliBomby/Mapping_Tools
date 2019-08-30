@@ -87,6 +87,7 @@
                         <MenuItem Header="_Open beatmap" Click="OpenBeatmap"/>
                         <MenuItem Header="_Open current beatmap" Click="OpenCurrentBeatmap"/>
                         <MenuItem Header="_Generate backup" Click="SaveBackup"/>
+                        <MenuItem Header="_BetterSave™ current beatmap" Click="CoolSave"/>
                     </MenuItem>
                     <MenuItem Height="31" Header="_Tools" Padding="12,0,0,0" MinWidth="65">
                         <MenuItem Header="_Map Cleaner" Click="LoadCleaner"/>
