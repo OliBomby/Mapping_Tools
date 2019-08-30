@@ -6,14 +6,16 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Windows;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Mapping_Tools.Classes.Tools
 {
     public static class EditorReaderStuff
     {
+        private static string UpdatedFileHash;
         private readonly static EditorReader editorReader = new EditorReader();
-
         public static EditorReader GetEditorReader()
         {
             return editorReader;
@@ -42,10 +44,44 @@ namespace Mapping_Tools.Classes.Tools
         /// </summary>
         public static void CoolSave()
         {
+            string hashString = "";
+            var currentPath = IOHelper.CurrentBeatmap();
             try
             {
-                var editor = GetNewestVersion(IOHelper.CurrentBeatmap());
+                if (File.Exists(currentPath))
+                {
+                    using (var md5 = MD5.Create())
+                    {
+                        using (var fileStream = File.OpenRead(currentPath))
+                        {
+                            var hash = md5.ComputeHash(fileStream);
+                            hashString = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                return;
+            }
+
+            try
+            {
+                var editor = GetNewestVersion(currentPath);
+                var data = editor.Beatmap.GetLines();
+                byte[] byteData = data.SelectMany(s => System.Text.Encoding.ASCII.GetBytes(s)).ToArray();
+                string memoryHash = "";
+                using (var md5 = MD5.Create())
+                {
+                    var hash = md5.ComputeHash(byteData);
+                    memoryHash = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+                }
+                if (memoryHash == hashString)
+                {
+                    return;
+                }
                 editor.SaveFile();
+                Console.WriteLine(memoryHash);
             }
             catch (Exception e)
             {

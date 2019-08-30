@@ -22,8 +22,10 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Mapping_Tools.Classes.Tools;
 
-namespace Mapping_Tools {
-    public partial class MainWindow : Window {
+namespace Mapping_Tools
+{
+    public partial class MainWindow : Window
+    {
         public bool IsMaximized; //Check for window state
         public double WidthWin, HeightWin; //Set default sizes of window
         public ViewCollection Views;
@@ -31,15 +33,18 @@ namespace Mapping_Tools {
 
         public static MainWindow AppWindow { get; set; }
         public static readonly HttpClient HttpClient = new HttpClient();
+        private static readonly FileSystemWatcher FsWatcher = new FileSystemWatcher();
         public static readonly KeyboardHookManager keyboardHookManager = new KeyboardHookManager();
         private static readonly string appCommon = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         public static readonly string AppDataPath = Path.Combine(appCommon, "Mapping Tools");
         public static readonly string ExportPath = Path.Combine(AppDataPath, "Exports");
 
-        public MainWindow() {
+        public MainWindow()
+        {
             Setup();
             InitializeComponent();
             SettingsManager.LoadConfig();
+            InitFsWatcher();
             AppWindow = this;
             IsMaximized = SettingsManager.Settings.MainWindowMaximized;
             WidthWin = SettingsManager.Settings.MainWindowWidth ?? Width;
@@ -55,39 +60,70 @@ namespace Mapping_Tools {
             ViewChanged();
         }
 
-        private void Setup() {
+        private void Setup()
+        {
             SessionhasAdminRights = IsUserAdministrator() ? true : false;
 
-            try {
+            try
+            {
                 AutoUpdater.ParseUpdateInfoEvent += AutoUpdaterOnParseUpdateInfoEvent;
                 AutoUpdater.Start("https://mappingtools.seira.moe/current/updater.json");
-            } catch(Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Console.WriteLine(ex.Message);
             }
-            
 
-            try {
+
+            try
+            {
                 Directory.CreateDirectory(AppDataPath);
                 Directory.CreateDirectory(ExportPath);
             }
-            catch( Exception ex ) {
+            catch (Exception ex)
+            {
                 System.Windows.MessageBox.Show(ex.Message);
             }
 
             // Register virtual key code 0x4D = M to QuickRun
             keyboardHookManager.RegisterHotkey(new[] { NonInvasiveKeyboardHookLibrary.ModifierKeys.Alt, NonInvasiveKeyboardHookLibrary.ModifierKeys.Control, NonInvasiveKeyboardHookLibrary.ModifierKeys.Shift }, 0x4D, QuickRunCurrentTool);
+            // Register virtual key code 0x53 = S to QuickBetterSave
+            keyboardHookManager.RegisterHotkey(new[] { NonInvasiveKeyboardHookLibrary.ModifierKeys.Shift, NonInvasiveKeyboardHookLibrary.ModifierKeys.Alt }, 0x53, QuickBetterSave);
             keyboardHookManager.Start();
         }
 
-        private void QuickRunCurrentTool() {
+        private void InitFsWatcher()
+        {
+            FsWatcher.Path = SettingsManager.GetSongsPath();
+            
+            FsWatcher.Filter = "*.osu";
+            FsWatcher.Changed += OnChangedFsWatcher;
+            FsWatcher.EnableRaisingEvents = true;
+            FsWatcher.IncludeSubdirectories = true;
+        }
+
+        private static void OnChangedFsWatcher(object sender, FileSystemEventArgs e)
+        {
+            Console.WriteLine(e.FullPath);
+            EditorReaderStuff.CoolSave();
+        }
+
+        private void QuickRunCurrentTool()
+        {
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
-                if (DataContext is IQuickRun tool) {
+                if (DataContext is IQuickRun tool)
+                {
                     tool.RunFinished -= Reload;
                     tool.RunFinished += Reload;
                     tool.QuickRun();
                 }
             });
+        }
+
+        private void QuickBetterSave()
+        {
+            EditorReaderStuff.CoolSave();
         }
 
         [DllImport("user32.dll")]
@@ -96,12 +132,16 @@ namespace Mapping_Tools {
         [DllImport("user32.dll")]
         private static extern bool SetForegroundWindow(IntPtr hWnd);
 
-        private void Reload(object sender, EventArgs e) {
-            if (((RunToolCompletedEventArgs)e).NeedReload) {
-                var proc = Process.GetProcessesByName("osu!").FirstOrDefault();;
-                if (proc != null) {
+        private void Reload(object sender, EventArgs e)
+        {
+            if (((RunToolCompletedEventArgs)e).NeedReload)
+            {
+                var proc = Process.GetProcessesByName("osu!").FirstOrDefault(); ;
+                if (proc != null)
+                {
                     var oldHandle = GetForegroundWindow();
-                    if (oldHandle != proc.MainWindowHandle) {
+                    if (oldHandle != proc.MainWindowHandle)
+                    {
                         SetForegroundWindow(proc.MainWindowHandle);
                         Thread.Sleep(300);
                     }
@@ -112,65 +152,81 @@ namespace Mapping_Tools {
             }
         }
 
-        private bool IsUserAdministrator() {
+        private bool IsUserAdministrator()
+        {
             bool isAdmin;
-            try {
+            try
+            {
                 WindowsIdentity user = WindowsIdentity.GetCurrent();
                 WindowsPrincipal principal = new WindowsPrincipal(user);
                 isAdmin = principal.IsInRole(WindowsBuiltInRole.Administrator);
             }
-            catch( UnauthorizedAccessException ) {
+            catch (UnauthorizedAccessException)
+            {
                 isAdmin = false;
             }
-            catch( Exception ) {
+            catch (Exception)
+            {
                 isAdmin = false;
             }
             return isAdmin;
         }
 
-        private void AutoUpdaterOnParseUpdateInfoEvent(ParseUpdateInfoEventArgs args) {
-            try {
+        private void AutoUpdaterOnParseUpdateInfoEvent(ParseUpdateInfoEventArgs args)
+        {
+            try
+            {
                 dynamic json = JsonConvert.DeserializeObject(args.RemoteData);
-                args.UpdateInfo = new UpdateInfoEventArgs {
+                args.UpdateInfo = new UpdateInfoEventArgs
+                {
                     CurrentVersion = json.version,
                     ChangelogURL = json.changelog,
                     Mandatory = json.mandatory,
                     DownloadURL = json.url
                 };
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Console.WriteLine(ex.Message);
             }
         }
 
-        public void SetCurrentMaps(string[] paths) {
+        public void SetCurrentMaps(string[] paths)
+        {
             currentMap.Text = string.Join("|", paths);
             SettingsManager.AddRecentMap(currentMap.Text, DateTime.Now);
         }
 
-        public void SetCurrentMapsString(string paths) {
+        public void SetCurrentMapsString(string paths)
+        {
             currentMap.Text = paths;
             SettingsManager.AddRecentMap(paths, DateTime.Now);
         }
 
-        public string[] GetCurrentMaps() {
+        public string[] GetCurrentMaps()
+        {
             return currentMap.Text.Split('|');
         }
 
-        public string GetCurrentMapsString() {
+        public string GetCurrentMapsString()
+        {
             return string.Join("|", GetCurrentMaps());
         }
 
-        private void OpenBeatmap(object sender, RoutedEventArgs e) {
+        private void OpenBeatmap(object sender, RoutedEventArgs e)
+        {
             string[] paths = IOHelper.BeatmapFileDialog(true);
-            if( paths.Length != 0 ) { SetCurrentMaps(paths); }
+            if (paths.Length != 0) { SetCurrentMaps(paths); }
         }
 
-        private void OpenCurrentBeatmap(object sender, RoutedEventArgs e) {
+        private void OpenCurrentBeatmap(object sender, RoutedEventArgs e)
+        {
             string path = IOHelper.CurrentBeatmap();
-            if( path != "" ) { SetCurrentMaps(new[] { path }); }
+            if (path != "") { SetCurrentMaps(new[] { path }); }
         }
 
-        private void SaveBackup(object sender, RoutedEventArgs e) {
+        private void SaveBackup(object sender, RoutedEventArgs e)
+        {
             var paths = GetCurrentMaps();
             bool result = IOHelper.SaveMapBackup(paths, true);
             if (result)
@@ -178,7 +234,8 @@ namespace Mapping_Tools {
         }
 
         //Method for loading the cleaner interface 
-        private void LoadCleaner(object sender, RoutedEventArgs e) {
+        private void LoadCleaner(object sender, RoutedEventArgs e)
+        {
             DataContext = Views.GetMapCleaner();
 
             TextBlock txt = this.FindName("header") as TextBlock;
@@ -191,7 +248,8 @@ namespace Mapping_Tools {
         }
 
         //Method for loading the cleaner interface 
-        private void LoadMetadataManager(object sender, RoutedEventArgs e) {
+        private void LoadMetadataManager(object sender, RoutedEventArgs e)
+        {
             DataContext = Views.GetMetadataManager();
 
             TextBlock txt = this.FindName("header") as TextBlock;
@@ -204,7 +262,8 @@ namespace Mapping_Tools {
         }
 
         //Method for loading the property transformer
-        private void LoadPropertyTransformer(object sender, RoutedEventArgs e) {
+        private void LoadPropertyTransformer(object sender, RoutedEventArgs e)
+        {
             DataContext = Views.GetPropertyTransformer();
 
             TextBlock txt = this.FindName("header") as TextBlock;
@@ -217,7 +276,8 @@ namespace Mapping_Tools {
         }
 
         //Method for loading the merger interface
-        private void LoadMerger(object sender, RoutedEventArgs e) {
+        private void LoadMerger(object sender, RoutedEventArgs e)
+        {
             DataContext = Views.GetSliderMerger();
 
             TextBlock txt = this.FindName("header") as TextBlock;
@@ -230,7 +290,8 @@ namespace Mapping_Tools {
         }
 
         //Method for loading the completionator interface
-        private void LoadCompletionator(object sender, RoutedEventArgs e) {
+        private void LoadCompletionator(object sender, RoutedEventArgs e)
+        {
             DataContext = Views.GetSliderCompletionator();
 
             TextBlock txt = this.FindName("header") as TextBlock;
@@ -243,7 +304,8 @@ namespace Mapping_Tools {
         }
 
         //Method for loading the snapping tools interface
-        private void LoadSnappingTools(object sender, RoutedEventArgs e) {
+        private void LoadSnappingTools(object sender, RoutedEventArgs e)
+        {
             DataContext = Views.GetSnappingTools();
 
             TextBlock txt = this.FindName("header") as TextBlock;
@@ -256,7 +318,8 @@ namespace Mapping_Tools {
         }
 
         //Method for loading the timing copier interface
-        private void LoadTimingCopier(object sender, RoutedEventArgs e) {
+        private void LoadTimingCopier(object sender, RoutedEventArgs e)
+        {
             DataContext = Views.GetTimingCopier();
 
             TextBlock txt = this.FindName("header") as TextBlock;
@@ -269,7 +332,8 @@ namespace Mapping_Tools {
         }
 
         //Method for loading the timing helper interface
-        private void LoadTimingHelper(object sender, RoutedEventArgs e) {
+        private void LoadTimingHelper(object sender, RoutedEventArgs e)
+        {
             DataContext = Views.GetTimingHelper();
 
             TextBlock txt = this.FindName("header") as TextBlock;
@@ -282,7 +346,8 @@ namespace Mapping_Tools {
         }
 
         //Method for loading the hitsound copier
-        private void LoadHSCopier(object sender, RoutedEventArgs e) {
+        private void LoadHSCopier(object sender, RoutedEventArgs e)
+        {
             DataContext = Views.GetHitsoundCopier();
 
             TextBlock txt = this.FindName("header") as TextBlock;
@@ -295,7 +360,8 @@ namespace Mapping_Tools {
         }
 
         //Method for loading the hitsound studio
-        private void LoadHSStudio(object sender, RoutedEventArgs e) {
+        private void LoadHSStudio(object sender, RoutedEventArgs e)
+        {
             DataContext = Views.GetHitsoundStudio();
 
             TextBlock txt = this.FindName("header") as TextBlock;
@@ -308,7 +374,8 @@ namespace Mapping_Tools {
         }
 
         //Method for loading the hitsound preview helper
-        private void LoadHSPreviewHelper(object sender, RoutedEventArgs e) {
+        private void LoadHSPreviewHelper(object sender, RoutedEventArgs e)
+        {
             DataContext = Views.GetHitsoundPreviewHelper();
 
             TextBlock txt = this.FindName("header") as TextBlock;
@@ -321,7 +388,8 @@ namespace Mapping_Tools {
         }
 
         //Method for loading the standard interface
-        private void LoadStartup(object sender, RoutedEventArgs e) {
+        private void LoadStartup(object sender, RoutedEventArgs e)
+        {
             DataContext = Views.GetStandard();
 
             TextBlock txt = this.FindName("header") as TextBlock;
@@ -334,7 +402,8 @@ namespace Mapping_Tools {
         }
 
         //Method for loading the preferences
-        private void LoadPreferences(object sender, RoutedEventArgs e) {
+        private void LoadPreferences(object sender, RoutedEventArgs e)
+        {
             DataContext = Views.GetPreferences();
 
             TextBlock txt = this.FindName("header") as TextBlock;
@@ -346,7 +415,8 @@ namespace Mapping_Tools {
             this.MinHeight = 100;
         }
 
-        private void ViewChanged() {
+        private void ViewChanged()
+        {
             System.Windows.Controls.MenuItem menuitem = this.FindName("project") as System.Windows.Controls.MenuItem;
             bool isSavable = DataContext.GetType().GetInterfaces().Any(x =>
                               x.IsGenericType &&
@@ -354,14 +424,16 @@ namespace Mapping_Tools {
             menuitem.Visibility = isSavable ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        private void LoadProject(object sender, RoutedEventArgs e) {
+        private void LoadProject(object sender, RoutedEventArgs e)
+        {
             if (!ProjectManager.IsSavable(DataContext))
                 return;
             dynamic data = DataContext;
             ProjectManager.LoadProject(data, true);
         }
 
-        private void SaveProject(object sender, RoutedEventArgs e) {
+        private void SaveProject(object sender, RoutedEventArgs e)
+        {
             if (!ProjectManager.IsSavable(DataContext))
                 return;
             dynamic data = DataContext;
@@ -369,40 +441,49 @@ namespace Mapping_Tools {
         }
 
         //Open backup folder in file explorer
-        private void OpenBackups(object sender, RoutedEventArgs e) {
-            try {
+        private void OpenBackups(object sender, RoutedEventArgs e)
+        {
+            try
+            {
                 Process.Start(SettingsManager.GetBackupsPath());
             }
-            catch( Exception ex ) {
+            catch (Exception ex)
+            {
                 System.Windows.Forms.MessageBox.Show(ex.Message);
                 return;
             }
         }
 
-        private void OpenWebsite(object sender, RoutedEventArgs e) {
+        private void OpenWebsite(object sender, RoutedEventArgs e)
+        {
             Process.Start("https://mappingtools.seira.moe/");
         }
 
-        private void CoolSave(object sender, RoutedEventArgs e) {
+        private void CoolSave(object sender, RoutedEventArgs e)
+        {
             EditorReaderStuff.CoolSave();
         }
 
         //Open project in browser
-        private void OpenGitHub(object sender, RoutedEventArgs e) {
+        private void OpenGitHub(object sender, RoutedEventArgs e)
+        {
             Process.Start("https://github.com/OliBomby/Mapping_Tools");
         }
 
         //Open info screen
-        private void OpenInfo(object sender, RoutedEventArgs e) {
+        private void OpenInfo(object sender, RoutedEventArgs e)
+        {
             Version version = Assembly.GetEntryAssembly().GetName().Version;
             System.Windows.MessageBox.Show(string.Format("Mapping Tools {0}\n\nMade by:\nOliBomby\nPotoofu", version.ToString()), "Info");
         }
 
         //Change top right icons on changed window state and set state variable
-        private void Window_StateChanged(object sender, EventArgs e) {
+        private void Window_StateChanged(object sender, EventArgs e)
+        {
             System.Windows.Controls.Button bt = this.FindName("toggle_button") as System.Windows.Controls.Button;
 
-            switch( this.WindowState ) {
+            switch (this.WindowState)
+            {
                 case WindowState.Maximized:
                     bt.Content = new PackIcon { Kind = PackIconKind.WindowRestore };
                     IsMaximized = true;
@@ -419,9 +500,11 @@ namespace Mapping_Tools {
         }
 
         //Clickevent for top right maximize/minimize button
-        private void ToggleWin(object sender, RoutedEventArgs e) {
+        private void ToggleWin(object sender, RoutedEventArgs e)
+        {
             System.Windows.Controls.Button bt = this.FindName("toggle_button") as System.Windows.Controls.Button;
-            if( IsMaximized ) {
+            if (IsMaximized)
+            {
                 this.WindowState = WindowState.Normal;
                 Width = WidthWin;
                 Height = HeightWin;
@@ -429,7 +512,8 @@ namespace Mapping_Tools {
                 window_border.BorderThickness = new Thickness(1);
                 bt.Content = new PackIcon { Kind = PackIconKind.WindowMaximize };
             }
-            else {
+            else
+            {
                 WidthWin = ActualWidth;
                 HeightWin = ActualHeight;
                 this.Left = SystemParameters.WorkArea.Left;
@@ -444,12 +528,14 @@ namespace Mapping_Tools {
         }
 
         //Minimize window on click
-        private void MinimizeWin(object sender, RoutedEventArgs e) {
+        private void MinimizeWin(object sender, RoutedEventArgs e)
+        {
             this.WindowState = WindowState.Minimized;
         }
 
         //Close window
-        private void CloseWin(object sender, RoutedEventArgs e) {
+        private void CloseWin(object sender, RoutedEventArgs e)
+        {
             Views.AutoSaveSettings();
             SettingsManager.UpdateSettings();
             SettingsManager.WriteToJSON(false);
@@ -457,22 +543,25 @@ namespace Mapping_Tools {
         }
 
         //Enable drag control of window and set icons when docked
-        private void DragWin(object sender, MouseButtonEventArgs e) {
-            if( e.ChangedButton == MouseButton.Left ) {
+        private void DragWin(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+            {
                 System.Windows.Controls.Button bt = this.FindName("toggle_button") as System.Windows.Controls.Button;
-                if( WindowState == WindowState.Maximized ) {
+                if (WindowState == WindowState.Maximized)
+                {
                     var point = PointToScreen(e.MouseDevice.GetPosition(this));
 
-                    if( point.X <= RestoreBounds.Width / 2 )
+                    if (point.X <= RestoreBounds.Width / 2)
                         Left = 0;
 
-                    else if( point.X >= RestoreBounds.Width )
-                        Left = point.X - ( RestoreBounds.Width - ( this.ActualWidth - point.X ) );
+                    else if (point.X >= RestoreBounds.Width)
+                        Left = point.X - (RestoreBounds.Width - (this.ActualWidth - point.X));
 
                     else
-                        Left = point.X - ( RestoreBounds.Width / 2 );
+                        Left = point.X - (RestoreBounds.Width / 2);
 
-                    Top = point.Y - ( ( (FrameworkElement) sender ).ActualHeight / 2 );
+                    Top = point.Y - (((FrameworkElement)sender).ActualHeight / 2);
                     WindowState = WindowState.Normal;
                     bt.Content = new PackIcon { Kind = PackIconKind.WindowMaximize };
                 }
