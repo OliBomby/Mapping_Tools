@@ -383,8 +383,7 @@ namespace Mapping_Tools {
             Process.Start("https://mappingtools.seira.moe/");
         }
 
-        private void CoolSave(object sender, RoutedEventArgs e)
-        {
+        private void CoolSave(object sender, RoutedEventArgs e) {
             EditorReaderStuff.CoolSave();
         }
 

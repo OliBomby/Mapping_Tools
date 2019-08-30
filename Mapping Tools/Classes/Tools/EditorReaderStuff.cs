@@ -1,16 +1,11 @@
 ﻿using Editor_Reader;
 using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.SystemTools;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace Mapping_Tools.Classes.Tools
@@ -42,6 +37,9 @@ namespace Mapping_Tools.Classes.Tools
             }
         }
 
+        /// <summary>
+        /// Saves current beatmap with the newest version from memory and rounded coordinates
+        /// </summary>
         public static void CoolSave()
         {
             try
