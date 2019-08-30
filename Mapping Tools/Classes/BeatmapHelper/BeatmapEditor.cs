@@ -17,9 +17,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public override void SaveFile() {
             var tempPath = System.IO.Path.Combine(MainWindow.AppDataPath, "temp.osu");
-            var data = Beatmap.GetLines().Select(s => s + "\n");
             SaveFile(tempPath);
-
             EditorReaderStuff.DontCoolSaveWhenMD5EqualsThisString = EditorReaderStuff.GetMD5FromPath(tempPath);
 
             base.SaveFile();
