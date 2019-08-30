@@ -11,16 +11,14 @@ using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SliderPathStuff;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Views.Standard;
 
 namespace Mapping_Tools.Views {
     /// <summary>
     /// Interaktionslogik für UserControl1.xaml
     /// </summary>
-    public partial class SliderMergerView : UserControl, IQuickRun {
+    public partial class SliderMergerView :UserControl {
         private readonly BackgroundWorker backgroundWorker;
-        private bool canRun = true;
-
-        public event EventHandler RunFinished;
 
         public SliderMergerView() {
             InitializeComponent();
@@ -36,15 +34,13 @@ namespace Mapping_Tools.Views {
 
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
             if( e.Error != null ) {
-                MessageBox.Show(string.Format("{0}{1}{2}", e.Error.Message, Environment.NewLine, e.Error.StackTrace), "Error");
+                new MessageWindow(ErrorType.Error, eventArg: e).Show();
             }
             else {
-                if (e.Result.ToString() != "")
-                    MessageBox.Show(e.Result.ToString());
+                new MessageWindow(ErrorType.Success, e.Result.ToString()).Show();
                 progress.Value = 0;
             }
             start.IsEnabled = true;
-            canRun = true;
         }
 
         private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
@@ -52,83 +48,64 @@ namespace Mapping_Tools.Views {
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
-            RunTool(MainWindow.AppWindow.GetCurrentMaps(), quick:false);
-        }
+            string fileToCopy = MainWindow.AppWindow.currentMap.Text;
+            IOHelper.SaveMapBackup(fileToCopy);
 
-        public void QuickRun() {
-            RunTool(new[] { IOHelper.CurrentBeatmap() }, quick:true);
-        }
-
-        private void RunTool(string[] paths, bool quick=false) {
-            if (!canRun) return;
-
-            IOHelper.SaveMapBackup(paths);
-
-            backgroundWorker.RunWorkerAsync(new Arguments(paths, LeniencyBox.GetDouble(0), SelectionModeBox.SelectedIndex, quick));
+            backgroundWorker.RunWorkerAsync(new Arguments(fileToCopy, LeniencyBox.GetDouble(0), (bool) ReqBookmBox.IsChecked));
             start.IsEnabled = false;
-            canRun = false;
         }
 
         private struct Arguments {
-            public string[] Paths;
+            public string Path;
             public double Leniency;
-            public int SelectionMode;
-            public bool Quick;
-            public Arguments(string[] paths, double leniency, int selectionMode, bool quick)
+            public bool RequireBookmarks;
+            public Arguments(string path, double leniency, bool requireBookmarks)
             {
-                Paths = paths;
+                Path = path;
                 Leniency = leniency;
-                SelectionMode = selectionMode;
-                Quick = quick;
+                RequireBookmarks = requireBookmarks;
             }
         }
 
         private string Merge_Sliders(Arguments arg, BackgroundWorker worker, DoWorkEventArgs _) {
             int slidersMerged = 0;
+            bool mergeLast = false;
 
-            bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+            BeatmapEditor editor = new BeatmapEditor(arg.Path);
+            Beatmap beatmap = editor.Beatmap;
+            List<HitObject> markedObjects = arg.RequireBookmarks ? beatmap.GetBookmarkedObjects() : beatmap.HitObjects;
 
-            foreach (string path in arg.Paths) {
-                var selected = new List<HitObject>();
-                BeatmapEditor editor = editorRead ? EditorReaderStuff.GetNewestVersion(path, out selected, reader) : new BeatmapEditor(path);
-                Beatmap beatmap = editor.Beatmap;
-                List<HitObject> markedObjects = arg.SelectionMode == 0 ? selected : 
-                                                arg.SelectionMode == 1 ? beatmap.GetBookmarkedObjects() : 
-                                                                         beatmap.HitObjects;
+            for (int i = 0; i < markedObjects.Count - 1; i++) {
+                HitObject ho1 = markedObjects[i];
+                HitObject ho2 = markedObjects[i + 1];
+                if (ho1.IsSlider && ho2.IsSlider && (ho1.CurvePoints.Last() - ho2.Pos).Length <= arg.Leniency) {
+                    ho2.Move(ho1.CurvePoints.Last() - ho2.Pos);
 
-                bool mergeLast = false;
-                for (int i = 0; i < markedObjects.Count - 1; i++) {
-                    HitObject ho1 = markedObjects[i];
-                    HitObject ho2 = markedObjects[i + 1];
-                    if (ho1.IsSlider && ho2.IsSlider && (ho1.CurvePoints.Last() - ho2.Pos).Length <= arg.Leniency) {
-                        ho2.Move(ho1.CurvePoints.Last() - ho2.Pos);
+                    SliderPath sp1 = BezierConverter.ConvertToBezier(ho1.SliderPath);
+                    SliderPath sp2 = BezierConverter.ConvertToBezier(ho2.SliderPath);
+                    Vector2[] mergedAnchors = sp1.ControlPoints.Concat(sp2.ControlPoints).ToArray();
+                    mergedAnchors.Round();
 
-                        SliderPath sp1 = BezierConverter.ConvertToBezier(ho1.SliderPath);
-                        SliderPath sp2 = BezierConverter.ConvertToBezier(ho2.SliderPath);
-                        Vector2[] mergedAnchors = sp1.ControlPoints.Concat(sp2.ControlPoints).ToArray();
-                        mergedAnchors.Round();
+                    SliderPath mergedPath = new SliderPath(PathType.Bezier, mergedAnchors, ho1.PixelLength + ho2.PixelLength);
+                    ho1.SliderPath = mergedPath;
 
-                        SliderPath mergedPath = new SliderPath(PathType.Bezier, mergedAnchors, ho1.PixelLength + ho2.PixelLength);
-                        ho1.SliderPath = mergedPath;
+                    beatmap.HitObjects.Remove(ho2);
+                    markedObjects.Remove(ho2);
+                    i--;
 
-                        beatmap.HitObjects.Remove(ho2);
-                        markedObjects.Remove(ho2);
-                        i--;
-
-                        slidersMerged++;
-                        if (!mergeLast) { slidersMerged++; }
-                        mergeLast = true;
-                    } else {
-                        mergeLast = false;
-                    }
-                    if (worker != null && worker.WorkerReportsProgress) {
-                        worker.ReportProgress(i / markedObjects.Count);
-                    }
+                    slidersMerged++;
+                    if(!mergeLast) { slidersMerged++; }
+                    mergeLast = true;
+                } else {
+                    mergeLast = false;
                 }
-
-                // Save the file
-                editor.SaveFile();
+                if (worker != null && worker.WorkerReportsProgress) {
+                    worker.ReportProgress(i / markedObjects.Count);
+                }
             }
+
+            // Save the file
+            editor.SaveFile();
 
             // Complete progressbar
             if (worker != null && worker.WorkerReportsProgress)
@@ -136,21 +113,17 @@ namespace Mapping_Tools.Views {
                 worker.ReportProgress(100);
             }
 
-            // Do stuff
-            if (arg.Quick)
-                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, editorRead));
-
             // Make an accurate message
             string message = "";
             if (Math.Abs(slidersMerged) == 1)
             {
-                message += "Successfully merged " + slidersMerged + " slider!";
+                message += $"Successfully merged {slidersMerged} slider!";
             }
             else
             {
-                message += "Successfully merged " + slidersMerged + " sliders!";
+                message += $"Successfully merged {slidersMerged} sliders!";
             }
-            return arg.Quick ? "" : message;
+            return message;
         }
     }
 }

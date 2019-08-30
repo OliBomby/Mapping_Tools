@@ -250,6 +250,18 @@
     <Compile Include="Components\Domain\ImportTypeToStringConverter.cs" />
     <Compile Include="Components\Domain\ParsableDoubleListValidationRule.cs" />
     <Compile Include="Components\Domain\DoubleToStringConverter.cs" />
+    <Compile Include="Components\ObjectVisualiser\HitObject.xaml.cs">
+      <DependentUpon>HitObject.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Components\ObjectVisualiser\ObjectPlayfield.xaml.cs">
+      <DependentUpon>ObjectPlayfield.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Components\ObjectVisualiser\SliderAnchor.xaml.cs">
+      <DependentUpon>SliderAnchor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Components\ObjectVisualiser\SliderAnchorLine.xaml.cs">
+      <DependentUpon>SliderAnchorLine.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Components\TimeLine\TimeLine.xaml.cs">
       <DependentUpon>TimeLine.xaml</DependentUpon>
     </Compile>
@@ -281,6 +293,9 @@
     </Compile>
     <Compile Include="Views\MetadataManager\MetadataManagerView.xaml.cs">
       <DependentUpon>MetadataManagerView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Standard\MessageWindow.xaml.cs">
+      <DependentUpon>MessageWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TimingHelper\TimingHelperView.xaml.cs">
       <DependentUpon>TimingHelperView.xaml</DependentUpon>
@@ -316,6 +331,22 @@
     <Compile Include="Views\HitsoundStudio\HitsoundLayerImportWindow.xaml.cs">
       <DependentUpon>HitsoundLayerImportWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="Components\ObjectVisualiser\HitObject.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Components\ObjectVisualiser\ObjectPlayfield.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Components\ObjectVisualiser\SliderAnchor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Components\ObjectVisualiser\SliderAnchorLine.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Components\TimeLine\TimeLine.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -359,6 +390,10 @@
     <Page Include="Views\MetadataManager\MetadataManagerView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Standard\MessageWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\TimingHelper\TimingHelperView.xaml">
       <Generator>MSBuild:Compile</Generator>

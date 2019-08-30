@@ -35,14 +35,10 @@
                 
                 <TextBox x:Name="LeniencyBox" Width="258" HorizontalAlignment="Left" Text="2" Margin="0,20,0,0"
                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Merge connection leniency"/>
-
-                <ComboBox x:Name="SelectionModeBox" Margin="0,26,0,0" SelectedIndex="1" Cursor="Hand" Width="258" HorizontalAlignment="Left"
-                    Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Object selection mode">
-                    <ComboBoxItem Content="Selected objects" Cursor="Hand"/>
-                    <ComboBoxItem Content="Bookmarked objects" Cursor="Hand"/>
-                    <ComboBoxItem Content="Everything" Cursor="Hand"/>
-                </ComboBox>
+                <CheckBox x:Name="ReqBookmBox" FontSize="14" IsChecked="True" Content="Require bookmarks" Margin="0,26,0,0"/>
+                <StackPanel x:Name="ov_host"/>
             </StackPanel>
+            
 
             <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
                 <Button

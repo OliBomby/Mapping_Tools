@@ -32,6 +32,20 @@
                     </Setter.Value>
                 </Setter>
             </Style>
+            <Style x:Key="MainViewExpander" TargetType="Expander">
+                <Setter Property="HeaderTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                            <TextBlock 
+                                Text="{Binding}" 
+                                FontSize="10" 
+                                FontWeight="Light"                                    
+                            />
+                        </DataTemplate>
+                </Setter.Value>
+                </Setter>
+            </Style>
+            
         </ResourceDictionary>
     </Application.Resources>
 </Application>
