@@ -20,6 +20,7 @@ using System.Net.Http;
 using NonInvasiveKeyboardHookLibrary;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Mapping_Tools.Classes.Tools;
 
 namespace Mapping_Tools {
     public partial class MainWindow : Window {
@@ -380,6 +381,11 @@ namespace Mapping_Tools {
 
         private void OpenWebsite(object sender, RoutedEventArgs e) {
             Process.Start("https://mappingtools.seira.moe/");
+        }
+
+        private void CoolSave(object sender, RoutedEventArgs e)
+        {
+            EditorReaderStuff.CoolSave();
         }
 
         //Open project in browser

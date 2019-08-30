@@ -15,10 +15,12 @@ using System.Windows;
 
 namespace Mapping_Tools.Classes.Tools
 {
-    public static class EditorReaderStuff {
+    public static class EditorReaderStuff
+    {
         private readonly static EditorReader editorReader = new EditorReader();
 
-        public static EditorReader GetEditorReader() {
+        public static EditorReader GetEditorReader()
+        {
             return editorReader;
         }
 
@@ -26,18 +28,37 @@ namespace Mapping_Tools.Classes.Tools
         /// Gets the instance of EditorReader with FetchAll. Throws an exception if the editor is not open.
         /// </summary>
         /// <returns></returns>
-        public static bool TryGetFullEditorReader(out EditorReader reader) {
+        public static bool TryGetFullEditorReader(out EditorReader reader)
+        {
             reader = editorReader;
-            try {
+            try
+            {
                 editorReader.FetchAll();
                 return true;
-            } catch {
+            }
+            catch
+            {
                 return false;
             }
         }
 
-        public static List<BeatmapHelper.HitObject> GetSelectedObjects(BeatmapEditor editor, EditorReader reader) {
-            try {
+        public static void CoolSave()
+        {
+            try
+            {
+                var editor = GetNewestVersion(IOHelper.CurrentBeatmap());
+                editor.SaveFile();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"BetterSave™ wasn't better after all\n{e.Message}");
+            }
+        }
+
+        public static List<BeatmapHelper.HitObject> GetSelectedObjects(BeatmapEditor editor, EditorReader reader)
+        {
+            try
+            {
                 string songs = SettingsManager.GetSongsPath();
                 string folder = reader.ContainingFolder;
                 string filename = reader.Filename;
@@ -53,13 +74,17 @@ namespace Mapping_Tools.Classes.Tools
                 var comparer = new HitObjectComparer();
 
                 // Get all the hit objects that are selected according to the editor reader
-                foreach (var ho in editor.Beatmap.HitObjects) {
-                    if (convertedSelected.Contains(ho, comparer)) {
+                foreach (var ho in editor.Beatmap.HitObjects)
+                {
+                    if (convertedSelected.Contains(ho, comparer))
+                    {
                         selectedHitObjects.Add(ho);
                     }
                 }
                 return selectedHitObjects;
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 MessageBox.Show($"Exception ({ex.Message}) while editor reading.");
                 return new List<BeatmapHelper.HitObject>();
             }
@@ -71,7 +96,8 @@ namespace Mapping_Tools.Classes.Tools
         /// <param name="path">Path to the beatmap</param>
         /// <param name="fullReader">Reader object that has already fetched all</param>
         /// <returns>An editor for the beatmap</returns>
-        public static BeatmapEditor GetNewestVersion(string path, EditorReader fullReader = null) {
+        public static BeatmapEditor GetNewestVersion(string path, EditorReader fullReader = null)
+        {
             return GetNewestVersion(path, out var _, fullReader);
         }
 
@@ -82,7 +108,8 @@ namespace Mapping_Tools.Classes.Tools
         /// <param name="selected">List of selected hit objects</param>
         /// <param name="fullReader">Reader object that has already fetched all</param>
         /// <returns>An editor for the beatmap</returns>
-        public static BeatmapEditor GetNewestVersion(string path, out List<BeatmapHelper.HitObject> selected, EditorReader fullReader = null) {
+        public static BeatmapEditor GetNewestVersion(string path, out List<BeatmapHelper.HitObject> selected, EditorReader fullReader = null)
+        {
             BeatmapEditor editor = new BeatmapEditor(path);
             selected = new List<BeatmapHelper.HitObject>();
 
@@ -94,7 +121,8 @@ namespace Mapping_Tools.Classes.Tools
 
             // Get the path from the beatmap in memory
             // This can only crash if the provided fullReader didn't fetch all values
-            try {
+            try
+            {
                 string songs = SettingsManager.GetSongsPath();
                 string folder = reader.ContainingFolder;
                 string filename = reader.Filename;
@@ -106,7 +134,9 @@ namespace Mapping_Tools.Classes.Tools
 
                 // Update the beatmap with memory values
                 selected = UpdateBeatmap(editor.Beatmap, reader);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 MessageBox.Show($"Exception ({ex.Message}) while editor reading.");
             }
 
@@ -119,7 +149,8 @@ namespace Mapping_Tools.Classes.Tools
         /// <param name="beatmap">Beatmap to replace values in</param>
         /// <param name="reader">Reader that contains the values from memory</param>
         /// <returns>A list of selected hit objects which originate from the beatmap.</returns>
-        public static List<BeatmapHelper.HitObject> UpdateBeatmap(Beatmap beatmap, EditorReader reader) {
+        public static List<BeatmapHelper.HitObject> UpdateBeatmap(Beatmap beatmap, EditorReader reader)
+        {
             beatmap.SetBookmarks(reader.bookmarks.Select<int, double>(o => o).ToList());
 
             beatmap.BeatmapTiming.TimingPoints = reader.controlPoints.Select(o => (TimingPoint)o).ToList();
