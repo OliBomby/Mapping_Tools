@@ -89,7 +89,7 @@ namespace Mapping_Tools {
 
             FsWatcher.Filter = "*.osu";
             FsWatcher.Changed += OnChangedFsWatcher;
-            //FsWatcher.EnableRaisingEvents = true;
+            FsWatcher.EnableRaisingEvents = true;
             FsWatcher.IncludeSubdirectories = true;
         }
 
@@ -104,6 +104,22 @@ namespace Mapping_Tools {
                 if( oldHandle != proc.MainWindowHandle ) {
                     return;
                 }
+            }
+
+            string hashString = "";
+            var currentPath = IOHelper.GetCurrentBeatmap();
+
+            try {
+                if (File.Exists(currentPath)) {
+                    hashString = EditorReaderStuff.GetMD5FromPath(currentPath);
+                }
+            }
+            catch {
+                return;
+            }
+
+            if (EditorReaderStuff.DontCoolSaveWhenMD5EqualsThisString == hashString) {
+                return;
             }
 
             EditorReaderStuff.CoolSave();

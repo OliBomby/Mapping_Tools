@@ -40,7 +40,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             SaveFile(Path, lines);
         }
 
-        public void SaveFile() {
+        public virtual void SaveFile() {
             SaveFile(Path, TextFile.GetLines());
         }
 
