@@ -111,10 +111,14 @@ namespace Mapping_Tools.Views {
             bool muteSliderends = arg.MuteSliderends;
             bool doMutedIndex = arg.MutedIndex >= 0;
 
+            string[] paths = arg.PathTo.Split('|');
+            int mapsDone = 0;
 
-            foreach (string pathTo in arg.PathTo.Split('|')) {
-                BeatmapEditor editorTo = new BeatmapEditor(pathTo);
-                BeatmapEditor editorFrom = new BeatmapEditor(arg.PathFrom);
+            bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+
+            foreach (string pathTo in paths) {
+                BeatmapEditor editorTo = editorRead ? EditorReaderStuff.GetNewestVersion(pathTo, reader) : new BeatmapEditor(pathTo);
+                BeatmapEditor editorFrom = editorRead ? EditorReaderStuff.GetNewestVersion(arg.PathFrom, reader) : new BeatmapEditor(arg.PathFrom);
 
                 Beatmap beatmapTo = editorTo.Beatmap;
                 Beatmap beatmapFrom = editorFrom.Beatmap;
@@ -138,7 +142,7 @@ namespace Mapping_Tools.Views {
                     // Save tlo times where volume is 5%
                     if (volumeMuteTimes != null) {
                         // Timingpointchange all the undefined tlo from copyFrom
-                        foreach (TimelineObject tloTo in tlTo.TimeLineObjects) {
+                        foreach (TimelineObject tloTo in tlTo.TimelineObjects) {
                             if (tloTo.canCopy && tloTo.FenoSampleVolume == 5) {
                                 volumeMuteTimes.Add(tloTo.Time);
                             }
@@ -164,7 +168,7 @@ namespace Mapping_Tools.Views {
                         List<TimingPointsChange> timingPointsChangesMute = new List<TimingPointsChange>();
                         processedTimeline.GiveTimingPoints(beatmapTo.BeatmapTiming);
 
-                        foreach (TimelineObject tloTo in processedTimeline.TimeLineObjects) {
+                        foreach (TimelineObject tloTo in processedTimeline.TimelineObjects) {
                             if (volumeMuteTimes.Contains(tloTo.Time)) {
                                 // Add timingpointschange to copy timingpoint hitsounds
                                 TimingPoint tp = tloTo.HitsoundTP.Copy();
@@ -192,7 +196,7 @@ namespace Mapping_Tools.Views {
                     Timeline tlFrom = beatmapFrom.GetTimeline();
 
                     List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
-                    int mode = beatmapTo.General["Mode"].Value;
+                    GameMode mode = (GameMode)beatmapTo.General["Mode"].Value;
                     string mapDir = editorTo.GetBeatmapFolder();
                     Dictionary<string, string> firstSamples = HitsoundImporter.AnalyzeSamples(mapDir);
 
@@ -212,7 +216,9 @@ namespace Mapping_Tools.Views {
                                 if (beatmapFrom.HitObjects.Any(o => o.Time < tp.Offset && o.EndTime > tp.Offset))
                                 {
                                     // Timingpoint is in a body for both beatmaps
-                                    beatmapTo.BeatmapTiming.TimingPoints.Remove(tp);
+                                    // Don't remove redlines
+                                    if (!tp.Inherited)
+                                        beatmapTo.BeatmapTiming.TimingPoints.Remove(tp);
                                 }
                             }
                         }
@@ -252,13 +258,13 @@ namespace Mapping_Tools.Views {
                     Dictionary<string, string> firstSamples = HitsoundImporter.AnalyzeSamples(mapDir, true);
 
                     var samplesTo = new HashSet<StoryboardSoundSample>(beatmapTo.StoryboardSoundSamples);
-                    int mode = beatmapTo.General["Mode"].Value;
+                    GameMode mode = (GameMode)beatmapTo.General["Mode"].Value;
 
                     foreach (StoryboardSoundSample sampleFrom in beatmapFrom.StoryboardSoundSamples)
                     {
                         if (ignoreHSSBSamples)
                         {
-                            List<TimelineObject> tloHere = processedTimeline.TimeLineObjects.FindAll(o => Math.Abs(o.Time - sampleFrom.Time) <= temporalLeniency);
+                            List<TimelineObject> tloHere = processedTimeline.TimelineObjects.FindAll(o => Math.Abs(o.Time - sampleFrom.Time) <= temporalLeniency);
                             HashSet<string> samplesHere = new HashSet<string>();
                             foreach (TimelineObject tlo in tloHere)
                             {
@@ -303,7 +309,7 @@ namespace Mapping_Tools.Views {
                     beatmapTo.GiveObjectsGreenlines();
                     processedTimeline.GiveTimingPoints(beatmapTo.BeatmapTiming);
 
-                    foreach (TimelineObject tloTo in processedTimeline.TimeLineObjects)
+                    foreach (TimelineObject tloTo in processedTimeline.TimelineObjects)
                     {
                         if (FilterMuteTLO(tloTo, beatmapTo, arg))
                         {
@@ -342,10 +348,9 @@ namespace Mapping_Tools.Views {
                 // Save the file
                 editorTo.SaveFile();
 
-                // Complete progressbar
-                if (worker != null && worker.WorkerReportsProgress)
-                {
-                    worker.ReportProgress(100);
+                // Update progressbar
+                if (worker != null && worker.WorkerReportsProgress) {
+                    worker.ReportProgress(++mapsDone * 100 / paths.Length);
                 }
             }
 
@@ -356,7 +361,7 @@ namespace Mapping_Tools.Views {
         }
 
         private void CopyHitsounds(Arguments arg, Timeline tlFrom, Timeline tlTo) {
-            foreach (TimelineObject tloFrom in tlFrom.TimeLineObjects) {
+            foreach (TimelineObject tloFrom in tlFrom.TimelineObjects) {
                 TimelineObject tloTo = tlTo.GetNearestTLO(tloFrom.Time, true);
 
                 if (tloTo != null && Math.Abs(Math.Round(tloFrom.Time) - Math.Round(tloTo.Time)) <= arg.TemporalLeniency) {
@@ -367,8 +372,8 @@ namespace Mapping_Tools.Views {
             }
         }
 
-        private void CopyHitsounds(Arguments arg, Timeline tlFrom, Timeline tlTo, List<TimingPointsChange> timingPointsChanges, int mode, string mapDir, Dictionary<string, string> firstSamples) {
-            foreach (TimelineObject tloFrom in tlFrom.TimeLineObjects) {
+        private void CopyHitsounds(Arguments arg, Timeline tlFrom, Timeline tlTo, List<TimingPointsChange> timingPointsChanges, GameMode mode, string mapDir, Dictionary<string, string> firstSamples) {
+            foreach (TimelineObject tloFrom in tlFrom.TimelineObjects) {
                 TimelineObject tloTo = tlTo.GetNearestTLO(tloFrom.Time, true);
 
                 if (tloTo != null && Math.Abs(Math.Round(tloFrom.Time) - Math.Round(tloTo.Time)) <= arg.TemporalLeniency) {
@@ -384,7 +389,7 @@ namespace Mapping_Tools.Views {
             }
 
             // Timingpointchange all the undefined tlo from copyFrom
-            foreach (TimelineObject tloTo in tlTo.TimeLineObjects) {
+            foreach (TimelineObject tloTo in tlTo.TimelineObjects) {
                 if (tloTo.canCopy) {
                     TimingPoint tp = tloTo.HitsoundTP.Copy();
                     bool holdSampleset = arg.CopySamplesets && tloTo.SampleSet == SampleSet.Auto;
@@ -410,9 +415,10 @@ namespace Mapping_Tools.Views {
                             List<string> newSamples = tloTo.GetFirstPlayingFilenames(mode, mapDir, firstSamples);
                             if (nativeSamples.SequenceEqual(newSamples)) {
                                 // Sampleset changes dont change sound
-                                holdSampleset = false;
+                                tp.SampleSet = newSampleSet;
+                            } else {
+                                tp.SampleSet = oldSampleSet;
                             }
-                            tp.SampleSet = oldSampleSet;
                         }
                         if (holdIndex) {
 
@@ -431,9 +437,10 @@ namespace Mapping_Tools.Views {
                             List<string> newSamples = tloTo.GetFirstPlayingFilenames(mode, mapDir, firstSamples);
                             if (nativeSamples.SequenceEqual(newSamples)) {
                                 // Index changes dont change sound
-                                holdIndex = false;
+                                tp.SampleIndex = newIndex;
+                            } else {
+                                tp.SampleIndex = oldIndex;
                             }
-                            tp.SampleIndex = oldIndex;
                         }
                         tloTo.GiveHitsoundTimingPoint(tp);
                     }
@@ -485,10 +492,9 @@ namespace Mapping_Tools.Views {
 
                 if (ho.IsSlider) {
                     // Remove edge hitsounds
-                    ho.EdgeHitsounds = ho.EdgeHitsounds.Select(o => 0).ToArray();
-                    ho.EdgeSampleSets = ho.EdgeSampleSets.Select(o => SampleSet.Auto).ToArray();
-                    ho.EdgeAdditionSets = ho.EdgeAdditionSets.Select(o => SampleSet.Auto).ToArray();
-                    ho.SliderExtras = false;
+                    ho.EdgeHitsounds = ho.EdgeHitsounds.Select(o => 0).ToList();
+                    ho.EdgeSampleSets = ho.EdgeSampleSets.Select(o => SampleSet.Auto).ToList();
+                    ho.EdgeAdditionSets = ho.EdgeAdditionSets.Select(o => SampleSet.Auto).ToList();
                 }
             }
         }

@@ -19,8 +19,8 @@ namespace Mapping_Tools.Views {
             InitializeComponent();
             HitsoundLayers = new List<HitsoundLayer>();
             index = 0;
-            BeatmapPathBox.Text = MainWindow.AppWindow.GetCurrentMap();
-            BeatmapPathBox2.Text = MainWindow.AppWindow.GetCurrentMap();
+            BeatmapPathBox.Text = MainWindow.AppWindow.GetCurrentMaps()[0];
+            BeatmapPathBox2.Text = MainWindow.AppWindow.GetCurrentMapsString();
         }
 
         public HitsoundLayerImportWindow(int i) {
@@ -30,8 +30,8 @@ namespace Mapping_Tools.Views {
             NameBox0.Text = string.Format("Layer {0}", index + 1);
             NameBox.Text = string.Format("Layer {0}", index + 1);
             NameBox2.Text = string.Format("Layer {0}", index + 1);
-            BeatmapPathBox.Text = MainWindow.AppWindow.GetCurrentMap();
-            BeatmapPathBox2.Text = MainWindow.AppWindow.GetCurrentMap();
+            BeatmapPathBox.Text = MainWindow.AppWindow.GetCurrentMaps()[0];
+            BeatmapPathBox2.Text = MainWindow.AppWindow.GetCurrentMapsString();
         }
 
         private void BeatmapBrowse_Click(object sender, RoutedEventArgs e) {

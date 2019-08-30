@@ -20,8 +20,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public List<string> StoryboardLayer4 { get; set; }
         public List<StoryboardSoundSample> StoryboardSoundSamples { get; set; }
 
-
         public StoryBoard(List<string> lines) {
+            SetLines(lines);
+        }
+
+        public void SetLines(List<string> lines) {
             // Load up all the shit
 
             List<string> eventsLines = GetCategoryLines(lines, "[Events]");

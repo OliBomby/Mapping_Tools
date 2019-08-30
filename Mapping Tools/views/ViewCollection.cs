@@ -109,6 +109,14 @@ namespace Mapping_Tools.Views {
             return SnappingTools;
         }
 
+        private UserControl TimingCopier { get; set; }
+        public UserControl GetTimingCopier() {
+            if (TimingCopier == null) {
+                TimingCopier = new TimingCopierView();
+            }
+            return TimingCopier;
+        }
+
         private UserControl TimingHelper { get; set; }
         public UserControl GetTimingHelper() {
             if (TimingHelper == null) {

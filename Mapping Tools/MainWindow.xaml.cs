@@ -17,6 +17,10 @@ using System.Drawing;
 using System.Reflection;
 using System.Linq;
 using System.Net.Http;
+using NonInvasiveKeyboardHookLibrary;
+using System.Runtime.InteropServices;
+using System.Threading;
+using Mapping_Tools.Classes.Tools;
 
 namespace Mapping_Tools {
     public partial class MainWindow : Window {
@@ -27,6 +31,7 @@ namespace Mapping_Tools {
 
         public static MainWindow AppWindow { get; set; }
         public static readonly HttpClient HttpClient = new HttpClient();
+        public static readonly KeyboardHookManager keyboardHookManager = new KeyboardHookManager();
         private static readonly string appCommon = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         public static readonly string AppDataPath = Path.Combine(appCommon, "Mapping Tools");
         public static readonly string ExportPath = Path.Combine(AppDataPath, "Exports");
@@ -46,9 +51,7 @@ namespace Mapping_Tools {
             Views = new ViewCollection(); // Make a ViewCollection object
             DataContext = new StandardVM(); // Generate Standard view model to show on startup
 
-            if(SettingsManager.GetRecentMaps().Count > 0 ) {
-                SetCurrentMap(SettingsManager.GetRecentMaps()[0][0]);
-            } // Set currentmap to previously opened map
+            SetCurrentMaps(SettingsManager.GetLatestCurrentMaps()); // Set currentmap to previously opened map
             ViewChanged();
         }
 
@@ -69,6 +72,43 @@ namespace Mapping_Tools {
             }
             catch( Exception ex ) {
                 System.Windows.MessageBox.Show(ex.Message);
+            }
+
+            // Register virtual key code 0x4D = M to QuickRun
+            keyboardHookManager.RegisterHotkey(new[] { NonInvasiveKeyboardHookLibrary.ModifierKeys.Alt, NonInvasiveKeyboardHookLibrary.ModifierKeys.Control, NonInvasiveKeyboardHookLibrary.ModifierKeys.Shift }, 0x4D, QuickRunCurrentTool);
+            keyboardHookManager.Start();
+        }
+
+        private void QuickRunCurrentTool() {
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                if (DataContext is IQuickRun tool) {
+                    tool.RunFinished -= Reload;
+                    tool.RunFinished += Reload;
+                    tool.QuickRun();
+                }
+            });
+        }
+
+        [DllImport("user32.dll")]
+        static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll")]
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        private void Reload(object sender, EventArgs e) {
+            if (((RunToolCompletedEventArgs)e).NeedReload) {
+                var proc = Process.GetProcessesByName("osu!").FirstOrDefault();;
+                if (proc != null) {
+                    var oldHandle = GetForegroundWindow();
+                    if (oldHandle != proc.MainWindowHandle) {
+                        SetForegroundWindow(proc.MainWindowHandle);
+                        Thread.Sleep(300);
+                    }
+                }
+                SendKeys.SendWait("^{L 10}");
+                Thread.Sleep(100);
+                SendKeys.SendWait("{ENTER}");
             }
         }
 
@@ -102,29 +142,39 @@ namespace Mapping_Tools {
             }
         }
 
-        public void SetCurrentMap(string path) {
-            currentMap.Text = path;
-            SettingsManager.AddRecentMap(path, DateTime.Now);
+        public void SetCurrentMaps(string[] paths) {
+            currentMap.Text = string.Join("|", paths);
+            SettingsManager.AddRecentMap(currentMap.Text, DateTime.Now);
         }
 
-        public string GetCurrentMap() {
-            return currentMap.Text;
+        public void SetCurrentMapsString(string paths) {
+            currentMap.Text = paths;
+            SettingsManager.AddRecentMap(paths, DateTime.Now);
+        }
+
+        public string[] GetCurrentMaps() {
+            return currentMap.Text.Split('|');
+        }
+
+        public string GetCurrentMapsString() {
+            return string.Join("|", GetCurrentMaps());
         }
 
         private void OpenBeatmap(object sender, RoutedEventArgs e) {
-            string[] paths = IOHelper.BeatmapFileDialog();
-            if( paths.Length != 0 ) { SetCurrentMap(paths[0]); }
+            string[] paths = IOHelper.BeatmapFileDialog(true);
+            if( paths.Length != 0 ) { SetCurrentMaps(paths); }
         }
 
         private void OpenCurrentBeatmap(object sender, RoutedEventArgs e) {
             string path = IOHelper.CurrentBeatmap();
-            if( path != "" ) { SetCurrentMap(path); }
+            if( path != "" ) { SetCurrentMaps(new[] { path }); }
         }
 
         private void SaveBackup(object sender, RoutedEventArgs e) {
-            bool result = IOHelper.SaveMapBackup(GetCurrentMap(), forced: true);
+            var paths = GetCurrentMaps();
+            bool result = IOHelper.SaveMapBackup(paths, true);
             if (result)
-                System.Windows.MessageBox.Show("Beatmap successfully copied!");
+                System.Windows.MessageBox.Show($"Beatmap{(paths.Length == 1 ? "" : "s")} successfully copied!");
         }
 
         //Method for loading the cleaner interface 
@@ -198,6 +248,19 @@ namespace Mapping_Tools {
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Snapping Tools";
+
+            ViewChanged();
+
+            this.MinWidth = 400;
+            this.MinHeight = 380;
+        }
+
+        //Method for loading the timing copier interface
+        private void LoadTimingCopier(object sender, RoutedEventArgs e) {
+            DataContext = Views.GetTimingCopier();
+
+            TextBlock txt = this.FindName("header") as TextBlock;
+            txt.Text = "Mapping Tools - Timing Copier";
 
             ViewChanged();
 
@@ -291,48 +354,6 @@ namespace Mapping_Tools {
             menuitem.Visibility = isSavable ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        public static DialogResult InputBox(string title, string promptText, ref string value) {
-            using (Form form = new Form()) {
-                System.Windows.Forms.Label label = new System.Windows.Forms.Label();
-                System.Windows.Forms.TextBox textBox = new System.Windows.Forms.TextBox();
-                System.Windows.Forms.Button buttonOk = new System.Windows.Forms.Button();
-                System.Windows.Forms.Button buttonCancel = new System.Windows.Forms.Button();
-
-                form.Text = title;
-                label.Text = promptText;
-                textBox.Text = value;
-
-                buttonOk.Text = "OK";
-                buttonCancel.Text = "Cancel";
-                buttonOk.DialogResult = System.Windows.Forms.DialogResult.OK;
-                buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-
-                label.SetBounds(9, 20, 372, 13);
-                textBox.SetBounds(12, 36, 372, 20);
-                buttonOk.SetBounds(228, 72, 75, 23);
-                buttonCancel.SetBounds(309, 72, 75, 23);
-
-                label.AutoSize = true;
-                textBox.Anchor |= AnchorStyles.Right;
-                buttonOk.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-                buttonCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-
-                form.ClientSize = new System.Drawing.Size(396, 107);
-                form.Controls.AddRange(new System.Windows.Forms.Control[] { label, textBox, buttonOk, buttonCancel });
-                form.ClientSize = new System.Drawing.Size(Math.Max(300, label.Right + 10), form.ClientSize.Height);
-                form.FormBorderStyle = FormBorderStyle.FixedDialog;
-                form.StartPosition = FormStartPosition.CenterScreen;
-                form.MinimizeBox = false;
-                form.MaximizeBox = false;
-                form.AcceptButton = buttonOk;
-                form.CancelButton = buttonCancel;
-
-                DialogResult dialogResult = form.ShowDialog();
-                value = textBox.Text;
-                return dialogResult;
-            }
-        }
-
         private void LoadProject(object sender, RoutedEventArgs e) {
             if (!ProjectManager.IsSavable(DataContext))
                 return;
@@ -360,6 +381,10 @@ namespace Mapping_Tools {
 
         private void OpenWebsite(object sender, RoutedEventArgs e) {
             Process.Start("https://mappingtools.seira.moe/");
+        }
+
+        private void CoolSave(object sender, RoutedEventArgs e) {
+            EditorReaderStuff.CoolSave();
         }
 
         //Open project in browser

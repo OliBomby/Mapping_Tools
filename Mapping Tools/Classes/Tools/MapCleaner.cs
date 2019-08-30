@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.Tools {
     public class MapCleaner {
-        public struct MapCleanerArgs {
+        public class MapCleanerArgs {
             public bool VolumeSliders;
             public bool SamplesetSliders;
             public bool VolumeSpinners;
@@ -39,13 +39,23 @@ namespace Mapping_Tools.Classes.Tools {
             public static readonly MapCleanerArgs BasicResnap = new MapCleanerArgs(true, true, true, true, false, false, false, false, 16, 12);
         }
 
-        public struct MapCleanerResult {
-            public int ObjectsResnapped;
-            public int SamplesRemoved;
+        public class MapCleanerResult {
+            public int ObjectsResnapped = 0;
+            public int SamplesRemoved = 0;
+            public int TimingPointsRemoved = 0;
+
+            public MapCleanerResult() {
+            }
 
             public MapCleanerResult(int objectsResnapped, int samplesRemoved) {
                 ObjectsResnapped = objectsResnapped;
                 SamplesRemoved = samplesRemoved;
+            }
+
+            public void Add(MapCleanerResult other) {
+                ObjectsResnapped += other.ObjectsResnapped;
+                SamplesRemoved += other.SamplesRemoved;
+                TimingPointsRemoved += other.TimingPointsRemoved;
             }
         }
 
@@ -63,7 +73,7 @@ namespace Mapping_Tools.Classes.Tools {
             Timing timing = beatmap.BeatmapTiming;
             Timeline timeline = beatmap.GetTimeline();
 
-            int mode = beatmap.General["Mode"].Value;
+            GameMode mode = (GameMode)beatmap.General["Mode"].Value;
             double circleSize = beatmap.Difficulty["CircleSize"].Value;
             string mapDir = editor.GetBeatmapFolder();
             Dictionary<string, string> firstSamples = HitsoundImporter.AnalyzeSamples(mapDir);
@@ -132,7 +142,7 @@ namespace Mapping_Tools.Classes.Tools {
 
             // Maybe mute unclickable timelineobjects
             if (args.RemoveUnclickableHitsounds) {
-                foreach (TimelineObject tlo in timeline.TimeLineObjects) {
+                foreach (TimelineObject tlo in timeline.TimelineObjects) {
                     if (!(tlo.IsCircle || tlo.IsSliderHead || tlo.IsHoldnoteHead))  // Not clickable
                     {
                         tlo.FenoSampleVolume = 5;  // 5% volume mute
@@ -151,7 +161,7 @@ namespace Mapping_Tools.Classes.Tools {
             UpdateProgressBar(worker, 55);
 
             // Add SV changes for taiko and mania
-            if (mode == 1 || mode == 3) {
+            if (mode == GameMode.Taiko || mode == GameMode.Mania) {
                 foreach (TimingPoint tp in svChanges) {
                     timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true));
                 }
@@ -190,7 +200,6 @@ namespace Mapping_Tools.Classes.Tools {
                 if (ho.IsSlider && (!samplesetActuallyChanged) && ho.SampleSet == 0)  // Case can put sampleset on sliderbody
                 {
                     ho.SampleSet = ho.HitsoundTP.SampleSet;
-                    ho.SliderExtras = true;
                 }
                 if (ho.IsSlider && samplesetActuallyChanged) // Make it start out with the right sampleset
                 {
@@ -202,12 +211,12 @@ namespace Mapping_Tools.Classes.Tools {
             UpdateProgressBar(worker, 75);
 
             // Add timeline hitsounds
-            foreach (TimelineObject tlo in timeline.TimeLineObjects) {
+            foreach (TimelineObject tlo in timeline.TimelineObjects) {
                 // Change the samplesets in the hitobjects
                 if (tlo.Origin.IsCircle) {
                     tlo.Origin.SampleSet = tlo.FenoSampleSet;
                     tlo.Origin.AdditionSet = tlo.FenoAdditionSet;
-                    if (mode == 3) {
+                    if (mode == GameMode.Mania) {
                         tlo.Origin.CustomIndex = tlo.FenoCustomIndex;
                         tlo.Origin.SampleVolume = tlo.FenoSampleVolume;
                     }
@@ -215,7 +224,6 @@ namespace Mapping_Tools.Classes.Tools {
                     tlo.Origin.EdgeHitsounds[tlo.Repeat] = tlo.GetHitsounds();
                     tlo.Origin.EdgeSampleSets[tlo.Repeat] = tlo.FenoSampleSet;
                     tlo.Origin.EdgeAdditionSets[tlo.Repeat] = tlo.FenoAdditionSet;
-                    tlo.Origin.SliderExtras = true;
                     if (tlo.Origin.EdgeAdditionSets[tlo.Repeat] == tlo.Origin.EdgeSampleSets[tlo.Repeat])  // Simplify additions to auto
                     {
                         tlo.Origin.EdgeAdditionSets[tlo.Repeat] = 0;
@@ -264,9 +272,11 @@ namespace Mapping_Tools.Classes.Tools {
                         List<string> newSamples = tlo.GetFirstPlayingFilenames(mode, mapDir, firstSamples);
                         if (nativeSamples.SequenceEqual(newSamples)) {
                             // Index changes dont change sound
-                            ind = false;
+                            tp.SampleIndex = newIndex;
+                        } else {
+                            tp.SampleIndex = oldIndex;
                         }
-                        tp.SampleIndex = oldIndex;
+                        
                         tlo.GiveHitsoundTimingPoint(tp);
                     }
 
@@ -306,7 +316,7 @@ namespace Mapping_Tools.Classes.Tools {
                 BeatmapEditor editor = new BeatmapEditor(path);
                 Beatmap beatmap = editor.Beatmap;
 
-                int mode = beatmap.General["Mode"].Value;
+                GameMode mode = (GameMode)beatmap.General["Mode"].Value;
                 double sliderTickRate = beatmap.Difficulty["SliderTickRate"].Value;
 
                 if (!anySpinners)
@@ -318,7 +328,7 @@ namespace Mapping_Tools.Classes.Tools {
                     allFilenames.UnionWith(ho.GetPlayingBodyFilenames(sliderTickRate, false));
                 }
 
-                foreach (TimelineObject tlo in beatmap.GetTimeline().TimeLineObjects) {
+                foreach (TimelineObject tlo in beatmap.GetTimeline().TimelineObjects) {
                     allFilenames.UnionWith(tlo.GetPlayingFilenames(mode, false));
                 }
 

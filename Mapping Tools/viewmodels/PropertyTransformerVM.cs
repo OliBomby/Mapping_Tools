@@ -234,7 +234,7 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
-        public string MapPath;
+        public string[] MapPaths;
 
         public event PropertyChangedEventHandler PropertyChanged;
 

@@ -61,7 +61,7 @@
                     <DataGrid.Resources>
                         <Style TargetType="DataGridRow" BasedOn="{StaticResource MaterialDesignDataGridRow}">
                             <Setter Property="IsSelected"
-                                Value="{Binding IsSelected}" />
+                                Value="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         </Style>
                     </DataGrid.Resources>
                     <DataGrid.Columns>
@@ -118,6 +118,9 @@
                         Orientation="Horizontal">
                     <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add an item" Command="{Binding AddCommand}" Margin="5">
                         <materialDesign:PackIcon Kind="Plus" Height="24" Width="24" />
+                    </Button>
+                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Copy selected items" Command="{Binding CopyCommand}" Margin="5">
+                        <materialDesign:PackIcon Kind="ContentCopy" Height="24" Width="24" />
                     </Button>
                     <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove selected items" Command="{Binding RemoveCommand}" Margin="5">
                         <materialDesign:PackIcon Kind="Trashcan" Height="24" Width="24" />

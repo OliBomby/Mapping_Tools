@@ -10,7 +10,6 @@ namespace Mapping_Tools.Classes.SystemTools
     public class IOHelper
     {
         private static readonly IOsuMemoryReader PioReader = OsuMemoryReader.Instance;
-        private static readonly EditorReader KarooReader = new EditorReader();
 
         public static bool SaveMapBackup(string fileToCopy, bool forced=false) {
             if (!SettingsManager.GetMakeBackups() && !forced)
@@ -25,6 +24,16 @@ namespace Mapping_Tools.Classes.SystemTools
                 MessageBox.Show(ex.Message);
                 return false;
             }
+        }
+
+        public static bool SaveMapBackup(string[] filesToCopy, bool forced = false) {
+            bool result = true;
+            foreach (string fileToCopy in filesToCopy) {
+                result = SaveMapBackup(fileToCopy, forced) && result;
+                if (!result)
+                    break;
+            }
+            return result;
         }
 
         public static string FolderDialog(string initialDirectory = "") {
@@ -117,7 +126,7 @@ namespace Mapping_Tools.Classes.SystemTools
         }
 
         public static string[] BeatmapFileDialog(bool multiselect=false) {
-            string path = MainWindow.AppWindow.GetCurrentMap();
+            string path = MainWindow.AppWindow.GetCurrentMaps()[0];
             using (OpenFileDialog openFileDialog = new OpenFileDialog {
                 InitialDirectory = path != "" ? Directory.GetParent(path).FullName : SettingsManager.GetSongsPath(),
                 Filter = "Osu files (*.osu)|*.osu",
@@ -132,24 +141,17 @@ namespace Mapping_Tools.Classes.SystemTools
         }
 
         public static string CurrentBeatmap() {
-            string songs = SettingsManager.GetSongsPath();
+            try {
+                string songs = SettingsManager.GetSongsPath();
 
-            bool inEditor = PioReader.GetCurrentStatus(out int _) == OsuMemoryStatus.EditingMap;
-            if (inEditor) {
-                KarooReader.FetchAll();
-                string folder = KarooReader.ContainingFolder;
-                string filename = KarooReader.Filename;
-                string path = Path.Combine(songs, folder, filename);
-
-                if (songs == "" || folder == "" || filename == "") { return ""; }
-                return path;
-            } else {
                 string folder = PioReader.GetMapFolderName();
                 string filename = PioReader.GetOsuFileName();
                 string path = Path.Combine(songs, folder, filename);
 
                 if (songs == "" || folder == "" || filename == "") { return ""; }
                 return path;
+            } catch (Exception) {
+                return "";
             }
         }
     }

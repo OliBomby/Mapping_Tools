@@ -9,12 +9,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Globalization;
+using System.Windows;
+using Mapping_Tools.Classes.Tools;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     class HitsoundImporter {
         public static List<double> TimesFromStack(string path, double x, double y) {
             List<double> times = new List<double>();
-            BeatmapEditor editor = new BeatmapEditor(path);
+            BeatmapEditor editor = EditorReaderStuff.GetNewestVersion(path);
 
             bool xIgnore = x == -1;
             bool yIgnore = y == -1;
@@ -43,6 +45,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 .Where(n => extList.Contains(Path.GetExtension(n), StringComparer.OrdinalIgnoreCase)).ToList();
 
             Dictionary<string, string> dict = new Dictionary<string, string>();
+            bool error = false;
             
             // Compare all samples to find ones with the same data
             for (int i = 0; i < samplePaths.Count; i++) {
@@ -53,18 +56,27 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         
                         if (thisLength != otherLength) { continue; }
 
-                        using (var thisWave = SampleImporter.OpenSample(samplePaths[i])) {
-                            using (var otherWave = SampleImporter.OpenSample(samplePaths[k])) {
-                                if (thisWave.Length != otherWave.Length) { continue; }
+                        try {
+                            using (var thisWave = SampleImporter.OpenSample(samplePaths[i])) {
+                                using (var otherWave = SampleImporter.OpenSample(samplePaths[k])) {
+                                    if (thisWave.Length != otherWave.Length) { continue; }
 
-                                byte[] thisBuffer = new byte[thisWave.Length];
-                                thisWave.Read(thisBuffer, 0, (int)thisWave.Length);
+                                    byte[] thisBuffer = new byte[thisWave.Length];
+                                    thisWave.Read(thisBuffer, 0, (int)thisWave.Length);
 
-                                byte[] otherBuffer = new byte[otherWave.Length];
-                                otherWave.Read(otherBuffer, 0, (int)otherWave.Length);
+                                    byte[] otherBuffer = new byte[otherWave.Length];
+                                    otherWave.Read(otherBuffer, 0, (int)otherWave.Length);
 
-                                if (!thisBuffer.SequenceEqual(otherBuffer)) { continue; }
+                                    if (!thisBuffer.SequenceEqual(otherBuffer)) { continue; }
+                                }
                             }
+                        } catch (Exception ex) {
+                            // Something went wrong reading the samples. I'll just assume they weren't the same
+                            if (!error) {
+                                MessageBox.Show($"Exception '{ex.Message}' while trying to analyze samples.", "Warning");
+                                error = true;
+                            }
+                            continue;
                         }
                     }
                     
@@ -83,17 +95,17 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// <param name="path">The path to the beatmap</param>
         /// <returns>The hitsound layers</returns>
         public static List<HitsoundLayer> ImportHitsounds(string path) {
-            BeatmapEditor editor = new BeatmapEditor(path);
+            BeatmapEditor editor = EditorReaderStuff.GetNewestVersion(path);
             Beatmap beatmap = editor.Beatmap;
             Timeline timeline = beatmap.GetTimeline();
 
-            int mode = beatmap.General["Mode"].Value;
+            GameMode mode = (GameMode)beatmap.General["Mode"].Value;
             string mapDir = editor.GetBeatmapFolder();
             Dictionary<string, string> firstSamples = AnalyzeSamples(mapDir);
 
             List<HitsoundLayer> hitsoundLayers = new List<HitsoundLayer>();
 
-            foreach (TimelineObject tlo in timeline.TimeLineObjects) {
+            foreach (TimelineObject tlo in timeline.TimelineObjects) {
                 if (!tlo.HasHitsound) { continue; }
 
                 List<string> samples = tlo.GetPlayingFilenames(mode);

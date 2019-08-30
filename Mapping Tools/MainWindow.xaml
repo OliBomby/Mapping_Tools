@@ -87,6 +87,7 @@
                         <MenuItem Header="_Open beatmap" Click="OpenBeatmap"/>
                         <MenuItem Header="_Open current beatmap" Click="OpenCurrentBeatmap"/>
                         <MenuItem Header="_Generate backup" Click="SaveBackup"/>
+                        <MenuItem Header="_BetterSave™ current beatmap" Click="CoolSave"/>
                     </MenuItem>
                     <MenuItem Height="31" Header="_Tools" Padding="12,0,0,0" MinWidth="65">
                         <MenuItem Header="_Map Cleaner" Click="LoadCleaner"/>
@@ -94,6 +95,7 @@
                         <MenuItem Header="_Property Transformer" Click="LoadPropertyTransformer"/>
                         <MenuItem Header="_Slider Merger" Click="LoadMerger"/>
                         <MenuItem Header="_Slider Completionator" Click="LoadCompletionator"/>
+                        <MenuItem Header="_Timing Copier" Click="LoadTimingCopier"/>
                         <MenuItem Header="_Timing Helper" Click="LoadTimingHelper"/>
                         <MenuItem Header="_Hitsound Copier" Click="LoadHSCopier"/>
                         <MenuItem Header="_Hitsound Studio" Click="LoadHSStudio"/>
@@ -129,9 +131,7 @@
                         <TextBlock Padding="10,10,0,0" Text="Current Map:" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontWeight="Normal"/>
                     </Grid>
                     <Grid Grid.Column="1">
-                        <Viewbox Margin="0,0,20,0" HorizontalAlignment="Left">
-                            <TextBlock x:FieldModifier="public" Name="currentMap" Height="35" TextWrapping="Wrap" Padding="10,10,0,0" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontWeight="Normal"/>
-                        </Viewbox>
+                        <TextBlock x:FieldModifier="public" Name="currentMap" Height="35" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Padding="10,10,0,0" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontWeight="Normal"/>
                     </Grid>
                 </Grid>
             </materialDesign:ColorZone>

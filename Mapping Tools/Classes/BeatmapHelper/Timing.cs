@@ -13,13 +13,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public List<TimingPoint> TimingPoints { get; set; }
         public double SliderMultiplier { get; set; }
 
-        public Timing(List<string> lines) {
-            TimingPoints = GetTimingPoints(lines);
-            SliderMultiplier = GetSliderMultiplier(lines);
+        public Timing(List<string> timingLines, double sliderMultiplier) {
+            TimingPoints = GetTimingPoints(timingLines);
+            SliderMultiplier = sliderMultiplier;
+            Sort();
         }
 
         public void Sort() {
-            TimingPoints = TimingPoints.OrderBy(o => o.Offset).ToList();
+            TimingPoints = TimingPoints.OrderBy(o => o.Offset).ThenByDescending(o => o.Inherited).ToList();
         }
 
         public static double GetNearestTimeMeter(double time, TimingPoint tp, int divisor) {
@@ -43,8 +44,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
-        public double Resnap(double time, int divisor2, int divisor3, bool floor=true, TimingPoint tp=null) {
-            TimingPoint beforeTP = tp ?? GetRedlineAtTime(time);
+        public double Resnap(double time, int divisor2, int divisor3, bool floor=true, TimingPoint tp=null, TimingPoint firstTP=null) {
+            TimingPoint beforeTP = tp ?? GetRedlineAtTime(time, firstTP);
             TimingPoint afterTP = tp == null ? GetRedlineAfterTime(time) : null;
 
             double newTime2 = GetNearestTimeMeter(time, beforeTP, divisor2);
@@ -141,8 +142,21 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return GetRedlineAtTime(time).MpB;
         }
 
-        public TimingPoint GetRedlineAtTime(double time) {
+        public TimingPoint GetGreenlineAtTime(double time) {
             TimingPoint lastTP = GetFirstTimingPointExtended();
+            foreach (TimingPoint tp in TimingPoints) {
+                if (Precision.DefinitelyBigger(tp.Offset, time)) {
+                    return lastTP;
+                }
+                if (!tp.Inherited) {
+                    lastTP = tp;
+                }
+            }
+            return lastTP;
+        }
+
+        public TimingPoint GetRedlineAtTime(double time, TimingPoint firstTimingPoint=null) {
+            TimingPoint lastTP = firstTimingPoint ?? GetFirstTimingPointExtended();
             foreach( TimingPoint tp in TimingPoints ) {
                 if( Precision.DefinitelyBigger(tp.Offset, time) ) {
                     return lastTP;
@@ -195,19 +209,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return ( -10000 * temporalLength * SliderMultiplier ) / ( GetMpBAtTime(time) * sv );
         }
 
-        public double GetSliderMultiplier(List<string> lines) {
-            foreach( string line in lines ) {
-                string[] split = line.Split(':');
-                if( split.Length < 2 ) {
-                    continue;
-                }
-                else if( split[0] == "SliderMultiplier" ) {
-                    return double.Parse(split[1], CultureInfo.InvariantCulture);
-                }
-            }
-            return 1.4;
-        }
-
         public List<TimingPoint> GetAllRedlines() {
             List<TimingPoint> redlines = new List<TimingPoint>();
             foreach( TimingPoint tp in TimingPoints ) {
@@ -218,42 +219,22 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return redlines;
         }
 
-        public List<TimingPoint> GetTimingPoints(List<string> lines) {
-            List<TimingPoint> timingPoints = new List<TimingPoint>();
-            bool atTiming = false;
-            int currentLine = 0;
-
-            while( currentLine + 1 < lines.Count ) {
-                if( atTiming ) {
-                    string[] values = lines[currentLine].Split(',');
-
-                    // Check if it's already done with the TimingPoints
-                    if( values.Length < 6 ) {
-                        break;
-                    }
-                    BitArray b = new BitArray(new int[] { int.Parse(values[7]) });
-                    bool kiai = b[0];
-                    bool omit = b[3];
-                    timingPoints.Add(new TimingPoint(
-                        ParseDouble(values[0]),
-                        ParseDouble(values[1]),
-                        int.Parse(values[2]),
-                        (SampleSet)int.Parse(values[3]),
-                        int.Parse(values[4]),
-                        ParseDouble(values[5]),
-                        values[6] == "1",
-                        kiai,
-                        omit));
+        public List<TimingPoint> GetAllGreenlines() {
+            List<TimingPoint> greenlines = new List<TimingPoint>();
+            foreach (TimingPoint tp in TimingPoints) {
+                if (!tp.Inherited) {
+                    greenlines.Add(tp);
                 }
-                else {
-                    if( lines[currentLine] == "[TimingPoints]" ) {
-                        atTiming = true;
-                    }
-                }
-                currentLine += 1;
             }
-            // Sort the timingPoints
-            TimingPoints = timingPoints.OrderBy(o => o.Offset).ToList();
+            return greenlines;
+        }
+
+        private List<TimingPoint> GetTimingPoints(List<string> timingLines) {
+            List<TimingPoint> timingPoints = new List<TimingPoint>();
+
+            foreach (string line in timingLines) { 
+                timingPoints.Add(new TimingPoint(line));
+            }
 
             return timingPoints;
         }
@@ -274,10 +255,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 return new TimingPoint(0, 1000, firstTP.Meter, firstTP.SampleSet, firstTP.SampleIndex, firstTP.Volume, firstTP.Inherited, false, false);
             }
 
-        }
-
-        private double ParseDouble(string d) {
-            return double.Parse(d, CultureInfo.InvariantCulture);
         }
     }
 }

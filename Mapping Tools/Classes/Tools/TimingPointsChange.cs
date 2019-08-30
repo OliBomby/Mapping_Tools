@@ -112,6 +112,11 @@ namespace Mapping_Tools.Classes.Tools {
             timing.Sort();
         }
 
+        public void Debug() {
+            Console.WriteLine(MyTP.GetLine());
+            Console.WriteLine($"{MpB}, {Meter}, {Sampleset}, {Index}, {Volume}, {Inherited}, {Kiai}, {OmitFirstBarLine}");
+        }
+
         public void AddChangeOld(List<TimingPoint> list, bool allAfter=false) {
             TimingPoint prev = null;
             TimingPoint on = null;

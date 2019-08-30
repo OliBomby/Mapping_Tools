@@ -121,13 +121,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
-        public bool PlaysNormal(int mode) {
-            return mode != 3 || Normal || !(Whistle || Finish || Clap);
+        public bool PlaysNormal(GameMode mode) {
+            return mode != GameMode.Mania || Normal || !(Whistle || Finish || Clap);
         }
 
-        public List<Tuple<SampleSet, Hitsound, int>> GetPlayingHitsounds(int mode = 0) {
+        public List<Tuple<SampleSet, Hitsound, int>> GetPlayingHitsounds(GameMode mode = GameMode.Standard) {
             List<Tuple<SampleSet, Hitsound, int>> samples = new List<Tuple<SampleSet, Hitsound, int>>();
-            bool normal = mode != 3 || Normal || !(Whistle || Finish || Clap);
+            bool normal = mode != GameMode.Mania || Normal || !(Whistle || Finish || Clap);
 
             if (normal)
                 samples.Add(new Tuple<SampleSet, Hitsound, int>(FenoSampleSet, Hitsound.Normal, FenoCustomIndex));
@@ -141,9 +141,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return samples;
         }
 
-        public List<string> GetPlayingFilenames(int mode = 0, bool includeDefaults = true) {
+        public List<string> GetPlayingFilenames(GameMode mode = GameMode.Standard, bool includeDefaults = true) {
             List<string> samples = new List<string>();
-            bool normal = mode != 3 || Normal || !(Whistle || Finish || Clap);
+            bool normal = mode != GameMode.Mania || Normal || !(Whistle || Finish || Clap);
             bool useFilename = Filename != null && Filename != "" && (IsCircle || IsHoldnoteHead);
 
             if (useFilename) {
@@ -162,9 +162,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return samples;
         }
 
-        public List<string> GetFirstPlayingFilenames(int mode, string mapDir, Dictionary<string, string> firstSamples, bool includeDefaults=true) {
+        public List<string> GetFirstPlayingFilenames(GameMode mode, string mapDir, Dictionary<string, string> firstSamples, bool includeDefaults=true) {
             List<string> samples = new List<string>();
-            bool normal = mode != 3 || Normal || !(Whistle || Finish || Clap);
+            bool normal = mode != GameMode.Mania || Normal || !(Whistle || Finish || Clap);
             bool useFilename = Filename != null && Filename != "" && (IsCircle || IsHoldnoteHead);
 
             if (useFilename) {
@@ -189,7 +189,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return samples;
         }
 
-        private void AddFirstIdenticalFilename(SampleSet sampleSet, Hitsound hitsound, int index, List<string> samples, int mode, bool useFilename, string mapDir, Dictionary<string, string> firstSamples, bool includeDefaults) {
+        private void AddFirstIdenticalFilename(SampleSet sampleSet, Hitsound hitsound, int index, List<string> samples, GameMode mode, bool useFilename, string mapDir, Dictionary<string, string> firstSamples, bool includeDefaults) {
             string filename = GetFileName(sampleSet, hitsound, index, mode);
             string samplePath = Path.Combine(mapDir, filename);
             string fullPathExtLess = Path.Combine(Path.GetDirectoryName(samplePath), Path.GetFileNameWithoutExtension(samplePath));
@@ -219,7 +219,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 Origin.EdgeHitsounds[Repeat] = GetHitsounds();
                 Origin.EdgeSampleSets[Repeat] = SampleSet;
                 Origin.EdgeAdditionSets[Repeat] = AdditionSet;
-                Origin.SliderExtras = true;
             }
         }
 
@@ -247,8 +246,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
-        public static string GetFileName(SampleSet sampleSet, Hitsound hitsound, int index, int mode) {
-            string taiko = mode == 1 ? "taiko-" : "";
+        public static string GetFileName(SampleSet sampleSet, Hitsound hitsound, int index, GameMode mode) {
+            string taiko = mode == GameMode.Taiko ? "taiko-" : "";
             if (index == 0) {
                 return string.Format("{2}{0}-hit{1}-default.wav", sampleSet.ToString().ToLower(), hitsound.ToString().ToLower(), taiko);
             }

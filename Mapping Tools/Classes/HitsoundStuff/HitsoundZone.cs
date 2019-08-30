@@ -29,10 +29,24 @@ namespace Mapping_Tools.Classes.HitsoundStuff
             _hitsound = Hitsound.Normal;
         }
 
+        public HitsoundZone(bool isSelected, string name, string filename, double xPos, double yPos, SampleSet sampleSet, Hitsound hitsound) {
+            _isSelected = isSelected;
+            _name = name;
+            _filename = filename;
+            _xPos = xPos;
+            _yPos = yPos;
+            _sampleSet = sampleSet;
+            _hitsound = hitsound;
+        }
+
         public double Distance(Vector2 pos) {
             double dx = XPos == -1 ? 0 : XPos - pos.X;
             double dy = YPos == -1 ? 0 : YPos - pos.Y;
             return Math.Sqrt(dx * dx + dy * dy);
+        }
+
+        public HitsoundZone Copy() {
+            return new HitsoundZone(IsSelected, Name, Filename, XPos, YPos, SampleSet, Hitsound);
         }
 
         public bool IsSelected {

@@ -1,7 +1,8 @@
-﻿using System;
+﻿using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
-    public struct Colour {
+    public class Colour
+    {
         public double Red { get; set; }
         public double Green { get; set; }
         public double Blue { get; set; }
@@ -15,13 +16,22 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public Colour(string line) {
             string[] split = line.Split(':');
             string[] csplit = split[1].Split(',');
-            Red = double.Parse(csplit[0]);
-            Green = double.Parse(csplit[1]);
-            Blue = double.Parse(csplit[2]);
+
+            if (TryParseDouble(csplit[0], out double r))
+                Red = r;
+            else throw new BeatmapParsingException("Failed to parse red component of colour.", line);
+
+            if (TryParseDouble(csplit[1], out double g))
+                Green = g;
+            else throw new BeatmapParsingException("Failed to parse green component of colour.", line);
+
+            if (TryParseDouble(csplit[2], out double b))
+                Blue = b;
+            else throw new BeatmapParsingException("Failed to parse blue component of colour.", line);
         }
 
         public override string ToString() {
-            return (int) Math.Round(Red) + "," + (int) Math.Round(Green) + "," + (int) Math.Round(Blue);
+            return $"{Red.ToRoundInvariant()},{Green.ToRoundInvariant()},{Blue.ToRoundInvariant()}";
         }
     }
 }
