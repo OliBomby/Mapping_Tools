@@ -89,7 +89,7 @@ namespace Mapping_Tools {
 
             FsWatcher.Filter = "*.osu";
             FsWatcher.Changed += OnChangedFsWatcher;
-            FsWatcher.EnableRaisingEvents = true;
+            //FsWatcher.EnableRaisingEvents = true;
             FsWatcher.IncludeSubdirectories = true;
         }
 
