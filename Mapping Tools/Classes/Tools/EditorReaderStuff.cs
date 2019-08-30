@@ -13,6 +13,7 @@ namespace Mapping_Tools.Classes.Tools {
 
     public abstract class EditorReaderStuff {
         private readonly static EditorReader editorReader = new EditorReader();
+        public static string DontCoolSaveWhenMD5EqualsThisString = "";
 
         public static EditorReader GetEditorReader() {
             return editorReader;
@@ -37,39 +38,16 @@ namespace Mapping_Tools.Classes.Tools {
         /// Saves current beatmap with the newest version from memory and rounded coordinates
         /// </summary>
         public static void CoolSave() {
-            string hashString = "";
-            var currentPath = IOHelper.GetCurrentBeatmap();
-            var tempPath = Path.Combine(MainWindow.AppDataPath, "temp.osu");
-
             try {
-                if( File.Exists(currentPath) ) {
-                    hashString = GetMD5FromPath(currentPath);
-                }
-            }
-            catch {
-                return;
-            }
-
-            try {
-                var editor = GetNewestVersion(currentPath);
-                var data = editor.Beatmap.GetLines().Select(s => s + "\n");
-                editor.SaveFile(tempPath);
-
-                string tempMap = GetMD5FromPath(tempPath);
-
-                if( tempMap == hashString ) {
-                    return;
-                }
-
+                var editor = GetNewestVersion(IOHelper.GetCurrentBeatmap());
                 editor.SaveFile();
             }
-
             catch( Exception e ) {
                 MessageBox.Show($"BetterSave™ wasn't better after all\n{e.Message}");
             }
         }
 
-        private static string GetMD5FromPath(string path) {
+        public static string GetMD5FromPath(string path) {
             using( var md5 = MD5.Create() ) {
                 using( var fileStream = File.OpenRead(path) ) {
                     var hash = md5.ComputeHash(fileStream);

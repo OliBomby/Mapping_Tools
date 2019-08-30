@@ -106,6 +106,22 @@ namespace Mapping_Tools {
                 }
             }
 
+            string hashString = "";
+            var currentPath = IOHelper.GetCurrentBeatmap();
+
+            try {
+                if (File.Exists(currentPath)) {
+                    hashString = EditorReaderStuff.GetMD5FromPath(currentPath);
+                }
+            }
+            catch {
+                return;
+            }
+
+            if (EditorReaderStuff.DontCoolSaveWhenMD5EqualsThisString == hashString) {
+                return;
+            }
+
             EditorReaderStuff.CoolSave();
         }
 
