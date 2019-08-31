@@ -47,5 +47,9 @@ namespace Mapping_Tools.Views
                 SettingsManager.Settings.BackupsPath = path;
             }
         }
+
+        private void Button_Click_3(object sender, RoutedEventArgs e) {
+            MainWindow.AppWindow.listenerManager.LoadHotkeys();
+        }
     }
 }
