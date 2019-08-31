@@ -44,9 +44,9 @@
                     <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                 </Button >
             </Grid>
-            <CheckBox Content="Make automatic backups" IsChecked="{Binding MakeBackups, Mode=TwoWay}" Margin="0,5,0,0"/>
-            <CheckBox Content="Override osu! save with BetterSave™" IsChecked="{Binding OverrideOsuSave, Mode=TwoWay}" Margin="0,0,0,0"/>
-            <CheckBox Content="Auto reload after QuickRun" IsChecked="{Binding AutoReload, Mode=TwoWay}" Margin="0,0,0,0"/>
+            <CheckBox Content="Make automatic backups" IsChecked="{Binding MakeBackups, Mode=TwoWay}" Margin="0,5,0,0" ToolTip="Make automatic backups whenever you run tools."/>
+            <CheckBox Content="Override osu! save with BetterSave™" IsChecked="{Binding OverrideOsuSave, Mode=TwoWay}" Margin="0,0,0,0" ToolTip="Automatically BetterSave after every osu! save."/>
+            <CheckBox Content="Auto reload after QuickRun" IsChecked="{Binding AutoReload, Mode=TwoWay}" Margin="0,0,0,0" ToolTip="Tries to reload the editor after every QuickRun."/>
             <Grid Margin="0,20,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="300"/>
@@ -71,8 +71,8 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="QuickRun hotkey:"/>
-                    <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Text="BetterSave™ hotkey:"/>
+                    <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="QuickRun hotkey:" ToolTip="QuickRun let's you quickly run the current tool on the current beatmap."/>
+                    <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Text="BetterSave™ hotkey:" ToolTip="BetterSave saves the current map with proper rounding instead of truncating values."/>
 
                     <components:HotkeyEditorControl Grid.Row="0" Grid.Column="1" Hotkey="{Binding QuickRunHotkey}"/>
                     <components:HotkeyEditorControl Grid.Row="1" Grid.Column="1" Hotkey="{Binding BetterSaveHotkey}"/>
