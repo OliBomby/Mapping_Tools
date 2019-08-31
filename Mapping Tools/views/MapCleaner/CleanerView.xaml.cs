@@ -1,9 +1,6 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -13,13 +10,16 @@ using Mapping_Tools.Components.TimeLine;
 using Mapping_Tools.Classes.SystemTools;
 
 namespace Mapping_Tools.Views {
-    public partial class CleanerView :UserControl {
+    public partial class CleanerView :UserControl, IQuickRun {
         private readonly BackgroundWorker backgroundWorker;
+        private bool canRun = true;
         List<double> TimingpointsRemoved;
         List<double> TimingpointsAdded;
         List<double> TimingpointsChanged;
         double EndTime_monitor;
         TimeLine TL;
+
+        public event EventHandler RunFinished;
 
         public CleanerView() {
             InitializeComponent();
@@ -30,14 +30,29 @@ namespace Mapping_Tools.Views {
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
-            Arguments arguments = GetArgumentsFromWindow();
-            
-            string[] filesToCopy = arguments.Paths;
-            IOHelper.SaveMapBackup(filesToCopy);
+            RunTool(MainWindow.AppWindow.GetCurrentMaps(), quick: false);
+        }
+
+        public void QuickRun() {
+            RunTool(new[] { IOHelper.GetCurrentBeatmap() }, quick: true);
+        }
+
+        private void RunTool(string[] paths, bool quick = false) {
+            if (!canRun) return;
+
+            IOHelper.SaveMapBackup(paths);
+
+            Arguments arguments = new Arguments(paths, quick,
+                                                new MapCleaner.MapCleanerArgs((bool)VolumeSliders.IsChecked, (bool)SamplesetSliders.IsChecked, (bool)VolumeSpinners.IsChecked,
+                                                                         (bool)ResnapObjects.IsChecked, (bool)ResnapBookmarks.IsChecked,
+                                                                         (bool)RemoveUnusedSamples.IsChecked,
+                                                                         (bool)RemoveMuting.IsChecked,
+                                                                         (bool)RemoveUnclickableHitsounds.IsChecked,
+                                                                         int.Parse(Snap1.Text.Split('/')[1]), int.Parse(Snap2.Text.Split('/')[1])));
 
             backgroundWorker.RunWorkerAsync(arguments);
-
             start.IsEnabled = false;
+            canRun = false;
         }
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
@@ -50,37 +65,29 @@ namespace Mapping_Tools.Views {
         }
 
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
-            if( e.Error != null ) {
+            if (e.Error != null) {
                 MessageBox.Show(string.Format("{0}{1}{2}", e.Error.Message, Environment.NewLine, e.Error.StackTrace), "Error");
             }
             else {
                 FillTimeLine();
-                MessageBox.Show(e.Result.ToString());
+                if (e.Result.ToString() != "")
+                    MessageBox.Show(e.Result.ToString());
                 progress.Value = 0;
             }
             start.IsEnabled = true;
+            canRun = true;
         }
 
         private struct Arguments {
             public string[] Paths;
+            public bool Quick;
             public MapCleaner.MapCleanerArgs CleanerArguments;
 
-            public Arguments(string[] paths, MapCleaner.MapCleanerArgs cleanerArguments) {
+            public Arguments(string[] paths, bool quick, MapCleaner.MapCleanerArgs cleanerArguments) {
                 Paths = paths;
+                Quick = quick;
                 CleanerArguments = cleanerArguments;
             }
-        }
-
-        private Arguments GetArgumentsFromWindow() {
-            string[] filesToCopy = MainWindow.AppWindow.GetCurrentMaps();
-            Arguments arguments = new Arguments(filesToCopy,
-                                                new MapCleaner.MapCleanerArgs((bool)VolumeSliders.IsChecked, (bool)SamplesetSliders.IsChecked, (bool)VolumeSpinners.IsChecked,
-                                                                         (bool)ResnapObjects.IsChecked, (bool)ResnapBookmarks.IsChecked,
-                                                                         (bool)RemoveUnusedSamples.IsChecked,
-                                                                         (bool)RemoveMuting.IsChecked,
-                                                                         (bool)RemoveUnclickableHitsounds.IsChecked,
-                                                                         int.Parse(Snap1.Text.Split('/')[1]), int.Parse(Snap2.Text.Split('/')[1])));
-            return arguments;
         }
 
         private string Run_Program(Arguments args, BackgroundWorker worker, DoWorkEventArgs _) {
@@ -123,11 +130,15 @@ namespace Mapping_Tools.Views {
                 }
             }
 
+            // Do stuff
+            if (args.Quick)
+                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, editorRead));
+
             // Make an accurate message
             string message = $"Successfully {(result.TimingPointsRemoved < 0 ? "added" : "removed")} {Math.Abs(result.TimingPointsRemoved)} {(Math.Abs(result.TimingPointsRemoved) == 1 ? "greenline" : "greenlines")}" +
                 (args.CleanerArguments.ResnapObjects ? $" and resnapped {result.ObjectsResnapped} {(result.ObjectsResnapped == 1 ? "object" : "objects")}" : "") + 
                 (args.CleanerArguments.RemoveUnusedSamples ? $" and removed {result.SamplesRemoved} unused {(result.SamplesRemoved == 1 ? "sample" : "samples")}" : "") + "!";
-            return message;
+            return args.Quick ? "" : message;
         }
 
         private void Monitor_Differences(List<TimingPoint> originalTimingPoints, List<TimingPoint> newTimingPoints) {
