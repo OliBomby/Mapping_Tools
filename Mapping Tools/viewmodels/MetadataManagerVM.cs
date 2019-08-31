@@ -11,10 +11,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Mapping_Tools.Viewmodels
-{
-    public class MetadataManagerVM : INotifyPropertyChanged
-    {
+namespace Mapping_Tools.Viewmodels {
+
+    public class MetadataManagerVM :INotifyPropertyChanged {
         private string _importPath;
         private string _exportPath;
 
@@ -32,8 +31,8 @@ namespace Mapping_Tools.Viewmodels
 
             ImportLoadCommand = new CommandImplementation(
                 _ => {
-                    string path = IOHelper.CurrentBeatmap();
-                    if (path != "") {
+                    string path = IOHelper.GetCurrentBeatmap();
+                    if( path != "" ) {
                         ImportPath = path;
                     }
                 });
@@ -41,7 +40,7 @@ namespace Mapping_Tools.Viewmodels
             ImportBrowseCommand = new CommandImplementation(
                 _ => {
                     string[] paths = IOHelper.BeatmapFileDialog(multiselect: false);
-                    if (paths.Length != 0) {
+                    if( paths.Length != 0 ) {
                         ImportPath = paths[0];
                     }
                 });
@@ -54,7 +53,7 @@ namespace Mapping_Tools.Viewmodels
             ExportBrowseCommand = new CommandImplementation(
                 _ => {
                     string[] paths = IOHelper.BeatmapFileDialog(multiselect: true);
-                    if (paths.Length != 0) {
+                    if( paths.Length != 0 ) {
                         ExportPath = string.Join("|", paths);
                     }
                 });
@@ -73,7 +72,7 @@ namespace Mapping_Tools.Viewmodels
                 Source = beatmap.Metadata["Source"].StringValue;
                 Tags = beatmap.Metadata["Tags"].StringValue;
             }
-            catch (Exception ex) {
+            catch( Exception ex ) {
                 MessageBox.Show(string.Format("{0}{1}{2}", ex.Message, Environment.NewLine, ex.StackTrace), "Error");
             }
         }
@@ -86,15 +85,18 @@ namespace Mapping_Tools.Viewmodels
         public string ImportPath {
             get { return _importPath; }
             set {
-                if (_importPath == value) return;
+                if( _importPath == value )
+                    return;
                 _importPath = value;
                 OnPropertyChanged();
             }
         }
+
         public string ExportPath {
             get { return _exportPath; }
             set {
-                if (_exportPath == value) return;
+                if( _exportPath == value )
+                    return;
                 _exportPath = value;
                 OnPropertyChanged();
             }
@@ -103,55 +105,68 @@ namespace Mapping_Tools.Viewmodels
         public string Artist {
             get { return _artist; }
             set {
-                if (_artist == value) return;
+                if( _artist == value )
+                    return;
                 _artist = value;
                 OnPropertyChanged();
             }
         }
+
         public string RomanisedArtist {
             get { return _romanisedArtist; }
             set {
-                if (_romanisedArtist == value) return;
+                if( _romanisedArtist == value )
+                    return;
                 _romanisedArtist = value;
                 OnPropertyChanged();
             }
         }
+
         public string Title {
             get { return _title; }
             set {
-                if (_title == value) return;
+                if( _title == value )
+                    return;
                 _title = value;
                 OnPropertyChanged();
             }
         }
+
         public string RomanisedTitle {
             get { return _romanisedTitle; }
             set {
-                if (_romanisedTitle == value) return;
+                if( _romanisedTitle == value )
+                    return;
                 _romanisedTitle = value;
                 OnPropertyChanged();
             }
         }
+
         public string BeatmapCreator {
             get { return _beatmapCreator; }
             set {
-                if (_beatmapCreator == value) return;
+                if( _beatmapCreator == value )
+                    return;
                 _beatmapCreator = value;
                 OnPropertyChanged();
             }
         }
+
         public string Source {
             get { return _source; }
             set {
-                if (_source == value) return;
+                if( _source == value )
+                    return;
                 _source = value;
                 OnPropertyChanged();
             }
         }
+
         public string Tags {
             get { return _tags; }
             set {
-                if (_tags == value) return;
+                if( _tags == value )
+                    return;
                 _tags = RemoveDuplicateTags(value);
                 OnPropertyChanged();
             }

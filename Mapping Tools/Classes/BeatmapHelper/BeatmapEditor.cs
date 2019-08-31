@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Mapping_Tools.Classes.Tools;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     public class BeatmapEditor : Editor {
@@ -11,6 +13,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public BeatmapEditor(string path) {
             Path = path;
             TextFile = new Beatmap(ReadFile(Path));
+        }
+
+        public override void SaveFile() {
+            var tempPath = System.IO.Path.Combine(MainWindow.AppDataPath, "temp.osu");
+            SaveFile(tempPath);
+            EditorReaderStuff.DontCoolSaveWhenMD5EqualsThisString = EditorReaderStuff.GetMD5FromPath(tempPath);
+
+            base.SaveFile();
         }
     }
 }

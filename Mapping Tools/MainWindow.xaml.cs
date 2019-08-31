@@ -17,10 +17,14 @@ using System.Drawing;
 using System.Reflection;
 using System.Linq;
 using System.Net.Http;
-using Mapping_Tools.Views.Standard;
+using NonInvasiveKeyboardHookLibrary;
+using System.Runtime.InteropServices;
+using System.Threading;
+using Mapping_Tools.Classes.Tools;
 
 namespace Mapping_Tools {
-    public partial class MainWindow : Window {
+
+    public partial class MainWindow :Window {
         public bool IsMaximized; //Check for window state
         public double WidthWin, HeightWin; //Set default sizes of window
         public ViewCollection Views;
@@ -28,6 +32,8 @@ namespace Mapping_Tools {
 
         public static MainWindow AppWindow { get; set; }
         public static readonly HttpClient HttpClient = new HttpClient();
+        private static readonly FileSystemWatcher FsWatcher = new FileSystemWatcher();
+        public static readonly KeyboardHookManager keyboardHookManager = new KeyboardHookManager();
         private static readonly string appCommon = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         public static readonly string AppDataPath = Path.Combine(appCommon, "Mapping Tools");
         public static readonly string ExportPath = Path.Combine(AppDataPath, "Exports");
@@ -36,6 +42,7 @@ namespace Mapping_Tools {
             Setup();
             InitializeComponent();
             SettingsManager.LoadConfig();
+            InitFsWatcher();
             AppWindow = this;
             IsMaximized = SettingsManager.Settings.MainWindowMaximized;
             WidthWin = SettingsManager.Settings.MainWindowWidth ?? Width;
@@ -47,9 +54,7 @@ namespace Mapping_Tools {
             Views = new ViewCollection(); // Make a ViewCollection object
             DataContext = new StandardVM(); // Generate Standard view model to show on startup
 
-            if(SettingsManager.GetRecentMaps().Count > 0 ) {
-                SetCurrentMap(SettingsManager.GetRecentMaps()[0][0]);
-            } // Set currentmap to previously opened map
+            SetCurrentMaps(SettingsManager.GetLatestCurrentMaps()); // Set currentmap to previously opened map
             ViewChanged();
         }
 
@@ -59,10 +64,10 @@ namespace Mapping_Tools {
             try {
                 AutoUpdater.ParseUpdateInfoEvent += AutoUpdaterOnParseUpdateInfoEvent;
                 AutoUpdater.Start("https://mappingtools.seira.moe/current/updater.json");
-            } catch(Exception ex) {
+            }
+            catch( Exception ex ) {
                 Console.WriteLine(ex.Message);
             }
-            
 
             try {
                 Directory.CreateDirectory(AppDataPath);
@@ -70,6 +75,90 @@ namespace Mapping_Tools {
             }
             catch( Exception ex ) {
                 System.Windows.MessageBox.Show(ex.Message);
+            }
+
+            // Register virtual key code 0x4D = M to QuickRun
+            keyboardHookManager.RegisterHotkey(new[] { NonInvasiveKeyboardHookLibrary.ModifierKeys.Alt, NonInvasiveKeyboardHookLibrary.ModifierKeys.Control, NonInvasiveKeyboardHookLibrary.ModifierKeys.Shift }, 0x4D, QuickRunCurrentTool);
+            // Register virtual key code 0x53 = S to QuickBetterSave
+            keyboardHookManager.RegisterHotkey(new[] { NonInvasiveKeyboardHookLibrary.ModifierKeys.Shift, NonInvasiveKeyboardHookLibrary.ModifierKeys.Alt }, 0x53, QuickBetterSave);
+            keyboardHookManager.Start();
+        }
+
+        private void InitFsWatcher() {
+            FsWatcher.Path = SettingsManager.GetSongsPath();
+
+            FsWatcher.Filter = "*.osu";
+            FsWatcher.Changed += OnChangedFsWatcher;
+            FsWatcher.EnableRaisingEvents = true;
+            FsWatcher.IncludeSubdirectories = true;
+        }
+
+        private static void OnChangedFsWatcher(object sender, FileSystemEventArgs e) {
+            if( e.FullPath != IOHelper.GetCurrentBeatmap() ) {
+                return;
+            }
+
+            var proc = Process.GetProcessesByName("osu!").FirstOrDefault();
+            if( proc != null ) {
+                var oldHandle = GetForegroundWindow();
+                if( oldHandle != proc.MainWindowHandle ) {
+                    return;
+                }
+            }
+
+            string hashString = "";
+            var currentPath = IOHelper.GetCurrentBeatmap();
+
+            try {
+                if (File.Exists(currentPath)) {
+                    hashString = EditorReaderStuff.GetMD5FromPath(currentPath);
+                }
+            }
+            catch {
+                return;
+            }
+
+            if (EditorReaderStuff.DontCoolSaveWhenMD5EqualsThisString == hashString) {
+                return;
+            }
+
+            EditorReaderStuff.CoolSave();
+        }
+
+        private void QuickRunCurrentTool() {
+            System.Windows.Application.Current.Dispatcher.Invoke(() => {
+                if( DataContext is IQuickRun tool ) {
+                    tool.RunFinished -= Reload;
+                    tool.RunFinished += Reload;
+                    tool.QuickRun();
+                }
+            });
+        }
+
+        private void QuickBetterSave() {
+            EditorReaderStuff.CoolSave();
+        }
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll")]
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        private void Reload(object sender, EventArgs e) {
+            if( ( (RunToolCompletedEventArgs) e ).NeedReload ) {
+                var proc = Process.GetProcessesByName("osu!").FirstOrDefault();
+                ;
+                if( proc != null ) {
+                    var oldHandle = GetForegroundWindow();
+                    if( oldHandle != proc.MainWindowHandle ) {
+                        SetForegroundWindow(proc.MainWindowHandle);
+                        Thread.Sleep(300);
+                    }
+                }
+                SendKeys.SendWait("^{L 10}");
+                Thread.Sleep(100);
+                SendKeys.SendWait("{ENTER}");
             }
         }
 
@@ -98,37 +187,48 @@ namespace Mapping_Tools {
                     Mandatory = json.mandatory,
                     DownloadURL = json.url
                 };
-            } catch (Exception ex) {
+            }
+            catch( Exception ex ) {
                 Console.WriteLine(ex.Message);
             }
         }
 
-        public void SetCurrentMap(string path) {
-            currentMap.Text = path;
-            SettingsManager.AddRecentMap(path, DateTime.Now);
+        public void SetCurrentMaps(string[] paths) {
+            currentMap.Text = string.Join("|", paths);
+            SettingsManager.AddRecentMap(currentMap.Text, DateTime.Now);
         }
 
-        public string GetCurrentMap() {
-            return currentMap.Text;
+        public void SetCurrentMapsString(string paths) {
+            currentMap.Text = paths;
+            SettingsManager.AddRecentMap(paths, DateTime.Now);
+        }
+
+        public string[] GetCurrentMaps() {
+            return currentMap.Text.Split('|');
+        }
+
+        public string GetCurrentMapsString() {
+            return string.Join("|", GetCurrentMaps());
         }
 
         private void OpenBeatmap(object sender, RoutedEventArgs e) {
-            string[] paths = IOHelper.BeatmapFileDialog();
-            if( paths.Length != 0 ) { SetCurrentMap(paths[0]); }
+            string[] paths = IOHelper.BeatmapFileDialog(true);
+            if( paths.Length != 0 ) { SetCurrentMaps(paths); }
         }
 
-        private void OpenCurrentBeatmap(object sender, RoutedEventArgs e) {
-            string path = IOHelper.CurrentBeatmap();
-            if( path != "" ) { SetCurrentMap(path); }
+        private void OpenGetCurrentBeatmap(object sender, RoutedEventArgs e) {
+            string path = IOHelper.GetCurrentBeatmap();
+            if( path != "" ) { SetCurrentMaps(new[] { path }); }
         }
 
         private void SaveBackup(object sender, RoutedEventArgs e) {
-            bool result = IOHelper.SaveMapBackup(GetCurrentMap(), forced: true);
-            if (result)
-                System.Windows.MessageBox.Show("Beatmap successfully copied!");
+            var paths = GetCurrentMaps();
+            bool result = IOHelper.SaveMapBackup(paths, true);
+            if( result )
+                System.Windows.MessageBox.Show($"Beatmap{( paths.Length == 1 ? "" : "s" )} successfully copied!");
         }
 
-        //Method for loading the cleaner interface 
+        //Method for loading the cleaner interface
         private void LoadCleaner(object sender, RoutedEventArgs e) {
             DataContext = Views.GetMapCleaner();
 
@@ -141,7 +241,7 @@ namespace Mapping_Tools {
             MinHeight = 560;
         }
 
-        //Method for loading the cleaner interface 
+        //Method for loading the cleaner interface
         private void LoadMetadataManager(object sender, RoutedEventArgs e) {
             DataContext = Views.GetMetadataManager();
 
@@ -199,6 +299,19 @@ namespace Mapping_Tools {
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Snapping Tools";
+
+            ViewChanged();
+
+            this.MinWidth = 400;
+            this.MinHeight = 380;
+        }
+
+        //Method for loading the timing copier interface
+        private void LoadTimingCopier(object sender, RoutedEventArgs e) {
+            DataContext = Views.GetTimingCopier();
+
+            TextBlock txt = this.FindName("header") as TextBlock;
+            txt.Text = "Mapping Tools - Timing Copier";
 
             ViewChanged();
 
@@ -292,57 +405,15 @@ namespace Mapping_Tools {
             menuitem.Visibility = isSavable ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        public static DialogResult InputBox(string title, string promptText, ref string value) {
-            using (Form form = new Form()) {
-                System.Windows.Forms.Label label = new System.Windows.Forms.Label();
-                System.Windows.Forms.TextBox textBox = new System.Windows.Forms.TextBox();
-                System.Windows.Forms.Button buttonOk = new System.Windows.Forms.Button();
-                System.Windows.Forms.Button buttonCancel = new System.Windows.Forms.Button();
-
-                form.Text = title;
-                label.Text = promptText;
-                textBox.Text = value;
-
-                buttonOk.Text = "OK";
-                buttonCancel.Text = "Cancel";
-                buttonOk.DialogResult = System.Windows.Forms.DialogResult.OK;
-                buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-
-                label.SetBounds(9, 20, 372, 13);
-                textBox.SetBounds(12, 36, 372, 20);
-                buttonOk.SetBounds(228, 72, 75, 23);
-                buttonCancel.SetBounds(309, 72, 75, 23);
-
-                label.AutoSize = true;
-                textBox.Anchor |= AnchorStyles.Right;
-                buttonOk.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-                buttonCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-
-                form.ClientSize = new System.Drawing.Size(396, 107);
-                form.Controls.AddRange(new System.Windows.Forms.Control[] { label, textBox, buttonOk, buttonCancel });
-                form.ClientSize = new System.Drawing.Size(Math.Max(300, label.Right + 10), form.ClientSize.Height);
-                form.FormBorderStyle = FormBorderStyle.FixedDialog;
-                form.StartPosition = FormStartPosition.CenterScreen;
-                form.MinimizeBox = false;
-                form.MaximizeBox = false;
-                form.AcceptButton = buttonOk;
-                form.CancelButton = buttonCancel;
-
-                DialogResult dialogResult = form.ShowDialog();
-                value = textBox.Text;
-                return dialogResult;
-            }
-        }
-
         private void LoadProject(object sender, RoutedEventArgs e) {
-            if (!ProjectManager.IsSavable(DataContext))
+            if( !ProjectManager.IsSavable(DataContext) )
                 return;
             dynamic data = DataContext;
             ProjectManager.LoadProject(data, true);
         }
 
         private void SaveProject(object sender, RoutedEventArgs e) {
-            if (!ProjectManager.IsSavable(DataContext))
+            if( !ProjectManager.IsSavable(DataContext) )
                 return;
             dynamic data = DataContext;
             ProjectManager.SaveProject(data, true);
@@ -363,6 +434,10 @@ namespace Mapping_Tools {
             Process.Start("https://mappingtools.seira.moe/");
         }
 
+        private void CoolSave(object sender, RoutedEventArgs e) {
+            EditorReaderStuff.CoolSave();
+        }
+
         //Open project in browser
         private void OpenGitHub(object sender, RoutedEventArgs e) {
             Process.Start("https://github.com/OliBomby/Mapping_Tools");
@@ -371,8 +446,7 @@ namespace Mapping_Tools {
         //Open info screen
         private void OpenInfo(object sender, RoutedEventArgs e) {
             Version version = Assembly.GetEntryAssembly().GetName().Version;
-            
-            new MessageWindow(ErrorType.Success, $"Mapping Tools {version.ToString()}\n\nMade by:\nOliBomby\nPotoofu\nCoppertine", title: "Info").Show();
+            System.Windows.MessageBox.Show(string.Format("Mapping Tools {0}\n\nMade by:\nOliBomby\nPotoofu", version.ToString()), "Info");
         }
 
         //Change top right icons on changed window state and set state variable
@@ -385,8 +459,10 @@ namespace Mapping_Tools {
                     IsMaximized = true;
                     window_border.BorderThickness = new Thickness(0);
                     break;
+
                 case WindowState.Minimized:
                     break;
+
                 case WindowState.Normal:
                     window_border.BorderThickness = new Thickness(1);
                     IsMaximized = false;
@@ -442,10 +518,8 @@ namespace Mapping_Tools {
 
                     if( point.X <= RestoreBounds.Width / 2 )
                         Left = 0;
-
                     else if( point.X >= RestoreBounds.Width )
                         Left = point.X - ( RestoreBounds.Width - ( this.ActualWidth - point.X ) );
-
                     else
                         Left = point.X - ( RestoreBounds.Width / 2 );
 
@@ -453,7 +527,7 @@ namespace Mapping_Tools {
                     WindowState = WindowState.Normal;
                     bt.Content = new PackIcon { Kind = PackIconKind.WindowMaximize };
                 }
-                if (e.LeftButton == MouseButtonState.Pressed)
+                if( e.LeftButton == MouseButtonState.Pressed )
                     this.DragMove();
                 //bt.Content = new PackIcon { Kind = PackIconKind.WindowRestore };
             }

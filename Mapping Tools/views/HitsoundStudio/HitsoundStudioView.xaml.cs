@@ -227,7 +227,7 @@ namespace Mapping_Tools.Views {
 
         private void SelectedImportPathLoad_Click(object sender, RoutedEventArgs e) {
             try {
-                string path = IOHelper.CurrentBeatmap();
+                string path = IOHelper.GetCurrentBeatmap();
                 if (path != "") {
                     SelectedImportPathBox.Text = path;
                 }
@@ -255,7 +255,7 @@ namespace Mapping_Tools.Views {
 
         private void BaseBeatmapLoad_Click(object sender, RoutedEventArgs e) {
             try {
-                string path = IOHelper.CurrentBeatmap();
+                string path = IOHelper.GetCurrentBeatmap();
                 if (path != "") {
                     Settings.BaseBeatmap = path;
                     }
