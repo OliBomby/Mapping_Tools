@@ -305,17 +305,16 @@ namespace Mapping_Tools.Views {
                             // Add timingpointschange to copy timingpoint hitsounds
                             TimingPoint tp = tloTo.HitsoundTP.Copy();
                             tp.Offset = tloTo.Time;
-                            tp.Volume = 5;
+                            tp.SampleSet = arg.MutedSampleset;
                             tp.SampleIndex = arg.MutedIndex;
-                            timingPointsChanges.Add(new TimingPointsChange(tp, index: doMutedIndex, volume: true));
+                            tp.Volume = 5;
+                            timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: true, index: doMutedIndex, volume: true));
                         }
                         else {
-                            // Add timingpointschange to preserve index and volume
+                            // Add timingpointschange to preserve index and volume and sampleset
                             TimingPoint tp = tloTo.HitsoundTP.Copy();
                             tp.Offset = tloTo.Time;
-                            tp.SampleIndex = tloTo.FenoCustomIndex;
-                            tp.Volume = tloTo.FenoSampleVolume;
-                            timingPointsChanges.Add(new TimingPointsChange(tp, index: doMutedIndex, volume: true));
+                            timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: true, index: doMutedIndex, volume: true));
                         }
                     }
 

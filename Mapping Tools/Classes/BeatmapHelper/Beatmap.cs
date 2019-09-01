@@ -114,11 +114,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             // Set the timing object
             BeatmapTiming = new Timing(timingLines, Difficulty["SliderMultiplier"].Value);
 
-            // Sort the HitObjects
-            HitObjects = HitObjects.OrderBy(o => o.Time).ToList();
-
+            SortHitObjects();
             CalculateSliderEndTimes();
             GiveObjectsGreenlines();
+        }
+
+        public void SortHitObjects() {
+            // Sort the HitObjects
+            HitObjects = HitObjects.OrderBy(o => o.Time).ToList();
         }
 
         public void CalculateSliderEndTimes() {

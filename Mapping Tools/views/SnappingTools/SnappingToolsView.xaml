@@ -9,20 +9,35 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" Width="759.5">
     <Grid Name="MasterGrid">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Grid Name="FirstGrid" Grid.Row="0" Grid.Column="0" Margin="0,0,204,0">
-            <StackPanel Grid.Row="0" Margin="0,0,10,0">
-                <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}"><Run Text="Snapping Tools"/></TextBlock>
+        <Grid Name="FirstGrid" Grid.Row="0">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
+                    <Run Text="SnappingTools"/>
+                    </TextBlock>
+                    <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom">
+                        <materialDesign:PopupBox.ToggleContent>
+                            <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
+                        </materialDesign:PopupBox.ToggleContent>
+                        <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
+                        Calculate intersections of linear sliders.
+                        </TextBlock>
+                    </materialDesign:PopupBox>
+                    <materialDesign:PopupBox Margin="0,10,10,10" VerticalAlignment="Bottom">
+                        <materialDesign:PopupBox.ToggleContent>
+                            <materialDesign:PackIcon Kind="LightningBoltCircle" Width="24" Height="24" Foreground="{DynamicResource PrimaryHueLightBrush}"/>
+                        </materialDesign:PopupBox.ToggleContent>
+                        <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
+                            This tool is compatible with QuickRun!
+                        </TextBlock>
+                    </materialDesign:PopupBox>
+                </StackPanel>
             </StackPanel>
-        </Grid>
-        <Grid Name="SecoundGrid" Grid.Row="1" Grid.Column="0">
+
             <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
                 <Button
                     x:Name="start"
@@ -33,26 +48,18 @@
                 </Button>
             </Viewbox>
         </Grid>
-        <Grid Margin="0,0,0,0" Name="ThirdGrid" Grid.Row="2" Grid.Column="0">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="20"/>
-                </Grid.RowDefinitions>
-                <Grid Grid.Column="0">
-                    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" Orientation="Horizontal">
-                        <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Opacity="0.58"/>
-                        <ProgressBar x:Name="loader_progress" Foreground="#FF838383" Background="{x:Null}" BorderBrush="{x:Null}"/>
-                    </StackPanel>
-                </Grid>
-                <Grid Grid.Column="1">
-                    <DockPanel>
-                        <ProgressBar x:Name="progress" Margin="20,0,20,0" Height="20" Foreground="#FF838383" Background="{x:Null}" BorderBrush="{x:Null}"/>
-                    </DockPanel>
-                </Grid>
+        <Grid Name="SecondGrid" Grid.Row="1" Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Opacity="0.58"/>
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <ProgressBar x:Name="progress" Margin="20,0,20,0" Height="20" Foreground="#FF838383" Background="{x:Null}" BorderBrush="{x:Null}"/>
             </Grid>
         </Grid>
     </Grid>
