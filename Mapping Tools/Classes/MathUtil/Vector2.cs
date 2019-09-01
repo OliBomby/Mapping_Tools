@@ -215,7 +215,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <summary>
         /// Defines an instance with all components set to NaN.
         /// </summary>
-        public static readonly Vector2 NaN = new Vector2(Double.NaN, Double.NaN);
+        public static readonly Vector2 NaN = new Vector2(double.NaN, double.NaN);
 
         /// <summary>
         /// Defines the size of the Vector2 struct in bytes.
