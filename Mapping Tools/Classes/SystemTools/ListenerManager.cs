@@ -14,7 +14,7 @@ namespace Mapping_Tools.Classes.SystemTools {
     public class ListenerManager {
         public readonly FileSystemWatcher FsWatcher = new FileSystemWatcher();
         public readonly KeyboardHookManager keyboardHookManager = new KeyboardHookManager();
-
+        
         public ListenerManager() {
             InitFsWatcher();
 
@@ -49,12 +49,10 @@ namespace Mapping_Tools.Classes.SystemTools {
         }
 
         private void RegisterHotkey(Hotkey hotkey, Action action) {
-            keyboardHookManager.RegisterHotkey(WindowsModifiersToOtherModifiers(hotkey.Modifiers), ResolveKey(hotkey.Key), action);
+            if (hotkey != null)
+                keyboardHookManager.RegisterHotkey(WindowsModifiersToOtherModifiers(hotkey.Modifiers), ResolveKey(hotkey.Key), action);
             //Console.WriteLine($"Registered hotkey {hotkey.Modifiers}, {hotkey.Key}, {action}");
         }
-
-        [DllImport("user32.dll")]
-        static extern short VkKeyScan(char ch);
 
         static public int ResolveKey(System.Windows.Input.Key key) {
             return System.Windows.Input.KeyInterop.VirtualKeyFromKey(key);
