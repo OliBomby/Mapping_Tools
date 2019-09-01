@@ -55,6 +55,50 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
         }
 
+        private bool overrideOsuSave;
+        public bool OverrideOsuSave {
+            get { return overrideOsuSave; }
+            set {
+                if (overrideOsuSave != value) {
+                    overrideOsuSave = value;
+                    NotifyPropertyChanged("OverrideOsuSave");
+                }
+            }
+        }
+
+        private bool autoReload;
+        public bool AutoReload {
+            get { return autoReload; }
+            set {
+                if (autoReload != value) {
+                    autoReload = value;
+                    NotifyPropertyChanged("AutoReload");
+                }
+            }
+        }
+
+        private Hotkey quickRunHotkey;
+        public Hotkey QuickRunHotkey {
+            get { return quickRunHotkey; }
+            set {
+                if (quickRunHotkey != value) {
+                    quickRunHotkey = value;
+                    NotifyPropertyChanged("QuickRunHotkey");
+                }
+            }
+        }
+
+        private Hotkey betterSaveHotkey;
+        public Hotkey BetterSaveHotkey {
+            get { return betterSaveHotkey; }
+            set {
+                if (betterSaveHotkey != value) {
+                    betterSaveHotkey = value;
+                    NotifyPropertyChanged("BetterSaveHotkey");
+                }
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public void NotifyPropertyChanged(string propName) {
@@ -70,6 +114,8 @@ namespace Mapping_Tools.Classes.SystemTools {
             SongsPath = "";
             BackupsPath = "";
             MakeBackups = true;
+            OverrideOsuSave = false;
+            AutoReload = true;
         }
 
         public void AddRecentMap(string paths, DateTime date) {

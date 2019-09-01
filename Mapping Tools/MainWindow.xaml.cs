@@ -28,12 +28,11 @@ namespace Mapping_Tools {
         public bool IsMaximized; //Check for window state
         public double WidthWin, HeightWin; //Set default sizes of window
         public ViewCollection Views;
+        public ListenerManager listenerManager;
         public bool SessionhasAdminRights;
 
         public static MainWindow AppWindow { get; set; }
         public static readonly HttpClient HttpClient = new HttpClient();
-        private static readonly FileSystemWatcher FsWatcher = new FileSystemWatcher();
-        public static readonly KeyboardHookManager keyboardHookManager = new KeyboardHookManager();
         private static readonly string appCommon = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         public static readonly string AppDataPath = Path.Combine(appCommon, "Mapping Tools");
         public static readonly string ExportPath = Path.Combine(AppDataPath, "Exports");
@@ -42,7 +41,7 @@ namespace Mapping_Tools {
             Setup();
             InitializeComponent();
             SettingsManager.LoadConfig();
-            InitFsWatcher();
+            listenerManager = new ListenerManager();
             AppWindow = this;
             IsMaximized = SettingsManager.Settings.MainWindowMaximized;
             WidthWin = SettingsManager.Settings.MainWindowWidth ?? Width;
@@ -76,90 +75,6 @@ namespace Mapping_Tools {
             catch( Exception ex ) {
                 System.Windows.MessageBox.Show(ex.Message);
             }
-
-            // Register virtual key code 0x4D = M to QuickRun
-            keyboardHookManager.RegisterHotkey(new[] { NonInvasiveKeyboardHookLibrary.ModifierKeys.Alt, NonInvasiveKeyboardHookLibrary.ModifierKeys.Control, NonInvasiveKeyboardHookLibrary.ModifierKeys.Shift }, 0x4D, QuickRunCurrentTool);
-            // Register virtual key code 0x53 = S to QuickBetterSave
-            keyboardHookManager.RegisterHotkey(new[] { NonInvasiveKeyboardHookLibrary.ModifierKeys.Shift, NonInvasiveKeyboardHookLibrary.ModifierKeys.Alt }, 0x53, QuickBetterSave);
-            keyboardHookManager.Start();
-        }
-
-        private void InitFsWatcher() {
-            FsWatcher.Path = SettingsManager.GetSongsPath();
-
-            FsWatcher.Filter = "*.osu";
-            FsWatcher.Changed += OnChangedFsWatcher;
-            FsWatcher.EnableRaisingEvents = true;
-            FsWatcher.IncludeSubdirectories = true;
-        }
-
-        private static void OnChangedFsWatcher(object sender, FileSystemEventArgs e) {
-            if( e.FullPath != IOHelper.GetCurrentBeatmap() ) {
-                return;
-            }
-
-            var proc = Process.GetProcessesByName("osu!").FirstOrDefault();
-            if( proc != null ) {
-                var oldHandle = GetForegroundWindow();
-                if( oldHandle != proc.MainWindowHandle ) {
-                    return;
-                }
-            }
-
-            string hashString = "";
-            var currentPath = IOHelper.GetCurrentBeatmap();
-
-            try {
-                if (File.Exists(currentPath)) {
-                    hashString = EditorReaderStuff.GetMD5FromPath(currentPath);
-                }
-            }
-            catch {
-                return;
-            }
-
-            if (EditorReaderStuff.DontCoolSaveWhenMD5EqualsThisString == hashString) {
-                return;
-            }
-
-            EditorReaderStuff.CoolSave();
-        }
-
-        private void QuickRunCurrentTool() {
-            System.Windows.Application.Current.Dispatcher.Invoke(() => {
-                if( DataContext is IQuickRun tool ) {
-                    tool.RunFinished -= Reload;
-                    tool.RunFinished += Reload;
-                    tool.QuickRun();
-                }
-            });
-        }
-
-        private void QuickBetterSave() {
-            EditorReaderStuff.CoolSave();
-        }
-
-        [DllImport("user32.dll")]
-        private static extern IntPtr GetForegroundWindow();
-
-        [DllImport("user32.dll")]
-        private static extern bool SetForegroundWindow(IntPtr hWnd);
-
-        private void Reload(object sender, EventArgs e) {
-            if( ( (RunToolCompletedEventArgs) e ).NeedReload ) {
-                var proc = Process.GetProcessesByName("osu!").FirstOrDefault();
-                ;
-                if( proc != null ) {
-                    var oldHandle = GetForegroundWindow();
-                    if( oldHandle != proc.MainWindowHandle ) {
-                        SetForegroundWindow(proc.MainWindowHandle);
-                        Thread.Sleep(300);
-                    }
-                }
-                SendKeys.SendWait("^{L 10}");
-                Thread.Sleep(100);
-                SendKeys.SendWait("{ENTER}");
-            }
         }
 
         private bool IsUserAdministrator() {
@@ -191,6 +106,10 @@ namespace Mapping_Tools {
             catch( Exception ex ) {
                 Console.WriteLine(ex.Message);
             }
+        }
+
+        public object GetCurrentView() {
+            return DataContext;
         }
 
         public void SetCurrentMaps(string[] paths) {
