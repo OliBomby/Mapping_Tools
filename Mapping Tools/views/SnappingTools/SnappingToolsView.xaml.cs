@@ -13,6 +13,7 @@ using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SliderPathStuff;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Views.SnappingTools;
 
 namespace Mapping_Tools.Views {
     /// <summary>
@@ -29,6 +30,9 @@ namespace Mapping_Tools.Views {
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
             backgroundWorker = (BackgroundWorker)FindResource("backgroundWorker");
+
+            var overlay = new SnappingOverlay();
+            overlay.Show();
         }
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
