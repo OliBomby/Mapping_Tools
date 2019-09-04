@@ -6,20 +6,19 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace Mapping_Tools.Viewmodels {
     public class SnappingToolsVM {
-        private Hotkey _snapHotkey;
-        public Hotkey SnapHotkey { get => _snapHotkey; set => SetSnapHotkey(value); } // Update active hotkey
+        public Hotkey SnapHotkey { get; set; }
 
-        private void SetSnapHotkey(Hotkey value) {
-            _snapHotkey = value;
-            MainWindow.AppWindow.listenerManager.ChangeActiveHotkeyHotkey("SnapHotkey", SnapHotkey);
-        }
+        public ObservableCollection<IGenerateRelevantObjects> Generators { get; }
 
-        public ObservableCollection<IGenerateRelevantObjects> Generators { get; set; }
         private string _filter = "";
         public string Filter { get => _filter; set => SetFilter(value); }
+
+        private readonly DispatcherTimer AutoSnapTimer = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(100) };
 
         public SnappingToolsVM() {
             var interfaceType = typeof(IGenerateRelevantObjects);
@@ -33,12 +32,31 @@ namespace Mapping_Tools.Viewmodels {
             view.GroupDescriptions.Add(groupDescription);
             view.Filter = UserFilter;
 
-            MainWindow.AppWindow.listenerManager.AddActiveHotkey("SnapHotkey", new ActionHotkey(SnapHotkey, SnapMouse));
+            AutoSnapTimer.Tick += Timer_Tick;
+            AutoSnapTimer.Start();
         }
 
-        private void SnapMouse() {
-            // Snap mouse to nearest RelevantObject
-            Console.WriteLine("SnapMouse got executed");
+        void Timer_Tick(object sender, EventArgs e) {
+            if (IsHotkeyDown(SnapHotkey)) {
+                Console.WriteLine("AutoSnapMouse got executed");
+            }
+        }
+
+        private bool IsHotkeyDown(Hotkey hotkey) {
+            if (hotkey == null)
+                return false;
+            if (!Keyboard.IsKeyDown(hotkey.Key))
+                return false;
+            if (hotkey.Modifiers.HasFlag(ModifierKeys.Alt) && !(Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt)))
+                return false;
+            if (hotkey.Modifiers.HasFlag(ModifierKeys.Control) && !(Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
+                return false;
+            if (hotkey.Modifiers.HasFlag(ModifierKeys.Shift) && !(Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)))
+                return false;
+            if (hotkey.Modifiers.HasFlag(ModifierKeys.Windows) && !(Keyboard.IsKeyDown(Key.LWin) || Keyboard.IsKeyDown(Key.RWin)))
+                return false;
+
+            return true;
         }
 
         private bool UserFilter(object item) {
