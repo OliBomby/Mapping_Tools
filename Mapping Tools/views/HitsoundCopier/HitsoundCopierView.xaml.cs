@@ -16,7 +16,7 @@ namespace Mapping_Tools.Views {
     /// <summary>
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
-    public partial class HitsoundCopierView :UserControl {
+    public partial class HitsoundCopierView : MappingTool {
         private readonly BackgroundWorker backgroundWorker;
 
         public HitsoundCopierView() {

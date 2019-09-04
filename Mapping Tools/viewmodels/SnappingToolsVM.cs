@@ -19,6 +19,7 @@ namespace Mapping_Tools.Viewmodels {
         public string Filter { get => _filter; set => SetFilter(value); }
 
         private readonly DispatcherTimer AutoSnapTimer = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(100) };
+        public bool AutoSnapTimerEnabled { get => AutoSnapTimer.IsEnabled; set => AutoSnapTimer.IsEnabled = value; }
 
         public SnappingToolsVM() {
             var interfaceType = typeof(IGenerateRelevantObjects);
@@ -33,7 +34,6 @@ namespace Mapping_Tools.Viewmodels {
             view.Filter = UserFilter;
 
             AutoSnapTimer.Tick += Timer_Tick;
-            AutoSnapTimer.Start();
         }
 
         void Timer_Tick(object sender, EventArgs e) {

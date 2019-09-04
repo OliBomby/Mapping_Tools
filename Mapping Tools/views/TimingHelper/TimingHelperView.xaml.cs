@@ -16,7 +16,7 @@ namespace Mapping_Tools.Views {
     /// <summary>
     /// Interactielogica voor TimingHelperView.xaml
     /// </summary>
-    public partial class TimingHelperView :UserControl {
+    public partial class TimingHelperView : MappingTool {
         private readonly BackgroundWorker backgroundWorker;
 
         public TimingHelperView() {

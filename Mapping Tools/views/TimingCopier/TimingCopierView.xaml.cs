@@ -17,7 +17,7 @@ namespace Mapping_Tools.Views {
     /// <summary>
     /// Interactielogica voor TimingCopierView.xaml
     /// </summary>
-    public partial class TimingCopierView : UserControl, ISavable<TimingCopierVM> {
+    public partial class TimingCopierView : MappingTool, ISavable<TimingCopierVM> {
         private readonly BackgroundWorker backgroundWorker;
 
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "timingcopierproject.json");

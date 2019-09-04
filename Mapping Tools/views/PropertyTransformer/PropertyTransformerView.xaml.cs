@@ -14,7 +14,7 @@ namespace Mapping_Tools.Views {
     /// <summary>
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
-    public partial class PropertyTransformerView : UserControl {
+    public partial class PropertyTransformerView : MappingTool {
         private readonly BackgroundWorker backgroundWorker;
 
         public PropertyTransformerView() {

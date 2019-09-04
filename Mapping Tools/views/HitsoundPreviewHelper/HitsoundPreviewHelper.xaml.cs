@@ -16,7 +16,7 @@ namespace Mapping_Tools.Views {
     /// <summary>
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
-    public partial class HitsoundPreviewHelperView : UserControl, ISavable<HitsoundPreviewHelperVM> {
+    public partial class HitsoundPreviewHelperView : MappingTool, ISavable<HitsoundPreviewHelperVM> {
         private readonly BackgroundWorker backgroundWorker;
 
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "hspreviewproject.json");

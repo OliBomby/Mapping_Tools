@@ -51,10 +51,9 @@ namespace Mapping_Tools {
             WidthWin = SettingsManager.Settings.MainWindowWidth ?? Width;
             HeightWin = SettingsManager.Settings.MainWindowHeight ?? Height;
             Views = new ViewCollection(); // Make a ViewCollection object
-            DataContext = new StandardVM(); // Generate Standard view model to show on startup
+            SetCurrentView(new StandardVM()); // Generate Standard view model to show on startup
 
             SetCurrentMaps(SettingsManager.GetLatestCurrentMaps()); // Set currentmap to previously opened map
-            ViewChanged();
         }
 
         private void Setup() {
@@ -112,6 +111,18 @@ namespace Mapping_Tools {
             return DataContext;
         }
 
+        public void SetCurrentView(object view) {
+            if (DataContext is MappingTool mt) {
+                mt.Deactivate();
+            }
+            if (view is MappingTool nmt) {
+                nmt.Activate();
+            }
+
+            DataContext = view;
+            ViewChanged();
+        }
+
         public void SetCurrentMaps(string[] paths) {
             currentMap.Text = string.Join("|", paths);
             SettingsManager.AddRecentMap(currentMap.Text, DateTime.Now);
@@ -149,7 +160,7 @@ namespace Mapping_Tools {
 
         //Method for loading the cleaner interface
         private void LoadCleaner(object sender, RoutedEventArgs e) {
-            DataContext = Views.GetMapCleaner();
+            SetCurrentView(Views.GetMapCleaner());
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Map Cleaner";
@@ -162,7 +173,7 @@ namespace Mapping_Tools {
 
         //Method for loading the cleaner interface
         private void LoadMetadataManager(object sender, RoutedEventArgs e) {
-            DataContext = Views.GetMetadataManager();
+            SetCurrentView(Views.GetMetadataManager());
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Metadata Manager";
@@ -175,7 +186,7 @@ namespace Mapping_Tools {
 
         //Method for loading the property transformer
         private void LoadPropertyTransformer(object sender, RoutedEventArgs e) {
-            DataContext = Views.GetPropertyTransformer();
+            SetCurrentView(Views.GetPropertyTransformer());
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Property Transformer";
@@ -188,7 +199,7 @@ namespace Mapping_Tools {
 
         //Method for loading the merger interface
         private void LoadMerger(object sender, RoutedEventArgs e) {
-            DataContext = Views.GetSliderMerger();
+            SetCurrentView(Views.GetSliderMerger());
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Slider Merger";
@@ -201,7 +212,7 @@ namespace Mapping_Tools {
 
         //Method for loading the completionator interface
         private void LoadCompletionator(object sender, RoutedEventArgs e) {
-            DataContext = Views.GetSliderCompletionator();
+            SetCurrentView(Views.GetSliderCompletionator());
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Slider Completionator";
@@ -214,7 +225,7 @@ namespace Mapping_Tools {
 
         //Method for loading the snapping tools interface
         private void LoadSnappingTools(object sender, RoutedEventArgs e) {
-            DataContext = Views.GetSnappingTools();
+            SetCurrentView(Views.GetSnappingTools());
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Snapping Tools";
@@ -227,7 +238,7 @@ namespace Mapping_Tools {
 
         //Method for loading the timing copier interface
         private void LoadTimingCopier(object sender, RoutedEventArgs e) {
-            DataContext = Views.GetTimingCopier();
+            SetCurrentView(Views.GetTimingCopier());
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Timing Copier";
@@ -240,7 +251,7 @@ namespace Mapping_Tools {
 
         //Method for loading the timing helper interface
         private void LoadTimingHelper(object sender, RoutedEventArgs e) {
-            DataContext = Views.GetTimingHelper();
+            SetCurrentView(Views.GetTimingHelper());
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Timing Helper";
@@ -253,7 +264,7 @@ namespace Mapping_Tools {
 
         //Method for loading the hitsound copier
         private void LoadHSCopier(object sender, RoutedEventArgs e) {
-            DataContext = Views.GetHitsoundCopier();
+            SetCurrentView(Views.GetHitsoundCopier());
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Hitsound Copier";
@@ -266,7 +277,7 @@ namespace Mapping_Tools {
 
         //Method for loading the hitsound studio
         private void LoadHSStudio(object sender, RoutedEventArgs e) {
-            DataContext = Views.GetHitsoundStudio();
+            SetCurrentView(Views.GetHitsoundStudio());
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Hitsound Studio";
@@ -279,7 +290,7 @@ namespace Mapping_Tools {
 
         //Method for loading the hitsound preview helper
         private void LoadHSPreviewHelper(object sender, RoutedEventArgs e) {
-            DataContext = Views.GetHitsoundPreviewHelper();
+            SetCurrentView(Views.GetHitsoundPreviewHelper());
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Hitsound Preview Helper";
@@ -292,7 +303,7 @@ namespace Mapping_Tools {
 
         //Method for loading the standard interface
         private void LoadStartup(object sender, RoutedEventArgs e) {
-            DataContext = Views.GetStandard();
+            SetCurrentView(Views.GetStandard());
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools";
@@ -305,7 +316,7 @@ namespace Mapping_Tools {
 
         //Method for loading the preferences
         private void LoadPreferences(object sender, RoutedEventArgs e) {
-            DataContext = Views.GetPreferences();
+            SetCurrentView(Views.GetPreferences());
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Preferences";

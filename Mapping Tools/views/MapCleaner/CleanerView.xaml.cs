@@ -10,7 +10,7 @@ using Mapping_Tools.Components.TimeLine;
 using Mapping_Tools.Classes.SystemTools;
 
 namespace Mapping_Tools.Views {
-    public partial class CleanerView :UserControl, IQuickRun {
+    public partial class CleanerView : MappingTool, IQuickRun {
         private readonly BackgroundWorker backgroundWorker;
         private bool canRun = true;
         List<double> TimingpointsRemoved;

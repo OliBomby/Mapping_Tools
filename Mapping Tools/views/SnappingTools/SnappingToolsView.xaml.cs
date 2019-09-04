@@ -16,18 +16,18 @@ namespace Mapping_Tools.Views {
     /// <summary>
     /// Interaktionslogik für UserControl1.xaml
     /// </summary>
-    public partial class SnappingToolsView : UserControl, IQuickRun {
+    public partial class SnappingToolsView : MappingTool, IQuickRun {
         private readonly BackgroundWorker backgroundWorker;
         private bool canRun = true;
 
         public event EventHandler RunFinished;
 
         public SnappingToolsView() {
+            DataContext = new SnappingToolsVM();
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
             backgroundWorker = (BackgroundWorker)FindResource("backgroundWorker");
-            DataContext = new SnappingToolsVM();
         }
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {

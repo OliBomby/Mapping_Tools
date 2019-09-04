@@ -16,7 +16,7 @@ namespace Mapping_Tools.Views {
     /// <summary>
     /// Interaktionslogik für UserControl1.xaml
     /// </summary>
-    public partial class SliderMergerView : UserControl, IQuickRun {
+    public partial class SliderMergerView : MappingTool, IQuickRun {
         private readonly BackgroundWorker backgroundWorker;
         private bool canRun = true;
 
