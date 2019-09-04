@@ -28,12 +28,11 @@ namespace Mapping_Tools {
         public bool IsMaximized; //Check for window state
         public double WidthWin, HeightWin; //Set default sizes of window
         public ViewCollection Views;
+        public ListenerManager listenerManager;
         public bool SessionhasAdminRights;
 
         public static MainWindow AppWindow { get; set; }
         public static readonly HttpClient HttpClient = new HttpClient();
-        private static readonly FileSystemWatcher FsWatcher = new FileSystemWatcher();
-        public static readonly KeyboardHookManager keyboardHookManager = new KeyboardHookManager();
         private static readonly string appCommon = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         public static readonly string AppDataPath = Path.Combine(appCommon, "Mapping Tools");
         public static readonly string ExportPath = Path.Combine(AppDataPath, "Exports");
@@ -42,7 +41,7 @@ namespace Mapping_Tools {
             Setup();
             InitializeComponent();
             SettingsManager.LoadConfig();
-            InitFsWatcher();
+            listenerManager = new ListenerManager();
             AppWindow = this;
             IsMaximized = SettingsManager.Settings.MainWindowMaximized;
             WidthWin = SettingsManager.Settings.MainWindowWidth ?? Width;
@@ -52,10 +51,9 @@ namespace Mapping_Tools {
             WidthWin = SettingsManager.Settings.MainWindowWidth ?? Width;
             HeightWin = SettingsManager.Settings.MainWindowHeight ?? Height;
             Views = new ViewCollection(); // Make a ViewCollection object
-            DataContext = new StandardVM(); // Generate Standard view model to show on startup
+            SetCurrentView(new StandardVM()); // Generate Standard view model to show on startup
 
             SetCurrentMaps(SettingsManager.GetLatestCurrentMaps()); // Set currentmap to previously opened map
-            ViewChanged();
         }
 
         private void Setup() {
@@ -75,90 +73,6 @@ namespace Mapping_Tools {
             }
             catch( Exception ex ) {
                 System.Windows.MessageBox.Show(ex.Message);
-            }
-
-            // Register virtual key code 0x4D = M to QuickRun
-            keyboardHookManager.RegisterHotkey(new[] { NonInvasiveKeyboardHookLibrary.ModifierKeys.Alt, NonInvasiveKeyboardHookLibrary.ModifierKeys.Control, NonInvasiveKeyboardHookLibrary.ModifierKeys.Shift }, 0x4D, QuickRunCurrentTool);
-            // Register virtual key code 0x53 = S to QuickBetterSave
-            keyboardHookManager.RegisterHotkey(new[] { NonInvasiveKeyboardHookLibrary.ModifierKeys.Shift, NonInvasiveKeyboardHookLibrary.ModifierKeys.Alt }, 0x53, QuickBetterSave);
-            keyboardHookManager.Start();
-        }
-
-        private void InitFsWatcher() {
-            FsWatcher.Path = SettingsManager.GetSongsPath();
-
-            FsWatcher.Filter = "*.osu";
-            FsWatcher.Changed += OnChangedFsWatcher;
-            FsWatcher.EnableRaisingEvents = true;
-            FsWatcher.IncludeSubdirectories = true;
-        }
-
-        private static void OnChangedFsWatcher(object sender, FileSystemEventArgs e) {
-            if( e.FullPath != IOHelper.GetCurrentBeatmap() ) {
-                return;
-            }
-
-            var proc = Process.GetProcessesByName("osu!").FirstOrDefault();
-            if( proc != null ) {
-                var oldHandle = GetForegroundWindow();
-                if( oldHandle != proc.MainWindowHandle ) {
-                    return;
-                }
-            }
-
-            string hashString = "";
-            var currentPath = IOHelper.GetCurrentBeatmap();
-
-            try {
-                if (File.Exists(currentPath)) {
-                    hashString = EditorReaderStuff.GetMD5FromPath(currentPath);
-                }
-            }
-            catch {
-                return;
-            }
-
-            if (EditorReaderStuff.DontCoolSaveWhenMD5EqualsThisString == hashString) {
-                return;
-            }
-
-            EditorReaderStuff.CoolSave();
-        }
-
-        private void QuickRunCurrentTool() {
-            System.Windows.Application.Current.Dispatcher.Invoke(() => {
-                if( DataContext is IQuickRun tool ) {
-                    tool.RunFinished -= Reload;
-                    tool.RunFinished += Reload;
-                    tool.QuickRun();
-                }
-            });
-        }
-
-        private void QuickBetterSave() {
-            EditorReaderStuff.CoolSave();
-        }
-
-        [DllImport("user32.dll")]
-        private static extern IntPtr GetForegroundWindow();
-
-        [DllImport("user32.dll")]
-        private static extern bool SetForegroundWindow(IntPtr hWnd);
-
-        private void Reload(object sender, EventArgs e) {
-            if( ( (RunToolCompletedEventArgs) e ).NeedReload ) {
-                var proc = Process.GetProcessesByName("osu!").FirstOrDefault();
-                ;
-                if( proc != null ) {
-                    var oldHandle = GetForegroundWindow();
-                    if( oldHandle != proc.MainWindowHandle ) {
-                        SetForegroundWindow(proc.MainWindowHandle);
-                        Thread.Sleep(300);
-                    }
-                }
-                SendKeys.SendWait("^{L 10}");
-                Thread.Sleep(100);
-                SendKeys.SendWait("{ENTER}");
             }
         }
 
@@ -191,6 +105,22 @@ namespace Mapping_Tools {
             catch( Exception ex ) {
                 Console.WriteLine(ex.Message);
             }
+        }
+
+        public object GetCurrentView() {
+            return DataContext;
+        }
+
+        public void SetCurrentView(object view) {
+            if (DataContext is MappingTool mt) {
+                mt.Deactivate();
+            }
+            if (view is MappingTool nmt) {
+                nmt.Activate();
+            }
+
+            DataContext = view;
+            ViewChanged();
         }
 
         public void SetCurrentMaps(string[] paths) {
@@ -230,7 +160,7 @@ namespace Mapping_Tools {
 
         //Method for loading the cleaner interface
         private void LoadCleaner(object sender, RoutedEventArgs e) {
-            DataContext = Views.GetMapCleaner();
+            SetCurrentView(Views.GetMapCleaner());
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Map Cleaner";
@@ -243,7 +173,7 @@ namespace Mapping_Tools {
 
         //Method for loading the cleaner interface
         private void LoadMetadataManager(object sender, RoutedEventArgs e) {
-            DataContext = Views.GetMetadataManager();
+            SetCurrentView(Views.GetMetadataManager());
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Metadata Manager";
@@ -256,7 +186,7 @@ namespace Mapping_Tools {
 
         //Method for loading the property transformer
         private void LoadPropertyTransformer(object sender, RoutedEventArgs e) {
-            DataContext = Views.GetPropertyTransformer();
+            SetCurrentView(Views.GetPropertyTransformer());
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Property Transformer";
@@ -269,7 +199,7 @@ namespace Mapping_Tools {
 
         //Method for loading the merger interface
         private void LoadMerger(object sender, RoutedEventArgs e) {
-            DataContext = Views.GetSliderMerger();
+            SetCurrentView(Views.GetSliderMerger());
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Slider Merger";
@@ -282,7 +212,7 @@ namespace Mapping_Tools {
 
         //Method for loading the completionator interface
         private void LoadCompletionator(object sender, RoutedEventArgs e) {
-            DataContext = Views.GetSliderCompletionator();
+            SetCurrentView(Views.GetSliderCompletionator());
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Slider Completionator";
@@ -295,7 +225,7 @@ namespace Mapping_Tools {
 
         //Method for loading the snapping tools interface
         private void LoadSnappingTools(object sender, RoutedEventArgs e) {
-            DataContext = Views.GetSnappingTools();
+            SetCurrentView(Views.GetSnappingTools());
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Snapping Tools";
@@ -308,7 +238,7 @@ namespace Mapping_Tools {
 
         //Method for loading the timing copier interface
         private void LoadTimingCopier(object sender, RoutedEventArgs e) {
-            DataContext = Views.GetTimingCopier();
+            SetCurrentView(Views.GetTimingCopier());
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Timing Copier";
@@ -321,7 +251,7 @@ namespace Mapping_Tools {
 
         //Method for loading the timing helper interface
         private void LoadTimingHelper(object sender, RoutedEventArgs e) {
-            DataContext = Views.GetTimingHelper();
+            SetCurrentView(Views.GetTimingHelper());
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Timing Helper";
@@ -334,7 +264,7 @@ namespace Mapping_Tools {
 
         //Method for loading the hitsound copier
         private void LoadHSCopier(object sender, RoutedEventArgs e) {
-            DataContext = Views.GetHitsoundCopier();
+            SetCurrentView(Views.GetHitsoundCopier());
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Hitsound Copier";
@@ -347,7 +277,7 @@ namespace Mapping_Tools {
 
         //Method for loading the hitsound studio
         private void LoadHSStudio(object sender, RoutedEventArgs e) {
-            DataContext = Views.GetHitsoundStudio();
+            SetCurrentView(Views.GetHitsoundStudio());
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Hitsound Studio";
@@ -360,7 +290,7 @@ namespace Mapping_Tools {
 
         //Method for loading the hitsound preview helper
         private void LoadHSPreviewHelper(object sender, RoutedEventArgs e) {
-            DataContext = Views.GetHitsoundPreviewHelper();
+            SetCurrentView(Views.GetHitsoundPreviewHelper());
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Hitsound Preview Helper";
@@ -373,7 +303,7 @@ namespace Mapping_Tools {
 
         //Method for loading the standard interface
         private void LoadStartup(object sender, RoutedEventArgs e) {
-            DataContext = Views.GetStandard();
+            SetCurrentView(Views.GetStandard());
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools";
@@ -386,7 +316,7 @@ namespace Mapping_Tools {
 
         //Method for loading the preferences
         private void LoadPreferences(object sender, RoutedEventArgs e) {
-            DataContext = Views.GetPreferences();
+            SetCurrentView(Views.GetPreferences());
 
             TextBlock txt = this.FindName("header") as TextBlock;
             txt.Text = "Mapping Tools - Preferences";

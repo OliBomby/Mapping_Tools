@@ -215,7 +215,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <summary>
         /// Defines an instance with all components set to NaN.
         /// </summary>
-        public static readonly Vector2 NaN = new Vector2(Double.NaN, Double.NaN);
+        public static readonly Vector2 NaN = new Vector2(double.NaN, double.NaN);
 
         /// <summary>
         /// Defines the size of the Vector2 struct in bytes.
@@ -799,6 +799,28 @@ namespace Mapping_Tools.Classes.MathUtil {
             Subtract(ref temp, ref a, out temp);
             Multiply(ref temp, v, out temp);
             Add(ref result, ref temp, out result);
+        }
+
+        /// <summary>
+        /// Rotate a vector by an angle.
+        /// </summary>
+        /// <param name="vec">The vector to rotate.</param>
+        /// <param name="angle">The angle in radians to rotate the vector by.</param>
+        /// <returns>The result of the operation.</returns>
+        public static Vector2 Rotate(Vector2 vec, double angle) {
+            Rotate(ref vec, ref angle, out Vector2 result);
+            return result;
+        }
+
+        /// <summary>
+        /// Rotate a vector by an angle.
+        /// </summary>
+        /// <param name="vec">The vector to rotate.</param>
+        /// <param name="angle">The angle in radians to rotate the vector by.</param>
+        /// <param name="result">The result of the operation.</param>
+        public static void Rotate(ref Vector2 vec, ref double angle, out Vector2 result) {
+            result.X = vec.X * Math.Cos(angle) - vec.Y * Math.Sin(angle);
+            result.Y = vec.X * Math.Sin(angle) + vec.Y * Math.Cos(angle);
         }
 
         /// <summary>

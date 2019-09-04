@@ -187,6 +187,7 @@
     <Compile Include="Classes\HitsoundStuff\SampleSoundGenerator.cs" />
     <Compile Include="Classes\HitsoundStuff\SF2Extension.cs" />
     <Compile Include="Classes\HitsoundStuff\VolumeBalancingArgs.cs" />
+    <Compile Include="Classes\MathUtil\Circle.cs" />
     <Compile Include="Classes\MathUtil\Extensions.cs" />
     <Compile Include="Classes\MathUtil\BezierCurve.cs" />
     <Compile Include="Classes\MathUtil\BezierCurveCubic.cs" />
@@ -229,8 +230,21 @@
     <Compile Include="Classes\SliderPathStuff\SliderInterpreter.cs" />
     <Compile Include="Classes\SliderPathStuff\SliderPath.cs" />
     <Compile Include="Classes\BeatmapHelper\TValue.cs" />
+    <Compile Include="Classes\SnappingTools\IRelevantObject.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantCircle.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantLine.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\GeneratorType.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjects.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjectsFromHitObjects.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjectsFromRelevantPoints.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\StartPointGenerator.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\TriangleGenerator.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantPoint.cs" />
+    <Compile Include="Classes\SystemTools\ActionHotkey.cs" />
+    <Compile Include="Classes\SystemTools\Hotkey.cs" />
     <Compile Include="Classes\SystemTools\IOHelper.cs" />
     <Compile Include="Classes\SystemTools\IQuickRun.cs" />
+    <Compile Include="Classes\SystemTools\ListenerManager.cs" />
     <Compile Include="Classes\SystemTools\ProjectManager.cs" />
     <Compile Include="Classes\SystemTools\ISavable.cs" />
     <Compile Include="Classes\SystemTools\RunToolCompletedEventArgs.cs" />
@@ -250,6 +264,9 @@
     <Compile Include="Components\Domain\ImportTypeToStringConverter.cs" />
     <Compile Include="Components\Domain\ParsableDoubleListValidationRule.cs" />
     <Compile Include="Components\Domain\DoubleToStringConverter.cs" />
+    <Compile Include="Components\HotkeyEditorControl.xaml.cs">
+      <DependentUpon>HotkeyEditorControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Components\ObjectVisualiser\HitObject.xaml.cs">
       <DependentUpon>HitObject.xaml</DependentUpon>
     </Compile>
@@ -285,6 +302,10 @@
     <Compile Include="Viewmodels\PreferencesVM.cs" />
     <Compile Include="Viewmodels\StandardVM.cs" />
     <Compile Include="Views\Extensions.cs" />
+    <Compile Include="Views\MappingTool.cs" />
+    <Compile Include="Views\SnappingTools\SnappingOverlay.xaml.cs">
+      <DependentUpon>SnappingOverlay.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\TimingCopier\TimingCopierView.xaml.cs">
       <DependentUpon>TimingCopierView.xaml</DependentUpon>
     </Compile>
@@ -331,6 +352,10 @@
     <Compile Include="Views\HitsoundStudio\HitsoundLayerImportWindow.xaml.cs">
       <DependentUpon>HitsoundLayerImportWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="Components\HotkeyEditorControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Components\ObjectVisualiser\HitObject.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -379,6 +404,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\SnappingTools\SnappingOverlay.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\TimingCopier\TimingCopierView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

@@ -1,9 +1,6 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,16 +8,18 @@ using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Components.TimeLine;
 using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Views.Standard;
 
 namespace Mapping_Tools.Views {
-    public partial class CleanerView :UserControl {
+    public partial class CleanerView : MappingTool, IQuickRun {
         private readonly BackgroundWorker backgroundWorker;
+        private bool canRun = true;
         List<double> TimingpointsRemoved;
         List<double> TimingpointsAdded;
         List<double> TimingpointsChanged;
         double EndTime_monitor;
         TimeLine TL;
+
+        public event EventHandler RunFinished;
 
         public CleanerView() {
             InitializeComponent();
@@ -31,14 +30,29 @@ namespace Mapping_Tools.Views {
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
-            Arguments arguments = GetArgumentsFromWindow();
-            
-            string fileToCopy = arguments.Path;
-            IOHelper.SaveMapBackup(fileToCopy);
+            RunTool(MainWindow.AppWindow.GetCurrentMaps(), quick: false);
+        }
+
+        public void QuickRun() {
+            RunTool(new[] { IOHelper.GetCurrentBeatmap() }, quick: true);
+        }
+
+        private void RunTool(string[] paths, bool quick = false) {
+            if (!canRun) return;
+
+            IOHelper.SaveMapBackup(paths);
+
+            Arguments arguments = new Arguments(paths, quick,
+                                                new MapCleaner.MapCleanerArgs((bool)VolumeSliders.IsChecked, (bool)SamplesetSliders.IsChecked, (bool)VolumeSpinners.IsChecked,
+                                                                         (bool)ResnapObjects.IsChecked, (bool)ResnapBookmarks.IsChecked,
+                                                                         (bool)RemoveUnusedSamples.IsChecked,
+                                                                         (bool)RemoveMuting.IsChecked,
+                                                                         (bool)RemoveUnclickableHitsounds.IsChecked,
+                                                                         int.Parse(Snap1.Text.Split('/')[1]), int.Parse(Snap2.Text.Split('/')[1])));
 
             backgroundWorker.RunWorkerAsync(arguments);
-
             start.IsEnabled = false;
+            canRun = false;
         }
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
@@ -51,64 +65,80 @@ namespace Mapping_Tools.Views {
         }
 
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
-            if (e.Error != null)
-            {
-                new MessageWindow(ErrorType.Error, eventArg: e).Show();
+            if (e.Error != null) {
+                MessageBox.Show(string.Format("{0}{1}{2}", e.Error.Message, Environment.NewLine, e.Error.StackTrace), "Error");
             }
-            else
-            {
-                new MessageWindow(ErrorType.Success, e.Result.ToString()).Show();
+            else {
+                FillTimeLine();
+                if (e.Result.ToString() != "")
+                    MessageBox.Show(e.Result.ToString());
                 progress.Value = 0;
             }
             start.IsEnabled = true;
+            canRun = true;
         }
 
         private struct Arguments {
-            public string Path;
+            public string[] Paths;
+            public bool Quick;
             public MapCleaner.MapCleanerArgs CleanerArguments;
 
-            public Arguments(string path, MapCleaner.MapCleanerArgs cleanerArguments) {
-                Path = path;
+            public Arguments(string[] paths, bool quick, MapCleaner.MapCleanerArgs cleanerArguments) {
+                Paths = paths;
+                Quick = quick;
                 CleanerArguments = cleanerArguments;
             }
         }
 
-        private Arguments GetArgumentsFromWindow() {
-            string fileToCopy = MainWindow.AppWindow.currentMap.Text;
-            Arguments arguments = new Arguments(fileToCopy,
-                                                new MapCleaner.MapCleanerArgs((bool)VolumeSliders.IsChecked, (bool)SamplesetSliders.IsChecked, (bool)VolumeSpinners.IsChecked,
-                                                                         (bool)ResnapObjects.IsChecked, (bool)ResnapBookmarks.IsChecked,
-                                                                         (bool)RemoveUnusedSamples.IsChecked,
-                                                                         (bool)RemoveMuting.IsChecked,
-                                                                         (bool)RemoveUnclickableHitsounds.IsChecked,
-                                                                         int.Parse(Snap1.Text.Split('/')[1]), int.Parse(Snap2.Text.Split('/')[1])));
-            return arguments;
-        }
-
         private string Run_Program(Arguments args, BackgroundWorker worker, DoWorkEventArgs _) {
+            var result = new MapCleaner.MapCleanerResult();
 
-            throw new Exception("Because Person is dumb");
-            //BeatmapEditor editor = new BeatmapEditor(args.Path);
+            bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
 
-            //List<TimingPoint> orgininalTimingPoints = new List<TimingPoint>();
-            //foreach (TimingPoint tp in editor.Beatmap.BeatmapTiming.TimingPoints) { orgininalTimingPoints.Add(tp.Copy()); }
-            //int oldTimingPointsCount = editor.Beatmap.BeatmapTiming.TimingPoints.Count;
+            if (args.Paths.Length == 1) {
+                BeatmapEditor editor = editorRead ? EditorReaderStuff.GetNewestVersion(args.Paths[0], reader) : new BeatmapEditor(args.Paths[0]);
 
-            //var result = MapCleaner.CleanMap(editor, args.CleanerArguments, worker);
+                List<TimingPoint> orgininalTimingPoints = new List<TimingPoint>();
+                foreach (TimingPoint tp in editor.Beatmap.BeatmapTiming.TimingPoints) { orgininalTimingPoints.Add(tp.Copy()); }
+                int oldTimingPointsCount = editor.Beatmap.BeatmapTiming.TimingPoints.Count;
 
-            //List<TimingPoint> newTimingPoints = editor.Beatmap.BeatmapTiming.TimingPoints;
-            //Monitor_Differences(orgininalTimingPoints, newTimingPoints);
+                result.Add(MapCleaner.CleanMap(editor, args.CleanerArguments, worker));
 
-            //// Save the file
-            //editor.SaveFile();
-            
+                // Update result with removed count
+                int removed = oldTimingPointsCount - editor.Beatmap.BeatmapTiming.TimingPoints.Count;
+                result.TimingPointsRemoved += removed;
 
-            //// Make an accurate message
-            //int removed = oldTimingPointsCount - editor.Beatmap.BeatmapTiming.TimingPoints.Count;
-            //string message = $"Successfully {(removed < 0 ? "added" : "removed")} {Math.Abs(removed)} {(Math.Abs(removed) == 1 ? "greenline" : "greenlines")}" +
-            //    (args.CleanerArguments.ResnapObjects ? $" and resnapped {result.ObjectsResnapped} {(result.ObjectsResnapped == 1 ? "object" : "objects")}" : "") + 
-            //    (args.CleanerArguments.RemoveUnusedSamples ? $" and removed {result.SamplesRemoved} unused {(result.SamplesRemoved == 1 ? "sample" : "samples")}" : "") + "!";
-            //return message;
+                List<TimingPoint> newTimingPoints = editor.Beatmap.BeatmapTiming.TimingPoints;
+                Monitor_Differences(orgininalTimingPoints, newTimingPoints);
+
+                // Save the file
+                editor.SaveFile();
+            } else {
+                foreach (string path in args.Paths) {
+                    BeatmapEditor editor = editorRead ? EditorReaderStuff.GetNewestVersion(path, reader) : new BeatmapEditor(path);
+
+                    int oldTimingPointsCount = editor.Beatmap.BeatmapTiming.TimingPoints.Count;
+
+                    result.Add(MapCleaner.CleanMap(editor, args.CleanerArguments, worker));
+
+                    // Update result with removed count
+                    int removed = oldTimingPointsCount - editor.Beatmap.BeatmapTiming.TimingPoints.Count;
+                    result.TimingPointsRemoved += removed;
+
+                    // Save the file
+                    editor.SaveFile();
+                }
+            }
+
+            // Do stuff
+            if (args.Quick)
+                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, editorRead));
+
+            // Make an accurate message
+            string message = $"Successfully {(result.TimingPointsRemoved < 0 ? "added" : "removed")} {Math.Abs(result.TimingPointsRemoved)} {(Math.Abs(result.TimingPointsRemoved) == 1 ? "greenline" : "greenlines")}" +
+                (args.CleanerArguments.ResnapObjects ? $" and resnapped {result.ObjectsResnapped} {(result.ObjectsResnapped == 1 ? "object" : "objects")}" : "") + 
+                (args.CleanerArguments.RemoveUnusedSamples ? $" and removed {result.SamplesRemoved} unused {(result.SamplesRemoved == 1 ? "sample" : "samples")}" : "") + "!";
+            return args.Quick ? "" : message;
         }
 
         private void Monitor_Differences(List<TimingPoint> originalTimingPoints, List<TimingPoint> newTimingPoints) {

@@ -16,7 +16,7 @@ namespace Mapping_Tools.Views {
     /// <summary>
     /// Interactielogica voor MetadataManagerView.xaml
     /// </summary>
-    public partial class MetadataManagerView : UserControl, ISavable<MetadataManagerVM> {
+    public partial class MetadataManagerView : MappingTool, ISavable<MetadataManagerVM> {
         private readonly BackgroundWorker backgroundWorker;
 
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "metadataproject.json");

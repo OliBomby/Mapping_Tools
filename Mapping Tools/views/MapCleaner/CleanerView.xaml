@@ -1,8 +1,9 @@
-﻿<UserControl x:Class="Mapping_Tools.Views.CleanerView"
+﻿<local:MappingTool x:Class="Mapping_Tools.Views.CleanerView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Mapping_Tools.Views"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:cm="clr-namespace:System.ComponentModel;assembly=System"
              mc:Ignorable="d" 
@@ -16,20 +17,28 @@
         <Grid Name="FirstGrid" Grid.Row="0">
             <StackPanel>
               <StackPanel Orientation="Horizontal">
-                <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
-                  <Run Text="Map Cleaner"/>
-                </TextBlock>
-                <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom">
-                  <materialDesign:PopupBox.ToggleContent>
-                    <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
-                  </materialDesign:PopupBox.ToggleContent>
-                  <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
-                    It cleans the current map of useless greenlines and it also lets you do some other stuff regarding the whole map.
-                    <LineBreak/>
-                    Map cleaner cleans useless greenline stuff by storing all the influences of the timingpoints and then removing all the timingpoints and then rebuilding all the timingpoints in a good way. This means the greenlines automatically get resnapped to the objects that use them.
-                  </TextBlock>
-                </materialDesign:PopupBox>
-              </StackPanel>
+                    <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
+                        <Run Text="Map Cleaner"/>
+                    </TextBlock>
+                    <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom">
+                        <materialDesign:PopupBox.ToggleContent>
+                        <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
+                        </materialDesign:PopupBox.ToggleContent>
+                        <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
+                        It cleans the current map of useless greenlines and it also lets you do some other stuff regarding the whole map.
+                        <LineBreak/>
+                        Map cleaner cleans useless greenline stuff by storing all the influences of the timingpoints and then removing all the timingpoints and then rebuilding all the timingpoints in a good way. This means the greenlines automatically get resnapped to the objects that use them.
+                        </TextBlock>
+                    </materialDesign:PopupBox>
+                    <materialDesign:PopupBox Margin="0,10,10,10" VerticalAlignment="Bottom">
+                        <materialDesign:PopupBox.ToggleContent>
+                            <materialDesign:PackIcon Kind="LightningBoltCircle" Width="24" Height="24" Foreground="{DynamicResource PrimaryHueLightBrush}"/>
+                        </materialDesign:PopupBox.ToggleContent>
+                        <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
+                            This tool is compatible with QuickRun!
+                        </TextBlock>
+                    </materialDesign:PopupBox>
+                </StackPanel>
               
                 <CheckBox FontSize="14" x:Name="ResnapObjects" Cursor="Hand" Margin="0,10,0,0">
                     Resnap objects
@@ -108,4 +117,4 @@
          WorkerReportsProgress="True"
          ProgressChanged="BackgroundWorker_ProgressChanged"/>
     </UserControl.Resources>
-</UserControl>
+</local:MappingTool>

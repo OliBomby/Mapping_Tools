@@ -102,7 +102,7 @@ namespace Mapping_Tools.Classes.Tools
                 {
                     for (int i = n; i > j; i--)
                     {
-                        arc[i] = arc[i] * (float)tf + arc[i - 1] * (float)(1 - tf);
+                        arc[i] = arc[i] * tf + arc[i - 1] * (1 - tf);
                     }
                 }
                 arcLength = Math.Atan2(arc.Last()[1], arc.Last()[0]);

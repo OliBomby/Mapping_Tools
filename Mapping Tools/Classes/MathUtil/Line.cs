@@ -63,7 +63,7 @@ namespace Mapping_Tools.Classes.MathUtil {
                 C = vec1.X;
             }
             else {
-                A = -1 * (vec2.Y - vec1.Y) / (vec2.X - vec2.X);
+                A = -1 * (vec2.Y - vec1.Y) / (vec2.X - vec1.X);
                 B = 1;
                 C = vec1.Y + A * vec1.X;
             }
@@ -99,6 +99,16 @@ namespace Mapping_Tools.Classes.MathUtil {
         public static readonly Line AxisY = new Line(0, 1);
 
         /// <summary>
+        /// Calculate the distance between a line and a point
+        /// </summary>
+        /// <param name="left">The line</param>
+        /// <param name="right">The point</param>
+        /// <returns>The distance between the line and the point</returns>
+        public static double Distance(Line left, Vector2 right) {
+            return Math.Abs(left.A * right.X + left.B * right.X + left.C) / Math.Sqrt(left.A * left.A + left.B * left.B);
+        }
+
+        /// <summary>
         /// Calculate the intersection of two lines
         /// </summary>
         /// <param name="left">First operand</param>
@@ -106,7 +116,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <returns>The intersection the two inputs</returns>
         public static Vector2 Intersection(Line left, Line right)
         {
-            Intersection(ref left, ref right, out Vector2 result);
+            Intersection(left, right, out Vector2 result);
             return result;
         }
 
@@ -116,15 +126,18 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="left">First operand</param>
         /// <param name="right">Second operand</param>
         /// <returns>The intersection the two inputs</returns>
-        public static void Intersection(ref Line left, ref Line right, out Vector2 result)
+        public static bool Intersection(Line left, Line right, out Vector2 result)
         {
             double d1 = 1 / right.A;
-            if (left.B == left.A * right.B * d1)
+            if (left.B == left.A * right.B * d1) {
                 result = Vector2.NaN;
+                return false;
+            }
             else{
                 double y = (left.C - left.A * right.C * d1) / (left.B - left.A * right.B * d1);
                 double x = right.C * d1 - right.B * y * d1;
                 result = new Vector2(x, y);
+                return true;
             }
         }
 
