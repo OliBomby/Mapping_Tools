@@ -187,6 +187,7 @@
     <Compile Include="Classes\HitsoundStuff\SampleSoundGenerator.cs" />
     <Compile Include="Classes\HitsoundStuff\SF2Extension.cs" />
     <Compile Include="Classes\HitsoundStuff\VolumeBalancingArgs.cs" />
+    <Compile Include="Classes\MathUtil\Circle.cs" />
     <Compile Include="Classes\MathUtil\Extensions.cs" />
     <Compile Include="Classes\MathUtil\BezierCurve.cs" />
     <Compile Include="Classes\MathUtil\BezierCurveCubic.cs" />
@@ -229,6 +230,15 @@
     <Compile Include="Classes\SliderPathStuff\SliderInterpreter.cs" />
     <Compile Include="Classes\SliderPathStuff\SliderPath.cs" />
     <Compile Include="Classes\BeatmapHelper\TValue.cs" />
+    <Compile Include="Classes\SnappingTools\IRelevantObject.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantCircle.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantLine.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\GeneratorType.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjects.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjectsFromHitObjects.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjectsFromRelevantPoints.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\TriangleGenerator.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantPoint.cs" />
     <Compile Include="Classes\SystemTools\Hotkey.cs" />
     <Compile Include="Classes\SystemTools\IOHelper.cs" />
     <Compile Include="Classes\SystemTools\IQuickRun.cs" />

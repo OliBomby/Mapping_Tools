@@ -7,10 +7,12 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SliderPathStuff;
+using Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Views.SnappingTools;
@@ -31,8 +33,29 @@ namespace Mapping_Tools.Views {
             Height = MainWindow.AppWindow.content_views.Height;
             backgroundWorker = (BackgroundWorker)FindResource("backgroundWorker");
 
-            var overlay = new SnappingOverlay();
-            overlay.Show();
+            var interfaceType = typeof(IGenerateRelevantObjects);
+            var generators = AppDomain.CurrentDomain.GetAssemblies()
+              .SelectMany(x => x.GetTypes())
+              .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
+              .Select(x => Activator.CreateInstance(x)).OfType<IGenerateRelevantObjects>().ToList();
+
+            lvUsers.ItemsSource = generators;
+
+            CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(lvUsers.ItemsSource);
+            PropertyGroupDescription groupDescription = new PropertyGroupDescription("GeneratorType");
+            view.GroupDescriptions.Add(groupDescription);
+            view.Filter = UserFilter;
+        }
+
+        private bool UserFilter(object item) {
+            if (String.IsNullOrEmpty(txtFilter.Text))
+                return true;
+            else
+                return ((item as HitsoundZone).Name.IndexOf(txtFilter.Text, StringComparison.OrdinalIgnoreCase) >= 0);
+        }
+
+        private void txtFilter_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e) {
+            CollectionViewSource.GetDefaultView(lvUsers.ItemsSource).Refresh();
         }
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
@@ -107,7 +130,7 @@ namespace Mapping_Tools.Views {
                         Line line1 = new Line(ho.Pos, ho.CurvePoints.Last());
                         Line line2 = new Line(otherHo.Pos, otherHo.CurvePoints.Last());
 
-                        if (Line.Intersection(ref line1, ref line2, out var intersection)) {
+                        if (Line.Intersection(line1, line2, out var intersection)) {
                             if (intersection != Vector2.NaN)
                                 beatmap.HitObjects.Add(new HitObject((ho.Time + otherHo.Time) / 2, 0, SampleSet.Auto, SampleSet.Auto) { Pos = intersection });
                         }

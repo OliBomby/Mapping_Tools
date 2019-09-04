@@ -802,6 +802,28 @@ namespace Mapping_Tools.Classes.MathUtil {
         }
 
         /// <summary>
+        /// Rotate a vector by an angle.
+        /// </summary>
+        /// <param name="vec">The vector to rotate.</param>
+        /// <param name="angle">The angle in radians to rotate the vector by.</param>
+        /// <returns>The result of the operation.</returns>
+        public static Vector2 Rotate(Vector2 vec, double angle) {
+            Rotate(ref vec, ref angle, out Vector2 result);
+            return result;
+        }
+
+        /// <summary>
+        /// Rotate a vector by an angle.
+        /// </summary>
+        /// <param name="vec">The vector to rotate.</param>
+        /// <param name="angle">The angle in radians to rotate the vector by.</param>
+        /// <param name="result">The result of the operation.</param>
+        public static void Rotate(ref Vector2 vec, ref double angle, out Vector2 result) {
+            result.X = vec.X * Math.Cos(angle) - vec.Y * Math.Sin(angle);
+            result.Y = vec.X * Math.Sin(angle) + vec.Y * Math.Cos(angle);
+        }
+
+        /// <summary>
         /// Transforms a vector by a quaternion rotation.
         /// </summary>
         /// <param name="vec">The vector to transform.</param>
