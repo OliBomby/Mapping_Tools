@@ -14,11 +14,13 @@ namespace Mapping_Tools.Classes.SystemTools {
     public class ListenerManager {
         public readonly FileSystemWatcher FsWatcher = new FileSystemWatcher();
         public readonly KeyboardHookManager keyboardHookManager = new KeyboardHookManager();
+        public Dictionary<string, ActionHotkey> ActiveHotkeys = new Dictionary<string, ActionHotkey>();
         
         public ListenerManager() {
             InitFsWatcher();
 
             LoadHotkeys();
+            ReloadHotkeys();
             keyboardHookManager.Start();
 
             SettingsManager.Settings.PropertyChanged += OnSettingsChanged;
@@ -33,19 +35,40 @@ namespace Mapping_Tools.Classes.SystemTools {
                     FsWatcher.Path = SettingsManager.GetSongsPath();
                     break;
                 case "QuickRunHotkey":
-                    LoadHotkeys();
+                    ChangeActiveHotkeyHotkey("QuickRunHotkey", SettingsManager.Settings.QuickRunHotkey);
                     break;
                 case "BetterSaveHotkey":
-                    LoadHotkeys();
+                    ChangeActiveHotkeyHotkey("BetterSaveHotkey", SettingsManager.Settings.BetterSaveHotkey);
                     break;
             }
         }
 
-        public void LoadHotkeys() {
+        private void LoadHotkeys() {
+            AddActiveHotkey("QuickRunHotkey", new ActionHotkey(SettingsManager.Settings.QuickRunHotkey, QuickRunCurrentTool));
+            AddActiveHotkey("BetterSaveHotkey", new ActionHotkey(SettingsManager.Settings.BetterSaveHotkey, QuickBetterSave));
+        }
+
+        public void AddActiveHotkey(string name, ActionHotkey actionHotkey) {
+            ActiveHotkeys.Add(name, actionHotkey);
+            ReloadHotkeys();
+        }
+
+        public bool ChangeActiveHotkeyHotkey(string name, Hotkey hotkey) {
+            if (ActiveHotkeys.ContainsKey(name)) {
+                ActiveHotkeys[name].Hotkey = hotkey;
+                ReloadHotkeys();
+                return true;
+            } else {
+                return false;
+            }
+        }
+        
+        public void ReloadHotkeys() {
             keyboardHookManager.UnregisterAll();
 
-            RegisterHotkey(SettingsManager.Settings.QuickRunHotkey, QuickRunCurrentTool);
-            RegisterHotkey(SettingsManager.Settings.BetterSaveHotkey, QuickBetterSave);
+            foreach (ActionHotkey ah in ActiveHotkeys.Values) {
+                RegisterHotkey(ah.Hotkey, ah.Action);
+            }
         }
 
         private void RegisterHotkey(Hotkey hotkey, Action action) {

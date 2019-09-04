@@ -239,6 +239,7 @@
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjectsFromRelevantPoints.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\TriangleGenerator.cs" />
     <Compile Include="Classes\SnappingTools\RelevantPoint.cs" />
+    <Compile Include="Classes\SystemTools\ActionHotkey.cs" />
     <Compile Include="Classes\SystemTools\Hotkey.cs" />
     <Compile Include="Classes\SystemTools\IOHelper.cs" />
     <Compile Include="Classes\SystemTools\IQuickRun.cs" />

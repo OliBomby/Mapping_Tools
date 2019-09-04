@@ -1,22 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SliderPathStuff;
-using Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Viewmodels;
-using Mapping_Tools.Views.SnappingTools;
 
 namespace Mapping_Tools.Views {
     /// <summary>

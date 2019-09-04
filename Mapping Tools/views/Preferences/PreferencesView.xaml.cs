@@ -49,7 +49,7 @@ namespace Mapping_Tools.Views
         }
 
         private void Button_Click_3(object sender, RoutedEventArgs e) {
-            MainWindow.AppWindow.listenerManager.LoadHotkeys();
+            MainWindow.AppWindow.listenerManager.ReloadHotkeys();
         }
     }
 }
