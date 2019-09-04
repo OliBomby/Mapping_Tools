@@ -15,6 +15,7 @@ using Mapping_Tools.Classes.SliderPathStuff;
 using Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Viewmodels;
 using Mapping_Tools.Views.SnappingTools;
 
 namespace Mapping_Tools.Views {
@@ -32,30 +33,7 @@ namespace Mapping_Tools.Views {
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
             backgroundWorker = (BackgroundWorker)FindResource("backgroundWorker");
-
-            var interfaceType = typeof(IGenerateRelevantObjects);
-            var generators = AppDomain.CurrentDomain.GetAssemblies()
-              .SelectMany(x => x.GetTypes())
-              .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
-              .Select(x => Activator.CreateInstance(x)).OfType<IGenerateRelevantObjects>().ToList();
-
-            lvUsers.ItemsSource = generators;
-
-            CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(lvUsers.ItemsSource);
-            PropertyGroupDescription groupDescription = new PropertyGroupDescription("GeneratorType");
-            view.GroupDescriptions.Add(groupDescription);
-            view.Filter = UserFilter;
-        }
-
-        private bool UserFilter(object item) {
-            if (String.IsNullOrEmpty(txtFilter.Text))
-                return true;
-            else
-                return ((item as HitsoundZone).Name.IndexOf(txtFilter.Text, StringComparison.OrdinalIgnoreCase) >= 0);
-        }
-
-        private void txtFilter_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e) {
-            CollectionViewSource.GetDefaultView(lvUsers.ItemsSource).Refresh();
+            DataContext = new SnappingToolsVM();
         }
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {

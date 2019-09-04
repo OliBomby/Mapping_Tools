@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:Mapping_Tools.Views"
              xmlns:cm="clr-namespace:System.ComponentModel;assembly=System"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:components="clr-namespace:Mapping_Tools.Components"
              mc:Ignorable="d" 
              d:DesignHeight="450" Width="759.5">
     <Grid Name="MasterGrid">
@@ -37,8 +38,9 @@
                     </materialDesign:PopupBox>
                 </StackPanel>
 
-                <TextBox Margin="0,0,0,10" Name="txtFilter" TextChanged="txtFilter_TextChanged" />
-                <ListView Name="lvUsers" SelectionMode="Single">
+                <components:HotkeyEditorControl Width="150" HorizontalAlignment="Left" Hotkey="{Binding SnapHotkey}"/>
+                <TextBox Margin="0,0,0,10" Name="txtFilter" Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}"/>
+                <ListView Name="lvUsers" SelectionMode="Single" ItemsSource="{Binding Generators}">
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Header="IsActive">
