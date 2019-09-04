@@ -1,4 +1,5 @@
-﻿using Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators;
+﻿using Mapping_Tools.Classes.SnappingTools;
+using Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators;
 using Mapping_Tools.Classes.SystemTools;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ namespace Mapping_Tools.Viewmodels {
         public Hotkey SnapHotkey { get; set; }
 
         public ObservableCollection<IGenerateRelevantObjects> Generators { get; }
+        private readonly List<IRelevantObject> relevantObjects = new List<IRelevantObject>();
 
         private string _filter = "";
         public string Filter { get => _filter; set => SetFilter(value); }
@@ -36,6 +38,10 @@ namespace Mapping_Tools.Viewmodels {
             view.Filter = UserFilter;
 
             AutoSnapTimer.Tick += Timer_Tick;
+        }
+
+        private void GenerateRelevantObjects() {
+
         }
 
         void Timer_Tick(object sender, EventArgs e) {
