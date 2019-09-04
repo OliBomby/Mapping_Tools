@@ -3,9 +3,11 @@ using Mapping_Tools.Classes.SystemTools;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Threading;
 
@@ -18,7 +20,7 @@ namespace Mapping_Tools.Viewmodels {
         private string _filter = "";
         public string Filter { get => _filter; set => SetFilter(value); }
 
-        private readonly DispatcherTimer AutoSnapTimer = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(100) };
+        private readonly DispatcherTimer AutoSnapTimer = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(10) };
         public bool AutoSnapTimerEnabled { get => AutoSnapTimer.IsEnabled; set => AutoSnapTimer.IsEnabled = value; }
 
         public SnappingToolsVM() {
@@ -38,7 +40,8 @@ namespace Mapping_Tools.Viewmodels {
 
         void Timer_Tick(object sender, EventArgs e) {
             if (IsHotkeyDown(SnapHotkey)) {
-                Console.WriteLine("AutoSnapMouse got executed");
+                // Move the cursor's Position
+                // System.Windows.Forms.Cursor.Position = new Point();
             }
         }
 
