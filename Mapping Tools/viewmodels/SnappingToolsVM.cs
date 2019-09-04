@@ -1,6 +1,9 @@
-﻿using Mapping_Tools.Classes.SnappingTools;
+﻿using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SnappingTools;
 using Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators;
 using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Components.Domain;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -38,16 +41,53 @@ namespace Mapping_Tools.Viewmodels {
             view.Filter = UserFilter;
 
             AutoSnapTimer.Tick += Timer_Tick;
+
+            GenerateCommand = new CommandImplementation(
+                _ => {
+                    GenerateRelevantObjects();
+                });
         }
 
         private void GenerateRelevantObjects() {
+            if (EditorReaderStuff.TryGetFullEditorReader(out var reader)) {
+                var editor = EditorReaderStuff.GetNewestVersion(reader, out var _);
 
+                relevantObjects.Clear();
+
+                var activeGenerators = Generators.Where(o => o.IsActive);
+
+                foreach (var gen in activeGenerators.OfType<IGenerateRelevantObjectsFromHitObjects>()) {
+                    relevantObjects.AddRange(gen.GetRelevantObjects(editor.Beatmap.HitObjects));
+                }
+                foreach (var gen in activeGenerators.OfType<IGenerateRelevantObjectsFromRelevantPoints>()) {
+                    relevantObjects.AddRange(gen.GetRelevantObjects(relevantObjects.OfType<RelevantPoint>().ToList()));
+                }
+            }
         }
 
         void Timer_Tick(object sender, EventArgs e) {
             if (IsHotkeyDown(SnapHotkey)) {
                 // Move the cursor's Position
                 // System.Windows.Forms.Cursor.Position = new Point();
+                var cursorPoint = System.Windows.Forms.Cursor.Position;
+                // CONVERT THIS CURSOR POSITION TO EDITOR POSITION
+                var cursorPos = new Vector2(cursorPoint.X, cursorPoint.Y);
+
+                if (relevantObjects.Count == 0)
+                    return;
+
+                IRelevantObject nearest = null;
+                double smallestDistance = double.PositiveInfinity;
+                foreach (IRelevantObject o in relevantObjects) {
+                    double dist = o.DistanceTo(cursorPos);
+                    if (dist < smallestDistance) {
+                        smallestDistance = dist;
+                        nearest = o;
+                    }
+                }
+
+                var nearestPoint = nearest.NearestPoint(cursorPos);
+                System.Windows.Forms.Cursor.Position = new Point((int)Math.Round(nearestPoint.X), (int)Math.Round(nearestPoint.Y));
             }
         }
 
@@ -79,5 +119,7 @@ namespace Mapping_Tools.Viewmodels {
             _filter = value;
             CollectionViewSource.GetDefaultView(Generators).Refresh();
         }
+
+        public CommandImplementation GenerateCommand { get; }
     }
 }

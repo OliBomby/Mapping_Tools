@@ -24,8 +24,8 @@ namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators {
                     var diff = obj2.child - obj1.child;
                     var rotated = Vector2.Rotate(diff, Math.PI / 3 * 22);
 
-                    newObjects.Add(new RelevantPoint(obj1.child + rotated));
-                    newObjects.Add(new RelevantPoint(obj2.child - rotated));
+                    newObjects.Add(new RelevantPoint(obj1.child - rotated));
+                    newObjects.Add(new RelevantPoint(obj2.child + rotated));
                 }
             }
 

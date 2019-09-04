@@ -32,5 +32,9 @@ namespace Mapping_Tools.Classes.SnappingTools {
                 return false;
             }
         }
+
+        public Vector2 NearestPoint(Vector2 point) {
+            throw new NotImplementedException();
+        }
     }
 }

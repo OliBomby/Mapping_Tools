@@ -16,5 +16,10 @@ namespace Mapping_Tools.Classes.SnappingTools {
         public bool Intersection(IRelevantObject other, out Vector2[] intersections) {
             throw new NotImplementedException();
         }
+
+        public Vector2 NearestPoint(Vector2 point) {
+            var diff = point - child.Centre;
+            return child.Centre + diff / diff.Length * child.Radius;
+        }
     }
 }

@@ -86,6 +86,21 @@ namespace Mapping_Tools.Classes.Tools {
             }
         }
 
+        public static BeatmapEditor GetNewestVersion(EditorReader reader, out List<BeatmapHelper.HitObject> selected) {
+            // Get the path from the beatmap in memory
+            string songs = SettingsManager.GetSongsPath();
+            string folder = reader.ContainingFolder;
+            string filename = reader.Filename;
+            string memoryPath = Path.Combine(songs, folder, filename);
+
+            var editor = new BeatmapEditor(memoryPath);
+
+            // Update the beatmap with memory values
+            selected = UpdateBeatmap(editor.Beatmap, reader);
+
+            return editor;
+        }
+
         /// <summary>
         /// Returns an editor for the beatmap of the specified path. If said beatmap is currently open in the editor it will update the Beatmap object with the latest values.
         /// </summary>

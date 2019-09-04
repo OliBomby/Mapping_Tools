@@ -40,6 +40,7 @@
                 </StackPanel>
 
                 <components:HotkeyEditorControl Width="150" HorizontalAlignment="Left" Margin="0,10,0,0" Hotkey="{Binding SnapHotkey}"/>
+                <Button Content="Test" Command="{Binding GenerateCommand}"/>
                 <TextBox Margin="0,0,0,10" Name="txtFilter" Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}"/>
                 <ListView Name="lvUsers" SelectionMode="Single" ItemsSource="{Binding Generators}">
                     <ListView.View>
