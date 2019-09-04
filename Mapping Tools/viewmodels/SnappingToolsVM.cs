@@ -9,7 +9,14 @@ using System.Windows.Data;
 
 namespace Mapping_Tools.Viewmodels {
     public class SnappingToolsVM {
-        public Hotkey SnapHotkey { get; set; } // Update active hotkey
+        private Hotkey _snapHotkey;
+        public Hotkey SnapHotkey { get => _snapHotkey; set => SetSnapHotkey(value); } // Update active hotkey
+
+        private void SetSnapHotkey(Hotkey value) {
+            _snapHotkey = value;
+            MainWindow.AppWindow.listenerManager.ChangeActiveHotkeyHotkey("SnapHotkey", SnapHotkey);
+        }
+
         public ObservableCollection<IGenerateRelevantObjects> Generators { get; set; }
         private string _filter = "";
         public string Filter { get => _filter; set => SetFilter(value); }
@@ -31,6 +38,7 @@ namespace Mapping_Tools.Viewmodels {
 
         private void SnapMouse() {
             // Snap mouse to nearest RelevantObject
+            Console.WriteLine("SnapMouse got executed");
         }
 
         private bool UserFilter(object item) {
