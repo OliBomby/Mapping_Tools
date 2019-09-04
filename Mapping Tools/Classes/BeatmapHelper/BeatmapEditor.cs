@@ -25,7 +25,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
             EditorReaderStuff.DontCoolSaveWhenMD5EqualsThisString = EditorReaderStuff.GetMD5FromPath(tempPath);
 
-            SaveFile();
+            base.SaveFile();
         }
     }
 }
