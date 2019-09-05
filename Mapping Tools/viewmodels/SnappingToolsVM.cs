@@ -103,7 +103,7 @@ namespace Mapping_Tools.Viewmodels {
                 // System.Windows.Forms.Cursor.Position = new Point();
                 var cursorPoint = System.Windows.Forms.Cursor.Position;
                 // CONVERT THIS CURSOR POSITION TO EDITOR POSITION
-                var cursorPos = new Vector2(cursorPoint.X, cursorPoint.Y);
+                var cursorPos = ToEditorPosition(new Vector2(cursorPoint.X, cursorPoint.Y));
 
                 if (relevantObjects.Count == 0)
                     return;
@@ -118,9 +118,21 @@ namespace Mapping_Tools.Viewmodels {
                     }
                 }
 
-                var nearestPoint = nearest.NearestPoint(cursorPos);
+                // CONVERT THIS TO CURSOR POSITION
+                var nearestPoint = ToMonitorPosition(nearest.NearestPoint(cursorPos));
                 System.Windows.Forms.Cursor.Position = new Point((int)Math.Round(nearestPoint.X), (int)Math.Round(nearestPoint.Y));
             }
+        }
+
+        private Vector2 ToEditorPosition(Vector2 pos) {
+            // (400, 189) -> (0, 0)
+            // (1520, 1028) -> (512, 384)
+            // Console.WriteLine(pos);
+            return (pos - new Vector2(400, 189)) / 2.186;
+        }
+
+        private Vector2 ToMonitorPosition(Vector2 pos) {
+            return pos * 2.186 + new Vector2(400, 189);
         }
 
         private bool IsHotkeyDown(Hotkey hotkey) {

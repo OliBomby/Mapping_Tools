@@ -5,7 +5,7 @@ namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators {
     class StartPointGenerator : IGenerateRelevantObjectsFromHitObjects {
         public bool IsActive { get; set; }
         public string Name => "StartPoint Generator";
-        public GeneratorType GeneratorType => GeneratorType.Polygons;
+        public GeneratorType GeneratorType => GeneratorType.Basic;
 
         public List<IRelevantObject> GetRelevantObjects(List<HitObject> objects) {
             List<IRelevantObject> newObjects = new List<IRelevantObject>();

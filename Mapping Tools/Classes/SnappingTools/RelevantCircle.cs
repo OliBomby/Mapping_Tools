@@ -10,7 +10,8 @@ namespace Mapping_Tools.Classes.SnappingTools {
         public readonly Circle child;
 
         public double DistanceTo(Vector2 point) {
-            return Math.Abs(Vector2.Distance(point, child.Centre) - child.Radius);
+            var dist = Vector2.Distance(point, child.Centre);
+            return Math.Abs(dist - child.Radius);
         }
 
         public bool Intersection(IRelevantObject other, out Vector2[] intersections) {
@@ -19,7 +20,12 @@ namespace Mapping_Tools.Classes.SnappingTools {
 
         public Vector2 NearestPoint(Vector2 point) {
             var diff = point - child.Centre;
-            return child.Centre + diff / diff.Length * child.Radius;
+            var dist = diff.Length;
+            return child.Centre + diff / dist * child.Radius;
+        }
+
+        public RelevantCircle(Circle circle) {
+            child = circle;
         }
     }
 }
