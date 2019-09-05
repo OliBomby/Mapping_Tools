@@ -52,16 +52,48 @@ namespace Mapping_Tools.Viewmodels {
             if (EditorReaderStuff.TryGetFullEditorReader(out var reader)) {
                 var editor = EditorReaderStuff.GetNewestVersion(reader, out var _);
 
-                relevantObjects.Clear();
+                // Get the visible hitobjects using approach rate
+                var editorTime = reader.EditorTime();
+                var approachTime = ApproachRateToMs(reader.ApproachRate);
+                var visibleObjects = editor.Beatmap.HitObjects.Where(o => Math.Abs(o.Time - editorTime) < approachTime).ToList();
 
+                // Get all the active generators
                 var activeGenerators = Generators.Where(o => o.IsActive);
 
+                // Reset the old RelevantObjects
+                relevantObjects.Clear();
+
+                // Generate RelevantObjects based on the visible hitobjects
                 foreach (var gen in activeGenerators.OfType<IGenerateRelevantObjectsFromHitObjects>()) {
-                    relevantObjects.AddRange(gen.GetRelevantObjects(editor.Beatmap.HitObjects));
+                    relevantObjects.AddRange(gen.GetRelevantObjects(visibleObjects));
                 }
+
+                // Seperate the RelevantObjects
+                var relevantPoints = new List<RelevantPoint>();
+                var relevantLines = new List<RelevantLine>();
+                var relevantCircles = new List<RelevantCircle>();
+
+                foreach (var ro in relevantObjects) {
+                    if (ro is RelevantPoint rp)
+                        relevantPoints.Add(rp);
+                    else if (ro is RelevantLine rl)
+                        relevantLines.Add(rl);
+                    else if (ro is RelevantCircle rc)
+                        relevantCircles.Add(rc);
+                }
+
+                // Generate more RelevantObjects
                 foreach (var gen in activeGenerators.OfType<IGenerateRelevantObjectsFromRelevantPoints>()) {
-                    relevantObjects.AddRange(gen.GetRelevantObjects(relevantObjects.OfType<RelevantPoint>().ToList()));
+                    relevantObjects.AddRange(gen.GetRelevantObjects(relevantPoints));
                 }
+            }
+        }
+
+        private double ApproachRateToMs(double approachRate) {
+            if (approachRate < 5) {
+                return 1800 - 120 * approachRate;
+            } else {
+                return 1200 - 150 * (approachRate - 5);
             }
         }
 
