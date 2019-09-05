@@ -8,9 +8,9 @@ using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators {
-    class EqualSpacingGenerator : IGenerateRelevantObjectsFromRelevantPoints {
+    class LineGenerator : IGenerateRelevantObjectsFromRelevantPoints {
         public bool IsActive { get; set; }
-        public string Name => "Equal Spacing Generator";
+        public string Name => "Line Generator";
         public GeneratorType GeneratorType => GeneratorType.Polygons;
 
         public List<IRelevantObject> GetRelevantObjects(List<RelevantPoint> objects) {
@@ -21,9 +21,8 @@ namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators {
                     var obj1 = objects[i];
                     var obj2 = objects[k];
 
-                    var radius = (obj2.child - obj1.child).Length;
-                    newObjects.Add(new RelevantCircle(new Circle(obj1.child, radius)));
-                    newObjects.Add(new RelevantCircle(new Circle(obj2.child, radius)));
+                    Line line = new Line(obj1.child, obj2.child);
+                    newObjects.Add(new RelevantLine(line));
                 }
             }
 

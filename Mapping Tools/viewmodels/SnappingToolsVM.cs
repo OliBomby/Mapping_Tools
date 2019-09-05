@@ -25,7 +25,7 @@ namespace Mapping_Tools.Viewmodels {
         private string _filter = "";
         public string Filter { get => _filter; set => SetFilter(value); }
 
-        private readonly DispatcherTimer AutoSnapTimer = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(10) };
+        private readonly DispatcherTimer AutoSnapTimer = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(0) };
         public bool AutoSnapTimerEnabled { get => AutoSnapTimer.IsEnabled; set => AutoSnapTimer.IsEnabled = value; }
 
         public SnappingToolsVM() {

@@ -238,9 +238,11 @@
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjectsFromHitObjects.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjectsFromRelevantPoints.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\PerfectCircleBlanketGenerator.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\LinearLineGenerator.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\PerfectCircleGenerator.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\StartPointGenerator.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\EqualSpacingGenerator.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\LineGenerator.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\TriangleGenerator.cs" />
     <Compile Include="Classes\SnappingTools\RelevantPoint.cs" />
     <Compile Include="Classes\SystemTools\ActionHotkey.cs" />
