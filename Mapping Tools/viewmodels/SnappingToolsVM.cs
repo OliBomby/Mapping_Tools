@@ -28,6 +28,8 @@ namespace Mapping_Tools.Viewmodels {
         private readonly DispatcherTimer AutoSnapTimer = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(0) };
         public bool AutoSnapTimerEnabled { get => AutoSnapTimer.IsEnabled; set => AutoSnapTimer.IsEnabled = value; }
 
+        private const double pointsBias = 3;
+
         public SnappingToolsVM() {
             var interfaceType = typeof(IGenerateRelevantObjects);
             Generators = new ObservableCollection<IGenerateRelevantObjects>(AppDomain.CurrentDomain.GetAssemblies()
@@ -83,6 +85,9 @@ namespace Mapping_Tools.Viewmodels {
                 }
 
                 // Generate more RelevantObjects
+                foreach (var gen in activeGenerators.OfType<IGenerateRelevantObjectsFromRelevantObjects>()) {
+                    relevantObjects.AddRange(gen.GetRelevantObjects(relevantObjects));
+                }
                 foreach (var gen in activeGenerators.OfType<IGenerateRelevantObjectsFromRelevantPoints>()) {
                     relevantObjects.AddRange(gen.GetRelevantObjects(relevantPoints));
                 }
@@ -112,6 +117,8 @@ namespace Mapping_Tools.Viewmodels {
                 double smallestDistance = double.PositiveInfinity;
                 foreach (IRelevantObject o in relevantObjects) {
                     double dist = o.DistanceTo(cursorPos);
+                    if (o is RelevantPoint) // Prioritize points to be able to snap to intersections
+                        dist -= pointsBias;
                     if (dist < smallestDistance) {
                         smallestDistance = dist;
                         nearest = o;

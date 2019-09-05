@@ -236,7 +236,9 @@
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\GeneratorType.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjects.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjectsFromHitObjects.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjectsFromRelevantObjects.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjectsFromRelevantPoints.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IntersectionGenerator.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\PerfectCircleBlanketGenerator.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\LinearLineGenerator.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\PerfectCircleGenerator.cs" />
