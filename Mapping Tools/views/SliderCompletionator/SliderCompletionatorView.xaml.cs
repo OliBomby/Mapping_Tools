@@ -12,6 +12,7 @@ using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SliderPathStuff;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Views.Standard;
 
 namespace Mapping_Tools.Views {
     /// <summary>
@@ -37,10 +38,10 @@ namespace Mapping_Tools.Views {
 
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
             if (e.Error != null) {
-                MessageBox.Show(string.Format("{0}{1}{2}", e.Error.Message, Environment.NewLine, e.Error.StackTrace), "Error");
+                new MessageWindow(ErrorType.Error, eventArg: e);
             } else {
                 if (e.Result.ToString() != "")
-                    MessageBox.Show(e.Result.ToString());
+                    new MessageWindow(ErrorType.Success, e.Result.ToString());
                 progress.Value = 0;
             }
             start.IsEnabled = true;

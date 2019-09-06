@@ -6,7 +6,7 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         Title="Message" 
-        Height="230.248" 
+        Height="163.402" 
         Width="409.329"
         WindowStyle="None"
         ResizeMode="CanResize"
