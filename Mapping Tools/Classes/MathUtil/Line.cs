@@ -105,7 +105,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="right">The point</param>
         /// <returns>The distance between the line and the point</returns>
         public static double Distance(Line left, Vector2 right) {
-            return Math.Abs(left.A * right.X + left.B * right.X + left.C) / Math.Sqrt(left.A * left.A + left.B * left.B);
+            return Math.Abs(left.A * right.X + left.B * right.Y - left.C) / Math.Sqrt(left.A * left.A + left.B * left.B);
         }
 
         /// <summary>

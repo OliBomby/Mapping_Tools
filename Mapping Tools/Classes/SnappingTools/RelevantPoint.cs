@@ -26,6 +26,10 @@ namespace Mapping_Tools.Classes.SnappingTools {
             }
         }
 
+        public Vector2 NearestPoint(Vector2 point) {
+            return child;
+        }
+
         public RelevantPoint(Vector2 vec) {
             child = vec;
         }

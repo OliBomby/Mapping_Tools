@@ -8,12 +8,12 @@ using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators {
-    class TriangleGenerator : IGenerateRelevantObjectsFromRelevantPoints {
+    class IntersectionGenerator : IGenerateRelevantObjectsFromRelevantObjects {
         public bool IsActive { get; set; }
-        public string Name => "Triangle Generator";
-        public GeneratorType GeneratorType => GeneratorType.Polygons;
+        public string Name => "Intersection Generator";
+        public GeneratorType GeneratorType => GeneratorType.Geometries;
 
-        public List<IRelevantObject> GetRelevantObjects(List<RelevantPoint> objects) {
+        public List<IRelevantObject> GetRelevantObjects(List<IRelevantObject> objects) {
             List<IRelevantObject> newObjects = new List<IRelevantObject>();
 
             for (int i = 0; i < objects.Count; i++) {
@@ -21,11 +21,14 @@ namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators {
                     var obj1 = objects[i];
                     var obj2 = objects[k];
 
-                    var diff = obj2.child - obj1.child;
-                    var rotated = Vector2.Rotate(diff, Math.PI / 3 * 22);
+                    // I don't want to intersect points
+                    if (obj1 is RelevantPoint || obj2 is RelevantPoint) continue;
 
-                    newObjects.Add(new RelevantPoint(obj1.child - rotated));
-                    newObjects.Add(new RelevantPoint(obj2.child + rotated));
+                    if (obj1.Intersection(obj2, out Vector2[] intersections)) {
+                        foreach (Vector2 v in intersections) {
+                            newObjects.Add(new RelevantPoint(v));
+                        }
+                    }
                 }
             }
 

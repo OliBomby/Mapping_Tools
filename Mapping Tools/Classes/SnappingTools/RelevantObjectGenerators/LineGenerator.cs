@@ -8,9 +8,9 @@ using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators {
-    class TriangleGenerator : IGenerateRelevantObjectsFromRelevantPoints {
+    class LineGenerator : IGenerateRelevantObjectsFromRelevantPoints {
         public bool IsActive { get; set; }
-        public string Name => "Triangle Generator";
+        public string Name => "Line Generator";
         public GeneratorType GeneratorType => GeneratorType.Polygons;
 
         public List<IRelevantObject> GetRelevantObjects(List<RelevantPoint> objects) {
@@ -21,11 +21,8 @@ namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators {
                     var obj1 = objects[i];
                     var obj2 = objects[k];
 
-                    var diff = obj2.child - obj1.child;
-                    var rotated = Vector2.Rotate(diff, Math.PI / 3 * 22);
-
-                    newObjects.Add(new RelevantPoint(obj1.child - rotated));
-                    newObjects.Add(new RelevantPoint(obj2.child + rotated));
+                    Line line = new Line(obj1.child, obj2.child);
+                    newObjects.Add(new RelevantLine(line));
                 }
             }
 

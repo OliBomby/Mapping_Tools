@@ -32,5 +32,17 @@ namespace Mapping_Tools.Classes.SnappingTools {
                 return false;
             }
         }
+
+        public Vector2 NearestPoint(Vector2 point) {
+            double a = child.A, b = child.B, c = -child.C;
+            double abs = a * a + b * b;
+            double x = (b * (b * point.X - a * point.Y) - a * c) / abs;
+            double y = (a * (-b * point.X + a * point.Y) - b * c) / abs;
+            return new Vector2(x, y);
+        }
+
+        public RelevantLine(Line line) {
+            child = line;
+        }
     }
 }

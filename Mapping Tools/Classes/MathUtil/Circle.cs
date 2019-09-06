@@ -38,6 +38,15 @@ namespace Mapping_Tools.Classes.MathUtil {
         }
 
         /// <summary>
+        /// Constructs a new Circle from a CircleArc.
+        /// </summary>
+        /// <param name="arc">The CircleArc to get centre point and radius from.</param>
+        public Circle(CircleArc arc) {
+            Centre = arc.Centre;
+            Radius = arc.Radius;
+        }
+
+        /// <summary>
         /// Defines a Circle that is a unit circle.
         /// </summary>
         public static readonly Circle UnitCircle = new Circle(Vector2.Zero, 1);
