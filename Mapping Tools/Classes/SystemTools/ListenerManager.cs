@@ -120,7 +120,7 @@ namespace Mapping_Tools.Classes.SystemTools {
 
         private void Reload(object sender, EventArgs e) {
             if (((RunToolCompletedEventArgs)e).NeedReload && SettingsManager.Settings.AutoReload) {
-                var proc = Process.GetProcessesByName("osu!").FirstOrDefault();
+                var proc = System.Diagnostics.Process.GetProcessesByName("osu!").FirstOrDefault();
                 ;
                 if (proc != null) {
                     var oldHandle = GetForegroundWindow();
@@ -153,7 +153,7 @@ namespace Mapping_Tools.Classes.SystemTools {
                 return;
             }
 
-            var proc = Process.GetProcessesByName("osu!").FirstOrDefault();
+            var proc = System.Diagnostics.Process.GetProcessesByName("osu!").FirstOrDefault();
             if (proc != null) {
                 var oldHandle = GetForegroundWindow();
                 if (oldHandle != proc.MainWindowHandle) {

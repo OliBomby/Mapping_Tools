@@ -157,7 +157,7 @@ namespace Mapping_Tools.Views {
                 UpdateProgressBar(worker, 99);
 
                 // Open export folder
-                Process.Start(arg.ExportFolder);
+                System.Diagnostics.Process.Start(arg.ExportFolder);
             }
 
             UpdateProgressBar(worker, 100);
