@@ -64,11 +64,13 @@ namespace Mapping_Tools.Classes.SystemTools {
         }
         
         public void ReloadHotkeys() {
-            keyboardHookManager.UnregisterAll();
+            try {
+                keyboardHookManager.UnregisterAll();
 
-            foreach (ActionHotkey ah in ActiveHotkeys.Values) {
-                RegisterHotkey(ah.Hotkey, ah.Action);
-            }
+                foreach (ActionHotkey ah in ActiveHotkeys.Values) {
+                    RegisterHotkey(ah.Hotkey, ah.Action);
+                }
+            } catch { MessageBox.Show("Could not reload hotkeys.", "Warning"); }
         }
 
         private void RegisterHotkey(Hotkey hotkey, Action action) {
@@ -134,7 +136,9 @@ namespace Mapping_Tools.Classes.SystemTools {
         }
 
         private void InitFsWatcher() {
-            FsWatcher.Path = SettingsManager.GetSongsPath();
+            try {
+                FsWatcher.Path = SettingsManager.GetSongsPath();
+            } catch { }
 
             FsWatcher.Filter = "*.osu";
             FsWatcher.Changed += OnChangedFsWatcher;
