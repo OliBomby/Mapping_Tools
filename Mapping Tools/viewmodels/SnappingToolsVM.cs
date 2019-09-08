@@ -9,9 +9,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Linq;
-using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Threading;
 
@@ -20,28 +18,28 @@ namespace Mapping_Tools.Viewmodels {
         public Hotkey SnapHotkey { get; set; }
 
         public ObservableCollection<IGenerateRelevantObjects> Generators { get; }
-        private readonly List<IRelevantObject> relevantObjects = new List<IRelevantObject>();
+        private readonly List<IRelevantObject> _relevantObjects = new List<IRelevantObject>();
 
         private string _filter = "";
         public string Filter { get => _filter; set => SetFilter(value); }
 
-        private readonly DispatcherTimer AutoSnapTimer = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(0) };
-        public bool AutoSnapTimerEnabled { get => AutoSnapTimer.IsEnabled; set => AutoSnapTimer.IsEnabled = value; }
+        public DispatcherTimer AutoSnapTimer { get; }
 
-        private const double pointsBias = 3;
+        private const double PointsBias = 3;
 
         public SnappingToolsVM() {
             var interfaceType = typeof(IGenerateRelevantObjects);
             Generators = new ObservableCollection<IGenerateRelevantObjects>(AppDomain.CurrentDomain.GetAssemblies()
               .SelectMany(x => x.GetTypes())
               .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
-              .Select(x => Activator.CreateInstance(x)).OfType<IGenerateRelevantObjects>());
+              .Select(Activator.CreateInstance).OfType<IGenerateRelevantObjects>());
 
             CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(Generators);
             PropertyGroupDescription groupDescription = new PropertyGroupDescription("GeneratorType");
             view.GroupDescriptions.Add(groupDescription);
             view.Filter = UserFilter;
 
+            AutoSnapTimer = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(0) };
             AutoSnapTimer.Tick += Timer_Tick;
 
             GenerateCommand = new CommandImplementation(
@@ -60,14 +58,14 @@ namespace Mapping_Tools.Viewmodels {
                 var visibleObjects = editor.Beatmap.HitObjects.Where(o => Math.Abs(o.Time - editorTime) < approachTime).ToList();
 
                 // Get all the active generators
-                var activeGenerators = Generators.Where(o => o.IsActive);
+                var activeGenerators = Generators.Where(o => o.IsActive).ToList();
 
                 // Reset the old RelevantObjects
-                relevantObjects.Clear();
+                _relevantObjects.Clear();
 
                 // Generate RelevantObjects based on the visible hitobjects
                 foreach (var gen in activeGenerators.OfType<IGenerateRelevantObjectsFromHitObjects>()) {
-                    relevantObjects.AddRange(gen.GetRelevantObjects(visibleObjects));
+                    _relevantObjects.AddRange(gen.GetRelevantObjects(visibleObjects));
                 }
 
                 // Seperate the RelevantObjects
@@ -75,7 +73,7 @@ namespace Mapping_Tools.Viewmodels {
                 var relevantLines = new List<RelevantLine>();
                 var relevantCircles = new List<RelevantCircle>();
 
-                foreach (var ro in relevantObjects) {
+                foreach (var ro in _relevantObjects) {
                     if (ro is RelevantPoint rp)
                         relevantPoints.Add(rp);
                     else if (ro is RelevantLine rl)
@@ -86,10 +84,10 @@ namespace Mapping_Tools.Viewmodels {
 
                 // Generate more RelevantObjects
                 foreach (var gen in activeGenerators.OfType<IGenerateRelevantObjectsFromRelevantObjects>()) {
-                    relevantObjects.AddRange(gen.GetRelevantObjects(relevantObjects));
+                    _relevantObjects.AddRange(gen.GetRelevantObjects(_relevantObjects));
                 }
                 foreach (var gen in activeGenerators.OfType<IGenerateRelevantObjectsFromRelevantPoints>()) {
-                    relevantObjects.AddRange(gen.GetRelevantObjects(relevantPoints));
+                    _relevantObjects.AddRange(gen.GetRelevantObjects(relevantPoints));
                 }
             }
         }
@@ -102,33 +100,33 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
-        void Timer_Tick(object sender, EventArgs e) {
-            if (IsHotkeyDown(SnapHotkey)) {
-                // Move the cursor's Position
-                // System.Windows.Forms.Cursor.Position = new Point();
-                var cursorPoint = System.Windows.Forms.Cursor.Position;
-                // CONVERT THIS CURSOR POSITION TO EDITOR POSITION
-                var cursorPos = ToEditorPosition(new Vector2(cursorPoint.X, cursorPoint.Y));
+        private void Timer_Tick(object sender, EventArgs e) {
+            if (!IsHotkeyDown(SnapHotkey)) return;
+            // Move the cursor's Position
+            // System.Windows.Forms.Cursor.Position = new Point();
+            var cursorPoint = System.Windows.Forms.Cursor.Position;
+            // CONVERT THIS CURSOR POSITION TO EDITOR POSITION
+            var cursorPos = ToEditorPosition(new Vector2(cursorPoint.X, cursorPoint.Y));
 
-                if (relevantObjects.Count == 0)
-                    return;
+            if (_relevantObjects.Count == 0)
+                return;
 
-                IRelevantObject nearest = null;
-                double smallestDistance = double.PositiveInfinity;
-                foreach (IRelevantObject o in relevantObjects) {
-                    double dist = o.DistanceTo(cursorPos);
-                    if (o is RelevantPoint) // Prioritize points to be able to snap to intersections
-                        dist -= pointsBias;
-                    if (dist < smallestDistance) {
-                        smallestDistance = dist;
-                        nearest = o;
-                    }
+            IRelevantObject nearest = null;
+            double smallestDistance = double.PositiveInfinity;
+            foreach (IRelevantObject o in _relevantObjects) {
+                double dist = o.DistanceTo(cursorPos);
+                if (o is RelevantPoint) // Prioritize points to be able to snap to intersections
+                    dist -= PointsBias;
+                if (dist < smallestDistance) {
+                    smallestDistance = dist;
+                    nearest = o;
                 }
-
-                // CONVERT THIS TO CURSOR POSITION
-                var nearestPoint = ToMonitorPosition(nearest.NearestPoint(cursorPos));
-                System.Windows.Forms.Cursor.Position = new Point((int)Math.Round(nearestPoint.X), (int)Math.Round(nearestPoint.Y));
             }
+
+            // CONVERT THIS TO CURSOR POSITION
+            if (nearest == null) return;
+            var nearestPoint = ToMonitorPosition(nearest.NearestPoint(cursorPos));
+            System.Windows.Forms.Cursor.Position = new Point((int)Math.Round(nearestPoint.X), (int)Math.Round(nearestPoint.Y));
         }
 
         private Vector2 ToEditorPosition(Vector2 pos) {
@@ -159,11 +157,11 @@ namespace Mapping_Tools.Viewmodels {
             return true;
         }
 
-        private bool UserFilter(object item) {
+        private bool UserFilter(object item)
+        {
             if (string.IsNullOrEmpty(Filter))
                 return true;
-            else
-                return ((item as IGenerateRelevantObjects).Name.IndexOf(Filter, StringComparison.OrdinalIgnoreCase) >= 0);
+            return ((IGenerateRelevantObjects) item).Name.IndexOf(Filter, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         private void SetFilter(string value) {

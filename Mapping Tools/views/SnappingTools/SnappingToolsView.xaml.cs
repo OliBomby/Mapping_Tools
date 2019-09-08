@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
@@ -13,12 +12,9 @@ using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Viewmodels;
 
 namespace Mapping_Tools.Views {
-    /// <summary>
-    /// Interaktionslogik für UserControl1.xaml
-    /// </summary>
-    public partial class SnappingToolsView : MappingTool, IQuickRun {
-        private readonly BackgroundWorker backgroundWorker;
-        private bool canRun = true;
+    public partial class SnappingToolsView : IQuickRun {
+        private readonly BackgroundWorker _backgroundWorker;
+        private bool _canRun = true;
 
         public event EventHandler RunFinished;
 
@@ -27,59 +23,59 @@ namespace Mapping_Tools.Views {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
-            backgroundWorker = (BackgroundWorker)FindResource("backgroundWorker");
+            _backgroundWorker = (BackgroundWorker)FindResource("BackgroundWorker");
         }
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
-            e.Result = Complete_Sliders((Arguments)e.Argument, bgw, e);
+            e.Result = Complete_Sliders((Arguments)e.Argument, bgw);
         }
 
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
             if (e.Error != null) {
-                MessageBox.Show(string.Format("{0}{1}{2}", e.Error.Message, Environment.NewLine, e.Error.StackTrace), "Error");
+                MessageBox.Show($"{e.Error.Message}{Environment.NewLine}{e.Error.StackTrace}", "Error");
             }
             else {
                 if (e.Result.ToString() != "")
                     MessageBox.Show(e.Result.ToString());
-                progress.Value = 0;
+                Progress.Value = 0;
             }
-            start.IsEnabled = true;
-            canRun = true;
+            Start.IsEnabled = true;
+            _canRun = true;
         }
 
         private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
-            progress.Value = e.ProgressPercentage;
+            Progress.Value = e.ProgressPercentage;
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
-            RunTool(MainWindow.AppWindow.GetCurrentMaps(), quick: false);
+            RunTool(MainWindow.AppWindow.GetCurrentMaps());
         }
 
         public void QuickRun() {
-            RunTool(new[] { IOHelper.GetCurrentBeatmap() }, quick: true);
+            RunTool(new[] { IOHelper.GetCurrentBeatmap() }, true);
         }
 
         private void RunTool(string[] paths, bool quick = false) {
-            if (!canRun) return;
+            if (!_canRun) return;
 
             IOHelper.SaveMapBackup(paths);
 
-            backgroundWorker.RunWorkerAsync(new Arguments(paths, quick));
-            start.IsEnabled = false;
-            canRun = false;
+            _backgroundWorker.RunWorkerAsync(new Arguments(paths, quick));
+            Start.IsEnabled = false;
+            _canRun = false;
         }
 
         private struct Arguments {
-            public string[] Paths;
-            public bool Quick;
+            public readonly string[] Paths;
+            public readonly bool Quick;
             public Arguments(string[] paths, bool quick) {
                 Paths = paths;
                 Quick = quick;
             }
         }
 
-        private string Complete_Sliders(Arguments arg, BackgroundWorker worker, DoWorkEventArgs _) {
+        private string Complete_Sliders(Arguments arg, BackgroundWorker worker) {
             int circlesAdded = 0;
 
             bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
