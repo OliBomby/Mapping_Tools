@@ -74,6 +74,7 @@ namespace Mapping_Tools.Viewmodels {
             // Listen for changes in the osu! user config
             _configWatcher = new FileSystemWatcher();
             SetConfigWatcherPath(SettingsManager.Settings.OsuConfigPath);
+            _configWatcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.Attributes | NotifyFilters.CreationTime;
             _configWatcher.Changed += OnChangedConfigWatcher;
 
             // Listen for changes in osu! user config path in the settings
@@ -92,7 +93,7 @@ namespace Mapping_Tools.Viewmodels {
             try {
                 _configWatcher.Path = Path.GetDirectoryName(path);
                 _configWatcher.Filter = Path.GetFileName(path);
-            } catch { }
+            } catch (Exception ex) { Console.WriteLine(@"Can't set ConfigWatcher Path/Filter: " + ex.Message); }
         }
 
         private void OnChangedConfigWatcher(object sender, FileSystemEventArgs e)
