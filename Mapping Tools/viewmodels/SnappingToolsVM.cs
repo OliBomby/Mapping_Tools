@@ -158,12 +158,13 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
-        private double ApproachRateToMs(double approachRate) {
+        private double ApproachRateToMs(double approachRate)
+        {
             if (approachRate < 5) {
                 return 1800 - 120 * approachRate;
-            } else {
-                return 1200 - 150 * (approachRate - 5);
             }
+
+            return 1200 - 150 * (approachRate - 5);
         }
 
         private void AutoSnapTimerTick(object sender, EventArgs e) {
@@ -211,7 +212,7 @@ namespace Mapping_Tools.Viewmodels {
             return pos * 2.186 + new Vector2(400, 189);
         }
 
-        private bool IsHotkeyDown(Hotkey hotkey) {
+        private static bool IsHotkeyDown(Hotkey hotkey) {
             if (hotkey == null)
                 return false;
             if (!Keyboard.IsKeyDown(hotkey.Key))

@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Mapping_Tools.Classes.BeatmapHelper;
+﻿using System.Collections.Generic;
 using Mapping_Tools.Classes.MathUtil;
 
-namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators {
+namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators.Generators {
     class IntersectionGenerator : RelevantObjectsGenerator, IGenerateRelevantObjectsFromRelevantObjects {
-        public string Name => "Intersection Generator";
-        public GeneratorType GeneratorType => GeneratorType.Geometries;
+        public new string Name => "Intersection Generator";
+        public new GeneratorType GeneratorType => GeneratorType.Geometries;
 
         public List<IRelevantObject> GetRelevantObjects(List<IRelevantObject> objects) {
             List<IRelevantObject> newObjects = new List<IRelevantObject>();

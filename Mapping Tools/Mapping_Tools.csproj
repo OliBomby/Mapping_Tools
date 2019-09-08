@@ -256,14 +256,14 @@
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjectsFromHitObjects.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjectsFromRelevantObjects.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjectsFromRelevantPoints.cs" />
-    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IntersectionGenerator.cs" />
-    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\PerfectCircleBlanketGenerator.cs" />
-    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\LinearLineGenerator.cs" />
-    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\PerfectCircleGenerator.cs" />
-    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\StartPointGenerator.cs" />
-    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\EqualSpacingGenerator.cs" />
-    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\LineGenerator.cs" />
-    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\TriangleGenerator.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\IntersectionGenerator.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\PerfectCircleBlanketGenerator.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\LinearLineGenerator.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\PerfectCircleGenerator.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\StartPointGenerator.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\EqualSpacingGenerator.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\LineGenerator.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\TriangleGenerator.cs" />
     <Compile Include="Classes\SnappingTools\RelevantPoint.cs" />
     <Compile Include="Classes\SystemTools\ActionHotkey.cs" />
     <Compile Include="Classes\SystemTools\Hotkey.cs" />
@@ -506,6 +506,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="BeforeBuild" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

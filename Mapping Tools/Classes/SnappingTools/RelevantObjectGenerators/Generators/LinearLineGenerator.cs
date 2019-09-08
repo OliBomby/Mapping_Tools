@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SliderPathStuff;
 
-namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators {
+namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators.Generators {
     class LinearLineGenerator : RelevantObjectsGenerator, IGenerateRelevantObjectsFromHitObjects {
-        public string Name => "Linear Line Generator";
-        public GeneratorType GeneratorType => GeneratorType.Basic;
+        public new string Name => "Linear Line Generator";
+        public new GeneratorType GeneratorType => GeneratorType.Basic;
 
         public List<IRelevantObject> GetRelevantObjects(List<HitObject> objects) {
             List<IRelevantObject> newObjects = new List<IRelevantObject>();
