@@ -5,8 +5,7 @@ using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SliderPathStuff;
 
 namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators {
-    class LinearLineGenerator : IGenerateRelevantObjectsFromHitObjects {
-        public bool IsActive { get; set; }
+    class LinearLineGenerator : RelevantObjectsGenerator, IGenerateRelevantObjectsFromHitObjects {
         public string Name => "Linear Line Generator";
         public GeneratorType GeneratorType => GeneratorType.Basic;
 
@@ -15,7 +14,7 @@ namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators {
 
             foreach (HitObject ho in objects) {
                 // Only get perfect type sliders
-                if (!ho.IsSlider || !(ho.SliderType == PathType.Linear))
+                if (!ho.IsSlider || ho.SliderType != PathType.Linear)
                     continue;
 
                 Line line = new Line(ho.Pos, ho.CurvePoints[ho.CurvePoints.Count - 1]);

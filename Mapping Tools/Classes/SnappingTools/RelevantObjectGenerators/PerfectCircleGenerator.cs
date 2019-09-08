@@ -5,8 +5,7 @@ using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SliderPathStuff;
 
 namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators {
-    class PerfectCircleGenerator : IGenerateRelevantObjectsFromHitObjects {
-        public bool IsActive { get; set; }
+    class PerfectCircleGenerator : RelevantObjectsGenerator, IGenerateRelevantObjectsFromHitObjects {
         public string Name => "Perfect Circle Generator";
         public GeneratorType GeneratorType => GeneratorType.Basic;
 

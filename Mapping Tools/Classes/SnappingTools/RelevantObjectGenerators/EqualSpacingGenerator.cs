@@ -8,8 +8,7 @@ using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators {
-    class EqualSpacingGenerator : IGenerateRelevantObjectsFromRelevantPoints {
-        public bool IsActive { get; set; }
+    class EqualSpacingGenerator : RelevantObjectsGenerator, IGenerateRelevantObjectsFromRelevantPoints {
         public string Name => "Equal Spacing Generator";
         public GeneratorType GeneratorType => GeneratorType.Polygons;
 

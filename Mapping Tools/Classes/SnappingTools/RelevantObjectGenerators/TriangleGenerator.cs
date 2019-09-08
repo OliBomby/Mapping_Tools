@@ -8,8 +8,7 @@ using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators {
-    class TriangleGenerator : IGenerateRelevantObjectsFromRelevantPoints {
-        public bool IsActive { get; set; }
+    class TriangleGenerator : RelevantObjectsGenerator, IGenerateRelevantObjectsFromRelevantPoints {
         public string Name => "Triangle Generator";
         public GeneratorType GeneratorType => GeneratorType.Polygons;
 

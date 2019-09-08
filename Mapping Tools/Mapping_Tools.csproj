@@ -252,7 +252,7 @@
     <Compile Include="Classes\SnappingTools\RelevantCircle.cs" />
     <Compile Include="Classes\SnappingTools\RelevantLine.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\GeneratorType.cs" />
-    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjects.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\RelevantObjectsGenerator.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjectsFromHitObjects.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjectsFromRelevantObjects.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjectsFromRelevantPoints.cs" />
@@ -302,6 +302,7 @@
       <DependentUpon>TimeLineMark.xaml</DependentUpon>
     </Compile>
     <Compile Include="Classes\Tools\TimingPointsChange.cs" />
+    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Viewmodels\CleanerVM.cs" />
     <Compile Include="Viewmodels\HitsoundPreviewHelperVM.cs" />
     <Compile Include="Viewmodels\HitsoundStudioVM.cs" />

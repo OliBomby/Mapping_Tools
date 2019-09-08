@@ -8,8 +8,7 @@ using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators {
-    class IntersectionGenerator : IGenerateRelevantObjectsFromRelevantObjects {
-        public bool IsActive { get; set; }
+    class IntersectionGenerator : RelevantObjectsGenerator, IGenerateRelevantObjectsFromRelevantObjects {
         public string Name => "Intersection Generator";
         public GeneratorType GeneratorType => GeneratorType.Geometries;
 

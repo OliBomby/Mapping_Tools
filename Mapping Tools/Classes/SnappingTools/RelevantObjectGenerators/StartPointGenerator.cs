@@ -2,8 +2,7 @@
 using Mapping_Tools.Classes.BeatmapHelper;
 
 namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators {
-    class StartPointGenerator : IGenerateRelevantObjectsFromHitObjects {
-        public bool IsActive { get; set; }
+    class StartPointGenerator : RelevantObjectsGenerator, IGenerateRelevantObjectsFromHitObjects {
         public string Name => "StartPoint Generator";
         public GeneratorType GeneratorType => GeneratorType.Basic;
 

@@ -8,8 +8,7 @@ using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators {
-    class LineGenerator : IGenerateRelevantObjectsFromRelevantPoints {
-        public bool IsActive { get; set; }
+    class LineGenerator : RelevantObjectsGenerator, IGenerateRelevantObjectsFromRelevantPoints {
         public string Name => "Line Generator";
         public GeneratorType GeneratorType => GeneratorType.Polygons;
 
