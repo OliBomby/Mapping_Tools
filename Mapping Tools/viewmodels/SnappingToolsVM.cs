@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -27,12 +28,25 @@ namespace Mapping_Tools.Viewmodels {
         private string _filter = "";
         public string Filter { get => _filter; set => SetFilter(value); }
 
-        public DispatcherTimer UpdateTimer { get; }
-        private DispatcherTimer AutoSnapTimer { get; }
+        public bool ListenersEnabled
+        {
+            set
+            {
+                UpdateTimer.IsEnabled = value;
+                _configWatcher.EnableRaisingEvents = value;
+            }
+        }
+
+        private readonly DispatcherTimer UpdateTimer;
+        private readonly DispatcherTimer AutoSnapTimer;
 
         private const double PointsBias = 3;
 
+        private readonly CoordinateConverter _coordinateConverter;
+        public readonly FileSystemWatcher _configWatcher;
+
         public SnappingToolsVM() {
+            // Get all the RelevantObjectGenerators
             var interfaceType = typeof(RelevantObjectsGenerator);
             Generators = new ObservableCollection<RelevantObjectsGenerator>(AppDomain.CurrentDomain.GetAssemblies()
               .SelectMany(x => x.GetTypes())
@@ -42,15 +56,48 @@ namespace Mapping_Tools.Viewmodels {
             // Add PropertyChanged event to all generators to listen for changes
             foreach (var gen in Generators) { gen.PropertyChanged += OnGeneratorPropertyChanged; }
 
+            // Set up groups and filters
             CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(Generators);
             PropertyGroupDescription groupDescription = new PropertyGroupDescription("GeneratorType");
             view.GroupDescriptions.Add(groupDescription);
             view.Filter = UserFilter;
 
+            // Set up timers for responding to hotkey presses and beatmap changes
             UpdateTimer = new DispatcherTimer(DispatcherPriority.Normal) { Interval = TimeSpan.FromMilliseconds(100) };
             UpdateTimer.Tick += UpdateTimerTick;
             AutoSnapTimer = new DispatcherTimer(DispatcherPriority.Send) { Interval = TimeSpan.FromMilliseconds(16) };
             AutoSnapTimer.Tick += AutoSnapTimerTick;
+
+            // Set up a coordinate converter for converting coordinates between screen and osu!
+            _coordinateConverter = new CoordinateConverter();
+
+            // Listen for changes in the osu! user config
+            _configWatcher = new FileSystemWatcher();
+            SetConfigWatcherPath(SettingsManager.Settings.OsuConfigPath);
+            _configWatcher.Changed += OnChangedConfigWatcher;
+
+            // Listen for changes in osu! user config path in the settings
+            SettingsManager.Settings.PropertyChanged += OnSettingsChanged;
+        }
+
+        private void OnSettingsChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName != "OsuConfigPath") return;
+            SetConfigWatcherPath(SettingsManager.Settings.OsuConfigPath);
+            _coordinateConverter.ReadConfig();
+        }
+
+        private void SetConfigWatcherPath(string path)
+        {
+            try {
+                _configWatcher.Path = Path.GetDirectoryName(path);
+                _configWatcher.Filter = Path.GetFileName(path);
+            } catch { }
+        }
+
+        private void OnChangedConfigWatcher(object sender, FileSystemEventArgs e)
+        {
+            _coordinateConverter.ReadConfig();
         }
 
         private void OnGeneratorPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -65,7 +112,7 @@ namespace Mapping_Tools.Viewmodels {
         private void UpdateTimerTick(object sender, EventArgs e)
         {
             var reader = EditorReaderStuff.GetEditorReader();
-            if (reader.EditorNeedsReload() || reader.ProcessNeedsReload())
+            if (reader.ProcessNeedsReload())
             {
                 try
                 {
@@ -178,7 +225,7 @@ namespace Mapping_Tools.Viewmodels {
             // System.Windows.Forms.Cursor.Position = new Point();
             var cursorPoint = System.Windows.Forms.Cursor.Position;
             // CONVERT THIS CURSOR POSITION TO EDITOR POSITION
-            var cursorPos = ToEditorPosition(new Vector2(cursorPoint.X, cursorPoint.Y));
+            var cursorPos = _coordinateConverter.ScreenToEditorCoordinate(new Vector2(cursorPoint.X, cursorPoint.Y));
 
             if (_relevantObjects.Count == 0)
                 return;
@@ -197,19 +244,8 @@ namespace Mapping_Tools.Viewmodels {
 
             // CONVERT THIS TO CURSOR POSITION
             if (nearest == null) return;
-            var nearestPoint = ToMonitorPosition(nearest.NearestPoint(cursorPos));
+            var nearestPoint = _coordinateConverter.EditorToScreenCoordinate(nearest.NearestPoint(cursorPos));
             System.Windows.Forms.Cursor.Position = new Point((int)Math.Round(nearestPoint.X), (int)Math.Round(nearestPoint.Y));
-        }
-
-        private Vector2 ToEditorPosition(Vector2 pos) {
-            // (400, 189) -> (0, 0)
-            // (1520, 1028) -> (512, 384)
-            // Console.WriteLine(pos);
-            return (pos - new Vector2(400, 189)) / 2.186;
-        }
-
-        private Vector2 ToMonitorPosition(Vector2 pos) {
-            return pos * 2.186 + new Vector2(400, 189);
         }
 
         private static bool IsHotkeyDown(Hotkey hotkey) {

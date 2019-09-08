@@ -193,6 +193,13 @@ namespace Mapping_Tools.Classes.MathUtil {
         }
 
         /// <summary>
+        /// Ceils the coordinates to integer values.
+        /// </summary>
+        public Vector2 Ceiled() {
+            return new Vector2(Math.Ceiling(X), Math.Ceiling(Y));
+        }
+
+        /// <summary>
         /// Defines a unit-length Vector2 that points towards the X-axis.
         /// </summary>
         public static readonly Vector2 UnitX = new Vector2(1, 0);

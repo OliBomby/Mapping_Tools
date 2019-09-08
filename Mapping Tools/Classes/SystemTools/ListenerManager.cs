@@ -32,7 +32,9 @@ namespace Mapping_Tools.Classes.SystemTools {
                     FsWatcher.EnableRaisingEvents = SettingsManager.Settings.OverrideOsuSave;
                     break;
                 case "SongsPath":
-                    FsWatcher.Path = SettingsManager.GetSongsPath();
+                    try {
+                        FsWatcher.Path = SettingsManager.GetSongsPath();
+                    } catch { }
                     break;
                 case "QuickRunHotkey":
                     ChangeActiveHotkeyHotkey("QuickRunHotkey", SettingsManager.Settings.QuickRunHotkey);

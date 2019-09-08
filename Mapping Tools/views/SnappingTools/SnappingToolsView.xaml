@@ -9,7 +9,7 @@
              xmlns:components="clr-namespace:Mapping_Tools.Components"
              xmlns:relevantObjectGenerators="clr-namespace:Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators"
              mc:Ignorable="d"
-             IsActive="{Binding UpdateTimer.IsEnabled}"
+             IsActive="{Binding ListenersEnabled, Mode=OneWayToSource}"
              d:DesignHeight="450" Width="759.5">
     <Grid Name="MasterGrid">
         <Grid.RowDefinitions>
