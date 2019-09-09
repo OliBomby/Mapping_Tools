@@ -95,11 +95,8 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="intersections">The intersections.</param>
         /// <returns>Whether there is at least one intersection.</returns>
         public static bool Intersection(Circle left, Circle right, out Vector2[] intersections) {
-            var offset = left.Centre;
-            var a = right.Centre.X - offset.X;
-            var b = right.Centre.Y - offset.Y;
-            var line = new Line(a * 2, b * 2, left.Radius * left.Radius - right.Radius * right.Radius + a * a + b * b);
-            line.C += offset.X * line.A + offset.Y * line.B;
+            double x1 = left.Centre.X, y1 = left.Centre.Y, x2 = right.Centre.X, y2 = right.Centre.Y, r1 = left.Radius, r2 = right.Radius;
+            var line = new Line(x2 - x1, y2 - y1, (r1 * r1 - r2 * r2 + x2 * x2 - x1 * x1 + y2 * y2 - y1 * y1) / 2);
             return Intersection(left, line, out intersections);
         }
 
