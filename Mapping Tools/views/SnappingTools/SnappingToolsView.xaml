@@ -101,16 +101,6 @@
                         </GroupStyle>
                     </ListView.GroupStyle>
                 </ListView>
-
-                <Viewbox Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
-                    <Button
-                    x:Name="Start"
-                    Style="{StaticResource MaterialDesignFloatingActionButton}"
-                    Click="Start_Click">
-                        <materialDesign:PackIcon
-                        Kind="Play" Height="36" Width="36" />
-                    </Button>
-                </Viewbox>
             </Grid>
         </Grid>
         <Grid Name="SecondGrid" Grid.Row="1" Grid.Column="0">
@@ -128,11 +118,4 @@
             </Grid>
         </Grid>
     </Grid>
-    <UserControl.Resources>
-        <cm:BackgroundWorker x:Key="BackgroundWorker"
-         DoWork="BackgroundWorker_DoWork"
-         RunWorkerCompleted="BackgroundWorker_RunWorkerCompleted"
-         WorkerReportsProgress="True"
-         ProgressChanged="BackgroundWorker_ProgressChanged"/>
-    </UserControl.Resources>
 </local:MappingTool>
