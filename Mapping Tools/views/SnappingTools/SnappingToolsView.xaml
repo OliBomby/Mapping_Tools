@@ -34,7 +34,7 @@
                                 <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
                             </materialDesign:PopupBox.ToggleContent>
                             <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
-                        Generates and keeps track of a list virtual objects that are geometrically relevant to the objects visible on your screen. Press the Activation Key to let your cursor snap to the closest virtual object.
+                        Generates and keeps track of a list virtual objects that are geometrically relevant to the objects visible on your screen. Press and hold the Activation Key to let your cursor snap to the closest virtual object.
                             </TextBlock>
                         </materialDesign:PopupBox>
                         <materialDesign:PopupBox Margin="0,10,10,10" VerticalAlignment="Bottom">
