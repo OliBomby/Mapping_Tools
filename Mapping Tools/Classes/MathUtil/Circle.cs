@@ -88,6 +88,22 @@ namespace Mapping_Tools.Classes.MathUtil {
         }
 
         /// <summary>
+        /// Calculate the intersection(s) of two circles.
+        /// </summary>
+        /// <param name="left">Circle 1.</param>
+        /// <param name="right">Circle 2.</param>
+        /// <param name="intersections">The intersections.</param>
+        /// <returns>Whether there is at least one intersection.</returns>
+        public static bool Intersection(Circle left, Circle right, out Vector2[] intersections) {
+            var offset = left.Centre;
+            var a = right.Centre.X - offset.X;
+            var b = right.Centre.Y - offset.Y;
+            var line = new Line(a * 2, b * 2, left.Radius * left.Radius - right.Radius * right.Radius + a * a + b * b);
+            line.C += offset.X * line.A + offset.Y * line.B;
+            return Intersection(left, line, out intersections);
+        }
+
+        /// <summary>
         /// Calculates points among the Circle.
         /// </summary>
         /// <param name="amountPoints">Number of points to calculate.</param>

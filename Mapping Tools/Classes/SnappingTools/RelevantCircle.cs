@@ -21,8 +21,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
             } else if (other is RelevantLine line) {
                 return Circle.Intersection(child, line.child, out intersections);
             } else if (other is RelevantCircle circle) {
-                intersections = new Vector2[0];
-                return false;
+                return Circle.Intersection(child, circle.child, out intersections);
             } else {
                 intersections = new Vector2[0];
                 return false;
