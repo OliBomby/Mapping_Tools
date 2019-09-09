@@ -1,9 +1,7 @@
 ﻿using Mapping_Tools.Classes.MathUtil;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Media;
+using Line = Mapping_Tools.Classes.MathUtil.Line;
 
 namespace Mapping_Tools.Classes.SnappingTools {
     public class RelevantLine : IRelevantObject {
@@ -13,23 +11,31 @@ namespace Mapping_Tools.Classes.SnappingTools {
             return Line.Distance(child, point);
         }
 
-        public bool Intersection(IRelevantObject other, out Vector2[] intersections) {
+        public bool Intersection(IRelevantObject other, out Vector2[] intersections)
+        {
             if (other is RelevantPoint point) {
                 intersections = new[] { point.child };
                 return Precision.AlmostEquals(Line.Distance(child, point.child), 0);
             }
-            else if (other is RelevantLine line) {
+
+            if (other is RelevantLine line) {
                 bool IsIntersecting = Line.Intersection(child, line.child, out var intersection);
                 intersections = new[] { intersection };
                 return IsIntersecting;
             }
-            else if (other is RelevantCircle circle) {
+
+            if (other is RelevantCircle circle) {
                 return Circle.Intersection(circle.child, child, out intersections);
             }
-            else {
-                intersections = new Vector2[0];
-                return false;
-            }
+
+            intersections = new Vector2[0];
+            return false;
+        }
+
+        public void DrawYourself(DrawingContext context, CoordinateConverter converter) {
+            var cPos1 = converter.EditorToRelativeCoordinate(new Vector2(child.C / child.A, 0));
+            var cPos2 = converter.EditorToRelativeCoordinate(new Vector2(0, child.C / child.B));
+            context.DrawLine(new Pen(Brushes.LawnGreen, 5), new Point(cPos1.X, cPos1.Y), new Point(cPos2.X, cPos2.Y));
         }
 
         public Vector2 NearestPoint(Vector2 point) {

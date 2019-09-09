@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Mapping_Tools</RootNamespace>
     <AssemblyName>Mapping Tools</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -253,6 +253,8 @@
     <Compile Include="Classes\SnappingTools\RelevantCircle.cs" />
     <Compile Include="Classes\SnappingTools\RelevantLine.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\GeneratorType.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjectsFromRelevantCircles.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjectsFromRelevantLines.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\RelevantObjectsGenerator.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjectsFromHitObjects.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjectsFromRelevantObjects.cs" />
@@ -311,16 +313,14 @@
     <Compile Include="Viewmodels\TimingCopierVM.cs" />
     <Compile Include="Viewmodels\MetadataManagerVM.cs" />
     <Compile Include="Viewmodels\PropertyTransformerVM.cs" />
-    <Compile Include="Viewmodels\SnappingToolsVM.cs" />
+    <Compile Include="Viewmodels\SnappingToolsVm.cs" />
     <Compile Include="Viewmodels\SliderCompletionatorVM.cs" />
     <Compile Include="Viewmodels\SliderMergerVM.cs" />
     <Compile Include="Viewmodels\PreferencesVM.cs" />
     <Compile Include="Viewmodels\StandardVM.cs" />
     <Compile Include="Views\Extensions.cs" />
     <Compile Include="Views\MappingTool.cs" />
-    <Compile Include="Views\SnappingTools\SnappingOverlay.xaml.cs">
-      <DependentUpon>SnappingOverlay.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="Views\SnappingTools\SnappingToolsOverlay.cs" />
     <Compile Include="Views\TimingCopier\TimingCopierView.xaml.cs">
       <DependentUpon>TimingCopierView.xaml</DependentUpon>
     </Compile>
@@ -400,10 +400,6 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Views\SnappingTools\SnappingOverlay.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\TimingCopier\TimingCopierView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

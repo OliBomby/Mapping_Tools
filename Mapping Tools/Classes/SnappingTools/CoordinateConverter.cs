@@ -80,6 +80,9 @@ namespace Mapping_Tools.Classes.SnappingTools {
                 ? (LetterboxingPosition / 200 + new Vector2(0.5, 0.5)) * (ScreenResolution - OsuWindowDimensions)
                 : Vector2.Zero;  
             var windowOffset = OsuWindowPosition + letterboxOffset + new Vector2(0, FilebarHeight);
+            if (!Fullscreen && !Letterboxing && OsuWindowDimensions != ScreenResolution) {
+                windowOffset += new Vector2(0, 24);
+            }
 
             // Screen pixels per osu pixel
             var ratio = windowDimensions.Y / 480;
@@ -96,6 +99,9 @@ namespace Mapping_Tools.Classes.SnappingTools {
                 ? (LetterboxingPosition / 200 + new Vector2(0.5, 0.5)) * (ScreenResolution - OsuWindowDimensions)
                 : Vector2.Zero;
             var windowOffset = OsuWindowPosition + letterboxOffset + new Vector2(0, FilebarHeight);
+            if (!Fullscreen && !Letterboxing && OsuWindowDimensions != ScreenResolution) {
+                windowOffset += new Vector2(0, 24);
+            }
 
             // Screen pixels per osu pixel
             var ratio = windowDimensions.Y / 480;
@@ -103,6 +109,33 @@ namespace Mapping_Tools.Classes.SnappingTools {
             var gridOffset = windowDimensions - new Vector2(512, 384) * ratio;
 
             return (coord * ratio + windowOffset + new Vector2(gridOffset.X / 2, gridOffset.Y / 4 * 3) + ExtraOffset).Rounded();
+        }
+
+        public Vector2 EditorToRelativeCoordinate(Vector2 coord) {
+            var windowDimensions = OsuWindowDimensions - new Vector2(0, FilebarHeight);
+            var letterboxOffset = Letterboxing
+                ? (LetterboxingPosition / 200 + new Vector2(0.5, 0.5)) * (ScreenResolution - OsuWindowDimensions)
+                : Vector2.Zero;
+            var windowOffset = letterboxOffset + new Vector2(0, FilebarHeight);
+            if (!Fullscreen && !Letterboxing && OsuWindowDimensions != ScreenResolution) {
+                windowOffset += new Vector2(0, 24);
+            }
+
+            // Screen pixels per osu pixel
+            var ratio = windowDimensions.Y / 480;
+
+            var gridOffset = windowDimensions - new Vector2(512, 384) * ratio;
+
+            return (coord * ratio + windowOffset + new Vector2(gridOffset.X / 2, gridOffset.Y / 4 * 3) + ExtraOffset).Rounded();
+        }
+
+        public double EditorToScreenSize(double d)
+        {
+            var windowDimensions = OsuWindowDimensions - new Vector2(0, FilebarHeight);
+
+            // Screen pixels per osu pixel
+            var ratio = windowDimensions.Y / 480;
+            return d * ratio;
         }
 
         public override string ToString() {

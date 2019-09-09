@@ -13,7 +13,7 @@ namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators.Generator
 
             foreach (HitObject ho in objects) {
                 // Only get perfect type sliders
-                if (!ho.IsSlider || ho.SliderType != PathType.PerfectCurve)
+                if (!ho.IsSlider || ho.SliderType != PathType.PerfectCurve || ho.CurvePoints.Count != 2)
                     continue;
 
                 Circle circle = new Circle(new CircleArc(ho.GetAllCurvePoints()));

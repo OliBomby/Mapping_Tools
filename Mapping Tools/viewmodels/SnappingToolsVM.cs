@@ -1,29 +1,32 @@
-﻿using Mapping_Tools.Classes.MathUtil;
+﻿using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SnappingTools;
 using Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
-using Mapping_Tools.Components.Domain;
+using Mapping_Tools.Views.SnappingTools;
+using Process.NET;
+using Process.NET.Memory;
+using Process.NET.Windows;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
-using Mapping_Tools.Classes.BeatmapHelper;
 
 namespace Mapping_Tools.Viewmodels {
-    public class SnappingToolsVM {
+    public class SnappingToolsVm {
         public Hotkey SnapHotkey { get; set; }
 
         public ObservableCollection<RelevantObjectsGenerator> Generators { get; }
         private readonly List<IRelevantObject> _relevantObjects = new List<IRelevantObject>();
+        private List<HitObject> _visibleObjects;
         private int _editorTime;
-        private double[] _visibleObjectTimes;
 
         private string _filter = "";
         public string Filter { get => _filter; set => SetFilter(value); }
@@ -32,20 +35,44 @@ namespace Mapping_Tools.Viewmodels {
         {
             set
             {
-                UpdateTimer.IsEnabled = value;
+                _updateTimer.IsEnabled = value;
                 _configWatcher.EnableRaisingEvents = value;
+
+                if (!value)
+                {
+                    _state = State.Disabled;
+                    _overlay.Dispose();
+                }
+                else
+                {
+                    _state = State.LookingForProcess;
+                }
             }
         }
 
-        private readonly DispatcherTimer UpdateTimer;
-        private readonly DispatcherTimer AutoSnapTimer;
+        private readonly DispatcherTimer _updateTimer;
+        private readonly DispatcherTimer _autoSnapTimer;
 
         private const double PointsBias = 3;
 
         private readonly CoordinateConverter _coordinateConverter;
-        public readonly FileSystemWatcher _configWatcher;
+        private readonly FileSystemWatcher _configWatcher;
 
-        public SnappingToolsVM() {
+        private SnappingToolsOverlay _overlay;
+        private ProcessSharp _processSharp;
+        private IWindow _osuWindow;
+
+        private State _state;
+
+        private enum State
+        {
+            Disabled,
+            LookingForProcess,
+            LookingForEditor,
+            Active
+        }
+
+        public SnappingToolsVm() {
             // Get all the RelevantObjectGenerators
             var interfaceType = typeof(RelevantObjectsGenerator);
             Generators = new ObservableCollection<RelevantObjectsGenerator>(AppDomain.CurrentDomain.GetAssemblies()
@@ -63,10 +90,10 @@ namespace Mapping_Tools.Viewmodels {
             view.Filter = UserFilter;
 
             // Set up timers for responding to hotkey presses and beatmap changes
-            UpdateTimer = new DispatcherTimer(DispatcherPriority.Normal) { Interval = TimeSpan.FromMilliseconds(100) };
-            UpdateTimer.Tick += UpdateTimerTick;
-            AutoSnapTimer = new DispatcherTimer(DispatcherPriority.Send) { Interval = TimeSpan.FromMilliseconds(16) };
-            AutoSnapTimer.Tick += AutoSnapTimerTick;
+            _updateTimer = new DispatcherTimer(DispatcherPriority.Normal) { Interval = TimeSpan.FromMilliseconds(100) };
+            _updateTimer.Tick += UpdateTimerTick;
+            _autoSnapTimer = new DispatcherTimer(DispatcherPriority.Send) { Interval = TimeSpan.FromMilliseconds(16) };
+            _autoSnapTimer.Tick += AutoSnapTimerTick;
 
             // Set up a coordinate converter for converting coordinates between screen and osu!
             _coordinateConverter = new CoordinateConverter();
@@ -79,6 +106,13 @@ namespace Mapping_Tools.Viewmodels {
 
             // Listen for changes in osu! user config path in the settings
             SettingsManager.Settings.PropertyChanged += OnSettingsChanged;
+        }
+
+        private void OnDraw(object sender, DrawingContext context) {
+            foreach (var obj in _relevantObjects)
+            {
+                obj.DrawYourself(context, _coordinateConverter);
+            }
         }
 
         private void OnSettingsChanged(object sender, PropertyChangedEventArgs e)
@@ -103,39 +137,115 @@ namespace Mapping_Tools.Viewmodels {
 
         private void OnGeneratorPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "IsActive")
+            if (e.PropertyName == "IsActive" && _state == State.Active)
             {
                 // Reload relevant objects when a generator gets enabled/disabled
                 GenerateRelevantObjects();
+                _overlay.OverlayWindow.InvalidateVisual();
             }
         }
 
-        private void UpdateTimerTick(object sender, EventArgs e)
-        {
+        private void UpdateTimerTick(object sender, EventArgs e) {
             var reader = EditorReaderStuff.GetEditorReader();
-            if (reader.ProcessNeedsReload())
-            {
-                try
-                {
-                    reader.FetchHOM();
-                }
-                catch
-                {
-                    return;
-                }
-            }
+            switch (_state) {
+                case State.Disabled:
+                    break;
+                case State.LookingForProcess:
+                    _updateTimer.Interval = TimeSpan.FromSeconds(5);
 
-            var time = reader.EditorTime();
-            if (time != _editorTime)
-            {
-                _editorTime = time;
-                UpdateRelevantObjects();
-            }
+                    // Set up objects/overlay
+                    var process = System.Diagnostics.Process.GetProcessesByName("osu!").FirstOrDefault();
+                    if (process == null) {
+                        return;
+                    }
 
-            if (!AutoSnapTimer.IsEnabled && IsHotkeyDown(SnapHotkey))
-            {
-                AutoSnapTimer.Start();
+                    try {
+                        reader.SetProcess();
+                    } catch (Win32Exception) {
+                        return;
+                    }
+
+                    _processSharp = new ProcessSharp(process, MemoryType.Remote);
+                    _overlay = new SnappingToolsOverlay { Converter = _coordinateConverter };
+
+                    _osuWindow = _processSharp.WindowFactory.MainWindow;
+                    _overlay.Initialize(_osuWindow);
+                    _overlay.Enable();
+
+                    _overlay.OverlayWindow.Draw += OnDraw;
+
+                    _updateTimer.Interval = TimeSpan.FromSeconds(1);
+                    _state = State.LookingForEditor;
+                    break;
+                case State.LookingForEditor:
+                    _updateTimer.Interval = TimeSpan.FromSeconds(1);
+                    if (reader.ProcessNeedsReload()) {
+                        _state = State.LookingForProcess;
+                        _overlay.Dispose();
+                        return;
+                    }
+
+                    try
+                    {
+                        if (!_osuWindow.Title.EndsWith(@".osu"))
+                        {
+                            return;
+                        }
+                    }
+                    catch (ArgumentException)
+                    {
+                        _state = State.LookingForProcess;
+                        _overlay.Dispose();
+                        return;
+                    }
+
+                    try {
+                        reader.FetchEditor();
+                    } catch {
+                        return;
+                    }
+
+                    _updateTimer.Interval = TimeSpan.FromMilliseconds(100);
+                    _state = State.Active;
+                    break;
+                case State.Active:
+                    _updateTimer.Interval = TimeSpan.FromMilliseconds(100);
+
+                    if (reader.ProcessNeedsReload()) {
+                        ClearRelevantObjects();
+                        _state = State.LookingForProcess;
+                        _overlay.Dispose();
+                        return;
+                    }
+                    if (reader.EditorNeedsReload()) {
+                        ClearRelevantObjects();
+                        _state = State.LookingForEditor;
+                        return;
+                    }
+
+                    var editorTime = reader.EditorTime();
+                    if (editorTime != _editorTime)
+                    {
+                        _editorTime = editorTime;
+                        UpdateRelevantObjects();
+                    }
+
+                    _overlay.Update();
+
+                    if (!_autoSnapTimer.IsEnabled && IsHotkeyDown(SnapHotkey)) {
+                        _autoSnapTimer.Start();
+                    }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
+        }
+
+        private void ClearRelevantObjects()
+        {
+            if (_relevantObjects.Count == 0) return;
+            _relevantObjects.Clear();
+            _overlay.OverlayWindow.InvalidateVisual();
         }
 
         private void UpdateRelevantObjects() {
@@ -146,17 +256,18 @@ namespace Mapping_Tools.Viewmodels {
             // Get the visible hitobjects using approach rate
             var approachTime = ApproachRateToMs(reader.ApproachRate);
             var visibleObjects = editor.Beatmap.HitObjects.Where(o => Math.Abs(o.Time - _editorTime) < approachTime).ToList();
-            var visibleObjectTimes = visibleObjects.Select(o => o.Time).ToArray();
 
-            if (_visibleObjectTimes != null && visibleObjectTimes.SequenceEqual(_visibleObjectTimes))
+            if (_visibleObjects != null && visibleObjects.SequenceEqual(_visibleObjects, new HitObjectComparer()))
             {
                 // Visible Objects didn't change. Return to avoid redundant updates
                 return;
             }
-            // Set the new times
-            _visibleObjectTimes = visibleObjectTimes;
+            // Set the new hitobjects
+            _visibleObjects = visibleObjects;
 
             GenerateRelevantObjects(visibleObjects);
+
+            _overlay.OverlayWindow.InvalidateVisual();
         }
 
         private void GenerateRelevantObjects(List<HitObject> visibleObjects=null)
@@ -170,6 +281,7 @@ namespace Mapping_Tools.Viewmodels {
                 // Get the visible hitobjects using approach rate
                 var approachTime = ApproachRateToMs(reader.ApproachRate);
                 visibleObjects = editor.Beatmap.HitObjects.Where(o => Math.Abs(o.Time - _editorTime) < approachTime).ToList();
+                _visibleObjects = visibleObjects;
             }
 
             // Get all the active generators
@@ -198,15 +310,21 @@ namespace Mapping_Tools.Viewmodels {
             }
 
             // Generate more RelevantObjects
-            foreach (var gen in activeGenerators.OfType<IGenerateRelevantObjectsFromRelevantObjects>()) {
-                _relevantObjects.AddRange(gen.GetRelevantObjects(_relevantObjects));
-            }
             foreach (var gen in activeGenerators.OfType<IGenerateRelevantObjectsFromRelevantPoints>()) {
                 _relevantObjects.AddRange(gen.GetRelevantObjects(relevantPoints));
             }
+            foreach (var gen in activeGenerators.OfType<IGenerateRelevantObjectsFromRelevantLines>()) {
+                _relevantObjects.AddRange(gen.GetRelevantObjects(relevantLines));
+            }
+            foreach (var gen in activeGenerators.OfType<IGenerateRelevantObjectsFromRelevantCircles>()) {
+                _relevantObjects.AddRange(gen.GetRelevantObjects(relevantCircles));
+            }
+            foreach (var gen in activeGenerators.OfType<IGenerateRelevantObjectsFromRelevantObjects>()) {
+                _relevantObjects.AddRange(gen.GetRelevantObjects(_relevantObjects));
+            }
         }
 
-        private double ApproachRateToMs(double approachRate)
+        private static double ApproachRateToMs(double approachRate)
         {
             if (approachRate < 5) {
                 return 1800 - 120 * approachRate;
@@ -218,7 +336,7 @@ namespace Mapping_Tools.Viewmodels {
         private void AutoSnapTimerTick(object sender, EventArgs e) {
             if (!IsHotkeyDown(SnapHotkey))
             {
-                AutoSnapTimer.Stop();
+                _autoSnapTimer.Stop();
                 return;
             }
 
@@ -246,7 +364,7 @@ namespace Mapping_Tools.Viewmodels {
             // CONVERT THIS TO CURSOR POSITION
             if (nearest == null) return;
             var nearestPoint = _coordinateConverter.EditorToScreenCoordinate(nearest.NearestPoint(cursorPos));
-            System.Windows.Forms.Cursor.Position = new Point((int)Math.Round(nearestPoint.X), (int)Math.Round(nearestPoint.Y));
+            System.Windows.Forms.Cursor.Position = new System.Drawing.Point((int)Math.Round(nearestPoint.X), (int)Math.Round(nearestPoint.Y));
         }
 
         private static bool IsHotkeyDown(Hotkey hotkey) {

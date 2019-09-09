@@ -460,6 +460,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return string.Join(",", values);
         }
 
+        public override string ToString()
+        {
+            return GetLine();
+        }
+
         public int GetObjectType() {
             BitArray cs = new BitArray(new int[] { ComboSkip });
             return MathHelper.GetIntFromBitArray(new BitArray(new bool[] { IsCircle, IsSlider, NewCombo, IsSpinner, cs[0], cs[1], cs[2], IsHoldNote }));

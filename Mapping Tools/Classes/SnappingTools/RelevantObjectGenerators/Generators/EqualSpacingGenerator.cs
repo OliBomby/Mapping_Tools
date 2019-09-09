@@ -3,7 +3,7 @@ using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators.Generators {
     class EqualSpacingGenerator : RelevantObjectsGenerator, IGenerateRelevantObjectsFromRelevantPoints {
-        public string Name => "Equal Spacing Generator";
+        public new string Name => "Equal Spacing Generator";
         public new GeneratorType GeneratorType => GeneratorType.Polygons;
 
         public List<IRelevantObject> GetRelevantObjects(List<RelevantPoint> objects) {

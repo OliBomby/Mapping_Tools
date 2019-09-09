@@ -13,7 +13,7 @@ namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators.Generator
 
             foreach (HitObject ho in objects) {
                 // Only get perfect type sliders
-                if (!ho.IsSlider || ho.SliderType != PathType.Linear)
+                if (!ho.IsSlider || ho.SliderType != PathType.Linear || ho.CurvePoints.Count < 1)
                     continue;
 
                 Line line = new Line(ho.Pos, ho.CurvePoints[ho.CurvePoints.Count - 1]);

@@ -43,7 +43,7 @@
         <DataTemplate DataType="{x:Type viewmodels:SliderCompletionatorVM}">
             <views:SliderCompletionatorView DataContext="{Binding}"/>
         </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodels:SnappingToolsVM}">
+        <DataTemplate DataType="{x:Type viewmodels:SnappingToolsVm}">
             <views:SnappingToolsView DataContext="{Binding}"/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type viewmodels:HitsoundCopierVM}">
