@@ -16,7 +16,7 @@
         Title="SnappingOverlay" Height="450" Width="800">
     <Grid>
         <Canvas x:Name="MainCanvas">
-            <Rectangle Fill="Red" Width="50" Height="50" Canvas.Left="100" Canvas.Top="100"  IsHitTestVisible="False"/>
+            <!--Rectangle Fill="Red" Width="50" Height="50" Canvas.Left="100" Canvas.Top="100"  IsHitTestVisible="False"/-->
         </Canvas>
     </Grid>
 </Window>

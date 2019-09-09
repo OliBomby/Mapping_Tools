@@ -15,6 +15,7 @@ namespace Mapping_Tools.Views {
     public partial class SnappingToolsView : IQuickRun {
         private readonly BackgroundWorker _backgroundWorker;
         private bool _canRun = true;
+        public static SnappingTools.SnappingOverlay overlay { get; set; }
 
         public event EventHandler RunFinished;
 
@@ -24,6 +25,9 @@ namespace Mapping_Tools.Views {
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
             _backgroundWorker = (BackgroundWorker)FindResource("BackgroundWorker");
+
+            overlay = new SnappingTools.SnappingOverlay();
+            overlay.Show();
         }
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {

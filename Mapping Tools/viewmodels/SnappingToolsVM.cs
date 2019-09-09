@@ -190,7 +190,10 @@ namespace Mapping_Tools.Viewmodels {
 
             foreach (var ro in _relevantObjects) {
                 if (ro is RelevantPoint rp)
+                {
                     relevantPoints.Add(rp);
+                    Views.SnappingTools.SnappingOverlay.CreateOverlayPoint(_coordinateConverter.EditorToScreenCoordinate(rp.child));
+                }
                 else if (ro is RelevantLine rl)
                     relevantLines.Add(rl);
                 else if (ro is RelevantCircle rc)
