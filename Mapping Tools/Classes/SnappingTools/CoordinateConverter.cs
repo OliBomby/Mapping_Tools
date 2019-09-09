@@ -103,5 +103,9 @@ namespace Mapping_Tools.Classes.SnappingTools {
 
             return (coord * ratio + windowOffset + new Vector2(gridOffset.X / 2, gridOffset.Y / 4 * 3)).Ceiled();
         }
+
+        public override string ToString() {
+            return $"{ScreenResolution}, {OsuWindowPosition}, {OsuWindowDimensions}, {Fullscreen}, {Letterboxing}, {LetterboxingPosition}";
+        }
     }
 }
