@@ -8,6 +8,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
     public class CoordinateConverter
     {
         private const int FilebarHeight = 24;
+        private readonly Vector2 ExtraOffset = new Vector2(0.5, 0.5);
         private string[] _configLines;
 
         public Vector2 ScreenResolution;
@@ -85,7 +86,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
 
             var gridOffset = windowDimensions - new Vector2(512, 384) * ratio;
 
-            return (coord - windowOffset - new Vector2(gridOffset.X / 2, gridOffset.Y / 4 * 3)) / ratio;
+            return (coord - ExtraOffset - windowOffset - new Vector2(gridOffset.X / 2, gridOffset.Y / 4 * 3)) / ratio;
         }
 
         public Vector2 EditorToScreenCoordinate(Vector2 coord)
@@ -101,7 +102,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
 
             var gridOffset = windowDimensions - new Vector2(512, 384) * ratio;
 
-            return (coord * ratio + windowOffset + new Vector2(gridOffset.X / 2, gridOffset.Y / 4 * 3)).Rounded();
+            return (coord * ratio + windowOffset + new Vector2(gridOffset.X / 2, gridOffset.Y / 4 * 3) + ExtraOffset).Rounded();
         }
 
         public override string ToString() {
