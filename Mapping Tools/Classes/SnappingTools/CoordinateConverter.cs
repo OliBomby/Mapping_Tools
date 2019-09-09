@@ -85,7 +85,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
 
             var gridOffset = windowDimensions - new Vector2(512, 384) * ratio;
 
-            return ((coord - windowOffset - new Vector2(gridOffset.X / 2, gridOffset.Y / 4 * 3)) / ratio).Ceiled();
+            return (coord - windowOffset - new Vector2(gridOffset.X / 2, gridOffset.Y / 4 * 3)) / ratio;
         }
 
         public Vector2 EditorToScreenCoordinate(Vector2 coord)
@@ -101,7 +101,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
 
             var gridOffset = windowDimensions - new Vector2(512, 384) * ratio;
 
-            return (coord * ratio + windowOffset + new Vector2(gridOffset.X / 2, gridOffset.Y / 4 * 3)).Ceiled();
+            return (coord * ratio + windowOffset + new Vector2(gridOffset.X / 2, gridOffset.Y / 4 * 3)).Rounded();
         }
 
         public override string ToString() {

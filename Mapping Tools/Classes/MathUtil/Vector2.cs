@@ -193,6 +193,13 @@ namespace Mapping_Tools.Classes.MathUtil {
         }
 
         /// <summary>
+        /// Rounds the coordinates to integer values.
+        /// </summary>
+        public Vector2 Rounded() {
+            return new Vector2(Math.Round(X), Math.Round(Y));
+        }
+
+        /// <summary>
         /// Ceils the coordinates to integer values.
         /// </summary>
         public Vector2 Ceiled() {
