@@ -15,7 +15,18 @@ namespace Mapping_Tools.Classes.SnappingTools {
         }
 
         public bool Intersection(IRelevantObject other, out Vector2[] intersections) {
-            throw new NotImplementedException();
+            if (other is RelevantPoint point) {
+                intersections = new[] { point.child };
+                return Precision.AlmostEquals(Vector2.Distance(child.Centre, point.child), child.Radius);
+            } else if (other is RelevantLine line) {
+                return Circle.Intersection(child, line.child, out intersections);
+            } else if (other is RelevantCircle circle) {
+                intersections = new Vector2[0];
+                return false;
+            } else {
+                intersections = new Vector2[0];
+                return false;
+            }
         }
 
         public Vector2 NearestPoint(Vector2 point) {

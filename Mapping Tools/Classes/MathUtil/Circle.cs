@@ -51,34 +51,41 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// </summary>
         public static readonly Circle UnitCircle = new Circle(Vector2.Zero, 1);
 
-        /*public static bool Intersection(Circle left, Line right, out Vector2[] intersections) {
-            Vector2 offset = left.Centre;
-            double r = left.Radius;
-            double a = right.A;
-            double b = right.B;
-            double c = -right.C;
-            double x0 = -a * c / (a * a + b * b);
-            double y0 = -b * c / (a * a + b * b);
-            if (c * c > r * r * (a * a + b * b) + EPS) {
-                intersections = new Vector2[] { };
+        /// <summary>
+        /// Calculates the intersection(s) between a Circle and a Line.
+        /// </summary>
+        /// <param name="left">The circle.</param>
+        /// <param name="right">The line.</param>
+        /// <param name="intersections">The calculated intersection(s).</param>
+        /// <returns>Whether there is at least one intersection.</returns>
+        public static bool Intersection(Circle left, Line right, out Vector2[] intersections) {
+            var offset = left.Centre;
+            var c = right.C - (right.A * offset.X + right.B * offset.Y);
+
+            var abs = right.A * right.A + right.B * right.B;
+            var d = left.Radius * left.Radius * abs - c * c;
+
+            if (d < 0) {
+                // No intersections
+                intersections = new Vector2[0];
                 return false;
             }
-            else if (abs(c * c - r * r * (a * a + b * b)) < EPS) {
-                puts("1 point");
-                cout << x0 << ' ' << y0 << '\n';
+
+            var ca = c * right.A;
+            var bc = right.B * c;
+            var root = Math.Sqrt(d);
+
+            if (d == 0) {
+                // One intersection
+                intersections = new[] { new Vector2(ca + right.B * root, bc + right.A * root) / abs + offset };
+                return true;
+            } else {
+                // Two intersections
+                intersections = new[] { new Vector2(ca + right.B * root, bc + right.A * root) / abs + offset,
+                                        new Vector2(ca - right.B * root, bc - right.A * root) / abs + offset };
+                return true;
             }
-            else {
-                double d = r * r - c * c / (a * a + b * b);
-                double mult = Math.Sqrt(d / (a * a + b * b));
-                double ax, ay, bx, by;
-                ax = x0 + b * mult;
-                bx = x0 - b * mult;
-                ay = y0 - a * mult;
-                by = y0 + a * mult;
-                puts("2 points");
-                cout << ax << ' ' << ay << '\n' << bx << ' ' << by << '\n';
-            }
-        }*/
+        }
 
         /// <summary>
         /// Calculates points among the Circle.

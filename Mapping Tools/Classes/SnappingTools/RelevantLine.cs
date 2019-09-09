@@ -24,11 +24,10 @@ namespace Mapping_Tools.Classes.SnappingTools {
                 return IsIntersecting;
             }
             else if (other is RelevantCircle circle) {
-                intersections = new Vector2[] { };
-                return false;
+                return Circle.Intersection(circle.child, child, out intersections);
             }
             else {
-                intersections = new Vector2[] { };
+                intersections = new Vector2[0];
                 return false;
             }
         }
