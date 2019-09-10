@@ -1,4 +1,5 @@
-using Mapping_Tools.Classes.MathUtil;
+
+﻿using Mapping_Tools.Classes.MathUtil;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
@@ -63,6 +64,19 @@ namespace Mapping_Tools.Classes.SnappingTools {
 
         public RelevantLine(Line line) {
             child = line;
+        }
+
+        public struct Vector2Comparer : IEqualityComparer<Vector2>
+        {
+            public bool Equals(Vector2 a, Vector2 b)
+            {
+                return a.X == b.X && a.Y == b.Y;
+            }
+
+            public int GetHashCode(Vector2 a)
+            {
+                return a.GetHashCode();
+            }
         }
     }
 }
