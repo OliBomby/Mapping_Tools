@@ -106,6 +106,8 @@ namespace Mapping_Tools.Viewmodels {
 
             // Listen for changes in osu! user config path in the settings
             SettingsManager.Settings.PropertyChanged += OnSettingsChanged;
+
+            _state = State.LookingForProcess;
         }
 
         private void OnDraw(object sender, DrawingContext context) {
