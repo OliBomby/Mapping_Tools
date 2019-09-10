@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
-using System.Xml.Serialization;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Mapping_Tools.Classes.MathUtil {
     /// <summary>Represents a line with infinite length using three double-precision floating-point numbers in the equation AX + BY = C.</summary>
@@ -128,17 +129,39 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <returns>The intersection the two inputs</returns>
         public static bool Intersection(Line left, Line right, out Vector2 result)
         {
-            double d1 = 1 / right.A;
-            if (left.B == left.A * right.B * d1) {
+            if (right.A == 0) { var temp = left; left = right; right = temp; } // swap inputs to prevent division by zero
+
+            if (right.A * left.B == left.A * right.B) {
                 result = Vector2.NaN;
                 return false;
             }
             else{
-                double y = (left.C - left.A * right.C * d1) / (left.B - left.A * right.B * d1);
-                double x = right.C * d1 - right.B * y * d1;
+                double y = (left.C - left.A * right.C / right.A) / (left.B - left.A * right.B / right.A);
+                double x = right.C / right.A - right.B * y / right.A;
                 result = new Vector2(x, y);
                 return true;
             }
+        }
+
+        ///<summary>
+        ///Calculates the intersection(s) between a Rectangle and a Line.
+        ///</summary>
+        ///<param name="rect">The rectangle</param>
+        ///<param name="line">The line</param>
+        /// <param name="intersections">The calculated intersection(s).</param>
+        ///<returns>Whether there are exactly two intersections.</returns>
+        public static bool Intersection(Box2 rect, Line line, out Vector2[] intersections)
+        {
+            List<Vector2> candidates = new List<Vector2>
+            {
+                new Vector2 {X = rect.Left, Y = line.C / line.B },
+                new Vector2 {X = line.C / line.A, Y = rect.Bottom },
+                new Vector2 {X = (line.C - rect.Top * line.B) / line.A , Y = rect.Top },
+                new Vector2 {X = rect.Right , Y = (line.C - rect.Right * line.A) / line.B },
+            };
+
+            intersections = candidates.Where(p => (p[0] >= rect.Left) && (p[0] <= rect.Right) && (p[1] >= rect.Bottom) && (p[1] <= rect.Top)).ToArray();
+            return (intersections.Length == 2) ? true : false;
         }
 
         /// <summary>
