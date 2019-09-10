@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Mapping_Tools.Views.PreferencesView"
+<UserControl x:Class="Mapping_Tools.Views.PreferencesView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -9,7 +9,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <StackPanel Margin="0,0,10,0">
+        <StackPanel Margin="0,0,100,0">
             <TextBlock Foreground="{DynamicResource PrimaryHueMidBrush}" FontSize="40" FontWeight="Bold"><Run Text="Preferences"/></TextBlock>
             <Grid Margin="0,20,0,0">
                 <Grid.ColumnDefinitions>
@@ -55,54 +55,45 @@
                     <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                 </Button >
             </Grid>
-            <CheckBox Content="Make automatic backups" IsChecked="{Binding MakeBackups, Mode=TwoWay}" Margin="0,10,0,0" ToolTip="Make automatic backups whenever you run tools."/>
+            <CheckBox Content="Make automatic backups" IsChecked="{Binding MakeBackups, Mode=TwoWay}" Margin="0,5,0,0" ToolTip="Make automatic backups whenever you run tools."/>
             <CheckBox Content="Override osu! save with BetterSave™" IsChecked="{Binding OverrideOsuSave, Mode=TwoWay}" Margin="0,0,0,0" ToolTip="Automatically BetterSave after every osu! save."/>
             <CheckBox Content="Auto reload after QuickRun" IsChecked="{Binding AutoReload, Mode=TwoWay}" Margin="0,0,0,0" ToolTip="Tries to reload the editor after every QuickRun."/>
-            <Grid Margin="0,10,0,0">
+            <Grid Margin="0,20,0,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="150"/>
-                    <ColumnDefinition Width="150"/>
-                    <ColumnDefinition Width="80"/>
-                    <ColumnDefinition Width="150"/>
-                    <ColumnDefinition Width="80"/>
-                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="300"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="QuickRun hotkey:" ToolTip="QuickRun let's you quickly run the current tool on the current beatmap."/>
-                <TextBlock Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" Text="Single:" ToolTip="Executes this tool when there is a single object selected." HorizontalAlignment="Center"/>
-                <TextBlock Grid.Row="0" Grid.Column="4" VerticalAlignment="Center" Text="Multiple:" ToolTip="Executes this tool when there are multiple objects selected." HorizontalAlignment="Center"/>
-                <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Text="BetterSave™ hotkey:" ToolTip="BetterSave saves the current map with proper rounding instead of truncating values."/>
+                <Button Grid.Column="1" Content="Reload hotkeys" Click="Button_Click_3" Width="140" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
 
-                <components:HotkeyEditorControl Grid.Row="0" Grid.Column="1" Hotkey="{Binding QuickRunHotkey}"/>
-                <components:HotkeyEditorControl Grid.Row="1" Grid.Column="1" Hotkey="{Binding BetterSaveHotkey}"/>
+                <Grid Grid.Column="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-                <ComboBox x:Name="SingleQuickRun" Grid.Row="0" Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center" Width="150">
-                    <ComboBoxItem Content="&lt;Current tool&gt;" IsSelected="True"/>
-                    <ComboBoxItem Content="Map Cleaner"/>
-                    <ComboBoxItem Content="Slider Completionator"/>
-                </ComboBox>
+                    <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="QuickRun hotkey:" ToolTip="QuickRun let's you quickly run the current tool on the current beatmap."/>
+                    <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Text="BetterSave™ hotkey:" ToolTip="BetterSave saves the current map with proper rounding instead of truncating values."/>
 
-                <ComboBox x:Name="MultipleQuickRun" Grid.Row="0" Grid.Column="5" HorizontalAlignment="Center" VerticalAlignment="Center" Width="150">
-                    <ComboBoxItem Content="&lt;Current tool&gt;" IsSelected="True"/>
-                    <ComboBoxItem Content="Map Cleaner"/>
-                    <ComboBoxItem Content="Slider Completionator"/>
-                    <ComboBoxItem Content="Slider Merger"/>
-                </ComboBox>
+                    <components:HotkeyEditorControl Grid.Row="0" Grid.Column="1" Hotkey="{Binding QuickRunHotkey}"/>
+                    <components:HotkeyEditorControl Grid.Row="1" Grid.Column="1" Hotkey="{Binding BetterSaveHotkey}"/>
+                </Grid>
             </Grid>
-
-            <Button Content="Reload hotkeys" Click="Button_Click_3" Width="130" Style="{StaticResource MaterialDesignRaisedLightButton}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,15,0,0"/>
-
             <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
                 <TextBlock Text="Light"/>
                 <ToggleButton Margin="8,0,16,0" IsChecked="True" Checked="MakeDark" Unchecked="MakeLight"/>
                 <TextBlock Text="Dark"/>
             </StackPanel>
-
         </StackPanel>
     </Grid>
 </UserControl>
