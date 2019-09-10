@@ -1,5 +1,4 @@
-
-﻿using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.MathUtil;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
