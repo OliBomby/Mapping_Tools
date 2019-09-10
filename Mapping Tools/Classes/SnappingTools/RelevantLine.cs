@@ -1,6 +1,6 @@
-using Mapping_Tools.Classes.MathUtil;
+
+﻿using Mapping_Tools.Classes.MathUtil;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using Line = Mapping_Tools.Classes.MathUtil.Line;
@@ -8,6 +8,18 @@ using Line = Mapping_Tools.Classes.MathUtil.Line;
 namespace Mapping_Tools.Classes.SnappingTools {
     public class RelevantLine : IRelevantObject {
         public readonly Line child;
+        public static Pen DefaultPen = new Pen()
+        {
+            Brush = new SolidColorBrush
+            {
+                Color = Colors.LawnGreen,
+                Opacity = 0.8,
+            },
+            DashStyle = DashStyles.Dash,
+            Thickness = 3,
+        };
+        public Pen Pen { get; set; } = DefaultPen;
+        public bool IsHighlighted;
 
         public double DistanceTo(Vector2 point) {
             return Line.Distance(child, point);
@@ -39,7 +51,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
             var cPos1 = converter.EditorToRelativeCoordinate(points[0]);
             var cPos2 = converter.EditorToRelativeCoordinate(points[1]);
 
-            context.DrawLine(new Pen(Brushes.LawnGreen, 5), new Point(cPos1.X, cPos1.Y), new Point(cPos2.X, cPos2.Y));
+            context.DrawLine(Pen, new Point(cPos1.X, cPos1.Y), new Point(cPos2.X, cPos2.Y));
         }
 
         public Vector2 NearestPoint(Vector2 point) {
@@ -52,6 +64,19 @@ namespace Mapping_Tools.Classes.SnappingTools {
 
         public RelevantLine(Line line) {
             child = line;
+        }
+
+        public struct Vector2Comparer : IEqualityComparer<Vector2>
+        {
+            public bool Equals(Vector2 a, Vector2 b)
+            {
+                return a.X == b.X && a.Y == b.Y;
+            }
+
+            public int GetHashCode(Vector2 a)
+            {
+                return a.GetHashCode();
+            }
         }
     }
 }
