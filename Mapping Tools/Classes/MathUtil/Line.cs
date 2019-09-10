@@ -128,14 +128,15 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <returns>The intersection the two inputs</returns>
         public static bool Intersection(Line left, Line right, out Vector2 result)
         {
-            double d1 = 1 / right.A;
-            if (left.B == left.A * right.B * d1) {
+            if (right.A == 0) { var temp = left; left = right; right = temp; } // swap inputs to prevent division by zero
+
+            if (right.A * left.B == left.A * right.B) {
                 result = Vector2.NaN;
                 return false;
             }
             else{
-                double y = (left.C - left.A * right.C * d1) / (left.B - left.A * right.B * d1);
-                double x = right.C * d1 - right.B * y * d1;
+                double y = (left.C - left.A * right.C / right.A) / (left.B - left.A * right.B / right.A);
+                double x = right.C / right.A - right.B * y / right.A;
                 result = new Vector2(x, y);
                 return true;
             }
