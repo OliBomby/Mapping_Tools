@@ -38,22 +38,26 @@ namespace Mapping_Tools {
         public static readonly string ExportPath = Path.Combine(AppDataPath, "Exports");
 
         public MainWindow() {
-            Setup();
             InitializeComponent();
-            SettingsManager.LoadConfig();
-            listenerManager = new ListenerManager();
-            AppWindow = this;
-            IsMaximized = SettingsManager.Settings.MainWindowMaximized;
-            WidthWin = SettingsManager.Settings.MainWindowWidth ?? Width;
-            HeightWin = SettingsManager.Settings.MainWindowHeight ?? Height;
-            IsMaximized = !IsMaximized;
-            ToggleWin(this, null);
-            WidthWin = SettingsManager.Settings.MainWindowWidth ?? Width;
-            HeightWin = SettingsManager.Settings.MainWindowHeight ?? Height;
-            Views = new ViewCollection(); // Make a ViewCollection object
-            SetCurrentView(new StandardVM()); // Generate Standard view model to show on startup
+            try {
+                Setup();
+                SettingsManager.LoadConfig();
+                listenerManager = new ListenerManager();
+                AppWindow = this;
+                IsMaximized = SettingsManager.Settings.MainWindowMaximized;
+                WidthWin = SettingsManager.Settings.MainWindowWidth ?? Width;
+                HeightWin = SettingsManager.Settings.MainWindowHeight ?? Height;
+                IsMaximized = !IsMaximized;
+                ToggleWin(this, null);
+                WidthWin = SettingsManager.Settings.MainWindowWidth ?? Width;
+                HeightWin = SettingsManager.Settings.MainWindowHeight ?? Height;
+                Views = new ViewCollection(); // Make a ViewCollection object
+                SetCurrentView(new StandardVM()); // Generate Standard view model to show on startup
 
-            SetCurrentMaps(SettingsManager.GetLatestCurrentMaps()); // Set currentmap to previously opened map
+                SetCurrentMaps(SettingsManager.GetLatestCurrentMaps()); // Set currentmap to previously opened map
+            } catch (Exception ex) {
+                System.Windows.MessageBox.Show(string.Format("{0}{1}{2}", ex.Message, Environment.NewLine, ex.StackTrace), "Error");
+            }
         }
 
         private void Setup() {
@@ -352,7 +356,7 @@ namespace Mapping_Tools {
         //Open backup folder in file explorer
         private void OpenBackups(object sender, RoutedEventArgs e) {
             try {
-                Process.Start(SettingsManager.GetBackupsPath());
+                System.Diagnostics.Process.Start(SettingsManager.GetBackupsPath());
             }
             catch( Exception ex ) {
                 System.Windows.Forms.MessageBox.Show(ex.Message);
@@ -361,7 +365,7 @@ namespace Mapping_Tools {
         }
 
         private void OpenWebsite(object sender, RoutedEventArgs e) {
-            Process.Start("https://mappingtools.seira.moe/");
+            System.Diagnostics.Process.Start("https://mappingtools.seira.moe/");
         }
 
         private void CoolSave(object sender, RoutedEventArgs e) {
@@ -370,7 +374,7 @@ namespace Mapping_Tools {
 
         //Open project in browser
         private void OpenGitHub(object sender, RoutedEventArgs e) {
-            Process.Start("https://github.com/OliBomby/Mapping_Tools");
+            System.Diagnostics.Process.Start("https://github.com/OliBomby/Mapping_Tools");
         }
 
         //Open info screen

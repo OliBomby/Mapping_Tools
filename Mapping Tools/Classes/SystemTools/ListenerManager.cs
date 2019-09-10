@@ -64,11 +64,13 @@ namespace Mapping_Tools.Classes.SystemTools {
         }
         
         public void ReloadHotkeys() {
-            keyboardHookManager.UnregisterAll();
+            try {
+                keyboardHookManager.UnregisterAll();
 
-            foreach (ActionHotkey ah in ActiveHotkeys.Values) {
-                RegisterHotkey(ah.Hotkey, ah.Action);
-            }
+                foreach (ActionHotkey ah in ActiveHotkeys.Values) {
+                    RegisterHotkey(ah.Hotkey, ah.Action);
+                }
+            } catch { MessageBox.Show("Could not reload hotkeys.", "Warning"); }
         }
 
         private void RegisterHotkey(Hotkey hotkey, Action action) {
@@ -118,7 +120,7 @@ namespace Mapping_Tools.Classes.SystemTools {
 
         private void Reload(object sender, EventArgs e) {
             if (((RunToolCompletedEventArgs)e).NeedReload && SettingsManager.Settings.AutoReload) {
-                var proc = Process.GetProcessesByName("osu!").FirstOrDefault();
+                var proc = System.Diagnostics.Process.GetProcessesByName("osu!").FirstOrDefault();
                 ;
                 if (proc != null) {
                     var oldHandle = GetForegroundWindow();
@@ -134,7 +136,9 @@ namespace Mapping_Tools.Classes.SystemTools {
         }
 
         private void InitFsWatcher() {
-            FsWatcher.Path = SettingsManager.GetSongsPath();
+            try {
+                FsWatcher.Path = SettingsManager.GetSongsPath();
+            } catch { }
 
             FsWatcher.Filter = "*.osu";
             FsWatcher.Changed += OnChangedFsWatcher;
@@ -149,7 +153,7 @@ namespace Mapping_Tools.Classes.SystemTools {
                 return;
             }
 
-            var proc = Process.GetProcessesByName("osu!").FirstOrDefault();
+            var proc = System.Diagnostics.Process.GetProcessesByName("osu!").FirstOrDefault();
             if (proc != null) {
                 var oldHandle = GetForegroundWindow();
                 if (oldHandle != proc.MainWindowHandle) {
