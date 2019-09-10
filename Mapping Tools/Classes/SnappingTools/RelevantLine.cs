@@ -1,4 +1,6 @@
-﻿using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.MathUtil;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using Line = Mapping_Tools.Classes.MathUtil.Line;
@@ -33,8 +35,10 @@ namespace Mapping_Tools.Classes.SnappingTools {
         }
 
         public void DrawYourself(DrawingContext context, CoordinateConverter converter) {
-            var cPos1 = converter.EditorToRelativeCoordinate(new Vector2(child.C / child.A, 0));
-            var cPos2 = converter.EditorToRelativeCoordinate(new Vector2(0, child.C / child.B));
+            bool b = Line.Intersection(new Box2 { Bottom = 0, Left = 0, Top = 384, Right = 512 }, child, out Vector2[] points);
+            var cPos1 = converter.EditorToRelativeCoordinate(points[0]);
+            var cPos2 = converter.EditorToRelativeCoordinate(points[1]);
+
             context.DrawLine(new Pen(Brushes.LawnGreen, 5), new Point(cPos1.X, cPos1.Y), new Point(cPos2.X, cPos2.Y));
         }
 
@@ -48,6 +52,19 @@ namespace Mapping_Tools.Classes.SnappingTools {
 
         public RelevantLine(Line line) {
             child = line;
+        }
+
+        public struct Vector2Comparer : IEqualityComparer<Vector2>
+        {
+            public bool Equals(Vector2 a, Vector2 b)
+            {
+                return a.X == b.X && a.Y == b.Y;
+            }
+
+            public int GetHashCode(Vector2 a)
+            {
+                return a.GetHashCode();
+            }
         }
     }
 }
