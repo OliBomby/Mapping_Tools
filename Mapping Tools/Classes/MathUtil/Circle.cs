@@ -59,11 +59,10 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="intersections">The calculated intersection(s).</param>
         /// <returns>Whether there is at least one intersection.</returns>
         public static bool Intersection(Circle left, Line right, out Vector2[] intersections) {
-            var offset = left.Centre;
-            var c = right.C - (right.A * offset.X + right.B * offset.Y);
+            var cp = right.C - right.A * left.Centre[0] - right.B * left.Centre[1];
 
             var abs = right.A * right.A + right.B * right.B;
-            var d = left.Radius * left.Radius * abs - c * c;
+            var d = left.Radius * left.Radius * abs - cp * cp;
 
             if (d < 0) {
                 // No intersections
@@ -71,18 +70,18 @@ namespace Mapping_Tools.Classes.MathUtil {
                 return false;
             }
 
-            var ca = c * right.A;
-            var bc = right.B * c;
+            var ca = cp * right.A;
+            var bc = right.B * cp;
             var root = Math.Sqrt(d);
 
             if (d == 0) {
                 // One intersection
-                intersections = new[] { new Vector2(ca + right.B * root, bc + right.A * root) / abs + offset };
+                intersections = new[] { new Vector2(ca , bc) / abs + left.Centre };
                 return true;
             } else {
                 // Two intersections
-                intersections = new[] { new Vector2(ca + right.B * root, bc + right.A * root) / abs + offset,
-                                        new Vector2(ca - right.B * root, bc - right.A * root) / abs + offset };
+                intersections = new[] { new Vector2(ca + right.B * root, bc - right.A * root) / abs + left.Centre,
+                                        new Vector2(ca - right.B * root, bc + right.A * root) / abs + left.Centre };
                 return true;
             }
         }
