@@ -106,6 +106,8 @@ namespace Mapping_Tools.Viewmodels {
 
             // Listen for changes in osu! user config path in the settings
             SettingsManager.Settings.PropertyChanged += OnSettingsChanged;
+
+            _state = State.LookingForProcess;
         }
 
         private void OnDraw(object sender, DrawingContext context) {
@@ -248,15 +250,22 @@ namespace Mapping_Tools.Viewmodels {
             _overlay.OverlayWindow.InvalidateVisual();
         }
 
-        private void UpdateRelevantObjects() {
-            if (!EditorReaderStuff.TryGetFullEditorReader(out var reader)) return;
+        private List<HitObject> GetVisibleHitObjects()
+        {
+            if (!EditorReaderStuff.TryGetFullEditorReader(out var reader)) return new List<HitObject>();
 
-            var editor = EditorReaderStuff.GetNewestVersion(reader, out _);
+            var hitObjects = EditorReaderStuff.GetHitObjects(reader);
 
             // Get the visible hitobjects using approach rate
             var approachTime = ApproachRateToMs(reader.ApproachRate);
-            var visibleObjects = editor.Beatmap.HitObjects.Where(o => Math.Abs(o.Time - _editorTime) < approachTime).ToList();
+            var thereAreSelected = reader.numSelected > 0;
+            return hitObjects.Where(o => Math.Abs(o.Time - _editorTime) < approachTime && (!thereAreSelected || o.IsSelected)).ToList();
+        }
 
+        private void UpdateRelevantObjects()
+        {
+            var visibleObjects = GetVisibleHitObjects();
+            
             if (_visibleObjects != null && visibleObjects.SequenceEqual(_visibleObjects, new HitObjectComparer()))
             {
                 // Visible Objects didn't change. Return to avoid redundant updates
@@ -274,13 +283,7 @@ namespace Mapping_Tools.Viewmodels {
         {
             if (visibleObjects == null)
             {
-                if (!EditorReaderStuff.TryGetFullEditorReader(out var reader)) return;
-
-                var editor = EditorReaderStuff.GetNewestVersion(reader, out _);
-
-                // Get the visible hitobjects using approach rate
-                var approachTime = ApproachRateToMs(reader.ApproachRate);
-                visibleObjects = editor.Beatmap.HitObjects.Where(o => Math.Abs(o.Time - _editorTime) < approachTime).ToList();
+                visibleObjects = GetVisibleHitObjects();
                 _visibleObjects = visibleObjects;
             }
 
@@ -300,13 +303,20 @@ namespace Mapping_Tools.Viewmodels {
             var relevantLines = new List<RelevantLine>();
             var relevantCircles = new List<RelevantCircle>();
 
-            foreach (var ro in _relevantObjects) {
-                if (ro is RelevantPoint rp)
-                    relevantPoints.Add(rp);
-                else if (ro is RelevantLine rl)
-                    relevantLines.Add(rl);
-                else if (ro is RelevantCircle rc)
-                    relevantCircles.Add(rc);
+            foreach (var ro in _relevantObjects)
+            {
+                switch (ro)
+                {
+                    case RelevantPoint rp:
+                        relevantPoints.Add(rp);
+                        break;
+                    case RelevantLine rl:
+                        relevantLines.Add(rl);
+                        break;
+                    case RelevantCircle rc:
+                        relevantCircles.Add(rc);
+                        break;
+                }
             }
 
             // Generate more RelevantObjects

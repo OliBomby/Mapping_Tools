@@ -12,7 +12,7 @@ using System.Windows;
 namespace Mapping_Tools.Classes.Tools {
 
     public abstract class EditorReaderStuff {
-        private readonly static EditorReader editorReader = new EditorReader();
+        private static readonly EditorReader editorReader = new EditorReader();
         public static string DontCoolSaveWhenMD5EqualsThisString = "";
 
         public static EditorReader GetEditorReader() {
@@ -179,6 +179,16 @@ namespace Mapping_Tools.Classes.Tools {
             beatmap.GiveObjectsGreenlines();
 
             return selected;
+        }
+
+        /// <summary>
+        /// Gets the hit objects out of an editor reader and converts them to better type
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <returns></returns>
+        public static List<BeatmapHelper.HitObject> GetHitObjects(EditorReader reader)
+        {
+            return reader.hitObjects.Select(o => (BeatmapHelper.HitObject) o).ToList();
         }
     }
 }

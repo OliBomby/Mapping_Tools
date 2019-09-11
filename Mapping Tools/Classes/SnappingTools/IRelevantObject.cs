@@ -1,4 +1,4 @@
-﻿using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.MathUtil;
 using System.Windows.Media;
 
 namespace Mapping_Tools.Classes.SnappingTools {
@@ -7,5 +7,6 @@ namespace Mapping_Tools.Classes.SnappingTools {
         Vector2 NearestPoint(Vector2 point);
         bool Intersection(IRelevantObject other, out Vector2[] intersections);
         void DrawYourself(DrawingContext context, CoordinateConverter converter);
+        Pen Pen { get; set; }
     }
 }
