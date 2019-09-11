@@ -1,7 +1,10 @@
-﻿using System;
+﻿using Mapping_Tools.Annotations;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public class Settings : INotifyPropertyChanged {
@@ -11,98 +14,101 @@ namespace Mapping_Tools.Classes.SystemTools {
         public double? MainWindowHeight { get; set; }
         public bool MainWindowMaximized { get; set; }
 
-        private string osuPath;
+        private string _osuPath;
         public string OsuPath {
-            get { return osuPath; }
+            get => _osuPath;
             set {
-                if (osuPath != value) {
-                    osuPath = value;
-                    NotifyPropertyChanged("OsuPath");
-                }
+                if (_osuPath == value) return;
+                _osuPath = value;
+                OnPropertyChanged();
             }
         }
 
-        private string songsPath;
+        private string _songsPath;
         public string SongsPath {
-            get { return songsPath; }
+            get => _songsPath;
             set {
-                if (songsPath != value) {
-                    songsPath = value;
-                    NotifyPropertyChanged("SongsPath");
-                }
+                if (_songsPath == value) return;
+                _songsPath = value;
+                OnPropertyChanged();
             }
         }
 
-        private string backupsPath;
+        private string _backupsPath;
         public string BackupsPath {
-            get { return backupsPath; }
+            get => _backupsPath;
             set {
-                if (backupsPath != value) {
-                    backupsPath = value;
-                    NotifyPropertyChanged("BackupsPath");
-                }
+                if (_backupsPath == value) return;
+                _backupsPath = value;
+                OnPropertyChanged();
             }
         }
 
-        private bool makeBackups;
+        private string _osuConfigPath;
+        public string OsuConfigPath {
+            get => _osuConfigPath;
+            set {
+                if (_osuConfigPath == value) return;
+                _osuConfigPath = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _makeBackups;
         public bool MakeBackups {
-            get { return makeBackups; }
+            get => _makeBackups;
             set {
-                if (makeBackups != value) {
-                    makeBackups = value;
-                    NotifyPropertyChanged("MakeBackups");
-                }
+                if (_makeBackups == value) return;
+                _makeBackups = value;
+                OnPropertyChanged();
             }
         }
 
-        private bool overrideOsuSave;
+        private bool _overrideOsuSave;
         public bool OverrideOsuSave {
-            get { return overrideOsuSave; }
+            get => _overrideOsuSave;
             set {
-                if (overrideOsuSave != value) {
-                    overrideOsuSave = value;
-                    NotifyPropertyChanged("OverrideOsuSave");
-                }
+                if (_overrideOsuSave == value) return;
+                _overrideOsuSave = value;
+                OnPropertyChanged();
             }
         }
 
-        private bool autoReload;
+        private bool _autoReload;
         public bool AutoReload {
-            get { return autoReload; }
+            get => _autoReload;
             set {
-                if (autoReload != value) {
-                    autoReload = value;
-                    NotifyPropertyChanged("AutoReload");
-                }
+                if (_autoReload == value) return;
+                _autoReload = value;
+                OnPropertyChanged();
             }
         }
 
-        private Hotkey quickRunHotkey;
+        private Hotkey _quickRunHotkey;
         public Hotkey QuickRunHotkey {
-            get { return quickRunHotkey; }
+            get => _quickRunHotkey;
             set {
-                if (quickRunHotkey != value) {
-                    quickRunHotkey = value;
-                    NotifyPropertyChanged("QuickRunHotkey");
-                }
+                if (_quickRunHotkey == value) return;
+                _quickRunHotkey = value;
+                OnPropertyChanged();
             }
         }
 
-        private Hotkey betterSaveHotkey;
+        private Hotkey _betterSaveHotkey;
         public Hotkey BetterSaveHotkey {
-            get { return betterSaveHotkey; }
+            get => _betterSaveHotkey;
             set {
-                if (betterSaveHotkey != value) {
-                    betterSaveHotkey = value;
-                    NotifyPropertyChanged("BetterSaveHotkey");
-                }
+                if (_betterSaveHotkey == value) return;
+                _betterSaveHotkey = value;
+                OnPropertyChanged();
             }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public void NotifyPropertyChanged(string propName) {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public Settings() {
@@ -127,7 +133,7 @@ namespace Mapping_Tools.Classes.SystemTools {
                 catch (ArgumentOutOfRangeException) {
                 }
             }
-            RecentMaps.Insert(0, new string[] { paths, date.ToString()});
+            RecentMaps.Insert(0, new string[] { paths, date.ToString(CultureInfo.CurrentCulture)});
         }
 
         public void CopyTo(Settings other) {

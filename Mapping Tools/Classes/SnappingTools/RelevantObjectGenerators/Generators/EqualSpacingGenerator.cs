@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Mapping_Tools.Classes.BeatmapHelper;
+﻿using System.Collections.Generic;
 using Mapping_Tools.Classes.MathUtil;
 
-namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators {
-    class EqualSpacingGenerator : IGenerateRelevantObjectsFromRelevantPoints {
-        public bool IsActive { get; set; }
-        public string Name => "Equal Spacing Generator";
-        public GeneratorType GeneratorType => GeneratorType.Polygons;
+namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators.Generators {
+    class EqualSpacingGenerator : RelevantObjectsGenerator, IGenerateRelevantObjectsFromRelevantPoints {
+        public new string Name => "Equal Spacing Generator";
+        public new GeneratorType GeneratorType => GeneratorType.Polygons;
 
         public List<IRelevantObject> GetRelevantObjects(List<RelevantPoint> objects) {
             List<IRelevantObject> newObjects = new List<IRelevantObject>();

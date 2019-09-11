@@ -51,5 +51,13 @@ namespace Mapping_Tools.Views
         private void Button_Click_3(object sender, RoutedEventArgs e) {
             MainWindow.AppWindow.listenerManager.ReloadHotkeys();
         }
+
+        private void Button_Click_4(object sender, RoutedEventArgs e)
+        {
+            string path = IOHelper.ConfigFileDialog(SettingsManager.GetOsuPath());
+            if (!string.IsNullOrWhiteSpace(path)) {
+                SettingsManager.Settings.OsuConfigPath = path;
+            }
+        }
     }
 }

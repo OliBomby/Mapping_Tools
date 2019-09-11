@@ -1,9 +1,7 @@
 ﻿using Mapping_Tools.Classes.MathUtil;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Media;
 
 namespace Mapping_Tools.Classes.SnappingTools {
     public class RelevantCircle : IRelevantObject {
@@ -14,8 +12,29 @@ namespace Mapping_Tools.Classes.SnappingTools {
             return Math.Abs(dist - child.Radius);
         }
 
-        public bool Intersection(IRelevantObject other, out Vector2[] intersections) {
-            throw new NotImplementedException();
+        public bool Intersection(IRelevantObject other, out Vector2[] intersections)
+        {
+            if (other is RelevantPoint point) {
+                intersections = new[] { point.child };
+                return Precision.AlmostEquals(Vector2.Distance(child.Centre, point.child), child.Radius);
+            }
+
+            if (other is RelevantLine line) {
+                return Circle.Intersection(child, line.child, out intersections);
+            }
+
+            if (other is RelevantCircle circle) {
+                return Circle.Intersection(child, circle.child, out intersections);
+            }
+
+            intersections = new Vector2[0];
+            return false;
+        }
+
+        public void DrawYourself(DrawingContext context, CoordinateConverter converter) {
+            var cPos = converter.EditorToRelativeCoordinate(child.Centre);
+            var radius = converter.EditorToScreenSize(child.Radius);
+            context.DrawEllipse(null, new Pen(Brushes.Red, 5), new Point(cPos.X, cPos.Y), radius, radius);
         }
 
         public Vector2 NearestPoint(Vector2 point) {

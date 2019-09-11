@@ -437,6 +437,7 @@ namespace Mapping_Tools {
 
         //Close window
         private void CloseWin(object sender, RoutedEventArgs e) {
+            if (DataContext is MappingTool mt){ mt.Deactivate(); }
             Views.AutoSaveSettings();
             SettingsManager.UpdateSettings();
             SettingsManager.WriteToJSON(false);

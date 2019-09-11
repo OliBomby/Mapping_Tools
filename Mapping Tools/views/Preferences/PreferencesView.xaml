@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Mapping_Tools.Views.PreferencesView"
+<UserControl x:Class="Mapping_Tools.Views.PreferencesView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -44,7 +44,18 @@
                     <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                 </Button >
             </Grid>
-            <CheckBox Content="Make automatic backups" IsChecked="{Binding MakeBackups, Mode=TwoWay}" Margin="0,10,0,0" ToolTip="Make automatic backups whenever you run tools."/>
+            <Grid Margin="0,10,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="OsuConfigPathBox" Text="{Binding OsuConfigPath, Mode=TwoWay}" MinWidth="220" Margin="0,0,5,0"
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="osu! user config file"/>
+                <Button Grid.Column="1" Cursor="Hand" Click="Button_Click_4" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
+                    <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                </Button >
+            </Grid>
+            <CheckBox Content="Make automatic backups" IsChecked="{Binding MakeBackups, Mode=TwoWay}" Margin="0,5,0,0" ToolTip="Make automatic backups whenever you run tools."/>
             <CheckBox Content="Override osu! save with BetterSave™" IsChecked="{Binding OverrideOsuSave, Mode=TwoWay}" Margin="0,0,0,0" ToolTip="Automatically BetterSave after every osu! save."/>
             <CheckBox Content="Auto reload after QuickRun" IsChecked="{Binding AutoReload, Mode=TwoWay}" Margin="0,0,0,0" ToolTip="Tries to reload the editor after every QuickRun."/>
             <Grid Margin="0,10,0,0">

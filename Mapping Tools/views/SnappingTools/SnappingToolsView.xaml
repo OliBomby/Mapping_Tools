@@ -7,8 +7,9 @@
              xmlns:cm="clr-namespace:System.ComponentModel;assembly=System"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:components="clr-namespace:Mapping_Tools.Components"
+             xmlns:relevantObjectGenerators="clr-namespace:Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators"
              mc:Ignorable="d"
-             IsActive="{Binding AutoSnapTimerEnabled}"
+             IsActive="{Binding ListenersEnabled, Mode=OneWayToSource}"
              d:DesignHeight="450" Width="759.5">
     <Grid Name="MasterGrid">
         <Grid.RowDefinitions>
@@ -33,23 +34,24 @@
                                 <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
                             </materialDesign:PopupBox.ToggleContent>
                             <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
-                        Calculate intersections of linear sliders.
-                            </TextBlock>
-                        </materialDesign:PopupBox>
-                        <materialDesign:PopupBox Margin="0,10,10,10" VerticalAlignment="Bottom">
-                            <materialDesign:PopupBox.ToggleContent>
-                                <materialDesign:PackIcon Kind="LightningBoltCircle" Width="24" Height="24" Foreground="{DynamicResource PrimaryHueLightBrush}"/>
-                            </materialDesign:PopupBox.ToggleContent>
-                            <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
-                            This tool is compatible with QuickRun!
+                        Generates and keeps track of a list virtual objects that are geometrically relevant to the objects visible on your screen. Press and hold the Activation Key to let your cursor snap to the closest virtual object.
                             </TextBlock>
                         </materialDesign:PopupBox>
                     </StackPanel>
-
-                    <components:HotkeyEditorControl Width="150" HorizontalAlignment="Left" Margin="0,10,0,0" Hotkey="{Binding SnapHotkey}"/>
-                    <Button Content="Reload relevant objects" Command="{Binding GenerateCommand}"/>
-                    <TextBox Margin="0,0,0,10" Name="txtFilter" Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}"/>
-                    
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock x:Name="ActivationKeyTextBlock" Text="Activation Key:" VerticalAlignment="Bottom" Margin="10,0" ToolTip="Press and hold this key to snap your cursor to the closest virtual object."/>
+                        <components:HotkeyEditorControl Width="150" HorizontalAlignment="Left" Margin="0,10,0,0" Hotkey="{Binding SnapHotkey}" Grid.Column="1"/>
+                        <TextBlock x:Name="FilterTextBlock" Grid.Row="1" Text="Filters:" VerticalAlignment="Center" Margin="10,0"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" Margin="0,0,0,10" Name="TxtFilter" Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Grid>
                 </StackPanel>
 
                 <ListView Grid.Row="1" SelectionMode="Single" ItemsSource="{Binding Generators}" ScrollViewer.VerticalScrollBarVisibility="Visible">
@@ -57,8 +59,8 @@
                         <GridView>
                             <GridViewColumn Header="IsActive">
                                 <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <CheckBox IsChecked="{Binding IsActive}"/>
+                                    <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
+                                        <CheckBox IsChecked="{Binding IsActive}" />
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
@@ -91,16 +93,6 @@
                         </GroupStyle>
                     </ListView.GroupStyle>
                 </ListView>
-
-                <Viewbox Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
-                    <Button
-                    x:Name="start"
-                    Style="{StaticResource MaterialDesignFloatingActionButton}"
-                    Click="Start_Click">
-                        <materialDesign:PackIcon
-                        Kind="Play" Height="36" Width="36" />
-                    </Button>
-                </Viewbox>
             </Grid>
         </Grid>
         <Grid Name="SecondGrid" Grid.Row="1" Grid.Column="0">
@@ -114,15 +106,8 @@
                 </WrapPanel>
             </Grid>
             <Grid Grid.Column="1">
-                <ProgressBar x:Name="progress" Margin="20,0,20,0" Height="20" Foreground="#FF838383" Background="{x:Null}" BorderBrush="{x:Null}"/>
+                <ProgressBar x:Name="Progress" Margin="20,0,20,0" Height="20" Foreground="#FF838383" Background="{x:Null}" BorderBrush="{x:Null}"/>
             </Grid>
         </Grid>
     </Grid>
-    <UserControl.Resources>
-        <cm:BackgroundWorker x:Key="backgroundWorker"
-         DoWork="BackgroundWorker_DoWork"
-         RunWorkerCompleted="BackgroundWorker_RunWorkerCompleted"
-         WorkerReportsProgress="True"
-         ProgressChanged="BackgroundWorker_ProgressChanged"/>
-    </UserControl.Resources>
 </local:MappingTool>

@@ -89,6 +89,21 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
         }
 
+        public static string ConfigFileDialog(string initialDirectory = "") {
+            bool restore = initialDirectory == "";
+
+            using (OpenFileDialog openFileDialog = new OpenFileDialog {
+                Filter = "Config files (*.cfg)|*.cfg",
+                FilterIndex = 1,
+                InitialDirectory = initialDirectory,
+                RestoreDirectory = restore,
+                CheckFileExists = true
+            }) {
+                openFileDialog.ShowDialog();
+                return openFileDialog.FileName;
+            }
+        }
+
         public static string MIDIFileDialog() {
             using( OpenFileDialog openFileDialog = new OpenFileDialog {
                 Filter = "MIDI files (*.mid)|*.mid",

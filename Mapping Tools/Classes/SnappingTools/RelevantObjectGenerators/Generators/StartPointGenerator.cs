@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using Mapping_Tools.Classes.BeatmapHelper;
 
-namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators {
-    class StartPointGenerator : IGenerateRelevantObjectsFromHitObjects {
-        public bool IsActive { get; set; }
-        public string Name => "StartPoint Generator";
-        public GeneratorType GeneratorType => GeneratorType.Basic;
+namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators.Generators {
+    class StartPointGenerator : RelevantObjectsGenerator, IGenerateRelevantObjectsFromHitObjects {
+        public new string Name => "StartPoint Generator";
+        public new GeneratorType GeneratorType => GeneratorType.Basic;
 
         public List<IRelevantObject> GetRelevantObjects(List<HitObject> objects) {
             List<IRelevantObject> newObjects = new List<IRelevantObject>();

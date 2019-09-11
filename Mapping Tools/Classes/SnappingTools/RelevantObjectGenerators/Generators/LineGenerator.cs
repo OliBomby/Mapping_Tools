@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Mapping_Tools.Classes.BeatmapHelper;
+﻿using System.Collections.Generic;
 using Mapping_Tools.Classes.MathUtil;
 
-namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators {
-    class LineGenerator : IGenerateRelevantObjectsFromRelevantPoints {
-        public bool IsActive { get; set; }
-        public string Name => "Line Generator";
-        public GeneratorType GeneratorType => GeneratorType.Polygons;
+namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators.Generators {
+    class LineGenerator : RelevantObjectsGenerator, IGenerateRelevantObjectsFromRelevantPoints {
+        public new string Name => "Line Generator";
+        public new GeneratorType GeneratorType => GeneratorType.Polygons;
 
         public List<IRelevantObject> GetRelevantObjects(List<RelevantPoint> objects) {
             List<IRelevantObject> newObjects = new List<IRelevantObject>();
