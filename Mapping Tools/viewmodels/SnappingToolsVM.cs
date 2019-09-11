@@ -302,13 +302,20 @@ namespace Mapping_Tools.Viewmodels {
             var relevantLines = new List<RelevantLine>();
             var relevantCircles = new List<RelevantCircle>();
 
-            foreach (var ro in _relevantObjects) {
-                if (ro is RelevantPoint rp)
-                    relevantPoints.Add(rp);
-                else if (ro is RelevantLine rl)
-                    relevantLines.Add(rl);
-                else if (ro is RelevantCircle rc)
-                    relevantCircles.Add(rc);
+            foreach (var ro in _relevantObjects)
+            {
+                switch (ro)
+                {
+                    case RelevantPoint rp:
+                        relevantPoints.Add(rp);
+                        break;
+                    case RelevantLine rl:
+                        relevantLines.Add(rl);
+                        break;
+                    case RelevantCircle rc:
+                        relevantCircles.Add(rc);
+                        break;
+                }
             }
 
             // Generate more RelevantObjects
