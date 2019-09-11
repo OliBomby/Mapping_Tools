@@ -22,10 +22,8 @@ namespace Mapping_Tools.Views.SnappingTools {
             base.Initialize(targetWindow);
 
             OverlayWindow = new OverlayWindow(targetWindow);
-#if DEBUG
             OverlayWindow.BorderBrush = Brushes.Blue;
             OverlayWindow.BorderThickness = new Thickness(3);
-#endif
 
             _tickEngine.Interval = TimeSpan.FromMilliseconds(1000 / 60f);
             _tickEngine.PreTick += OnPreTick;
