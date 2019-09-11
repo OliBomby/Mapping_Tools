@@ -250,15 +250,22 @@ namespace Mapping_Tools.Viewmodels {
             _overlay.OverlayWindow.InvalidateVisual();
         }
 
-        private void UpdateRelevantObjects() {
-            if (!EditorReaderStuff.TryGetFullEditorReader(out var reader)) return;
+        private List<HitObject> GetVisibleHitObjects()
+        {
+            if (!EditorReaderStuff.TryGetFullEditorReader(out var reader)) return new List<HitObject>();
 
-            var editor = EditorReaderStuff.GetNewestVersion(reader, out _);
+            var hitObjects = EditorReaderStuff.GetHitObjects(reader);
 
             // Get the visible hitobjects using approach rate
             var approachTime = ApproachRateToMs(reader.ApproachRate);
-            var visibleObjects = editor.Beatmap.HitObjects.Where(o => Math.Abs(o.Time - _editorTime) < approachTime).ToList();
+            var thereAreSelected = reader.numSelected > 0;
+            return hitObjects.Where(o => Math.Abs(o.Time - _editorTime) < approachTime && (!thereAreSelected || o.IsSelected)).ToList();
+        }
 
+        private void UpdateRelevantObjects()
+        {
+            var visibleObjects = GetVisibleHitObjects();
+            
             if (_visibleObjects != null && visibleObjects.SequenceEqual(_visibleObjects, new HitObjectComparer()))
             {
                 // Visible Objects didn't change. Return to avoid redundant updates
@@ -276,13 +283,7 @@ namespace Mapping_Tools.Viewmodels {
         {
             if (visibleObjects == null)
             {
-                if (!EditorReaderStuff.TryGetFullEditorReader(out var reader)) return;
-
-                var editor = EditorReaderStuff.GetNewestVersion(reader, out _);
-
-                // Get the visible hitobjects using approach rate
-                var approachTime = ApproachRateToMs(reader.ApproachRate);
-                visibleObjects = editor.Beatmap.HitObjects.Where(o => Math.Abs(o.Time - _editorTime) < approachTime).ToList();
+                visibleObjects = GetVisibleHitObjects();
                 _visibleObjects = visibleObjects;
             }
 
