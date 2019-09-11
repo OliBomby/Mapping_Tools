@@ -1,4 +1,4 @@
-using Mapping_Tools.Classes.MathUtil;
+﻿using Mapping_Tools.Classes.MathUtil;
 using System.Windows;
 using System.Windows.Media;
 using Line = Mapping_Tools.Classes.MathUtil.Line;
@@ -6,12 +6,10 @@ using Line = Mapping_Tools.Classes.MathUtil.Line;
 namespace Mapping_Tools.Classes.SnappingTools {
     public class RelevantPoint : IRelevantObject {
         public readonly Vector2 child;
-        public static Pen DefaultPen = new Pen()
-        {
-            Brush = new SolidColorBrush
-            {
+        private readonly static Pen DefaultPen = new Pen() {
+            Brush = new SolidColorBrush {
                 Color = Colors.Cyan,
-                Opacity = 0.8,
+                Opacity = 0.8f,
             },
             DashStyle = DashStyles.Solid,
             Thickness = 3,
@@ -40,8 +38,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
             return false;
         }
 
-        public void DrawYourself(DrawingContext context, CoordinateConverter converter)
-        {
+        public void DrawYourself(DrawingContext context, CoordinateConverter converter) {
             var cPos = converter.EditorToRelativeCoordinate(child);
             context.DrawEllipse(null, Pen, new Point(cPos.X, cPos.Y), 5, 5);
         }
