@@ -44,7 +44,7 @@ namespace Mapping_Tools.Views.SnappingTools {
             // This will only be true if the target window is active
             // (or very recently has been, depends on your update rate)
             if (OverlayWindow.IsVisible) {
-                OverlayWindow.Update();
+                //OverlayWindow.Update();
 
                 Converter.OsuWindowPosition = new Vector2(OverlayWindow.Left, OverlayWindow.Top);
             }

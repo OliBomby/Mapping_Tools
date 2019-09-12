@@ -2,13 +2,15 @@
 using Mapping_Tools.Classes.SystemTools;
 using System;
 using System.IO;
+using System.Windows;
 using System.Windows.Forms;
 
 namespace Mapping_Tools.Classes.SnappingTools {
     public class CoordinateConverter
     {
-        private const int FilebarHeight = 24;
+        private const int FilebarHeight = 28;
         private const int WindowChromeHeight = 32;
+        private readonly Vector2 OsuWindowPositionOffset = new Vector2(2, 1);
         private readonly Vector2 ExtraOffset = new Vector2(0.5, 0.5);
         private string[] _configLines;
 
@@ -17,6 +19,8 @@ namespace Mapping_Tools.Classes.SnappingTools {
         public bool Fullscreen;
         public bool Letterboxing;
         public Vector2 LetterboxingPosition;
+
+        public Vector2 EditorResolution => OsuResolution - new Vector2(0, FilebarHeight);
 
         public CoordinateConverter()
         {
@@ -72,21 +76,86 @@ namespace Mapping_Tools.Classes.SnappingTools {
             return new Box2(screenBounds.Left, screenBounds.Top, screenBounds.Right, screenBounds.Bottom);
         }
 
-        public Box2 GetOsuWindowBox()
+        private bool OsuFillsScreen
         {
-            var chromeAddition = OsuResolution == new Vector2(GetScreenBox().Right, GetScreenBox().Bottom) ? Vector2.Zero : new Vector2(0, WindowChromeHeight);
-            return Fullscreen ? new Box2(Vector2.Zero, OsuResolution) : new Box2(OsuWindowPosition, OsuWindowPosition + OsuResolution + chromeAddition);
+            get
+            {
+                var screenBox = GetScreenBox();
+                return Fullscreen || Letterboxing || OsuResolution == new Vector2(screenBox.Right, screenBox.Bottom);
+            }
         }
 
         /// <summary>
-        /// Gets the area of the screen which is the editor area without menu bar
+        /// Gets the area on the screen in pixels which contains the entire osu window.
+        /// </summary>
+        /// <returns></returns>
+        public Box2 GetOsuWindowBox()
+        {
+            var chromeAddition = OsuFillsScreen ? Vector2.Zero : new Vector2(2, 2 + WindowChromeHeight);
+            return Letterboxing ? GetScreenBox() : 
+                Fullscreen ? new Box2(Vector2.Zero, OsuResolution) : 
+                new Box2(OsuWindowPosition + OsuWindowPositionOffset, OsuWindowPosition + OsuWindowPositionOffset + OsuResolution + chromeAddition);
+        }
+
+        /// <summary>
+        /// Gets the area on the screen in pixels which contains the entire osu window without added window chrome border.
+        /// </summary>
+        /// <returns></returns>
+        public Box2 GetOsuWindowBoxWithoutChrome()
+        {
+            var osuWindow = GetOsuWindowBox();
+            if (OsuFillsScreen) return osuWindow;
+
+            osuWindow.Top += 1 + WindowChromeHeight;
+            osuWindow.Left += 1;
+            osuWindow.Right -= 1;
+            osuWindow.Bottom -= 1;
+            return osuWindow;
+        }
+
+        /// <summary>
+        /// Gets the area on the screen in pixels which is the editor area without menu bar and without letterboxing black space.
         /// </summary>
         /// <returns></returns>
         public Box2 GetEditorBox()
         {
-            var osuWindow = GetOsuWindowBox();
+            var osuWindow = GetOsuWindowBoxWithoutChrome();
             osuWindow.Top += FilebarHeight;
+            if (!Letterboxing) return osuWindow;
+
+            var letterboxMultiplier = LetterboxingPosition / 200 + new Vector2(0.5, 0.5);  // range: 0-1
+            var blackSpaceSize = new Vector2(osuWindow.Width, osuWindow.Height) - EditorResolution;
+            var letterboxOffset = letterboxMultiplier * blackSpaceSize;
+            var letterboxOffset2 = (Vector2.One - letterboxMultiplier) * blackSpaceSize;
+
+            osuWindow.Left += letterboxOffset.X;
+            osuWindow.Top += letterboxOffset.Y;
+            osuWindow.Right -= letterboxOffset2.X;
+            osuWindow.Bottom -= letterboxOffset2.Y;
             return osuWindow;
+        }
+
+        /// <summary>
+        /// Gets the area on the screen in pixels which is the editor space going from (0, 0) to (512, 384) in osu pixels.
+        /// </summary>
+        /// <returns></returns>
+        public Box2 GetEditorGridBox()
+        {
+            var editor = GetEditorBox();
+
+            // Screen pixels per osu pixel
+            var ratio = editor.Height / 480;
+
+            var gridDimensions = new Vector2(512, 384) * ratio;
+            var emptySpace = new Vector2(editor.Width, editor.Height) - gridDimensions;
+            var gridOffset = new Vector2(emptySpace.X / 2, emptySpace.Y / 4 * 3);
+
+            editor.Left += gridOffset.X;
+            editor.Top += gridOffset.Y;
+            editor.Right = editor.Left + gridDimensions.X;
+            editor.Bottom = editor.Top + gridDimensions.Y;
+
+            return editor;
         }
 
         public Vector2 ScreenResolution = new Vector2(1920, 1080);
