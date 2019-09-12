@@ -8,12 +8,12 @@ namespace Mapping_Tools.Classes.SnappingTools {
     public class CoordinateConverter
     {
         private const int FilebarHeight = 24;
+        private const int WindowChromeHeight = 32;
         private readonly Vector2 ExtraOffset = new Vector2(0.5, 0.5);
         private string[] _configLines;
 
-        public Vector2 ScreenResolution;
         public Vector2 OsuWindowPosition = Vector2.Zero;
-        public Vector2 OsuWindowDimensions;
+        public Vector2 OsuResolution;
         public bool Fullscreen;
         public bool Letterboxing;
         public Vector2 LetterboxingPosition;
@@ -25,9 +25,6 @@ namespace Mapping_Tools.Classes.SnappingTools {
 
         public void Initialize()
         {
-            var screenBounds = Screen.PrimaryScreen.Bounds;
-            ScreenResolution = new Vector2(screenBounds.Width, screenBounds.Height);
-
             ReadConfig();
         }
 
@@ -42,10 +39,10 @@ namespace Mapping_Tools.Classes.SnappingTools {
 
                 Fullscreen = FindConfigValue("Fullscreen") == "1";
                 if (Fullscreen) {
-                    OsuWindowDimensions = new Vector2(double.Parse(FindConfigValue("WidthFullscreen")),
+                    OsuResolution = new Vector2(double.Parse(FindConfigValue("WidthFullscreen")),
                         double.Parse(FindConfigValue("HeightFullscreen")));
                 } else {
-                    OsuWindowDimensions = new Vector2(double.Parse(FindConfigValue("Width")),
+                    OsuResolution = new Vector2(double.Parse(FindConfigValue("Width")),
                         double.Parse(FindConfigValue("Height")));
                 }
 
@@ -69,18 +66,43 @@ namespace Mapping_Tools.Classes.SnappingTools {
             throw new Exception($"Can't find the key {key} in osu! user config.");
         }
 
+        public static Box2 GetScreenBox()
+        {
+            var screenBounds = Screen.PrimaryScreen.Bounds;
+            return new Box2(screenBounds.Left, screenBounds.Top, screenBounds.Right, screenBounds.Bottom);
+        }
+
+        public Box2 GetOsuWindowBox()
+        {
+            var chromeAddition = OsuResolution == new Vector2(GetScreenBox().Right, GetScreenBox().Bottom) ? Vector2.Zero : new Vector2(0, WindowChromeHeight);
+            return Fullscreen ? new Box2(Vector2.Zero, OsuResolution) : new Box2(OsuWindowPosition, OsuWindowPosition + OsuResolution + chromeAddition);
+        }
+
+        /// <summary>
+        /// Gets the area of the screen which is the editor area without menu bar
+        /// </summary>
+        /// <returns></returns>
+        public Box2 GetEditorBox()
+        {
+            var osuWindow = GetOsuWindowBox();
+            osuWindow.Top += FilebarHeight;
+            return osuWindow;
+        }
+
+        public Vector2 ScreenResolution = new Vector2(1920, 1080);
+
         public Vector2 ScreenToEditorCoordinate(Vector2 coord)
         {
             // In letterbox mode the osu window is always fullscreen sized and not upscaled
             // Letterboxing works in both fullscreen and windowed mode
             // The filebar is always at the topmost and not connected to the osu window, but it does reduce the window height by 24 every time
 
-            var windowDimensions = OsuWindowDimensions - new Vector2(0, FilebarHeight);
+            var windowDimensions = OsuResolution - new Vector2(0, FilebarHeight);
             var letterboxOffset = Letterboxing
-                ? (LetterboxingPosition / 200 + new Vector2(0.5, 0.5)) * (ScreenResolution - OsuWindowDimensions)
+                ? (LetterboxingPosition / 200 + new Vector2(0.5, 0.5)) * (ScreenResolution - OsuResolution)
                 : Vector2.Zero;  
             var windowOffset = OsuWindowPosition + letterboxOffset + new Vector2(0, FilebarHeight);
-            if (!Fullscreen && !Letterboxing && OsuWindowDimensions != ScreenResolution) {
+            if (!Fullscreen && !Letterboxing && OsuResolution != ScreenResolution) {
                 windowOffset += new Vector2(0, 24);
             }
 
@@ -94,12 +116,12 @@ namespace Mapping_Tools.Classes.SnappingTools {
 
         public Vector2 EditorToScreenCoordinate(Vector2 coord)
         {
-            var windowDimensions = OsuWindowDimensions - new Vector2(0, FilebarHeight);
+            var windowDimensions = OsuResolution - new Vector2(0, FilebarHeight);
             var letterboxOffset = Letterboxing
-                ? (LetterboxingPosition / 200 + new Vector2(0.5, 0.5)) * (ScreenResolution - OsuWindowDimensions)
+                ? (LetterboxingPosition / 200 + new Vector2(0.5, 0.5)) * (ScreenResolution - OsuResolution)
                 : Vector2.Zero;
             var windowOffset = OsuWindowPosition + letterboxOffset + new Vector2(0, FilebarHeight);
-            if (!Fullscreen && !Letterboxing && OsuWindowDimensions != ScreenResolution) {
+            if (!Fullscreen && !Letterboxing && OsuResolution != ScreenResolution) {
                 windowOffset += new Vector2(0, 24);
             }
 
@@ -112,12 +134,12 @@ namespace Mapping_Tools.Classes.SnappingTools {
         }
 
         public Vector2 EditorToRelativeCoordinate(Vector2 coord) {
-            var windowDimensions = OsuWindowDimensions - new Vector2(0, FilebarHeight);
+            var windowDimensions = OsuResolution - new Vector2(0, FilebarHeight);
             var letterboxOffset = Letterboxing
-                ? (LetterboxingPosition / 200 + new Vector2(0.5, 0.5)) * (ScreenResolution - OsuWindowDimensions)
+                ? (LetterboxingPosition / 200 + new Vector2(0.5, 0.5)) * (ScreenResolution - OsuResolution)
                 : Vector2.Zero;
             var windowOffset = letterboxOffset + new Vector2(0, FilebarHeight);
-            if (!Fullscreen && !Letterboxing && OsuWindowDimensions != ScreenResolution) {
+            if (!Fullscreen && !Letterboxing && OsuResolution != ScreenResolution) {
                 windowOffset += new Vector2(0, 24);
             }
 
@@ -131,7 +153,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
 
         public double EditorToScreenSize(double d)
         {
-            var windowDimensions = OsuWindowDimensions - new Vector2(0, FilebarHeight);
+            var windowDimensions = OsuResolution - new Vector2(0, FilebarHeight);
 
             // Screen pixels per osu pixel
             var ratio = windowDimensions.Y / 480;
@@ -139,7 +161,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
         }
 
         public override string ToString() {
-            return $"{ScreenResolution}, {OsuWindowPosition}, {OsuWindowDimensions}, {Fullscreen}, {Letterboxing}, {LetterboxingPosition}";
+            return $"{ScreenResolution}, {OsuWindowPosition}, {OsuResolution}, {Fullscreen}, {Letterboxing}, {LetterboxingPosition}";
         }
     }
 }

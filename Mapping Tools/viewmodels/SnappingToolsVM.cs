@@ -137,7 +137,8 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
-        private void UpdateTimerTick(object sender, EventArgs e) {
+        private void UpdateTimerTick(object sender, EventArgs e)
+        {
             var reader = EditorReaderStuff.GetEditorReader();
             switch (_state) {
                 case State.Disabled:
@@ -221,6 +222,14 @@ namespace Mapping_Tools.Viewmodels {
                     }
 
                     _overlay.Update();
+                    _coordinateConverter.OsuWindowPosition = new Vector2(_osuWindow.X, _osuWindow.Y);
+                    var bounds = _coordinateConverter.GetEditorBox();
+                    Console.WriteLine(bounds);
+                    Console.WriteLine(System.Windows.Forms.Cursor.Position);
+                    _overlay.OverlayWindow.Left = bounds.Left;
+                    _overlay.OverlayWindow.Top = bounds.Top;
+                    _overlay.OverlayWindow.Width = bounds.Width;
+                    _overlay.OverlayWindow.Height = bounds.Height;
 
                     if (!_autoSnapTimer.IsEnabled && IsHotkeyDown(SnapHotkey)) {
                         _autoSnapTimer.Start();
