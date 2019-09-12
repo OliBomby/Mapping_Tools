@@ -1,4 +1,5 @@
 ﻿using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SystemTools;
 using System;
 using System.Windows;
 using System.Windows.Media;
@@ -6,20 +7,24 @@ using System.Windows.Media;
 namespace Mapping_Tools.Classes.SnappingTools {
     public class RelevantCircle : IRelevantObject {
         public readonly Circle child;
-        private readonly static Pen DefaultPen = new Pen() {
-            Brush = new SolidColorBrush {
-                Color = Colors.Red,
-                Opacity = 0.8f,
-            },
-            DashStyle = DashStyles.Dash,
-            Thickness = 3,
-        };
-        public Pen Pen { get; set; } = DefaultPen;
+        private readonly SnappingToolsPreferences settings = SettingsManager.Settings.SnappingToolsPreferences;
+
         public bool IsHighlighted;
 
         public double DistanceTo(Vector2 point) {
             var dist = Vector2.Distance(point, child.Centre);
             return Math.Abs(dist - child.Radius);
+        }
+        private Pen GetDefaultPen() {
+            Pen pen = new Pen() {
+                Brush = new SolidColorBrush {
+                    Color = settings.CircleColor,
+                    Opacity = settings.CircleOpacity,
+                },
+                DashStyle = settings.GetDashStyle(settings.CircleDashstyle),
+                Thickness = settings.CircleThickness,
+            };
+            return pen;
         }
 
         public bool Intersection(IRelevantObject other, out Vector2[] intersections) {
@@ -43,7 +48,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
         public void DrawYourself(DrawingContext context, CoordinateConverter converter) {
             var cPos = converter.EditorToRelativeCoordinate(child.Centre);
             var radius = converter.EditorToScreenSize(child.Radius);
-            context.DrawEllipse(null, Pen, new Point(cPos.X, cPos.Y), radius, radius);
+            context.DrawEllipse(null, GetDefaultPen(), new Point(cPos.X, cPos.Y), radius, radius);
         }
 
         public Vector2 NearestPoint(Vector2 point) {

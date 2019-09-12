@@ -68,6 +68,9 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public SnappingToolsVm() {
+            //initiate SnappingToolsPreferences if it's null
+            if (SettingsManager.Settings.SnappingToolsPreferences == null) { SettingsManager.Settings.SnappingToolsPreferences = new SnappingToolsPreferences(); }
+
             // Get all the RelevantObjectGenerators
             var interfaceType = typeof(RelevantObjectsGenerator);
             Generators = new ObservableCollection<RelevantObjectsGenerator>(AppDomain.CurrentDomain.GetAssemblies()

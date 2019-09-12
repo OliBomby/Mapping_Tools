@@ -20,7 +20,8 @@ namespace Mapping_Tools.Views.SnappingTools {
     /// </summary>
     public partial class SnappingToolsPreferencesWindow : Window {
         public SnappingToolsPreferencesWindow() {
-            DataContext = SnappingToolsView.Settings;
+            SnappingToolsPreferencesVM VM = new SnappingToolsPreferencesVM();
+            DataContext = VM;
             InitializeComponent();
         }
 

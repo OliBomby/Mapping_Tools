@@ -1,4 +1,5 @@
 ﻿using Mapping_Tools.Annotations;
+using Mapping_Tools.Classes.SnappingTools;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,7 +10,7 @@ using System.Runtime.CompilerServices;
 namespace Mapping_Tools.Classes.SystemTools {
     public class Settings : INotifyPropertyChanged {
         public List<string[]> RecentMaps { get; set; }
-
+        public SnappingToolsPreferences SnappingToolsPreferences { get; set; }
         public double? MainWindowWidth { get; set; }
         public double? MainWindowHeight { get; set; }
         public bool MainWindowMaximized { get; set; }
