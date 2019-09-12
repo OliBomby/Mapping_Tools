@@ -4,6 +4,8 @@ using Overlay.NET.Common;
 using Overlay.NET.Wpf;
 using Process.NET.Windows;
 using System;
+using System.Windows;
+using System.Windows.Media;
 using OverlayWindow = Overlay.NET.Wpf.OverlayWindow;
 
 namespace Mapping_Tools.Views.SnappingTools {
@@ -20,6 +22,8 @@ namespace Mapping_Tools.Views.SnappingTools {
             base.Initialize(targetWindow);
 
             OverlayWindow = new OverlayWindow(targetWindow);
+            OverlayWindow.BorderBrush = Brushes.Blue;
+            OverlayWindow.BorderThickness = new Thickness(3);
 
             _tickEngine.Interval = TimeSpan.FromMilliseconds(1000 / 60f);
             _tickEngine.PreTick += OnPreTick;

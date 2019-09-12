@@ -69,6 +69,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         // Special combined with timeline
         public List<TimelineObject> TimelineObjects = new List<TimelineObject>();
 
+        public bool IsSelected { get; set; } = false;
+
         public HitObject(string line) {
             // Example lines:
             // 74,183,57308,2,0,B|70:236,1,53.9999983520508,4|0,0:3|0:0,0:0:0:0:
@@ -139,6 +141,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             SampleSet = (SampleSet)ob.SampleSet;
             AdditionSet = (SampleSet)ob.SampleSetAdditions;
             CustomIndex = ob.CustomSampleSet;
+            IsSelected = ob.IsSelected;
         }
 
         public static explicit operator HitObject(Editor_Reader.HitObject ob) {
