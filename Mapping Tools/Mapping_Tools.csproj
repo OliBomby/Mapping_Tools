@@ -268,11 +268,14 @@
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\LineGenerator.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\TriangleGenerator.cs" />
     <Compile Include="Classes\SnappingTools\RelevantPoint.cs" />
+    <Compile Include="Classes\SnappingTools\SnappingToolsSettings.cs" />
     <Compile Include="Classes\SystemTools\ActionHotkey.cs" />
     <Compile Include="Classes\SystemTools\Hotkey.cs" />
     <Compile Include="Classes\SystemTools\IOHelper.cs" />
     <Compile Include="Classes\SystemTools\IQuickRun.cs" />
     <Compile Include="Classes\SystemTools\ListenerManager.cs" />
+    <Compile Include="Classes\SystemTools\OverlaySettings\RelevantObjectSettings.cs" />
+    <Compile Include="Classes\SystemTools\OverlaySettings\RelevantPointSettings.cs" />
     <Compile Include="Classes\SystemTools\ProjectManager.cs" />
     <Compile Include="Classes\SystemTools\ISavable.cs" />
     <Compile Include="Classes\SystemTools\RunToolCompletedEventArgs.cs" />
@@ -283,6 +286,7 @@
     <Compile Include="Classes\Tools\CircleBezierPreset.cs" />
     <Compile Include="Classes\Tools\EditorReaderStuff.cs" />
     <Compile Include="Classes\Tools\MapCleaner.cs" />
+    <Compile Include="Components\Domain\ColorToBrushConverter.cs" />
     <Compile Include="Components\Domain\CommandImplementation.cs" />
     <Compile Include="Components\Domain\IsASCIIValidationRule.cs" />
     <Compile Include="Components\Domain\SnapDivisorToStringConverter.cs" />
@@ -294,6 +298,9 @@
     <Compile Include="Components\Domain\DoubleToStringConverter.cs" />
     <Compile Include="Components\HotkeyEditorControl.xaml.cs">
       <DependentUpon>HotkeyEditorControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Components\RelevantObjectSettingsControl.xaml.cs">
+      <DependentUpon>RelevantObjectSettingsControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Components\TimeLine\TimeLine.xaml.cs">
       <DependentUpon>TimeLine.xaml</DependentUpon>
@@ -321,6 +328,9 @@
     <Compile Include="Views\Extensions.cs" />
     <Compile Include="Views\MappingTool.cs" />
     <Compile Include="Views\SnappingTools\SnappingToolsOverlay.cs" />
+    <Compile Include="Views\SnappingTools\SnappingToolsPreferencesWindow.xaml.cs">
+      <DependentUpon>SnappingToolsPreferencesWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\TimingCopier\TimingCopierView.xaml.cs">
       <DependentUpon>TimingCopierView.xaml</DependentUpon>
     </Compile>
@@ -368,6 +378,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Components\RelevantObjectSettingsControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Components\TimeLine\TimeLine.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -400,6 +414,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\SnappingTools\SnappingToolsPreferencesWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\TimingCopier\TimingCopierView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
