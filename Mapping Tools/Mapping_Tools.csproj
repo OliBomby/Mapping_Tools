@@ -253,6 +253,7 @@
     <Compile Include="Classes\BeatmapHelper\TValue.cs" />
     <Compile Include="Classes\SnappingTools\CoordinateConverter.cs" />
     <Compile Include="Classes\SnappingTools\IRelevantObject.cs" />
+    <Compile Include="Classes\SnappingTools\PrefferencesManager.cs" />
     <Compile Include="Classes\SnappingTools\RelevantCircle.cs" />
     <Compile Include="Classes\SnappingTools\RelevantLine.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\GeneratorType.cs" />

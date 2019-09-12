@@ -17,7 +17,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
             DashStyle = DashStyles.Dash,
             Thickness = 3,
         };
-        public Pen Pen { get; set; } = DefaultPen;
+        public Pen Pen { get => FetchPrefferencesPen(); set => FetchPrefferencesPen(); }
         public bool IsHighlighted;
 
         public double DistanceTo(Vector2 point) {
@@ -59,6 +59,11 @@ namespace Mapping_Tools.Classes.SnappingTools {
             double x = (b * (b * point.X - a * point.Y) - a * c) / abs;
             double y = (a * (-b * point.X + a * point.Y) - b * c) / abs;
             return new Vector2(x, y);
+        }
+
+        public Pen FetchPrefferencesPen()
+        {
+            throw new System.NotImplementedException();
         }
 
         public RelevantLine(Line line) {
