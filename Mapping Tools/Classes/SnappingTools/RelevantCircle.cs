@@ -1,4 +1,4 @@
-using Mapping_Tools.Classes.MathUtil;
+﻿using Mapping_Tools.Classes.MathUtil;
 using System;
 using System.Windows;
 using System.Windows.Media;
@@ -6,12 +6,10 @@ using System.Windows.Media;
 namespace Mapping_Tools.Classes.SnappingTools {
     public class RelevantCircle : IRelevantObject {
         public readonly Circle child;
-        public static Pen DefaultPen = new Pen()
-        {
-            Brush = new SolidColorBrush
-            {
+        private readonly static Pen DefaultPen = new Pen() {
+            Brush = new SolidColorBrush {
                 Color = Colors.Red,
-                Opacity = 0.8,
+                Opacity = 0.8f,
             },
             DashStyle = DashStyles.Dash,
             Thickness = 3,
@@ -24,8 +22,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
             return Math.Abs(dist - child.Radius);
         }
 
-        public bool Intersection(IRelevantObject other, out Vector2[] intersections)
-        {
+        public bool Intersection(IRelevantObject other, out Vector2[] intersections) {
             if (other is RelevantPoint point) {
                 intersections = new[] { point.child };
                 return Precision.AlmostEquals(Vector2.Distance(child.Centre, point.child), child.Radius);

@@ -94,6 +94,11 @@
                 <ToggleButton Margin="8,0,16,0" IsChecked="True" Checked="MakeDark" Unchecked="MakeLight"/>
                 <TextBlock Text="Dark"/>
             </StackPanel>
+            <materialDesign:Card Margin="0,20,0,0">
+                <Expander Header="Snapping Tools Preferences">
+
+                </Expander>
+            </materialDesign:Card>
         </StackPanel>
     </Grid>
 </UserControl>
