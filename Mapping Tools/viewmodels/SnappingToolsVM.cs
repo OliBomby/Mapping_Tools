@@ -31,20 +31,16 @@ namespace Mapping_Tools.Viewmodels {
         private string _filter = "";
         public string Filter { get => _filter; set => SetFilter(value); }
 
-        public bool ListenersEnabled
-        {
-            set
-            {
+        public bool ListenersEnabled {
+            set {
                 _updateTimer.IsEnabled = value;
                 _configWatcher.EnableRaisingEvents = value;
 
-                if (!value)
-                {
+                if (!value) {
                     _state = State.Disabled;
                     _overlay.Dispose();
                 }
-                else
-                {
+                else {
                     _state = State.LookingForProcess;
                 }
             }
@@ -64,8 +60,7 @@ namespace Mapping_Tools.Viewmodels {
 
         private State _state;
 
-        private enum State
-        {
+        private enum State {
             Disabled,
             LookingForProcess,
             LookingForEditor,
@@ -84,7 +79,7 @@ namespace Mapping_Tools.Viewmodels {
             foreach (var gen in Generators) { gen.PropertyChanged += OnGeneratorPropertyChanged; }
 
             // Set up groups and filters
-            CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(Generators);
+            CollectionView view = (CollectionView) CollectionViewSource.GetDefaultView(Generators);
             PropertyGroupDescription groupDescription = new PropertyGroupDescription("GeneratorType");
             view.GroupDescriptions.Add(groupDescription);
             view.Filter = UserFilter;
@@ -111,36 +106,31 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         private void OnDraw(object sender, DrawingContext context) {
-            foreach (var obj in _relevantObjects)
-            {
+            foreach (var obj in _relevantObjects) {
                 obj.DrawYourself(context, _coordinateConverter);
             }
         }
 
-        private void OnSettingsChanged(object sender, PropertyChangedEventArgs e)
-        {
+        private void OnSettingsChanged(object sender, PropertyChangedEventArgs e) {
             if (e.PropertyName != "OsuConfigPath") return;
             SetConfigWatcherPath(SettingsManager.Settings.OsuConfigPath);
             _coordinateConverter.ReadConfig();
         }
 
-        private void SetConfigWatcherPath(string path)
-        {
+        private void SetConfigWatcherPath(string path) {
             try {
                 _configWatcher.Path = Path.GetDirectoryName(path);
                 _configWatcher.Filter = Path.GetFileName(path);
-            } catch (Exception ex) { Console.WriteLine(@"Can't set ConfigWatcher Path/Filter: " + ex.Message); }
+            }
+            catch (Exception ex) { Console.WriteLine(@"Can't set ConfigWatcher Path/Filter: " + ex.Message); }
         }
 
-        private void OnChangedConfigWatcher(object sender, FileSystemEventArgs e)
-        {
+        private void OnChangedConfigWatcher(object sender, FileSystemEventArgs e) {
             _coordinateConverter.ReadConfig();
         }
 
-        private void OnGeneratorPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == "IsActive" && _state == State.Active)
-            {
+        private void OnGeneratorPropertyChanged(object sender, PropertyChangedEventArgs e) {
+            if (e.PropertyName == "IsActive" && _state == State.Active) {
                 // Reload relevant objects when a generator gets enabled/disabled
                 GenerateRelevantObjects();
                 _overlay.OverlayWindow.InvalidateVisual();
@@ -163,7 +153,8 @@ namespace Mapping_Tools.Viewmodels {
 
                     try {
                         reader.SetProcess();
-                    } catch (Win32Exception) {
+                    }
+                    catch (Win32Exception) {
                         return;
                     }
 
@@ -187,15 +178,12 @@ namespace Mapping_Tools.Viewmodels {
                         return;
                     }
 
-                    try
-                    {
-                        if (!_osuWindow.Title.EndsWith(@".osu"))
-                        {
+                    try {
+                        if (!_osuWindow.Title.EndsWith(@".osu")) {
                             return;
                         }
                     }
-                    catch (ArgumentException)
-                    {
+                    catch (ArgumentException) {
                         _state = State.LookingForProcess;
                         _overlay.Dispose();
                         return;
@@ -203,7 +191,8 @@ namespace Mapping_Tools.Viewmodels {
 
                     try {
                         reader.FetchEditor();
-                    } catch {
+                    }
+                    catch {
                         return;
                     }
 
@@ -226,8 +215,7 @@ namespace Mapping_Tools.Viewmodels {
                     }
 
                     var editorTime = reader.EditorTime();
-                    if (editorTime != _editorTime)
-                    {
+                    if (editorTime != _editorTime) {
                         _editorTime = editorTime;
                         UpdateRelevantObjects();
                     }
@@ -243,8 +231,7 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
-        private void ClearRelevantObjects()
-        {
+        private void ClearRelevantObjects() {
             if (_relevantObjects.Count == 0) return;
             _relevantObjects.Clear();
             _overlay.OverlayWindow.InvalidateVisual();
@@ -261,7 +248,7 @@ namespace Mapping_Tools.Viewmodels {
             var thereAreSelected = reader.numSelected > 0;
             return hitObjects.Where(o => Math.Abs(o.Time - _editorTime) < approachTime && (!thereAreSelected || o.IsSelected)).ToList();
         }
-
+      
         private void UpdateRelevantObjects()
         {
             var visibleObjects = GetVisibleHitObjects();
@@ -278,7 +265,7 @@ namespace Mapping_Tools.Viewmodels {
 
             _overlay.OverlayWindow.InvalidateVisual();
         }
-
+      
         private void GenerateRelevantObjects(List<HitObject> visibleObjects=null)
         {
             if (visibleObjects == null)
@@ -334,8 +321,7 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
-        private static double ApproachRateToMs(double approachRate)
-        {
+        private static double ApproachRateToMs(double approachRate) {
             if (approachRate < 5) {
                 return 1800 - 120 * approachRate;
             }
@@ -344,8 +330,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         private void AutoSnapTimerTick(object sender, EventArgs e) {
-            if (!IsHotkeyDown(SnapHotkey))
-            {
+            if (!IsHotkeyDown(SnapHotkey)) {
                 _autoSnapTimer.Stop();
                 return;
             }
@@ -374,7 +359,7 @@ namespace Mapping_Tools.Viewmodels {
             // CONVERT THIS TO CURSOR POSITION
             if (nearest == null) return;
             var nearestPoint = _coordinateConverter.EditorToScreenCoordinate(nearest.NearestPoint(cursorPos));
-            System.Windows.Forms.Cursor.Position = new System.Drawing.Point((int)Math.Round(nearestPoint.X), (int)Math.Round(nearestPoint.Y));
+            System.Windows.Forms.Cursor.Position = new System.Drawing.Point((int) Math.Round(nearestPoint.X), (int) Math.Round(nearestPoint.Y));
         }
 
         private static bool IsHotkeyDown(Hotkey hotkey) {
@@ -394,8 +379,7 @@ namespace Mapping_Tools.Viewmodels {
             return true;
         }
 
-        private bool UserFilter(object item)
-        {
+        private bool UserFilter(object item) {
             if (string.IsNullOrEmpty(Filter))
                 return true;
             return ((RelevantObjectsGenerator) item).Name.IndexOf(Filter, StringComparison.OrdinalIgnoreCase) >= 0;

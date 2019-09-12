@@ -1,5 +1,4 @@
 using Mapping_Tools.Classes.MathUtil;
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
 using Line = Mapping_Tools.Classes.MathUtil.Line;
@@ -7,12 +6,10 @@ using Line = Mapping_Tools.Classes.MathUtil.Line;
 namespace Mapping_Tools.Classes.SnappingTools {
     public class RelevantLine : IRelevantObject {
         public readonly Line child;
-        public static Pen DefaultPen = new Pen()
-        {
-            Brush = new SolidColorBrush
-            {
+        private readonly static Pen DefaultPen = new Pen() {
+            Brush = new SolidColorBrush {
                 Color = Colors.LawnGreen,
-                Opacity = 0.8,
+                Opacity = 0.8f,
             },
             DashStyle = DashStyles.Dash,
             Thickness = 3,
@@ -24,8 +21,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
             return Line.Distance(child, point);
         }
 
-        public bool Intersection(IRelevantObject other, out Vector2[] intersections)
-        {
+        public bool Intersection(IRelevantObject other, out Vector2[] intersections) {
             if (other is RelevantPoint point) {
                 intersections = new[] { point.child };
                 return Precision.AlmostEquals(Line.Distance(child, point.child), 0);
