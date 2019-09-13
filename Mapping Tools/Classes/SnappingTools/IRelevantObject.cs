@@ -8,6 +8,6 @@ namespace Mapping_Tools.Classes.SnappingTools {
         bool Intersection(IRelevantObject other, out Vector2[] intersections);
         void DrawYourself(DrawingContext context, CoordinateConverter converter);
         Pen Pen { get; set; }
-        Pen FetchPrefferencesPen();
+       
     }
 }

@@ -14,7 +14,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
             DashStyle = DashStyles.Dash,
             Thickness = 3,
         };
-        public Pen Pen { get => FetchPrefferencesPen(); set => FetchPrefferencesPen(); }
+        public Pen Pen { get; set; }
         public bool IsHighlighted;
 
         public double DistanceTo(Vector2 point) {
@@ -52,10 +52,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
             return child.Centre + diff / dist * child.Radius;
         }
 
-        public Pen FetchPrefferencesPen()
-        {
-            
-        }
+
 
         public RelevantCircle(Circle circle) {
             child = circle;
