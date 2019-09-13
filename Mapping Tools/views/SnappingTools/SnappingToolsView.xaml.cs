@@ -4,8 +4,6 @@ using Mapping_Tools.Views.SnappingTools;
 
 namespace Mapping_Tools.Views {
     public partial class SnappingToolsView {
-        public static SnappingToolsSettings Settings { get; set; } = new SnappingToolsSettings();
-
         public SnappingToolsView() {
             DataContext = new SnappingToolsVm();
             InitializeComponent();

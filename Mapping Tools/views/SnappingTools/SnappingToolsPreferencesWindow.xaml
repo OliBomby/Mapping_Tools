@@ -6,12 +6,11 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:components="clr-namespace:Mapping_Tools.Components"
         mc:Ignorable="d"
-        Title="Snapping Tools Preferences" Height="500" Width="556"
+        Title="Snapping Tools Preferences" Height="500" Width="570" MinWidth="575"
         WindowStyle="None"
         ResizeMode="CanResize"
         AllowsTransparency="False"
         WindowStartupLocation="CenterScreen"
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Medium"
         TextElement.FontSize="14"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" Background="{DynamicResource MaterialDesignPaper}">
@@ -33,8 +32,124 @@
             </StackPanel>
         </Grid>
 
-        <StackPanel>
-            <components:RelevantObjectSettingsControl RelevantObjectSettings="{Binding LineSettings}"/>
-        </StackPanel>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Hidden">
+            <StackPanel>
+
+                <materialDesign:Card Margin="0,5,0,0">
+                    <TreeView HorizontalAlignment="Stretch">
+                        <TreeViewItem Header="Virtual points settings">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120" />
+                                    <ColumnDefinition Width="300"/>
+                                </Grid.ColumnDefinitions>
+                                <DockPanel>
+                                    <TextBox Text="{Binding Color, ElementName=PointColorPicker, UpdateSourceTrigger=PropertyChanged}"
+                                        Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" materialDesign:HintAssist.Hint="Color HEX value"
+                                        DockPanel.Dock="Top" Margin="2,0,10,2"/>
+                                </DockPanel>
+                                <materialDesign:ColorPicker Color="{Binding SnappingToolsPreferences.PointColor}" Grid.Column="1" x:Name="PointColorPicker" HorizontalAlignment="Stretch"/>
+                            </Grid>
+
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Opacity" Width="120" VerticalAlignment="Center"/>
+                                <Slider x:Name="PointOpacitySlider" Width="300" TickFrequency="0.01" Orientation="Horizontal" Minimum="0" Maximum="1" Value="{Binding SnappingToolsPreferences.PointOpacity,  UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
+                                <TextBox x:Name="PointOpacityTextbox" Width="60" Text="{Binding ElementName=PointOpacitySlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Thickness" Width="120" VerticalAlignment="Center"/>
+                                <Slider x:Name="PointThicknessSlider" Width="300" TickFrequency="1" Orientation="Horizontal" Minimum="1" Maximum="10" Value="{Binding SnappingToolsPreferences.PointThickness, UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
+                                <TextBox x:Name="PointThicknessTextbox" Width="60" Text="{Binding ElementName=PointThicknessSlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="DashStyle" Width="120" VerticalAlignment="Center"/>
+                                <ComboBox x:Name="PointDashStyleCombobox" Width="300" Margin="11,0" ItemsSource="{Binding SnappingToolsPreferences.DashStylesList}" SelectedItem="{Binding SnappingToolsPreferences.PointDashStyle}"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Size" Width="120" VerticalAlignment="Center"/>
+                                <Slider x:Name="PointSizeSlider" Width="300" TickFrequency="1" Orientation="Horizontal" Minimum="1" Maximum="10" Value="{Binding SnappingToolsPreferences.PointSize, UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
+                                <TextBox x:Name="PointSizeTextbox" Width="60" Text="{Binding ElementName=PointSizeSlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                        </TreeViewItem>
+                    </TreeView>
+                </materialDesign:Card>
+
+                <materialDesign:Card Margin="0,5,0,0">
+                    <TreeView HorizontalAlignment="Stretch">
+                        <TreeViewItem Header="Virtual lines settings">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120" />
+                                    <ColumnDefinition Width="300"/>
+                                </Grid.ColumnDefinitions>
+                                <DockPanel>
+                                    <TextBox Text="{Binding Color, ElementName=LineColorPicker, UpdateSourceTrigger=PropertyChanged}"
+                                        Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" materialDesign:HintAssist.Hint="Color HEX value"
+                                        DockPanel.Dock="Top" Margin="2,0,10,2"/>
+                                </DockPanel>
+                                <materialDesign:ColorPicker Color="{Binding SnappingToolsPreferences.LineColor}" Grid.Column="1" x:Name="LineColorPicker" HorizontalAlignment="Stretch"/>
+                            </Grid>
+
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Opacity" Width="120" VerticalAlignment="Center"/>
+                                <Slider x:Name="LineOpacitySlider" Width="300" TickFrequency="0.01" Orientation="Horizontal" Minimum="0" Maximum="1" Value="{Binding SnappingToolsPreferences.LineOpacity,  UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
+                                <TextBox x:Name="LineOpacityTextbox" Width="60" Text="{Binding ElementName=LineOpacitySlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Thickness" Width="120" VerticalAlignment="Center"/>
+                                <Slider x:Name="LineThicknessSlider" Width="300" TickFrequency="1" Orientation="Horizontal" Minimum="1" Maximum="10" Value="{Binding SnappingToolsPreferences.LineThickness, UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
+                                <TextBox x:Name="LineThicknessTextbox" Width="60" Text="{Binding ElementName=LineThicknessSlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="DashStyle" Width="120" VerticalAlignment="Center"/>
+                                <ComboBox x:Name="LineDashStyleCombobox" Width="300" Margin="11,0" ItemsSource="{Binding SnappingToolsPreferences.DashStylesList}" SelectedItem="{Binding SnappingToolsPreferences.LineDashStyle}"/>
+                            </StackPanel>
+                        </TreeViewItem>
+                    </TreeView>
+                </materialDesign:Card>
+
+                <materialDesign:Card Margin="0,5,0,0">
+                    <TreeView HorizontalAlignment="Stretch">
+                        <TreeViewItem Header="Virtual circles settings">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120" />
+                                    <ColumnDefinition Width="300"/>
+                                </Grid.ColumnDefinitions>
+                                <DockPanel>
+                                    <TextBox Text="{Binding Color, ElementName=CircleColorPicker, UpdateSourceTrigger=PropertyChanged}"
+                                        Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" materialDesign:HintAssist.Hint="Color HEX value"
+                                        DockPanel.Dock="Top" Margin="2,0,10,2"/>
+                                </DockPanel>
+                                <materialDesign:ColorPicker Color="{Binding SnappingToolsPreferences.CircleColor}" Grid.Column="1" x:Name="CircleColorPicker" HorizontalAlignment="Stretch"/>
+                            </Grid>
+
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Opacity" Width="120" VerticalAlignment="Center"/>
+                                <Slider x:Name="CircleOpacitySlider" Width="300" TickFrequency="0.01" Orientation="Horizontal" Minimum="0" Maximum="1" Value="{Binding SnappingToolsPreferences.CircleOpacity,  UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
+                                <TextBox x:Name="CircleOpacityTextbox" Width="60" Text="{Binding ElementName=CircleOpacitySlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Thickness" Width="120" VerticalAlignment="Center"/>
+                                <Slider x:Name="CircleThicknessSlider" Width="300" TickFrequency="1" Orientation="Horizontal" Minimum="1" Maximum="10" Value="{Binding SnappingToolsPreferences.CircleThickness, UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
+                                <TextBox x:Name="CircleThicknessTextbox" Width="60" Text="{Binding ElementName=CircleThicknessSlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="DashStyle" Width="120" VerticalAlignment="Center"/>
+                                <ComboBox x:Name="CircleDashStyleCombobox" Width="300" Margin="11,0" ItemsSource="{Binding SnappingToolsPreferences.DashStylesList}" SelectedItem="{Binding SnappingToolsPreferences.CircleDashStyle}"/>
+                            </StackPanel>
+                        </TreeViewItem>
+                    </TreeView>
+                </materialDesign:Card>
+
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Window>
