@@ -5,24 +5,30 @@ using System;
 using System.Collections.ObjectModel;
 
 namespace Mapping_Tools.Classes.SnappingTools {
-    public class SnappingToolsPreferences : BindableBase {
+    public class SnappingToolsPreferences : BindableBase, ICloneable{
+        #region private storage
         private Color pointColor = Colors.Cyan;
         private double pointOpacity = 0.8;
         private double pointThickness = 3;
-        private string pointDashstyle = "Solid";
+        private string pointDashstyle = DashStylesList[4];
         private double pointSize = 5;
 
         private Color lineColor = Colors.LawnGreen;
         private double lineOpacity = 0.8;
         private double lineThickness = 3;
-        private string lineDashstyle = "Dash";
+        private string lineDashstyle = DashStylesList[0];
 
         private Color circleColor = Colors.Red;
         private double circleOpacity = 0.8;
         private double circleThickness = 3;
-        private string circleDashstyle = "Dash";
+        private string circleDashstyle = DashStylesList[0];
 
-        //Point settings
+        private double scale = 1;
+        private int offsetX = 0;
+        private int offsetY = 0;
+        #endregion
+
+        #region point settings
         public Color PointColor {
             get => pointColor;
             set => Set(ref pointColor, value);
@@ -43,8 +49,9 @@ namespace Mapping_Tools.Classes.SnappingTools {
             get => pointSize;
             set => Set(ref pointSize, value);
         }
+        #endregion
 
-        //Line settings
+        #region line settings
         public Color LineColor {
             get => lineColor;
             set => Set(ref lineColor, value);
@@ -61,8 +68,9 @@ namespace Mapping_Tools.Classes.SnappingTools {
             get => lineDashstyle;
             set => Set(ref lineDashstyle, value);
         }
+        #endregion
 
-        //Circle settings
+        #region circle settings
         public Color CircleColor {
             get => circleColor;
             set => Set(ref circleColor, value);
@@ -79,12 +87,38 @@ namespace Mapping_Tools.Classes.SnappingTools {
             get => circleDashstyle;
             set => Set(ref circleDashstyle, value);
         }
+        #endregion
+
+        #region global settings
+        public double Scale {
+            get => scale;
+            set => Set(ref scale, value);
+        }
+
+        public int OffsetX {
+            get => offsetX;
+            set => Set(ref offsetX, value);
+        }
+
+        public int OffsetY {
+            get => offsetY;
+            set => Set(ref offsetY, value);
+        }
+
+        public int[] Offset {
+            get {
+                return new int[] { offsetX, offsetY };
+            }
+        }
+        #endregion
+
+        #region dashstyle helpers
         public static ObservableCollection<string> DashStylesList { get; } = new ObservableCollection<string> {
             "Dash",
             "Dot",
             "DashDot",
             "DashDotDot",
-            "Solid",
+            "Solid"
         };
 
         public DashStyle GetDashStyle(string input) {
@@ -103,5 +137,12 @@ namespace Mapping_Tools.Classes.SnappingTools {
                     throw new ArgumentOutOfRangeException();
             }
         }
+        #endregion
+
+        #region IClonable members
+        public object Clone() {
+            return MemberwiseClone();
+        }
+        #endregion
     }
 }

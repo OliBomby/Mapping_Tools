@@ -1,9 +1,9 @@
-﻿using Mapping_Tools.Classes.SnappingTools;
-using Mapping_Tools.Viewmodels;
+﻿using Mapping_Tools.Viewmodels;
 using Mapping_Tools.Views.SnappingTools;
 
 namespace Mapping_Tools.Views {
     public partial class SnappingToolsView {
+        public SnappingToolsPreferencesWindow preferencesWindow;
         public SnappingToolsView() {
             DataContext = new SnappingToolsVm();
             InitializeComponent();
@@ -12,8 +12,17 @@ namespace Mapping_Tools.Views {
         }
 
         private void PreferencesButton_Click(object sender, System.Windows.RoutedEventArgs e) {
-             SnappingToolsPreferencesWindow preferencesWindow = new SnappingToolsPreferencesWindow();
-             preferencesWindow.ShowDialog();
+            if (preferencesWindow == null) {
+                preferencesWindow = new SnappingToolsPreferencesWindow();
+                preferencesWindow.Show();
+                preferencesWindow.Closed += PreferencesWindow_Closed;
+            } else {
+                preferencesWindow.Activate();
+            }
+        }
+
+        private void PreferencesWindow_Closed(object sender, System.EventArgs e) {
+            preferencesWindow = null;
         }
     }
 }
