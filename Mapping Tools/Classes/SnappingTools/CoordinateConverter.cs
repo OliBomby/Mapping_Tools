@@ -24,7 +24,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
         }
 
         public Vector2 OsuWindowPositionOffset = new Vector2(2, 1);  // Extra offset applied to the position of the osu! window
-        public Vector2 RandomAssOffset => new Vector2(0.5, 0.5);
+        public Vector2 PositionSnapOffset => new Vector2(0.5, 0.5);  // A random offset to fix 1 pixel off snapping
         private string[] _configLines;
 
         public Vector2 OsuWindowPosition = Vector2.Zero;
@@ -189,7 +189,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
             var ratioX = editorGridBox.Width / EditorGridResolution.X;
             var ratioY = editorGridBox.Height / EditorGridResolution.Y;
 
-            return new Vector2((coord.X - RandomAssOffset.X - editorGridBox.Left) / ratioX, (coord.Y - RandomAssOffset.Y - editorGridBox.Top) / ratioY);
+            return new Vector2((coord.X - PositionSnapOffset.X - editorGridBox.Left) / ratioX, (coord.Y - PositionSnapOffset.Y - editorGridBox.Top) / ratioY);
         }
 
         public Vector2 EditorToScreenCoordinate(Vector2 coord) {
@@ -197,7 +197,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
             var ratioX = editorGridBox.Width / EditorGridResolution.X;
             var ratioY = editorGridBox.Height / EditorGridResolution.Y;
 
-            return new Vector2(coord.X * ratioX + editorGridBox.Left, coord.Y * ratioY + editorGridBox.Top) + RandomAssOffset;
+            return new Vector2(coord.X * ratioX + editorGridBox.Left, coord.Y * ratioY + editorGridBox.Top) + PositionSnapOffset;
         }
 
         public Vector2 EditorToRelativeCoordinate(Vector2 coord) {
