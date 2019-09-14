@@ -164,14 +164,7 @@ namespace Mapping_Tools.Viewmodels {
                     }
 
                     _processSharp = new ProcessSharp(process, MemoryType.Remote);
-                    _overlay = new SnappingToolsOverlay { Converter = _coordinateConverter };
-
                     _osuWindow = _processSharp.WindowFactory.MainWindow;
-                    _overlay.Initialize(_osuWindow);
-                    _overlay.Converter = _coordinateConverter;
-                    _overlay.Enable();
-
-                    _overlay.OverlayWindow.Draw += OnDraw;
 
                     _updateTimer.Interval = TimeSpan.FromSeconds(1);
                     _state = State.LookingForEditor;
@@ -180,7 +173,7 @@ namespace Mapping_Tools.Viewmodels {
                     _updateTimer.Interval = TimeSpan.FromSeconds(1);
                     if (reader.ProcessNeedsReload()) {
                         _state = State.LookingForProcess;
-                        _overlay.Dispose();
+                        _overlay?.Dispose();
                         return;
                     }
 
@@ -191,7 +184,7 @@ namespace Mapping_Tools.Viewmodels {
                     }
                     catch (ArgumentException) {
                         _state = State.LookingForProcess;
-                        _overlay.Dispose();
+                        _overlay?.Dispose();
                         return;
                     }
 
@@ -201,6 +194,14 @@ namespace Mapping_Tools.Viewmodels {
                     catch {
                         return;
                     }
+
+                    _overlay = new SnappingToolsOverlay { Converter = _coordinateConverter };
+
+                    _overlay.Initialize(_osuWindow);
+                    _overlay.Converter = _coordinateConverter;
+                    _overlay.Enable();
+
+                    _overlay.OverlayWindow.Draw += OnDraw;
 
                     _updateTimer.Interval = TimeSpan.FromMilliseconds(100);
                     _state = State.Active;
