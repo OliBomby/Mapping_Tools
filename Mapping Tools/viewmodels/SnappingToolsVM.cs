@@ -14,6 +14,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -140,7 +141,8 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
-        private void UpdateTimerTick(object sender, EventArgs e) {
+        private void UpdateTimerTick(object sender, EventArgs e)
+        {
             var reader = EditorReaderStuff.GetEditorReader();
             switch (_state) {
                 case State.Disabled:
@@ -166,6 +168,7 @@ namespace Mapping_Tools.Viewmodels {
 
                     _osuWindow = _processSharp.WindowFactory.MainWindow;
                     _overlay.Initialize(_osuWindow);
+                    _overlay.Converter = _coordinateConverter;
                     _overlay.Enable();
 
                     _overlay.OverlayWindow.Draw += OnDraw;
@@ -223,6 +226,7 @@ namespace Mapping_Tools.Viewmodels {
                         UpdateRelevantObjects();
                     }
 
+                    _coordinateConverter.OsuWindowPosition = new Vector2(_osuWindow.X, _osuWindow.Y);
                     _overlay.Update();
 
                     if (!_autoSnapTimer.IsEnabled && IsHotkeyDown(SnapHotkey)) {

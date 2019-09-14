@@ -3,8 +3,9 @@ using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators.Generators {
     class LineGenerator : RelevantObjectsGenerator, IGenerateRelevantObjectsFromRelevantPoints {
-        public new string Name => "Line Generator";
-        public new GeneratorType GeneratorType => GeneratorType.Polygons;
+        public new string Name => "Point Connector";
+        public new string Tooltip => "Takes a pair of virtual points and generates a virtual line that connects the two.";
+        public new GeneratorType GeneratorType => GeneratorType.Geometries;
 
         public List<IRelevantObject> GetRelevantObjects(List<RelevantPoint> objects) {
             List<IRelevantObject> newObjects = new List<IRelevantObject>();

@@ -3,8 +3,9 @@ using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators.Generators {
     class EqualSpacingGenerator : RelevantObjectsGenerator, IGenerateRelevantObjectsFromRelevantPoints {
-        public new string Name => "Equal Spacing Generator";
-        public new GeneratorType GeneratorType => GeneratorType.Polygons;
+        public new string Name => "Equal Spacing Assistant";
+        public new string Tooltip => "Takes a pair of virtual points and generates a pair of virtual circles with their centers on each point. Their radius is equal to the spacing between the two.";
+        public new GeneratorType GeneratorType => GeneratorType.Assistants;
 
         public List<IRelevantObject> GetRelevantObjects(List<RelevantPoint> objects) {
             List<IRelevantObject> newObjects = new List<IRelevantObject>();

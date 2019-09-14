@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Mapping_Tools.Classes.SnappingTools;
+﻿using Mapping_Tools.Classes.SnappingTools;
 using Mapping_Tools.Classes.SystemTools;
 using System.ComponentModel;
 

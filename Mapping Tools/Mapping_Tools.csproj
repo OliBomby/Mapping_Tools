@@ -271,6 +271,7 @@
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\EqualSpacingGenerator.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\LineGenerator.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\TriangleGenerator.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\TriangleGenerator2.cs" />
     <Compile Include="Classes\SnappingTools\RelevantPoint.cs" />
     <Compile Include="Classes\SnappingTools\SnappingToolsPreferences.cs" />
     <Compile Include="Classes\SystemTools\ActionHotkey.cs" />

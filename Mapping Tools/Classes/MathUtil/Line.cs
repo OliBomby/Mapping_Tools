@@ -154,14 +154,14 @@ namespace Mapping_Tools.Classes.MathUtil {
         {
             List<Vector2> candidates = new List<Vector2>
             {
-                new Vector2 {X = rect.Left, Y = line.C / line.B },
-                new Vector2 {X = line.C / line.A, Y = rect.Bottom },
-                new Vector2 {X = (line.C - rect.Top * line.B) / line.A , Y = rect.Top },
-                new Vector2 {X = rect.Right , Y = (line.C - rect.Right * line.A) / line.B },
+                new Vector2 {X = rect.Left, Y = (line.C - line.A * rect.Left) / line.B },
+                new Vector2 {X = (line.C - line.B * rect.Top) / line.A, Y = rect.Top },
+                new Vector2 {X = (line.C - line.B * rect.Bottom) / line.A, Y = rect.Bottom },
+                new Vector2 {X = rect.Right, Y = (line.C - line.A * rect.Right) / line.B },
             };
 
-            intersections = candidates.Where(p => (p[0] >= rect.Left) && (p[0] <= rect.Right) && (p[1] >= rect.Bottom) && (p[1] <= rect.Top)).ToArray();
-            return (intersections.Length == 2) ? true : false;
+            intersections = candidates.Where(p => (p[0] >= rect.Left) && (p[0] <= rect.Right) && (p[1] >= rect.Top) && (p[1] <= rect.Bottom)).ToArray();
+            return intersections.Length == 2;
         }
 
         /// <summary>
