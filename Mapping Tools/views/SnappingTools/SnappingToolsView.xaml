@@ -70,7 +70,13 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Header="Name" Width="300" DisplayMemberBinding="{Binding Name}" />
+                            <GridViewColumn Header="Name" Width="300">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
+                                        <TextBlock Text="{Binding Name}" ToolTip="{Binding Tooltip}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
                         </GridView>
                     </ListView.View>
 
@@ -101,6 +107,7 @@
                 </ListView>
             </Grid>
         </Grid>
+        
         <Grid Name="SecondGrid" Grid.Row="1" Grid.Column="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
