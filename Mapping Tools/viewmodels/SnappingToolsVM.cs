@@ -255,7 +255,7 @@ namespace Mapping_Tools.Viewmodels {
             // Get the visible hitobjects using approach rate
             var approachTime = ApproachRateToMs(reader.ApproachRate);
             var thereAreSelected = hitObjects.Any(o => o.IsSelected);
-            return hitObjects.Where(o => Math.Abs(o.Time - _editorTime) < approachTime && (!thereAreSelected || o.IsSelected)).ToList();
+            return hitObjects.Where(o => thereAreSelected ? o.IsSelected : Math.Abs(o.Time - _editorTime) < approachTime).ToList();
         }
       
         private void UpdateRelevantObjects()
