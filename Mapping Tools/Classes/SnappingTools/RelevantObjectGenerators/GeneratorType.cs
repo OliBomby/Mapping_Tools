@@ -4,6 +4,9 @@
         Polygons,
         Blankets,
         Geometries,
-        Symmetries
+        Symmetries,
+        Readers,
+        Assistants,
+        Generators,
     }
 }

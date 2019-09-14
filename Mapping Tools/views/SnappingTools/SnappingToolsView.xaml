@@ -34,9 +34,8 @@
                             <materialDesign:PopupBox.ToggleContent>
                                 <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
                             </materialDesign:PopupBox.ToggleContent>
-                            <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
-                        Generates and keeps track of a list virtual objects that are geometrically relevant to the objects visible on your screen. Press and hold the Activation Key to let your cursor snap to the closest virtual object.
-                            </TextBlock>
+                            <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5" xml:space="preserve"> Generates and keeps track of a list virtual objects that are geometrically relevant to the objects visible on your screen. Press and hold the Activation Key to let your cursor snap to the closest virtual object.
+⚠ You must specify your user config file in the Preferences for this tool to function.</TextBlock>
                         </materialDesign:PopupBox>
                     </StackPanel>
                     <Grid>
@@ -70,7 +69,13 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Header="Name" Width="300" DisplayMemberBinding="{Binding Name}" />
+                            <GridViewColumn Header="Name" Width="300">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
+                                        <TextBlock Text="{Binding Name}" ToolTip="{Binding Tooltip}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
                         </GridView>
                     </ListView.View>
 
@@ -101,6 +106,7 @@
                 </ListView>
             </Grid>
         </Grid>
+        
         <Grid Name="SecondGrid" Grid.Row="1" Grid.Column="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
