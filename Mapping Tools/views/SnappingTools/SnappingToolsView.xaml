@@ -69,7 +69,7 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Header="Name" Width="300">
+                            <GridViewColumn Header="Name" Width="500">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
                                         <TextBlock Text="{Binding Name}" ToolTip="{Binding Tooltip}"/>
