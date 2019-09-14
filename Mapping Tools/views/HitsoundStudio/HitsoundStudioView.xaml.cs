@@ -1,21 +1,19 @@
-﻿using System;
+﻿using Mapping_Tools.Classes.HitsoundStuff;
+using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Viewmodels;
+using NAudio.Wave;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Mapping_Tools.Classes.HitsoundStuff;
-using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Viewmodels;
-using NAudio.Wave;
-using NAudio.Vorbis;
-using System.Text;
-using System.Globalization;
 
 namespace Mapping_Tools.Views {
+
     /// <summary>
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
@@ -36,7 +34,7 @@ namespace Mapping_Tools.Views {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
-            backgroundWorker = (BackgroundWorker) FindResource("backgroundWorker");
+            backgroundWorker = (BackgroundWorker)FindResource("backgroundWorker");
             Settings = new HitsoundStudioVM();
             DataContext = Settings;
             LayersList.SelectedIndex = 0;
@@ -47,14 +45,13 @@ namespace Mapping_Tools.Views {
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
-            Make_Hitsounds((Arguments) e.Argument, bgw, e);
+            Make_Hitsounds((Arguments)e.Argument, bgw, e);
         }
 
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
-            if( e.Error != null ) {
+            if (e.Error != null) {
                 MessageBox.Show(string.Format("{0}{1}{2}", e.Error.Message, Environment.NewLine, e.Error.StackTrace), "Error");
-            }
-            else {
+            } else {
                 progress.Value = 0;
             }
             start.IsEnabled = true;
@@ -71,6 +68,7 @@ namespace Mapping_Tools.Views {
             public Sample DefaultSample;
             public List<HitsoundLayer> HitsoundLayers;
             public bool Debug;
+
             public Arguments(string exportFolder, string baseBeatmap, Sample defaultSample, List<HitsoundLayer> hitsoundLayers, bool debug) {
                 ExportFolder = exportFolder;
                 BaseBeatmap = baseBeatmap;
@@ -123,8 +121,7 @@ namespace Mapping_Tools.Views {
                 UpdateProgressBar(worker, 100);
 
                 MessageBox.Show(string.Format("Number of sample indices: {0}, Number of samples: {1}, Number of greenlines: {2}", completeHitsounds.CustomIndices.Count, samples, greenlines));
-            } 
-            else {
+            } else {
                 // Convert the multiple layers into packages that have the samples from all the layers at one specific time
                 List<SamplePackage> samplePackages = HitsoundConverter.ZipLayers(arg.HitsoundLayers, arg.DefaultSample);
                 UpdateProgressBar(worker, 10);
@@ -159,6 +156,8 @@ namespace Mapping_Tools.Views {
                 // Open export folder
                 System.Diagnostics.Process.Start(arg.ExportFolder);
             }
+            // Collect garbage
+            GC.Collect();
 
             UpdateProgressBar(worker, 100);
         }
@@ -221,7 +220,7 @@ namespace Mapping_Tools.Views {
                 string[] paths = IOHelper.BeatmapFileDialog();
                 if (paths.Length != 0) {
                     SelectedImportPathBox.Text = paths[0];
-                    }
+                }
             } catch (Exception) { }
         }
 
@@ -240,7 +239,7 @@ namespace Mapping_Tools.Views {
                 if (path != "") {
                     Settings.DefaultSample.SampleArgs.Path = path;
                     DefaultSamplePathBox.Text = path;
-                    }
+                }
             } catch (Exception) { }
         }
 
@@ -249,7 +248,7 @@ namespace Mapping_Tools.Views {
                 string[] paths = IOHelper.BeatmapFileDialog();
                 if (paths.Length != 0) {
                     Settings.BaseBeatmap = paths[0];
-                    }
+                }
             } catch (Exception) { }
         }
 
@@ -258,7 +257,7 @@ namespace Mapping_Tools.Views {
                 string path = IOHelper.GetCurrentBeatmap();
                 if (path != "") {
                     Settings.BaseBeatmap = path;
-                    }
+                }
             } catch (Exception) { }
         }
 
@@ -326,7 +325,6 @@ namespace Mapping_Tools.Views {
             SelectedImportVelocityBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.Velocity);
             SelectedImportVelocityRoughnessBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.VelocityRoughness, CultureInfo.InvariantCulture);
 
-
             // Update visibility
             if (selectedLayers.Any(o => o.SampleArgs.UsesSoundFont)) {
                 SoundFontArgsPanel.Visibility = Visibility.Visible;
@@ -357,7 +355,7 @@ namespace Mapping_Tools.Views {
             suppressEvents = false;
         }
 
-        void HitsoundLayer_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
+        private void HitsoundLayer_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
             try {
                 SampleGeneratingArgs args = selectedLayer.SampleArgs;
                 var mainOutputStream = SampleImporter.ImportSample(args);
@@ -373,13 +371,10 @@ namespace Mapping_Tools.Views {
                 player.PlaybackStopped += PlayerStopped;
 
                 player.Play();
-            }
-            catch (FileNotFoundException) { MessageBox.Show("Could not find the specified sample."); }
-            catch (DirectoryNotFoundException) { MessageBox.Show("Could not find the specified sample's directory."); }
-            catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
+            } catch (FileNotFoundException) { MessageBox.Show("Could not find the specified sample."); } catch (DirectoryNotFoundException) { MessageBox.Show("Could not find the specified sample's directory."); } catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
         }
 
-        void PlayerStopped(object sender, StoppedEventArgs e) {
+        private void PlayerStopped(object sender, StoppedEventArgs e) {
             ((WaveOutEvent)sender).Dispose();
             GC.Collect();
         }
@@ -407,7 +402,7 @@ namespace Mapping_Tools.Views {
                         LayersList.SelectedItems.Add(layer);
                     }
                 }
-                
+
                 RecalculatePriorities();
                 Num_Layers_Changed();
                 GetSelectedLayers();
@@ -437,7 +432,6 @@ namespace Mapping_Tools.Views {
 
                 RecalculatePriorities();
                 Num_Layers_Changed();
-
             } catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
         }
 

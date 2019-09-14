@@ -2,27 +2,29 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Windows;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public static class SettingsManager {
-        private static readonly string JSONPath = Path.Combine(MainWindow.AppDataPath, "config.json");
+        private static readonly string JsonPath = Path.Combine(MainWindow.AppDataPath, "config.json");
         private static readonly JsonSerializer Serializer = new JsonSerializer {
             NullValueHandling = NullValueHandling.Ignore
         };
 
         public static readonly Settings Settings = new Settings();
-        public static bool InstanceComplete = false;
+        public static bool InstanceComplete;
 
         public static void LoadConfig() {
-            InstanceComplete = File.Exists(JSONPath) ? LoadFromJSON() : CreateJSON();
+            InstanceComplete = File.Exists(JsonPath) ? LoadFromJson() : CreateJson();
             DefaultPaths();
         }
 
-        private static bool LoadFromJSON() {
+        private static bool LoadFromJson() {
             try {
-                using( StreamReader sr = new StreamReader(JSONPath)) {
+                using( StreamReader sr = new StreamReader(JsonPath)) {
                     using (JsonReader reader = new JsonTextReader(sr)) {
                         Settings newSettings = Serializer.Deserialize<Settings>(reader);
                         newSettings.CopyTo(Settings);
@@ -39,9 +41,9 @@ namespace Mapping_Tools.Classes.SystemTools {
             return true;
         }
 
-        private static bool CreateJSON() {
+        private static bool CreateJson() {
             try {
-                using( StreamWriter sw = new StreamWriter(JSONPath)) {
+                using( StreamWriter sw = new StreamWriter(JsonPath)) {
                     using (JsonWriter writer = new JsonTextWriter(sw)) {
                         Serializer.Serialize(writer, Settings);
                     }
@@ -57,9 +59,9 @@ namespace Mapping_Tools.Classes.SystemTools {
             return true;
         }
 
-        public static bool WriteToJSON(bool doLoading=false) {
+        public static bool WriteToJson(bool doLoading=false) {
             try {
-                using( StreamWriter sw = new StreamWriter(JSONPath)) {
+                using( StreamWriter sw = new StreamWriter(JsonPath)) {
                     using (JsonWriter writer = new JsonTextWriter(sw)) {
                         Serializer.Serialize(writer, Settings);
                     }
@@ -74,14 +76,24 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
 
             if( doLoading ) {
-                LoadFromJSON();
+                LoadFromJson();
             }
 
             return true;
         }
 
-        public static void AddRecentMap(string paths, DateTime date) {
-            Settings.AddRecentMap(paths, date);
+        public static void AddRecentMap(string[] paths, DateTime date) {
+            foreach (var path in paths)
+            {
+                Settings.RecentMaps.RemoveAll(o => o[0] == path);
+                if (Settings.RecentMaps.Count > 19) {
+                    try {
+                        Settings.RecentMaps.Remove(Settings.RecentMaps.Last());
+                    } catch (ArgumentOutOfRangeException) {
+                    }
+                }
+                Settings.RecentMaps.Insert(0, new[] { path, date.ToString(CultureInfo.CurrentCulture) });
+            }
         }
 
         public static void DefaultPaths() {
@@ -107,11 +119,12 @@ namespace Mapping_Tools.Classes.SystemTools {
         }
 
         private static string FindByDisplayName(RegistryKey parentKey, string name) {
-            string[] nameList = parentKey.GetSubKeyNames();
-            for (int i = 0; i < nameList.Length; i++) {
-                RegistryKey regKey = parentKey.OpenSubKey(nameList[i]);
+            var nameList = parentKey.GetSubKeyNames();
+            foreach (var t in nameList)
+            {
+                RegistryKey regKey = parentKey.OpenSubKey(t);
                 try {
-                    if (regKey.GetValue("DisplayName").ToString() == name) {
+                    if (regKey != null && regKey.GetValue("DisplayName").ToString() == name) {
                         return Path.GetDirectoryName(regKey.GetValue("UninstallString").ToString());
                     }
                 } catch (NullReferenceException) { }

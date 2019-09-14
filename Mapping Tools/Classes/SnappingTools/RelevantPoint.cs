@@ -6,7 +6,7 @@ using Line = Mapping_Tools.Classes.MathUtil.Line;
 namespace Mapping_Tools.Classes.SnappingTools {
     public class RelevantPoint : IRelevantObject {
         public readonly Vector2 child;
-        private readonly static Pen DefaultPen = new Pen() {
+        private static readonly Pen DefaultPen = new Pen() {
             Brush = new SolidColorBrush {
                 Color = Colors.Cyan,
                 Opacity = 0.8f,
@@ -39,7 +39,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
         }
 
         public void DrawYourself(DrawingContext context, CoordinateConverter converter) {
-            var cPos = converter.EditorToRelativeCoordinate(child);
+            var cPos = converter.ToDpi(converter.EditorToRelativeCoordinate(child));
             context.DrawEllipse(null, Pen, new Point(cPos.X, cPos.Y), 5, 5);
         }
 

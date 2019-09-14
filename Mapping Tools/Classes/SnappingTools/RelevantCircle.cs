@@ -6,7 +6,7 @@ using System.Windows.Media;
 namespace Mapping_Tools.Classes.SnappingTools {
     public class RelevantCircle : IRelevantObject {
         public readonly Circle child;
-        private readonly static Pen DefaultPen = new Pen() {
+        private static readonly Pen DefaultPen = new Pen() {
             Brush = new SolidColorBrush {
                 Color = Colors.Red,
                 Opacity = 0.8f,
@@ -42,8 +42,8 @@ namespace Mapping_Tools.Classes.SnappingTools {
 
         public void DrawYourself(DrawingContext context, CoordinateConverter converter) {
             var cPos = converter.EditorToRelativeCoordinate(child.Centre);
-            var radius = converter.EditorToScreenSize(child.Radius);
-            context.DrawEllipse(null, Pen, new Point(cPos.X, cPos.Y), radius, radius);
+            var radius = converter.ToDpi(converter.EditorToRelativeCoordinate(new Vector2(child.Radius)));
+            context.DrawEllipse(null, Pen, new Point(cPos.X, cPos.Y), radius.X, radius.Y);
         }
 
         public Vector2 NearestPoint(Vector2 point) {

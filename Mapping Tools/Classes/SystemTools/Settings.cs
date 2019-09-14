@@ -124,18 +124,6 @@ namespace Mapping_Tools.Classes.SystemTools {
             AutoReload = true;
         }
 
-        public void AddRecentMap(string paths, DateTime date) {
-            RecentMaps.RemoveAll(o => o[0] == paths);
-            if( RecentMaps.Count > 19 ) {
-                try {
-                    RecentMaps.Remove(RecentMaps.Last());
-                }
-                catch (ArgumentOutOfRangeException) {
-                }
-            }
-            RecentMaps.Insert(0, new string[] { paths, date.ToString(CultureInfo.CurrentCulture)});
-        }
-
         public void CopyTo(Settings other) {
             foreach (var prop in typeof(Settings).GetProperties()) {
                 prop.SetValue(other, prop.GetValue(this));

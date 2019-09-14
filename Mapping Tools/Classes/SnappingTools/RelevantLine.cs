@@ -6,7 +6,7 @@ using Line = Mapping_Tools.Classes.MathUtil.Line;
 namespace Mapping_Tools.Classes.SnappingTools {
     public class RelevantLine : IRelevantObject {
         public readonly Line child;
-        private readonly static Pen DefaultPen = new Pen() {
+        private static readonly Pen DefaultPen = new Pen() {
             Brush = new SolidColorBrush {
                 Color = Colors.LawnGreen,
                 Opacity = 0.8f,
@@ -42,9 +42,9 @@ namespace Mapping_Tools.Classes.SnappingTools {
         }
 
         public void DrawYourself(DrawingContext context, CoordinateConverter converter) {
-            if (!Line.Intersection(new Box2 { Bottom = 0, Left = 0, Top = 384, Right = 512 }, child, out Vector2[] points)) { return; }
-            var cPos1 = converter.EditorToRelativeCoordinate(points[0]);
-            var cPos2 = converter.EditorToRelativeCoordinate(points[1]);
+            if (!Line.Intersection(new Box2 { Left = -1000, Top = -1000, Right = 1512, Bottom = 1384 }, child, out var points)) { return; }
+            var cPos1 = converter.ToDpi(converter.EditorToRelativeCoordinate(points[0]));
+            var cPos2 = converter.ToDpi(converter.EditorToRelativeCoordinate(points[1]));
 
             context.DrawLine(Pen, new Point(cPos1.X, cPos1.Y), new Point(cPos2.X, cPos2.Y));
         }

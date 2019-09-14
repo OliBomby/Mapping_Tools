@@ -165,6 +165,7 @@ namespace Mapping_Tools.Viewmodels {
 
                     _osuWindow = _processSharp.WindowFactory.MainWindow;
                     _overlay.Initialize(_osuWindow);
+                    _overlay.Converter = _coordinateConverter;
                     _overlay.Enable();
 
                     _overlay.OverlayWindow.Draw += OnDraw;
@@ -222,21 +223,8 @@ namespace Mapping_Tools.Viewmodels {
                         UpdateRelevantObjects();
                     }
 
-                    _overlay.Update();
-                    PresentationSource source =
-                        PresentationSource.FromVisual(MainWindow.AppWindow);
-                    double dpiX =
-                        source.CompositionTarget.TransformToDevice.M11;
-                    double dpiY =
-                        source.CompositionTarget.TransformToDevice.M22;
                     _coordinateConverter.OsuWindowPosition = new Vector2(_osuWindow.X, _osuWindow.Y);
-                    var bounds = _coordinateConverter.GetEditorGridBox();
-                    Console.WriteLine(bounds);
-                    Console.WriteLine(System.Windows.Forms.Cursor.Position);
-                    _overlay.OverlayWindow.Left = bounds.Left / dpiX + 0.2;
-                    _overlay.OverlayWindow.Top = bounds.Top / dpiY + 0.2;
-                    _overlay.OverlayWindow.Width = bounds.Width / dpiX + 0.2;
-                    _overlay.OverlayWindow.Height = bounds.Height / dpiY + 0.2;
+                    _overlay.Update();
 
                     if (!_autoSnapTimer.IsEnabled && IsHotkeyDown(SnapHotkey)) {
                         _autoSnapTimer.Start();
