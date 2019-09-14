@@ -217,11 +217,13 @@ namespace Mapping_Tools.Classes.SnappingTools {
             return new Vector2(coord.X * ratioX, coord.Y * ratioY) + gridOffset;
         }
 
-        public double EditorToScreenSize(double d) {
+        // Scales editor size to screen size
+        public Vector2 ScaleByRatio(Vector2 thing) {
             var editorGridBox = GetEditorGridBox();
+            var ratioX = editorGridBox.Width / EditorGridResolution.X;
             var ratioY = editorGridBox.Height / EditorGridResolution.Y;
 
-            return d * ratioY;
+            return new Vector2(thing.X * ratioX, thing.Y * ratioY);
         }
 
         public override string ToString() {

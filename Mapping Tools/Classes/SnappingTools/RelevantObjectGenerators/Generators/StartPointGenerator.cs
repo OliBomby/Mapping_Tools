@@ -3,7 +3,7 @@ using Mapping_Tools.Classes.BeatmapHelper;
 
 namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators.Generators {
     class StartPointGenerator : RelevantObjectsGenerator, IGenerateRelevantObjectsFromHitObjects {
-        public new string Name => "Point Generator";
+        public new string Name => "Point on Start of Hit Object Generator";
         public new string Tooltip => "Generates virtual points on slider heads and circles.";
         public new GeneratorType GeneratorType => GeneratorType.Generators;
 

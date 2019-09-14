@@ -164,14 +164,7 @@ namespace Mapping_Tools.Viewmodels {
                     }
 
                     _processSharp = new ProcessSharp(process, MemoryType.Remote);
-                    _overlay = new SnappingToolsOverlay { Converter = _coordinateConverter };
-
                     _osuWindow = _processSharp.WindowFactory.MainWindow;
-                    _overlay.Initialize(_osuWindow);
-                    _overlay.Converter = _coordinateConverter;
-                    _overlay.Enable();
-
-                    _overlay.OverlayWindow.Draw += OnDraw;
 
                     _updateTimer.Interval = TimeSpan.FromSeconds(1);
                     _state = State.LookingForEditor;
@@ -180,7 +173,7 @@ namespace Mapping_Tools.Viewmodels {
                     _updateTimer.Interval = TimeSpan.FromSeconds(1);
                     if (reader.ProcessNeedsReload()) {
                         _state = State.LookingForProcess;
-                        _overlay.Dispose();
+                        _overlay?.Dispose();
                         return;
                     }
 
@@ -191,7 +184,7 @@ namespace Mapping_Tools.Viewmodels {
                     }
                     catch (ArgumentException) {
                         _state = State.LookingForProcess;
-                        _overlay.Dispose();
+                        _overlay?.Dispose();
                         return;
                     }
 
@@ -201,6 +194,14 @@ namespace Mapping_Tools.Viewmodels {
                     catch {
                         return;
                     }
+
+                    _overlay = new SnappingToolsOverlay { Converter = _coordinateConverter };
+
+                    _overlay.Initialize(_osuWindow);
+                    _overlay.Converter = _coordinateConverter;
+                    _overlay.Enable();
+
+                    _overlay.OverlayWindow.Draw += OnDraw;
 
                     _updateTimer.Interval = TimeSpan.FromMilliseconds(100);
                     _state = State.Active;
@@ -217,6 +218,7 @@ namespace Mapping_Tools.Viewmodels {
                     if (reader.EditorNeedsReload()) {
                         ClearRelevantObjects();
                         _state = State.LookingForEditor;
+                        _overlay.Dispose();
                         return;
                     }
 
@@ -252,7 +254,7 @@ namespace Mapping_Tools.Viewmodels {
 
             // Get the visible hitobjects using approach rate
             var approachTime = ApproachRateToMs(reader.ApproachRate);
-            var thereAreSelected = reader.numSelected > 0;
+            var thereAreSelected = hitObjects.Any(o => o.IsSelected);
             return hitObjects.Where(o => Math.Abs(o.Time - _editorTime) < approachTime && (!thereAreSelected || o.IsSelected)).ToList();
         }
       
