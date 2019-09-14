@@ -4,7 +4,7 @@ using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators.Generators {
     class TriangleGenerator : RelevantObjectsGenerator, IGenerateRelevantObjectsFromRelevantPoints {
-        public new string Name => "Equilateral Triangle Assistant (Type I)";
+        public new string Name => "Equilateral Triangle from Two Points Generator (Type I)";
         public new string Tooltip => "Takes a pair of virtual points and generates a virtual point on each side to make two equilateral triangles.";
         public new GeneratorType GeneratorType => GeneratorType.Assistants;
 
