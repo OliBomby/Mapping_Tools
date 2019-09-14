@@ -129,12 +129,12 @@ namespace Mapping_Tools {
 
         public void SetCurrentMaps(string[] paths) {
             currentMap.Text = string.Join("|", paths);
-            SettingsManager.AddRecentMap(currentMap.Text, DateTime.Now);
+            SettingsManager.AddRecentMap(paths, DateTime.Now);
         }
 
         public void SetCurrentMapsString(string paths) {
             currentMap.Text = paths;
-            SettingsManager.AddRecentMap(paths, DateTime.Now);
+            SettingsManager.AddRecentMap(paths.Split('|'), DateTime.Now);
         }
 
         public string[] GetCurrentMaps() {
@@ -440,7 +440,7 @@ namespace Mapping_Tools {
             if (DataContext is MappingTool mt){ mt.Deactivate(); }
             Views.AutoSaveSettings();
             SettingsManager.UpdateSettings();
-            SettingsManager.WriteToJSON(false);
+            SettingsManager.WriteToJson(false);
             this.Close();
         }
 

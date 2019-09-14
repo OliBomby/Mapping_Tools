@@ -43,11 +43,15 @@ namespace Mapping_Tools.Views.SnappingTools {
         private void OnTick(object sender, EventArgs eventArgs) {
             // This will only be true if the target window is active
             // (or very recently has been, depends on your update rate)
-            if (OverlayWindow.IsVisible) {
-                OverlayWindow.Update();
+            if (!OverlayWindow.IsVisible) return;
 
-                Converter.OsuWindowPosition = new Vector2(OverlayWindow.Left, OverlayWindow.Top);
-            }
+            var bounds = Converter.GetEditorBox();
+            var topLeft = Converter.ToDpi(new Vector2(bounds.Left, bounds.Top));
+            var bottomRight = Converter.ToDpi(new Vector2(bounds.Right, bounds.Bottom));
+            OverlayWindow.Left = topLeft.X;
+            OverlayWindow.Top = topLeft.Y;
+            OverlayWindow.Width = bottomRight.X - topLeft.X;
+            OverlayWindow.Height = bottomRight.Y - topLeft.Y;
         }
 
         private void OnPreTick(object sender, EventArgs eventArgs) {
