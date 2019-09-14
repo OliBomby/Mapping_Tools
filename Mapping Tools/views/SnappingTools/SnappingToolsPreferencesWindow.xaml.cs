@@ -16,10 +16,6 @@ namespace Mapping_Tools.Views.SnappingTools {
             InitializeComponent();
         }
 
-        private void CloseWin(object sender, EventArgs e) {
-            Close();
-        }
-
         private void ApplyButton_Click(object sender, RoutedEventArgs e) {
             Close();
         }
