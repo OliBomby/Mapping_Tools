@@ -24,7 +24,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
         }
 
         public Vector2 OsuWindowPositionOffset = new Vector2(2, 1);  // Extra offset applied to the position of the osu! window
-        public Vector2 PositionSnapOffset => new Vector2(0.5, 0.5);  // A random offset to fix 1 pixel off snapping
+        public Vector2 PositionSnapOffset => new Vector2(0.5, 0.5);  // An offset to fix a random instance of 1 pixel off snapping
         private string[] _configLines;
 
         public Vector2 OsuWindowPosition = Vector2.Zero;
