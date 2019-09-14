@@ -217,6 +217,7 @@ namespace Mapping_Tools.Viewmodels {
                     if (reader.EditorNeedsReload()) {
                         ClearRelevantObjects();
                         _state = State.LookingForEditor;
+                        _overlay.Dispose();
                         return;
                     }
 
@@ -252,7 +253,7 @@ namespace Mapping_Tools.Viewmodels {
 
             // Get the visible hitobjects using approach rate
             var approachTime = ApproachRateToMs(reader.ApproachRate);
-            var thereAreSelected = reader.numSelected > 0;
+            var thereAreSelected = hitObjects.Any(o => o.IsSelected);
             return hitObjects.Where(o => Math.Abs(o.Time - _editorTime) < approachTime && (!thereAreSelected || o.IsSelected)).ToList();
         }
       
