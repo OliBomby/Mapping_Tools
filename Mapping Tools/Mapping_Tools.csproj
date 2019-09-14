@@ -252,6 +252,10 @@
     <Compile Include="Classes\SnappingTools\IRelevantObject.cs" />
     <Compile Include="Classes\SnappingTools\RelevantCircle.cs" />
     <Compile Include="Classes\SnappingTools\RelevantLine.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\AnchorPointGenerator.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\PerpendicularGenerator.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\ParallelismGenerator.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\LastAnchorGenerator.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\GeneratorType.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjectsFromRelevantCircles.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjectsFromRelevantLines.cs" />
