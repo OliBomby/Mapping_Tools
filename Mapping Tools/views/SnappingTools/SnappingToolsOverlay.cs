@@ -22,6 +22,7 @@ namespace Mapping_Tools.Views.SnappingTools {
             base.Initialize(targetWindow);
 
             OverlayWindow = new OverlayWindow(targetWindow);
+            OverlayWindow.ShowInTaskbar = false;
             OverlayWindow.BorderBrush = Brushes.Blue;
             OverlayWindow.BorderThickness = new Thickness(3);
 
