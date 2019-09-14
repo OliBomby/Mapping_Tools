@@ -46,7 +46,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
         }
 
         public void DrawYourself(DrawingContext context, CoordinateConverter converter) {
-            var cPos = converter.EditorToRelativeCoordinate(child.Centre);
+            var cPos = converter.ToDpi(converter.EditorToRelativeCoordinate(child.Centre));
             var radius = converter.ToDpi(converter.ScaleByRatio(new Vector2(child.Radius)));
             context.DrawEllipse(null, GetDefaultPen(), new Point(cPos.X, cPos.Y), radius.X, radius.Y);
         }
