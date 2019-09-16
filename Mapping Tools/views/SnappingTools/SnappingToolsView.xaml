@@ -11,7 +11,7 @@
              xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
              mc:Ignorable="d"
              IsActive="{Binding ListenersEnabled, Mode=OneWayToSource}"
-             d:DesignHeight="450" Width="759.5">
+             d:DesignHeight="450" Width="759.5" d:DataContext="{d:DesignData SnappingToolsVm}">
     <Grid Name="MasterGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>

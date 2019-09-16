@@ -22,12 +22,12 @@ using System.Windows.Threading;
 namespace Mapping_Tools.Viewmodels {
     public class SnappingToolsVm
     {
-        private SnappingToolsPreferences preferences;
+        private SnappingToolsPreferences _preferences;
         public SnappingToolsPreferences Preferences {
-            get => preferences;
+            get => _preferences;
             set {
                 if (value == null) return;
-                preferences = value;
+                _preferences = value;
             }
         }
 
