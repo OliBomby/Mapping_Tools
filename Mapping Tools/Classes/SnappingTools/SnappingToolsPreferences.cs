@@ -3,6 +3,7 @@ using System.Windows.Media;
 using Mapping_Tools.Classes.SystemTools;
 using System;
 using System.Collections.ObjectModel;
+using System.Windows.Input;
 
 namespace Mapping_Tools.Classes.SnappingTools {
     public class SnappingToolsPreferences : BindableBase, ICloneable{
@@ -10,19 +11,20 @@ namespace Mapping_Tools.Classes.SnappingTools {
         private Color pointColor = Colors.Cyan;
         private double pointOpacity = 0.8;
         private double pointThickness = 3;
-        private string pointDashstyle = DashStylesList[4];
+        private DashStylesEnum pointDashstyle = DashStylesEnum.Solid;
         private double pointSize = 5;
 
         private Color lineColor = Colors.LawnGreen;
         private double lineOpacity = 0.8;
         private double lineThickness = 3;
-        private string lineDashstyle = DashStylesList[0];
+        private DashStylesEnum lineDashstyle = DashStylesEnum.Dash;
 
         private Color circleColor = Colors.Red;
         private double circleOpacity = 0.8;
         private double circleThickness = 3;
-        private string circleDashstyle = DashStylesList[0];
+        private DashStylesEnum circleDashstyle = DashStylesEnum.Dash;
 
+        private Hotkey snapHotkey = new Hotkey(Key.M, ModifierKeys.None);
         private double scale = 1;
         private int offsetX = 0;
         private int offsetY = 0;
@@ -41,7 +43,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
             get => pointThickness;
             set => Set(ref pointThickness, value);
         }
-        public string PointDashstyle {
+        public DashStylesEnum PointDashstyle {
             get => pointDashstyle;
             set => Set(ref pointDashstyle, value);
         }
@@ -64,7 +66,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
             get => lineThickness;
             set => Set(ref lineThickness, value);
         }
-        public string LineDashstyle {
+        public DashStylesEnum LineDashstyle {
             get => lineDashstyle;
             set => Set(ref lineDashstyle, value);
         }
@@ -83,13 +85,18 @@ namespace Mapping_Tools.Classes.SnappingTools {
             get => circleThickness;
             set => Set(ref circleThickness, value);
         }
-        public string CircleDashstyle {
+        public DashStylesEnum CircleDashstyle {
             get => circleDashstyle;
             set => Set(ref circleDashstyle, value);
         }
         #endregion
 
         #region global settings
+        public Hotkey SnapHotkey {
+            get => snapHotkey;
+            set => Set(ref snapHotkey, value);
+        }
+
         public double Scale {
             get => scale;
             set => Set(ref scale, value);
@@ -113,25 +120,19 @@ namespace Mapping_Tools.Classes.SnappingTools {
         #endregion
 
         #region dashstyle helpers
-        public static ObservableCollection<string> DashStylesList { get; } = new ObservableCollection<string> {
-            "Dash",
-            "Dot",
-            "DashDot",
-            "DashDotDot",
-            "Solid"
-        };
+        public static IEnumerable<string> DashStylesEnumerable => Enum.GetNames(typeof(DashStylesEnum));
 
-        public DashStyle GetDashStyle(string input) {
+        public DashStyle GetDashStyle(DashStylesEnum input) {
             switch (input) {
-                case "Dash":
+                case DashStylesEnum.Dash:
                     return DashStyles.Dash;
-                case "Dot":
+                case DashStylesEnum.Dot:
                     return DashStyles.Dot;
-                case "DashDot":
+                case DashStylesEnum.DashDot:
                     return DashStyles.DashDot;
-                case "DashDotDot":
+                case DashStylesEnum.DashDotDot:
                     return DashStyles.DashDotDot;
-                case "Solid":
+                case DashStylesEnum.Solid:
                     return DashStyles.Solid;
                 default:
                     throw new ArgumentOutOfRangeException();

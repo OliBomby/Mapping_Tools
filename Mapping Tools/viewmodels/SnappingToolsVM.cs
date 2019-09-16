@@ -14,15 +14,22 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace Mapping_Tools.Viewmodels {
-    public class SnappingToolsVm {
-        public Hotkey SnapHotkey { get; set; }
+    public class SnappingToolsVm
+    {
+        private SnappingToolsPreferences preferences;
+        public SnappingToolsPreferences Preferences {
+            get => preferences;
+            set {
+                if (value == null) return;
+                preferences = value;
+            }
+        }
 
         public ObservableCollection<RelevantObjectsGenerator> Generators { get; }
         private readonly List<IRelevantObject> _relevantObjects = new List<IRelevantObject>();
@@ -69,8 +76,8 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public SnappingToolsVm() {
-            //initiate SnappingToolsPreferences if it's null
-            if (SettingsManager.Settings.SnappingToolsPreferences == null) { SettingsManager.Settings.SnappingToolsPreferences = new SnappingToolsPreferences(); }
+            // Get preferences
+            Preferences = new SnappingToolsPreferences();
 
             // Get all the RelevantObjectGenerators
             var interfaceType = typeof(RelevantObjectsGenerator);
@@ -111,7 +118,7 @@ namespace Mapping_Tools.Viewmodels {
 
         private void OnDraw(object sender, DrawingContext context) {
             foreach (var obj in _relevantObjects) {
-                obj.DrawYourself(context, _coordinateConverter);
+                obj.DrawYourself(context, _coordinateConverter, Preferences);
             }
         }
 
@@ -141,8 +148,7 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
-        private void UpdateTimerTick(object sender, EventArgs e)
-        {
+        private void UpdateTimerTick(object sender, EventArgs e) {
             var reader = EditorReaderStuff.GetEditorReader();
             switch (_state) {
                 case State.Disabled:
@@ -231,7 +237,7 @@ namespace Mapping_Tools.Viewmodels {
                     _coordinateConverter.OsuWindowPosition = new Vector2(_osuWindow.X, _osuWindow.Y);
                     _overlay.Update();
 
-                    if (!_autoSnapTimer.IsEnabled && IsHotkeyDown(SnapHotkey)) {
+                    if (!_autoSnapTimer.IsEnabled && IsHotkeyDown(Preferences.SnapHotkey)) {
                         _autoSnapTimer.Start();
                     }
                     break;
@@ -339,7 +345,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         private void AutoSnapTimerTick(object sender, EventArgs e) {
-            if (!IsHotkeyDown(SnapHotkey)) {
+            if (!IsHotkeyDown(Preferences.SnapHotkey)) {
                 _autoSnapTimer.Stop();
                 return;
             }

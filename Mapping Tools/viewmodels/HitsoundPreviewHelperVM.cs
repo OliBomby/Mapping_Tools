@@ -79,17 +79,9 @@ namespace Mapping_Tools.Viewmodels
         public CommandImplementation CopyCommand { get; }
         public CommandImplementation RemoveCommand { get; }
 
-        public IEnumerable<string> SampleSets {
-            get {
-                return Enum.GetNames(typeof(SampleSet));
-            }
-        }
+        public IEnumerable<string> SampleSets => Enum.GetNames(typeof(SampleSet));
 
-        public IEnumerable<string> Hitsounds {
-            get {
-                return Enum.GetNames(typeof(Hitsound));
-            }
-        }
+        public IEnumerable<string> Hitsounds => Enum.GetNames(typeof(Hitsound));
 
         public event PropertyChangedEventHandler PropertyChanged;
 
