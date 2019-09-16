@@ -2,7 +2,6 @@
 using System.Windows.Media;
 using Mapping_Tools.Classes.SystemTools;
 using System;
-using System.Collections.ObjectModel;
 using System.Windows.Input;
 using Mapping_Tools.Classes.MathUtil;
 
