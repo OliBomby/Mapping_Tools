@@ -67,7 +67,7 @@
                             <GridViewColumn Header="IsActive">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
-                                        <CheckBox IsChecked="{Binding IsActive}" />
+                                        <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding IsActive}" />
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
@@ -75,6 +75,32 @@
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
                                         <TextBlock Text="{Binding Name}" ToolTip="{Binding Tooltip}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Mode">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
+                                        <ListBox
+                                            Style="{StaticResource MaterialDesignToolToggleListBox}"
+                                            SelectedIndex="0">
+                                            <ListBoxItem>
+                                                <materialDesign:PackIcon
+                                                    Kind="FormatAlignLeft" />
+                                            </ListBoxItem>
+                                            <ListBoxItem>
+                                                <materialDesign:PackIcon
+                                                    Kind="FormatAlignCenter" />
+                                            </ListBoxItem>
+                                            <ListBoxItem>
+                                                <materialDesign:PackIcon
+                                                    Kind="FormatAlignRight" />
+                                            </ListBoxItem>
+                                            <ListBoxItem>
+                                                <materialDesign:PackIcon
+                                                    Kind="FormatAlignJustify" />
+                                            </ListBoxItem>
+                                        </ListBox>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
