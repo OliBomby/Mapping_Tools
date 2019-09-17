@@ -4,6 +4,7 @@ using Mapping_Tools.Classes.SystemTools;
 using System;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.SnappingTools {
     public class SnappingToolsPreferences : BindableBase, ICloneable{
@@ -25,9 +26,10 @@ namespace Mapping_Tools.Classes.SnappingTools {
         private DashStylesEnum circleDashstyle = DashStylesEnum.Dash;
 
         private Hotkey snapHotkey = new Hotkey(Key.M, ModifierKeys.None);
-        private double scale = 1;
-        private int offsetX = 0;
-        private int offsetY = 0;
+        private double offsetLeft = 2;
+        private double offsetTop = 1;
+        private double offsetRight = 2;
+        private double offsetBottom = 1;
         #endregion
 
         #region point settings
@@ -97,26 +99,28 @@ namespace Mapping_Tools.Classes.SnappingTools {
             set => Set(ref snapHotkey, value);
         }
 
-        public double Scale {
-            get => scale;
-            set => Set(ref scale, value);
+        public double OffsetLeft {
+            get => offsetLeft;
+            set => Set(ref offsetLeft, value);
         }
 
-        public int OffsetX {
-            get => offsetX;
-            set => Set(ref offsetX, value);
+        public double OffsetTop {
+            get => offsetTop;
+            set => Set(ref offsetTop, value);
         }
 
-        public int OffsetY {
-            get => offsetY;
-            set => Set(ref offsetY, value);
+        public double OffsetRight {
+            get => offsetRight;
+            set => Set(ref offsetRight, value);
         }
 
-        public int[] Offset {
-            get {
-                return new int[] { offsetX, offsetY };
-            }
+        public double OffsetBottom {
+            get => offsetBottom;
+            set => Set(ref offsetBottom, value);
         }
+
+        public Box2 OverlayOffset => new Box2(OffsetLeft, OffsetTop, OffsetRight, OffsetBottom);
+
         #endregion
 
         #region dashstyle helpers

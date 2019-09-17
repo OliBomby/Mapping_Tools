@@ -69,8 +69,12 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public SnappingToolsVm() {
+            // Set up a coordinate converter for converting coordinates between screen and osu!
+            _coordinateConverter = new CoordinateConverter();
+
             // Get preferences
             Preferences = new SnappingToolsPreferences();
+            Preferences.PropertyChanged += PreferencesOnPropertyChanged;
 
             // Get all the RelevantObjectGenerators
             var interfaceType = typeof(RelevantObjectsGenerator);
@@ -94,9 +98,6 @@ namespace Mapping_Tools.Viewmodels {
             _autoSnapTimer = new DispatcherTimer(DispatcherPriority.Send) { Interval = TimeSpan.FromMilliseconds(16) };
             _autoSnapTimer.Tick += AutoSnapTimerTick;
 
-            // Set up a coordinate converter for converting coordinates between screen and osu!
-            _coordinateConverter = new CoordinateConverter();
-
             // Listen for changes in the osu! user config
             _configWatcher = new FileSystemWatcher();
             SetConfigWatcherPath(SettingsManager.Settings.OsuConfigPath);
@@ -107,6 +108,23 @@ namespace Mapping_Tools.Viewmodels {
             SettingsManager.Settings.PropertyChanged += OnSettingsChanged;
 
             _state = State.LookingForProcess;
+        }
+
+        private void PreferencesOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
+            switch (e.PropertyName) {
+                case "OffsetLeft":
+                    _coordinateConverter.EditorBoxOffset.Left = Preferences.OffsetLeft;
+                    break;
+                case "OffsetTop":
+                    _coordinateConverter.EditorBoxOffset.Top = Preferences.OffsetTop;
+                    break;
+                case "OffsetRight":
+                    _coordinateConverter.EditorBoxOffset.Right = Preferences.OffsetRight;
+                    break;
+                case "OffsetBottom":
+                    _coordinateConverter.EditorBoxOffset.Bottom = Preferences.OffsetBottom;
+                    break;
+            }
         }
 
         private void OnDraw(object sender, DrawingContext context) {

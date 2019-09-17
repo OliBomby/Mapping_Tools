@@ -14,7 +14,8 @@
         TextElement.FontWeight="Medium"
         TextElement.FontSize="14"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" Background="{DynamicResource MaterialDesignPaper}">
+        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" Background="{DynamicResource MaterialDesignPaper}"
+        d:DataContext="{d:DesignData SnappingToolsPreferences}">
     <WindowChrome.WindowChrome>
         <WindowChrome 
             CaptionHeight="35"
@@ -156,17 +157,11 @@
                         <ListBox>
                             <ListBoxItem>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Width="100" Margin="0 0 0 6" Text="Offset" VerticalAlignment="Bottom" ToolTip="Offsets the overlay. Use this field when the automatic editor-to-screen coordinate conversion seems to fail."/>
-                                    <TextBox Text="{Binding OffsetX}" Width="100" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="X-Coordinate" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 20 0"/>
-                                    <TextBox Text="{Binding OffsetY}" Width="100" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Y-Coordinate" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
-                                </StackPanel>
-                            </ListBoxItem>
-
-
-                            <ListBoxItem>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Width="100" Margin="0 0 0 6" Text="Scale" VerticalAlignment="Bottom" ToolTip="Scales the overlay by the specified factor. Use this field when the automatic editor-to-screen coordinate conversion seems to fail."/>
-                                    <TextBox Text="{Binding Scale}" Width="100" VerticalAlignment="Bottom" HorizontalAlignment="Left" materialDesign:HintAssist.Hint="Scaling factor" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
+                                    <TextBlock Width="100" Margin="0 0 0 6" Text="Offset" VerticalAlignment="Bottom" ToolTip="Offsets the overlay box. Use this field when the automatic editor-to-screen coordinate conversion seems to fail."/>
+                                    <TextBox Text="{Binding OffsetLeft}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Left offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 10 0"/>
+                                    <TextBox Text="{Binding OffsetTop}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Top offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 10 0"/>
+                                    <TextBox Text="{Binding OffsetRight}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Right offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 10 0"/>
+                                    <TextBox Text="{Binding OffsetBottom}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Bottom offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
                                 </StackPanel>
                             </ListBoxItem>
                         </ListBox>
