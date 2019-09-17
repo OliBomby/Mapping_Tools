@@ -2,6 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Linq;
 using System.Collections.Generic;
+using System.Security.Policy;
 
 namespace Mapping_Tools.Classes.MathUtil {
     /// <summary>Represents a line with infinite length using three double-precision floating-point numbers in the equation AX + BY = C.</summary>
@@ -10,94 +11,53 @@ namespace Mapping_Tools.Classes.MathUtil {
     /// </remarks>
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public struct Line :IEquatable<Line> {
+    public struct Line2 :IEquatable<Line2> {
         /// <summary>
-        /// The A component of the Line.
+        /// The base vector where the Line originates from.
         /// </summary>
-        public double A;
+        public Vector2 BaseVector;
 
         /// <summary>
-        /// The B component of the Line.
+        /// The direction vector of the Line.
         /// </summary>
-        public double B;
+        public Vector2 DirectionVector;
 
         /// <summary>
-        /// The C component of the Line.
+        /// Constructs a new Line using a base vector and a direciton vector.
         /// </summary>
-        public double C;
-
-        /// <summary>
-        /// Constructs a new Line.
-        /// </summary>
-        /// <param name="a">The a component of the Line.</param>
-        /// <param name="b">The b component of the Line.</param>
-        /// <param name="c">The c component of the Line.</param>
-        public Line(double a, double b, double c)
+        /// <param name="baseVector">The base vector of the Line.</param>
+        /// <param name="directionVector">The direction vector of the Line.</param>
+        public Line2(Vector2 baseVector, Vector2 directionVector)
         {
-            A = a;
-            B = b;
-            C = c;
+            BaseVector = baseVector;
+            DirectionVector = directionVector;
         }
 
-        /// <summary>
-        /// Constructs a new Line as Y = AX + B.
-        /// </summary>
-        /// <param name="a">The a component of the Line.</param>
-        /// <param name="b">The b component of the Line.</param>
-        public Line(double a, double b)
+        public Line2(Vector2 baseVector, double angle)
         {
-            A = -a;
-            B = 1;
-            C = b;
+            BaseVector = baseVector;
+            DirectionVector = new Vector2(Math.Cos(angle), Math.Sin(angle));
         }
 
         /// <summary>
         /// Constructs a new Line using two points.
         /// </summary>
-        /// <param name="vec1">The first point on the Line.</param>
-        /// <param name="vec2">The second point on the Line.</param>
-        public Line(Vector2 vec1, Vector2 vec2)
-        {
-            if (Precision.AlmostEquals(vec1.X, vec2.X)) {
-                A = 1;
-                B = 0;
-                C = vec1.X;
-            }
-            else {
-                A = -1 * (vec2.Y - vec1.Y) / (vec2.X - vec1.X);
-                B = 1;
-                C = vec1.Y + A * vec1.X;
-            }
+        /// <param name="p1">The first point on the Line.</param>
+        /// <param name="p2">The second point on the Line.</param>
+        public static Line2 FromPoints(Vector2 p1, Vector2 p2) {
+            return new Line2(p1, p2 - p1);
         }
 
-        /// <summary>
-        /// Constructs a new Line using a point and an angle.
-        /// </summary>
-        /// <param name="vec1">The point on the Line.</param>
-        /// <param name="angle">The angle of the Line.</param>
-        public Line(Vector2 vec1, double angle)
-        {
-            if(Precision.AlmostEquals(Math.Abs(angle), 0.5 * Math.PI)) {
-                A = 1;
-                B = 0;
-                C = vec1.X;
-            }
-            else {
-                A = -1 * Math.Tan(angle);
-                B = 1;
-                C = vec1.Y + A * vec1.X;
-            }
-        }
 
         /// <summary>
         /// Defines a Line that is the X-axis.
         /// </summary>
-        public static readonly Line AxisX = new Line(0, 1, 0);
+        public static readonly Line2 AxisX = new Line2(Vector2.Zero, Vector2.UnitX);
 
         /// <summary>
         /// Defines a Line that is the Y-axis.
         /// </summary>
-        public static readonly Line AxisY = new Line(0, 1);
+        public static readonly Line2 AxisY = new Line2(Vector2.Zero, Vector2.UnitY);
 
         /// <summary>
         /// Calculate the distance between a line and a point
@@ -105,7 +65,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="left">The line</param>
         /// <param name="right">The point</param>
         /// <returns>The distance between the line and the point</returns>
-        public static double Distance(Line left, Vector2 right) {
+        public static double Distance(Line2 left, Vector2 right) {
             return Math.Abs(left.A * right.X + left.B * right.Y - left.C) / Math.Sqrt(left.A * left.A + left.B * left.B);
         }
 
@@ -115,7 +75,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="left">First operand</param>
         /// <param name="right">Second operand</param>
         /// <returns>The intersection the two inputs</returns>
-        public static Vector2 Intersection(Line left, Line right)
+        public static Vector2 Intersection(Line2 left, Line2 right)
         {
             Intersection(left, right, out Vector2 result);
             return result;
@@ -127,7 +87,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="left">First operand</param>
         /// <param name="right">Second operand</param>
         /// <returns>The intersection the two inputs</returns>
-        public static bool Intersection(Line left, Line right, out Vector2 result)
+        public static bool Intersection(Line2 left, Line2 right, out Vector2 result)
         {
             if (right.A == 0) { var temp = left; left = right; right = temp; } // swap inputs to prevent division by zero
 
@@ -150,7 +110,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         ///<param name="line">The line</param>
         /// <param name="intersections">The calculated intersection(s).</param>
         ///<returns>Whether there are exactly two intersections.</returns>
-        public static bool Intersection(Box2 rect, Line line, out Vector2[] intersections)
+        public static bool Intersection(Box2 rect, Line2 line, out Vector2[] intersections)
         {
             List<Vector2> candidates = new List<Vector2>
             {
@@ -170,7 +130,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="left">Left operand.</param>
         /// <param name="right">Right operand.</param>
         /// <returns>True if both instances are equal; false otherwise.</returns>
-        public static bool operator ==(Line left, Line right) {
+        public static bool operator ==(Line2 left, Line2 right) {
             return left.Equals(right);
         }
 
@@ -180,7 +140,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="left">Left operand.</param>
         /// <param name="right">Right operand.</param>
         /// <returns>True if both instances are not equal; false otherwise.</returns>
-        public static bool operator !=(Line left, Line right) {
+        public static bool operator !=(Line2 left, Line2 right) {
             return !left.Equals(right);
         }
 
@@ -190,7 +150,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// </summary>
         /// <returns></returns>
         public override string ToString() {
-            return string.Format("({0}{3} {1}{3} {2})", A, B, C, listSeparator);
+            return string.Format("({0}{2} {1})", BaseVector, DirectionVector, listSeparator);
         }
 
         /// <summary>
@@ -199,7 +159,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <returns>A System.Int32 containing the unique hashcode for this instance.</returns>
         public override int GetHashCode() {
             unchecked {
-                return (((A.GetHashCode() * 397 ) ^ B.GetHashCode()) * 397) ^ C.GetHashCode();
+                return ((BaseVector.GetHashCode() * 397 ) ^ DirectionVector.GetHashCode()) * 397;
             }
         }
 
@@ -209,21 +169,20 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="obj">The object to compare to.</param>
         /// <returns>True if the instances are equal; false otherwise.</returns>
         public override bool Equals(object obj) {
-            if( !( obj is Line ) ) {
+            if( !( obj is Line2 ) ) {
                 return false;
             }
 
-            return Equals((Line) obj);
+            return Equals((Line2) obj);
         }
 
         /// <summary>Indicates whether the current line is equal to another line.</summary>
         /// <param name="other">A line to compare with this line.</param>
         /// <returns>true if the current line is equal to the line parameter; otherwise, false.</returns>
-        public bool Equals(Line other) {
-            return
-                A == other.A &&
-                B == other.B &&
-                C == other.C;
+        public bool Equals(Line2 other)
+        {
+            return BaseVector == other.BaseVector &&
+            DirectionVector == other.DirectionVector;
         }
     }
 }
