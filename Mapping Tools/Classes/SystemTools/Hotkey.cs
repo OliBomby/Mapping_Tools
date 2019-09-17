@@ -3,9 +3,9 @@ using System.Windows.Input;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public class Hotkey {
-        public Key Key { get; }
+        public Key Key { get; set; }
 
-        public ModifierKeys Modifiers { get; }
+        public ModifierKeys Modifiers { get; set; }
 
         public Hotkey(Key key, ModifierKeys modifiers) {
             Key = key;

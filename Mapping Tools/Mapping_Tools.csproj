@@ -251,6 +251,7 @@
     <Compile Include="Classes\SliderPathStuff\SliderInterpreter.cs" />
     <Compile Include="Classes\SliderPathStuff\SliderPath.cs" />
     <Compile Include="Classes\BeatmapHelper\TValue.cs" />
+    <Compile Include="Classes\SnappingTools\DashStylesEnum.cs" />
     <Compile Include="Classes\SnappingTools\CoordinateConverter.cs" />
     <Compile Include="Classes\SnappingTools\IRelevantObject.cs" />
     <Compile Include="Classes\SnappingTools\PrefferencesManager.cs" />
@@ -335,7 +336,6 @@
     <Compile Include="Viewmodels\HitsoundPreviewHelperVM.cs" />
     <Compile Include="Viewmodels\HitsoundStudioVM.cs" />
     <Compile Include="Viewmodels\HitsoundCopierVM.cs" />
-    <Compile Include="Viewmodels\SnappingToolsPreferencesVM.cs" />
     <Compile Include="Viewmodels\TimingCopierVM.cs" />
     <Compile Include="Viewmodels\MetadataManagerVM.cs" />
     <Compile Include="Viewmodels\PropertyTransformerVM.cs" />

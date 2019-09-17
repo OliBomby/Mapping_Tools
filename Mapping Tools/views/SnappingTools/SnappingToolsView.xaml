@@ -11,7 +11,7 @@
              xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
              mc:Ignorable="d"
              IsActive="{Binding ListenersEnabled, Mode=OneWayToSource}"
-             d:DesignHeight="450" Width="759.5">
+             d:DesignHeight="450" Width="759.5" d:DataContext="{d:DesignData SnappingToolsVm}">
     <Grid Name="MasterGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -50,22 +50,25 @@
                         </Grid.ColumnDefinitions>
 
                         <TextBlock x:Name="ActivationKeyTextBlock" Text="Activation Key:" VerticalAlignment="Bottom" Margin="10,0" ToolTip="Press and hold this key to snap your cursor to the closest virtual object."/>
-                        <components:HotkeyEditorControl Width="150" HorizontalAlignment="Left" Margin="0,10,0,0" Hotkey="{Binding SnapHotkey}" Grid.Column="1"/>
-                        <Button x:Name="PreferencesButton" Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Preferences..." Grid.Column="2" Click="PreferencesButton_Click">
+                        <components:HotkeyEditorControl Width="150" HorizontalAlignment="Left" Margin="0,10,0,0" Hotkey="{Binding Preferences.SnapHotkey}"
+                                                        Grid.Row="0" Grid.Column="1"/>
+                        <Button x:Name="PreferencesButton" Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Preferences..."
+                                Grid.Row="0" Grid.Column="2" Click="PreferencesButton_Click">
                             <materialDesign:PackIcon Kind="SettingsOutline" Height="24" Width="24" />
                         </Button>
-                        <TextBlock x:Name="FilterTextBlock" Grid.Row="1" Text="Filters:" VerticalAlignment="Center" Margin="10,0"/>
+                        <TextBlock x:Name="FilterTextBlock" Grid.Row="1" Grid.Column="0" Text="Filters:" VerticalAlignment="Center" Margin="10,0"/>
                         <TextBox Grid.Row="1" Grid.Column="1" Margin="0,0,0,10" Name="TxtFilter" Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}" Grid.ColumnSpan="2"/>
                     </Grid>
                 </StackPanel>
 
-                <ListView Grid.Row="1" SelectionMode="Single" ItemsSource="{Binding Generators}" ScrollViewer.VerticalScrollBarVisibility="Visible">
-                    <ListView.View>
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" CanContentScroll="True" PreviewMouseWheel="UIElement_OnPreviewMouseWheel">
+                    <ListView SelectionMode="Single" ItemsSource="{Binding Generators}" ScrollViewer.CanContentScroll="False">
+                        <ListView.View>
                         <GridView>
                             <GridViewColumn Header="IsActive">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
-                                        <CheckBox IsChecked="{Binding IsActive}" />
+                                        <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding IsActive}" />
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
@@ -73,6 +76,32 @@
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
                                         <TextBlock Text="{Binding Name}" ToolTip="{Binding Tooltip}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Mode">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
+                                        <ListBox
+                                            Style="{StaticResource MaterialDesignToolToggleListBox}"
+                                            SelectedIndex="0">
+                                            <ListBoxItem>
+                                                <materialDesign:PackIcon
+                                                    Kind="FormatAlignLeft" />
+                                            </ListBoxItem>
+                                            <ListBoxItem>
+                                                <materialDesign:PackIcon
+                                                    Kind="FormatAlignCenter" />
+                                            </ListBoxItem>
+                                            <ListBoxItem>
+                                                <materialDesign:PackIcon
+                                                    Kind="FormatAlignRight" />
+                                            </ListBoxItem>
+                                            <ListBoxItem>
+                                                <materialDesign:PackIcon
+                                                    Kind="FormatAlignJustify" />
+                                            </ListBoxItem>
+                                        </ListBox>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
@@ -104,6 +133,7 @@
                         </GroupStyle>
                     </ListView.GroupStyle>
                 </ListView>
+                </ScrollViewer>
             </Grid>
         </Grid>
         

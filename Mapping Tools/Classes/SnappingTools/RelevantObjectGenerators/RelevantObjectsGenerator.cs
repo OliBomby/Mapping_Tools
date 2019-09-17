@@ -17,9 +17,9 @@ namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators {
             }
         }
 
-        public string Name { get; }
-        public string Tooltip { get; }
-        public GeneratorType GeneratorType { get; }
+        public abstract string Name { get; }
+        public abstract string Tooltip { get; }
+        public abstract GeneratorType GeneratorType { get; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

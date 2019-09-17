@@ -14,15 +14,15 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace Mapping_Tools.Viewmodels {
-    public class SnappingToolsVm {
-        public Hotkey SnapHotkey { get; set; }
+    public class SnappingToolsVm
+    {
+        public SnappingToolsPreferences Preferences { get; }
 
         public ObservableCollection<RelevantObjectsGenerator> Generators { get; }
         private readonly List<IRelevantObject> _relevantObjects = new List<IRelevantObject>();
@@ -69,8 +69,12 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public SnappingToolsVm() {
-            //initiate SnappingToolsPreferences if it's null
-            if (SettingsManager.Settings.SnappingToolsPreferences == null) { SettingsManager.Settings.SnappingToolsPreferences = new SnappingToolsPreferences(); }
+            // Set up a coordinate converter for converting coordinates between screen and osu!
+            _coordinateConverter = new CoordinateConverter();
+
+            // Get preferences
+            Preferences = new SnappingToolsPreferences();
+            Preferences.PropertyChanged += PreferencesOnPropertyChanged;
 
             // Get all the RelevantObjectGenerators
             var interfaceType = typeof(RelevantObjectsGenerator);
@@ -83,8 +87,8 @@ namespace Mapping_Tools.Viewmodels {
             foreach (var gen in Generators) { gen.PropertyChanged += OnGeneratorPropertyChanged; }
 
             // Set up groups and filters
-            CollectionView view = (CollectionView) CollectionViewSource.GetDefaultView(Generators);
-            PropertyGroupDescription groupDescription = new PropertyGroupDescription("GeneratorType");
+            var view = (CollectionView) CollectionViewSource.GetDefaultView(Generators);
+            var groupDescription = new PropertyGroupDescription("GeneratorType");
             view.GroupDescriptions.Add(groupDescription);
             view.Filter = UserFilter;
 
@@ -93,9 +97,6 @@ namespace Mapping_Tools.Viewmodels {
             _updateTimer.Tick += UpdateTimerTick;
             _autoSnapTimer = new DispatcherTimer(DispatcherPriority.Send) { Interval = TimeSpan.FromMilliseconds(16) };
             _autoSnapTimer.Tick += AutoSnapTimerTick;
-
-            // Set up a coordinate converter for converting coordinates between screen and osu!
-            _coordinateConverter = new CoordinateConverter();
 
             // Listen for changes in the osu! user config
             _configWatcher = new FileSystemWatcher();
@@ -109,9 +110,29 @@ namespace Mapping_Tools.Viewmodels {
             _state = State.LookingForProcess;
         }
 
+        private void PreferencesOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
+            switch (e.PropertyName) {
+                case "OffsetLeft":
+                    _coordinateConverter.EditorBoxOffset.Left = Preferences.OffsetLeft;
+                    break;
+                case "OffsetTop":
+                    _coordinateConverter.EditorBoxOffset.Top = Preferences.OffsetTop;
+                    break;
+                case "OffsetRight":
+                    _coordinateConverter.EditorBoxOffset.Right = Preferences.OffsetRight;
+                    break;
+                case "OffsetBottom":
+                    _coordinateConverter.EditorBoxOffset.Bottom = Preferences.OffsetBottom;
+                    break;
+                case "DebugEnabled":
+                    _overlay.SetBorder(Preferences.DebugEnabled);
+                    break;
+            }
+        }
+
         private void OnDraw(object sender, DrawingContext context) {
             foreach (var obj in _relevantObjects) {
-                obj.DrawYourself(context, _coordinateConverter);
+                obj.DrawYourself(context, _coordinateConverter, Preferences);
             }
         }
 
@@ -141,8 +162,7 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
-        private void UpdateTimerTick(object sender, EventArgs e)
-        {
+        private void UpdateTimerTick(object sender, EventArgs e) {
             var reader = EditorReaderStuff.GetEditorReader();
             switch (_state) {
                 case State.Disabled:
@@ -231,7 +251,7 @@ namespace Mapping_Tools.Viewmodels {
                     _coordinateConverter.OsuWindowPosition = new Vector2(_osuWindow.X, _osuWindow.Y);
                     _overlay.Update();
 
-                    if (!_autoSnapTimer.IsEnabled && IsHotkeyDown(SnapHotkey)) {
+                    if (!_autoSnapTimer.IsEnabled && IsHotkeyDown(Preferences.SnapHotkey)) {
                         _autoSnapTimer.Start();
                     }
                     break;
@@ -339,7 +359,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         private void AutoSnapTimerTick(object sender, EventArgs e) {
-            if (!IsHotkeyDown(SnapHotkey)) {
+            if (!IsHotkeyDown(Preferences.SnapHotkey)) {
                 _autoSnapTimer.Stop();
                 return;
             }
@@ -391,7 +411,7 @@ namespace Mapping_Tools.Viewmodels {
         private bool UserFilter(object item) {
             if (string.IsNullOrEmpty(Filter))
                 return true;
-            return ((RelevantObjectsGenerator) item).Name.IndexOf(Filter, StringComparison.OrdinalIgnoreCase) >= 0;
+            return ((RelevantObjectsGenerator)item).Name.IndexOf(Filter, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         private void SetFilter(string value) {

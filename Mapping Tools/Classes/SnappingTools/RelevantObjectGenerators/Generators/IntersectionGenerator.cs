@@ -3,9 +3,9 @@ using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators.Generators {
     class IntersectionGenerator : RelevantObjectsGenerator, IGenerateRelevantObjectsFromRelevantObjects {
-        public new string Name => "Intersection Point Calculator";
-        public new string Tooltip => "Takes a pair of virtual lines or circles and generates a virtual point on each of their intersections.";
-        public new GeneratorType GeneratorType => GeneratorType.Geometries;
+        public override string Name => "Intersection Point Calculator";
+        public override string Tooltip => "Takes a pair of virtual lines or circles and generates a virtual point on each of their intersections.";
+        public override GeneratorType GeneratorType => GeneratorType.Geometries;
 
         public List<IRelevantObject> GetRelevantObjects(List<IRelevantObject> objects) {
             List<IRelevantObject> newObjects = new List<IRelevantObject>();

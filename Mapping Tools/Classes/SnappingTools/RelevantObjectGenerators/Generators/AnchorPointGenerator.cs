@@ -4,9 +4,9 @@ using Mapping_Tools.Classes.BeatmapHelper;
 
 namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators.Generators {
     class AnchorPointGenerator : RelevantObjectsGenerator, IGenerateRelevantObjectsFromHitObjects {
-        public new string Name => "Anchor of Slider Point Generator";
-        public new string Tooltip => "Generates virtual points on anchors of sliders.";
-        public new GeneratorType GeneratorType => GeneratorType.Generators;
+        public override string Name => "Anchor of Slider Point Generator";
+        public override string Tooltip => "Generates virtual points on anchors of sliders.";
+        public override GeneratorType GeneratorType => GeneratorType.Generators;
 
         public List<IRelevantObject> GetRelevantObjects(List<HitObject> objects)
         {

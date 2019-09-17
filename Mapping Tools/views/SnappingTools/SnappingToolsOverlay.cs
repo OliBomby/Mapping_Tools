@@ -21,14 +21,21 @@ namespace Mapping_Tools.Views.SnappingTools {
             // Set target window by calling the base method
             base.Initialize(targetWindow);
 
-            OverlayWindow = new OverlayWindow(targetWindow);
-            OverlayWindow.ShowInTaskbar = false;
-            OverlayWindow.BorderBrush = Brushes.Blue;
-            OverlayWindow.BorderThickness = new Thickness(3);
+            OverlayWindow = new OverlayWindow(targetWindow) {ShowInTaskbar = false};
 
             _tickEngine.Interval = TimeSpan.FromMilliseconds(1000 / 60f);
             _tickEngine.PreTick += OnPreTick;
             _tickEngine.Tick += OnTick;
+        }
+
+        public void SetBorder(bool enabled) {
+            if (enabled) {
+                OverlayWindow.BorderBrush = Brushes.GreenYellow;
+                OverlayWindow.BorderThickness = new Thickness(3);
+            } else {
+                OverlayWindow.BorderBrush = Brushes.Transparent;
+                OverlayWindow.BorderThickness = new Thickness(0);
+            }
         }
 
         public override void Enable() {

@@ -5,9 +5,9 @@ using Mapping_Tools.Classes.SliderPathStuff;
 
 namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators.Generators {
     class PerfectCircleGenerator : RelevantObjectsGenerator, IGenerateRelevantObjectsFromHitObjects {
-        public new string Name => "Circle from Three Point Slider Generator";
-        public new string Tooltip => "Takes a circular arc slider and generates a virtual circle that completes the arc.";
-        public new GeneratorType GeneratorType => GeneratorType.Generators;
+        public override string Name => "Circle from Three Point Slider Generator";
+        public override string Tooltip => "Takes a circular arc slider and generates a virtual circle that completes the arc.";
+        public override GeneratorType GeneratorType => GeneratorType.Generators;
 
         public List<IRelevantObject> GetRelevantObjects(List<HitObject> objects) {
             List<IRelevantObject> newObjects = new List<IRelevantObject>();

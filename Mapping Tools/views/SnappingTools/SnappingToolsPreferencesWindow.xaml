@@ -14,7 +14,8 @@
         TextElement.FontWeight="Medium"
         TextElement.FontSize="14"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" Background="{DynamicResource MaterialDesignPaper}">
+        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" Background="{DynamicResource MaterialDesignPaper}"
+        d:DataContext="{d:DesignData SnappingToolsPreferences}">
     <WindowChrome.WindowChrome>
         <WindowChrome 
             CaptionHeight="35"
@@ -51,29 +52,29 @@
                                         Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" materialDesign:HintAssist.Hint="Color HEX value"
                                         DockPanel.Dock="Top" Margin="2,0,10,2"/>
                                     </DockPanel>
-                                    <materialDesign:ColorPicker Color="{Binding SnappingToolsPreferences.PointColor}" Grid.Column="1" x:Name="PointColorPicker" HorizontalAlignment="Stretch"/>
+                                    <materialDesign:ColorPicker Color="{Binding PointColor}" Grid.Column="1" x:Name="PointColorPicker" HorizontalAlignment="Stretch"/>
                                 </Grid>
 
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="Opacity" Width="120" VerticalAlignment="Center"/>
-                                    <Slider x:Name="PointOpacitySlider" Width="300" TickFrequency="0.01" Orientation="Horizontal" Minimum="0" Maximum="1" Value="{Binding SnappingToolsPreferences.PointOpacity,  UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
+                                    <Slider x:Name="PointOpacitySlider" Width="300" TickFrequency="0.01" Orientation="Horizontal" Minimum="0" Maximum="1" Value="{Binding PointOpacity,  UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
                                     <TextBox x:Name="PointOpacityTextbox" Width="60" Text="{Binding ElementName=PointOpacitySlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="Thickness" Width="120" VerticalAlignment="Center"/>
-                                    <Slider x:Name="PointThicknessSlider" Width="300" TickFrequency="1" Orientation="Horizontal" Minimum="1" Maximum="10" Value="{Binding SnappingToolsPreferences.PointThickness, UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
+                                    <Slider x:Name="PointThicknessSlider" Width="300" TickFrequency="1" Orientation="Horizontal" Minimum="1" Maximum="10" Value="{Binding PointThickness, UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
                                     <TextBox x:Name="PointThicknessTextbox" Width="60" Text="{Binding ElementName=PointThicknessSlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="DashStyle" Width="120" VerticalAlignment="Center"/>
-                                    <ComboBox x:Name="PointDashStyleCombobox" Width="300" Margin="11,0" ItemsSource="{Binding SnappingToolsPreferences.DashStylesList}" SelectedItem="{Binding SnappingToolsPreferences.PointDashstyle}"/>
+                                    <ComboBox x:Name="PointDashStyleCombobox" Width="300" Margin="11,0" ItemsSource="{Binding DashStylesEnumerable}" SelectedItem="{Binding PointDashstyle}"/>
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="Size" Width="120" VerticalAlignment="Center"/>
-                                    <Slider x:Name="PointSizeSlider" Width="300" TickFrequency="1" Orientation="Horizontal" Minimum="1" Maximum="10" Value="{Binding SnappingToolsPreferences.PointSize, UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
+                                    <Slider x:Name="PointSizeSlider" Width="300" TickFrequency="1" Orientation="Horizontal" Minimum="1" Maximum="10" Value="{Binding PointSize, UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
                                     <TextBox x:Name="PointSizeTextbox" Width="60" Text="{Binding ElementName=PointSizeSlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
                                 </StackPanel>
                             </TreeViewItem>
@@ -93,24 +94,24 @@
                                         Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" materialDesign:HintAssist.Hint="Color HEX value"
                                         DockPanel.Dock="Top" Margin="2,0,10,2"/>
                                     </DockPanel>
-                                    <materialDesign:ColorPicker Color="{Binding SnappingToolsPreferences.LineColor}" Grid.Column="1" x:Name="LineColorPicker" HorizontalAlignment="Stretch"/>
+                                    <materialDesign:ColorPicker Color="{Binding LineColor}" Grid.Column="1" x:Name="LineColorPicker" HorizontalAlignment="Stretch"/>
                                 </Grid>
 
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="Opacity" Width="120" VerticalAlignment="Center"/>
-                                    <Slider x:Name="LineOpacitySlider" Width="300" TickFrequency="0.01" Orientation="Horizontal" Minimum="0" Maximum="1" Value="{Binding SnappingToolsPreferences.LineOpacity,  UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
+                                    <Slider x:Name="LineOpacitySlider" Width="300" TickFrequency="0.01" Orientation="Horizontal" Minimum="0" Maximum="1" Value="{Binding LineOpacity,  UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
                                     <TextBox x:Name="LineOpacityTextbox" Width="60" Text="{Binding ElementName=LineOpacitySlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="Thickness" Width="120" VerticalAlignment="Center"/>
-                                    <Slider x:Name="LineThicknessSlider" Width="300" TickFrequency="1" Orientation="Horizontal" Minimum="1" Maximum="10" Value="{Binding SnappingToolsPreferences.LineThickness, UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
+                                    <Slider x:Name="LineThicknessSlider" Width="300" TickFrequency="1" Orientation="Horizontal" Minimum="1" Maximum="10" Value="{Binding LineThickness, UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
                                     <TextBox x:Name="LineThicknessTextbox" Width="60" Text="{Binding ElementName=LineThicknessSlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="DashStyle" Width="120" VerticalAlignment="Center"/>
-                                    <ComboBox x:Name="LineDashStyleCombobox" Width="300" Margin="11,0" ItemsSource="{Binding SnappingToolsPreferences.DashStylesList}" SelectedItem="{Binding SnappingToolsPreferences.LineDashstyle}"/>
+                                    <ComboBox x:Name="LineDashStyleCombobox" Width="300" Margin="11,0" ItemsSource="{Binding DashStylesEnumerable}" SelectedItem="{Binding LineDashstyle}"/>
                                 </StackPanel>
                             </TreeViewItem>
                         </TreeView>
@@ -129,24 +130,24 @@
                                         Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" materialDesign:HintAssist.Hint="Color HEX value"
                                         DockPanel.Dock="Top" Margin="2,0,10,2"/>
                                     </DockPanel>
-                                    <materialDesign:ColorPicker Color="{Binding SnappingToolsPreferences.CircleColor}" Grid.Column="1" x:Name="CircleColorPicker" HorizontalAlignment="Stretch"/>
+                                    <materialDesign:ColorPicker Color="{Binding CircleColor}" Grid.Column="1" x:Name="CircleColorPicker" HorizontalAlignment="Stretch"/>
                                 </Grid>
 
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="Opacity" Width="120" VerticalAlignment="Center"/>
-                                    <Slider x:Name="CircleOpacitySlider" Width="300" TickFrequency="0.01" Orientation="Horizontal" Minimum="0" Maximum="1" Value="{Binding SnappingToolsPreferences.CircleOpacity,  UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
+                                    <Slider x:Name="CircleOpacitySlider" Width="300" TickFrequency="0.01" Orientation="Horizontal" Minimum="0" Maximum="1" Value="{Binding CircleOpacity,  UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
                                     <TextBox x:Name="CircleOpacityTextbox" Width="60" Text="{Binding ElementName=CircleOpacitySlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="Thickness" Width="120" VerticalAlignment="Center"/>
-                                    <Slider x:Name="CircleThicknessSlider" Width="300" TickFrequency="1" Orientation="Horizontal" Minimum="1" Maximum="10" Value="{Binding SnappingToolsPreferences.CircleThickness, UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
+                                    <Slider x:Name="CircleThicknessSlider" Width="300" TickFrequency="1" Orientation="Horizontal" Minimum="1" Maximum="10" Value="{Binding CircleThickness, UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
                                     <TextBox x:Name="CircleThicknessTextbox" Width="60" Text="{Binding ElementName=CircleThicknessSlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="DashStyle" Width="120" VerticalAlignment="Center"/>
-                                    <ComboBox x:Name="CircleDashStyleCombobox" Width="300" Margin="11,0" ItemsSource="{Binding SnappingToolsPreferences.DashStylesList}" SelectedItem="{Binding SnappingToolsPreferences.CircleDashstyle}"/>
+                                    <ComboBox x:Name="CircleDashStyleCombobox" Width="300" Margin="11,0" ItemsSource="{Binding DashStylesEnumerable}" SelectedItem="{Binding CircleDashstyle}"/>
                                 </StackPanel>
                             </TreeViewItem>
                         </TreeView>
@@ -156,17 +157,17 @@
                         <ListBox>
                             <ListBoxItem>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Width="100" Margin="0 0 0 6" Text="Offset" VerticalAlignment="Bottom" ToolTip="Offsets the overlay. Use this field when the automatic editor-to-screen coordinate conversion seems to fail."/>
-                                    <TextBox Text="{Binding SnappingToolsPreferences.OffsetX}" Width="100" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="X-Coordinate" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 20 0"/>
-                                    <TextBox Text="{Binding SnappingToolsPreferences.OffsetY}" Width="100" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Y-Coordinate" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
+                                    <TextBlock Width="100" Margin="0 0 0 6" Text="Offset" VerticalAlignment="Bottom" ToolTip="Offsets the overlay box. Use this field when the automatic editor-to-screen coordinate conversion seems to fail."/>
+                                    <TextBox Text="{Binding OffsetLeft}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Left offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 10 0"/>
+                                    <TextBox Text="{Binding OffsetTop}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Top offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 10 0"/>
+                                    <TextBox Text="{Binding OffsetRight}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Right offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 10 0"/>
+                                    <TextBox Text="{Binding OffsetBottom}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Bottom offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
                                 </StackPanel>
                             </ListBoxItem>
-
-
                             <ListBoxItem>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Width="100" Margin="0 0 0 6" Text="Scale" VerticalAlignment="Bottom" ToolTip="Scales the overlay by the specified factor. Use this field when the automatic editor-to-screen coordinate conversion seems to fail."/>
-                                    <TextBox Text="{Binding SnappingToolsPreferences.Scale}" Width="100" VerticalAlignment="Bottom" HorizontalAlignment="Left" materialDesign:HintAssist.Hint="Scaling factor" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
+                                    <TextBlock Width="100" Margin="0 0 0 6" Text="Debug" VerticalAlignment="Center" ToolTip="Makes a border appear inside the overlay, so you can see the boundaries."/>
+                                    <ToggleButton IsChecked="{Binding DebugEnabled}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignSwitchToggleButton}"/>
                                 </StackPanel>
                             </ListBoxItem>
                         </ListBox>

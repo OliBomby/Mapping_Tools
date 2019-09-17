@@ -23,7 +23,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
             }
         }
 
-        public Vector2 OsuWindowPositionOffset = new Vector2(2, 1);  // Extra offset applied to the position of the osu! window
+        public Box2 EditorBoxOffset = new Box2(2, 1, 2, 1);  // Extra offset applied to the bounds of the editor box
         public Vector2 PositionSnapOffset => new Vector2(0.5, 0.5);  // An offset to fix a random instance of 1 pixel off snapping
         private string[] _configLines;
 
@@ -118,7 +118,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
             var chromeAddition = OsuFillsScreen ? Vector2.Zero : new Vector2(2, 2 + WindowChromeHeight);
             return Letterboxing ? GetScreenBox() :
                 OsuFillsScreen ? new Box2(Vector2.Zero, OsuResolution) :
-                new Box2(OsuWindowPosition + OsuWindowPositionOffset, OsuWindowPosition + OsuWindowPositionOffset + OsuResolution + chromeAddition);
+                new Box2(OsuWindowPosition, OsuWindowPosition + OsuResolution + chromeAddition);
         }
 
         /// <summary>
@@ -143,7 +143,9 @@ namespace Mapping_Tools.Classes.SnappingTools {
         public Box2 GetEditorBox() {
             var osuWindow = GetOsuWindowBoxWithoutChrome();
             osuWindow.Top += FilebarHeight;
-            if (!Letterboxing) return osuWindow;
+            if (!Letterboxing) {
+                return AddBox2(osuWindow, EditorBoxOffset);
+            }
 
             var letterboxMultiplier = LetterboxingPosition / 200 + new Vector2(0.5, 0.5);  // range: 0-1
             var blackSpaceSize = new Vector2(osuWindow.Width, osuWindow.Height) - EditorResolution;
@@ -154,7 +156,16 @@ namespace Mapping_Tools.Classes.SnappingTools {
             osuWindow.Top += letterboxOffset.Y;
             osuWindow.Right -= letterboxOffset2.X;
             osuWindow.Bottom -= letterboxOffset2.Y;
-            return osuWindow;
+
+            return AddBox2(osuWindow, EditorBoxOffset);
+        }
+
+        private static Box2 AddBox2(Box2 thisBox2, Box2 otherBox2) {
+            return new Box2(
+                thisBox2.Left + otherBox2.Left,
+            thisBox2.Top + otherBox2.Top,
+            thisBox2.Right + otherBox2.Right,
+            thisBox2.Bottom + otherBox2.Bottom);
         }
 
         /// <summary>
