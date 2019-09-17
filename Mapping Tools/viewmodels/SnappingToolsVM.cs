@@ -22,14 +22,7 @@ using System.Windows.Threading;
 namespace Mapping_Tools.Viewmodels {
     public class SnappingToolsVm
     {
-        private SnappingToolsPreferences _preferences;
-        public SnappingToolsPreferences Preferences {
-            get => _preferences;
-            set {
-                if (value == null) return;
-                _preferences = value;
-            }
-        }
+        public SnappingToolsPreferences Preferences { get; }
 
         public ObservableCollection<RelevantObjectsGenerator> Generators { get; }
         private readonly List<IRelevantObject> _relevantObjects = new List<IRelevantObject>();

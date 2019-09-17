@@ -145,5 +145,13 @@ namespace Mapping_Tools.Classes.SnappingTools {
             return MemberwiseClone();
         }
         #endregion
+
+        public void CopyTo(SnappingToolsPreferences other) {
+            foreach (var prop in typeof(SnappingToolsPreferences).GetProperties()) {
+                if (!prop.CanWrite || !prop.CanRead) continue;
+
+                prop.SetValue(other, prop.GetValue(this));
+            }
+        }
     }
 }

@@ -28,9 +28,8 @@ namespace Mapping_Tools.Views {
             return ((SnappingToolsVm) DataContext).Preferences;
         }
 
-        public void SetSaveData(SnappingToolsPreferences saveData)
-        {
-            ((SnappingToolsVm) DataContext).Preferences = saveData;
+        public void SetSaveData(SnappingToolsPreferences saveData) {
+            saveData?.CopyTo(((SnappingToolsVm)DataContext).Preferences);
         }
 
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "snappingtoolsproject.json");
