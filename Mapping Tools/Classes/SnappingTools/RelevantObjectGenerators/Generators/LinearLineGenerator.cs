@@ -17,7 +17,7 @@ namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators.Generator
                 if (!ho.IsSlider || ho.SliderType != PathType.Linear || ho.CurvePoints.Count < 1)
                     continue;
 
-                Line line = new Line(ho.Pos, ho.CurvePoints[ho.CurvePoints.Count - 1]);
+                Line2 line = new Line2(ho.Pos, ho.CurvePoints[ho.CurvePoints.Count - 1]);
                 newObjects.Add(new RelevantLine(line));
             }
 

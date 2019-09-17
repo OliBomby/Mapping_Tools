@@ -28,11 +28,11 @@ namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators.Generator
             return newObjects;
         }
 
-        private static RelevantLine MakePerpendicularLine(Line line, Vector2 point)
+        private static RelevantLine MakePerpendicularLine(Line2 line, Vector2 point)
         {
             var a = -line.B;
             var b = line.A;
-            return new RelevantLine(new Line(a, b, a * point.X + b * point.Y));
+            return new RelevantLine(new Line2(a, b, a * point.X + b * point.Y));
         }
     }
 }

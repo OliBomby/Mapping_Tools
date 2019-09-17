@@ -169,18 +169,13 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="obj">The object to compare to.</param>
         /// <returns>True if the instances are equal; false otherwise.</returns>
         public override bool Equals(object obj) {
-            if( !( obj is Line2 ) ) {
-                return false;
-            }
-
-            return Equals((Line2) obj);
+            return obj is Line2 line2 && Equals(line2);
         }
 
         /// <summary>Indicates whether the current line is equal to another line.</summary>
         /// <param name="other">A line to compare with this line.</param>
         /// <returns>true if the current line is equal to the line parameter; otherwise, false.</returns>
-        public bool Equals(Line2 other)
-        {
+        public bool Equals(Line2 other) {
             return BaseVector == other.BaseVector &&
             DirectionVector == other.DirectionVector;
         }

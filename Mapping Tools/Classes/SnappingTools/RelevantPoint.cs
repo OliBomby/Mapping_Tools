@@ -2,7 +2,7 @@
 using Mapping_Tools.Classes.SystemTools;
 using System.Windows;
 using System.Windows.Media;
-using Line = Mapping_Tools.Classes.MathUtil.Line;
+using Line2 = Mapping_Tools.Classes.MathUtil.Line2;
 
 namespace Mapping_Tools.Classes.SnappingTools {
     public class RelevantPoint : IRelevantObject {
@@ -32,7 +32,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
                 case RelevantPoint point:
                     return Precision.AlmostEquals(point.child.X, child.X) & Precision.AlmostEquals(point.child.Y, child.Y);
                 case RelevantLine line:
-                    return Precision.AlmostEquals(Line.Distance(line.child, child), 0);
+                    return Precision.AlmostEquals(Line2.Distance(line.child, child), 0);
                 case RelevantCircle circle:
                     return Precision.AlmostEquals(Vector2.Distance(circle.child.Centre, child), circle.child.Radius);
                 default:
