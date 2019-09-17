@@ -3,9 +3,9 @@ using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators.Generators {
     class PerpendicularGenerator : RelevantObjectsGenerator, IGenerateRelevantObjectsFromRelevantObjects {
-        public new string Name => "Perpendicular Line Calculator";
-        public new string Tooltip => "Takes a pair of line and point and generates a virtual line perpendicular to the line on top of the point.";
-        public new GeneratorType GeneratorType => GeneratorType.Geometries;
+        public override string Name => "Perpendicular Line Calculator";
+        public override string Tooltip => "Takes a pair of line and point and generates a virtual line perpendicular to the line on top of the point.";
+        public override GeneratorType GeneratorType => GeneratorType.Geometries;
 
         public List<IRelevantObject> GetRelevantObjects(List<IRelevantObject> objects) {
             List<IRelevantObject> newObjects = new List<IRelevantObject>();

@@ -87,8 +87,8 @@ namespace Mapping_Tools.Viewmodels {
             foreach (var gen in Generators) { gen.PropertyChanged += OnGeneratorPropertyChanged; }
 
             // Set up groups and filters
-            CollectionView view = (CollectionView) CollectionViewSource.GetDefaultView(Generators);
-            PropertyGroupDescription groupDescription = new PropertyGroupDescription("GeneratorType");
+            var view = (CollectionView) CollectionViewSource.GetDefaultView(Generators);
+            var groupDescription = new PropertyGroupDescription("GeneratorType");
             view.GroupDescriptions.Add(groupDescription);
             view.Filter = UserFilter;
 
@@ -411,10 +411,7 @@ namespace Mapping_Tools.Viewmodels {
         private bool UserFilter(object item) {
             if (string.IsNullOrEmpty(Filter))
                 return true;
-            var name = ((dynamic) item).Name;
-            if (name == null)
-                return true;
-            return name.IndexOf(Filter, StringComparison.OrdinalIgnoreCase) >= 0;
+            return ((RelevantObjectsGenerator)item).Name.IndexOf(Filter, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         private void SetFilter(string value) {

@@ -4,9 +4,9 @@ using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators.Generators {
     class TriangleGenerator2 : RelevantObjectsGenerator, IGenerateRelevantObjectsFromRelevantPoints {
-        public new string Name => "Equilateral Triangle from Two Points Generator (Type II)";
-        public new string Tooltip => "Takes a pair of virtual points and generates a virtual point on each side to make two equilateral triangles.";
-        public new GeneratorType GeneratorType => GeneratorType.Assistants;
+        public override string Name => "Equilateral Triangle from Two Points Generator (Type II)";
+        public override string Tooltip => "Takes a pair of virtual points and generates a virtual point on each side to make two equilateral triangles.";
+        public override GeneratorType GeneratorType => GeneratorType.Assistants;
 
         public List<IRelevantObject> GetRelevantObjects(List<RelevantPoint> objects) {
             List<IRelevantObject> newObjects = new List<IRelevantObject>();

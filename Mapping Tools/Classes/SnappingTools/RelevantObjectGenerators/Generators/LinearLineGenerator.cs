@@ -5,9 +5,9 @@ using Mapping_Tools.Classes.SliderPathStuff;
 
 namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators.Generators {
     class LinearLineGenerator : RelevantObjectsGenerator, IGenerateRelevantObjectsFromHitObjects {
-        public new string Name => "Line Generator for Linear Sliders";
-        public new string Tooltip => "Takes a linear slider and generates a virtual line that matches it.";
-        public new GeneratorType GeneratorType => GeneratorType.Generators;
+        public override string Name => "Line Generator for Linear Sliders";
+        public override string Tooltip => "Takes a linear slider and generates a virtual line that matches it.";
+        public override GeneratorType GeneratorType => GeneratorType.Generators;
 
         public List<IRelevantObject> GetRelevantObjects(List<HitObject> objects) {
             List<IRelevantObject> newObjects = new List<IRelevantObject>();

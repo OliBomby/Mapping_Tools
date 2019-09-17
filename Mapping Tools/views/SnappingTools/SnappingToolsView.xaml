@@ -57,7 +57,7 @@
                             <materialDesign:PackIcon Kind="SettingsOutline" Height="24" Width="24" />
                         </Button>
                         <TextBlock x:Name="FilterTextBlock" Grid.Row="1" Grid.Column="0" Text="Filters:" VerticalAlignment="Center" Margin="10,0"/>
-                        <TextBox Grid.Row="1" Grid.Column="1" Margin="0,0,0,10" Name="TxtFilter" Text="{Binding Filter, UpdateSourceTrigger=LostFocus}" Grid.ColumnSpan="2"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" Margin="0,0,0,10" Name="TxtFilter" Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}" Grid.ColumnSpan="2"/>
                     </Grid>
                 </StackPanel>
 
