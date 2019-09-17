@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Windows.Controls;
+using System.Windows.Input;
 using Mapping_Tools.Classes.SnappingTools;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Viewmodels;
@@ -34,5 +36,11 @@ namespace Mapping_Tools.Views {
 
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "snappingtoolsproject.json");
         public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Snapping Tools Projects");
+
+        private void UIElement_OnPreviewMouseWheel(object sender, MouseWheelEventArgs e) {
+            ScrollViewer scv = (ScrollViewer)sender;
+            scv.ScrollToVerticalOffset(scv.VerticalOffset - e.Delta);
+            e.Handled = true;
+        }
     }
 }

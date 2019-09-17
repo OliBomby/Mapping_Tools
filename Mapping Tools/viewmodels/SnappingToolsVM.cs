@@ -411,7 +411,10 @@ namespace Mapping_Tools.Viewmodels {
         private bool UserFilter(object item) {
             if (string.IsNullOrEmpty(Filter))
                 return true;
-            return ((RelevantObjectsGenerator) item).Name.IndexOf(Filter, StringComparison.OrdinalIgnoreCase) >= 0;
+            var name = ((RelevantObjectsGenerator) item).Name;
+            if (name == null)
+                return true;
+            return name.IndexOf(Filter, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         private void SetFilter(string value) {
