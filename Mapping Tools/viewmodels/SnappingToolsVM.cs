@@ -124,6 +124,9 @@ namespace Mapping_Tools.Viewmodels {
                 case "OffsetBottom":
                     _coordinateConverter.EditorBoxOffset.Bottom = Preferences.OffsetBottom;
                     break;
+                case "DebugEnabled":
+                    _overlay.SetBorder(Preferences.DebugEnabled);
+                    break;
             }
         }
 

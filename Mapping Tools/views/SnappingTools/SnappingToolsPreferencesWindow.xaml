@@ -164,6 +164,12 @@
                                     <TextBox Text="{Binding OffsetBottom}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Bottom offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
                                 </StackPanel>
                             </ListBoxItem>
+                            <ListBoxItem>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Width="100" Margin="0 0 0 6" Text="Debug" VerticalAlignment="Center" ToolTip="Makes a border appear inside the overlay, so you can see the boundaries."/>
+                                    <ToggleButton IsChecked="{Binding DebugEnabled}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignSwitchToggleButton}"/>
+                                </StackPanel>
+                            </ListBoxItem>
                         </ListBox>
                     </Border>
                 </StackPanel>

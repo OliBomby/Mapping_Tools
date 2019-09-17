@@ -30,6 +30,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
         private double offsetTop = 1;
         private double offsetRight = 2;
         private double offsetBottom = 1;
+        private bool debugEnabled = false;
         #endregion
 
         #region point settings
@@ -120,6 +121,11 @@ namespace Mapping_Tools.Classes.SnappingTools {
         }
 
         public Box2 OverlayOffset => new Box2(OffsetLeft, OffsetTop, OffsetRight, OffsetBottom);
+
+        public bool DebugEnabled {
+            get => debugEnabled;
+            set => Set(ref debugEnabled, value);
+        }
 
         #endregion
 
