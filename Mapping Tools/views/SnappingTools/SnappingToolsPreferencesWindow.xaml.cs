@@ -10,9 +10,11 @@ namespace Mapping_Tools.Views.SnappingTools {
     /// </summary>
     public partial class SnappingToolsPreferencesWindow
     {
-        public SnappingToolsPreferences Preferences { get => (SnappingToolsPreferences)DataContext;
+        public SnappingToolsPreferences Preferences {
+            get => (SnappingToolsPreferences)DataContext;
             set => DataContext = value;
         }
+
         public SnappingToolsPreferencesWindow(SnappingToolsPreferences preferences = null) {
             Preferences = preferences ?? new SnappingToolsPreferences();
             InitializeComponent();

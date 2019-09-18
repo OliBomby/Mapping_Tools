@@ -166,7 +166,7 @@
                             </ListBoxItem>
                             <ListBoxItem>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Width="100" Margin="0 0 0 6" Text="Debug" VerticalAlignment="Center" ToolTip="Makes a border appear inside the overlay, so you can see the boundaries."/>
+                                    <TextBlock Width="100" Margin="0 0 0 6" Text="Debug" VerticalAlignment="Center" ToolTip="Makes a blue border appear around the overlay, so you can see the boundaries of the overlay box."/>
                                     <ToggleButton IsChecked="{Binding DebugEnabled}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignSwitchToggleButton}"/>
                                 </StackPanel>
                             </ListBoxItem>

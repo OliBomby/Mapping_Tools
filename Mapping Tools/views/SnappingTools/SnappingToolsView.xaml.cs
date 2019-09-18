@@ -25,10 +25,7 @@ namespace Mapping_Tools.Views {
             } 
         }
 
-        public SnappingToolsPreferences GetSaveData()
-        {
-            return ((SnappingToolsVm) DataContext).Preferences;
-        }
+        public SnappingToolsPreferences GetSaveData() => ((SnappingToolsVm)DataContext).Preferences;
 
         public void SetSaveData(SnappingToolsPreferences saveData) {
             saveData?.CopyTo(((SnappingToolsVm)DataContext).Preferences);
