@@ -406,10 +406,7 @@ namespace Mapping_Tools.Viewmodels {
                 return false;
             if (hotkey.Modifiers.HasFlag(ModifierKeys.Shift) && !(Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)))
                 return false;
-            if (hotkey.Modifiers.HasFlag(ModifierKeys.Windows) && !(Keyboard.IsKeyDown(Key.LWin) || Keyboard.IsKeyDown(Key.RWin)))
-                return false;
-
-            return true;
+            return !hotkey.Modifiers.HasFlag(ModifierKeys.Windows) || (Keyboard.IsKeyDown(Key.LWin) || Keyboard.IsKeyDown(Key.RWin));
         }
 
         private bool UserFilter(object item) {
