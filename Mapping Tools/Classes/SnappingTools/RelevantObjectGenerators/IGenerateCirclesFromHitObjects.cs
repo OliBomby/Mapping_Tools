@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators {
-    public interface IGenerateRelevantObjectsFromHitObjects {
-        List<IRelevantObject> GetRelevantObjects(List<HitObject> objects);
+    public interface IGenerateCirclesFromHitObjects {
+        List<RelevantCircle> GetRelevantObjects(List<HitObject> objects);
     }
 }

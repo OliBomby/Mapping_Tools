@@ -25,7 +25,10 @@ namespace Mapping_Tools.Viewmodels {
         public SnappingToolsPreferences Preferences { get; }
 
         public ObservableCollection<RelevantObjectsGenerator> Generators { get; }
-        private readonly List<IRelevantObject> _relevantObjects = new List<IRelevantObject>();
+        public readonly List<RelevantPoint> RelevantPoints = new List<RelevantPoint>();
+        public readonly List<RelevantLine> RelevantLines = new List<RelevantLine>();
+        public readonly List<RelevantCircle> RelevantCircles = new List<RelevantCircle>();
+        public readonly List<IRelevantObject> RelevantObjects = new List<IRelevantObject>();
         private List<HitObject> _visibleObjects;
         private int _editorTime;
 
@@ -131,7 +134,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         private void OnDraw(object sender, DrawingContext context) {
-            foreach (var obj in _relevantObjects) {
+            foreach (var obj in RelevantObjects) {
                 obj.DrawYourself(context, _coordinateConverter, Preferences);
             }
         }
@@ -260,10 +263,14 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
-        private void ClearRelevantObjects() {
-            if (_relevantObjects.Count == 0) return;
-            _relevantObjects.Clear();
-            _overlay.OverlayWindow.InvalidateVisual();
+        private void ClearRelevantObjects(bool redraw = true) {
+            if (RelevantObjects.Count == 0) return;
+            RelevantPoints.Clear();
+            RelevantLines.Clear();
+            RelevantCircles.Clear();
+            RelevantObjects.Clear();
+            if (redraw)
+                _overlay.OverlayWindow.InvalidateVisual();
         }
 
         private List<HitObject> GetVisibleHitObjects()
@@ -307,47 +314,43 @@ namespace Mapping_Tools.Viewmodels {
             var activeGenerators = Generators.Where(o => o.IsActive).ToList();
 
             // Reset the old RelevantObjects
-            _relevantObjects.Clear();
+            ClearRelevantObjects(false);
 
             // Generate RelevantObjects based on the visible hitobjects
-            foreach (var gen in activeGenerators.OfType<IGenerateRelevantObjectsFromHitObjects>()) {
-                _relevantObjects.AddRange(gen.GetRelevantObjects(visibleObjects));
+            foreach (var gen in activeGenerators.OfType<IGeneratePointsFromHitObjects>()) {
+                RelevantPoints.AddRange(gen.GetRelevantObjects(visibleObjects));
+            }
+            foreach (var gen in activeGenerators.OfType<IGenerateLinesFromHitObjects>()) {
+                RelevantLines.AddRange(gen.GetRelevantObjects(visibleObjects));
+            }
+            foreach (var gen in activeGenerators.OfType<IGenerateCirclesFromHitObjects>()) {
+                RelevantCircles.AddRange(gen.GetRelevantObjects(visibleObjects));
             }
 
-            // Seperate the RelevantObjects
-            var relevantPoints = new List<RelevantPoint>();
-            var relevantLines = new List<RelevantLine>();
-            var relevantCircles = new List<RelevantCircle>();
+            Inception(activeGenerators);
+        }
 
-            foreach (var ro in _relevantObjects)
-            {
-                switch (ro)
-                {
-                    case RelevantPoint rp:
-                        relevantPoints.Add(rp);
-                        break;
-                    case RelevantLine rl:
-                        relevantLines.Add(rl);
-                        break;
-                    case RelevantCircle rc:
-                        relevantCircles.Add(rc);
-                        break;
-                }
-            }
+        private void Inception(IReadOnlyCollection<RelevantObjectsGenerator> activeGenerators) {
+            // Make temporary lists to get consistent inceptions
+            var points = new List<RelevantPoint>();
+            var lines = new List<RelevantLine>();
+            var circles = new List<RelevantCircle>();
 
             // Generate more RelevantObjects
-            foreach (var gen in activeGenerators.OfType<IGenerateRelevantObjectsFromRelevantPoints>()) {
-                _relevantObjects.AddRange(gen.GetRelevantObjects(relevantPoints));
+            foreach (var gen in activeGenerators.OfType<IGeneratePointsFromRelevantObjects>()) {
+                points.AddRange(gen.GetRelevantObjects(RelevantPoints, RelevantLines, RelevantCircles));
             }
-            foreach (var gen in activeGenerators.OfType<IGenerateRelevantObjectsFromRelevantLines>()) {
-                _relevantObjects.AddRange(gen.GetRelevantObjects(relevantLines));
+            foreach (var gen in activeGenerators.OfType<IGenerateLinesFromRelevantObjects>()) {
+                lines.AddRange(gen.GetRelevantObjects(RelevantPoints, RelevantLines, RelevantCircles));
             }
-            foreach (var gen in activeGenerators.OfType<IGenerateRelevantObjectsFromRelevantCircles>()) {
-                _relevantObjects.AddRange(gen.GetRelevantObjects(relevantCircles));
+            foreach (var gen in activeGenerators.OfType<IGenerateCirclesFromRelevantObjects>()) {
+                circles.AddRange(gen.GetRelevantObjects(RelevantPoints, RelevantLines, RelevantCircles));
             }
-            foreach (var gen in activeGenerators.OfType<IGenerateRelevantObjectsFromRelevantObjects>()) {
-                _relevantObjects.AddRange(gen.GetRelevantObjects(_relevantObjects));
-            }
+
+            // Add the tempory lists to the main lists
+            RelevantPoints.AddRange(points);
+            RelevantLines.AddRange(lines);
+            RelevantCircles.AddRange(circles);
         }
 
         private static double ApproachRateToMs(double approachRate) {
@@ -370,19 +373,18 @@ namespace Mapping_Tools.Viewmodels {
             // CONVERT THIS CURSOR POSITION TO EDITOR POSITION
             var cursorPos = _coordinateConverter.ScreenToEditorCoordinate(new Vector2(cursorPoint.X, cursorPoint.Y));
 
-            if (_relevantObjects.Count == 0)
+            if (RelevantObjects.Count == 0)
                 return;
 
             IRelevantObject nearest = null;
-            double smallestDistance = double.PositiveInfinity;
-            foreach (IRelevantObject o in _relevantObjects) {
-                double dist = o.DistanceTo(cursorPos);
+            var smallestDistance = double.PositiveInfinity;
+            foreach (var o in RelevantObjects) {
+                var dist = o.DistanceTo(cursorPos);
                 if (o is RelevantPoint) // Prioritize points to be able to snap to intersections
                     dist -= PointsBias;
-                if (dist < smallestDistance) {
-                    smallestDistance = dist;
-                    nearest = o;
-                }
+                if (!(dist < smallestDistance)) continue;
+                smallestDistance = dist;
+                nearest = o;
             }
 
             // CONVERT THIS TO CURSOR POSITION

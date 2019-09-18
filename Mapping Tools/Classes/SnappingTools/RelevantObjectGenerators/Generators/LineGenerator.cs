@@ -2,20 +2,20 @@
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators.Generators {
-    class LineGenerator : RelevantObjectsGenerator, IGenerateRelevantObjectsFromRelevantPoints {
+    class LineGenerator : RelevantObjectsGenerator, IGenerateLinesFromRelevantObjects {
         public override string Name => "Lines between Two Points Generator";
         public override string Tooltip => "Takes a pair of virtual points and generates a virtual line that connects the two.";
         public override GeneratorType GeneratorType => GeneratorType.Geometries;
 
-        public List<IRelevantObject> GetRelevantObjects(List<RelevantPoint> objects) {
-            List<IRelevantObject> newObjects = new List<IRelevantObject>();
+        public List<RelevantLine> GetRelevantObjects(List<RelevantPoint> points, List<RelevantLine> lines, List<RelevantCircle> circles) {
+            var newObjects = new List<RelevantLine>();
 
-            for (int i = 0; i < objects.Count; i++) {
-                for (int k = i + 1; k < objects.Count; k++) {
-                    var obj1 = objects[i];
-                    var obj2 = objects[k];
+            for (var i = 0; i < points.Count; i++) {
+                for (var k = i + 1; k < points.Count; k++) {
+                    var obj1 = points[i];
+                    var obj2 = points[k];
 
-                    Line line = new Line(obj1.child, obj2.child);
+                    var line = new Line(obj1.child, obj2.child);
                     newObjects.Add(new RelevantLine(line));
                 }
             }
