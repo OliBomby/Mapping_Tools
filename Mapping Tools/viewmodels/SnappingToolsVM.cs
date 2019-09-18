@@ -28,7 +28,7 @@ namespace Mapping_Tools.Viewmodels {
         public readonly List<RelevantPoint> RelevantPoints = new List<RelevantPoint>();
         public readonly List<RelevantLine> RelevantLines = new List<RelevantLine>();
         public readonly List<RelevantCircle> RelevantCircles = new List<RelevantCircle>();
-        public readonly List<IRelevantObject> RelevantObjects = new List<IRelevantObject>();
+        public List<IRelevantObject> RelevantObjects = new List<IRelevantObject>();
         private List<HitObject> _visibleObjects;
         private int _editorTime;
 
@@ -328,6 +328,8 @@ namespace Mapping_Tools.Viewmodels {
             }
 
             Inception(activeGenerators);
+
+            RelevantObjects = RelevantLines.Concat<IRelevantObject>(RelevantCircles).Concat(RelevantPoints).ToList();
         }
 
         private void Inception(IReadOnlyCollection<RelevantObjectsGenerator> activeGenerators) {
