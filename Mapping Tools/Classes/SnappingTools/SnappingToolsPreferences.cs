@@ -3,6 +3,7 @@ using System.Windows.Media;
 using Mapping_Tools.Classes.SystemTools;
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Input;
 using Mapping_Tools.Classes.MathUtil;
 
@@ -130,7 +131,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
         #endregion
 
         #region dashstyle helpers
-        public static IEnumerable<string> DashStylesEnumerable => Enum.GetNames(typeof(DashStylesEnum));
+        public static IEnumerable<DashStylesEnum> DashStylesEnumerable => Enum.GetValues(typeof(DashStylesEnum)).Cast<DashStylesEnum>();
 
         public DashStyle GetDashStyle(DashStylesEnum input) {
             switch (input) {
