@@ -1,5 +1,4 @@
 using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.SystemTools;
 using System.Windows;
 using System.Windows.Media;
 using Line = Mapping_Tools.Classes.MathUtil.Line;
