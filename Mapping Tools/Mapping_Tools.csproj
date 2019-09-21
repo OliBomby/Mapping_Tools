@@ -278,8 +278,9 @@
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\TriangleGenerator.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\TriangleGenerator2.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectLayer.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectPreferences.cs" />
     <Compile Include="Classes\SnappingTools\RelevantPoint.cs" />
-    <Compile Include="Classes\SnappingTools\Models\SnappingToolsPreferences.cs" />
+    <Compile Include="Classes\SnappingTools\SnappingToolsPreferences.cs" />
     <Compile Include="Classes\SystemTools\ActionHotkey.cs" />
     <Compile Include="Classes\SystemTools\BindableBase.cs" />
     <Compile Include="Classes\SystemTools\Hotkey.cs" />
