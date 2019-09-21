@@ -1,8 +1,5 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using Mapping_Tools.Classes.SnappingTools;
-using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Viewmodels;
 
 namespace Mapping_Tools.Views.SnappingTools {
     /// <summary>
