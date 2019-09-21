@@ -20,7 +20,7 @@ namespace Mapping_Tools.Views {
         private void PreferencesButton_Click(object sender, System.Windows.RoutedEventArgs e) {
             var preferencesWindow = new SnappingToolsPreferencesWindow(GetSaveData());
             var result = preferencesWindow.ShowDialog();
-            if (result == true) {
+            if (result.GetValueOrDefault()) {
                 SetSaveData(preferencesWindow.Preferences);
             } 
         }
