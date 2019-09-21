@@ -2,7 +2,6 @@
 using System.Windows.Media;
 using Mapping_Tools.Classes.SystemTools;
 using System;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 using Mapping_Tools.Classes.MathUtil;
@@ -10,21 +9,33 @@ using Mapping_Tools.Classes.MathUtil;
 namespace Mapping_Tools.Classes.SnappingTools {
     public class SnappingToolsPreferences : BindableBase, ICloneable{
         #region private storage
-        private Color pointColor = Colors.Cyan;
-        private double pointOpacity = 0.8;
-        private double pointThickness = 3;
-        private DashStylesEnum pointDashstyle = DashStylesEnum.Solid;
-        private double pointSize = 5;
-
-        private Color lineColor = Colors.LawnGreen;
-        private double lineOpacity = 0.8;
-        private double lineThickness = 3;
-        private DashStylesEnum lineDashstyle = DashStylesEnum.Dash;
-
-        private Color circleColor = Colors.Red;
-        private double circleOpacity = 0.8;
-        private double circleThickness = 3;
-        private DashStylesEnum circleDashstyle = DashStylesEnum.Dash;
+        private List<RelevantObjectPreferences> releventObjectPreferences = new List<RelevantObjectPreferences> {
+            new RelevantObjectPreferences {
+                Name = "Virtual point preferences",
+                Color = Colors.Cyan,
+                Dashstyle = DashStylesEnum.Solid,
+                Opacity = 0.8,
+                Size = 5,
+                Thickness = 3,
+                HasSizeOption = true,
+            },
+            new RelevantObjectPreferences {
+                Name = "Virtual line preferences",
+                Color = Colors.LawnGreen,
+                Dashstyle = DashStylesEnum.Dash,
+                Opacity = 0.8,
+                Thickness = 3,
+                HasSizeOption = false,
+            },
+            new RelevantObjectPreferences {
+                Name = "Virtual circle preferences",
+                Color = Colors.Red,
+                Dashstyle = DashStylesEnum.Dash,
+                Opacity = 0.8,
+                Thickness = 3,
+                HasSizeOption = false,
+            }
+        };
 
         private Hotkey snapHotkey = new Hotkey(Key.M, ModifierKeys.None);
         private double offsetLeft = 2;
@@ -34,66 +45,10 @@ namespace Mapping_Tools.Classes.SnappingTools {
         private bool debugEnabled = false;
         #endregion
 
-        #region point settings
-        public Color PointColor {
-            get => pointColor;
-            set => Set(ref pointColor, value);
+        public List<RelevantObjectPreferences> RelevantObjectPreferences {
+            get => releventObjectPreferences;
+            set => Set(ref releventObjectPreferences, value);
         }
-        public double PointOpacity {
-            get => pointOpacity;
-            set => Set(ref pointOpacity, value);
-        }
-        public double PointThickness {
-            get => pointThickness;
-            set => Set(ref pointThickness, value);
-        }
-        public DashStylesEnum PointDashstyle {
-            get => pointDashstyle;
-            set => Set(ref pointDashstyle, value);
-        }
-        public double PointSize {
-            get => pointSize;
-            set => Set(ref pointSize, value);
-        }
-        #endregion
-
-        #region line settings
-        public Color LineColor {
-            get => lineColor;
-            set => Set(ref lineColor, value);
-        }
-        public double LineOpacity {
-            get => lineOpacity;
-            set => Set(ref lineOpacity, value);
-        }
-        public double LineThickness {
-            get => lineThickness;
-            set => Set(ref lineThickness, value);
-        }
-        public DashStylesEnum LineDashstyle {
-            get => lineDashstyle;
-            set => Set(ref lineDashstyle, value);
-        }
-        #endregion
-
-        #region circle settings
-        public Color CircleColor {
-            get => circleColor;
-            set => Set(ref circleColor, value);
-        }
-        public double CircleOpacity {
-            get => circleOpacity;
-            set => Set(ref circleOpacity, value);
-        }
-        public double CircleThickness {
-            get => circleThickness;
-            set => Set(ref circleThickness, value);
-        }
-        public DashStylesEnum CircleDashstyle {
-            get => circleDashstyle;
-            set => Set(ref circleDashstyle, value);
-        }
-        #endregion
 
         #region global settings
         public Hotkey SnapHotkey {
@@ -130,24 +85,15 @@ namespace Mapping_Tools.Classes.SnappingTools {
 
         #endregion
 
-        #region dashstyle helpers
-        public static IEnumerable<DashStylesEnum> DashStylesEnumerable => Enum.GetValues(typeof(DashStylesEnum)).Cast<DashStylesEnum>();
-
-        public DashStyle GetDashStyle(DashStylesEnum input) {
-            switch (input) {
-                case DashStylesEnum.Dash:
-                    return DashStyles.Dash;
-                case DashStylesEnum.Dot:
-                    return DashStyles.Dot;
-                case DashStylesEnum.DashDot:
-                    return DashStyles.DashDot;
-                case DashStylesEnum.DashDotDot:
-                    return DashStyles.DashDotDot;
-                case DashStylesEnum.Solid:
-                    return DashStyles.Solid;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+        #region helper methods
+        /// <summary>
+        /// Finds and returns an existing instance of <see cref="RelevantObjectPreferences"/> based on <see cref="RelevantObjectPreferences.Name"/> property.
+        /// </summary>
+        /// <param name="input"><see cref="RelevantObjectPreferences.Name"/> property of the desired instance of <see cref="RelevantObjectPreferences.Name"/>.</param>
+        /// <exception cref="ArgumentOutOfRangeException"/>
+        public RelevantObjectPreferences GetReleventObjectPreferences(string input) {
+            List<RelevantObjectPreferences> output = releventObjectPreferences.Where(o => o.Name == input).ToList();
+            return output[0] ?? throw new ArgumentOutOfRangeException();
         }
         #endregion
 
@@ -160,8 +106,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
         public void CopyTo(SnappingToolsPreferences other) {
             foreach (var prop in typeof(SnappingToolsPreferences).GetProperties()) {
                 if (!prop.CanWrite || !prop.CanRead) continue;
-
-                prop.SetValue(other, prop.GetValue(this));
+                try { prop.SetValue(other, prop.GetValue(this)); } catch { }
             }
         }
     }
