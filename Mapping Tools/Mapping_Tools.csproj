@@ -251,6 +251,7 @@
     <Compile Include="Classes\SnappingTools\DashStylesEnum.cs" />
     <Compile Include="Classes\SnappingTools\CoordinateConverter.cs" />
     <Compile Include="Classes\SnappingTools\IRelevantObject.cs" />
+    <Compile Include="Classes\SnappingTools\Models\RelevantObjectPreferences.cs" />
     <Compile Include="Classes\SnappingTools\RelevantCircle.cs" />
     <Compile Include="Classes\SnappingTools\RelevantLine.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\AnchorPointGenerator.cs" />
@@ -275,7 +276,7 @@
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\TriangleGenerator.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\TriangleGenerator2.cs" />
     <Compile Include="Classes\SnappingTools\RelevantPoint.cs" />
-    <Compile Include="Classes\SnappingTools\SnappingToolsPreferences.cs" />
+    <Compile Include="Classes\SnappingTools\Models\SnappingToolsPreferences.cs" />
     <Compile Include="Classes\SystemTools\ActionHotkey.cs" />
     <Compile Include="Classes\SystemTools\BindableBase.cs" />
     <Compile Include="Classes\SystemTools\Hotkey.cs" />
