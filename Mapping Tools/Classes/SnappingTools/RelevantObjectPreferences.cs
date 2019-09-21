@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Media;
 using Mapping_Tools.Classes.SystemTools;
 
@@ -58,7 +59,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
             };
         }
 
-        public static IEnumerable<string> DashStylesEnumerable => Enum.GetNames(typeof(DashStylesEnum));
+        public static IEnumerable<DashStylesEnum> DashStylesEnumerable => Enum.GetValues(typeof(DashStylesEnum)).Cast<DashStylesEnum>();
 
         private DashStyle GetDashStyle() {
             switch (Dashstyle) {
