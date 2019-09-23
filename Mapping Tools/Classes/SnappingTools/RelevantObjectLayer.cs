@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.SnappingTools {
-    public class RelevantObjectLayer : ObjectLayer<IRelevantObject> {
-        public new List<IRelevantObject> ObjectList {
+    public class RelevantObjectLayer : ObjectLayer {
+        public List<IRelevantObject> ObjectList {
             get {
                 var objects = Lines.Concat<IRelevantObject>(Circles).Concat(Points).ToList();
                 return objects;
@@ -18,8 +18,16 @@ namespace Mapping_Tools.Classes.SnappingTools {
             }
         }
 
-        private List<RelevantPoint> Points;
-        private List<RelevantLine> Lines;
-        private List<RelevantCircle> Circles;
+        private List<RelevantPoint> Points = new List<RelevantPoint>();
+        private List<RelevantLine> Lines = new List<RelevantLine>();
+        private List<RelevantCircle> Circles = new List<RelevantCircle>();
+
+        public void AddPoint(RelevantPoint point) {
+            Points.Add(point);
+        }
+
+        public void AddPoints(List<RelevantPoint> points) {
+            Points.AddRange(points);
+        }
     }
 }
