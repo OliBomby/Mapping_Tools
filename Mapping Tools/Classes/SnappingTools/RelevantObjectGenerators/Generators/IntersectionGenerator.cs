@@ -17,7 +17,7 @@ namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators.Generator
                     var obj1 = lines[i];
                     var obj2 = lines[k];
 
-                    if (!Line.Intersection(obj1.child, obj2.child, out var intersection)) continue;
+                    if (!Line2.Intersection(obj1.child, obj2.child, out var intersection)) continue;
                     newObjects.Add(new RelevantPoint(intersection));
                 }
             }

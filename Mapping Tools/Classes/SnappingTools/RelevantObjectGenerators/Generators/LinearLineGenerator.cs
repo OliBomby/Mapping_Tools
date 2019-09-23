@@ -11,7 +11,7 @@ namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators.Generator
         public override GeneratorType GeneratorType => GeneratorType.Generators;
 
         public List<RelevantLine> GetRelevantObjects(List<HitObject> objects) {
-            return (from ho in objects where ho.IsSlider && ho.SliderType == PathType.Linear && ho.CurvePoints.Count >= 1 select new RelevantLine(new Line2(ho.Pos, ho.CurvePoints[ho.CurvePoints.Count - 1]))).ToList();
+            return (from ho in objects where ho.IsSlider && ho.SliderType == PathType.Linear && ho.CurvePoints.Count >= 1 select new RelevantLine(Line2.FromPoints(ho.Pos, ho.CurvePoints[ho.CurvePoints.Count - 1]))).ToList();
         }
     }
 }

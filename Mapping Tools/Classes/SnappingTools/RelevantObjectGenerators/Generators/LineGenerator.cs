@@ -15,7 +15,7 @@ namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators.Generator
                     var obj1 = points[i];
                     var obj2 = points[k];
 
-                    Line2 line = new Line2(obj1.child, obj2.child);
+                    Line2 line = Line2.FromPoints(obj1.child, obj2.child);
                     newObjects.Add(new RelevantLine(line));
                 }
             }
