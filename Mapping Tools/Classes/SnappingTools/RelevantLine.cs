@@ -1,25 +1,25 @@
 using System.Windows;
 using System.Windows.Media;
 using Mapping_Tools.Classes.MathUtil;
-using Line = Mapping_Tools.Classes.MathUtil.Line;
+using Line2 = Mapping_Tools.Classes.MathUtil.Line2;
 
 namespace Mapping_Tools.Classes.SnappingTools {
     public class RelevantLine : IRelevantObject {
-        public readonly Line child;
+        public readonly Line2 child;
 
         public bool IsHighlighted;
 
         public double DistanceTo(Vector2 point) {
-            return Line.Distance(child, point);
+            return Line2.Distance(child, point);
         }
 
         public bool Intersection(IRelevantObject other, out Vector2[] intersections) {
             switch (other) {
                 case RelevantPoint point:
                     intersections = new[] { point.child };
-                    return Precision.AlmostEquals(Line.Distance(child, point.child), 0);
+                    return Precision.AlmostEquals(Line2.Distance(child, point.child), 0);
                 case RelevantLine line: {
-                    bool IsIntersecting = Line.Intersection(child, line.child, out var intersection);
+                    bool IsIntersecting = Line2.Intersection(child, line.child, out var intersection);
                     intersections = new[] { intersection };
                     return IsIntersecting;
                 }
@@ -32,7 +32,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
         }
 
         public void DrawYourself(DrawingContext context, CoordinateConverter converter, SnappingToolsPreferences preferences) {
-            if (!Line.Intersection(new Box2 { Left = -1000, Top = -1000, Right = 1512, Bottom = 1384 }, child, out var points)) { return; }
+            if (!Line2.Intersection(new Box2 { Left = -1000, Top = -1000, Right = 1512, Bottom = 1384 }, child, out var points)) { return; }
             RelevantObjectPreferences roPref = preferences.GetReleventObjectPreferences("Virtual line preferences");
             var cPos1 = converter.ToDpi(converter.EditorToRelativeCoordinate(points[0]));
             var cPos2 = converter.ToDpi(converter.EditorToRelativeCoordinate(points[1]));
@@ -40,14 +40,10 @@ namespace Mapping_Tools.Classes.SnappingTools {
         }
 
         public Vector2 NearestPoint(Vector2 point) {
-            double a = child.A, b = child.B, c = -child.C;
-            double abs = a * a + b * b;
-            double x = (b * (b * point.X - a * point.Y) - a * c) / abs;
-            double y = (a * (-b * point.X + a * point.Y) - b * c) / abs;
-            return new Vector2(x, y);
+            return Line2.NearestPoint(child, point);
         }
 
-        public RelevantLine(Line line) {
+        public RelevantLine(Line2 line) {
             child = line;
         }
     }

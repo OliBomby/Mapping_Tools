@@ -8,8 +8,8 @@ namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators.Generator
         public override string Tooltip => "Takes a pair of line and point and generates a virtual line parallel to the line on top of the point.";
         public override GeneratorType GeneratorType => GeneratorType.Geometries;
 
-        private static RelevantLine MakeParallelLine(Line line, Vector2 point) {
-            return new RelevantLine(new Line(line.A, line.B, line.A * point.X + line.B * point.Y));
+        private static RelevantLine MakeParallelLine(Line2 line, Vector2 point) {
+            return new RelevantLine(new Line2(point, line.DirectionVector));
         }
 
         public List<RelevantLine> GetRelevantObjects(List<RelevantPoint> points, List<RelevantLine> lines, List<RelevantCircle> circles) {

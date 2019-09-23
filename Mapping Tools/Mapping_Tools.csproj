@@ -234,7 +234,7 @@
     <Compile Include="Classes\MathUtil\Matrix4x3d.cs" />
     <Compile Include="Classes\MathUtil\Quaternion.cs" />
     <Compile Include="Classes\MathUtil\Quaterniond.cs" />
-    <Compile Include="Classes\MathUtil\Line.cs" />
+    <Compile Include="Classes\MathUtil\Line2.cs" />
     <Compile Include="Classes\MathUtil\Vector2.cs" />
     <Compile Include="Classes\MathUtil\Vector2d.cs" />
     <Compile Include="Classes\MathUtil\Vector3.cs" />
