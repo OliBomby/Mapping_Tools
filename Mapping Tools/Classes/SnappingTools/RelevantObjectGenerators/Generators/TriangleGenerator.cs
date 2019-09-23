@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators.Generators {
-    class TriangleGenerator : RelevantObjectsGenerator, IGenerateRelevantObjectsFromRelevantPoints {
+    class TriangleGenerator : RelevantObjectsGenerator, IGeneratePointsFromRelevantObjects  {
         public override string Name => "Equilateral Triangle from Two Points Generator (Type I)";
         public override string Tooltip => "Takes a pair of virtual points and generates a virtual point on each side to make two equilateral triangles.";
         public override GeneratorType GeneratorType => GeneratorType.Assistants;
 
-        public List<IRelevantObject> GetRelevantObjects(List<RelevantPoint> objects) {
-            List<IRelevantObject> newObjects = new List<IRelevantObject>();
+        public List<RelevantPoint> GetRelevantObjects(List<RelevantPoint> points, List<RelevantLine> lines, List<RelevantCircle> circles) {
+            var newObjects = new List<RelevantPoint>();
 
-            for (int i = 0; i < objects.Count; i++) {
-                for (int k = i + 1; k < objects.Count; k++) {
-                    var obj1 = objects[i];
-                    var obj2 = objects[k];
+            for (var i = 0; i < points.Count; i++) {
+                for (var k = i + 1; k < points.Count; k++) {
+                    var obj1 = points[i];
+                    var obj2 = points[k];
 
                     var diff = obj2.child - obj1.child;
                     var rotated = Vector2.Rotate(diff, Math.PI * 2 / 3);

@@ -1,7 +1,6 @@
-﻿using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.SystemTools;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Media;
+using Mapping_Tools.Classes.MathUtil;
 using Line2 = Mapping_Tools.Classes.MathUtil.Line2;
 
 namespace Mapping_Tools.Classes.SnappingTools {
@@ -12,18 +11,6 @@ namespace Mapping_Tools.Classes.SnappingTools {
 
         public double DistanceTo(Vector2 point) {
             return Vector2.Distance(child, point);
-        }
-
-        private static Pen GetPen(SnappingToolsPreferences preferences) {
-             var pen = new Pen {
-                 Brush = new SolidColorBrush {
-                     Color = preferences.PointColor,
-                     Opacity = preferences.PointOpacity,
-                 },
-                 DashStyle = preferences.GetDashStyle(preferences.PointDashstyle),
-                 Thickness = preferences.PointThickness,
-             };
-            return pen;
         }
 
         public bool Intersection(IRelevantObject other, out Vector2[] intersections) {
@@ -41,8 +28,9 @@ namespace Mapping_Tools.Classes.SnappingTools {
         }
 
         public void DrawYourself(DrawingContext context, CoordinateConverter converter, SnappingToolsPreferences preferences) {
+            RelevantObjectPreferences roPref = preferences.GetReleventObjectPreferences("Virtual point preferences");
             var cPos = converter.ToDpi(converter.EditorToRelativeCoordinate(child));
-            context.DrawEllipse(null, GetPen(preferences), new Point(cPos.X, cPos.Y), preferences.PointSize, preferences.PointSize);
+            context.DrawEllipse(null, roPref.Pen, new Point(cPos.X, cPos.Y), roPref.Size, roPref.Size);
         }
 
         public Vector2 NearestPoint(Vector2 point) {

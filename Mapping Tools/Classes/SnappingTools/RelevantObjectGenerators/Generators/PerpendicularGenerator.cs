@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators.Generators {
-    class PerpendicularGenerator : RelevantObjectsGenerator, IGenerateRelevantObjectsFromRelevantObjects {
+    class PerpendicularGenerator : RelevantObjectsGenerator, IGenerateLinesFromRelevantObjects {
         public override string Name => "Perpendicular Line Calculator";
         public override string Tooltip => "Takes a pair of line and point and generates a virtual line perpendicular to the line on top of the point.";
         public override GeneratorType GeneratorType => GeneratorType.Geometries;
@@ -32,6 +33,10 @@ namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators.Generator
             var perp = line.PerpendicularLeft();
             perp.PositionVector = point;
             return new RelevantLine(perp);
+        }
+
+        public List<RelevantLine> GetRelevantObjects(List<RelevantPoint> points, List<RelevantLine> lines, List<RelevantCircle> circles) {
+            return (from line in lines from point in points select MakePerpendicularLine(line.child, point.child)).ToList();
         }
     }
 }

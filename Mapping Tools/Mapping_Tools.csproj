@@ -250,7 +250,9 @@
     <Compile Include="Classes\BeatmapHelper\TValue.cs" />
     <Compile Include="Classes\SnappingTools\DashStylesEnum.cs" />
     <Compile Include="Classes\SnappingTools\CoordinateConverter.cs" />
+    <Compile Include="Classes\SnappingTools\HitObjectLayer.cs" />
     <Compile Include="Classes\SnappingTools\IRelevantObject.cs" />
+    <Compile Include="Classes\SnappingTools\ObjectLayer.cs" />
     <Compile Include="Classes\SnappingTools\RelevantCircle.cs" />
     <Compile Include="Classes\SnappingTools\RelevantLine.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\AnchorPointGenerator.cs" />
@@ -259,12 +261,13 @@
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\ParallelismGenerator.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\LastAnchorGenerator.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\GeneratorType.cs" />
-    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjectsFromRelevantCircles.cs" />
-    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjectsFromRelevantLines.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateCirclesFromRelevantObjects.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateCirclesFromHitObjects.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateLinesFromHitObjects.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGeneratePointsfromRelevantObjects.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\RelevantObjectsGenerator.cs" />
-    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjectsFromHitObjects.cs" />
-    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjectsFromRelevantObjects.cs" />
-    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateRelevantObjectsFromRelevantPoints.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGeneratePointsFromHitObjects.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\IGenerateLinesFromRelevantObjects.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\IntersectionGenerator.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\PerfectCircleBlanketGenerator.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\LinearLineGenerator.cs" />
@@ -274,6 +277,8 @@
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\LineGenerator.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\TriangleGenerator.cs" />
     <Compile Include="Classes\SnappingTools\RelevantObjectGenerators\Generators\TriangleGenerator2.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectLayer.cs" />
+    <Compile Include="Classes\SnappingTools\RelevantObjectPreferences.cs" />
     <Compile Include="Classes\SnappingTools\RelevantPoint.cs" />
     <Compile Include="Classes\SnappingTools\SnappingToolsPreferences.cs" />
     <Compile Include="Classes\SystemTools\ActionHotkey.cs" />
