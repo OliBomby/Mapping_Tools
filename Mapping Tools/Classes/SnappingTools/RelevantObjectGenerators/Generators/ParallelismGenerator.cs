@@ -29,7 +29,7 @@ namespace Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators.Generator
         }
 
         private static RelevantLine MakeParallelLine(Line2 line, Vector2 point) {
-            return new RelevantLine(new Line2(line.A, line.B, line.A * point.X + line.B * point.Y));
+            return new RelevantLine(new Line2(point, line.DirectionVector));
         }
     }
 }

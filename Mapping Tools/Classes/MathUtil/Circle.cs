@@ -59,31 +59,37 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="intersections">The calculated intersection(s).</param>
         /// <returns>Whether there is at least one intersection.</returns>
         public static bool Intersection(Circle left, Line2 right, out Vector2[] intersections) {
-            var cp = right.C - right.A * left.Centre[0] - right.B * left.Centre[1];
-
-            var abs = right.A * right.A + right.B * right.B;
-            var d = left.Radius * left.Radius * abs - cp * cp;
-
-            if (d < 0) {
-                // No intersections
+            var dr = right.DirectionVector.Length;
+            var dr2 = dr * dr;
+            var d = right.PositionVector.X * right.DirectionVector.Y - right.DirectionVector.X * right.PositionVector.Y;
+            var discriminant = left.Radius * left.Radius * dr2 - d * d;
+            if (discriminant < 0) {
                 intersections = new Vector2[0];
                 return false;
             }
 
-            var ca = cp * right.A;
-            var bc = right.B * cp;
-            var root = Math.Sqrt(d);
+            var root = Math.Sqrt(discriminant);
 
-            if (d == 0) {
-                // One intersection
-                intersections = new[] { new Vector2(ca , bc) / abs + left.Centre };
-                return true;
-            } else {
-                // Two intersections
-                intersections = new[] { new Vector2(ca + right.B * root, bc - right.A * root) / abs + left.Centre,
-                                        new Vector2(ca - right.B * root, bc + right.A * root) / abs + left.Centre };
+            if (Math.Abs(discriminant) < Precision.DOUBLE_EPSILON) {
+                intersections = new[] {
+                    new Vector2((d * right.DirectionVector.Y + Sgn(right.DirectionVector.Y) * right.DirectionVector.X * root) / dr2,
+                                (-d * right.DirectionVector.X + Math.Abs(right.DirectionVector.X) * root) / dr2)
+
+                };
                 return true;
             }
+            intersections = new[] {
+                new Vector2((d * right.DirectionVector.Y + Sgn(right.DirectionVector.Y) * right.DirectionVector.X * root) / dr2,
+                            (-d * right.DirectionVector.X + Math.Abs(right.DirectionVector.X) * root) / dr2),
+                new Vector2((d * right.DirectionVector.Y - Sgn(right.DirectionVector.Y) * right.DirectionVector.X * root) / dr2,
+                            (-d * right.DirectionVector.X - Math.Abs(right.DirectionVector.X) * root) / dr2)
+
+            };
+            return true;
+        }
+
+        private static int Sgn(double x) {
+            return x < 0 ? -1 : 1;
         }
 
         /// <summary>
@@ -94,9 +100,31 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="intersections">The intersections.</param>
         /// <returns>Whether there is at least one intersection.</returns>
         public static bool Intersection(Circle left, Circle right, out Vector2[] intersections) {
-            double x1 = left.Centre.X, y1 = left.Centre.Y, x2 = right.Centre.X, y2 = right.Centre.Y, r1 = left.Radius, r2 = right.Radius;
-            var line = new Line2(x2 - x1, y2 - y1, (r1 * r1 - r2 * r2 + x2 * x2 - x1 * x1 + y2 * y2 - y1 * y1) / 2);
-            return Intersection(left, line, out intersections);
+            var d = Vector2.Distance(left.Centre, right.Centre);
+            if (d > left.Radius + right.Radius || d <= Math.Abs(left.Radius - right.Radius)) {
+                // None or infinite solutions
+            }
+
+            var d2 = d * d;
+            var a = (left.Radius * left.Radius - right.Radius * right.Radius + d2) / (2 * d);
+            var p2 = left.Centre + a * (right.Centre - left.Centre) / d;
+            var h = Math.Sqrt(left.Radius * left.Radius - a * a);
+
+            if (Math.Abs(d - (left.Radius + right.Radius)) < Precision.DOUBLE_EPSILON) {
+                // One solution
+                intersections = new[] {
+                    new Vector2(p2.X + h * (right.Centre.Y - left.Centre.Y) / d,
+                                p2.Y - h * (right.Centre.X - left.Centre.X) / d)
+                };
+                return true;
+            }
+            intersections = new[] {
+                new Vector2(p2.X + h * (right.Centre.Y - left.Centre.Y) / d,
+                            p2.Y - h * (right.Centre.X - left.Centre.X) / d),
+                new Vector2(p2.X - h * (right.Centre.Y - left.Centre.Y) / d,
+                            p2.Y + h * (right.Centre.X - left.Centre.X) / d)
+            };
+            return true;
         }
 
         /// <summary>

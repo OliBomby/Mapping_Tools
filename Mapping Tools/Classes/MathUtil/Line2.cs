@@ -13,9 +13,9 @@ namespace Mapping_Tools.Classes.MathUtil {
     [StructLayout(LayoutKind.Sequential)]
     public struct Line2 :IEquatable<Line2> {
         /// <summary>
-        /// The base vector where the Line originates from.
+        /// The point where the Line originates from.
         /// </summary>
-        public Vector2 BaseVector;
+        public Vector2 PositionVector;
 
         /// <summary>
         /// The direction vector of the Line.
@@ -25,17 +25,17 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <summary>
         /// Constructs a new Line using a base vector and a direciton vector.
         /// </summary>
-        /// <param name="baseVector">The base vector of the Line.</param>
+        /// <param name="positionVector">The base vector of the Line.</param>
         /// <param name="directionVector">The direction vector of the Line.</param>
-        public Line2(Vector2 baseVector, Vector2 directionVector)
+        public Line2(Vector2 positionVector, Vector2 directionVector)
         {
-            BaseVector = baseVector;
+            PositionVector = positionVector;
             DirectionVector = directionVector;
         }
 
-        public Line2(Vector2 baseVector, double angle)
+        public Line2(Vector2 positionVector, double angle)
         {
-            BaseVector = baseVector;
+            PositionVector = positionVector;
             DirectionVector = new Vector2(Math.Cos(angle), Math.Sin(angle));
         }
 
@@ -48,6 +48,30 @@ namespace Mapping_Tools.Classes.MathUtil {
             return new Line2(p1, p2 - p1);
         }
 
+        /// <summary>
+        /// Calculates point on Line at a given t
+        /// </summary>
+        /// <param name="t">Progression along the Line</param>
+        /// <returns></returns>
+        public Vector2 PointOnLine(double t) {
+            return PositionVector + t * DirectionVector;
+        }
+
+        /// <summary>
+        /// Gets the Line perpendicular on the left side of this line
+        /// </summary>
+        /// <returns></returns>
+        public Line2 PerpendicularLeft() {
+            return new Line2(PositionVector, DirectionVector.PerpendicularLeft);
+        }
+
+        /// <summary>
+        /// Gets the Line perpendicular on the right side of this line
+        /// </summary>
+        /// <returns></returns>
+        public Line2 PerpendicularRight() {
+            return new Line2(PositionVector, DirectionVector.PerpendicularRight);
+        }
 
         /// <summary>
         /// Defines a Line that is the X-axis.
@@ -66,7 +90,17 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="right">The point</param>
         /// <returns>The distance between the line and the point</returns>
         public static double Distance(Line2 left, Vector2 right) {
-            return Math.Abs(left.A * right.X + left.B * right.Y - left.C) / Math.Sqrt(left.A * left.A + left.B * left.B);
+            return Math.Abs(left.DirectionVector.Y * right.X - left.DirectionVector.X * right.Y +
+                            left.PositionVector.Y * left.DirectionVector.X -
+                            left.PositionVector.X * left.DirectionVector.Y) /
+                   left.DirectionVector.Length;
+        }
+
+        public static Vector2 NearestPoint(Line2 left, Vector2 right) {
+            var perp = left.PerpendicularLeft();
+            perp.PositionVector = right;
+            Intersection(perp, left, out var intersection);
+            return intersection;
         }
 
         /// <summary>
@@ -87,20 +121,20 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="left">First operand</param>
         /// <param name="right">Second operand</param>
         /// <returns>The intersection the two inputs</returns>
-        public static bool Intersection(Line2 left, Line2 right, out Vector2 result)
-        {
-            if (right.A == 0) { var temp = left; left = right; right = temp; } // swap inputs to prevent division by zero
-
-            if (right.A * left.B == left.A * right.B) {
+        public static bool Intersection(Line2 left, Line2 right, out Vector2 result) {
+            var p1 = left.PositionVector;
+            var p2 = left.PositionVector + left.DirectionVector;
+            var p3 = right.PositionVector;
+            var p4 = right.PositionVector + right.DirectionVector;
+            var denom = (p1.X - p2.X) * (p3.Y - p4.Y) - (p1.Y - p2.Y) * (p3.X - p4.X);
+            if (Math.Abs(denom) < Precision.DOUBLE_EPSILON) {
                 result = Vector2.NaN;
                 return false;
             }
-            else{
-                double y = (left.C - left.A * right.C / right.A) / (left.B - left.A * right.B / right.A);
-                double x = right.C / right.A - right.B * y / right.A;
-                result = new Vector2(x, y);
-                return true;
-            }
+
+            var t = ((p1.X - p3.X) * (p3.Y - p4.Y) - (p1.Y - p3.Y) * (p3.X - p4.X)) / denom;
+            result = left.PointOnLine(t);
+            return true;
         }
 
         ///<summary>
@@ -110,15 +144,16 @@ namespace Mapping_Tools.Classes.MathUtil {
         ///<param name="line">The line</param>
         /// <param name="intersections">The calculated intersection(s).</param>
         ///<returns>Whether there are exactly two intersections.</returns>
-        public static bool Intersection(Box2 rect, Line2 line, out Vector2[] intersections)
-        {
-            List<Vector2> candidates = new List<Vector2>
-            {
-                new Vector2 {X = rect.Left, Y = (line.C - line.A * rect.Left) / line.B },
-                new Vector2 {X = (line.C - line.B * rect.Top) / line.A, Y = rect.Top },
-                new Vector2 {X = (line.C - line.B * rect.Bottom) / line.A, Y = rect.Bottom },
-                new Vector2 {X = rect.Right, Y = (line.C - line.A * rect.Right) / line.B },
-            };
+        public static bool Intersection(Box2 rect, Line2 line, out Vector2[] intersections) {
+            var candidates = new List<Vector2>(4);
+            if (Math.Abs(line.DirectionVector.X) > Precision.DOUBLE_EPSILON) {
+                candidates.Add(line.PointOnLine((rect.Left - line.PositionVector.X) / line.DirectionVector.X));
+                candidates.Add(line.PointOnLine((rect.Right - line.PositionVector.X) / line.DirectionVector.X));
+            }
+            if (Math.Abs(line.DirectionVector.Y) > Precision.DOUBLE_EPSILON) {
+                candidates.Add(line.PointOnLine((rect.Top - line.PositionVector.Y) / line.DirectionVector.Y));
+                candidates.Add(line.PointOnLine((rect.Bottom - line.PositionVector.Y) / line.DirectionVector.Y));
+            }
 
             intersections = candidates.Where(p => (p[0] >= rect.Left) && (p[0] <= rect.Right) && (p[1] >= rect.Top) && (p[1] <= rect.Bottom)).ToArray();
             return intersections.Length == 2;
@@ -150,7 +185,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// </summary>
         /// <returns></returns>
         public override string ToString() {
-            return string.Format("({0}{2} {1})", BaseVector, DirectionVector, listSeparator);
+            return string.Format("({0}{2} {1})", PositionVector, DirectionVector, listSeparator);
         }
 
         /// <summary>
@@ -159,7 +194,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <returns>A System.Int32 containing the unique hashcode for this instance.</returns>
         public override int GetHashCode() {
             unchecked {
-                return ((BaseVector.GetHashCode() * 397 ) ^ DirectionVector.GetHashCode()) * 397;
+                return ((PositionVector.GetHashCode() * 397 ) ^ DirectionVector.GetHashCode()) * 397;
             }
         }
 
@@ -176,7 +211,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="other">A line to compare with this line.</param>
         /// <returns>true if the current line is equal to the line parameter; otherwise, false.</returns>
         public bool Equals(Line2 other) {
-            return BaseVector == other.BaseVector &&
+            return PositionVector == other.PositionVector &&
             DirectionVector == other.DirectionVector;
         }
     }
