@@ -345,7 +345,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 CurvePoints = points;
 
                 if (TryParseInt(values[6], out int repeat))
-                    Repeat = int.Parse(values[6]);
+                    Repeat = repeat;
                 else throw new BeatmapParsingException("Failed to parse repeat number of slider.", line);
 
                 if (TryParseDouble(values[7], out double pixelLength))

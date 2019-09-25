@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.Windows.Input;
 using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
 
 namespace Mapping_Tools.Classes.SnappingTools {
     public class SnappingToolsPreferences : BindableBase, ICloneable{
@@ -38,9 +39,9 @@ namespace Mapping_Tools.Classes.SnappingTools {
         };
 
         private Hotkey snapHotkey = new Hotkey(Key.M, ModifierKeys.None);
-        private double offsetLeft = 2;
+        private double offsetLeft = 0;
         private double offsetTop = 1;
-        private double offsetRight = 2;
+        private double offsetRight = 0;
         private double offsetBottom = 1;
         private bool debugEnabled = false;
         #endregion

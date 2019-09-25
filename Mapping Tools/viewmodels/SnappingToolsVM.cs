@@ -1,7 +1,8 @@
 ﻿using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SnappingTools;
-using Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantDrawable;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Views.SnappingTools;
@@ -14,6 +15,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -28,17 +30,26 @@ namespace Mapping_Tools.Viewmodels {
         public readonly List<RelevantPoint> RelevantPoints = new List<RelevantPoint>();
         public readonly List<RelevantLine> RelevantLines = new List<RelevantLine>();
         public readonly List<RelevantCircle> RelevantCircles = new List<RelevantCircle>();
-        public List<IRelevantObject> RelevantObjects = new List<IRelevantObject>();
+        public List<IRelevantDrawable> RelevantObjects = new List<IRelevantDrawable>();
         private List<HitObject> _visibleObjects;
         private int _editorTime;
 
         private string _filter = "";
         public string Filter { get => _filter; set => SetFilter(value); }
 
+        private bool _listenersEnabled;
         public bool ListenersEnabled {
+            get => _listenersEnabled;
             set {
+                _listenersEnabled = value;
+
                 _updateTimer.IsEnabled = value;
-                _configWatcher.EnableRaisingEvents = value;
+
+                try {
+                    _configWatcher.EnableRaisingEvents = value;
+                } catch {
+                    MessageBox.Show("Can't enable filesystem watcher. osu! config path is probably incorrect.", "Warning");
+                }
 
                 if (!value) {
                     _state = State.Disabled;
@@ -329,7 +340,7 @@ namespace Mapping_Tools.Viewmodels {
 
             Inception(activeGenerators);
 
-            RelevantObjects = RelevantLines.Concat<IRelevantObject>(RelevantCircles).Concat(RelevantPoints).ToList();
+            RelevantObjects = RelevantLines.Concat<IRelevantDrawable>(RelevantCircles).Concat(RelevantPoints).ToList();
         }
 
         private void Inception(IReadOnlyCollection<RelevantObjectsGenerator> activeGenerators) {
@@ -378,7 +389,7 @@ namespace Mapping_Tools.Viewmodels {
             if (RelevantObjects.Count == 0)
                 return;
 
-            IRelevantObject nearest = null;
+            IRelevantDrawable nearest = null;
             var smallestDistance = double.PositiveInfinity;
             foreach (var o in RelevantObjects) {
                 var dist = o.DistanceTo(cursorPos);

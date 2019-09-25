@@ -113,16 +113,14 @@ namespace Mapping_Tools.Classes.MathUtil {
             if (Math.Abs(d - (left.Radius + right.Radius)) < Precision.DOUBLE_EPSILON) {
                 // One solution
                 intersections = new[] {
-                    new Vector2(p2.X + h * (right.Centre.Y - left.Centre.Y) / d,
-                                p2.Y - h * (right.Centre.X - left.Centre.X) / d)
+                    p2
                 };
                 return true;
             }
+            var b = h * (right.Centre - left.Centre) / d;
             intersections = new[] {
-                new Vector2(p2.X + h * (right.Centre.Y - left.Centre.Y) / d,
-                            p2.Y - h * (right.Centre.X - left.Centre.X) / d),
-                new Vector2(p2.X - h * (right.Centre.Y - left.Centre.Y) / d,
-                            p2.Y + h * (right.Centre.X - left.Centre.X) / d)
+                p2 + b.PerpendicularLeft,
+                p2 + b.PerpendicularRight
             };
             return true;
         }
