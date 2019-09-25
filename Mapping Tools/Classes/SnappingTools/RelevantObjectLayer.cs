@@ -29,5 +29,12 @@ namespace Mapping_Tools.Classes.SnappingTools {
         public void AddPoints(List<RelevantPoint> points) {
             Points.AddRange(points);
         }
+
+        /// <summary>
+        /// Remove objects that are generated from concurrent generators
+        /// </summary>
+        public void DeleteObjectsFromConcurrent() {
+            throw new NotImplementedException();
+        }
     }
 }

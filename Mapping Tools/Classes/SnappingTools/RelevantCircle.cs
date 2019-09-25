@@ -4,7 +4,7 @@ using System.Windows.Media;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.SnappingTools {
-    public class RelevantCircle : IRelevantObject {
+    public class RelevantCircle : IRelevantDrawable {
         public readonly Circle child;
 
         public bool IsHighlighted;

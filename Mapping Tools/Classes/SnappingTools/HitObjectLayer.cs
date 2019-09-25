@@ -1,29 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.SnappingTools.RelevantObjectGenerators;
-
-namespace Mapping_Tools.Classes.SnappingTools {
+﻿namespace Mapping_Tools.Classes.SnappingTools {
     /// <summary>
     /// Container for a list of HitObjects
     /// </summary>
     public class HitObjectLayer : ObjectLayer {
-        public List<HitObject> HitObjects = new List<HitObject>();
-        public List<RelevantObjectsGenerator> Generators;
-        public ObjectLayer PreviousLayer;
-        public ObjectLayer NextLayer;
+        // This list must always be sorted by time
+        public HitObjectContext HitObjects {
+            get => (HitObjectContext) Objects;
+            set => Objects = value;
+        }
+        // Context is all the objects sorted by time of this layer and previous layers if that's your preference
+        // A context must always have the same objects as the layers
+        public HitObjectContext NextHitObjectContext {
+            get => (HitObjectContext)NextContext;
+            set => NextContext = value;
+        }
 
-        public void Add(HitObject hitObject) {
-            foreach (var pointsGenerator in Generators.OfType<IGeneratePointsFromHitObjects>()) {
+        public HitObjectGeneratorCollection GeneratorCollection;
+        public RelevantObjectLayer NextLayer;
+        public LayerCollection Collection;
+
+        public void Add(RelevantHitObject hitObject) {
+            // Check if this object or something similar exists anywhere in the context or in this layer
+            if (HitObjects.FindSimilar(hitObject, Collection.AcceptableDifference, out var similarObject)) {
+                similarObject.Consume(hitObject);
+            }
+
+            Objects.SortedInsert(hitObject);
+            NextContext.SortedInsert(hitObject);
+
+            NextLayer.DeleteObjectsFromConcurrent();
+
+            GeneratorCollection.GenerateNewObjects(NextLayer, NextHitObjectContext, hitObject);
+
+            /*foreach (var pointsGenerator in Generators.OfType<IGeneratePointsFromHitObjects>()) {
                 if (NextLayer is RelevantObjectLayer rol) {
                     rol.AddPoints(pointsGenerator.GetRelevantObjects(HitObjects));
                 }
-            }
+            }*/
 
-            HitObjects.Add(hitObject);
 
             // Sort the object list
             // Redo any generators that need concurrent HitObjects
