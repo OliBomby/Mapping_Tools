@@ -67,7 +67,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
                 Letterboxing = FindConfigValue("Letterboxing") == "1";
                 LetterboxingPosition = new Vector2(double.Parse(FindConfigValue("LetterboxPositionX")),
                     double.Parse(FindConfigValue("LetterboxPositionY")));
-            } catch (Exception ex) { Console.WriteLine(ex.Message + @" while reading osu! user config."); }
+            } catch (Exception ex) { System.Windows.MessageBox.Show(ex.Message); }
         }
 
         private string FindConfigValue(string key) {
