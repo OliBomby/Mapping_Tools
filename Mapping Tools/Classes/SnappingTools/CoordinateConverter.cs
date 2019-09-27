@@ -23,7 +23,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
             }
         }
 
-        public Box2 EditorBoxOffset = new Box2(2, 1, 2, 1);  // Extra offset applied to the bounds of the editor box
+        public Box2 EditorBoxOffset = new Box2(0, 1, 0, 1);  // Extra offset applied to the bounds of the editor box
         public Vector2 PositionSnapOffset => new Vector2(0.5, 0.5);  // An offset to fix a random instance of 1 pixel off snapping
         private string[] _configLines;
 
