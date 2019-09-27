@@ -4,7 +4,7 @@ using System.Linq;
 using System.Collections.Generic;
 
 namespace Mapping_Tools.Classes.MathUtil {
-    /// <summary>Represents a line with infinite length using three double-precision floating-point numbers in the equation AX + BY = C.</summary>
+    /// <summary>Represents a 2D line with infinite length using a position vector and a direction vector.</summary>
     /// <remarks>
     /// The Line structure is suitable for interoperation with unmanaged code requiring three consecutive doubles.
     /// </remarks>
