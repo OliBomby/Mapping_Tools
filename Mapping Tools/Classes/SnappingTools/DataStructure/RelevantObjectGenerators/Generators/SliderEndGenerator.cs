@@ -6,7 +6,7 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
     class SliderEndGenerator : RelevantObjectsGenerator, IGeneratePointsFromHitObjects {
-        public override string Name => "Slider End Generator";
+        public override string Name => "Virtual Points on Slider Ends";
         public override string Tooltip => "Generates virtual points on the actual ends of sliders.";
         public override GeneratorType GeneratorType => GeneratorType.Generators;
 

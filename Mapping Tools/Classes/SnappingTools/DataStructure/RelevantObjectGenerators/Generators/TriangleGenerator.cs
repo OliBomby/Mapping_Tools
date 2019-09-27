@@ -6,7 +6,7 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
     class TriangleGenerator : RelevantObjectsGenerator, IGeneratePointsFromRelevantObjects  {
-        public override string Name => "Equilateral Triangle from Two Points Generator (Type I)";
+        public override string Name => "Equilateral Triangle from Two Points (Type I)";
         public override string Tooltip => "Takes a pair of virtual points and generates a virtual point on each side to make two equilateral triangles.";
         public override GeneratorType GeneratorType => GeneratorType.Assistants;
 

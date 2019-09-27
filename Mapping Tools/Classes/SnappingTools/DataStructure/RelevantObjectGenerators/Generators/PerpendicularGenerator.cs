@@ -8,7 +8,7 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
     class PerpendicularGenerator : RelevantObjectsGenerator, IGenerateLinesFromRelevantObjects {
         public override string Name => "Perpendicular Line Calculator";
-        public override string Tooltip => "Takes a pair of line and point and generates a virtual line perpendicular to the line on top of the point.";
+        public override string Tooltip => "Takes a pair of line and point and generates a virtual line across the point that is perpendicular to the line.";
         public override GeneratorType GeneratorType => GeneratorType.Geometries;
 
         public List<IRelevantObject> GetRelevantObjects(List<IRelevantObject> objects) {

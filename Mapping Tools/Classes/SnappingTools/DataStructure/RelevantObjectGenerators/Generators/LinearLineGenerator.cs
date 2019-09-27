@@ -8,7 +8,7 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
     class LinearLineGenerator : RelevantObjectsGenerator, IGenerateLinesFromHitObjects {
-        public override string Name => "Line Generator for Linear Sliders";
+        public override string Name => "Virtual Lines on Linear Sliders";
         public override string Tooltip => "Takes a linear slider and generates a virtual line that matches it.";
         public override GeneratorType GeneratorType => GeneratorType.Generators;
 

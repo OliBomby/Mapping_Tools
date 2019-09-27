@@ -6,7 +6,7 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
     class LastAnchorGenerator : RelevantObjectsGenerator, IGeneratePointsFromHitObjects {
-        public override string Name => "Point on Last Anchor of Slider Generator";
+        public override string Name => "Virtual Points on the Last Anchors of Sliders";
         public override string Tooltip => "Generates virtual points on the last anchors of sliders.";
         public override GeneratorType GeneratorType => GeneratorType.Generators;
 

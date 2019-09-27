@@ -5,7 +5,7 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
     class EqualSpacingGenerator : RelevantObjectsGenerator, IGenerateCirclesFromRelevantObjects {
-        public override string Name => "Assistant for Equal Spacing defined by Two Points";
+        public override string Name => "Equal Spacing defined by Two Points";
         public override string Tooltip => "Takes a pair of virtual points and generates a pair of virtual circles with their centers on each point. Their radius is equal to the spacing between the two.";
         public override GeneratorType GeneratorType => GeneratorType.Assistants;
 

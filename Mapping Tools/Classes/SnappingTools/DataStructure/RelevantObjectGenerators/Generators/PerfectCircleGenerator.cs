@@ -8,7 +8,7 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
     class PerfectCircleGenerator : RelevantObjectsGenerator, IGenerateCirclesFromHitObjects {
-        public override string Name => "Circle from Three Point Slider Generator";
+        public override string Name => "Virtual Circles on 3-Point Sliders";
         public override string Tooltip => "Takes a circular arc slider and generates a virtual circle that completes the arc.";
         public override GeneratorType GeneratorType => GeneratorType.Generators;
 
