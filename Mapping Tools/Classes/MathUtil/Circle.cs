@@ -5,7 +5,7 @@ using System.Xml.Serialization;
 
 namespace Mapping_Tools.Classes.MathUtil {
     /// <summary>Represents a Circle as could be defined by a centre point and a radius.</summary>
-    public struct Circle :IEquatable<Circle> {
+    public struct Circle : IEquatable<Circle> {
         /// <summary>
         /// The centre of the Circle.
         /// </summary>
@@ -21,8 +21,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// </summary>
         /// <param name="centre">The centre of the Circle.</param>
         /// <param name="radius">The radius of the Circle.</param>
-        public Circle(Vector2 centre, double radius)
-        {
+        public Circle(Vector2 centre, double radius) {
             Centre = centre;
             Radius = radius;
         }
@@ -31,8 +30,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// Constructs a new Circle using two points.
         /// </summary>
         /// <param name="points">List containing the points.</param>
-        public Circle(Vector2 centre, Vector2 outerPoint)
-        {
+        public Circle(Vector2 centre, Vector2 outerPoint) {
             Centre = centre;
             Radius = Vector2.Distance(centre, outerPoint);
         }
@@ -59,37 +57,35 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="intersections">The calculated intersection(s).</param>
         /// <returns>Whether there is at least one intersection.</returns>
         public static bool Intersection(Circle left, Line2 right, out Vector2[] intersections) {
-            var dr = right.DirectionVector.Length;
-            var dr2 = dr * dr;
-            var d = right.PositionVector.X * right.DirectionVector.Y - right.DirectionVector.X * right.PositionVector.Y;
-            var discriminant = left.Radius * left.Radius * dr2 - d * d;
-            if (discriminant < 0) {
+            double p1 = right.PositionVector.X;
+            double p2 = right.PositionVector.Y;
+            double d1 = right.DirectionVector.X;
+            double d2 = right.DirectionVector.Y;
+            double c1 = left.Centre.X;
+            double c2 = left.Centre.Y;
+            double r = left.Radius;
+
+            double ds = d1 * d1 + d2 * d2;
+            double c = d2 * p1 - d1 * p2 - d2 * c1 + d1 * c2;
+            double disc = (r * r * ds) - (c * c);
+
+            if (disc < -Precision.DOUBLE_EPSILON) {
                 intersections = new Vector2[0];
                 return false;
             }
 
-            var root = Math.Sqrt(discriminant);
+            var root = Math.Sqrt(disc);
 
-            if (Math.Abs(discriminant) < Precision.DOUBLE_EPSILON) {
-                intersections = new[] {
-                    new Vector2((d * right.DirectionVector.Y + Sgn(right.DirectionVector.Y) * right.DirectionVector.X * root) / dr2,
-                                (-d * right.DirectionVector.X + Math.Abs(right.DirectionVector.X) * root) / dr2)
-
-                };
+            if (Math.Abs(disc) < Precision.DOUBLE_EPSILON) {
+                intersections = new Vector2[1] { new Vector2(c * d2 / ds + c1, -c * d1 / ds + c2) };
                 return true;
             }
-            intersections = new[] {
-                new Vector2((d * right.DirectionVector.Y + Sgn(right.DirectionVector.Y) * right.DirectionVector.X * root) / dr2,
-                            (-d * right.DirectionVector.X + Math.Abs(right.DirectionVector.X) * root) / dr2),
-                new Vector2((d * right.DirectionVector.Y - Sgn(right.DirectionVector.Y) * right.DirectionVector.X * root) / dr2,
-                            (-d * right.DirectionVector.X - Math.Abs(right.DirectionVector.X) * root) / dr2)
 
+            intersections = new Vector2[2] {
+                new Vector2((c * d2 - d1 * root) / ds + c1, (-c * d1 - d2 * root) / ds + c2),
+                new Vector2((c * d2 + d1 * root) / ds + c1, (-c * d1 + d2 * root) / ds + c2),
             };
             return true;
-        }
-
-        private static int Sgn(double x) {
-            return x < 0 ? -1 : 1;
         }
 
         /// <summary>
@@ -170,7 +166,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         public override string ToString() {
             return string.Format("({1}{0} {2})", listSeparator, Centre, Radius);
         }
-        
+
 
         /// <summary>
         /// Indicates whether this instance and a specified object are equal.
@@ -178,11 +174,11 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="obj">The object to compare to.</param>
         /// <returns>True if the instances are equal; false otherwise.</returns>
         public override bool Equals(object obj) {
-            if( !( obj is Circle ) ) {
+            if (!(obj is Circle)) {
                 return false;
             }
 
-            return Equals((Circle) obj);
+            return Equals((Circle)obj);
         }
 
         /// <summary>Indicates whether the current Circle is equal to another Circle.</summary>
@@ -198,8 +194,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// Returns the hashcode for this instance.
         /// </summary>
         /// <returns>A System.Int32 containing the unique hashcode for this instance.</returns>
-        public override int GetHashCode()
-        {
+        public override int GetHashCode() {
             var hashCode = 2048149326;
             hashCode = hashCode * -1521134295 + base.GetHashCode();
             hashCode = hashCode * -1521134295 + EqualityComparer<Vector2>.Default.GetHashCode(Centre);
