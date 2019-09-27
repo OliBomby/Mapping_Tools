@@ -7,7 +7,7 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
     class ParallelismGenerator : RelevantObjectsGenerator, IGenerateLinesFromRelevantObjects {
         public override string Name => "Parallel Line Calculator";
-        public override string Tooltip => "Takes a pair of line and point and generates a virtual line parallel to the line on top of the point.";
+        public override string Tooltip => "Takes a pair of line and point and generates a virtual line across the point that is parallel to the line.";
         public override GeneratorType GeneratorType => GeneratorType.Geometries;
 
         private static RelevantLine MakeParallelLine(Line2 line, Vector2 point) {

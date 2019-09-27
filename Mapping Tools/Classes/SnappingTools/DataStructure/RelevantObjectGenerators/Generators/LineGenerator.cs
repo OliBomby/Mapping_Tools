@@ -5,7 +5,7 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
     class LineGenerator : RelevantObjectsGenerator, IGenerateLinesFromRelevantObjects {
-        public override string Name => "Lines between Two Points Generator";
+        public override string Name => "Virtual Lines from Virtual Points Calculator";
         public override string Tooltip => "Takes a pair of virtual points and generates a virtual line that connects the two.";
         public override GeneratorType GeneratorType => GeneratorType.Geometries;
 
