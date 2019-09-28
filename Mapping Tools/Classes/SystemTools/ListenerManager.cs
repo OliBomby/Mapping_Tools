@@ -108,9 +108,7 @@ namespace Mapping_Tools.Classes.SystemTools {
             if (!SettingsManager.Settings.SmartQuickRunEnabled) { QuickRunCurrentTool(); return; }
 
             if (EditorReaderStuff.TryGetFullEditorReader(out EditorReader reader)) {
-                EditorReaderStuff.GetNewestVersion(IOHelper.GetCurrentBeatmap(), out List<BeatmapHelper.HitObject> selected, reader);
-                int so = selected.Count;
-
+                int so = reader.hitObjects.Where(o => o.IsSelected).Count();
                 IQuickRun tool = null;
 
                 System.Windows.Application.Current.Dispatcher.Invoke(() => {
