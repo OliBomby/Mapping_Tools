@@ -293,10 +293,12 @@
     <Compile Include="Classes\SystemTools\BindableBase.cs" />
     <Compile Include="Classes\SystemTools\Hotkey.cs" />
     <Compile Include="Classes\SystemTools\IOHelper.cs" />
-    <Compile Include="Classes\SystemTools\IQuickRun.cs" />
+    <Compile Include="Classes\SystemTools\QuickRun\IQuickRun.cs" />
     <Compile Include="Classes\SystemTools\ListenerManager.cs" />
     <Compile Include="Classes\SystemTools\ProjectManager.cs" />
     <Compile Include="Classes\SystemTools\ISavable.cs" />
+    <Compile Include="Classes\SystemTools\QuickRun\QuickRunEnumToDescriptionValueConverter.cs" />
+    <Compile Include="Classes\SystemTools\QuickRun\QuickRunEnum.cs" />
     <Compile Include="Classes\SystemTools\RunToolCompletedEventArgs.cs" />
     <Compile Include="Classes\SystemTools\Settings.cs" />
     <Compile Include="Classes\SystemTools\SettingsManager.cs" />
