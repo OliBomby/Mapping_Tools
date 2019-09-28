@@ -1,9 +1,7 @@
 ﻿using Mapping_Tools.Annotations;
-using Mapping_Tools.Classes.SnappingTools;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -94,6 +92,38 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
         }
 
+        private bool _smartQuickRunEnabled;
+        public bool SmartQuickRunEnabled {
+            get => _smartQuickRunEnabled;
+            set {
+                if (_smartQuickRunEnabled == value) return;
+                _smartQuickRunEnabled = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public static IEnumerable<SingleQuickRunEnum> SingleQuickRunEnumerable => Enum.GetValues(typeof(SingleQuickRunEnum)).Cast<SingleQuickRunEnum>();
+        private SingleQuickRunEnum _singleQuickRunTool;
+        public SingleQuickRunEnum SingleQuickRunTool {
+            get => _singleQuickRunTool;
+            set {
+                if (_singleQuickRunTool == value) return;
+                _singleQuickRunTool = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public static IEnumerable<MultipleQuickRunEnum> MultipleQuickRunEnumerable => Enum.GetValues(typeof(MultipleQuickRunEnum)).Cast<MultipleQuickRunEnum>();
+        private MultipleQuickRunEnum _multipleQuickRunTool;
+        public MultipleQuickRunEnum MultipleQuickRunTool {
+            get => _multipleQuickRunTool;
+            set {
+                if (_multipleQuickRunTool == value) return;
+                _multipleQuickRunTool = value;
+                OnPropertyChanged();
+            }
+        }
+
         private Hotkey _betterSaveHotkey;
         public Hotkey BetterSaveHotkey {
             get => _betterSaveHotkey;
@@ -122,10 +152,14 @@ namespace Mapping_Tools.Classes.SystemTools {
             MakeBackups = true;
             OverrideOsuSave = false;
             AutoReload = true;
+            SmartQuickRunEnabled = true;
+            SingleQuickRunTool = SingleQuickRunEnum.Current;
+            MultipleQuickRunTool = MultipleQuickRunEnum.Current;
         }
 
         public void CopyTo(Settings other) {
             foreach (var prop in typeof(Settings).GetProperties()) {
+                if (!prop.CanRead || !prop.CanWrite) { continue; }
                 prop.SetValue(other, prop.GetValue(this));
             }
         }
