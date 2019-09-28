@@ -3,7 +3,7 @@ using System.Windows.Media;
 using Mapping_Tools.Classes.MathUtil;
 using Line2 = Mapping_Tools.Classes.MathUtil.Line2;
 
-namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantDrawable {
+namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
     public class RelevantLine : RelevantDrawable {
         public readonly Line2 Child;
 

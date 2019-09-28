@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Mapping_Tools.Annotations;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 
-namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes {
+namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators {
     public abstract class RelevantObjectsGenerator : INotifyPropertyChanged
     {
         private bool _isActive;

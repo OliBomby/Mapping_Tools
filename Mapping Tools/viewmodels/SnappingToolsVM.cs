@@ -1,7 +1,7 @@
 ﻿using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SnappingTools;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantDrawable;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
@@ -20,6 +20,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
 
 namespace Mapping_Tools.Viewmodels {
     public class SnappingToolsVm

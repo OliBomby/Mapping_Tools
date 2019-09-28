@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
 
-namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
-    public class RelevantObjectContext : IEnumerable<IRelevantObject> {
+namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectCollection {
+    public class RelevantObjectCollection : IEnumerable<IRelevantObject> {
         public List<IRelevantObject> Objects;
 
         public void SortTimes() {

@@ -7,6 +7,7 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:components="clr-namespace:Mapping_Tools.Components"
              xmlns:generatorTypes="clr-namespace:Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes"
+             xmlns:relevantObjectGenerators="clr-namespace:Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators"
              mc:Ignorable="d"
              IsActive="{Binding ListenersEnabled, Mode=OneWayToSource}"
              d:DesignHeight="450" Width="759.5" d:DataContext="{d:DesignData SnappingToolsVm}">
@@ -65,21 +66,21 @@
                         <GridView>
                             <GridViewColumn Header="IsActive">
                                 <GridViewColumn.CellTemplate>
-                                    <DataTemplate DataType="generatorTypes:RelevantObjectsGenerator">
+                                    <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
                                         <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding IsActive}" Cursor="Hand"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
                             <GridViewColumn Header="Name" Width="500">
                                 <GridViewColumn.CellTemplate>
-                                    <DataTemplate DataType="generatorTypes:RelevantObjectsGenerator">
+                                    <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
                                         <TextBlock Text="{Binding Name}" ToolTip="{Binding Tooltip}"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
                             <GridViewColumn Header="Mode">
                                 <GridViewColumn.CellTemplate>
-                                    <DataTemplate DataType="generatorTypes:RelevantObjectsGenerator">
+                                    <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
                                         <ListBox
                                             Style="{StaticResource MaterialDesignToolToggleListBox}"
                                             SelectedIndex="0">

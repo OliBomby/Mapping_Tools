@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantDrawable;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
 
-namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.Layers {
+namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
     public class RelevantObjectLayer : ObjectLayer {
         public List<IRelevantObject> ObjectList {
             get {

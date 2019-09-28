@@ -1,19 +1,21 @@
-﻿using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
+﻿using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectCollection;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
 
-namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.Layers {
+namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
     /// <summary>
     /// Container for a list of HitObjects
     /// </summary>
     public class HitObjectLayer : ObjectLayer {
         // This list must always be sorted by time
-        public HitObjectContext HitObjects {
-            get => (HitObjectContext) Objects;
+        public HitObjectCollection HitObjects {
+            get => (HitObjectCollection) Objects;
             set => Objects = value;
         }
         // Context is all the objects sorted by time of this layer and previous layers if that's your preference
         // A context must always have the same objects as the layers
-        public HitObjectContext NextHitObjectContext {
-            get => (HitObjectContext)NextContext;
+        public HitObjectCollection NextHitObjectContext {
+            get => (HitObjectCollection)NextContext;
             set => NextContext = value;
         }
 

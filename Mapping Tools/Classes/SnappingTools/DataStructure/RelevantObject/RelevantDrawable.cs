@@ -1,7 +1,7 @@
 ﻿using System.Windows.Media;
 using Mapping_Tools.Classes.MathUtil;
 
-namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantDrawable {
+namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
     public abstract class RelevantDrawable : RelevantObject, IRelevantDrawable {
         public bool IsHighlighted { get; set; }
 

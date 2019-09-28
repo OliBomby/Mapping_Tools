@@ -1,7 +1,8 @@
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.Layers;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 using System;
 using System.Collections.Generic;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.Layers;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
     public interface IRelevantObject : IDisposable {
