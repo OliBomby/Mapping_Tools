@@ -4,13 +4,20 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
              xmlns:components="clr-namespace:Mapping_Tools.Components"
+             xmlns:syst="clr-namespace:Mapping_Tools.Classes.SystemTools"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800" MinWidth="500" MinHeight="600">
+    
+    <UserControl.Resources>
+        <syst:SingleQuickRunEnumToDescriptionValueConverter x:Key="singleConverter"/>
+        <syst:MultipleQuickRunEnumToDescriptionValueConverter x:Key="multipleConverter"/>
+    </UserControl.Resources>
+    
     <Grid>
         <StackPanel Margin="0,0,100,0">
             <TextBlock Foreground="{DynamicResource PrimaryHueMidBrush}" FontSize="40" FontWeight="Bold"><Run Text="Preferences"/></TextBlock>
+            
             <Grid Margin="0,20,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -22,6 +29,7 @@
                     <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                 </Button >
             </Grid>
+            
             <Grid Margin="0,10,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -33,6 +41,7 @@
                     <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                 </Button >
             </Grid>
+            
             <Grid Margin="0,10,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -44,6 +53,7 @@
                     <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                 </Button >
             </Grid>
+
             <Grid Margin="0,10,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -55,43 +65,50 @@
                     <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                 </Button >
             </Grid>
-            <CheckBox Content="Make automatic backups" IsChecked="{Binding MakeBackups, Mode=TwoWay}" Margin="0,5,0,0" ToolTip="Make automatic backups whenever you run tools."/>
-            <CheckBox Content="Override osu! save with BetterSave™" IsChecked="{Binding OverrideOsuSave, Mode=TwoWay}" Margin="0,0,0,0" ToolTip="Automatically BetterSave after every osu! save."/>
-            <CheckBox Content="Auto reload after QuickRun" IsChecked="{Binding AutoReload, Mode=TwoWay}" Margin="0,0,0,0" ToolTip="Tries to reload the editor after every QuickRun."/>
-            <Grid Margin="0,20,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="300"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="1" Content="Reload hotkeys" Click="Button_Click_3" Width="140" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
+            <StackPanel Margin="5 10 0 0">
+                <CheckBox Content="Make automatic backups" IsChecked="{Binding MakeBackups, Mode=TwoWay}" ToolTip="Make automatic backups whenever you run tools."/>
+                <CheckBox Content="Override osu! save with BetterSave™" IsChecked="{Binding OverrideOsuSave, Mode=TwoWay}" ToolTip="Automatically BetterSave after every osu! save."/>
+                <CheckBox Content="Auto reload after QuickRun" IsChecked="{Binding AutoReload, Mode=TwoWay}" ToolTip="Tries to reload the editor after every QuickRun."/>
+            </StackPanel>
 
-                <Grid Grid.Column="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="150"/>
-                        <ColumnDefinition Width="150"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
+            <StackPanel Margin="5 10 0 0">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Width="150" VerticalAlignment="Center" Text="QuickRun hotkey:" ToolTip="QuickRun lets you quickly run the current tool on the current beatmap."/>
+                    <components:HotkeyEditorControl Width="150" Hotkey="{Binding QuickRunHotkey}"/>
 
-                    <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="QuickRun hotkey:" ToolTip="QuickRun let's you quickly run the current tool on the current beatmap."/>
-                    <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Text="BetterSave™ hotkey:" ToolTip="BetterSave saves the current map with proper rounding instead of truncating values."/>
+                    <CheckBox x:Name="SmartQuickRunCheckBox" IsChecked="{Binding SmartQuickRunEnabled}" Margin="15 0 0 0"/>
 
-                    <components:HotkeyEditorControl Grid.Row="0" Grid.Column="1" Hotkey="{Binding QuickRunHotkey}"/>
-                    <components:HotkeyEditorControl Grid.Row="1" Grid.Column="1" Hotkey="{Binding BetterSaveHotkey}"/>
-                </Grid>
-            </Grid>
-            <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+                    <TextBlock Text="Single:" VerticalAlignment="Center" Margin="15 0" IsEnabled="{Binding ElementName=SmartQuickRunCheckBox, Path=IsChecked}" Style="{StaticResource TogglableTextBlock}"/>
+                    <ComboBox ItemsSource="{Binding SingleQuickRunEnumerable}" Width="120" SelectedItem="{Binding SingleQuickRunTool}" IsEnabled="{Binding ElementName=SmartQuickRunCheckBox, Path=IsChecked}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Converter={StaticResource singleConverter}}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+                    <TextBlock Text="Multiple:" VerticalAlignment="Center" Margin="15 0" IsEnabled="{Binding ElementName=SmartQuickRunCheckBox, Path=IsChecked}" Style="{StaticResource TogglableTextBlock}"/>
+                    <ComboBox ItemsSource="{Binding MultipleQuickRunEnumerable}" Width="120" SelectedItem="{Binding MultipleQuickRunTool}" IsEnabled="{Binding ElementName=SmartQuickRunCheckBox, Path=IsChecked}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Converter={StaticResource multipleConverter}}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Width="150" VerticalAlignment="Center" Text="BetterSave™ hotkey:" ToolTip="BetterSave saves the current map with proper rounding instead of truncating values."/>
+                    <components:HotkeyEditorControl Width="150" Hotkey="{Binding BetterSaveHotkey}"/>
+                </StackPanel>
+            </StackPanel>
+
+            <Button Content="Reload hotkeys" Click="Button_Click_3" Width="140" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5 10 0 0" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
+
+            <StackPanel Orientation="Horizontal" Margin="0 15 0 0">
                 <TextBlock Text="Light"/>
-                <ToggleButton Margin="8,0,16,0" IsChecked="True" Checked="MakeDark" Unchecked="MakeLight"/>
+                <ToggleButton Margin="10 0" IsChecked="True" Checked="MakeDark" Unchecked="MakeLight"/>
                 <TextBlock Text="Dark"/>
             </StackPanel>
         </StackPanel>

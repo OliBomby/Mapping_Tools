@@ -1,9 +1,9 @@
-﻿using Mapping_Tools.Classes.Tools;
+﻿using Editor_Reader;
+using Mapping_Tools.Classes.Tools;
 using NonInvasiveKeyboardHookLibrary;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -46,7 +46,7 @@ namespace Mapping_Tools.Classes.SystemTools {
         }
 
         private void LoadHotkeys() {
-            AddActiveHotkey("QuickRunHotkey", new ActionHotkey(SettingsManager.Settings.QuickRunHotkey, QuickRunCurrentTool));
+            AddActiveHotkey("QuickRunHotkey", new ActionHotkey(SettingsManager.Settings.QuickRunHotkey, SmartQuickRun));
             AddActiveHotkey("BetterSaveHotkey", new ActionHotkey(SettingsManager.Settings.BetterSaveHotkey, QuickBetterSave));
         }
 
@@ -102,6 +102,50 @@ namespace Mapping_Tools.Classes.SystemTools {
 
         private void QuickBetterSave() {
             EditorReaderStuff.CoolSave();
+        }
+
+        private void SmartQuickRun() {
+            if (!SettingsManager.Settings.SmartQuickRunEnabled) { QuickRunCurrentTool(); return; }
+
+            if (EditorReaderStuff.TryGetFullEditorReader(out EditorReader reader)) {
+                int so = reader.hitObjects.Where(o => o.IsSelected).Count();
+                IQuickRun tool = null;
+
+                System.Windows.Application.Current.Dispatcher.Invoke(() => {
+                    if (so <= 1) {
+                        switch (SettingsManager.Settings.SingleQuickRunTool) {
+                            case SingleQuickRunEnum.Current:
+                                QuickRunCurrentTool();
+                                return;
+                            case SingleQuickRunEnum.Cleaner:
+                                tool = (IQuickRun)MainWindow.AppWindow.Views.GetMapCleaner();
+                                break;
+                            case SingleQuickRunEnum.Completionator:
+                                tool = (IQuickRun)MainWindow.AppWindow.Views.GetSliderCompletionator();
+                                break;
+                        }
+                    } else {
+                        switch (SettingsManager.Settings.MultipleQuickRunTool) {
+                            case MultipleQuickRunEnum.Current:
+                                QuickRunCurrentTool();
+                                return;
+                            case MultipleQuickRunEnum.Cleaner:
+                                tool = (IQuickRun)MainWindow.AppWindow.Views.GetMapCleaner();
+                                break;
+                            case MultipleQuickRunEnum.Completionator:
+                                tool = (IQuickRun)MainWindow.AppWindow.Views.GetSliderCompletionator();
+                                break;
+                            case MultipleQuickRunEnum.Merger:
+                                tool = (IQuickRun)MainWindow.AppWindow.Views.GetSliderMerger();
+                                break;
+                        }
+                    }
+
+                    tool.RunFinished -= Reload;
+                    tool.RunFinished += Reload;
+                    tool.QuickRun();
+                });
+            }
         }
 
         private void QuickRunCurrentTool() {
