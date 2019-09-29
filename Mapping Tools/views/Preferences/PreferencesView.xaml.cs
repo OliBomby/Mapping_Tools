@@ -17,14 +17,13 @@ namespace Mapping_Tools.Views
             DataContext = SettingsManager.Settings;
         }
 
-        [Obsolete]
         private void MakeDark(object sender, RoutedEventArgs e) {
-            new PaletteHelper().SetLightDark(true);
+            //new PaletteHelper().SetLightDark(true);
         }
 
-        [Obsolete]
         private void MakeLight(object sender, RoutedEventArgs e) {
-            new PaletteHelper().SetLightDark(false);
+            MessageBox.Show("No", "No");
+            //new PaletteHelper().SetLightDark(false);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e) {
