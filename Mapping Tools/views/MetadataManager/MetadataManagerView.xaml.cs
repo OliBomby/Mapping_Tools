@@ -1,22 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.HitsoundStuff;
-using Mapping_Tools.Classes.MathUtil;
+﻿using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Viewmodels;
+using System;
+using System.ComponentModel;
+using System.IO;
+using System.Windows;
 
 namespace Mapping_Tools.Views {
     /// <summary>
     /// Interactielogica voor MetadataManagerView.xaml
     /// </summary>
-    public partial class MetadataManagerView : MappingTool, ISavable<MetadataManagerVm> {
+    public partial class MetadataManagerView : ISavable<MetadataManagerVm> {
         private readonly BackgroundWorker backgroundWorker;
 
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "metadataproject.json");
@@ -39,7 +34,7 @@ namespace Mapping_Tools.Views {
 
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
             if( e.Error != null ) {
-                MessageBox.Show(string.Format("{0}{1}{2}", e.Error.Message, Environment.NewLine, e.Error.StackTrace), "Error");
+                MessageBox.Show($"{e.Error.Message}{Environment.NewLine}{e.Error.StackTrace}", "Error");
             }
             else {
                 MessageBox.Show(e.Result.ToString());
@@ -53,8 +48,8 @@ namespace Mapping_Tools.Views {
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
-            string[] filesToCopy = ((MetadataManagerVm)DataContext).ExportPath.Split('|');
-            foreach (string fileToCopy in filesToCopy) {
+            var filesToCopy = ((MetadataManagerVm)DataContext).ExportPath.Split('|');
+            foreach (var fileToCopy in filesToCopy) {
                 IOHelper.SaveMapBackup(fileToCopy);
             }
 
@@ -63,15 +58,15 @@ namespace Mapping_Tools.Views {
         }
 
 
-        private string Copy_Metadata(MetadataManagerVm arg, BackgroundWorker worker, DoWorkEventArgs _) {
-            string[] paths = arg.ExportPath.Split('|');
-            int mapsDone = 0;
+        private static string Copy_Metadata(MetadataManagerVm arg, BackgroundWorker worker, DoWorkEventArgs _) {
+            var paths = arg.ExportPath.Split('|');
+            var mapsDone = 0;
 
-            bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+            var editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
 
-            foreach (string path in paths) {
-                BeatmapEditor editor = editorRead ? EditorReaderStuff.GetNewestVersion(path, reader) : new BeatmapEditor(path);
-                Beatmap beatmap = editor.Beatmap;
+            foreach (var path in paths) {
+                var editor = editorRead ? EditorReaderStuff.GetNewestVersion(path, reader) : new BeatmapEditor(path);
+                var beatmap = editor.Beatmap;
 
                 beatmap.Metadata["ArtistUnicode"].StringValue = arg.Artist;
                 beatmap.Metadata["Artist"].StringValue = arg.RomanisedArtist;
@@ -91,7 +86,7 @@ namespace Mapping_Tools.Views {
             }
 
             // Make an accurate message
-            string message = string.Format("Successfully exported metadata to {0} {1}!", mapsDone, mapsDone == 1 ? "beatmap" : "beatmaps");
+            var message = $"Successfully exported metadata to {mapsDone} {(mapsDone == 1 ? "beatmap" : "beatmaps")}!";
             return message;
         }
 
