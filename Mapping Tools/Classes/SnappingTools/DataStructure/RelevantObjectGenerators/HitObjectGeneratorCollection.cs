@@ -5,6 +5,7 @@ using System.Reflection;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.Layers;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectCollection;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators {
     public class HitObjectGeneratorCollection {

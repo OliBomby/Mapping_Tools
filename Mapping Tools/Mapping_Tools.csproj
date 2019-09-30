@@ -253,8 +253,8 @@
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectCollection\HitObjectCollection.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\HitObjectGeneratorCollection.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\Layers\HitObjectLayer.cs" />
-    <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\RelevantObjectGeneratorAttribute.cs" />
-    <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectPairGenerator.cs" />
+    <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Allocation\RelevantObjectGeneratorAttribute.cs" />
+    <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Allocation\RelevantObjectPairGenerator.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObject\IRelevantDrawable.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObject\IRelevantObject.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\LayerCollection.cs" />

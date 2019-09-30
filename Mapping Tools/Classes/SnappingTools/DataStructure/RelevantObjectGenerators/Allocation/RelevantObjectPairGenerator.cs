@@ -1,7 +1,6 @@
 ﻿using Mapping_Tools.Classes.SnappingTools.DataStructure.Layers;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
 
-namespace Mapping_Tools.Classes.SnappingTools.DataStructure {
+namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation {
     public class RelevantObjectPairGenerator {
         public void GeneratePairs(ObjectLayer layer) {
             // Get the dependencies of all the active generators
