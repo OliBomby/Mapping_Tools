@@ -80,7 +80,7 @@
                     </Button >
                 </Grid>
 
-                <Separator Style="{StaticResource MaterialDesignLightSeparator}" Margin="0,10,0,10"/>
+                <Separator Style="{StaticResource MaterialDesignLightSeparator}" Background="{DynamicResource MaterialDesignDivider}" Margin="0,10,0,10"/>
 
                 <Grid>
                     <Grid.ColumnDefinitions>
