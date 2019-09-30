@@ -16,7 +16,7 @@ namespace Mapping_Tools.Views {
     /// <summary>
     /// Interactielogica voor MetadataManagerView.xaml
     /// </summary>
-    public partial class MetadataManagerView : MappingTool, ISavable<MetadataManagerVM> {
+    public partial class MetadataManagerView : MappingTool, ISavable<MetadataManagerVm> {
         private readonly BackgroundWorker backgroundWorker;
 
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "metadataproject.json");
@@ -25,7 +25,7 @@ namespace Mapping_Tools.Views {
 
         public MetadataManagerView() {
             InitializeComponent();
-            DataContext = new MetadataManagerVM();
+            DataContext = new MetadataManagerVm();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
             backgroundWorker = (BackgroundWorker) FindResource("backgroundWorker");
@@ -34,7 +34,7 @@ namespace Mapping_Tools.Views {
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
-            e.Result = Copy_Metadata((MetadataManagerVM) e.Argument, bgw, e);
+            e.Result = Copy_Metadata((MetadataManagerVm) e.Argument, bgw, e);
         }
 
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
@@ -53,17 +53,17 @@ namespace Mapping_Tools.Views {
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
-            string[] filesToCopy = ((MetadataManagerVM)DataContext).ExportPath.Split('|');
+            string[] filesToCopy = ((MetadataManagerVm)DataContext).ExportPath.Split('|');
             foreach (string fileToCopy in filesToCopy) {
                 IOHelper.SaveMapBackup(fileToCopy);
             }
 
-            backgroundWorker.RunWorkerAsync((MetadataManagerVM)DataContext);
+            backgroundWorker.RunWorkerAsync((MetadataManagerVm)DataContext);
             start.IsEnabled = false;
         }
 
 
-        private string Copy_Metadata(MetadataManagerVM arg, BackgroundWorker worker, DoWorkEventArgs _) {
+        private string Copy_Metadata(MetadataManagerVm arg, BackgroundWorker worker, DoWorkEventArgs _) {
             string[] paths = arg.ExportPath.Split('|');
             int mapsDone = 0;
 
@@ -95,11 +95,11 @@ namespace Mapping_Tools.Views {
             return message;
         }
 
-        public MetadataManagerVM GetSaveData() {
-            return (MetadataManagerVM)DataContext;
+        public MetadataManagerVm GetSaveData() {
+            return (MetadataManagerVm)DataContext;
         }
 
-        public void SetSaveData(MetadataManagerVM saveData) {
+        public void SetSaveData(MetadataManagerVm saveData) {
             DataContext = saveData;
         }
     }

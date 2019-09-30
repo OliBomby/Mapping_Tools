@@ -336,7 +336,7 @@
     <Compile Include="Viewmodels\HitsoundStudioVM.cs" />
     <Compile Include="Viewmodels\HitsoundCopierVM.cs" />
     <Compile Include="Viewmodels\TimingCopierVM.cs" />
-    <Compile Include="Viewmodels\MetadataManagerVM.cs" />
+    <Compile Include="Viewmodels\MetadataManagerVm.cs" />
     <Compile Include="Viewmodels\PropertyTransformerVM.cs" />
     <Compile Include="Viewmodels\SnappingToolsVm.cs" />
     <Compile Include="Viewmodels\SliderCompletionatorVM.cs" />
