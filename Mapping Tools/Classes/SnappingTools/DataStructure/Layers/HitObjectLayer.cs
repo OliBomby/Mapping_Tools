@@ -12,14 +12,8 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
             get => (HitObjectCollection) Objects;
             set => Objects = value;
         }
-        // Context is all the objects sorted by time of this layer and previous layers if that's your preference
-        // A context must always have the same objects as the layers
-        public HitObjectCollection NextHitObjectContext {
-            get => (HitObjectCollection)NextContext;
-            set => NextContext = value;
-        }
 
-        public HitObjectGeneratorCollection GeneratorCollection;
+        public override HitObjectGeneratorCollection GeneratorCollection { get; set; }
         public RelevantObjectLayer NextLayer;
         public LayerCollection Collection;
 
@@ -30,11 +24,10 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
             }
 
             Objects.SortedInsert(hitObject);
-            NextContext.SortedInsert(hitObject);
 
             NextLayer.DeleteObjectsFromConcurrent();
 
-            GeneratorCollection.GenerateNewObjects(NextLayer, NextHitObjectContext, hitObject);
+            GeneratorCollection.GenerateNewObjects(NextLayer, hitObject);
 
             /*foreach (var pointsGenerator in Generators.OfType<IGeneratePointsFromHitObjects>()) {
                 if (NextLayer is RelevantObjectLayer rol) {

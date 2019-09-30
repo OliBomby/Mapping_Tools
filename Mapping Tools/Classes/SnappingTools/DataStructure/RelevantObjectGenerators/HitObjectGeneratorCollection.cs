@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.Layers;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectCollection;
@@ -17,6 +19,10 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         public void GenerateNewObjects(ObjectLayer nextLayer, HitObjectCollection nextContext, RelevantHitObject hitObject) {
             // Only generate objects using the new object and the rest and redo all concurrent generators
             throw new NotImplementedException();
+        }
+
+        public Type[] GetDependencies() {
+            Generators.Where(o => o.IsActive).Select(o => o.GetType()).SelectMany(type => type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic).Where(m => m.GetCustomAttribute<RelevantObjectGeneratorAttribute>() != null)).Select(o => o.GetGenericArguments()[0]);
         }
     }
 }
