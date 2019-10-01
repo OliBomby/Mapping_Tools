@@ -3,17 +3,14 @@ using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Components.Domain;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
+using Mapping_Tools.Annotations;
 
 namespace Mapping_Tools.Viewmodels {
 
-    public class MetadataManagerVM :INotifyPropertyChanged {
+    public class MetadataManagerVm :INotifyPropertyChanged {
         private string _importPath;
         private string _exportPath;
 
@@ -25,13 +22,13 @@ namespace Mapping_Tools.Viewmodels {
         private string _source;
         private string _tags;
 
-        public MetadataManagerVM() {
+        public MetadataManagerVm() {
             _importPath = "";
             _exportPath = "";
 
             ImportLoadCommand = new CommandImplementation(
                 _ => {
-                    string path = IOHelper.GetCurrentBeatmap();
+                    var path = IOHelper.GetCurrentBeatmap();
                     if( path != "" ) {
                         ImportPath = path;
                     }
@@ -39,7 +36,7 @@ namespace Mapping_Tools.Viewmodels {
 
             ImportBrowseCommand = new CommandImplementation(
                 _ => {
-                    string[] paths = IOHelper.BeatmapFileDialog(multiselect: false);
+                    var paths = IOHelper.BeatmapFileDialog();
                     if( paths.Length != 0 ) {
                         ImportPath = paths[0];
                     }
@@ -50,9 +47,17 @@ namespace Mapping_Tools.Viewmodels {
                     ImportFromBeatmap(ImportPath);
                 });
 
+            ExportLoadCommand = new CommandImplementation(
+                _ => {
+                    var path = IOHelper.GetCurrentBeatmap();
+                    if (path != "") {
+                        ExportPath = path;
+                    }
+                });
+
             ExportBrowseCommand = new CommandImplementation(
                 _ => {
-                    string[] paths = IOHelper.BeatmapFileDialog(multiselect: true);
+                    var paths = IOHelper.BeatmapFileDialog(true);
                     if( paths.Length != 0 ) {
                         ExportPath = string.Join("|", paths);
                     }
@@ -61,8 +66,8 @@ namespace Mapping_Tools.Viewmodels {
 
         private void ImportFromBeatmap(string importPath) {
             try {
-                BeatmapEditor editor = new BeatmapEditor(importPath);
-                Beatmap beatmap = editor.Beatmap;
+                var editor = new BeatmapEditor(importPath);
+                var beatmap = editor.Beatmap;
 
                 Artist = beatmap.Metadata["ArtistUnicode"].StringValue;
                 RomanisedArtist = beatmap.Metadata["Artist"].StringValue;
@@ -73,7 +78,7 @@ namespace Mapping_Tools.Viewmodels {
                 Tags = beatmap.Metadata["Tags"].StringValue;
             }
             catch( Exception ex ) {
-                MessageBox.Show(string.Format("{0}{1}{2}", ex.Message, Environment.NewLine, ex.StackTrace), "Error");
+                MessageBox.Show($"{ex.Message}{Environment.NewLine}{ex.StackTrace}", "Error");
             }
         }
 
@@ -83,7 +88,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public string ImportPath {
-            get { return _importPath; }
+            get => _importPath;
             set {
                 if( _importPath == value )
                     return;
@@ -93,7 +98,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public string ExportPath {
-            get { return _exportPath; }
+            get => _exportPath;
             set {
                 if( _exportPath == value )
                     return;
@@ -103,7 +108,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public string Artist {
-            get { return _artist; }
+            get => _artist;
             set {
                 if( _artist == value )
                     return;
@@ -113,7 +118,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public string RomanisedArtist {
-            get { return _romanisedArtist; }
+            get => _romanisedArtist;
             set {
                 if( _romanisedArtist == value )
                     return;
@@ -123,7 +128,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public string Title {
-            get { return _title; }
+            get => _title;
             set {
                 if( _title == value )
                     return;
@@ -133,7 +138,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public string RomanisedTitle {
-            get { return _romanisedTitle; }
+            get => _romanisedTitle;
             set {
                 if( _romanisedTitle == value )
                     return;
@@ -143,7 +148,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public string BeatmapCreator {
-            get { return _beatmapCreator; }
+            get => _beatmapCreator;
             set {
                 if( _beatmapCreator == value )
                     return;
@@ -153,7 +158,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public string Source {
-            get { return _source; }
+            get => _source;
             set {
                 if( _source == value )
                     return;
@@ -163,7 +168,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public string Tags {
-            get { return _tags; }
+            get => _tags;
             set {
                 if( _tags == value )
                     return;
@@ -175,10 +180,12 @@ namespace Mapping_Tools.Viewmodels {
         public CommandImplementation ImportLoadCommand { get; }
         public CommandImplementation ImportBrowseCommand { get; }
         public CommandImplementation ImportCommand { get; }
+        public CommandImplementation ExportLoadCommand { get; }
         public CommandImplementation ExportBrowseCommand { get; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

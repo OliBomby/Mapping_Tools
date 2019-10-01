@@ -534,7 +534,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vec1">The vector</param>
         /// <param name="line">The line</param>
         /// <returns>The distance</returns>
-        public static double Distance(Vector2 vec1, Line line)
+        public static double Distance(Vector2 vec1, Line2 line)
         {
             Distance(ref vec1, ref line, out double result);
             return result;
@@ -546,9 +546,8 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="vec1">The vector</param>
         /// <param name="line">The line</param>
         /// <param name="result">The distance</param>
-        public static void Distance(ref Vector2 vec1, ref Line line, out double result)
-        {
-            result = Math.Abs(line.A * vec1.X + line.B * vec1.Y - line.C) / Math.Sqrt(line.A * line.A + line.B * line.B);
+        public static void Distance(ref Vector2 vec1, ref Line2 line, out double result) {
+            result = Line2.Distance(line, vec1);
         }
 
         /// <summary>
@@ -710,8 +709,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="left">First operand</param>
         /// <param name="right">Second operand</param>
         /// <returns>The mirror projection of the input</returns>
-        public static Vector2 Mirror(Vector2 left, Line right)
-        {
+        public static Vector2 Mirror(Vector2 left, Line2 right) {
             Mirror(ref left, ref right, out Vector2 result);
             return result;
         }
@@ -722,12 +720,9 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="left">First operand</param>
         /// <param name="right">Second operand</param>
         /// <returns>The mirror projection of the input</returns>
-        public static void Mirror(ref Vector2 left, ref Line right, out Vector2 result)
-        {
-            double temp = -2 * (right.A * left.X + right.B * left.Y - right.C) / (Math.Pow(right.A, 2) + Math.Pow(right.B, 2));
-            double x = temp * right.A + left.X;
-            double y = temp * right.B + left.Y;
-            result = new Vector2(x, y);
+        public static void Mirror(ref Vector2 left, ref Line2 right, out Vector2 result) {
+            var nearest = Line2.NearestPoint(right, left);
+            result = left + 2 * (nearest - left);
         }
 
         /// <summary>
@@ -736,9 +731,8 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="left">First operand</param>
         /// <param name="right">Second operand</param>
         /// <returns>The closest point on the line</returns>
-        public static Vector2 Snap(Vector2 left, Line right)
-        {
-            Mirror(ref left, ref right, out Vector2 result);
+        public static Vector2 Snap(Vector2 left, Line2 right) {
+            Snap(ref left, ref right, out Vector2 result);
             return result;
         }
 
@@ -748,12 +742,8 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="left">First operand</param>
         /// <param name="right">Second operand</param>
         /// <returns>The closest point on the line</returns>
-        public static void Snap(ref Vector2 left, ref Line right, out Vector2 result)
-        {
-            double temp = -1 * (right.A * left.X + right.B * left.Y - right.C) / (Math.Pow(right.A, 2) + Math.Pow(right.B, 2));
-            double x = temp * right.A + left.X;
-            double y = temp * right.B + left.Y;
-            result = new Vector2(x, y);
+        public static void Snap(ref Vector2 left, ref Line2 right, out Vector2 result) {
+            result = Line2.NearestPoint(right, left);
         }
 
         /// <summary>

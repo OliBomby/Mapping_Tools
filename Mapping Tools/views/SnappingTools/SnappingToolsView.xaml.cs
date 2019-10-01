@@ -20,15 +20,12 @@ namespace Mapping_Tools.Views {
         private void PreferencesButton_Click(object sender, System.Windows.RoutedEventArgs e) {
             var preferencesWindow = new SnappingToolsPreferencesWindow(GetSaveData());
             var result = preferencesWindow.ShowDialog();
-            if (result == true) {
+            if (result.GetValueOrDefault()) {
                 SetSaveData(preferencesWindow.Preferences);
             } 
         }
 
-        public SnappingToolsPreferences GetSaveData()
-        {
-            return ((SnappingToolsVm) DataContext).Preferences;
-        }
+        public SnappingToolsPreferences GetSaveData() => ((SnappingToolsVm)DataContext).Preferences;
 
         public void SetSaveData(SnappingToolsPreferences saveData) {
             saveData?.CopyTo(((SnappingToolsVm)DataContext).Preferences);

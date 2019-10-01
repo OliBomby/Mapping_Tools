@@ -1,40 +1,33 @@
-﻿using System;
-using System.Diagnostics;
-using System.Windows;
-using System.Windows.Input;
-using System.Windows.Controls;
-using MaterialDesignThemes.Wpf;
-using Mapping_Tools.Viewmodels;
-using Microsoft.Win32;
-using System.IO;
+﻿using AutoUpdaterDotNET;
 using Mapping_Tools.Classes.SystemTools;
-using AutoUpdaterDotNET;
-using Newtonsoft.Json;
-using System.Security.Principal;
+using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Viewmodels;
 using Mapping_Tools.Views;
-using System.Windows.Forms;
-using System.Drawing;
-using System.Reflection;
+using MaterialDesignThemes.Wpf;
+using Newtonsoft.Json;
+using System;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
-using NonInvasiveKeyboardHookLibrary;
-using System.Runtime.InteropServices;
-using System.Threading;
-using Mapping_Tools.Classes.Tools;
+using System.Reflection;
+using System.Security.Principal;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace Mapping_Tools {
 
-    public partial class MainWindow :Window {
+    public partial class MainWindow {
         public bool IsMaximized; //Check for window state
         public double WidthWin, HeightWin; //Set default sizes of window
         public ViewCollection Views;
-        public ListenerManager listenerManager;
+        public ListenerManager ListenerManager;
         public bool SessionhasAdminRights;
 
         public static MainWindow AppWindow { get; set; }
         public static readonly HttpClient HttpClient = new HttpClient();
-        private static readonly string appCommon = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        public static readonly string AppDataPath = Path.Combine(appCommon, "Mapping Tools");
+        private static readonly string AppCommon = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        public static readonly string AppDataPath = Path.Combine(AppCommon, "Mapping Tools");
         public static readonly string ExportPath = Path.Combine(AppDataPath, "Exports");
 
         public MainWindow() {
@@ -42,7 +35,7 @@ namespace Mapping_Tools {
             try {
                 Setup();
                 SettingsManager.LoadConfig();
-                listenerManager = new ListenerManager();
+                ListenerManager = new ListenerManager();
                 AppWindow = this;
                 IsMaximized = SettingsManager.Settings.MainWindowMaximized;
                 WidthWin = SettingsManager.Settings.MainWindowWidth ?? Width;
@@ -56,12 +49,12 @@ namespace Mapping_Tools {
 
                 SetCurrentMaps(SettingsManager.GetLatestCurrentMaps()); // Set currentmap to previously opened map
             } catch (Exception ex) {
-                System.Windows.MessageBox.Show(string.Format("{0}{1}{2}", ex.Message, Environment.NewLine, ex.StackTrace), "Error");
+                MessageBox.Show($"{ex.Message}{Environment.NewLine}{ex.StackTrace}", "Error");
             }
         }
 
         private void Setup() {
-            SessionhasAdminRights = IsUserAdministrator() ? true : false;
+            SessionhasAdminRights = IsUserAdministrator();
 
             try {
                 AutoUpdater.ParseUpdateInfoEvent += AutoUpdaterOnParseUpdateInfoEvent;
@@ -76,7 +69,7 @@ namespace Mapping_Tools {
                 Directory.CreateDirectory(ExportPath);
             }
             catch( Exception ex ) {
-                System.Windows.MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.Message);
             }
         }
 
@@ -157,19 +150,16 @@ namespace Mapping_Tools {
 
         private void SaveBackup(object sender, RoutedEventArgs e) {
             var paths = GetCurrentMaps();
-            bool result = IOHelper.SaveMapBackup(paths, true);
+            var result = IOHelper.SaveMapBackup(paths, true);
             if( result )
-                System.Windows.MessageBox.Show($"Beatmap{( paths.Length == 1 ? "" : "s" )} successfully copied!");
+                MessageBox.Show($"Beatmap{( paths.Length == 1 ? "" : "s" )} successfully copied!");
         }
 
         //Method for loading the cleaner interface
         private void LoadCleaner(object sender, RoutedEventArgs e) {
             SetCurrentView(Views.GetMapCleaner());
 
-            TextBlock txt = this.FindName("header") as TextBlock;
-            txt.Text = "Mapping Tools - Map Cleaner";
-
-            ViewChanged();
+            if (FindName("header") is TextBlock txt) txt.Text = "Mapping Tools - Map Cleaner";
 
             MinWidth = 630;
             MinHeight = 560;
@@ -179,10 +169,7 @@ namespace Mapping_Tools {
         private void LoadMetadataManager(object sender, RoutedEventArgs e) {
             SetCurrentView(Views.GetMetadataManager());
 
-            TextBlock txt = this.FindName("header") as TextBlock;
-            txt.Text = "Mapping Tools - Metadata Manager";
-
-            ViewChanged();
+            if (this.FindName("header") is TextBlock txt) txt.Text = "Mapping Tools - Metadata Manager";
 
             MinWidth = 630;
             MinHeight = 560;
@@ -192,10 +179,7 @@ namespace Mapping_Tools {
         private void LoadPropertyTransformer(object sender, RoutedEventArgs e) {
             SetCurrentView(Views.GetPropertyTransformer());
 
-            TextBlock txt = this.FindName("header") as TextBlock;
-            txt.Text = "Mapping Tools - Property Transformer";
-
-            ViewChanged();
+            if (this.FindName("header") is TextBlock txt) txt.Text = "Mapping Tools - Property Transformer";
 
             MinWidth = 630;
             MinHeight = 560;
@@ -205,10 +189,7 @@ namespace Mapping_Tools {
         private void LoadMerger(object sender, RoutedEventArgs e) {
             SetCurrentView(Views.GetSliderMerger());
 
-            TextBlock txt = this.FindName("header") as TextBlock;
-            txt.Text = "Mapping Tools - Slider Merger";
-
-            ViewChanged();
+            if (this.FindName("header") is TextBlock txt) txt.Text = "Mapping Tools - Slider Merger";
 
             this.MinWidth = 400;
             this.MinHeight = 380;
@@ -218,10 +199,7 @@ namespace Mapping_Tools {
         private void LoadCompletionator(object sender, RoutedEventArgs e) {
             SetCurrentView(Views.GetSliderCompletionator());
 
-            TextBlock txt = this.FindName("header") as TextBlock;
-            txt.Text = "Mapping Tools - Slider Completionator";
-
-            ViewChanged();
+            if (this.FindName("header") is TextBlock txt) txt.Text = "Mapping Tools - Slider Completionator";
 
             this.MinWidth = 400;
             this.MinHeight = 380;
@@ -231,10 +209,7 @@ namespace Mapping_Tools {
         private void LoadSnappingTools(object sender, RoutedEventArgs e) {
             SetCurrentView(Views.GetSnappingTools());
 
-            TextBlock txt = this.FindName("header") as TextBlock;
-            txt.Text = "Mapping Tools - Snapping Tools";
-
-            ViewChanged();
+            if (this.FindName("header") is TextBlock txt) txt.Text = "Mapping Tools - Snapping Tools";
 
             this.MinWidth = 400;
             this.MinHeight = 380;
@@ -244,10 +219,7 @@ namespace Mapping_Tools {
         private void LoadTimingCopier(object sender, RoutedEventArgs e) {
             SetCurrentView(Views.GetTimingCopier());
 
-            TextBlock txt = this.FindName("header") as TextBlock;
-            txt.Text = "Mapping Tools - Timing Copier";
-
-            ViewChanged();
+            if (this.FindName("header") is TextBlock txt) txt.Text = "Mapping Tools - Timing Copier";
 
             this.MinWidth = 400;
             this.MinHeight = 380;
@@ -257,10 +229,7 @@ namespace Mapping_Tools {
         private void LoadTimingHelper(object sender, RoutedEventArgs e) {
             SetCurrentView(Views.GetTimingHelper());
 
-            TextBlock txt = this.FindName("header") as TextBlock;
-            txt.Text = "Mapping Tools - Timing Helper";
-
-            ViewChanged();
+            if (this.FindName("header") is TextBlock txt) txt.Text = "Mapping Tools - Timing Helper";
 
             this.MinWidth = 400;
             this.MinHeight = 380;
@@ -270,10 +239,7 @@ namespace Mapping_Tools {
         private void LoadHSCopier(object sender, RoutedEventArgs e) {
             SetCurrentView(Views.GetHitsoundCopier());
 
-            TextBlock txt = this.FindName("header") as TextBlock;
-            txt.Text = "Mapping Tools - Hitsound Copier";
-
-            ViewChanged();
+            if (this.FindName("header") is TextBlock txt) txt.Text = "Mapping Tools - Hitsound Copier";
 
             this.MinWidth = 100;
             this.MinHeight = 100;
@@ -283,10 +249,7 @@ namespace Mapping_Tools {
         private void LoadHSStudio(object sender, RoutedEventArgs e) {
             SetCurrentView(Views.GetHitsoundStudio());
 
-            TextBlock txt = this.FindName("header") as TextBlock;
-            txt.Text = "Mapping Tools - Hitsound Studio";
-
-            ViewChanged();
+            if (this.FindName("header") is TextBlock txt) txt.Text = "Mapping Tools - Hitsound Studio";
 
             this.MinWidth = 100;
             this.MinHeight = 100;
@@ -296,10 +259,7 @@ namespace Mapping_Tools {
         private void LoadHSPreviewHelper(object sender, RoutedEventArgs e) {
             SetCurrentView(Views.GetHitsoundPreviewHelper());
 
-            TextBlock txt = this.FindName("header") as TextBlock;
-            txt.Text = "Mapping Tools - Hitsound Preview Helper";
-
-            ViewChanged();
+            if (this.FindName("header") is TextBlock txt) txt.Text = "Mapping Tools - Hitsound Preview Helper";
 
             this.MinWidth = 100;
             this.MinHeight = 100;
@@ -309,10 +269,7 @@ namespace Mapping_Tools {
         private void LoadStartup(object sender, RoutedEventArgs e) {
             SetCurrentView(Views.GetStandard());
 
-            TextBlock txt = this.FindName("header") as TextBlock;
-            txt.Text = "Mapping Tools";
-
-            ViewChanged();
+            if (this.FindName("header") is TextBlock txt) txt.Text = "Mapping Tools";
 
             this.MinWidth = 100;
             this.MinHeight = 100;
@@ -322,21 +279,18 @@ namespace Mapping_Tools {
         private void LoadPreferences(object sender, RoutedEventArgs e) {
             SetCurrentView(Views.GetPreferences());
 
-            TextBlock txt = this.FindName("header") as TextBlock;
-            txt.Text = "Mapping Tools - Preferences";
-
-            ViewChanged();
+            if (this.FindName("header") is TextBlock txt) txt.Text = "Mapping Tools - Preferences";
 
             this.MinWidth = 100;
             this.MinHeight = 100;
         }
 
         private void ViewChanged() {
-            System.Windows.Controls.MenuItem menuitem = this.FindName("project") as System.Windows.Controls.MenuItem;
-            bool isSavable = DataContext.GetType().GetInterfaces().Any(x =>
+            if (!(FindName("project") is MenuItem menuitem)) return;
+            var isSavable = DataContext.GetType().GetInterfaces().Any(x =>
                               x.IsGenericType &&
                               x.GetGenericTypeDefinition() == typeof(ISavable<>));
-            menuitem.Visibility = isSavable ? Visibility.Visible : Visibility.Collapsed;
+             menuitem.Visibility = isSavable ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void LoadProject(object sender, RoutedEventArgs e) {
@@ -360,7 +314,6 @@ namespace Mapping_Tools {
             }
             catch( Exception ex ) {
                 System.Windows.Forms.MessageBox.Show(ex.Message);
-                return;
             }
         }
 
@@ -379,13 +332,13 @@ namespace Mapping_Tools {
 
         //Open info screen
         private void OpenInfo(object sender, RoutedEventArgs e) {
-            Version version = Assembly.GetEntryAssembly().GetName().Version;
-            System.Windows.MessageBox.Show(string.Format("Mapping Tools {0}\n\nMade by:\nOliBomby\nPotoofu", version.ToString()), "Info");
+            var version = Assembly.GetEntryAssembly()?.GetName().Version;
+            MessageBox.Show($"Mapping Tools {version}\n\nMade by:\nOliBomby\nPotoofu", "Info");
         }
 
         //Change top right icons on changed window state and set state variable
         private void Window_StateChanged(object sender, EventArgs e) {
-            System.Windows.Controls.Button bt = this.FindName("toggle_button") as System.Windows.Controls.Button;
+            if (!(this.FindName("toggle_button") is Button bt)) return;
 
             switch( this.WindowState ) {
                 case WindowState.Maximized:
@@ -407,7 +360,8 @@ namespace Mapping_Tools {
 
         //Clickevent for top right maximize/minimize button
         private void ToggleWin(object sender, RoutedEventArgs e) {
-            System.Windows.Controls.Button bt = this.FindName("toggle_button") as System.Windows.Controls.Button;
+            if (!(this.FindName("toggle_button") is Button bt)) return;
+
             if( IsMaximized ) {
                 this.WindowState = WindowState.Normal;
                 Width = WidthWin;
@@ -440,32 +394,32 @@ namespace Mapping_Tools {
             if (DataContext is MappingTool mt){ mt.Deactivate(); }
             Views.AutoSaveSettings();
             SettingsManager.UpdateSettings();
-            SettingsManager.WriteToJson(false);
+            SettingsManager.WriteToJson();
             this.Close();
         }
 
         //Enable drag control of window and set icons when docked
         private void DragWin(object sender, MouseButtonEventArgs e) {
-            if( e.ChangedButton == MouseButton.Left ) {
-                System.Windows.Controls.Button bt = this.FindName("toggle_button") as System.Windows.Controls.Button;
-                if( WindowState == WindowState.Maximized ) {
-                    var point = PointToScreen(e.MouseDevice.GetPosition(this));
+            if (e.ChangedButton != MouseButton.Left) return;
+            if (!(this.FindName("toggle_button") is Button bt)) return;
 
-                    if( point.X <= RestoreBounds.Width / 2 )
-                        Left = 0;
-                    else if( point.X >= RestoreBounds.Width )
-                        Left = point.X - ( RestoreBounds.Width - ( this.ActualWidth - point.X ) );
-                    else
-                        Left = point.X - ( RestoreBounds.Width / 2 );
+            if( WindowState == WindowState.Maximized ) {
+                var point = PointToScreen(e.MouseDevice.GetPosition(this));
 
-                    Top = point.Y - ( ( (FrameworkElement) sender ).ActualHeight / 2 );
-                    WindowState = WindowState.Normal;
-                    bt.Content = new PackIcon { Kind = PackIconKind.WindowMaximize };
-                }
-                if( e.LeftButton == MouseButtonState.Pressed )
-                    this.DragMove();
-                //bt.Content = new PackIcon { Kind = PackIconKind.WindowRestore };
+                if( point.X <= RestoreBounds.Width / 2 )
+                    Left = 0;
+                else if( point.X >= RestoreBounds.Width )
+                    Left = point.X - ( RestoreBounds.Width - ( this.ActualWidth - point.X ) );
+                else
+                    Left = point.X - ( RestoreBounds.Width / 2 );
+
+                Top = point.Y - ( ( (FrameworkElement) sender ).ActualHeight / 2 );
+                WindowState = WindowState.Normal;
+                bt.Content = new PackIcon { Kind = PackIconKind.WindowMaximize };
             }
+            if( e.LeftButton == MouseButtonState.Pressed )
+                this.DragMove();
+            //bt.Content = new PackIcon { Kind = PackIconKind.WindowRestore };
         }
     }
 }
