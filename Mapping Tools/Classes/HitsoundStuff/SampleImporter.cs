@@ -18,7 +18,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             ".wav", ".ogg", ".mp3", ".sf2", ".sfz", ".sf1", ".ssx", ".sfpack", ".sfark" };
 
         public static bool ValidateSampleArgs(string path) {
-            return (File.Exists(path) && ValidSamplePathExtensions.Contains(Path.GetExtension(path));
+            return (File.Exists(path) && ValidSamplePathExtensions.Contains(Path.GetExtension(path)));
         }
 
         public static bool ValidateSampleArgs(SampleGeneratingArgs args) {
