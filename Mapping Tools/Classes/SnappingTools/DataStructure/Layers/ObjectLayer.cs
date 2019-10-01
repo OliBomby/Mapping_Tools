@@ -7,8 +7,12 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
     public abstract class ObjectLayer {
         public RelevantObjectCollection.RelevantObjectCollection Objects { get; set; }
         public abstract HitObjectGeneratorCollection GeneratorCollection { get; set; }
+        public LayerCollection ParentCollection { get; set; }
+
         public void SortTimes() {
             Objects.SortTimes();
         }
+
+        public abstract void Add(object obj);
     }
 }

@@ -15,11 +15,12 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
 
         public override HitObjectGeneratorCollection GeneratorCollection { get; set; }
         public RelevantObjectLayer NextLayer;
-        public LayerCollection Collection;
 
-        public void Add(RelevantHitObject hitObject) {
+        public override void Add(object obj) {
+            if (!(obj is RelevantHitObject hitObject)) return;
+
             // Check if this object or something similar exists anywhere in the context or in this layer
-            if (HitObjects.FindSimilar(hitObject, Collection.AcceptableDifference, out var similarObject)) {
+            if (HitObjects.FindSimilar(hitObject, ParentCollection.AcceptableDifference, out var similarObject)) {
                 similarObject.Consume(hitObject);
             }
 
@@ -27,13 +28,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
 
             NextLayer.DeleteObjectsFromConcurrent();
 
-            GeneratorCollection.GenerateNewObjects(NextLayer, hitObject);
-
-            /*foreach (var pointsGenerator in Generators.OfType<IGeneratePointsFromHitObjects>()) {
-                if (NextLayer is RelevantObjectLayer rol) {
-                    rol.AddPoints(pointsGenerator.GetRelevantObjects(HitObjects));
-                }
-            }*/
+            GeneratorCollection.GenerateNewObjects(this, NextLayer, hitObject);
 
 
             // Sort the object list

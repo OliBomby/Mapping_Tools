@@ -4,7 +4,6 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
     public class RelevantObjectPairGenerator {
         public void GeneratePairs(ObjectLayer layer) {
             // Get the dependencies of all the active generators
-            layer.GeneratorCollection.GetDependencies();
             // Check the preferences for generating preferences
             // Get the necessary layers
             // Take into account the situation. The changes of the layer

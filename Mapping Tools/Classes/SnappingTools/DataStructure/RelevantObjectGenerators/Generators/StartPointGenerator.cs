@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
+﻿using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 
@@ -11,10 +8,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         public override string Tooltip => "Generates virtual points on slider heads and circles.";
         public override GeneratorType GeneratorType => GeneratorType.Generators;
 
-        [RelevantObjectGenerator]
-        public List<RelevantPoint> GetRelevantObjects(List<HitObject> objects)
-        {
-            return (from ho in objects where !ho.IsSpinner select new RelevantPoint(ho.Pos)).ToList();
+        [RelevantObjectGenerator(typeof(RelevantHitObject), typeof(RelevantPoint))]
+        public RelevantPoint GetRelevantObjects(RelevantHitObject ho) {
+            return new RelevantPoint(ho.HitObject.Pos);
         }
     }
 }
