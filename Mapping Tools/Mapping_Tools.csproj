@@ -346,6 +346,7 @@
     <Compile Include="Viewmodels\SliderMergerVM.cs" />
     <Compile Include="Viewmodels\PreferencesVM.cs" />
     <Compile Include="Viewmodels\StandardVM.cs" />
+    <Compile Include="Views\DontShowTitleAttribute.cs" />
     <Compile Include="Views\Extensions.cs" />
     <Compile Include="Views\MappingTool.cs" />
     <Compile Include="Views\RhythmGuide\RhythmGuideView.xaml.cs">

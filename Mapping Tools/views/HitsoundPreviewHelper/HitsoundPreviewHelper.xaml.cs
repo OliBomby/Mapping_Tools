@@ -16,12 +16,16 @@ namespace Mapping_Tools.Views {
     /// <summary>
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
-    public partial class HitsoundPreviewHelperView : MappingTool, ISavable<HitsoundPreviewHelperVM> {
+    public partial class HitsoundPreviewHelperView : ISavable<HitsoundPreviewHelperVM> {
         private readonly BackgroundWorker backgroundWorker;
 
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "hspreviewproject.json");
 
         public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Hitsound Preview Projects");
+
+        public static readonly string ToolName = "Hitsound Preview Helper";
+
+        public static readonly string ToolDescription = $@"Hitsound Preview Helper helps by placing hitsounds on all the objects of the current map based on the positions of the objects. That way you can hear the hitsounds play while you hitsound without having to assign them manually and later import them to Hitsound Studio.{Environment.NewLine}This tool is meant to help a very specific hitsounding workflow. If you hitsound by placing circles on different parts on the screen and treat each position as a different layer of hitsounds. For example using a mania map and have each column represent a different sound.";
 
         public HitsoundPreviewHelperView() {
             InitializeComponent();

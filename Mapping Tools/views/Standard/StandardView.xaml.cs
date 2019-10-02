@@ -6,7 +6,12 @@ using System.Net.Http;
 using System.Windows.Controls;
 
 namespace Mapping_Tools.Views {
-    public partial class StandardView :UserControl {
+    [DontShowTitle]
+    public partial class StandardView {
+        public static readonly string ToolName = "Get Started";
+
+        public static readonly string ToolDescription = $@"";
+
         private static readonly Dictionary<string, string> jankReplacements = new Dictionary<string, string>() {
             { @"<br/>", "\n" },
             { @"<br>", "\n" }

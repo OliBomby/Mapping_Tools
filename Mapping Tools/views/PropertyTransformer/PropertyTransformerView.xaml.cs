@@ -14,8 +14,12 @@ namespace Mapping_Tools.Views {
     /// <summary>
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
-    public partial class PropertyTransformerView : MappingTool {
+    public partial class PropertyTransformerView {
         private readonly BackgroundWorker backgroundWorker;
+
+        public static readonly string ToolName = "Property Transformer";
+
+        public static readonly string ToolDescription = $@"Multiple and add to properties of all the timingpoints, hitobjects, bookmarks and storyboarded samples of the current map.{Environment.NewLine}The new value is the old value times the multiplier plus the offset. The multiplier is the left textbox and the offset is the right textbox. The multiplier gets done first.{Environment.NewLine}Resulting values get rounded if they have to be integer.";
 
         public PropertyTransformerView() {
             InitializeComponent();

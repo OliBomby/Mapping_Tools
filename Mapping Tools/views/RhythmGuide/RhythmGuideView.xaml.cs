@@ -13,6 +13,10 @@ namespace Mapping_Tools.Views.RhythmGuide {
         private readonly BackgroundWorker backgroundWorker;
         private readonly RhythmGuideVm settings;
 
+        public static readonly string ToolName = "Rhythm Guide";
+
+        public static readonly string ToolDescription = $@"Make a beatmap with circles from the rhythm of multiple maps, so you have a reference for hitsounding.{Environment.NewLine}You can add the circles to an existing map or make a new map with the circles.{Environment.NewLine}Use the browse button to choose mutliple maps at the same time.";
+
         public RhythmGuideView() {
             InitializeComponent();
             backgroundWorker = (BackgroundWorker) FindResource("BackgroundWorker");

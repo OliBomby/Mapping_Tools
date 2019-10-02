@@ -21,6 +21,10 @@ namespace Mapping_Tools.Views {
 
         public event EventHandler RunFinished;
 
+        public static readonly string ToolName = "Map Cleaner";
+
+        public static readonly string ToolDescription = $@"It cleans the current map of useless greenlines and it also lets you do some other stuff regarding the whole map.{Environment.NewLine}Map cleaner cleans useless greenline stuff by storing all the influences of the timingpoints and then removing all the timingpoints and then rebuilding all the timingpoints in a good way. This means the greenlines automatically get resnapped to the objects that use them.";
+
         public CleanerView() {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;

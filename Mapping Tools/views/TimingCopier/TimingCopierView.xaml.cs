@@ -17,12 +17,16 @@ namespace Mapping_Tools.Views {
     /// <summary>
     /// Interactielogica voor TimingCopierView.xaml
     /// </summary>
-    public partial class TimingCopierView : MappingTool, ISavable<TimingCopierVM> {
+    public partial class TimingCopierView : ISavable<TimingCopierVM> {
         private readonly BackgroundWorker backgroundWorker;
 
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "timingcopierproject.json");
 
         public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Timing Copier Projects");
+
+        public static readonly string ToolName = "Timing Copier";
+
+        public static readonly string ToolDescription = $@"Copies timing from A to B.{Environment.NewLine}There are 3 modes that describe how this program will handle moving objects (hitobjects/timingpoints/bookmarks) to the new timing:{Environment.NewLine}'Number of beats between objects stays the same' will move the objects so that the number of beats between objects stays the same. After that it will also resnap to the specified snap divisors. Make sure everything is snapped and don't use this if your new timing is supposed to change the number of beats between objects.{Environment.NewLine}'Just resnap' will snap the objects to the new timing on the specified snap divisors. This doesn't resnap bookmarks.{Environment.NewLine}'Don't move objects' will not move the objects at all.";
 
         public TimingCopierView() {
             InitializeComponent();

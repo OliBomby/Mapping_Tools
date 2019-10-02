@@ -11,6 +11,11 @@ namespace Mapping_Tools.Views
     /// </summary>
     public partial class PreferencesView : UserControl
     {
+
+        public static readonly string ToolName = "Preferences";
+
+        public static readonly string ToolDescription = $@"";
+
         public PreferencesView()
         {
             InitializeComponent();

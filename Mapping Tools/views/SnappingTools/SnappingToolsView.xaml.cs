@@ -9,6 +9,11 @@ using Mapping_Tools.Views.SnappingTools;
 
 namespace Mapping_Tools.Views {
     public partial class SnappingToolsView : ISavable<SnappingToolsPreferences> {
+
+        public static readonly string ToolName = "Snapping Tools";
+
+        public static readonly string ToolDescription = $@"Generates and keeps track of a list virtual objects that are geometrically relevant to the objects visible on your screen. Press and hold the Activation Key to let your cursor snap to the closest virtual object.{Environment.NewLine}⚠ You must specify your user config file in the Preferences for this tool to function.";
+
         public SnappingToolsView() {
             DataContext = new SnappingToolsVm();
             InitializeComponent();

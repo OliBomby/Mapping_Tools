@@ -16,11 +16,15 @@ namespace Mapping_Tools.Views {
     /// <summary>
     /// Interaktionslogik für UserControl1.xaml
     /// </summary>
-    public partial class SliderMergerView : MappingTool, IQuickRun {
+    public partial class SliderMergerView : IQuickRun {
         private readonly BackgroundWorker backgroundWorker;
         private bool canRun = true;
 
         public event EventHandler RunFinished;
+
+        public static readonly string ToolName = "Slider Merger";
+
+        public static readonly string ToolDescription = $@"Merge 2 or more sliders into one big slider. The pixel length of the resulting slider is the sum of the pixel lengths of the sliders that made it up.{Environment.NewLine}This program will automatically convert any type of slider into a Beziér slider for the purpose of merging.{Environment.NewLine}In order for 2 sliders to merge, place the second slider on top of the last anchor of the first slider.";
 
         public SliderMergerView() {
             InitializeComponent();

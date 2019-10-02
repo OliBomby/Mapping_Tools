@@ -17,11 +17,15 @@ namespace Mapping_Tools.Views {
     /// <summary>
     /// Interaktionslogik für UserControl1.xaml
     /// </summary>
-    public partial class SliderCompletionatorView : MappingTool, IQuickRun {
+    public partial class SliderCompletionatorView : IQuickRun {
         private readonly BackgroundWorker backgroundWorker;
         private bool canRun = true;
 
         public event EventHandler RunFinished;
+
+        public static readonly string ToolName = "Slider Completionator";
+
+        public static readonly string ToolDescription = $@"Change the length and duration of marked sliders and this tool will automatically handle the SV for you.";
 
         public SliderCompletionatorView() {
             InitializeComponent();
