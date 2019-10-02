@@ -38,10 +38,12 @@ namespace Mapping_Tools.Views {
 
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
             if (e.Error != null) {
-                new MessageWindow(ErrorType.Error, eventArg: e);
+                //new MessageWindow(ErrorType.Error, eventArg: e);
+                MessageBox.Show(e.Error.Message);
             } else {
                 if (e.Result.ToString() != "")
-                    new MessageWindow(ErrorType.Success, e.Result.ToString());
+                    //new MessageWindow(ErrorType.Success, e.Result.ToString());
+                    MessageBox.Show(e.Result.ToString());
                 progress.Value = 0;
             }
             start.IsEnabled = true;
