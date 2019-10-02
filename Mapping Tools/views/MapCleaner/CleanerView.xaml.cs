@@ -8,9 +8,11 @@ using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Components.TimeLine;
 using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.SystemTools.QuickRun;
 
 namespace Mapping_Tools.Views {
-    public partial class CleanerView : MappingTool, IQuickRun {
+    [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
+    public partial class CleanerView : IQuickRun {
         private readonly BackgroundWorker backgroundWorker;
         private bool canRun = true;
         List<double> TimingpointsRemoved;

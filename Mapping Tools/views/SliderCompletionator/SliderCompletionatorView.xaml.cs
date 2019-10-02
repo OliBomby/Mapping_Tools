@@ -11,12 +11,14 @@ using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SliderPathStuff;
 using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Classes.Tools;
 
 namespace Mapping_Tools.Views {
     /// <summary>
     /// Interaktionslogik für UserControl1.xaml
     /// </summary>
+    [SmartQuickRunUsage(SmartQuickRunTargets.AnySelection)]
     public partial class SliderCompletionatorView : IQuickRun {
         private readonly BackgroundWorker backgroundWorker;
         private bool canRun = true;

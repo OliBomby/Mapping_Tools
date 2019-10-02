@@ -44,8 +44,7 @@ namespace Mapping_Tools {
                 ToggleWin(this, null);
                 WidthWin = SettingsManager.Settings.MainWindowWidth ?? Width;
                 HeightWin = SettingsManager.Settings.MainWindowHeight ?? Height;
-                Views = new ViewCollection(); // Make a ViewCollection object
-                SetCurrentView(new StandardVM()); // Generate Standard view model to show on startup
+                SetCurrentView(typeof(StandardView)); // Generate Standard view model to show on startup
 
                 SetCurrentMaps(SettingsManager.GetLatestCurrentMaps()); // Set currentmap to previously opened map
             } catch (Exception ex) {
@@ -71,6 +70,38 @@ namespace Mapping_Tools {
             catch( Exception ex ) {
                 MessageBox.Show(ex.Message);
             }
+
+            Views = new ViewCollection(); // Make a ViewCollection object
+            ToolsMenu.ItemsSource = ViewCollection.GetAllToolTypes().Select(o => {
+                var item = new MenuItem() {Header = "_" + ViewCollection.GetName(o)};
+                item.Click += ViewSelectMenuItemOnClick;
+                return item;
+            }).OrderBy(o => o.Header);
+        }
+
+        private void SetCurrentView(string name) {
+            try {
+                SetCurrentView(Views.GetView(name));
+                if (FindName("header") is TextBlock txt) txt.Text = $"Mapping Tools - {name}";
+            } catch (ArgumentException ex) {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void SetCurrentView(Type type) {
+            try {
+                SetCurrentView(Views.GetView(type));
+                if (FindName("header") is TextBlock txt) txt.Text = $"Mapping Tools - {ViewCollection.GetName(type)}";
+            } catch (ArgumentException ex) {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void ViewSelectMenuItemOnClick(object sender, RoutedEventArgs e) {
+            if (((MenuItem) sender).Header == null) return;
+
+            var toolName = ((MenuItem) sender).Header.ToString().Substring(1);
+            SetCurrentView(toolName);
         }
 
         private bool IsUserAdministrator() {
@@ -153,136 +184,6 @@ namespace Mapping_Tools {
             var result = IOHelper.SaveMapBackup(paths, true);
             if( result )
                 MessageBox.Show($"Beatmap{( paths.Length == 1 ? "" : "s" )} successfully copied!");
-        }
-
-        //Method for loading the cleaner interface
-        private void LoadCleaner(object sender, RoutedEventArgs e) {
-            SetCurrentView(Views.GetMapCleaner());
-
-            if (FindName("header") is TextBlock txt) txt.Text = "Mapping Tools - Map Cleaner";
-
-            MinWidth = 630;
-            MinHeight = 560;
-        }
-
-        //Method for loading the cleaner interface
-        private void LoadMetadataManager(object sender, RoutedEventArgs e) {
-            SetCurrentView(Views.GetMetadataManager());
-
-            if (this.FindName("header") is TextBlock txt) txt.Text = "Mapping Tools - Metadata Manager";
-
-            MinWidth = 630;
-            MinHeight = 560;
-        }
-
-        //Method for loading the property transformer
-        private void LoadPropertyTransformer(object sender, RoutedEventArgs e) {
-            SetCurrentView(Views.GetPropertyTransformer());
-
-            if (this.FindName("header") is TextBlock txt) txt.Text = "Mapping Tools - Property Transformer";
-
-            MinWidth = 630;
-            MinHeight = 560;
-        }
-
-        //Method for loading the merger interface
-        private void LoadMerger(object sender, RoutedEventArgs e) {
-            SetCurrentView(Views.GetSliderMerger());
-
-            if (this.FindName("header") is TextBlock txt) txt.Text = "Mapping Tools - Slider Merger";
-
-            this.MinWidth = 400;
-            this.MinHeight = 380;
-        }
-
-        //Method for loading the completionator interface
-        private void LoadCompletionator(object sender, RoutedEventArgs e) {
-            SetCurrentView(Views.GetSliderCompletionator());
-
-            if (this.FindName("header") is TextBlock txt) txt.Text = "Mapping Tools - Slider Completionator";
-
-            this.MinWidth = 400;
-            this.MinHeight = 380;
-        }
-
-        //Method for loading the snapping tools interface
-        private void LoadSnappingTools(object sender, RoutedEventArgs e) {
-            SetCurrentView(Views.GetSnappingTools());
-
-            if (this.FindName("header") is TextBlock txt) txt.Text = "Mapping Tools - Snapping Tools";
-
-            this.MinWidth = 400;
-            this.MinHeight = 380;
-        }
-
-        //Method for loading the timing copier interface
-        private void LoadTimingCopier(object sender, RoutedEventArgs e) {
-            SetCurrentView(Views.GetTimingCopier());
-
-            if (this.FindName("header") is TextBlock txt) txt.Text = "Mapping Tools - Timing Copier";
-
-            this.MinWidth = 400;
-            this.MinHeight = 380;
-        }
-
-        //Method for loading the timing helper interface
-        private void LoadTimingHelper(object sender, RoutedEventArgs e) {
-            SetCurrentView(Views.GetTimingHelper());
-
-            if (this.FindName("header") is TextBlock txt) txt.Text = "Mapping Tools - Timing Helper";
-
-            this.MinWidth = 400;
-            this.MinHeight = 380;
-        }
-
-        //Method for loading the hitsound copier
-        private void LoadHSCopier(object sender, RoutedEventArgs e) {
-            SetCurrentView(Views.GetHitsoundCopier());
-
-            if (this.FindName("header") is TextBlock txt) txt.Text = "Mapping Tools - Hitsound Copier";
-
-            this.MinWidth = 100;
-            this.MinHeight = 100;
-        }
-
-        //Method for loading the hitsound studio
-        private void LoadHSStudio(object sender, RoutedEventArgs e) {
-            SetCurrentView(Views.GetHitsoundStudio());
-
-            if (this.FindName("header") is TextBlock txt) txt.Text = "Mapping Tools - Hitsound Studio";
-
-            this.MinWidth = 100;
-            this.MinHeight = 100;
-        }
-
-        //Method for loading the hitsound preview helper
-        private void LoadHSPreviewHelper(object sender, RoutedEventArgs e) {
-            SetCurrentView(Views.GetHitsoundPreviewHelper());
-
-            if (this.FindName("header") is TextBlock txt) txt.Text = "Mapping Tools - Hitsound Preview Helper";
-
-            this.MinWidth = 100;
-            this.MinHeight = 100;
-        }
-
-        //Method for loading the standard interface
-        private void LoadStartup(object sender, RoutedEventArgs e) {
-            SetCurrentView(Views.GetStandard());
-
-            if (this.FindName("header") is TextBlock txt) txt.Text = "Mapping Tools";
-
-            this.MinWidth = 100;
-            this.MinHeight = 100;
-        }
-
-        //Method for loading the preferences
-        private void LoadPreferences(object sender, RoutedEventArgs e) {
-            SetCurrentView(Views.GetPreferences());
-
-            if (this.FindName("header") is TextBlock txt) txt.Text = "Mapping Tools - Preferences";
-
-            this.MinWidth = 100;
-            this.MinHeight = 100;
         }
 
         private void ViewChanged() {

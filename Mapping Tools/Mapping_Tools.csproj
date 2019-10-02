@@ -297,8 +297,8 @@
     <Compile Include="Classes\SystemTools\ListenerManager.cs" />
     <Compile Include="Classes\SystemTools\ProjectManager.cs" />
     <Compile Include="Classes\SystemTools\ISavable.cs" />
-    <Compile Include="Classes\SystemTools\QuickRun\QuickRunEnumToDescriptionValueConverter.cs" />
-    <Compile Include="Classes\SystemTools\QuickRun\QuickRunEnum.cs" />
+    <Compile Include="Classes\SystemTools\QuickRun\SmartQuickRunTargets.cs" />
+    <Compile Include="Classes\SystemTools\QuickRun\SmartQuickRunUsageAttribute.cs" />
     <Compile Include="Classes\SystemTools\RunToolCompletedEventArgs.cs" />
     <Compile Include="Classes\SystemTools\Settings.cs" />
     <Compile Include="Classes\SystemTools\SettingsManager.cs" />

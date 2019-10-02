@@ -12,7 +12,7 @@ namespace Mapping_Tools.Views.RhythmGuide {
 
         public RhythmGuideWindow() {
             InitializeComponent();
-            DataContext = innerView = MainWindow.AppWindow.Views.GetRhythmGuide();
+            DataContext = innerView = MainWindow.AppWindow.Views.GetView(typeof(RhythmGuideView)) as RhythmGuideView;
         }
 
         //Close window

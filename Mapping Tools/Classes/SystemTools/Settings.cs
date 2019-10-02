@@ -102,9 +102,8 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
         }
 
-        public static IEnumerable<SingleQuickRunEnum> SingleQuickRunEnumerable => Enum.GetValues(typeof(SingleQuickRunEnum)).Cast<SingleQuickRunEnum>();
-        private SingleQuickRunEnum _singleQuickRunTool;
-        public SingleQuickRunEnum SingleQuickRunTool {
+        private string _singleQuickRunTool;
+        public string SingleQuickRunTool {
             get => _singleQuickRunTool;
             set {
                 if (_singleQuickRunTool == value) return;
@@ -113,9 +112,8 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
         }
 
-        public static IEnumerable<MultipleQuickRunEnum> MultipleQuickRunEnumerable => Enum.GetValues(typeof(MultipleQuickRunEnum)).Cast<MultipleQuickRunEnum>();
-        private MultipleQuickRunEnum _multipleQuickRunTool;
-        public MultipleQuickRunEnum MultipleQuickRunTool {
+        private string _multipleQuickRunTool;
+        public string MultipleQuickRunTool {
             get => _multipleQuickRunTool;
             set {
                 if (_multipleQuickRunTool == value) return;
@@ -153,8 +151,8 @@ namespace Mapping_Tools.Classes.SystemTools {
             OverrideOsuSave = false;
             AutoReload = true;
             SmartQuickRunEnabled = true;
-            SingleQuickRunTool = SingleQuickRunEnum.Current;
-            MultipleQuickRunTool = MultipleQuickRunEnum.Current;
+            SingleQuickRunTool = "<Current Tool>";
+            MultipleQuickRunTool = "<Current Tool>";
         }
 
         public void CopyTo(Settings other) {

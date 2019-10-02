@@ -8,7 +8,7 @@ using System.Windows.Controls;
 namespace Mapping_Tools.Views {
     [DontShowTitle]
     public partial class StandardView {
-        public static readonly string ToolName = "Get Started";
+        public static readonly string ToolName = "Get started";
 
         public static readonly string ToolDescription = $@"";
 

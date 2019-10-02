@@ -1,16 +1,17 @@
 ﻿using Mapping_Tools.Classes.SystemTools;
 using MaterialDesignThemes.Wpf;
 using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using Mapping_Tools.Classes.SystemTools.QuickRun;
 
 namespace Mapping_Tools.Views
 {
     /// <summary>
     /// Interaktionslogik für UserControl2.xaml
     /// </summary>
-    public partial class PreferencesView : UserControl
-    {
+    public partial class PreferencesView {
 
         public static readonly string ToolName = "Preferences";
 
@@ -20,6 +21,12 @@ namespace Mapping_Tools.Views
         {
             InitializeComponent();
             DataContext = SettingsManager.Settings;
+
+            var views = MainWindow.AppWindow.Views;
+            SingleQuickRunBox.ItemsSource = new[] {"<Current Tool>"}.Concat(
+                ViewCollection.GetNames(ViewCollection.GetAllQuickRunTypesWithTargets(SmartQuickRunTargets.SingleSelection)));
+            MultipleQuickRunBox.ItemsSource = new[] {"<Current Tool>"}.Concat(
+                ViewCollection.GetNames(ViewCollection.GetAllQuickRunTypesWithTargets(SmartQuickRunTargets.MultipleSelection)));
         }
 
         [Obsolete]

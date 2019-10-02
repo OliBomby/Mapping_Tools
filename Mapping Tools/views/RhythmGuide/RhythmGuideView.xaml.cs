@@ -19,6 +19,8 @@ namespace Mapping_Tools.Views.RhythmGuide {
 
         public RhythmGuideView() {
             InitializeComponent();
+            Width = MainWindow.AppWindow.content_views.Width;
+            Height = MainWindow.AppWindow.content_views.Height;
             backgroundWorker = (BackgroundWorker) FindResource("BackgroundWorker");
             DataContext = settings = new RhythmGuideVm();
         }

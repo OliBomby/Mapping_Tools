@@ -7,13 +7,8 @@
              xmlns:components="clr-namespace:Mapping_Tools.Components"
              xmlns:syst="clr-namespace:Mapping_Tools.Classes.SystemTools"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" MinWidth="500" MinHeight="600">
-    
-    <UserControl.Resources>
-        <syst:SingleQuickRunEnumToDescriptionValueConverter x:Key="singleConverter"/>
-        <syst:MultipleQuickRunEnumToDescriptionValueConverter x:Key="multipleConverter"/>
-    </UserControl.Resources>
-    
+             d:DesignHeight="450" d:DesignWidth="800" MinWidth="500" MinHeight="600"
+             d:DataContext="{d:DesignData Settings}">
     <Grid>
         <StackPanel Margin="0,0,100,0">
             <TextBlock Foreground="{DynamicResource PrimaryHueMidBrush}" FontSize="40" FontWeight="Bold"><Run Text="Preferences"/></TextBlock>
@@ -77,25 +72,15 @@
                     <TextBlock Width="150" VerticalAlignment="Center" Text="QuickRun hotkey:" ToolTip="QuickRun lets you quickly run the current tool on the current beatmap."/>
                     <components:HotkeyEditorControl Width="150" Hotkey="{Binding QuickRunHotkey}"/>
 
-                    <CheckBox x:Name="SmartQuickRunCheckBox" IsChecked="{Binding SmartQuickRunEnabled}" Margin="15 0 0 0"/>
+                    <CheckBox x:Name="SmartQuickRunCheckBox" IsChecked="{Binding SmartQuickRunEnabled}" Margin="15 0 0 0" VerticalAlignment="Center"/>
 
-                    <TextBlock Text="Single:" VerticalAlignment="Center" Margin="15 0" IsEnabled="{Binding ElementName=SmartQuickRunCheckBox, Path=IsChecked}" Style="{StaticResource TogglableTextBlock}"/>
-                    <ComboBox ItemsSource="{Binding SingleQuickRunEnumerable}" Width="120" SelectedItem="{Binding SingleQuickRunTool}" IsEnabled="{Binding ElementName=SmartQuickRunCheckBox, Path=IsChecked}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Converter={StaticResource singleConverter}}"/>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
+                    <StackPanel Orientation="Horizontal" IsEnabled="{Binding ElementName=SmartQuickRunCheckBox, Path=IsChecked}">
+                        <TextBlock Text="Single:" VerticalAlignment="Center" Margin="15 0" Style="{StaticResource TogglableTextBlock}"/>
+                        <ComboBox x:Name="SingleQuickRunBox" Width="120" SelectedItem="{Binding SingleQuickRunTool}"/>
 
-                    <TextBlock Text="Multiple:" VerticalAlignment="Center" Margin="15 0" IsEnabled="{Binding ElementName=SmartQuickRunCheckBox, Path=IsChecked}" Style="{StaticResource TogglableTextBlock}"/>
-                    <ComboBox ItemsSource="{Binding MultipleQuickRunEnumerable}" Width="120" SelectedItem="{Binding MultipleQuickRunTool}" IsEnabled="{Binding ElementName=SmartQuickRunCheckBox, Path=IsChecked}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Converter={StaticResource multipleConverter}}"/>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
+                        <TextBlock Text="Multiple:" VerticalAlignment="Center" Margin="15 0" Style="{StaticResource TogglableTextBlock}"/>
+                        <ComboBox x:Name="MultipleQuickRunBox" Width="120" SelectedItem="{Binding MultipleQuickRunTool}"/>
+                    </StackPanel>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal">
