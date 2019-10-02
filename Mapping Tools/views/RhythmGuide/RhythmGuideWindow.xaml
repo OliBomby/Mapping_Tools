@@ -1,0 +1,44 @@
+﻿<Window x:Class="Mapping_Tools.Views.RhythmGuide.RhythmGuideWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+        Title="Rhythm Guide" Height="600" Width="800"
+        WindowStyle="None"
+        ResizeMode="CanResize"
+        AllowsTransparency="False"
+        WindowStartupLocation="CenterScreen"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Medium"
+        TextElement.FontSize="14"
+        MouseDown="DragWin" 
+        SizeChanged="RhythmGuideWindow_OnSizeChanged"
+        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" Background="{DynamicResource MaterialDesignPaper}">
+    <WindowChrome.WindowChrome>
+        <WindowChrome 
+            CaptionHeight="35"
+            ResizeBorderThickness="5" />
+    </WindowChrome.WindowChrome>
+    <Window.Resources>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid VerticalAlignment="Top" Grid.Row="0">
+            <StackPanel WindowChrome.IsHitTestVisibleInChrome="true" Height="35" VerticalAlignment="Top" HorizontalAlignment="Right" Orientation="Horizontal">
+                <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowCLose}" Click="CloseWin" HorizontalAlignment="Right" Height="35" Foreground="{DynamicResource MaterialDesignBody}"/>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <ContentControl Name="ContentControl" Content="{Binding}" Margin="10"/>
+        </Grid>
+
+        <Border Name="WindowBorder" BorderThickness="1" Grid.Row="0" Grid.RowSpan="2" Background="{x:Null}" BorderBrush="{DynamicResource PrimaryHueDarkBrush}"/>
+    </Grid>
+</Window>

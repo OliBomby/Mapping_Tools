@@ -27,7 +27,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public void SetLine(string line) {
             string[] values = line.Split(',');
 
-            if (values[0] != "Sample") {
+            if (values[0] != "Sample" && values[0] != "5") {
                 throw new BeatmapParsingException("This line is not a storyboarded sample.", line);
             }
 
