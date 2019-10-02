@@ -1,19 +1,55 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.HitsoundStuff;
+using Mapping_Tools.Classes.SystemTools;
 
 namespace Mapping_Tools.Classes.Tools {
     public class RhythmGuide {
-        public class RhythmGuideGeneratorArgs {
-            public string[] Paths;
-            public GameMode OutputGameMode;
-            public string OutputName;
-            public bool NcEverything;
+        public class RhythmGuideGeneratorArgs : BindableBase {
+            #region private_members
 
-            public ExportMode ExportMode;
-            public string ExportPath;
+            private string[] _paths = new string[0];
+            private GameMode _outputGameMode = GameMode.Standard;
+            private string _outputName = "Hitsounds";
+            private bool _ncEverything;
+
+            private ExportMode _exportMode = ExportMode.NewMap;
+            private string _exportPath = Path.Combine(MainWindow.ExportPath, @"rhythm_guide.osu");
+
+            #endregion
+
+            public string[] Paths {
+                get => _paths;
+                set => Set(ref _paths, value);
+            }
+            public GameMode OutputGameMode {
+                get => _outputGameMode;
+                set => Set(ref _outputGameMode, value);
+            }
+            public string OutputName {
+                get => _outputName;
+                set => Set(ref _outputName, value);
+            }
+            public bool NcEverything {
+                get => _ncEverything;
+                set => Set(ref _ncEverything, value);
+            }
+
+            public ExportMode ExportMode {
+                get => _exportMode;
+                set => Set(ref _exportMode, value);
+            }
+            public string ExportPath {
+                get => _exportPath;
+                set => Set(ref _exportPath, value);
+            }
+
+            public override string ToString() {
+                return $@"{Paths}, {ExportPath}, {ExportMode}, {OutputGameMode}, {OutputName}, {NcEverything}";
+            }
         } 
 
         public enum ExportMode {
@@ -22,6 +58,9 @@ namespace Mapping_Tools.Classes.Tools {
         }
 
         public static void GenerateRhythmGuide(RhythmGuideGeneratorArgs args) {
+            if (args.ExportPath == null) {
+                throw new ArgumentException("Export path can not be null.");
+            }
             switch (args.ExportMode) {
                 case ExportMode.NewMap:
                     var editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
@@ -30,6 +69,8 @@ namespace Mapping_Tools.Classes.Tools {
 
                     var editor = new Editor() {TextFile = beatmap, Path = args.ExportPath};
                     editor.SaveFile();
+                    System.Diagnostics.Process.Start(Path.GetDirectoryName(args.ExportPath) ??
+                                                     throw new ArgumentException("Export path must be a file."));
                     break;
                 case ExportMode.AddToMap:
                     var editor2 = EditorReaderStuff.GetNewestVersion(args.ExportPath);

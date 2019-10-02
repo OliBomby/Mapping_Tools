@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Reflection;
 using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Views.RhythmGuide;
 
 namespace Mapping_Tools.Views {
     public class ViewCollection {
@@ -123,6 +124,11 @@ namespace Mapping_Tools.Views {
                 TimingHelper = new TimingHelperView();
             }
             return TimingHelper;
+        }
+
+        private UserControl RhythmGuide { get; set; }
+        public UserControl GetRhythmGuide() {
+            return RhythmGuide ?? (RhythmGuide = new RhythmGuideView());
         }
     }
 }

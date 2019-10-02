@@ -10,6 +10,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using Mapping_Tools.Views.RhythmGuide;
 
 namespace Mapping_Tools.Viewmodels
 {
@@ -17,10 +18,23 @@ namespace Mapping_Tools.Viewmodels
     {
         private ObservableCollection<HitsoundZone> _items;
         private bool? _isAllItemsSelected;
+        private RhythmGuideWindow _rhythmGuideWindow;
 
         public HitsoundPreviewHelperVM() {
             _items = new ObservableCollection<HitsoundZone>();
 
+            RhythmGuideCommand = new CommandImplementation(
+                _ => {
+                    try {
+                        if (_rhythmGuideWindow == null) {
+                            _rhythmGuideWindow = new RhythmGuideWindow();
+                            _rhythmGuideWindow.Closed += RhythmGuideWindowOnClosed;
+                            _rhythmGuideWindow.Show();
+                        } else {
+                            _rhythmGuideWindow.Focus();
+                        }
+                    } catch (Exception ex) { MessageBox.Show(ex.Message); }
+                });
             AddCommand = new CommandImplementation(
                 _ => {
                     try {
@@ -44,6 +58,10 @@ namespace Mapping_Tools.Viewmodels
                         Items.RemoveAll(o => o.IsSelected);
                     } catch (Exception ex) { MessageBox.Show(ex.Message); }
                 });
+        }
+
+        private void RhythmGuideWindowOnClosed(object sender, EventArgs e) {
+            _rhythmGuideWindow = null;
         }
 
         public ObservableCollection<HitsoundZone> Items {
@@ -75,6 +93,7 @@ namespace Mapping_Tools.Viewmodels
             }
         }
 
+        public CommandImplementation RhythmGuideCommand { get; }
         public CommandImplementation AddCommand { get; }
         public CommandImplementation CopyCommand { get; }
         public CommandImplementation RemoveCommand { get; }
