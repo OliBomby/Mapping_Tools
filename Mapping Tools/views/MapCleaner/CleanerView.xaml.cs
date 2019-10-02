@@ -1,14 +1,13 @@
-﻿using System;
+﻿using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.SystemTools.QuickRun;
+using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Components.TimeLine;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.Tools;
-using Mapping_Tools.Components.TimeLine;
-using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.SystemTools.QuickRun;
 
 namespace Mapping_Tools.Views {
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
@@ -73,8 +72,7 @@ namespace Mapping_Tools.Views {
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
             if (e.Error != null) {
                 MessageBox.Show(string.Format("{0}{1}{2}", e.Error.Message, Environment.NewLine, e.Error.StackTrace), "Error");
-            }
-            else {
+            } else {
                 FillTimeLine();
                 if (e.Result.ToString() != "")
                     MessageBox.Show(e.Result.ToString());
