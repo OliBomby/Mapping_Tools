@@ -50,13 +50,11 @@ namespace Mapping_Tools.Views {
         }
 
         public static string GetName(Type type) {
-            if (type.GetField("ToolName") == null)
-                return type.ToString();
-            return type.GetField("ToolName").GetValue(null).ToString();
+            return type.GetField("ToolName") == null ? nameof(type) : type.GetField("ToolName").GetValue(null).ToString();
         }
 
         public static Type GetType(string name) {
-            return GetAllViewTypes().FirstOrDefault(o => (string)o.GetField("ToolName")?.GetValue(null) == name);
+            return GetAllViewTypes().FirstOrDefault(o => GetName(o) == name);
         }
 
         public object GetView(Type type) {
