@@ -39,32 +39,8 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
                 var concurrent = generator.IsConcurrent;
                 var needsHitObjects = generator.NeedsHitObjects();
 
-                var parametersList = new List<object[]>();
-                // How to generate pairs for one list which is the same type
-                switch (dependencies.Length) {
-                    case 0:
-                        parametersList.Add(new object[0]);
-                        break;
-                    case 1:
-                        parametersList.Add(new object[] {hitObject});
-                        break;
-                    case 2:
-                        parametersList.AddRange(from thisLayerHitObject in thisLayer.HitObjects
-                            where thisLayerHitObject != hitObject
-                            select new object[] {hitObject, thisLayerHitObject});
-                        break;
-                    case 3:
-                        var hitObjects = thisLayer.HitObjects.HitObjects;
-                        for (var i = 0; i < hitObjects.Count; i++) {
-                            for (var k = i + 1; i < hitObjects.Count; k++) {
-                                if (hitObjects[i] == hitObject || hitObjects[k] == hitObject) continue;
-                                parametersList.Add(new object[] {hitObject, hitObjects[i], hitObjects[k]});
-                            }
-                        }
-
-                        break;
-                }
-
+                var parametersList = RelevantObjectPairGenerator.GetParametersList(dependencies, thisLayer.HitObjects, hitObject);
+                
                 foreach (var parameters in parametersList) {
                     nextLayer.Add(method.Invoke(generator, parameters));
                 }
