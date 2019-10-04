@@ -7,11 +7,19 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectCollection
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation {
     public class RelevantObjectPairGenerator {
+        /// <summary>
+        /// Combinations generator for RelevantHitObjects
+        /// </summary>
+        /// <param name="dependencies">The types of objects in every combination</param>
+        /// <param name="hitObjectCollection">All the RelevantHitObjects</param>
+        /// <param name="hitObject">The new RelevantHitObject</param>
+        /// <returns>Enumerable of object array where the objects in the object array have the types specified in dependencies</returns>
         public static IEnumerable<object[]> GetParametersList(Type[] dependencies, HitObjectCollection hitObjectCollection, RelevantHitObject hitObject) {
             // Because hitobject is new, you only need to generate the combinations of the objects without the new hitobject
             // and then add the hitobect to every combination
 
             // I use dependencies.Length - 1 because new hitobject satisfies one of the dependencies
+            // I also assume all the types in dependencies are of RelevantHitObject
             var combinations = CombinationsRecursion(
                 hitObjectCollection.HitObjects.Except(new[] {hitObject}).ToArray(),
                 dependencies.Length - 1);
@@ -21,6 +29,8 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
 
             return parametersList;
         }
+
+
 
         public static IEnumerable<IEnumerable<T>> CartesianProduct<T>(IEnumerable<IEnumerable<T>> sequences) {
             IEnumerable<IEnumerable<T>> emptyProduct = new[] { Enumerable.Empty<T>() };
