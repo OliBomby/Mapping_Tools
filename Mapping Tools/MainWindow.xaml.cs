@@ -82,7 +82,6 @@ namespace Mapping_Tools {
         private void SetCurrentView(string name) {
             try {
                 SetCurrentView(Views.GetView(name));
-                if (FindName("header") is TextBlock txt) txt.Text = $"Mapping Tools - {name}";
             } catch (ArgumentException ex) {
                 MessageBox.Show(ex.Message);
             }
@@ -91,10 +90,27 @@ namespace Mapping_Tools {
         private void SetCurrentView(Type type) {
             try {
                 SetCurrentView(Views.GetView(type));
-                if (FindName("header") is TextBlock txt) txt.Text = $"Mapping Tools - {ViewCollection.GetName(type)}";
             } catch (ArgumentException ex) {
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        public void SetCurrentView(object view) {
+            var type = view.GetType();
+
+            if (FindName("header") is TextBlock txt) {
+                txt.Text = type.GetCustomAttribute<DontShowTitleAttribute>() == null ? $"Mapping Tools - {ViewCollection.GetName(type)}" : "Mapping Tools";
+            }
+
+            if (DataContext is MappingTool mt) {
+                mt.Deactivate();
+            }
+            if (view is MappingTool nmt) {
+                nmt.Activate();
+            }
+
+            DataContext = view;
+            ViewChanged();
         }
 
         private void ViewSelectMenuItemOnClick(object sender, RoutedEventArgs e) {
@@ -137,18 +153,6 @@ namespace Mapping_Tools {
 
         public object GetCurrentView() {
             return DataContext;
-        }
-
-        public void SetCurrentView(object view) {
-            if (DataContext is MappingTool mt) {
-                mt.Deactivate();
-            }
-            if (view is MappingTool nmt) {
-                nmt.Activate();
-            }
-
-            DataContext = view;
-            ViewChanged();
         }
 
         public void SetCurrentMaps(string[] paths) {
