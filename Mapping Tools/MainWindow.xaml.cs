@@ -72,7 +72,7 @@ namespace Mapping_Tools {
             }
 
             Views = new ViewCollection(); // Make a ViewCollection object
-            ToolsMenu.ItemsSource = ViewCollection.GetAllToolTypes().Select(o => {
+            ToolsMenu.ItemsSource = ViewCollection.GetAllToolTypes().Where(o => o.GetCustomAttribute<HiddenToolAttribute>() == null).Select(o => {
                 var item = new MenuItem() {Header = "_" + ViewCollection.GetName(o)};
                 item.Click += ViewSelectMenuItemOnClick;
                 return item;
