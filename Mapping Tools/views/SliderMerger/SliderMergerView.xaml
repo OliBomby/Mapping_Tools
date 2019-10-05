@@ -42,20 +42,24 @@
                 </StackPanel>
                 
                 <TextBox x:Name="LeniencyBox" Width="258" HorizontalAlignment="Left" Text="2" Margin="0,20,0,0"
-                    Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Merge connection leniency"/>
+                    Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Merge connection leniency"
+                    ToolTip="The maximum distance in osu! pixels that an object can be from the end of previous object and still merge."/>
 
                 <ComboBox x:Name="SelectionModeBox" Margin="0,26,0,0" SelectedIndex="0" Cursor="Hand" Width="258" HorizontalAlignment="Left"
-                    Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Object selection mode">
-                    <ComboBoxItem Content="Selected objects" Cursor="Hand"/>
-                    <ComboBoxItem Content="Bookmarked objects" Cursor="Hand"/>
-                    <ComboBoxItem Content="Everything" Cursor="Hand"/>
+                    Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Object selection mode"
+                    ToolTip="How will Slider Merger choose hitobjects to attempt merging. Slider Merger will not always merge all the specified objects, because the distance between every pair of objects must still be within the connection distance leniency.">
+                    <ComboBoxItem Content="Selected objects" Cursor="Hand" ToolTip="Only merge selected hitobjects."/>
+                    <ComboBoxItem Content="Bookmarked objects" Cursor="Hand" ToolTip="Only merge hitobjects that have a bookmark on them."/>
+                    <ComboBoxItem Content="Everything" Cursor="Hand" ToolTip="Try merging on all hitobjects."/>
                 </ComboBox>
 
                 <ComboBox x:Name="ConnectionModeBox" Margin="0,26,0,0" Cursor="Hand" SelectedIndex="0" Width="258" HorizontalAlignment="Left" ItemsSource="{Binding ConnectionModes}"
-                          Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Object connection mode">
+                          Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Object connection mode"
+                          ToolTip="This is how Slider Merger is going to deal with space gaps between hitobjects that it wants to merge.">
                 </ComboBox>
 
-                <CheckBox x:Name="LinearOnLinearBox" Margin="0,26,0,0" Content="Use linear curve type on fully linear merge"></CheckBox>
+                <CheckBox x:Name="LinearOnLinearBox" Margin="0,26,0,0" Content="Use linear curve type on fully linear merge"
+                          ToolTip="This option will make Slider Merger, if possible, use linear curve type and no red anchors for the combined slider(s)."></CheckBox>
             </StackPanel>
 
             <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
