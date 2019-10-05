@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SliderPathStuff;
 using Mapping_Tools.Classes.SystemTools;
@@ -101,6 +102,7 @@ namespace Mapping_Tools.Views {
                         var sp1 = BezierConverter.ConvertToBezier(ho1.SliderPath).ControlPoints;
                         var sp2 = BezierConverter.ConvertToBezier(ho2.SliderPath).ControlPoints;
 
+                        double extraLength = 0;
                         switch (arg.ConnectionMode) {
                             case ConnectionMode.Move:
                                 Move(sp2, sp1.Last() - sp2.First());
@@ -108,6 +110,7 @@ namespace Mapping_Tools.Views {
                             case ConnectionMode.Linear:
                                 sp1.Add(sp1.Last());
                                 sp1.Add(sp2.First());
+                                extraLength = (ho1.CurvePoints.Last() - ho2.Pos).Length;
                                 break;
                         }
 
@@ -124,7 +127,7 @@ namespace Mapping_Tools.Views {
                         }
 
                         var mergedPath = new SliderPath(linearLinear ? PathType.Linear : PathType.Bezier, mergedAnchors.ToArray(),
-                            ho1.PixelLength + ho2.PixelLength);
+                            ho1.PixelLength + ho2.PixelLength + extraLength);
                         ho1.SliderPath = mergedPath;
 
                         beatmap.HitObjects.Remove(ho2);
@@ -134,7 +137,85 @@ namespace Mapping_Tools.Views {
                         slidersMerged++;
                         if (!mergeLast) slidersMerged++;
                         mergeLast = true;
-                    } else {
+                    } else if (ho1.IsSlider && ho2.IsCircle && (ho1.CurvePoints.Last() - ho2.Pos).Length <= arg.Leniency) {
+                        var sp1 = BezierConverter.ConvertToBezier(ho1.SliderPath).ControlPoints;
+
+                        sp1.Add(sp1.Last());
+                        sp1.Add(ho2.Pos);
+                        var extraLength = (ho1.CurvePoints.Last() - ho2.Pos).Length;
+
+                        var mergedAnchors = sp1;
+                        mergedAnchors.Round();
+
+                        var linearLinear = arg.LinearOnLinear && IsLinearBezier(sp1);
+                        if (linearLinear) {
+                            for (var j = 0; j < mergedAnchors.Count - 1; j++) {
+                                if (mergedAnchors[j] != mergedAnchors[j + 1]) continue;
+                                mergedAnchors.RemoveAt(j);
+                                j--;
+                            }
+                        }
+
+                        var mergedPath = new SliderPath(linearLinear ? PathType.Linear : PathType.Bezier, mergedAnchors.ToArray(), ho1.PixelLength + extraLength);
+                        ho1.SliderPath = mergedPath;
+
+                        beatmap.HitObjects.Remove(ho2);
+                        markedObjects.Remove(ho2);
+                        i--;
+
+                        slidersMerged++;
+                        if (!mergeLast) slidersMerged++;
+                        mergeLast = true;
+                    } else if (ho1.IsCircle && ho2.IsSlider && (ho1.Pos - ho2.Pos).Length <= arg.Leniency) {
+                        var sp2 = BezierConverter.ConvertToBezier(ho2.SliderPath).ControlPoints;
+
+                        sp2.Insert(0, sp2.First());
+                        sp2.Insert(0, ho1.Pos);
+                        var extraLength = (ho1.Pos - ho2.Pos).Length;
+
+                        var mergedAnchors = sp2;
+                        mergedAnchors.Round();
+
+                        var linearLinear = arg.LinearOnLinear && IsLinearBezier(sp2);
+                        if (linearLinear) {
+                            for (var j = 0; j < mergedAnchors.Count - 1; j++) {
+                                if (mergedAnchors[j] != mergedAnchors[j + 1]) continue;
+                                mergedAnchors.RemoveAt(j);
+                                j--;
+                            }
+                        }
+
+                        var mergedPath = new SliderPath(linearLinear ? PathType.Linear : PathType.Bezier, mergedAnchors.ToArray(), ho2.PixelLength + extraLength);
+                        ho2.SliderPath = mergedPath;
+
+                        beatmap.HitObjects.Remove(ho1);
+                        markedObjects.Remove(ho1);
+                        i--;
+
+                        slidersMerged++;
+                        if (!mergeLast) slidersMerged++;
+                        mergeLast = true;
+                    } else if (ho1.IsCircle && ho2.IsCircle && (ho1.Pos - ho2.Pos).Length <= arg.Leniency) {
+                        var mergedAnchors = new List<Vector2> {ho1.Pos, ho2.Pos};
+
+                        var mergedPath = new SliderPath(arg.LinearOnLinear ? PathType.Linear : PathType.Bezier, mergedAnchors.ToArray(), (ho1.Pos - ho2.Pos).Length);
+                        ho1.SliderPath = mergedPath;
+                        ho1.IsCircle = false;
+                        ho1.IsSlider = true;
+                        ho1.Repeat = 1;
+                        ho1.EdgeHitsounds = new List<int> {ho1.GetHitsounds(), ho2.GetHitsounds()};
+                        ho1.EdgeSampleSets = new List<SampleSet> {ho1.SampleSet, ho2.SampleSet};
+                        ho1.EdgeAdditionSets = new List<SampleSet> {ho1.AdditionSet, ho2.AdditionSet};
+
+                        beatmap.HitObjects.Remove(ho2);
+                        markedObjects.Remove(ho2);
+                        i--;
+
+                        slidersMerged++;
+                        if (!mergeLast) slidersMerged++;
+                        mergeLast = true;
+                    }
+                    else {
                         mergeLast = false;
                     }
 
