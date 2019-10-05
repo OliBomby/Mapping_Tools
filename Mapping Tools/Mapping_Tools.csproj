@@ -319,6 +319,9 @@
     <Compile Include="Components\Domain\ImportTypeToStringConverter.cs" />
     <Compile Include="Components\Domain\ParsableDoubleListValidationRule.cs" />
     <Compile Include="Components\Domain\DoubleToStringConverter.cs" />
+    <Compile Include="Components\ViewHeaderComponent.xaml.cs">
+      <DependentUpon>ViewHeaderComponent.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Components\HotkeyEditorControl.xaml.cs">
       <DependentUpon>HotkeyEditorControl.xaml</DependentUpon>
     </Compile>
@@ -403,6 +406,10 @@
     <Compile Include="Views\HitsoundStudio\HitsoundLayerImportWindow.xaml.cs">
       <DependentUpon>HitsoundLayerImportWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="Components\ViewHeaderComponent.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Components\HotkeyEditorControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
