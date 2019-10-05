@@ -229,10 +229,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public void Move(Vector2 delta) {
             Pos += delta;
-            if (IsSlider) {
-                for (int i = 0; i < CurvePoints.Count; i++) {
-                    CurvePoints[i] = CurvePoints[i] + delta;
-                }
+            if (!IsSlider) return;
+            for (var i = 0; i < CurvePoints.Count; i++) {
+                CurvePoints[i] = CurvePoints[i] + delta;
             }
         }
 

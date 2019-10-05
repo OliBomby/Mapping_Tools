@@ -7,7 +7,7 @@
              xmlns:cm="clr-namespace:System.ComponentModel;assembly=System"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
-             d:DesignHeight="450" Width="759.5">
+             d:DesignHeight="450" Width="759.5" d:DataContext="{d:DesignData SliderMergerVM}">
     <Grid Name="MasterGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -50,6 +50,12 @@
                     <ComboBoxItem Content="Bookmarked objects" Cursor="Hand"/>
                     <ComboBoxItem Content="Everything" Cursor="Hand"/>
                 </ComboBox>
+
+                <ComboBox x:Name="ConnectionModeBox" Margin="0,26,0,0" Cursor="Hand" SelectedIndex="0" Width="258" HorizontalAlignment="Left" ItemsSource="{Binding ConnectionModes}"
+                          Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Object connection mode">
+                </ComboBox>
+
+                <CheckBox x:Name="LinearOnLinearBox" Margin="0,26,0,0" Content="Use linear curve type on fully linear merge"></CheckBox>
             </StackPanel>
 
             <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
