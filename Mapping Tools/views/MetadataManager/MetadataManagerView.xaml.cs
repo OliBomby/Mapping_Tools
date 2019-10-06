@@ -18,6 +18,10 @@ namespace Mapping_Tools.Views {
 
         public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Metadata Manager Projects");
 
+        public static readonly string ToolName = "Metadata Manager";
+
+        public static readonly string ToolDescription = $@"To save you the time of editing metadata on every individual difficulty, edit metadata in this tool and copy it to multiple diffs anytime.{Environment.NewLine}You can also import metadata from beatmaps, so you can copy metadata from A to B.{Environment.NewLine}Save and load metadata configurations, so you can work on multiple mapsets without hassle.";
+
         public MetadataManagerView() {
             InitializeComponent();
             DataContext = new MetadataManagerVm();

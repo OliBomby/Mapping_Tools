@@ -1,16 +1,17 @@
-﻿using System;
+﻿using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.SystemTools.QuickRun;
+using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Components.TimeLine;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.Tools;
-using Mapping_Tools.Components.TimeLine;
-using Mapping_Tools.Classes.SystemTools;
 
 namespace Mapping_Tools.Views {
-    public partial class CleanerView : MappingTool, IQuickRun {
+    [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
+    public partial class CleanerView : IQuickRun {
         private readonly BackgroundWorker backgroundWorker;
         private bool canRun = true;
         List<double> TimingpointsRemoved;
@@ -20,6 +21,10 @@ namespace Mapping_Tools.Views {
         TimeLine TL;
 
         public event EventHandler RunFinished;
+
+        public static readonly string ToolName = "Map Cleaner";
+
+        public static readonly string ToolDescription = $@"It cleans the current map of useless greenlines and it also lets you do some other stuff regarding the whole map.{Environment.NewLine}Map cleaner cleans useless greenline stuff by storing all the influences of the timingpoints and then removing all the timingpoints and then rebuilding all the timingpoints in a good way. This means the greenlines automatically get resnapped to the objects that use them.";
 
         public CleanerView() {
             InitializeComponent();
@@ -67,8 +72,7 @@ namespace Mapping_Tools.Views {
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
             if (e.Error != null) {
                 MessageBox.Show(string.Format("{0}{1}{2}", e.Error.Message, Environment.NewLine, e.Error.StackTrace), "Error");
-            }
-            else {
+            } else {
                 FillTimeLine();
                 if (e.Result.ToString() != "")
                     MessageBox.Show(e.Result.ToString());

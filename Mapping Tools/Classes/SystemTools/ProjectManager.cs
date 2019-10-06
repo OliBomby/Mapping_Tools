@@ -73,5 +73,11 @@ namespace Mapping_Tools.Classes.SystemTools {
                         x.IsGenericType &&
                         x.GetGenericTypeDefinition() == typeof(ISavable<>));
         }
+
+        public static bool IsSavable(Type type) {
+            return type.GetInterfaces().Any(x =>
+                x.IsGenericType &&
+                x.GetGenericTypeDefinition() == typeof(ISavable<>));
+        }
     }
 }

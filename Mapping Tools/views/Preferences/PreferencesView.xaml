@@ -7,13 +7,8 @@
              xmlns:components="clr-namespace:Mapping_Tools.Components"
              xmlns:syst="clr-namespace:Mapping_Tools.Classes.SystemTools"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" MinWidth="500" MinHeight="600">
-    
-    <UserControl.Resources>
-        <syst:SingleQuickRunEnumToDescriptionValueConverter x:Key="singleConverter"/>
-        <syst:MultipleQuickRunEnumToDescriptionValueConverter x:Key="multipleConverter"/>
-    </UserControl.Resources>
-    
+             d:DesignHeight="450" d:DesignWidth="800" MinWidth="500" MinHeight="600"
+             d:DataContext="{d:DesignData Settings}">
     <Grid>
         <StackPanel Margin="0,0,10,0">
             <TextBlock Foreground="{DynamicResource PrimaryHueMidBrush}" FontSize="40" FontWeight="Bold"><Run Text="Preferences"/></TextBlock>
@@ -92,8 +87,24 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="QuickRun hotkey:" ToolTip="QuickRun let's you quickly run the current tool on the current beatmap."/>
-                    <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Text="BetterSave™ hotkey:" ToolTip="BetterSave saves the current map with proper rounding instead of truncating values."/>
+                    <CheckBox x:Name="SmartQuickRunCheckBox" IsChecked="{Binding SmartQuickRunEnabled}" Margin="15 0 0 0" VerticalAlignment="Center"/>
+
+                    <StackPanel Orientation="Horizontal" IsEnabled="{Binding ElementName=SmartQuickRunCheckBox, Path=IsChecked}">
+                        <TextBlock Text="Single:" VerticalAlignment="Center" Margin="15 0" Style="{StaticResource TogglableTextBlock}"/>
+                        <ComboBox x:Name="SingleQuickRunBox" Width="120" SelectedItem="{Binding SingleQuickRunTool}"/>
+
+                        <TextBlock Text="Multiple:" VerticalAlignment="Center" Margin="15 0" Style="{StaticResource TogglableTextBlock}"/>
+                        <ComboBox x:Name="MultipleQuickRunBox" Width="120" SelectedItem="{Binding MultipleQuickRunTool}"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Width="150" VerticalAlignment="Center" Text="BetterSave™ hotkey:" ToolTip="BetterSave saves the current map with proper rounding instead of truncating values."/>
+                    <components:HotkeyEditorControl Width="150" Hotkey="{Binding BetterSaveHotkey}"/>
+                </StackPanel>
+            </StackPanel>
+
+            <Button Content="Reload hotkeys" Click="Button_Click_3" Width="140" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5 10 0 0" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
 
                     <components:HotkeyEditorControl Grid.Row="0" Grid.Column="1" Hotkey="{Binding QuickRunHotkey}"/>
                     <components:HotkeyEditorControl Grid.Row="1" Grid.Column="1" Hotkey="{Binding BetterSaveHotkey}"/>

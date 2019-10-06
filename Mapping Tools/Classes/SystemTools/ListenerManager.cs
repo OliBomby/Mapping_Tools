@@ -81,7 +81,7 @@ namespace Mapping_Tools.Classes.SystemTools {
             //Console.WriteLine($"Registered hotkey {hotkey.Modifiers}, {hotkey.Key}, {action}");
         }
 
-        static public int ResolveKey(System.Windows.Input.Key key) {
+        public static int ResolveKey(System.Windows.Input.Key key) {
             return System.Windows.Input.KeyInterop.VirtualKeyFromKey(key);
         }
 
@@ -104,58 +104,61 @@ namespace Mapping_Tools.Classes.SystemTools {
             EditorReaderStuff.CoolSave();
         }
 
-        private void SmartQuickRun() {
-            if (!SettingsManager.Settings.SmartQuickRunEnabled) { QuickRunCurrentTool(); return; }
+        private static void SmartQuickRun() {
+            try {
+                if (!SettingsManager.Settings.SmartQuickRunEnabled) { QuickRunCurrentTool(); return; }
 
-            if (EditorReaderStuff.TryGetFullEditorReader(out EditorReader reader)) {
-                int so = reader.hitObjects.Where(o => o.IsSelected).Count();
+                if (!EditorReaderStuff.TryGetFullEditorReader(out var reader)) return;
+                var so = reader.hitObjects.Count(o => o.IsSelected);
                 IQuickRun tool = null;
 
+                if (System.Windows.Application.Current.Dispatcher == null) return;
+
                 System.Windows.Application.Current.Dispatcher.Invoke(() => {
-                    if (so <= 1) {
-                        switch (SettingsManager.Settings.SingleQuickRunTool) {
-                            case SingleQuickRunEnum.Current:
-                                QuickRunCurrentTool();
-                                return;
-                            case SingleQuickRunEnum.Cleaner:
-                                tool = (IQuickRun)MainWindow.AppWindow.Views.GetMapCleaner();
-                                break;
-                            case SingleQuickRunEnum.Completionator:
-                                tool = (IQuickRun)MainWindow.AppWindow.Views.GetSliderCompletionator();
-                                break;
+                    if (so == 1) {
+                        if (SettingsManager.Settings.SingleQuickRunTool == "<Current Tool>") {
+                            QuickRunCurrentTool();
+                            return;
                         }
-                    } else {
-                        switch (SettingsManager.Settings.MultipleQuickRunTool) {
-                            case MultipleQuickRunEnum.Current:
-                                QuickRunCurrentTool();
-                                return;
-                            case MultipleQuickRunEnum.Cleaner:
-                                tool = (IQuickRun)MainWindow.AppWindow.Views.GetMapCleaner();
-                                break;
-                            case MultipleQuickRunEnum.Completionator:
-                                tool = (IQuickRun)MainWindow.AppWindow.Views.GetSliderCompletionator();
-                                break;
-                            case MultipleQuickRunEnum.Merger:
-                                tool = (IQuickRun)MainWindow.AppWindow.Views.GetSliderMerger();
-                                break;
+
+                        if (!(MainWindow.AppWindow.Views.GetView(SettingsManager.Settings.SingleQuickRunTool) is
+                            IQuickRun singleTool)) return;
+                        tool = singleTool;
+                    } else if (so > 1) {
+                        if (SettingsManager.Settings.MultipleQuickRunTool == "<Current Tool>") {
+                            QuickRunCurrentTool();
+                            return;
                         }
+
+                        if (!(MainWindow.AppWindow.Views.GetView(SettingsManager.Settings.MultipleQuickRunTool) is
+                            IQuickRun multiTool)) return;
+                        tool = multiTool;
                     }
+
+                    if (tool == null) return;
 
                     tool.RunFinished -= Reload;
                     tool.RunFinished += Reload;
                     tool.QuickRun();
                 });
+            } catch (Exception) {
+                // Ignored
             }
         }
 
-        private void QuickRunCurrentTool() {
-            System.Windows.Application.Current.Dispatcher.Invoke(() => {
-                if (MainWindow.AppWindow.GetCurrentView() is IQuickRun tool) {
+        private static void QuickRunCurrentTool() {
+            try {
+                if (System.Windows.Application.Current.Dispatcher == null) return;
+
+                System.Windows.Application.Current.Dispatcher.Invoke(() => {
+                    if (!(MainWindow.AppWindow.GetCurrentView() is IQuickRun tool)) return;
                     tool.RunFinished -= Reload;
                     tool.RunFinished += Reload;
                     tool.QuickRun();
-                }
-            });
+                });
+            } catch (Exception) {
+                // Ignored
+            }
         }
 
         [DllImport("user32.dll")]
@@ -164,21 +167,21 @@ namespace Mapping_Tools.Classes.SystemTools {
         [DllImport("user32.dll")]
         private static extern bool SetForegroundWindow(IntPtr hWnd);
 
-        private void Reload(object sender, EventArgs e) {
-            if (((RunToolCompletedEventArgs)e).NeedReload && SettingsManager.Settings.AutoReload) {
-                var proc = System.Diagnostics.Process.GetProcessesByName("osu!").FirstOrDefault();
-                ;
-                if (proc != null) {
-                    var oldHandle = GetForegroundWindow();
-                    if (oldHandle != proc.MainWindowHandle) {
-                        SetForegroundWindow(proc.MainWindowHandle);
-                        Thread.Sleep(300);
-                    }
+        private static void Reload(object sender, EventArgs e) {
+            if (!((RunToolCompletedEventArgs) e).NeedReload || !SettingsManager.Settings.AutoReload) return;
+
+            var proc = System.Diagnostics.Process.GetProcessesByName("osu!").FirstOrDefault();
+            
+            if (proc != null) {
+                var oldHandle = GetForegroundWindow();
+                if (oldHandle != proc.MainWindowHandle) {
+                    SetForegroundWindow(proc.MainWindowHandle);
+                    Thread.Sleep(300);
                 }
-                SendKeys.SendWait("^{L 10}");
-                Thread.Sleep(100);
-                SendKeys.SendWait("{ENTER}");
             }
+            SendKeys.SendWait("^{L 10}");
+            Thread.Sleep(100);
+            SendKeys.SendWait("{ENTER}");
         }
 
         private void InitFsWatcher() {

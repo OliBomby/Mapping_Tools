@@ -16,8 +16,12 @@ namespace Mapping_Tools.Views {
     /// <summary>
     /// Interactielogica voor TimingHelperView.xaml
     /// </summary>
-    public partial class TimingHelperView : MappingTool {
+    public partial class TimingHelperView {
         private readonly BackgroundWorker backgroundWorker;
+
+        public static readonly string ToolName = "Timing Helper";
+
+        public static readonly string ToolDescription = $@"Timing Helper is meant to speed up your timing job by placing the redlines for you. You only have to tell it where exactly all the sounds are.{Environment.NewLine}What you do is place 'markers' exactly on the correct timing of sounds. These markers can be hit objects, bookmarks, greenlines and redlines.{Environment.NewLine}Timing Helper will then adjust BPM and/or add redlines to make every marker be snapped.";
 
         public TimingHelperView() {
             InitializeComponent();

@@ -17,7 +17,7 @@ namespace Mapping_Tools.Views {
     /// <summary>
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
-    public partial class HitsoundStudioView : MappingTool, ISavable<HitsoundStudioVM> {
+    public partial class HitsoundStudioView : ISavable<HitsoundStudioVM> {
         private readonly BackgroundWorker backgroundWorker;
         private HitsoundStudioVM Settings;
 
@@ -29,6 +29,10 @@ namespace Mapping_Tools.Views {
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "hsstudioproject.json");
 
         public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Hitsound Studio Projects");
+
+        public static readonly string ToolName = "Hitsound Studio";
+
+        public static readonly string ToolDescription = $@"Hitsound Studio is the tool that lets you import data from multiple outside sources and convert them to osu! standard hitsounds in the form of a hitsounding difficulty that can you copy to other beatmaps.{Environment.NewLine}It represents hitsounds as a list of layers (hitsound layers). One layer contains a unique sound, the sampleset and hitsound that accompany that sound and a list of times that sound has to be played.";
 
         public HitsoundStudioView() {
             InitializeComponent();

@@ -1,28 +1,26 @@
-﻿using System;
+﻿using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.SystemTools.QuickRun;
+using Mapping_Tools.Classes.Tools;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.SliderPathStuff;
-using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.Tools;
-using Mapping_Tools.Views.Standard;
 
 namespace Mapping_Tools.Views {
     /// <summary>
     /// Interaktionslogik für UserControl1.xaml
     /// </summary>
-    public partial class SliderCompletionatorView : MappingTool, IQuickRun {
+    [SmartQuickRunUsage(SmartQuickRunTargets.AnySelection)]
+    public partial class SliderCompletionatorView : IQuickRun {
         private readonly BackgroundWorker backgroundWorker;
         private bool canRun = true;
 
         public event EventHandler RunFinished;
+
+        public static readonly string ToolName = "Slider Completionator";
+
+        public static readonly string ToolDescription = $@"Change the length and duration of marked sliders and this tool will automatically handle the SV for you.";
 
         public SliderCompletionatorView() {
             InitializeComponent();

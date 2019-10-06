@@ -90,22 +90,11 @@
                         <MenuItem Header="_Generate backup" Click="SaveBackup"/>
                         <MenuItem Header="_BetterSave™ current beatmap" Click="CoolSave"/>
                     </MenuItem>
-                    <MenuItem Height="31" Header="_Tools" Padding="12,0,0,0" MinWidth="65">
-                        <MenuItem Header="_Map Cleaner" Click="LoadCleaner"/>
-                        <MenuItem Header="_Metadata Manager" Click="LoadMetadataManager"/>
-                        <MenuItem Header="_Property Transformer" Click="LoadPropertyTransformer"/>
-                        <MenuItem Header="_Snapping Tools" Click="LoadSnappingTools"/>
-                        <MenuItem Header="_Slider Merger" Click="LoadMerger"/>
-                        <MenuItem Header="_Slider Completionator" Click="LoadCompletionator"/>
-                        <MenuItem Header="_Timing Copier" Click="LoadTimingCopier"/>
-                        <MenuItem Header="_Timing Helper" Click="LoadTimingHelper"/>
-                        <MenuItem Header="_Hitsound Copier" Click="LoadHSCopier"/>
-                        <MenuItem Header="_Hitsound Studio" Click="LoadHSStudio"/>
-                        <MenuItem Header="_Hitsound Preview Helper" Click="LoadHSPreviewHelper"/>
+                    <MenuItem x:Name="ToolsMenu" Height="31" Header="_Tools" Padding="12,0,0,0" MinWidth="65">
                     </MenuItem>
                     <MenuItem Height="31" Header="_Options" Padding="12,0,0,0" MinWidth="80">
-                        <MenuItem Header="_Get started" Click="LoadStartup"/>
-                        <MenuItem Header="_Preferences" Click="LoadPreferences"/>
+                        <MenuItem Header="_Get started" Click="ViewSelectMenuItemOnClick"/>
+                        <MenuItem Header="_Preferences" Click="ViewSelectMenuItemOnClick"/>
                         <MenuItem Header="_Open backups folder" Click="OpenBackups"/>
                     </MenuItem>
                     <MenuItem Height="31" Header="_About" Padding="12,0,0,0" MinWidth="67">

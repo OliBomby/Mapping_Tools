@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 
 namespace Mapping_Tools.Views {
-    public class MappingTool : UserControl {
+    public abstract class MappingTool : UserControl {
         public static readonly DependencyProperty IsActiveProperty =
             DependencyProperty.Register(nameof(IsActive), typeof(bool), typeof(MappingTool),
                 new FrameworkPropertyMetadata(default(bool), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));

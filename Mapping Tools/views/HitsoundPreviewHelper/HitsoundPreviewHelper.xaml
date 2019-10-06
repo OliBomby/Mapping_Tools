@@ -83,29 +83,29 @@
                             </DataGridCheckBoxColumn.Header>
                         </DataGridCheckBoxColumn>
                         <materialDesign:MaterialDataGridTextColumn
-                            Binding="{Binding Name}"
+                            Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
                             Header="Name"
                             EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}" />
                         <materialDesign:MaterialDataGridTextColumn
-                            Binding="{Binding Filename}"
+                            Binding="{Binding Filename, UpdateSourceTrigger=PropertyChanged}"
                             Header="Filename"
                             EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}" />
                         <materialDesign:MaterialDataGridTextColumn
-                            Binding="{Binding XPos, Converter={StaticResource D2SConverter}, ConverterParameter=-1}"
+                            Binding="{Binding XPos, Converter={StaticResource D2SConverter}, ConverterParameter=-1, UpdateSourceTrigger=PropertyChanged}"
                             Header="X position"
                             EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"/>
                         <materialDesign:MaterialDataGridTextColumn
-                            Binding="{Binding YPos, Converter={StaticResource D2SConverter}, ConverterParameter=-1}"
+                            Binding="{Binding YPos, Converter={StaticResource D2SConverter}, ConverterParameter=-1, UpdateSourceTrigger=PropertyChanged}"
                             Header="Y position"
                             EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"/>
                         <!-- use custom combo box column to get better combos. Use ItemsSourceBinding as your binding template to be applied to each combo -->
                         <materialDesign:MaterialDataGridComboBoxColumn
                             Header="SampleSet"
-                            SelectedValueBinding="{Binding SampleSet, Converter={StaticResource SS2SConverter}}"
+                            SelectedValueBinding="{Binding SampleSet, Converter={StaticResource SS2SConverter}, UpdateSourceTrigger=PropertyChanged}"
                             ItemsSourceBinding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}, Path=DataContext.SampleSets}" />
                         <materialDesign:MaterialDataGridComboBoxColumn
                             Header="Hitsound"
-                            SelectedValueBinding="{Binding Hitsound, Converter={StaticResource HS2SConverter}}"
+                            SelectedValueBinding="{Binding Hitsound, Converter={StaticResource HS2SConverter}, UpdateSourceTrigger=PropertyChanged}"
                             ItemsSourceBinding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}, Path=DataContext.Hitsounds}" />
                     </DataGrid.Columns>
                 </DataGrid>
