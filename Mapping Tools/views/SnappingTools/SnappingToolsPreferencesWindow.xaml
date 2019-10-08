@@ -42,7 +42,6 @@
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Hidden">
             <Border Padding="10">
                 <StackPanel>
-
                     <ItemsControl ItemsSource="{Binding RelevantObjectPreferences}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -94,10 +93,18 @@
                                     <TextBox Text="{Binding OffsetBottom}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Bottom offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
                                 </StackPanel>
                             </ListBoxItem>
+                            
                             <ListBoxItem>
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Width="100" Margin="0 0 0 6" Text="Debug" VerticalAlignment="Center" ToolTip="Visualize boundaries of the overlay box for debugging purposes."/>
                                     <ToggleButton IsChecked="{Binding DebugEnabled}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignSwitchToggleButton}"/>
+                                </StackPanel>
+                            </ListBoxItem>
+                            
+                            <ListBoxItem>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Width="100" Margin="0 0 0 6" Text="Press-to-View" VerticalAlignment="Center" ToolTip="Visualize virtual objects only when the Activation Key is pressed."/>
+                                    <ToggleButton IsChecked="{Binding PressToViewEnabled}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignSwitchToggleButton}"/>
                                 </StackPanel>
                             </ListBoxItem>
                         </ListBox>
