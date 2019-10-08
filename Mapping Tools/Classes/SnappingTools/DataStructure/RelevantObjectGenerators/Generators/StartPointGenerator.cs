@@ -8,7 +8,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         public override string Tooltip => "Generates virtual points on slider heads and circles.";
         public override GeneratorType GeneratorType => GeneratorType.Generators;
 
-        [RelevantObjectGenerator(typeof(RelevantHitObject), typeof(RelevantPoint))]
+        [RelevantObjectGenerator]
         public RelevantPoint GetRelevantObjects(RelevantHitObject ho) {
             return new RelevantPoint(ho.HitObject.Pos);
         }
