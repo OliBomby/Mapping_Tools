@@ -161,6 +161,7 @@ namespace Mapping_Tools.Classes.SystemTools {
             OverrideOsuSave = false;
             AutoReload = true;
             SmartQuickRunEnabled = true;
+            NoneQuickRunTool = "<Current Tool>";
             SingleQuickRunTool = "<Current Tool>";
             MultipleQuickRunTool = "<Current Tool>";
         }
