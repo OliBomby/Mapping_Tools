@@ -102,6 +102,16 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
         }
 
+        private string _noneQuickRunTool;
+        public string NoneQuickRunTool {
+            get => _noneQuickRunTool;
+            set {
+                if (_noneQuickRunTool == value) return;
+                _noneQuickRunTool = value;
+                OnPropertyChanged();
+            }
+        }
+
         private string _singleQuickRunTool;
         public string SingleQuickRunTool {
             get => _singleQuickRunTool;

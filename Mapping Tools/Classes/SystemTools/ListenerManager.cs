@@ -115,23 +115,20 @@ namespace Mapping_Tools.Classes.SystemTools {
                 if (System.Windows.Application.Current.Dispatcher == null) return;
 
                 System.Windows.Application.Current.Dispatcher.Invoke(() => {
-                    if (so == 1) {
-                        if (SettingsManager.Settings.SingleQuickRunTool == "<Current Tool>") {
-                            QuickRunCurrentTool();
-                            return;
-                        }
+                    if (so == 0) {
+                        if (SettingsManager.Settings.NoneQuickRunTool == "<Current Tool>") { QuickRunCurrentTool(); return; }
+                        if (!(MainWindow.AppWindow.Views.GetView(SettingsManager.Settings.NoneQuickRunTool) is IQuickRun noneTool)) return;
 
-                        if (!(MainWindow.AppWindow.Views.GetView(SettingsManager.Settings.SingleQuickRunTool) is
-                            IQuickRun singleTool)) return;
+                        tool = noneTool;
+                    } else if (so == 1) {
+                        if (SettingsManager.Settings.SingleQuickRunTool == "<Current Tool>") { QuickRunCurrentTool(); return; }
+                        if (!(MainWindow.AppWindow.Views.GetView(SettingsManager.Settings.SingleQuickRunTool) is IQuickRun singleTool)) return;
+
                         tool = singleTool;
                     } else if (so > 1) {
-                        if (SettingsManager.Settings.MultipleQuickRunTool == "<Current Tool>") {
-                            QuickRunCurrentTool();
-                            return;
-                        }
+                        if (SettingsManager.Settings.MultipleQuickRunTool == "<Current Tool>") { QuickRunCurrentTool(); return; } 
+                        if (!(MainWindow.AppWindow.Views.GetView(SettingsManager.Settings.MultipleQuickRunTool) is IQuickRun multiTool)) return;
 
-                        if (!(MainWindow.AppWindow.Views.GetView(SettingsManager.Settings.MultipleQuickRunTool) is
-                            IQuickRun multiTool)) return;
                         tool = multiTool;
                     }
 

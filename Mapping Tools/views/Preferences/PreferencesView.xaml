@@ -75,6 +75,9 @@
                     <CheckBox x:Name="SmartQuickRunCheckBox" IsChecked="{Binding SmartQuickRunEnabled}" Margin="15 0 0 0" VerticalAlignment="Center"/>
 
                     <StackPanel Orientation="Horizontal" IsEnabled="{Binding ElementName=SmartQuickRunCheckBox, Path=IsChecked}">
+                        <TextBlock Text="None:" VerticalAlignment="Center" Margin="15 0" Style="{StaticResource TogglableTextBlock}"/>
+                        <ComboBox x:Name="NoneQuickRunBox" Width="120" SelectedItem="{Binding NoneQuickRunTool}"/>
+
                         <TextBlock Text="Single:" VerticalAlignment="Center" Margin="15 0" Style="{StaticResource TogglableTextBlock}"/>
                         <ComboBox x:Name="SingleQuickRunBox" Width="120" SelectedItem="{Binding SingleQuickRunTool}"/>
 
