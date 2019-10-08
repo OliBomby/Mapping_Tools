@@ -72,7 +72,7 @@
                     <TextBlock Width="150" VerticalAlignment="Center" Text="QuickRun hotkey:" ToolTip="QuickRun lets you quickly run the current tool on the current beatmap."/>
                     <components:HotkeyEditorControl Width="150" Hotkey="{Binding QuickRunHotkey}"/>
 
-                    <CheckBox x:Name="SmartQuickRunCheckBox" IsChecked="{Binding SmartQuickRunEnabled}" Margin="15 0 0 0" VerticalAlignment="Center"/>
+                    <CheckBox x:Name="SmartQuickRunCheckBox" IsChecked="{Binding SmartQuickRunEnabled}" Margin="15 0 0 0" VerticalAlignment="Center" ToolTip="Enable SmartQuickRun to modify the behavior of QuickRun based on the number of objects currently selected on the editor."/>
 
                     <StackPanel Orientation="Horizontal" IsEnabled="{Binding ElementName=SmartQuickRunCheckBox, Path=IsChecked}">
                         <TextBlock Text="None:" VerticalAlignment="Center" Margin="15 0" Style="{StaticResource TogglableTextBlock}"/>
