@@ -34,11 +34,26 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
             // Because hitobject is new, you only need to generate the combinations of the objects without the new hitobject
             // and then add the hitobect to every combination
 
-            // I use dependencies.Length - 1 because new hitobject satisfies one of the dependencies
+            // Get a list of dependencies without the type of relevantObject, since that one will be added afterwards
+            var neededCombinations = dependencies.ToList();
+            if (!neededCombinations.Remove(relevantObject.GetType())) {
+                // If relevantObject is not in the dependencies then this generator doesn't want to do anything with this new relevantObject
+                return new object[0][];
+            }
+
+            // Count how many of every type are in the neededCombinations
+            var neededCombinationsCount = new Dictionary<Type, int>();
+            foreach (var type in neededCombinations) {
+                if (neededCombinationsCount.ContainsKey(type)) {
+                    neededCombinationsCount[type] += 1;
+                } else {
+                    neededCombinationsCount[type] = 1;
+                }
+            }
+
             // I also assume all the types in dependencies are of RelevantHitObject
-            var combinations = CombinationsRecursion(
-                relevantObjectCollection.Objects.Except(new[] { relevantObject }).ToArray(),
-                dependencies.Length - 1);
+            var b = relevantObjectCollection.Objects.Except(new[] {relevantObject}).ToArray();
+            var combinations = neededCombinationsCount.Select(o => CombinationsRecursion(b.OfType<RelevantCircle>().ToArray(), o.Value));
 
             // Add the new hitobject to every combination
             var parametersList = combinations.Select(o => o.Concat(new[] { relevantObject }).ToArray());
