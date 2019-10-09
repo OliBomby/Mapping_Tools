@@ -1,6 +1,7 @@
 ﻿using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectCollection;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorCollection;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
     /// <summary>

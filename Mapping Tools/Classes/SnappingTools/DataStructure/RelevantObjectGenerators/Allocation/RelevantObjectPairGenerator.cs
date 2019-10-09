@@ -30,6 +30,13 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
             return parametersList;
         }
 
+        /// <summary>
+        /// Generates all combinations necessary for an array of dependencies and a newly added relevant object.
+        /// </summary>
+        /// <param name="dependencies">Array of types indicating which types go in the generator.</param>
+        /// <param name="relevantObjectCollection">All the relevant objects that are relevant to this generator.</param>
+        /// <param name="relevantObject">The newly added relevant object.</param>
+        /// <returns></returns>
         public static IEnumerable<object[]> GetParametersList(Type[] dependencies, RelevantObjectCollection.RelevantObjectCollection relevantObjectCollection, RelevantObject.RelevantObject relevantObject) {
             // Because hitobject is new, you only need to generate the combinations of the objects without the new hitobject
             // and then add the hitobect to every combination
