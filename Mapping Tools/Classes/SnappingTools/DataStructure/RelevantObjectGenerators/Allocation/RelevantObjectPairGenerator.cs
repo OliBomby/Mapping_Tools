@@ -66,9 +66,17 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
             }
 
             var combinations = neededCombinationsCount.Select(o => CombinationsRecursion(typedCollection[o.Key].ToArray(), o.Value));
+            /*
+             * [[combi1, combi2, combi3], [combi4, combi5, combi6], [combi7, combi8]]
+             * to
+             * [[1+4+7], [1+4+8], 1+5+7, 1+5+8, 1+6+7, 1+6+8, 2+4+7, 2+4+8,...]
+             */
 
-            // Add the new hitobject to every combination
-            var parametersList = combinations.Select(o => o.Concat(new[] { relevantObject }).ToArray());
+            var enumerable = combinations as IEnumerable<IRelevantObject[]>[] ?? combinations.ToArray();
+            var thingy = CartesianProduct(enumerable).Select(o => o.SelectMany(x => x));
+
+            // Add the new relevantObject to every combination
+            var parametersList = thingy.Select(o => o.Concat(new[] { relevantObject }).ToArray());
 
             return parametersList;
         }
