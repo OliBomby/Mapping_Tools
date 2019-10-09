@@ -16,7 +16,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         /// <returns>Enumerable of object array where the objects in the object array have the types specified in dependencies</returns>
         public static IEnumerable<object[]> GetParametersList(Type[] dependencies, HitObjectCollection hitObjectCollection, RelevantHitObject hitObject) {
             // Because hitobject is new, you only need to generate the combinations of the objects without the new hitobject
-            // and then add the hitobect to every combination
+            // and then add the hitobject to every combination
 
             // I use dependencies.Length - 1 because new hitobject satisfies one of the dependencies
             // I also assume all the types in dependencies are of RelevantHitObject
@@ -38,8 +38,8 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         /// <param name="relevantObject">The newly added relevant object.</param>
         /// <returns></returns>
         public static IEnumerable<object[]> GetParametersList(Type[] dependencies, RelevantObjectCollection.RelevantObjectCollection relevantObjectCollection, RelevantObject.RelevantObject relevantObject) {
-            // Because hitobject is new, you only need to generate the combinations of the objects without the new hitobject
-            // and then add the hitobect to every combination
+            // Because relevantObject is new, you only need to generate the combinations of the objects without the new relevant object
+            // and then add the relevantObject to every combination
 
             // Get a list of dependencies without the type of relevantObject, since that one will be added afterwards
             var neededCombinations = dependencies.ToList();
