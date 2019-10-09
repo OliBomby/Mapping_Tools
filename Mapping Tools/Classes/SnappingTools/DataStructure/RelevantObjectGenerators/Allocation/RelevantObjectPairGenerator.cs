@@ -51,9 +51,21 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
                 }
             }
 
-            // I also assume all the types in dependencies are of RelevantHitObject
+            // Collection without the new relevantObject
             var b = relevantObjectCollection.Objects.Except(new[] {relevantObject}).ToArray();
-            var combinations = neededCombinationsCount.Select(o => CombinationsRecursion(b.OfType<RelevantCircle>().ToArray(), o.Value));
+
+            // Seperate the collection by type
+            var typedCollection = new Dictionary<Type, List<IRelevantObject>>();
+            foreach (var obj in b) {
+                var type = obj.GetType();
+                if (typedCollection.ContainsKey(type)) {
+                    typedCollection[type].Add(obj);
+                } else {
+                    typedCollection[type] = new List<IRelevantObject> {obj};
+                }
+            }
+
+            var combinations = neededCombinationsCount.Select(o => CombinationsRecursion(typedCollection[o.Key].ToArray(), o.Value));
 
             // Add the new hitobject to every combination
             var parametersList = combinations.Select(o => o.Concat(new[] { relevantObject }).ToArray());
