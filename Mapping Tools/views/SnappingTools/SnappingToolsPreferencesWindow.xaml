@@ -99,14 +99,26 @@
 
                             <ListBoxItem>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Width="100" Margin="0 0 0 6" Text="Behavior" VerticalAlignment="Center" ToolTip="Options to customize the behavior of SnappingTools."/>
+                                    <TextBlock Width="100" Margin="0 0 0 6" Text="Downkey:" VerticalAlignment="Center" ToolTip="Customize what gets displayed when the Activation Key is pressed."/>
                                     <StackPanel>
-                                        <RadioButton IsChecked="{Binding Behavior, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:Behavior.Default}}"
-                                                     Content="Default" ToolTip="Default behavior. Display all virtual objects at all times."/>
-                                        <RadioButton IsChecked="{Binding Behavior, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:Behavior.PressToViewEverything}}"
-                                                     Content="Press-To-View" ToolTip="Display virtual objects only when the Activation Key is pressed."/>
-                                        <RadioButton IsChecked="{Binding Behavior, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:Behavior.PressToViewParentsOnly}}"
-                                                     Content="Press-To-View Parents Only" ToolTip="Display only the object the cursor is currently snapping to and its parents."/>
+                                        <RadioButton IsChecked="{Binding KeyDownViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:ViewMode.Everything}}"
+                                                     Content="Everything" ToolTip="Default behavior. Display all virtual objects when the Activation Key is pressed."/>
+                                        <RadioButton IsChecked="{Binding KeyDownViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:ViewMode.ParentsOnly}}"
+                                                     Content="Parents Only" ToolTip="Display the object the cursor is currently snapping to and its parents."/>
+                                        <RadioButton IsChecked="{Binding KeyDownViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:ViewMode.Nothing}}"
+                                                     Content="Nothing" ToolTip="Do not display anything even if the Activation Key is pressed."/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Width="100" Margin="0 0 0 6" Text="Upkey:" VerticalAlignment="Center" ToolTip="Customize what gets displayed when the Activation Key is not pressed."/>
+                                    <StackPanel>
+                                        <RadioButton IsChecked="{Binding KeyUpViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:ViewMode.Everything}}"
+                                                     Content="Everything" ToolTip="Default behavior. Display all virtual objects even if the Activation Key is not pressed."/>
+                                        <RadioButton IsChecked="{Binding KeyUpViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:ViewMode.Nothing}}"
+                                                     Content="Nothing" ToolTip="Do not display anything if the Activation Key is not pressed."/>
                                     </StackPanel>
                                 </StackPanel>
                             </ListBoxItem>
