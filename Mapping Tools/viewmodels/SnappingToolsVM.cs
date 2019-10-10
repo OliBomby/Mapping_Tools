@@ -83,43 +83,8 @@ namespace Mapping_Tools.Viewmodels {
             Active
         }
 
-        private ViewMode _keyDownView {
-            get {
-                switch (Preferences.Behavior) {
-                    case Behavior.Default:
-                        return ViewMode.Everything;
-                    case Behavior.PressToViewEverything:
-                        return ViewMode.Everything;
-                    case Behavior.PressToViewParentsOnly:
-                        return ViewMode.ParentsOnly;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-        }
-        private ViewMode _keyUpView {
-            get {
-                switch (Preferences.Behavior) {
-                    case Behavior.Default:
-                        return ViewMode.Everything;
-                    case Behavior.PressToViewEverything:
-                        return ViewMode.Nothing;
-                    case Behavior.PressToViewParentsOnly:
-                        return ViewMode.Nothing;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-        }
-
-        private enum ViewMode {
-            Everything,
-            ParentsOnly,
-            Nothing
-        }
-
         private bool HotkeyRedrawsOverlay {
-            get => Preferences.Behavior == Behavior.PressToViewEverything || Preferences.Behavior == Behavior.PressToViewParentsOnly;
+            get => Preferences.KeyDownViewMode != Preferences.KeyUpViewMode;
         }
 
         public SnappingToolsVm() {
@@ -186,7 +151,7 @@ namespace Mapping_Tools.Viewmodels {
 
         private void OnDraw(object sender, DrawingContext context) {
             if (IsHotkeyDown(Preferences.SnapHotkey)) {
-                switch (_keyDownView) {
+                switch (Preferences.KeyDownViewMode) {
                     case ViewMode.Everything:
                         foreach (var obj in RelevantObjects)
                             obj.DrawYourself(context, _coordinateConverter, Preferences);
@@ -197,13 +162,11 @@ namespace Mapping_Tools.Viewmodels {
                         break;
                 }
             } else {
-                switch (_keyUpView) {
+                switch (Preferences.KeyUpViewMode) {
                     case ViewMode.Everything:
                         foreach (var obj in RelevantObjects)
                             obj.DrawYourself(context, _coordinateConverter, Preferences);
                         break;
-                    case ViewMode.ParentsOnly:
-                        throw new NotImplementedException();
                     case ViewMode.Nothing:
                         break;
                 }

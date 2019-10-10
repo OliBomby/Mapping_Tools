@@ -18,7 +18,8 @@ namespace Mapping_Tools.Classes.SnappingTools {
         private double offsetRight;
         private double offsetBottom;
         private bool debugEnabled;
-        private Behavior behavior;
+        private ViewMode keyDownViewMode;
+        private ViewMode keyUpViewMode;
         #endregion
 
         public List<RelevantObjectPreferences> RelevantObjectPreferences {
@@ -59,11 +60,15 @@ namespace Mapping_Tools.Classes.SnappingTools {
             set => Set(ref debugEnabled, value);
         }
 
-        public Behavior Behavior {
-            get => behavior;
-            set => Set(ref behavior, value);
+        public ViewMode KeyDownViewMode {
+            get => keyDownViewMode;
+            set => Set(ref keyDownViewMode, value);
         }
 
+        public ViewMode KeyUpViewMode {
+            get => keyUpViewMode;
+            set => Set(ref keyUpViewMode, value);
+        }
         #endregion
 
         #region helper methods
@@ -119,7 +124,8 @@ namespace Mapping_Tools.Classes.SnappingTools {
             offsetRight = 0;
             offsetBottom = 1;
             debugEnabled = false;
-            behavior = Behavior.Default;
+            keyDownViewMode = ViewMode.Everything;
+            keyUpViewMode = ViewMode.Everything;
         }
         #endregion
 
@@ -131,9 +137,9 @@ namespace Mapping_Tools.Classes.SnappingTools {
         }
     }
 
-    public enum Behavior {
-        Default,
-        PressToViewEverything,
-        PressToViewParentsOnly,
+    public enum ViewMode {
+        Everything,
+        ParentsOnly,
+        Nothing
     }
 }
