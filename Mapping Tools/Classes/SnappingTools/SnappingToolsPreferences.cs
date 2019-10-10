@@ -18,7 +18,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
         private double offsetRight;
         private double offsetBottom;
         private bool debugEnabled;
-        private bool pressToViewEnabled;
+        private Behavior behavior;
         #endregion
 
         public List<RelevantObjectPreferences> RelevantObjectPreferences {
@@ -59,10 +59,11 @@ namespace Mapping_Tools.Classes.SnappingTools {
             set => Set(ref debugEnabled, value);
         }
 
-        public bool PressToViewEnabled {
-            get => pressToViewEnabled;
-            set => Set(ref pressToViewEnabled, value);
+        public Behavior Behavior {
+            get => behavior;
+            set => Set(ref behavior, value);
         }
+
         #endregion
 
         #region helper methods
@@ -118,7 +119,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
             offsetRight = 0;
             offsetBottom = 1;
             debugEnabled = false;
-            pressToViewEnabled = false;
+            behavior = Behavior.Default;
         }
         #endregion
 
@@ -128,5 +129,11 @@ namespace Mapping_Tools.Classes.SnappingTools {
                 try { prop.SetValue(other, prop.GetValue(this)); } catch { }
             }
         }
+    }
+
+    public enum Behavior {
+        Default,
+        PressToViewEverything,
+        PressToViewParentsOnly,
     }
 }
