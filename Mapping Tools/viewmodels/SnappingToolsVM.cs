@@ -188,9 +188,8 @@ namespace Mapping_Tools.Viewmodels {
             if (IsHotkeyDown(Preferences.SnapHotkey)) {
                 switch (_keyDownView) {
                     case ViewMode.Everything:
-                        foreach (var obj in RelevantObjects) {
+                        foreach (var obj in RelevantObjects)
                             obj.DrawYourself(context, _coordinateConverter, Preferences);
-                        }
                         break;
                     case ViewMode.ParentsOnly:
                         throw new NotImplementedException();
@@ -200,9 +199,8 @@ namespace Mapping_Tools.Viewmodels {
             } else {
                 switch (_keyUpView) {
                     case ViewMode.Everything:
-                        foreach (var obj in RelevantObjects) {
+                        foreach (var obj in RelevantObjects)
                             obj.DrawYourself(context, _coordinateConverter, Preferences);
-                        }
                         break;
                     case ViewMode.ParentsOnly:
                         throw new NotImplementedException();
@@ -448,7 +446,7 @@ namespace Mapping_Tools.Viewmodels {
             // System.Windows.Forms.Cursor.Position = new Point();
             var cursorPoint = System.Windows.Forms.Cursor.Position;
             // CONVERT THIS CURSOR POSITION TO EDITOR POSITION
-            Vector2 cursorPos = _coordinateConverter.ScreenToEditorCoordinate(new Vector2(cursorPoint.X, cursorPoint.Y));
+            var cursorPos = _coordinateConverter.ScreenToEditorCoordinate(new Vector2(cursorPoint.X, cursorPoint.Y));
 
             if (RelevantObjects.Count == 0)
                 return;
