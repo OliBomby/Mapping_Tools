@@ -3,6 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Mapping_Tools.Classes.SnappingTools"
+        xmlns:components="clr-namespace:Mapping_Tools.Components.Domain"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         Title="Snapping Tools Preferences" Height="500" Width="570" MinWidth="575" MinHeight="360"
@@ -24,6 +26,7 @@
  
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="VisibleIfTrueConverter" />
+        <components:EnumToBoolConverter x:Key="EnumToBoolConverter" />
     </Window.Resources>
 
     <Grid>
@@ -42,7 +45,6 @@
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Hidden">
             <Border Padding="10">
                 <StackPanel>
-
                     <ItemsControl ItemsSource="{Binding RelevantObjectPreferences}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -94,6 +96,21 @@
                                     <TextBox Text="{Binding OffsetBottom}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Bottom offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
                                 </StackPanel>
                             </ListBoxItem>
+
+                            <ListBoxItem>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Width="100" Margin="0 0 0 6" Text="Behavior" VerticalAlignment="Center" ToolTip="Options to customize the behavior of SnappingTools."/>
+                                    <StackPanel>
+                                        <RadioButton IsChecked="{Binding Behavior, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:Behavior.Default}}"
+                                                     Content="Default" ToolTip="Default behavior. Display all virtual objects at all times."/>
+                                        <RadioButton IsChecked="{Binding Behavior, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:Behavior.PressToViewEverything}}"
+                                                     Content="Press-To-View" ToolTip="Display virtual objects only when the Activation Key is pressed."/>
+                                        <RadioButton IsChecked="{Binding Behavior, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:Behavior.PressToViewParentsOnly}}"
+                                                     Content="Press-To-View Parents Only" ToolTip="Display only the object the cursor is currently snapping to and its parents."/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </ListBoxItem>
+
                             <ListBoxItem>
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Width="100" Margin="0 0 0 6" Text="Debug" VerticalAlignment="Center" ToolTip="Visualize boundaries of the overlay box for debugging purposes."/>
