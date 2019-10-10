@@ -83,6 +83,45 @@ namespace Mapping_Tools.Viewmodels {
             Active
         }
 
+        private ViewMode _keyDownView {
+            get {
+                switch (Preferences.Behavior) {
+                    case Behavior.Default:
+                        return ViewMode.Everything;
+                    case Behavior.PressToViewEverything:
+                        return ViewMode.Everything;
+                    case Behavior.PressToViewParentsOnly:
+                        return ViewMode.ParentsOnly;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
+        private ViewMode _keyUpView {
+            get {
+                switch (Preferences.Behavior) {
+                    case Behavior.Default:
+                        return ViewMode.Everything;
+                    case Behavior.PressToViewEverything:
+                        return ViewMode.Nothing;
+                    case Behavior.PressToViewParentsOnly:
+                        return ViewMode.Nothing;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
+
+        private enum ViewMode {
+            Everything,
+            ParentsOnly,
+            Nothing
+        }
+
+        private bool HotkeyRedrawsOverlay {
+            get => Preferences.Behavior == Behavior.PressToViewEverything || Preferences.Behavior == Behavior.PressToViewParentsOnly;
+        }
+
         public SnappingToolsVm() {
             // Set up a coordinate converter for converting coordinates between screen and osu!
             _coordinateConverter = new CoordinateConverter();
@@ -146,8 +185,30 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         private void OnDraw(object sender, DrawingContext context) {
-            foreach (var obj in RelevantObjects) {
-                obj.DrawYourself(context, _coordinateConverter, Preferences);
+            if (IsHotkeyDown(Preferences.SnapHotkey)) {
+                switch (_keyDownView) {
+                    case ViewMode.Everything:
+                        foreach (var obj in RelevantObjects) {
+                            obj.DrawYourself(context, _coordinateConverter, Preferences);
+                        }
+                        break;
+                    case ViewMode.ParentsOnly:
+                        throw new NotImplementedException();
+                    case ViewMode.Nothing:
+                        break;
+                }
+            } else {
+                switch (_keyUpView) {
+                    case ViewMode.Everything:
+                        foreach (var obj in RelevantObjects) {
+                            obj.DrawYourself(context, _coordinateConverter, Preferences);
+                        }
+                        break;
+                    case ViewMode.ParentsOnly:
+                        throw new NotImplementedException();
+                    case ViewMode.Nothing:
+                        break;
+                }
             }
         }
 
@@ -231,9 +292,7 @@ namespace Mapping_Tools.Viewmodels {
                     }
 
                     _overlay = new SnappingToolsOverlay { Converter = _coordinateConverter };
-
                     _overlay.Initialize(_osuWindow);
-                    _overlay.Converter = _coordinateConverter;
                     _overlay.Enable();
 
                     _overlay.OverlayWindow.Draw += OnDraw;
@@ -267,6 +326,8 @@ namespace Mapping_Tools.Viewmodels {
                     _overlay.Update();
 
                     if (!_autoSnapTimer.IsEnabled && IsHotkeyDown(Preferences.SnapHotkey)) {
+                        if (HotkeyRedrawsOverlay)
+                            _overlay.OverlayWindow.InvalidateVisual();
                         _autoSnapTimer.Start();
                     }
                     break;
@@ -377,6 +438,8 @@ namespace Mapping_Tools.Viewmodels {
 
         private void AutoSnapTimerTick(object sender, EventArgs e) {
             if (!IsHotkeyDown(Preferences.SnapHotkey)) {
+                if (HotkeyRedrawsOverlay)
+                    _overlay?.OverlayWindow.InvalidateVisual();
                 _autoSnapTimer.Stop();
                 return;
             }
@@ -385,7 +448,7 @@ namespace Mapping_Tools.Viewmodels {
             // System.Windows.Forms.Cursor.Position = new Point();
             var cursorPoint = System.Windows.Forms.Cursor.Position;
             // CONVERT THIS CURSOR POSITION TO EDITOR POSITION
-            var cursorPos = _coordinateConverter.ScreenToEditorCoordinate(new Vector2(cursorPoint.X, cursorPoint.Y));
+            Vector2 cursorPos = _coordinateConverter.ScreenToEditorCoordinate(new Vector2(cursorPoint.X, cursorPoint.Y));
 
             if (RelevantObjects.Count == 0)
                 return;
