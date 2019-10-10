@@ -43,5 +43,13 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         public RelevantCircle(Circle circle) {
             Child = circle;
         }
+
+        public override double DistanceTo(IRelevantObject relevantObject) {
+            throw new NotImplementedException();
+        }
+
+        public override void Consume(IRelevantObject relevantObject) {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -38,5 +38,13 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         public RelevantPoint(Vector2 vec) {
             Child = vec;
         }
+
+        public override double DistanceTo(IRelevantObject relevantObject) {
+            throw new System.NotImplementedException();
+        }
+
+        public override void Consume(IRelevantObject relevantObject) {
+            throw new System.NotImplementedException();
+        }
     }
 }

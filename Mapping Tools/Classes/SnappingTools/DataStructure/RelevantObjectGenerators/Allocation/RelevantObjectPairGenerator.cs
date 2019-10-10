@@ -14,14 +14,14 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         /// <param name="hitObjectCollection">All the RelevantHitObjects</param>
         /// <param name="hitObject">The new RelevantHitObject</param>
         /// <returns>Enumerable of object array where the objects in the object array have the types specified in dependencies</returns>
-        public static IEnumerable<object[]> GetParametersList(Type[] dependencies, HitObjectCollection hitObjectCollection, RelevantHitObject hitObject) {
+        public static IEnumerable<object[]> GetParametersList(Type[] dependencies, List<IRelevantObject> hitObjectCollection, RelevantHitObject hitObject) {
             // Because hitobject is new, you only need to generate the combinations of the objects without the new hitobject
             // and then add the hitobject to every combination
 
             // I use dependencies.Length - 1 because new hitobject satisfies one of the dependencies
             // I also assume all the types in dependencies are of RelevantHitObject
             var combinations = CombinationsRecursion(
-                hitObjectCollection.HitObjects.Except(new[] {hitObject}).ToArray(),
+                hitObjectCollection.Except(new[] {hitObject}).ToArray(),
                 dependencies.Length - 1);
 
             // Add the new hitobject to every combination
@@ -58,21 +58,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
                 }
             }
 
-            // Collection without the new relevantObject
-            var b = relevantObjectCollection.Objects.Except(new[] {relevantObject}).ToArray();
-
-            // Seperate the collection by type
-            var typedCollection = new Dictionary<Type, List<IRelevantObject>>();
-            foreach (var obj in b) {
-                var type = obj.GetType();
-                if (typedCollection.ContainsKey(type)) {
-                    typedCollection[type].Add(obj);
-                } else {
-                    typedCollection[type] = new List<IRelevantObject> {obj};
-                }
-            }
-
-            var combinations = neededCombinationsCount.Select(o => CombinationsRecursion(typedCollection[o.Key].ToArray(), o.Value));
+            var combinations = neededCombinationsCount.Select(o => CombinationsRecursion(relevantObjectCollection[o.Key].Except(new[] {relevantObject}).ToArray(), o.Value));
             /*
              * [[combi1, combi2, combi3], [combi4, combi5, combi6], [combi7, combi8]]
              * to

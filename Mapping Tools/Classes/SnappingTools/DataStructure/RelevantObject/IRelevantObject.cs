@@ -15,5 +15,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         List<IRelevantObject> ChildObjects { get; set; }
         void UpdateRelevancy();
         void UpdateTime();
+        double DistanceTo(IRelevantObject relevantObject);
+        void Consume(IRelevantObject relevantObject);
     }
 }

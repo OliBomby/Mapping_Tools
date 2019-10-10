@@ -53,5 +53,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
             if (ParentObjects == null || ParentObjects.Count == 0) return;
             Time = ParentObjects.Sum(o => o.Time) / ParentObjects.Count;
         }
+
+        public abstract double DistanceTo(IRelevantObject relevantObject);
+
+        public abstract void Consume(IRelevantObject relevantObject);
     }
 }

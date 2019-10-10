@@ -44,5 +44,13 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         public RelevantLine(Line2 line) {
             Child = line;
         }
+
+        public override double DistanceTo(IRelevantObject relevantObject) {
+            throw new System.NotImplementedException();
+        }
+
+        public override void Consume(IRelevantObject relevantObject) {
+            throw new System.NotImplementedException();
+        }
     }
 }

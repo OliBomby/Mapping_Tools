@@ -35,5 +35,13 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
 
             return differences.Sum() / differences.Count;
         }
+
+        public override double DistanceTo(IRelevantObject relevantObject) {
+            throw new System.NotImplementedException();
+        }
+
+        public override void Consume(IRelevantObject relevantObject) {
+            throw new System.NotImplementedException();
+        }
     }
 }

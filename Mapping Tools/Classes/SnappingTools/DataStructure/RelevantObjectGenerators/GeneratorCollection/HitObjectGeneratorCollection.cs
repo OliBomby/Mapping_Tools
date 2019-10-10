@@ -29,6 +29,8 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
             // Generate pairs with a set of layers and a dependency
             // Return the new pairs
 
+            // Only care about RelevantHitObject
+            var hitObjects = thisLayer.HitObjects[typeof(RelevantHitObject)];
             var activeGenerators = GetActiveGenerators();
             foreach (var generator in activeGenerators) {
                 var method = generator.GetGeneratorMethod();
@@ -36,7 +38,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
                 //var concurrent = generator.IsConcurrent;
                 //var needsHitObjects = generator.NeedsHitObjects();
 
-                var parametersList = RelevantObjectPairGenerator.GetParametersList(dependencies, thisLayer.HitObjects, newHitObject);
+                var parametersList = RelevantObjectPairGenerator.GetParametersList(dependencies, hitObjects, newHitObject);
                 
                 foreach (var parameters in parametersList) {
                     nextLayer.Add(method.Invoke(generator, parameters));
