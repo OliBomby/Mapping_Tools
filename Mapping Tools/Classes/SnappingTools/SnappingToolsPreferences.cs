@@ -10,40 +10,16 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
 namespace Mapping_Tools.Classes.SnappingTools {
     public class SnappingToolsPreferences : BindableBase, ICloneable{
         #region private storage
-        private List<RelevantObjectPreferences> releventObjectPreferences = new List<RelevantObjectPreferences> {
-            new RelevantObjectPreferences {
-                Name = "Virtual point preferences",
-                Color = Colors.Cyan,
-                Dashstyle = DashStylesEnum.Solid,
-                Opacity = 0.8,
-                Size = 5,
-                Thickness = 3,
-                HasSizeOption = true,
-            },
-            new RelevantObjectPreferences {
-                Name = "Virtual line preferences",
-                Color = Colors.LawnGreen,
-                Dashstyle = DashStylesEnum.Dash,
-                Opacity = 0.8,
-                Thickness = 3,
-                HasSizeOption = false,
-            },
-            new RelevantObjectPreferences {
-                Name = "Virtual circle preferences",
-                Color = Colors.Red,
-                Dashstyle = DashStylesEnum.Dash,
-                Opacity = 0.8,
-                Thickness = 3,
-                HasSizeOption = false,
-            }
-        };
+        private List<RelevantObjectPreferences> releventObjectPreferences;
 
-        private Hotkey snapHotkey = new Hotkey(Key.M, ModifierKeys.None);
-        private double offsetLeft = 0;
-        private double offsetTop = 1;
-        private double offsetRight = 0;
-        private double offsetBottom = 1;
-        private bool debugEnabled = false;
+        private Hotkey snapHotkey;
+        private double offsetLeft;
+        private double offsetTop;
+        private double offsetRight;
+        private double offsetBottom;
+        private bool debugEnabled;
+        private ViewMode keyDownViewMode;
+        private ViewMode keyUpViewMode;
         #endregion
 
         public List<RelevantObjectPreferences> RelevantObjectPreferences {
@@ -84,6 +60,15 @@ namespace Mapping_Tools.Classes.SnappingTools {
             set => Set(ref debugEnabled, value);
         }
 
+        public ViewMode KeyDownViewMode {
+            get => keyDownViewMode;
+            set => Set(ref keyDownViewMode, value);
+        }
+
+        public ViewMode KeyUpViewMode {
+            get => keyUpViewMode;
+            set => Set(ref keyUpViewMode, value);
+        }
         #endregion
 
         #region helper methods
@@ -104,11 +89,57 @@ namespace Mapping_Tools.Classes.SnappingTools {
         }
         #endregion
 
+        #region default constructor
+        public SnappingToolsPreferences() {
+            releventObjectPreferences = new List<RelevantObjectPreferences> {
+                new RelevantObjectPreferences {
+                    Name = "Virtual point preferences",
+                    Color = Colors.Cyan,
+                    Dashstyle = DashStylesEnum.Solid,
+                    Opacity = 0.8,
+                    Size = 5,
+                    Thickness = 3,
+                    HasSizeOption = true,
+                },
+                new RelevantObjectPreferences {
+                    Name = "Virtual line preferences",
+                    Color = Colors.LawnGreen,
+                    Dashstyle = DashStylesEnum.Dash,
+                    Opacity = 0.8,
+                    Thickness = 3,
+                    HasSizeOption = false,
+                },
+                new RelevantObjectPreferences {
+                    Name = "Virtual circle preferences",
+                    Color = Colors.Red,
+                    Dashstyle = DashStylesEnum.Dash,
+                    Opacity = 0.8,
+                    Thickness = 3,
+                    HasSizeOption = false,
+                }
+            };
+            snapHotkey = new Hotkey(Key.M, ModifierKeys.None);
+            offsetLeft = 0;
+            offsetTop = 1;
+            offsetRight = 0;
+            offsetBottom = 1;
+            debugEnabled = false;
+            keyDownViewMode = ViewMode.Everything;
+            keyUpViewMode = ViewMode.Everything;
+        }
+        #endregion
+
         public void CopyTo(SnappingToolsPreferences other) {
             foreach (var prop in typeof(SnappingToolsPreferences).GetProperties()) {
                 if (!prop.CanWrite || !prop.CanRead) continue;
                 try { prop.SetValue(other, prop.GetValue(this)); } catch { }
             }
         }
+    }
+
+    public enum ViewMode {
+        Everything,
+        ParentsOnly,
+        Nothing
     }
 }

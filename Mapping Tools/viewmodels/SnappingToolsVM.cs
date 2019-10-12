@@ -83,6 +83,10 @@ namespace Mapping_Tools.Viewmodels {
             Active
         }
 
+        private bool HotkeyRedrawsOverlay {
+            get => Preferences.KeyDownViewMode != Preferences.KeyUpViewMode;
+        }
+
         public SnappingToolsVm() {
             // Set up a coordinate converter for converting coordinates between screen and osu!
             _coordinateConverter = new CoordinateConverter();
@@ -146,8 +150,26 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         private void OnDraw(object sender, DrawingContext context) {
-            foreach (var obj in RelevantObjects) {
-                obj.DrawYourself(context, _coordinateConverter, Preferences);
+            if (IsHotkeyDown(Preferences.SnapHotkey)) {
+                switch (Preferences.KeyDownViewMode) {
+                    case ViewMode.Everything:
+                        foreach (var obj in RelevantObjects)
+                            obj.DrawYourself(context, _coordinateConverter, Preferences);
+                        break;
+                    case ViewMode.ParentsOnly:
+                        throw new NotImplementedException();
+                    case ViewMode.Nothing:
+                        break;
+                }
+            } else {
+                switch (Preferences.KeyUpViewMode) {
+                    case ViewMode.Everything:
+                        foreach (var obj in RelevantObjects)
+                            obj.DrawYourself(context, _coordinateConverter, Preferences);
+                        break;
+                    case ViewMode.Nothing:
+                        break;
+                }
             }
         }
 
@@ -231,9 +253,7 @@ namespace Mapping_Tools.Viewmodels {
                     }
 
                     _overlay = new SnappingToolsOverlay { Converter = _coordinateConverter };
-
                     _overlay.Initialize(_osuWindow);
-                    _overlay.Converter = _coordinateConverter;
                     _overlay.Enable();
 
                     _overlay.OverlayWindow.Draw += OnDraw;
@@ -267,6 +287,8 @@ namespace Mapping_Tools.Viewmodels {
                     _overlay.Update();
 
                     if (!_autoSnapTimer.IsEnabled && IsHotkeyDown(Preferences.SnapHotkey)) {
+                        if (HotkeyRedrawsOverlay)
+                            _overlay.OverlayWindow.InvalidateVisual();
                         _autoSnapTimer.Start();
                     }
                     break;
@@ -377,6 +399,8 @@ namespace Mapping_Tools.Viewmodels {
 
         private void AutoSnapTimerTick(object sender, EventArgs e) {
             if (!IsHotkeyDown(Preferences.SnapHotkey)) {
+                if (HotkeyRedrawsOverlay)
+                    _overlay?.OverlayWindow.InvalidateVisual();
                 _autoSnapTimer.Stop();
                 return;
             }

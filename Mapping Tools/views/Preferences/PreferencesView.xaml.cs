@@ -23,6 +23,8 @@ namespace Mapping_Tools.Views
             DataContext = SettingsManager.Settings;
 
             var views = MainWindow.AppWindow.Views;
+            NoneQuickRunBox.ItemsSource = new[] { "<Current Tool>" }.Concat(
+                ViewCollection.GetNames(ViewCollection.GetAllQuickRunTypesWithTargets(SmartQuickRunTargets.NoSelection)));
             SingleQuickRunBox.ItemsSource = new[] {"<Current Tool>"}.Concat(
                 ViewCollection.GetNames(ViewCollection.GetAllQuickRunTypesWithTargets(SmartQuickRunTargets.SingleSelection)));
             MultipleQuickRunBox.ItemsSource = new[] {"<Current Tool>"}.Concat(

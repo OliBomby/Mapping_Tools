@@ -42,7 +42,7 @@ namespace Mapping_Tools.Classes.Tools {
                 if (tp.Offset < MyTP.Offset && (prevTimingPoint == null || tp.Offset >= prevTimingPoint.Offset)) {
                     prevTimingPoint = tp;
                 }
-                if (tp.Offset == MyTP.Offset) {
+                if (Math.Abs(tp.Offset - MyTP.Offset) < 2) {
                     onTimingPoints.Add(tp);
                     onHasRed = tp.Inherited || onHasRed;
                     onHasGreen = !tp.Inherited || onHasGreen;

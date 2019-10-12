@@ -193,6 +193,27 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return string.Format("{0}-slider{1}{2}.wav", sampleSet.ToString().ToLower(), sampleName, index);
         }
 
+        public List<double> GetAllTloTimes(Timing timing) {
+            var times = new List<double>();
+
+            if (IsCircle) {
+                times.Add(Time);
+            } else if (IsSlider) {
+                // Adding time for every repeat of the slider
+                var sliderTemporalLength = timing.CalculateSliderTemporalLength(Time, PixelLength);
+
+                for (var i = 0; i <= Repeat; i++) {
+                    var time = Math.Floor(Time + sliderTemporalLength * i);
+                    times.Add(time);
+                }
+            } else if (IsSpinner || IsHoldNote) {
+                  times.Add(Time);
+                  times.Add(EndTime);
+            }
+
+            return times;
+        }
+
         public void MoveTime(double deltaTime) {
             Time += deltaTime;
             EndTime += deltaTime;
