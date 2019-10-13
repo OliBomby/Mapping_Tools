@@ -178,12 +178,41 @@ namespace Mapping_Tools.Views {
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
+            //TODO: Create Save File Dialog (using beatmap default hitsound osu file as name)
+            //      with Sample Export formats
+
             if (Settings.BaseBeatmap == null || Settings.DefaultSample == null) {
                 MessageBox.Show("Please import a base beatmap and default hitsound first.");
                 return;
             }
             backgroundWorker.RunWorkerAsync(new Arguments(MainWindow.ExportPath, Settings.BaseBeatmap, Settings.DefaultSample, Settings.HitsoundLayers.ToList(), false));
             start.IsEnabled = false;
+        }
+
+        /// <summary>
+        /// Displays custom Save File Dialog with custom export options.
+        /// The options include:
+        /// <list type="bullet">
+        ///     <item>
+        ///         <description>Audio Export (.ogg, wav, .aif, mp3)</description>
+        ///     </item>
+        ///     <item>
+        ///         <description>Commpression options for Mixer</description>
+        ///     </item>
+        ///     <item>
+        ///         <description>Option to generate custom samples.</description>
+        ///     </item>
+        ///     <item>
+        ///         <description>Clean Files in spesified folder before export.</description>
+        ///     </item>
+        ///     <item>
+        ///     <description></description>
+        ///     </item>
+        /// </list>
+        /// </summary>
+        private void GetExportDialog()
+        {
+
         }
 
         private void GetSelectedLayers() {
