@@ -191,6 +191,7 @@ namespace Mapping_Tools.Views {
 
         /// <summary>
         /// Displays custom Save File Dialog with custom export options.
+        /// 
         /// The options include:
         /// <list type="bullet">
         ///     <item>
