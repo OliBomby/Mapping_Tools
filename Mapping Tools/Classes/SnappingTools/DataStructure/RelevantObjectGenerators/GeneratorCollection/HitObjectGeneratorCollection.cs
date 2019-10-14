@@ -5,13 +5,7 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorCollection {
-    public class HitObjectGeneratorCollection {
-        public List<RelevantObjectsGenerator> Generators;
-
-        public IEnumerable<RelevantObjectsGenerator> GetActiveGenerators() {
-            return Generators.Where(o => o.IsActive);
-        }
-
+    public class HitObjectGeneratorCollection : GeneratorCollection {
         /// <summary>
         /// Generates new objects for the next layer based on the new object in the previous layer.
         /// </summary>
@@ -19,7 +13,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         /// <param name="nextLayer">The layer to generate new objects for</param>
         /// <param name="nextContext">Context of the next layer</param>
         /// <param name="newHitObject">The new object of the previous layer</param>
-        public void GenerateNewObjects(HitObjectLayer thisLayer, ObjectLayer nextLayer, RelevantHitObject newHitObject) {
+        public override void GenerateNewObjects(ObjectLayer thisLayer, ObjectLayer nextLayer, IRelevantObject newHitObject) {
             // Only generate objects using the new object and the rest and redo all concurrent generators
 
             // Get the dependencies of all the active generators
@@ -28,9 +22,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
             // Take into account the situation. The changes of the layer
             // Generate pairs with a set of layers and a dependency
             // Return the new pairs
-
-            // Only care about RelevantHitObject
-            var hitObjects = thisLayer.HitObjects[typeof(RelevantHitObject)];
+            
             var activeGenerators = GetActiveGenerators();
             foreach (var generator in activeGenerators) {
                 var method = generator.GetGeneratorMethod();
@@ -38,12 +30,16 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
                 //var concurrent = generator.IsConcurrent;
                 //var needsHitObjects = generator.NeedsHitObjects();
 
-                var parametersList = RelevantObjectPairGenerator.GetParametersList(dependencies, hitObjects, newHitObject);
+                var parametersList = RelevantObjectPairGenerator.GetParametersList(dependencies, thisLayer.Objects, newHitObject);
                 
                 foreach (var parameters in parametersList) {
                     nextLayer.Add(method.Invoke(generator, parameters));
                 }
             }
+        }
+
+        public override void GenerateNewObjects(ObjectLayer thisLayer, ObjectLayer nextLayer, IRelevantObject[] newRelevantObjects) {
+            throw new System.NotImplementedException();
         }
     }
 }

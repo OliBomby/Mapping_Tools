@@ -37,7 +37,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         /// <param name="relevantObjectCollection">All the relevant objects that are relevant to this generator.</param>
         /// <param name="relevantObject">The newly added relevant object.</param>
         /// <returns></returns>
-        public static IEnumerable<object[]> GetParametersList(Type[] dependencies, RelevantObjectCollection.RelevantObjectCollection relevantObjectCollection, RelevantObject.RelevantObject relevantObject) {
+        public static IEnumerable<object[]> GetParametersList(Type[] dependencies, RelevantObjectCollection.RelevantObjectCollection relevantObjectCollection, IRelevantObject relevantObject) {
             // Because relevantObject is new, you only need to generate the combinations of the objects without the new relevant object
             // and then add the relevantObject to every combination
 
