@@ -374,16 +374,12 @@ namespace Mapping_Tools.Views {
             return mpb;
         }
 
-        private bool IsSnapped(double time, double resnappedTime, double leniency = 3) {
-            if (Math.Abs(resnappedTime - time) <= leniency) {
-                return true;
-            } else {
-                return false;
-            }
+        private static bool IsSnapped(double time, double resnappedTime, double leniency = 3) {
+            return Math.Abs(resnappedTime - time) <= leniency;
         }
 
         private class Marker {
-            public double Time { get; set; }
+            public double Time { get; }
             public double BeatsFromLastMarker { get; set; }
 
             public Marker(double time) {
