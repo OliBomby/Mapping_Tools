@@ -12,8 +12,6 @@ using System.Windows;
 namespace Mapping_Tools.Views {
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
     public partial class CleanerView : IQuickRun {
-        private readonly BackgroundWorker backgroundWorker;
-        private bool canRun = true;
         List<double> TimingpointsRemoved;
         List<double> TimingpointsAdded;
         List<double> TimingpointsChanged;
@@ -30,8 +28,6 @@ namespace Mapping_Tools.Views {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
-
-            backgroundWorker = ( (BackgroundWorker) FindResource("backgroundWorker") );
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
@@ -43,7 +39,7 @@ namespace Mapping_Tools.Views {
         }
 
         private void RunTool(string[] paths, bool quick = false) {
-            if (!canRun) return;
+            if (!CanRun) return;
 
             IOHelper.SaveMapBackup(paths);
 
@@ -55,31 +51,20 @@ namespace Mapping_Tools.Views {
                                                                          (bool)RemoveUnclickableHitsounds.IsChecked,
                                                                          int.Parse(Snap1.Text.Split('/')[1]), int.Parse(Snap2.Text.Split('/')[1])));
 
-            backgroundWorker.RunWorkerAsync(arguments);
-            start.IsEnabled = false;
-            canRun = false;
+            BackgroundWorker.RunWorkerAsync(arguments);
+            CanRun = false;
         }
 
-        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
+        protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
             e.Result = Run_Program((Arguments) e.Argument, bgw, e);
         }
 
-        private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
-            progress.Value = e.ProgressPercentage;
-        }
-
-        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
-            if (e.Error != null) {
-                MessageBox.Show(string.Format("{0}{1}{2}", e.Error.Message, Environment.NewLine, e.Error.StackTrace), "Error");
-            } else {
+        protected override void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
+            if (e.Error == null) {
                 FillTimeLine();
-                if (e.Result.ToString() != "")
-                    MessageBox.Show(e.Result.ToString());
-                progress.Value = 0;
             }
-            start.IsEnabled = true;
-            canRun = true;
+            base.BackgroundWorker_RunWorkerCompleted(sender, e);
         }
 
         private struct Arguments {

@@ -18,8 +18,6 @@ namespace Mapping_Tools.Views {
     /// Interactielogica voor TimingCopierView.xaml
     /// </summary>
     public partial class TimingCopierView : ISavable<TimingCopierVM> {
-        private readonly BackgroundWorker backgroundWorker;
-
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "timingcopierproject.json");
 
         public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Timing Copier Projects");
@@ -33,36 +31,20 @@ namespace Mapping_Tools.Views {
             DataContext = new TimingCopierVM();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
-            backgroundWorker = (BackgroundWorker) FindResource("backgroundWorker");
             ProjectManager.LoadProject(this, message: false);
         }
 
-        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
+        protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
             e.Result = Copy_Timing((TimingCopierVM) e.Argument, bgw, e);
-        }
-
-        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
-            if( e.Error != null ) {
-                MessageBox.Show(string.Format("{0}{1}{2}", e.Error.Message, Environment.NewLine, e.Error.StackTrace), "Error");
-            }
-            else {
-                MessageBox.Show(e.Result.ToString());
-                progress.Value = 0;
-            }
-            start.IsEnabled = true;
-        }
-
-        private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
-            progress.Value = e.ProgressPercentage;
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
             string filesToCopy = ((TimingCopierVM)DataContext).ExportPath;
             IOHelper.SaveMapBackup(filesToCopy.Split('|'));
 
-            backgroundWorker.RunWorkerAsync(DataContext);
-            start.IsEnabled = false;
+            BackgroundWorker.RunWorkerAsync(DataContext);
+            CanRun = false;
         }
 
         private string Copy_Timing(TimingCopierVM arg, BackgroundWorker worker, DoWorkEventArgs _) {
