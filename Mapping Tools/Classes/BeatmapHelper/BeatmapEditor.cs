@@ -3,18 +3,37 @@ using System.Collections.Generic;
 using System.IO;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
-    public class BeatmapEditor : Editor {
-        public Beatmap Beatmap { get => (Beatmap)TextFile; }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    public class BeatmapEditor : Editor {
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Beatmap Beatmap => (Beatmap)TextFile;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lines"></param>
         public BeatmapEditor(List<string> lines) {
             TextFile = new Beatmap(lines);
         }
-
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="path"></param>
         public BeatmapEditor(string path) {
             Path = path;
             TextFile = new Beatmap(ReadFile(Path));
         }
-
+        
+        /// <summary>
+        /// Saves the current file within a temporary file before using CoolSave
+        /// </summary>
         public override void SaveFile() {
             var tempPath = System.IO.Path.Combine(MainWindow.AppDataPath, "temp.osu");
 
@@ -23,7 +42,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
             File.WriteAllLines(tempPath, TextFile.GetLines());
 
-            EditorReaderStuff.DontCoolSaveWhenMD5EqualsThisString = EditorReaderStuff.GetMD5FromPath(tempPath);
+            EditorReaderStuff.Md5ComparasonString = EditorReaderStuff.GetMD5FromPath(tempPath);
 
             base.SaveFile();
         }

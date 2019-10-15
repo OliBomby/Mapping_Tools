@@ -32,7 +32,10 @@ namespace Mapping_Tools.Views {
 
         public static readonly string ToolName = "Hitsound Studio";
 
-        public static readonly string ToolDescription = $@"Hitsound Studio is the tool that lets you import data from multiple outside sources and convert them to osu! standard hitsounds in the form of a hitsounding difficulty that can you copy to other beatmaps.{Environment.NewLine}It represents hitsounds as a list of layers (hitsound layers). One layer contains a unique sound, the sampleset and hitsound that accompany that sound and a list of times that sound has to be played.";
+        public static readonly string ToolDescription =
+            $@"Hitsound Studio is the tool that lets you import data from multiple outside sources and convert them to osu! standard hitsounds in the form of a hitsounding difficulty that can you copy to other beatmaps." +
+            $@"{Environment.NewLine}It represents hitsounds as a list of layers (hitsound layers). One layer contains a unique sound, " +
+            $@"the sampleset and hitsound that accompany that sound and a list of times that sound has to be played.";
 
         public HitsoundStudioView() {
             InitializeComponent();
@@ -124,7 +127,9 @@ namespace Mapping_Tools.Views {
                 }
                 UpdateProgressBar(worker, 100);
 
-                MessageBox.Show(string.Format("Number of sample indices: {0}, Number of samples: {1}, Number of greenlines: {2}", completeHitsounds.CustomIndices.Count, samples, greenlines));
+                MessageBox.Show(
+                    $"Number of sample indices: {completeHitsounds.CustomIndices.Count}," +
+                    $" Number of samples: {samples}, Number of green lines: {greenlines}");
             } else {
                 // Convert the multiple layers into packages that have the samples from all the layers at one specific time
                 List<SamplePackage> samplePackages = HitsoundConverter.ZipLayers(arg.HitsoundLayers, arg.DefaultSample);
@@ -179,7 +184,7 @@ namespace Mapping_Tools.Views {
 
         private void Start_Click(object sender, RoutedEventArgs e) {
             //TODO: Create Save File Dialog (using beatmap default hitsound osu file as name)
-            //      with Sample Export formats
+            //TODO: with Sample Export formats
 
             if (Settings.BaseBeatmap == null || Settings.DefaultSample == null) {
                 MessageBox.Show("Please import a base beatmap and default hitsound first.");
@@ -360,31 +365,21 @@ namespace Mapping_Tools.Views {
             SelectedImportVelocityRoughnessBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.VelocityRoughness, CultureInfo.InvariantCulture);
 
             // Update visibility
-            if (selectedLayers.Any(o => o.SampleArgs.UsesSoundFont)) {
-                SoundFontArgsPanel.Visibility = Visibility.Visible;
-            } else {
-                SoundFontArgsPanel.Visibility = Visibility.Collapsed;
-            }
-            if (selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Stack)) {
-                SelectedStackPanel.Visibility = Visibility.Visible;
-            } else {
-                SelectedStackPanel.Visibility = Visibility.Collapsed;
-            }
-            if (selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Hitsounds)) {
-                SelectedHitsoundsPanel.Visibility = Visibility.Visible;
-            } else {
-                SelectedHitsoundsPanel.Visibility = Visibility.Collapsed;
-            }
-            if (selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.MIDI)) {
-                SelectedMIDIPanel.Visibility = Visibility.Visible;
-            } else {
-                SelectedMIDIPanel.Visibility = Visibility.Collapsed;
-            }
-            if (selectedLayers.Any(o => o.ImportArgs.CanImport)) {
-                ImportArgsPanel.Visibility = Visibility.Visible;
-            } else {
-                ImportArgsPanel.Visibility = Visibility.Collapsed;
-            }
+            SoundFontArgsPanel.Visibility = selectedLayers.Any(o => o.SampleArgs.UsesSoundFont)
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+            SelectedStackPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Stack)
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+            SelectedHitsoundsPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Hitsounds)
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+            SelectedMIDIPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.MIDI)
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+            ImportArgsPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.CanImport)
+                ? Visibility.Visible
+                : Visibility.Collapsed;
 
             suppressEvents = false;
         }
@@ -405,7 +400,17 @@ namespace Mapping_Tools.Views {
                 player.PlaybackStopped += PlayerStopped;
 
                 player.Play();
-            } catch (FileNotFoundException) { MessageBox.Show("Could not find the specified sample."); } catch (DirectoryNotFoundException) { MessageBox.Show("Could not find the specified sample's directory."); } catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
+            } catch (FileNotFoundException) { MessageBox.Show("Could not find the specified sample."); }
+            
+            catch (DirectoryNotFoundException)
+            {
+                MessageBox.Show("Could not find the specified sample's directory.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
+            }
         }
 
         private void PlayerStopped(object sender, StoppedEventArgs e) {
@@ -568,7 +573,7 @@ namespace Mapping_Tools.Views {
         private void SelectedNameBox_TextChanged(object sender, TextChangedEventArgs e) {
             if (suppressEvents) return;
 
-            string t = (sender as TextBox).Text;
+            string t = ((TextBox) sender).Text;
             foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
                 hitsoundLayer.Name = t;
             }
@@ -577,7 +582,7 @@ namespace Mapping_Tools.Views {
         private void SelectedSampleSetBox_SelectionChanged(object sender, SelectionChangedEventArgs e) {
             if (suppressEvents) return;
 
-            string t = ((sender as ComboBox).SelectedItem as ComboBoxItem).Content.ToString();
+            string t = (((ComboBox) sender).SelectedItem as ComboBoxItem)?.Content.ToString();
             foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
                 hitsoundLayer.SampleSetString = t;
             }
@@ -586,7 +591,7 @@ namespace Mapping_Tools.Views {
         private void SelectedHitsoundBox_SelectionChanged(object sender, SelectionChangedEventArgs e) {
             if (suppressEvents) return;
 
-            string t = ((sender as ComboBox).SelectedItem as ComboBoxItem).Content.ToString();
+            string t = ((ComboBoxItem) ((ComboBox) sender).SelectedItem).Content.ToString();
             foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
                 hitsoundLayer.HitsoundString = t;
             }
@@ -594,10 +599,13 @@ namespace Mapping_Tools.Views {
 
         private void TimesBox_TextChanged(object sender, TextChangedEventArgs e) {
             if (suppressEvents) return;
-            if ((sender as TextBox).GetBindingExpression(TextBox.TextProperty).HasValidationError) return;
+            if (sender != null &&
+                (sender as TextBox).GetBindingExpression(TextBox.TextProperty)
+                .HasValidationError)
+                return;
 
             try {
-                List<double> t = (sender as TextBox).Text.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(o => double.Parse(o)).OrderBy(o => o).ToList();
+                List<double> t = ((TextBox) sender)?.Text.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(o => double.Parse(o)).OrderBy(o => o).ToList();
 
                 foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
                     hitsoundLayer.Times = t;
@@ -608,7 +616,7 @@ namespace Mapping_Tools.Views {
         private void SelectedSamplePathBox_TextChanged(object sender, TextChangedEventArgs e) {
             if (suppressEvents) return;
 
-            string t = (sender as TextBox).Text;
+            string t = ((TextBox) sender).Text;
             foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
                 hitsoundLayer.SampleArgs.Path = t;
             }
@@ -721,7 +729,7 @@ namespace Mapping_Tools.Views {
         private void SelectedImportSamplePathBox_TextChanged(object sender, TextChangedEventArgs e) {
             if (suppressEvents) return;
 
-            string t = (sender as TextBox).Text;
+            string t = ((TextBox) sender).Text;
             foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
                 hitsoundLayer.ImportArgs.SamplePath = t;
             }
@@ -790,10 +798,18 @@ namespace Mapping_Tools.Views {
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public HitsoundStudioVM GetSaveData() {
             return Settings;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="saveData"></param>
         public void SetSaveData(HitsoundStudioVM saveData) {
             suppressEvents = true;
 

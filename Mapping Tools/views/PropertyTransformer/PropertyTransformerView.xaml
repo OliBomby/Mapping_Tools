@@ -67,7 +67,7 @@
                     <TextBox x:Name="TPBPMOffsetBox" Text="{Binding Path=TimingpointBPMOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0}" MinWidth="120"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="New slider velocity = SV " MinWidth="350"/>
+                    <TextBlock Text="New slider velocity = SliderVelocity " MinWidth="350"/>
                     <TextBlock Text="x "/>
                     <TextBox x:Name="TPSVMultiplierBox" Text="{Binding Path=TimingpointSVMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1}" MinWidth="120"/>
                     <TextBlock Text=" + "/>

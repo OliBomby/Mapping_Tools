@@ -9,19 +9,34 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
+using Mapping_Tools.Classes.SystemTools.QuickRun;
 
 namespace Mapping_Tools.Classes.SystemTools {
+    /// <summary>
+    /// 
+    /// </summary>
     public class ListenerManager {
+
+        /// <summary>
+        /// 
+        /// </summary>
         public readonly FileSystemWatcher FsWatcher = new FileSystemWatcher();
-        public readonly KeyboardHookManager keyboardHookManager = new KeyboardHookManager();
+        /// <summary>
+        /// 
+        /// </summary>
+        public readonly KeyboardHookManager KeyboardHookManager = new KeyboardHookManager();
+        /// <summary>
+        /// 
+        /// </summary>
         public Dictionary<string, ActionHotkey> ActiveHotkeys = new Dictionary<string, ActionHotkey>();
-        
+
+        /// <inheritdoc />
         public ListenerManager() {
             InitFsWatcher();
 
             LoadHotkeys();
             ReloadHotkeys();
-            keyboardHookManager.Start();
+            KeyboardHookManager.Start();
 
             SettingsManager.Settings.PropertyChanged += OnSettingsChanged;
         }
@@ -67,7 +82,7 @@ namespace Mapping_Tools.Classes.SystemTools {
         
         public void ReloadHotkeys() {
             try {
-                keyboardHookManager.UnregisterAll();
+                KeyboardHookManager.UnregisterAll();
 
                 foreach (ActionHotkey ah in ActiveHotkeys.Values) {
                     RegisterHotkey(ah.Hotkey, ah.Action);
@@ -77,7 +92,7 @@ namespace Mapping_Tools.Classes.SystemTools {
 
         private void RegisterHotkey(Hotkey hotkey, Action action) {
             if (hotkey != null)
-                keyboardHookManager.RegisterHotkey(WindowsModifiersToOtherModifiers(hotkey.Modifiers), ResolveKey(hotkey.Key), action);
+                KeyboardHookManager.RegisterHotkey(WindowsModifiersToOtherModifiers(hotkey.Modifiers), ResolveKey(hotkey.Key), action);
             //Console.WriteLine($"Registered hotkey {hotkey.Modifiers}, {hotkey.Key}, {action}");
         }
 
@@ -217,7 +232,7 @@ namespace Mapping_Tools.Classes.SystemTools {
                 return;
             }
 
-            if (EditorReaderStuff.DontCoolSaveWhenMD5EqualsThisString == hashString) {
+            if (EditorReaderStuff.Md5ComparasonString == hashString) {
                 return;
             }
 

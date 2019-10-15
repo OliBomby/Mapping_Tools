@@ -13,7 +13,10 @@ namespace Mapping_Tools.Views {
 
         public static readonly string ToolName = "Snapping Tools";
 
-        public static readonly string ToolDescription = $@"Generates and keeps track of a list virtual objects that are geometrically relevant to the objects visible on your screen. Press and hold the Activation Key to let your cursor snap to the closest virtual object.{Environment.NewLine}⚠ You must specify your user config file in the Preferences for this tool to function.";
+        public static readonly string ToolDescription =
+            $@"Generates and keeps track of a list virtual objects that are geometrically relevant to the objects visible on your screen." +
+            $@" Press and hold the Activation Key to let your cursor snap to the closest virtual object." +
+            $@"{Environment.NewLine}⚠ You must specify your user config file in the Preferences for this tool to function.";
 
         public SnappingToolsView() {
             DataContext = new SnappingToolsVm();
@@ -31,8 +34,16 @@ namespace Mapping_Tools.Views {
             } 
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public SnappingToolsPreferences GetSaveData() => ((SnappingToolsVm)DataContext).Preferences;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="saveData"></param>
         public void SetSaveData(SnappingToolsPreferences saveData) {
             saveData?.CopyTo(((SnappingToolsVm)DataContext).Preferences);
         }

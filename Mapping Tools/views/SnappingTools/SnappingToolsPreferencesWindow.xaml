@@ -17,13 +17,13 @@
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" Background="{DynamicResource MaterialDesignPaper}"
         d:DataContext="{d:DesignData SnappingToolsPreferences}">
-    
+
     <WindowChrome.WindowChrome>
         <WindowChrome 
             CaptionHeight="35"
             ResizeBorderThickness="5" />
     </WindowChrome.WindowChrome>
- 
+
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="VisibleIfTrueConverter" />
         <components:EnumToBoolConverter x:Key="EnumToBoolConverter" />
@@ -151,5 +151,5 @@
         <Border BorderThickness="1" Grid.RowSpan="3" Background="{x:Null}" BorderBrush="{DynamicResource PrimaryHueDarkBrush}"/>
 
     </Grid>
-    
+
 </Window>

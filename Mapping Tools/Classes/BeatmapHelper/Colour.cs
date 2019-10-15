@@ -30,6 +30,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             else throw new BeatmapParsingException("Failed to parse blue component of colour.", line);
         }
 
+        /// <inheritdoc />
         public override string ToString() {
             return $"{Red.ToRoundInvariant()},{Green.ToRoundInvariant()},{Blue.ToRoundInvariant()}";
         }

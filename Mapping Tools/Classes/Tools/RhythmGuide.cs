@@ -7,8 +7,17 @@ using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.SystemTools;
 
 namespace Mapping_Tools.Classes.Tools {
+
+    /// <summary>
+    /// 
+    /// </summary>
     public class RhythmGuide {
+
+        /// <summary>
+        /// 
+        /// </summary>
         public class RhythmGuideGeneratorArgs : BindableBase {
+
             #region private_members
 
             private string[] _paths = new string[0];
@@ -21,42 +30,83 @@ namespace Mapping_Tools.Classes.Tools {
 
             #endregion
 
+            /// <summary>
+            /// A string of paths to import from.
+            /// </summary>
             public string[] Paths {
                 get => _paths;
                 set => Set(ref _paths, value);
             }
+
+            /// <summary>
+            /// The Selected output game mode
+            /// </summary>
             public GameMode OutputGameMode {
                 get => _outputGameMode;
                 set => Set(ref _outputGameMode, value);
             }
+
+            /// <summary>
+            /// The difficulty name of the output
+            /// </summary>
             public string OutputName {
                 get => _outputName;
                 set => Set(ref _outputName, value);
             }
+
+            /// <summary>
+            /// If each object should have a new combo.
+            /// </summary>
             public bool NcEverything {
                 get => _ncEverything;
                 set => Set(ref _ncEverything, value);
             }
 
+            /// <summary>
+            /// 
+            /// </summary>
             public ExportMode ExportMode {
                 get => _exportMode;
                 set => Set(ref _exportMode, value);
             }
+
+            /// <summary>
+            /// 
+            /// </summary>
             public string ExportPath {
                 get => _exportPath;
                 set => Set(ref _exportPath, value);
             }
 
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <returns></returns>
             public override string ToString() {
                 return $@"{Paths}, {ExportPath}, {ExportMode}, {OutputGameMode}, {OutputName}, {NcEverything}";
             }
         } 
 
+        /// <summary>
+        /// 
+        /// </summary>
         public enum ExportMode {
+            /// <summary>
+            /// 
+            /// </summary>
             NewMap,
+
+            /// <summary>
+            /// 
+            /// </summary>
             AddToMap,
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="args"></param>
         public static void GenerateRhythmGuide(RhythmGuideGeneratorArgs args) {
             if (args.ExportPath == null) {
                 throw new ArgumentException("Export path can not be null.");
@@ -111,7 +161,7 @@ namespace Mapping_Tools.Classes.Tools {
             return newBeatmap;
         }
 
-        private static void PopulateBeatmap(Beatmap beatmap, Beatmap[] beatmaps, bool ncEverything) {
+        private static void PopulateBeatmap(Beatmap beatmap, IEnumerable<Beatmap> beatmaps, bool ncEverything) {
             // Get the times from all beatmaps
             var times = new HashSet<double>();
             foreach (var b in beatmaps) {

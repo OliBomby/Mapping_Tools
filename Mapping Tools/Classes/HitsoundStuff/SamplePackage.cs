@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
+    /// <summary>
+    /// 
+    /// </summary>
     public class SamplePackage {
         public double Time;
         public double Volume;
@@ -22,15 +25,22 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Samples = new HashSet<Sample>();
         }
 
+        /// <summary>
+        /// Grabs the <see cref="SampleSet"/> relying on priority with both itself and other layers of the same sample.
+        /// </summary>
+        /// <returns></returns>
         public SampleSet GetSampleSet() {
             SampleSet sampleSet = SampleSet.Auto;
             int bestPriority = int.MaxValue;
-            foreach (Sample sample in Samples) {
-                if (sample.Hitsound == 0 && sample.Priority < bestPriority) {
+            foreach (var sample in Samples)
+            {
+                if (sample.Hitsound == 0 && sample.Priority < bestPriority)
+                {
                     sampleSet = sample.SampleSet;
                     bestPriority = sample.Priority;
                 }
             }
+
             return sampleSet;
         }
 
@@ -81,6 +91,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return ci;
         }
 
+        /// <summary>
+        /// Grabs the <see cref="HitsoundEvent"/> that is created into the specified sample custom index.
+        /// </summary>
+        /// <param name="index">The Custom Sample Index</param>
+        /// <returns>The current custom index sample list.</returns>
         public HitsoundEvent GetHitsound(int index) {
             SampleSet sampleSet = GetSampleSet();
             SampleSet additions = GetAdditions();

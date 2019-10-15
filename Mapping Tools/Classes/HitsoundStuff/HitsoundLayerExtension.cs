@@ -6,22 +6,22 @@ using System.Text;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     static class HitsoundLayerExtension {
-        public static string AllToStringOrDefault<obj, TResult>(this List<obj> list, Func<obj, TResult> func, CultureInfo culture=null) {
+        public static string AllToStringOrDefault<TObj, TResult>(this List<TObj> list, Func<TObj, TResult> func, CultureInfo culture=null) {
             if (list.Count == 0)
                 return "";
             TResult first = func(list.First());
-            foreach (obj o in list) {
+            foreach (TObj o in list) {
                 if (!func(o).Equals(first))
                     return "";
             }
             return Convert.ToString(first, culture);
         }
 
-        public static string AllToStringOrDefault<obj, TResult>(this List<obj> list, Func<obj, TResult> func, Func<TResult, string> stringConverter) {
+        public static string AllToStringOrDefault<TObj, TResult>(this List<TObj> list, Func<TObj, TResult> func, Func<TResult, string> stringConverter) {
             if (list.Count == 0)
                 return "";
             TResult first = func(list.First());
-            foreach (obj o in list) {
+            foreach (TObj o in list) {
                 if (!func(o).Equals(first))
                     return "";
             }

@@ -11,22 +11,33 @@ using System.Windows;
 
 namespace Mapping_Tools.Classes.Tools {
 
+    /// <summary>
+    /// 
+    /// </summary>
     public abstract class EditorReaderStuff {
-        private static readonly EditorReader editorReader = new EditorReader();
-        public static string DontCoolSaveWhenMD5EqualsThisString = "";
+        private static readonly EditorReader EditorReader = new EditorReader();
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public static string Md5ComparasonString = "";
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <returns></returns>
         public static EditorReader GetEditorReader() {
-            return editorReader;
+            return EditorReader;
         }
 
         /// <summary>
-        /// Gets the instance of EditorReader with FetchAll. Throws an exception if the editor is not open.
+        /// Gets the instance of EditorReader with FetchAll. Throws an <see cref="Exception"/> if the editor is not open.
         /// </summary>
         /// <returns></returns>
         public static bool TryGetFullEditorReader(out EditorReader reader) {
-            reader = editorReader;
+            reader = EditorReader;
             try {
-                editorReader.FetchAll();
+                EditorReader.FetchAll();
                 return true;
             }
             catch {
@@ -47,6 +58,11 @@ namespace Mapping_Tools.Classes.Tools {
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static string GetMD5FromPath(string path) {
             using( var md5 = MD5.Create() ) {
                 using( var fileStream = File.OpenRead(path) ) {
@@ -56,6 +72,12 @@ namespace Mapping_Tools.Classes.Tools {
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="editor"></param>
+        /// <param name="reader"></param>
+        /// <returns></returns>
         public static List<BeatmapHelper.HitObject> GetSelectedObjects(BeatmapEditor editor, EditorReader reader) {
             try {
                 string songs = SettingsManager.GetSongsPath();
@@ -86,6 +108,12 @@ namespace Mapping_Tools.Classes.Tools {
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="selected"></param>
+        /// <returns></returns>
         public static BeatmapEditor GetNewestVersion(EditorReader reader, out List<BeatmapHelper.HitObject> selected) {
             // Get the path from the beatmap in memory
             string songs = SettingsManager.GetSongsPath();
@@ -185,7 +213,7 @@ namespace Mapping_Tools.Classes.Tools {
         /// Gets the hit objects out of an editor reader and converts them to better type
         /// </summary>
         /// <param name="reader"></param>
-        /// <returns></returns>
+        /// <returns>List of <see cref="BeatmapHelper.HitObject"/></returns>
         public static List<BeatmapHelper.HitObject> GetHitObjects(EditorReader reader)
         {
             return reader.hitObjects.Select(o => (BeatmapHelper.HitObject) o).ToList();

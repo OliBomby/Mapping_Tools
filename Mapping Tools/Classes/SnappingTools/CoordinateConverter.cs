@@ -7,6 +7,9 @@ using System.Windows.Forms;
 
 namespace Mapping_Tools.Classes.SnappingTools {
 
+    /// <summary>
+    /// Converts the coordinates of both the mouse, window and editor.
+    /// </summary>
     public class CoordinateConverter {
 
         private double FilebarHeight {
@@ -23,22 +26,59 @@ namespace Mapping_Tools.Classes.SnappingTools {
             }
         }
 
-        public Box2 EditorBoxOffset = new Box2(0, 1, 0, 1);  // Extra offset applied to the bounds of the editor box
-        public Vector2 PositionSnapOffset => new Vector2(0.5, 0.5);  // An offset to fix a random instance of 1 pixel off snapping
+        /// <summary>
+        /// The editor box offset that is applied to the bounds of the editor box.
+        /// </summary>
+        public Box2 EditorBoxOffset = new Box2(0, 1, 0, 1);
+
+        /// <summary>
+        /// An offset to fix a random instance of 1 pixel off snapping.
+        /// </summary>
+        public Vector2 PositionSnapOffset => new Vector2(0.5, 0.5); 
+
+        /// <summary>
+        /// 
+        /// </summary>
         private string[] _configLines;
 
+        /// <summary>
+        /// The window position of the osu! game using <see cref="Vector2"/>.
+        /// </summary>
         public Vector2 OsuWindowPosition = Vector2.Zero;
+
+        /// <summary>
+        /// The resolution of the osu! game using <see cref="Vector2"/>
+        /// </summary>
         public Vector2 OsuResolution;
+
+        /// <summary>
+        /// The fullscreen value grabbed from the user's config file.
+        /// </summary>
         public bool Fullscreen;
+
+        /// <summary>
+        /// The letterboxing value grabbed from the user's config file.
+        /// </summary>
         public bool Letterboxing;
+
+        /// <summary>
+        /// The position of the letterboxing from the user's config file.
+        /// </summary>
         public Vector2 LetterboxingPosition;
 
-        // Dimensions of the editor screen without the menu bar
+        /// <summary>
+        /// Dimensions of the editor screen without the menu bar
+        /// </summary>
         public Vector2 EditorResolution => OsuResolution - new Vector2(0, FilebarHeight);
 
-        // Dimensions of the editor grid in osu! pixels
+        /// <summary>
+        /// Dimensions of the editor grid in osu! pixels
+        /// </summary>
         public readonly Vector2 EditorGridResolution = new Vector2(512, 384);
 
+        /// <summary>
+        /// Constructor of CorrdinateConverter
+        /// </summary>
         public CoordinateConverter() {
             Initialize();
         }
@@ -48,7 +88,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
         }
 
         /// <summary>
-        /// Reads the osu! user config to get the variables: resolution, letterboxing & letterboxing position
+        /// Reads the osu! user config to get the variables: resolution, letterboxing and letterboxing position
         /// </summary>
         public void ReadConfig() {
             try {
@@ -80,7 +120,11 @@ namespace Mapping_Tools.Classes.SnappingTools {
             throw new Exception($"Can't find the key {key} in osu! user config.");
         }
 
-        // Converts pixel coordinate to DPI coordinate
+        /// <summary>
+        ///  Converts pixel coordinate to DPI coordinate
+        /// </summary>
+        /// <param name="coord"></param>
+        /// <returns></returns>
         public Vector2 ToDpi(Vector2 coord) {
             var source = PresentationSource.FromVisual(MainWindow.AppWindow);
             if (source == null) return coord;
@@ -90,6 +134,10 @@ namespace Mapping_Tools.Classes.SnappingTools {
             return new Vector2(coord.X / dpiX, coord.Y / dpiY) + new Vector2(0.1, 0.1);
         }
 
+        /// <summary>
+        /// Gets the DPI multiplier from the app window.
+        /// </summary>
+        /// <returns></returns>
         public Vector2 GetDpiMultiplier() {
             var source = PresentationSource.FromVisual(MainWindow.AppWindow);
             if (source?.CompositionTarget != null)
@@ -139,7 +187,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
         /// <summary>
         /// Gets the area on the screen in pixels which is the editor area without menu bar and without letterboxing black space.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The area of the editor box using</returns>
         public Box2 GetEditorBox() {
             var osuWindow = GetOsuWindowBoxWithoutChrome();
             osuWindow.Top += FilebarHeight;
@@ -203,6 +251,11 @@ namespace Mapping_Tools.Classes.SnappingTools {
             return new Vector2((coord.X - PositionSnapOffset.X - editorGridBox.Left) / ratioX, (coord.Y - PositionSnapOffset.Y - editorGridBox.Top) / ratioY);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="coord"></param>
+        /// <returns></returns>
         public Vector2 EditorToScreenCoordinate(Vector2 coord) {
             var editorGridBox = GetEditorGridBox();
             var ratioX = editorGridBox.Width / EditorGridResolution.X;
@@ -211,6 +264,11 @@ namespace Mapping_Tools.Classes.SnappingTools {
             return new Vector2(coord.X * ratioX + editorGridBox.Left, coord.Y * ratioY + editorGridBox.Top) + PositionSnapOffset;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="coord"></param>
+        /// <returns></returns>
         public Vector2 EditorToRelativeCoordinate(Vector2 coord) {
             var editor = GetEditorBox();
 
@@ -228,7 +286,11 @@ namespace Mapping_Tools.Classes.SnappingTools {
             return new Vector2(coord.X * ratioX, coord.Y * ratioY) + gridOffset;
         }
 
-        // Scales editor size to screen size
+        /// <summary>
+        /// Scales editor size to screen size
+        /// </summary>
+        /// <param name="thing"></param>
+        /// <returns></returns>
         public Vector2 ScaleByRatio(Vector2 thing) {
             var editorGridBox = GetEditorGridBox();
             var ratioX = editorGridBox.Width / EditorGridResolution.X;
@@ -237,6 +299,10 @@ namespace Mapping_Tools.Classes.SnappingTools {
             return new Vector2(thing.X * ratioX, thing.Y * ratioY);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>String value of the Coordinate converter</returns>
         public override string ToString() {
             return $"{GetScreenBox()}, {OsuWindowPosition}, {OsuResolution}, {Fullscreen}, {Letterboxing}, {LetterboxingPosition}";
         }

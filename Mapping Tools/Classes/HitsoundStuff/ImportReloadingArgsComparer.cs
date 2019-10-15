@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
+    /// <summary>
+    /// 
+    /// </summary>
     public class ImportReloadingArgsComparer : IEqualityComparer<ImportReloadingArgs> {
         public bool Equals(ImportReloadingArgs x, ImportReloadingArgs y) {
             if (x.ImportType != y.ImportType)
@@ -24,6 +27,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
+        /// <summary>Returns a hash code for the specified object.</summary>
+        /// <param name="obj">The <see cref="T:System.Object" /> for which a hash code is to be returned.</param>
+        /// <returns>A hash code for the specified object.</returns>
+        /// <exception cref="T:System.ArgumentNullException">The type of <paramref name="obj" /> is a reference type and <paramref name="obj" /> is null.</exception>
         public int GetHashCode(ImportReloadingArgs x) {
             var hashCode = 1887348610;
             hashCode = hashCode * -1521134295 + x.ImportType.GetHashCode();

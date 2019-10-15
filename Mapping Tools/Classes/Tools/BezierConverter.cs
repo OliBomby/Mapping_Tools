@@ -7,6 +7,9 @@ using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.Tools
 {
+    /// <summary>
+    /// Converts a slider between differnet types of curves.
+    /// </summary>
     public static class BezierConverter
     {
         private static readonly List<CircleBezierPreset> CirclePresets = new List<CircleBezierPreset> {
@@ -28,6 +31,11 @@ namespace Mapping_Tools.Classes.Tools
             return points;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sliderPath"></param>
+        /// <returns></returns>
         public static SliderPath ConvertToBezier(SliderPath sliderPath)
         {
             switch (sliderPath.Type)
@@ -38,10 +46,19 @@ namespace Mapping_Tools.Classes.Tools
                     return ConvertCircleToBezier(sliderPath);
                 case PathType.Catmull:
                     return ConvertCatmullToBezier(sliderPath);
+                case PathType.Bezier:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
             return sliderPath;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="perfectPath"></param>
+        /// <returns></returns>
         public static SliderPath ConvertCircleToBezier(SliderPath perfectPath)
         {
             if (perfectPath.Type != PathType.PerfectCurve)
@@ -54,14 +71,24 @@ namespace Mapping_Tools.Classes.Tools
             return newPath;
         }
 
-        public static SliderPath ConvertCircleToBezier(CircleArc cs)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ca"></param>
+        /// <returns></returns>
+        public static SliderPath ConvertCircleToBezier(CircleArc ca)
         {
-            Vector2[] newAnchors = ConvertCircleToBezierAnchors(cs).ToArray();
+            Vector2[] newAnchors = ConvertCircleToBezierAnchors(ca).ToArray();
 
             SliderPath newPath = new SliderPath(PathType.Bezier, newAnchors);
             return newPath;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="perfectAnchors"></param>
+        /// <returns></returns>
         public static SliderPath ConvertCircleToBezier(List<Vector2> perfectAnchors)
         {
             Vector2[] newAnchors = ConvertCircleToBezierAnchors(perfectAnchors).ToArray();
@@ -70,6 +97,11 @@ namespace Mapping_Tools.Classes.Tools
             return newPath;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="perfectAnchors"></param>
+        /// <returns></returns>
         public static List<Vector2> ConvertCircleToBezierAnchors(List<Vector2> perfectAnchors)
         {
             CircleArc cs = new CircleArc(perfectAnchors);
@@ -77,7 +109,12 @@ namespace Mapping_Tools.Classes.Tools
                 return perfectAnchors;
             return ConvertCircleToBezierAnchors(cs);
         }
-
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cs"></param>
+        /// <returns></returns>
         public static List<Vector2> ConvertCircleToBezierAnchors(CircleArc cs)
         {
             CircleBezierPreset preset = CirclePresets.Last();
@@ -122,6 +159,11 @@ namespace Mapping_Tools.Classes.Tools
             return arc;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="catmullPath"></param>
+        /// <returns></returns>
         public static SliderPath ConvertCatmullToBezier(SliderPath catmullPath)
         {
             if (catmullPath.Type != PathType.Catmull)
@@ -134,6 +176,11 @@ namespace Mapping_Tools.Classes.Tools
             return newPath;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="catmullAnchors"></param>
+        /// <returns></returns>
         public static SliderPath ConvertCatmullToBezier(List<Vector2> catmullAnchors)
         {
             Vector2[] newAnchors = ConvertCatmullToBezierAnchors(catmullAnchors).ToArray();
@@ -142,6 +189,11 @@ namespace Mapping_Tools.Classes.Tools
             return newPath;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pts"></param>
+        /// <returns></returns>
         public static List<Vector2> ConvertCatmullToBezierAnchors(List<Vector2> pts)
         {
             List<Vector2> cubics = new List<Vector2>
@@ -165,6 +217,11 @@ namespace Mapping_Tools.Classes.Tools
             return cubics;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="linearPath"></param>
+        /// <returns></returns>
         public static SliderPath ConvertLinearToBezier(SliderPath linearPath)
         {
             if (linearPath.Type != PathType.Linear)
@@ -177,6 +234,11 @@ namespace Mapping_Tools.Classes.Tools
             return newPath;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="linearAnchors"></param>
+        /// <returns></returns>
         public static SliderPath ConvertLinearToBezier(List<Vector2> linearAnchors)
         {
             Vector2[] newAnchors = ConvertLinearToBezierAnchors(linearAnchors).ToArray();
@@ -185,6 +247,11 @@ namespace Mapping_Tools.Classes.Tools
             return newPath;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pts"></param>
+        /// <returns></returns>
         public static List<Vector2> ConvertLinearToBezierAnchors(List<Vector2> pts)
         {
             List<Vector2> bezier = new List<Vector2>

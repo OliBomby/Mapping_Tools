@@ -3,7 +3,15 @@ using System;
 using System.Globalization;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
+    /// <summary>
+    /// 
+    /// </summary>
     public static class FileFormatHelper {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public static string ToInvariant(this object obj) {
             return Convert.ToString(obj, CultureInfo.InvariantCulture);
         }

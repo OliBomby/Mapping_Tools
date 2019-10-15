@@ -7,8 +7,17 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
+    /// <summary>
+    /// 
+    /// </summary>
     public class HitsoundEvent {
+        /// <summary>
+        /// 
+        /// </summary>
         public double Time;
+        /// <summary>
+        /// 
+        /// </summary>
         public double Volume;
         public SampleSet SampleSet;
         public SampleSet Additions;
@@ -28,6 +37,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Clap = clap;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public int GetHitsounds() {
             return MathHelper.GetIntFromBitArray(new BitArray(new bool[] { false, Whistle, Finish, Clap }));
         }

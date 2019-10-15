@@ -1,17 +1,17 @@
-﻿using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.HitsoundStuff;
-using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.SystemTools.QuickRun;
-using Mapping_Tools.Classes.Tools;
-using Mapping_Tools.Viewmodels;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.HitsoundStuff;
+using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.SystemTools.QuickRun;
+using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Viewmodels;
 
-namespace Mapping_Tools.Views {
+namespace Mapping_Tools.Views.HitsoundPreviewHelper {
     /// <summary>
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
@@ -20,16 +20,33 @@ namespace Mapping_Tools.Views {
         private readonly BackgroundWorker backgroundWorker;
         private bool canRun = true;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public event EventHandler RunFinished;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "hspreviewproject.json");
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Hitsound Preview Projects");
 
         public static readonly string ToolName = "Hitsound Preview Helper";
 
-        public static readonly string ToolDescription = $@"Hitsound Preview Helper helps by placing hitsounds on all the objects of the current map based on the positions of the objects. That way you can hear the hitsounds play while you hitsound without having to assign them manually and later import them to Hitsound Studio.{Environment.NewLine}This tool is meant to help a very specific hitsounding workflow. If you hitsound by placing circles on different parts on the screen and treat each position as a different layer of hitsounds. For example using a mania map and have each column represent a different sound.";
+        public static readonly string ToolDescription =
+            $@"Hitsound Preview Helper helps by placing hitsounds on all the objects of the current map based on the positions of the objects. " +
+            $@"That way you can hear the hitsounds play while you hitsound without having to assign them manually and later import them to Hitsound Studio." +
+            $@"{Environment.NewLine}This tool is meant to help a very specific hitsounding workflow." +
+            $@" If you hitsound by placing circles on different parts on the screen and treat each position as a different layer of hitsounds." +
+            $@" For example using a mania map and have each column represent a different sound.";
 
+        /// <summary>
+        /// 
+        /// </summary>
         public HitsoundPreviewHelperView() {
             InitializeComponent();
             DataContext = new HitsoundPreviewHelperVM();
@@ -46,7 +63,7 @@ namespace Mapping_Tools.Views {
 
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
             if (e.Error != null) {
-                MessageBox.Show(string.Format("{0}{1}{2}", e.Error.Message, Environment.NewLine, e.Error.StackTrace), "Error");
+                MessageBox.Show($"{e.Error.Message}{Environment.NewLine}{e.Error.StackTrace}", "Error");
             } else {
                 if (e.Result.ToString() != "")
                     MessageBox.Show(e.Result.ToString());
@@ -126,6 +143,9 @@ namespace Mapping_Tools.Views {
             RunTool(MainWindow.AppWindow.GetCurrentMaps(), quick: false);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void QuickRun() {
             RunTool(new[] { IOHelper.GetCurrentBeatmap() }, quick: true);
         }
@@ -142,10 +162,18 @@ namespace Mapping_Tools.Views {
             canRun = false;
         }
 
+        /// <summary>
+        /// Grabs and imports all save data specified into the tool.
+        /// </summary>
+        /// <returns></returns>
         public HitsoundPreviewHelperVM GetSaveData() {
             return (HitsoundPreviewHelperVM)DataContext;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="saveData"></param>
         public void SetSaveData(HitsoundPreviewHelperVM saveData) {
             DataContext = saveData;
         }

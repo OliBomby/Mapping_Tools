@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using Mapping_Tools.Annotations;
 
 namespace Mapping_Tools.Views {
     /// <summary>
@@ -17,11 +18,25 @@ namespace Mapping_Tools.Views {
     public partial class HitsoundCopierView {
         private readonly BackgroundWorker backgroundWorker;
 
-        public static readonly string ToolName = "Hitsound Copier";
+        /// <summary>
+        /// 
+        /// </summary>
+        [UsedImplicitly] public static readonly string ToolName = "Hitsound Copier";
 
-        public static readonly string ToolDescription =
-            $@"Copies hitsounds from A to B.{Environment.NewLine}There are 2 modes. First mode is overwrite everything.This will basically first remove the hitsounds from the map you’re copying to and then copy the hitsounds.{Environment.NewLine}Second mode is copying only the defined hitsounds. A defined hitsound is when there is something there in the map you’re copying from. This mode will copy over all the hitsounds from the map you’re copying from. Anything in the map you’re copying to that has not been defined in the map you’re copying from will not change. For instance muted sliderends will remain there.";
+        /// <summary>
+        /// 
+        /// </summary>
+        [UsedImplicitly] public static readonly string ToolDescription =
+            $@"Copies hitsounds from A to B.{Environment.NewLine}There are 2 modes. " +
+            $@"First mode is overwrite everything. " +
+            $@"This will basically first remove the hitsounds from the map you’re copying to and then copy the hitsounds." +
+            $@"{Environment.NewLine}Second mode is copying only the defined hitsounds." +
+            $@" A defined hitsound is when there is something there in the map you’re copying from." +
+            $@" This mode will copy over all the hitsounds from the map you’re copying from. " +
+            $@"Anything in the map you’re copying to that has not been defined in the map you’re copying from will not change. " +
+            $@"For instance muted sliderends will remain there.";
 
+        /// <inheritdoc />
         public HitsoundCopierView() {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
@@ -492,9 +507,9 @@ namespace Mapping_Tools.Views {
 
             // Check filter snap
             // It's at least snap x or worse if the time is not a multiple of snap x / 2
-            var redline = beatmapTo.BeatmapTiming.GetRedlineAtTime(tloTo.Time - 1);
-            var resnappedTime = beatmapTo.BeatmapTiming.Resnap(tloTo.Time, arg.Snap1, arg.Snap2, false, redline);
-            var beatsFromRedline = (resnappedTime - redline.Offset) / redline.MpB;
+            var timingPoint = beatmapTo.BeatmapTiming.GetRedlineAtTime(tloTo.Time - 1);
+            var resnappedTime = beatmapTo.BeatmapTiming.Resnap(tloTo.Time, arg.Snap1, arg.Snap2, false, timingPoint);
+            var beatsFromRedline = (resnappedTime - timingPoint.Offset) / timingPoint.MpB;
             var dist1 = beatsFromRedline * arg.Snap1 / (arg.Snap1 == 1 ? 4 : 2);
             var dist2 = beatsFromRedline * arg.Snap2 / (arg.Snap2 == 1 ? 4 : arg.Snap2 == 3 ? 3 : 2);
             dist1 %= 1;
@@ -504,7 +519,7 @@ namespace Mapping_Tools.Views {
                 return false;
 
             // Check filter temporal length
-            return Precision.AlmostBigger(tloTo.Origin.TemporalLength, arg.MinLength * redline.MpB);
+            return Precision.AlmostBigger(tloTo.Origin.TemporalLength, arg.MinLength * timingPoint.MpB);
         }
 
         private void BeatmapFromBrowse_Click(object sender, RoutedEventArgs e) {

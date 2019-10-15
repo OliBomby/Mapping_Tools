@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     class SampleImporter {
+        // TODO: Include sfz
         public static readonly string[] ValidSamplePathExtensions = new string[] { ".wav", ".ogg", ".mp3", ".sf2" };
 
         public static bool ValidateSampleArgs(string path) {
@@ -40,17 +41,17 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         public static Dictionary<SampleGeneratingArgs, SampleSoundGenerator> ImportSamples(IEnumerable<SampleGeneratingArgs> argsList) {
             var samples = new Dictionary<SampleGeneratingArgs, SampleSoundGenerator>();
-            var seperatedByPath = new Dictionary<string, HashSet<SampleGeneratingArgs>>();
+            var separatedByPath = new Dictionary<string, HashSet<SampleGeneratingArgs>>();
 
             foreach (var args in argsList) {
-                if (seperatedByPath.TryGetValue(args.Path, out HashSet<SampleGeneratingArgs> value)) {
+                if (separatedByPath.TryGetValue(args.Path, out HashSet<SampleGeneratingArgs> value)) {
                     value.Add(args);
                 } else {
-                    seperatedByPath.Add(args.Path, new HashSet<SampleGeneratingArgs>() { args });
+                    separatedByPath.Add(args.Path, new HashSet<SampleGeneratingArgs>() { args });
                 }
             }
 
-            foreach (var pair in seperatedByPath) {
+            foreach (var pair in separatedByPath) {
                 var path = pair.Key;
                 if (!ValidateSampleArgs(path))
                     continue;
@@ -146,24 +147,24 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 }
 
                 // an Instrument contains a set of zones that contain sample headers.
-                foreach (var izone in i.Zones) {
-                    var sh = izone.SampleHeader();
+                foreach (var instrumentZone in i.Zones) {
+                    var sh = instrumentZone.SampleHeader();
                     if (sh == null)
                         continue;
 
                     //Console.WriteLine(sh.SampleName);
-                    //Console.WriteLine(izone.Key());
+                    //Console.WriteLine(instrumentZone.Key());
                     //Console.WriteLine(sh.SampleRate);
                     //Console.WriteLine(sh.Start);
 
                     // Requested key/velocity must also fit in the key/velocity range of the sample
-                    ushort keyRange = izone.KeyRange();
+                    ushort keyRange = instrumentZone.KeyRange();
                     byte keyLow = (byte)keyRange;
                     byte keyHigh = (byte)(keyRange >> 8);
                     if (!(args.Key >= keyLow && args.Key <= keyHigh) && args.Key != -1 && keyRange != 0) {
                         continue;
                     }
-                    ushort velRange = izone.VelocityRange();
+                    ushort velRange = instrumentZone.VelocityRange();
                     byte velLow = (byte)keyRange;
                     byte velHigh = (byte)(keyRange >> 8);
                     if (!(args.Velocity >= velLow && args.Velocity <= velHigh) && args.Velocity != -1 && velRange != 0) {
@@ -171,10 +172,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     }
 
                     // Get the closest key possible
-                    int dist = Math.Abs(args.Key - izone.Key());
+                    int dist = Math.Abs(args.Key - instrumentZone.Key());
 
                     if (dist < bdist || args.Key == -1) {
-                        closest = izone;
+                        closest = instrumentZone;
                         bdist = dist;
                     }
                 }
@@ -287,12 +288,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return output;
         }
 
-        private static SampleSoundGenerator GetSampleRemainder(SampleHeader sh, Zone izone, byte[] sample, SampleGeneratingArgs args) {
+        private static SampleSoundGenerator GetSampleRemainder(SampleHeader sh, Zone instrumentZone, byte[] sample, SampleGeneratingArgs args) {
             // Indices in sf2 are numbers of samples, not byte length. So double them
-            int start = (int)sh.Start + izone.FullStartAddressOffset();
-            int end = (int)sh.End + izone.FullEndAddressOffset();
-            int startLoop = (int)sh.StartLoop + izone.FullStartLoopAddressOffset();
-            int endLoop = (int)sh.EndLoop + izone.FullEndLoopAddressOffset();
+            int start = (int)sh.Start + instrumentZone.FullStartAddressOffset();
+            int end = (int)sh.End + instrumentZone.FullEndAddressOffset();
+            int startLoop = (int)sh.StartLoop + instrumentZone.FullStartLoopAddressOffset();
+            int endLoop = (int)sh.EndLoop + instrumentZone.FullEndLoopAddressOffset();
 
             int length = end - start;
             int loopLength = endLoop - startLoop;
@@ -310,7 +311,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             int numberOfLoopSamples = numberOfSamples - lengthFirstHalf - lengthSecondHalf;
 
             if (numberOfLoopSamples < loopLength) {
-                return GetSampleWithoutLoop(sh, izone, sample, args);
+                return GetSampleWithoutLoop(sh, instrumentZone, sample, args);
             }
 
             int numberOfBytes = numberOfSamples * 2;

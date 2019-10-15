@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
 
@@ -14,6 +11,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
     /// </summary>
     public class Beatmap : ITextFile {
 
+        /// TODO: Complete Documentation of Beatmap
         /// <summary>
         /// 
         /// </summary>
@@ -105,7 +103,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public List<double> Bookmarks { get => GetBookmarks(); set => SetBookmarks(value); }
 
         /// <summary>
-        /// Initalizes the Beatmap file format.
+        /// Initializes the Beatmap file format.
         /// </summary>
         /// <param name="lines"></param>
         public Beatmap(List<string> lines) {
@@ -207,7 +205,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// Sorts all hitobjects in map by order of time.
         /// </summary>
         public void SortHitObjects() {
-            // Sort the HitObjects
             HitObjects = HitObjects.OrderBy(o => o.Time).ToList();
         }
 
@@ -228,10 +225,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         public void GiveObjectsGreenlines() {
             foreach (var ho in HitObjects) {
-                ho.SV = BeatmapTiming.GetSVAtTime(ho.Time);
-                ho.TP = BeatmapTiming.GetTimingPointAtTime(ho.Time);
-                ho.HitsoundTP = BeatmapTiming.GetTimingPointAtTime(ho.Time + 5);
-                ho.Redline = BeatmapTiming.GetRedlineAtTime(ho.Time);
+                ho.SliderVelocity = BeatmapTiming.GetSVAtTime(ho.Time);
+                ho.TimingPoint = BeatmapTiming.GetTimingPointAtTime(ho.Time);
+                ho.HitsoundTimingPoint = BeatmapTiming.GetTimingPointAtTime(ho.Time + 5);
+                ho.UnInheritedTimingPoint = BeatmapTiming.GetRedlineAtTime(ho.Time);
                 ho.BodyHitsounds = BeatmapTiming.GetTimingPointsInTimeRange(ho.Time, ho.EndTime);
                 foreach (var time in ho.GetAllTloTimes(BeatmapTiming)) {
                     ho.BodyHitsounds.RemoveAll(o => Math.Abs(time - o.Offset) <= 5);
@@ -265,7 +262,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <returns>The list of Bookmarks.</returns>
         public List<double> GetBookmarks() {
             try {
-                return Editor["Bookmarks"].GetStringValue().Split(',').Select(p => double.Parse(p)).ToList();
+                return Editor["Bookmarks"].GetStringValue().Split(',').Select(double.Parse).ToList();
             }
             catch (KeyNotFoundException) {
                 return new List<double>();
@@ -292,8 +289,12 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return markedObjects;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public List<string> GetLines() {
-            // Getting all the shit
+            // Getting all the stuff
             List<string> lines = new List<string>
             {
                 "osu file format v14",
@@ -353,7 +354,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 lines.Add(tp.GetLine());
             }
             lines.Add("");
-            if (ComboColours.Count() > 0) {
+            if (ComboColours.Any()) {
                 lines.Add("");
                 lines.Add("[Colours]");
                 for (int i = 0; i < ComboColours.Count; i++) {
@@ -373,7 +374,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         /// <summary>
-        /// Grabs the spesified file name of beatmap file.
+        /// Grabs the specified file name of beatmap file.
         /// with format of:
         /// <c>Artist - Title (Host) [Difficulty].osu</c>
         /// </summary>

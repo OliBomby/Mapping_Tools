@@ -243,7 +243,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             // Add an extra timingpoint that is the same as the first redline but like 10 x meter beats earlier so any objects before the first redline can use that thing
 
             // When you have a greenline before the first redline, the greenline will act like the first redline and you can snap objects to the greenline's bpm. 
-            // The value in the greenline will be used as the milliseconds per beat, so for example a 1x SV slider will be 600 bpm.
+            // The value in the greenline will be used as the milliseconds per beat, so for example a 1x SliderVelocity slider will be 600 bpm.
             // The timeline will work like a redline on 0 offset and 1000 milliseconds per beat
 
             TimingPoint firstTP = TimingPoints.FirstOrDefault();

@@ -10,21 +10,30 @@ using System.Threading.Tasks;
 using System.Windows;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
+    // TODO: Complete Comments for Hitsound Layer
+    /// <summary>
+    /// 
+    /// </summary>
     public class HitsoundLayer : INotifyPropertyChanged {
         private string name;
+        /// <summary>
+        /// 
+        /// </summary>
         public string Name {
-            get { return name; }
+            get => name;
             set {
-                if (name != value) {
-                    name = value;
-                    NotifyPropertyChanged("Name");
-                }
+                if (name == value) return;
+                name = value;
+                NotifyPropertyChanged("Name");
             }
         }
 
         private SampleSet sampleSet;
+        /// <summary>
+        /// 
+        /// </summary>
         public SampleSet SampleSet {
-            get { return sampleSet; }
+            get => sampleSet;
             set {
                 if (sampleSet != value) {
                     sampleSet = value;
@@ -45,6 +54,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         private int priority;
+        /// <summary>
+        /// 
+        /// </summary>
         public int Priority {
             get { return priority; }
             set {
@@ -56,6 +68,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         private LayerImportArgs importArgs;
+        /// <summary>
+        /// 
+        /// </summary>
         public LayerImportArgs ImportArgs {
             get { return importArgs; }
             set {
@@ -79,7 +94,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         private List<double> times;
         public List<double> Times {
-            get { return times; }
+            get => times;
             set {
                 if (times != value) {
                     times = value;
@@ -88,6 +103,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string SampleSetString { get => GetSampleSetString(); set => SetSampleSetString(value); }
 
         private void SetSampleSetString(string value) {
@@ -99,6 +117,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return SampleSet.ToString();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string HitsoundString { get => GetHitsoundString(); set => SetHitsoundString(value); }
 
         private void SetHitsoundString(string value) {
@@ -110,6 +131,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return Hitsound.ToString();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public int SampleSetComboBoxIndex { get => GetSampleSetComboBoxIndex(); set => SetSampleSetComboBoxIndex(value); }
 
         private void SetSampleSetComboBoxIndex(int value) {
@@ -120,12 +144,16 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return (int)SampleSet - 1;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
 
         public void NotifyPropertyChanged(string propName) {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
         }
 
+        /// <inheritdoc />
         public HitsoundLayer() {
             Name = "";
             SampleSet = SampleSet.Normal;
@@ -135,6 +163,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Times = new List<double>();
         }
 
+        /// <inheritdoc />
         public HitsoundLayer(string name, ImportType importType, SampleSet sampleSet, Hitsound hitsound, string samplePath) {
             Name = name;
             SampleSet = sampleSet;
@@ -144,6 +173,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Times = new List<double>();
         }
 
+        /// <inheritdoc />
         public HitsoundLayer(string name, ImportType importType, SampleSet sampleSet, Hitsound hitsound, SampleGeneratingArgs sampleArgs) {
             Name = name;
             SampleSet = sampleSet;
@@ -153,6 +183,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Times = new List<double>();
         }
 
+        /// <inheritdoc />
         public HitsoundLayer(string name, SampleSet sampleSet, Hitsound hitsound, SampleGeneratingArgs sampleArgs, LayerImportArgs importArgs) {
             Name = name;
             SampleSet = sampleSet;
@@ -162,10 +193,18 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Times = new List<double>();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="priority"></param>
         public void SetPriority(int priority) {
             Priority = priority;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="layers"></param>
         public void Reload(List<HitsoundLayer> layers) {
             List<HitsoundLayer> sameLayer = layers.FindAll(o => ImportArgs.ReloadCompatible(o.ImportArgs));
 

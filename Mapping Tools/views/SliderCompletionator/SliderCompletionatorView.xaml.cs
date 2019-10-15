@@ -20,8 +20,9 @@ namespace Mapping_Tools.Views {
 
         public static readonly string ToolName = "Slider Completionator";
 
-        public static readonly string ToolDescription = $@"Change the length and duration of marked sliders and this tool will automatically handle the SV for you.";
+        public static readonly string ToolDescription = $@"Change the length and duration of marked sliders and this tool will automatically handle the SliderVelocity for you.";
 
+        /// <inheritdoc />
         public SliderCompletionatorView() {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
@@ -36,7 +37,7 @@ namespace Mapping_Tools.Views {
 
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
             if (e.Error != null) {
-                MessageBox.Show(string.Format("{0}{1}{2}", e.Error.Message, Environment.NewLine, e.Error.StackTrace), "Error");
+                MessageBox.Show($"{e.Error.Message}{Environment.NewLine}{e.Error.StackTrace}", "Error");
             } else {
                 if (e.Result.ToString() != "")
                     MessageBox.Show(e.Result.ToString());
@@ -107,7 +108,7 @@ namespace Mapping_Tools.Views {
                         double newTemporalLength = arg.TemporalLength != -1 ? timing.GetMpBAtTime(ho.Time) * arg.TemporalLength : oldTemporalLength;
                         double oldSV = timing.GetSVAtTime(ho.Time);
                         double newSV = oldSV / ((newSpatialLength / oldSpatialLength) / (newTemporalLength / oldTemporalLength));
-                        ho.SV = newSV;
+                        ho.SliderVelocity = newSV;
                         ho.PixelLength = newSpatialLength;
                         slidersCompleted++;
                     }
@@ -116,20 +117,20 @@ namespace Mapping_Tools.Views {
                     }
                 }
 
-                // Reconstruct SV
+                // Reconstruct SliderVelocity
                 List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
                 // Add Hitobject stuff
                 foreach (HitObject ho in beatmap.HitObjects) {
-                    if (ho.IsSlider) // SV changes
+                    if (ho.IsSlider) // SliderVelocity changes
                     {
-                        TimingPoint tp = ho.TP.Copy();
+                        TimingPoint tp = ho.TimingPoint.Copy();
                         tp.Offset = ho.Time;
-                        tp.MpB = ho.SV;
+                        tp.MpB = ho.SliderVelocity;
                         timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true));
                     }
                 }
 
-                // Add the new SV changes
+                // Add the new SliderVelocity changes
                 TimingPointsChange.ApplyChanges(timing, timingPointsChanges);
 
                 // Save the file
