@@ -91,7 +91,7 @@ namespace Mapping_Tools.Views {
                 }
                 else if( Tabs.SelectedIndex == 3 ) {
                     // Import MIDI
-                    HitsoundLayers = HitsoundImporter.ImportMIDI(BeatmapPathBox3.Text, (bool) InstrumentBox3.IsChecked, (bool) KeysoundBox3.IsChecked, (bool) LengthBox3.IsChecked, LengthRoughnessBox3.GetDouble(2), (bool) VelocityBox3.IsChecked, VelocityRoughnessBox3.GetDouble(10));
+                    HitsoundLayers = HitsoundImporter.ImportMidi(BeatmapPathBox3.Text, (bool) InstrumentBox3.IsChecked, (bool) KeysoundBox3.IsChecked, (bool) LengthBox3.IsChecked, LengthRoughnessBox3.GetDouble(2), (bool) VelocityBox3.IsChecked, VelocityRoughnessBox3.GetDouble(10));
                     HitsoundLayers.ForEach(o => o.Name = string.Format("{0}: {1}", NameBox3.Text, o.Name));
                 }
                 else {
