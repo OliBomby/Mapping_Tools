@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.ExceptionServices;
-using Mapping_Tools.Annotations;
+﻿using Mapping_Tools.Annotations;
+using System;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation {
     /// <summary>
@@ -11,6 +7,6 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
     /// </summary>
     [MeansImplicitUse]
     [AttributeUsage(AttributeTargets.Method)]
-    public class RelevantObjectGeneratorAttribute : Attribute {
+    public class RelevantObjectsGeneratorMethodAttribute : Attribute {
     }
 }

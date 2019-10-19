@@ -3,12 +3,12 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
-    class StartPointGenerator : RelevantObjectsGenerator {
+    public class StartPointGenerator : RelevantObjectsGenerator {
         public override string Name => "Virtual Points on Slider Heads and Circles";
         public override string Tooltip => "Generates virtual points on slider heads and circles.";
         public override GeneratorType GeneratorType => GeneratorType.Generators;
 
-        [RelevantObjectGenerator]
+        [RelevantObjectsGeneratorMethod]
         public RelevantPoint GetRelevantObjects(RelevantHitObject ho) {
             return new RelevantPoint(ho.HitObject.Pos);
         }

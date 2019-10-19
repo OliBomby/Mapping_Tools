@@ -44,33 +44,32 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private MethodInfo _generatorMethod;
-        public MethodInfo GetGeneratorMethod() {
-            if (_generatorMethod == null) {
-                var methods = GetType().GetMethods().Where(m => m.GetCustomAttribute<RelevantObjectGeneratorAttribute>() != null)
-                    .ToArray();
-                if (methods.Length != 1) {
-                    throw new Exception($@"Type {GetType()} does not have exactly one generator method.");
-                }
-
-                _generatorMethod = methods[0];
+        private MethodInfo[] _generatorMethods;
+        public MethodInfo[] GetGeneratorMethods() {
+            if (_generatorMethods != null) return _generatorMethods;
+            var methods = GetType().GetMethods().Where(m => m.GetCustomAttribute<RelevantObjectsGeneratorMethodAttribute>() != null)
+                .ToArray();
+            if (methods.Length == 0) {
+                throw new InvalidOperationException($@"Type {GetType()} does not have any generator method.");
             }
 
-            return _generatorMethod;
+            _generatorMethods = methods;
+
+            return _generatorMethods;
         }
 
-        public Type[] GetDependencies() {
-            return GetGeneratorMethod().GetGenericArguments();
+        public static Type[] GetDependencies(MethodInfo generatorMethodInfo) {
+            return generatorMethodInfo.GetGenericArguments();
         }
 
-        public Type GetReturnType() {
-            return GetGeneratorMethod().ReturnType;
+        public static Type GetReturnType(MethodInfo generatorMethodInfo) {
+            return generatorMethodInfo.ReturnType;
         }
 
-        private bool? _needsHitObjects;
-        public bool NeedsHitObjects() {
+        private static bool? _needsHitObjects;
+        public static bool NeedsHitObjects(MethodInfo generatorMethodInfo) {
             if (_needsHitObjects == null) {
-                _needsHitObjects = GetDependencies().Contains(typeof(RelevantHitObject));
+                _needsHitObjects = GetDependencies(generatorMethodInfo).Contains(typeof(RelevantHitObject));
             }
 
             return _needsHitObjects.Value;
