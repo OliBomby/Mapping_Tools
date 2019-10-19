@@ -270,13 +270,7 @@
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\ParallelismGenerator.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\LastAnchorGenerator.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorTypes\GeneratorType.cs" />
-    <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorTypes\IGenerateCirclesFromRelevantObjects.cs" />
-    <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorTypes\IGenerateCirclesFromHitObjects.cs" />
-    <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorTypes\IGenerateLinesFromHitObjects.cs" />
-    <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorTypes\IGeneratePointsfromRelevantObjects.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\RelevantObjectsGenerator.cs" />
-    <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorTypes\IGeneratePointsFromHitObjects.cs" />
-    <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorTypes\IGenerateLinesFromRelevantObjects.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\IntersectionGenerator.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\PerfectCircleBlanketGenerator.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\LinearLineGenerator.cs" />
