@@ -45,11 +45,12 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         }
 
         public override double DistanceTo(IRelevantObject relevantObject) {
-            throw new NotImplementedException();
-        }
+            if (!(relevantObject is RelevantCircle relevantCircle)) {
+                return double.PositiveInfinity;
+            }
 
-        public override void Consume(IRelevantObject relevantObject) {
-            throw new NotImplementedException();
+            return Vector2.Distance(Child.Centre, relevantCircle.Child.Centre) +
+                   Math.Abs(Child.Radius - relevantCircle.Child.Radius);
         }
     }
 }

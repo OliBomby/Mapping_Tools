@@ -175,6 +175,7 @@
     <Compile Include="Classes\BeatmapHelper\FileFormatHelper.cs" />
     <Compile Include="Classes\BeatmapHelper\GameMode.cs" />
     <Compile Include="Classes\BeatmapHelper\HitObjectComparer.cs" />
+    <Compile Include="Classes\BeatmapHelper\HitObjectType.cs" />
     <Compile Include="Classes\BeatmapHelper\ITextLine.cs" />
     <Compile Include="Classes\BeatmapHelper\StoryboardEditor.cs" />
     <Compile Include="Classes\BeatmapHelper\ITextFile.cs" />
@@ -250,17 +251,13 @@
     <Compile Include="Classes\BeatmapHelper\TValue.cs" />
     <Compile Include="Classes\SnappingTools\DashStylesEnum.cs" />
     <Compile Include="Classes\SnappingTools\CoordinateConverter.cs" />
-    <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectCollection\HitObjectCollection.cs" />
-    <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorCollection\GeneratorCollection.cs" />
-    <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorCollection\RelevantObjectGeneratorCollection.cs" />
-    <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorCollection\HitObjectGeneratorCollection.cs" />
-    <Compile Include="Classes\SnappingTools\DataStructure\Layers\HitObjectLayer.cs" />
+    <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorCollection\RelevantObjectsGeneratorCollection.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Allocation\RelevantObjectGeneratorAttribute.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Allocation\RelevantObjectPairGenerator.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObject\IRelevantDrawable.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObject\IRelevantObject.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\LayerCollection.cs" />
-    <Compile Include="Classes\SnappingTools\DataStructure\Layers\ObjectLayer.cs" />
+    <Compile Include="Classes\SnappingTools\DataStructure\Layers\RelevantObjectLayer.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObject\RelevantObjects\RelevantCircle.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObject\RelevantDrawable.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObject\RelevantObjects\RelevantHitObject.cs" />
@@ -289,7 +286,6 @@
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\LineGenerator.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\TriangleGenerator.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\TriangleGenerator2.cs" />
-    <Compile Include="Classes\SnappingTools\DataStructure\Layers\RelevantObjectLayer.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObject\RelevantObjectPreferences.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObject\RelevantObjects\RelevantPoint.cs" />
     <Compile Include="Classes\SnappingTools\SnappingToolsPreferences.cs" />

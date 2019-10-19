@@ -27,5 +27,11 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectCollec
             similarObject = TryGetValue(type, out var list) ? list.First(o => obj.DistanceTo(o) < acceptableDifference) : null;
             return similarObject != null;
         }
+
+        public void RemoveRelevantObject(IRelevantObject relevantObject) {
+            if (TryGetValue(relevantObject.GetType(), out var list)) {
+                list.Remove(relevantObject);
+            }
+        }
     }
 }

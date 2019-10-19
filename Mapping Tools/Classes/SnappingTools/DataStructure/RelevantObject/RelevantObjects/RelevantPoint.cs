@@ -40,11 +40,11 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         }
 
         public override double DistanceTo(IRelevantObject relevantObject) {
-            throw new System.NotImplementedException();
-        }
+            if (!(relevantObject is RelevantPoint relevantPoint)) {
+                return double.PositiveInfinity;
+            }
 
-        public override void Consume(IRelevantObject relevantObject) {
-            throw new System.NotImplementedException();
+            return Vector2.Distance(Child, relevantPoint.Child);
         }
     }
 }

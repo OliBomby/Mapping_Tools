@@ -46,11 +46,13 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         }
 
         public override double DistanceTo(IRelevantObject relevantObject) {
-            throw new System.NotImplementedException();
-        }
+            if (!(relevantObject is RelevantLine relevantLine)) {
+                return double.PositiveInfinity;
+            }
 
-        public override void Consume(IRelevantObject relevantObject) {
-            throw new System.NotImplementedException();
+            return Vector2.Distance(Child.PositionVector, relevantLine.Child.PositionVector) +
+                   1 / Vector2.Dot(Child.DirectionVector, relevantLine.Child.DirectionVector) /
+                   (Child.DirectionVector.Length * relevantLine.Child.DirectionVector.Length) - 1;
         }
     }
 }

@@ -9,13 +9,12 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         double Time { get; set; }
         double Relevancy { get; set; }
         bool Disposed { get; set; }
-        ObjectLayer Layer { get; set; }
+        RelevantObjectLayer Layer { get; set; }
         RelevantObjectsGenerator Generator { get; set; }
         List<IRelevantObject> ParentObjects { get; set; }
         List<IRelevantObject> ChildObjects { get; set; }
         void UpdateRelevancy();
         void UpdateTime();
         double DistanceTo(IRelevantObject relevantObject);
-        void Consume(IRelevantObject relevantObject);
     }
 }

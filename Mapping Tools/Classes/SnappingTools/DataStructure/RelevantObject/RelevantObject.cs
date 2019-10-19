@@ -30,7 +30,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
             }
         }
         public bool Disposed { get; set; }
-        public ObjectLayer Layer { get; set; }
+        public RelevantObjectLayer Layer { get; set; }
         public RelevantObjectsGenerator Generator { get; set; }
 
         private List<IRelevantObject> _parentObjects;
@@ -55,7 +55,5 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         }
 
         public abstract double DistanceTo(IRelevantObject relevantObject);
-
-        public abstract void Consume(IRelevantObject relevantObject);
     }
 }

@@ -1,20 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.Layers;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorCollection;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure {
     public class LayerCollection {
-        public HitObjectLayer HitObjectLayer;
-        public List<RelevantObjectLayer> RelevantObjectLayers;
+        public List<RelevantObjectLayer> ObjectLayers;
+
+        public RelevantObjectsGeneratorCollection AllGenerators;
+
         public double AcceptableDifference { get; set; }
 
         public void SetInceptionLevel(int inceptionLevel) {
-            throw new NotImplementedException();
+            if (inceptionLevel < 0) {
+                throw new ArgumentException("Inception level can't be less than 0.");
+            }
+
+            if (ObjectLayers.Count < inceptionLevel) {
+                // Add more layers
+                var layersToAdd = inceptionLevel - ObjectLayers.Count;
+                for (var i = 0; i < layersToAdd; i++) {
+                    var lastLayer = ObjectLayers.Last();
+                    var newLayer = new RelevantObjectLayer(this, AllGenerators) {PreviousLayer = lastLayer};
+                    lastLayer.NextLayer = newLayer;
+                    ObjectLayers.Add(newLayer);
+                }
+            } else if (ObjectLayers.Count > inceptionLevel) {
+                // Remove layers
+                var layersToRemove = ObjectLayers.Count - inceptionLevel;
+                for (var i = 0; i < layersToRemove; i++) {
+                    ObjectLayers.RemoveAt(ObjectLayers.Count - 1);
+                    var lastLayer = ObjectLayers.Last();
+                    lastLayer.NextLayer = null;
+                }
+            }
         }
 
-        public List<IRelevantObject> GetAllRelevantObjects() {
-            throw new NotImplementedException();
+        public IEnumerable<IRelevantObject> GetAllRelevantObjects() {
+            return ObjectLayers.SelectMany(a => a.Objects.Values.SelectMany(b => b));
         }
     }
 }
