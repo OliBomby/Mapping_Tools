@@ -29,18 +29,28 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
             Objects.SortTimes();
         }
 
-        public virtual void Add(IEnumerable<IRelevantObject> relevantObjects) {
+        public void Add(IEnumerable<IRelevantObject> relevantObjects) {
             // Check if this object or something similar exists anywhere in the context or in this layer
             foreach (var relevantObject in relevantObjects) {
-                if (Objects.FindSimilar(relevantObject, ParentCollection.AcceptableDifference, out _)) {
-                    continue;  // Continue so the relevant object doesn't get added
-                }
-
-                // Insert the new object
-                Objects.SortedInsert(relevantObject);
+                Add(relevantObject, false);
             }
 
+            // Propagate changes
             NextLayer.GenerateNewObjects();
+        }
+
+        public void Add(IRelevantObject relevantObject, bool propagate = true) {
+            if (Objects.FindSimilar(relevantObject, ParentCollection.AcceptableDifference, out _)) {
+                return;  // return so the relevant object doesn't get added
+            }
+
+            // Insert the new object
+            Objects.SortedInsert(relevantObject);
+
+            // Propagate changes
+            if (propagate) {
+                NextLayer.GenerateNewObjects();
+            }
         }
 
         /// <summary>
@@ -57,33 +67,51 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                 var parametersList = RelevantObjectPairGenerator.GetParametersList(dependencies, PreviousLayer.Objects);
                 
                 foreach (var parameters in parametersList) {
-                    // Generate new relevant objects
-                    var newRelevantObjects = ((IEnumerable<IRelevantObject>)method.Invoke(generator, parameters)).ToArray();
+                    // Generate the new relevant object(s)
+                    var result = method.Invoke(generator, parameters);
 
                     // Cast parameters to relevant objects
                     var relevantParents = parameters.Cast<IRelevantObject>().ToList();
 
-                    // Add parents to the new relevant objects
-                    foreach (var relevantObject in newRelevantObjects) {
-                        relevantObject.ParentObjects = relevantParents;
+                    switch (result) {
+                        case IEnumerable<IRelevantObject> newRelevantObjectsEnumerable: {
+                            // Enumerate to array
+                            var newRelevantObjectsArray = newRelevantObjectsEnumerable.ToArray();
+
+                            // Add parents to the new relevant objects
+                            foreach (var relevantObject in newRelevantObjectsArray) {
+                                relevantObject.ParentObjects = relevantParents;
+                            }
+
+                            // Add the new relevant objects to the children of the parents
+                            relevantParents.ForEach(o => o.ChildObjects.AddRange(newRelevantObjectsArray));
+
+                            // Add the new relevant objects to this layer
+                            Add(newRelevantObjectsArray);
+                            break;
+                        }
+                        case IRelevantObject newRelevantObject:
+                            // Add parents to the new relevant object
+                            newRelevantObject.ParentObjects = relevantParents;
+
+                            // Add the new relevant object to the children of the parents
+                            relevantParents.ForEach(o => o.ChildObjects.Add(newRelevantObject));
+
+                            // Add the new relevant objects to this layer
+                            Add(newRelevantObject);
+                            break;
                     }
-
-                    // Add the new relevant objects to the children of the parents
-                    relevantParents.ForEach(o => o.ChildObjects.AddRange(newRelevantObjects));
-
-                    // Add the new relevant objects to this layer
-                    Add(newRelevantObjects);
                 }
             }
         }
 
-        public virtual void Remove(IEnumerable<IRelevantObject> relevantObjects) {
+        public void Remove(IEnumerable<IRelevantObject> relevantObjects) {
             foreach (var relevantObject in relevantObjects) {
                 Remove(relevantObject);
             }
         }
 
-        public virtual void Remove(IRelevantObject relevantObject) {
+        public void Remove(IRelevantObject relevantObject) {
             // Remove relevant object from this layer
             Objects.RemoveRelevantObject(relevantObject);
 
