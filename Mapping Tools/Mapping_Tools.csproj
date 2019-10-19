@@ -297,8 +297,8 @@
     <Compile Include="Classes\SystemTools\ListenerManager.cs" />
     <Compile Include="Classes\SystemTools\ProjectManager.cs" />
     <Compile Include="Classes\SystemTools\ISavable.cs" />
-    <Compile Include="Classes\SystemTools\QuickRun\QuickRunEnumToDescriptionValueConverter.cs" />
-    <Compile Include="Classes\SystemTools\QuickRun\QuickRunEnum.cs" />
+    <Compile Include="Classes\SystemTools\QuickRun\SmartQuickRunTargets.cs" />
+    <Compile Include="Classes\SystemTools\QuickRun\SmartQuickRunUsageAttribute.cs" />
     <Compile Include="Classes\SystemTools\RunToolCompletedEventArgs.cs" />
     <Compile Include="Classes\SystemTools\Settings.cs" />
     <Compile Include="Classes\SystemTools\SettingsManager.cs" />
@@ -307,8 +307,11 @@
     <Compile Include="Classes\Tools\CircleBezierPreset.cs" />
     <Compile Include="Classes\Tools\EditorReaderStuff.cs" />
     <Compile Include="Classes\Tools\MapCleaner.cs" />
+    <Compile Include="Classes\Tools\RhythmGuide.cs" />
     <Compile Include="Components\Domain\ColorToBrushConverter.cs" />
     <Compile Include="Components\Domain\CommandImplementation.cs" />
+    <Compile Include="Components\Domain\EnumToBoolConverter.cs" />
+    <Compile Include="Components\Domain\StringArrayToStringConverter.cs" />
     <Compile Include="Components\Domain\IsASCIIValidationRule.cs" />
     <Compile Include="Components\Domain\SnapDivisorToStringConverter.cs" />
     <Compile Include="Components\Domain\VolumeToPercentageConverter.cs" />
@@ -317,6 +320,9 @@
     <Compile Include="Components\Domain\ImportTypeToStringConverter.cs" />
     <Compile Include="Components\Domain\ParsableDoubleListValidationRule.cs" />
     <Compile Include="Components\Domain\DoubleToStringConverter.cs" />
+    <Compile Include="Components\ViewHeaderComponent.xaml.cs">
+      <DependentUpon>ViewHeaderComponent.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Components\HotkeyEditorControl.xaml.cs">
       <DependentUpon>HotkeyEditorControl.xaml</DependentUpon>
     </Compile>
@@ -335,6 +341,7 @@
     <Compile Include="Viewmodels\HitsoundPreviewHelperVM.cs" />
     <Compile Include="Viewmodels\HitsoundStudioVM.cs" />
     <Compile Include="Viewmodels\HitsoundCopierVM.cs" />
+    <Compile Include="Viewmodels\RhythmGuideVm.cs" />
     <Compile Include="Viewmodels\TimingCopierVM.cs" />
     <Compile Include="Viewmodels\MetadataManagerVm.cs" />
     <Compile Include="Viewmodels\PropertyTransformerVM.cs" />
@@ -343,8 +350,17 @@
     <Compile Include="Viewmodels\SliderMergerVM.cs" />
     <Compile Include="Viewmodels\PreferencesVM.cs" />
     <Compile Include="Viewmodels\StandardVM.cs" />
+    <Compile Include="Views\HiddenToolAttribute.cs" />
+    <Compile Include="Views\DontShowTitleAttribute.cs" />
     <Compile Include="Views\Extensions.cs" />
+    <Compile Include="Views\SingleRunMappingTool.cs" />
     <Compile Include="Views\MappingTool.cs" />
+    <Compile Include="Views\RhythmGuide\RhythmGuideView.xaml.cs">
+      <DependentUpon>RhythmGuideView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\RhythmGuide\RhythmGuideWindow.xaml.cs">
+      <DependentUpon>RhythmGuideWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SnappingTools\SnappingToolsOverlay.cs" />
     <Compile Include="Views\SnappingTools\SnappingToolsPreferencesWindow.xaml.cs">
       <DependentUpon>SnappingToolsPreferencesWindow.xaml</DependentUpon>
@@ -392,6 +408,10 @@
     <Compile Include="Views\HitsoundStudio\HitsoundLayerImportWindow.xaml.cs">
       <DependentUpon>HitsoundLayerImportWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="Components\ViewHeaderComponent.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Components\HotkeyEditorControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -428,6 +448,14 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\RhythmGuide\RhythmGuideView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\RhythmGuide\RhythmGuideWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\SnappingTools\SnappingToolsPreferencesWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

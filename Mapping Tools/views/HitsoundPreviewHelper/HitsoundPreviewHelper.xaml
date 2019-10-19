@@ -1,22 +1,17 @@
-﻿<local:MappingTool x:Class="Mapping_Tools.Views.HitsoundPreviewHelperView"
+﻿<local:SingleRunMappingTool x:Class="Mapping_Tools.Views.HitsoundPreviewHelperView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Mapping_Tools.Views"
-             xmlns:cm="clr-namespace:System.ComponentModel;assembly=System"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
+             x:Name="This"
              mc:Ignorable="d" Width="900" Height="700">
     <UserControl.Resources>
         <domain:DoubleToStringConverter x:Key="D2SConverter"/>
         <domain:SampleSetToStringConverter x:Key="SS2SConverter"/>
         <domain:HitsoundToStringConverter x:Key="HS2SConverter"/>
-        <cm:BackgroundWorker x:Key="backgroundWorker"
-         DoWork="BackgroundWorker_DoWork"
-         RunWorkerCompleted="BackgroundWorker_RunWorkerCompleted"
-         WorkerReportsProgress="True"
-         ProgressChanged="BackgroundWorker_ProgressChanged"/>
     </UserControl.Resources>
     <Grid Name="MasterGrid">
         <Grid.RowDefinitions>
@@ -83,29 +78,29 @@
                             </DataGridCheckBoxColumn.Header>
                         </DataGridCheckBoxColumn>
                         <materialDesign:MaterialDataGridTextColumn
-                            Binding="{Binding Name}"
+                            Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
                             Header="Name"
                             EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}" />
                         <materialDesign:MaterialDataGridTextColumn
-                            Binding="{Binding Filename}"
+                            Binding="{Binding Filename, UpdateSourceTrigger=PropertyChanged}"
                             Header="Filename"
                             EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}" />
                         <materialDesign:MaterialDataGridTextColumn
-                            Binding="{Binding XPos, Converter={StaticResource D2SConverter}, ConverterParameter=-1}"
+                            Binding="{Binding XPos, Converter={StaticResource D2SConverter}, ConverterParameter=-1, UpdateSourceTrigger=PropertyChanged}"
                             Header="X position"
                             EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"/>
                         <materialDesign:MaterialDataGridTextColumn
-                            Binding="{Binding YPos, Converter={StaticResource D2SConverter}, ConverterParameter=-1}"
+                            Binding="{Binding YPos, Converter={StaticResource D2SConverter}, ConverterParameter=-1, UpdateSourceTrigger=PropertyChanged}"
                             Header="Y position"
                             EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"/>
                         <!-- use custom combo box column to get better combos. Use ItemsSourceBinding as your binding template to be applied to each combo -->
                         <materialDesign:MaterialDataGridComboBoxColumn
                             Header="SampleSet"
-                            SelectedValueBinding="{Binding SampleSet, Converter={StaticResource SS2SConverter}}"
+                            SelectedValueBinding="{Binding SampleSet, Converter={StaticResource SS2SConverter}, UpdateSourceTrigger=PropertyChanged}"
                             ItemsSourceBinding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}, Path=DataContext.SampleSets}" />
                         <materialDesign:MaterialDataGridComboBoxColumn
                             Header="Hitsound"
-                            SelectedValueBinding="{Binding Hitsound, Converter={StaticResource HS2SConverter}}"
+                            SelectedValueBinding="{Binding Hitsound, Converter={StaticResource HS2SConverter}, UpdateSourceTrigger=PropertyChanged}"
                             ItemsSourceBinding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}, Path=DataContext.Hitsounds}" />
                     </DataGrid.Columns>
                 </DataGrid>
@@ -116,6 +111,9 @@
                         HorizontalAlignment="Right"
                         VerticalAlignment="Bottom"
                         Orientation="Horizontal">
+                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Generate rhythm guide" Command="{Binding RhythmGuideCommand}" Margin="5">
+                        <materialDesign:PackIcon Kind="AlternatingCurrent" Height="24" Width="24" />
+                    </Button>
                     <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add an item" Command="{Binding AddCommand}" Margin="5">
                         <materialDesign:PackIcon Kind="Plus" Height="24" Width="24" />
                     </Button>
@@ -130,7 +128,7 @@
 
             <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
                 <Button
-                    x:Name="start"
+                    IsEnabled="{Binding ElementName=This, Path=CanRun}"
                     Style="{StaticResource MaterialDesignFloatingActionButton}"
                     Click="Start_Click">
                     <materialDesign:PackIcon
@@ -149,8 +147,8 @@
                 </WrapPanel>
             </Grid>
             <Grid Grid.Column="1">
-                <ProgressBar x:Name="progress" Margin="20,0,20,0" Height="20" Background="{x:Null}" BorderBrush="{x:Null}"/>
+                <ProgressBar Value="{Binding ElementName=This, Path=Progress}" Margin="20,0,20,0" Height="20" Background="{x:Null}" BorderBrush="{x:Null}"/>
             </Grid>
         </Grid>
     </Grid>
-</local:MappingTool>
+</local:SingleRunMappingTool>

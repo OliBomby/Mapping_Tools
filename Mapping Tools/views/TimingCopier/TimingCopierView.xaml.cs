@@ -17,48 +17,34 @@ namespace Mapping_Tools.Views {
     /// <summary>
     /// Interactielogica voor TimingCopierView.xaml
     /// </summary>
-    public partial class TimingCopierView : MappingTool, ISavable<TimingCopierVM> {
-        private readonly BackgroundWorker backgroundWorker;
-
+    public partial class TimingCopierView : ISavable<TimingCopierVM> {
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "timingcopierproject.json");
 
         public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Timing Copier Projects");
+
+        public static readonly string ToolName = "Timing Copier";
+
+        public static readonly string ToolDescription = $@"Copies timing from A to B.{Environment.NewLine}There are 3 modes that describe how this program will handle moving objects (hitobjects/timingpoints/bookmarks) to the new timing:{Environment.NewLine}'Number of beats between objects stays the same' will move the objects so that the number of beats between objects stays the same. After that it will also resnap to the specified snap divisors. Make sure everything is snapped and don't use this if your new timing is supposed to change the number of beats between objects.{Environment.NewLine}'Just resnap' will snap the objects to the new timing on the specified snap divisors. This doesn't resnap bookmarks.{Environment.NewLine}'Don't move objects' will not move the objects at all.";
 
         public TimingCopierView() {
             InitializeComponent();
             DataContext = new TimingCopierVM();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
-            backgroundWorker = (BackgroundWorker) FindResource("backgroundWorker");
             ProjectManager.LoadProject(this, message: false);
         }
 
-        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
+        protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
             e.Result = Copy_Timing((TimingCopierVM) e.Argument, bgw, e);
-        }
-
-        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
-            if( e.Error != null ) {
-                MessageBox.Show(string.Format("{0}{1}{2}", e.Error.Message, Environment.NewLine, e.Error.StackTrace), "Error");
-            }
-            else {
-                MessageBox.Show(e.Result.ToString());
-                progress.Value = 0;
-            }
-            start.IsEnabled = true;
-        }
-
-        private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
-            progress.Value = e.ProgressPercentage;
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
             string filesToCopy = ((TimingCopierVM)DataContext).ExportPath;
             IOHelper.SaveMapBackup(filesToCopy.Split('|'));
 
-            backgroundWorker.RunWorkerAsync(DataContext);
-            start.IsEnabled = false;
+            BackgroundWorker.RunWorkerAsync(DataContext);
+            CanRun = false;
         }
 
         private string Copy_Timing(TimingCopierVM arg, BackgroundWorker worker, DoWorkEventArgs _) {

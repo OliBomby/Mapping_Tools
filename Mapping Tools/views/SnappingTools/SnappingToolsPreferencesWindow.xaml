@@ -3,6 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Mapping_Tools.Classes.SnappingTools"
+        xmlns:components="clr-namespace:Mapping_Tools.Components.Domain"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         Title="Snapping Tools Preferences" Height="500" Width="570" MinWidth="575" MinHeight="360"
@@ -24,6 +26,7 @@
  
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="VisibleIfTrueConverter" />
+        <components:EnumToBoolConverter x:Key="EnumToBoolConverter" />
     </Window.Resources>
 
     <Grid>
@@ -42,7 +45,6 @@
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Hidden">
             <Border Padding="10">
                 <StackPanel>
-
                     <ItemsControl ItemsSource="{Binding RelevantObjectPreferences}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -94,6 +96,33 @@
                                     <TextBox Text="{Binding OffsetBottom}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Bottom offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
                                 </StackPanel>
                             </ListBoxItem>
+
+                            <ListBoxItem>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Width="100" Margin="0 0 0 6" Text="Downkey:" VerticalAlignment="Center" ToolTip="Customize what gets displayed when the Activation Key is pressed."/>
+                                    <StackPanel>
+                                        <RadioButton IsChecked="{Binding KeyDownViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:ViewMode.Everything}}"
+                                                     Content="Everything" ToolTip="Default behavior. Display all virtual objects when the Activation Key is pressed."/>
+                                        <RadioButton IsChecked="{Binding KeyDownViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:ViewMode.ParentsOnly}}"
+                                                     Content="Parents Only" ToolTip="Display the object the cursor is currently snapping to and its parents."/>
+                                        <RadioButton IsChecked="{Binding KeyDownViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:ViewMode.Nothing}}"
+                                                     Content="Nothing" ToolTip="Do not display anything even if the Activation Key is pressed."/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Width="100" Margin="0 0 0 6" Text="Upkey:" VerticalAlignment="Center" ToolTip="Customize what gets displayed when the Activation Key is not pressed."/>
+                                    <StackPanel>
+                                        <RadioButton IsChecked="{Binding KeyUpViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:ViewMode.Everything}}"
+                                                     Content="Everything" ToolTip="Default behavior. Display all virtual objects even if the Activation Key is not pressed."/>
+                                        <RadioButton IsChecked="{Binding KeyUpViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:ViewMode.Nothing}}"
+                                                     Content="Nothing" ToolTip="Do not display anything if the Activation Key is not pressed."/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </ListBoxItem>
+
                             <ListBoxItem>
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Width="100" Margin="0 0 0 6" Text="Debug" VerticalAlignment="Center" ToolTip="Visualize boundaries of the overlay box for debugging purposes."/>

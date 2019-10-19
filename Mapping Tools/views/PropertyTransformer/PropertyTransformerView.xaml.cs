@@ -14,44 +14,25 @@ namespace Mapping_Tools.Views {
     /// <summary>
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
-    public partial class PropertyTransformerView : MappingTool {
-        private readonly BackgroundWorker backgroundWorker;
+    public partial class PropertyTransformerView {
+        public static readonly string ToolName = "Property Transformer";
+
+        public static readonly string ToolDescription = $@"Multiple and add to properties of all the timingpoints, hitobjects, bookmarks and storyboarded samples of the current map.{Environment.NewLine}The new value is the old value times the multiplier plus the offset. The multiplier is the left textbox and the offset is the right textbox. The multiplier gets done first.{Environment.NewLine}Resulting values get rounded if they have to be integer.";
 
         public PropertyTransformerView() {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
-            backgroundWorker = (BackgroundWorker)FindResource("backgroundWorker");
             DataContext = new PropertyTransformerVM();
         }
 
-        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
+        protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
             e.Result = TransformProperties((PropertyTransformerVM)e.Argument, bgw, e);
         }
 
-        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
-            if (e.Error != null) {
-                MessageBox.Show(string.Format("{0}{1}{2}", e.Error.Message, Environment.NewLine, e.Error.StackTrace), "Error");
-            } else {
-                MessageBox.Show(e.Result.ToString());
-                progress.Value = 0;
-            }
-            start.IsEnabled = true;
-        }
-
-        private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
-            progress.Value = e.ProgressPercentage;
-        }
-
         private bool Filter(double value, double time, bool doMatch, bool doRange, double match, double min, double max) {
             return (!doMatch || Precision.AlmostEquals(value, match, 0.01)) && (!doRange || (time >= min && time <= max));
-        }
-
-        private void UpdateProgressBar(BackgroundWorker worker, int progress) {
-            if (worker != null && worker.WorkerReportsProgress) {
-                worker.ReportProgress(progress);
-            }
         }
 
         private string TransformProperties(PropertyTransformerVM vm, BackgroundWorker worker, DoWorkEventArgs _) {
@@ -187,9 +168,9 @@ namespace Mapping_Tools.Views {
             IOHelper.SaveMapBackup(filesToCopy);
 
             ((PropertyTransformerVM)DataContext).MapPaths = filesToCopy;
-            backgroundWorker.RunWorkerAsync(DataContext);
+            BackgroundWorker.RunWorkerAsync(DataContext);
 
-            start.IsEnabled = false;
+            CanRun = false;
         }
     }
 }

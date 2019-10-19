@@ -83,11 +83,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
             Inherited = values[6] == "1";
 
-            if (TryParseInt(values[7], out int style)) {
-                BitArray b = new BitArray(new int[] { style });
-                Kiai = b[0];
-                OmitFirstBarLine = b[3];
-            } else throw new BeatmapParsingException("Failed to style of timing point", line);
+            if (values.Length > 7) {
+                if (TryParseInt(values[7], out int style)) {
+                    BitArray b = new BitArray(new int[] { style });
+                    Kiai = b[0];
+                    OmitFirstBarLine = b[3];
+                } else throw new BeatmapParsingException("Failed to style of timing point", line);
+            }
         }
 
         public TimingPoint Copy() {

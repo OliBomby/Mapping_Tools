@@ -134,12 +134,15 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public void GiveObjectsGreenlines() {
-            foreach (HitObject ho in HitObjects) {
+            foreach (var ho in HitObjects) {
                 ho.SV = BeatmapTiming.GetSVAtTime(ho.Time);
                 ho.TP = BeatmapTiming.GetTimingPointAtTime(ho.Time);
                 ho.HitsoundTP = BeatmapTiming.GetTimingPointAtTime(ho.Time + 5);
                 ho.Redline = BeatmapTiming.GetRedlineAtTime(ho.Time);
                 ho.BodyHitsounds = BeatmapTiming.GetTimingPointsInTimeRange(ho.Time, ho.EndTime);
+                foreach (var time in ho.GetAllTloTimes(BeatmapTiming)) {
+                    ho.BodyHitsounds.RemoveAll(o => Math.Abs(time - o.Offset) <= 5);
+                }
             }
         }
 

@@ -6,123 +6,81 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Reflection;
 using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.SystemTools.QuickRun;
+using Mapping_Tools.Views.RhythmGuide;
 
 namespace Mapping_Tools.Views {
     public class ViewCollection {
+        private static readonly Type _acceptableType = typeof(UserControl);
+        private static readonly Type _mappingToolType = typeof(MappingTool);
+        private static readonly Type _quickRunType = typeof(IQuickRun);
+
+        public Dictionary<Type, object> Views = new Dictionary<Type, object>();
+
+        private static Type[] _allViewTypes;
+        public static Type[] GetAllViewTypes() {
+            return _allViewTypes ?? (_allViewTypes = AppDomain.CurrentDomain.GetAssemblies()
+                       .SelectMany(x => x.GetTypes())
+                       .Where(x => _acceptableType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract).ToArray());
+        }
+
+        private static Type[] _allToolTypes;
+        public static Type[] GetAllToolTypes() {
+            return _allToolTypes ?? (_allToolTypes = GetAllViewTypes()
+                       .Where(x => _mappingToolType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract).ToArray());
+        }
+
+        private static Type[] _allQuickRunTypes;
+        public static Type[] GetAllQuickRunTypes() {
+            return _allQuickRunTypes ?? (_allQuickRunTypes = GetAllToolTypes()
+                       .Where(x => _quickRunType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract).ToArray());
+        }
+
+        public static Type[] GetAllQuickRunTypesWithTargets(SmartQuickRunTargets targets) {
+            return GetAllQuickRunTypes().Where(o => {
+                    var attribute = o.GetCustomAttribute<SmartQuickRunUsageAttribute>();
+                    return attribute != null && attribute.Targets.HasFlag(targets);
+                })
+                .ToArray();
+        }
+
+        public static string[] GetNames(Type[] types) {
+            return types.Where(o => o.GetField("ToolName") != null)
+                .Select(GetName).ToArray();
+        }
+
+        public static string GetName(Type type) {
+            return type.GetField("ToolName") == null ? type.ToString() : type.GetField("ToolName").GetValue(null).ToString();
+        }
+
+        public static string GetDescription(Type type) {
+            return type.GetField("ToolDescription") == null ? "" : type.GetField("ToolDescription").GetValue(null).ToString();
+        }
+
+        public static Type GetType(string name) {
+            return GetAllViewTypes().FirstOrDefault(o => GetName(o) == name);
+        }
+
+        public object GetView(Type type) {
+            if (!Views.ContainsKey(type)) {
+                Views.Add(type, Activator.CreateInstance(type));
+            }
+            return Views[type];
+        }
+
+        public object GetView(string name) {
+            var type = GetType(name);
+            if (type == null) {
+                throw new ArgumentException($"There exists no view with name '{name}'");
+            }
+
+            return GetView(type);
+        }
+
         public void AutoSaveSettings() {
-            foreach (var prop in typeof(ViewCollection).GetProperties(BindingFlags.NonPublic | BindingFlags.Instance)) {
-                var value = prop.GetValue(this);
-                if (value == null)
-                    continue;
-                if (ProjectManager.IsSavable(value)) {
-                    dynamic v = prop.GetValue(this);
-                    ProjectManager.SaveProject(v);
-                }
+            foreach (var kvp in Views.Where(kvp => ProjectManager.IsSavable(kvp.Key))) {
+                ProjectManager.SaveProject((dynamic)kvp.Value);
             }
-        }
-
-        private UserControl Standard { get; set; }
-        public UserControl GetStandard() {
-            if (Standard == null) {
-                Standard = new StandardView();
-            }
-            return Standard;
-        }
-
-        private UserControl Preferences { get; set; }
-        public UserControl GetPreferences() {
-            if (Preferences == null) {
-                Preferences = new PreferencesView();
-            }
-            return Preferences;
-        }
-
-        private UserControl MapCleaner { get; set; }
-        public UserControl GetMapCleaner() {
-            if (MapCleaner == null) {
-                MapCleaner = new CleanerView();
-            }
-            return MapCleaner;
-        }
-
-        private UserControl MatadataManager { get; set; }
-        public UserControl GetMetadataManager() {
-            if (MatadataManager == null) {
-                MatadataManager = new MetadataManagerView();
-            }
-            return MatadataManager;
-        }
-
-        private UserControl HitsoundPreviewHelper { get; set; }
-        public UserControl GetHitsoundPreviewHelper() {
-            if (HitsoundPreviewHelper == null) {
-                HitsoundPreviewHelper = new HitsoundPreviewHelperView();
-            }
-            return HitsoundPreviewHelper;
-        }
-
-        private UserControl PropertyTransformer { get; set; }
-        public UserControl GetPropertyTransformer() {
-            if (PropertyTransformer == null) {
-                PropertyTransformer = new PropertyTransformerView();
-            }
-            return PropertyTransformer;
-        }
-
-        private UserControl HitsoundCopier { get; set; }
-        public UserControl GetHitsoundCopier() {
-            if (HitsoundCopier == null) {
-                HitsoundCopier = new HitsoundCopierView();
-            }
-            return HitsoundCopier;
-        }
-
-        private UserControl HitsoundStudio { get; set; }
-        public UserControl GetHitsoundStudio() {
-            if (HitsoundStudio == null) {
-                HitsoundStudio = new HitsoundStudioView();
-            }
-            return HitsoundStudio;
-        }
-
-        private UserControl SliderCompletionator { get; set; }
-        public UserControl GetSliderCompletionator() {
-            if (SliderCompletionator == null) {
-                SliderCompletionator = new SliderCompletionatorView();
-            }
-            return SliderCompletionator;
-        }
-
-        private UserControl SliderMerger { get; set; }
-        public UserControl GetSliderMerger() {
-            if (SliderMerger == null) {
-                SliderMerger = new SliderMergerView();
-            }
-            return SliderMerger;
-        }
-
-        private UserControl SnappingTools { get; set; }
-        public UserControl GetSnappingTools() {
-            if (SnappingTools == null) {
-                SnappingTools = new SnappingToolsView();
-            }
-            return SnappingTools;
-        }
-
-        private UserControl TimingCopier { get; set; }
-        public UserControl GetTimingCopier() {
-            if (TimingCopier == null) {
-                TimingCopier = new TimingCopierView();
-            }
-            return TimingCopier;
-        }
-
-        private UserControl TimingHelper { get; set; }
-        public UserControl GetTimingHelper() {
-            if (TimingHelper == null) {
-                TimingHelper = new TimingHelperView();
-            }
-            return TimingHelper;
         }
     }
 }

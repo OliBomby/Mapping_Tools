@@ -1,54 +1,33 @@
-﻿using System;
+﻿using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.SystemTools.QuickRun;
+using Mapping_Tools.Classes.Tools;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.SliderPathStuff;
-using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.Tools;
 
 namespace Mapping_Tools.Views {
     /// <summary>
     /// Interaktionslogik für UserControl1.xaml
     /// </summary>
-    public partial class SliderCompletionatorView : MappingTool, IQuickRun {
-        private readonly BackgroundWorker backgroundWorker;
-        private bool canRun = true;
-
+    [SmartQuickRunUsage(SmartQuickRunTargets.AnySelection)]
+    public partial class SliderCompletionatorView : IQuickRun {
         public event EventHandler RunFinished;
+
+        public static readonly string ToolName = "Slider Completionator";
+
+        public static readonly string ToolDescription = $@"Change the length and duration of marked sliders and this tool will automatically handle the SV for you.";
 
         public SliderCompletionatorView() {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
-            backgroundWorker = (BackgroundWorker) FindResource("backgroundWorker") ;
         }
 
-        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
+        protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
             e.Result = Complete_Sliders((Arguments) e.Argument, bgw, e);
-        }
-
-        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
-            if (e.Error != null) {
-                MessageBox.Show(string.Format("{0}{1}{2}", e.Error.Message, Environment.NewLine, e.Error.StackTrace), "Error");
-            } else {
-                if (e.Result.ToString() != "")
-                    MessageBox.Show(e.Result.ToString());
-                progress.Value = 0;
-            }
-            start.IsEnabled = true;
-            canRun = true;
-        }
-
-        private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
-            progress.Value = e.ProgressPercentage;
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
@@ -60,13 +39,12 @@ namespace Mapping_Tools.Views {
         }
 
         private void RunTool(string[] paths, bool quick = false) {
-            if (!canRun) return;
+            if (!CanRun) return;
 
             IOHelper.SaveMapBackup(paths);
 
-            backgroundWorker.RunWorkerAsync(new Arguments(paths, TemporalBox.GetDouble(), SpatialBox.GetDouble(), SelectionModeBox.SelectedIndex, quick));
-            start.IsEnabled = false;
-            canRun = false;
+            BackgroundWorker.RunWorkerAsync(new Arguments(paths, TemporalBox.GetDouble(), SpatialBox.GetDouble(), SelectionModeBox.SelectedIndex, quick));
+            CanRun = false;
         }
 
         private struct Arguments {

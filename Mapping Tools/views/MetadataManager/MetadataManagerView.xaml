@@ -1,4 +1,4 @@
-﻿<local:MappingTool x:Class="Mapping_Tools.Views.MetadataManagerView"
+﻿<local:SingleRunMappingTool x:Class="Mapping_Tools.Views.MetadataManagerView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -8,13 +8,9 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
              mc:Ignorable="d" 
+             x:Name="This"
              d:DesignHeight="650" Width="759.5">
     <UserControl.Resources>
-        <cm:BackgroundWorker x:Key="backgroundWorker"
-         DoWork="BackgroundWorker_DoWork"
-         RunWorkerCompleted="BackgroundWorker_RunWorkerCompleted"
-         WorkerReportsProgress="True"
-         ProgressChanged="BackgroundWorker_ProgressChanged"/>
         <domain:IsASCIIValidationRule x:Key="IsASCIIValidationRule"/>
     </UserControl.Resources>
     <Grid Name="MasterGrid">
@@ -132,7 +128,7 @@
             </StackPanel>
             <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
                 <Button
-                    x:Name="start"
+                    IsEnabled="{Binding ElementName=This, Path=CanRun}"
                     Style="{StaticResource MaterialDesignFloatingActionButton}"
                     Click="Start_Click">
                     <materialDesign:PackIcon
@@ -151,8 +147,8 @@
                 </WrapPanel>
             </Grid>
             <Grid Grid.Column="1">
-                <ProgressBar x:Name="progress" Margin="20,0,20,0" Height="20" Background="{x:Null}" BorderBrush="{x:Null}"/>
+                <ProgressBar Value="{Binding ElementName=This, Path=Progress}" Margin="20,0,20,0" Height="20" Background="{x:Null}" BorderBrush="{x:Null}"/>
             </Grid>
         </Grid>
     </Grid>
-</local:MappingTool>
+</local:SingleRunMappingTool>

@@ -62,6 +62,16 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
         }
 
+        private bool _useEditorReader;
+        public bool UseEditorReader {
+            get => _useEditorReader;
+            set {
+                if (_useEditorReader == value) return;
+                _useEditorReader = value;
+                OnPropertyChanged();
+            }
+        }
+
         private bool _overrideOsuSave;
         public bool OverrideOsuSave {
             get => _overrideOsuSave;
@@ -102,9 +112,18 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
         }
 
-        public static IEnumerable<SingleQuickRunEnum> SingleQuickRunEnumerable => Enum.GetValues(typeof(SingleQuickRunEnum)).Cast<SingleQuickRunEnum>();
-        private SingleQuickRunEnum _singleQuickRunTool;
-        public SingleQuickRunEnum SingleQuickRunTool {
+        private string _noneQuickRunTool;
+        public string NoneQuickRunTool {
+            get => _noneQuickRunTool;
+            set {
+                if (_noneQuickRunTool == value) return;
+                _noneQuickRunTool = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _singleQuickRunTool;
+        public string SingleQuickRunTool {
             get => _singleQuickRunTool;
             set {
                 if (_singleQuickRunTool == value) return;
@@ -113,9 +132,8 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
         }
 
-        public static IEnumerable<MultipleQuickRunEnum> MultipleQuickRunEnumerable => Enum.GetValues(typeof(MultipleQuickRunEnum)).Cast<MultipleQuickRunEnum>();
-        private MultipleQuickRunEnum _multipleQuickRunTool;
-        public MultipleQuickRunEnum MultipleQuickRunTool {
+        private string _multipleQuickRunTool;
+        public string MultipleQuickRunTool {
             get => _multipleQuickRunTool;
             set {
                 if (_multipleQuickRunTool == value) return;
@@ -150,11 +168,13 @@ namespace Mapping_Tools.Classes.SystemTools {
             SongsPath = "";
             BackupsPath = "";
             MakeBackups = true;
+            UseEditorReader = true;
             OverrideOsuSave = false;
             AutoReload = true;
             SmartQuickRunEnabled = true;
-            SingleQuickRunTool = SingleQuickRunEnum.Current;
-            MultipleQuickRunTool = MultipleQuickRunEnum.Current;
+            NoneQuickRunTool = "<Current Tool>";
+            SingleQuickRunTool = "<Current Tool>";
+            MultipleQuickRunTool = "<Current Tool>";
         }
 
         public void CopyTo(Settings other) {

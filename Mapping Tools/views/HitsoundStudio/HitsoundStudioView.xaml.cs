@@ -17,11 +17,10 @@ namespace Mapping_Tools.Views {
     /// <summary>
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
-    public partial class HitsoundStudioView : MappingTool, ISavable<HitsoundStudioVM> {
-        private readonly BackgroundWorker backgroundWorker;
+    public partial class HitsoundStudioView : ISavable<HitsoundStudioVM> {
         private HitsoundStudioVM Settings;
 
-        private bool suppressEvents = false;
+        private bool suppressEvents;
 
         private List<HitsoundLayer> selectedLayers;
         private HitsoundLayer selectedLayer;
@@ -30,11 +29,14 @@ namespace Mapping_Tools.Views {
 
         public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Hitsound Studio Projects");
 
+        public static readonly string ToolName = "Hitsound Studio";
+
+        public static readonly string ToolDescription = $@"Hitsound Studio is the tool that lets you import data from multiple outside sources and convert them to osu! standard hitsounds in the form of a hitsounding difficulty that can you copy to other beatmaps.{Environment.NewLine}It represents hitsounds as a list of layers (hitsound layers). One layer contains a unique sound, the sampleset and hitsound that accompany that sound and a list of times that sound has to be played.";
+
         public HitsoundStudioView() {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
-            backgroundWorker = (BackgroundWorker)FindResource("backgroundWorker");
             Settings = new HitsoundStudioVM();
             DataContext = Settings;
             LayersList.SelectedIndex = 0;
@@ -43,23 +45,9 @@ namespace Mapping_Tools.Views {
             ProjectManager.LoadProject(this, message: false);
         }
 
-        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
+        protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
             Make_Hitsounds((Arguments)e.Argument, bgw, e);
-        }
-
-        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
-            if (e.Error != null) {
-                MessageBox.Show(string.Format("{0}{1}{2}", e.Error.Message, Environment.NewLine, e.Error.StackTrace), "Error");
-            } else {
-                progress.Value = 0;
-            }
-            start.IsEnabled = true;
-            startish.IsEnabled = true;
-        }
-
-        private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
-            progress.Value = e.ProgressPercentage;
         }
 
         private struct Arguments {
@@ -162,15 +150,9 @@ namespace Mapping_Tools.Views {
             UpdateProgressBar(worker, 100);
         }
 
-        private void UpdateProgressBar(BackgroundWorker worker, int progress) {
-            if (worker != null && worker.WorkerReportsProgress) {
-                worker.ReportProgress(progress);
-            }
-        }
-
         private void Startish_Click(object sender, RoutedEventArgs e) {
-            backgroundWorker.RunWorkerAsync(new Arguments(MainWindow.ExportPath, Settings.BaseBeatmap, Settings.DefaultSample, Settings.HitsoundLayers.ToList(), true));
-            startish.IsEnabled = false;
+            BackgroundWorker.RunWorkerAsync(new Arguments(MainWindow.ExportPath, Settings.BaseBeatmap, Settings.DefaultSample, Settings.HitsoundLayers.ToList(), true));
+            CanRun = false;
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
@@ -178,8 +160,8 @@ namespace Mapping_Tools.Views {
                 MessageBox.Show("Please import a base beatmap and default hitsound first.");
                 return;
             }
-            backgroundWorker.RunWorkerAsync(new Arguments(MainWindow.ExportPath, Settings.BaseBeatmap, Settings.DefaultSample, Settings.HitsoundLayers.ToList(), false));
-            start.IsEnabled = false;
+            BackgroundWorker.RunWorkerAsync(new Arguments(MainWindow.ExportPath, Settings.BaseBeatmap, Settings.DefaultSample, Settings.HitsoundLayers.ToList(), false));
+            CanRun = false;
         }
 
         private void GetSelectedLayers() {

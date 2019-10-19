@@ -12,39 +12,25 @@ namespace Mapping_Tools.Views {
     /// Interactielogica voor MetadataManagerView.xaml
     /// </summary>
     public partial class MetadataManagerView : ISavable<MetadataManagerVm> {
-        private readonly BackgroundWorker backgroundWorker;
-
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "metadataproject.json");
 
         public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Metadata Manager Projects");
+
+        public static readonly string ToolName = "Metadata Manager";
+
+        public static readonly string ToolDescription = $@"To save you the time of editing metadata on every individual difficulty, edit metadata in this tool and copy it to multiple diffs anytime.{Environment.NewLine}You can also import metadata from beatmaps, so you can copy metadata from A to B.{Environment.NewLine}Save and load metadata configurations, so you can work on multiple mapsets without hassle.";
 
         public MetadataManagerView() {
             InitializeComponent();
             DataContext = new MetadataManagerVm();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
-            backgroundWorker = (BackgroundWorker) FindResource("backgroundWorker");
             ProjectManager.LoadProject(this, message: false);
         }
 
-        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
+        protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
             e.Result = Copy_Metadata((MetadataManagerVm) e.Argument, bgw, e);
-        }
-
-        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
-            if( e.Error != null ) {
-                MessageBox.Show($"{e.Error.Message}{Environment.NewLine}{e.Error.StackTrace}", "Error");
-            }
-            else {
-                MessageBox.Show(e.Result.ToString());
-                progress.Value = 0;
-            }
-            start.IsEnabled = true;
-        }
-
-        private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
-            progress.Value = e.ProgressPercentage;
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
@@ -53,8 +39,8 @@ namespace Mapping_Tools.Views {
                 IOHelper.SaveMapBackup(fileToCopy);
             }
 
-            backgroundWorker.RunWorkerAsync((MetadataManagerVm)DataContext);
-            start.IsEnabled = false;
+            BackgroundWorker.RunWorkerAsync((MetadataManagerVm)DataContext);
+            CanRun = false;
         }
 
 
