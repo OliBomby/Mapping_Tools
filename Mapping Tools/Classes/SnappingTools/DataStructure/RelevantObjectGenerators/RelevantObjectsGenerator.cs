@@ -59,7 +59,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         }
 
         public static Type[] GetDependencies(MethodInfo generatorMethodInfo) {
-            return generatorMethodInfo.GetGenericArguments();
+            return generatorMethodInfo.GetParameters().Select(o => o.ParameterType).ToArray();
         }
 
         public static Type GetReturnType(MethodInfo generatorMethodInfo) {

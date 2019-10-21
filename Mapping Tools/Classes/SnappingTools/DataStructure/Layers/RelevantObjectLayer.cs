@@ -70,9 +70,19 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                     var dependencies = RelevantObjectsGenerator.GetDependencies(method);
                     var needsHitObjects = RelevantObjectsGenerator.NeedsHitObjects(method);
 
-                    var parametersList = RelevantObjectPairGenerator.GetParametersList(dependencies, PreviousLayer.Objects);
-                    
+                    // Continue if there are dependencies but nothing to get the values from
+                    if (dependencies.Length > 0 && PreviousLayer == null) {
+                        continue;
+                    }
+
+                    var parametersList = RelevantObjectPairGenerator.GetParametersList(dependencies, PreviousLayer?.Objects);
+                    Console.WriteLine(generator.Name);
+                    Console.WriteLine("Previous layer: " + PreviousLayer);
+                    Console.WriteLine("Dependencies length: " + dependencies.Length);
                     foreach (var parameters in parametersList) {
+                        foreach (var parameter in parameters) {
+                            Console.WriteLine(parameter);
+                        }
                         // Generate the new relevant object(s)
                         var result = method.Invoke(generator, parameters);
 
@@ -106,7 +116,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
 
                                 // Add the new relevant objects to this layer
                                 Add(newRelevantObject, false);
-                                addedSomething = true
+                                addedSomething = true;
                                 break;
                         }
                     }

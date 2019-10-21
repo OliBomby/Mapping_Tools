@@ -10,6 +10,10 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
     public class RelevantObjectPairGenerator {
         public static IEnumerable<object[]> GetParametersList(Type[] dependencies,
             RelevantObjectCollection.RelevantObjectCollection collection) {
+            // Handle special case
+            if (collection == null || dependencies.Length == 0) {
+                return new[] {new object[0] };
+            }
 
             // Count how many of every type are in the neededCombinations
             var neededCombinations = new Dictionary<Type, int>();

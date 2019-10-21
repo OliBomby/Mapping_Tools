@@ -13,6 +13,15 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure {
 
         public double AcceptableDifference { get; set; }
 
+        public LayerCollection(RelevantObjectsGeneratorCollection generators, double acceptableDifference) {
+            ObjectLayers = new List<RelevantObjectLayer>();
+            AllGenerators = generators;
+            AcceptableDifference = acceptableDifference;
+
+            // Generate 1 layer
+            ObjectLayers.Add(new RelevantObjectLayer(this, AllGenerators));
+        }
+
         public void SetInceptionLevel(int inceptionLevel) {
             if (inceptionLevel < 0) {
                 throw new ArgumentException("Inception level can't be less than 0.");
@@ -22,9 +31,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure {
                 // Add more layers
                 var layersToAdd = inceptionLevel - ObjectLayers.Count;
                 for (var i = 0; i < layersToAdd; i++) {
-                    var lastLayer = ObjectLayers.Last();
+                    var lastLayer = ObjectLayers.LastOrDefault();
                     var newLayer = new RelevantObjectLayer(this, AllGenerators) {PreviousLayer = lastLayer};
-                    lastLayer.NextLayer = newLayer;
+                    if (lastLayer != null) lastLayer.NextLayer = newLayer;
                     ObjectLayers.Add(newLayer);
                 }
             } else if (ObjectLayers.Count > inceptionLevel) {
@@ -32,8 +41,8 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure {
                 var layersToRemove = ObjectLayers.Count - inceptionLevel;
                 for (var i = 0; i < layersToRemove; i++) {
                     ObjectLayers.RemoveAt(ObjectLayers.Count - 1);
-                    var lastLayer = ObjectLayers.Last();
-                    lastLayer.NextLayer = null;
+                    var lastLayer = ObjectLayers.LastOrDefault();
+                    if (lastLayer != null) lastLayer.NextLayer = null;
                 }
             }
         }
@@ -58,7 +67,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure {
         }
 
         public IEnumerable<RelevantHitObject> GetRootRelevantHitObjects() {
-            return GetRootLayer().Objects[typeof(RelevantHitObject)].Cast<RelevantHitObject>();
+            return GetRootLayer().Objects.TryGetValue(typeof(RelevantHitObject), out var list)
+                ? list.Cast<RelevantHitObject>()
+                : new RelevantHitObject[0];
         }
     }
 }

@@ -87,13 +87,6 @@ namespace Mapping_Tools.Viewmodels {
             // Set up a coordinate converter for converting coordinates between screen and osu!
             _coordinateConverter = new CoordinateConverter();
 
-            // Initialize layer collection
-            LayerCollection = new LayerCollection() {
-                AllGenerators = new RelevantObjectsGeneratorCollection(Generators),
-                AcceptableDifference = 10
-            };
-            LayerCollection.SetInceptionLevel(2);
-
             // Get preferences
             Preferences = new SnappingToolsPreferences();
             Preferences.PropertyChanged += PreferencesOnPropertyChanged;
@@ -114,6 +107,10 @@ namespace Mapping_Tools.Viewmodels {
             view.GroupDescriptions.Add(groupDescription);
             view.Filter = UserFilter;
 
+            // Initialize layer collection
+            LayerCollection = new LayerCollection(new RelevantObjectsGeneratorCollection(Generators), 10);
+            LayerCollection.SetInceptionLevel(2);
+            
             // Set up timers for responding to hotkey presses and beatmap changes
             _updateTimer = new DispatcherTimer(DispatcherPriority.Normal) { Interval = TimeSpan.FromMilliseconds(100) };
             _updateTimer.Tick += UpdateTimerTick;
@@ -200,7 +197,7 @@ namespace Mapping_Tools.Viewmodels {
         private void OnGeneratorPropertyChanged(object sender, PropertyChangedEventArgs e) {
             if (e.PropertyName == "IsActive" && _state == State.Active) {
                 // Reload relevant objects when a generator gets enabled/disabled
-                GenerateRelevantObjects();
+                LayerCollection.GetRootLayer().GenerateNewObjects();
                 _overlay.OverlayWindow.InvalidateVisual();
             }
         }
@@ -271,13 +268,11 @@ namespace Mapping_Tools.Viewmodels {
                     _updateTimer.Interval = TimeSpan.FromMilliseconds(100);
 
                     if (reader.ProcessNeedsReload()) {
-                        ClearRelevantObjects();
                         _state = State.LookingForProcess;
                         _overlay.Dispose();
                         return;
                     }
                     if (reader.EditorNeedsReload()) {
-                        ClearRelevantObjects();
                         _state = State.LookingForEditor;
                         _overlay.Dispose();
                         return;
@@ -301,16 +296,6 @@ namespace Mapping_Tools.Viewmodels {
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-        }
-
-        private void ClearRelevantObjects(bool redraw = true) {
-            if (RelevantObjects.Count == 0) return;
-            RelevantPoints.Clear();
-            RelevantLines.Clear();
-            RelevantCircles.Clear();
-            RelevantObjects.Clear();
-            if (redraw)
-                _overlay.OverlayWindow.InvalidateVisual();
         }
 
         private List<HitObject> GetVisibleHitObjects()
@@ -344,9 +329,6 @@ namespace Mapping_Tools.Viewmodels {
                 return;
             }
 
-            // Update relevant objects
-            GenerateRelevantObjects(visibleObjects);
-
             _overlay.OverlayWindow.InvalidateVisual();
         }
 
@@ -372,12 +354,15 @@ namespace Mapping_Tools.Viewmodels {
             // CONVERT THIS CURSOR POSITION TO EDITOR POSITION
             var cursorPos = _coordinateConverter.ScreenToEditorCoordinate(new Vector2(cursorPoint.X, cursorPoint.Y));
 
-            if (RelevantObjects.Count == 0)
+            // Get all the relevant drawables
+            var drawables = LayerCollection.GetAllRelevantDrawables().ToArray();
+
+            if (drawables.Length == 0)
                 return;
 
             IRelevantDrawable nearest = null;
             var smallestDistance = double.PositiveInfinity;
-            foreach (var o in RelevantObjects) {
+            foreach (var o in drawables) {
                 var dist = o.DistanceTo(cursorPos);
                 if (o is RelevantPoint) // Prioritize points to be able to snap to intersections
                     dist -= PointsBias;
