@@ -49,6 +49,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
             // Insert the new object
             Objects.SortedInsert(relevantObject);
 
+            // Set layer variable in object
+            relevantObject.Layer = this;
+
             // Propagate changes
             if (propagate) {
                 NextLayer?.GenerateNewObjects();
@@ -58,7 +61,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
         /// <summary>
         /// Generates relevant objects and adds them to this layer.
         /// </summary>
-        public void GenerateNewObjects() {
+        public void GenerateNewObjects(bool forcePropagate = false) {
             var addedSomething = false;
             var activeGenerators = GeneratorCollection.GetActiveGenerators();
             foreach (var generator in activeGenerators) {
@@ -76,13 +79,8 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                     }
 
                     var parametersList = RelevantObjectPairGenerator.GetParametersList(dependencies, PreviousLayer?.Objects);
-                    Console.WriteLine(generator.Name);
-                    Console.WriteLine("Previous layer: " + PreviousLayer);
-                    Console.WriteLine("Dependencies length: " + dependencies.Length);
+
                     foreach (var parameters in parametersList) {
-                        foreach (var parameter in parameters) {
-                            Console.WriteLine(parameter);
-                        }
                         // Generate the new relevant object(s)
                         var result = method.Invoke(generator, parameters);
 
@@ -94,9 +92,10 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                                 // Enumerate to array
                                 var newRelevantObjectsArray = newRelevantObjectsEnumerable as IRelevantObject[] ?? newRelevantObjectsEnumerable.ToArray();
 
-                                // Add parents to the new relevant objects
+                                // Add parents and generator to the new relevant objects
                                 foreach (var relevantObject in newRelevantObjectsArray) {
                                     relevantObject.ParentObjects = relevantParents;
+                                    relevantObject.Generator = generator;
                                 }
 
                                 // Add the new relevant objects to the children of the parents
@@ -108,8 +107,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                                 break;
                             }
                             case IRelevantObject newRelevantObject:
-                                // Add parents to the new relevant object
+                                // Add parents and generator to the new relevant object
                                 newRelevantObject.ParentObjects = relevantParents;
+                                newRelevantObject.Generator = generator;
 
                                 // Add the new relevant object to the children of the parents
                                 relevantParents.ForEach(o => o.ChildObjects.Add(newRelevantObject));
@@ -124,24 +124,34 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
             }
 
             // Propagate if anything was added to this layer
-            if (addedSomething) {
-                NextLayer?.GenerateNewObjects();
+            if (addedSomething || forcePropagate) {
+                NextLayer?.GenerateNewObjects(forcePropagate);
             }
         }
 
-        public void Remove(IEnumerable<IRelevantObject> relevantObjects) {
+        public void Remove(IEnumerable<IRelevantObject> relevantObjects, bool propagate = true) {
             foreach (var relevantObject in relevantObjects) {
-                Remove(relevantObject);
+                Remove(relevantObject, propagate);
             }
         }
 
-        public void Remove(IRelevantObject relevantObject) {
+        public void Remove(IRelevantObject relevantObject, bool propagate = true) {
+            if (relevantObject.Disposed) return;
+
             // Remove relevant object from this layer
             Objects.RemoveRelevantObject(relevantObject);
 
-            // Kill all children
-            foreach (var relevantObjectChildObject in relevantObject.ChildObjects) {
-                relevantObjectChildObject.Layer.Remove(relevantObjectChildObject);
+            if (propagate) {
+                // Return if there are no children
+                if (relevantObject.ChildObjects == null) {
+                    return;
+                }
+
+                // Kill all children
+                foreach (var relevantObjectChildObject in relevantObject.ChildObjects.Where(relevantObjectChildObject =>
+                    relevantObjectChildObject.Layer != null)) {
+                    relevantObjectChildObject.Layer.Remove(relevantObjectChildObject);
+                }
             }
         }
     }

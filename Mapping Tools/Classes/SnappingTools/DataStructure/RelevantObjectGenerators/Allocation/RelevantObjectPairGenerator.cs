@@ -21,7 +21,18 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
                 if (neededCombinations.ContainsKey(type)) {
                     neededCombinations[type] += 1;
                 } else {
-                    neededCombinations[type] = 1;
+                    neededCombinations.Add(type, 1);
+                }
+            }
+
+            // Check if the collection contains enough items to ever satisfy the needed combinations
+            foreach (var neededCombination in neededCombinations) {
+                if (collection.TryGetValue(neededCombination.Key, out var list)) {
+                    if (list.Count < neededCombination.Value) {
+                        return new object[0][];
+                    }
+                } else {
+                    return new object[0][];
                 }
             }
 

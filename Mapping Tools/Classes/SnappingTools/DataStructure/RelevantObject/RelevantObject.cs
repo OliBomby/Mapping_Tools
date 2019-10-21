@@ -1,14 +1,24 @@
-﻿using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
+﻿using Mapping_Tools.Classes.SnappingTools.DataStructure.Layers;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.Layers;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
     public abstract class RelevantObject : IRelevantObject {
         public void Dispose() {
+            Layer?.Remove(this, false);
             Disposed = true;
-            throw new System.NotImplementedException();
+
+            // Return if there are no children
+            if (ChildObjects == null) {
+                return;
+            }
+
+            // Kill all children
+            foreach (var relevantObjectChildObject in ChildObjects) {
+                relevantObjectChildObject.Dispose();
+            }
         }
 
         private double _time;
@@ -16,8 +26,8 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
             get => _time;
             set {
                 _time = value;
-                ChildObjects.ForEach(o => o.UpdateTime());
-                Layer.SortTimes();
+                ChildObjects?.ForEach(o => o.UpdateTime());
+                Layer?.SortTimes();
             }
         }
 
@@ -26,7 +36,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
             get => _relevancy;
             set {
                 _relevancy = value;
-                ChildObjects.ForEach(o => o.UpdateRelevancy());
+                ChildObjects?.ForEach(o => o.UpdateRelevancy());
             }
         }
         public bool Disposed { get; set; }
@@ -44,6 +54,12 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         }
 
         public List<IRelevantObject> ChildObjects { get; set; }
+
+        protected RelevantObject() {
+            ParentObjects = new List<IRelevantObject>();
+            ChildObjects = new List<IRelevantObject>();
+        }
+
         public void UpdateRelevancy() {
             if (ParentObjects == null || ParentObjects.Count == 0) return;
             Relevancy = ParentObjects.Max(o => o.Relevancy);

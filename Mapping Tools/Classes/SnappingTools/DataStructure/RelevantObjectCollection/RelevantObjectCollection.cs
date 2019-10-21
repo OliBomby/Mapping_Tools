@@ -16,7 +16,11 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectCollec
             if (TryGetValue(type, out var list)) {
                 // Insert the new object at the right index so time stays sorted
                 var index = list.FindIndex(o => o.Time > obj.Time);
-                list.Insert(index, obj);
+                if (index == -1) {
+                    list.Add(obj);
+                } else {
+                    list.Insert(index, obj);
+                }
             } else {
                 Add(type, new List<IRelevantObject> {obj});
             }
@@ -24,7 +28,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectCollec
 
         public bool FindSimilar(IRelevantObject obj, double acceptableDifference, out IRelevantObject similarObject) {
             var type = obj.GetType();
-            similarObject = TryGetValue(type, out var list) ? list.First(o => obj.DistanceTo(o) < acceptableDifference) : null;
+            similarObject = TryGetValue(type, out var list) ? list.FirstOrDefault(o => obj.DistanceTo(o) < acceptableDifference) : null;
             return similarObject != null;
         }
 

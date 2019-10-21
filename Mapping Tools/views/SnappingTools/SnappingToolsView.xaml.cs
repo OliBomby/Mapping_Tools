@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using Mapping_Tools.Classes.SnappingTools;
 using Mapping_Tools.Classes.SystemTools;
@@ -40,8 +41,13 @@ namespace Mapping_Tools.Views {
         public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Snapping Tools Projects");
 
         private void UIElement_OnPreviewMouseWheel(object sender, MouseWheelEventArgs e) {
-            ScrollViewer scv = (ScrollViewer)sender;
+            var scv = (ScrollViewer)sender;
             scv.ScrollToVerticalOffset(scv.VerticalOffset - e.Delta);
+            e.Handled = true;
+        }
+
+        private void UIElement_OnPreviewMouseDown(object sender, MouseButtonEventArgs e) {
+            if (sender is ToggleButton toggleButton) toggleButton.IsChecked = !toggleButton.IsChecked.GetValueOrDefault();
             e.Handled = true;
         }
     }
