@@ -94,6 +94,7 @@ namespace Mapping_Tools.Viewmodels {
                 AllGenerators = new RelevantObjectsGeneratorCollection(Generators),
                 AcceptableDifference = 10
             };
+            LayerCollection.SetInceptionLevel(2);
 
             // Get preferences
             Preferences = new SnappingToolsPreferences();
