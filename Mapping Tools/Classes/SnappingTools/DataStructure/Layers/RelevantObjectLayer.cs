@@ -93,15 +93,15 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                                 // Enumerate to array
                                 var newRelevantObjectsArray = newRelevantObjectsEnumerable as IRelevantObject[] ?? newRelevantObjectsEnumerable.ToArray();
 
+                                // Add the new relevant objects to the children of the parents
+                                foreach (var relevantParent in relevantParents) {
+                                    relevantParent.ChildObjects.UnionWith(newRelevantObjectsArray);
+                                }
+
                                 // Add parents and generator to the new relevant objects
                                 foreach (var relevantObject in newRelevantObjectsArray) {
                                     relevantObject.ParentObjects = relevantParents;
                                     relevantObject.Generator = generator;
-                                }
-
-                                // Add the new relevant objects to the children of the parents
-                                foreach (var relevantParent in relevantParents) {
-                                    relevantParent.ChildObjects.UnionWith(newRelevantObjectsArray);
                                 }
 
                                 // Add the new relevant objects to this layer
@@ -110,14 +110,14 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                                 break;
                             }
                             case IRelevantObject newRelevantObject:
-                                // Add parents and generator to the new relevant object
-                                newRelevantObject.ParentObjects = relevantParents;
-                                newRelevantObject.Generator = generator;
-
                                 // Add the new relevant object to the children of the parents
                                 foreach (var relevantParent in relevantParents) {
                                     relevantParent.ChildObjects.Add(newRelevantObject);
                                 }
+
+                                // Add parents and generator to the new relevant object
+                                newRelevantObject.ParentObjects = relevantParents;
+                                newRelevantObject.Generator = generator;
 
                                 // Add the new relevant objects to this layer
                                 Add(newRelevantObject, false);
