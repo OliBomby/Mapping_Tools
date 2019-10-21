@@ -62,6 +62,16 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
         }
 
+        private bool _useEditorReader;
+        public bool UseEditorReader {
+            get => _useEditorReader;
+            set {
+                if (_useEditorReader == value) return;
+                _useEditorReader = value;
+                OnPropertyChanged();
+            }
+        }
+
         private bool _overrideOsuSave;
         public bool OverrideOsuSave {
             get => _overrideOsuSave;
@@ -158,6 +168,7 @@ namespace Mapping_Tools.Classes.SystemTools {
             SongsPath = "";
             BackupsPath = "";
             MakeBackups = true;
+            UseEditorReader = true;
             OverrideOsuSave = false;
             AutoReload = true;
             SmartQuickRunEnabled = true;

@@ -63,6 +63,7 @@
 
             <StackPanel Margin="5 10 0 0">
                 <CheckBox Content="Make automatic backups" IsChecked="{Binding MakeBackups, Mode=TwoWay}" ToolTip="Make automatic backups whenever you run tools."/>
+                <CheckBox Content="Enable Editor Reader" IsChecked="{Binding UseEditorReader, Mode=TwoWay}" ToolTip="Enable functionality of Editor Reader. Editor Reader reads the memory of your osu! client to get live data from your editor."/>
                 <CheckBox Content="Override osu! save with BetterSave™" IsChecked="{Binding OverrideOsuSave, Mode=TwoWay}" ToolTip="Automatically BetterSave after every osu! save."/>
                 <CheckBox Content="Auto reload after QuickRun" IsChecked="{Binding AutoReload, Mode=TwoWay}" ToolTip="Tries to reload the editor after every QuickRun."/>
             </StackPanel>

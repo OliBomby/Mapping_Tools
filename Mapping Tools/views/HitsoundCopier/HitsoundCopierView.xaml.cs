@@ -16,12 +16,7 @@ namespace Mapping_Tools.Views {
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
     public partial class HitsoundCopierView {
-        private readonly BackgroundWorker backgroundWorker;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        [UsedImplicitly] public static readonly string ToolName = "Hitsound Copier";
+        public static readonly string ToolName = "Hitsound Copier";
 
         /// <summary>
         /// 
@@ -41,27 +36,11 @@ namespace Mapping_Tools.Views {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
-            backgroundWorker = (BackgroundWorker) FindResource("backgroundWorker");
         }
 
-        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
+        protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
             e.Result = Copy_Hitsounds((Arguments) e.Argument, bgw);
-        }
-
-        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
-            if (e.Error != null) {
-                MessageBox.Show($"{e.Error.Message}{Environment.NewLine}{e.Error.StackTrace}", "Error");
-            } else {
-                MessageBox.Show(e.Result.ToString());
-                progress.Value = 0;
-            }
-
-            start.IsEnabled = true;
-        }
-
-        private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
-            progress.Value = e.ProgressPercentage;
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
@@ -69,7 +48,7 @@ namespace Mapping_Tools.Views {
                 IOHelper.SaveMapBackup(fileToCopy);
             }
 
-            backgroundWorker.RunWorkerAsync(new Arguments(BeatmapToBox.Text, BeatmapFromBox.Text,
+            BackgroundWorker.RunWorkerAsync(new Arguments(BeatmapToBox.Text, BeatmapFromBox.Text,
                 CopyModeBox.SelectedIndex, LeniencyBox.GetDouble(5),
                 CopyHitsoundsBox.IsChecked.GetValueOrDefault(), CopyBodyBox.IsChecked.GetValueOrDefault(),
                 CopySamplesetBox.IsChecked.GetValueOrDefault(),
@@ -80,7 +59,7 @@ namespace Mapping_Tools.Views {
                 int.Parse(MutedSnap1.Text.Split('/')[1]), int.Parse(MutedSnap2.Text.Split('/')[1]),
                 MutedMinLengthBox.GetDouble(0), MutedCustomIndexBox.GetInt(),
                 (SampleSet) (MutedSampleSetBox.SelectedIndex + 1)));
-            start.IsEnabled = false;
+            CanRun = false;
         }
 
         private struct Arguments {

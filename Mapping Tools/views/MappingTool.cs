@@ -1,9 +1,14 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 
 namespace Mapping_Tools.Views {
-    public abstract class MappingTool : UserControl {
+    [HiddenTool]
+    public class MappingTool : UserControl, INotifyPropertyChanged {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public static readonly DependencyProperty IsActiveProperty =
             DependencyProperty.Register(nameof(IsActive), typeof(bool), typeof(MappingTool),
                 new FrameworkPropertyMetadata(default(bool), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
@@ -18,6 +23,15 @@ namespace Mapping_Tools.Views {
         }
         public void Deactivate() {
             IsActive = false;
+        }
+
+        protected void Set<T>(ref T target, T value, [CallerMemberName] string propertyName = "") {
+            target = value;
+            RaisePropertyChanged(propertyName);
+        }
+
+        protected void RaisePropertyChanged([CallerMemberName] string propertyName = "") {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

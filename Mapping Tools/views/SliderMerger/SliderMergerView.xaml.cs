@@ -23,14 +23,10 @@ namespace Mapping_Tools.Views {
         public static readonly string ToolDescription =
             $@"Merge 2 or more sliders and circles into one big slider.{Environment.NewLine}This program will automatically convert any type of slider into a Beziér slider for the purpose of merging.{Environment.NewLine}Circles can be merged too and will always use the linear connection mode.";
 
-        private readonly BackgroundWorker backgroundWorker;
-        private bool canRun = true;
-
         public SliderMergerView() {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
-            backgroundWorker = (BackgroundWorker) FindResource("backgroundWorker");
             DataContext = new SliderMergerVM();
         }
 
@@ -40,27 +36,9 @@ namespace Mapping_Tools.Views {
             RunTool(new[] {IOHelper.GetCurrentBeatmap()}, true);
         }
 
-        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
+        protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
             e.Result = Merge_Sliders((Arguments) e.Argument, bgw);
-        }
-
-        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
-            if (e.Error != null) {
-                MessageBox.Show($"{e.Error.Message}{Environment.NewLine}{e.Error.StackTrace}",
-                    "Error");
-            } else {
-                if (e.Result.ToString() != "")
-                    MessageBox.Show(e.Result.ToString());
-                progress.Value = 0;
-            }
-
-            start.IsEnabled = true;
-            canRun = true;
-        }
-
-        private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
-            progress.Value = e.ProgressPercentage;
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
@@ -68,15 +46,14 @@ namespace Mapping_Tools.Views {
         }
 
         private void RunTool(string[] paths, bool quick = false) {
-            if (!canRun) return;
+            if (!CanRun) return;
 
             IOHelper.SaveMapBackup(paths);
 
-            backgroundWorker.RunWorkerAsync(new Arguments(paths, LeniencyBox.GetDouble(0),
+            BackgroundWorker.RunWorkerAsync(new Arguments(paths, LeniencyBox.GetDouble(0),
                 SelectionModeBox.SelectedIndex, (ConnectionMode) ConnectionModeBox.SelectedItem,
                 LinearOnLinearBox.IsChecked.GetValueOrDefault(), quick));
-            start.IsEnabled = false;
-            canRun = false;
+            CanRun = false;
         }
 
         private string Merge_Sliders(Arguments arg, BackgroundWorker worker) {

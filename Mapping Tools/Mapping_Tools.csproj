@@ -357,6 +357,7 @@
     <Compile Include="Views\HiddenToolAttribute.cs" />
     <Compile Include="Views\DontShowTitleAttribute.cs" />
     <Compile Include="Views\Extensions.cs" />
+    <Compile Include="Views\SingleRunMappingTool.cs" />
     <Compile Include="Views\MappingTool.cs" />
     <Compile Include="Views\RhythmGuide\RhythmGuideView.xaml.cs">
       <DependentUpon>RhythmGuideView.xaml</DependentUpon>

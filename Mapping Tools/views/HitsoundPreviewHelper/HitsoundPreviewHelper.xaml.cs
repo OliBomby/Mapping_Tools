@@ -17,12 +17,6 @@ namespace Mapping_Tools.Views.HitsoundPreviewHelper {
     /// </summary>
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
     public partial class HitsoundPreviewHelperView : ISavable<HitsoundPreviewHelperVM>, IQuickRun {
-        private readonly BackgroundWorker backgroundWorker;
-        private bool canRun = true;
-
-        /// <summary>
-        /// 
-        /// </summary>
         public event EventHandler RunFinished;
 
         /// <summary>
@@ -52,35 +46,12 @@ namespace Mapping_Tools.Views.HitsoundPreviewHelper {
             DataContext = new HitsoundPreviewHelperVM();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
-            backgroundWorker = (BackgroundWorker)FindResource("backgroundWorker");
             ProjectManager.LoadProject(this, message:false);
         }
 
-        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
+        protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
             e.Result = PlaceHitsounds((Arguments)e.Argument, bgw, e);
-        }
-
-        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
-            if (e.Error != null) {
-                MessageBox.Show($"{e.Error.Message}{Environment.NewLine}{e.Error.StackTrace}", "Error");
-            } else {
-                if (e.Result.ToString() != "")
-                    MessageBox.Show(e.Result.ToString());
-                progress.Value = 0;
-            }
-            start.IsEnabled = true;
-            canRun = true;
-        }
-
-        private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
-            progress.Value = e.ProgressPercentage;
-        }
-
-        private void UpdateProgressBar(BackgroundWorker worker, int progress) {
-            if (worker != null && worker.WorkerReportsProgress) {
-                worker.ReportProgress(progress);
-            }
         }
 
         private struct Arguments
@@ -152,14 +123,13 @@ namespace Mapping_Tools.Views.HitsoundPreviewHelper {
 
 
         private void RunTool(string[] paths, bool quick = false) {
-            if (!canRun) return;
+            if (!CanRun) return;
 
             IOHelper.SaveMapBackup(paths);
 
-            backgroundWorker.RunWorkerAsync(new Arguments(paths, quick, ((HitsoundPreviewHelperVM)DataContext).Items.ToList()));
+            BackgroundWorker.RunWorkerAsync(new Arguments(paths, quick, ((HitsoundPreviewHelperVM)DataContext).Items.ToList()));
 
-            start.IsEnabled = false;
-            canRun = false;
+            CanRun = false;
         }
 
         /// <summary>
