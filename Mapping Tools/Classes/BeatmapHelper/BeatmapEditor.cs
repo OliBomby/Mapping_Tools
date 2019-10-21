@@ -42,7 +42,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
             File.WriteAllLines(tempPath, TextFile.GetLines());
 
-            EditorReaderStuff.Md5ComparasonString = EditorReaderStuff.GetMD5FromPath(tempPath);
+            EditorReaderStuff.Md5ComparisionString = EditorReaderStuff.GetMD5FromPath(tempPath);
 
             base.SaveFile();
         }

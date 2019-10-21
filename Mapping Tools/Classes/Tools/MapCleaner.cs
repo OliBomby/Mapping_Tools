@@ -247,7 +247,7 @@ namespace Mapping_Tools.Classes.Tools {
                 }
                 if (tlo.HasHitsound) // Add greenlines for custom indexes and volumes
                 {
-                    TimingPoint tp = tlo.HitsoundTP.Copy();
+                    TimingPoint tp = tlo.HitsoundTimingPoint.Copy();
 
                     bool doUnmute = tlo.FenoSampleVolume == 5 && args.RemoveMuting;
                     bool ind = !tlo.UsesFilename && !doUnmute;  // Index doesnt have to change if custom is overridden by Filename

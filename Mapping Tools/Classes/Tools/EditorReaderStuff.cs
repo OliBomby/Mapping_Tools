@@ -20,7 +20,7 @@ namespace Mapping_Tools.Classes.Tools {
         /// <summary>
         /// 
         /// </summary>
-        public static string Md5ComparasonString = "";
+        public static string Md5ComparisionString = "";
 
         /// <summary>
         /// Constructor

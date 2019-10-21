@@ -83,6 +83,9 @@ namespace Mapping_Tools.Classes.SnappingTools {
             Initialize();
         }
 
+        /// <summary>
+        /// Initializes the config reader.
+        /// </summary>
         public void Initialize() {
             ReadConfig();
         }
@@ -146,6 +149,10 @@ namespace Mapping_Tools.Classes.SnappingTools {
             return Vector2.One;
         }
 
+        /// <summary>
+        /// Grabs the current boundaries of the osu! window.
+        /// </summary>
+        /// <returns></returns>
         public static Box2 GetScreenBox() {
             var screenBounds = Screen.PrimaryScreen.Bounds;
             return new Box2(screenBounds.Left, screenBounds.Top, screenBounds.Right, screenBounds.Bottom);
@@ -187,7 +194,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
         /// <summary>
         /// Gets the area on the screen in pixels which is the editor area without menu bar and without letterboxing black space.
         /// </summary>
-        /// <returns>The area of the editor box using</returns>
+        /// <returns>The area of the editor box.</returns>
         public Box2 GetEditorBox() {
             var osuWindow = GetOsuWindowBoxWithoutChrome();
             osuWindow.Top += FilebarHeight;

@@ -13,7 +13,7 @@ using Mapping_Tools.Classes.SystemTools.QuickRun;
 
 namespace Mapping_Tools.Classes.SystemTools {
     /// <summary>
-    /// 
+    /// TODO: Complete comments. because hotkeys?
     /// </summary>
     public class ListenerManager {
 
@@ -232,7 +232,7 @@ namespace Mapping_Tools.Classes.SystemTools {
                 return;
             }
 
-            if (EditorReaderStuff.Md5ComparasonString == hashString) {
+            if (EditorReaderStuff.Md5ComparisionString == hashString) {
                 return;
             }
 

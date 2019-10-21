@@ -337,6 +337,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return EdgeHitsounds.Any(o => o != 0) || EdgeSampleSets.Any(o => o != SampleSet.Auto) || EdgeAdditionSets.Any(o => o != SampleSet.Auto) || SampleSet != SampleSet.Auto || AdditionSet != SampleSet.Auto || CustomIndex != 0 || SampleVolume != 0 || Filename != "";
         }
 
+
+        /// <inheritdoc />
         public void SetLine(string line) {
             var values = line.Split(',');
 
@@ -455,6 +457,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
+        /// <inheritdoc />
         public string GetLine() {
             var values = new List<string> {
                 Pos.X.ToRoundInvariant(),

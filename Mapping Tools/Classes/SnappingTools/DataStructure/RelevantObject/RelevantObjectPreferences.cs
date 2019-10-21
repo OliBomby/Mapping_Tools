@@ -67,9 +67,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
                     return DashStyles.Dash;
                 case DashStylesEnum.Dot:
                     return DashStyles.Dot;
-                case DashStylesEnum.DashDot:
+                case DashStylesEnum.DashSingleDot:
                     return DashStyles.DashDot;
-                case DashStylesEnum.DashDotDot:
+                case DashStylesEnum.DashDoubleDot:
                     return DashStyles.DashDotDot;
                 case DashStylesEnum.Solid:
                     return DashStyles.Solid;

@@ -173,7 +173,7 @@ namespace Mapping_Tools.Views {
                     if (volumeMuteTimes != null) {
                         // Timingpointchange all the undefined tlo from copyFrom
                         volumeMuteTimes.AddRange(from tloTo in tlTo.TimelineObjects
-                            where tloTo.canCopy && Math.Abs(tloTo.FenoSampleVolume - 5) < Precision.DOUBLE_EPSILON
+                            where tloTo.CanCopy && Math.Abs(tloTo.FenoSampleVolume - 5) < Precision.DOUBLE_EPSILON
                             select tloTo.Time);
                     }
 
@@ -195,13 +195,13 @@ namespace Mapping_Tools.Views {
                         foreach (var tloTo in processedTimeline.TimelineObjects) {
                             if (volumeMuteTimes.Contains(tloTo.Time)) {
                                 // Add timingpointschange to copy timingpoint hitsounds
-                                var tp = tloTo.HitsoundTP.Copy();
+                                var tp = tloTo.HitsoundTimingPoint.Copy();
                                 tp.Offset = tloTo.Time;
                                 tp.Volume = 5;
                                 timingPointsChangesMute.Add(new TimingPointsChange(tp, volume: true));
                             } else {
                                 // Add timingpointschange to preserve index and volume
-                                var tp = tloTo.HitsoundTP.Copy();
+                                var tp = tloTo.HitsoundTimingPoint.Copy();
                                 tp.Offset = tloTo.Time;
                                 tp.Volume = tloTo.FenoSampleVolume;
                                 timingPointsChangesMute.Add(new TimingPointsChange(tp, volume: true));
@@ -323,7 +323,7 @@ namespace Mapping_Tools.Views {
                             tloTo.HitsoundsToOrigin();
 
                             // Add timingpointschange to copy timingpoint hitsounds
-                            var tp = tloTo.HitsoundTP.Copy();
+                            var tp = tloTo.HitsoundTimingPoint.Copy();
                             tp.Offset = tloTo.Time;
                             tp.SampleSet = arg.MutedSampleset;
                             tp.SampleIndex = arg.MutedIndex;
@@ -332,7 +332,7 @@ namespace Mapping_Tools.Views {
                                 volume: true));
                         } else {
                             // Add timingpointschange to preserve index and volume and sampleset
-                            var tp = tloTo.HitsoundTP.Copy();
+                            var tp = tloTo.HitsoundTimingPoint.Copy();
                             tp.Offset = tloTo.Time;
                             timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: true, index: doMutedIndex,
                                 volume: true));
@@ -357,7 +357,7 @@ namespace Mapping_Tools.Views {
 
         private static void CopyHitsounds(Arguments arg, Timeline tlFrom, Timeline tlTo) {
             foreach (var tloFrom in tlFrom.TimelineObjects) {
-                var tloTo = tlTo.GetNearestTLO(tloFrom.Time, true);
+                var tloTo = tlTo.GetNearestTlo(tloFrom.Time, true);
 
                 if (tloTo != null &&
                     Math.Abs(Math.Round(tloFrom.Time) - Math.Round(tloTo.Time)) <= arg.TemporalLeniency) {
@@ -365,7 +365,7 @@ namespace Mapping_Tools.Views {
                     CopyHitsounds(arg, tloFrom, tloTo);
                 }
 
-                tloFrom.canCopy = false;
+                tloFrom.CanCopy = false;
             }
         }
 
@@ -373,7 +373,7 @@ namespace Mapping_Tools.Views {
             List<TimingPointsChange> timingPointsChanges, GameMode mode, string mapDir,
             Dictionary<string, string> firstSamples) {
             foreach (var tloFrom in tlFrom.TimelineObjects) {
-                var tloTo = tlTo.GetNearestTLO(tloFrom.Time, true);
+                var tloTo = tlTo.GetNearestTlo(tloFrom.Time, true);
 
                 if (tloTo != null &&
                     Math.Abs(Math.Round(tloFrom.Time) - Math.Round(tloTo.Time)) <= arg.TemporalLeniency) {
@@ -381,19 +381,19 @@ namespace Mapping_Tools.Views {
                     CopyHitsounds(arg, tloFrom, tloTo);
 
                     // Add timingpointschange to copy timingpoint hitsounds
-                    var tp = tloFrom.HitsoundTP.Copy();
+                    var tp = tloFrom.HitsoundTimingPoint.Copy();
                     tp.Offset = tloTo.Time;
                     timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: arg.CopySamplesets,
                         index: arg.CopySamplesets, volume: arg.CopyVolumes));
                 }
 
-                tloFrom.canCopy = false;
+                tloFrom.CanCopy = false;
             }
 
             // Timingpointchange all the undefined tlo from copyFrom
             foreach (var tloTo in tlTo.TimelineObjects) {
-                if (!tloTo.canCopy) continue;
-                var tp = tloTo.HitsoundTP.Copy();
+                if (!tloTo.CanCopy) continue;
+                var tp = tloTo.HitsoundTimingPoint.Copy();
                 var holdSampleset = arg.CopySamplesets && tloTo.SampleSet == SampleSet.Auto;
                 var holdIndex = arg.CopySamplesets && !(tloTo.CanCustoms && tloTo.CustomIndex != 0);
 
@@ -467,7 +467,7 @@ namespace Mapping_Tools.Views {
             }
 
             tloTo.HitsoundsToOrigin();
-            tloTo.canCopy = false;
+            tloTo.CanCopy = false;
         }
 
         private static void ResetHitObjectHitsounds(Beatmap beatmap) {
@@ -493,7 +493,7 @@ namespace Mapping_Tools.Views {
 
         private static bool FilterMuteTlo(TimelineObject tloTo, Beatmap beatmapTo, Arguments arg) {
             // Check whether it's defined
-            if (!tloTo.canCopy)
+            if (!tloTo.CanCopy)
                 return false;
 
             // Check type

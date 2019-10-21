@@ -9,52 +9,142 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
+    /// <summary>
+    /// 
+    /// </summary>
     public class TimelineObject {
+        /// <summary>
+        /// 
+        /// </summary>
         public HitObject Origin { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public double Time { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public int Repeat { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public int ObjectType { get; set; }
         private BitArray TypeArray { get => new BitArray(new int[] { ObjectType }); }
-        public bool IsCircle { get => TypeArray[0]; }
-        public bool IsSlider { get => TypeArray[1]; }
-        public bool IsSpinner { get => TypeArray[3]; }
-        public bool IsHoldNote { get => TypeArray[7]; }
-        public bool IsSliderHead { get => IsSlider && Repeat == 0; }
-        public bool IsSliderRepeat { get => IsSlider && Repeat != 0 && Repeat != Origin.Repeat; }
-        public bool IsSliderEnd { get => IsSlider && Repeat == Origin.Repeat; }
-        public bool IsSpinnerHead { get => IsSpinner && Repeat == 0; }
-        public bool IsSpinnerEnd { get => IsSpinner && Repeat == 1; }
-        public bool IsHoldnoteHead { get => IsHoldNote && Repeat == 0; }
-        public bool IsHoldnoteEnd { get => IsHoldNote && Repeat == 1; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool IsCircle => TypeArray[0];
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool IsSlider => TypeArray[1];
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool IsSpinner => TypeArray[3];
+        public bool IsHoldNote => TypeArray[7];
+        public bool IsSliderHead => IsSlider && Repeat == 0;
+        public bool IsSliderRepeat => IsSlider && Repeat != 0 && Repeat != Origin.Repeat;
+        public bool IsSliderEnd => IsSlider && Repeat == Origin.Repeat;
+        public bool IsSpinnerHead => IsSpinner && Repeat == 0;
+        public bool IsSpinnerEnd => IsSpinner && Repeat == 1;
+        public bool IsHoldnoteHead => IsHoldNote && Repeat == 0;
+        public bool IsHoldnoteEnd => IsHoldNote && Repeat == 1;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public SampleSet SampleSet { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public SampleSet AdditionSet { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public bool Normal { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public bool Whistle { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public bool Finish { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public bool Clap { get; set; }
 
-        public bool HasHitsound { get => IsCircle || IsSliderHead || IsHoldnoteHead || IsSliderEnd || IsSpinnerEnd || IsSliderRepeat; }
-        public bool UsesFilename { get => Filename != null && Filename != "" && (IsCircle || IsHoldnoteHead); }
-        public bool CanCustoms { get => IsCircle || IsHoldnoteHead; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool HasHitsound =>
+            IsCircle || IsSliderHead || IsHoldnoteHead || IsSliderEnd || IsSpinnerEnd || IsSliderRepeat;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool UsesFilename => !string.IsNullOrEmpty(Filename) && (IsCircle || IsHoldnoteHead);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool CanCustoms => IsCircle || IsHoldnoteHead;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public int CustomIndex { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public double SampleVolume { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public string Filename { get; set; }
 
         // Special combined with greenline
-        public TimingPoint TP { get; set; }
-        public TimingPoint HitsoundTP { get; set; }
-        public TimingPoint Redline { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public TimingPoint TimingPoint { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public TimingPoint HitsoundTimingPoint { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public TimingPoint UninheritedTimingPoint { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public SampleSet FenoSampleSet { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public SampleSet FenoAdditionSet { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public int FenoCustomIndex { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public double FenoSampleVolume { get; set; }
 
-        // Special for hitsound copier
-        public bool canCopy = true;
+        // 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>Special for hitsound copier</remarks>
+        public bool CanCopy = true;
 
+        /// <inheritdoc />
         public TimelineObject(HitObject origin, double time, int objectType, int repeat, int hitsounds, SampleSet sampleset, SampleSet additionset) {
             Origin = origin;
             Time = time;
@@ -80,6 +170,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
+        /// <summary>
+        /// Grabs the hitsound from the <see cref="TimelineObject"/>
+        /// </summary>
+        /// <returns></returns>
         public Hitsound GetHitsound() {
             if (Normal) {
                 return Hitsound.Normal;
@@ -96,10 +190,18 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return Hitsound.Normal;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public int GetHitsounds() {
             return MathHelper.GetIntFromBitArray(new BitArray(new bool[] { Normal, Whistle, Finish, Clap }));
         }
 
+        /// <summary>
+        /// Sets the hitsound to the <see cref="TimelineObject"/>
+        /// </summary>
+        /// <param name="hitsound"></param>
         public void SetHitsound(Hitsound hitsound) {
             Normal = false;
             Whistle = false;
@@ -118,13 +220,26 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 case Hitsound.Clap:
                     Clap = true;
                     return;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(hitsound), hitsound, null);
             }
         }
 
+        /// <summary>
+        /// Checks if the selected timeline object does play a normal
+        /// (Only in modes other than Mania)
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <returns></returns>
         public bool PlaysNormal(GameMode mode) {
             return mode != GameMode.Mania || Normal || !(Whistle || Finish || Clap);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <returns></returns>
         public List<Tuple<SampleSet, Hitsound, int>> GetPlayingHitsounds(GameMode mode = GameMode.Standard) {
             List<Tuple<SampleSet, Hitsound, int>> samples = new List<Tuple<SampleSet, Hitsound, int>>();
             bool normal = mode != GameMode.Mania || Normal || !(Whistle || Finish || Clap);
@@ -141,10 +256,16 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return samples;
         }
 
+        /// <summary>
+        /// Grabs the playing filenames of the <see cref="TimelineObject"/>
+        /// </summary>
+        /// <param name="mode">The osu! <see cref="GameMode"/></param>
+        /// <param name="includeDefaults"></param>
+        /// <returns></returns>
         public List<string> GetPlayingFilenames(GameMode mode = GameMode.Standard, bool includeDefaults = true) {
             List<string> samples = new List<string>();
             bool normal = mode != GameMode.Mania || Normal || !(Whistle || Finish || Clap);
-            bool useFilename = Filename != null && Filename != "" && (IsCircle || IsHoldnoteHead);
+            bool useFilename = !string.IsNullOrEmpty(Filename) && (IsCircle || IsHoldnoteHead);
 
             if (useFilename) {
                 samples.Add(Filename);
@@ -162,14 +283,24 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return samples;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <param name="mapDir"></param>
+        /// <param name="firstSamples"></param>
+        /// <param name="includeDefaults"></param>
+        /// <returns></returns>
         public List<string> GetFirstPlayingFilenames(GameMode mode, string mapDir, Dictionary<string, string> firstSamples, bool includeDefaults=true) {
             List<string> samples = new List<string>();
             bool normal = mode != GameMode.Mania || Normal || !(Whistle || Finish || Clap);
-            bool useFilename = Filename != null && Filename != "" && (IsCircle || IsHoldnoteHead);
+            bool useFilename = !string.IsNullOrEmpty(Filename) && (IsCircle || IsHoldnoteHead);
 
             if (useFilename) {
                 string samplePath = Path.Combine(mapDir, Filename);
-                string fullPathExtLess = Path.Combine(Path.GetDirectoryName(samplePath), Path.GetFileNameWithoutExtension(samplePath));
+                string fullPathExtLess = Path.Combine(
+                    Path.GetDirectoryName(samplePath) ?? throw new InvalidOperationException(),
+                    Path.GetFileNameWithoutExtension(samplePath));
 
                 // Get the first occurence of this sound to not get duplicated
                 if (firstSamples.Keys.Contains(fullPathExtLess)) {
@@ -177,13 +308,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 }
             } else if (includeDefaults || FenoCustomIndex != 0) {
                 if (normal)
-                    AddFirstIdenticalFilename(FenoSampleSet, Hitsound.Normal, FenoCustomIndex, samples, mode, useFilename, mapDir, firstSamples, includeDefaults);
+                    AddFirstIdenticalFilename(FenoSampleSet, Hitsound.Normal, FenoCustomIndex, samples, mode, false, mapDir, firstSamples, includeDefaults);
                 if (Whistle)
-                    AddFirstIdenticalFilename(FenoAdditionSet, Hitsound.Whistle, FenoCustomIndex, samples, mode, useFilename, mapDir, firstSamples, includeDefaults);
+                    AddFirstIdenticalFilename(FenoAdditionSet, Hitsound.Whistle, FenoCustomIndex, samples, mode, false, mapDir, firstSamples, includeDefaults);
                 if (Finish)
-                    AddFirstIdenticalFilename(FenoAdditionSet, Hitsound.Finish, FenoCustomIndex, samples, mode, useFilename, mapDir, firstSamples, includeDefaults);
+                    AddFirstIdenticalFilename(FenoAdditionSet, Hitsound.Finish, FenoCustomIndex, samples, mode, false, mapDir, firstSamples, includeDefaults);
                 if (Clap)
-                    AddFirstIdenticalFilename(FenoAdditionSet, Hitsound.Clap, FenoCustomIndex, samples, mode, useFilename, mapDir, firstSamples, includeDefaults);
+                    AddFirstIdenticalFilename(FenoAdditionSet, Hitsound.Clap, FenoCustomIndex, samples, mode, false, mapDir, firstSamples, includeDefaults);
             }
 
             return samples;
@@ -192,7 +323,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         private void AddFirstIdenticalFilename(SampleSet sampleSet, Hitsound hitsound, int index, List<string> samples, GameMode mode, bool useFilename, string mapDir, Dictionary<string, string> firstSamples, bool includeDefaults) {
             string filename = GetFileName(sampleSet, hitsound, index, mode);
             string samplePath = Path.Combine(mapDir, filename);
-            string fullPathExtLess = Path.Combine(Path.GetDirectoryName(samplePath), Path.GetFileNameWithoutExtension(samplePath));
+            string fullPathExtLess = Path.Combine(
+                Path.GetDirectoryName(samplePath) ?? throw new InvalidOperationException(),
+                Path.GetFileNameWithoutExtension(samplePath));
 
             // Get the first occurence of this sound to not get duplicated
             if (firstSamples.Keys.Contains(fullPathExtLess)) {
@@ -207,6 +340,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void HitsoundsToOrigin() {
             if (Origin.IsCircle || (Origin.IsSpinner && Repeat == 1) || (Origin.IsHoldNote && Repeat == 0)) {
                 Origin.Hitsounds = GetHitsounds();
@@ -222,39 +358,37 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="hstp"></param>
         public void GiveHitsoundTimingPoint(TimingPoint hstp) {
-            HitsoundTP = hstp;
-            if (SampleSet == 0) {
-                FenoSampleSet = hstp.SampleSet;
-            } else {
-                FenoSampleSet = SampleSet;
-            }
-            if (AdditionSet == 0) {
-                FenoAdditionSet = FenoSampleSet;
-            } else {
-                FenoAdditionSet = AdditionSet;
-            }
-            if (CustomIndex == 0) {
-                FenoCustomIndex = hstp.SampleIndex;
-            } else {
-                FenoCustomIndex = CustomIndex;
-            }
-            if (SampleVolume == 0) {
-                FenoSampleVolume = hstp.Volume;
-            } else {
-                FenoSampleVolume = SampleVolume;
-            }
+            HitsoundTimingPoint = hstp;
+            FenoSampleSet = SampleSet == 0 ? hstp.SampleSet : SampleSet;
+            FenoAdditionSet = AdditionSet == 0 ? FenoSampleSet : AdditionSet;
+            FenoCustomIndex = CustomIndex == 0 ? hstp.SampleIndex : CustomIndex;
+            FenoSampleVolume = SampleVolume == 0 ? hstp.Volume : SampleVolume;
         }
 
+        /// <summary>
+        /// Grabs the playing file name of the object.
+        /// </summary>
+        /// <param name="sampleSet"></param>
+        /// <param name="hitsound"></param>
+        /// <param name="index"></param>
+        /// <param name="mode"></param>
+        /// <returns></returns>
         public static string GetFileName(SampleSet sampleSet, Hitsound hitsound, int index, GameMode mode) {
             string taiko = mode == GameMode.Taiko ? "taiko-" : "";
-            if (index == 0) {
-                return string.Format("{2}{0}-hit{1}-default.wav", sampleSet.ToString().ToLower(), hitsound.ToString().ToLower(), taiko);
+            switch (index)
+            {
+                case 0:
+                    return $"{taiko}{sampleSet.ToString().ToLower()}-hit{hitsound.ToString().ToLower()}-default";
+                case 1:
+                    return $"{taiko}{sampleSet.ToString().ToLower()}-hit{hitsound.ToString().ToLower()}";
+                default:
+                    return $"{taiko}{sampleSet.ToString().ToLower()}-hit{hitsound.ToString().ToLower()}{index}";
             }
-            if (index == 1) {
-                return string.Format("{2}{0}-hit{1}.wav", sampleSet.ToString().ToLower(), hitsound.ToString().ToLower(), taiko);
-            }
-            return string.Format("{3}{0}-hit{1}{2}.wav", sampleSet.ToString().ToLower(), hitsound.ToString().ToLower(), index, taiko);
         }
     }
 }
