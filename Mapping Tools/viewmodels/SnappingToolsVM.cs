@@ -20,7 +20,9 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using Mapping_Tools.Classes.SnappingTools.DataStructure;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorCollection;
 
 namespace Mapping_Tools.Viewmodels {
     public class SnappingToolsVm
@@ -28,11 +30,7 @@ namespace Mapping_Tools.Viewmodels {
         public SnappingToolsPreferences Preferences { get; }
 
         public ObservableCollection<RelevantObjectsGenerator> Generators { get; }
-        public readonly List<RelevantPoint> RelevantPoints = new List<RelevantPoint>();
-        public readonly List<RelevantLine> RelevantLines = new List<RelevantLine>();
-        public readonly List<RelevantCircle> RelevantCircles = new List<RelevantCircle>();
-        public List<IRelevantDrawable> RelevantObjects = new List<IRelevantDrawable>();
-        private List<HitObject> _visibleObjects;
+        protected readonly LayerCollection LayerCollection;
         private int _editorTime;
 
         private string _filter = "";
@@ -90,6 +88,12 @@ namespace Mapping_Tools.Viewmodels {
         public SnappingToolsVm() {
             // Set up a coordinate converter for converting coordinates between screen and osu!
             _coordinateConverter = new CoordinateConverter();
+
+            // Initialize layer collection
+            LayerCollection = new LayerCollection() {
+                AllGenerators = new RelevantObjectsGeneratorCollection(Generators),
+                AcceptableDifference = 10
+            };
 
             // Get preferences
             Preferences = new SnappingToolsPreferences();
@@ -323,70 +327,25 @@ namespace Mapping_Tools.Viewmodels {
         {
             var visibleObjects = GetVisibleHitObjects();
             
-            if (_visibleObjects != null && visibleObjects.SequenceEqual(_visibleObjects, new HitObjectComparer()))
+            var comparer = new HitObjectComparer();
+            var rootLayer = LayerCollection.GetRootLayer();
+            var existingHitObjects = LayerCollection.GetRootRelevantHitObjects();
+            var added = visibleObjects.Where(o => !existingHitObjects.Select(x => x.HitObject).Contains(o, comparer)).ToArray();
+            var removed = existingHitObjects.Where(o => !visibleObjects.Contains(o.HitObject, comparer)).ToArray();
+
+            rootLayer.Remove(removed);
+            rootLayer.Add(added.Select(o => new RelevantHitObject(o)));
+
+            if (added.Length == 0 && removed.Length == 0)
             {
-                // Visible Objects didn't change. Return to avoid redundant updates
+                // Root bjects didn't change. Return to avoid redundant updates
                 return;
             }
-            // Set the new hitobjects
-            _visibleObjects = visibleObjects;
 
+            // Update relevant objects
             GenerateRelevantObjects(visibleObjects);
 
             _overlay.OverlayWindow.InvalidateVisual();
-        }
-      
-        private void GenerateRelevantObjects(List<HitObject> visibleObjects=null)
-        {
-            if (visibleObjects == null)
-            {
-                visibleObjects = GetVisibleHitObjects();
-                _visibleObjects = visibleObjects;
-            }
-
-            // Get all the active generators
-            var activeGenerators = Generators.Where(o => o.IsActive).ToList();
-
-            // Reset the old RelevantObjects
-            ClearRelevantObjects(false);
-
-            // Generate RelevantObjects based on the visible hitobjects
-            foreach (var gen in activeGenerators.OfType<IGeneratePointsFromHitObjects>()) {
-                RelevantPoints.AddRange(gen.GetRelevantObjects(visibleObjects));
-            }
-            foreach (var gen in activeGenerators.OfType<IGenerateLinesFromHitObjects>()) {
-                RelevantLines.AddRange(gen.GetRelevantObjects(visibleObjects));
-            }
-            foreach (var gen in activeGenerators.OfType<IGenerateCirclesFromHitObjects>()) {
-                RelevantCircles.AddRange(gen.GetRelevantObjects(visibleObjects));
-            }
-
-            Inception(activeGenerators);
-
-            RelevantObjects = RelevantLines.Concat<IRelevantDrawable>(RelevantCircles).Concat(RelevantPoints).ToList();
-        }
-
-        private void Inception(IReadOnlyCollection<RelevantObjectsGenerator> activeGenerators) {
-            // Make temporary lists to get consistent inceptions
-            var points = new List<RelevantPoint>();
-            var lines = new List<RelevantLine>();
-            var circles = new List<RelevantCircle>();
-
-            // Generate more RelevantObjects
-            foreach (var gen in activeGenerators.OfType<IGeneratePointsFromRelevantObjects>()) {
-                points.AddRange(gen.GetRelevantObjects(RelevantPoints, RelevantLines, RelevantCircles));
-            }
-            foreach (var gen in activeGenerators.OfType<IGenerateLinesFromRelevantObjects>()) {
-                lines.AddRange(gen.GetRelevantObjects(RelevantPoints, RelevantLines, RelevantCircles));
-            }
-            foreach (var gen in activeGenerators.OfType<IGenerateCirclesFromRelevantObjects>()) {
-                circles.AddRange(gen.GetRelevantObjects(RelevantPoints, RelevantLines, RelevantCircles));
-            }
-
-            // Add the tempory lists to the main lists
-            RelevantPoints.AddRange(points);
-            RelevantLines.AddRange(lines);
-            RelevantCircles.AddRange(circles);
         }
 
         private static double ApproachRateToMs(double approachRate) {

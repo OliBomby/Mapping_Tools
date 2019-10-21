@@ -41,5 +41,13 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure {
         public IEnumerable<IRelevantObject> GetAllRelevantObjects() {
             return ObjectLayers.SelectMany(a => a.Objects.Values.SelectMany(b => b));
         }
+
+        public RelevantObjectLayer GetRootLayer() {
+            return ObjectLayers[0];
+        }
+
+        public IEnumerable<RelevantHitObject> GetRootRelevantHitObjects() {
+            return GetRootLayer().Objects[typeof(RelevantHitObject)].Cast<RelevantHitObject>();
+        }
     }
 }

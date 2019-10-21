@@ -12,6 +12,10 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
             set => HitObject.IsSelected = value;
         }
 
+        public RelevantHitObject(HitObject hitObject) {
+            HitObject = hitObject;
+        }
+
         public void Consume(RelevantHitObject other) {
             ParentObjects = ParentObjects.Concat(other.ParentObjects).ToList();
             IsSelected = IsSelected || other.IsSelected;
