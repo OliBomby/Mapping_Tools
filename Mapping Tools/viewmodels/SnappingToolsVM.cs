@@ -81,9 +81,7 @@ namespace Mapping_Tools.Viewmodels {
             Active
         }
 
-        private bool HotkeyRedrawsOverlay {
-            get => Preferences.KeyDownViewMode != Preferences.KeyUpViewMode;
-        }
+        private bool HotkeyRedrawsOverlay => Preferences.KeyDownViewMode != Preferences.KeyUpViewMode;
 
         public SnappingToolsVm() {
             // Set up a coordinate converter for converting coordinates between screen and osu!
@@ -158,10 +156,12 @@ namespace Mapping_Tools.Viewmodels {
             if (IsHotkeyDown(Preferences.SnapHotkey)) {
                 switch (Preferences.KeyDownViewMode) {
                     case ViewMode.Everything:
-                        foreach (var obj in RelevantObjects)
-                            obj.DrawYourself(context, _coordinateConverter, Preferences);
+                        foreach (var relevantDrawable in LayerCollection.GetAllRelevantDrawables()) {
+                            relevantDrawable.DrawYourself(context, _coordinateConverter, Preferences);
+                        }
                         break;
                     case ViewMode.ParentsOnly:
+                        // Get the relevant object which is snapped being snapped to
                         throw new NotImplementedException();
                     case ViewMode.Nothing:
                         break;
@@ -169,8 +169,9 @@ namespace Mapping_Tools.Viewmodels {
             } else {
                 switch (Preferences.KeyUpViewMode) {
                     case ViewMode.Everything:
-                        foreach (var obj in RelevantObjects)
-                            obj.DrawYourself(context, _coordinateConverter, Preferences);
+                        foreach (var relevantDrawable in LayerCollection.GetAllRelevantDrawables()) {
+                            relevantDrawable.DrawYourself(context, _coordinateConverter, Preferences);
+                        }
                         break;
                     case ViewMode.Nothing:
                         break;
