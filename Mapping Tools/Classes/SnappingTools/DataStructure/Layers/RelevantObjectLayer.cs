@@ -29,14 +29,16 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
             Objects.SortTimes();
         }
 
-        public void Add(IEnumerable<IRelevantObject> relevantObjects) {
+        public void Add(IEnumerable<IRelevantObject> relevantObjects, bool propagate = true) {
             // Check if this object or something similar exists anywhere in the context or in this layer
             foreach (var relevantObject in relevantObjects) {
                 Add(relevantObject, false);
             }
 
             // Propagate changes
-            NextLayer.GenerateNewObjects();
+            if (propagate) {
+                NextLayer?.GenerateNewObjects();
+            }
         }
 
         public void Add(IRelevantObject relevantObject, bool propagate = true) {
@@ -49,7 +51,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
 
             // Propagate changes
             if (propagate) {
-                NextLayer.GenerateNewObjects();
+                NextLayer?.GenerateNewObjects();
             }
         }
 
@@ -57,6 +59,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
         /// Generates relevant objects and adds them to this layer.
         /// </summary>
         public void GenerateNewObjects() {
+            var addedSomething = false;
             var activeGenerators = GeneratorCollection.GetActiveGenerators();
             foreach (var generator in activeGenerators) {
                 var concurrent = generator.IsConcurrent;
@@ -90,7 +93,8 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                                 relevantParents.ForEach(o => o.ChildObjects.AddRange(newRelevantObjectsArray));
 
                                 // Add the new relevant objects to this layer
-                                Add(newRelevantObjectsArray);
+                                Add(newRelevantObjectsArray, false);
+                                addedSomething = true;
                                 break;
                             }
                             case IRelevantObject newRelevantObject:
@@ -101,11 +105,17 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                                 relevantParents.ForEach(o => o.ChildObjects.Add(newRelevantObject));
 
                                 // Add the new relevant objects to this layer
-                                Add(newRelevantObject);
+                                Add(newRelevantObject, false);
+                                addedSomething = true
                                 break;
                         }
                     }
                 }
+            }
+
+            // Propagate if anything was added to this layer
+            if (addedSomething) {
+                NextLayer?.GenerateNewObjects();
             }
         }
 
