@@ -42,7 +42,8 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
         }
 
         public void Add(IRelevantObject relevantObject, bool propagate = true) {
-            if (Objects.FindSimilar(relevantObject, ParentCollection.AcceptableDifference, out _)) {
+            if (Objects.FindSimilar(relevantObject, ParentCollection.AcceptableDifference, out var similarObject)) {
+                similarObject.Consume(relevantObject);
                 return;  // return so the relevant object doesn't get added
             }
 
@@ -85,7 +86,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                         var result = method.Invoke(generator, parameters);
 
                         // Cast parameters to relevant objects
-                        var relevantParents = parameters.Cast<IRelevantObject>().ToList();
+                        var relevantParents = new HashSet<IRelevantObject>(parameters.Cast<IRelevantObject>());
 
                         switch (result) {
                             case IEnumerable<IRelevantObject> newRelevantObjectsEnumerable: {
@@ -99,7 +100,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                                 }
 
                                 // Add the new relevant objects to the children of the parents
-                                relevantParents.ForEach(o => o.ChildObjects.AddRange(newRelevantObjectsArray));
+                                foreach (var relevantParent in relevantParents) {
+                                    relevantParent.ChildObjects.UnionWith(newRelevantObjectsArray);
+                                }
 
                                 // Add the new relevant objects to this layer
                                 Add(newRelevantObjectsArray, false);
@@ -112,7 +115,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                                 newRelevantObject.Generator = generator;
 
                                 // Add the new relevant object to the children of the parents
-                                relevantParents.ForEach(o => o.ChildObjects.Add(newRelevantObject));
+                                foreach (var relevantParent in relevantParents) {
+                                    relevantParent.ChildObjects.Add(newRelevantObject);
+                                }
 
                                 // Add the new relevant objects to this layer
                                 Add(newRelevantObject, false);

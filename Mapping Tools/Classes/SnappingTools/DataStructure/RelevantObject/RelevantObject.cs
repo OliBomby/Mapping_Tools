@@ -26,7 +26,10 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
             get => _time;
             set {
                 _time = value;
-                ChildObjects?.ForEach(o => o.UpdateTime());
+                if (ChildObjects == null) return;
+                foreach (var relevantObject in ChildObjects) {
+                    relevantObject.UpdateTime();
+                }
                 Layer?.SortTimes();
             }
         }
@@ -36,15 +39,31 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
             get => _relevancy;
             set {
                 _relevancy = value;
-                ChildObjects?.ForEach(o => o.UpdateRelevancy());
+                if (ChildObjects == null) return;
+                foreach (var relevantObject in ChildObjects) {
+                    relevantObject.UpdateRelevancy();
+                }
             }
         }
         public bool Disposed { get; set; }
+
+        private bool _isSelected { get; set; }
+        public virtual bool IsSelected {
+            get => _isSelected; 
+            set {
+                _isSelected = value;
+                if (ChildObjects == null) return;
+                foreach (var relevantObject in ChildObjects) {
+                    relevantObject.UpdateSelected();
+                }
+            }
+        }
+
         public RelevantObjectLayer Layer { get; set; }
         public RelevantObjectsGenerator Generator { get; set; }
 
-        private List<IRelevantObject> _parentObjects;
-        public List<IRelevantObject> ParentObjects {
+        private HashSet<IRelevantObject> _parentObjects;
+        public HashSet<IRelevantObject> ParentObjects {
             get => _parentObjects;
             set {
                 _parentObjects = value;
@@ -53,11 +72,11 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
             }
         }
 
-        public List<IRelevantObject> ChildObjects { get; set; }
+        public HashSet<IRelevantObject> ChildObjects { get; set; }
 
         protected RelevantObject() {
-            ParentObjects = new List<IRelevantObject>();
-            ChildObjects = new List<IRelevantObject>();
+            ParentObjects = new HashSet<IRelevantObject>();
+            ChildObjects = new HashSet<IRelevantObject>();
         }
 
         public void UpdateRelevancy() {
@@ -68,6 +87,15 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         public void UpdateTime() {
             if (ParentObjects == null || ParentObjects.Count == 0) return;
             Time = ParentObjects.Sum(o => o.Time) / ParentObjects.Count;
+        }
+
+        public void UpdateSelected() {
+            if (ParentObjects == null || ParentObjects.Count == 0) return;
+            IsSelected = ParentObjects.Any(o => o.IsSelected);
+        }
+        
+        public void Consume(IRelevantObject other) {
+            ParentObjects.UnionWith(other.ParentObjects);
         }
 
         public abstract double DistanceTo(IRelevantObject relevantObject);

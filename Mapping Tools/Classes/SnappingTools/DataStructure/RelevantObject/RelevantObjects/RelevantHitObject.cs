@@ -7,18 +7,13 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
     public class RelevantHitObject : RelevantObject {
         public HitObject HitObject;
 
-        public bool IsSelected {
+        public override bool IsSelected {
             get => HitObject.IsSelected;
             set => HitObject.IsSelected = value;
         }
 
         public RelevantHitObject(HitObject hitObject) {
             HitObject = hitObject;
-        }
-
-        public void Consume(RelevantHitObject other) {
-            ParentObjects = ParentObjects.Concat(other.ParentObjects).ToList();
-            IsSelected = IsSelected || other.IsSelected;
         }
 
         public double Difference(RelevantHitObject other) {

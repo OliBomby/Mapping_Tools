@@ -9,12 +9,15 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         double Time { get; set; }
         double Relevancy { get; set; }
         bool Disposed { get; set; }
+        bool IsSelected { get; set; }
         RelevantObjectLayer Layer { get; set; }
         RelevantObjectsGenerator Generator { get; set; }
-        List<IRelevantObject> ParentObjects { get; set; }
-        List<IRelevantObject> ChildObjects { get; set; }
+        HashSet<IRelevantObject> ParentObjects { get; set; }
+        HashSet<IRelevantObject> ChildObjects { get; set; }
         void UpdateRelevancy();
         void UpdateTime();
+        void UpdateSelected();
+        void Consume(IRelevantObject other);
         double DistanceTo(IRelevantObject relevantObject);
     }
 }

@@ -211,6 +211,7 @@ namespace Mapping_Tools.Viewmodels {
                     }
                 }
 
+                // Redraw the overlay
                 _overlay.OverlayWindow.InvalidateVisual();
             }
         }
