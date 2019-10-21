@@ -42,6 +42,17 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure {
             return ObjectLayers.SelectMany(a => a.Objects.Values.SelectMany(b => b));
         }
 
+        /// <summary>
+        /// Gets all objects of all layers that implement IRelevantDrawable
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<IRelevantDrawable> GetAllRelevantDrawables() {
+            return ObjectLayers
+                .SelectMany(layer =>
+                    layer.Objects.Where(kvp => typeof(IRelevantDrawable).IsAssignableFrom(kvp.Key))
+                        .SelectMany(kvp => kvp.Value)).Cast<IRelevantDrawable>();
+        }
+
         public RelevantObjectLayer GetRootLayer() {
             return ObjectLayers[0];
         }
