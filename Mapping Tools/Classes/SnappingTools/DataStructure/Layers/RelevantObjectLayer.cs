@@ -78,7 +78,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                     if (dependencies.Length > 0 && PreviousLayer == null) {
                         continue;
                     }
-                    Console.WriteLine(generator.Name.ToUpper());
+                    //Console.WriteLine(generator.Name.ToUpper());
                     var parametersList = RelevantObjectPairGenerator.GetParametersList(dependencies, PreviousLayer?.Objects);
 
                     foreach (var parameters in parametersList) {
