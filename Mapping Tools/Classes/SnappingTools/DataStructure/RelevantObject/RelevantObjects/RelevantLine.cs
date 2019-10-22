@@ -1,3 +1,4 @@
+using System;
 using System.Windows;
 using System.Windows.Media;
 using Mapping_Tools.Classes.MathUtil;
@@ -43,6 +44,17 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
 
         public RelevantLine(Line2 line) {
             Child = line;
+        }
+
+        public override double DistanceTo(IRelevantObject relevantObject) {
+            if (!(relevantObject is RelevantLine relevantLine)) {
+                return double.PositiveInfinity;
+            }
+
+            var ca = Vector2.Dot(Child.DirectionVector, relevantLine.Child.DirectionVector) /
+                    (Child.DirectionVector.Length * relevantLine.Child.DirectionVector.Length);
+            return Vector2.Distance(Child.PositionVector, relevantLine.Child.PositionVector) +
+                   1 / Math.Pow(ca, 500) - 1;
         }
     }
 }

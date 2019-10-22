@@ -7,14 +7,13 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
     public class RelevantHitObject : RelevantObject {
         public HitObject HitObject;
 
-        public bool IsSelected {
+        public override bool IsSelected {
             get => HitObject.IsSelected;
             set => HitObject.IsSelected = value;
         }
 
-        public void Consume(RelevantHitObject other) {
-            ParentObjects = ParentObjects.Concat(other.ParentObjects).ToList();
-            IsSelected = IsSelected || other.IsSelected;
+        public RelevantHitObject(HitObject hitObject) {
+            HitObject = hitObject;
         }
 
         public double Difference(RelevantHitObject other) {
@@ -34,6 +33,18 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
             differences.AddRange(HitObject.CurvePoints.Select((t, i) => Vector2.DistanceSquared(t, other.HitObject.CurvePoints[i])));
 
             return differences.Sum() / differences.Count;
+        }
+
+        public override double DistanceTo(IRelevantObject relevantObject) {
+            if (!(relevantObject is RelevantHitObject relevantHitObject)) {
+                return double.PositiveInfinity;
+            }
+
+            if (HitObject.GetHitObjectType() != relevantHitObject.HitObject.GetHitObjectType()) {
+                return double.PositiveInfinity;
+            }
+
+            return Vector2.Distance(HitObject.Pos, relevantHitObject.HitObject.Pos);
         }
     }
 }

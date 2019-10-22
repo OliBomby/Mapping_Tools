@@ -38,5 +38,13 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         public RelevantPoint(Vector2 vec) {
             Child = vec;
         }
+
+        public override double DistanceTo(IRelevantObject relevantObject) {
+            if (!(relevantObject is RelevantPoint relevantPoint)) {
+                return double.PositiveInfinity;
+            }
+
+            return Vector2.Distance(Child, relevantPoint.Child);
+        }
     }
 }
