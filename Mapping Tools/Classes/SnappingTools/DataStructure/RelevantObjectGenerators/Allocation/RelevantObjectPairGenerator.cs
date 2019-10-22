@@ -10,6 +10,11 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
     public class RelevantObjectPairGenerator {
         public static IEnumerable<object[]> GetParametersList(Type[] dependencies,
             RelevantObjectCollection.RelevantObjectCollection collection) {
+            /*Console.WriteLine("Dependencies:");
+            foreach (var dependency in dependencies) {
+                Console.WriteLine(dependency);
+            }*/
+
             // Handle special case
             if (collection == null || dependencies.Length == 0) {
                 return new[] {new object[0] };
@@ -24,6 +29,10 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
                     neededCombinations.Add(type, 1);
                 }
             }
+            /*Console.WriteLine("Dependencies count:");
+            foreach (var dependency in neededCombinations) {
+                Console.WriteLine(dependency.Key + ": " + dependency.Value);
+            }*/
 
             // Check if the collection contains enough items to ever satisfy the needed combinations
             foreach (var neededCombination in neededCombinations) {
@@ -35,16 +44,48 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
                     return new object[0][];
                 }
             }
+            //Console.WriteLine("Check succeeded");
 
             // Make all combinations for every individual type
             var allCombinationsOfEveryType = neededCombinations.Select(kvp => CombinationsRecursion(collection[kvp.Key].ToArray(), kvp.Value));
 
+            /*Console.WriteLine("combinations of every type:");
+            foreach (var a in allCombinationsOfEveryType) {
+                Console.WriteLine("a");
+                Console.WriteLine($@"Number of combinations: {a.Count()}");
+                foreach (var b in a) {
+                    Console.WriteLine("b");
+                    foreach (var c in b) {
+                        Console.WriteLine(c);
+                    }
+                }
+            }*/
+
             // Construct all parameter combinations
             // Make combinations of combinations
             var combinationCombinations = CartesianProduct(allCombinationsOfEveryType);
+            /*Console.WriteLine("Cartesian product:");
+            Console.WriteLine($@"Number of combinations: {combinationCombinations.Count()}");
+            foreach (var a in combinationCombinations) {
+                Console.WriteLine("a");
+                foreach (var b in a) {
+                    Console.WriteLine("b");
+                    foreach (var c in b) {
+                        Console.WriteLine(c);
+                    }
+                }
+            }*/
 
             // Flatten collection
             var parametersCollection = combinationCombinations.Select(o => o.SelectMany(x => x).ToArray());
+            /*Console.WriteLine("Flattened:");
+            Console.WriteLine($@"Number of combinations: {parametersCollection.Count()}");
+            foreach (var a in parametersCollection) {
+                Console.WriteLine("a");
+                foreach (var b in a) {
+                    Console.WriteLine(b);
+                }
+            }*/
 
             return parametersCollection;
         }
