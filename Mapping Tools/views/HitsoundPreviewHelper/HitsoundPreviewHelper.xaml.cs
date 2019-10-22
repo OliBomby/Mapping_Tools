@@ -11,12 +11,14 @@ using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Viewmodels;
 
-namespace Mapping_Tools.Views.HitsoundPreviewHelper {
+namespace Mapping_Tools.Views
+{
     /// <summary>
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
-    public partial class HitsoundPreviewHelperView : ISavable<HitsoundPreviewHelperVM>, IQuickRun {
+    public partial class HitsoundPreviewHelperView : ISavable<HitsoundPreviewHelperVM>, IQuickRun
+    {
         public event EventHandler RunFinished;
 
         /// <summary>
@@ -41,17 +43,19 @@ namespace Mapping_Tools.Views.HitsoundPreviewHelper {
         /// <summary>
         /// 
         /// </summary>
-        public HitsoundPreviewHelperView() {
+        public HitsoundPreviewHelperView()
+        {
             InitializeComponent();
             DataContext = new HitsoundPreviewHelperVM();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
-            ProjectManager.LoadProject(this, message:false);
+            ProjectManager.LoadProject(this, message: false);
         }
 
-        protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
+        protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
             var bgw = sender as BackgroundWorker;
-            e.Result = PlaceHitsounds((Arguments)e.Argument, bgw, e);
+            e.Result = PlaceHitsounds((Arguments) e.Argument, bgw, e);
         }
 
         private struct Arguments
@@ -59,32 +63,40 @@ namespace Mapping_Tools.Views.HitsoundPreviewHelper {
             public string[] Paths;
             public bool Quick;
             public List<HitsoundZone> Zones;
-            public Arguments(string[] paths, bool quick, List<HitsoundZone> zones) {
+
+            public Arguments(string[] paths, bool quick, List<HitsoundZone> zones)
+            {
                 Paths = paths;
                 Quick = quick;
                 Zones = zones;
             }
         }
 
-        private string PlaceHitsounds(Arguments args, BackgroundWorker worker, DoWorkEventArgs _) {
+        private string PlaceHitsounds(Arguments args, BackgroundWorker worker, DoWorkEventArgs _)
+        {
             if (args.Zones.Count == 0)
                 return "There are no zones!";
 
             bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
 
-            foreach (string path in args.Paths) {
-                BeatmapEditor editor = editorRead ? EditorReaderStuff.GetNewestVersion(path, reader) : new BeatmapEditor(path);
+            foreach (string path in args.Paths)
+            {
+                BeatmapEditor editor =
+                    editorRead ? EditorReaderStuff.GetNewestVersion(path, reader) : new BeatmapEditor(path);
                 Beatmap beatmap = editor.Beatmap;
                 Timeline timeline = beatmap.GetTimeline();
 
-                for (int i = 0; i < timeline.TimelineObjects.Count; i++) {
+                for (int i = 0; i < timeline.TimelineObjects.Count; i++)
+                {
                     var tlo = timeline.TimelineObjects[i];
 
                     var column = args.Zones.FirstOrDefault();
                     double best = double.MaxValue;
-                    foreach (var c in args.Zones) {
+                    foreach (var c in args.Zones)
+                    {
                         double dist = c.Distance(tlo.Origin.Pos);
-                        if (dist < best) {
+                        if (dist < best)
+                        {
                             best = dist;
                             column = c;
                         }
@@ -97,7 +109,7 @@ namespace Mapping_Tools.Views.HitsoundPreviewHelper {
                     tlo.SetHitsound(column.Hitsound);
                     tlo.HitsoundsToOrigin();
 
-                    UpdateProgressBar(worker, (int)(100f * i / beatmap.HitObjects.Count));
+                    UpdateProgressBar(worker, (int) (100f * i / beatmap.HitObjects.Count));
                 }
 
                 // Save the file
@@ -110,42 +122,40 @@ namespace Mapping_Tools.Views.HitsoundPreviewHelper {
 
             return args.Quick ? "" : "Done!";
         }
-        private void Start_Click(object sender, RoutedEventArgs e) {
+
+        private void Start_Click(object sender, RoutedEventArgs e)
+        {
             RunTool(MainWindow.AppWindow.GetCurrentMaps(), quick: false);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public void QuickRun() {
-            RunTool(new[] { IOHelper.GetCurrentBeatmap() }, quick: true);
+        public void QuickRun()
+        {
+            RunTool(new[] {IOHelper.GetCurrentBeatmap()}, quick: true);
         }
 
 
-        private void RunTool(string[] paths, bool quick = false) {
+        private void RunTool(string[] paths, bool quick = false)
+        {
             if (!CanRun) return;
 
             IOHelper.SaveMapBackup(paths);
 
-            BackgroundWorker.RunWorkerAsync(new Arguments(paths, quick, ((HitsoundPreviewHelperVM)DataContext).Items.ToList()));
+            BackgroundWorker.RunWorkerAsync(new Arguments(paths, quick,
+                ((HitsoundPreviewHelperVM) DataContext).Items.ToList()));
 
             CanRun = false;
         }
 
-        /// <summary>
-        /// Grabs and imports all save data specified into the tool.
-        /// </summary>
-        /// <returns></returns>
-        public HitsoundPreviewHelperVM GetSaveData() {
-            return (HitsoundPreviewHelperVM)DataContext;
+        public HitsoundPreviewHelperVM GetSaveData()
+        {
+            return (HitsoundPreviewHelperVM) DataContext;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="saveData"></param>
-        public void SetSaveData(HitsoundPreviewHelperVM saveData) {
+        public void SetSaveData(HitsoundPreviewHelperVM saveData)
+        {
             DataContext = saveData;
+
         }
+
     }
 }

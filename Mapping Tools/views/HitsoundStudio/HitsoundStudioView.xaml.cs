@@ -10,7 +10,14 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using System.Windows.Input;
+using Mapping_Tools.Views.HitsoundStudio;
+using Microsoft.Win32;
+using Microsoft.WindowsAPICodePack.Dialogs;
+using ComboBox = System.Windows.Controls.ComboBox;
+using MessageBox = System.Windows.MessageBox;
+using TextBox = System.Windows.Controls.TextBox;
 
 namespace Mapping_Tools.Views {
 
@@ -168,6 +175,21 @@ namespace Mapping_Tools.Views {
                 MessageBox.Show("Please import a base beatmap and default hitsound first.");
                 return;
             }
+
+            HitsoundStudioExportControl control = new HitsoundStudioExportControl();
+
+            using (CustomSaveFileDialog openDialog = new CustomSaveFileDialog(control))
+            {
+                openDialog.Dlg.FileName = "test";
+
+                //Show the Save As dialog associated to the CustomFileDialog control
+                DialogResult res = openDialog.Dlg.ShowDialog();
+                if (res == DialogResult.OK)
+                    MessageBox.Show("Save Dialog Finished");
+
+
+            }
+
             BackgroundWorker.RunWorkerAsync(new Arguments(MainWindow.ExportPath, Settings.BaseBeatmap, Settings.DefaultSample, Settings.HitsoundLayers.ToList(), false));
             CanRun = false;
         }

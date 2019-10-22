@@ -29,7 +29,7 @@ namespace Mapping_Tools.Classes.Tools {
         /// </summary>
         /// <returns></returns>
         public static EditorReader GetEditorReader() {
-            return EditorReader;
+            return editorReader;
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace Mapping_Tools.Classes.Tools {
             if (!SettingsManager.Settings.UseEditorReader) return false;
 
             try {
-                EditorReader.FetchAll();
+                editorReader.FetchAll();
                 return true;
             }
             catch {
@@ -81,7 +81,7 @@ namespace Mapping_Tools.Classes.Tools {
             }
         }
 
-        public static List<HitObject> GetSelectedObjects(BeatmapEditor editor, EditorReader reader) {
+
         /// <summary>
         /// 
         /// </summary>
@@ -118,7 +118,6 @@ namespace Mapping_Tools.Classes.Tools {
             }
         }
 
-        public static BeatmapEditor GetNewestVersion(EditorReader reader, out List<HitObject> selected) {
         /// <summary>
         /// 
         /// </summary>
