@@ -108,7 +108,7 @@ namespace Mapping_Tools.Viewmodels {
             view.Filter = UserFilter;
 
             // Initialize layer collection
-            LayerCollection = new LayerCollection(new RelevantObjectsGeneratorCollection(Generators), 10);
+            LayerCollection = new LayerCollection(new RelevantObjectsGeneratorCollection(Generators), 2);
             LayerCollection.SetInceptionLevel(3);
             
             // Set up timers for responding to hotkey presses and beatmap changes
