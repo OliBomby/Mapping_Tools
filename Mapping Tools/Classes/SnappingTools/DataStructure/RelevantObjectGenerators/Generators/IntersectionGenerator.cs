@@ -2,48 +2,28 @@
 using System.Linq;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
-    class IntersectionGenerator : RelevantObjectsGenerator, IGeneratePointsFromRelevantObjects {
+    public class IntersectionGenerator : RelevantObjectsGenerator {
         public override string Name => "Intersection Point Calculator";
         public override string Tooltip => "Takes a pair of virtual lines or circles and generates a virtual point on each of their intersections.";
         public override GeneratorType GeneratorType => GeneratorType.Geometries;
 
-        public List<RelevantPoint> GetRelevantObjects(List<RelevantPoint> points, List<RelevantLine> lines, List<RelevantCircle> circles) {
-            var newObjects = new List<RelevantPoint>();
+        [RelevantObjectsGeneratorMethod]
+        public RelevantPoint GetLineLineIntersection(RelevantLine line1, RelevantLine line2) {
+            return Line2.Intersection(line1.Child, line2.Child, out var intersection) ? new RelevantPoint(intersection) : null;
+        }
 
-            // Intersect lines with lines
-            for (var i = 0; i < lines.Count; i++) {
-                for (var k = i + 1; k < lines.Count; k++) {
-                    var obj1 = lines[i];
-                    var obj2 = lines[k];
+        [RelevantObjectsGeneratorMethod]
+        public IEnumerable<RelevantPoint> GetLineCircleIntersection(RelevantLine line, RelevantCircle circle) {
+            return Circle.Intersection(circle.Child, line.Child, out var intersections) ? intersections.Select(o => new RelevantPoint(o)) : null;
+        }
 
-                    if (!Line2.Intersection(obj1.Child, obj2.Child, out var intersection)) continue;
-                    newObjects.Add(new RelevantPoint(intersection));
-                }
-            }
-
-            // Intersect lines with circles
-            foreach (var line in lines) {
-                foreach (var circle in circles) {
-                    if (!Circle.Intersection(circle.Child, line.Child, out var intersections)) continue;
-                    newObjects.AddRange(intersections.Select(v => new RelevantPoint(v)));
-                }
-            }
-
-            // Intersect circles with circles
-            for (var i = 0; i < circles.Count; i++) {
-                for (var k = i + 1; k < circles.Count; k++) {
-                    var obj1 = circles[i];
-                    var obj2 = circles[k];
-
-                    if (!Circle.Intersection(obj1.Child, obj2.Child, out var intersections)) continue;
-                    newObjects.AddRange(intersections.Select(v => new RelevantPoint(v)));
-                }
-            }
-
-            return newObjects;
+        [RelevantObjectsGeneratorMethod]
+        public IEnumerable<RelevantPoint> GetCircleCircleIntersection(RelevantCircle circle1, RelevantCircle circle2) {
+            return Circle.Intersection(circle1.Child, circle2.Child, out var intersections) ? intersections.Select(o => new RelevantPoint(o)) : null;
         }
     }
 }

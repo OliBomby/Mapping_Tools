@@ -183,6 +183,30 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return samples;
         }
 
+        /// <summary>
+        /// Gets the type of this hit object.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">If this hit object has no type.</exception>
+        public HitObjectType GetHitObjectType() {
+            if (IsCircle) {
+                return HitObjectType.Circle;
+            }
+
+            if (IsSlider) {
+                return HitObjectType.Slider;
+            }
+
+            if (IsSpinner) {
+                return HitObjectType.Spinner;
+            }
+
+            if (IsHoldNote) {
+                return HitObjectType.HoldNote;
+            }
+
+            throw new InvalidOperationException("This hit object has no type.");
+        }
+
         private string GetSliderFilename(SampleSet sampleSet, string sampleName, int index) {
             if (index == 0) {
                 return string.Format("{0}-slider{1}-default.wav", sampleSet.ToString().ToLower(), sampleName);
