@@ -17,6 +17,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
         private double offsetTop;
         private double offsetRight;
         private double offsetBottom;
+        private double acceptableDifference;
         private bool debugEnabled;
         private ViewMode keyDownViewMode;
         private ViewMode keyUpViewMode;
@@ -54,6 +55,11 @@ namespace Mapping_Tools.Classes.SnappingTools {
         }
 
         public Box2 OverlayOffset => new Box2(OffsetLeft, OffsetTop, OffsetRight, OffsetBottom);
+
+        public double AcceptableDifference {
+            get => acceptableDifference;
+            set => Set(ref acceptableDifference, value);
+        }
 
         public bool DebugEnabled {
             get => debugEnabled;

@@ -126,6 +126,13 @@
 
                             <ListBoxItem>
                                 <StackPanel Orientation="Horizontal">
+                                    <TextBlock Width="100" Margin="0 0 0 6" Text="Minimal diff:" VerticalAlignment="Bottom" ToolTip="Similar virtual objects get merged together. This sets the minimal acceptable difference that two objects can have and not get merged together."></TextBlock>
+                                    <TextBox Text="{Binding AcceptableDifference}" Width="150" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Minimal difference" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
+                                </StackPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem>
+                                <StackPanel Orientation="Horizontal">
                                     <TextBlock Width="100" Margin="0 0 0 6" Text="Debug" VerticalAlignment="Center" ToolTip="Visualize boundaries of the overlay box for debugging purposes."/>
                                     <ToggleButton IsChecked="{Binding DebugEnabled}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignSwitchToggleButton}"/>
                                 </StackPanel>
