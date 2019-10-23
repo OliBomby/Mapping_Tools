@@ -14,6 +14,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         RelevantObjectsGenerator Generator { get; set; }
         HashSet<IRelevantObject> ParentObjects { get; set; }
         HashSet<IRelevantObject> ChildObjects { get; set; }
+        HashSet<IRelevantObject> GetParentage();
         void UpdateRelevancy();
         void UpdateTime();
         void UpdateSelected();

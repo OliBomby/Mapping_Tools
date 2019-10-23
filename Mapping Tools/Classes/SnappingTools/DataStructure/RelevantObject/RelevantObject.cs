@@ -79,6 +79,23 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
             ChildObjects = new HashSet<IRelevantObject>();
         }
 
+        /// <summary>
+        /// Returns a set with all the parents of this object and all the parents' parents and this object itself
+        /// </summary>
+        public HashSet<IRelevantObject> GetParentage() {
+            var parentageSet = new HashSet<IRelevantObject> {this};
+
+            if (ParentObjects == null || ParentObjects.Count == 0) {
+                return parentageSet;
+            }
+
+            foreach (var relevantObject in ParentObjects) {
+                parentageSet.UnionWith(relevantObject.GetParentage());
+            }
+
+            return parentageSet;
+        }
+
         public void UpdateRelevancy() {
             if (ParentObjects == null || ParentObjects.Count == 0) return;
             Relevancy = ParentObjects.Max(o => o.Relevancy);

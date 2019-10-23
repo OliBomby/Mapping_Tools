@@ -146,6 +146,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
+        public static double ApproachRateToMs(double approachRate) {
+            if (approachRate < 5) {
+                return 1800 - 120 * approachRate;
+            }
+
+            return 1200 - 150 * (approachRate - 5);
+        }
+
         public List<HitObject> GetHitObjectsWithRangeInRange(double start, double end) {
             return HitObjects.FindAll(o => o.EndTime >= start && o.Time <= end);
         }
@@ -158,7 +166,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public List<double> GetBookmarks() {
             try {
-                return Editor["Bookmarks"].GetStringValue().Split(',').Select(p => double.Parse(p)).ToList();
+                return Editor["Bookmarks"].GetStringValue().Split(',').Select(p => Double.Parse(p)).ToList();
             }
             catch (KeyNotFoundException) {
                 return new List<double>();
@@ -167,7 +175,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public void SetBookmarks(List<double> bookmarks) {
             if (bookmarks.Count > 0) {
-                Editor["Bookmarks"] = new TValue(string.Join(",", bookmarks.Select(d => Math.Round(d))));
+                Editor["Bookmarks"] = new TValue(String.Join(",", bookmarks.Select(d => Math.Round(d))));
             }
         }
 
@@ -183,8 +191,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public List<string> GetLines() {
             // Getting all the shit
-            List<string> lines = new List<string>
-            {
+            List<string> lines = new List<string> {
                 "osu file format v14",
                 "",
                 "[General]"
@@ -262,10 +269,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public string GetFileName() {
-            string fileName = string.Format("{0} - {1} ({2}) [{3}].osu", Metadata["Artist"].StringValue, Metadata["Title"].StringValue, Metadata["Creator"].StringValue, Metadata["Version"].StringValue);
+            string fileName = String.Format("{0} - {1} ({2}) [{3}].osu", Metadata["Artist"].StringValue, Metadata["Title"].StringValue, Metadata["Creator"].StringValue, Metadata["Version"].StringValue);
 
             string regexSearch = new string(Path.GetInvalidFileNameChars());
-            Regex r = new Regex(string.Format("[{0}]", Regex.Escape(regexSearch)));
+            Regex r = new Regex(String.Format("[{0}]", Regex.Escape(regexSearch)));
             fileName = r.Replace(fileName, "");
             return fileName;
         }

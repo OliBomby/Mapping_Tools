@@ -31,6 +31,8 @@ namespace Mapping_Tools.Viewmodels {
 
         public ObservableCollection<RelevantObjectsGenerator> Generators { get; }
         protected readonly LayerCollection LayerCollection;
+
+        private IRelevantObject _lastSnappedRelevantObject;
         private int _editorTime;
 
         private string _filter = "";
@@ -156,12 +158,25 @@ namespace Mapping_Tools.Viewmodels {
                         foreach (var relevantDrawable in LayerCollection.GetAllRelevantDrawables()) {
                             relevantDrawable.DrawYourself(context, _coordinateConverter, Preferences);
                         }
+
                         break;
                     case ViewMode.ParentsOnly:
-                        // Get the relevant object which is snapped being snapped to
-                        throw new NotImplementedException();
+                        if (_lastSnappedRelevantObject == null) {
+                            break;
+                        }
+
+                        // Get the parents of the relevant object which is being snapped to
+                        foreach (var relevantObject in _lastSnappedRelevantObject.GetParentage()) {
+                            if (relevantObject is IRelevantDrawable relevantDrawable) {
+                                relevantDrawable.DrawYourself(context, _coordinateConverter, Preferences);
+                            }
+                        }
+
+                        break;
                     case ViewMode.Nothing:
                         break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
             } else {
                 switch (Preferences.KeyUpViewMode) {
@@ -172,6 +187,10 @@ namespace Mapping_Tools.Viewmodels {
                         break;
                     case ViewMode.Nothing:
                         break;
+                    case ViewMode.ParentsOnly:
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
             }
         }
@@ -302,7 +321,8 @@ namespace Mapping_Tools.Viewmodels {
                     _overlay.Update();
 
                     if (!_autoSnapTimer.IsEnabled && IsHotkeyDown(Preferences.SnapHotkey)) {
-                        if (HotkeyRedrawsOverlay)
+                        // Update overlay but not on parents only view mode, because that one updates on his own terms
+                        if (HotkeyRedrawsOverlay && Preferences.KeyDownViewMode != ViewMode.ParentsOnly)
                             _overlay.OverlayWindow.InvalidateVisual();
                         _autoSnapTimer.Start();
                     }
@@ -319,7 +339,7 @@ namespace Mapping_Tools.Viewmodels {
             var hitObjects = EditorReaderStuff.GetHitObjects(reader);
 
             // Get the visible hitobjects using approach rate
-            var approachTime = ApproachRateToMs(reader.ApproachRate);
+            var approachTime = Beatmap.ApproachRateToMs(reader.ApproachRate);
             var thereAreSelected = hitObjects.Any(o => o.IsSelected);
             return hitObjects.Where(o => thereAreSelected ? o.IsSelected : _editorTime > o.Time - approachTime && _editorTime < o.EndTime + approachTime).ToList();
         }
@@ -346,14 +366,6 @@ namespace Mapping_Tools.Viewmodels {
             _overlay.OverlayWindow.InvalidateVisual();
         }
 
-        private static double ApproachRateToMs(double approachRate) {
-            if (approachRate < 5) {
-                return 1800 - 120 * approachRate;
-            }
-
-            return 1200 - 150 * (approachRate - 5);
-        }
-
         private void AutoSnapTimerTick(object sender, EventArgs e) {
             if (!IsHotkeyDown(Preferences.SnapHotkey)) {
                 if (HotkeyRedrawsOverlay)
@@ -374,15 +386,25 @@ namespace Mapping_Tools.Viewmodels {
             if (drawables.Length == 0)
                 return;
 
+            // Get the relevant object nearest to the cursor
             IRelevantDrawable nearest = null;
             var smallestDistance = double.PositiveInfinity;
             foreach (var o in drawables) {
                 var dist = o.DistanceTo(cursorPos);
                 if (o is RelevantPoint) // Prioritize points to be able to snap to intersections
                     dist -= PointsBias;
+
                 if (!(dist < smallestDistance)) continue;
                 smallestDistance = dist;
                 nearest = o;
+            }
+
+            // Update overlay if the last snapped changed and parentview is on
+            if (nearest != _lastSnappedRelevantObject && Preferences.KeyDownViewMode == ViewMode.ParentsOnly) {
+                // Set the last snapped relevant object
+                _lastSnappedRelevantObject = nearest;
+                // Update overlay
+                _overlay.OverlayWindow.InvalidateVisual();
             }
 
             // CONVERT THIS TO CURSOR POSITION
