@@ -35,6 +35,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure {
                     var newLayer = new RelevantObjectLayer(this, AllGenerators) {PreviousLayer = lastLayer};
                     if (lastLayer != null) lastLayer.NextLayer = newLayer;
                     ObjectLayers.Add(newLayer);
+
+                    // Derive new relevant objects in the new layer
+                    newLayer.GenerateNewObjects();
                 }
             } else if (ObjectLayers.Count > inceptionLevel) {
                 // Remove layers
