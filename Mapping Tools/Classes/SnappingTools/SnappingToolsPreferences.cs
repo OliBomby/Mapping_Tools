@@ -10,7 +10,7 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
 namespace Mapping_Tools.Classes.SnappingTools {
     public class SnappingToolsPreferences : BindableBase, ICloneable{
         #region private storage
-        private List<RelevantObjectPreferences> releventObjectPreferences;
+        private Dictionary<string, RelevantObjectPreferences> relevantObjectPreferences;
 
         private Hotkey snapHotkey;
         private double offsetLeft;
@@ -22,9 +22,9 @@ namespace Mapping_Tools.Classes.SnappingTools {
         private ViewMode keyUpViewMode;
         #endregion
 
-        public List<RelevantObjectPreferences> RelevantObjectPreferences {
-            get => releventObjectPreferences;
-            set => Set(ref releventObjectPreferences, value);
+        public Dictionary<string, RelevantObjectPreferences> RelevantObjectPreferences {
+            get => relevantObjectPreferences;
+            set => Set(ref relevantObjectPreferences, value);
         }
 
         #region global settings
@@ -73,13 +73,10 @@ namespace Mapping_Tools.Classes.SnappingTools {
 
         #region helper methods
         /// <summary>
-        /// Finds and returns an existing instance of <see cref="RelevantObjectPreferences"/> based on <see cref="RelevantObjectPreferences.Name"/> property.
+        /// Gets the instance of <see cref="RelevantObjectPreferences"/> out of the dictionary based on the <see cref="RelevantObjectPreferences.Name"/> property.
         /// </summary>
-        /// <param name="input"><see cref="RelevantObjectPreferences.Name"/> property of the desired instance of <see cref="RelevantObjectPreferences.Name"/>.</param>
-        /// <exception cref="ArgumentOutOfRangeException"/>
         public RelevantObjectPreferences GetReleventObjectPreferences(string input) {
-            List<RelevantObjectPreferences> output = releventObjectPreferences.Where(o => o.Name == input).ToList();
-            return output[0] ?? throw new ArgumentOutOfRangeException();
+            return RelevantObjectPreferences.TryGetValue(input, out var output) ? output : new RelevantObjectPreferences();
         }
         #endregion
 
@@ -91,33 +88,38 @@ namespace Mapping_Tools.Classes.SnappingTools {
 
         #region default constructor
         public SnappingToolsPreferences() {
-            releventObjectPreferences = new List<RelevantObjectPreferences> {
-                new RelevantObjectPreferences {
-                    Name = "Virtual point preferences",
-                    Color = Colors.Cyan,
-                    Dashstyle = DashStylesEnum.Solid,
-                    Opacity = 0.8,
-                    Size = 5,
-                    Thickness = 3,
-                    HasSizeOption = true,
-                },
-                new RelevantObjectPreferences {
-                    Name = "Virtual line preferences",
-                    Color = Colors.LawnGreen,
-                    Dashstyle = DashStylesEnum.Dash,
-                    Opacity = 0.8,
-                    Thickness = 3,
-                    HasSizeOption = false,
-                },
-                new RelevantObjectPreferences {
-                    Name = "Virtual circle preferences",
-                    Color = Colors.Red,
-                    Dashstyle = DashStylesEnum.Dash,
-                    Opacity = 0.8,
-                    Thickness = 3,
-                    HasSizeOption = false,
+            relevantObjectPreferences = new Dictionary<string, RelevantObjectPreferences> {
+                {
+                    "Virtual point preferences", new RelevantObjectPreferences {
+                        Name = "Virtual point preferences",
+                        Color = Colors.Cyan,
+                        Dashstyle = DashStylesEnum.Solid,
+                        Opacity = 0.8,
+                        Size = 5,
+                        Thickness = 3,
+                        HasSizeOption = true,
+                    }
+                }, {
+                    "Virtual line preferences", new RelevantObjectPreferences {
+                        Name = "Virtual line preferences",
+                        Color = Colors.LawnGreen,
+                        Dashstyle = DashStylesEnum.Dash,
+                        Opacity = 0.8,
+                        Thickness = 3,
+                        HasSizeOption = false,
+                    }
+                }, {
+                    "Virtual circle preferences", new RelevantObjectPreferences {
+                        Name = "Virtual circle preferences",
+                        Color = Colors.Red,
+                        Dashstyle = DashStylesEnum.Dash,
+                        Opacity = 0.8,
+                        Thickness = 3,
+                        HasSizeOption = false,
+                    }
                 }
             };
+
             snapHotkey = new Hotkey(Key.M, ModifierKeys.None);
             offsetLeft = 0;
             offsetTop = 1;

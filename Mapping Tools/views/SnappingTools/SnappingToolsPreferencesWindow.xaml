@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:Mapping_Tools.Classes.SnappingTools"
         xmlns:components="clr-namespace:Mapping_Tools.Components.Domain"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:generic="clr-namespace:System.Collections.Generic;assembly=mscorlib"
         mc:Ignorable="d"
         Title="Snapping Tools Preferences" Height="500" Width="570" MinWidth="575" MinHeight="360"
         WindowStyle="None"
@@ -49,34 +50,34 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <materialDesign:Card Margin="0 0 0 5">
-                                    <TreeViewItem Header="{Binding Name}" Foreground="{DynamicResource MaterialDesignBody}">
+                                    <TreeViewItem Header="{Binding Key}" Foreground="{DynamicResource MaterialDesignBody}">
                                         <StackPanel Orientation="Horizontal">
                                             <TextBox Text="{Binding Color, ElementName=ColorPicker}"
 								                     Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" materialDesign:HintAssist.Hint="Color HEX value"
 								                     Width="120" Margin="2,0,10,2"/>
-                                            <materialDesign:ColorPicker Color="{Binding Color}" x:Name="ColorPicker" Width="300"/>
+                                            <materialDesign:ColorPicker Color="{Binding Value.Color}" x:Name="ColorPicker" Width="300"/>
                                         </StackPanel>
 
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="Opacity" Width="120" VerticalAlignment="Center"/>
-                                            <Slider x:Name="OpacitySlider" Width="300" TickFrequency="0.01" Orientation="Horizontal" Minimum="0" Maximum="1" Value="{Binding Opacity,  UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
+                                            <Slider x:Name="OpacitySlider" Width="300" TickFrequency="0.01" Orientation="Horizontal" Minimum="0" Maximum="1" Value="{Binding Value.Opacity, UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
                                             <TextBox x:Name="OpacityTextbox" Width="40" Text="{Binding ElementName=OpacitySlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
                                         </StackPanel>
 
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="Thickness" Width="120" VerticalAlignment="Center"/>
-                                            <Slider x:Name="ThicknessSlider" Width="300" TickFrequency="1" Orientation="Horizontal" Minimum="1" Maximum="10" Value="{Binding Thickness, UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
+                                            <Slider x:Name="ThicknessSlider" Width="300" TickFrequency="1" Orientation="Horizontal" Minimum="1" Maximum="10" Value="{Binding Value.Thickness, UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
                                             <TextBox x:Name="ThicknessTextbox" Width="40" Text="{Binding ElementName=ThicknessSlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
                                         </StackPanel>
 
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="DashStyle" Width="120" VerticalAlignment="Center"/>
-                                            <ComboBox x:Name="DashStyleCombobox" Width="300" Margin="11,0" ItemsSource="{Binding DashStylesEnumerable}" SelectedItem="{Binding Dashstyle}"/>
+                                            <ComboBox x:Name="DashStyleCombobox" Width="300" Margin="11,0" ItemsSource="{Binding Value.DashStylesEnumerable}" SelectedItem="{Binding Value.Dashstyle}"/>
                                         </StackPanel>
 
-                                        <StackPanel Orientation="Horizontal" Visibility="{Binding HasSizeOption, Converter={StaticResource VisibleIfTrueConverter}}">
+                                        <StackPanel Orientation="Horizontal" Visibility="{Binding Value.HasSizeOption, Converter={StaticResource BooleanToVisibilityConverter}}">
                                             <TextBlock Text="Size" Width="120" VerticalAlignment="Center"/>
-                                            <Slider x:Name="SizeSlider" Width="300" TickFrequency="1" Orientation="Horizontal" Minimum="1" Maximum="10" Value="{Binding Size, UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
+                                            <Slider x:Name="SizeSlider" Width="300" TickFrequency="1" Orientation="Horizontal" Minimum="1" Maximum="10" Value="{Binding Value.Size, UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
                                             <TextBox x:Name="SizeTextbox" Width="40" Text="{Binding ElementName=SizeSlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
                                         </StackPanel>
                                     </TreeViewItem>
