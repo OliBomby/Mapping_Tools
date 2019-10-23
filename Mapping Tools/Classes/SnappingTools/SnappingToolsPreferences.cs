@@ -131,6 +131,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
             offsetTop = 1;
             offsetRight = 0;
             offsetBottom = 1;
+            acceptableDifference = 2;
             debugEnabled = false;
             keyDownViewMode = ViewMode.Everything;
             keyUpViewMode = ViewMode.Everything;
