@@ -79,7 +79,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                         continue;
                     }
                     //Console.WriteLine(generator.Name.ToUpper());
-                    var parametersList = RelevantObjectPairGenerator.GetParametersList(dependencies, PreviousLayer?.Objects);
+                    var parametersList = RelevantObjectPairGenerator.GetParametersList(dependencies, PreviousLayer?.Objects, concurrent);
 
                     foreach (var parameters in parametersList) {
                         // Generate the new relevant object(s)
