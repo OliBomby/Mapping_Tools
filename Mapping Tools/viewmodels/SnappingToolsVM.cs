@@ -395,7 +395,11 @@ namespace Mapping_Tools.Viewmodels {
             var added = hitObjects.Where(o => !existingHitObjects.Select(x => x.HitObject).Contains(o, comparer)).ToArray();
             var removed = existingHitObjects.Where(o => !hitObjects.Contains(o.HitObject, comparer)).ToArray();
 
-            rootLayer.Remove(removed);
+            // Dispose of all the removed hit objects
+            foreach (var relevantHitObject in removed) {
+                relevantHitObject.Dispose();
+            }
+            // Add new hit objects to root layer
             rootLayer.Add(added.Select(o => new RelevantHitObject(o)));
 
             if (added.Length == 0 && removed.Length == 0)
