@@ -363,7 +363,7 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
-        private List<HitObject> GetVisibleHitObjects()
+        private List<HitObject> GetHitObjects()
         {
             if (!EditorReaderStuff.TryGetFullEditorReader(out var reader)) return new List<HitObject>();
 
@@ -371,19 +371,29 @@ namespace Mapping_Tools.Viewmodels {
 
             // Get the visible hitobjects using approach rate
             var approachTime = Beatmap.ApproachRateToMs(reader.ApproachRate);
-            var thereAreSelected = hitObjects.Any(o => o.IsSelected);
-            return hitObjects.Where(o => thereAreSelected ? o.IsSelected : _editorTime > o.Time - approachTime && _editorTime < o.EndTime + approachTime).ToList();
+
+            switch (Preferences.SelectedHitObjectMode) {
+                case SelectedHitObjectMode.AllwaysAllVisible:
+                    return hitObjects.Where(o => _editorTime > o.Time - approachTime && _editorTime < o.EndTime + approachTime).ToList();
+                case SelectedHitObjectMode.VisibleOrSelected:
+                    var thereAreSelected = hitObjects.Any(o => o.IsSelected);
+                    return hitObjects.Where(o => thereAreSelected ? o.IsSelected : _editorTime > o.Time - approachTime && _editorTime < o.EndTime + approachTime).ToList();
+                case SelectedHitObjectMode.OnlySelected:
+                    return hitObjects.Where(o => o.IsSelected).ToList();
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
       
         private void UpdateRelevantObjects()
         {
-            var visibleObjects = GetVisibleHitObjects();
+            var hitObjects = GetHitObjects();
             
             var comparer = new HitObjectComparer();
             var rootLayer = LayerCollection.GetRootLayer();
             var existingHitObjects = LayerCollection.GetRootRelevantHitObjects();
-            var added = visibleObjects.Where(o => !existingHitObjects.Select(x => x.HitObject).Contains(o, comparer)).ToArray();
-            var removed = existingHitObjects.Where(o => !visibleObjects.Contains(o.HitObject, comparer)).ToArray();
+            var added = hitObjects.Where(o => !existingHitObjects.Select(x => x.HitObject).Contains(o, comparer)).ToArray();
+            var removed = existingHitObjects.Where(o => !hitObjects.Contains(o.HitObject, comparer)).ToArray();
 
             rootLayer.Remove(removed);
             rootLayer.Add(added.Select(o => new RelevantHitObject(o)));

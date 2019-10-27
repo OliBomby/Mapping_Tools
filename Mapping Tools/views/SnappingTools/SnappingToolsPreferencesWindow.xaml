@@ -130,6 +130,20 @@
 
                             <ListBoxItem>
                                 <StackPanel Orientation="Horizontal">
+                                    <TextBlock Width="100" Margin="0 0 0 6" Text="Selection:" VerticalAlignment="Center" ToolTip="Customize what hit objects get used for generating virtual objects."/>
+                                    <StackPanel>
+                                        <RadioButton IsChecked="{Binding SelectedHitObjectMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:SelectedHitObjectMode.AllwaysAllVisible}}"
+                                                     Content="All visible" ToolTip="Use the visible hit objects regardless of selection."/>
+                                        <RadioButton IsChecked="{Binding SelectedHitObjectMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:SelectedHitObjectMode.VisibleOrSelected}}"
+                                                     Content="Visible or selected" ToolTip="Use the visible hit objects, but use the selected hit objects if any are selected."/>
+                                        <RadioButton IsChecked="{Binding SelectedHitObjectMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:SelectedHitObjectMode.OnlySelected}}"
+                                                     Content="Selected only" ToolTip="Exclusively use selected hit objects."/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem>
+                                <StackPanel Orientation="Horizontal">
                                     <TextBlock Width="100" Margin="0 0 0 6" Text="Minimal diff:" VerticalAlignment="Bottom" ToolTip="Similar virtual objects get merged together. This sets the minimal acceptable difference that two objects can have and not get merged together."></TextBlock>
                                     <TextBox Text="{Binding AcceptableDifference}" Width="150" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Minimal difference" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
                                 </StackPanel>

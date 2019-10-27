@@ -21,6 +21,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
         private bool debugEnabled;
         private ViewMode keyDownViewMode;
         private ViewMode keyUpViewMode;
+        private SelectedHitObjectMode selectedHitObjectMode;
         #endregion
 
         public Dictionary<string, RelevantObjectPreferences> RelevantObjectPreferences {
@@ -74,6 +75,11 @@ namespace Mapping_Tools.Classes.SnappingTools {
         public ViewMode KeyUpViewMode {
             get => keyUpViewMode;
             set => Set(ref keyUpViewMode, value);
+        }
+
+        public SelectedHitObjectMode SelectedHitObjectMode {
+            get => selectedHitObjectMode;
+            set => Set(ref selectedHitObjectMode, value);
         }
         #endregion
 
@@ -135,6 +141,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
             debugEnabled = false;
             keyDownViewMode = ViewMode.Everything;
             keyUpViewMode = ViewMode.Everything;
+            selectedHitObjectMode = SelectedHitObjectMode.VisibleOrSelected;
         }
         #endregion
 
@@ -154,5 +161,11 @@ namespace Mapping_Tools.Classes.SnappingTools {
         Everything = 1 << 2,
 
         ChildrenAndParents = Children | Parents,
+    }
+
+    public enum SelectedHitObjectMode {
+        AllwaysAllVisible,
+        VisibleOrSelected,
+        OnlySelected
     }
 }
