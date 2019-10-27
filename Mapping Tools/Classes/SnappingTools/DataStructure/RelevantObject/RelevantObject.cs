@@ -104,6 +104,23 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
             return parentageSet;
         }
 
+        /// <summary>
+        /// Returns a set with all the children of this object and all the children' children and this object itself
+        /// </summary>
+        public HashSet<IRelevantObject> GetDescendants() {
+            var childrenSet = new HashSet<IRelevantObject> {this};
+
+            if (ChildObjects == null || ChildObjects.Count == 0) {
+                return childrenSet;
+            }
+
+            foreach (var relevantObject in ChildObjects) {
+                childrenSet.UnionWith(relevantObject.GetDescendants());
+            }
+
+            return childrenSet;
+        }
+
         public void UpdateRelevancy() {
             if (ParentObjects == null || ParentObjects.Count == 0) return;
             Relevancy = ParentObjects.Max(o => o.Relevancy);

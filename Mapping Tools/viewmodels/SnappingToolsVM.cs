@@ -83,7 +83,12 @@ namespace Mapping_Tools.Viewmodels {
             Active
         }
 
-        private bool HotkeyRedrawsOverlay => Preferences.KeyDownViewMode != Preferences.KeyUpViewMode;
+        private bool HotkeyDownRedrawsOverlay => Preferences.KeyDownViewMode != Preferences.KeyUpViewMode && !SnapChangeRedrawsOverlay;
+
+        private bool HotkeyUpRedrawsOverlay => Preferences.KeyDownViewMode != Preferences.KeyUpViewMode;
+
+        private bool SnapChangeRedrawsOverlay => Preferences.KeyDownViewMode.HasFlag(ViewMode.Parents) ||
+                                                  Preferences.KeyDownViewMode.HasFlag(ViewMode.Children);
 
         public SnappingToolsVm() {
             // Set up a coordinate converter for converting coordinates between screen and osu!
@@ -156,44 +161,38 @@ namespace Mapping_Tools.Viewmodels {
 
         private void OnDraw(object sender, DrawingContext context) {
             if (IsHotkeyDown(Preferences.SnapHotkey)) {
-                switch (Preferences.KeyDownViewMode) {
-                    case ViewMode.Everything:
-                        foreach (var relevantDrawable in LayerCollection.GetAllRelevantDrawables()) {
-                            relevantDrawable.DrawYourself(context, _coordinateConverter, Preferences);
-                        }
+                // Handle key down rendering
+                if (Preferences.KeyDownViewMode.HasFlag(ViewMode.Everything)) {
+                    foreach (var relevantDrawable in LayerCollection.GetAllRelevantDrawables()) {
+                        relevantDrawable.DrawYourself(context, _coordinateConverter, Preferences);
+                    }
+                    // It has already drawn everything so return
+                    return;
+                }
 
-                        break;
-                    case ViewMode.ParentsOnly:
-                        if (_lastSnappedRelevantObject == null) {
-                            break;
-                        }
+                var objectsToRender = new HashSet<IRelevantObject>();
 
-                        // Get the parents of the relevant object which is being snapped to
-                        foreach (var relevantObject in _lastSnappedRelevantObject.GetParentage()) {
-                            if (relevantObject is IRelevantDrawable relevantDrawable) {
-                                relevantDrawable.DrawYourself(context, _coordinateConverter, Preferences);
-                            }
-                        }
+                if (Preferences.KeyDownViewMode.HasFlag(ViewMode.Parents) && _lastSnappedRelevantObject != null) {
+                    // Get the parents of the relevant object which is being snapped to
+                    objectsToRender.UnionWith(_lastSnappedRelevantObject.GetParentage());
+                }
 
-                        break;
-                    case ViewMode.Nothing:
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
+                if (Preferences.KeyDownViewMode.HasFlag(ViewMode.Children) && _lastSnappedRelevantObject != null) {
+                    // Get the parents of the relevant object which is being snapped to
+                    objectsToRender.UnionWith(_lastSnappedRelevantObject.GetDescendants());
+                }
+
+                foreach (var relevantObject in objectsToRender) {
+                    if (relevantObject is IRelevantDrawable relevantDrawable) {
+                        relevantDrawable.DrawYourself(context, _coordinateConverter, Preferences);
+                    }
                 }
             } else {
-                switch (Preferences.KeyUpViewMode) {
-                    case ViewMode.Everything:
-                        foreach (var relevantDrawable in LayerCollection.GetAllRelevantDrawables()) {
-                            relevantDrawable.DrawYourself(context, _coordinateConverter, Preferences);
-                        }
-                        break;
-                    case ViewMode.Nothing:
-                        break;
-                    case ViewMode.ParentsOnly:
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
+                // Handle key up rendering
+                if (Preferences.KeyUpViewMode.HasFlag(ViewMode.Everything)) {
+                    foreach (var relevantDrawable in LayerCollection.GetAllRelevantDrawables()) {
+                        relevantDrawable.DrawYourself(context, _coordinateConverter, Preferences);
+                    }
                 }
             }
         }
@@ -340,7 +339,7 @@ namespace Mapping_Tools.Viewmodels {
                     }
 
                     var editorTime = reader.EditorTime();
-                    if (editorTime != _editorTime || true) {
+                    if (editorTime != _editorTime) {
                         _editorTime = editorTime;
                         UpdateRelevantObjects();
                     }
@@ -350,8 +349,12 @@ namespace Mapping_Tools.Viewmodels {
 
                     if (!_autoSnapTimer.IsEnabled && IsHotkeyDown(Preferences.SnapHotkey)) {
                         // Update overlay but not on parents only view mode, because that one updates on his own terms
-                        if (HotkeyRedrawsOverlay && Preferences.KeyDownViewMode != ViewMode.ParentsOnly)
+                        if (HotkeyDownRedrawsOverlay)
                             _overlay.OverlayWindow.InvalidateVisual();
+
+                        // Reset last snapped relevant object to trigger an overlay update in the snap timer tick
+                        _lastSnappedRelevantObject = null;
+                        
                         _autoSnapTimer.Start();
                     }
                     break;
@@ -396,7 +399,7 @@ namespace Mapping_Tools.Viewmodels {
 
         private void AutoSnapTimerTick(object sender, EventArgs e) {
             if (!IsHotkeyDown(Preferences.SnapHotkey)) {
-                if (HotkeyRedrawsOverlay)
+                if (HotkeyUpRedrawsOverlay)
                     _overlay?.OverlayWindow.InvalidateVisual();
                 _autoSnapTimer.Stop();
                 return;
@@ -428,7 +431,7 @@ namespace Mapping_Tools.Viewmodels {
             }
 
             // Update overlay if the last snapped changed and parentview is on
-            if (nearest != _lastSnappedRelevantObject && Preferences.KeyDownViewMode == ViewMode.ParentsOnly) {
+            if (nearest != _lastSnappedRelevantObject && SnapChangeRedrawsOverlay) {
                 // Set the last snapped relevant object
                 _lastSnappedRelevantObject = nearest;
                 // Update overlay

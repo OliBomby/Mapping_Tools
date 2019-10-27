@@ -104,8 +104,12 @@
                                     <StackPanel>
                                         <RadioButton IsChecked="{Binding KeyDownViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:ViewMode.Everything}}"
                                                      Content="Everything" ToolTip="Default behavior. Display all virtual objects when the Activation Key is pressed."/>
-                                        <RadioButton IsChecked="{Binding KeyDownViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:ViewMode.ParentsOnly}}"
-                                                     Content="Parents Only" ToolTip="Display the object the cursor is currently snapping to and its parents."/>
+                                        <RadioButton IsChecked="{Binding KeyDownViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:ViewMode.ChildrenAndParents}}"
+                                                     Content="Children and Parents" ToolTip="Display the object the cursor is currently snapping to, its parents and its children."/>
+                                        <RadioButton IsChecked="{Binding KeyDownViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:ViewMode.Parents}}"
+                                                     Content="Parents" ToolTip="Display the object the cursor is currently snapping to and its parents."/>
+                                        <RadioButton IsChecked="{Binding KeyDownViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:ViewMode.Children}}"
+                                                     Content="Children" ToolTip="Display the object the cursor is currently snapping to and its children."/>
                                         <RadioButton IsChecked="{Binding KeyDownViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:ViewMode.Nothing}}"
                                                      Content="Nothing" ToolTip="Do not display anything even if the Activation Key is pressed."/>
                                     </StackPanel>

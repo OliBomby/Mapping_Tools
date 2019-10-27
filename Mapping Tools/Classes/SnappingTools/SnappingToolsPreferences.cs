@@ -146,9 +146,13 @@ namespace Mapping_Tools.Classes.SnappingTools {
         }
     }
 
+    [Flags]
     public enum ViewMode {
-        Everything,
-        ParentsOnly,
-        Nothing
+        Nothing = 0,
+        Children = 1,
+        Parents = 1 << 1,
+        Everything = 1 << 2,
+
+        ChildrenAndParents = Children | Parents,
     }
 }

@@ -1,5 +1,6 @@
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.Layers;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
@@ -15,6 +16,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         HashSet<IRelevantObject> ParentObjects { get; set; }
         HashSet<IRelevantObject> ChildObjects { get; set; }
         HashSet<IRelevantObject> GetParentage();
+        HashSet<IRelevantObject> GetDescendants();
         void UpdateRelevancy();
         void UpdateTime();
         void UpdateSelected();
