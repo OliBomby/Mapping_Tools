@@ -157,6 +157,10 @@ namespace Mapping_Tools.Viewmodels {
                 case "DebugEnabled":
                     _overlay.SetBorder(Preferences.DebugEnabled);
                     break;
+                case "InceptionLevel":
+                    LayerCollection.SetInceptionLevel(Preferences.InceptionLevel);
+                    _overlay.OverlayWindow.InvalidateVisual();
+                    break;
             }
         }
 

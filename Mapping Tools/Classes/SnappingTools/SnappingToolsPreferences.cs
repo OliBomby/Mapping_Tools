@@ -23,6 +23,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
         private ViewMode keyUpViewMode;
         private SelectedHitObjectMode selectedHitObjectMode;
         private UpdateMode updateMode;
+        private int inceptionLevel;
         #endregion
 
         public Dictionary<string, RelevantObjectPreferences> RelevantObjectPreferences {
@@ -87,6 +88,11 @@ namespace Mapping_Tools.Classes.SnappingTools {
             get => updateMode;
             set => Set(ref updateMode, value);
         }
+
+        public int InceptionLevel {
+            get => inceptionLevel;
+            set => Set(ref inceptionLevel, value);
+        }
         #endregion
 
         #region helper methods
@@ -148,6 +154,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
             keyDownViewMode = ViewMode.Everything;
             keyUpViewMode = ViewMode.Everything;
             selectedHitObjectMode = SelectedHitObjectMode.VisibleOrSelected;
+            inceptionLevel = 4;
         }
         #endregion
 

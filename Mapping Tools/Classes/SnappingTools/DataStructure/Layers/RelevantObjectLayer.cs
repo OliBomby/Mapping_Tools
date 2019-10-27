@@ -171,5 +171,14 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                 }
             }
         }
+
+        /// <summary>
+        /// Disposes all relevant objects in this layer
+        /// </summary>
+        public void Clear() {
+            foreach (var relevantObject in Objects.Select(kvp => kvp.Value.ToArray()).SelectMany(toDispose => toDispose)) {
+                relevantObject.Dispose();
+            }
+        }
     }
 }

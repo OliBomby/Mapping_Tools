@@ -90,11 +90,19 @@
                         <ListBox>
                             <ListBoxItem>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Width="100" Margin="0 0 0 6" Text="Offset" VerticalAlignment="Bottom" ToolTip="Offsets the overlay box. Use this field when the automatic editor-to-screen coordinate conversion seems to fail."/>
+                                    <TextBlock Width="100" Margin="0 0 0 6" Text="Offset:" VerticalAlignment="Bottom" ToolTip="Offsets the overlay box. Use this field when the automatic editor-to-screen coordinate conversion seems to fail."/>
                                     <TextBox Text="{Binding OffsetLeft}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Left offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 10 0"/>
                                     <TextBox Text="{Binding OffsetTop}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Top offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 10 0"/>
                                     <TextBox Text="{Binding OffsetRight}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Right offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 10 0"/>
                                     <TextBox Text="{Binding OffsetBottom}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Bottom offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
+                                </StackPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Width="100" Margin="0 0 0 6" Text="Complexity:" VerticalAlignment="Bottom" ToolTip="Specifies how many layers of virtual objects can be used. More layers means more generation of virtual objects from the previous virtual objects in the tree."/>
+                                    <TextBox Text="{Binding InceptionLevel}" Width="120" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Inception level" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                             ToolTip="Specifies how many layers of virtual objects can be used. More layers means more generation of virtual objects from the previous virtual objects in the tree. It is recommended to use between 2 and 10 layers."/>
                                 </StackPanel>
                             </ListBoxItem>
 
