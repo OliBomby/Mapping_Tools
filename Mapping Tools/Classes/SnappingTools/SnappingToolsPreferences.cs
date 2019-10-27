@@ -22,6 +22,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
         private ViewMode keyDownViewMode;
         private ViewMode keyUpViewMode;
         private SelectedHitObjectMode selectedHitObjectMode;
+        private UpdateMode updateMode;
         #endregion
 
         public Dictionary<string, RelevantObjectPreferences> RelevantObjectPreferences {
@@ -80,6 +81,11 @@ namespace Mapping_Tools.Classes.SnappingTools {
         public SelectedHitObjectMode SelectedHitObjectMode {
             get => selectedHitObjectMode;
             set => Set(ref selectedHitObjectMode, value);
+        }
+
+        public UpdateMode UpdateMode {
+            get => updateMode;
+            set => Set(ref updateMode, value);
         }
         #endregion
 
@@ -167,5 +173,12 @@ namespace Mapping_Tools.Classes.SnappingTools {
         AllwaysAllVisible,
         VisibleOrSelected,
         OnlySelected
+    }
+
+    public enum UpdateMode {
+        AnyChange,
+        TimeChange,
+        HotkeyDown,
+        OsuActivated
     }
 }

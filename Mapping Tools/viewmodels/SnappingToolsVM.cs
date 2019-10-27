@@ -34,6 +34,7 @@ namespace Mapping_Tools.Viewmodels {
 
         private IRelevantObject _lastSnappedRelevantObject;
         private int _editorTime;
+        private bool _osuActivated;
 
         private string _filter = "";
         public string Filter { get => _filter; set => SetFilter(value); }
@@ -338,11 +339,43 @@ namespace Mapping_Tools.Viewmodels {
                         return;
                     }
 
+                    // Get editor time
                     var editorTime = reader.EditorTime();
-                    if (editorTime != _editorTime) {
-                        _editorTime = editorTime;
-                        UpdateRelevantObjects();
+                    // Get osu! state
+                    var osuActivated = _osuWindow.IsActivated;
+
+                    // Handle updating of relevant objects
+                    switch (Preferences.UpdateMode) {
+                        case UpdateMode.AnyChange:
+                            UpdateRelevantObjects();
+                            break;
+                        case UpdateMode.TimeChange:
+                            if (_editorTime != editorTime) {
+                                UpdateRelevantObjects();
+                            }
+
+                            break;
+                        case UpdateMode.HotkeyDown:
+                            if (IsHotkeyDown(Preferences.SnapHotkey)) {
+                                UpdateRelevantObjects();
+                            }
+
+                            break;
+                        case UpdateMode.OsuActivated:
+                            // Before not activated and after activated
+                            if (!_osuActivated && osuActivated) {
+                                UpdateRelevantObjects();
+                            }
+
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
                     }
+
+                    // Update old editor time variable
+                    _editorTime = editorTime;
+                    // Update old osu activated variable
+                    _osuActivated = osuActivated;
 
                     _coordinateConverter.OsuWindowPosition = new Vector2(_osuWindow.X, _osuWindow.Y);
                     _overlay.Update();

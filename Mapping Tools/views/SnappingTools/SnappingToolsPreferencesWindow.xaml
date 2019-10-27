@@ -144,6 +144,22 @@
 
                             <ListBoxItem>
                                 <StackPanel Orientation="Horizontal">
+                                    <TextBlock Width="100" Margin="0 0 0 6" Text="Updating:" VerticalAlignment="Center" ToolTip="Customize on what events the virtual objects get updated."/>
+                                    <StackPanel>
+                                        <RadioButton IsChecked="{Binding UpdateMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:UpdateMode.AnyChange}}"
+                                                     Content="Any change" ToolTip="Update whenever used hit objects get changed."/>
+                                        <RadioButton IsChecked="{Binding UpdateMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:UpdateMode.TimeChange}}"
+                                                     Content="Time change" ToolTip="Update whenever the editor changes time."/>
+                                        <RadioButton IsChecked="{Binding UpdateMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:UpdateMode.HotkeyDown}}"
+                                                     Content="Hotkey down" ToolTip="Update whenever the snapping hotkey is down."/>
+                                        <RadioButton IsChecked="{Binding UpdateMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:UpdateMode.OsuActivated}}"
+                                                     Content="osu! activated" ToolTip="Update whenever the osu! window goes from an inactive state to an active state."/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem>
+                                <StackPanel Orientation="Horizontal">
                                     <TextBlock Width="100" Margin="0 0 0 6" Text="Minimal diff:" VerticalAlignment="Bottom" ToolTip="Similar virtual objects get merged together. This sets the minimal acceptable difference that two objects can have and not get merged together."></TextBlock>
                                     <TextBox Text="{Binding AcceptableDifference}" Width="150" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Minimal difference" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
                                 </StackPanel>
