@@ -63,6 +63,16 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
         /// Generates relevant objects and adds them to this layer.
         /// </summary>
         public void GenerateNewObjects(bool forcePropagate = false) {
+            // Remove all relevant objects generated from a concurrent generator
+            foreach (var objectLayerObject in Objects.Values) {
+                for (var i = 0; i < objectLayerObject.Count; i++) {
+                    var obj = objectLayerObject[i];
+                    if (obj.Generator == null || !obj.Generator.IsConcurrent) continue;
+                    obj.Dispose();
+                    i--;
+                }
+            }
+
             var addedSomething = false;
             var activeGenerators = GeneratorCollection.GetActiveGenerators();
             foreach (var generator in activeGenerators) {

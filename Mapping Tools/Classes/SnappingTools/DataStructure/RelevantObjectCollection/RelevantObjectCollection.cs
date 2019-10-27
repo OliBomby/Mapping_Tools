@@ -46,10 +46,12 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectCollec
             while (index1 < list1.Count || index2 < list2.Count) {
                 if (index1 >= list1.Count) {
                     newList.Add(list2[index2++]);
+                    continue;
                 }
 
                 if (index2 >= list2.Count) {
                     newList.Add(list1[index1++]);
+                    continue;
                 }
 
                 newList.Add(list1[index1].Time < list2[index2].Time ? list1[index1++] : list2[index2++]);

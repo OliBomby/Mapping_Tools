@@ -22,7 +22,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         }
 
         private double _time;
-        public double Time {
+        public virtual double Time {
             get => _time;
             set {
                 _time = value;
