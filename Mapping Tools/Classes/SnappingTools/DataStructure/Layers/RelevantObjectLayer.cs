@@ -44,6 +44,8 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
         public void Add(IRelevantObject relevantObject, bool propagate = true) {
             if (Objects.FindSimilar(relevantObject, ParentCollection.AcceptableDifference, out var similarObject)) {
                 similarObject.Consume(relevantObject);
+                // Dispose this relevant object
+                relevantObject.Dispose();
                 return;  // return so the relevant object doesn't get added
             }
 

@@ -10,14 +10,22 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
             Layer?.Remove(this, false);
             Disposed = true;
 
+            // Remove this from parents
+            if (ParentObjects != null) {
+                foreach (var relevantObject in ParentObjects) {
+                    relevantObject.ChildObjects.Remove(this);
+                }
+            }
+
             // Return if there are no children
             if (ChildObjects == null) {
                 return;
             }
 
             // Kill all children
-            foreach (var relevantObjectChildObject in ChildObjects) {
-                relevantObjectChildObject.Dispose();
+            var objectsToDispose = ChildObjects.ToArray();
+            foreach (var t in objectsToDispose) {
+                t.Dispose();
             }
         }
 
@@ -113,6 +121,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         
         public void Consume(IRelevantObject other) {
             ParentObjects.UnionWith(other.ParentObjects);
+            ChildObjects.UnionWith(other.ChildObjects);
         }
 
         public abstract double DistanceTo(IRelevantObject relevantObject);
