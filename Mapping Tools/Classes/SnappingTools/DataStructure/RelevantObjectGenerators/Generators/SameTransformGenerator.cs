@@ -9,6 +9,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         public override string Name => "Same Transformation Generator";
         public override string Tooltip => "Takes 3 virtual points and predicts the next virtual point using the transformation matrix of the previous 3 virtual points.";
         public override GeneratorType GeneratorType => GeneratorType.Assistants;
+        public override GeneratorTemporalPositioning TemporalPositioning => GeneratorTemporalPositioning.After;
 
         [RelevantObjectsGeneratorMethod]
         public RelevantPoint GetRelevantObjects(RelevantPoint point1, RelevantPoint point2, RelevantPoint point3) {
