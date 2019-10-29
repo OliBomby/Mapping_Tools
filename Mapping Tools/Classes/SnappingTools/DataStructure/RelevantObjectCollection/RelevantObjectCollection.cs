@@ -26,6 +26,18 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectCollec
             }
         }
 
+        /// <summary>
+        /// Adds all the elements of the other collection to this collection and keeps it sorted by time if both collections were sorted by time already
+        /// </summary>
+        /// <param name="other">The collection to merge with</param>
+        public void MergeWith(RelevantObjectCollection other) {
+            foreach (var kvp in this) {
+                if (other.TryGetValue(kvp.Key, out var otherValue)) {
+                    this[kvp.Key] = SortedMerge(kvp.Value, otherValue);
+                }
+            }
+        }
+
         public List<IRelevantObject> GetSortedSubset(IEnumerable<Type> keys) {
             var result = new List<IRelevantObject>();
 
@@ -38,6 +50,12 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectCollec
             return result;
         }
 
+        /// <summary>
+        /// Merges two lists of relevant objects into one. If both lists are sorted by time then the output will also be sorted by time. Duplicates will not be removed.
+        /// </summary>
+        /// <param name="list1">The first time-sorted list</param>
+        /// <param name="list2">The second time-sorted list</param>
+        /// <returns>A time-sorted list with the elements of both input lists</returns>
         public static List<IRelevantObject> SortedMerge(List<IRelevantObject> list1, List<IRelevantObject> list2) {
             var newList = new List<IRelevantObject>(list1.Count + list2.Count);
 
