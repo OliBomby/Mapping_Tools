@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectCollection {
     public class RelevantObjectCollection : Dictionary<Type, List<IRelevantObject>> {
@@ -31,10 +32,15 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectCollec
         /// </summary>
         /// <param name="other">The collection to merge with</param>
         public void MergeWith(RelevantObjectCollection other) {
+            // Merge all types in this
             foreach (var kvp in this) {
                 if (other.TryGetValue(kvp.Key, out var otherValue)) {
                     this[kvp.Key] = SortedMerge(kvp.Value, otherValue);
                 }
+            }
+            // Add the types that only the other has
+            foreach (var type in other.Keys.Except(Keys)) {
+                Add(type, other[type]);
             }
         }
 
