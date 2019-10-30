@@ -152,7 +152,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         continue;
 
                     //Console.WriteLine(sh.SampleName);
-                    //Console.WriteLine(izone.Key());
+                    //Console.WriteLine("key: "+ izone.Key());
                     //Console.WriteLine(sh.SampleRate);
                     //Console.WriteLine(sh.Start);
 
@@ -179,8 +179,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     }
                 }
             }
-            //Console.WriteLine("closest: " + closest);
             if (closest != null) {
+                //Console.WriteLine("closest: " + closest.Key());
                 wave = GenerateSample(closest, sf2.SampleData, args);
                 return wave;
             }
