@@ -3,6 +3,7 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
     public abstract class RelevantObject : IRelevantObject {
@@ -128,7 +129,23 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
 
         public void UpdateTime() {
             if (ParentObjects == null || ParentObjects.Count == 0) return;
-            Time = ParentObjects.Sum(o => o.Time) / ParentObjects.Count;
+
+            var temporalPositioning = Generator?.TemporalPositioning ?? GeneratorTemporalPositioning.Average;
+
+            switch (temporalPositioning) {
+                case GeneratorTemporalPositioning.Average:
+                    Time = ParentObjects.Sum(o => o.Time) / ParentObjects.Count;
+                    break;
+                case GeneratorTemporalPositioning.After:
+                    Time = 2 * ParentObjects.Max(o => o.Time) - ParentObjects.Sum(o => o.Time) / ParentObjects.Count;
+                    break;
+                case GeneratorTemporalPositioning.Before:
+                    Time = 2 * ParentObjects.Min(o => o.Time) - ParentObjects.Sum(o => o.Time) / ParentObjects.Count;
+                    break;
+                default:
+                    Time = ParentObjects.Sum(o => o.Time) / ParentObjects.Count;
+                    break;
+            }
         }
 
         public void UpdateSelected() {

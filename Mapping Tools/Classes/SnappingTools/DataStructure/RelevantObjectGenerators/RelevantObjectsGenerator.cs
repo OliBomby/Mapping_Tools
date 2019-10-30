@@ -35,6 +35,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         public abstract string Name { get; }
         public abstract string Tooltip { get; }
         public abstract GeneratorType GeneratorType { get; }
+        public virtual GeneratorTemporalPositioning TemporalPositioning => GeneratorTemporalPositioning.Average;
 
         public event PropertyChangedEventHandler PropertyChanged;
 

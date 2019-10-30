@@ -30,13 +30,16 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
         }
 
         public void Add(IEnumerable<IRelevantObject> relevantObjects, bool propagate = true) {
+            bool addedAny = false;  // Check any relevant objects get added at all
+
             // Check if this object or something similar exists anywhere in the context or in this layer
             foreach (var relevantObject in relevantObjects) {
                 Add(relevantObject, false);
+                addedAny = true;
             }
 
-            // Propagate changes
-            if (propagate) {
+            // Propagate changes if stuff got added
+            if (propagate && addedAny) {
                 NextLayer?.GenerateNewObjects();
             }
         }
