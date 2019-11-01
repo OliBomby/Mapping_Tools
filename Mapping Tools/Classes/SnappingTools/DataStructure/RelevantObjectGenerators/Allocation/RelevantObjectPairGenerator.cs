@@ -7,11 +7,11 @@ using System.Windows.Documents;
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation {
     public class RelevantObjectPairGenerator {
         public static IEnumerable<object[]> GetParametersList(Type[] dependencies,
-            RelevantObjectCollection.RelevantObjectCollection collection, bool concurrent) {
-            return concurrent ? GeneratePairsConcurrent(dependencies, collection) : GeneratePairsDense(dependencies, collection);
+            RelevantObjectCollection.RelevantObjectCollection collection, bool sequential) {
+            return sequential ? GeneratePairsSequential(dependencies, collection) : GeneratePairsDense(dependencies, collection);
         }
 
-        public static IEnumerable<IRelevantObject[]> GeneratePairsConcurrent(Type[] dependencies,
+        public static IEnumerable<IRelevantObject[]> GeneratePairsSequential(Type[] dependencies,
             RelevantObjectCollection.RelevantObjectCollection collection) {
             // Handle special case
             if (collection == null || dependencies.Length == 0) {

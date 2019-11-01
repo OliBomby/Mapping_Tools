@@ -68,11 +68,11 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
         /// Generates relevant objects and adds them to this layer.
         /// </summary>
         public void GenerateNewObjects(bool forcePropagate = false) {
-            // Remove all relevant objects generated from a concurrent generator
+            // Remove all relevant objects generated from a sequential generator
             foreach (var objectLayerObject in Objects.Values) {
                 for (var i = 0; i < objectLayerObject.Count; i++) {
                     var obj = objectLayerObject[i];
-                    if (obj.Generator == null || !obj.Generator.IsConcurrent) continue;
+                    if (obj.Generator == null || !obj.Generator.IsSequential) continue;
                     obj.Dispose();
                     i--;
                 }
@@ -81,7 +81,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
             var addedSomething = false;
             var activeGenerators = GeneratorCollection.GetActiveGenerators();
             foreach (var generator in activeGenerators) {
-                var concurrent = generator.IsConcurrent;
+                var sequential = generator.IsSequential;
 
                 var methods = generator.GetGeneratorMethods();
 
@@ -94,7 +94,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                         continue;
                     }
                     //Console.WriteLine(generator.Name.ToUpper());
-                    var parametersList = RelevantObjectPairGenerator.GetParametersList(dependencies, PreviousLayer?.Objects, concurrent);
+                    var parametersList = RelevantObjectPairGenerator.GetParametersList(dependencies, PreviousLayer?.Objects, sequential);
 
                     foreach (var parameters in parametersList) {
                         // Generate the new relevant object(s)
