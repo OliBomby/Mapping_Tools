@@ -31,24 +31,7 @@ namespace Mapping_Tools.Views {
             e.Result = Complete_Sliders((Arguments) e.Argument, bgw, e);
         }
 
-        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
-            if (e.Error != null) {
-                //new MessageWindow(ErrorType.Error, eventArg: e);
-                MessageBox.Show(e.Error.Message);
-            } else {
-                if (e.Result.ToString() != "")
-                    //new MessageWindow(ErrorType.Success, e.Result.ToString());
-                    MessageBox.Show(e.Result.ToString());
-                progress.Value = 0;
-            }
-            start.IsEnabled = true;
-            canRun = true;
-        }
-
-        private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
-            progress.Value = e.ProgressPercentage;
-        }
-
+       
         private void Start_Click(object sender, RoutedEventArgs e) {
             RunTool(MainWindow.AppWindow.GetCurrentMaps(), quick: false);
         }
