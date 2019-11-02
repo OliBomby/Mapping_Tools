@@ -7,8 +7,9 @@ using System.Security.Policy;
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectCollection {
     public class RelevantObjectCollection : Dictionary<Type, List<IRelevantObject>> {
         public void SortTimes() {
-            foreach (var kvp in this) {
-                this[kvp.Key] = kvp.Value.OrderBy(o => o.Time).ToList();
+            var keys = new List<Type>(Keys);
+            foreach (var key in keys) {
+                this[key] = this[key].OrderBy(o => o.Time).ToList();
             }
         }
 
@@ -33,15 +34,35 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectCollec
         /// <param name="other">The collection to merge with</param>
         public void MergeWith(RelevantObjectCollection other) {
             // Merge all types in this
-            foreach (var kvp in this) {
-                if (other.TryGetValue(kvp.Key, out var otherValue)) {
-                    this[kvp.Key] = SortedMerge(kvp.Value, otherValue);
+            var keys = new List<Type>(Keys);
+            foreach (var key in keys) {
+                if (other.TryGetValue(key, out var otherValue)) {
+                    this[key] = SortedMerge(this[key], otherValue);
                 }
             }
             // Add the types that only the other has
             foreach (var type in other.Keys.Except(Keys)) {
                 Add(type, other[type]);
             }
+        }
+
+        public static RelevantObjectCollection Merge(RelevantObjectCollection collection1,
+            RelevantObjectCollection collection2) {
+            var result = new RelevantObjectCollection();
+
+            // Merge all types in this
+            foreach (var kvp in collection1) {
+                result.Add(kvp.Key,
+                    collection2.TryGetValue(kvp.Key, out var otherValue)
+                        ? SortedMerge(kvp.Value, otherValue)
+                        : kvp.Value);
+            }
+            // Add the types that only the other has
+            foreach (var type in collection2.Keys.Except(collection1.Keys)) {
+                result.Add(type, collection2[type]);
+            }
+
+            return result;
         }
 
         public List<IRelevantObject> GetSortedSubset(IEnumerable<Type> keys) {

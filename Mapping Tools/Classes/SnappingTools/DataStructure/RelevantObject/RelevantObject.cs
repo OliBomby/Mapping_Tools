@@ -8,6 +8,10 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
     public abstract class RelevantObject : IRelevantObject {
         public void Dispose() {
+            if (Disposed) {
+                return;
+            }
+
             Layer?.Remove(this, false);
             Disposed = true;
 
@@ -56,7 +60,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         }
         public bool Disposed { get; set; }
 
-        private bool _isSelected { get; set; }
+        private bool _isSelected;
         public virtual bool IsSelected {
             get => _isSelected; 
             set {

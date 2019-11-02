@@ -45,12 +45,48 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
         }
 
         public void Add(IRelevantObject relevantObject, bool propagate = true) {
+            if (relevantObject is RelevantLine l) {
+                Console.WriteLine(l.Child);
+                Console.WriteLine(Objects);
+                foreach (var kvp in Objects) {
+                    foreach (var o in kvp.Value) {
+                        if (o is RelevantLine a) {
+                            Console.WriteLine("aaaa:  " + a.Child);
+                        } else {
+                            Console.WriteLine("aaaaa:  "+ o);
+                        }
+                    }
+                }
+            }
             if (Objects.FindSimilar(relevantObject, ParentCollection.AcceptableDifference, out var similarObject)) {
                 similarObject.Consume(relevantObject);
                 // Dispose this relevant object
+                Console.WriteLine("Disposed");
                 relevantObject.Dispose();
                 return;  // return so the relevant object doesn't get added
             }
+
+            var previousCollection = GetAllPreviousLayersCollection();
+            if (relevantObject is RelevantLine p) {
+                Console.WriteLine(p.Child);
+                Console.WriteLine(previousCollection);
+                foreach (var kvp in previousCollection) {
+                    foreach (var o in kvp.Value) {
+                        if (o is RelevantLine a) {
+                            Console.WriteLine("aaaa:  " + a.Child);
+                        } else {
+                            Console.WriteLine("aaaaa:  "+ o);
+                        }
+                    }
+                }
+            }
+            if (previousCollection != null && previousCollection.FindSimilar(relevantObject, ParentCollection.AcceptableDifference, out _)) {
+                // Dispose this relevant object
+                Console.WriteLine("Disposed");
+                relevantObject.Dispose();
+                return;  // return so the relevant object doesn't get added
+            }
+            Console.WriteLine("Not Disposed");
 
             // Insert the new object
             Objects.SortedInsert(relevantObject);
@@ -62,6 +98,16 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
             if (propagate) {
                 NextLayer?.GenerateNewObjects();
             }
+        }
+
+        private RelevantObjectCollection.RelevantObjectCollection GetAllPreviousLayersCollection() {
+            if (PreviousLayer == null) return null;
+
+            var collection = PreviousLayer.GetAllPreviousLayersCollection();
+
+            return collection == null ? 
+                PreviousLayer.Objects : 
+                RelevantObjectCollection.RelevantObjectCollection.Merge(collection, PreviousLayer.Objects);
         }
 
         /// <summary>
@@ -77,13 +123,17 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                     i--;
                 }
             }
-
+            
             var addedSomething = false;
-            var activeGenerators = GeneratorCollection.GetActiveGenerators();
-            foreach (var generator in activeGenerators) {
-                var sequential = generator.IsSequential;
+            var activeGenerators = GeneratorCollection.GetActiveGenerators().ToArray();
 
+            // Get the previous layers objects
+            var deepObjects = activeGenerators.Any(o => o.IsDeep) ? GetAllPreviousLayersCollection() : null;
+
+            foreach (var generator in activeGenerators) {
                 var methods = generator.GetGeneratorMethods();
+
+                var objects = generator.IsDeep ? deepObjects : PreviousLayer?.Objects;
 
                 foreach (var method in methods) {
                     var dependencies = RelevantObjectsGenerator.GetDependencies(method);
@@ -93,8 +143,11 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                     if (dependencies.Length > 0 && PreviousLayer == null) {
                         continue;
                     }
+
                     //Console.WriteLine(generator.Name.ToUpper());
-                    var parametersList = RelevantObjectPairGenerator.GetParametersList(dependencies, PreviousLayer?.Objects, sequential);
+                    var parametersList =
+                        RelevantObjectPairGenerator.GetParametersList(dependencies, objects,
+                            generator.IsSequential);
 
                     foreach (var parameters in parametersList) {
                         // Generate the new relevant object(s)
@@ -106,7 +159,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                         switch (result) {
                             case IEnumerable<IRelevantObject> newRelevantObjectsEnumerable: {
                                 // Enumerate to array
-                                var newRelevantObjectsArray = newRelevantObjectsEnumerable as IRelevantObject[] ?? newRelevantObjectsEnumerable.ToArray();
+                                var newRelevantObjectsArray =
+                                    newRelevantObjectsEnumerable as IRelevantObject[] ??
+                                    newRelevantObjectsEnumerable.ToArray();
 
                                 // Add the new relevant objects to the children of the parents
                                 foreach (var relevantParent in relevantParents) {
@@ -156,8 +211,6 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
         }
 
         public void Remove(IRelevantObject relevantObject, bool propagate = true) {
-            if (relevantObject.Disposed) return;
-
             // Remove relevant object from this layer
             Objects.RemoveRelevantObject(relevantObject);
 

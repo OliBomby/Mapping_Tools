@@ -32,6 +32,16 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
             }
         }
 
+        private bool _isDeep;
+        public bool IsDeep {
+            get => _isDeep;
+            set {
+                if (value == _isDeep) return;
+                _isDeep = value;
+                OnPropertyChanged();
+            }
+        }
+
         public abstract string Name { get; }
         public abstract string Tooltip { get; }
         public abstract GeneratorType GeneratorType { get; }
