@@ -12,17 +12,13 @@ using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     class SampleImporter {
-        // TODO: Include sfz
-        public static readonly string[] ValidSamplePathExtensions = new string[] { ".wav", ".ogg", ".mp3", ".sf2" };
+        // TODO: Redo importing of soundfonts to include all legacy
+        //          and new versions of soundfonts (which should be included in NAudio)
+        public static readonly string[] ValidSamplePathExtensions = new string[] { 
+            ".wav", ".ogg", ".mp3", ".sf2", ".sfz", ".sf1", ".ssx", ".sfpack", ".sfark" };
 
         public static bool ValidateSampleArgs(string path) {
-            if (!File.Exists(path))
-                return false;
-
-            else if (!ValidSamplePathExtensions.Contains(Path.GetExtension(path)))
-                return false;
-
-            return true;
+            return (File.Exists(path) && ValidSamplePathExtensions.Contains(Path.GetExtension(path)));
         }
 
         public static bool ValidateSampleArgs(SampleGeneratingArgs args) {
@@ -34,7 +30,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 return ValidateSampleArgs(args);
             return loadedSamples.ContainsKey(args) && loadedSamples[args] != null;
         }
-
+  
         public static WaveStream OpenSample(string path) {
             return Path.GetExtension(path) == ".ogg" ? (WaveStream)new VorbisWaveReader(path) : new MediaFoundationReader(path);
         }
@@ -104,14 +100,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             };
             return generator;
         }
-
+        
+        // TODO: format soundfont import to detect file versions and types of files. 
         public static SampleSoundGenerator ImportFromSoundFont(SampleGeneratingArgs args, SoundFont sf2) {
             SampleSoundGenerator wave = null;
 
             foreach (var preset in sf2.Presets) {
-                //Console.WriteLine("Preset: " + preset.Name);
-                //Console.WriteLine("Preset num: " + preset.PatchNumber);
-                //Console.WriteLine("Preset bank: " + preset.Bank);
                 if (preset.PatchNumber != args.Patch && args.Patch != -1) {
                     continue;
                 }
@@ -131,16 +125,31 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
             Zone closest = null;
             int bdist = int.MaxValue;
-            for (int index = 0; index < preset.Zones.Length; index++) { // perc. bank likely has more than one instrument here.
+            /*
+                == Aproximate Pesdo Code of importing a preset from sf2 ==
+                -    Get all preset zones from soundfont (sf2)
+                -    get the instrument and double check if it's not null (if it is, "continue" the method)
+                -    is the instrument grabbed the same as what args is asking for? (if not, "continue" method)
+                -    get each zone within instrument and create wav file from information
+                    -   get Sample Header of instrument zone and double check if null (if so, "continue")
+                    -   get the Key range of spesified zone and create high and low keys 8 bit's in difference.
+                        -   is the key not the same as what the args asked for? (yes, then "continue")
+                    -   Get the velocity range of spesified zone and create high and low keys 8 bits' in difference.
+                        -   is the velocity not the same as what the args asked for? (yes, then "continue")
+                    -   Find the closest key from instrument zone to the key spesified from args.
+                        - is the closest key lower than the maximum integer value or, is the key of args just not spesified?
+                            - if so, set the closest zone (initial = null) to the current zone, 
+                            - if so, set the bdist (initial = maximum integer value) to the closest key.
+                    -   Is there a zone found from above?
+                        - If so, create a wave from zone information using the SampleData.
+            */
+            
+            for (int index = 0; index < preset.Zones.Length; index++) { // perccusion bank likely has more than one instrument here.
                 var pzone = preset.Zones[index];
 
                 var i = pzone.Instrument();
                 if (i == null)
                     continue;
-
-                //if (index < 4) {
-                //    Console.WriteLine("Instrument: " + pzone.Instrument().Name);
-                //}
 
                 if (index != args.Instrument && args.Instrument != -1) {
                     continue;
@@ -151,11 +160,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     var sh = instrumentZone.SampleHeader();
                     if (sh == null)
                         continue;
-
-                    //Console.WriteLine(sh.SampleName);
-                    //Console.WriteLine(instrumentZone.Key());
-                    //Console.WriteLine(sh.SampleRate);
-                    //Console.WriteLine(sh.Start);
 
                     // Requested key/velocity must also fit in the key/velocity range of the sample
                     ushort keyRange = instrumentZone.KeyRange();
@@ -180,7 +184,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     }
                 }
             }
-            //Console.WriteLine("closest: " + closest);
             if (closest != null) {
                 wave = GenerateSample(closest, sf2.SampleData, args);
                 return wave;
