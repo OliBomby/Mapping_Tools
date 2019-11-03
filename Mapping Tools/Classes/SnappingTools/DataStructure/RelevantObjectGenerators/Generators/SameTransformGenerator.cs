@@ -23,7 +23,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
             }
 
             // Calculate the next point
-            Vector2 newPoint = Vector2.ComplexQuotient(Vector2.ComplexProduct(b, b), a) + point3.Child;
+            Vector2 newPoint = Vector2.ComplexProduct(b, Vector2.ComplexQuotient(b, a)) + point3.Child;
 
             return new RelevantPoint(newPoint);
         }
