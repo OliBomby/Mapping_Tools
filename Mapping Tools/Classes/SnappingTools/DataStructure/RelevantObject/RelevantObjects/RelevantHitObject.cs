@@ -54,15 +54,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         }
 
         public override double DistanceTo(IRelevantObject relevantObject) {
-            if (!(relevantObject is RelevantHitObject relevantHitObject)) {
-                return double.PositiveInfinity;
-            }
-
-            if (HitObject.GetHitObjectType() != relevantHitObject.HitObject.GetHitObjectType()) {
-                return double.PositiveInfinity;
-            }
-
-            return Vector2.Distance(HitObject.Pos, relevantHitObject.HitObject.Pos);
+            return double.PositiveInfinity;
         }
     }
 }
