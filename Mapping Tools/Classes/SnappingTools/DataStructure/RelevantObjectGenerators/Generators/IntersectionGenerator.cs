@@ -11,6 +11,10 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         public override string Tooltip => "Takes a pair of virtual lines or circles and generates a virtual point on each of their intersections.";
         public override GeneratorType GeneratorType => GeneratorType.Geometries;
 
+        public IntersectionGenerator() {
+            IsDeep = true;
+        }
+
         [RelevantObjectsGeneratorMethod]
         public RelevantPoint GetLineLineIntersection(RelevantLine line1, RelevantLine line2) {
             return Line2.Intersection(line1.Child, line2.Child, out var intersection) ? new RelevantPoint(intersection) : null;

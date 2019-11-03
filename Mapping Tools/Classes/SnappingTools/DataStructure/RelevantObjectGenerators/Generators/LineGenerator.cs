@@ -9,6 +9,10 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         public override string Tooltip => "Takes a pair of virtual points and generates a virtual line that connects the two.";
         public override GeneratorType GeneratorType => GeneratorType.Geometries;
 
+        public LineGenerator() {
+            IsSequential = true;
+        }
+
         [RelevantObjectsGeneratorMethod]
         public RelevantLine GetRelevantObjects(RelevantPoint point1, RelevantPoint point2) {
             return new RelevantLine(Line2.FromPoints(point1.Child, point2.Child));

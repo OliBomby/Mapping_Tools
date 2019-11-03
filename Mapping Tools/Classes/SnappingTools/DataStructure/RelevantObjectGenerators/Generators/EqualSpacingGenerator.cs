@@ -9,6 +9,10 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         public override string Tooltip => "Takes a pair of virtual points and generates a pair of virtual circles with their centers on each point. Their radius is equal to the spacing between the two.";
         public override GeneratorType GeneratorType => GeneratorType.Assistants;
 
+        public EqualSpacingGenerator() {
+            IsSequential = true;
+        }
+
         [RelevantObjectsGeneratorMethod]
         public RelevantCircle[] GetRelevantObjects(RelevantPoint point1, RelevantPoint point2) {
             var radius = (point1.Child - point2.Child).Length;

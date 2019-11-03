@@ -11,6 +11,10 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         public override GeneratorType GeneratorType => GeneratorType.Assistants;
         public override GeneratorTemporalPositioning TemporalPositioning => GeneratorTemporalPositioning.After;
 
+        public SameTransformGenerator() {
+            IsSequential = true;
+        }
+
         [RelevantObjectsGeneratorMethod]
         public RelevantPoint GetRelevantObjects(RelevantPoint point1, RelevantPoint point2, RelevantPoint point3) {
             // Get the vectors between the points
