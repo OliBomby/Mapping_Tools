@@ -27,7 +27,7 @@
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
-                    <Run Text="SnappingTools"/>
+                    <Run Text="Geometry Dashboard"/>
                         </TextBlock>
                         <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom">
                             <materialDesign:PopupBox.ToggleContent>
