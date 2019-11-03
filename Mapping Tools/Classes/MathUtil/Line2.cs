@@ -154,8 +154,11 @@ namespace Mapping_Tools.Classes.MathUtil {
                 candidates.Add(line.PointOnLine((rect.Bottom - line.PositionVector.Y) / line.DirectionVector.Y));
             }
 
-            intersections = candidates.Where(p => (p[0] >= rect.Left) && (p[0] <= rect.Right) && (p[1] >= rect.Top) && (p[1] <= rect.Bottom)).ToArray();
-            return intersections.Length == 2;
+            intersections = candidates.Where(p => (p[0] > rect.Left - Precision.DOUBLE_EPSILON) &&
+                                                  (p[0] < rect.Right + Precision.DOUBLE_EPSILON) &&
+                                                  (p[1] > rect.Top - Precision.DOUBLE_EPSILON) &&
+                                                  (p[1] < rect.Bottom + Precision.DOUBLE_EPSILON)).ToArray();
+            return intersections.Length >= 2;
         }
 
         /// <summary>

@@ -45,48 +45,21 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
         }
 
         public void Add(IRelevantObject relevantObject, bool propagate = true) {
-            if (relevantObject is RelevantLine l) {
-                Console.WriteLine(l.Child);
-                Console.WriteLine(Objects);
-                foreach (var kvp in Objects) {
-                    foreach (var o in kvp.Value) {
-                        if (o is RelevantLine a) {
-                            Console.WriteLine("aaaa:  " + a.Child);
-                        } else {
-                            Console.WriteLine("aaaaa:  "+ o);
-                        }
-                    }
-                }
-            }
             if (Objects.FindSimilar(relevantObject, ParentCollection.AcceptableDifference, out var similarObject)) {
+                // Consume object
                 similarObject.Consume(relevantObject);
                 // Dispose this relevant object
-                Console.WriteLine("Disposed");
                 relevantObject.Dispose();
                 return;  // return so the relevant object doesn't get added
             }
 
             var previousCollection = GetAllPreviousLayersCollection();
-            if (relevantObject is RelevantLine p) {
-                Console.WriteLine(p.Child);
-                Console.WriteLine(previousCollection);
-                foreach (var kvp in previousCollection) {
-                    foreach (var o in kvp.Value) {
-                        if (o is RelevantLine a) {
-                            Console.WriteLine("aaaa:  " + a.Child);
-                        } else {
-                            Console.WriteLine("aaaaa:  "+ o);
-                        }
-                    }
-                }
-            }
             if (previousCollection != null && previousCollection.FindSimilar(relevantObject, ParentCollection.AcceptableDifference, out _)) {
+                // Don't consume because that causes inheritance issues
                 // Dispose this relevant object
-                Console.WriteLine("Disposed");
                 relevantObject.Dispose();
                 return;  // return so the relevant object doesn't get added
             }
-            Console.WriteLine("Not Disposed");
 
             // Insert the new object
             Objects.SortedInsert(relevantObject);
