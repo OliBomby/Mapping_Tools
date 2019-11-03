@@ -13,7 +13,8 @@ namespace Mapping_Tools.Views.SnappingTools {
         }
 
         public SnappingToolsPreferencesWindow(SnappingToolsPreferences preferences = null) {
-            Preferences = preferences ?? new SnappingToolsPreferences();
+            Preferences = new SnappingToolsPreferences();
+            preferences?.CopyTo(Preferences);
             InitializeComponent();
         }
 

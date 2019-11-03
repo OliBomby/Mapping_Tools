@@ -43,5 +43,14 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         public RelevantCircle(Circle circle) {
             Child = circle;
         }
+
+        public override double DistanceTo(IRelevantObject relevantObject) {
+            if (!(relevantObject is RelevantCircle relevantCircle)) {
+                return double.PositiveInfinity;
+            }
+
+            return Vector2.Distance(Child.Centre, relevantCircle.Child.Centre) +
+                   Math.Abs(Child.Radius - relevantCircle.Child.Radius);
+        }
     }
 }

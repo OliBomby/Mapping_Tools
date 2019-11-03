@@ -702,6 +702,46 @@ namespace Mapping_Tools.Classes.MathUtil {
         }
 
         /// <summary>
+        /// Calculate the product of two vectors as if they are complex numbers
+        /// </summary>
+        /// <param name="left">First operand</param>
+        /// <param name="right">Second operand</param>
+        /// <returns>The complex product the two inputs</returns>
+        public static Vector2 ComplexProduct(Vector2 left, Vector2 right) {
+            return new Vector2(left.X * right.X - left.Y * right.Y, left.X * right.Y + left.Y * right.X);
+        }
+
+        /// <summary>
+        /// Calculate the product of two vectors as if they are complex numbers
+        /// </summary>
+        /// <param name="left">First operand</param>
+        /// <param name="right">Second operand</param>
+        /// <param name="result">The complex product of the two inputs</param>
+        public static void ComplexProduct(ref Vector2 left, ref Vector2 right, out Vector2 result) {
+            result = new Vector2(left.X * right.X - left.Y * right.Y, left.X * right.Y + left.Y * right.X);
+        }
+
+        /// <summary>
+        /// Calculate the quotient of two vectors as if they are complex numbers
+        /// </summary>
+        /// <param name="left">First operand</param>
+        /// <param name="right">Second operand</param>
+        /// <returns>The complex quotient the two inputs</returns>
+        public static Vector2 ComplexQuotient(Vector2 left, Vector2 right) {
+            return new Vector2(right.X * left.X + right.Y * left.Y, right.X * left.Y - right.Y * left.X) / right.LengthSquared;
+        }
+
+        /// <summary>
+        /// Calculate the quotient of two vectors as if they are complex numbers
+        /// </summary>
+        /// <param name="left">First operand</param>
+        /// <param name="right">Second operand</param>
+        /// <param name="result">The complex quotient of the two inputs</param>
+        public static void ComplexQuotient(ref Vector2 left, ref Vector2 right, out Vector2 result) {
+            result = new Vector2(left.X * right.X + left.Y * right.Y, left.X * right.Y - left.Y * right.X) / left.LengthSquared;
+        }
+
+        /// <summary>
         /// Calculate the mirror projection of the given vector and line
         /// </summary>
         /// <param name="left">First operand</param>

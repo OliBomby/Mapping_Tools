@@ -20,8 +20,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// <inheritdoc />
         public SampleSoundGenerator(WaveStream wave) {
             Wave = wave;
-            KeyCorrection = -1;
-            VolumeCorrection = -1;
+            KeyCorrection = 0;
+            VolumeCorrection = 1;
             FadeStart = -1;
             FadeLength = -1;
         }
@@ -29,8 +29,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// <inheritdoc />
         public SampleSoundGenerator(WaveStream wave, double fadeStart, double fadeLength) {
             Wave = wave;
-            KeyCorrection = -1;
-            VolumeCorrection = -1;
+            KeyCorrection = 0;
+            VolumeCorrection = 1;
             FadeStart = fadeStart;
             FadeLength = fadeLength;
         }
@@ -47,10 +47,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 output = new DelayFadeOutSampleProvider(output);
                 (output as DelayFadeOutSampleProvider).BeginFadeOut(FadeStart * 1000, FadeLength * 1000);
             }
-            if (KeyCorrection != -1 && KeyCorrection != 0) {
+            if (KeyCorrection != 0) {
                 output = SampleImporter.PitchShift(output, KeyCorrection);
             }
-            if (VolumeCorrection != -1 && VolumeCorrection != 1) {
+            if (VolumeCorrection != 1) {
                 output = SampleImporter.VolumeChange(output, VolumeCorrection);
             }
             return output;

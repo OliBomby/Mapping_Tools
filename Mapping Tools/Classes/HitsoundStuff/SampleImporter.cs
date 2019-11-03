@@ -185,6 +185,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 }
             }
             if (closest != null) {
+                //Console.WriteLine("closest: " + closest.Key());
                 wave = GenerateSample(closest, sf2.SampleData, args);
                 return wave;
             }

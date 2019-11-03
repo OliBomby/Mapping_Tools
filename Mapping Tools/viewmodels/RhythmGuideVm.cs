@@ -54,5 +54,6 @@ namespace Mapping_Tools.Viewmodels {
 
         public IEnumerable<RhythmGuide.ExportMode> ExportModes => Enum.GetValues(typeof(RhythmGuide.ExportMode)).Cast<RhythmGuide.ExportMode>();
         public IEnumerable<GameMode> ExportGameModes => Enum.GetValues(typeof(GameMode)).Cast<GameMode>();
+        public IEnumerable<RhythmGuide.SelectionMode> SelectionModes => Enum.GetValues(typeof(RhythmGuide.SelectionMode)).Cast<RhythmGuide.SelectionMode>();
     }
 }

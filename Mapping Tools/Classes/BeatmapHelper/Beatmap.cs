@@ -235,6 +235,18 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 }
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="approachRate"></param>
+        /// <returns></returns>
+        public static double ApproachRateToMs(double approachRate) {
+            if (approachRate < 5) {
+                return 1800 - 120 * approachRate;
+            }
+
+            return 1200 - 150 * (approachRate - 5);
+        }
 
         /// <summary>
         /// 
@@ -262,7 +274,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <returns>The list of Bookmarks.</returns>
         public List<double> GetBookmarks() {
             try {
-                return Editor["Bookmarks"].GetStringValue().Split(',').Select(double.Parse).ToList();
+                return Editor["Bookmarks"].GetStringValue().Split(',').Select(p => Double.Parse(p)).ToList();
             }
             catch (KeyNotFoundException) {
                 return new List<double>();
@@ -275,7 +287,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="bookmarks"></param>
         public void SetBookmarks(List<double> bookmarks) {
             if (bookmarks.Count > 0) {
-                Editor["Bookmarks"] = new TValue(string.Join(",", bookmarks.Select(d => Math.Round(d))));
+                Editor["Bookmarks"] = new TValue(String.Join(",", bookmarks.Select(d => Math.Round(d))));
             }
         }
 

@@ -24,6 +24,7 @@ namespace Mapping_Tools.Classes.Tools {
             private GameMode _outputGameMode = GameMode.Standard;
             private string _outputName = "Hitsounds";
             private bool _ncEverything;
+            private SelectionMode _selectionMode = SelectionMode.HitsoundEvents;
 
             private ExportMode _exportMode = ExportMode.NewMap;
             private string _exportPath = Path.Combine(MainWindow.ExportPath, @"rhythm_guide.osu");
@@ -60,6 +61,14 @@ namespace Mapping_Tools.Classes.Tools {
             public bool NcEverything {
                 get => _ncEverything;
                 set => Set(ref _ncEverything, value);
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public SelectionMode SelectionMode {
+                get => _selectionMode;
+                set => Set(ref _selectionMode, value);
             }
 
             /// <summary>
@@ -103,6 +112,11 @@ namespace Mapping_Tools.Classes.Tools {
             AddToMap,
         }
 
+        public enum SelectionMode {
+            AllEvents,
+            HitsoundEvents
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -111,22 +125,22 @@ namespace Mapping_Tools.Classes.Tools {
             if (args.ExportPath == null) {
                 throw new ArgumentException("Export path can not be null.");
             }
+            var editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
             switch (args.ExportMode) {
                 case ExportMode.NewMap:
-                    var editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
                     var beatmap = MergeBeatmaps(args.Paths.Select(o => editorRead ? EditorReaderStuff.GetNewestVersion(o, reader) : new BeatmapEditor(o)).Select(o => o.Beatmap).ToArray(),
-                        args.OutputGameMode, args.OutputName, args.NcEverything);
+                        args);
 
-                    var editor = new Editor() {TextFile = beatmap, Path = args.ExportPath};
+                    var editor = new Editor {TextFile = beatmap, Path = args.ExportPath};
                     editor.SaveFile();
                     System.Diagnostics.Process.Start(Path.GetDirectoryName(args.ExportPath) ??
                                                      throw new ArgumentException("Export path must be a file."));
                     break;
                 case ExportMode.AddToMap:
-                    var editor2 = EditorReaderStuff.GetNewestVersion(args.ExportPath);
+                    var editor2 = EditorReaderStuff.GetNewestVersion(args.ExportPath, reader);
                     PopulateBeatmap(editor2.Beatmap,
-                        args.Paths.Select(o => new BeatmapEditor(o)).Select(o => o.Beatmap).ToArray(),
-                        args.NcEverything);
+                        args.Paths.Select(o => editorRead ? EditorReaderStuff.GetNewestVersion(o, reader) : new BeatmapEditor(o)).Select(o => o.Beatmap).ToArray(),
+                        args);
 
                     editor2.SaveFile();
                     break;
@@ -135,7 +149,7 @@ namespace Mapping_Tools.Classes.Tools {
             }
         }
 
-        private static Beatmap MergeBeatmaps(Beatmap[] beatmaps, GameMode outputGameMode, string outputName, bool ncEverything) {
+        private static Beatmap MergeBeatmaps(Beatmap[] beatmaps, RhythmGuideGeneratorArgs args) {
             if (beatmaps.Length == 0) {
                 throw new ArgumentException("There must be at least one beatmap.");
             }
@@ -151,32 +165,43 @@ namespace Mapping_Tools.Classes.Tools {
 
             // Change some parameters;
             newBeatmap.General["StackLeniency"] = new TValue("0.0");
-            newBeatmap.General["Mode"] = new TValue(((int)outputGameMode).ToString());
-            newBeatmap.Metadata["Version"] = new TValue(outputName);
+            newBeatmap.General["Mode"] = new TValue(((int)args.OutputGameMode).ToString());
+            newBeatmap.Metadata["Version"] = new TValue(args.OutputName);
             newBeatmap.Difficulty["CircleSize"] = new TValue("4");
 
             // Add hitobjects
-            PopulateBeatmap(newBeatmap, beatmaps, ncEverything);
+            PopulateBeatmap(newBeatmap, beatmaps, args);
 
             return newBeatmap;
         }
 
-        private static void PopulateBeatmap(Beatmap beatmap, IEnumerable<Beatmap> beatmaps, bool ncEverything) {
+        private static void PopulateBeatmap(Beatmap beatmap, IEnumerable<Beatmap> beatmaps, RhythmGuideGeneratorArgs args) {
             // Get the times from all beatmaps
             var times = new HashSet<double>();
             foreach (var b in beatmaps) {
-                foreach (var hitObject in b.HitObjects) {
-                    // Add all repeats
-                    for (var i = 0; i <= hitObject.Repeat; i++) {
-                        var time = hitObject.Time + hitObject.TemporalLength * i;
-                        times.Add(b.BeatmapTiming.Resnap(time, 16, 12));
+                var timeline = b.GetTimeline();
+                foreach (var timelineObject in timeline.TimelineObjects) {
+                    // Handle different selection modes
+                    switch (args.SelectionMode) {
+                        case SelectionMode.AllEvents:
+                            times.Add(b.BeatmapTiming.Resnap(timelineObject.Time, 16, 12));
+
+                            break;
+                        case SelectionMode.HitsoundEvents:
+                            if (timelineObject.HasHitsound) {
+                                times.Add(b.BeatmapTiming.Resnap(timelineObject.Time, 16, 12));
+                            }
+
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
                     }
                 }
             }
 
             // Generate hitcircles at those times
             foreach (var ho in times.Select(time => new HitObject(time, 0, SampleSet.Auto, SampleSet.Auto))) {
-                ho.NewCombo = ncEverything;
+                ho.NewCombo = args.NcEverything;
                 beatmap.HitObjects.Add(ho);
             }
         }

@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:Mapping_Tools.Classes.SnappingTools"
         xmlns:components="clr-namespace:Mapping_Tools.Components.Domain"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:generic="clr-namespace:System.Collections.Generic;assembly=mscorlib"
         mc:Ignorable="d"
         Title="Snapping Tools Preferences" Height="500" Width="570" MinWidth="575" MinHeight="360"
         WindowStyle="None"
@@ -49,34 +50,34 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <materialDesign:Card Margin="0 0 0 5">
-                                    <TreeViewItem Header="{Binding Name}" Foreground="{DynamicResource MaterialDesignBody}">
+                                    <TreeViewItem Header="{Binding Key}" Foreground="{DynamicResource MaterialDesignBody}">
                                         <StackPanel Orientation="Horizontal">
                                             <TextBox Text="{Binding Color, ElementName=ColorPicker}"
 								                     Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" materialDesign:HintAssist.Hint="Color HEX value"
 								                     Width="120" Margin="2,0,10,2"/>
-                                            <materialDesign:ColorPicker Color="{Binding Color}" x:Name="ColorPicker" Width="300"/>
+                                            <materialDesign:ColorPicker Color="{Binding Value.Color}" x:Name="ColorPicker" Width="300"/>
                                         </StackPanel>
 
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="Opacity" Width="120" VerticalAlignment="Center"/>
-                                            <Slider x:Name="OpacitySlider" Width="300" TickFrequency="0.01" Orientation="Horizontal" Minimum="0" Maximum="1" Value="{Binding Opacity,  UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
+                                            <Slider x:Name="OpacitySlider" Width="300" TickFrequency="0.01" Orientation="Horizontal" Minimum="0" Maximum="1" Value="{Binding Value.Opacity, UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
                                             <TextBox x:Name="OpacityTextbox" Width="40" Text="{Binding ElementName=OpacitySlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
                                         </StackPanel>
 
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="Thickness" Width="120" VerticalAlignment="Center"/>
-                                            <Slider x:Name="ThicknessSlider" Width="300" TickFrequency="1" Orientation="Horizontal" Minimum="1" Maximum="10" Value="{Binding Thickness, UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
+                                            <Slider x:Name="ThicknessSlider" Width="300" TickFrequency="1" Orientation="Horizontal" Minimum="1" Maximum="10" Value="{Binding Value.Thickness, UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
                                             <TextBox x:Name="ThicknessTextbox" Width="40" Text="{Binding ElementName=ThicknessSlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
                                         </StackPanel>
 
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="DashStyle" Width="120" VerticalAlignment="Center"/>
-                                            <ComboBox x:Name="DashStyleCombobox" Width="300" Margin="11,0" ItemsSource="{Binding DashStylesEnumerable}" SelectedItem="{Binding Dashstyle}"/>
+                                            <ComboBox x:Name="DashStyleCombobox" Width="300" Margin="11,0" ItemsSource="{Binding Value.DashStylesEnumerable}" SelectedItem="{Binding Value.Dashstyle}"/>
                                         </StackPanel>
 
-                                        <StackPanel Orientation="Horizontal" Visibility="{Binding HasSizeOption, Converter={StaticResource VisibleIfTrueConverter}}">
+                                        <StackPanel Orientation="Horizontal" Visibility="{Binding Value.HasSizeOption, Converter={StaticResource BooleanToVisibilityConverter}}">
                                             <TextBlock Text="Size" Width="120" VerticalAlignment="Center"/>
-                                            <Slider x:Name="SizeSlider" Width="300" TickFrequency="1" Orientation="Horizontal" Minimum="1" Maximum="10" Value="{Binding Size, UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
+                                            <Slider x:Name="SizeSlider" Width="300" TickFrequency="1" Orientation="Horizontal" Minimum="1" Maximum="10" Value="{Binding Value.Size, UpdateSourceTrigger=PropertyChanged}" Margin="5, 0" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
                                             <TextBox x:Name="SizeTextbox" Width="40" Text="{Binding ElementName=SizeSlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
                                         </StackPanel>
                                     </TreeViewItem>
@@ -89,7 +90,7 @@
                         <ListBox>
                             <ListBoxItem>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Width="100" Margin="0 0 0 6" Text="Offset" VerticalAlignment="Bottom" ToolTip="Offsets the overlay box. Use this field when the automatic editor-to-screen coordinate conversion seems to fail."/>
+                                    <TextBlock Width="100" Margin="0 0 0 6" Text="Offset:" VerticalAlignment="Bottom" ToolTip="Offsets the overlay box. Use this field when the automatic editor-to-screen coordinate conversion seems to fail."/>
                                     <TextBox Text="{Binding OffsetLeft}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Left offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 10 0"/>
                                     <TextBox Text="{Binding OffsetTop}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Top offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 10 0"/>
                                     <TextBox Text="{Binding OffsetRight}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Right offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 10 0"/>
@@ -99,12 +100,24 @@
 
                             <ListBoxItem>
                                 <StackPanel Orientation="Horizontal">
+                                    <TextBlock Width="100" Margin="0 0 0 6" Text="Complexity:" VerticalAlignment="Bottom" ToolTip="Specifies how many layers of virtual objects can be used. More layers means more generation of virtual objects from the previous virtual objects in the tree."/>
+                                    <TextBox Text="{Binding InceptionLevel}" Width="120" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Inception level" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                             ToolTip="Specifies how many layers of virtual objects can be used. More layers means more generation of virtual objects from the previous virtual objects in the tree. It is recommended to use between 2 and 10 layers."/>
+                                </StackPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem>
+                                <StackPanel Orientation="Horizontal">
                                     <TextBlock Width="100" Margin="0 0 0 6" Text="Downkey:" VerticalAlignment="Center" ToolTip="Customize what gets displayed when the Activation Key is pressed."/>
                                     <StackPanel>
                                         <RadioButton IsChecked="{Binding KeyDownViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:ViewMode.Everything}}"
                                                      Content="Everything" ToolTip="Default behavior. Display all virtual objects when the Activation Key is pressed."/>
-                                        <RadioButton IsChecked="{Binding KeyDownViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:ViewMode.ParentsOnly}}"
-                                                     Content="Parents Only" ToolTip="Display the object the cursor is currently snapping to and its parents."/>
+                                        <RadioButton IsChecked="{Binding KeyDownViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:ViewMode.ChildrenAndParents}}"
+                                                     Content="Children and Parents" ToolTip="Display the object the cursor is currently snapping to, its parents and its children."/>
+                                        <RadioButton IsChecked="{Binding KeyDownViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:ViewMode.Parents}}"
+                                                     Content="Parents" ToolTip="Display the object the cursor is currently snapping to and its parents."/>
+                                        <RadioButton IsChecked="{Binding KeyDownViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:ViewMode.Children}}"
+                                                     Content="Children" ToolTip="Display the object the cursor is currently snapping to and its children."/>
                                         <RadioButton IsChecked="{Binding KeyDownViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:ViewMode.Nothing}}"
                                                      Content="Nothing" ToolTip="Do not display anything even if the Activation Key is pressed."/>
                                     </StackPanel>
@@ -120,6 +133,43 @@
                                         <RadioButton IsChecked="{Binding KeyUpViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:ViewMode.Nothing}}"
                                                      Content="Nothing" ToolTip="Do not display anything if the Activation Key is not pressed."/>
                                     </StackPanel>
+                                </StackPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Width="100" Margin="0 0 0 6" Text="Selection:" VerticalAlignment="Center" ToolTip="Customize what hit objects get used for generating virtual objects."/>
+                                    <StackPanel>
+                                        <RadioButton IsChecked="{Binding SelectedHitObjectMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:SelectedHitObjectMode.AllwaysAllVisible}}"
+                                                     Content="All visible" ToolTip="Use the visible hit objects regardless of selection."/>
+                                        <RadioButton IsChecked="{Binding SelectedHitObjectMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:SelectedHitObjectMode.VisibleOrSelected}}"
+                                                     Content="Visible or selected" ToolTip="Use the visible hit objects, but use the selected hit objects if any are selected."/>
+                                        <RadioButton IsChecked="{Binding SelectedHitObjectMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:SelectedHitObjectMode.OnlySelected}}"
+                                                     Content="Selected only" ToolTip="Exclusively use selected hit objects."/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Width="100" Margin="0 0 0 6" Text="Updating:" VerticalAlignment="Center" ToolTip="Customize on what events the virtual objects get updated."/>
+                                    <StackPanel>
+                                        <RadioButton IsChecked="{Binding UpdateMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:UpdateMode.AnyChange}}"
+                                                     Content="Any change" ToolTip="Update whenever used hit objects get changed."/>
+                                        <RadioButton IsChecked="{Binding UpdateMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:UpdateMode.TimeChange}}"
+                                                     Content="Time change" ToolTip="Update whenever the editor changes time."/>
+                                        <RadioButton IsChecked="{Binding UpdateMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:UpdateMode.HotkeyDown}}"
+                                                     Content="Hotkey down" ToolTip="Update whenever the snapping hotkey is down."/>
+                                        <RadioButton IsChecked="{Binding UpdateMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:UpdateMode.OsuActivated}}"
+                                                     Content="osu! activated" ToolTip="Update whenever the osu! window goes from an inactive state to an active state."/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Width="100" Margin="0 0 0 6" Text="Minimal diff:" VerticalAlignment="Bottom" ToolTip="Similar virtual objects get merged together. This sets the minimal acceptable difference that two objects can have and not get merged together."></TextBlock>
+                                    <TextBox Text="{Binding AcceptableDifference}" Width="150" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Minimal difference" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
                                 </StackPanel>
                             </ListBoxItem>
 

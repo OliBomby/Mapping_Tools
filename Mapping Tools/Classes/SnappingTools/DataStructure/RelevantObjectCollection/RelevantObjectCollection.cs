@@ -1,27 +1,99 @@
-﻿using System.Collections;
+﻿using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
+using System;
 using System.Collections.Generic;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
+using System.Linq;
+using System.Security.Policy;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectCollection {
-    public class RelevantObjectCollection : IEnumerable<IRelevantObject> {
-        public List<IRelevantObject> Objects;
-
+    public class RelevantObjectCollection : Dictionary<Type, List<IRelevantObject>> {
         public void SortTimes() {
-            Objects.Sort((o1, o2) => o1.Time.CompareTo(o2.Time));
+            foreach (var kvp in this) {
+                this[kvp.Key] = kvp.Value.OrderBy(o => o.Time).ToList();
+            }
         }
 
         public void SortedInsert(IRelevantObject obj) {
-            // Insert the new object at the right index so time stays sorted
-            var index = Objects.FindIndex(o => o.Time > obj.Time);
-            Objects.Insert(index, obj);
+            var type = obj.GetType();
+            if (TryGetValue(type, out var list)) {
+                // Insert the new object at the right index so time stays sorted
+                var index = list.FindIndex(o => o.Time > obj.Time);
+                if (index == -1) {
+                    list.Add(obj);
+                } else {
+                    list.Insert(index, obj);
+                }
+            } else {
+                Add(type, new List<IRelevantObject> {obj});
+            }
         }
 
-        public IEnumerator<IRelevantObject> GetEnumerator() {
-            return Objects.GetEnumerator();
+        /// <summary>
+        /// Adds all the elements of the other collection to this collection and keeps it sorted by time if both collections were sorted by time already
+        /// </summary>
+        /// <param name="other">The collection to merge with</param>
+        public void MergeWith(RelevantObjectCollection other) {
+            // Merge all types in this
+            foreach (var kvp in this) {
+                if (other.TryGetValue(kvp.Key, out var otherValue)) {
+                    this[kvp.Key] = SortedMerge(kvp.Value, otherValue);
+                }
+            }
+            // Add the types that only the other has
+            foreach (var type in other.Keys.Except(Keys)) {
+                Add(type, other[type]);
+            }
         }
 
-        IEnumerator IEnumerable.GetEnumerator() {
-            return GetEnumerator();
+        public List<IRelevantObject> GetSortedSubset(IEnumerable<Type> keys) {
+            var result = new List<IRelevantObject>();
+
+            foreach (var key in keys) {
+                if (TryGetValue(key, out var list)) {
+                    result = SortedMerge(result, list);
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Merges two lists of relevant objects into one. If both lists are sorted by time then the output will also be sorted by time. Duplicates will not be removed.
+        /// </summary>
+        /// <param name="list1">The first time-sorted list</param>
+        /// <param name="list2">The second time-sorted list</param>
+        /// <returns>A time-sorted list with the elements of both input lists</returns>
+        public static List<IRelevantObject> SortedMerge(List<IRelevantObject> list1, List<IRelevantObject> list2) {
+            var newList = new List<IRelevantObject>(list1.Count + list2.Count);
+
+            var index1 = 0;
+            var index2 = 0;
+            while (index1 < list1.Count || index2 < list2.Count) {
+                if (index1 >= list1.Count) {
+                    newList.Add(list2[index2++]);
+                    continue;
+                }
+
+                if (index2 >= list2.Count) {
+                    newList.Add(list1[index1++]);
+                    continue;
+                }
+
+                newList.Add(list1[index1].Time < list2[index2].Time ? list1[index1++] : list2[index2++]);
+            }
+
+            return newList;
+        }
+
+        public bool FindSimilar(IRelevantObject obj, double acceptableDifference, out IRelevantObject similarObject) {
+            var type = obj.GetType();
+            similarObject = TryGetValue(type, out var list) ? list.FirstOrDefault(o => obj.DistanceTo(o) < acceptableDifference) : null;
+            return similarObject != null;
+        }
+
+        public void RemoveRelevantObject(IRelevantObject relevantObject) {
+            if (TryGetValue(relevantObject.GetType(), out var list)) {
+                list.Remove(relevantObject);
+            }
         }
     }
 }
