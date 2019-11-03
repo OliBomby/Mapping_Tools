@@ -37,8 +37,8 @@ namespace Mapping_Tools.Views {
             saveData?.CopyTo(((SnappingToolsVm)DataContext).Preferences);
         }
 
-        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "snappingtoolsproject.json");
-        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Snapping Tools Projects");
+        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "geometrydashboardproject.json");
+        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Geometry Dashboard Projects");
 
         private void UIElement_OnPreviewMouseWheel(object sender, MouseWheelEventArgs e) {
             var scv = (ScrollViewer)sender;
