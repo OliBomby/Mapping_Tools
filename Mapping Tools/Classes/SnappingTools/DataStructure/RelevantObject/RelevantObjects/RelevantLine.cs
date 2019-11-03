@@ -51,10 +51,11 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
                 return double.PositiveInfinity;
             }
 
-            var ca = Vector2.Dot(Child.DirectionVector, relevantLine.Child.DirectionVector) /
+            var cosAlpha = Vector2.Dot(Child.DirectionVector, relevantLine.Child.DirectionVector) /
                     (Child.DirectionVector.Length * relevantLine.Child.DirectionVector.Length);
-            return Vector2.Distance(Child.PositionVector, relevantLine.Child.PositionVector) +
-                   1 / Math.Pow(ca, 500) - 1;
+            // This is the length of the opposite side in a right triangle with an adjacent side length of 100
+            var angleDiff = Math.Sqrt(10000 / (cosAlpha * cosAlpha) - 10000);
+            return Vector2.Distance(Child.PositionVector, relevantLine.Child.PositionVector) + angleDiff;
         }
     }
 }
