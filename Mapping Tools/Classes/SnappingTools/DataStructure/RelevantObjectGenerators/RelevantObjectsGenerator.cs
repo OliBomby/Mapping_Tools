@@ -1,59 +1,19 @@
-﻿using System;
-using System.ComponentModel;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using Mapping_Tools.Annotations;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
+﻿using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
+using System;
+using System.Linq;
+using System.Reflection;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators {
-    public abstract class RelevantObjectsGenerator : INotifyPropertyChanged
+    public abstract class RelevantObjectsGenerator
     {
-        private bool _isActive;
-        public bool IsActive
-        {
-            get => _isActive;
-            set {
-                if (value == _isActive) return;
-                _isActive = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private bool _isSequential;
-        public bool IsSequential {
-            get => _isSequential;
-            set {
-                if (value == _isSequential) return;
-                _isSequential = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private bool _isDeep;
-        public bool IsDeep {
-            get => _isDeep;
-            set {
-                if (value == _isDeep) return;
-                _isDeep = value;
-                OnPropertyChanged();
-            }
-        }
+        public GeneratorSettings Settings { get; } = new GeneratorSettings();
 
         public abstract string Name { get; }
         public abstract string Tooltip { get; }
         public abstract GeneratorType GeneratorType { get; }
         public virtual GeneratorTemporalPositioning TemporalPositioning => GeneratorTemporalPositioning.Average;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
 
         private MethodInfo[] _generatorMethods;
         public MethodInfo[] GetGeneratorMethods() {

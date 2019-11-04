@@ -10,7 +10,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         public override GeneratorType GeneratorType => GeneratorType.Assistants;
 
         public EqualSpacingGenerator() {
-            IsSequential = true;
+            Settings.IsSequential = true;
         }
 
         [RelevantObjectsGeneratorMethod]

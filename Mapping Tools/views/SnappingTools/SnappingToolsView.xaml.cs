@@ -31,10 +31,10 @@ namespace Mapping_Tools.Views {
             } 
         }
 
-        public SnappingToolsPreferences GetSaveData() => ((SnappingToolsVm)DataContext).Preferences;
+        public SnappingToolsPreferences GetSaveData() => ((SnappingToolsVm)DataContext).GetPreferences();
 
         public void SetSaveData(SnappingToolsPreferences saveData) {
-            saveData?.CopyTo(((SnappingToolsVm)DataContext).Preferences);
+            ((SnappingToolsVm)DataContext).SetPreferences(saveData);
         }
 
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "geometrydashboardproject.json");

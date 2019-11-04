@@ -6,7 +6,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         public RelevantObjectsGeneratorCollection(IEnumerable<RelevantObjectsGenerator> collection) : base(collection) {}
 
         public IEnumerable<RelevantObjectsGenerator> GetActiveGenerators() {
-            return this.Where(o => o.IsActive);
+            return this.Where(o => o.Settings.IsActive);
         }
     }
 }

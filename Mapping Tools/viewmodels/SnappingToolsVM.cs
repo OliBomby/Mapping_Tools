@@ -107,7 +107,7 @@ namespace Mapping_Tools.Viewmodels {
               .Select(Activator.CreateInstance).OfType<RelevantObjectsGenerator>());
 
             // Add PropertyChanged event to all generators to listen for changes
-            foreach (var gen in Generators) { gen.PropertyChanged += OnGeneratorPropertyChanged; }
+            foreach (var gen in Generators) { gen.Settings.PropertyChanged += OnGeneratorPropertyChanged; }
 
             // Set up groups and filters
             var view = (CollectionView) CollectionViewSource.GetDefaultView(Generators);
@@ -161,7 +161,19 @@ namespace Mapping_Tools.Viewmodels {
                     LayerCollection.SetInceptionLevel(Preferences.InceptionLevel);
                     _overlay.OverlayWindow.InvalidateVisual();
                     break;
+                case "GeneratorSettings":
+                    Preferences.ApplyGeneratorSettings(Generators);
+                    break;
             }
+        }
+
+        public SnappingToolsPreferences GetPreferences() {
+            Preferences.SaveGeneratorSettings(Generators);
+            return Preferences;
+        }
+
+        public void SetPreferences(SnappingToolsPreferences preferences) {
+            preferences?.CopyTo(Preferences);
         }
 
         private void OnDraw(object sender, DrawingContext context) {
@@ -225,7 +237,7 @@ namespace Mapping_Tools.Viewmodels {
                 case "IsActive":
                     if (_state == State.Active) {
                         // Reload relevant objects when a generator gets enabled/disabled
-                        if (((RelevantObjectsGenerator)sender).IsActive) {
+                        if (((RelevantObjectsGenerator)sender).Settings.IsActive) {
                             // Generate new objects for all layers
                             LayerCollection.GetRootLayer().GenerateNewObjects(true);
                         } else {

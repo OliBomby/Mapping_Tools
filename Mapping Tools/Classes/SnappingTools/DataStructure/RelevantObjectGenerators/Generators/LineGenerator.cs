@@ -10,7 +10,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         public override GeneratorType GeneratorType => GeneratorType.Geometries;
 
         public LineGenerator() {
-            IsSequential = true;
+            Settings.IsSequential = true;
         }
 
         [RelevantObjectsGeneratorMethod]
