@@ -6,11 +6,13 @@ using System.Linq;
 using System.Windows.Input;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
 
 namespace Mapping_Tools.Classes.SnappingTools {
     public class SnappingToolsPreferences : BindableBase, ICloneable{
         #region private storage
         private Dictionary<string, RelevantObjectPreferences> relevantObjectPreferences;
+        private Dictionary<Type, GeneratorSettings> generatorSettings;
 
         private Hotkey snapHotkey;
         private double offsetLeft;
@@ -29,6 +31,11 @@ namespace Mapping_Tools.Classes.SnappingTools {
         public Dictionary<string, RelevantObjectPreferences> RelevantObjectPreferences {
             get => relevantObjectPreferences;
             set => Set(ref relevantObjectPreferences, value);
+        }
+
+        public Dictionary<Type, GeneratorSettings> GeneratorSettings {
+            get => generatorSettings;
+            set => Set(ref generatorSettings, value);
         }
 
         #region global settings
@@ -102,6 +109,28 @@ namespace Mapping_Tools.Classes.SnappingTools {
         public RelevantObjectPreferences GetReleventObjectPreferences(string input) {
             return RelevantObjectPreferences.TryGetValue(input, out var output) ? output : new RelevantObjectPreferences();
         }
+
+        /// <summary>
+        /// Applies the generator settings of the preferences to the specified generators
+        /// </summary>
+        /// <param name="generators">The generators to apply the settings to</param>
+        public void ApplyGeneratorSettings(IEnumerable<RelevantObjectsGenerator> generators) {
+            foreach (var generator in generators) {
+                if (GeneratorSettings.TryGetValue(generator.GetType(), out var settings)) {
+                    settings.CopyTo(generator.Settings);
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Gets the settings from the specified generators and saves it to these preferences
+        /// </summary>
+        /// <param name="generators">The generators to get the settings from</param>
+        public void SaveGeneratorSettings(IEnumerable<RelevantObjectsGenerator> generators) {
+            foreach (var generator in generators) {
+                GeneratorSettings[generator.GetType()] = generator.Settings;
+            }
+        }
         #endregion
 
         #region IClonable members
@@ -143,6 +172,8 @@ namespace Mapping_Tools.Classes.SnappingTools {
                     }
                 }
             };
+
+            generatorSettings = new Dictionary<Type, GeneratorSettings>();
 
             snapHotkey = new Hotkey(Key.M, ModifierKeys.None);
             offsetLeft = 0;

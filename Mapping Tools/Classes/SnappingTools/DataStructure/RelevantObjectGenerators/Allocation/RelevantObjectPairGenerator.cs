@@ -28,6 +28,13 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
             var combination = new IRelevantObject[dependencies.Length];
             while (i < sortedObjects.Count) {
                 var obj = sortedObjects[i];
+
+                // Ignore the uninheritable objects
+                if (!obj.IsInheritable) {
+                    i++;
+                    continue;
+                }
+
                 var type = obj.GetType();
 
                 var indexOfType = -1;
@@ -98,8 +105,8 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
             }
             //Console.WriteLine("Check succeeded");
 
-            // Make all combinations for every individual type
-            var allCombinationsOfEveryType = neededCombinations.Select(kvp => CombinationsRecursion(collection[kvp.Key].ToArray(), kvp.Value));
+            // Make all combinations for every individual type & only get inheritable
+            var allCombinationsOfEveryType = neededCombinations.Select(kvp => CombinationsRecursion(collection[kvp.Key].Where(o => o.IsInheritable).ToArray(), kvp.Value));
 
             /*Console.WriteLine("combinations of every type:");
             foreach (var a in allCombinationsOfEveryType) {

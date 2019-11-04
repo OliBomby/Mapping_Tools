@@ -67,7 +67,7 @@
                             <GridViewColumn Header="IsActive">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
-                                        <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding IsActive}" PreviewMouseDown="UIElement_OnPreviewMouseDown" Cursor="Hand"/>
+                                        <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding Settings.IsActive}" PreviewMouseDown="UIElement_OnPreviewMouseDown" Cursor="Hand"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
@@ -81,14 +81,14 @@
                             <GridViewColumn Header="IsSequential">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
-                                        <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding IsSequential}" PreviewMouseDown="UIElement_OnPreviewMouseDown" Cursor="Hand"/>
+                                        <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding Settings.IsSequential}" PreviewMouseDown="UIElement_OnPreviewMouseDown" Cursor="Hand"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
                             <GridViewColumn Header="IsDeep">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
-                                        <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding IsDeep}" PreviewMouseDown="UIElement_OnPreviewMouseDown" Cursor="Hand"/>
+                                        <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding Settings.IsDeep}" PreviewMouseDown="UIElement_OnPreviewMouseDown" Cursor="Hand"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>

@@ -91,7 +91,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
             foreach (var objectLayerObject in Objects.Values) {
                 for (var i = 0; i < objectLayerObject.Count; i++) {
                     var obj = objectLayerObject[i];
-                    if (obj.Generator == null || !obj.Generator.IsSequential) continue;
+                    if (obj.Generator == null || !obj.Generator.Settings.IsSequential) continue;
                     obj.Dispose();
                     i--;
                 }
@@ -101,12 +101,12 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
             var activeGenerators = GeneratorCollection.GetActiveGenerators().ToArray();
 
             // Get the previous layers objects
-            var deepObjects = activeGenerators.Any(o => o.IsDeep) ? GetAllPreviousLayersCollection() : null;
+            var deepObjects = activeGenerators.Any(o => o.Settings.IsDeep) ? GetAllPreviousLayersCollection() : null;
 
             foreach (var generator in activeGenerators) {
                 var methods = generator.GetGeneratorMethods();
 
-                var objects = generator.IsDeep ? deepObjects : PreviousLayer?.Objects;
+                var objects = generator.Settings.IsDeep ? deepObjects : PreviousLayer?.Objects;
 
                 foreach (var method in methods) {
                     var dependencies = RelevantObjectsGenerator.GetDependencies(method);
@@ -120,7 +120,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                     //Console.WriteLine(generator.Name.ToUpper());
                     var parametersList =
                         RelevantObjectPairGenerator.GetParametersList(dependencies, objects,
-                            generator.IsSequential);
+                            generator.Settings.IsSequential);
 
                     foreach (var parameters in parametersList) {
                         // Generate the new relevant object(s)
