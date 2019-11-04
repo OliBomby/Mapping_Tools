@@ -143,8 +143,8 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
 
                                 // Add parents and generator to the new relevant objects
                                 foreach (var relevantObject in newRelevantObjectsArray) {
+                                    relevantObject.Generator = generator;  // Generator has to be set before parents, otherwise temporal position will go wrong
                                     relevantObject.ParentObjects = relevantParents;
-                                    relevantObject.Generator = generator;
                                 }
 
                                 // Add the new relevant objects to this layer
@@ -159,8 +159,8 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                                 }
 
                                 // Add parents and generator to the new relevant object
+                                newRelevantObject.Generator = generator;  // Generator has to be set before parents, otherwise temporal position will go wrong
                                 newRelevantObject.ParentObjects = relevantParents;
-                                newRelevantObject.Generator = generator;
 
                                 // Add the new relevant objects to this layer
                                 Add(newRelevantObject, false);
