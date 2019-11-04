@@ -8,12 +8,16 @@ using System.Reflection;
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators {
     public abstract class RelevantObjectsGenerator
     {
-        public GeneratorSettings Settings { get; } = new GeneratorSettings();
+        public GeneratorSettings Settings { get; }
 
         public abstract string Name { get; }
         public abstract string Tooltip { get; }
         public abstract GeneratorType GeneratorType { get; }
         public virtual GeneratorTemporalPositioning TemporalPositioning => GeneratorTemporalPositioning.Average;
+
+        protected RelevantObjectsGenerator() {
+            Settings = new GeneratorSettings(this);
+        }
 
         private MethodInfo[] _generatorMethods;
         public MethodInfo[] GetGeneratorMethods() {

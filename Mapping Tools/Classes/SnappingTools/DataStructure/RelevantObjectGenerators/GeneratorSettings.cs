@@ -2,6 +2,16 @@
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators {
     public class GeneratorSettings : BindableBase {
+        public RelevantObjectsGenerator Generator { get; set; }
+
+        public GeneratorSettings() {
+
+        }
+
+        public GeneratorSettings(RelevantObjectsGenerator generator) {
+            Generator = generator;
+        }
+
         private bool _isActive;
         public bool IsActive
         {
