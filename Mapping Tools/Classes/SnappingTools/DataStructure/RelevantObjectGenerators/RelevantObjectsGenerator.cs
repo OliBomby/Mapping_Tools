@@ -1,5 +1,4 @@
-﻿using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation;
+﻿using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 using System;
 using System.Linq;
@@ -39,15 +38,6 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
 
         public static Type GetReturnType(MethodInfo generatorMethodInfo) {
             return generatorMethodInfo.ReturnType;
-        }
-
-        private static bool? _needsHitObjects;
-        public static bool NeedsHitObjects(MethodInfo generatorMethodInfo) {
-            if (_needsHitObjects == null) {
-                _needsHitObjects = GetDependencies(generatorMethodInfo).Contains(typeof(RelevantHitObject));
-            }
-
-            return _needsHitObjects.Value;
         }
     }
 }

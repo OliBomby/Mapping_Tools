@@ -16,7 +16,6 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
         [CanBeNull]
         public RelevantObjectsGeneratorCollection GeneratorCollection { get; set; }
 
-        [CanBeNull]
         public LayerCollection ParentCollection { get; set; }
 
         [CanBeNull] 
@@ -73,7 +72,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                 relevantObject.Dispose();
                 return;  // return so the relevant object doesn't get added
             }
-
+              
             // Insert the new object
             Objects.SortedInsert(relevantObject);
 
@@ -100,6 +99,8 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
         /// Generates relevant objects and adds them to this layer.
         /// </summary>
         public void GenerateNewObjects(bool forcePropagate = false) {
+            if (GeneratorCollection == null) return;
+
             // Remove all relevant objects generated from a sequential generator
             foreach (var objectLayerObject in Objects.Values) {
                 for (var i = 0; i < objectLayerObject.Count; i++) {
@@ -123,7 +124,6 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
 
                 foreach (var method in methods) {
                     var dependencies = RelevantObjectsGenerator.GetDependencies(method);
-                    var needsHitObjects = RelevantObjectsGenerator.NeedsHitObjects(method);
 
                     // Continue if there are dependencies but nothing to get the values from
                     if (dependencies.Length > 0 && PreviousLayer == null) {
@@ -205,17 +205,15 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
             // Remove relevant object from this layer
             Objects.RemoveRelevantObject(relevantObject);
 
-            if (propagate) {
-                // Return if there are no children
-                if (relevantObject.ChildObjects == null) {
-                    return;
-                }
+            if (!propagate) return;
+            // Return if there are no children
+            if (relevantObject.ChildObjects == null) {
+                return;
+            }
 
-                // Kill all children
-                foreach (var relevantObjectChildObject in relevantObject.ChildObjects.Where(relevantObjectChildObject =>
-                    relevantObjectChildObject.Layer != null)) {
-                    relevantObjectChildObject.Layer.Remove(relevantObjectChildObject);
-                }
+            // Kill all children
+            foreach (var relevantObjectChildObject in relevantObject.ChildObjects) {
+                relevantObjectChildObject.Layer?.Remove(relevantObjectChildObject);
             }
         }
 
