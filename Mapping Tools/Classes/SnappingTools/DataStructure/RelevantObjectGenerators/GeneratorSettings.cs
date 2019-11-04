@@ -1,9 +1,11 @@
-﻿using Mapping_Tools.Classes.SystemTools;
+﻿using Mapping_Tools.Annotations;
+using Mapping_Tools.Classes.SystemTools;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators {
     public class GeneratorSettings : BindableBase {
         [JsonIgnore]
+        [CanBeNull]
         public RelevantObjectsGenerator Generator { get; set; }
 
         public GeneratorSettings() {

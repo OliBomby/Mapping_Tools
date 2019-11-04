@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorCollection;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
     /// <summary>
@@ -12,11 +12,18 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
     /// </summary>
     public class RelevantObjectLayer {
         public RelevantObjectCollection.RelevantObjectCollection Objects { get; set; }
+
+        [CanBeNull]
         public RelevantObjectsGeneratorCollection GeneratorCollection { get; set; }
+
+        [CanBeNull]
         public LayerCollection ParentCollection { get; set; }
 
-        public RelevantObjectLayer PreviousLayer;
-        public RelevantObjectLayer NextLayer;
+        [CanBeNull] 
+        public RelevantObjectLayer PreviousLayer { get; set; }
+
+        [CanBeNull]
+        public RelevantObjectLayer NextLayer { get; set; }
 
         public RelevantObjectLayer(LayerCollection parentCollection, RelevantObjectsGeneratorCollection generatorCollection) {
             ParentCollection = parentCollection;

@@ -1,9 +1,8 @@
 ﻿using Mapping_Tools.Classes.SnappingTools.DataStructure.Layers;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
-using System;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 using System.Collections.Generic;
 using System.Linq;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
     public abstract class RelevantObject : IRelevantObject {

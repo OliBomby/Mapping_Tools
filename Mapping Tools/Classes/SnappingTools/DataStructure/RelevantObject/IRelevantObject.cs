@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.Layers;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
+using Newtonsoft.Json;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
     public interface IRelevantObject : IDisposable {
@@ -41,23 +42,27 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         /// <summary>
         /// The layer in which this object is located.
         /// </summary>
+        [JsonIgnore]
         [CanBeNull]
         RelevantObjectLayer Layer { get; set; }
 
         /// <summary>
         /// The generator that generated this object.
         /// </summary>
+        [JsonIgnore]
         [CanBeNull]
         RelevantObjectsGenerator Generator { get; set; }
 
         /// <summary>
         /// The objects that this object was generated from.
         /// </summary>
+        [JsonIgnore]
         HashSet<IRelevantObject> ParentObjects { get; set; }
 
         /// <summary>
         /// The objects that were generated from this object
         /// </summary>
+        [JsonIgnore]
         HashSet<IRelevantObject> ChildObjects { get; set; }
 
         HashSet<IRelevantObject> GetParentage();
