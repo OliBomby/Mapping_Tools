@@ -45,6 +45,12 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
         }
 
         public void Add(IRelevantObject relevantObject, bool propagate = true) {
+            // Don't add if this layer is over the max
+            if (Objects.GetCount() > ParentCollection.MaxObjects) {
+                relevantObject.Dispose();
+                return;
+            }
+
             if (Objects.FindSimilar(relevantObject, ParentCollection.AcceptableDifference, out var similarObject)) {
                 // Consume object
                 similarObject.Consume(relevantObject);
