@@ -12,7 +12,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         public override GeneratorTemporalPositioning TemporalPositioning => GeneratorTemporalPositioning.After;
 
         public SameTransformGenerator2() {
-            IsSequential = true;
+            Settings.IsSequential = true;
         }
 
         [RelevantObjectsGeneratorMethod]
