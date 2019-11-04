@@ -171,6 +171,11 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                 }
             }
 
+            // Don't propagate if this layer is over the max
+            if (Objects.GetCount() > ParentCollection.MaxObjects) {
+                return;
+            }
+
             // Propagate if anything was added to this layer
             if (addedSomething || forcePropagate) {
                 NextLayer?.GenerateNewObjects(forcePropagate);

@@ -116,5 +116,13 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectCollec
                 list.Remove(relevantObject);
             }
         }
+
+        /// <summary>
+        /// Returns the number of relevant objects in this collection
+        /// </summary>
+        /// <returns></returns>
+        public int GetCount() {
+            return this.Sum(kvp => kvp.Value.Count);
+        }
     }
 }

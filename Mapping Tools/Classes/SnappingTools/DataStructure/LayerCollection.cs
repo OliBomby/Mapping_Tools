@@ -13,6 +13,11 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure {
 
         public double AcceptableDifference { get; set; }
 
+        /// <summary>
+        /// This is the maximum number of relevant objects any layer may hold
+        /// </summary>
+        public int MaxObjects { get; } = 1000;
+
         public LayerCollection(RelevantObjectsGeneratorCollection generators, double acceptableDifference) {
             ObjectLayers = new List<RelevantObjectLayer>();
             AllGenerators = generators;
