@@ -72,6 +72,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
             }
         }
 
+        public bool IsLocked { get; set; }
+        public bool IsInheritable { get; set; } = true;
+
         public RelevantObjectLayer Layer { get; set; }
         public RelevantObjectsGenerator Generator { get; set; }
 
@@ -155,6 +158,27 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         public void UpdateSelected() {
             if (ParentObjects == null || ParentObjects.Count == 0) return;
             IsSelected = ParentObjects.Any(o => o.IsSelected);
+        }
+
+        /// <summary>
+        /// Makes a copy of this relevant object which is locked and is disconnected from the object structure.
+        /// </summary>
+        /// <returns></returns>
+        public IRelevantObject GetLockedRelevantObject() {
+            var locked = (IRelevantObject)MemberwiseClone();
+
+            locked.Layer = null;
+            locked.Generator = null;
+            locked.ParentObjects.Clear();
+            locked.ChildObjects.Clear();
+
+            locked.Relevancy = 1;
+
+            locked.Disposed = false;
+            locked.IsSelected = false;
+            locked.IsLocked = true;
+
+            return locked;
         }
         
         public void Consume(IRelevantObject other) {
