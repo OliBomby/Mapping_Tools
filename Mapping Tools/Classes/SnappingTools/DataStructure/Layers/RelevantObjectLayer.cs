@@ -105,7 +105,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
             foreach (var objectLayerObject in Objects.Values) {
                 for (var i = 0; i < objectLayerObject.Count; i++) {
                     var obj = objectLayerObject[i];
-                    if (obj.Generator == null || !obj.Generator.Settings.IsSequential) continue;
+                    if (!(obj.Generator != null && obj.Generator.Settings.IsSequential)) continue;
                     obj.Dispose();
                     i--;
                 }
@@ -117,6 +117,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
             // Get the previous layers objects
             var deepObjects = activeGenerators.Any(o => o.Settings.IsDeep) ? GetAllPreviousLayersCollection() : null;
 
+            var objectsToAdd = new List<IRelevantObject>();
             foreach (var generator in activeGenerators) {
                 var methods = generator.GetGeneratorMethods();
 
@@ -161,7 +162,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                                 }
 
                                 // Add the new relevant objects to this layer
-                                Add(newRelevantObjectsArray, false);
+                                objectsToAdd.AddRange(newRelevantObjectsArray);
                                 addedSomething = true;
                                 break;
                             }
@@ -176,13 +177,16 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                                 newRelevantObject.ParentObjects = relevantParents;
 
                                 // Add the new relevant objects to this layer
-                                Add(newRelevantObject, false);
+                                objectsToAdd.Add(newRelevantObject);
                                 addedSomething = true;
                                 break;
                         }
                     }
                 }
             }
+
+            // Add objects to this layer
+            Add(objectsToAdd, false);
 
             // Don't propagate if this layer is over the max
             if (Objects.GetCount() > ParentCollection.MaxObjects) {
