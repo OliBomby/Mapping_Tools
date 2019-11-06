@@ -28,7 +28,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
 
         protected Color AdjustColor(Color color) {
             var hsb = color.ToHsb();
-            return new Hsb( IsSelected ? hsb.Hue + 100 : hsb.Hue, hsb.Saturation, hsb.Brightness).ToColor();
+            return new Hsb( IsSelected ? hsb.Hue + 100 : hsb.Hue,
+                IsLocked ? hsb.Saturation * 0.1 : hsb.Saturation,
+                IsInheritable ? hsb.Brightness : hsb.Brightness * 0.5).ToColor();
         }
 
         protected double AdjustOpacity(double opacity) {
