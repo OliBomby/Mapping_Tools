@@ -3,6 +3,7 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 using System.Collections.Generic;
 using System.Linq;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
     public abstract class RelevantObject : IRelevantObject {
@@ -157,7 +158,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
 
         public void UpdateSelected() {
             if (ParentObjects == null || ParentObjects.Count == 0) return;
-            IsSelected = ParentObjects.Any(o => o.IsSelected);
+            IsSelected = ParentObjects.Any(o => o is RelevantHitObject && o.IsSelected);
         }
 
         /// <summary>
