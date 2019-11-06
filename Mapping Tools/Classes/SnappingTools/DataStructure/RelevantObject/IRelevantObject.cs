@@ -1,11 +1,9 @@
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.Layers;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
     public interface IRelevantObject : IDisposable {
@@ -69,7 +67,6 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         HashSet<IRelevantObject> GetDescendants();
         void UpdateRelevancy();
         void UpdateTime();
-        void UpdateSelected();
         IRelevantObject GetLockedRelevantObject();
         void Consume(IRelevantObject other);
         double DistanceTo(IRelevantObject relevantObject);

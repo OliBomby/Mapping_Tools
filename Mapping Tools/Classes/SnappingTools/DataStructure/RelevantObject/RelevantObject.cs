@@ -60,18 +60,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         }
         public bool Disposed { get; set; }
 
-        private bool _isSelected;
-        public virtual bool IsSelected {
-            get => _isSelected; 
-            set {
-                _isSelected = value;
-                if (ChildObjects == null) return;
-                foreach (var relevantObject in ChildObjects) {
-                    relevantObject.UpdateSelected();
-                }
-            }
-        }
-
+        public virtual bool IsSelected { get; set; }
         public bool IsLocked { get; set; }
         public bool IsInheritable { get; set; } = true;
 
@@ -154,11 +143,6 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
                     Time = ParentObjects.Sum(o => o.Time) / ParentObjects.Count;
                     break;
             }
-        }
-
-        public void UpdateSelected() {
-            if (ParentObjects == null || ParentObjects.Count == 0) return;
-            IsSelected = ParentObjects.Any(o => o is RelevantHitObject && o.IsSelected);
         }
 
         /// <summary>

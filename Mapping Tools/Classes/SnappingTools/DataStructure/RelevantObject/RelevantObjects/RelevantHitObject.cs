@@ -21,13 +21,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.Relev
 
         public override bool IsSelected {
             get => HitObject.IsSelected;
-            set {
-                HitObject.IsSelected = value;
-                if (ChildObjects == null) return;
-                foreach (var relevantObject in ChildObjects) {
-                    relevantObject.UpdateSelected();
-                }
-            }
+            set => HitObject.IsSelected = value;
         }
 
         public RelevantHitObject(HitObject hitObject) {
