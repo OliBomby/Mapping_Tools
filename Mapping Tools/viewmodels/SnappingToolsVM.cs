@@ -21,6 +21,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using Mapping_Tools.Classes.SnappingTools.DataStructure;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorCollection;
 

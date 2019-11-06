@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Media;
 using Mapping_Tools.Classes.MathUtil;
 
-namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
+namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects {
     public class RelevantCircle : RelevantDrawable {
         public readonly Circle Child;
 

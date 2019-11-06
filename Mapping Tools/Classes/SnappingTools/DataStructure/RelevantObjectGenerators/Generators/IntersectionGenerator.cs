@@ -2,6 +2,7 @@
 using System.Linq;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 

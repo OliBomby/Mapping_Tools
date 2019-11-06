@@ -3,7 +3,7 @@ using System.Linq;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 
-namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
+namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects {
     public class RelevantHitObject : RelevantObject {
         public HitObject HitObject;
 

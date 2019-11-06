@@ -2,9 +2,8 @@ using System;
 using System.Windows;
 using System.Windows.Media;
 using Mapping_Tools.Classes.MathUtil;
-using Line2 = Mapping_Tools.Classes.MathUtil.Line2;
 
-namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
+namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects {
     public class RelevantLine : RelevantDrawable {
         public readonly Line2 Child;
 
@@ -18,9 +17,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
                     intersections = new[] { point.Child };
                     return Precision.AlmostEquals(Line2.Distance(Child, point.Child), 0);
                 case RelevantLine line: {
-                    bool IsIntersecting = Line2.Intersection(Child, line.Child, out var intersection);
+                    bool isIntersecting = Line2.Intersection(Child, line.Child, out var intersection);
                     intersections = new[] { intersection };
-                    return IsIntersecting;
+                    return isIntersecting;
                 }
                 case RelevantCircle circle:
                     return Circle.Intersection(circle.Child, Child, out intersections);
