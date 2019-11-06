@@ -52,7 +52,7 @@
                                 Grid.Column="2" Click="PreferencesButton_Click">
                             <materialDesign:PackIcon Kind="SettingsOutline" Height="24" Width="24" />
                         </Button>
-                        <TextBlock x:Name="FilterTextBlock" Grid.Column="0" Text="Filters:" VerticalAlignment="Center" Margin="10,0"/>
+                        <TextBlock x:Name="FilterTextBlock" Grid.Column="0" Text="Filters" VerticalAlignment="Center" Margin="10,0"/>
                         <TextBox Grid.Column="1" Margin="0,0,10,10" Name="TxtFilter" Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
                 </StackPanel>

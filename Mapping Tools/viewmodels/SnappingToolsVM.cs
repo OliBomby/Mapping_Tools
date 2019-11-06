@@ -2,7 +2,6 @@
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SnappingTools;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Views.SnappingTools;
@@ -34,6 +33,13 @@ namespace Mapping_Tools.Viewmodels {
         protected readonly LayerCollection LayerCollection;
 
         private IRelevantObject _lastSnappedRelevantObject;
+        private readonly List<IRelevantDrawable> _lastSelectedRelevantDrawables;
+        private readonly List<IRelevantDrawable> _lastLockedRelevantDrawables;
+        private readonly List<IRelevantDrawable> _lastInheritRelevantDrawables;
+        private bool _selectedToggle;
+        private bool _lockedToggle;
+        private bool _inheritableToggle;
+
         private int _editorTime;
         private bool _osuActivated;
 
@@ -66,6 +72,9 @@ namespace Mapping_Tools.Viewmodels {
 
         private readonly DispatcherTimer _updateTimer;
         private readonly DispatcherTimer _autoSnapTimer;
+        private readonly DispatcherTimer _selectTimer;
+        private readonly DispatcherTimer _lockTimer;
+        private readonly DispatcherTimer _inheritTimer;
 
         private const double PointsBias = 3;
 
@@ -125,6 +134,17 @@ namespace Mapping_Tools.Viewmodels {
             _updateTimer.Tick += UpdateTimerTick;
             _autoSnapTimer = new DispatcherTimer(DispatcherPriority.Send) { Interval = TimeSpan.FromMilliseconds(16) };
             _autoSnapTimer.Tick += AutoSnapTimerTick;
+            _selectTimer = new DispatcherTimer(DispatcherPriority.Send) { Interval = TimeSpan.FromMilliseconds(16) };
+            _selectTimer.Tick += SelectTimerTick;
+            _lockTimer = new DispatcherTimer(DispatcherPriority.Send) { Interval = TimeSpan.FromMilliseconds(16) };
+            _lockTimer.Tick += LockTimerTick;
+            _inheritTimer = new DispatcherTimer(DispatcherPriority.Send) { Interval = TimeSpan.FromMilliseconds(16) };
+            _inheritTimer.Tick += InheritTimerTick;
+
+            // Setup some lists for the hotkey controls
+            _lastSelectedRelevantDrawables = new List<IRelevantDrawable>();
+            _lastLockedRelevantDrawables = new List<IRelevantDrawable>();
+            _lastInheritRelevantDrawables = new List<IRelevantDrawable>();
 
             // Listen for changes in the osu! user config
             _configWatcher = new FileSystemWatcher();
@@ -429,6 +449,15 @@ namespace Mapping_Tools.Viewmodels {
                         
                         _autoSnapTimer.Start();
                     }
+                    if (!_selectTimer.IsEnabled && IsHotkeyDown(Preferences.SelectHotkey)) {
+                        _selectTimer.Start();
+                    }
+                    if (!_lockTimer.IsEnabled && IsHotkeyDown(Preferences.LockHotkey)) {
+                        _lockTimer.Start();
+                    }
+                    if (!_inheritTimer.IsEnabled && IsHotkeyDown(Preferences.InheritHotkey)) {
+                        _inheritTimer.Start();
+                    }
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -484,24 +513,132 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         private void AutoSnapTimerTick(object sender, EventArgs e) {
+            // Check timer stop
             if (!IsHotkeyDown(Preferences.SnapHotkey)) {
                 if (HotkeyUpRedrawsOverlay)
                     _overlay?.OverlayWindow.InvalidateVisual();
                 _autoSnapTimer.Stop();
                 return;
             }
+            
+            // Get nearest drawable
+            var cursorPos = GetCursorPosition();
+            var nearest = GetNearestDrawable(cursorPos);
 
-            // Move the cursor's Position
-            // System.Windows.Forms.Cursor.Position = new Point();
-            var cursorPoint = System.Windows.Forms.Cursor.Position;
-            // CONVERT THIS CURSOR POSITION TO EDITOR POSITION
-            var cursorPos = _coordinateConverter.ScreenToEditorCoordinate(new Vector2(cursorPoint.X, cursorPoint.Y));
+            // Update overlay if the last snapped changed and parentview is on
+            if (nearest != _lastSnappedRelevantObject && SnapChangeRedrawsOverlay) {
+                // Set the last snapped relevant object
+                _lastSnappedRelevantObject = nearest;
+                // Update overlay
+                _overlay.OverlayWindow.InvalidateVisual();
+            }
 
+            // CONVERT THIS TO CURSOR POSITION
+            if (nearest == null) return;
+
+            var nearestPoint = _coordinateConverter.EditorToScreenCoordinate(nearest.NearestPoint(cursorPos));
+            System.Windows.Forms.Cursor.Position = new System.Drawing.Point((int) Math.Round(nearestPoint.X), (int) Math.Round(nearestPoint.Y));
+        }
+
+        private void SelectTimerTick(object sender, EventArgs e) {
+            // Check timer stop
+            if (!IsHotkeyDown(Preferences.SelectHotkey)) {
+                _selectTimer.Stop();
+                _lastSelectedRelevantDrawables.Clear();
+                return;
+            }
+
+            // Get nearest drawable
+            var cursorPos = GetCursorPosition();
+            var nearest = GetNearestDrawable(cursorPos);
+
+            if (nearest == null) return;
+
+            // Check if this drawable was already handled with this keypress
+            if (_lastSelectedRelevantDrawables.Contains(nearest)) return;
+
+            // Get the selecting mode
+            if (_lastSelectedRelevantDrawables.Count == 0) {
+                _selectedToggle = !nearest.IsSelected;
+            }
+
+            // Set the selected variable of the nearest drawable
+            nearest.IsSelected = _selectedToggle;
+
+            // Add nearest drawable to the list so it doesnt get toggled later
+            _lastSelectedRelevantDrawables.Add(nearest);
+
+            // Redraw overlay
+            _overlay.OverlayWindow.InvalidateVisual();
+        }
+
+        private void LockTimerTick(object sender, EventArgs e) {
+            // Check timer stop
+            if (!IsHotkeyDown(Preferences.LockHotkey)) {
+                _lockTimer.Stop();
+                _lastLockedRelevantDrawables.Clear();
+                return;
+            }
+
+            // Get nearest drawable
+            var cursorPos = GetCursorPosition();
+            var nearest = GetNearestDrawable(cursorPos);
+
+            if (nearest == null) return;
+
+            // Check if this drawable was already handled with this keypress
+            if (_lastLockedRelevantDrawables.Contains(nearest)) return;
+
+            // Get the locking mode
+            if (_lastLockedRelevantDrawables.Count == 0) {
+                _lockedToggle = !nearest.IsLocked;
+            }
+
+            // Set the locked variable of the nearest drawable
+            nearest.IsLocked = _lockedToggle;
+
+            // Add nearest drawable to the list so it doesnt get toggled later
+            _lastLockedRelevantDrawables.Add(nearest);
+
+            // Redraw overlay
+            _overlay.OverlayWindow.InvalidateVisual();
+        }
+
+        private void InheritTimerTick(object sender, EventArgs e) {
+            // Check timer stop
+            if (!IsHotkeyDown(Preferences.InheritHotkey)) {
+                _inheritTimer.Stop();
+                _lastInheritRelevantDrawables.Clear();
+                return;
+            }
+
+            // Get nearest drawable
+            var cursorPos = GetCursorPosition();
+            var nearest = GetNearestDrawable(cursorPos);
+
+            if (nearest == null) return;
+
+            // Check if this drawable was already handled with this keypress
+            if (_lastInheritRelevantDrawables.Contains(nearest)) return;
+
+            // Get the inherit mode
+            if (_lastInheritRelevantDrawables.Count == 0) {
+                _inheritableToggle = !nearest.IsInheritable;
+            }
+
+            // Set the inheritable variable of the nearest drawable
+            nearest.IsInheritable = _inheritableToggle;
+
+            // Add nearest drawable to the list so it doesnt get toggled later
+            _lastInheritRelevantDrawables.Add(nearest);
+
+            // Redraw overlay
+            _overlay.OverlayWindow.InvalidateVisual();
+        }
+
+        private IRelevantDrawable GetNearestDrawable(Vector2 cursorPos) {
             // Get all the relevant drawables
             var drawables = LayerCollection.GetAllRelevantDrawables().ToArray();
-
-            if (drawables.Length == 0)
-                return;
 
             // Get the relevant object nearest to the cursor
             IRelevantDrawable nearest = null;
@@ -516,18 +653,16 @@ namespace Mapping_Tools.Viewmodels {
                 nearest = o;
             }
 
-            // Update overlay if the last snapped changed and parentview is on
-            if (nearest != _lastSnappedRelevantObject && SnapChangeRedrawsOverlay) {
-                // Set the last snapped relevant object
-                _lastSnappedRelevantObject = nearest;
-                // Update overlay
-                _overlay.OverlayWindow.InvalidateVisual();
-            }
+            return nearest;
+        }
 
-            // CONVERT THIS TO CURSOR POSITION
-            if (nearest == null) return;
-            var nearestPoint = _coordinateConverter.EditorToScreenCoordinate(nearest.NearestPoint(cursorPos));
-            System.Windows.Forms.Cursor.Position = new System.Drawing.Point((int) Math.Round(nearestPoint.X), (int) Math.Round(nearestPoint.Y));
+        private Vector2 GetCursorPosition() {
+            // System.Windows.Forms.Cursor.Position = new Point();
+            var cursorPoint = System.Windows.Forms.Cursor.Position;
+            // CONVERT THIS CURSOR POSITION TO EDITOR POSITION
+            var cursorPos = _coordinateConverter.ScreenToEditorCoordinate(new Vector2(cursorPoint.X, cursorPoint.Y));
+
+            return cursorPos;
         }
 
         private static bool IsHotkeyDown(Hotkey hotkey) {

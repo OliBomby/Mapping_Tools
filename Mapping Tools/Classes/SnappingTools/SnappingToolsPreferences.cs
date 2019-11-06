@@ -15,6 +15,9 @@ namespace Mapping_Tools.Classes.SnappingTools {
         private Dictionary<Type, GeneratorSettings> generatorSettings;
 
         private Hotkey snapHotkey;
+        private Hotkey selectHotkey;
+        private Hotkey lockHotkey;
+        private Hotkey inheritHotkey;
         private double offsetLeft;
         private double offsetTop;
         private double offsetRight;
@@ -42,6 +45,18 @@ namespace Mapping_Tools.Classes.SnappingTools {
         public Hotkey SnapHotkey {
             get => snapHotkey;
             set => Set(ref snapHotkey, value);
+        }
+        public Hotkey SelectHotkey {
+            get => selectHotkey;
+            set => Set(ref selectHotkey, value);
+        }
+        public Hotkey LockHotkey {
+            get => lockHotkey;
+            set => Set(ref lockHotkey, value);
+        }
+        public Hotkey InheritHotkey {
+            get => inheritHotkey;
+            set => Set(ref inheritHotkey, value);
         }
 
         public double OffsetLeft {
@@ -176,6 +191,9 @@ namespace Mapping_Tools.Classes.SnappingTools {
             generatorSettings = new Dictionary<Type, GeneratorSettings>();
 
             snapHotkey = new Hotkey(Key.M, ModifierKeys.None);
+            selectHotkey = new Hotkey(Key.N, ModifierKeys.None);
+            lockHotkey = new Hotkey(Key.N, ModifierKeys.Shift);
+            inheritHotkey = new Hotkey(Key.N, ModifierKeys.Alt);
             offsetLeft = 0;
             offsetTop = 1;
             offsetRight = 0;
