@@ -37,9 +37,9 @@
 ⚠ You must specify your user config file in the Preferences for this tool to function.</TextBlock>
                         </materialDesign:PopupBox>
                     </StackPanel>
-                    <Grid>
+
+                    <Grid Margin="0,0,0,10">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
@@ -48,15 +48,12 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock x:Name="ActivationKeyTextBlock" Text="Activation Key:" VerticalAlignment="Bottom" Margin="10,0" ToolTip="Press and hold this key to snap your cursor to the closest virtual object."/>
-                        <components:HotkeyEditorControl Width="150" HorizontalAlignment="Left" Margin="0,10,0,0" Hotkey="{Binding Preferences.SnapHotkey}"
-                                                        Grid.Row="0" Grid.Column="1"/>
                         <Button x:Name="PreferencesButton" Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Preferences..."
-                                Grid.Row="0" Grid.Column="2" Click="PreferencesButton_Click">
+                                Grid.Column="2" Click="PreferencesButton_Click">
                             <materialDesign:PackIcon Kind="SettingsOutline" Height="24" Width="24" />
                         </Button>
-                        <TextBlock x:Name="FilterTextBlock" Grid.Row="1" Grid.Column="0" Text="Filters:" VerticalAlignment="Center" Margin="10,0"/>
-                        <TextBox Grid.Row="1" Grid.Column="1" Margin="0,0,0,10" Name="TxtFilter" Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}" Grid.ColumnSpan="2"/>
+                        <TextBlock x:Name="FilterTextBlock" Grid.Column="0" Text="Filters:" VerticalAlignment="Center" Margin="10,0"/>
+                        <TextBox Grid.Column="1" Margin="0,0,10,10" Name="TxtFilter" Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
                 </StackPanel>
 
