@@ -74,7 +74,6 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
                 _parentObjects = value;
                 UpdateRelevancy();
                 UpdateTime();
-                UpdateSelected();
             }
         }
 
