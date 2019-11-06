@@ -27,7 +27,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.Relev
         public override void DrawYourself(DrawingContext context, CoordinateConverter converter, SnappingToolsPreferences preferences) {
             var roPref = preferences.GetReleventObjectPreferences("Virtual point preferences");
             var cPos = converter.ToDpi(converter.EditorToRelativeCoordinate(Child));
-            context.DrawEllipse(null, roPref.GetPen(), new Point(cPos.X, cPos.Y), roPref.Size, roPref.Size);
+            context.DrawEllipse(null, GetPen(roPref), new Point(cPos.X, cPos.Y), roPref.Size, roPref.Size);
         }
 
         public override Vector2 NearestPoint(Vector2 point) {

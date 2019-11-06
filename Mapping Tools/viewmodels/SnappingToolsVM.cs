@@ -461,7 +461,7 @@ namespace Mapping_Tools.Viewmodels {
         {
             var hitObjects = GetHitObjects();
             
-            var comparer = new HitObjectComparer();
+            var comparer = new HitObjectComparer(true);
             var rootLayer = LayerCollection.GetRootLayer();
             var existingHitObjects = LayerCollection.GetRootRelevantHitObjects();
             var added = hitObjects.Where(o => !existingHitObjects.Select(x => x.HitObject).Contains(o, comparer)).ToArray();

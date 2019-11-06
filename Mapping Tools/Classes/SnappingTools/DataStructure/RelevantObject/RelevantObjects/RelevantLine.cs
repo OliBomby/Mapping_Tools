@@ -34,7 +34,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.Relev
             var roPref = preferences.GetReleventObjectPreferences("Virtual line preferences");
             var cPos1 = converter.ToDpi(converter.EditorToRelativeCoordinate(points[0]));
             var cPos2 = converter.ToDpi(converter.EditorToRelativeCoordinate(points[1]));
-            context.DrawLine(roPref.GetPen(), new Point(cPos1.X, cPos1.Y), new Point(cPos2.X, cPos2.Y));
+            context.DrawLine(GetPen(roPref), new Point(cPos1.X, cPos1.Y), new Point(cPos2.X, cPos2.Y));
         }
 
         public override Vector2 NearestPoint(Vector2 point) {
