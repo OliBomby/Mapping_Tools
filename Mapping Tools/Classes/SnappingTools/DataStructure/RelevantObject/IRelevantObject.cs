@@ -33,7 +33,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         bool IsLocked { get; set; }
 
         /// <summary>
-        /// Indicates whether this object can get children. If false, generators will ignore this object. This trait cannot be inherited.
+        /// Indicates whether this object can get children. If false, generators will ignore this object, so this object can't have any children. This trait cannot be inherited.
         /// </summary>
         bool IsInheritable { get; set; }
 

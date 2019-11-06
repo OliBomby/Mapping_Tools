@@ -62,7 +62,24 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
 
         public virtual bool IsSelected { get; set; }
         public bool IsLocked { get; set; }
-        public bool IsInheritable { get; set; } = true;
+
+        private bool _isInheritable = true;
+        public bool IsInheritable {
+            get => _isInheritable;
+            set {
+                if (_isInheritable == value) return;
+                _isInheritable = value;
+                if (_isInheritable) {
+                    Layer?.NextLayer?.GenerateNewObjects();
+                } else {
+                    var objectsToDispose = ChildObjects.ToArray();
+                    foreach (var t in objectsToDispose) {
+                        t.Dispose();
+                    }
+                    Layer?.NextLayer?.GenerateNewObjects();
+                }
+            }
+        }
 
         public RelevantObjectLayer Layer { get; set; }
         public RelevantObjectsGenerator Generator { get; set; }
