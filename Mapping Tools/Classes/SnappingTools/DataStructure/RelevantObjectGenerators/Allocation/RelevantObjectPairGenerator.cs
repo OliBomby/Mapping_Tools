@@ -93,10 +93,10 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
                 Console.WriteLine(dependency.Key + ": " + dependency.Value);
             }*/
 
-            // Check if the collection contains enough items to ever satisfy the needed combinations
+            // Check if the collection contains enough inheritable items to ever satisfy the needed combinations
             foreach (var neededCombination in neededCombinations) {
                 if (collection.TryGetValue(neededCombination.Key, out var list)) {
-                    if (list.Count < neededCombination.Value) {
+                    if (list.Count(o => o.IsInheritable) < neededCombination.Value) {
                         return new IRelevantObject[0][];
                     }
                 } else {

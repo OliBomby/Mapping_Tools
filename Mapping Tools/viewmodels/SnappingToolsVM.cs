@@ -198,6 +198,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         private void OnDraw(object sender, DrawingContext context) {
+            //Console.WriteLine($@"Drawable count: {LayerCollection.GetAllRelevantDrawables().Count()}");
             if (IsHotkeyDown(Preferences.SnapHotkey)) {
                 // Handle key down rendering
                 if (Preferences.KeyDownViewMode.HasFlag(ViewMode.Everything)) {

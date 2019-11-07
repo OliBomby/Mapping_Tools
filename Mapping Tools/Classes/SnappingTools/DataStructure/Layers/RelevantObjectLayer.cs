@@ -74,6 +74,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                 relevantObject.Dispose();
                 return;  // return so the relevant object doesn't get added
             }
+            
+            // Set DoNotDispose for the GenerateNewObjects method
+            relevantObject.DoNotDispose = true;
               
             // Insert the new object
             Objects.SortedInsert(relevantObject);
