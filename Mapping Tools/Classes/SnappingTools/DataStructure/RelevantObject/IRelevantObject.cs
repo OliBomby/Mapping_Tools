@@ -23,6 +23,11 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         bool Disposed { get; set; }
 
         /// <summary>
+        /// Some kind of temporary variable to indicate that this object must not be removed.
+        /// </summary>
+        bool DoNotDispose { get; set; }
+
+        /// <summary>
         /// Indicates whether this object is selected. Selected objects can trigger special interactions. This trait can be inherited.
         /// </summary>
         bool IsSelected { get; set; }

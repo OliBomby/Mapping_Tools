@@ -62,6 +62,8 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                 similarObject.Consume(relevantObject);
                 // Dispose this relevant object
                 relevantObject.Dispose();
+                // Set DoNotDispose for the GenerateNewObjects method
+                similarObject.DoNotDispose = true;
                 return;  // return so the relevant object doesn't get added
             }
 
@@ -96,34 +98,31 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
         }
 
         /// <summary>
-        /// Generates relevant objects and adds them to this layer.
+        /// Regenerates the relevant objects of this layer using the active generators. Any relevant objects that already exist do not get replaced and any relevant objects that should not exist get removed.
         /// </summary>
         public void GenerateNewObjects(bool forcePropagate = false) {
             if (GeneratorCollection == null) return;
-
-            // Remove all relevant objects generated from a sequential generator
-            foreach (var objectLayerObject in Objects.Values) {
-                for (var i = 0; i < objectLayerObject.Count; i++) {
-                    var obj = objectLayerObject[i];
-                    if (!(obj.Generator != null && obj.Generator.Settings.IsSequential)) continue;
-                    obj.Dispose();
-                    i--;
-                }
-            }
             
-            var addedSomething = false;
+            // Get all active generators for this layer
             var activeGenerators = GeneratorCollection.GetActiveGenerators().ToArray();
 
-            // Get the previous layers objects
+            // Get the previous layers objects if any generators are deep
             var deepObjects = activeGenerators.Any(o => o.Settings.IsDeep) ? GetAllPreviousLayersCollection() : null;
 
+            // Initialize list for objects to add later
             var objectsToAdd = new List<IRelevantObject>();
+
+            // Loop through all active generators
             foreach (var generator in activeGenerators) {
+                // Get the generator methods
                 var methods = generator.GetGeneratorMethods();
 
+                // Get the required relevant object collection for this generator
                 var objects = generator.Settings.IsDeep ? deepObjects : PreviousLayer?.Objects;
 
+                // Loop through all generator methods in this generator
                 foreach (var method in methods) {
+                    // Get the dependencies for this generator method
                     var dependencies = RelevantObjectsGenerator.GetDependencies(method);
 
                     // Continue if there are dependencies but nothing to get the values from
@@ -131,11 +130,12 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                         continue;
                     }
 
-                    //Console.WriteLine(generator.Name.ToUpper());
+                    // Get all the combinations of relevant objects to use this generator method on
                     var parametersList =
                         RelevantObjectPairGenerator.GetParametersList(dependencies, objects,
                             generator.Settings.IsSequential);
 
+                    // Generate all the new relevant objects
                     foreach (var parameters in parametersList) {
                         // Generate the new relevant object(s)
                         var result = method.Invoke(generator, parameters);
@@ -143,6 +143,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                         // Cast parameters to relevant objects
                         var relevantParents = new HashSet<IRelevantObject>(parameters.Cast<IRelevantObject>());
 
+                        // Handle different return types
                         switch (result) {
                             case IEnumerable<IRelevantObject> newRelevantObjectsEnumerable: {
                                 // Enumerate to array
@@ -163,7 +164,6 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
 
                                 // Add the new relevant objects to this layer
                                 objectsToAdd.AddRange(newRelevantObjectsArray);
-                                addedSomething = true;
                                 break;
                             }
                             case IRelevantObject newRelevantObject:
@@ -178,23 +178,39 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
 
                                 // Add the new relevant objects to this layer
                                 objectsToAdd.Add(newRelevantObject);
-                                addedSomething = true;
                                 break;
                         }
                     }
                 }
             }
 
+            // Set all DoNotDispose to false
+            foreach (var relevantObject in Objects.Values.SelectMany(list => list)) {
+                relevantObject.DoNotDispose = false;
+            }
+
             // Add objects to this layer
+            // This sets DoNotDispose for all the relevant objects that already exist in this layer and are consuming the objects to add.
             Add(objectsToAdd, false);
 
-            // Don't propagate if this layer is over the max
+            // Dispose all relevant objects in this layer that were generated from a generator, but not generated now.
+            foreach (var objectLayerObject in Objects.Values) {
+                for (var i = 0; i < objectLayerObject.Count; i++) {
+                    var obj = objectLayerObject[i];
+                    // Continue for relevant objects with no generator or DoNotDispose
+                    if (obj.Generator == null || obj.DoNotDispose) continue;
+                    obj.Dispose();
+                    i--;
+                }
+            }
+
+            // Don't propagate if this layer has more than the max number of relevant objects
             if (Objects.GetCount() > ParentCollection.MaxObjects) {
                 return;
             }
 
             // Propagate if anything was added to this layer
-            if (addedSomething || forcePropagate) {
+            if (objectsToAdd.Count > 0 || forcePropagate) {
                 NextLayer?.GenerateNewObjects(forcePropagate);
             }
         }

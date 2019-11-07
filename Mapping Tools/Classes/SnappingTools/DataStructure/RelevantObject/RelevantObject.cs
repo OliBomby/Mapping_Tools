@@ -60,6 +60,8 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         }
         public bool Disposed { get; set; }
 
+        public bool DoNotDispose { get; set; }
+
         public virtual bool IsSelected { get; set; }
         public bool IsLocked { get; set; }
 
