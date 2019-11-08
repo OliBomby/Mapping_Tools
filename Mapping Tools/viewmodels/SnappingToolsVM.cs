@@ -696,7 +696,7 @@ namespace Mapping_Tools.Viewmodels {
             }
 
             _state = State.Disabled;
-            _overlay.Dispose();
+            _overlay?.Dispose();
         }
     }
 }
