@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Input;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
 
@@ -35,6 +36,10 @@ namespace Mapping_Tools.Views.SnappingTools {
                         horizontalPanel.Children.Add(name);
 
                         var toggleButton = new ToggleButton {IsChecked = boolValue, Cursor = Cursors.Hand};
+                        Binding myBinding = new Binding(prop.Name) {
+                            Source = DataContext
+                        };
+                        toggleButton.SetBinding(ToggleButton.IsCheckedProperty, myBinding);
                         horizontalPanel.Children.Add(toggleButton);
                         break;
                 }
