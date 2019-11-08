@@ -25,7 +25,7 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorCollection;
 
 namespace Mapping_Tools.Viewmodels {
-    public class SnappingToolsVm
+    public class SnappingToolsVm : IDisposable
     {
         public SnappingToolsPreferences Preferences { get; }
 
@@ -689,6 +689,13 @@ namespace Mapping_Tools.Viewmodels {
         private void SetFilter(string value) {
             _filter = value;
             CollectionViewSource.GetDefaultView(Generators).Refresh();
+        }
+
+        public void Dispose() {
+            _overlay?.Dispose();
+            _configWatcher?.Dispose();
+            _processSharp?.Dispose();
+            _osuWindow?.Dispose();
         }
     }
 }

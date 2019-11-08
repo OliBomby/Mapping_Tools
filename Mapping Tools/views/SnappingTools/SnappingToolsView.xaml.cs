@@ -50,5 +50,10 @@ namespace Mapping_Tools.Views {
             if (sender is ToggleButton toggleButton) toggleButton.IsChecked = !toggleButton.IsChecked.GetValueOrDefault();
             e.Handled = true;
         }
+
+        public override void Dispose() {
+            ((SnappingToolsVm)DataContext).Dispose();
+            base.Dispose();
+        }
     }
 }

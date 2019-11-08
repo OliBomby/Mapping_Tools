@@ -6,7 +6,7 @@ using System.Windows.Controls;
 
 namespace Mapping_Tools.Views {
     [HiddenTool]
-    public class MappingTool : UserControl, INotifyPropertyChanged {
+    public class MappingTool : UserControl, INotifyPropertyChanged, IDisposable {
         public event PropertyChangedEventHandler PropertyChanged;
 
         public static readonly DependencyProperty IsActiveProperty =
@@ -18,10 +18,10 @@ namespace Mapping_Tools.Views {
             set => SetValue(IsActiveProperty, value);
         }
 
-        public void Activate() {
+        public virtual void Activate() {
             IsActive = true;
         }
-        public void Deactivate() {
+        public virtual void Deactivate() {
             IsActive = false;
         }
 
@@ -32,6 +32,10 @@ namespace Mapping_Tools.Views {
 
         protected void RaisePropertyChanged([CallerMemberName] string propertyName = "") {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public virtual void Dispose() {
+            IsActive = false;
         }
     }
 }
