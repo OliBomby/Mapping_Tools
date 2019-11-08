@@ -46,30 +46,6 @@ namespace Mapping_Tools.Viewmodels {
         private string _filter = "";
         public string Filter { get => _filter; set => SetFilter(value); }
 
-        private bool _listenersEnabled;
-        public bool ListenersEnabled {
-            get => _listenersEnabled;
-            set {
-                _listenersEnabled = value;
-
-                _updateTimer.IsEnabled = value;
-
-                try {
-                    _configWatcher.EnableRaisingEvents = value;
-                } catch {
-                    MessageBox.Show("Can't enable filesystem watcher. osu! config path is probably incorrect.", "Warning");
-                }
-
-                if (!value) {
-                    _state = State.Disabled;
-                    _overlay.Dispose();
-                }
-                else {
-                    _state = State.LookingForProcess;
-                }
-            }
-        }
-
         private readonly DispatcherTimer _updateTimer;
         private readonly DispatcherTimer _autoSnapTimer;
         private readonly DispatcherTimer _selectTimer;
@@ -340,7 +316,7 @@ namespace Mapping_Tools.Viewmodels {
                     try {
                         reader.SetProcess();
                     }
-                    catch (Win32Exception) {
+                    catch {
                         return;
                     }
 
@@ -696,6 +672,31 @@ namespace Mapping_Tools.Viewmodels {
             _configWatcher?.Dispose();
             _processSharp?.Dispose();
             _osuWindow?.Dispose();
+        }
+
+        public void Activate() {
+            _updateTimer.IsEnabled = true;
+
+            try {
+                _configWatcher.EnableRaisingEvents = true;
+            } catch {
+                MessageBox.Show("Can't enable filesystem watcher. osu! config path is probably incorrect.", "Warning");
+            }
+
+            _state = State.LookingForProcess;
+        }
+
+        public void Deactivate() {
+            _updateTimer.IsEnabled = false;
+
+            try {
+                _configWatcher.EnableRaisingEvents = false;
+            } catch {
+                MessageBox.Show("Can't disable filesystem watcher. osu! config path is probably incorrect.", "Warning");
+            }
+
+            _state = State.Disabled;
+            _overlay.Dispose();
         }
     }
 }
