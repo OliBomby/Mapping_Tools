@@ -214,6 +214,7 @@
     <Compile Include="Classes\MathUtil\Box2.cs" />
     <Compile Include="Classes\MathUtil\Box2d.cs" />
     <Compile Include="Classes\MathUtil\CircleArc.cs" />
+    <Compile Include="Classes\MathUtil\LineSegment.cs" />
     <Compile Include="Classes\MathUtil\MathHelper.cs" />
     <Compile Include="Classes\MathUtil\Matrix2.cs" />
     <Compile Include="Classes\MathUtil\Matrix2d.cs" />
@@ -325,6 +326,11 @@
     </Compile>
     <Compile Include="Components\HotkeyEditorControl.xaml.cs">
       <DependentUpon>HotkeyEditorControl.xaml</DependentUpon>
+    <Compile Include="Components\Graph\Anchor.xaml.cs">
+      <DependentUpon>Anchor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Components\Graph\Graph.xaml.cs">
+      <DependentUpon>Graph.xaml</DependentUpon>
     </Compile>
     <Compile Include="Components\TimeLine\TimeLine.xaml.cs">
       <DependentUpon>TimeLine.xaml</DependentUpon>
@@ -416,6 +422,11 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Components\HotkeyEditorControl.xaml">
+    <Page Include="Components\Graph\Anchor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Components\Graph\Graph.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
