@@ -15,6 +15,11 @@ namespace Mapping_Tools.Views {
 
         public static readonly string ToolDescription = $@"Generates and keeps track of a list virtual objects that are geometrically relevant to the objects visible on your screen. Press and hold the Activation Key to let your cursor snap to the closest virtual object.{Environment.NewLine}⚠ You must specify your user config file in the Preferences for this tool to function.";
 
+        public SnappingToolsVm ViewModel {
+            get => (SnappingToolsVm) DataContext;
+            set => DataContext = value;
+        }
+
         public SnappingToolsView() {
             DataContext = new SnappingToolsVm();
             InitializeComponent();
@@ -31,10 +36,10 @@ namespace Mapping_Tools.Views {
             } 
         }
 
-        public SnappingToolsPreferences GetSaveData() => ((SnappingToolsVm)DataContext).GetPreferences();
+        public SnappingToolsPreferences GetSaveData() => ViewModel.GetPreferences();
 
         public void SetSaveData(SnappingToolsPreferences saveData) {
-            ((SnappingToolsVm)DataContext).SetPreferences(saveData);
+            ViewModel.SetPreferences(saveData);
         }
 
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "geometrydashboardproject.json");
@@ -51,8 +56,18 @@ namespace Mapping_Tools.Views {
             e.Handled = true;
         }
 
+        public override void Activate() {
+            ViewModel.Activate();
+            base.Activate();
+        }
+
+        public override void Deactivate() {
+            ViewModel.Deactivate();
+            base.Deactivate();
+        }
+
         public override void Dispose() {
-            ((SnappingToolsVm)DataContext).Dispose();
+            ViewModel.Dispose();
             base.Dispose();
         }
     }
