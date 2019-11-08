@@ -36,6 +36,18 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
             set => Set(ref _isDeep, value);
         }
 
+        private double _relevancyRatio;
+        public double RelevancyRatio {
+            get => _relevancyRatio;
+            set => Set(ref _relevancyRatio, value);
+        }
+
+        private string _test = "";
+        public string Test {
+            get => _test;
+            set => Set(ref _test, value);
+        }
+
         public void CopyTo(GeneratorSettings other) {
             foreach (var prop in typeof(GeneratorSettings).GetProperties()) {
                 if (!prop.CanWrite || !prop.CanRead) continue;
