@@ -48,7 +48,7 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <Button x:Name="PreferencesButton" Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Preferences..."
+                        <Button x:Name="PreferencesButton" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}" ToolTip="Preferences..."
                                 Grid.Column="2" Click="PreferencesButton_Click">
                             <materialDesign:PackIcon Kind="SettingsOutline" Height="24" Width="24" />
                         </Button>
@@ -65,6 +65,17 @@
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
                                         <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding Settings.IsActive}" PreviewMouseDown="UIElement_OnPreviewMouseDown" Cursor="Hand"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Settings">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
+                                        <Viewbox Width="100" Height="30" Margin="-5,-5,15,-5">
+                                            <Button ToolTip="Generator settings..." Command="{Binding GeneratorSettingsCommand}">
+                                                Configure
+                                            </Button>
+                                        </Viewbox>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
@@ -86,32 +97,6 @@
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
                                         <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding Settings.IsDeep}" PreviewMouseDown="UIElement_OnPreviewMouseDown" Cursor="Hand"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                            <GridViewColumn Header="Mode">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
-                                        <ListBox
-                                            Style="{StaticResource MaterialDesignToolToggleListBox}"
-                                            SelectedIndex="0">
-                                            <ListBoxItem>
-                                                <materialDesign:PackIcon
-                                                    Kind="FormatAlignLeft" />
-                                            </ListBoxItem>
-                                            <ListBoxItem>
-                                                <materialDesign:PackIcon
-                                                    Kind="FormatAlignCenter" />
-                                            </ListBoxItem>
-                                            <ListBoxItem>
-                                                <materialDesign:PackIcon
-                                                    Kind="FormatAlignRight" />
-                                            </ListBoxItem>
-                                            <ListBoxItem>
-                                                <materialDesign:PackIcon
-                                                    Kind="FormatAlignJustify" />
-                                            </ListBoxItem>
-                                        </ListBox>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>

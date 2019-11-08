@@ -362,6 +362,9 @@
       <DependentUpon>RhythmGuideWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SnappingTools\SnappingToolsOverlay.cs" />
+    <Compile Include="Views\SnappingTools\GeneratorSettingsWindow.xaml.cs">
+      <DependentUpon>GeneratorSettingsWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SnappingTools\SnappingToolsPreferencesWindow.xaml.cs">
       <DependentUpon>SnappingToolsPreferencesWindow.xaml</DependentUpon>
     </Compile>
@@ -455,6 +458,10 @@
     <Page Include="Views\RhythmGuide\RhythmGuideWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SnappingTools\GeneratorSettingsWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\SnappingTools\SnappingToolsPreferencesWindow.xaml">
       <SubType>Designer</SubType>

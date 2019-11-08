@@ -3,11 +3,16 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Windows;
+using Mapping_Tools.Components.Domain;
+using Mapping_Tools.Views.SnappingTools;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators {
     public abstract class RelevantObjectsGenerator
     {
         public GeneratorSettings Settings { get; }
+        
+        public CommandImplementation GeneratorSettingsCommand { get; }
 
         public abstract string Name { get; }
         public abstract string Tooltip { get; }
@@ -16,6 +21,15 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
 
         protected RelevantObjectsGenerator() {
             Settings = new GeneratorSettings(this);
+
+            // Make command
+            GeneratorSettingsCommand = new CommandImplementation(
+                e => {
+                    try {
+                        var settingsWindow = new GeneratorSettingsWindow(Settings);
+                        settingsWindow.ShowDialog();
+                    } catch (Exception ex) { MessageBox.Show(ex.Message); }
+                });
         }
 
         private MethodInfo[] _generatorMethods;

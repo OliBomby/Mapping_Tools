@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Mapping_Tools.Classes.SnappingTools;
+using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Viewmodels;
+using Mapping_Tools.Views.SnappingTools;
+using System;
 using System.IO;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using Mapping_Tools.Classes.SnappingTools;
-using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Viewmodels;
-using Mapping_Tools.Views.SnappingTools;
 
 namespace Mapping_Tools.Views {
     public partial class SnappingToolsView : ISavable<SnappingToolsPreferences> {
