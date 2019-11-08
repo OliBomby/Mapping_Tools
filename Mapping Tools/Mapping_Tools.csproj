@@ -326,6 +326,7 @@
     </Compile>
     <Compile Include="Components\HotkeyEditorControl.xaml.cs">
       <DependentUpon>HotkeyEditorControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Components\Graph\Anchor.xaml.cs">
       <DependentUpon>Anchor.xaml</DependentUpon>
     </Compile>
@@ -422,6 +423,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Components\HotkeyEditorControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Components\Graph\Anchor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
