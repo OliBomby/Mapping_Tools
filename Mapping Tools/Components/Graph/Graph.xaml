@@ -3,13 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Mapping_Tools.Components.Graph"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
+             Loaded="Graph_OnLoaded"
+             MouseEnter="Graph_OnMouseEnter"
+             MouseLeave="Graph_OnMouseLeave"
              d:DesignHeight="300" d:DesignWidth="300">
-    <Canvas x:Name="mainCanvas"
-                Background="DarkSlateGray"
-                MouseLeftButtonDown="ThisMouseLeftButtonDown">
-        <Polyline Name="line" Stroke="Gray" StrokeThickness="1"/>
-        <Polyline Name="pathLine" Stroke="White" StrokeThickness="1" StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+    <Canvas x:Name="MainCanvas"
+            Background="Transparent"
+            MouseRightButtonDown="ThisMouseRightButtonDown">
     </Canvas>
 </UserControl>

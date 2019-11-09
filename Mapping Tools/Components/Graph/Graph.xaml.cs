@@ -1,146 +1,295 @@
-﻿using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.SliderPathStuff;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Components.Graph {
     /// <summary>
-    /// Interaction logic for UserControl1.xaml
+    /// Interaction logic for Graph.xaml
     /// </summary>
-    public partial class Graph : UserControl {
-        public List<Anchor> Anchors;
+    public partial class Graph {
+        private readonly List<Anchor> tensionAnchors;
+
+        public List<Anchor> Anchors { get; }
+
+        private bool drawAnchors;
+
         public double XMin { get; set; }
         public double YMin { get; set; }
         public double XMax { get; set; }
         public double YMax { get; set; }
 
+        private Brush _stroke;
+        public Brush Stroke {
+            get => _stroke;
+            set { 
+                _stroke = value;
+                UpdateVisual();
+            }
+        }
+
+        private Brush _fill;
+        public Brush Fill {
+            get => _fill;
+            set {
+                _fill = value;
+                UpdateVisual();
+            }
+        }
+
+        private Brush _anchorStroke;
+        public Brush AnchorStroke { get => _anchorStroke;
+            set {
+                _anchorStroke = value;
+                Anchors.ForEach(o => o.Stroke = value);
+            }
+        }
+
+        private Brush _anchorFill;
+        public Brush AnchorFill { get => _anchorFill;
+            set {
+                _anchorFill = value;
+                Anchors.ForEach(o => o.Fill = value);
+            }
+        }
+
+        private Brush _tensionAnchorStroke;
+        public Brush TensionAnchorStroke { get => _tensionAnchorStroke;
+            set {
+                _tensionAnchorStroke = value;
+                tensionAnchors.ForEach(o => o.Stroke = value);
+            }
+        }
+
+        private Brush _tensionAnchorFill;
+        public Brush TensionAnchorFill { get => _tensionAnchorFill;
+            set {
+                _tensionAnchorFill = value;
+                tensionAnchors.ForEach(o => o.Fill = value);
+            }
+        }
+
 
         public Graph() {
             InitializeComponent();
+            tensionAnchors = new List<Anchor>();
             Anchors = new List<Anchor>();
+            Background = new SolidColorBrush(Color.FromArgb(30, 0, 0, 0));
+
             XMin = 0;
             YMin = 0;
             XMax = 1;
             YMax = 1;
+
+            // Initialize Anchors
+            Anchors.Add(MakeAnchor(new Vector2(0, 0.5)));
+            AddAnchor(new Vector2(1, 0.5));
+        }
+
+        public void SetBrush(Brush brush) {
+            var transparentBrush = brush.Clone();
+            transparentBrush.Opacity = 0.3;
+
+            Stroke = brush;
+            Fill = transparentBrush;
+            AnchorStroke = brush;
+            AnchorFill = transparentBrush;
+            TensionAnchorStroke = brush;
+            TensionAnchorFill = transparentBrush;
+        }
+
+        public Anchor AddAnchor(Vector2 pos) {
+            // Clamp the position withing bounds
+            pos = Vector2.Clamp(pos, Vector2.Zero, Vector2.One);
+
+            // Find the correct index
+            var index = Anchors.FindIndex(o => o.Pos.X > pos.X);
+            index = index == -1 ? Math.Max(Anchors.Count - 1, 1) : index;
+
+            // Make anchor
+            var anchor = MakeAnchor(pos);
+
+            // Make tension anchor
+            var tensionAnchor = MakeAnchor(pos, true);
+
+            // Link Anchors
+            anchor.LinkedAnchor = tensionAnchor;
+            tensionAnchor.LinkedAnchor = anchor;
+            
+            // Insert anchor
+            Anchors.Insert(index, anchor);
+
+            // Add tension anchor
+            tensionAnchors.Add(tensionAnchor);
+
+            UpdateVisual();
+
+            return anchor;
         }
 
         public void RemoveAnchor(Anchor anchor) {
-            mainCanvas.Children.Remove(anchor);
+            // Dont remove the anchors on the left and right edge
+            if (IsEdgeAnchor(anchor)) return;
+
             Anchors.Remove(anchor);
-            AnchorsUpdated(this, null);
+            tensionAnchors.Remove(anchor.LinkedAnchor);
+            UpdateVisual();
         }
 
-        public void RemoveAnchor(int index) {
-            RemoveAnchor(Anchors[index]);
+        public bool IsEdgeAnchor(Anchor anchor) {
+            return anchor == Anchors[0] || anchor == Anchors[Anchors.Count - 1];
         }
 
-        private void ThisMouseLeftButtonDown(object sender, MouseButtonEventArgs e) {
-            if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)) {
-                // Create an anchor right on the cursor
-                Anchor anchor = new Anchor(this);
-
-                // Get the position of the mouse relative to the Canvas
-                Point mousePos = e.GetPosition(mainCanvas);
-
-                // Center the object on the mouse
-                anchor.SetPosition(mousePos);
-
-                // Find the correct index to insert this anchor
-                int index = Anchors.Count;
-                if (index >= 2) {
-                    // Find the nearest line segment
-                    double nearest = double.PositiveInfinity;
-                    for (int i = 0; i < Anchors.Count - 1; i++) {
-                        Classes.MathUtil.LineSegment line = new Classes.MathUtil.LineSegment(Anchors[i].GetVector(), Anchors[i + 1].GetVector());
-                        double dist = Classes.MathUtil.LineSegment.Distance(line, new Vector2(mousePos));
-
-                        if (dist < nearest) {
-                            nearest = dist;
-                            index = i + 1;
-                        }
-                    }
-                }
-
-                AddAnchor(anchor, index);
-            }
-            e.Handled = true;
+        private Anchor MakeAnchor(Vector2 pos, bool isTensionPoint = false) {
+            var anchor = new Anchor(this, pos, isTensionPoint) {
+                Stroke = isTensionPoint ? TensionAnchorStroke : AnchorStroke,
+                Fill = isTensionPoint ? TensionAnchorFill : AnchorFill
+            };
+            return anchor;
         }
 
-        private void AnchorsUpdated(object sender=null, EventArgs e=null) {
-            PointCollection pointCollection = new PointCollection(Anchors.Count);
-            foreach (Anchor a in Anchors) {
-                pointCollection.Add(a.GetPosition());
-            }
-            line.Points = pointCollection;
-
-            SliderPath path = new SliderPath(PathType.Bezier, GetAnchorVectorsCanvas().ToArray());
-            List<Vector2> calculatedPath = new List<Vector2>();
-            path.GetPathToProgress(calculatedPath, 0, 1);
-
-            PointCollection pathCollection = new PointCollection();
-            foreach (Vector2 v in calculatedPath) {
-                pathCollection.Add(new Point(v.X, v.Y));
-            }
-            pathLine.Points = pathCollection;
+        private void ThisMouseRightButtonDown(object sender, MouseButtonEventArgs e) {
+            var newAnchor = AddAnchor(GetPosition(e.GetPosition(this)));
+            newAnchor.EnableDragging();
         }
 
-        private double Distance(Point p1, Point p2) {
-            Vector d = p2 - p1;
-            return d.Length;
-        }
-
-        private List<Vector2> GetAnchorVectorsCanvas() {
-            List<Vector2> convertedAnchors = new List<Vector2>(Anchors.Count * 2);
-            foreach (Anchor a in Anchors) {
-                convertedAnchors.Add(a.GetVector());
-                if (a.Red) {  // Red anchors count double
-                    convertedAnchors.Add(a.GetVector());
+        /// <summary>
+        /// Calculates the height of the curve for a given X value.
+        /// </summary>
+        /// <param name="x">The progression along the curve (0-1)</param>
+        /// <returns>The height of the curve (0-1)</returns>
+        public double GetValue(double x) {
+            // Find the section
+            var previousAnchor = Anchors[0];
+            var nextAnchor = Anchors[1];
+            foreach (var anchor in Anchors) {
+                if (anchor.Pos.X < x) {
+                    previousAnchor = anchor;
+                } else {
+                    nextAnchor = anchor;
+                    break;
                 }
             }
-            return convertedAnchors;
-        }
 
-        public List<Vector2> GetAnchorVectors() {
-            List<Vector2> convertedAnchors = new List<Vector2>(Anchors.Count * 2);
-            foreach (Anchor a in Anchors) {
-                var v = a.GetVector();
-                v.X = v.X / mainCanvas.ActualWidth * XMax + XMin;
-                v.Y = (1 - v.Y / mainCanvas.ActualHeight) * YMax + XMin;
-
-                convertedAnchors.Add(v);
-                if (a.Red) {  // Red anchors count double
-                    convertedAnchors.Add(v);
-                }
+            // Calculate the value via interpolation
+            var diff = nextAnchor.Pos - previousAnchor.Pos;
+            if (Math.Abs(diff.X) < Precision.DOUBLE_EPSILON) {
+                return previousAnchor.Pos.Y;
             }
-            return convertedAnchors;
+            var sectionProgress = (x - previousAnchor.Pos.X) / diff.X;
+            return diff.Y * sectionProgress + previousAnchor.Pos.Y;
         }
 
-        public List<Vector2> GetGraph() {
-            SliderPath path = new SliderPath(PathType.Bezier, GetAnchorVectors().ToArray());
-            List<Vector2> calculatedPath = new List<Vector2>();
-            path.GetPathToProgress(calculatedPath, 0, 1);
-            return calculatedPath;
+        private Point GetRelativePoint(Vector2 pos) {
+            return new Point(pos.X * Width, Height - pos.Y * Height);
         }
 
-        public void AddAnchor(Anchor anchor, int? index=null) {
-            int insertIndex = index ?? Anchors.Count;
+        private Vector2 GetPosition(Point pos) {
+            return new Vector2(pos.X / Width, (Height - pos.Y) / Height);
+        }
 
-            anchor.Changed += AnchorsUpdated;
-            mainCanvas.Children.Insert(insertIndex + 2, anchor);  // + 1 because there is already a PolyLine object in the canvas that has to stay at index 0
-            Anchors.Insert(insertIndex, anchor);
-            AnchorsUpdated();
+        public void UpdateVisual() {
+            // Clear canvas
+            MainCanvas.Children.Clear();
+
+            // Add interpolation line
+            var points = new PointCollection();
+            for (int i = 0; i <= Width; i++) {
+                var x = i / Width;
+                var y = GetValue(x);
+
+                points.Add(GetRelativePoint(new Vector2(x, y)));
+            }
+
+            var line = new Polyline {Points = points, Stroke = Stroke, StrokeThickness = 2};
+            MainCanvas.Children.Add(line);
+
+            // Draw area under line
+            var points2 = new PointCollection(points) {
+                GetRelativePoint(new Vector2(1, 0)), GetRelativePoint(new Vector2(0, 0))
+            };
+
+            var polygon = new Polygon {Points = points2, Fill = Fill};
+            MainCanvas.Children.Add(polygon);
+
+            // Return if we dont draw Anchors
+            if (!drawAnchors) return;
+
+            // Add tension Anchors
+            foreach (var tensionAnchor in tensionAnchors) {
+                if (tensionAnchor.LinkedAnchor == null) continue;
+
+                // Find x position in the middle
+                var next = tensionAnchor.LinkedAnchor;
+                var previous = Anchors[Anchors.IndexOf(next) - 1];
+                var x = (next.Pos.X + previous.Pos.X) / 2;
+
+                // Get y on the graph and set position
+                var y = GetValue(x);
+                tensionAnchor.Pos = new Vector2(x, y);
+
+                RenderAnchor(tensionAnchor);
+            }
+
+            // Add Anchors
+            foreach (var anchor in Anchors) {
+                RenderAnchor(anchor);
+            }
+        }
+
+        private void RenderAnchor(Anchor anchor) {
+            MainCanvas.Children.Add(anchor);
+            var p = GetRelativePoint(anchor.Pos);
+            Canvas.SetLeft(anchor, p.X - anchor.Width / 2);
+            Canvas.SetTop(anchor, p.Y - anchor.Height / 2);
+        }
+
+        public void MoveAnchor(Anchor anchor, Vector diff) {
+            if (anchor.IsTensionPoint) {
+                if (anchor.LinkedAnchor == null) return;
+                anchor.SetTension(anchor.Tension - diff.Y / 100);
+            } else {
+                var movement = new Vector2(diff.X / Width, -diff.Y / Height);
+                MoveAnchorTo(anchor, anchor.Pos + movement);
+            }
+        }
+
+        public void MoveAnchorTo(Anchor anchor, Vector2 pos) {
+            var index = Anchors.IndexOf(anchor);
+            var previous = Anchors.ElementAtOrDefault(index - 1);
+            var next = Anchors.ElementAtOrDefault(index + 1);
+            if (previous == null || next == null) {
+                pos.X = anchor.Pos.X;
+            } else {
+                pos.X = MathHelper.Clamp(pos.X, previous.Pos.X + 1E-4, next.Pos.X - 1E-4);
+            }
+
+            pos.Y = MathHelper.Clamp(pos.Y, 0, 1);
+
+            anchor.Pos = pos;
+
+            UpdateVisual();
+        }
+
+        private void Graph_OnLoaded(object sender, RoutedEventArgs e) {
+            UpdateVisual();
+        }
+
+        private void Graph_OnMouseEnter(object sender, MouseEventArgs e) {
+            if (drawAnchors) return;
+            drawAnchors = true;
+            UpdateVisual();
+        }
+
+        private void Graph_OnMouseLeave(object sender, MouseEventArgs e) {
+            if (!drawAnchors) return;
+            drawAnchors = false;
+            UpdateVisual();
         }
     }
 }

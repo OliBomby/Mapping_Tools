@@ -1,9 +1,11 @@
 ﻿using Mapping_Tools.Classes.SystemTools;
 using System.Windows;
+using System.Windows.Media;
+using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Components.Graph;
 
 namespace Mapping_Tools.Views {
-    [HiddenTool]
+    //[HiddenTool]
     public partial class SlideratorView {
         public static readonly string ToolName = "Sliderator";
 
@@ -16,15 +18,14 @@ namespace Mapping_Tools.Views {
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
 
-            Graph = new Graph {Width = 200, Height = 200};
+            Graph = new Graph {
+                Width = 200, Height = 200
+            };
 
-            var anchor1 = new Anchor(Graph);
-            anchor1.SetPosition(new Point(Graph.XMin, Graph.YMin));
-            Graph.AddAnchor(anchor1);
+            Graph.SetBrush(new SolidColorBrush(Color.FromArgb(255, 0, 255, 255)));
 
-            var anchor2 = new Anchor(Graph);
-            anchor2.SetPosition(new Point(Graph.XMax, Graph.YMax));
-            Graph.AddAnchor(anchor2);
+            Graph.MoveAnchorTo(Graph.Anchors[0], Vector2.Zero);
+            Graph.MoveAnchorTo(Graph.Anchors[Graph.Anchors.Count - 1], Vector2.One);
 
             GraphHost.Content = Graph;
         }
