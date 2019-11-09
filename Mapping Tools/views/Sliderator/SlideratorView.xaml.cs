@@ -1,8 +1,11 @@
-﻿using Mapping_Tools.Classes.SystemTools;
+﻿using System;
+using Mapping_Tools.Classes.SystemTools;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Threading;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Components.Graph;
+using MaterialDesignColors.ColorManipulation;
 
 namespace Mapping_Tools.Views {
     //[HiddenTool]
@@ -12,6 +15,8 @@ namespace Mapping_Tools.Views {
         public static readonly string ToolDescription = "";
 
         public Graph Graph;
+        private DispatcherTimer timer;
+        private double hue;
 
         public SlideratorView() {
             InitializeComponent();
@@ -28,6 +33,15 @@ namespace Mapping_Tools.Views {
             Graph.MoveAnchorTo(Graph.Anchors[Graph.Anchors.Count - 1], Vector2.One);
 
             GraphHost.Content = Graph;
+
+            timer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(16)};
+            timer.Tick += TimerOnTick;
+            timer.Start();
+        }
+
+        private void TimerOnTick(object sender, EventArgs e) {
+            Graph.SetBrush(new SolidColorBrush(new Hsb(hue, 1, 1).ToColor()));
+            hue = (hue + 1) % 360;
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
