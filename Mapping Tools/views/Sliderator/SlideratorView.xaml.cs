@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using Mapping_Tools.Classes.SystemTools;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
 using Mapping_Tools.Classes.MathUtil;
@@ -24,8 +26,21 @@ namespace Mapping_Tools.Views {
             Height = MainWindow.AppWindow.content_views.Height;
 
             Graph = new Graph {
-                Width = 400, Height = 400
+                Width = 400, Height = 400, XMax = 3, YMax = 10, YMin = 0.10
             };
+
+            var markers = new List<GraphMarker>();
+            for (int i = 0; i <= 10; i++) {
+                markers.Add(new GraphMarker {Orientation = Orientation.Horizontal, Text = $"{i}x", Value = i});
+            }
+            for (int i = 0; i <= 12; i++) {
+                markers.Add(new GraphMarker {Orientation = Orientation.Vertical, Value = i / 4d, DrawMarker = true,
+                    MarkerColor = i % 4 == 0 ? Colors.White : i % 2 == 0 ? Colors.Red : Colors.DodgerBlue,
+                    MarkerLength = i % 4 == 0 ? 12 : 7, Text = i % 4 == 0 ? (i / 4).ToString() : null
+                });
+            }
+
+            Graph.SetMarkers(markers);
 
             Graph.SetBrush(new SolidColorBrush(Color.FromArgb(255, 0, 255, 255)));
 
@@ -34,7 +49,7 @@ namespace Mapping_Tools.Views {
 
             GraphHost.Content = Graph;
 
-            timer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(16)};
+            timer = new DispatcherTimer(DispatcherPriority.Render) {Interval = TimeSpan.FromMilliseconds(16)};
             timer.Tick += TimerOnTick;
             timer.Start();
         }

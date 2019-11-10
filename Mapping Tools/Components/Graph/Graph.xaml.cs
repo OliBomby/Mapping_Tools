@@ -17,6 +17,7 @@ namespace Mapping_Tools.Components.Graph {
 
         public List<TensionAnchor> TensionAnchors { get; }
         public List<Anchor> Anchors { get; }
+        public List<GraphMarker> Markers { get; set; }
 
 
         public double XMin { get; set; }
@@ -39,6 +40,15 @@ namespace Mapping_Tools.Components.Graph {
             set {
                 _fill = value;
                 UpdateVisual();
+            }
+        }
+
+        private Brush _edgesBrush;
+        public Brush EdgesBrush {
+            get => _edgesBrush;
+            set {
+                _edgesBrush = value;
+                Anchors.ForEach(o => o.Stroke = value);
             }
         }
 
@@ -79,7 +89,10 @@ namespace Mapping_Tools.Components.Graph {
             InitializeComponent();
             TensionAnchors = new List<TensionAnchor>();
             Anchors = new List<Anchor>();
+            Markers = new List<GraphMarker>();
+
             Background = new SolidColorBrush(Color.FromArgb(30, 0, 0, 0));
+            EdgesBrush = new SolidColorBrush(Color.FromArgb(255, 100, 100, 100));
 
             XMin = 0;
             YMin = 0;
@@ -204,6 +217,19 @@ namespace Mapping_Tools.Components.Graph {
             // Clear canvas
             MainCanvas.Children.Clear();
 
+            // Add markers
+            foreach (var marker in Markers.Where(marker => !(marker.X < 0) && !(marker.X > Width) && !(marker.Y < 0) && !(marker.Y > Height))) {
+                MainCanvas.Children.Add(marker);
+            }
+
+            // Add border
+            var rect = new Rectangle {
+                Stroke = EdgesBrush, Width = Width, Height = Height, StrokeThickness = 2
+            };
+            Canvas.SetLeft(rect, 0);
+            Canvas.SetTop(rect, 0);
+            MainCanvas.Children.Add(rect);
+
             // Add interpolation line
             var points = new PointCollection();
             for (int i = 0; i <= Width; i++) {
@@ -289,6 +315,23 @@ namespace Mapping_Tools.Components.Graph {
             if (!_drawAnchors) return;
             _drawAnchors = false;
             UpdateVisual();
+        }
+
+        public void SetMarkers(List<GraphMarker> markers) {
+            foreach (var graphMarker in markers) {
+                graphMarker.Stroke = EdgesBrush;
+                graphMarker.Width = Width;
+                graphMarker.Height = Height;
+                if (graphMarker.Orientation == Orientation.Horizontal) {
+                    graphMarker.X = 0;
+                    graphMarker.Y = Height - Height * ((graphMarker.Value - YMin) / (YMax - YMin));
+                } else {
+                    graphMarker.X = Width * ((graphMarker.Value - XMin) / (XMax - XMin));
+                    graphMarker.Y = 0;
+                }
+            }
+
+            Markers = markers;
         }
     }
 }
