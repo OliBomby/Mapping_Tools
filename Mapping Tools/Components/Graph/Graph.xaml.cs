@@ -13,11 +13,11 @@ namespace Mapping_Tools.Components.Graph {
     /// Interaction logic for Graph.xaml
     /// </summary>
     public partial class Graph {
-        private readonly List<Anchor> tensionAnchors;
+        private bool _drawAnchors;
 
+        public List<TensionAnchor> TensionAnchors { get; }
         public List<Anchor> Anchors { get; }
 
-        private bool drawAnchors;
 
         public double XMin { get; set; }
         public double YMin { get; set; }
@@ -62,7 +62,7 @@ namespace Mapping_Tools.Components.Graph {
         public Brush TensionAnchorStroke { get => _tensionAnchorStroke;
             set {
                 _tensionAnchorStroke = value;
-                tensionAnchors.ForEach(o => o.Stroke = value);
+                TensionAnchors.ForEach(o => o.Stroke = value);
             }
         }
 
@@ -70,14 +70,14 @@ namespace Mapping_Tools.Components.Graph {
         public Brush TensionAnchorFill { get => _tensionAnchorFill;
             set {
                 _tensionAnchorFill = value;
-                tensionAnchors.ForEach(o => o.Fill = value);
+                TensionAnchors.ForEach(o => o.Fill = value);
             }
         }
 
 
         public Graph() {
             InitializeComponent();
-            tensionAnchors = new List<Anchor>();
+            TensionAnchors = new List<TensionAnchor>();
             Anchors = new List<Anchor>();
             Background = new SolidColorBrush(Color.FromArgb(30, 0, 0, 0));
 
@@ -93,7 +93,7 @@ namespace Mapping_Tools.Components.Graph {
 
         public void SetBrush(Brush brush) {
             var transparentBrush = brush.Clone();
-            transparentBrush.Opacity = 0.3;
+            transparentBrush.Opacity = 0.2;
 
             Stroke = brush;
             Fill = transparentBrush;
@@ -115,17 +115,16 @@ namespace Mapping_Tools.Components.Graph {
             var anchor = MakeAnchor(pos);
 
             // Make tension anchor
-            var tensionAnchor = MakeAnchor(pos, true);
+            var tensionAnchor = MakeTensionAnchor(pos, anchor);
 
             // Link Anchors
-            anchor.LinkedAnchor = tensionAnchor;
-            tensionAnchor.LinkedAnchor = anchor;
+            anchor.TensionAnchor = tensionAnchor;
             
             // Insert anchor
             Anchors.Insert(index, anchor);
 
             // Add tension anchor
-            tensionAnchors.Add(tensionAnchor);
+            TensionAnchors.Add(tensionAnchor);
 
             UpdateVisual();
 
@@ -137,7 +136,7 @@ namespace Mapping_Tools.Components.Graph {
             if (IsEdgeAnchor(anchor)) return;
 
             Anchors.Remove(anchor);
-            tensionAnchors.Remove(anchor.LinkedAnchor);
+            TensionAnchors.Remove(anchor.TensionAnchor);
             UpdateVisual();
         }
 
@@ -145,10 +144,18 @@ namespace Mapping_Tools.Components.Graph {
             return anchor == Anchors[0] || anchor == Anchors[Anchors.Count - 1];
         }
 
-        private Anchor MakeAnchor(Vector2 pos, bool isTensionPoint = false) {
-            var anchor = new Anchor(this, pos, isTensionPoint) {
-                Stroke = isTensionPoint ? TensionAnchorStroke : AnchorStroke,
-                Fill = isTensionPoint ? TensionAnchorFill : AnchorFill
+        private Anchor MakeAnchor(Vector2 pos) {
+            var anchor = new Anchor(this, pos) {
+                Stroke = AnchorStroke,
+                Fill = AnchorFill
+            };
+            return anchor;
+        }
+
+        private TensionAnchor MakeTensionAnchor(Vector2 pos, Anchor parentAnchor) {
+            var anchor = new TensionAnchor(this, pos, parentAnchor) {
+                Stroke = TensionAnchorStroke,
+                Fill = TensionAnchorFill
             };
             return anchor;
         }
@@ -218,14 +225,12 @@ namespace Mapping_Tools.Components.Graph {
             MainCanvas.Children.Add(polygon);
 
             // Return if we dont draw Anchors
-            if (!drawAnchors) return;
+            if (!_drawAnchors) return;
 
             // Add tension Anchors
-            foreach (var tensionAnchor in tensionAnchors) {
-                if (tensionAnchor.LinkedAnchor == null) continue;
-
+            foreach (var tensionAnchor in TensionAnchors) {
                 // Find x position in the middle
-                var next = tensionAnchor.LinkedAnchor;
+                var next = tensionAnchor.ParentAnchor;
                 var previous = Anchors[Anchors.IndexOf(next) - 1];
 
                 if (Math.Abs(next.Pos.X - previous.Pos.X) < Precision.DOUBLE_EPSILON) {
@@ -237,30 +242,20 @@ namespace Mapping_Tools.Components.Graph {
                 var y = GetValue(x);
                 tensionAnchor.Pos = new Vector2(x, y);
 
-                RenderAnchor(tensionAnchor);
+                RenderGraphPoint(tensionAnchor);
             }
 
             // Add Anchors
             foreach (var anchor in Anchors) {
-                RenderAnchor(anchor);
+                RenderGraphPoint(anchor);
             }
         }
 
-        private void RenderAnchor(Anchor anchor) {
-            MainCanvas.Children.Add(anchor);
-            var p = GetRelativePoint(anchor.Pos);
-            Canvas.SetLeft(anchor, p.X - anchor.Width / 2);
-            Canvas.SetTop(anchor, p.Y - anchor.Height / 2);
-        }
-
-        public void MoveAnchor(Anchor anchor, Vector diff) {
-            if (anchor.IsTensionPoint) {
-                if (anchor.LinkedAnchor == null) return;
-                anchor.SetTension(anchor.Tension - diff.Y / 1000);
-            } else {
-                var movement = new Vector2(diff.X / Width, -diff.Y / Height);
-                MoveAnchorTo(anchor, anchor.Pos + movement);
-            }
+        private void RenderGraphPoint(GraphPointControl point) {
+            MainCanvas.Children.Add(point);
+            var p = GetRelativePoint(point.Pos);
+            Canvas.SetLeft(point, p.X - point.Width / 2);
+            Canvas.SetTop(point, p.Y - point.Height / 2);
         }
 
         public void MoveAnchorTo(Anchor anchor, Vector2 pos) {
@@ -285,14 +280,14 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private void Graph_OnMouseEnter(object sender, MouseEventArgs e) {
-            if (drawAnchors) return;
-            drawAnchors = true;
+            if (_drawAnchors) return;
+            _drawAnchors = true;
             UpdateVisual();
         }
 
         private void Graph_OnMouseLeave(object sender, MouseEventArgs e) {
-            if (!drawAnchors) return;
-            drawAnchors = false;
+            if (!_drawAnchors) return;
+            _drawAnchors = false;
             UpdateVisual();
         }
     }
