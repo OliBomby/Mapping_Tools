@@ -24,7 +24,7 @@ namespace Mapping_Tools.Views {
             Height = MainWindow.AppWindow.content_views.Height;
 
             Graph = new Graph {
-                Width = 200, Height = 200
+                Width = 400, Height = 400
             };
 
             Graph.SetBrush(new SolidColorBrush(Color.FromArgb(255, 0, 255, 255)));

@@ -227,6 +227,10 @@ namespace Mapping_Tools.Components.Graph {
                 // Find x position in the middle
                 var next = tensionAnchor.LinkedAnchor;
                 var previous = Anchors[Anchors.IndexOf(next) - 1];
+
+                if (Math.Abs(next.Pos.X - previous.Pos.X) < Precision.DOUBLE_EPSILON) {
+                    continue;
+                }
                 var x = (next.Pos.X + previous.Pos.X) / 2;
 
                 // Get y on the graph and set position
@@ -252,7 +256,7 @@ namespace Mapping_Tools.Components.Graph {
         public void MoveAnchor(Anchor anchor, Vector diff) {
             if (anchor.IsTensionPoint) {
                 if (anchor.LinkedAnchor == null) return;
-                anchor.SetTension(anchor.Tension - diff.Y / 100);
+                anchor.SetTension(anchor.Tension - diff.Y / 1000);
             } else {
                 var movement = new Vector2(diff.X / Width, -diff.Y / Height);
                 MoveAnchorTo(anchor, anchor.Pos + movement);
@@ -266,7 +270,7 @@ namespace Mapping_Tools.Components.Graph {
             if (previous == null || next == null) {
                 pos.X = anchor.Pos.X;
             } else {
-                pos.X = MathHelper.Clamp(pos.X, previous.Pos.X + 1E-4, next.Pos.X - 1E-4);
+                pos.X = MathHelper.Clamp(pos.X, previous.Pos.X, next.Pos.X);
             }
 
             pos.Y = MathHelper.Clamp(pos.Y, 0, 1);

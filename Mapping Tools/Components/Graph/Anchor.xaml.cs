@@ -12,8 +12,8 @@ namespace Mapping_Tools.Components.Graph {
     /// Interaction logic for Anchor.xaml
     /// </summary>
     public partial class Anchor {
-        private static readonly double anchorSize = 12;
-        private static readonly double tensionAnchorSize = 7;
+        private const double AnchorSize = 12;
+        private const double TensionAnchorSize = 7;
 
         private bool _isDragging;
         private bool _ignoreDrag;
@@ -41,6 +41,9 @@ namespace Mapping_Tools.Components.Graph {
             set { 
                 _stroke = value;
                 MainShape.Stroke = value;
+                if (_isDragging && IsTensionPoint) {
+                    MainShape.Fill = value;
+                }
             }
         }
 
@@ -49,7 +52,9 @@ namespace Mapping_Tools.Components.Graph {
             get => _fill;
             set {
                 _fill = value;
-                MainShape.Fill = value;
+                if (!(_isDragging && IsTensionPoint)) {
+                    MainShape.Fill = value;
+                }
             }
         }
 
@@ -64,7 +69,7 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private void SetDimensions() {
-            SetSize(IsTensionPoint ? tensionAnchorSize : anchorSize);
+            SetSize(IsTensionPoint ? TensionAnchorSize : AnchorSize);
         }
 
         private void SetSize(double size) {
@@ -228,7 +233,7 @@ namespace Mapping_Tools.Components.Graph {
                 LinkedAnchor.Tension = tension;
 
             if (_isDragging) {
-                SetSize(tensionAnchorSize * Math.Pow(1.5, Math.Min(Math.Abs(Tension) - 1, 1)));
+                SetSize(TensionAnchorSize * Math.Pow(1.5, Math.Min(Math.Abs(Tension) - 1, 1)));
             } else {
                 Graph.UpdateVisual();
             }
