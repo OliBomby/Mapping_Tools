@@ -12,6 +12,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
+using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Views.HitsoundStudio;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
@@ -180,7 +181,11 @@ namespace Mapping_Tools.Views {
 
             using (CustomSaveFileDialog openDialog = new CustomSaveFileDialog(control))
             {
-                openDialog.Dlg.FileName = "test";
+                openDialog.Dlg.FileName = "Hitsounds";
+                openDialog.Dlg.InitialDirectory = MainWindow.ExportPath;
+                openDialog.Dlg.OverwritePrompt = false;
+                openDialog.Dlg.AddExtension = false;
+
 
                 //Show the Save As dialog associated to the CustomFileDialog control
                 DialogResult res = openDialog.Dlg.ShowDialog();

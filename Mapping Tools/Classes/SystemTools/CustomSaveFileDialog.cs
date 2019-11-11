@@ -85,7 +85,7 @@ namespace Mapping_Tools.Classes.SystemTools
             // saveFileDialog1
             // 
             this.saveFileDialog1.Title = "Save As";
-            this.saveFileDialog1.FileOk += new System.ComponentModel.CancelEventHandler(this.saveFileDialog1_FileOk);
+            
             // 
             // CustomSaveFileDialog
             // 
