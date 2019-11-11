@@ -6,13 +6,13 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
-    public class SameTransformGenerator : RelevantObjectsGenerator {
-        public override string Name => "Same Transformation Generator";
-        public override string Tooltip => "Takes 3 virtual points and predicts the next virtual point using the transformation matrix of the previous 3 virtual points.";
+    public class SameTransformGenerator2 : RelevantObjectsGenerator {
+        public override string Name => "Same Transformation Generator Reversed";
+        public override string Tooltip => "Takes 3 virtual points and predicts the next virtual point using the transformation matrix of the previous 3 virtual points, but the angle is reversed.";
         public override GeneratorType GeneratorType => GeneratorType.Assistants;
         public override GeneratorTemporalPositioning TemporalPositioning => GeneratorTemporalPositioning.After;
 
-        public SameTransformGenerator() {
+        public SameTransformGenerator2() {
             Settings.IsSequential = true;
         }
 
@@ -28,7 +28,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
             }
 
             // Calculate the next point
-            Vector2 newPoint = Vector2.ComplexProduct(b, Vector2.ComplexQuotient(b, a)) + point3.Child;
+            var diff = Vector2.ComplexQuotient(b, a);
+            diff.Y = -diff.Y;
+            Vector2 newPoint = Vector2.ComplexProduct(b, diff) + point3.Child;
 
             return new RelevantPoint(newPoint);
         }

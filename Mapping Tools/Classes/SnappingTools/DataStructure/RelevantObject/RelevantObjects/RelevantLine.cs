@@ -2,9 +2,8 @@ using System;
 using System.Windows;
 using System.Windows.Media;
 using Mapping_Tools.Classes.MathUtil;
-using Line2 = Mapping_Tools.Classes.MathUtil.Line2;
 
-namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
+namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects {
     public class RelevantLine : RelevantDrawable {
         public readonly Line2 Child;
 
@@ -18,9 +17,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
                     intersections = new[] { point.Child };
                     return Precision.AlmostEquals(Line2.Distance(Child, point.Child), 0);
                 case RelevantLine line: {
-                    bool IsIntersecting = Line2.Intersection(Child, line.Child, out var intersection);
+                    bool isIntersecting = Line2.Intersection(Child, line.Child, out var intersection);
                     intersections = new[] { intersection };
-                    return IsIntersecting;
+                    return isIntersecting;
                 }
                 case RelevantCircle circle:
                     return Circle.Intersection(circle.Child, Child, out intersections);
@@ -35,7 +34,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
             var roPref = preferences.GetReleventObjectPreferences("Virtual line preferences");
             var cPos1 = converter.ToDpi(converter.EditorToRelativeCoordinate(points[0]));
             var cPos2 = converter.ToDpi(converter.EditorToRelativeCoordinate(points[1]));
-            context.DrawLine(roPref.GetPen(), new Point(cPos1.X, cPos1.Y), new Point(cPos2.X, cPos2.Y));
+            context.DrawLine(GetPen(roPref), new Point(cPos1.X, cPos1.Y), new Point(cPos2.X, cPos2.Y));
         }
 
         public override Vector2 NearestPoint(Vector2 point) {
@@ -51,10 +50,11 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
                 return double.PositiveInfinity;
             }
 
-            var ca = Vector2.Dot(Child.DirectionVector, relevantLine.Child.DirectionVector) /
+            var cosAlpha = Vector2.Dot(Child.DirectionVector, relevantLine.Child.DirectionVector) /
                     (Child.DirectionVector.Length * relevantLine.Child.DirectionVector.Length);
-            return Vector2.Distance(Child.PositionVector, relevantLine.Child.PositionVector) +
-                   1 / Math.Pow(ca, 500) - 1;
+            // This is the length of the opposite side in a right triangle with an adjacent side length of 100
+            var angleDiff = Math.Sqrt(10000 / (cosAlpha * cosAlpha) - 10000);
+            return Vector2.Distance(Child.PositionVector, relevantLine.Child.PositionVector) + angleDiff;
         }
     }
 }

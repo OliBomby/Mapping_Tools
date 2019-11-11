@@ -38,6 +38,9 @@
                 <ListViewItem>
                     4. Click the play button in the bottom right to run the program
                 </ListViewItem>
+                <ListViewItem>
+                    5. Read the guides, documentation or FAQ over at the website
+                </ListViewItem>
             </ListView>
         </Grid>
 

@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Media;
 using Mapping_Tools.Classes.MathUtil;
 
-namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
+namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects {
     public class RelevantCircle : RelevantDrawable {
         public readonly Circle Child;
 
@@ -31,7 +31,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
             var roPref = preferences.GetReleventObjectPreferences("Virtual circle preferences");
             var cPos = converter.ToDpi(converter.EditorToRelativeCoordinate(Child.Centre));
             var radius = converter.ToDpi(converter.ScaleByRatio(new Vector2(Child.Radius)));
-            context.DrawEllipse(null, roPref.GetPen(), new Point(cPos.X, cPos.Y), radius.X, radius.Y);
+            context.DrawEllipse(null, GetPen(roPref), new Point(cPos.X, cPos.Y), radius.X, radius.Y);
         }
 
         public override Vector2 NearestPoint(Vector2 point) {

@@ -5,11 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Mapping_Tools.Views"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:components="clr-namespace:Mapping_Tools.Components"
-             xmlns:generatorTypes="clr-namespace:Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes"
              xmlns:relevantObjectGenerators="clr-namespace:Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators"
              mc:Ignorable="d"
-             IsActive="{Binding ListenersEnabled, Mode=OneWayToSource}"
              d:DesignHeight="450" Width="759.5" d:DataContext="{d:DesignData SnappingToolsVm}">
     <Grid>
         <Grid.RowDefinitions>
@@ -27,7 +24,7 @@
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
-                    <Run Text="SnappingTools"/>
+                    <Run Text="Geometry Dashboard"/>
                         </TextBlock>
                         <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom">
                             <materialDesign:PopupBox.ToggleContent>
@@ -37,9 +34,9 @@
 ⚠ You must specify your user config file in the Preferences for this tool to function.</TextBlock>
                         </materialDesign:PopupBox>
                     </StackPanel>
-                    <Grid>
+
+                    <Grid Margin="0,0,0,10">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
@@ -48,15 +45,12 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock x:Name="ActivationKeyTextBlock" Text="Activation Key:" VerticalAlignment="Bottom" Margin="10,0" ToolTip="Press and hold this key to snap your cursor to the closest virtual object."/>
-                        <components:HotkeyEditorControl Width="150" HorizontalAlignment="Left" Margin="0,10,0,0" Hotkey="{Binding Preferences.SnapHotkey}"
-                                                        Grid.Row="0" Grid.Column="1"/>
-                        <Button x:Name="PreferencesButton" Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Preferences..."
-                                Grid.Row="0" Grid.Column="2" Click="PreferencesButton_Click">
+                        <Button x:Name="PreferencesButton" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}" ToolTip="Preferences..."
+                                Grid.Column="2" Click="PreferencesButton_Click">
                             <materialDesign:PackIcon Kind="SettingsOutline" Height="24" Width="24" />
                         </Button>
-                        <TextBlock x:Name="FilterTextBlock" Grid.Row="1" Grid.Column="0" Text="Filters:" VerticalAlignment="Center" Margin="10,0"/>
-                        <TextBox Grid.Row="1" Grid.Column="1" Margin="0,0,0,10" Name="TxtFilter" Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}" Grid.ColumnSpan="2"/>
+                        <TextBlock x:Name="FilterTextBlock" Grid.Column="0" Text="Filters" VerticalAlignment="Center" Margin="10,0"/>
+                        <TextBox Grid.Column="1" Margin="0,0,10,10" Name="TxtFilter" Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
                 </StackPanel>
 
@@ -67,7 +61,18 @@
                             <GridViewColumn Header="IsActive">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
-                                        <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding IsActive}" PreviewMouseDown="UIElement_OnPreviewMouseDown" Cursor="Hand"/>
+                                        <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding Settings.IsActive}" PreviewMouseDown="UIElement_OnPreviewMouseDown" Cursor="Hand"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Settings">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
+                                        <Viewbox Width="100" Height="30" Margin="-5,-5,15,-5">
+                                            <Button ToolTip="Generator settings..." Command="{Binding GeneratorSettingsCommand}" materialDesign:ButtonAssist.CornerRadius="10">
+                                                Configure
+                                            </Button>
+                                        </Viewbox>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
@@ -81,33 +86,14 @@
                             <GridViewColumn Header="IsSequential">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
-                                        <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding IsSequential}" PreviewMouseDown="UIElement_OnPreviewMouseDown" Cursor="Hand"/>
+                                        <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding Settings.IsSequential}" PreviewMouseDown="UIElement_OnPreviewMouseDown" Cursor="Hand"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Header="Mode">
+                            <GridViewColumn Header="IsDeep">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
-                                        <ListBox
-                                            Style="{StaticResource MaterialDesignToolToggleListBox}"
-                                            SelectedIndex="0">
-                                            <ListBoxItem>
-                                                <materialDesign:PackIcon
-                                                    Kind="FormatAlignLeft" />
-                                            </ListBoxItem>
-                                            <ListBoxItem>
-                                                <materialDesign:PackIcon
-                                                    Kind="FormatAlignCenter" />
-                                            </ListBoxItem>
-                                            <ListBoxItem>
-                                                <materialDesign:PackIcon
-                                                    Kind="FormatAlignRight" />
-                                            </ListBoxItem>
-                                            <ListBoxItem>
-                                                <materialDesign:PackIcon
-                                                    Kind="FormatAlignJustify" />
-                                            </ListBoxItem>
-                                        </ListBox>
+                                        <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding Settings.IsDeep}" PreviewMouseDown="UIElement_OnPreviewMouseDown" Cursor="Hand"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>

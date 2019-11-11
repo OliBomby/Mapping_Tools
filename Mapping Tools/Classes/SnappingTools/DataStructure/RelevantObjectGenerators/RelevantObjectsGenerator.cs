@@ -1,48 +1,35 @@
-﻿using System;
-using System.ComponentModel;
+﻿using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
+using System;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using Mapping_Tools.Annotations;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
+using System.Windows;
+using Mapping_Tools.Components.Domain;
+using Mapping_Tools.Views.SnappingTools;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators {
-    public abstract class RelevantObjectsGenerator : INotifyPropertyChanged
+    public abstract class RelevantObjectsGenerator
     {
-        private bool _isActive;
-        public bool IsActive
-        {
-            get => _isActive;
-            set {
-                if (value == _isActive) return;
-                _isActive = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private bool _isSequential;
-        public bool IsSequential {
-            get => _isSequential;
-            set {
-                if (value == _isSequential) return;
-                _isSequential = value;
-                OnPropertyChanged();
-            }
-        }
+        public GeneratorSettings Settings { get; }
+        
+        public CommandImplementation GeneratorSettingsCommand { get; }
 
         public abstract string Name { get; }
         public abstract string Tooltip { get; }
         public abstract GeneratorType GeneratorType { get; }
         public virtual GeneratorTemporalPositioning TemporalPositioning => GeneratorTemporalPositioning.Average;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        protected RelevantObjectsGenerator() {
+            Settings = new GeneratorSettings(this);
 
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            // Make command
+            GeneratorSettingsCommand = new CommandImplementation(
+                e => {
+                    try {
+                        var settingsWindow = new GeneratorSettingsWindow(Settings);
+                        settingsWindow.ShowDialog();
+                    } catch (Exception ex) { MessageBox.Show(ex.Message); }
+                });
         }
 
         private MethodInfo[] _generatorMethods;
@@ -65,15 +52,6 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
 
         public static Type GetReturnType(MethodInfo generatorMethodInfo) {
             return generatorMethodInfo.ReturnType;
-        }
-
-        private static bool? _needsHitObjects;
-        public static bool NeedsHitObjects(MethodInfo generatorMethodInfo) {
-            if (_needsHitObjects == null) {
-                _needsHitObjects = GetDependencies(generatorMethodInfo).Contains(typeof(RelevantHitObject));
-            }
-
-            return _needsHitObjects.Value;
         }
     }
 }

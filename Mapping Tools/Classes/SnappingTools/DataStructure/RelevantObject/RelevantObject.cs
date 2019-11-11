@@ -1,13 +1,17 @@
 ﻿using Mapping_Tools.Classes.SnappingTools.DataStructure.Layers;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
-using System;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 using System.Collections.Generic;
 using System.Linq;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
     public abstract class RelevantObject : IRelevantObject {
         public void Dispose() {
+            if (Disposed) {
+                return;
+            }
+
             Layer?.Remove(this, false);
             Disposed = true;
 
@@ -56,14 +60,25 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         }
         public bool Disposed { get; set; }
 
-        private bool _isSelected { get; set; }
-        public virtual bool IsSelected {
-            get => _isSelected; 
+        public bool DoNotDispose { get; set; }
+
+        public virtual bool IsSelected { get; set; }
+        public bool IsLocked { get; set; }
+
+        private bool _isInheritable = true;
+        public bool IsInheritable {
+            get => _isInheritable;
             set {
-                _isSelected = value;
-                if (ChildObjects == null) return;
-                foreach (var relevantObject in ChildObjects) {
-                    relevantObject.UpdateSelected();
+                if (_isInheritable == value) return;
+                _isInheritable = value;
+                if (_isInheritable) {
+                    Layer?.NextLayer?.GenerateNewObjects();
+                } else {
+                    var objectsToDispose = ChildObjects.ToArray();
+                    foreach (var t in objectsToDispose) {
+                        t.Dispose();
+                    }
+                    Layer?.NextLayer?.GenerateNewObjects();
                 }
             }
         }
@@ -148,9 +163,25 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
             }
         }
 
-        public void UpdateSelected() {
-            if (ParentObjects == null || ParentObjects.Count == 0) return;
-            IsSelected = ParentObjects.Any(o => o.IsSelected);
+        /// <summary>
+        /// Makes a copy of this relevant object which is locked and is disconnected from the object structure.
+        /// </summary>
+        /// <returns></returns>
+        public IRelevantObject GetLockedRelevantObject() {
+            var locked = (IRelevantObject)MemberwiseClone();
+
+            locked.Layer = null;
+            locked.Generator = null;
+            locked.ParentObjects.Clear();
+            locked.ChildObjects.Clear();
+
+            locked.Relevancy = 1;
+
+            locked.Disposed = false;
+            locked.IsSelected = false;
+            locked.IsLocked = true;
+
+            return locked;
         }
         
         public void Consume(IRelevantObject other) {

@@ -6,13 +6,18 @@ using System.Linq;
 using System.Windows.Input;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
 
 namespace Mapping_Tools.Classes.SnappingTools {
     public class SnappingToolsPreferences : BindableBase, ICloneable{
         #region private storage
         private Dictionary<string, RelevantObjectPreferences> relevantObjectPreferences;
+        private Dictionary<Type, GeneratorSettings> generatorSettings;
 
         private Hotkey snapHotkey;
+        private Hotkey selectHotkey;
+        private Hotkey lockHotkey;
+        private Hotkey inheritHotkey;
         private double offsetLeft;
         private double offsetTop;
         private double offsetRight;
@@ -31,10 +36,27 @@ namespace Mapping_Tools.Classes.SnappingTools {
             set => Set(ref relevantObjectPreferences, value);
         }
 
+        public Dictionary<Type, GeneratorSettings> GeneratorSettings {
+            get => generatorSettings;
+            set => Set(ref generatorSettings, value);
+        }
+
         #region global settings
         public Hotkey SnapHotkey {
             get => snapHotkey;
             set => Set(ref snapHotkey, value);
+        }
+        public Hotkey SelectHotkey {
+            get => selectHotkey;
+            set => Set(ref selectHotkey, value);
+        }
+        public Hotkey LockHotkey {
+            get => lockHotkey;
+            set => Set(ref lockHotkey, value);
+        }
+        public Hotkey InheritHotkey {
+            get => inheritHotkey;
+            set => Set(ref inheritHotkey, value);
         }
 
         public double OffsetLeft {
@@ -102,6 +124,28 @@ namespace Mapping_Tools.Classes.SnappingTools {
         public RelevantObjectPreferences GetReleventObjectPreferences(string input) {
             return RelevantObjectPreferences.TryGetValue(input, out var output) ? output : new RelevantObjectPreferences();
         }
+
+        /// <summary>
+        /// Applies the generator settings of the preferences to the specified generators
+        /// </summary>
+        /// <param name="generators">The generators to apply the settings to</param>
+        public void ApplyGeneratorSettings(IEnumerable<RelevantObjectsGenerator> generators) {
+            foreach (var generator in generators) {
+                if (GeneratorSettings.TryGetValue(generator.GetType(), out var settings)) {
+                    settings.CopyTo(generator.Settings);
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Gets the settings from the specified generators and saves it to these preferences
+        /// </summary>
+        /// <param name="generators">The generators to get the settings from</param>
+        public void SaveGeneratorSettings(IEnumerable<RelevantObjectsGenerator> generators) {
+            foreach (var generator in generators) {
+                GeneratorSettings[generator.GetType()] = generator.Settings;
+            }
+        }
         #endregion
 
         #region IClonable members
@@ -144,7 +188,12 @@ namespace Mapping_Tools.Classes.SnappingTools {
                 }
             };
 
+            generatorSettings = new Dictionary<Type, GeneratorSettings>();
+
             snapHotkey = new Hotkey(Key.M, ModifierKeys.None);
+            selectHotkey = new Hotkey(Key.N, ModifierKeys.None);
+            lockHotkey = new Hotkey(Key.N, ModifierKeys.Shift);
+            inheritHotkey = new Hotkey(Key.N, ModifierKeys.Alt);
             offsetLeft = 0;
             offsetTop = 1;
             offsetRight = 0;

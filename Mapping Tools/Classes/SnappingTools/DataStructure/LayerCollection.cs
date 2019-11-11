@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.Layers;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorCollection;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure {
@@ -12,6 +13,11 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure {
         public RelevantObjectsGeneratorCollection AllGenerators;
 
         public double AcceptableDifference { get; set; }
+
+        /// <summary>
+        /// This is the maximum number of relevant objects any layer may hold
+        /// </summary>
+        public int MaxObjects { get; } = 1000;
 
         public LayerCollection(RelevantObjectsGeneratorCollection generators, double acceptableDifference) {
             ObjectLayers = new List<RelevantObjectLayer>();

@@ -249,6 +249,7 @@
     <Compile Include="Classes\MathUtil\Box2.cs" />
     <Compile Include="Classes\MathUtil\Box2d.cs" />
     <Compile Include="Classes\MathUtil\CircleArc.cs" />
+    <Compile Include="Classes\MathUtil\LineSegment.cs" />
     <Compile Include="Classes\MathUtil\MathHelper.cs" />
     <Compile Include="Classes\MathUtil\Matrix2.cs" />
     <Compile Include="Classes\MathUtil\Matrix2d.cs" />
@@ -289,6 +290,8 @@
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorCollection\RelevantObjectsGeneratorCollection.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Allocation\RelevantObjectsGeneratorMethodAttribute.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Allocation\RelevantObjectPairGenerator.cs" />
+    <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SameTransformGenerator2.cs" />
+    <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorSettings.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SameTransformGenerator.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SquareGenerator.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SquareGenerator2.cs" />
@@ -357,6 +360,11 @@
     <Compile Include="Components\Domain\ImportTypeToStringConverter.cs" />
     <Compile Include="Components\Domain\ParsableDoubleListValidationRule.cs" />
     <Compile Include="Components\Domain\DoubleToStringConverter.cs" />
+    <Compile Include="Components\Graph\GraphMarker.cs" />
+    <Compile Include="Components\Graph\TensionAnchor.xaml.cs">
+      <DependentUpon>TensionAnchor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Components\Graph\GraphPointControl.cs" />
     <Compile Include="Components\ViewHeaderComponent.xaml.cs">
       <DependentUpon>ViewHeaderComponent.xaml</DependentUpon>
     </Compile>
@@ -374,6 +382,12 @@
     </Compile>
     <Compile Include="Components\ObjectVisualiser\SliderAnchorLine.xaml.cs">
       <DependentUpon>SliderAnchorLine.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Components\Graph\Anchor.xaml.cs">
+      <DependentUpon>Anchor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Components\Graph\Graph.xaml.cs">
+      <DependentUpon>Graph.xaml</DependentUpon>
     </Compile>
     <Compile Include="Components\TimeLine\TimeLine.xaml.cs">
       <DependentUpon>TimeLine.xaml</DependentUpon>
@@ -408,6 +422,9 @@
     <Compile Include="Views\HitsoundStudio\HitsoundStudioExportControl.Designer.cs">
       <DependentUpon>HitsoundStudioExportControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="Views\Sliderator\SlideratorView.xaml.cs">
+      <DependentUpon>SlideratorView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SingleRunMappingTool.cs" />
     <Compile Include="Views\MappingTool.cs" />
     <Compile Include="Views\RhythmGuide\RhythmGuideView.xaml.cs">
@@ -417,6 +434,9 @@
       <DependentUpon>RhythmGuideWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SnappingTools\SnappingToolsOverlay.cs" />
+    <Compile Include="Views\SnappingTools\GeneratorSettingsWindow.xaml.cs">
+      <DependentUpon>GeneratorSettingsWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SnappingTools\SnappingToolsPreferencesWindow.xaml.cs">
       <DependentUpon>SnappingToolsPreferencesWindow.xaml</DependentUpon>
     </Compile>
@@ -466,6 +486,10 @@
     <Compile Include="Views\HitsoundStudio\HitsoundLayerImportWindow.xaml.cs">
       <DependentUpon>HitsoundLayerImportWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="Components\Graph\TensionAnchor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Components\ViewHeaderComponent.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -522,6 +546,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\Sliderator\SlideratorView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\RhythmGuide\RhythmGuideView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -529,6 +557,10 @@
     <Page Include="Views\RhythmGuide\RhythmGuideWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SnappingTools\GeneratorSettingsWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\SnappingTools\SnappingToolsPreferencesWindow.xaml">
       <SubType>Designer</SubType>

@@ -2,6 +2,7 @@
 using System.Linq;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 
@@ -10,6 +11,10 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         public override string Name => "Intersection Point Calculator";
         public override string Tooltip => "Takes a pair of virtual lines or circles and generates a virtual point on each of their intersections.";
         public override GeneratorType GeneratorType => GeneratorType.Geometries;
+
+        public IntersectionGenerator() {
+            Settings.IsDeep = true;
+        }
 
         [RelevantObjectsGeneratorMethod]
         public RelevantPoint GetLineLineIntersection(RelevantLine line1, RelevantLine line2) {

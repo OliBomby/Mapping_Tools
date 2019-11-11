@@ -2,7 +2,6 @@
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SnappingTools;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Views.SnappingTools;
@@ -21,11 +20,12 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using Mapping_Tools.Classes.SnappingTools.DataStructure;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorCollection;
 
 namespace Mapping_Tools.Viewmodels {
-    public class SnappingToolsVm
+    public class SnappingToolsVm : IDisposable
     {
         public SnappingToolsPreferences Preferences { get; }
 
@@ -33,38 +33,24 @@ namespace Mapping_Tools.Viewmodels {
         protected readonly LayerCollection LayerCollection;
 
         private IRelevantObject _lastSnappedRelevantObject;
+        private readonly List<IRelevantDrawable> _lastSelectedRelevantDrawables;
+        private readonly List<IRelevantDrawable> _lastLockedRelevantDrawables;
+        private readonly List<IRelevantDrawable> _lastInheritRelevantDrawables;
+        private bool _selectedToggle;
+        private bool _lockedToggle;
+        private bool _inheritableToggle;
+
         private int _editorTime;
         private bool _osuActivated;
 
         private string _filter = "";
         public string Filter { get => _filter; set => SetFilter(value); }
 
-        private bool _listenersEnabled;
-        public bool ListenersEnabled {
-            get => _listenersEnabled;
-            set {
-                _listenersEnabled = value;
-
-                _updateTimer.IsEnabled = value;
-
-                try {
-                    _configWatcher.EnableRaisingEvents = value;
-                } catch {
-                    MessageBox.Show("Can't enable filesystem watcher. osu! config path is probably incorrect.", "Warning");
-                }
-
-                if (!value) {
-                    _state = State.Disabled;
-                    _overlay.Dispose();
-                }
-                else {
-                    _state = State.LookingForProcess;
-                }
-            }
-        }
-
         private readonly DispatcherTimer _updateTimer;
         private readonly DispatcherTimer _autoSnapTimer;
+        private readonly DispatcherTimer _selectTimer;
+        private readonly DispatcherTimer _lockTimer;
+        private readonly DispatcherTimer _inheritTimer;
 
         private const double PointsBias = 3;
 
@@ -107,7 +93,7 @@ namespace Mapping_Tools.Viewmodels {
               .Select(Activator.CreateInstance).OfType<RelevantObjectsGenerator>());
 
             // Add PropertyChanged event to all generators to listen for changes
-            foreach (var gen in Generators) { gen.PropertyChanged += OnGeneratorPropertyChanged; }
+            foreach (var gen in Generators) { gen.Settings.PropertyChanged += OnGeneratorSettingsPropertyChanged; }
 
             // Set up groups and filters
             var view = (CollectionView) CollectionViewSource.GetDefaultView(Generators);
@@ -124,6 +110,17 @@ namespace Mapping_Tools.Viewmodels {
             _updateTimer.Tick += UpdateTimerTick;
             _autoSnapTimer = new DispatcherTimer(DispatcherPriority.Send) { Interval = TimeSpan.FromMilliseconds(16) };
             _autoSnapTimer.Tick += AutoSnapTimerTick;
+            _selectTimer = new DispatcherTimer(DispatcherPriority.Send) { Interval = TimeSpan.FromMilliseconds(16) };
+            _selectTimer.Tick += SelectTimerTick;
+            _lockTimer = new DispatcherTimer(DispatcherPriority.Send) { Interval = TimeSpan.FromMilliseconds(16) };
+            _lockTimer.Tick += LockTimerTick;
+            _inheritTimer = new DispatcherTimer(DispatcherPriority.Send) { Interval = TimeSpan.FromMilliseconds(16) };
+            _inheritTimer.Tick += InheritTimerTick;
+
+            // Setup some lists for the hotkey controls
+            _lastSelectedRelevantDrawables = new List<IRelevantDrawable>();
+            _lastLockedRelevantDrawables = new List<IRelevantDrawable>();
+            _lastInheritRelevantDrawables = new List<IRelevantDrawable>();
 
             // Listen for changes in the osu! user config
             _configWatcher = new FileSystemWatcher();
@@ -161,10 +158,23 @@ namespace Mapping_Tools.Viewmodels {
                     LayerCollection.SetInceptionLevel(Preferences.InceptionLevel);
                     _overlay.OverlayWindow.InvalidateVisual();
                     break;
+                case "GeneratorSettings":
+                    Preferences.ApplyGeneratorSettings(Generators);
+                    break;
             }
         }
 
+        public SnappingToolsPreferences GetPreferences() {
+            Preferences.SaveGeneratorSettings(Generators);
+            return Preferences;
+        }
+
+        public void SetPreferences(SnappingToolsPreferences preferences) {
+            preferences?.CopyTo(Preferences);
+        }
+
         private void OnDraw(object sender, DrawingContext context) {
+            //Console.WriteLine($@"Drawable count: {LayerCollection.GetAllRelevantDrawables().Count()}");
             if (IsHotkeyDown(Preferences.SnapHotkey)) {
                 // Handle key down rendering
                 if (Preferences.KeyDownViewMode.HasFlag(ViewMode.Everything)) {
@@ -220,19 +230,22 @@ namespace Mapping_Tools.Viewmodels {
             _coordinateConverter.ReadConfig();
         }
 
-        private void OnGeneratorPropertyChanged(object sender, PropertyChangedEventArgs e) {
+        private void OnGeneratorSettingsPropertyChanged(object sender, PropertyChangedEventArgs e) {
+            var settings = (GeneratorSettings) sender;
+            var generator = settings.Generator;
+
             switch (e.PropertyName) {
                 case "IsActive":
                     if (_state == State.Active) {
                         // Reload relevant objects when a generator gets enabled/disabled
-                        if (((RelevantObjectsGenerator)sender).IsActive) {
+                        if (settings.IsActive) {
                             // Generate new objects for all layers
                             LayerCollection.GetRootLayer().GenerateNewObjects(true);
                         } else {
                             // Delete all relevant objects generated by this generator
                             foreach (var objectLayerObject in LayerCollection.ObjectLayers.SelectMany(objectLayer => objectLayer.Objects.Values)) {
                                 for (var i = 0; i < objectLayerObject.Count; i++) {
-                                    if (objectLayerObject[i].Generator != sender) continue;
+                                    if (objectLayerObject[i].Generator != generator) continue;
                                     objectLayerObject[i].Dispose();
                                     i--;
                                 }
@@ -249,7 +262,26 @@ namespace Mapping_Tools.Viewmodels {
                         // Delete all relevant objects generated by this generator
                         foreach (var objectLayerObject in LayerCollection.ObjectLayers.SelectMany(objectLayer => objectLayer.Objects.Values)) {
                             for (var i = 0; i < objectLayerObject.Count; i++) {
-                                if (objectLayerObject[i].Generator != sender) continue;
+                                if (objectLayerObject[i].Generator != generator) continue;
+                                objectLayerObject[i].Dispose();
+                                i--;
+                            }
+                        }
+
+                        // Generate new objects for all layers
+                        LayerCollection.GetRootLayer().GenerateNewObjects(true);
+
+                        // Redraw the overlay
+                        _overlay.OverlayWindow.InvalidateVisual();
+                    }
+
+                    break;
+                case "IsDeep":
+                    if (_state == State.Active) {
+                        // Delete all relevant objects generated by this generator
+                        foreach (var objectLayerObject in LayerCollection.ObjectLayers.SelectMany(objectLayer => objectLayer.Objects.Values)) {
+                            for (var i = 0; i < objectLayerObject.Count; i++) {
+                                if (objectLayerObject[i].Generator != generator) continue;
                                 objectLayerObject[i].Dispose();
                                 i--;
                             }
@@ -284,7 +316,7 @@ namespace Mapping_Tools.Viewmodels {
                     try {
                         reader.SetProcess();
                     }
-                    catch (Win32Exception) {
+                    catch {
                         return;
                     }
 
@@ -394,6 +426,15 @@ namespace Mapping_Tools.Viewmodels {
                         
                         _autoSnapTimer.Start();
                     }
+                    if (!_selectTimer.IsEnabled && IsHotkeyDown(Preferences.SelectHotkey)) {
+                        _selectTimer.Start();
+                    }
+                    if (!_lockTimer.IsEnabled && IsHotkeyDown(Preferences.LockHotkey)) {
+                        _lockTimer.Start();
+                    }
+                    if (!_inheritTimer.IsEnabled && IsHotkeyDown(Preferences.InheritHotkey)) {
+                        _inheritTimer.Start();
+                    }
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -426,7 +467,7 @@ namespace Mapping_Tools.Viewmodels {
         {
             var hitObjects = GetHitObjects();
             
-            var comparer = new HitObjectComparer();
+            var comparer = new HitObjectComparer(true);
             var rootLayer = LayerCollection.GetRootLayer();
             var existingHitObjects = LayerCollection.GetRootRelevantHitObjects();
             var added = hitObjects.Where(o => !existingHitObjects.Select(x => x.HitObject).Contains(o, comparer)).ToArray();
@@ -441,7 +482,7 @@ namespace Mapping_Tools.Viewmodels {
 
             if (added.Length == 0 && removed.Length == 0)
             {
-                // Root bjects didn't change. Return to avoid redundant updates
+                // Root objects didn't change. Return to avoid redundant updates
                 return;
             }
 
@@ -449,24 +490,132 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         private void AutoSnapTimerTick(object sender, EventArgs e) {
+            // Check timer stop
             if (!IsHotkeyDown(Preferences.SnapHotkey)) {
                 if (HotkeyUpRedrawsOverlay)
                     _overlay?.OverlayWindow.InvalidateVisual();
                 _autoSnapTimer.Stop();
                 return;
             }
+            
+            // Get nearest drawable
+            var cursorPos = GetCursorPosition();
+            var nearest = GetNearestDrawable(cursorPos);
 
-            // Move the cursor's Position
-            // System.Windows.Forms.Cursor.Position = new Point();
-            var cursorPoint = System.Windows.Forms.Cursor.Position;
-            // CONVERT THIS CURSOR POSITION TO EDITOR POSITION
-            var cursorPos = _coordinateConverter.ScreenToEditorCoordinate(new Vector2(cursorPoint.X, cursorPoint.Y));
+            // Update overlay if the last snapped changed and parentview is on
+            if (nearest != _lastSnappedRelevantObject && SnapChangeRedrawsOverlay) {
+                // Set the last snapped relevant object
+                _lastSnappedRelevantObject = nearest;
+                // Update overlay
+                _overlay.OverlayWindow.InvalidateVisual();
+            }
 
+            // CONVERT THIS TO CURSOR POSITION
+            if (nearest == null) return;
+
+            var nearestPoint = _coordinateConverter.EditorToScreenCoordinate(nearest.NearestPoint(cursorPos));
+            System.Windows.Forms.Cursor.Position = new System.Drawing.Point((int) Math.Round(nearestPoint.X), (int) Math.Round(nearestPoint.Y));
+        }
+
+        private void SelectTimerTick(object sender, EventArgs e) {
+            // Check timer stop
+            if (!IsHotkeyDown(Preferences.SelectHotkey)) {
+                _selectTimer.Stop();
+                _lastSelectedRelevantDrawables.Clear();
+                return;
+            }
+
+            // Get nearest drawable
+            var cursorPos = GetCursorPosition();
+            var nearest = GetNearestDrawable(cursorPos);
+
+            if (nearest == null) return;
+
+            // Check if this drawable was already handled with this keypress
+            if (_lastSelectedRelevantDrawables.Contains(nearest)) return;
+
+            // Get the selecting mode
+            if (_lastSelectedRelevantDrawables.Count == 0) {
+                _selectedToggle = !nearest.IsSelected;
+            }
+
+            // Set the selected variable of the nearest drawable
+            nearest.IsSelected = _selectedToggle;
+
+            // Add nearest drawable to the list so it doesnt get toggled later
+            _lastSelectedRelevantDrawables.Add(nearest);
+
+            // Redraw overlay
+            _overlay.OverlayWindow.InvalidateVisual();
+        }
+
+        private void LockTimerTick(object sender, EventArgs e) {
+            // Check timer stop
+            if (!IsHotkeyDown(Preferences.LockHotkey)) {
+                _lockTimer.Stop();
+                _lastLockedRelevantDrawables.Clear();
+                return;
+            }
+
+            // Get nearest drawable
+            var cursorPos = GetCursorPosition();
+            var nearest = GetNearestDrawable(cursorPos);
+
+            if (nearest == null) return;
+
+            // Check if this drawable was already handled with this keypress
+            if (_lastLockedRelevantDrawables.Contains(nearest)) return;
+
+            // Get the locking mode
+            if (_lastLockedRelevantDrawables.Count == 0) {
+                _lockedToggle = !nearest.IsLocked;
+            }
+
+            // Set the locked variable of the nearest drawable
+            nearest.IsLocked = _lockedToggle;
+
+            // Add nearest drawable to the list so it doesnt get toggled later
+            _lastLockedRelevantDrawables.Add(nearest);
+
+            // Redraw overlay
+            _overlay.OverlayWindow.InvalidateVisual();
+        }
+
+        private void InheritTimerTick(object sender, EventArgs e) {
+            // Check timer stop
+            if (!IsHotkeyDown(Preferences.InheritHotkey)) {
+                _inheritTimer.Stop();
+                _lastInheritRelevantDrawables.Clear();
+                return;
+            }
+
+            // Get nearest drawable
+            var cursorPos = GetCursorPosition();
+            var nearest = GetNearestDrawable(cursorPos);
+
+            if (nearest == null) return;
+
+            // Check if this drawable was already handled with this keypress
+            if (_lastInheritRelevantDrawables.Contains(nearest)) return;
+
+            // Get the inherit mode
+            if (_lastInheritRelevantDrawables.Count == 0) {
+                _inheritableToggle = !nearest.IsInheritable;
+            }
+
+            // Set the inheritable variable of the nearest drawable
+            nearest.IsInheritable = _inheritableToggle;
+
+            // Add nearest drawable to the list so it doesnt get toggled later
+            _lastInheritRelevantDrawables.Add(nearest);
+
+            // Redraw overlay
+            _overlay.OverlayWindow.InvalidateVisual();
+        }
+
+        private IRelevantDrawable GetNearestDrawable(Vector2 cursorPos) {
             // Get all the relevant drawables
             var drawables = LayerCollection.GetAllRelevantDrawables().ToArray();
-
-            if (drawables.Length == 0)
-                return;
 
             // Get the relevant object nearest to the cursor
             IRelevantDrawable nearest = null;
@@ -481,18 +630,16 @@ namespace Mapping_Tools.Viewmodels {
                 nearest = o;
             }
 
-            // Update overlay if the last snapped changed and parentview is on
-            if (nearest != _lastSnappedRelevantObject && SnapChangeRedrawsOverlay) {
-                // Set the last snapped relevant object
-                _lastSnappedRelevantObject = nearest;
-                // Update overlay
-                _overlay.OverlayWindow.InvalidateVisual();
-            }
+            return nearest;
+        }
 
-            // CONVERT THIS TO CURSOR POSITION
-            if (nearest == null) return;
-            var nearestPoint = _coordinateConverter.EditorToScreenCoordinate(nearest.NearestPoint(cursorPos));
-            System.Windows.Forms.Cursor.Position = new System.Drawing.Point((int) Math.Round(nearestPoint.X), (int) Math.Round(nearestPoint.Y));
+        private Vector2 GetCursorPosition() {
+            // System.Windows.Forms.Cursor.Position = new Point();
+            var cursorPoint = System.Windows.Forms.Cursor.Position;
+            // CONVERT THIS CURSOR POSITION TO EDITOR POSITION
+            var cursorPos = _coordinateConverter.ScreenToEditorCoordinate(new Vector2(cursorPoint.X, cursorPoint.Y));
+
+            return cursorPos;
         }
 
         private static bool IsHotkeyDown(Hotkey hotkey) {
@@ -518,6 +665,38 @@ namespace Mapping_Tools.Viewmodels {
         private void SetFilter(string value) {
             _filter = value;
             CollectionViewSource.GetDefaultView(Generators).Refresh();
+        }
+
+        public void Dispose() {
+            _overlay?.Dispose();
+            _configWatcher?.Dispose();
+            _processSharp?.Dispose();
+            _osuWindow?.Dispose();
+        }
+
+        public void Activate() {
+            _updateTimer.IsEnabled = true;
+
+            try {
+                _configWatcher.EnableRaisingEvents = true;
+            } catch {
+                MessageBox.Show("Can't enable filesystem watcher. osu! config path is probably incorrect.", "Warning");
+            }
+
+            _state = State.LookingForProcess;
+        }
+
+        public void Deactivate() {
+            _updateTimer.IsEnabled = false;
+
+            try {
+                _configWatcher.EnableRaisingEvents = false;
+            } catch {
+                MessageBox.Show("Can't disable filesystem watcher. osu! config path is probably incorrect.", "Warning");
+            }
+
+            _state = State.Disabled;
+            _overlay?.Dispose();
         }
     }
 }
