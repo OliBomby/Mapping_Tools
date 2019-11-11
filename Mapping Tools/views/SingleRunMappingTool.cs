@@ -41,7 +41,7 @@ namespace Mapping_Tools.Views {
         protected virtual void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
             if (e.Error != null) {
                 MessageBox.Show($"{e.Error.Message}{Environment.NewLine}{e.Error.StackTrace}", "Error");
-            } else if (!String.IsNullOrEmpty(e.Result.ToString())) {
+            } else if (!string.IsNullOrEmpty((string)e.Result)) {
                 MessageBox.Show(e.Result.ToString());
             }
 

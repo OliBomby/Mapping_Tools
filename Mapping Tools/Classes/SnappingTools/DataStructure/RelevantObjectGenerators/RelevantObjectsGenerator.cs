@@ -22,12 +22,12 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
             }
         }
 
-        private bool _isConcurrent;
-        public bool IsConcurrent {
-            get => _isConcurrent;
+        private bool _isSequential;
+        public bool IsSequential {
+            get => _isSequential;
             set {
-                if (value == _isConcurrent) return;
-                _isConcurrent = value;
+                if (value == _isSequential) return;
+                _isSequential = value;
                 OnPropertyChanged();
             }
         }
@@ -35,6 +35,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         public abstract string Name { get; }
         public abstract string Tooltip { get; }
         public abstract GeneratorType GeneratorType { get; }
+        public virtual GeneratorTemporalPositioning TemporalPositioning => GeneratorTemporalPositioning.Average;
 
         public event PropertyChangedEventHandler PropertyChanged;
 

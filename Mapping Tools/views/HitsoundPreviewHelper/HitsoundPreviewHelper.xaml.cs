@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Windows;
-using Mapping_Tools.Classes.BeatmapHelper;
+﻿using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Viewmodels;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Windows;
 
 namespace Mapping_Tools.Views
 {
@@ -21,18 +21,11 @@ namespace Mapping_Tools.Views
     {
         public event EventHandler RunFinished;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "hspreviewproject.json");
 
-        /// <summary>
-        /// 
-        /// </summary>
         public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Hitsound Preview Projects");
 
         public static readonly string ToolName = "Hitsound Preview Helper";
-
         public static readonly string ToolDescription =
             $@"Hitsound Preview Helper helps by placing hitsounds on all the objects of the current map based on the positions of the objects. " +
             $@"That way you can hear the hitsounds play while you hitsound without having to assign them manually and later import them to Hitsound Studio." +

@@ -7,9 +7,27 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
     public class RelevantHitObject : RelevantObject {
         public HitObject HitObject;
 
+        public override double Time {
+            get => HitObject.Time;
+            set {
+                HitObject.Time = value;
+                if (ChildObjects == null) return;
+                foreach (var relevantObject in ChildObjects) {
+                    relevantObject.UpdateTime();
+                }
+                Layer?.SortTimes();
+            }
+        }
+
         public override bool IsSelected {
             get => HitObject.IsSelected;
-            set => HitObject.IsSelected = value;
+            set {
+                HitObject.IsSelected = value;
+                if (ChildObjects == null) return;
+                foreach (var relevantObject in ChildObjects) {
+                    relevantObject.UpdateSelected();
+                }
+            }
         }
 
         public RelevantHitObject(HitObject hitObject) {

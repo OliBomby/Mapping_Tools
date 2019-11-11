@@ -3,6 +3,7 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
     public abstract class RelevantObject : IRelevantObject {
@@ -10,19 +11,27 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
             Layer?.Remove(this, false);
             Disposed = true;
 
+            // Remove this from parents
+            if (ParentObjects != null) {
+                foreach (var relevantObject in ParentObjects) {
+                    relevantObject.ChildObjects.Remove(this);
+                }
+            }
+
             // Return if there are no children
             if (ChildObjects == null) {
                 return;
             }
 
             // Kill all children
-            foreach (var relevantObjectChildObject in ChildObjects) {
-                relevantObjectChildObject.Dispose();
+            var objectsToDispose = ChildObjects.ToArray();
+            foreach (var t in objectsToDispose) {
+                t.Dispose();
             }
         }
 
         private double _time;
-        public double Time {
+        public virtual double Time {
             get => _time;
             set {
                 _time = value;
@@ -79,6 +88,40 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
             ChildObjects = new HashSet<IRelevantObject>();
         }
 
+        /// <summary>
+        /// Returns a set with all the parents of this object and all the parents' parents and this object itself
+        /// </summary>
+        public HashSet<IRelevantObject> GetParentage() {
+            var parentageSet = new HashSet<IRelevantObject> {this};
+
+            if (ParentObjects == null || ParentObjects.Count == 0) {
+                return parentageSet;
+            }
+
+            foreach (var relevantObject in ParentObjects) {
+                parentageSet.UnionWith(relevantObject.GetParentage());
+            }
+
+            return parentageSet;
+        }
+
+        /// <summary>
+        /// Returns a set with all the children of this object and all the children' children and this object itself
+        /// </summary>
+        public HashSet<IRelevantObject> GetDescendants() {
+            var childrenSet = new HashSet<IRelevantObject> {this};
+
+            if (ChildObjects == null || ChildObjects.Count == 0) {
+                return childrenSet;
+            }
+
+            foreach (var relevantObject in ChildObjects) {
+                childrenSet.UnionWith(relevantObject.GetDescendants());
+            }
+
+            return childrenSet;
+        }
+
         public void UpdateRelevancy() {
             if (ParentObjects == null || ParentObjects.Count == 0) return;
             Relevancy = ParentObjects.Max(o => o.Relevancy);
@@ -86,7 +129,23 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
 
         public void UpdateTime() {
             if (ParentObjects == null || ParentObjects.Count == 0) return;
-            Time = ParentObjects.Sum(o => o.Time) / ParentObjects.Count;
+
+            var temporalPositioning = Generator?.TemporalPositioning ?? GeneratorTemporalPositioning.Average;
+
+            switch (temporalPositioning) {
+                case GeneratorTemporalPositioning.Average:
+                    Time = ParentObjects.Sum(o => o.Time) / ParentObjects.Count;
+                    break;
+                case GeneratorTemporalPositioning.After:
+                    Time = 2 * ParentObjects.Max(o => o.Time) - ParentObjects.Sum(o => o.Time) / ParentObjects.Count;
+                    break;
+                case GeneratorTemporalPositioning.Before:
+                    Time = 2 * ParentObjects.Min(o => o.Time) - ParentObjects.Sum(o => o.Time) / ParentObjects.Count;
+                    break;
+                default:
+                    Time = ParentObjects.Sum(o => o.Time) / ParentObjects.Count;
+                    break;
+            }
         }
 
         public void UpdateSelected() {
@@ -96,6 +155,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         
         public void Consume(IRelevantObject other) {
             ParentObjects.UnionWith(other.ParentObjects);
+            ChildObjects.UnionWith(other.ChildObjects);
         }
 
         public abstract double DistanceTo(IRelevantObject relevantObject);

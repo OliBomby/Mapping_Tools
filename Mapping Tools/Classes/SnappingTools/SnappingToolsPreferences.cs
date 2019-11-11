@@ -10,21 +10,25 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
 namespace Mapping_Tools.Classes.SnappingTools {
     public class SnappingToolsPreferences : BindableBase, ICloneable{
         #region private storage
-        private List<RelevantObjectPreferences> releventObjectPreferences;
+        private Dictionary<string, RelevantObjectPreferences> relevantObjectPreferences;
 
         private Hotkey snapHotkey;
         private double offsetLeft;
         private double offsetTop;
         private double offsetRight;
         private double offsetBottom;
+        private double acceptableDifference;
         private bool debugEnabled;
         private ViewMode keyDownViewMode;
         private ViewMode keyUpViewMode;
+        private SelectedHitObjectMode selectedHitObjectMode;
+        private UpdateMode updateMode;
+        private int inceptionLevel;
         #endregion
 
-        public List<RelevantObjectPreferences> RelevantObjectPreferences {
-            get => releventObjectPreferences;
-            set => Set(ref releventObjectPreferences, value);
+        public Dictionary<string, RelevantObjectPreferences> RelevantObjectPreferences {
+            get => relevantObjectPreferences;
+            set => Set(ref relevantObjectPreferences, value);
         }
 
         #region global settings
@@ -55,6 +59,11 @@ namespace Mapping_Tools.Classes.SnappingTools {
 
         public Box2 OverlayOffset => new Box2(OffsetLeft, OffsetTop, OffsetRight, OffsetBottom);
 
+        public double AcceptableDifference {
+            get => acceptableDifference;
+            set => Set(ref acceptableDifference, value);
+        }
+
         public bool DebugEnabled {
             get => debugEnabled;
             set => Set(ref debugEnabled, value);
@@ -69,17 +78,29 @@ namespace Mapping_Tools.Classes.SnappingTools {
             get => keyUpViewMode;
             set => Set(ref keyUpViewMode, value);
         }
+
+        public SelectedHitObjectMode SelectedHitObjectMode {
+            get => selectedHitObjectMode;
+            set => Set(ref selectedHitObjectMode, value);
+        }
+
+        public UpdateMode UpdateMode {
+            get => updateMode;
+            set => Set(ref updateMode, value);
+        }
+
+        public int InceptionLevel {
+            get => inceptionLevel;
+            set => Set(ref inceptionLevel, value);
+        }
         #endregion
 
         #region helper methods
         /// <summary>
-        /// Finds and returns an existing instance of <see cref="RelevantObjectPreferences"/> based on <see cref="RelevantObjectPreferences.Name"/> property.
+        /// Gets the instance of <see cref="RelevantObjectPreferences"/> out of the dictionary based on the <see cref="RelevantObjectPreferences.Name"/> property.
         /// </summary>
-        /// <param name="input"><see cref="RelevantObjectPreferences.Name"/> property of the desired instance of <see cref="RelevantObjectPreferences.Name"/>.</param>
-        /// <exception cref="ArgumentOutOfRangeException"/>
         public RelevantObjectPreferences GetReleventObjectPreferences(string input) {
-            List<RelevantObjectPreferences> output = releventObjectPreferences.Where(o => o.Name == input).ToList();
-            return output[0] ?? throw new ArgumentOutOfRangeException();
+            return RelevantObjectPreferences.TryGetValue(input, out var output) ? output : new RelevantObjectPreferences();
         }
         #endregion
 
@@ -91,41 +112,49 @@ namespace Mapping_Tools.Classes.SnappingTools {
 
         #region default constructor
         public SnappingToolsPreferences() {
-            releventObjectPreferences = new List<RelevantObjectPreferences> {
-                new RelevantObjectPreferences {
-                    Name = "Virtual point preferences",
-                    Color = Colors.Cyan,
-                    Dashstyle = DashStylesEnum.Solid,
-                    Opacity = 0.8,
-                    Size = 5,
-                    Thickness = 3,
-                    HasSizeOption = true,
-                },
-                new RelevantObjectPreferences {
-                    Name = "Virtual line preferences",
-                    Color = Colors.LawnGreen,
-                    Dashstyle = DashStylesEnum.Dash,
-                    Opacity = 0.8,
-                    Thickness = 3,
-                    HasSizeOption = false,
-                },
-                new RelevantObjectPreferences {
-                    Name = "Virtual circle preferences",
-                    Color = Colors.Red,
-                    Dashstyle = DashStylesEnum.Dash,
-                    Opacity = 0.8,
-                    Thickness = 3,
-                    HasSizeOption = false,
+            relevantObjectPreferences = new Dictionary<string, RelevantObjectPreferences> {
+                {
+                    "Virtual point preferences", new RelevantObjectPreferences {
+                        Name = "Virtual point preferences",
+                        Color = Colors.Cyan,
+                        Dashstyle = DashStylesEnum.Solid,
+                        Opacity = 0.8,
+                        Size = 5,
+                        Thickness = 3,
+                        HasSizeOption = true,
+                    }
+                }, {
+                    "Virtual line preferences", new RelevantObjectPreferences {
+                        Name = "Virtual line preferences",
+                        Color = Colors.LawnGreen,
+                        Dashstyle = DashStylesEnum.Dash,
+                        Opacity = 0.8,
+                        Thickness = 3,
+                        HasSizeOption = false,
+                    }
+                }, {
+                    "Virtual circle preferences", new RelevantObjectPreferences {
+                        Name = "Virtual circle preferences",
+                        Color = Colors.Red,
+                        Dashstyle = DashStylesEnum.Dash,
+                        Opacity = 0.8,
+                        Thickness = 3,
+                        HasSizeOption = false,
+                    }
                 }
             };
+
             snapHotkey = new Hotkey(Key.M, ModifierKeys.None);
             offsetLeft = 0;
             offsetTop = 1;
             offsetRight = 0;
             offsetBottom = 1;
+            acceptableDifference = 2;
             debugEnabled = false;
             keyDownViewMode = ViewMode.Everything;
             keyUpViewMode = ViewMode.Everything;
+            selectedHitObjectMode = SelectedHitObjectMode.VisibleOrSelected;
+            inceptionLevel = 4;
         }
         #endregion
 
@@ -137,9 +166,26 @@ namespace Mapping_Tools.Classes.SnappingTools {
         }
     }
 
+    [Flags]
     public enum ViewMode {
-        Everything,
-        ParentsOnly,
-        Nothing
+        Nothing = 0,
+        Children = 1,
+        Parents = 1 << 1,
+        Everything = 1 << 2,
+
+        ChildrenAndParents = Children | Parents,
+    }
+
+    public enum SelectedHitObjectMode {
+        AllwaysAllVisible,
+        VisibleOrSelected,
+        OnlySelected
+    }
+
+    public enum UpdateMode {
+        AnyChange,
+        TimeChange,
+        HotkeyDown,
+        OsuActivated
     }
 }

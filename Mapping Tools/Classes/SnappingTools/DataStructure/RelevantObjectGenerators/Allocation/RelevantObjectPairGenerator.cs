@@ -1,14 +1,66 @@
-﻿using System;
+﻿using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Documents;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.Layers;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectCollection;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation {
     public class RelevantObjectPairGenerator {
         public static IEnumerable<object[]> GetParametersList(Type[] dependencies,
+            RelevantObjectCollection.RelevantObjectCollection collection, bool sequential) {
+            return sequential ? GeneratePairsSequential(dependencies, collection) : GeneratePairsDense(dependencies, collection);
+        }
+
+        public static IEnumerable<IRelevantObject[]> GeneratePairsSequential(Type[] dependencies,
+            RelevantObjectCollection.RelevantObjectCollection collection) {
+            // Handle special case
+            if (collection == null || dependencies.Length == 0) {
+                return new[] {new IRelevantObject[0] };
+            }
+
+            var sortedObjects = collection.GetSortedSubset(new HashSet<Type>(dependencies));
+
+            var combinations = new List<IRelevantObject[]>();
+
+            var i = 0;
+            var firstIndex = 0;
+            var indicesFound = new List<int>();
+            var combination = new IRelevantObject[dependencies.Length];
+            while (i < sortedObjects.Count) {
+                var obj = sortedObjects[i];
+                var type = obj.GetType();
+
+                var indexOfType = -1;
+                for (var j = 0; j < dependencies.Length; j++) {
+                    if (indicesFound.Contains(j) || type != dependencies[j]) continue;
+                    indexOfType = j;
+                    indicesFound.Add(j);
+                    break;
+                }
+
+                if (indexOfType != -1) {
+                    if (indicesFound.Count == 1) {
+                        firstIndex = i;
+                        combination = new IRelevantObject[dependencies.Length];
+                    }
+
+                    combination[indexOfType] = obj;
+
+                    if (indicesFound.Count == dependencies.Length) {
+                        combinations.Add(combination);
+
+                        indicesFound.Clear();
+                        i = firstIndex;
+                    }
+                }
+
+                i++;
+            }
+
+            return combinations;
+        }
+
+        public static IEnumerable<IRelevantObject[]> GeneratePairsDense(Type[] dependencies,
             RelevantObjectCollection.RelevantObjectCollection collection) {
             /*Console.WriteLine("Dependencies:");
             foreach (var dependency in dependencies) {
@@ -17,7 +69,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
 
             // Handle special case
             if (collection == null || dependencies.Length == 0) {
-                return new[] {new object[0] };
+                return new[] {new IRelevantObject[0] };
             }
 
             // Count how many of every type are in the neededCombinations
@@ -38,10 +90,10 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
             foreach (var neededCombination in neededCombinations) {
                 if (collection.TryGetValue(neededCombination.Key, out var list)) {
                     if (list.Count < neededCombination.Value) {
-                        return new object[0][];
+                        return new IRelevantObject[0][];
                     }
                 } else {
-                    return new object[0][];
+                    return new IRelevantObject[0][];
                 }
             }
             //Console.WriteLine("Check succeeded");

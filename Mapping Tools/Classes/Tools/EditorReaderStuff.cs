@@ -19,13 +19,14 @@ namespace Mapping_Tools.Classes.Tools {
         private static readonly EditorReader editorReader = new EditorReader();
        public static readonly string EditorReaderIsDisabledText = "You need to enable Editor Reader to use this feature.";
 
+        
         /// <summary>
         /// 
         /// </summary>
         public static string Md5ComparisionString = "";
 
         /// <summary>
-        /// Constructor
+        /// Don't use this unless you know what you're doing.
         /// </summary>
         /// <returns></returns>
         public static EditorReader GetEditorReader() {
@@ -43,11 +44,77 @@ namespace Mapping_Tools.Classes.Tools {
 
             try {
                 editorReader.FetchAll();
-                return true;
+                FixFullReader(editorReader);
+                return ValidateFullReader(editorReader);
             }
             catch {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Removes all invalid hit objects from the reader object
+        /// </summary>
+        /// <param name="reader">The fully fetched editor reader</param>
+        private static void FixFullReader(EditorReader reader) {
+            reader.hitObjects.RemoveAll(readerHitObject =>
+                readerHitObject.SegmentCount > 9000 || readerHitObject.Type == 0 || readerHitObject.SampleSet > 1000 ||
+                readerHitObject.SampleSetAdditions > 1000 || readerHitObject.SampleVolume > 1000);
+        }
+
+        /// <summary>
+        /// Checks for any insane values in the reader which indicate the editor has been incorrectly read
+        /// </summary>
+        /// <param name="reader">The fully fetched editor reader</param>
+        /// <returns>A boolean whether the reader is valid</returns>
+        private static bool ValidateFullReader(EditorReader reader) {
+            bool result = true;
+
+            foreach (var readerHitObject in reader.hitObjects) {
+                if (readerHitObject.SegmentCount > 9000 || readerHitObject.Type == 0 || readerHitObject.SampleSet > 1000 || readerHitObject.SampleSetAdditions > 1000 || readerHitObject.SampleVolume > 1000) {
+                    result = false;
+                }
+            }
+
+            if (!result) {
+                // Save error log
+                var path = Path.Combine(MainWindow.AppDataPath, "editor_reader_error.txt");
+
+                if (!File.Exists(path)) {
+                    File.Create(path).Dispose();
+                }
+
+                var lines = new List<string> {
+                    @"ContainingFolder: " + reader.ContainingFolder,
+                    @"Filename: " + reader.Filename,
+                    @"ApproachRate: " + reader.ApproachRate,
+                    @"CircleSize: " + reader.CircleSize,
+                    @"HPDrainRate: " + reader.HPDrainRate,
+                    @"OverallDifficulty: " + reader.OverallDifficulty,
+                    @"PreviewTime: " + reader.PreviewTime,
+                    @"SliderMultiplier: " + reader.SliderMultiplier,
+                    @"SliderTickRate: " + reader.SliderTickRate,
+                    @"StackLeniency: " + reader.StackLeniency,
+                    @"TimelineZoom: " + reader.TimelineZoom,
+                    @"numBookmarks: " + reader.numBookmarks,
+                    @"numClipboard: " + reader.numClipboard,
+                    @"numControlPoints: " + reader.numControlPoints,
+                    @"numObjects: " + reader.numObjects,
+                    @"numSelected: " + reader.numSelected,
+                    @"EditorTime: " + reader.EditorTime(),
+                    @"ProcessTitle: " + reader.ProcessTitle(),
+                    @"[HitObjects]",
+                };
+                lines.AddRange(reader.hitObjects.Select(readerHitObject => readerHitObject.ToString()));
+                lines.Add(@"[TimingPoints]");
+                lines.AddRange(reader.controlPoints.Select(readerControlPoint => readerControlPoint.ToString()));
+
+                File.WriteAllLines(path, lines);
+
+                MessageBox.Show("A problem has been encountered with editor reader. An error log has been saved to editor_reader_error.txt", "Warning");
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -81,7 +148,7 @@ namespace Mapping_Tools.Classes.Tools {
             }
         }
 
-
+        public static List<HitObject> GetSelectedObjects(BeatmapEditor editor, EditorReader reader) {
         /// <summary>
         /// 
         /// </summary>
@@ -118,6 +185,7 @@ namespace Mapping_Tools.Classes.Tools {
             }
         }
 
+        public static BeatmapEditor GetNewestVersion(EditorReader reader, out List<HitObject> selected) {
         /// <summary>
         /// 
         /// </summary>

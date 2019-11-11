@@ -30,13 +30,16 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
         }
 
         public void Add(IEnumerable<IRelevantObject> relevantObjects, bool propagate = true) {
+            bool addedAny = false;  // Check any relevant objects get added at all
+
             // Check if this object or something similar exists anywhere in the context or in this layer
             foreach (var relevantObject in relevantObjects) {
                 Add(relevantObject, false);
+                addedAny = true;
             }
 
-            // Propagate changes
-            if (propagate) {
+            // Propagate changes if stuff got added
+            if (propagate && addedAny) {
                 NextLayer?.GenerateNewObjects();
             }
         }
@@ -44,6 +47,8 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
         public void Add(IRelevantObject relevantObject, bool propagate = true) {
             if (Objects.FindSimilar(relevantObject, ParentCollection.AcceptableDifference, out var similarObject)) {
                 similarObject.Consume(relevantObject);
+                // Dispose this relevant object
+                relevantObject.Dispose();
                 return;  // return so the relevant object doesn't get added
             }
 
@@ -63,10 +68,20 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
         /// Generates relevant objects and adds them to this layer.
         /// </summary>
         public void GenerateNewObjects(bool forcePropagate = false) {
+            // Remove all relevant objects generated from a sequential generator
+            foreach (var objectLayerObject in Objects.Values) {
+                for (var i = 0; i < objectLayerObject.Count; i++) {
+                    var obj = objectLayerObject[i];
+                    if (obj.Generator == null || !obj.Generator.IsSequential) continue;
+                    obj.Dispose();
+                    i--;
+                }
+            }
+
             var addedSomething = false;
             var activeGenerators = GeneratorCollection.GetActiveGenerators();
             foreach (var generator in activeGenerators) {
-                var concurrent = generator.IsConcurrent;
+                var sequential = generator.IsSequential;
 
                 var methods = generator.GetGeneratorMethods();
 
@@ -79,7 +94,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                         continue;
                     }
                     //Console.WriteLine(generator.Name.ToUpper());
-                    var parametersList = RelevantObjectPairGenerator.GetParametersList(dependencies, PreviousLayer?.Objects);
+                    var parametersList = RelevantObjectPairGenerator.GetParametersList(dependencies, PreviousLayer?.Objects, sequential);
 
                     foreach (var parameters in parametersList) {
                         // Generate the new relevant object(s)
@@ -157,6 +172,15 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                     relevantObjectChildObject.Layer != null)) {
                     relevantObjectChildObject.Layer.Remove(relevantObjectChildObject);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Disposes all relevant objects in this layer
+        /// </summary>
+        public void Clear() {
+            foreach (var relevantObject in Objects.Select(kvp => kvp.Value.ToArray()).SelectMany(toDispose => toDispose)) {
+                relevantObject.Dispose();
             }
         }
     }

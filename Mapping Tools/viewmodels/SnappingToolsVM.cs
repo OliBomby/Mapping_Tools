@@ -31,7 +31,10 @@ namespace Mapping_Tools.Viewmodels {
 
         public ObservableCollection<RelevantObjectsGenerator> Generators { get; }
         protected readonly LayerCollection LayerCollection;
+
+        private IRelevantObject _lastSnappedRelevantObject;
         private int _editorTime;
+        private bool _osuActivated;
 
         private string _filter = "";
         public string Filter { get => _filter; set => SetFilter(value); }
@@ -81,7 +84,12 @@ namespace Mapping_Tools.Viewmodels {
             Active
         }
 
-        private bool HotkeyRedrawsOverlay => Preferences.KeyDownViewMode != Preferences.KeyUpViewMode;
+        private bool HotkeyDownRedrawsOverlay => Preferences.KeyDownViewMode != Preferences.KeyUpViewMode && !SnapChangeRedrawsOverlay;
+
+        private bool HotkeyUpRedrawsOverlay => Preferences.KeyDownViewMode != Preferences.KeyUpViewMode;
+
+        private bool SnapChangeRedrawsOverlay => Preferences.KeyDownViewMode.HasFlag(ViewMode.Parents) ||
+                                                  Preferences.KeyDownViewMode.HasFlag(ViewMode.Children);
 
         public SnappingToolsVm() {
             // Set up a coordinate converter for converting coordinates between screen and osu!
@@ -109,7 +117,7 @@ namespace Mapping_Tools.Viewmodels {
 
             // Initialize layer collection
             LayerCollection = new LayerCollection(new RelevantObjectsGeneratorCollection(Generators), 2);
-            LayerCollection.SetInceptionLevel(3);
+            LayerCollection.SetInceptionLevel(4);
             
             // Set up timers for responding to hotkey presses and beatmap changes
             _updateTimer = new DispatcherTimer(DispatcherPriority.Normal) { Interval = TimeSpan.FromMilliseconds(100) };
@@ -143,35 +151,53 @@ namespace Mapping_Tools.Viewmodels {
                 case "OffsetBottom":
                     _coordinateConverter.EditorBoxOffset.Bottom = Preferences.OffsetBottom;
                     break;
+                case "AcceptableDifference":
+                    LayerCollection.AcceptableDifference = Preferences.AcceptableDifference;
+                    break;
                 case "DebugEnabled":
                     _overlay.SetBorder(Preferences.DebugEnabled);
+                    break;
+                case "InceptionLevel":
+                    LayerCollection.SetInceptionLevel(Preferences.InceptionLevel);
+                    _overlay.OverlayWindow.InvalidateVisual();
                     break;
             }
         }
 
         private void OnDraw(object sender, DrawingContext context) {
             if (IsHotkeyDown(Preferences.SnapHotkey)) {
-                switch (Preferences.KeyDownViewMode) {
-                    case ViewMode.Everything:
-                        foreach (var relevantDrawable in LayerCollection.GetAllRelevantDrawables()) {
-                            relevantDrawable.DrawYourself(context, _coordinateConverter, Preferences);
-                        }
-                        break;
-                    case ViewMode.ParentsOnly:
-                        // Get the relevant object which is snapped being snapped to
-                        throw new NotImplementedException();
-                    case ViewMode.Nothing:
-                        break;
+                // Handle key down rendering
+                if (Preferences.KeyDownViewMode.HasFlag(ViewMode.Everything)) {
+                    foreach (var relevantDrawable in LayerCollection.GetAllRelevantDrawables()) {
+                        relevantDrawable.DrawYourself(context, _coordinateConverter, Preferences);
+                    }
+                    // It has already drawn everything so return
+                    return;
+                }
+
+                var objectsToRender = new HashSet<IRelevantObject>();
+
+                if (Preferences.KeyDownViewMode.HasFlag(ViewMode.Parents) && _lastSnappedRelevantObject != null) {
+                    // Get the parents of the relevant object which is being snapped to
+                    objectsToRender.UnionWith(_lastSnappedRelevantObject.GetParentage());
+                }
+
+                if (Preferences.KeyDownViewMode.HasFlag(ViewMode.Children) && _lastSnappedRelevantObject != null) {
+                    // Get the parents of the relevant object which is being snapped to
+                    objectsToRender.UnionWith(_lastSnappedRelevantObject.GetDescendants());
+                }
+
+                foreach (var relevantObject in objectsToRender) {
+                    if (relevantObject is IRelevantDrawable relevantDrawable) {
+                        relevantDrawable.DrawYourself(context, _coordinateConverter, Preferences);
+                    }
                 }
             } else {
-                switch (Preferences.KeyUpViewMode) {
-                    case ViewMode.Everything:
-                        foreach (var relevantDrawable in LayerCollection.GetAllRelevantDrawables()) {
-                            relevantDrawable.DrawYourself(context, _coordinateConverter, Preferences);
-                        }
-                        break;
-                    case ViewMode.Nothing:
-                        break;
+                // Handle key up rendering
+                if (Preferences.KeyUpViewMode.HasFlag(ViewMode.Everything)) {
+                    foreach (var relevantDrawable in LayerCollection.GetAllRelevantDrawables()) {
+                        relevantDrawable.DrawYourself(context, _coordinateConverter, Preferences);
+                    }
                 }
             }
         }
@@ -195,25 +221,50 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         private void OnGeneratorPropertyChanged(object sender, PropertyChangedEventArgs e) {
-            if (e.PropertyName == "IsActive" && _state == State.Active) {
-                // Reload relevant objects when a generator gets enabled/disabled
-                if (((RelevantObjectsGenerator)sender).IsActive) {
-                    // Generate new objects for all layers
-                    LayerCollection.GetRootLayer().GenerateNewObjects(true);
-                } else {
-                    // Delete all relevant objects generated by this generator
-                    foreach (var objectLayerObject in LayerCollection.ObjectLayers.SelectMany(objectLayer => objectLayer.Objects.Values)) {
-                        for (var i = 0; i < objectLayerObject.Count; i++) {
-                            if (objectLayerObject[i].Generator != sender) continue;
-                            objectLayerObject[i].Dispose();
-                            i--;
+            switch (e.PropertyName) {
+                case "IsActive":
+                    if (_state == State.Active) {
+                        // Reload relevant objects when a generator gets enabled/disabled
+                        if (((RelevantObjectsGenerator)sender).IsActive) {
+                            // Generate new objects for all layers
+                            LayerCollection.GetRootLayer().GenerateNewObjects(true);
+                        } else {
+                            // Delete all relevant objects generated by this generator
+                            foreach (var objectLayerObject in LayerCollection.ObjectLayers.SelectMany(objectLayer => objectLayer.Objects.Values)) {
+                                for (var i = 0; i < objectLayerObject.Count; i++) {
+                                    if (objectLayerObject[i].Generator != sender) continue;
+                                    objectLayerObject[i].Dispose();
+                                    i--;
+                                }
+                            }
                         }
-                    }
-                }
 
-                // Redraw the overlay
-                _overlay.OverlayWindow.InvalidateVisual();
+                        // Redraw the overlay
+                        _overlay.OverlayWindow.InvalidateVisual();
+                    }
+
+                    break;
+                case "IsSequential":
+                    if (_state == State.Active) {
+                        // Delete all relevant objects generated by this generator
+                        foreach (var objectLayerObject in LayerCollection.ObjectLayers.SelectMany(objectLayer => objectLayer.Objects.Values)) {
+                            for (var i = 0; i < objectLayerObject.Count; i++) {
+                                if (objectLayerObject[i].Generator != sender) continue;
+                                objectLayerObject[i].Dispose();
+                                i--;
+                            }
+                        }
+
+                        // Generate new objects for all layers
+                        LayerCollection.GetRootLayer().GenerateNewObjects(true);
+
+                        // Redraw the overlay
+                        _overlay.OverlayWindow.InvalidateVisual();
+                    }
+
+                    break;
             }
+            
         }
 
         private void UpdateTimerTick(object sender, EventArgs e) {
@@ -292,18 +343,55 @@ namespace Mapping_Tools.Viewmodels {
                         return;
                     }
 
+                    // Get editor time
                     var editorTime = reader.EditorTime();
-                    if (editorTime != _editorTime) {
-                        _editorTime = editorTime;
-                        UpdateRelevantObjects();
+                    // Get osu! state
+                    var osuActivated = _osuWindow.IsActivated;
+
+                    // Handle updating of relevant objects
+                    switch (Preferences.UpdateMode) {
+                        case UpdateMode.AnyChange:
+                            UpdateRelevantObjects();
+                            break;
+                        case UpdateMode.TimeChange:
+                            if (_editorTime != editorTime) {
+                                UpdateRelevantObjects();
+                            }
+
+                            break;
+                        case UpdateMode.HotkeyDown:
+                            if (IsHotkeyDown(Preferences.SnapHotkey)) {
+                                UpdateRelevantObjects();
+                            }
+
+                            break;
+                        case UpdateMode.OsuActivated:
+                            // Before not activated and after activated
+                            if (!_osuActivated && osuActivated) {
+                                UpdateRelevantObjects();
+                            }
+
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
                     }
+
+                    // Update old editor time variable
+                    _editorTime = editorTime;
+                    // Update old osu activated variable
+                    _osuActivated = osuActivated;
 
                     _coordinateConverter.OsuWindowPosition = new Vector2(_osuWindow.X, _osuWindow.Y);
                     _overlay.Update();
 
                     if (!_autoSnapTimer.IsEnabled && IsHotkeyDown(Preferences.SnapHotkey)) {
-                        if (HotkeyRedrawsOverlay)
+                        // Update overlay but not on parents only view mode, because that one updates on his own terms
+                        if (HotkeyDownRedrawsOverlay)
                             _overlay.OverlayWindow.InvalidateVisual();
+
+                        // Reset last snapped relevant object to trigger an overlay update in the snap timer tick
+                        _lastSnappedRelevantObject = null;
+                        
                         _autoSnapTimer.Start();
                     }
                     break;
@@ -312,29 +400,43 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
-        private List<HitObject> GetVisibleHitObjects()
+        private List<HitObject> GetHitObjects()
         {
             if (!EditorReaderStuff.TryGetFullEditorReader(out var reader)) return new List<HitObject>();
 
             var hitObjects = EditorReaderStuff.GetHitObjects(reader);
 
             // Get the visible hitobjects using approach rate
-            var approachTime = ApproachRateToMs(reader.ApproachRate);
-            var thereAreSelected = hitObjects.Any(o => o.IsSelected);
-            return hitObjects.Where(o => thereAreSelected ? o.IsSelected : _editorTime > o.Time - approachTime && _editorTime < o.EndTime + approachTime).ToList();
+            var approachTime = Beatmap.ApproachRateToMs(reader.ApproachRate);
+
+            switch (Preferences.SelectedHitObjectMode) {
+                case SelectedHitObjectMode.AllwaysAllVisible:
+                    return hitObjects.Where(o => _editorTime > o.Time - approachTime && _editorTime < o.EndTime + approachTime).ToList();
+                case SelectedHitObjectMode.VisibleOrSelected:
+                    var thereAreSelected = hitObjects.Any(o => o.IsSelected);
+                    return hitObjects.Where(o => thereAreSelected ? o.IsSelected : _editorTime > o.Time - approachTime && _editorTime < o.EndTime + approachTime).ToList();
+                case SelectedHitObjectMode.OnlySelected:
+                    return hitObjects.Where(o => o.IsSelected).ToList();
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
       
         private void UpdateRelevantObjects()
         {
-            var visibleObjects = GetVisibleHitObjects();
+            var hitObjects = GetHitObjects();
             
             var comparer = new HitObjectComparer();
             var rootLayer = LayerCollection.GetRootLayer();
             var existingHitObjects = LayerCollection.GetRootRelevantHitObjects();
-            var added = visibleObjects.Where(o => !existingHitObjects.Select(x => x.HitObject).Contains(o, comparer)).ToArray();
-            var removed = existingHitObjects.Where(o => !visibleObjects.Contains(o.HitObject, comparer)).ToArray();
+            var added = hitObjects.Where(o => !existingHitObjects.Select(x => x.HitObject).Contains(o, comparer)).ToArray();
+            var removed = existingHitObjects.Where(o => !hitObjects.Contains(o.HitObject, comparer)).ToArray();
 
-            rootLayer.Remove(removed);
+            // Dispose of all the removed hit objects
+            foreach (var relevantHitObject in removed) {
+                relevantHitObject.Dispose();
+            }
+            // Add new hit objects to root layer
             rootLayer.Add(added.Select(o => new RelevantHitObject(o)));
 
             if (added.Length == 0 && removed.Length == 0)
@@ -346,17 +448,9 @@ namespace Mapping_Tools.Viewmodels {
             _overlay.OverlayWindow.InvalidateVisual();
         }
 
-        private static double ApproachRateToMs(double approachRate) {
-            if (approachRate < 5) {
-                return 1800 - 120 * approachRate;
-            }
-
-            return 1200 - 150 * (approachRate - 5);
-        }
-
         private void AutoSnapTimerTick(object sender, EventArgs e) {
             if (!IsHotkeyDown(Preferences.SnapHotkey)) {
-                if (HotkeyRedrawsOverlay)
+                if (HotkeyUpRedrawsOverlay)
                     _overlay?.OverlayWindow.InvalidateVisual();
                 _autoSnapTimer.Stop();
                 return;
@@ -374,15 +468,25 @@ namespace Mapping_Tools.Viewmodels {
             if (drawables.Length == 0)
                 return;
 
+            // Get the relevant object nearest to the cursor
             IRelevantDrawable nearest = null;
             var smallestDistance = double.PositiveInfinity;
             foreach (var o in drawables) {
                 var dist = o.DistanceTo(cursorPos);
                 if (o is RelevantPoint) // Prioritize points to be able to snap to intersections
                     dist -= PointsBias;
+
                 if (!(dist < smallestDistance)) continue;
                 smallestDistance = dist;
                 nearest = o;
+            }
+
+            // Update overlay if the last snapped changed and parentview is on
+            if (nearest != _lastSnappedRelevantObject && SnapChangeRedrawsOverlay) {
+                // Set the last snapped relevant object
+                _lastSnappedRelevantObject = nearest;
+                // Update overlay
+                _overlay.OverlayWindow.InvalidateVisual();
             }
 
             // CONVERT THIS TO CURSOR POSITION

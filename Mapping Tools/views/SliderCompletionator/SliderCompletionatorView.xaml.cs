@@ -31,6 +31,7 @@ namespace Mapping_Tools.Views {
             e.Result = Complete_Sliders((Arguments) e.Argument, bgw, e);
         }
 
+       
         private void Start_Click(object sender, RoutedEventArgs e) {
             RunTool(MainWindow.AppWindow.GetCurrentMaps(), quick: false);
         }

@@ -35,11 +35,17 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure {
                     var newLayer = new RelevantObjectLayer(this, AllGenerators) {PreviousLayer = lastLayer};
                     if (lastLayer != null) lastLayer.NextLayer = newLayer;
                     ObjectLayers.Add(newLayer);
+
+                    // Derive new relevant objects in the new layer
+                    newLayer.GenerateNewObjects();
                 }
             } else if (ObjectLayers.Count > inceptionLevel) {
                 // Remove layers
                 var layersToRemove = ObjectLayers.Count - inceptionLevel;
                 for (var i = 0; i < layersToRemove; i++) {
+                    // Dispose all objects from last layer
+                    ObjectLayers[ObjectLayers.Count - 1].Clear();
+
                     ObjectLayers.RemoveAt(ObjectLayers.Count - 1);
                     var lastLayer = ObjectLayers.LastOrDefault();
                     if (lastLayer != null) lastLayer.NextLayer = null;

@@ -9,6 +9,7 @@ using Mapping_Tools.Viewmodels;
 using Mapping_Tools.Views.SnappingTools;
 
 namespace Mapping_Tools.Views {
+    
     public partial class SnappingToolsView : ISavable<SnappingToolsPreferences> {
 
         public static readonly string ToolName = "Snapping Tools";
