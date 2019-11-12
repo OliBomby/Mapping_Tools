@@ -163,6 +163,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                                 foreach (var relevantObject in newRelevantObjectsArray) {
                                     relevantObject.Generator = generator;  // Generator has to be set before parents, otherwise temporal position will go wrong
                                     relevantObject.ParentObjects = relevantParents;
+
+                                    // Set the IsInheritable setting according to the generator settings
+                                    relevantObject.IsInheritable = generator.Settings.GeneratesInheritable;
                                 }
 
                                 // Add the new relevant objects to this layer
@@ -178,6 +181,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                                 // Add parents and generator to the new relevant object
                                 newRelevantObject.Generator = generator;  // Generator has to be set before parents, otherwise temporal position will go wrong
                                 newRelevantObject.ParentObjects = relevantParents;
+                                
+                                // Set the IsInheritable setting according to the generator settings
+                                newRelevantObject.IsInheritable = generator.Settings.GeneratesInheritable;
 
                                 // Add the new relevant objects to this layer
                                 objectsToAdd.Add(newRelevantObject);

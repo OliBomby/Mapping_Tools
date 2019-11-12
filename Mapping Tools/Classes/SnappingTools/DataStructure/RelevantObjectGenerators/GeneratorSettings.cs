@@ -11,11 +11,14 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
 
         public GeneratorSettings() {
             _relevancyRatio = 0.8;
+            GeneratesInheritable = true;
         }
 
         public GeneratorSettings(RelevantObjectsGenerator generator) {
             Generator = generator;
+
             _relevancyRatio = 0.8;
+            GeneratesInheritable = true;
         }
 
         private bool _isActive;
@@ -43,10 +46,10 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
             set => Set(ref _relevancyRatio, value);
         }
 
-        private string _test = "";
-        public string Test {
-            get => _test;
-            set => Set(ref _test, value);
+        private bool _generatesInheritable;
+        public bool GeneratesInheritable {
+            get => _generatesInheritable;
+            set => Set(ref _generatesInheritable, value);
         }
 
         public void CopyTo(GeneratorSettings other) {
