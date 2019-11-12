@@ -12,6 +12,8 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure {
 
         public RelevantObjectsGeneratorCollection AllGenerators;
 
+        public RelevantObjectLayer LockedLayer;
+
         public double AcceptableDifference { get; set; }
 
         /// <summary>
@@ -23,9 +25,13 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure {
             ObjectLayers = new List<RelevantObjectLayer>();
             AllGenerators = generators;
             AcceptableDifference = acceptableDifference;
+            LockedLayer = new RelevantObjectLayer(this, null);
 
             // Generate 1 layer
             ObjectLayers.Add(new RelevantObjectLayer(this, AllGenerators));
+
+            // Set the previous layer of the rootlayer to the locked layer so every layer has the locked layer
+            GetRootLayer().PreviousLayer = LockedLayer;
         }
 
         public void SetInceptionLevel(int inceptionLevel) {
@@ -60,7 +66,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure {
         }
 
         public IEnumerable<IRelevantObject> GetAllRelevantObjects() {
-            return ObjectLayers.SelectMany(a => a.Objects.Values.SelectMany(b => b));
+            return ObjectLayers.Concat(new []{LockedLayer}).SelectMany(a => a.Objects.Values.SelectMany(b => b));
         }
 
         /// <summary>
@@ -68,7 +74,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure {
         /// </summary>
         /// <returns></returns>
         public IEnumerable<IRelevantDrawable> GetAllRelevantDrawables() {
-            return ObjectLayers
+            return ObjectLayers.Concat(new []{LockedLayer})
                 .SelectMany(layer =>
                     layer.Objects.Where(kvp => typeof(IRelevantDrawable).IsAssignableFrom(kvp.Key))
                         .SelectMany(kvp => kvp.Value)).Cast<IRelevantDrawable>();

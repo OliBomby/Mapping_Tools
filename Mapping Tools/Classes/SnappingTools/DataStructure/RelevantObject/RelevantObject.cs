@@ -180,6 +180,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
             locked.Disposed = false;
             locked.IsSelected = false;
             locked.IsLocked = true;
+            locked.IsInheritable = false;
 
             return locked;
         }
