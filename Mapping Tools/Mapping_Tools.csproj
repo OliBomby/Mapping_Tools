@@ -256,9 +256,11 @@
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Allocation\RelevantObjectsGeneratorMethodAttribute.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Allocation\RelevantObjectPairGenerator.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorGroupComparer.cs" />
+    <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorSettingses\SliderPathGeneratorSettings.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SameTransformGenerator2.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorSettings.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SameTransformGenerator.cs" />
+    <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SliderPathGenerator.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SquareGenerator.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SquareGenerator2.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorTypes\GeneratorTemporalPositioning.cs" />
