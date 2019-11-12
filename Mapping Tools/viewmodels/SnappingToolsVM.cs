@@ -653,13 +653,13 @@ namespace Mapping_Tools.Viewmodels {
                 return false;
             if (!Keyboard.IsKeyDown(hotkey.Key))
                 return false;
-            if (hotkey.Modifiers.HasFlag(ModifierKeys.Alt) && !(Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt)))
+            if (hotkey.Modifiers.HasFlag(ModifierKeys.Alt) != (Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt)))
                 return false;
-            if (hotkey.Modifiers.HasFlag(ModifierKeys.Control) && !(Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
+            if (hotkey.Modifiers.HasFlag(ModifierKeys.Control) != (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
                 return false;
-            if (hotkey.Modifiers.HasFlag(ModifierKeys.Shift) && !(Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)))
+            if (hotkey.Modifiers.HasFlag(ModifierKeys.Shift) != (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)))
                 return false;
-            return !hotkey.Modifiers.HasFlag(ModifierKeys.Windows) || (Keyboard.IsKeyDown(Key.LWin) || Keyboard.IsKeyDown(Key.RWin));
+            return hotkey.Modifiers.HasFlag(ModifierKeys.Windows) == (Keyboard.IsKeyDown(Key.LWin) || Keyboard.IsKeyDown(Key.RWin));
         }
 
         private bool UserFilter(object item) {
