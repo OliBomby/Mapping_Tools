@@ -9,6 +9,7 @@ using Process.NET;
 using Process.NET.Memory;
 using Process.NET.Windows;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -97,7 +98,8 @@ namespace Mapping_Tools.Viewmodels {
 
             // Set up groups and filters
             var view = (CollectionView) CollectionViewSource.GetDefaultView(Generators);
-            var groupDescription = new PropertyGroupDescription("GeneratorType");
+            var groupDescription = new PropertyGroupDescription("GeneratorType")
+                {CustomSort = new GeneratorGroupComparer()};
             view.GroupDescriptions.Add(groupDescription);
             view.Filter = UserFilter;
 
