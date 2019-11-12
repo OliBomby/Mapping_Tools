@@ -32,6 +32,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure {
 
             // Set the previous layer of the rootlayer to the locked layer so every layer has the locked layer
             GetRootLayer().PreviousLayer = LockedLayer;
+            LockedLayer.NextLayer = GetRootLayer();
         }
 
         public void SetInceptionLevel(int inceptionLevel) {
