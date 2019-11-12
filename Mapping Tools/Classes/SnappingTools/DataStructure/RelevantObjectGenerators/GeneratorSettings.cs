@@ -53,7 +53,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
             foreach (var prop in typeof(GeneratorSettings).GetProperties()) {
                 if (!prop.CanWrite || !prop.CanRead) continue;
                 if (prop.GetCustomAttribute(typeof(JsonIgnoreAttribute)) != null) continue;
-                try { prop.SetValue(other, prop.GetValue(this)); } catch { }
+                try { prop.SetValue(other, prop.GetValue(this)); } catch {
+                    // ignored
+                }
             }
         }
 
