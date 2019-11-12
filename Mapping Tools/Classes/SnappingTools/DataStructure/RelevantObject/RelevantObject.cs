@@ -101,6 +101,8 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         protected RelevantObject() {
             ParentObjects = new HashSet<IRelevantObject>();
             ChildObjects = new HashSet<IRelevantObject>();
+
+            Relevancy = 1;
         }
 
         /// <summary>
@@ -139,7 +141,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
 
         public void UpdateRelevancy() {
             if (ParentObjects == null || ParentObjects.Count == 0) return;
-            Relevancy = ParentObjects.Max(o => o.Relevancy);
+            Relevancy = (Generator?.Settings?.RelevancyRatio ?? 1) * ParentObjects.Average(o => o.Relevancy);
         }
 
         public void UpdateTime() {

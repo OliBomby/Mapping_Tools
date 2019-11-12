@@ -10,11 +10,12 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         public RelevantObjectsGenerator Generator { get; set; }
 
         public GeneratorSettings() {
-
+            _relevancyRatio = 0.9;
         }
 
         public GeneratorSettings(RelevantObjectsGenerator generator) {
             Generator = generator;
+            _relevancyRatio = 0.9;
         }
 
         private bool _isActive;
