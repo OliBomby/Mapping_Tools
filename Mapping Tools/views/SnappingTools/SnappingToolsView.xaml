@@ -54,7 +54,7 @@
                     </Grid>
                 </StackPanel>
 
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" CanContentScroll="True" PreviewMouseWheel="UIElement_OnPreviewMouseWheel">
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" CanContentScroll="True" PreviewMouseWheel="UIElement_OnPreviewMouseWheel" ScrollChanged="ScrollViewer_OnScrollChanged">
                     <ListView SelectionMode="Single" ItemsSource="{Binding Generators}" ScrollViewer.CanContentScroll="False">
                         <ListView.View>
                         <GridView>
