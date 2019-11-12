@@ -32,6 +32,19 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
                 });
         }
 
+        protected RelevantObjectsGenerator(GeneratorSettings settings) {
+            Settings = settings;
+
+            // Make command
+            GeneratorSettingsCommand = new CommandImplementation(
+                e => {
+                    try {
+                        var settingsWindow = new GeneratorSettingsWindow(Settings);
+                        settingsWindow.ShowDialog();
+                    } catch (Exception ex) { MessageBox.Show(ex.Message); }
+                });
+        }
+
         private MethodInfo[] _generatorMethods;
         public MethodInfo[] GetGeneratorMethods() {
             if (_generatorMethods != null) return _generatorMethods;

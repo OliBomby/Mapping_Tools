@@ -39,7 +39,7 @@ namespace Mapping_Tools.Views.SnappingTools {
 
                 var horizontalPanel = new StackPanel {Orientation = Orientation.Horizontal, Margin = new Thickness(10)};
 
-                var name = new TextBlock {Text = prop.Name, Width = 120};
+                var name = new TextBlock {Text = prop.Name, Width = 150};
                 horizontalPanel.Children.Add(name);
 
                 switch (value) {
