@@ -5,6 +5,8 @@ using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects {
     public class RelevantCircle : RelevantDrawable {
+        public override string PreferencesName => "Virtual circle preferences";
+
         public readonly Circle Child;
 
         public override double DistanceTo(Vector2 point) {
@@ -27,11 +29,10 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.Relev
             }
         }
 
-        public override void DrawYourself(DrawingContext context, CoordinateConverter converter, SnappingToolsPreferences preferences) {
-            var roPref = preferences.GetReleventObjectPreferences("Virtual circle preferences");
+        public override void DrawYourself(DrawingContext context, CoordinateConverter converter, RelevantObjectPreferences preferences, Pen pen) {
             var cPos = converter.ToDpi(converter.EditorToRelativeCoordinate(Child.Centre));
             var radius = converter.ToDpi(converter.ScaleByRatio(new Vector2(Child.Radius)));
-            context.DrawEllipse(null, GetPen(roPref), new Point(cPos.X, cPos.Y), radius.X, radius.Y);
+            context.DrawEllipse(null, pen, new Point(cPos.X, cPos.Y), radius.X, radius.Y);
         }
 
         public override Vector2 NearestPoint(Vector2 point) {

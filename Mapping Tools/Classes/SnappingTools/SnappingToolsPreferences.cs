@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Windows.Media;
+﻿using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Classes.SystemTools;
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Windows.Input;
-using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
+using System.Windows.Media;
 
 namespace Mapping_Tools.Classes.SnappingTools {
     public class SnappingToolsPreferences : BindableBase, ICloneable{
@@ -164,8 +164,8 @@ namespace Mapping_Tools.Classes.SnappingTools {
         public SnappingToolsPreferences() {
             relevantObjectPreferences = new Dictionary<string, RelevantObjectPreferences> {
                 {
-                    "Virtual point preferences", new RelevantObjectPreferences {
-                        Name = "Virtual point preferences",
+                    RelevantPoint.PreferencesNameStatic, new RelevantObjectPreferences {
+                        Name = RelevantPoint.PreferencesNameStatic,
                         Color = Colors.Cyan,
                         Dashstyle = DashStylesEnum.Solid,
                         Opacity = 0.8,
@@ -174,8 +174,8 @@ namespace Mapping_Tools.Classes.SnappingTools {
                         HasSizeOption = true,
                     }
                 }, {
-                    "Virtual line preferences", new RelevantObjectPreferences {
-                        Name = "Virtual line preferences",
+                    RelevantLine.PreferencesNameStatic, new RelevantObjectPreferences {
+                        Name = RelevantLine.PreferencesNameStatic,
                         Color = Colors.LawnGreen,
                         Dashstyle = DashStylesEnum.Dash,
                         Opacity = 0.8,
@@ -183,8 +183,8 @@ namespace Mapping_Tools.Classes.SnappingTools {
                         HasSizeOption = false,
                     }
                 }, {
-                    "Virtual circle preferences", new RelevantObjectPreferences {
-                        Name = "Virtual circle preferences",
+                    RelevantCircle.PreferencesNameStatic, new RelevantObjectPreferences {
+                        Name = RelevantCircle.PreferencesNameStatic,
                         Color = Colors.Red,
                         Dashstyle = DashStylesEnum.Dash,
                         Opacity = 0.8,
