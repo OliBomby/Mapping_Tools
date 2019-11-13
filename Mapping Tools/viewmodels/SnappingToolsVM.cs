@@ -676,6 +676,8 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public void Deactivate() {
+            if (Preferences.KeepRunning) return;
+
             _updateTimer.IsEnabled = false;
 
             try {
