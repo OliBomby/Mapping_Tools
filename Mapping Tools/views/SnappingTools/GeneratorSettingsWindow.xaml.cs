@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
+using Mapping_Tools.Components.Domain;
 
 namespace Mapping_Tools.Views.SnappingTools {
     /// <summary>
@@ -58,7 +59,8 @@ namespace Mapping_Tools.Views.SnappingTools {
                     case double doubleValue:
                         var doubleTextBox = new TextBox {Width = 100};
                         Binding doubleBinding = new Binding(prop.Name) {
-                            Source = DataContext
+                            Source = DataContext,
+                            Converter = new DoubleToStringConverter()
                         };
                         doubleTextBox.SetBinding(TextBox.TextProperty, doubleBinding);
                         horizontalPanel.Children.Add(doubleTextBox);
