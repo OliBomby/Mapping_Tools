@@ -27,6 +27,9 @@
 
             <ListView HorizontalAlignment="Left" Grid.Row="1" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <ListViewItem>
+                    0. Set the correct paths in [Options] -> [Preferences]
+                </ListViewItem>
+                <ListViewItem>
                     1. Open a beatmap -> [Open beatmap/Open current beatmap] to select a file from your system OR the currently in-game selected beatmap
                 </ListViewItem>
                 <ListViewItem>
@@ -36,7 +39,7 @@
                     3. Configure your tool
                 </ListViewItem>
                 <ListViewItem>
-                    4. Click the play button in the bottom right to run the program
+                    4. Click the run button in the bottom right to run the program
                 </ListViewItem>
                 <ListViewItem>
                     5. Read the guides, documentation or FAQ over at the website
