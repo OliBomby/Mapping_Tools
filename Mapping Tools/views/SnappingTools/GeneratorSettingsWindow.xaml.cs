@@ -1,13 +1,14 @@
-﻿using System;
+﻿using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
-using Mapping_Tools.Components.Domain;
 
 namespace Mapping_Tools.Views.SnappingTools {
     /// <summary>
@@ -40,6 +41,9 @@ namespace Mapping_Tools.Views.SnappingTools {
                 var horizontalPanel = new StackPanel {Orientation = Orientation.Horizontal, Margin = new Thickness(10)};
 
                 var name = new TextBlock {Text = prop.Name, Width = 150};
+                if (prop.GetCustomAttribute(typeof(DescriptionAttribute)) is DescriptionAttribute d) {
+                    name.ToolTip = d.Description;
+                }
                 horizontalPanel.Children.Add(name);
 
                 switch (value) {
