@@ -23,6 +23,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
         private double offsetRight;
         private double offsetBottom;
         private double acceptableDifference;
+        private bool keepRunning;
         private bool debugEnabled;
         private ViewMode keyDownViewMode;
         private ViewMode keyUpViewMode;
@@ -84,6 +85,11 @@ namespace Mapping_Tools.Classes.SnappingTools {
         public double AcceptableDifference {
             get => acceptableDifference;
             set => Set(ref acceptableDifference, value);
+        }
+
+        public bool KeepRunning {
+            get => keepRunning;
+            set => Set(ref keepRunning, value);
         }
 
         public bool DebugEnabled {
@@ -199,6 +205,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
             offsetRight = 0;
             offsetBottom = 1;
             acceptableDifference = 2;
+            keepRunning = false;
             debugEnabled = false;
             keyDownViewMode = ViewMode.Everything;
             keyUpViewMode = ViewMode.Everything;
