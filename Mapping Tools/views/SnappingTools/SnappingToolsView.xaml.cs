@@ -55,11 +55,6 @@ namespace Mapping_Tools.Views {
             e.Handled = true;
         }
 
-        private void UIElement_OnPreviewMouseDown(object sender, MouseButtonEventArgs e) {
-            if (sender is ToggleButton toggleButton) toggleButton.IsChecked = !toggleButton.IsChecked.GetValueOrDefault();
-            e.Handled = true;
-        }
-
         public override void Activate() {
             ViewModel.Activate();
             base.Activate();
