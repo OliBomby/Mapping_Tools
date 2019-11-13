@@ -6,7 +6,6 @@
         xmlns:local="clr-namespace:Mapping_Tools.Classes.SnappingTools"
         xmlns:components="clr-namespace:Mapping_Tools.Components.Domain"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        xmlns:generic="clr-namespace:System.Collections.Generic;assembly=mscorlib"
         xmlns:components1="clr-namespace:Mapping_Tools.Components"
         mc:Ignorable="d"
         Title="Snapping Tools Preferences" Height="500" Width="570" MinWidth="575" MinHeight="360"
@@ -27,7 +26,9 @@
     </WindowChrome.WindowChrome>
  
     <Window.Resources>
-        <components:EnumToBoolConverter x:Key="EnumToBoolConverter" />
+        <components:EnumToBoolConverter x:Key="EnumToBoolConverter"/>
+        <components:DoubleToStringConverter x:Key="DoubleToStringConverter"/>
+        <components:IntToStringConverter x:Key="IntToStringConverter"/>
     </Window.Resources>
 
     <Grid>
@@ -102,14 +103,14 @@
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
                                 <TextBlock Width="100" Margin="0 0 0 6" Text="Offset" VerticalAlignment="Bottom" ToolTip="Offsets the overlay box. Use this field when the automatic editor-to-screen coordinate conversion seems to fail."/>
-                                <TextBox Text="{Binding OffsetLeft}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Left offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 10 0"/>
-                                <TextBox Text="{Binding OffsetTop}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Top offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 10 0"/>
-                                <TextBox Text="{Binding OffsetRight}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Right offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 10 0"/>
-                                <TextBox Text="{Binding OffsetBottom}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Bottom offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
+                                <TextBox Text="{Binding OffsetLeft, Converter={StaticResource DoubleToStringConverter}}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Left offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 10 0"/>
+                                <TextBox Text="{Binding OffsetTop, Converter={StaticResource DoubleToStringConverter}}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Top offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 10 0"/>
+                                <TextBox Text="{Binding OffsetRight, Converter={StaticResource DoubleToStringConverter}}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Right offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 10 0"/>
+                                <TextBox Text="{Binding OffsetBottom, Converter={StaticResource DoubleToStringConverter}}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Bottom offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
                                 <TextBlock Width="100" Margin="0 0 0 6" Text="Complexity" VerticalAlignment="Bottom" ToolTip="Specifies how many layers of virtual objects can be used. More layers means more generation of virtual objects from the previous virtual objects in the tree."/>
-                                <TextBox Text="{Binding InceptionLevel}" Width="120" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Inception level" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                <TextBox Text="{Binding InceptionLevel, Converter={StaticResource IntToStringConverter}}" Width="120" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Inception level" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                                          ToolTip="Specifies how many layers of virtual objects can be used. More layers means more generation of virtual objects from the previous virtual objects in the tree. It is recommended to use between 2 and 10 layers."/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
@@ -162,7 +163,7 @@
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
                                 <TextBlock Width="100" Margin="0 0 0 6" Text="Minimal diff" VerticalAlignment="Bottom" ToolTip="Similar virtual objects get merged together. This sets the minimal acceptable difference that two objects can have and not get merged together."></TextBlock>
-                                <TextBox Text="{Binding AcceptableDifference}" Width="150" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Minimal difference" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
+                                <TextBox Text="{Binding AcceptableDifference, Converter={StaticResource DoubleToStringConverter}}" Width="150" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Minimal difference" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
                                 <TextBlock Width="100" Margin="0 0 0 6" Text="Debug" VerticalAlignment="Center" ToolTip="Visualize boundaries of the overlay box for debugging purposes."/>
@@ -187,7 +188,7 @@
             </Grid>
         </Border>
 
-        <Border BorderThickness="1" Grid.RowSpan="3" Background="{x:Null}" BorderBrush="{DynamicResource PrimaryHueDarkBrush}"/>
+        <Border BorderThickness="1" Grid.Row="0" Grid.RowSpan="3" Background="{x:Null}" BorderBrush="{DynamicResource PrimaryHueDarkBrush}"/>
 
     </Grid>
     
