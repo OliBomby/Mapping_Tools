@@ -4,7 +4,8 @@ using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects {
     public class RelevantPoint : RelevantDrawable {
-        public override string PreferencesName => "Virtual point preferences";
+        public static string PreferencesNameStatic => "Virtual point preferences";
+        public override string PreferencesName => PreferencesNameStatic;
 
         public readonly Vector2 Child;
 
