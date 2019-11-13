@@ -5,7 +5,8 @@ using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects {
     public class RelevantCircle : RelevantDrawable {
-        public override string PreferencesName => "Virtual circle preferences";
+        public static string PreferencesNameStatic => "Virtual circle preferences";
+        public override string PreferencesName => PreferencesNameStatic;
 
         public readonly Circle Child;
 

@@ -5,7 +5,8 @@ using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects {
     public class RelevantLine : RelevantDrawable {
-        public override string PreferencesName => "Virtual line preferences";
+        public static string PreferencesNameStatic => "Virtual line preferences";
+        public override string PreferencesName => PreferencesNameStatic;
 
         public readonly Line2 Child;
 
