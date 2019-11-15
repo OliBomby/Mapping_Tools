@@ -27,6 +27,7 @@
  
     <Window.Resources>
         <components:EnumToBoolConverter x:Key="EnumToBoolConverter"/>
+        <components:FlagToBoolConverter x:Key="FlagToBoolConverter"/>
         <components:DoubleToStringConverter x:Key="DoubleToStringConverter"/>
         <components:IntToStringConverter x:Key="IntToStringConverter"/>
     </Window.Resources>
@@ -115,18 +116,24 @@
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
                                 <TextBlock Width="100" Margin="0 0 0 6" Text="Downkey" VerticalAlignment="Center" ToolTip="Customize what gets displayed when the Activation Key is pressed."/>
-                                <StackPanel>
-                                    <RadioButton IsChecked="{Binding KeyDownViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:ViewMode.Everything}}"
-                                                 Content="Everything" ToolTip="Default behavior. Display all virtual objects when the Activation Key is pressed."/>
-                                    <RadioButton IsChecked="{Binding KeyDownViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:ViewMode.ChildrenAndParents}}"
-                                                 Content="Children and Parents" ToolTip="Display the object the cursor is currently snapping to, its parents and its children."/>
-                                    <RadioButton IsChecked="{Binding KeyDownViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:ViewMode.Parents}}"
-                                                 Content="Parents" ToolTip="Display the object the cursor is currently snapping to and its parents."/>
-                                    <RadioButton IsChecked="{Binding KeyDownViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:ViewMode.Children}}"
-                                                 Content="Children" ToolTip="Display the object the cursor is currently snapping to and its children."/>
-                                    <RadioButton IsChecked="{Binding KeyDownViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static local:ViewMode.Nothing}}"
-                                                 Content="Nothing" ToolTip="Do not display anything even if the Activation Key is pressed."/>
-                                </StackPanel>
+                                <ListBox SelectionMode="Extended" SelectionChanged="KeyDownViewModeSelector_OnSelectionChanged"
+                                    Style="{StaticResource MaterialDesignToolToggleListBox}">
+                                    <ListBoxItem ToolTip="Everything" Tag="{x:Static local:ViewMode.Everything}" IsSelected="{Binding KeyDownViewMode, Mode=OneTime, Converter={StaticResource FlagToBoolConverter}, ConverterParameter={x:Static local:ViewMode.Everything}}">
+                                        <materialDesign:PackIcon Kind="AllInclusive"/>
+                                    </ListBoxItem>
+                                    <ListBoxItem ToolTip="Parents and parents of parents" Tag="{x:Static local:ViewMode.Parents}" IsSelected="{Binding KeyDownViewMode, Mode=OneTime, Converter={StaticResource FlagToBoolConverter}, ConverterParameter={x:Static local:ViewMode.Parents}}">
+                                        P
+                                    </ListBoxItem>
+                                    <ListBoxItem ToolTip="Direct parents" Tag="{x:Static local:ViewMode.DirectParents}" IsSelected="{Binding KeyDownViewMode, Mode=OneTime, Converter={StaticResource FlagToBoolConverter}, ConverterParameter={x:Static local:ViewMode.DirectParents}}">
+                                        DP
+                                    </ListBoxItem>
+                                    <ListBoxItem ToolTip="Children and children of children"  Tag="{x:Static local:ViewMode.Children}" IsSelected="{Binding KeyDownViewMode, Mode=OneTime, Converter={StaticResource FlagToBoolConverter}, ConverterParameter={x:Static local:ViewMode.Children}}">
+                                        C
+                                    </ListBoxItem>
+                                    <ListBoxItem ToolTip="Direct children"  Tag="{x:Static local:ViewMode.DirectChildren}" IsSelected="{Binding KeyDownViewMode, Mode=OneTime, Converter={StaticResource FlagToBoolConverter}, ConverterParameter={x:Static local:ViewMode.DirectChildren}}">
+                                        DC
+                                    </ListBoxItem>
+                                </ListBox>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
                                 <TextBlock Width="100" Margin="0 0 0 6" Text="Upkey" VerticalAlignment="Center" ToolTip="Customize what gets displayed when the Activation Key is not pressed."/>

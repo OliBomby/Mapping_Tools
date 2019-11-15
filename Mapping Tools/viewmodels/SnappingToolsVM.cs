@@ -75,8 +75,8 @@ namespace Mapping_Tools.Viewmodels {
 
         private bool HotkeyUpRedrawsOverlay => Preferences.KeyDownViewMode != Preferences.KeyUpViewMode;
 
-        private bool SnapChangeRedrawsOverlay => Preferences.KeyDownViewMode.HasFlag(ViewMode.Parents) ||
-                                                  Preferences.KeyDownViewMode.HasFlag(ViewMode.Children);
+        private bool SnapChangeRedrawsOverlay => Preferences.KeyDownViewMode.HasFlag(ViewMode.Parents) || Preferences.KeyDownViewMode.HasFlag(ViewMode.DirectParents) ||
+                                                  Preferences.KeyDownViewMode.HasFlag(ViewMode.Children) || Preferences.KeyDownViewMode.HasFlag(ViewMode.DirectChildren);
 
         public SnappingToolsVm() {
             // Set up a coordinate converter for converting coordinates between screen and osu!
@@ -191,12 +191,16 @@ namespace Mapping_Tools.Viewmodels {
 
                 if (Preferences.KeyDownViewMode.HasFlag(ViewMode.Parents) && _lastSnappedRelevantObject != null) {
                     // Get the parents of the relevant object which is being snapped to
-                    objectsToRender.UnionWith(_lastSnappedRelevantObject.GetParentage());
+                    objectsToRender.UnionWith(_lastSnappedRelevantObject.GetParentage(int.MaxValue));
+                } else if (Preferences.KeyDownViewMode.HasFlag(ViewMode.DirectParents) && _lastSnappedRelevantObject != null) {
+                    objectsToRender.UnionWith(_lastSnappedRelevantObject.GetParentage(1));
                 }
 
                 if (Preferences.KeyDownViewMode.HasFlag(ViewMode.Children) && _lastSnappedRelevantObject != null) {
                     // Get the parents of the relevant object which is being snapped to
-                    objectsToRender.UnionWith(_lastSnappedRelevantObject.GetDescendants());
+                    objectsToRender.UnionWith(_lastSnappedRelevantObject.GetDescendants(int.MaxValue));
+                } else if (Preferences.KeyDownViewMode.HasFlag(ViewMode.DirectChildren) && _lastSnappedRelevantObject != null) {
+                    objectsToRender.UnionWith(_lastSnappedRelevantObject.GetDescendants(1));
                 }
 
                 foreach (var relevantObject in objectsToRender) {

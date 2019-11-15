@@ -226,10 +226,10 @@ namespace Mapping_Tools.Classes.SnappingTools {
     public enum ViewMode {
         Nothing = 0,
         Children = 1,
-        Parents = 1 << 1,
-        Everything = 1 << 2,
-
-        ChildrenAndParents = Children | Parents,
+        DirectChildren = 1 << 1,
+        Parents = 1 << 2,
+        DirectParents = 1 << 3,
+        Everything = 1 << 4
     }
 
     public enum SelectedHitObjectMode {
