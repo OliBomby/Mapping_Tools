@@ -108,15 +108,15 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         /// <summary>
         /// Returns a set with all the parents of this object and all the parents' parents and this object itself
         /// </summary>
-        public HashSet<IRelevantObject> GetParentage() {
+        public HashSet<IRelevantObject> GetParentage(int level) {
             var parentageSet = new HashSet<IRelevantObject> {this};
 
-            if (ParentObjects == null || ParentObjects.Count == 0) {
+            if (ParentObjects == null || ParentObjects.Count == 0 || level == 0) {
                 return parentageSet;
             }
 
             foreach (var relevantObject in ParentObjects) {
-                parentageSet.UnionWith(relevantObject.GetParentage());
+                parentageSet.UnionWith(relevantObject.GetParentage(level - 1));
             }
 
             return parentageSet;
@@ -125,15 +125,15 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         /// <summary>
         /// Returns a set with all the children of this object and all the children' children and this object itself
         /// </summary>
-        public HashSet<IRelevantObject> GetDescendants() {
+        public HashSet<IRelevantObject> GetDescendants(int level) {
             var childrenSet = new HashSet<IRelevantObject> {this};
 
-            if (ChildObjects == null || ChildObjects.Count == 0) {
+            if (ChildObjects == null || ChildObjects.Count == 0 || level == 0) {
                 return childrenSet;
             }
 
             foreach (var relevantObject in ChildObjects) {
-                childrenSet.UnionWith(relevantObject.GetDescendants());
+                childrenSet.UnionWith(relevantObject.GetDescendants(level - 1));
             }
 
             return childrenSet;

@@ -68,8 +68,8 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         [JsonIgnore]
         HashSet<IRelevantObject> ChildObjects { get; set; }
 
-        HashSet<IRelevantObject> GetParentage();
-        HashSet<IRelevantObject> GetDescendants();
+        HashSet<IRelevantObject> GetParentage(int level);
+        HashSet<IRelevantObject> GetDescendants(int level);
         void UpdateRelevancy();
         void UpdateTime();
         IRelevantObject GetLockedRelevantObject();

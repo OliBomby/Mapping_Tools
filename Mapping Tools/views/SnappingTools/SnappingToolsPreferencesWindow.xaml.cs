@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 using Mapping_Tools.Classes.SnappingTools;
 
 namespace Mapping_Tools.Views.SnappingTools {
@@ -28,6 +29,17 @@ namespace Mapping_Tools.Views.SnappingTools {
         {
             DialogResult = false;
             Close();
+        }
+
+        private void KeyDownViewModeSelector_OnSelectionChanged(object sender, SelectionChangedEventArgs e) {
+            foreach (var addedItem in e.AddedItems) {
+                var item = (ListBoxItem) addedItem;
+                Preferences.KeyDownViewMode |= (ViewMode)item.Tag;
+            }
+            foreach (var removedItem in e.RemovedItems) {
+                var item = (ListBoxItem) removedItem;
+                Preferences.KeyDownViewMode &= ~(ViewMode)item.Tag;
+            }
         }
     }
 }
