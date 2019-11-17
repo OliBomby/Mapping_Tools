@@ -11,7 +11,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         }
 
         public bool Check(IRelevantObject relevantObject, RelevantObjectsGenerator generator) {
-            return Predicates.Any(o => o.Check(relevantObject, generator));
+            return Predicates.Count == 0 || Predicates.Any(o => o.Check(relevantObject, generator));
         }
     }
 }

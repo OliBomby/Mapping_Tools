@@ -58,7 +58,7 @@
                     <ListView SelectionMode="Single" ItemsSource="{Binding Generators}" ScrollViewer.CanContentScroll="False">
                         <ListView.View>
                         <GridView>
-                            <GridViewColumn Header="IsActive">
+                            <GridViewColumn Header="Active">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
                                         <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding Settings.IsActive}" Cursor="Hand"/>
@@ -83,14 +83,14 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Header="IsSequential">
+                            <GridViewColumn Header="Sequential">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
                                         <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding Settings.IsSequential}" Cursor="Hand"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Header="IsDeep">
+                            <GridViewColumn Header="Deep">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
                                         <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding Settings.IsDeep}" Cursor="Hand"/>
