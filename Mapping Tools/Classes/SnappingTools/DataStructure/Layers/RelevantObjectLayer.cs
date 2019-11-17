@@ -121,7 +121,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                 var methods = generator.GetGeneratorMethods();
 
                 // Get the required relevant object collection for this generator
-                var objects = generator.Settings.IsDeep ? deepObjects : PreviousLayer?.Objects;
+                var objects = generator.Settings.IsDeep ? 
+                    deepObjects.GetSubset(generator.Settings.InputPredicate, generator) : 
+                    PreviousLayer?.Objects?.GetSubset(generator.Settings.InputPredicate, generator);
 
                 // Loop through all generator methods in this generator
                 foreach (var method in methods) {

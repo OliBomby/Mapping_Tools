@@ -12,11 +12,18 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         public bool NeedGeneratedByThis { get => _needGeneratedByThis; set => Set(ref _needGeneratedByThis, value); }
         public double MinRelevancy { get => _minRelevancy; set => Set(ref _minRelevancy, value); }
 
+        public SelectionPredicate() {
+        }
+
         public bool Check(IRelevantObject relevantObject, RelevantObjectsGenerator generator) {
             if (NeedSelected && !relevantObject.IsSelected) return false;
             if (NeedLocked && !relevantObject.IsLocked) return false;
             if (NeedGeneratedByThis && relevantObject.Generator != null && relevantObject.Generator != generator) return false;
             return !(relevantObject.Relevancy < MinRelevancy);
+        }
+
+        public override string ToString() {
+            return $@"NeedSelected: {NeedSelected}, NeedLocked: {NeedLocked}, NeedGeneratedByThis: {NeedGeneratedByThis}, MinRelevancy: {MinRelevancy}";
         }
     }
 }

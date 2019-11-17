@@ -1,9 +1,11 @@
-﻿using Mapping_Tools.Annotations;
+﻿using System;
+using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.SystemTools;
 using Newtonsoft.Json;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators {
     public class GeneratorSettings : BindableBase {
@@ -13,14 +15,16 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
 
         public GeneratorSettings() {
             _relevancyRatio = 0.8;
-            GeneratesInheritable = true;
+            _generatesInheritable = true;
+            _inputPredicate = new SelectionPredicateCollection();
+            _inputPredicate.Predicates.Add(new SelectionPredicate());
         }
 
         public GeneratorSettings(RelevantObjectsGenerator generator) {
             Generator = generator;
 
             _relevancyRatio = 0.8;
-            GeneratesInheritable = true;
+            _generatesInheritable = true;
         }
 
         private bool _isActive;
@@ -64,12 +68,28 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
             set => Set(ref _generatesInheritable, value);
         }
 
+        private SelectionPredicateCollection _inputPredicate;
+        [DisplayName("Input Selection")]
+        [Description("Specifies extra rules that virtual objects need to obey in order to be used by this generator.")]
+        public SelectionPredicateCollection InputPredicate {
+            get => _inputPredicate;
+            set => Set(ref _inputPredicate, value);
+        }
+
         public void CopyTo(GeneratorSettings other) {
             var otherProperties = other.GetType().GetProperties();
             foreach (var prop in GetType().GetProperties()) {
                 if (!prop.CanWrite || !prop.CanRead) continue;
                 if (!otherProperties.Contains(prop)) continue;
                 if (prop.GetCustomAttribute(typeof(JsonIgnoreAttribute)) != null) continue;
+                if (prop.GetValue(this) is SelectionPredicateCollection s) {
+                    Console.WriteLine("This");
+                    Console.WriteLine(s.Predicates[0]);
+                }
+                if (prop.GetValue(other) is SelectionPredicateCollection d) {
+                    Console.WriteLine("Other");
+                    Console.WriteLine(d.Predicates[0]);
+                }
                 try { prop.SetValue(other, prop.GetValue(this)); } catch {
                     // ignored
                 }
