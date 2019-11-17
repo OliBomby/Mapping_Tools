@@ -193,6 +193,11 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                 }
             }
 
+            // Stop if it is gonna add too many objects.
+            if (objectsToAdd.Count + Objects.GetCount() > ParentCollection.MaxObjects) {
+                return;
+            }
+
             // Set all DoNotDispose to false
             foreach (var relevantObject in Objects.Values.SelectMany(list => list)) {
                 relevantObject.DoNotDispose = false;
