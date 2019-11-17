@@ -1,7 +1,11 @@
 ﻿using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SnappingTools;
+using Mapping_Tools.Classes.SnappingTools.DataStructure;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorCollection;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Views.SnappingTools;
@@ -9,7 +13,6 @@ using Process.NET;
 using Process.NET.Memory;
 using Process.NET.Windows;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -20,10 +23,6 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-using Mapping_Tools.Classes.SnappingTools.DataStructure;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorCollection;
 
 namespace Mapping_Tools.Viewmodels {
     public class SnappingToolsVm : IDisposable
