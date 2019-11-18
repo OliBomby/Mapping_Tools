@@ -3,12 +3,12 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
-    public class MiddlePointGenerator3 : RelevantObjectsGenerator {
+    public class AveragePointGenerator3 : RelevantObjectsGenerator {
         public override string Name => "Average of Three Points";
         public override string Tooltip => "Takes three virtual points and calculates the average of the points.";
         public override GeneratorType GeneratorType => GeneratorType.Intermediate;
 
-        public MiddlePointGenerator3() {
+        public AveragePointGenerator3() {
             Settings.IsSequential = true;
         }
 
