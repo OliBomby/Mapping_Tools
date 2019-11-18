@@ -82,6 +82,14 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectCollec
         public RelevantObjectCollection GetSubset(SelectionPredicateCollection predicate, RelevantObjectsGenerator generator) {
             var result = new RelevantObjectCollection();
 
+            if (predicate == null) {
+                foreach (var kvp in this) {
+                    result.Add(kvp.Key, kvp.Value);
+                }
+
+                return result;
+            }
+
             foreach (var kvp in this) {
                 result.Add(kvp.Key, kvp.Value.Where(o => predicate.Check(o, generator)).ToList());
             }
