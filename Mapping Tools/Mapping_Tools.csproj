@@ -259,6 +259,7 @@
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorInputSelection\SelectionPredicate.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorInputSelection\SelectionPredicateCollection.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorSettingses\SliderPathGeneratorSettings.cs" />
+    <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SameTransformGenerator4.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SameTransformGenerator2.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorSettings.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SameTransformGenerator.cs" />

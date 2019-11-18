@@ -6,7 +6,7 @@ using System;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
     public class SameTransformGenerator2 : RelevantObjectsGenerator {
-        public override string Name => "Same Transformation Generator Reversed";
+        public override string Name => "Same Transformation Generator 3 Reversed";
         public override string Tooltip => "Takes 3 virtual points and predicts the next virtual point using the transformation matrix of the previous 3 virtual points, but the angle is reversed.";
         public override GeneratorType GeneratorType => GeneratorType.Advanced;
         public override GeneratorTemporalPositioning TemporalPositioning => GeneratorTemporalPositioning.After;
