@@ -5,13 +5,13 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators
 using System;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
-    public class SameTransformGenerator2 : RelevantObjectsGenerator {
+    public class SameTransformGenerator3Reversed : RelevantObjectsGenerator {
         public override string Name => "Successor of 3 Points Reversed";
         public override string Tooltip => "Takes 3 virtual points and calculates the next virtual point using the same velocity change and opposite angle.";
         public override GeneratorType GeneratorType => GeneratorType.Advanced;
         public override GeneratorTemporalPositioning TemporalPositioning => GeneratorTemporalPositioning.After;
 
-        public SameTransformGenerator2() {
+        public SameTransformGenerator3Reversed() {
             Settings.IsSequential = true;
         }
 

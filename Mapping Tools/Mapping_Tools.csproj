@@ -264,9 +264,9 @@
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\AveragePointGenerator2.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SymmetryGenerator.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SameTransformGenerator4.cs" />
-    <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SameTransformGenerator2.cs" />
+    <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SameTransformGenerator3Reversed.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorSettings.cs" />
-    <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SameTransformGenerator.cs" />
+    <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SameTransformGenerator3.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SliderPathGenerator.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SquareGenerator.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SquareGenerator2.cs" />
