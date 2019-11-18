@@ -12,9 +12,11 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         [RelevantObjectsGeneratorMethod]
         public RelevantLine[] GetRelevantObjects(RelevantLine line1, RelevantLine line2) {
             if (!Line2.Intersection(line1.Child, line2.Child, out var intersection)) return null;
+            var dir1Norm = Vector2.Normalize(line1.Child.DirectionVector);
+            var dir2Norm = Vector2.Normalize(line2.Child.DirectionVector);
             return new[] {
-                new RelevantLine(new Line2(intersection, line1.Child.DirectionVector + line2.Child.DirectionVector)), 
-                new RelevantLine(new Line2(intersection, line1.Child.DirectionVector - line2.Child.DirectionVector))
+                new RelevantLine(new Line2(intersection, dir1Norm + dir2Norm)), 
+                new RelevantLine(new Line2(intersection, dir1Norm - dir2Norm))
             };
         }
     }
