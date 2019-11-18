@@ -6,8 +6,8 @@ using System;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
     public class SameTransformGenerator4 : RelevantObjectsGenerator {
-        public override string Name => "Same Transformation Generator 4";
-        public override string Tooltip => "Takes 4 virtual points and calculates the next point using complex math.";
+        public override string Name => "Successor of 4 Points";
+        public override string Tooltip => "Takes 4 virtual points and calculates the next virtual point using the same angle, angle change, velocity change and change of velocity change.";
         public override GeneratorType GeneratorType => GeneratorType.Advanced;
         public override GeneratorTemporalPositioning TemporalPositioning => GeneratorTemporalPositioning.After;
 

@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
     public class IntersectionGenerator : RelevantObjectsGenerator {
-        public override string Name => "Intersection Point Calculator";
+        public override string Name => "Intersection Points";
         public override string Tooltip => "Takes a pair of virtual lines or circles and generates a virtual point on each of their intersections.";
         public override GeneratorType GeneratorType => GeneratorType.Advanced;
 

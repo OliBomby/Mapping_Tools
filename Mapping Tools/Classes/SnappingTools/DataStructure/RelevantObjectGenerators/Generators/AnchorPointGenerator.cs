@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
     public class AnchorPointGenerator : RelevantObjectsGenerator {
-        public override string Name => "Virtual Points on Slider Anchors";
+        public override string Name => "Points on Slider Anchors";
         public override string Tooltip => "Generates virtual points on the anchor points of sliders.";
         public override GeneratorType GeneratorType => GeneratorType.Basic;
 
