@@ -28,6 +28,8 @@ using Mapping_Tools.Classes.SnappingTools.Serialization;
 namespace Mapping_Tools.Viewmodels {
     public class SnappingToolsVm : IDisposable
     {
+        #region fields
+
         public SnappingToolsProject Project { get; set; }
         protected SnappingToolsPreferences Preferences => Project.CurrentPreferences;
 
@@ -77,8 +79,11 @@ namespace Mapping_Tools.Viewmodels {
         private bool HotkeyUpRedrawsOverlay => Preferences.KeyDownViewMode != Preferences.KeyUpViewMode;
 
         private bool SnapChangeRedrawsOverlay => Preferences.KeyDownViewMode.HasFlag(ViewMode.Parents) || Preferences.KeyDownViewMode.HasFlag(ViewMode.DirectParents) ||
-                                                  Preferences.KeyDownViewMode.HasFlag(ViewMode.Children) || Preferences.KeyDownViewMode.HasFlag(ViewMode.DirectChildren);
+                                                 Preferences.KeyDownViewMode.HasFlag(ViewMode.Children) || Preferences.KeyDownViewMode.HasFlag(ViewMode.DirectChildren);
 
+        #endregion
+
+        #region default constructor
         public SnappingToolsVm() {
             // Set up a coordinate converter for converting coordinates between screen and osu!
             _coordinateConverter = new CoordinateConverter();
@@ -139,168 +144,9 @@ namespace Mapping_Tools.Viewmodels {
 
             _state = State.LookingForProcess;
         }
-
-        private void PreferencesOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
-            switch (e.PropertyName) {
-                case "OffsetLeft":
-                    _coordinateConverter.EditorBoxOffset.Left = Preferences.OffsetLeft;
-                    break;
-                case "OffsetTop":
-                    _coordinateConverter.EditorBoxOffset.Top = Preferences.OffsetTop;
-                    break;
-                case "OffsetRight":
-                    _coordinateConverter.EditorBoxOffset.Right = Preferences.OffsetRight;
-                    break;
-                case "OffsetBottom":
-                    _coordinateConverter.EditorBoxOffset.Bottom = Preferences.OffsetBottom;
-                    break;
-                case "AcceptableDifference":
-                    LayerCollection.AcceptableDifference = Preferences.AcceptableDifference;
-                    break;
-                case "DebugEnabled":
-                    _overlay.SetBorder(Preferences.DebugEnabled);
-                    break;
-                case "InceptionLevel":
-                    LayerCollection.SetInceptionLevel(Preferences.InceptionLevel);
-                    _overlay.OverlayWindow.InvalidateVisual();
-                    break;
-            }
-        }
-
-        public void UpdateEverything() {
-            _coordinateConverter.EditorBoxOffset.Left = Preferences.OffsetLeft;
-            _coordinateConverter.EditorBoxOffset.Top = Preferences.OffsetTop;
-            _coordinateConverter.EditorBoxOffset.Right = Preferences.OffsetRight;
-            _coordinateConverter.EditorBoxOffset.Bottom = Preferences.OffsetBottom;
-            LayerCollection.AcceptableDifference = Preferences.AcceptableDifference;
-            LayerCollection.SetInceptionLevel(Preferences.InceptionLevel);
-            if (_overlay != null) {
-                _overlay.SetBorder(Preferences.DebugEnabled);
-                _overlay.OverlayWindow.InvalidateVisual();
-            }
-        }
-
-        public void SetProject(SnappingToolsProject project) {
-            Project = project;
-            Project.SetGenerators(Generators);
-            UpdateEverything();
-        }
-
-        public SnappingToolsProject GetProject() {
-            return Project.GetThis();
-        }
-
-        private void OnDraw(object sender, DrawingContext context) {
-            //Console.WriteLine($@"Drawable count: {LayerCollection.GetAllRelevantDrawables().Count()}");
-            if (IsHotkeyDown(Preferences.SnapHotkey)) {
-                // Handle key down rendering
-                if (Preferences.KeyDownViewMode.HasFlag(ViewMode.Everything)) {
-                    foreach (var relevantDrawable in LayerCollection.GetAllRelevantDrawables()) {
-                        relevantDrawable.DrawYourself(context, _coordinateConverter, Preferences);
-                    }
-                    // It has already drawn everything so return
-                    return;
-                }
-
-                var objectsToRender = new HashSet<IRelevantObject>();
-
-                if (Preferences.KeyDownViewMode.HasFlag(ViewMode.Parents) && _lastSnappedRelevantObject != null) {
-                    // Get the parents of the relevant object which is being snapped to
-                    objectsToRender.UnionWith(_lastSnappedRelevantObject.GetParentage(int.MaxValue));
-                } else if (Preferences.KeyDownViewMode.HasFlag(ViewMode.DirectParents) && _lastSnappedRelevantObject != null) {
-                    objectsToRender.UnionWith(_lastSnappedRelevantObject.GetParentage(1));
-                }
-
-                if (Preferences.KeyDownViewMode.HasFlag(ViewMode.Children) && _lastSnappedRelevantObject != null) {
-                    // Get the parents of the relevant object which is being snapped to
-                    objectsToRender.UnionWith(_lastSnappedRelevantObject.GetDescendants(int.MaxValue));
-                } else if (Preferences.KeyDownViewMode.HasFlag(ViewMode.DirectChildren) && _lastSnappedRelevantObject != null) {
-                    objectsToRender.UnionWith(_lastSnappedRelevantObject.GetDescendants(1));
-                }
-
-                foreach (var relevantObject in objectsToRender) {
-                    if (relevantObject is IRelevantDrawable relevantDrawable) {
-                        relevantDrawable.DrawYourself(context, _coordinateConverter, Preferences);
-                    }
-                }
-            } else {
-                // Handle key up rendering
-                if (Preferences.KeyUpViewMode.HasFlag(ViewMode.Everything)) {
-                    foreach (var relevantDrawable in LayerCollection.GetAllRelevantDrawables()) {
-                        relevantDrawable.DrawYourself(context, _coordinateConverter, Preferences);
-                    }
-                }
-            }
-        }
-
-        private void OnSettingsChanged(object sender, PropertyChangedEventArgs e) {
-            if (e.PropertyName != "OsuConfigPath") return;
-            SetConfigWatcherPath(SettingsManager.Settings.OsuConfigPath);
-            _coordinateConverter.ReadConfig();
-        }
-
-        private void SetConfigWatcherPath(string path) {
-            try {
-                _configWatcher.Path = Path.GetDirectoryName(path);
-                _configWatcher.Filter = Path.GetFileName(path);
-            }
-            catch (Exception ex) { Console.WriteLine(@"Can't set ConfigWatcher Path/Filter: " + ex.Message); }
-        }
-
-        private void OnChangedConfigWatcher(object sender, FileSystemEventArgs e) {
-            _coordinateConverter.ReadConfig();
-        }
-
-        private void OnGeneratorSettingsPropertyChanged(object sender, PropertyChangedEventArgs e) {
-            var settings = (GeneratorSettings) sender;
-            var generator = settings.Generator;
-
-            switch (e.PropertyName) {
-                case "IsActive":
-                    if (_state == State.Active) {
-                        // Reload relevant objects when a generator gets enabled/disabled
-                        if (settings.IsActive) {
-                            // Generate new objects for all layers
-                            LayerCollection.GetRootLayer().GenerateNewObjects(true);
-                        } else {
-                            // Delete all relevant objects generated by this generator
-                            foreach (var objectLayerObject in LayerCollection.ObjectLayers.SelectMany(objectLayer => objectLayer.Objects.Values)) {
-                                for (var i = 0; i < objectLayerObject.Count; i++) {
-                                    if (objectLayerObject[i].Generator != generator) continue;
-                                    objectLayerObject[i].Dispose();
-                                    i--;
-                                }
-                            }
-                        }
-
-                        // Redraw the overlay
-                        _overlay.OverlayWindow.InvalidateVisual();
-                    }
-
-                    break;
-                default:
-                    if (_state == State.Active) {
-                        // Delete all relevant objects generated by this generator
-                        foreach (var objectLayerObject in LayerCollection.ObjectLayers.SelectMany(objectLayer => objectLayer.Objects.Values)) {
-                            for (var i = 0; i < objectLayerObject.Count; i++) {
-                                if (objectLayerObject[i].Generator != generator) continue;
-                                objectLayerObject[i].Dispose();
-                                i--;
-                            }
-                        }
-
-                        // Generate new objects for all layers
-                        LayerCollection.GetRootLayer().GenerateNewObjects(true);
-
-                        // Redraw the overlay
-                        _overlay.OverlayWindow.InvalidateVisual();
-                    }
-
-                    break;
-            }
-            
-        }
-
+        #endregion
+        
+        #region main loop
         private void UpdateTimerTick(object sender, EventArgs e) {
             var reader = EditorReaderStuff.GetEditorReader();
             switch (_state) {
@@ -442,7 +288,53 @@ namespace Mapping_Tools.Viewmodels {
                     throw new ArgumentOutOfRangeException();
             }
         }
+        #endregion
 
+        #region geometry dashboard helpers
+        
+        private void OnDraw(object sender, DrawingContext context) {
+            //Console.WriteLine($@"Drawable count: {LayerCollection.GetAllRelevantDrawables().Count()}");
+            if (IsHotkeyDown(Preferences.SnapHotkey)) {
+                // Handle key down rendering
+                if (Preferences.KeyDownViewMode.HasFlag(ViewMode.Everything)) {
+                    foreach (var relevantDrawable in LayerCollection.GetAllRelevantDrawables()) {
+                        relevantDrawable.DrawYourself(context, _coordinateConverter, Preferences);
+                    }
+                    // It has already drawn everything so return
+                    return;
+                }
+
+                var objectsToRender = new HashSet<IRelevantObject>();
+
+                if (Preferences.KeyDownViewMode.HasFlag(ViewMode.Parents) && _lastSnappedRelevantObject != null) {
+                    // Get the parents of the relevant object which is being snapped to
+                    objectsToRender.UnionWith(_lastSnappedRelevantObject.GetParentage(int.MaxValue));
+                } else if (Preferences.KeyDownViewMode.HasFlag(ViewMode.DirectParents) && _lastSnappedRelevantObject != null) {
+                    objectsToRender.UnionWith(_lastSnappedRelevantObject.GetParentage(1));
+                }
+
+                if (Preferences.KeyDownViewMode.HasFlag(ViewMode.Children) && _lastSnappedRelevantObject != null) {
+                    // Get the parents of the relevant object which is being snapped to
+                    objectsToRender.UnionWith(_lastSnappedRelevantObject.GetDescendants(int.MaxValue));
+                } else if (Preferences.KeyDownViewMode.HasFlag(ViewMode.DirectChildren) && _lastSnappedRelevantObject != null) {
+                    objectsToRender.UnionWith(_lastSnappedRelevantObject.GetDescendants(1));
+                }
+
+                foreach (var relevantObject in objectsToRender) {
+                    if (relevantObject is IRelevantDrawable relevantDrawable) {
+                        relevantDrawable.DrawYourself(context, _coordinateConverter, Preferences);
+                    }
+                }
+            } else {
+                // Handle key up rendering
+                if (Preferences.KeyUpViewMode.HasFlag(ViewMode.Everything)) {
+                    foreach (var relevantDrawable in LayerCollection.GetAllRelevantDrawables()) {
+                        relevantDrawable.DrawYourself(context, _coordinateConverter, Preferences);
+                    }
+                }
+            }
+        }
+        
         private List<HitObject> GetHitObjects()
         {
             if (!EditorReaderStuff.TryGetFullEditorReader(out var reader)) return new List<HitObject>();
@@ -491,6 +383,52 @@ namespace Mapping_Tools.Viewmodels {
             _overlay.OverlayWindow.InvalidateVisual();
         }
 
+
+        private IRelevantDrawable GetNearestDrawable(Vector2 cursorPos) {
+            // Get all the relevant drawables
+            var drawables = LayerCollection.GetAllRelevantDrawables().ToArray();
+
+            // Get the relevant object nearest to the cursor
+            IRelevantDrawable nearest = null;
+            var smallestDistance = double.PositiveInfinity;
+            foreach (var o in drawables) {
+                var dist = o.DistanceTo(cursorPos);
+                if (o is RelevantPoint) // Prioritize points to be able to snap to intersections
+                    dist -= PointsBias;
+
+                if (!(dist < smallestDistance)) continue;
+                smallestDistance = dist;
+                nearest = o;
+            }
+
+            return nearest;
+        }
+
+        private Vector2 GetCursorPosition() {
+            // System.Windows.Forms.Cursor.Position = new Point();
+            var cursorPoint = System.Windows.Forms.Cursor.Position;
+            // CONVERT THIS CURSOR POSITION TO EDITOR POSITION
+            var cursorPos = _coordinateConverter.ScreenToEditorCoordinate(new Vector2(cursorPoint.X, cursorPoint.Y));
+
+            return cursorPos;
+        }
+
+        private static bool IsHotkeyDown(Hotkey hotkey) {
+            if (hotkey == null)
+                return false;
+            if (!Keyboard.IsKeyDown(hotkey.Key))
+                return false;
+            if (hotkey.Modifiers.HasFlag(ModifierKeys.Alt) != (Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt)))
+                return false;
+            if (hotkey.Modifiers.HasFlag(ModifierKeys.Control) != (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
+                return false;
+            if (hotkey.Modifiers.HasFlag(ModifierKeys.Shift) != (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)))
+                return false;
+            return hotkey.Modifiers.HasFlag(ModifierKeys.Windows) == (Keyboard.IsKeyDown(Key.LWin) || Keyboard.IsKeyDown(Key.RWin));
+        }
+        #endregion
+
+        #region hotkey loop ticks
         private void AutoSnapTimerTick(object sender, EventArgs e) {
             // Check timer stop
             if (!IsHotkeyDown(Preferences.SnapHotkey)) {
@@ -620,50 +558,114 @@ namespace Mapping_Tools.Viewmodels {
             // Redraw overlay
             _overlay.OverlayWindow.InvalidateVisual();
         }
+        
+        #endregion
 
-        private IRelevantDrawable GetNearestDrawable(Vector2 cursorPos) {
-            // Get all the relevant drawables
-            var drawables = LayerCollection.GetAllRelevantDrawables().ToArray();
+        #region change listeners
 
-            // Get the relevant object nearest to the cursor
-            IRelevantDrawable nearest = null;
-            var smallestDistance = double.PositiveInfinity;
-            foreach (var o in drawables) {
-                var dist = o.DistanceTo(cursorPos);
-                if (o is RelevantPoint) // Prioritize points to be able to snap to intersections
-                    dist -= PointsBias;
-
-                if (!(dist < smallestDistance)) continue;
-                smallestDistance = dist;
-                nearest = o;
+        private void PreferencesOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
+            switch (e.PropertyName) {
+                case "OffsetLeft":
+                    _coordinateConverter.EditorBoxOffset.Left = Preferences.OffsetLeft;
+                    break;
+                case "OffsetTop":
+                    _coordinateConverter.EditorBoxOffset.Top = Preferences.OffsetTop;
+                    break;
+                case "OffsetRight":
+                    _coordinateConverter.EditorBoxOffset.Right = Preferences.OffsetRight;
+                    break;
+                case "OffsetBottom":
+                    _coordinateConverter.EditorBoxOffset.Bottom = Preferences.OffsetBottom;
+                    break;
+                case "AcceptableDifference":
+                    LayerCollection.AcceptableDifference = Preferences.AcceptableDifference;
+                    break;
+                case "DebugEnabled":
+                    _overlay.SetBorder(Preferences.DebugEnabled);
+                    break;
+                case "InceptionLevel":
+                    LayerCollection.SetInceptionLevel(Preferences.InceptionLevel);
+                    _overlay.OverlayWindow.InvalidateVisual();
+                    break;
             }
-
-            return nearest;
         }
 
-        private Vector2 GetCursorPosition() {
-            // System.Windows.Forms.Cursor.Position = new Point();
-            var cursorPoint = System.Windows.Forms.Cursor.Position;
-            // CONVERT THIS CURSOR POSITION TO EDITOR POSITION
-            var cursorPos = _coordinateConverter.ScreenToEditorCoordinate(new Vector2(cursorPoint.X, cursorPoint.Y));
-
-            return cursorPos;
+        private void OnSettingsChanged(object sender, PropertyChangedEventArgs e) {
+            if (e.PropertyName != "OsuConfigPath") return;
+            SetConfigWatcherPath(SettingsManager.Settings.OsuConfigPath);
+            _coordinateConverter.ReadConfig();
         }
 
-        private static bool IsHotkeyDown(Hotkey hotkey) {
-            if (hotkey == null)
-                return false;
-            if (!Keyboard.IsKeyDown(hotkey.Key))
-                return false;
-            if (hotkey.Modifiers.HasFlag(ModifierKeys.Alt) != (Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt)))
-                return false;
-            if (hotkey.Modifiers.HasFlag(ModifierKeys.Control) != (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
-                return false;
-            if (hotkey.Modifiers.HasFlag(ModifierKeys.Shift) != (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)))
-                return false;
-            return hotkey.Modifiers.HasFlag(ModifierKeys.Windows) == (Keyboard.IsKeyDown(Key.LWin) || Keyboard.IsKeyDown(Key.RWin));
+        private void OnGeneratorSettingsPropertyChanged(object sender, PropertyChangedEventArgs e) {
+            var settings = (GeneratorSettings) sender;
+            var generator = settings.Generator;
+
+            switch (e.PropertyName) {
+                case "IsActive":
+                    if (_state == State.Active) {
+                        // Reload relevant objects when a generator gets enabled/disabled
+                        if (settings.IsActive) {
+                            // Generate new objects for all layers
+                            LayerCollection.GetRootLayer().GenerateNewObjects(true);
+                        } else {
+                            // Delete all relevant objects generated by this generator
+                            foreach (var objectLayerObject in LayerCollection.ObjectLayers.SelectMany(objectLayer => objectLayer.Objects.Values)) {
+                                for (var i = 0; i < objectLayerObject.Count; i++) {
+                                    if (objectLayerObject[i].Generator != generator) continue;
+                                    objectLayerObject[i].Dispose();
+                                    i--;
+                                }
+                            }
+                        }
+
+                        // Redraw the overlay
+                        _overlay.OverlayWindow.InvalidateVisual();
+                    }
+
+                    break;
+                default:
+                    if (_state == State.Active) {
+                        // Delete all relevant objects generated by this generator
+                        foreach (var objectLayerObject in LayerCollection.ObjectLayers.SelectMany(objectLayer => objectLayer.Objects.Values)) {
+                            for (var i = 0; i < objectLayerObject.Count; i++) {
+                                if (objectLayerObject[i].Generator != generator) continue;
+                                objectLayerObject[i].Dispose();
+                                i--;
+                            }
+                        }
+
+                        // Generate new objects for all layers
+                        LayerCollection.GetRootLayer().GenerateNewObjects(true);
+
+                        // Redraw the overlay
+                        _overlay.OverlayWindow.InvalidateVisual();
+                    }
+
+                    break;
+            }
+            
         }
 
+        #endregion
+
+        #region osu config watcher
+
+        private void SetConfigWatcherPath(string path) {
+            try {
+                _configWatcher.Path = Path.GetDirectoryName(path);
+                _configWatcher.Filter = Path.GetFileName(path);
+            }
+            catch (Exception ex) { Console.WriteLine(@"Can't set ConfigWatcher Path/Filter: " + ex.Message); }
+        }
+
+        private void OnChangedConfigWatcher(object sender, FileSystemEventArgs e) {
+            _coordinateConverter.ReadConfig();
+        }
+
+        #endregion
+
+        #region UI helpers
+        
         private bool UserFilter(object item) {
             if (string.IsNullOrEmpty(Filter))
                 return true;
@@ -674,6 +676,38 @@ namespace Mapping_Tools.Viewmodels {
             _filter = value;
             CollectionViewSource.GetDefaultView(Generators).Refresh();
         }
+        
+
+        #endregion
+        
+        #region serialization stuff
+
+        public void UpdateEverything() {
+            _coordinateConverter.EditorBoxOffset.Left = Preferences.OffsetLeft;
+            _coordinateConverter.EditorBoxOffset.Top = Preferences.OffsetTop;
+            _coordinateConverter.EditorBoxOffset.Right = Preferences.OffsetRight;
+            _coordinateConverter.EditorBoxOffset.Bottom = Preferences.OffsetBottom;
+            LayerCollection.AcceptableDifference = Preferences.AcceptableDifference;
+            LayerCollection.SetInceptionLevel(Preferences.InceptionLevel);
+            if (_overlay != null) {
+                _overlay.SetBorder(Preferences.DebugEnabled);
+                _overlay.OverlayWindow.InvalidateVisual();
+            }
+        }
+
+        public void SetProject(SnappingToolsProject project) {
+            Project = project;
+            Project.SetGenerators(Generators);
+            UpdateEverything();
+        }
+
+        public SnappingToolsProject GetProject() {
+            return Project.GetThis();
+        }
+
+        #endregion
+
+        #region tool management helpers
 
         public void Dispose() {
             _overlay?.Dispose();
@@ -708,5 +742,6 @@ namespace Mapping_Tools.Viewmodels {
             _state = State.Disabled;
             _overlay?.Dispose();
         }
+        #endregion
     }
 }
