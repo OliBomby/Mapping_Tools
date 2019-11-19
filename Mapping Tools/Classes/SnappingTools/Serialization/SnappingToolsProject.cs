@@ -49,7 +49,10 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
         /// </summary>
         /// <returns></returns>
         public SnappingToolsProject GetThis() {
-            CurrentPreferences.SaveGeneratorSettings(_generators);
+            if (_generators != null) {
+                CurrentPreferences.SaveGeneratorSettings(_generators);
+            }
+
             return this;
         }
     }

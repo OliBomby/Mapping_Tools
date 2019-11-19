@@ -31,7 +31,7 @@ namespace Mapping_Tools.Viewmodels {
         public SnappingToolsProject Project { get; set; }
         protected SnappingToolsPreferences Preferences => Project.CurrentPreferences;
 
-        protected ObservableCollection<RelevantObjectsGenerator> Generators { get; }
+        public ObservableCollection<RelevantObjectsGenerator> Generators { get; }
         protected readonly LayerCollection LayerCollection;
 
         private IRelevantObject _lastSnappedRelevantObject;
@@ -173,9 +173,11 @@ namespace Mapping_Tools.Viewmodels {
             _coordinateConverter.EditorBoxOffset.Right = Preferences.OffsetRight;
             _coordinateConverter.EditorBoxOffset.Bottom = Preferences.OffsetBottom;
             LayerCollection.AcceptableDifference = Preferences.AcceptableDifference;
-            _overlay.SetBorder(Preferences.DebugEnabled);
             LayerCollection.SetInceptionLevel(Preferences.InceptionLevel);
-            _overlay.OverlayWindow.InvalidateVisual();
+            if (_overlay != null) {
+                _overlay.SetBorder(Preferences.DebugEnabled);
+                _overlay.OverlayWindow.InvalidateVisual();
+            }
         }
 
         public void SetProject(SnappingToolsProject project) {
