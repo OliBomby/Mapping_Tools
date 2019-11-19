@@ -167,7 +167,7 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
-        public void UpdateStuff() {
+        public void UpdateEverything() {
             _coordinateConverter.EditorBoxOffset.Left = Preferences.OffsetLeft;
             _coordinateConverter.EditorBoxOffset.Top = Preferences.OffsetTop;
             _coordinateConverter.EditorBoxOffset.Right = Preferences.OffsetRight;
@@ -181,7 +181,7 @@ namespace Mapping_Tools.Viewmodels {
         public void SetProject(SnappingToolsProject project) {
             Project = project;
             Project.SetGenerators(Generators);
-            UpdateStuff();
+            UpdateEverything();
         }
 
         public SnappingToolsProject GetProject() {
