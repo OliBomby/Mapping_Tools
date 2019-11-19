@@ -1,16 +1,15 @@
-﻿using Mapping_Tools.Classes.SnappingTools;
+﻿using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SnappingTools.Serialization;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Viewmodels;
 using Mapping_Tools.Views.SnappingTools;
 using System;
 using System.IO;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Views {
-    public partial class SnappingToolsView : ISavable<SnappingToolsPreferences> {
+    public partial class SnappingToolsView : ISavable<SnappingToolsProject> {
 
         public static readonly string ToolName = "Geometry Dashboard";
 
@@ -32,17 +31,17 @@ namespace Mapping_Tools.Views {
         }
 
         private void PreferencesButton_Click(object sender, System.Windows.RoutedEventArgs e) {
-            var preferencesWindow = new SnappingToolsPreferencesWindow(GetSaveData());
+            var preferencesWindow = new SnappingToolsPreferencesWindow(ViewModel.Project.GetCurrentPreferences());
             var result = preferencesWindow.ShowDialog();
             if (result.GetValueOrDefault()) {
-                SetSaveData(preferencesWindow.Preferences);
+                ViewModel.Project.SetCurrentPreferences(preferencesWindow.Preferences);
             } 
         }
 
-        public SnappingToolsPreferences GetSaveData() => ViewModel.GetPreferences();
+        public SnappingToolsProject GetSaveData() => ViewModel.GetProject();
 
-        public void SetSaveData(SnappingToolsPreferences saveData) {
-            ViewModel.SetPreferences(saveData);
+        public void SetSaveData(SnappingToolsProject saveData) {
+            ViewModel.SetProject(saveData);
         }
 
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "geometrydashboardproject.json");

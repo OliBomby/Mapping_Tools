@@ -302,7 +302,8 @@
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\TriangleGenerator2.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObject\RelevantObjectPreferences.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObject\RelevantObjects\RelevantPoint.cs" />
-    <Compile Include="Classes\SnappingTools\SnappingToolsPreferences.cs" />
+    <Compile Include="Classes\SnappingTools\Serialization\SnappingToolsPreferences.cs" />
+    <Compile Include="Classes\SnappingTools\Serialization\SnappingToolsProject.cs" />
     <Compile Include="Classes\SystemTools\ActionHotkey.cs" />
     <Compile Include="Classes\SystemTools\BindableBase.cs" />
     <Compile Include="Classes\SystemTools\Hotkey.cs" />

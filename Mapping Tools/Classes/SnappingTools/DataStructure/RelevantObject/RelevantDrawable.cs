@@ -1,5 +1,6 @@
 ﻿using System.Windows.Media;
 using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SnappingTools.Serialization;
 using MaterialDesignColors.ColorManipulation;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
