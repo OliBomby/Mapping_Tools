@@ -23,13 +23,15 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using Mapping_Tools.Classes.SnappingTools.Serialization;
 
 namespace Mapping_Tools.Viewmodels {
     public class SnappingToolsVm : IDisposable
     {
-        public SnappingToolsPreferences Preferences { get; }
+        public SnappingToolsProject Project { get; set; }
+        protected SnappingToolsPreferences Preferences => Project.CurrentPreferences;
 
-        public ObservableCollection<RelevantObjectsGenerator> Generators { get; }
+        protected ObservableCollection<RelevantObjectsGenerator> Generators { get; }
         protected readonly LayerCollection LayerCollection;
 
         private IRelevantObject _lastSnappedRelevantObject;
@@ -81,8 +83,8 @@ namespace Mapping_Tools.Viewmodels {
             // Set up a coordinate converter for converting coordinates between screen and osu!
             _coordinateConverter = new CoordinateConverter();
 
-            // Get preferences
-            Preferences = new SnappingToolsPreferences();
+            // Initialize project and preferences
+            Project = new SnappingToolsProject();
             Preferences.PropertyChanged += PreferencesOnPropertyChanged;
 
             // Get all the RelevantObjectGenerators
@@ -91,6 +93,9 @@ namespace Mapping_Tools.Viewmodels {
               .SelectMany(x => x.GetTypes())
               .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
               .Select(Activator.CreateInstance).OfType<RelevantObjectsGenerator>());
+
+            // Set project stuff
+            Project.SetGenerators(Generators);
 
             // Add PropertyChanged event to all generators to listen for changes
             foreach (var gen in Generators) { gen.Settings.PropertyChanged += OnGeneratorSettingsPropertyChanged; }
@@ -159,19 +164,28 @@ namespace Mapping_Tools.Viewmodels {
                     LayerCollection.SetInceptionLevel(Preferences.InceptionLevel);
                     _overlay.OverlayWindow.InvalidateVisual();
                     break;
-                case "GeneratorSettings":
-                    Preferences.ApplyGeneratorSettings(Generators);
-                    break;
             }
         }
 
-        public SnappingToolsPreferences GetPreferences() {
-            Preferences.SaveGeneratorSettings(Generators);
-            return Preferences;
+        public void UpdateStuff() {
+            _coordinateConverter.EditorBoxOffset.Left = Preferences.OffsetLeft;
+            _coordinateConverter.EditorBoxOffset.Top = Preferences.OffsetTop;
+            _coordinateConverter.EditorBoxOffset.Right = Preferences.OffsetRight;
+            _coordinateConverter.EditorBoxOffset.Bottom = Preferences.OffsetBottom;
+            LayerCollection.AcceptableDifference = Preferences.AcceptableDifference;
+            _overlay.SetBorder(Preferences.DebugEnabled);
+            LayerCollection.SetInceptionLevel(Preferences.InceptionLevel);
+            _overlay.OverlayWindow.InvalidateVisual();
         }
 
-        public void SetPreferences(SnappingToolsPreferences preferences) {
-            preferences?.CopyTo(Preferences);
+        public void SetProject(SnappingToolsProject project) {
+            Project = project;
+            Project.SetGenerators(Generators);
+            UpdateStuff();
+        }
+
+        public SnappingToolsProject GetProject() {
+            return Project.GetThis();
         }
 
         private void OnDraw(object sender, DrawingContext context) {
