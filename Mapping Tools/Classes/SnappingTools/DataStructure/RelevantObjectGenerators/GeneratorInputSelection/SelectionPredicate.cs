@@ -14,9 +14,6 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         public bool NeedGeneratedNotByThis { get => _needGeneratedNotByThis; set => Set(ref _needGeneratedNotByThis, value); }
         public double MinRelevancy { get => _minRelevancy; set => Set(ref _minRelevancy, value); }
 
-        public SelectionPredicate() {
-        }
-
         public bool Check(IRelevantObject relevantObject, RelevantObjectsGenerator generator) {
             if (NeedSelected && !relevantObject.IsSelected) return false;
             if (NeedLocked && !relevantObject.IsLocked) return false;

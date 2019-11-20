@@ -111,7 +111,7 @@ namespace Mapping_Tools.Views.SnappingTools {
                     horizontalPanel.Children.Add(stringTextBox);
                     break;
                 case SelectionPredicateCollection c:
-                    var list = new ListView {Width = 230, ItemsSource = c.Predicates};
+                    var list = new ListView {Width = 270, ItemsSource = c.Predicates};
                     list.ItemTemplate = FindResource("SelectionPredicateTemplate") as DataTemplate;
                     var cm = new ContextMenu();
                     cm.Items.Add(new MenuItem {Header = "Duplicate", 
