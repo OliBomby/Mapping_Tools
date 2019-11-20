@@ -70,7 +70,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
 
         private SelectionPredicateCollection _inputPredicate;
         [DisplayName("Input Selection")]
-        [Description("Specifies extra rules that virtual objects need to obey in order to be used by this generator.")]
+        [Description("Specifies extra rules that virtual objects need to obey to be used by this generator.")]
         public SelectionPredicateCollection InputPredicate {
             get => _inputPredicate;
             set => Set(ref _inputPredicate, value);
