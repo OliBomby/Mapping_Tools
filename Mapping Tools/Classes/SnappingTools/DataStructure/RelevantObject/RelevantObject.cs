@@ -3,7 +3,6 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 using System.Collections.Generic;
 using System.Linq;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
     public abstract class RelevantObject : IRelevantObject {
@@ -62,8 +61,25 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
 
         public bool DoNotDispose { get; set; }
 
-        public virtual bool IsSelected { get; set; }
-        public bool IsLocked { get; set; }
+        private bool _isSelected;
+        public virtual bool IsSelected {
+            get => _isSelected;
+            set {
+                if (_isSelected == value) return;
+                _isSelected = value;
+                Layer?.NextLayer?.GenerateNewObjects();
+            }
+        }
+
+        private bool _isLocked;
+        public bool IsLocked {
+            get => _isLocked;
+            set {
+                if (_isLocked == value) return;
+                _isLocked = value;
+                Layer?.NextLayer?.GenerateNewObjects();
+            }
+        }
 
         private bool _isInheritable = true;
         public bool IsInheritable {
