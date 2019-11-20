@@ -239,12 +239,6 @@ namespace Mapping_Tools.Viewmodels {
                             }
 
                             break;
-                        case UpdateMode.HotkeyDown:
-                            if (IsHotkeyDown(Preferences.SnapHotkey)) {
-                                UpdateRelevantObjects();
-                            }
-
-                            break;
                         case UpdateMode.OsuActivated:
                             // Before not activated and after activated
                             if (!_osuActivated && osuActivated) {
@@ -252,8 +246,13 @@ namespace Mapping_Tools.Viewmodels {
                             }
 
                             break;
+                        case UpdateMode.HotkeyDown:
+                            break;
                         default:
                             throw new ArgumentOutOfRangeException();
+                    }
+                    if (IsHotkeyDown(Preferences.RefreshHotkey)) {
+                        UpdateRelevantObjects();
                     }
 
                     // Update old editor time variable

@@ -18,6 +18,7 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
         private Hotkey selectHotkey;
         private Hotkey lockHotkey;
         private Hotkey inheritHotkey;
+        private Hotkey refreshHotkey;
         private double offsetLeft;
         private double offsetTop;
         private double offsetRight;
@@ -58,6 +59,10 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
         public Hotkey InheritHotkey {
             get => inheritHotkey;
             set => Set(ref inheritHotkey, value);
+        }
+        public Hotkey RefreshHotkey {
+            get => refreshHotkey;
+            set => Set(ref refreshHotkey, value);
         }
 
         public double OffsetLeft {
@@ -200,6 +205,7 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
             selectHotkey = new Hotkey(Key.N, ModifierKeys.None);
             lockHotkey = new Hotkey(Key.N, ModifierKeys.Shift);
             inheritHotkey = new Hotkey(Key.N, ModifierKeys.Alt);
+            refreshHotkey = new Hotkey(Key.B, ModifierKeys.None);
             offsetLeft = 0;
             offsetTop = 1;
             offsetRight = 0;

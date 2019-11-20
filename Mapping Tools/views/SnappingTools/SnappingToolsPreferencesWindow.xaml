@@ -64,6 +64,10 @@
                                 <components1:HotkeyEditorControl Width="150" VerticalAlignment="Bottom" Hotkey="{Binding InheritHotkey}"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
+                                <TextBlock Width="100" Text="Refresh Key" VerticalAlignment="Bottom" Margin="0 0 0 6" ToolTip="Press or hold this key to continuously refresh the hit objects in the root layer the object tree."/>
+                                <components1:HotkeyEditorControl Width="150" VerticalAlignment="Bottom" Hotkey="{Binding RefreshHotkey}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="10">
                                 <TextBlock Width="100" Margin="0 0 0 6" Text="Offset" VerticalAlignment="Bottom" ToolTip="Offsets the overlay box. Use this field when the automatic editor-to-screen coordinate conversion seems to fail. Enable Debug mode to see the overlay box."/>
                                 <TextBox Text="{Binding OffsetLeft, Converter={StaticResource DoubleToStringConverter}}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Left offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 10 0"/>
                                 <TextBox Text="{Binding OffsetTop, Converter={StaticResource DoubleToStringConverter}}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Top offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 10 0"/>
@@ -123,10 +127,10 @@
                                                  Content="Any change" ToolTip="Update whenever used hit objects get changed."/>
                                     <RadioButton IsChecked="{Binding UpdateMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static serialization:UpdateMode.TimeChange}}"
                                                  Content="Time change" ToolTip="Update whenever the editor changes time."/>
-                                    <RadioButton IsChecked="{Binding UpdateMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static serialization:UpdateMode.HotkeyDown}}"
-                                                 Content="Hotkey down" ToolTip="Update whenever the snapping hotkey is down."/>
                                     <RadioButton IsChecked="{Binding UpdateMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static serialization:UpdateMode.OsuActivated}}"
                                                  Content="osu! activated" ToolTip="Update whenever the osu! window goes from an inactive state to an active state."/>
+                                    <RadioButton IsChecked="{Binding UpdateMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static serialization:UpdateMode.HotkeyDown}}"
+                                                 Content="Hotkey down" ToolTip="Update only when refresh hotkey is down."/>
                                 </StackPanel>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
