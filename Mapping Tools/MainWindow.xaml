@@ -123,6 +123,8 @@
             <Separator Background="{DynamicResource MaterialDesignDivider}" Grid.Row="2"/>
             <Grid x:Name="ThirdGrid" Grid.Row="3">
                 <ContentControl Margin="20" Name="content_views" Content="{Binding}"></ContentControl>
+
+                <materialDesign:Snackbar x:Name="MainSnackbar" MessageQueue="{materialDesign:MessageQueue}"/>
             </Grid>
             <materialDesign:ColorZone Mode="PrimaryDark" Grid.Row="4">
                 <Grid x:Name="ForthGrid">
