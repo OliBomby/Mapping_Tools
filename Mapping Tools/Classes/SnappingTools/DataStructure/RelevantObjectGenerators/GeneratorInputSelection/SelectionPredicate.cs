@@ -28,5 +28,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         public override string ToString() {
             return $@"NeedSelected: {NeedSelected}, NeedLocked: {NeedLocked}, NeedGeneratedByThis: {NeedGeneratedByThis}, NeedGeneratedNotByThis: {NeedGeneratedNotByThis}, MinRelevancy: {MinRelevancy}";
         }
+
+        public SelectionPredicate Clone() {
+            return (SelectionPredicate)MemberwiseClone();
+        }
     }
 }

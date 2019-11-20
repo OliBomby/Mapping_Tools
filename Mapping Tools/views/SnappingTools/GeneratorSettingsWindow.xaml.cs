@@ -1,6 +1,8 @@
-﻿using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
+﻿using Mapping_Tools.Classes;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
 using Mapping_Tools.Components.Domain;
+using MaterialDesignThemes.Wpf;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -49,7 +51,7 @@ namespace Mapping_Tools.Views.SnappingTools {
 
         private void CreateCard(IReadOnlyCollection<PropertyInfo> props, object settings) {
             if (props.Count == 0) return;
-            var card = new MaterialDesignThemes.Wpf.Card {Margin = new Thickness(10)};
+            var card = new Card {Margin = new Thickness(10)};
             var panel = new StackPanel();
             card.Content = panel;
 
@@ -109,9 +111,43 @@ namespace Mapping_Tools.Views.SnappingTools {
                     horizontalPanel.Children.Add(stringTextBox);
                     break;
                 case SelectionPredicateCollection c:
-                    var list = new ListView {Width = 300, ItemsSource = c.Predicates};
+                    var list = new ListView {Width = 230, ItemsSource = c.Predicates};
                     list.ItemTemplate = FindResource("SelectionPredicateTemplate") as DataTemplate;
+                    var cm = new ContextMenu();
+                    cm.Items.Add(new MenuItem {Header = "Duplicate", 
+                        Command = new CommandImplementation(_ => {
+                                var itemsToDupe = new SelectionPredicate[list.SelectedItems.Count];
+                                var i = 0;
+                                foreach (var listSelectedItem in list.SelectedItems) {
+                                    itemsToDupe[i++] = (SelectionPredicate)listSelectedItem;
+                                }
+                                foreach (var listSelectedItem in itemsToDupe) {
+                                    c.Predicates.Insert(list.Items.IndexOf(listSelectedItem)+1, listSelectedItem.Clone());
+                                }
+                        })});
+                    cm.Items.Add(new MenuItem {Header = "Remove",
+                        Command = new CommandImplementation(_ =>
+                            c.Predicates.RemoveAll(o => list.SelectedItems.Contains(o)))
+                    });
+                    list.ContextMenu = cm;
+
+                    var addButton = new Button {Style = FindResource("MaterialDesignFloatingActionMiniLightButton") as Style,
+                        VerticalAlignment = VerticalAlignment.Bottom,
+                        Content = new PackIcon {Kind = PackIconKind.Plus, Width = 24, Height = 24},
+                        Margin = new Thickness(5),
+                        Command = new CommandImplementation(_ => c.Predicates.Add(new SelectionPredicate()))};
+                    addButton.SetValue(Grid.ColumnProperty, 1);
+
+                    var removeButton = new Button {Style = FindResource("MaterialDesignFloatingActionMiniLightButton") as Style,
+                        VerticalAlignment = VerticalAlignment.Bottom,
+                        Content = new PackIcon {Kind = PackIconKind.Minus, Width = 24, Height = 24},
+                        Margin = new Thickness(5),
+                        Command = new CommandImplementation(_ => c.Predicates.RemoveAll(o => list.SelectedItems.Contains(o)))};
+                    removeButton.SetValue(Grid.ColumnProperty, 2);
+
                     horizontalPanel.Children.Add(list);
+                    horizontalPanel.Children.Add(addButton);
+                    horizontalPanel.Children.Add(removeButton);
                     break;
             }
 
