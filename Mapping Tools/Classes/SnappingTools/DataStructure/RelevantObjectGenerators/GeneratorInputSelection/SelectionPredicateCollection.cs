@@ -21,10 +21,12 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
             builder.Append('{');
             foreach (var selectionPredicate in Predicates) {
                 builder.Append(selectionPredicate);
-                builder.Append(", ");
+                builder.Append(" OR ");
             }
 
-            builder.Remove(builder.Length - 2, 2);
+            if (builder.Length >= 4) {
+                builder.Remove(builder.Length - 4, 4);
+            }
             builder.Append('}');
 
             return builder.ToString();

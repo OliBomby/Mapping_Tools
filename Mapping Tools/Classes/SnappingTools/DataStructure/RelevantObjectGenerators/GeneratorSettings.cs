@@ -1,11 +1,11 @@
 ﻿using System;
 using Mapping_Tools.Annotations;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
 using Mapping_Tools.Classes.SystemTools;
 using Newtonsoft.Json;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators {
     public class GeneratorSettings : BindableBase {
@@ -17,7 +17,6 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
             _relevancyRatio = 0.8;
             _generatesInheritable = true;
             _inputPredicate = new SelectionPredicateCollection();
-            _inputPredicate.Predicates.Add(new SelectionPredicate());
         }
 
         public GeneratorSettings(RelevantObjectsGenerator generator) {
@@ -25,6 +24,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
 
             _relevancyRatio = 0.8;
             _generatesInheritable = true;
+            _inputPredicate = new SelectionPredicateCollection();
         }
 
         private bool _isActive;
@@ -77,21 +77,13 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         }
 
         public void CopyTo(GeneratorSettings other) {
-            var otherProperties = other.GetType().GetProperties();
+            var otherPropertyNames = other.GetType().GetProperties().Select(o => o.Name).ToArray();
             foreach (var prop in GetType().GetProperties()) {
                 if (!prop.CanWrite || !prop.CanRead) continue;
-                if (!otherProperties.Contains(prop)) continue;
+                if (!otherPropertyNames.Contains(prop.Name)) continue;
                 if (prop.GetCustomAttribute(typeof(JsonIgnoreAttribute)) != null) continue;
-                if (prop.GetValue(this) is SelectionPredicateCollection s) {
-                    Console.WriteLine("This");
-                    Console.WriteLine(s.Predicates[0]);
-                }
-                if (prop.GetValue(other) is SelectionPredicateCollection d) {
-                    Console.WriteLine("Other");
-                    Console.WriteLine(d.Predicates[0]);
-                }
-                try { prop.SetValue(other, prop.GetValue(this)); } catch {
-                    // ignored
+                try { prop.SetValue(other, prop.GetValue(this)); } catch (Exception ex) {
+                    Console.WriteLine(ex.Message + ex.StackTrace);
                 }
             }
         }

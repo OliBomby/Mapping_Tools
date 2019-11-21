@@ -18,5 +18,10 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
             get => _otherInputPredicate;
             set => Set(ref _otherInputPredicate, value);
         }
+
+        public SymmetryGeneratorSettings() {
+            AxisInputPredicate = new SelectionPredicateCollection();
+            OtherInputPredicate = new SelectionPredicateCollection();
+        }
     }
 }
