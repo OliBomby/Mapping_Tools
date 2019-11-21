@@ -1,6 +1,6 @@
-﻿using System.Collections.ObjectModel;
+﻿using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
+using System.Collections.ObjectModel;
 using System.Linq;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection {
     public class SelectionPredicateCollection {
