@@ -115,6 +115,7 @@ namespace Mapping_Tools.Views.SnappingTools {
                     list.ItemTemplate = FindResource("SelectionPredicateTemplate") as DataTemplate;
                     var cm = new ContextMenu();
                     cm.Items.Add(new MenuItem {Header = "Duplicate", 
+                        ToolTip = "Duplicate selected predicates.",
                         Command = new CommandImplementation(_ => {
                                 var itemsToDupe = new SelectionPredicate[list.SelectedItems.Count];
                                 var i = 0;
@@ -126,12 +127,14 @@ namespace Mapping_Tools.Views.SnappingTools {
                                 }
                         })});
                     cm.Items.Add(new MenuItem {Header = "Remove",
+                        ToolTip = "Remove all selected predicates",
                         Command = new CommandImplementation(_ =>
                             c.Predicates.RemoveAll(o => list.SelectedItems.Contains(o)))
                     });
                     list.ContextMenu = cm;
 
                     var addButton = new Button {Style = FindResource("MaterialDesignFloatingActionMiniLightButton") as Style,
+                        ToolTip = "Add a new selection predicate.",
                         VerticalAlignment = VerticalAlignment.Bottom,
                         Content = new PackIcon {Kind = PackIconKind.Plus, Width = 24, Height = 24},
                         Margin = new Thickness(5),
@@ -139,10 +142,17 @@ namespace Mapping_Tools.Views.SnappingTools {
                     addButton.SetValue(Grid.ColumnProperty, 1);
 
                     var removeButton = new Button {Style = FindResource("MaterialDesignFloatingActionMiniLightButton") as Style,
+                        ToolTip = "Remove all selected predicates or the last predicate if nothing is selected.",
                         VerticalAlignment = VerticalAlignment.Bottom,
                         Content = new PackIcon {Kind = PackIconKind.Minus, Width = 24, Height = 24},
                         Margin = new Thickness(5),
-                        Command = new CommandImplementation(_ => c.Predicates.RemoveAll(o => list.SelectedItems.Contains(o)))};
+                        Command = new CommandImplementation(_ => {
+                            if (list.SelectedItems.Count == 0 && c.Predicates.Count > 0) {
+                                c.Predicates.RemoveAt(c.Predicates.Count - 1);
+                                return;
+                            }
+                            c.Predicates.RemoveAll(o => list.SelectedItems.Contains(o));
+                        })};
                     removeButton.SetValue(Grid.ColumnProperty, 2);
 
                     horizontalPanel.Children.Add(list);
