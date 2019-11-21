@@ -10,5 +10,13 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
             get => _axisInputPredicate;
             set => Set(ref _axisInputPredicate, value);
         }
+        
+        private SelectionPredicateCollection _otherInputPredicate;
+        [DisplayName("Other Input Selection")]
+        [Description("Specifies extra rules that virtual objects need to obey to get mirrored by this generator.")]
+        public SelectionPredicateCollection OtherInputPredicate {
+            get => _otherInputPredicate;
+            set => Set(ref _otherInputPredicate, value);
+        }
     }
 }

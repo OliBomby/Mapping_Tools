@@ -21,24 +21,26 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
 
             MySettings.AxisInputPredicate = new SelectionPredicateCollection();
             MySettings.AxisInputPredicate.Predicates.Add(new SelectionPredicate {NeedLocked = true});
+            MySettings.OtherInputPredicate = new SelectionPredicateCollection();
+            MySettings.AxisInputPredicate.Predicates.Add(new SelectionPredicate());
         }
 
         [RelevantObjectsGeneratorMethod]
         public RelevantPoint GetRelevantObjects(RelevantLine axis, RelevantPoint point) {
-            return !MySettings.AxisInputPredicate.Check(axis, this) ? null : 
+            return !MySettings.AxisInputPredicate.Check(axis, this) || !MySettings.OtherInputPredicate.Check(point, this) ? null : 
                 new RelevantPoint(Vector2.Mirror(point.Child, axis.Child));
         }
 
         [RelevantObjectsGeneratorMethod]
         public RelevantLine GetRelevantObjects(RelevantLine axis, RelevantLine line) {
-            return !MySettings.AxisInputPredicate.Check(axis, this) ? null : 
+            return !MySettings.AxisInputPredicate.Check(axis, this) || !MySettings.OtherInputPredicate.Check(line, this) ? null : 
                 new RelevantLine(Line2.FromPoints(Vector2.Mirror(line.Child.PositionVector, axis.Child), 
                     Vector2.Mirror(line.Child.PositionVector + line.Child.DirectionVector, axis.Child)));
         }
 
         [RelevantObjectsGeneratorMethod]
         public RelevantCircle GetRelevantObjects(RelevantLine axis, RelevantCircle circle) {
-            return !MySettings.AxisInputPredicate.Check(axis, this) ? null : 
+            return !MySettings.AxisInputPredicate.Check(axis, this) || !MySettings.OtherInputPredicate.Check(circle, this) ? null : 
                 new RelevantCircle(new Circle(Vector2.Mirror(circle.Child.Centre, axis.Child), circle.Child.Radius));
         }
     }
