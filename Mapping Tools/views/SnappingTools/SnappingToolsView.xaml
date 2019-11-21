@@ -69,7 +69,7 @@
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
                                         <Viewbox Width="100" Height="30" Margin="-5,-5,15,-5">
-                                            <Button ToolTip="Generator settings..." Command="{Binding GeneratorSettingsCommand}" materialDesign:ButtonAssist.CornerRadius="10">
+                                            <Button ToolTip="Generator settings..." Command="{Binding GeneratorSettingsCommand}" materialDesign:ButtonAssist.CornerRadius="7">
                                                 Configure
                                             </Button>
                                         </Viewbox>
