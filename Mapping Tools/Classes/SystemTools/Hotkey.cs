@@ -1,8 +1,9 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Windows.Input;
 
 namespace Mapping_Tools.Classes.SystemTools {
-    public class Hotkey {
+    public class Hotkey : ICloneable {
         public Key Key { get; set; }
 
         public ModifierKeys Modifiers { get; set; }
@@ -27,6 +28,10 @@ namespace Mapping_Tools.Classes.SystemTools {
             str.Append(Key);
 
             return str.ToString();
+        }
+
+        public object Clone() {
+            return MemberwiseClone();
         }
     }
 }

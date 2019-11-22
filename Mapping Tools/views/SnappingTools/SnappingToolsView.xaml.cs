@@ -45,7 +45,7 @@ namespace Mapping_Tools.Views {
                 ProjectWindow.Closed += ProjectWindowOnClosed;
                 ProjectWindow.Show();
             } else {
-                ProjectWindow.Topmost = true;
+                ProjectWindow.Activate();
             }
         }
 

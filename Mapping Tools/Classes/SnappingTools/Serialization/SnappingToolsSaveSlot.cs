@@ -25,7 +25,7 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
         [CanBeNull]
         public SnappingToolsProject ParentProject { get; set; }
 
-        public SnappingToolsPreferences Preferences { get; }
+        public SnappingToolsPreferences Preferences { get; set; }
 
         public SnappingToolsSaveSlot() {
             Preferences = new SnappingToolsPreferences();

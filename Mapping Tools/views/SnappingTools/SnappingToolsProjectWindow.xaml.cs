@@ -21,8 +21,8 @@ namespace Mapping_Tools.Views.SnappingTools {
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e) {
-            var newSave = new SnappingToolsSaveSlot {Name = "Save " + Project.SaveSlots.Count + 1};
-            Project.SaveToSlot(newSave);
+            var newSave = new SnappingToolsSaveSlot {Name = $"Save {Project.SaveSlots.Count + 1}"};
+            Project.SaveToSlot(newSave, false);
             Project.SaveSlots.Add(newSave);
         }
 

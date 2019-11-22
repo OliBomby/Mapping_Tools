@@ -51,49 +51,47 @@
             </StackPanel>
         </Grid>
 
-        <ScrollViewer Grid.Row="1" Grid.RowSpan="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Hidden">
-            <ListView Name="SaveSlotsGrid" SelectionMode="Single" ItemsSource="{Binding SaveSlots}" ScrollViewer.CanContentScroll="False" VerticalContentAlignment="Center">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn x:Name="NameHeader" Header="Name" Width="100">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate DataType="serialization:SnappingToolsSaveSlot">
-                                    <TextBox Width="{Binding ElementName=NameHeader, Path=Width}"
-                                             materialDesign:HintAssist.Hint="Name" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
+        <ListView Grid.Row="1" Grid.RowSpan="2" Name="SaveSlotsGrid" ItemsSource="{Binding SaveSlots}" VerticalContentAlignment="Center">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn x:Name="NameHeader" Header="Name" Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate DataType="serialization:SnappingToolsSaveSlot">
+                                <TextBox Width="{Binding ElementName=NameHeader, Path=Width}"
+                                         materialDesign:HintAssist.Hint="Name" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
 
-                        <GridViewColumn Header="Hotkey">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate DataType="serialization:SnappingToolsSaveSlot">
-                                    <components1:HotkeyEditorControl Width="150" HorizontalAlignment="Center" Hotkey="{Binding ProjectHotkey}"/>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
+                    <GridViewColumn Header="Hotkey">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate DataType="serialization:SnappingToolsSaveSlot">
+                                <components1:HotkeyEditorControl Width="150" HorizontalAlignment="Center" Hotkey="{Binding ProjectHotkey}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
 
-                        <GridViewColumn>
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate DataType="serialization:SnappingToolsSaveSlot">
-                                    <StackPanel Orientation="Horizontal">
-                                        <Button x:Name="SaveButton" ToolTip="Save current settings to this slot."
-                                                Command="{Binding SaveCommand}" Margin="0 0 8 0" materialDesign:ButtonAssist.CornerRadius="7">
-                                            Save
-                                        </Button>
+                    <GridViewColumn>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate DataType="serialization:SnappingToolsSaveSlot">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button x:Name="SaveButton" ToolTip="Save current settings to this slot."
+                                            Command="{Binding SaveCommand}" Margin="0 0 8 0" materialDesign:ButtonAssist.CornerRadius="7">
+                                        Save
+                                    </Button>
 
-                                        <Button x:Name="LoadButton" ToolTip="Load settings from this slot."
-                                                Command="{Binding LoadCommand}" Margin="0 0 8 0" materialDesign:ButtonAssist.CornerRadius="7">
-                                            Load
-                                        </Button>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
+                                    <Button x:Name="LoadButton" ToolTip="Load settings from this slot."
+                                            Command="{Binding LoadCommand}" Margin="0 0 8 0" materialDesign:ButtonAssist.CornerRadius="7">
+                                        Load
+                                    </Button>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
 
-                    </GridView>
-                </ListView.View>
-            </ListView>
-        </ScrollViewer>
+                </GridView>
+            </ListView.View>
+        </ListView>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 0 0 10">
             <Button x:Name="AddButton" Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a new slot"

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection {
-    public class SelectionPredicateCollection : IEquatable<SelectionPredicateCollection> {
+    public class SelectionPredicateCollection : IEquatable<SelectionPredicateCollection>, ICloneable {
         public ObservableCollection<SelectionPredicate> Predicates { get; set; }
 
         public SelectionPredicateCollection() {
@@ -47,6 +47,15 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
 
         public override int GetHashCode() {
             return Predicates.GetHashCode();
+        }
+
+        public object Clone() {
+            var clone = new SelectionPredicateCollection();
+            foreach (var selectionPredicate in Predicates) {
+                clone.Predicates.Add((SelectionPredicate)selectionPredicate.Clone());
+            }
+
+            return clone;
         }
     }
 }

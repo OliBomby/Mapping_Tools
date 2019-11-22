@@ -1,4 +1,5 @@
-﻿using Mapping_Tools.Annotations;
+﻿using System;
+using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
 using Newtonsoft.Json;
 using System.Collections.Generic;
@@ -66,12 +67,18 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
             return this;
         }
 
-        public void SaveToSlot(SnappingToolsSaveSlot snappingToolsSaveSlot) {
-            GetCurrentPreferences().CopyTo(snappingToolsSaveSlot.Preferences);
+        public void SaveToSlot(SnappingToolsSaveSlot saveSlot, bool message = true) {
+            saveSlot.Preferences = (SnappingToolsPreferences)GetCurrentPreferences().Clone();
+            if (message) {
+                MainWindow.Snackbar.MessageQueue.Enqueue($"Succesfully saved settings to {saveSlot.Name}!");
+            }
         }
 
-        public void LoadFromSlot(SnappingToolsSaveSlot snappingToolsSaveSlot) {
-            SetCurrentPreferences(snappingToolsSaveSlot.Preferences);
+        public void LoadFromSlot(SnappingToolsSaveSlot saveSlot, bool message = true) {
+            SetCurrentPreferences(saveSlot.Preferences);
+            if (message) {
+                MainWindow.Snackbar.MessageQueue.Enqueue($"Succesfully loaded settings from {saveSlot.Name}!");
+            }
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Windows.Media;
 using Mapping_Tools.Classes.SystemTools;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
-    public class RelevantObjectPreferences : BindableBase {
+    public class RelevantObjectPreferences : BindableBase, ICloneable {
         #region private storage
         private string name;
         private Color color;
@@ -65,6 +65,10 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        public object Clone() {
+            return MemberwiseClone();
         }
     }
 }

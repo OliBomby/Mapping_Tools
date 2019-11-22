@@ -3,7 +3,7 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
 using Mapping_Tools.Classes.SystemTools;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection {
-    public class SelectionPredicate : BindableBase, IEquatable<SelectionPredicate> {
+    public class SelectionPredicate : BindableBase, IEquatable<SelectionPredicate>, ICloneable {
         private bool _needSelected;
         private bool _needLocked;
         private bool _needGeneratedByThis;
@@ -27,8 +27,8 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
             return $@"NeedSelected: {NeedSelected}, NeedLocked: {NeedLocked}, NeedGeneratedByThis: {NeedGeneratedByThis}, NeedGeneratedNotByThis: {NeedGeneratedNotByThis}, MinRelevancy: {MinRelevancy}";
         }
 
-        public SelectionPredicate Clone() {
-            return (SelectionPredicate)MemberwiseClone();
+        public object Clone() {
+            return MemberwiseClone();
         }
 
         public bool Equals(SelectionPredicate other) {

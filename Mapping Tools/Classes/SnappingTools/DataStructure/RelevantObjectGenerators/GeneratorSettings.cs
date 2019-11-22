@@ -8,7 +8,7 @@ using System.Linq;
 using System.Reflection;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators {
-    public class GeneratorSettings : BindableBase {
+    public class GeneratorSettings : BindableBase, ICloneable {
         [JsonIgnore]
         [CanBeNull]
         public RelevantObjectsGenerator Generator { get; set; }
@@ -89,7 +89,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         }
 
         public object Clone() {
-            return MemberwiseClone();
+            var clone = (GeneratorSettings)MemberwiseClone();
+            clone.InputPredicate = (SelectionPredicateCollection)InputPredicate.Clone();
+            return clone;
         }
     }
 }

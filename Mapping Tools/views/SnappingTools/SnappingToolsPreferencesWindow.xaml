@@ -47,7 +47,7 @@
                         <ImageBrush ImageSource="/Data/mt_logo_white_24.png"/>
                     </materialDesign:ColorZone.OpacityMask>
                 </materialDesign:ColorZone>
-                <TextBlock Name="header" Text="Geometry Dashboard Preferences" Foreground="{DynamicResource MaterialDesignBody}" Margin="8,11,0,0" FontWeight="Normal"/>
+                <TextBlock Name="Header" Text="Preferences" Foreground="{DynamicResource MaterialDesignBody}" Margin="8,11,0,0" FontWeight="Normal"/>
             </StackPanel>
             
             <StackPanel WindowChrome.IsHitTestVisibleInChrome="true" HorizontalAlignment="Right" Orientation="Horizontal">

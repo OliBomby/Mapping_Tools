@@ -123,7 +123,7 @@ namespace Mapping_Tools.Views.SnappingTools {
                                     itemsToDupe[i++] = (SelectionPredicate)listSelectedItem;
                                 }
                                 foreach (var listSelectedItem in itemsToDupe) {
-                                    c.Predicates.Insert(list.Items.IndexOf(listSelectedItem)+1, listSelectedItem.Clone());
+                                    c.Predicates.Insert(list.Items.IndexOf(listSelectedItem)+1, (SelectionPredicate)listSelectedItem.Clone());
                                 }
                         })});
                     cm.Items.Add(new MenuItem {Header = "Remove",

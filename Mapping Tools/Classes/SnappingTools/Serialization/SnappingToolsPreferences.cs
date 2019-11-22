@@ -162,8 +162,21 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
         #endregion
 
         #region IClonable members
+        /// <summary>
+        /// Performs a deep copy
+        /// </summary>
+        /// <returns></returns>
         public object Clone() {
-            return MemberwiseClone();
+            var clone = (SnappingToolsPreferences)MemberwiseClone();
+            clone.GeneratorSettings = new Dictionary<Type, GeneratorSettings>();
+            foreach (var kvp in GeneratorSettings) {
+                clone.GeneratorSettings.Add(kvp.Key, (GeneratorSettings)kvp.Value.Clone());
+            }
+            clone.RelevantObjectPreferences = new Dictionary<string, RelevantObjectPreferences>();
+            foreach (var kvp in RelevantObjectPreferences) {
+                clone.RelevantObjectPreferences.Add(string.Copy(kvp.Key), (RelevantObjectPreferences)kvp.Value.Clone());
+            }
+            return clone;
         }
         #endregion
 
