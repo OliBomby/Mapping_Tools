@@ -8,7 +8,8 @@ namespace Mapping_Tools.Classes.SystemTools {
     public static class ProjectManager {
         private static readonly JsonSerializer Serializer = new JsonSerializer {
             NullValueHandling = NullValueHandling.Ignore,
-            TypeNameHandling = TypeNameHandling.All
+            TypeNameHandling = TypeNameHandling.All,
+            Formatting = Formatting.Indented
         };
 
         public static void SaveJson(string path, object obj) {
