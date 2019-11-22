@@ -40,8 +40,17 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Grid VerticalAlignment="Top" Grid.Row="0">
-            <StackPanel WindowChrome.IsHitTestVisibleInChrome="true" Height="35" VerticalAlignment="Top" HorizontalAlignment="Right" Orientation="Horizontal">
+        <Grid x:Name="FirstGrid" Grid.Row="0">
+            <StackPanel WindowChrome.IsHitTestVisibleInChrome="false" HorizontalAlignment="Left" Orientation="Horizontal">
+                <materialDesign:ColorZone Width="24" Height="24" Margin="9,6,0,0" Mode="Inverted">
+                    <materialDesign:ColorZone.OpacityMask>
+                        <ImageBrush ImageSource="/Data/mt_logo_white_24.png"/>
+                    </materialDesign:ColorZone.OpacityMask>
+                </materialDesign:ColorZone>
+                <TextBlock Name="header" Text="Geometry Dashboard Preferences" Foreground="{DynamicResource MaterialDesignBody}" Margin="8,11,0,0" FontWeight="Normal"/>
+            </StackPanel>
+            
+            <StackPanel WindowChrome.IsHitTestVisibleInChrome="true" HorizontalAlignment="Right" Orientation="Horizontal">
                 <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowCLose}" Click="CancelButton_Click" HorizontalAlignment="Right" Height="35" Foreground="{DynamicResource MaterialDesignBody}"/>
             </StackPanel>
         </Grid>

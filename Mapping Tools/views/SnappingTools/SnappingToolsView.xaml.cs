@@ -21,6 +21,7 @@ namespace Mapping_Tools.Views {
             get => (SnappingToolsVm) DataContext;
             set => DataContext = value;
         }
+        public SnappingToolsProjectWindow ProjectWindow;
 
         public SnappingToolsView() {
             DataContext = new SnappingToolsVm();
@@ -36,6 +37,15 @@ namespace Mapping_Tools.Views {
             if (result.GetValueOrDefault()) {
                 ViewModel.Project.SetCurrentPreferences(preferencesWindow.Preferences);
             } 
+        }
+
+        private void ProjectsButton_Click(object sender, System.Windows.RoutedEventArgs e) {
+            Console.WriteLine(ViewModel.Project.SaveSlots);
+            ProjectWindow = new SnappingToolsProjectWindow(ViewModel.Project);
+            var result = ProjectWindow.ShowDialog();
+            if (result.GetValueOrDefault()) {
+                ViewModel.Project = (SnappingToolsProject)ProjectWindow.DataContext;
+            }
         }
 
         public SnappingToolsProject GetSaveData() => ViewModel.GetProject();

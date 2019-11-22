@@ -44,11 +44,19 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
+                        
+                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                            <Button x:Name="PreferencesButton" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}" ToolTip="Preferences..."
+                                Click="PreferencesButton_Click" Margin="0 0 8 0">
+                                <materialDesign:PackIcon Kind="SettingsOutline" Height="24" Width="24" />
+                            </Button>
 
-                        <Button x:Name="PreferencesButton" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}" ToolTip="Preferences..."
-                                Grid.Column="2" Click="PreferencesButton_Click">
-                            <materialDesign:PackIcon Kind="SettingsOutline" Height="24" Width="24" />
-                        </Button>
+                            <Button x:Name="ProjectsButton" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}" ToolTip="Save Projects..."
+                                Click="ProjectsButton_Click">
+                                <materialDesign:PackIcon Kind="ContentSaveAll" Height="24" Width="24" />
+                            </Button>
+                        </StackPanel>
+                        
                         <TextBlock x:Name="FilterTextBlock" Grid.Column="0" Text="Filters" VerticalAlignment="Center" Margin="10,0"/>
                         <TextBox Grid.Column="1" Margin="0,0,10,10" Name="TxtFilter" Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
