@@ -234,13 +234,6 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
             inceptionLevel = 4;
         }
         #endregion
-
-        public void CopyTo(SnappingToolsPreferences other) {
-            foreach (var prop in typeof(SnappingToolsPreferences).GetProperties()) {
-                if (!prop.CanWrite || !prop.CanRead) continue;
-                try { prop.SetValue(other, prop.GetValue(this)); } catch { }
-            }
-        }
     }
 
     [Flags]
