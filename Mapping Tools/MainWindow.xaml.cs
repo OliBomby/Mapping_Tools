@@ -26,6 +26,7 @@ namespace Mapping_Tools {
 
         public static MainWindow AppWindow { get; set; }
         public static Snackbar Snackbar;
+        public static Random MainRandom = new Random();
         public static readonly HttpClient HttpClient = new HttpClient();
         private static readonly string AppCommon = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         public static readonly string AppDataPath = Path.Combine(AppCommon, "Mapping Tools");
@@ -39,6 +40,7 @@ namespace Mapping_Tools {
                 ListenerManager = new ListenerManager();
                 AppWindow = this;
                 Snackbar = MainSnackbar;
+                Snackbar.MessageQueue = new SnackbarMessageQueue(TimeSpan.FromSeconds(1));
                 IsMaximized = SettingsManager.Settings.MainWindowMaximized;
                 WidthWin = SettingsManager.Settings.MainWindowWidth ?? Width;
                 HeightWin = SettingsManager.Settings.MainWindowHeight ?? Height;

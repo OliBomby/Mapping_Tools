@@ -55,6 +55,11 @@ namespace Mapping_Tools.Classes.SystemTools {
             ReloadHotkeys();
         }
 
+        public void RemoveActiveHotkey(string name) {
+            ActiveHotkeys.Remove(name);
+            ReloadHotkeys();
+        }
+
         public bool ChangeActiveHotkeyHotkey(string name, Hotkey hotkey) {
             if (ActiveHotkeys.ContainsKey(name)) {
                 ActiveHotkeys[name].Hotkey = hotkey;
@@ -69,10 +74,10 @@ namespace Mapping_Tools.Classes.SystemTools {
             try {
                 keyboardHookManager.UnregisterAll();
 
-                foreach (ActionHotkey ah in ActiveHotkeys.Values) {
+                foreach (var ah in ActiveHotkeys.Values.Where(ah => ah.Hotkey != null && ah.Action != null)) {
                     RegisterHotkey(ah.Hotkey, ah.Action);
                 }
-            } catch { MessageBox.Show("Could not reload hotkeys.", "Warning"); }
+            } catch { MessageBox.Show(@"Could not reload hotkeys.", @"Warning"); }
         }
 
         private void RegisterHotkey(Hotkey hotkey, Action action) {

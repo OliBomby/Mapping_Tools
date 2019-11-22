@@ -73,7 +73,7 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate DataType="serialization:SnappingToolsSaveSlot">
                                 <components1:HotkeyEditorControl Width="{Binding ElementName=HotkeyHeader, Path=Width}"
-                                    HorizontalAlignment="Center" Hotkey="{Binding ProjectHotkey}"/>
+                                    HorizontalAlignment="Center" Hotkey="{Binding ProjectHotkey, UpdateSourceTrigger=LostFocus}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

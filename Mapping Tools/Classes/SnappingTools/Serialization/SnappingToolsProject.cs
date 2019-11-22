@@ -25,6 +25,11 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
         }
 
         private void SaveSlotsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+            if (e.OldItems != null) {
+                foreach (var oldItem in e.OldItems) {
+                    ((SnappingToolsSaveSlot) oldItem).Dispose();
+                }
+            }
             if (e.NewItems == null) return;
             foreach (var newItem in e.NewItems) {
                 ((SnappingToolsSaveSlot) newItem).ParentProject = this;
