@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using Mapping_Tools.Annotations;
+﻿using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 
 namespace Mapping_Tools.Classes.SnappingTools.Serialization {
     public class SnappingToolsProject {
@@ -12,12 +13,21 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
 
         public SnappingToolsPreferences CurrentPreferences { get; }
 
-        public ObservableCollection<SnappingToolsPreferences> SaveSlots { get; }
+        public ObservableCollection<SnappingToolsSaveSlot> SaveSlots { get; }
 
 
         public SnappingToolsProject() {
             CurrentPreferences = new SnappingToolsPreferences();
-            SaveSlots = new ObservableCollection<SnappingToolsPreferences>();
+            SaveSlots = new ObservableCollection<SnappingToolsSaveSlot>();
+
+            SaveSlots.CollectionChanged += SaveSlotsOnCollectionChanged;
+        }
+
+        private void SaveSlotsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+            if (e.NewItems == null) return;
+            foreach (var newItem in e.NewItems) {
+                ((SnappingToolsSaveSlot) newItem).ParentProject = this;
+            }
         }
 
         /// <summary>
@@ -56,11 +66,12 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
             return this;
         }
 
-        public void CopyTo(SnappingToolsProject other) {
-            foreach (var prop in typeof(SnappingToolsProject).GetProperties()) {
-                if (!prop.CanWrite || !prop.CanRead) continue;
-                try { prop.SetValue(other, prop.GetValue(this)); } catch { }
-            }
+        public void SaveToSlot(SnappingToolsSaveSlot snappingToolsSaveSlot) {
+            GetCurrentPreferences().CopyTo(snappingToolsSaveSlot.Preferences);
+        }
+
+        public void LoadFromSlot(SnappingToolsSaveSlot snappingToolsSaveSlot) {
+            SetCurrentPreferences(snappingToolsSaveSlot.Preferences);
         }
     }
 }

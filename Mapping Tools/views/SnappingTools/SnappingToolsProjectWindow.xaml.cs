@@ -3,7 +3,7 @@ using Mapping_Tools.Classes.SnappingTools.Serialization;
 
 namespace Mapping_Tools.Views.SnappingTools {
     /// <summary>
-    /// Interaction logic for SnappingToolsPreferencesWindow.xaml
+    /// Interaction logic for SnappingToolsProjectWindow.xaml
     /// </summary>
     public partial class SnappingToolsProjectWindow {
         public SnappingToolsProject Project {
@@ -11,42 +11,27 @@ namespace Mapping_Tools.Views.SnappingTools {
             set => DataContext = value;
         }
 
-        public SnappingToolsProjectWindow(SnappingToolsProject project = null) {
-            Project = new SnappingToolsProject();
-            project?.CopyTo(Project);
+        public SnappingToolsProjectWindow(SnappingToolsProject project) {
+            Project = project;
             InitializeComponent();
         }
 
-        private void ApplyButton_Click(object sender, RoutedEventArgs e)
-        {
-            DialogResult = true;
-            Close();
-        }
-
-        private void CancelButton_Click(object sender, RoutedEventArgs e)
-        {
-            DialogResult = false;
-            Close();
-        }
-
-        private SnappingToolsPreferences GetSelectedPreferences() {
-            return (SnappingToolsPreferences)SaveSlotsGrid.SelectedItem;
+        private SnappingToolsSaveSlot GetSelectedSaveSlot() {
+            return (SnappingToolsSaveSlot)SaveSlotsGrid.SelectedItem;
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e) {
-            ((SnappingToolsProject)DataContext).SaveSlots.Add(new SnappingToolsPreferences());
+            var newSave = new SnappingToolsSaveSlot {Name = "Save " + Project.SaveSlots.Count + 1};
+            Project.SaveToSlot(newSave);
+            Project.SaveSlots.Add(newSave);
         }
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e) {
-            ((SnappingToolsProject)DataContext).SaveSlots.Remove(GetSelectedPreferences());
+            Project.SaveSlots.Remove(GetSelectedSaveSlot());
         }
 
-        private void SaveButton_Click(object sender, RoutedEventArgs e) {
-            System.Console.WriteLine(sender);
-        }
-
-        private void LoadButton_Click(object sender, RoutedEventArgs e) {
-
+        private void CloseButton_Click(object sender, RoutedEventArgs e) {
+            Close();
         }
     }
 }

@@ -17,7 +17,7 @@
         TextElement.FontSize="14"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" Background="{DynamicResource MaterialDesignPaper}"
-        d:DataContext="{d:DesignData SnappingToolsPreferences}">
+        d:DataContext="{d:DesignData SnappingToolsProject}">
     
     <WindowChrome.WindowChrome>
         <WindowChrome 
@@ -26,10 +26,6 @@
     </WindowChrome.WindowChrome>
  
     <Window.Resources>
-        <components:EnumToBoolConverter x:Key="EnumToBoolConverter"/>
-        <components:FlagToBoolConverter x:Key="FlagToBoolConverter"/>
-        <components:DoubleToStringConverter x:Key="DoubleToStringConverter"/>
-        <components:IntToStringConverter x:Key="IntToStringConverter"/>
     </Window.Resources>
 
     <Grid>
@@ -47,11 +43,11 @@
                         <ImageBrush ImageSource="/Data/mt_logo_white_24.png"/>
                     </materialDesign:ColorZone.OpacityMask>
                 </materialDesign:ColorZone>
-                <TextBlock Text="Geometry Dashboard Projects" Foreground="{DynamicResource MaterialDesignBody}" Margin="8,11,0,0" FontWeight="Normal"/>
+                <TextBlock Text="Savestates" Foreground="{DynamicResource MaterialDesignBody}" Margin="8,11,0,0" FontWeight="Normal"/>
             </StackPanel>
 
             <StackPanel WindowChrome.IsHitTestVisibleInChrome="true" HorizontalAlignment="Right" Orientation="Horizontal">
-                <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowCLose}" Click="CancelButton_Click" HorizontalAlignment="Right" Height="35" Foreground="{DynamicResource MaterialDesignBody}"/>
+                <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowCLose}" Click="CloseButton_Click" HorizontalAlignment="Right" Height="35" Foreground="{DynamicResource MaterialDesignBody}"/>
             </StackPanel>
         </Grid>
 
@@ -61,7 +57,7 @@
                     <GridView>
                         <GridViewColumn x:Name="NameHeader" Header="Name" Width="100">
                             <GridViewColumn.CellTemplate>
-                                <DataTemplate DataType="serialization:SnappingToolsPreferences">
+                                <DataTemplate DataType="serialization:SnappingToolsSaveSlot">
                                     <TextBox Width="{Binding ElementName=NameHeader, Path=Width}"
                                              materialDesign:HintAssist.Hint="Name" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
                                 </DataTemplate>
@@ -70,7 +66,7 @@
 
                         <GridViewColumn Header="Hotkey">
                             <GridViewColumn.CellTemplate>
-                                <DataTemplate DataType="serialization:SnappingToolsPreferences">
+                                <DataTemplate DataType="serialization:SnappingToolsSaveSlot">
                                     <components1:HotkeyEditorControl Width="150" HorizontalAlignment="Center" Hotkey="{Binding ProjectHotkey}"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
@@ -78,16 +74,16 @@
 
                         <GridViewColumn>
                             <GridViewColumn.CellTemplate>
-                                <DataTemplate DataType="serialization:SnappingToolsPreferences">
+                                <DataTemplate DataType="serialization:SnappingToolsSaveSlot">
                                     <StackPanel Orientation="Horizontal">
-                                        <Button x:Name="SaveButton" Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Save the current settings to this slot"
-                                                Command="{Binding SaveCommand}" Margin="0 0 8 0">
-                                            <materialDesign:PackIcon Kind="ContentSave" Height="24" Width="24" />
+                                        <Button x:Name="SaveButton" ToolTip="Save current settings to this slot."
+                                                Command="{Binding SaveCommand}" Margin="0 0 8 0" materialDesign:ButtonAssist.CornerRadius="7">
+                                            Save
                                         </Button>
 
-                                        <Button x:Name="LoadButton" Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Load this setting onto the Dashboard"
-                                                Command="{Binding LoadCommand}" Margin="0 0 8 0">
-                                            <materialDesign:PackIcon Kind="ContentSaveMove" Height="24" Width="24"/>
+                                        <Button x:Name="LoadButton" ToolTip="Load settings from this slot."
+                                                Command="{Binding LoadCommand}" Margin="0 0 8 0" materialDesign:ButtonAssist.CornerRadius="7">
+                                            Load
                                         </Button>
                                     </StackPanel>
                                 </DataTemplate>
@@ -111,18 +107,6 @@
             </Button>
         </StackPanel>
 
-        <Border Grid.Row="3" Padding="10">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
-                <Button Grid.Column="0" Width="200" materialDesign:ButtonAssist.CornerRadius="10" x:Name="ApplyButton" Content="Apply" Click="ApplyButton_Click"/>
-                <Button Grid.Column="1" Width="200" materialDesign:ButtonAssist.CornerRadius="10" x:Name="CancelButton" Content="Cancel" Click="CancelButton_Click"/>
-            </Grid>
-        </Border>
-
-        <Border BorderThickness="1" Grid.Row="0" Grid.RowSpan="3" Background="{x:Null}" BorderBrush="{DynamicResource PrimaryHueDarkBrush}"/>
+        <Border BorderThickness="1" Grid.Row="0" Grid.RowSpan="4" Background="{x:Null}" BorderBrush="{DynamicResource PrimaryHueDarkBrush}"/>
     </Grid>
 </Window>

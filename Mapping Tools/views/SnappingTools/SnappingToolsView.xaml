@@ -51,7 +51,7 @@
                                 <materialDesign:PackIcon Kind="SettingsOutline" Height="24" Width="24" />
                             </Button>
 
-                            <Button x:Name="ProjectsButton" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}" ToolTip="Save Projects..."
+                            <Button x:Name="ProjectsButton" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}" ToolTip="Savestates..."
                                 Click="ProjectsButton_Click">
                                 <materialDesign:PackIcon Kind="ContentSaveAll" Height="24" Width="24" />
                             </Button>

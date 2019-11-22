@@ -40,12 +40,17 @@ namespace Mapping_Tools.Views {
         }
 
         private void ProjectsButton_Click(object sender, System.Windows.RoutedEventArgs e) {
-            Console.WriteLine(ViewModel.Project.SaveSlots);
-            ProjectWindow = new SnappingToolsProjectWindow(ViewModel.Project);
-            var result = ProjectWindow.ShowDialog();
-            if (result.GetValueOrDefault()) {
-                ViewModel.Project = (SnappingToolsProject)ProjectWindow.DataContext;
+            if (ProjectWindow == null) {
+                ProjectWindow = new SnappingToolsProjectWindow(ViewModel.GetProject());
+                ProjectWindow.Closed += ProjectWindowOnClosed;
+                ProjectWindow.Show();
+            } else {
+                ProjectWindow.Topmost = true;
             }
+        }
+
+        private void ProjectWindowOnClosed(object sender, EventArgs e) {
+            ProjectWindow = null;
         }
 
         public SnappingToolsProject GetSaveData() => ViewModel.GetProject();
