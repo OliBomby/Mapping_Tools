@@ -54,10 +54,6 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
         }
 
         public void SetCurrentPreferences(SnappingToolsPreferences preferences) {
-            if (preferences == null) {
-                Console.WriteLine("Setting current preferences failed!");
-            }
-
             CurrentPreferences = (SnappingToolsPreferences)preferences.Clone();
             if (_generators != null) {
                 CurrentPreferences.ApplyGeneratorSettings(_generators);
