@@ -101,6 +101,10 @@
         </ListView>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 0 0 10">
+            <Button x:Name="DebugButton" Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Re-register hotkeys in case something broke."
+                   Click="DebugButton_OnClick" Margin="0 0 8 0">
+                <materialDesign:PackIcon Kind="Reload" Height="24" Width="24" />
+            </Button>
             <Button x:Name="AddButton" Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a new save slot."
                                 Command="{Binding AddCommand}" Margin="0 0 8 0">
                 <materialDesign:PackIcon Kind="Plus" Height="24" Width="24" />

@@ -1,5 +1,7 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using Mapping_Tools.Classes;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators;
 using Mapping_Tools.Classes.SnappingTools.Serialization;
 using Mapping_Tools.Components.Domain;
 
@@ -22,6 +24,7 @@ namespace Mapping_Tools.Views.SnappingTools {
             AddCommand = new CommandImplementation(_ => {
                 var newSave = new SnappingToolsSaveSlot {Name = $"Save {Project.SaveSlots.Count + 1}"};
                 Project.SaveToSlot(newSave, false);
+                newSave.Activate();
                 Project.SaveSlots.Add(newSave);
             });
             RemoveCommand = new CommandImplementation(_ => {
@@ -48,6 +51,12 @@ namespace Mapping_Tools.Views.SnappingTools {
 
         private void CloseButton_Click(object sender, RoutedEventArgs e) {
             Close();
+        }
+
+        private void DebugButton_OnClick(object sender, RoutedEventArgs e) {
+            foreach (var saveSlot in Project.SaveSlots) {
+                saveSlot.RefreshHotkey();
+            }
         }
     }
 }

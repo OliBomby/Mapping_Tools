@@ -1,5 +1,4 @@
-﻿using Editor_Reader;
-using Mapping_Tools.Classes.Tools;
+﻿using Mapping_Tools.Classes.Tools;
 using NonInvasiveKeyboardHookLibrary;
 using System;
 using System.Collections.Generic;
@@ -9,11 +8,13 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
+using System.Windows.Input;
+using ModifierKeys = NonInvasiveKeyboardHookLibrary.ModifierKeys;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public class ListenerManager {
         public readonly FileSystemWatcher FsWatcher = new FileSystemWatcher();
-        public readonly KeyboardHookManager keyboardHookManager = new KeyboardHookManager();
+        public readonly KeyboardHookManager KeyboardHookManager = new KeyboardHookManager();
         public Dictionary<string, ActionHotkey> ActiveHotkeys = new Dictionary<string, ActionHotkey>();
         
         public ListenerManager() {
@@ -21,7 +22,7 @@ namespace Mapping_Tools.Classes.SystemTools {
 
             LoadHotkeys();
             ReloadHotkeys();
-            keyboardHookManager.Start();
+            KeyboardHookManager.Start();
 
             SettingsManager.Settings.PropertyChanged += OnSettingsChanged;
         }
@@ -34,7 +35,10 @@ namespace Mapping_Tools.Classes.SystemTools {
                 case "SongsPath":
                     try {
                         FsWatcher.Path = SettingsManager.GetSongsPath();
-                    } catch { }
+                    } catch {
+                        // ignored
+                    }
+
                     break;
                 case "QuickRunHotkey":
                     ChangeActiveHotkeyHotkey("QuickRunHotkey", SettingsManager.Settings.QuickRunHotkey);
@@ -65,29 +69,33 @@ namespace Mapping_Tools.Classes.SystemTools {
                 ActiveHotkeys[name].Hotkey = hotkey;
                 ReloadHotkeys();
                 return true;
-            } else {
-                return false;
             }
+
+            return false;
         }
         
         public void ReloadHotkeys() {
             try {
-                keyboardHookManager.UnregisterAll();
+                KeyboardHookManager.UnregisterAll();
 
-                foreach (var ah in ActiveHotkeys.Values.Where(ah => ah.Hotkey != null && ah.Action != null)) {
+                foreach (var ah in ActiveHotkeys.Values.Where(ah =>
+                    ah.Hotkey != null && ah.Action != null && ah.Hotkey.Key != Key.None)) {
                     RegisterHotkey(ah.Hotkey, ah.Action);
                 }
-            } catch { MessageBox.Show(@"Could not reload hotkeys.", @"Warning"); }
+            } catch (HotkeyAlreadyRegisteredException) {
+                MessageBox.Show(@"Can not register duplicate hotkeys.", @"Warning");
+            }
+            catch { MessageBox.Show(@"Could not reload hotkeys.", @"Warning"); }
         }
 
         private void RegisterHotkey(Hotkey hotkey, Action action) {
             if (hotkey != null)
-                keyboardHookManager.RegisterHotkey(WindowsModifiersToOtherModifiers(hotkey.Modifiers), ResolveKey(hotkey.Key), action);
+                KeyboardHookManager.RegisterHotkey(WindowsModifiersToOtherModifiers(hotkey.Modifiers), ResolveKey(hotkey.Key), action);
             //Console.WriteLine($"Registered hotkey {hotkey.Modifiers}, {hotkey.Key}, {action}");
         }
 
-        public static int ResolveKey(System.Windows.Input.Key key) {
-            return System.Windows.Input.KeyInterop.VirtualKeyFromKey(key);
+        public static int ResolveKey(Key key) {
+            return KeyInterop.VirtualKeyFromKey(key);
         }
 
         private ModifierKeys[] WindowsModifiersToOtherModifiers(System.Windows.Input.ModifierKeys modifierKeys) {
@@ -189,7 +197,9 @@ namespace Mapping_Tools.Classes.SystemTools {
         private void InitFsWatcher() {
             try {
                 FsWatcher.Path = SettingsManager.GetSongsPath();
-            } catch { }
+            } catch {
+                // ignored
+            }
 
             FsWatcher.Filter = "*.osu";
             FsWatcher.Changed += OnChangedFsWatcher;

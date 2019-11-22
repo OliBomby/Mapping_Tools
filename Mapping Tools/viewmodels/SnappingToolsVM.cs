@@ -18,6 +18,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -695,8 +696,17 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public void SetProject(SnappingToolsProject project) {
+            // Dispose old project
+            Project.Dispose();
+
+            // Load in new project
+            LoadNewProject(project);
+        }
+
+        private void LoadNewProject(SnappingToolsProject project) {
             Project = project;
             Project.SetGenerators(Generators);
+            Project.Activate();
             UpdateEverything();
         }
 

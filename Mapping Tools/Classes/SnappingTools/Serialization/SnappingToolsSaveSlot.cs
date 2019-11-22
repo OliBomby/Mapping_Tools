@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Windows.Input;
 using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.SystemTools;
@@ -9,6 +10,7 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
     public class SnappingToolsSaveSlot : BindableBase, IDisposable {
         private string _name;
         private Hotkey _projectHotkey;
+        [JsonIgnore]
         private readonly string _hotkeyHandle;
 
         public string Name {
@@ -18,14 +20,12 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
 
         public Hotkey ProjectHotkey {
             get => _projectHotkey;
-            set {
-                if (_projectHotkey.Equals(value)) return;
-                Set(ref _projectHotkey, value);
-                MainWindow.AppWindow.ListenerManager.ChangeActiveHotkeyHotkey(_hotkeyHandle, ProjectHotkey);
-            }
+            set => Set(ref _projectHotkey, value);
         }
 
+        [JsonIgnore]
         public CommandImplementation SaveCommand { get; }
+        [JsonIgnore]
         public CommandImplementation LoadCommand { get; }
 
         [JsonIgnore]
@@ -36,20 +36,36 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
 
         public SnappingToolsSaveSlot() {
             Preferences = new SnappingToolsPreferences();
-            _projectHotkey = new Hotkey(Key.None, ModifierKeys.None);
 
             // Setup hotkey stuff
+            _projectHotkey = new Hotkey(Key.None, ModifierKeys.None);
             _hotkeyHandle = GenerateActiveHotkeyHandle();
-            MainWindow.AppWindow.ListenerManager.AddActiveHotkey(_hotkeyHandle, 
-                new ActionHotkey(ProjectHotkey, () => {
-                    if (System.Windows.Application.Current.Dispatcher != null)
-                        System.Windows.Application.Current.Dispatcher.Invoke(() => ParentProject?.LoadFromSlot(this));
-                }));
+
+            PropertyChanged += OnPropertyChanged;
 
             // SaveCommand takes the CurrentPreferences and copies it to this instance.
             SaveCommand = new CommandImplementation(o => ParentProject?.SaveToSlot(this));
             // LoadCommand takes this instance and copies it to ProjectWindow's CurrentPreferences.
             LoadCommand = new CommandImplementation(o => ParentProject?.LoadFromSlot(this));
+        }
+
+        public void RefreshHotkey() {
+            MainWindow.AppWindow.ListenerManager.RemoveActiveHotkey(_hotkeyHandle);
+            RegisterHotkey();
+        }
+
+        private void RegisterHotkey() {
+            MainWindow.AppWindow.ListenerManager.AddActiveHotkey(_hotkeyHandle, 
+                new ActionHotkey(ProjectHotkey, () => {
+                    if (System.Windows.Application.Current.Dispatcher != null)
+                        System.Windows.Application.Current.Dispatcher.Invoke(() => ParentProject?.LoadFromSlot(this));
+                }));
+        }
+
+        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
+            if (e.PropertyName != "ProjectHotkey") return;
+            
+            MainWindow.AppWindow.ListenerManager.ChangeActiveHotkeyHotkey(_hotkeyHandle, ProjectHotkey);
         }
 
         public object Clone() {
@@ -61,7 +77,15 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
         }
 
         private static string GenerateActiveHotkeyHandle() {
-            return $"SaveSlot - {MainWindow.MainRandom.Next(int.MaxValue)}";
+            var number = MainWindow.MainRandom.Next(int.MaxValue);
+            while (MainWindow.AppWindow.ListenerManager.ActiveHotkeys.ContainsKey($"SaveSlot - {number}")) {
+                number = MainWindow.MainRandom.Next(int.MaxValue);
+            }
+            return $"SaveSlot - {number}";
+        }
+
+        public void Activate() {
+            RegisterHotkey();
         }
     }
 }

@@ -5,14 +5,19 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using Mapping_Tools.Classes.SystemTools;
 
 namespace Mapping_Tools.Classes.SnappingTools.Serialization {
-    public class SnappingToolsProject {
+    public class SnappingToolsProject : BindableBase, IDisposable {
         [CanBeNull]
         [JsonIgnore]
         private IEnumerable<RelevantObjectsGenerator> _generators;
 
-        public SnappingToolsPreferences CurrentPreferences { get; }
+        private SnappingToolsPreferences _currentPreferences;
+        public SnappingToolsPreferences CurrentPreferences {
+            get => _currentPreferences;
+            set => Set(ref _currentPreferences, value);
+        }
 
         public ObservableCollection<SnappingToolsSaveSlot> SaveSlots { get; }
 
@@ -27,6 +32,7 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
         private void SaveSlotsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
             if (e.OldItems != null) {
                 foreach (var oldItem in e.OldItems) {
+                    ((SnappingToolsSaveSlot) oldItem).ParentProject = null;
                     ((SnappingToolsSaveSlot) oldItem).Dispose();
                 }
             }
@@ -48,11 +54,16 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
         }
 
         public void SetCurrentPreferences(SnappingToolsPreferences preferences) {
-            preferences?.CopyTo(CurrentPreferences);
+            if (preferences == null) {
+                Console.WriteLine("Setting current preferences failed!");
+            }
+
+            CurrentPreferences = (SnappingToolsPreferences)preferences.Clone();
             if (_generators != null) {
                 CurrentPreferences.ApplyGeneratorSettings(_generators);
             }
         }
+
         public SnappingToolsPreferences GetCurrentPreferences() {
             if (_generators != null) {
                 CurrentPreferences.SaveGeneratorSettings(_generators);
@@ -83,6 +94,18 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
             SetCurrentPreferences(saveSlot.Preferences);
             if (message) {
                 MainWindow.Snackbar.MessageQueue.Enqueue($"Succesfully loaded settings from {saveSlot.Name}!");
+            }
+        }
+
+        public void Activate() {
+            foreach (var saveSlot in SaveSlots) {
+                saveSlot.Activate();
+            }
+        }
+
+        public void Dispose() {
+            foreach (var saveSlot in SaveSlots) {
+                saveSlot.Dispose();
             }
         }
     }
