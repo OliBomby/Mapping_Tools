@@ -127,7 +127,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         public HashSet<IRelevantObject> GetParentage(int level) {
             var parentageSet = new HashSet<IRelevantObject> {this};
 
-            if (ParentObjects == null || ParentObjects.Count == 0 || level == 0) {
+            if (ParentObjects == null || ParentObjects.Count == 0 || level == 0 || parentageSet.Count > 100) {
                 return parentageSet;
             }
 

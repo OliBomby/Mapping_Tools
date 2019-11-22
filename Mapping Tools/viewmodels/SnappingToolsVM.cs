@@ -88,9 +88,11 @@ namespace Mapping_Tools.Viewmodels {
         public SnappingToolsVm() {
             // Set up a coordinate converter for converting coordinates between screen and osu!
             _coordinateConverter = new CoordinateConverter();
-
+            
             // Initialize project and preferences
             Project = new SnappingToolsProject();
+            Project.PropertyChanged += ProjectOnPropertyChanged;
+
             Preferences.PropertyChanged += PreferencesOnPropertyChanged;
 
             // Get all the RelevantObjectGenerators
@@ -563,6 +565,12 @@ namespace Mapping_Tools.Viewmodels {
 
         #region change listeners
 
+        private void ProjectOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
+            if (e.PropertyName != "CurrentPreferences") return;
+            
+            UpdateEverything();
+        }
+
         private void PreferencesOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
             switch (e.PropertyName) {
                 case "OffsetLeft":
@@ -697,7 +705,7 @@ namespace Mapping_Tools.Viewmodels {
 
         public void SetProject(SnappingToolsProject project) {
             // Dispose old project
-            Project.Dispose();
+            Project?.Dispose();
 
             // Load in new project
             LoadNewProject(project);
@@ -707,6 +715,7 @@ namespace Mapping_Tools.Viewmodels {
             Project = project;
             Project.SetGenerators(Generators);
             Project.Activate();
+            Project.PropertyChanged += ProjectOnPropertyChanged;
             UpdateEverything();
         }
 

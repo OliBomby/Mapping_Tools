@@ -18,7 +18,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         public bool Check(IRelevantObject relevantObject, RelevantObjectsGenerator generator) {
             if (NeedSelected && !relevantObject.IsSelected) return false;
             if (NeedLocked && !relevantObject.IsLocked) return false;
-            if (NeedGeneratedByThis && relevantObject.Generator != null && relevantObject.Generator != generator) return false;
+            if (NeedGeneratedByThis && (relevantObject.Generator == null || relevantObject.Generator != generator)) return false;
             if (NeedGeneratedNotByThis && relevantObject.Generator != null && relevantObject.Generator == generator) return false;
             return !(relevantObject.Relevancy < MinRelevancy);
         }

@@ -91,8 +91,8 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AutoUpdater.NET, Version=1.5.4.0, Culture=neutral, PublicKeyToken=501435c91b35f4bc, processorArchitecture=MSIL">
-      <HintPath>..\packages\Autoupdater.NET.Official.1.5.4\lib\net40\AutoUpdater.NET.dll</HintPath>
+    <Reference Include="AutoUpdater.NET, Version=1.5.8.0, Culture=neutral, PublicKeyToken=501435c91b35f4bc, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autoupdater.NET.Official.1.5.8\lib\net40\AutoUpdater.NET.dll</HintPath>
     </Reference>
     <Reference Include="EditorReader">
       <HintPath>..\packages\EditorReader.dll</HintPath>
@@ -116,10 +116,10 @@
       <HintPath>..\packages\NAudio.Vorbis.1.0.0.0\lib\net35\NAudio.Vorbis.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NonInvasiveKeyboardHookLibrary, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NonInvasiveKeyboardHookLibrary.1.4.0\lib\net452\NonInvasiveKeyboardHookLibrary.dll</HintPath>
+      <HintPath>..\packages\NonInvasiveKeyboardHookLibrary.1.5.0\lib\net452\NonInvasiveKeyboardHookLibrary.dll</HintPath>
     </Reference>
     <Reference Include="NVorbis, Version=0.8.6.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\NVorbis.0.8.6\lib\net35\NVorbis.dll</HintPath>
@@ -135,18 +135,6 @@
     </Reference>
     <Reference Include="ProcessMemoryDataFinder">
       <HintPath>..\packages\ProcessMemoryDataFinder.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX, Version=3.1.2.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\packages\Overlay.NET.1.0.2\lib\SharpDX.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.Direct2D1, Version=3.1.2.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\packages\Overlay.NET.1.0.2\lib\SharpDX.Direct2D1.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.DXGI, Version=3.1.2.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\packages\Overlay.NET.1.0.2\lib\SharpDX.DXGI.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.Mathematics, Version=3.1.2.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\packages\Overlay.NET.1.0.2\lib\SharpDX.Mathematics.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -258,6 +246,7 @@
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorGroupComparer.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorInputSelection\SelectionPredicate.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorInputSelection\SelectionPredicateCollection.cs" />
+    <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorSettingses\ScaleRotateGeneratorSettings.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorSettingses\SymmetryGeneratorSettings.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorSettingses\SliderPathGeneratorSettings.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\AveragePointGenerator3.cs" />
@@ -265,6 +254,7 @@
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\AngleBisectorGenerator.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\PointBisectorGenerator.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SameTransformGenerator2.cs" />
+    <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\ScaleRotateGenerator.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SymmetryGenerator.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SameTransformGenerator4.cs" />
     <Compile Include="Classes\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SameTransformGenerator3Reversed.cs" />
