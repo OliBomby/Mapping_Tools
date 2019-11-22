@@ -55,5 +55,12 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
 
             return this;
         }
+
+        public void CopyTo(SnappingToolsProject other) {
+            foreach (var prop in typeof(SnappingToolsProject).GetProperties()) {
+                if (!prop.CanWrite || !prop.CanRead) continue;
+                try { prop.SetValue(other, prop.GetValue(this)); } catch { }
+            }
+        }
     }
 }
