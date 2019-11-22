@@ -60,7 +60,7 @@
             </ListView.ContextMenu>
             <ListView.View>
                 <GridView>
-                    <GridViewColumn x:Name="NameHeader" Header="Name" Width="100">
+                    <GridViewColumn x:Name="NameHeader" Header="Name" Width="150">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate DataType="serialization:SnappingToolsSaveSlot">
                                 <TextBox Width="{Binding ElementName=NameHeader, Path=Width}"
@@ -69,10 +69,11 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Header="Hotkey">
+                    <GridViewColumn x:Name="HotkeyHeader" Header="Hotkey" Width="130">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate DataType="serialization:SnappingToolsSaveSlot">
-                                <components1:HotkeyEditorControl Width="150" HorizontalAlignment="Center" Hotkey="{Binding ProjectHotkey}"/>
+                                <components1:HotkeyEditorControl Width="{Binding ElementName=HotkeyHeader, Path=Width}"
+                                    HorizontalAlignment="Center" Hotkey="{Binding ProjectHotkey}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

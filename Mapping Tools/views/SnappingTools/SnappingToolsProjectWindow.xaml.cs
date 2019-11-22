@@ -15,9 +15,9 @@ namespace Mapping_Tools.Views.SnappingTools {
         public CommandImplementation DuplicateCommand { get; }
 
         public SnappingToolsProjectWindow(SnappingToolsProject project) {
+            InitializeComponent();
             Project = project;
             DataContext = this;
-            InitializeComponent();
 
             AddCommand = new CommandImplementation(_ => {
                 var newSave = new SnappingToolsSaveSlot {Name = $"Save {Project.SaveSlots.Count + 1}"};
