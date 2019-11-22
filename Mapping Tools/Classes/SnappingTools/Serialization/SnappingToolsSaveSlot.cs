@@ -35,5 +35,9 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
             // LoadCommand takes this instance and copies it to ProjectWindow's CurrentPreferences.
             LoadCommand = new CommandImplementation(o => ParentProject?.LoadFromSlot(this));
         }
+
+        public object Clone() {
+            return new SnappingToolsSaveSlot {Name = Name, ProjectHotkey = (Hotkey)ProjectHotkey?.Clone(), Preferences = (SnappingToolsPreferences)Preferences.Clone()};
+        }
     }
 }

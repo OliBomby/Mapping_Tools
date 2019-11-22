@@ -17,7 +17,7 @@
         TextElement.FontSize="14"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" Background="{DynamicResource MaterialDesignPaper}"
-        d:DataContext="{d:DesignData SnappingToolsProject}">
+        d:DataContext="{d:DesignData SnappingToolsProjectWindow}">
     
     <WindowChrome.WindowChrome>
         <WindowChrome 
@@ -51,7 +51,13 @@
             </StackPanel>
         </Grid>
 
-        <ListView Grid.Row="1" Grid.RowSpan="2" Name="SaveSlotsGrid" ItemsSource="{Binding SaveSlots}" VerticalContentAlignment="Center">
+        <ListView Grid.Row="1" Grid.RowSpan="2" x:Name="SaveSlotsGrid" ItemsSource="{Binding Project.SaveSlots}" VerticalContentAlignment="Center">
+            <ListView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Duplicate" ToolTip="Duplicate selected saves." Command="{Binding DuplicateCommand}"></MenuItem>
+                    <MenuItem Header="Remove" ToolTip="Remove all selected saves." Command="{Binding RemoveCommand}"></MenuItem>
+                </ContextMenu>
+            </ListView.ContextMenu>
             <ListView.View>
                 <GridView>
                     <GridViewColumn x:Name="NameHeader" Header="Name" Width="100">
@@ -94,14 +100,14 @@
         </ListView>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 0 0 10">
-            <Button x:Name="AddButton" Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a new slot"
-                                Click="AddButton_Click" Margin="0 0 8 0">
+            <Button x:Name="AddButton" Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a new save slot."
+                                Command="{Binding AddCommand}" Margin="0 0 8 0">
                 <materialDesign:PackIcon Kind="Plus" Height="24" Width="24" />
             </Button>
 
-            <Button x:Name="DeleteButton" Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Delete selected slot"
-                                Click="DeleteButton_Click" Margin="0 0 8 0">
-                <materialDesign:PackIcon Kind="Trashcan" Height="24" Width="24"/>
+            <Button x:Name="DeleteButton" Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove all selected saves or the last save if nothing is selected."
+                                Command="{Binding RemoveCommand}" Margin="0 0 8 0">
+                <materialDesign:PackIcon Kind="Minus" Height="24" Width="24"/>
             </Button>
         </StackPanel>
 
