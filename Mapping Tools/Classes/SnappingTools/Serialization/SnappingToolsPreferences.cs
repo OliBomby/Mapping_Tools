@@ -3,16 +3,23 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Components.Domain;
+using Mapping_Tools.Views;
 using System;
 using System.Collections.Generic;
 using System.Windows.Input;
 using System.Windows.Media;
 
 namespace Mapping_Tools.Classes.SnappingTools.Serialization {
-    public class SnappingToolsPreferences : BindableBase, ICloneable{
+    public class SnappingToolsPreferences : BindableBase, ICloneable {
         #region private storage
         private Dictionary<string, RelevantObjectPreferences> relevantObjectPreferences;
         private Dictionary<Type, GeneratorSettings> generatorSettings;
+
+        private string name;
+        private Hotkey projectHotkey;
+        private readonly CommandImplementation saveCommand;
+        private readonly CommandImplementation loadCommand;
 
         private Hotkey snapHotkey;
         private Hotkey selectHotkey;
@@ -44,6 +51,16 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
         }
 
         #region global settings
+        public string Name {
+            get => name;
+            set => Set(ref name, value);
+        }
+        public Hotkey ProjectHotkey {
+            get => projectHotkey;
+            set => Set(ref projectHotkey, value);
+        }
+        public CommandImplementation SaveCommand => saveCommand;
+        public CommandImplementation LoadCommand => loadCommand;
         public Hotkey SnapHotkey {
             get => snapHotkey;
             set => Set(ref snapHotkey, value);
@@ -147,7 +164,7 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
                 }
             }
         }
-        
+
         /// <summary>
         /// Gets the settings from the specified generators and saves it to these preferences
         /// </summary>
@@ -217,8 +234,22 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
             keyUpViewMode = ViewMode.Everything;
             selectedHitObjectMode = SelectedHitObjectMode.VisibleOrSelected;
             inceptionLevel = 4;
+
+            //SaveCommand takes the CurrentPreferences and copies it to this instance.
+            saveCommand = new CommandImplementation(o => {
+                GetProject().CurrentPreferences.CopyTo(this);
+            });
+            //LoadCommand takes this instance and copies it to ProjectWindow's CurrentPreferences.
+            loadCommand = new CommandImplementation(o => {
+                this.CopyTo((GetWindowProject()).CurrentPreferences);
+            });
         }
         #endregion
+
+        private SnappingToolsProject GetProject() => 
+            ((SnappingToolsView)MainWindow.AppWindow.Views.GetView("Geometry Dashboard")).ViewModel.GetProject();
+        private SnappingToolsProject GetWindowProject() => 
+            (SnappingToolsProject)((SnappingToolsView)MainWindow.AppWindow.Views.GetView("Geometry Dashboard")).ProjectWindow.DataContext;
 
         public void CopyTo(SnappingToolsPreferences other) {
             foreach (var prop in typeof(SnappingToolsPreferences).GetProperties()) {
