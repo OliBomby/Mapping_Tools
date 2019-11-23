@@ -40,6 +40,10 @@ namespace Mapping_Tools.Classes.SnappingTools {
         public readonly Vector2 EditorGridResolution = new Vector2(512, 384);
 
         public CoordinateConverter() {
+            Fullscreen = true;
+            OsuResolution = new Vector2(1920, 1080);
+            Letterboxing = true;
+            LetterboxingPosition = new Vector2(0.5, 0.5);
             Initialize();
         }
 
