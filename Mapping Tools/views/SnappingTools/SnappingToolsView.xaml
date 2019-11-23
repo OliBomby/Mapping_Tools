@@ -36,7 +36,7 @@ You can then snap your mouse to those virtual points, lines and circles using a 
 You can find and configure all the hotkeys in the preferences (top right gear button). You can configure just about everything else too. 
 Hover your mouse over the names of things to probably get a tooltip which gives more explanation. I encourage you to try out everything!
 <LineBreak/>
-Virtual objects get generated in layers. The first layer is the hit objects in your editor, the second layer is virtual objects derived from those hit objects, the third layer is virtual objects derived from the previous virtual object, etc.
+Virtual objects are generated in layers. The first layer has the hit objects of your editor, the second layer has virtual objects derived from those hit objects, the third layer has virtual objects derived from the previous virtual objects, etc.
 You can specify the number of layers in the preferences. More layers generally results in exponentially more virtual objects.
 <LineBreak/>
 In the big list below are all the generators. These generators generate new virtual objects from previous virtual objects or hit objects.
