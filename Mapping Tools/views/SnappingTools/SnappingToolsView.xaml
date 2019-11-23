@@ -46,12 +46,12 @@
                         </Grid.ColumnDefinitions>
                         
                         <StackPanel Grid.Column="2" Orientation="Horizontal">
-                            <Button x:Name="ProjectsButton" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}" ToolTip="Savestates..."
+                            <Button x:Name="ProjectsButton" Style="{StaticResource MaterialDesignFloatingActionMiniButton}" ToolTip="Savestates..."
                                     Click="ProjectsButton_Click" Margin="0 0 8 0">
                                 <materialDesign:PackIcon Kind="ContentSaveAll" Height="24" Width="24" />
                             </Button>
 
-                            <Button x:Name="PreferencesButton" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}" ToolTip="Preferences..."
+                            <Button x:Name="PreferencesButton" Style="{StaticResource MaterialDesignFloatingActionMiniButton}" ToolTip="Preferences..."
                                 Click="PreferencesButton_Click">
                                 <materialDesign:PackIcon Kind="SettingsOutline" Height="24" Width="24" />
                             </Button>
