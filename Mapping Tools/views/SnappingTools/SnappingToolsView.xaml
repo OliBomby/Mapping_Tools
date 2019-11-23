@@ -30,8 +30,26 @@
                             <materialDesign:PopupBox.ToggleContent>
                                 <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
                             </materialDesign:PopupBox.ToggleContent>
-                            <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5" xml:space="preserve"> Generates and keeps track of a list virtual objects that are geometrically relevant to the objects visible on your screen. Press and hold the Activation Key to let your cursor snap to the closest virtual object.
-⚠ You must specify your user config file in the Preferences for this tool to function.</TextBlock>
+                            <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="10" xml:space="preserve">This tool derives virtual points, lines and circles from the hit objects in your editor and overlays them over the editor. 
+You can then snap your mouse to those virtual points, lines and circles using a hotkey, so you can use the geometry in your map.
+<LineBreak/>
+You can find and configure all the hotkeys in the preferences (top right gear button). You can configure just about everything else too. 
+Hover your mouse over the names of things to probably get a tooltip which gives more explanation. I encourage you to try out everything!
+<LineBreak/>
+Virtual objects get generated in layers. The first layer is the hit objects in your editor, the second layer is virtual objects derived from those hit objects, the third layer is virtual objects derived from the previous virtual object, etc.
+You can specify the number of layers in the preferences. More layers generally results in exponentially more virtual objects.
+<LineBreak/>
+In the big list below are all the generators. These generators generate new virtual objects from previous virtual objects or hit objects.
+All the generators in the basic section only take hit objects as an input, so when activating one of them you can instantly see the effect.
+The more advanced generators all take virtual objects as input, so you need to activate at least one basic generator active for them to work.
+<LineBreak/>
+Every generator also has it's own settings. You can access those settings by clicking the 'Configure' button on each generator.
+In these generator settings you can do thing like customize what virtual objects the generator accepts as input or change the properties of the output of the generator.
+<LineBreak/>
+Lastly there are savestates which you can use to quickly change out preferences and generator settings using hotkeys. As an advanced user this can save lots of time continuously changing generators and stuff.
+The savestates window is opened by clicking the button next to the preferences button.
+<LineBreak/>
+⚠ You must specify your user config file in the Mapping Tools Preferences (Options -> Preferences) for this tool to function.</TextBlock>
                         </materialDesign:PopupBox>
                     </StackPanel>
 
