@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses {
@@ -40,6 +41,16 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
             Scalar = 1;
             OriginInputPredicate = new SelectionPredicateCollection();
             OtherInputPredicate = new SelectionPredicateCollection();
+        }
+
+        public override object Clone() {
+            return new ScaleRotateGeneratorSettings {Generator = Generator, IsActive = IsActive, IsSequential = IsSequential, IsDeep = IsDeep, 
+                RelevancyRatio = RelevancyRatio, GeneratesInheritable = GeneratesInheritable,
+                InputPredicate = (SelectionPredicateCollection)InputPredicate.Clone(),
+                Angle = Angle, Scalar = Scalar, 
+                OriginInputPredicate = (SelectionPredicateCollection)OriginInputPredicate.Clone(),
+                OtherInputPredicate = (SelectionPredicateCollection)OtherInputPredicate.Clone()
+            };
         }
     }
 }

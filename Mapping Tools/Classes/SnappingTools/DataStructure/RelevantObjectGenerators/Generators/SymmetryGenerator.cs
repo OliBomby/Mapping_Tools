@@ -30,10 +30,21 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         }
 
         [RelevantObjectsGeneratorMethod]
-        public RelevantLine GetRelevantObjects(RelevantLine axis, RelevantLine line) {
-            return !MySettings.AxisInputPredicate.Check(axis, this) || !MySettings.OtherInputPredicate.Check(line, this) ? null : 
-                new RelevantLine(Line2.FromPoints(Vector2.Mirror(line.Child.PositionVector, axis.Child), 
-                    Vector2.Mirror(line.Child.PositionVector + line.Child.DirectionVector, axis.Child)));
+        public RelevantLine GetRelevantObjects(RelevantLine line1, RelevantLine line2) {
+            // Any line can be the axis
+            if (MySettings.AxisInputPredicate.Check(line1, this) && 
+                MySettings.OtherInputPredicate.Check(line2, this)) {
+                return new RelevantLine(Line2.FromPoints(Vector2.Mirror(line2.Child.PositionVector, line1.Child),
+                    Vector2.Mirror(line2.Child.PositionVector + line2.Child.DirectionVector, line1.Child)));
+            }
+
+            if (MySettings.AxisInputPredicate.Check(line2, this) &&
+                MySettings.OtherInputPredicate.Check(line1, this)) {
+                return new RelevantLine(Line2.FromPoints(Vector2.Mirror(line1.Child.PositionVector, line2.Child),
+                    Vector2.Mirror(line1.Child.PositionVector + line1.Child.DirectionVector, line2.Child)));
+            }
+
+            return null;
         }
 
         [RelevantObjectsGeneratorMethod]

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses {
     public class SliderPathGeneratorSettings : GeneratorSettings {
@@ -8,6 +9,14 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         public double PointDensity {
             get => _pointDensity;
             set => Set(ref _pointDensity, value);
+        }
+
+        public override object Clone() {
+            return new SliderPathGeneratorSettings {Generator = Generator, IsActive = IsActive, IsSequential = IsSequential, IsDeep = IsDeep, 
+                RelevancyRatio = RelevancyRatio, GeneratesInheritable = GeneratesInheritable,
+                InputPredicate = (SelectionPredicateCollection)InputPredicate.Clone(),
+                PointDensity = PointDensity
+            };
         }
     }
 }

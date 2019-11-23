@@ -195,9 +195,11 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                 }
             }
 
-            // Stop if it is gonna add too many objects.
-            if (objectsToAdd.Count + Objects.GetCount() > ParentCollection.MaxObjects) {
-                return;
+            // Avoid adding too many objects
+            var newCount = objectsToAdd.Count + Objects.GetCount();
+            var overshot = newCount - ParentCollection.MaxObjects;
+            if (overshot > 0) {
+                objectsToAdd.RemoveRange(objectsToAdd.Count - overshot, overshot);
             }
 
             // Set all DoNotDispose to false

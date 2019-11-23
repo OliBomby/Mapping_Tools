@@ -6,6 +6,7 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorCollection;
+using Mapping_Tools.Classes.SnappingTools.Serialization;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Views.SnappingTools;
@@ -18,13 +19,12 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-using Mapping_Tools.Classes.SnappingTools.Serialization;
+using Mapping_Tools.Components.Domain;
 
 namespace Mapping_Tools.Viewmodels {
     public class SnappingToolsVm : IDisposable
@@ -36,6 +36,10 @@ namespace Mapping_Tools.Viewmodels {
 
         public ObservableCollection<RelevantObjectsGenerator> Generators { get; }
         protected readonly LayerCollection LayerCollection;
+
+        public CommandImplementation SelectedToggleCommand { get; set; }
+        public CommandImplementation LockedToggleCommand { get; set; }
+        public CommandImplementation InheritableToggleCommand { get; set; }
 
         private IRelevantObject _lastSnappedRelevantObject;
         private readonly List<IRelevantDrawable> _lastSelectedRelevantDrawables;
@@ -135,6 +139,9 @@ namespace Mapping_Tools.Viewmodels {
             _lastSelectedRelevantDrawables = new List<IRelevantDrawable>();
             _lastLockedRelevantDrawables = new List<IRelevantDrawable>();
             _lastInheritRelevantDrawables = new List<IRelevantDrawable>();
+
+            // Setup commands
+            InitializeCommands();
 
             // Listen for changes in the osu! user config
             _configWatcher = new FileSystemWatcher();
@@ -688,6 +695,88 @@ namespace Mapping_Tools.Viewmodels {
 
         #endregion
         
+        #region command makers
+
+        private void InitializeCommands() {
+            SelectedToggleCommand = new CommandImplementation(_ => {
+                var virtualObjects = LayerCollection.GetAllRelevantDrawables();
+                if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)) {
+                    foreach (var relevantObject in virtualObjects) {
+                        relevantObject.AutoPropagate = false;
+                        relevantObject.IsSelected = true;
+                        relevantObject.AutoPropagate = true;
+                    }
+                } else if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)) {
+                    foreach (var relevantObject in virtualObjects) {
+                        relevantObject.AutoPropagate = false;
+                        relevantObject.IsSelected = false;
+                        relevantObject.AutoPropagate = true;
+                    }
+                } else {
+                    foreach (var relevantObject in virtualObjects) {
+                        relevantObject.AutoPropagate = false;
+                        relevantObject.IsSelected = !relevantObject.IsSelected;
+                        relevantObject.AutoPropagate = true;
+                    }
+                }
+                LayerCollection.GetRootLayer().GenerateNewObjects(true);
+                _overlay.OverlayWindow.InvalidateVisual();
+            });
+            LockedToggleCommand = new CommandImplementation(_ => {
+                var virtualObjects = LayerCollection.GetAllRelevantDrawables();
+                var lockedObjectsToDispose = new List<IRelevantObject>();
+                var lockedObjectsToAdd = new List<IRelevantObject>();
+                if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)) {
+                    lockedObjectsToAdd.AddRange(from relevantObject in virtualObjects where !relevantObject.IsLocked select relevantObject.GetLockedRelevantObject());
+                } else if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)) {
+                    lockedObjectsToDispose.AddRange(virtualObjects.Where(relevantObject => relevantObject.IsLocked));
+                } else {
+                    foreach (var relevantObject in virtualObjects) {
+                        if (relevantObject.IsLocked) {
+                            lockedObjectsToDispose.Add(relevantObject);
+                        } else {
+                            lockedObjectsToAdd.Add(relevantObject.GetLockedRelevantObject());
+                        }
+                    }
+                }
+
+                foreach (var relevantObject in lockedObjectsToAdd) {
+                    LayerCollection.LockedLayer.Add(relevantObject.GetLockedRelevantObject());
+                }
+                foreach (var relevantObject in lockedObjectsToDispose) {
+                    relevantObject.Dispose();
+                }
+                LayerCollection.GetRootLayer().GenerateNewObjects(true);
+                _overlay.OverlayWindow.InvalidateVisual();
+            });
+            InheritableToggleCommand = new CommandImplementation(_ => {
+                var virtualObjects = LayerCollection.GetAllRelevantDrawables();
+                if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)) {
+                    foreach (var relevantObject in virtualObjects) {
+                        relevantObject.AutoPropagate = false;
+                        relevantObject.IsInheritable = true;
+                        relevantObject.AutoPropagate = true;
+                    }
+                } else if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)) {
+                    foreach (var relevantObject in virtualObjects) {
+                        relevantObject.AutoPropagate = false;
+                        relevantObject.IsInheritable = false;
+                        relevantObject.AutoPropagate = true;
+                    }
+                } else {
+                    foreach (var relevantObject in virtualObjects) {
+                        relevantObject.AutoPropagate = false;
+                        relevantObject.IsInheritable = !relevantObject.IsInheritable;
+                        relevantObject.AutoPropagate = true;
+                    }
+                }
+                LayerCollection.GetRootLayer().GenerateNewObjects(true);
+                _overlay.OverlayWindow.InvalidateVisual();
+            });
+        }
+
+        #endregion
+
         #region serialization stuff
 
         public void UpdateEverything() {
@@ -728,6 +817,7 @@ namespace Mapping_Tools.Viewmodels {
         #region tool management helpers
 
         public void Dispose() {
+            _updateTimer.Stop();
             _overlay?.Dispose();
             _configWatcher?.Dispose();
             _processSharp?.Dispose();

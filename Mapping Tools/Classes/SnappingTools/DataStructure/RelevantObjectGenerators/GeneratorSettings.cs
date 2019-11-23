@@ -88,10 +88,10 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
             }
         }
 
-        public object Clone() {
-            var clone = (GeneratorSettings)MemberwiseClone();
-            clone.InputPredicate = (SelectionPredicateCollection)InputPredicate.Clone();
-            return clone;
+        public virtual object Clone() {
+            return new GeneratorSettings {Generator = Generator, IsActive = IsActive, IsSequential = IsSequential, IsDeep = IsDeep, 
+                RelevancyRatio = RelevancyRatio, GeneratesInheritable = GeneratesInheritable,
+                InputPredicate = (SelectionPredicateCollection)InputPredicate.Clone()};
         }
     }
 }

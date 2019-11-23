@@ -24,9 +24,19 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         }
 
         [RelevantObjectsGeneratorMethod]
-        public RelevantPoint GetRelevantObjects(RelevantPoint origin, RelevantPoint point) {
-            return !MySettings.OriginInputPredicate.Check(origin, this) || !MySettings.OtherInputPredicate.Check(point, this) ? null : 
-                new RelevantPoint( Matrix2.Mult(Matrix2.CreateRotation(MathHelper.DegreesToRadians(MySettings.Angle)), point.Child - origin.Child) * MySettings.Scalar + origin.Child);
+        public RelevantPoint GetRelevantObjects(RelevantPoint point1, RelevantPoint point2) {
+            // Any point can be the origin
+            if (MySettings.OriginInputPredicate.Check(point1, this) &&
+                MySettings.OtherInputPredicate.Check(point2, this)) {
+                return new RelevantPoint( Matrix2.Mult(Matrix2.CreateRotation(MathHelper.DegreesToRadians(MySettings.Angle)), point2.Child - point1.Child) * MySettings.Scalar + point1.Child);
+            }
+
+            if (MySettings.OriginInputPredicate.Check(point2, this) &&
+                MySettings.OtherInputPredicate.Check(point1, this)) {
+                return new RelevantPoint( Matrix2.Mult(Matrix2.CreateRotation(MathHelper.DegreesToRadians(MySettings.Angle)), point1.Child - point2.Child) * MySettings.Scalar + point2.Child);
+            }
+
+            return null;
         }
 
         [RelevantObjectsGeneratorMethod]

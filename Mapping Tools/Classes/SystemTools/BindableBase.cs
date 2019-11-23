@@ -6,6 +6,7 @@ namespace Mapping_Tools.Classes.SystemTools {
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void Set<T>(ref T target, T value, [CallerMemberName] string propertyName = "") {
+            if (target != null && target.Equals(value)) return;
             target = value;
             RaisePropertyChanged(propertyName);
         }

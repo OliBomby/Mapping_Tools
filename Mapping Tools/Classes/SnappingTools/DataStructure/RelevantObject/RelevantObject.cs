@@ -61,12 +61,15 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
 
         public bool DoNotDispose { get; set; }
 
+        public bool AutoPropagate { get; set; } = true;
+
         private bool _isSelected;
         public virtual bool IsSelected {
             get => _isSelected;
             set {
                 if (_isSelected == value) return;
                 _isSelected = value;
+                if (!AutoPropagate) return;
                 Layer?.NextLayer?.GenerateNewObjects();
             }
         }
@@ -77,6 +80,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
             set {
                 if (_isLocked == value) return;
                 _isLocked = value;
+                if (!AutoPropagate) return;
                 Layer?.NextLayer?.GenerateNewObjects();
             }
         }
@@ -87,6 +91,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
             set {
                 if (_isInheritable == value) return;
                 _isInheritable = value;
+                if (!AutoPropagate) return;
                 if (_isInheritable) {
                     Layer?.NextLayer?.GenerateNewObjects();
                 } else {

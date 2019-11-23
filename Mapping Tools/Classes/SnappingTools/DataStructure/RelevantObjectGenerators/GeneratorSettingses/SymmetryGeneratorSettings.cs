@@ -23,5 +23,14 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
             AxisInputPredicate = new SelectionPredicateCollection();
             OtherInputPredicate = new SelectionPredicateCollection();
         }
+
+        public override object Clone() {
+            return new SymmetryGeneratorSettings {Generator = Generator, IsActive = IsActive, IsSequential = IsSequential, IsDeep = IsDeep, 
+                RelevancyRatio = RelevancyRatio, GeneratesInheritable = GeneratesInheritable,
+                InputPredicate = (SelectionPredicateCollection)InputPredicate.Clone(),
+                AxisInputPredicate = (SelectionPredicateCollection)AxisInputPredicate.Clone(),
+                OtherInputPredicate = (SelectionPredicateCollection)OtherInputPredicate.Clone()
+            };
+        }
     }
 }
