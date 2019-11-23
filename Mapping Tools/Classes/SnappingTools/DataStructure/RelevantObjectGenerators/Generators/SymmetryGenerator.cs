@@ -7,8 +7,8 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
     public class SymmetryGenerator : RelevantObjectsGenerator {
-        public override string Name => "Symmetries from Lines";
-        public override string Tooltip => "Mirrors any virtual objects over a virtual line where the virtual line is the symmetry axis. In the settings you can set extra rules for selecting symmetry axis'.";
+        public override string Name => "Reflection across a Line";
+        public override string Tooltip => "Mirrors any virtual object over a virtual line where the virtual line is the symmetry axis. In the settings you can set extra rules for selecting the symmetry axis.";
         public override GeneratorType GeneratorType => GeneratorType.Advanced;
 
         private SymmetryGeneratorSettings MySettings => (SymmetryGeneratorSettings) Settings;
@@ -18,6 +18,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         /// </summary>
         public SymmetryGenerator() : base(new SymmetryGeneratorSettings()) {
             Settings.Generator = this;
+            Settings.IsDeep = true;
 
             MySettings.AxisInputPredicate.Predicates.Add(new SelectionPredicate {NeedLocked = true});
         }
