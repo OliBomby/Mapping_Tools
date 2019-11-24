@@ -69,7 +69,7 @@
                             <StackPanel Orientation="Horizontal" Margin="10">
                                 <TextBlock Width="100" Text="Lock Key" VerticalAlignment="Bottom" Margin="0 0 0 6" ToolTip="Press or hold this key to lock virtual objects."/>
                                 <components1:HotkeyEditorControl Width="150" VerticalAlignment="Bottom" Hotkey="{Binding LockHotkey}"/>
-                                <TextBlock Width="100" Text="Inherit Key" VerticalAlignment="Bottom" Margin="10 0 0 6" ToolTip="Press or hold this key to select which virtual objects can get used by generators."/>
+                                <TextBlock Width="100" Text="Usability Key" VerticalAlignment="Bottom" Margin="10 0 0 6" ToolTip="Press or hold this key to select which virtual objects can get used by generators."/>
                                 <components1:HotkeyEditorControl Width="150" VerticalAlignment="Bottom" Hotkey="{Binding InheritHotkey}"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
