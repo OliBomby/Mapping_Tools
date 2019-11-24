@@ -14,7 +14,7 @@ namespace Mapping_Tools.Components.Domain {
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
             if (value == null) {
                 if (parameter != null) {
-                    return (double) parameter;
+                    return double.Parse(parameter.ToString());
                 }
                 return new ValidationResult(false, "Cannot convert back null.");
             }
@@ -26,7 +26,7 @@ namespace Mapping_Tools.Components.Domain {
 
                 return new ValidationResult(false, "Double format error.");
             }
-            TypeConverters.TryParseDouble(value.ToString(), out double result2, (double)parameter);
+            TypeConverters.TryParseDouble(value.ToString(), out double result2, double.Parse(parameter.ToString()));
             return result2;
         }
     }

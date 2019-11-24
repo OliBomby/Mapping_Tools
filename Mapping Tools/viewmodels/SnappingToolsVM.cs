@@ -407,7 +407,7 @@ namespace Mapping_Tools.Viewmodels {
                     // Prioritize points to be able to snap to intersections
                     dist -= PointsBias;
                 }
-                if (o.IsSelected || o.IsLocked) {
+                if (specialPriority && (o.IsSelected || o.IsLocked)) {
                     // Prioritize selected and locked to be able to unselect them easily
                     dist -= SpecialBias;
                 }
@@ -483,7 +483,7 @@ namespace Mapping_Tools.Viewmodels {
 
             // Get nearest drawable
             var cursorPos = GetCursorPosition();
-            var nearest = GetNearestDrawable(cursorPos);
+            var nearest = GetNearestDrawable(cursorPos, true);
 
             if (nearest == null) return;
 
@@ -515,7 +515,7 @@ namespace Mapping_Tools.Viewmodels {
 
             // Get nearest drawable
             var cursorPos = GetCursorPosition();
-            var nearest = GetNearestDrawable(cursorPos);
+            var nearest = GetNearestDrawable(cursorPos, true);
 
             if (nearest == null) return;
 
