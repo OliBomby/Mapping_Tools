@@ -62,6 +62,7 @@ namespace Mapping_Tools.Viewmodels {
         private readonly DispatcherTimer _inheritTimer;
 
         private const double PointsBias = 3;
+        private const double SpecialBias = 3;
 
         private readonly CoordinateConverter _coordinateConverter;
         private readonly FileSystemWatcher _configWatcher;
@@ -393,7 +394,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
 
-        private IRelevantDrawable GetNearestDrawable(Vector2 cursorPos) {
+        private IRelevantDrawable GetNearestDrawable(Vector2 cursorPos, bool specialPriority = false) {
             // Get all the relevant drawables
             var drawables = LayerCollection.GetAllRelevantDrawables().ToArray();
 
@@ -402,8 +403,14 @@ namespace Mapping_Tools.Viewmodels {
             var smallestDistance = double.PositiveInfinity;
             foreach (var o in drawables) {
                 var dist = o.DistanceTo(cursorPos);
-                if (o is RelevantPoint) // Prioritize points to be able to snap to intersections
+                if (o is RelevantPoint) {
+                    // Prioritize points to be able to snap to intersections
                     dist -= PointsBias;
+                }
+                if (o.IsSelected || o.IsLocked) {
+                    // Prioritize selected and locked to be able to unselect them easily
+                    dist -= SpecialBias;
+                }
 
                 if (!(dist < smallestDistance)) continue;
                 smallestDistance = dist;
