@@ -56,7 +56,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.Relev
                     (Child.DirectionVector.Length * relevantLine.Child.DirectionVector.Length);
             // This is the length of the opposite side in a right triangle with an adjacent side length of 100
             var angleDiff = Math.Sqrt(10000 / (cosAlpha * cosAlpha) - 10000);
-            return Vector2.Distance(Child.PositionVector, relevantLine.Child.PositionVector) + angleDiff;
+            return Line2.Distance(Child, relevantLine.Child.PositionVector) + angleDiff;
         }
     }
 }
