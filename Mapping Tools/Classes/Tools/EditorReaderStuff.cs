@@ -148,7 +148,7 @@ namespace Mapping_Tools.Classes.Tools {
             }
         }
 
-        public static List<HitObject> GetSelectedObjects(BeatmapEditor editor, EditorReader reader) {
+        
         /// <summary>
         /// 
         /// </summary>
@@ -185,7 +185,7 @@ namespace Mapping_Tools.Classes.Tools {
             }
         }
 
-        public static BeatmapEditor GetNewestVersion(EditorReader reader, out List<HitObject> selected) {
+        
         /// <summary>
         /// 
         /// </summary>
