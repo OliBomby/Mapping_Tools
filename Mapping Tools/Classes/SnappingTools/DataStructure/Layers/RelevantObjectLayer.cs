@@ -85,9 +85,8 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
             relevantObject.Layer = this;
 
             // Propagate changes
-            if (propagate) {
-                NextLayer?.GenerateNewObjects();
-            }
+            if (!propagate || NextLayer == null) return;
+            NextLayer.GenerateNewObjects();
         }
 
         private RelevantObjectCollection.RelevantObjectCollection GetAllPreviousLayersCollection() {

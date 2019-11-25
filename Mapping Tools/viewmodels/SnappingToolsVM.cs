@@ -529,8 +529,10 @@ namespace Mapping_Tools.Viewmodels {
 
             // Set the locked variable of the nearest drawable
             if (_lockedToggle) {
-                if (!nearest.IsLocked)
+                if (!nearest.IsLocked) {
                     LayerCollection.LockedLayer.Add(nearest.GetLockedRelevantObject());
+                    LayerCollection.LockedLayer.NextLayer?.GenerateNewObjects(true);
+                }
             } else {
                 if (nearest.IsLocked)
                     nearest.Dispose();
