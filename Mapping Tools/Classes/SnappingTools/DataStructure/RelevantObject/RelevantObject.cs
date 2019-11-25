@@ -61,6 +61,8 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
 
         public bool DoNotDispose { get; set; }
 
+        public bool DefinitelyDispose { get; set; }
+
         public bool AutoPropagate { get; set; } = true;
 
         private bool _isSelected;
@@ -70,7 +72,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
                 if (_isSelected == value) return;
                 _isSelected = value;
                 if (!AutoPropagate) return;
-                Layer?.NextLayer?.GenerateNewObjects();
+                Layer?.NextLayer?.GenerateNewObjects(true);
             }
         }
 
@@ -81,7 +83,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
                 if (_isLocked == value) return;
                 _isLocked = value;
                 if (!AutoPropagate) return;
-                Layer?.NextLayer?.GenerateNewObjects();
+                Layer?.NextLayer?.GenerateNewObjects(true);
             }
         }
 
@@ -93,13 +95,13 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
                 _isInheritable = value;
                 if (!AutoPropagate) return;
                 if (_isInheritable) {
-                    Layer?.NextLayer?.GenerateNewObjects();
+                    Layer?.NextLayer?.GenerateNewObjects(true);
                 } else {
                     var objectsToDispose = ChildObjects.ToArray();
                     foreach (var t in objectsToDispose) {
                         t.Dispose();
                     }
-                    Layer?.NextLayer?.GenerateNewObjects();
+                    Layer?.NextLayer?.GenerateNewObjects(true);
                 }
             }
         }
@@ -132,10 +134,10 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         public HashSet<IRelevantObject> GetParentage(int level) {
             var parentageSet = new HashSet<IRelevantObject> {this};
 
-            if (ParentObjects == null || ParentObjects.Count == 0 || level == 0 || parentageSet.Count > 100) {
+            if (ParentObjects == null || ParentObjects.Count == 0 || level == 0 || IsLocked) {
                 return parentageSet;
             }
-
+            
             foreach (var relevantObject in ParentObjects) {
                 parentageSet.UnionWith(relevantObject.GetParentage(level - 1));
             }
@@ -207,6 +209,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         }
         
         public void Consume(IRelevantObject other) {
+            if (IsLocked) return;
             ParentObjects.UnionWith(other.ParentObjects);
             ChildObjects.UnionWith(other.ChildObjects);
         }
