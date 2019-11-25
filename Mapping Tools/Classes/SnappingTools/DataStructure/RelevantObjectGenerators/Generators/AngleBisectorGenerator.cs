@@ -1,6 +1,7 @@
 ﻿using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
@@ -8,6 +9,12 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         public override string Name => "Bisectors of Angles";
         public override string Tooltip => "Takes a pair virtual lines and generates the bisector of the angle between those lines at the point of the intersection.";
         public override GeneratorType GeneratorType => GeneratorType.Intermediate;
+
+        public AngleBisectorGenerator() {
+            Settings.IsActive = true;
+            Settings.IsDeep = true;
+            Settings.InputPredicate.Predicates.Add(new SelectionPredicate {NeedSelected = true});
+        }
 
         [RelevantObjectsGeneratorMethod]
         public RelevantLine[] GetRelevantObjects(RelevantLine line1, RelevantLine line2) {

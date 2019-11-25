@@ -10,6 +10,10 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         public override string Tooltip => "Takes a circular arc slider and generates a virtual point on its blanket center.";
         public override GeneratorType GeneratorType => GeneratorType.Basic;
 
+        public PerfectCircleBlanketGenerator() {
+            Settings.IsActive = true;
+        }
+
         [RelevantObjectsGeneratorMethod]
         public RelevantPoint GetRelevantObjects(RelevantHitObject relevantHitObject) {
             var ho = relevantHitObject.HitObject;

@@ -2,6 +2,7 @@
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 using System;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
     public class SameTransformGenerator2 : RelevantObjectsGenerator {
@@ -12,6 +13,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
 
         public SameTransformGenerator2() {
             Settings.IsSequential = true;
+            Settings.IsDeep = true;
+            Settings.InputPredicate.Predicates.Add(new SelectionPredicate {NeedSelected = true});
+            Settings.InputPredicate.Predicates.Add(new SelectionPredicate {NeedGeneratedByThis = true});
         }
 
         [RelevantObjectsGeneratorMethod]

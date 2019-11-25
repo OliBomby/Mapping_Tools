@@ -229,6 +229,7 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
             _keyDownViewMode = ViewMode.Parents;
             _keyUpViewMode = ViewMode.Everything;
             _selectedHitObjectMode = SelectedHitObjectMode.AllwaysAllVisible;
+            _updateMode = UpdateMode.OsuActivated;
             _inceptionLevel = 5;
         }
         #endregion

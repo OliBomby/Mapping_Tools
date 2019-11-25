@@ -3,12 +3,19 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantO
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 using System;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
     public class TriangleGenerator : RelevantObjectsGenerator {
         public override string Name => "Equilateral Triangle from Two Points (Type I)";
         public override string Tooltip => "Takes a pair of virtual points and generates a virtual point on each side to make two equilateral triangles.";
         public override GeneratorType GeneratorType => GeneratorType.Intermediate;
+
+        public TriangleGenerator() {
+            Settings.IsDeep = true;
+            Settings.InputPredicate.Predicates.Add(new SelectionPredicate {NeedSelected = true});
+            Settings.InputPredicate.Predicates.Add(new SelectionPredicate {NeedGeneratedByThis = true});
+        }
 
         [RelevantObjectsGeneratorMethod]
         public RelevantPoint[] GetRelevantObjects(RelevantPoint point1, RelevantPoint point2) {

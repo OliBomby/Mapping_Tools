@@ -3,12 +3,19 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantO
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 using System;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
     public class SquareGenerator2 : RelevantObjectsGenerator {
         public override string Name => "Square from Two Points (Type II)";
         public override string Tooltip => "Takes a pair of virtual points and generates a pair of virtual points on each side to make two squares in total.";
         public override GeneratorType GeneratorType => GeneratorType.Intermediate;
+
+        public SquareGenerator2() {
+            Settings.IsActive = true;
+            Settings.IsDeep = true;
+            Settings.InputPredicate.Predicates.Add(new SelectionPredicate {NeedSelected = true});
+        }
 
         [RelevantObjectsGeneratorMethod]
         public RelevantPoint[] GetRelevantObjects(RelevantPoint point1, RelevantPoint point2) {

@@ -10,6 +10,10 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         public override string Tooltip => "Generates virtual points on the anchor points of sliders.";
         public override GeneratorType GeneratorType => GeneratorType.Basic;
 
+        public AnchorPointGenerator() {
+            Settings.IsActive = true;
+        }
+
         [RelevantObjectsGeneratorMethod]
         public IEnumerable<RelevantPoint> GetRelevantObjects(RelevantHitObject relevantHitObject) {
             var ho = relevantHitObject.HitObject;

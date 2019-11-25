@@ -1,6 +1,7 @@
 ﻿using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
@@ -8,6 +9,13 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         public override string Name => "Perpendicular Lines";
         public override string Tooltip => "Takes a pair of line and point and generates a virtual line across the point that is perpendicular to the line.";
         public override GeneratorType GeneratorType => GeneratorType.Intermediate;
+
+        public PerpendicularGenerator() {
+            Settings.IsActive = true;
+            Settings.IsDeep = true;
+            Settings.InputPredicate.Predicates.Add(new SelectionPredicate {NeedSelected = true});
+            Settings.InputPredicate.Predicates.Add(new SelectionPredicate {NeedLocked = true});
+        }
 
         [RelevantObjectsGeneratorMethod]
         public RelevantLine GetRelevantObjects(RelevantLine line, RelevantPoint point) {
