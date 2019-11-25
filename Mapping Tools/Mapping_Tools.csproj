@@ -1,5 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\OpusDotNet.opus.win-x86.1.3.1\build\OpusDotNet.opus.win-x86.props" Condition="Exists('..\packages\OpusDotNet.opus.win-x86.1.3.1\build\OpusDotNet.opus.win-x86.props')" />
+  <Import Project="..\packages\OpusDotNet.opus.win-x64.1.3.1\build\OpusDotNet.opus.win-x64.props" Condition="Exists('..\packages\OpusDotNet.opus.win-x64.1.3.1\build\OpusDotNet.opus.win-x64.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -486,6 +488,14 @@
     <Compile Include="Views\HitsoundStudio\HitsoundLayerImportWindow.xaml.cs">
       <DependentUpon>HitsoundLayerImportWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="Components\Graph\Anchor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Components\Graph\Graph.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Components\Graph\TensionAnchor.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -688,6 +698,8 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\NAudio.Lame.1.0.9\build\NAudio.Lame.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NAudio.Lame.1.0.9\build\NAudio.Lame.targets'))" />
+    <Error Condition="!Exists('..\packages\OpusDotNet.opus.win-x64.1.3.1\build\OpusDotNet.opus.win-x64.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\OpusDotNet.opus.win-x64.1.3.1\build\OpusDotNet.opus.win-x64.props'))" />
+    <Error Condition="!Exists('..\packages\OpusDotNet.opus.win-x86.1.3.1\build\OpusDotNet.opus.win-x86.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\OpusDotNet.opus.win-x86.1.3.1\build\OpusDotNet.opus.win-x86.props'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

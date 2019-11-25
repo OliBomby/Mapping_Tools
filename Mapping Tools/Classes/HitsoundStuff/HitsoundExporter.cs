@@ -2,6 +2,7 @@
 using Mapping_Tools.Classes.Tools;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
+using NVorbis;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using NAudio.Lame;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     class HitsoundExporter {
@@ -120,6 +122,27 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     while (true) {
                         int bytesRead = sourceProvider.Read(buffer, 0, buffer.Length);
                         if (bytesRead == 0) {
+                            // end of source provider
+                            break;
+                        }
+                        // Write will throw exception if WAV file becomes too large
+                        writer.Write(buffer, 0, bytesRead);
+                    }
+                }
+            } catch (IndexOutOfRangeException) { }
+        }
+
+      private static void CreateMp3File(string fileName, IWaveProvider sourceProvider)
+        {
+            try
+            {
+                using (var writer = new LameMP3FileWriter(fileName, sourceProvider.WaveFormat, 192))
+                {
+                    var buffer = new byte[sourceProvider.WaveFormat.AverageBytesPerSecond * 4];
+                    while (true) {
+                        int bytesRead = sourceProvider.Read(buffer, 0, buffer.Length);
+                        if (bytesRead == 0)
+                        {
                             // end of source provider
                             break;
                         }
