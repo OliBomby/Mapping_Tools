@@ -23,7 +23,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
             Settings.IsDeep = true;
             MySettings.Angle = 180;
             MySettings.Scalar = 1;
-            MySettings.OriginInputPredicate.Predicates.Add(new SelectionPredicate {NeedLocked = true, NeedGeneratedNotByThis = true});
+            MySettings.OriginInputPredicate.Predicates.Add(new SelectionPredicate {NeedSelected = true, NeedLocked = true, NeedGeneratedNotByThis = true});
         }
 
         [RelevantObjectsGeneratorMethod]

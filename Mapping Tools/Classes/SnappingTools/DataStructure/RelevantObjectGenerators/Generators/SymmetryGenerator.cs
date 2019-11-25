@@ -21,7 +21,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
 
             Settings.IsActive = true;
             Settings.IsDeep = true;
-            MySettings.AxisInputPredicate.Predicates.Add(new SelectionPredicate {NeedLocked = true, NeedGeneratedNotByThis = true});
+            MySettings.AxisInputPredicate.Predicates.Add(new SelectionPredicate {NeedSelected = true, NeedLocked = true, NeedGeneratedNotByThis = true});
         }
 
         [RelevantObjectsGeneratorMethod]
