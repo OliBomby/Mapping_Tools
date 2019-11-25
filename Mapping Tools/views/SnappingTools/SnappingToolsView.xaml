@@ -74,7 +74,7 @@ The savestates window is opened by clicking the button next to the preferences b
                                 <materialDesign:PackIcon Kind="Lock" Height="24" Width="24" />
                             </Button>
                             <Button x:Name="InheritableButton" Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Toggle usability on all virtual objects. Hold shift for enable all, hold ctrl for disable all."
-                                    Command="{Binding InheritableToggleCommand}" Margin="0 0 18 0">
+                                    Command="{Binding InheritableToggleCommand}" Margin="0 0 28 0">
                                 <materialDesign:PackIcon Kind="Pizza" Height="24" Width="24" />
                             </Button>
 
@@ -94,7 +94,7 @@ The savestates window is opened by clicking the button next to the preferences b
                     </Grid>
                 </StackPanel>
 
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" CanContentScroll="True" PreviewMouseWheel="UIElement_OnPreviewMouseWheel" ScrollChanged="ScrollViewer_OnScrollChanged">
+                <ScrollViewer x:Name="GeneratorsScrollViewer" Grid.Row="1" VerticalScrollBarVisibility="Visible" CanContentScroll="True" PreviewMouseWheel="UIElement_OnPreviewMouseWheel" PreviewMouseDown="UIElement_OnPreviewMouseDown" ScrollChanged="ScrollViewer_OnScrollChanged">
                     <ListView SelectionMode="Single" ItemsSource="{Binding Generators}" ScrollViewer.CanContentScroll="False">
                         <ListView.View>
                         <GridView>

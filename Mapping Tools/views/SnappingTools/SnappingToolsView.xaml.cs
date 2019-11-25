@@ -5,7 +5,6 @@ using Mapping_Tools.Viewmodels;
 using Mapping_Tools.Views.SnappingTools;
 using System;
 using System.IO;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -17,6 +16,7 @@ namespace Mapping_Tools.Views {
         public static readonly string ToolDescription = $@"Generates and keeps track of a list virtual objects that are geometrically relevant to the objects visible on your screen. Press and hold the Activation Key to let your cursor snap to the closest virtual object.{Environment.NewLine}⚠ You must specify your user config file in the Preferences for this tool to function.";
 
         private double _scrollOffset;
+        private bool _resetScroll = true;
 
         public SnappingToolsVm ViewModel {
             get => (SnappingToolsVm) DataContext;
@@ -87,9 +87,13 @@ namespace Mapping_Tools.Views {
 
         private void ScrollViewer_OnScrollChanged(object sender, ScrollChangedEventArgs e) {
             var scv = (ScrollViewer) sender;
-            if (Math.Abs(_scrollOffset - scv.VerticalOffset) > Precision.DOUBLE_EPSILON) {
+            if (_resetScroll && Math.Abs(_scrollOffset - scv.VerticalOffset) > Precision.DOUBLE_EPSILON) {
                 scv.ScrollToVerticalOffset(_scrollOffset);
             }
+        }
+
+        private void UIElement_OnPreviewMouseDown(object sender, MouseButtonEventArgs e) {
+            _resetScroll = !Equals(e.Source, GeneratorsScrollViewer);
         }
     }
 }
