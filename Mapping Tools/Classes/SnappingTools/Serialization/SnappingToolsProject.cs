@@ -99,6 +99,12 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
             }
         }
 
+        public void Deactivate() {
+            foreach (var saveSlot in SaveSlots) {
+                saveSlot.Deactivate();
+            }
+        }
+
         public void Dispose() {
             foreach (var saveSlot in SaveSlots) {
                 saveSlot.Dispose();

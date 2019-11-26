@@ -62,6 +62,10 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
                 }));
         }
 
+        private void UnRegisterHotkey() {
+            MainWindow.AppWindow.ListenerManager.RemoveActiveHotkey(_hotkeyHandle);
+        }
+
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
             if (e.PropertyName != "ProjectHotkey") return;
             
@@ -73,7 +77,7 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
         }
 
         public void Dispose() {
-            MainWindow.AppWindow.ListenerManager.RemoveActiveHotkey(_hotkeyHandle);
+            UnRegisterHotkey();
         }
 
         private static string GenerateActiveHotkeyHandle() {
@@ -86,6 +90,10 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
 
         public void Activate() {
             RegisterHotkey();
+        }
+
+        public void Deactivate() {
+            UnRegisterHotkey();
         }
     }
 }

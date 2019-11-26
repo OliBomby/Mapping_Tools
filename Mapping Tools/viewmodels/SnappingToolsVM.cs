@@ -843,6 +843,8 @@ namespace Mapping_Tools.Viewmodels {
             }
 
             _state = State.LookingForProcess;
+
+            Project?.Activate();
         }
 
         public void Deactivate() {
@@ -858,6 +860,8 @@ namespace Mapping_Tools.Viewmodels {
 
             _state = State.Disabled;
             _overlay?.Dispose();
+
+            Project?.Deactivate();
         }
         #endregion
     }
