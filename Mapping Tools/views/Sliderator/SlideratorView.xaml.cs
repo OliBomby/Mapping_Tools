@@ -51,7 +51,7 @@ namespace Mapping_Tools.Views {
 
             timer = new DispatcherTimer(DispatcherPriority.Render) {Interval = TimeSpan.FromMilliseconds(16)};
             timer.Tick += TimerOnTick;
-            timer.Start();
+            //timer.Start();
         }
 
         private void TimerOnTick(object sender, EventArgs e) {

@@ -5,6 +5,9 @@ using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects {
     public class RelevantLine : RelevantDrawable {
+        public static string PreferencesNameStatic => "Virtual line preferences";
+        public override string PreferencesName => PreferencesNameStatic;
+
         public readonly Line2 Child;
 
         public override double DistanceTo(Vector2 point) {
@@ -29,12 +32,11 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.Relev
             }
         }
 
-        public override void DrawYourself(DrawingContext context, CoordinateConverter converter, SnappingToolsPreferences preferences) {
+        public override void DrawYourself(DrawingContext context, CoordinateConverter converter, RelevantObjectPreferences preferences, Pen pen) {
             if (!Line2.Intersection(new Box2 { Left = -1000, Top = -1000, Right = 1512, Bottom = 1384 }, Child, out var points)) { return; }
-            var roPref = preferences.GetReleventObjectPreferences("Virtual line preferences");
             var cPos1 = converter.ToDpi(converter.EditorToRelativeCoordinate(points[0]));
             var cPos2 = converter.ToDpi(converter.EditorToRelativeCoordinate(points[1]));
-            context.DrawLine(GetPen(roPref), new Point(cPos1.X, cPos1.Y), new Point(cPos2.X, cPos2.Y));
+            context.DrawLine(pen, new Point(cPos1.X, cPos1.Y), new Point(cPos2.X, cPos2.Y));
         }
 
         public override Vector2 NearestPoint(Vector2 point) {

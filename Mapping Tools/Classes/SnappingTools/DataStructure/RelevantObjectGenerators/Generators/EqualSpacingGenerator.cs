@@ -1,14 +1,13 @@
 ﻿using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
     public class EqualSpacingGenerator : RelevantObjectsGenerator {
-        public override string Name => "Equal Spacing defined by Two Points";
+        public override string Name => "Circles by Two Points";
         public override string Tooltip => "Takes a pair of virtual points and generates a pair of virtual circles with their centers on each point. Their radius is equal to the spacing between the two.";
-        public override GeneratorType GeneratorType => GeneratorType.Assistants;
+        public override GeneratorType GeneratorType => GeneratorType.Intermediate;
 
         public EqualSpacingGenerator() {
             Settings.IsSequential = true;

@@ -1,5 +1,7 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 using Mapping_Tools.Classes.SnappingTools;
+using Mapping_Tools.Classes.SnappingTools.Serialization;
 
 namespace Mapping_Tools.Views.SnappingTools {
     /// <summary>
@@ -13,8 +15,7 @@ namespace Mapping_Tools.Views.SnappingTools {
         }
 
         public SnappingToolsPreferencesWindow(SnappingToolsPreferences preferences = null) {
-            Preferences = new SnappingToolsPreferences();
-            preferences?.CopyTo(Preferences);
+            Preferences = (SnappingToolsPreferences)preferences?.Clone() ?? new SnappingToolsPreferences();
             InitializeComponent();
         }
 
@@ -28,6 +29,17 @@ namespace Mapping_Tools.Views.SnappingTools {
         {
             DialogResult = false;
             Close();
+        }
+
+        private void KeyDownViewModeSelector_OnSelectionChanged(object sender, SelectionChangedEventArgs e) {
+            foreach (var addedItem in e.AddedItems) {
+                var item = (ListBoxItem) addedItem;
+                Preferences.KeyDownViewMode |= (ViewMode)item.Tag;
+            }
+            foreach (var removedItem in e.RemovedItems) {
+                var item = (ListBoxItem) removedItem;
+                Preferences.KeyDownViewMode &= ~(ViewMode)item.Tag;
+            }
         }
     }
 }

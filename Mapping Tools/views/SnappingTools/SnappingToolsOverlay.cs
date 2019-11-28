@@ -61,12 +61,13 @@ namespace Mapping_Tools.Views.SnappingTools {
             if (!OverlayWindow.IsVisible) return;
 
             var bounds = Converter.GetEditorBox();
+
             var topLeft = Converter.ToDpi(new Vector2(bounds.Left, bounds.Top));
             var bottomRight = Converter.ToDpi(new Vector2(bounds.Right, bounds.Bottom));
             OverlayWindow.Left = topLeft.X;
             OverlayWindow.Top = topLeft.Y;
-            OverlayWindow.Width = bottomRight.X - topLeft.X;
-            OverlayWindow.Height = bottomRight.Y - topLeft.Y;
+            OverlayWindow.Width = Math.Abs(bottomRight.X - topLeft.X);
+            OverlayWindow.Height = Math.Abs(bottomRight.Y - topLeft.Y);
         }
 
         private void OnPreTick(object sender, EventArgs eventArgs) {
@@ -89,17 +90,21 @@ namespace Mapping_Tools.Views.SnappingTools {
                 return;
             }
 
-            if (IsEnabled) {
-                Disable();
+            try {
+                if (IsEnabled) {
+                    Disable();
+                }
+
+                OverlayWindow?.Hide();
+                OverlayWindow?.Close();
+                OverlayWindow = null;
+                _tickEngine.Stop();
+
+                base.Dispose();
+                _isDisposed = true;
+            } catch {
+                // ignored
             }
-
-            OverlayWindow?.Hide();
-            OverlayWindow?.Close();
-            OverlayWindow = null;
-            _tickEngine.Stop();
-
-            base.Dispose();
-            _isDisposed = true;
         }
 
         /// <summary>Allows an object to try to free resources and perform other cleanup operations before it is reclaimed by garbage collection.</summary>

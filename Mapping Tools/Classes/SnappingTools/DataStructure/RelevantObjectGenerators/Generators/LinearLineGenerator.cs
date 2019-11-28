@@ -1,16 +1,15 @@
 ﻿using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SliderPathStuff;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 using System.Linq;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
     public class LinearLineGenerator : RelevantObjectsGenerator {
-        public override string Name => "Virtual Lines on Linear Sliders";
+        public override string Name => "Lines on Linear Sliders";
         public override string Tooltip => "Takes a linear slider and generates a virtual line that matches it.";
-        public override GeneratorType GeneratorType => GeneratorType.Generators;
+        public override GeneratorType GeneratorType => GeneratorType.Basic;
 
         [RelevantObjectsGeneratorMethod]
         public RelevantLine GetRelevantObjects(RelevantHitObject relevantHitObject) {

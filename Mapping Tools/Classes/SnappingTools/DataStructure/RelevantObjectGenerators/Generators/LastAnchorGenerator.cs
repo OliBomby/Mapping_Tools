@@ -1,14 +1,13 @@
-﻿using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
+﻿using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 using System.Linq;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
     public class LastAnchorGenerator : RelevantObjectsGenerator {
-        public override string Name => "Virtual Points on the Last Anchors of Sliders";
+        public override string Name => "Points on Last Anchors";
         public override string Tooltip => "Generates virtual points on the last anchors of sliders.";
-        public override GeneratorType GeneratorType => GeneratorType.Generators;
+        public override GeneratorType GeneratorType => GeneratorType.Basic;
 
         [RelevantObjectsGeneratorMethod]
         public RelevantPoint GetRelevantObjects(RelevantHitObject relevantHitObject) {

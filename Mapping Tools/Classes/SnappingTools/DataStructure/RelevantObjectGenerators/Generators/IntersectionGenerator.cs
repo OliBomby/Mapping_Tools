@@ -1,16 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
+﻿using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
     public class IntersectionGenerator : RelevantObjectsGenerator {
-        public override string Name => "Intersection Point Calculator";
+        public override string Name => "Intersection Points";
         public override string Tooltip => "Takes a pair of virtual lines or circles and generates a virtual point on each of their intersections.";
-        public override GeneratorType GeneratorType => GeneratorType.Geometries;
+        public override GeneratorType GeneratorType => GeneratorType.Advanced;
 
         public IntersectionGenerator() {
             Settings.IsDeep = true;

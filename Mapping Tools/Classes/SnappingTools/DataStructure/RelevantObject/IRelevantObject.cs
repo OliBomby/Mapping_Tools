@@ -28,6 +28,11 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         bool DoNotDispose { get; set; }
 
         /// <summary>
+        /// With this enabled some changes made to this object cause it to automatically propagate.
+        /// </summary>
+        bool AutoPropagate { get; set; }
+
+        /// <summary>
         /// Indicates whether this object is selected. Selected objects can trigger special interactions. This trait can be inherited.
         /// </summary>
         bool IsSelected { get; set; }
@@ -68,8 +73,8 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         [JsonIgnore]
         HashSet<IRelevantObject> ChildObjects { get; set; }
 
-        HashSet<IRelevantObject> GetParentage();
-        HashSet<IRelevantObject> GetDescendants();
+        HashSet<IRelevantObject> GetParentage(int level);
+        HashSet<IRelevantObject> GetDescendants(int level);
         void UpdateRelevancy();
         void UpdateTime();
         IRelevantObject GetLockedRelevantObject();

@@ -80,6 +80,10 @@ namespace Mapping_Tools.Classes.SnappingTools {
         /// Constructor of CorrdinateConverter
         /// </summary>
         public CoordinateConverter() {
+            Fullscreen = true;
+            OsuResolution = new Vector2(1920, 1080);
+            Letterboxing = true;
+            LetterboxingPosition = new Vector2(0.5, 0.5);
             Initialize();
         }
 

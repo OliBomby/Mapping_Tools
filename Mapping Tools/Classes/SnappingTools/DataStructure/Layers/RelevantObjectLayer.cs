@@ -121,7 +121,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                 var methods = generator.GetGeneratorMethods();
 
                 // Get the required relevant object collection for this generator
-                var objects = generator.Settings.IsDeep ? deepObjects : PreviousLayer?.Objects;
+                var objects = generator.Settings.IsDeep ? 
+                    deepObjects.GetSubset(generator.Settings.InputPredicate, generator) : 
+                    PreviousLayer?.Objects?.GetSubset(generator.Settings.InputPredicate, generator);
 
                 // Loop through all generator methods in this generator
                 foreach (var method in methods) {
@@ -163,6 +165,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                                 foreach (var relevantObject in newRelevantObjectsArray) {
                                     relevantObject.Generator = generator;  // Generator has to be set before parents, otherwise temporal position will go wrong
                                     relevantObject.ParentObjects = relevantParents;
+
+                                    // Set the IsInheritable setting according to the generator settings
+                                    relevantObject.IsInheritable = generator.Settings.GeneratesInheritable;
                                 }
 
                                 // Add the new relevant objects to this layer
@@ -178,6 +183,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                                 // Add parents and generator to the new relevant object
                                 newRelevantObject.Generator = generator;  // Generator has to be set before parents, otherwise temporal position will go wrong
                                 newRelevantObject.ParentObjects = relevantParents;
+                                
+                                // Set the IsInheritable setting according to the generator settings
+                                newRelevantObject.IsInheritable = generator.Settings.GeneratesInheritable;
 
                                 // Add the new relevant objects to this layer
                                 objectsToAdd.Add(newRelevantObject);
@@ -185,6 +193,13 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                         }
                     }
                 }
+            }
+
+            // Avoid adding too many objects
+            var newCount = objectsToAdd.Count + Objects.GetCount();
+            var overshot = newCount - ParentCollection.MaxObjects;
+            if (overshot > 0) {
+                objectsToAdd.RemoveRange(objectsToAdd.Count - overshot, overshot);
             }
 
             // Set all DoNotDispose to false

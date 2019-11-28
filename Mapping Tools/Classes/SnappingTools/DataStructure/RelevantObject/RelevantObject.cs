@@ -3,7 +3,6 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 using System.Collections.Generic;
 using System.Linq;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
     public abstract class RelevantObject : IRelevantObject {
@@ -62,8 +61,29 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
 
         public bool DoNotDispose { get; set; }
 
-        public virtual bool IsSelected { get; set; }
-        public bool IsLocked { get; set; }
+        public bool AutoPropagate { get; set; } = true;
+
+        private bool _isSelected;
+        public virtual bool IsSelected {
+            get => _isSelected;
+            set {
+                if (_isSelected == value) return;
+                _isSelected = value;
+                if (!AutoPropagate) return;
+                Layer?.NextLayer?.GenerateNewObjects();
+            }
+        }
+
+        private bool _isLocked;
+        public bool IsLocked {
+            get => _isLocked;
+            set {
+                if (_isLocked == value) return;
+                _isLocked = value;
+                if (!AutoPropagate) return;
+                Layer?.NextLayer?.GenerateNewObjects();
+            }
+        }
 
         private bool _isInheritable = true;
         public bool IsInheritable {
@@ -71,6 +91,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
             set {
                 if (_isInheritable == value) return;
                 _isInheritable = value;
+                if (!AutoPropagate) return;
                 if (_isInheritable) {
                     Layer?.NextLayer?.GenerateNewObjects();
                 } else {
@@ -101,20 +122,22 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         protected RelevantObject() {
             ParentObjects = new HashSet<IRelevantObject>();
             ChildObjects = new HashSet<IRelevantObject>();
+
+            Relevancy = 1;
         }
 
         /// <summary>
         /// Returns a set with all the parents of this object and all the parents' parents and this object itself
         /// </summary>
-        public HashSet<IRelevantObject> GetParentage() {
+        public HashSet<IRelevantObject> GetParentage(int level) {
             var parentageSet = new HashSet<IRelevantObject> {this};
 
-            if (ParentObjects == null || ParentObjects.Count == 0) {
+            if (ParentObjects == null || ParentObjects.Count == 0 || level == 0 || parentageSet.Count > 100) {
                 return parentageSet;
             }
 
             foreach (var relevantObject in ParentObjects) {
-                parentageSet.UnionWith(relevantObject.GetParentage());
+                parentageSet.UnionWith(relevantObject.GetParentage(level - 1));
             }
 
             return parentageSet;
@@ -123,15 +146,15 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         /// <summary>
         /// Returns a set with all the children of this object and all the children' children and this object itself
         /// </summary>
-        public HashSet<IRelevantObject> GetDescendants() {
+        public HashSet<IRelevantObject> GetDescendants(int level) {
             var childrenSet = new HashSet<IRelevantObject> {this};
 
-            if (ChildObjects == null || ChildObjects.Count == 0) {
+            if (ChildObjects == null || ChildObjects.Count == 0 || level == 0) {
                 return childrenSet;
             }
 
             foreach (var relevantObject in ChildObjects) {
-                childrenSet.UnionWith(relevantObject.GetDescendants());
+                childrenSet.UnionWith(relevantObject.GetDescendants(level - 1));
             }
 
             return childrenSet;
@@ -139,7 +162,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
 
         public void UpdateRelevancy() {
             if (ParentObjects == null || ParentObjects.Count == 0) return;
-            Relevancy = ParentObjects.Max(o => o.Relevancy);
+            Relevancy = (Generator?.Settings?.RelevancyRatio ?? 1) * ParentObjects.Average(o => o.Relevancy);
         }
 
         public void UpdateTime() {
@@ -178,7 +201,6 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
             locked.Relevancy = 1;
 
             locked.Disposed = false;
-            locked.IsSelected = false;
             locked.IsLocked = true;
 
             return locked;

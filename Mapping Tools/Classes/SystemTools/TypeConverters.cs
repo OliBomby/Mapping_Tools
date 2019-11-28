@@ -34,12 +34,32 @@ namespace Mapping_Tools.Classes.SystemTools
             }
         }
 
-        public static bool TryParseInt(string str, out double result, double defaultValue = -1) {
+        public static bool TryParseDouble(string str, out double result) {
+            try {
+                result = ParseDouble(str);
+                return true;
+            } catch (Exception) {
+                result = -1;
+                return false;
+            }
+        }
+
+        public static bool TryParseInt(string str, out int result, int defaultValue = -1) {
             try {
                 result = ParseInt(str);
                 return true;
             } catch (Exception) {
                 result = defaultValue;
+                return false;
+            }
+        }
+
+        public static bool TryParseInt(string str, out int result) {
+            try {
+                result = ParseInt(str);
+                return true;
+            } catch (Exception) {
+                result = -1;
                 return false;
             }
         }

@@ -25,6 +25,8 @@ namespace Mapping_Tools {
         public bool SessionhasAdminRights;
 
         public static MainWindow AppWindow { get; set; }
+        public static Snackbar Snackbar;
+        public static Random MainRandom = new Random();
         public static readonly HttpClient HttpClient = new HttpClient();
         private static readonly string AppCommon = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         public static readonly string AppDataPath = Path.Combine(AppCommon, "Mapping Tools");
@@ -37,6 +39,8 @@ namespace Mapping_Tools {
                 SettingsManager.LoadConfig();
                 ListenerManager = new ListenerManager();
                 AppWindow = this;
+                Snackbar = MainSnackbar;
+                Snackbar.MessageQueue = new SnackbarMessageQueue(TimeSpan.FromSeconds(1));
                 IsMaximized = SettingsManager.Settings.MainWindowMaximized;
                 WidthWin = SettingsManager.Settings.MainWindowWidth ?? Width;
                 HeightWin = SettingsManager.Settings.MainWindowHeight ?? Height;
@@ -73,7 +77,8 @@ namespace Mapping_Tools {
 
             Views = new ViewCollection(); // Make a ViewCollection object
             ToolsMenu.ItemsSource = ViewCollection.GetAllToolTypes().Where(o => o.GetCustomAttribute<HiddenToolAttribute>() == null).Select(o => {
-                var item = new MenuItem() {Header = "_" + ViewCollection.GetName(o)};
+                var name = ViewCollection.GetName(o);
+                var item = new MenuItem() {Header = "_" + name, ToolTip = $"Open {name}."};
                 item.Click += ViewSelectMenuItemOnClick;
                 return item;
             }).OrderBy(o => o.Header);

@@ -4,6 +4,9 @@ using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects {
     public class RelevantPoint : RelevantDrawable {
+        public static string PreferencesNameStatic => "Virtual point preferences";
+        public override string PreferencesName => PreferencesNameStatic;
+
         public readonly Vector2 Child;
 
         public override double DistanceTo(Vector2 point) {
@@ -24,10 +27,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.Relev
             }
         }
 
-        public override void DrawYourself(DrawingContext context, CoordinateConverter converter, SnappingToolsPreferences preferences) {
-            var roPref = preferences.GetReleventObjectPreferences("Virtual point preferences");
+        public override void DrawYourself(DrawingContext context, CoordinateConverter converter, RelevantObjectPreferences preferences, Pen pen) {
             var cPos = converter.ToDpi(converter.EditorToRelativeCoordinate(Child));
-            context.DrawEllipse(null, GetPen(roPref), new Point(cPos.X, cPos.Y), roPref.Size, roPref.Size);
+            context.DrawEllipse(null, pen, new Point(cPos.X, cPos.Y), preferences.Size, preferences.Size);
         }
 
         public override Vector2 NearestPoint(Vector2 point) {

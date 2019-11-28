@@ -1,5 +1,4 @@
-﻿using Editor_Reader;
-using Mapping_Tools.Classes.Tools;
+﻿using Mapping_Tools.Classes.Tools;
 using NonInvasiveKeyboardHookLibrary;
 using System;
 using System.Collections.Generic;
@@ -9,28 +8,15 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
-using Mapping_Tools.Classes.SystemTools.QuickRun;
+using System.Windows.Input;
+using ModifierKeys = NonInvasiveKeyboardHookLibrary.ModifierKeys;
 
 namespace Mapping_Tools.Classes.SystemTools {
-    /// <summary>
-    /// TODO: Complete comments. because hotkeys?
-    /// </summary>
     public class ListenerManager {
-
-        /// <summary>
-        /// 
-        /// </summary>
         public readonly FileSystemWatcher FsWatcher = new FileSystemWatcher();
-        /// <summary>
-        /// 
-        /// </summary>
         public readonly KeyboardHookManager KeyboardHookManager = new KeyboardHookManager();
-        /// <summary>
-        /// 
-        /// </summary>
         public Dictionary<string, ActionHotkey> ActiveHotkeys = new Dictionary<string, ActionHotkey>();
-
-        /// <inheritdoc />
+        
         public ListenerManager() {
             InitFsWatcher();
 
@@ -49,7 +35,10 @@ namespace Mapping_Tools.Classes.SystemTools {
                 case "SongsPath":
                     try {
                         FsWatcher.Path = SettingsManager.GetSongsPath();
-                    } catch { }
+                    } catch {
+                        // ignored
+                    }
+
                     break;
                 case "QuickRunHotkey":
                     ChangeActiveHotkeyHotkey("QuickRunHotkey", SettingsManager.Settings.QuickRunHotkey);
@@ -70,24 +59,33 @@ namespace Mapping_Tools.Classes.SystemTools {
             ReloadHotkeys();
         }
 
+        public void RemoveActiveHotkey(string name) {
+            ActiveHotkeys.Remove(name);
+            ReloadHotkeys();
+        }
+
         public bool ChangeActiveHotkeyHotkey(string name, Hotkey hotkey) {
             if (ActiveHotkeys.ContainsKey(name)) {
                 ActiveHotkeys[name].Hotkey = hotkey;
                 ReloadHotkeys();
                 return true;
-            } else {
-                return false;
             }
+
+            return false;
         }
         
         public void ReloadHotkeys() {
             try {
                 KeyboardHookManager.UnregisterAll();
 
-                foreach (ActionHotkey ah in ActiveHotkeys.Values) {
+                foreach (var ah in ActiveHotkeys.Values.Where(ah =>
+                    ah.Hotkey != null && ah.Action != null && ah.Hotkey.Key != Key.None)) {
                     RegisterHotkey(ah.Hotkey, ah.Action);
                 }
-            } catch { MessageBox.Show("Could not reload hotkeys.", "Warning"); }
+            } catch (HotkeyAlreadyRegisteredException) {
+                MessageBox.Show(@"Can not register duplicate hotkeys.", @"Warning");
+            }
+            catch { MessageBox.Show(@"Could not reload hotkeys.", @"Warning"); }
         }
 
         private void RegisterHotkey(Hotkey hotkey, Action action) {
@@ -96,8 +94,8 @@ namespace Mapping_Tools.Classes.SystemTools {
             //Console.WriteLine($"Registered hotkey {hotkey.Modifiers}, {hotkey.Key}, {action}");
         }
 
-        public static int ResolveKey(System.Windows.Input.Key key) {
-            return System.Windows.Input.KeyInterop.VirtualKeyFromKey(key);
+        public static int ResolveKey(Key key) {
+            return KeyInterop.VirtualKeyFromKey(key);
         }
 
         private ModifierKeys[] WindowsModifiersToOtherModifiers(System.Windows.Input.ModifierKeys modifierKeys) {
@@ -199,7 +197,9 @@ namespace Mapping_Tools.Classes.SystemTools {
         private void InitFsWatcher() {
             try {
                 FsWatcher.Path = SettingsManager.GetSongsPath();
-            } catch { }
+            } catch {
+                // ignored
+            }
 
             FsWatcher.Filter = "*.osu";
             FsWatcher.Changed += OnChangedFsWatcher;
@@ -232,7 +232,7 @@ namespace Mapping_Tools.Classes.SystemTools {
                 return;
             }
 
-            if (EditorReaderStuff.Md5ComparisionString == hashString) {
+            if (EditorReaderStuff.DontCoolSaveWhenMD5EqualsThisString == hashString) {
                 return;
             }
 

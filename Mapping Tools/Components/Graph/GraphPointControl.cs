@@ -111,7 +111,10 @@ namespace Mapping_Tools.Components.Graph {
 
             if (!IsDragging) return;
 
-            if (e.RightButton != MouseButtonState.Pressed && e.LeftButton != MouseButtonState.Pressed) DisableDragging();
+            if (e.RightButton != MouseButtonState.Pressed && e.LeftButton != MouseButtonState.Pressed) {
+                DisableDragging();
+                return;
+            }
 
             // Get the position of the mouse relative to the Canvas
             var diff = GetRelativeCursorPosition(e);

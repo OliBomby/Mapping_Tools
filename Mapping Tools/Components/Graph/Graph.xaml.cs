@@ -209,8 +209,16 @@ namespace Mapping_Tools.Components.Graph {
             return new Point(pos.X * Width, Height - pos.Y * Height);
         }
 
+        private Point GetRelativePoint(double x) {
+            return GetRelativePoint(new Vector2(x, GetValue(x)));
+        }
+
         private Vector2 GetPosition(Point pos) {
             return new Vector2(pos.X / Width, (Height - pos.Y) / Height);
+        }
+
+        private Vector2 GetPosition(GraphMarker marker) {
+            return GetPosition(new Point(marker.X, marker.Y));
         }
 
         public void UpdateVisual() {
@@ -230,16 +238,28 @@ namespace Mapping_Tools.Components.Graph {
             Canvas.SetTop(rect, 0);
             MainCanvas.Children.Add(rect);
 
-            // Add interpolation line
+            // Check if there are at least 2 anchors
+            if (Anchors.Count < 2) return;
+
+            // Calculate interpolation line
             var points = new PointCollection();
-            for (int i = 0; i <= Width; i++) {
-                var x = i / Width;
-                var y = GetValue(x);
+            for (int i = 1; i < Anchors.Count; i++) {
+                var previous = Anchors[i - 1];
+                var next = Anchors[i];
 
-                points.Add(GetRelativePoint(new Vector2(x, y)));
+                points.Add(GetRelativePoint(previous.Pos));
+
+                for (int k = 1; k < Width * (next.Pos.X - previous.Pos.X); k++) {
+                    var x = previous.Pos.X + k / Width;
+
+                    points.Add(GetRelativePoint(x));
+                }
             }
+            points.Add(GetRelativePoint(Anchors[Anchors.Count - 1].Pos));
 
-            var line = new Polyline {Points = points, Stroke = Stroke, StrokeThickness = 2};
+            // Draw line
+            var line = new Polyline {Points = points, Stroke = Stroke, StrokeThickness = 2,
+                StrokeEndLineCap = PenLineCap.Round, StrokeStartLineCap = PenLineCap.Round, StrokeLineJoin = PenLineJoin.Round};
             MainCanvas.Children.Add(line);
 
             // Draw area under line
@@ -289,8 +309,25 @@ namespace Mapping_Tools.Components.Graph {
             var previous = Anchors.ElementAtOrDefault(index - 1);
             var next = Anchors.ElementAtOrDefault(index + 1);
             if (previous == null || next == null) {
+                // Is edge anchor so dont move it
                 pos.X = anchor.Pos.X;
             } else {
+                // Snap to nearest vertical marker unless left alt is held
+                if (!Keyboard.IsKeyDown(Key.LeftAlt)) {
+                    // Find the nearest marker
+                    GraphMarker nearestMarker = null;
+                    double nearestDistance = double.PositiveInfinity;
+                    foreach (var marker in Markers.Where(o => o.Orientation == Orientation.Vertical)) {
+                        var markerPos = GetPosition(marker);
+                        var dist = Math.Abs(pos.X - markerPos.X);
+                        if (!(dist < nearestDistance)) continue;
+                        nearestDistance = dist;
+                        nearestMarker = marker;
+                    }
+                    // Set X to that marker's value
+                    if (nearestMarker != null)
+                        pos.X = GetPosition(nearestMarker).X;
+                }
                 pos.X = MathHelper.Clamp(pos.X, previous.Pos.X, next.Pos.X);
             }
 

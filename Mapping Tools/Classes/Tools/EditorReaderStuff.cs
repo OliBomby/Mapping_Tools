@@ -128,6 +128,7 @@ namespace Mapping_Tools.Classes.Tools {
                 }
                 var editor = GetNewestVersion(IOHelper.GetCurrentBeatmap());
                 editor.SaveFile();
+                MainWindow.Snackbar.MessageQueue.Enqueue("Succesfully saved current beatmap!");
             }
             catch( Exception e ) {
                 MessageBox.Show($"BetterSave™ wasn't better after all\n{e.Message}");

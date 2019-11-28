@@ -20,6 +20,7 @@ namespace Mapping_Tools.Classes.SystemTools {
         /// <param name="value"></param>
         /// <param name="propertyName"></param>
         protected void Set<T>(ref T target, T value, [CallerMemberName] string propertyName = "") {
+            if (target != null && target.Equals(value)) return;
             target = value;
             RaisePropertyChanged(propertyName);
         }

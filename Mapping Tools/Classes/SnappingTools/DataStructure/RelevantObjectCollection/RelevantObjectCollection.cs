@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Policy;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectCollection {
     public class RelevantObjectCollection : Dictionary<Type, List<IRelevantObject>> {
@@ -72,6 +74,24 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectCollec
                 if (TryGetValue(key, out var list)) {
                     result = SortedMerge(result, list);
                 }
+            }
+
+            return result;
+        }
+
+        public RelevantObjectCollection GetSubset(SelectionPredicateCollection predicate, RelevantObjectsGenerator generator) {
+            var result = new RelevantObjectCollection();
+
+            if (predicate == null) {
+                foreach (var kvp in this) {
+                    result.Add(kvp.Key, kvp.Value);
+                }
+
+                return result;
+            }
+
+            foreach (var kvp in this) {
+                result.Add(kvp.Key, kvp.Value.Where(o => predicate.Check(o, generator)).ToList());
             }
 
             return result;
