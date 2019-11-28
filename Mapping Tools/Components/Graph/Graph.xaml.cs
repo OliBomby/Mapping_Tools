@@ -19,6 +19,7 @@ namespace Mapping_Tools.Components.Graph {
         public List<Anchor> Anchors { get; }
         public List<GraphMarker> Markers { get; set; }
 
+        public double MinMarkerSpacing { get; set; }
 
         public double XMin { get; set; }
         public double YMin { get; set; }
@@ -360,6 +361,8 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private void UpdateMarkers() {
+            var prevHorizontal = double.NegativeInfinity;
+            var prevVertical = double.NegativeInfinity;
             foreach (var graphMarker in Markers) {
                 graphMarker.Stroke = EdgesBrush;
                 graphMarker.Width = Width;
@@ -367,9 +370,17 @@ namespace Mapping_Tools.Components.Graph {
                 if (graphMarker.Orientation == Orientation.Horizontal) {
                     graphMarker.X = 0;
                     graphMarker.Y = Height - Height * ((graphMarker.Value - YMin) / (YMax - YMin));
+                    graphMarker.Visible = Math.Abs(prevHorizontal - graphMarker.Y) >= MinMarkerSpacing;
+                    if (graphMarker.Visible) {
+                        prevHorizontal = graphMarker.Y;
+                    }
                 } else {
                     graphMarker.X = Width * ((graphMarker.Value - XMin) / (XMax - XMin));
                     graphMarker.Y = 0;
+                    graphMarker.Visible = Math.Abs(prevVertical - graphMarker.X) >= MinMarkerSpacing;
+                    if (graphMarker.Visible) {
+                        prevVertical = graphMarker.X;
+                    }
                 }
                 graphMarker.InvalidateVisual();
             }

@@ -26,7 +26,7 @@ namespace Mapping_Tools.Views {
             Height = MainWindow.AppWindow.content_views.Height;
 
             Graph = new Graph {
-                Width = 400, Height = 400, XMax = 3, YMax = 10, YMin = 0.10
+                Width = 400, Height = 400, MinMarkerSpacing = 10, XMax = 3, YMax = 10, YMin = 0.10
             };
 
             var markers = new List<GraphMarker>();

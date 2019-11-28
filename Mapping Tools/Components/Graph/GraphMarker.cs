@@ -27,10 +27,16 @@ namespace Mapping_Tools.Components.Graph {
         public Color MarkerColor { get; set; }
 
         public bool DrawMarker { get; set; }
+
+        public bool Visible { get; set; }
  
         protected override void OnRender(DrawingContext drawingContext)
         {
             base.OnRender(drawingContext);
+
+            if (!Visible) {
+                return;
+            }
 
             var ft = Text != null ? new FormattedText(Text, CultureInfo.CurrentCulture,
                 FlowDirection.LeftToRight, new Typeface("Segoe UI"), 16, Stroke,
