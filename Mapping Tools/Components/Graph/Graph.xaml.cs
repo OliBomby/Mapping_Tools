@@ -21,6 +21,8 @@ namespace Mapping_Tools.Components.Graph {
 
         public double MinMarkerSpacing { get; set; }
 
+        public string LastInterpolationSet { get; set; }
+
         public double XMin { get; set; }
         public double YMin { get; set; }
         public double XMax { get; set; }
@@ -125,21 +127,31 @@ namespace Mapping_Tools.Components.Graph {
             var index = Anchors.FindIndex(o => o.Pos.X > pos.X);
             index = index == -1 ? Math.Max(Anchors.Count - 1, 1) : index;
 
+            // Get the next anchor
+            Anchor nextAnchor = null;
+            if (index < Anchors.Count) {
+                nextAnchor = Anchors[index];
+            }
+
             // Make anchor
-            var anchor = MakeAnchor(pos);
+            var anchor = LastInterpolationSet != null ? MakeAnchor(pos, LastInterpolationSet) : MakeAnchor(pos);
 
             // Make tension anchor
             var tensionAnchor = MakeTensionAnchor(pos, anchor);
 
             // Link Anchors
             anchor.TensionAnchor = tensionAnchor;
+
+            // Add tension
+            anchor.Tension = nextAnchor?.Tension ?? 0;
             
             // Insert anchor
             Anchors.Insert(index, anchor);
 
             // Add tension anchor
             TensionAnchors.Add(tensionAnchor);
-
+            
+            UpdateAnchorNeighbors();
             UpdateVisual();
 
             return anchor;
@@ -151,7 +163,21 @@ namespace Mapping_Tools.Components.Graph {
 
             Anchors.Remove(anchor);
             TensionAnchors.Remove(anchor.TensionAnchor);
+
+            UpdateAnchorNeighbors();
             UpdateVisual();
+        }
+
+        private void UpdateAnchorNeighbors() {
+            Anchor previousAnchor = null;
+            foreach (var anchor in Anchors) {
+                anchor.PreviousAnchor = previousAnchor;
+                if (previousAnchor != null) {
+                    previousAnchor.NextAnchor = anchor;
+                }
+
+                previousAnchor = anchor;
+            }
         }
 
         public bool IsEdgeAnchor(Anchor anchor) {
@@ -160,6 +186,14 @@ namespace Mapping_Tools.Components.Graph {
 
         private Anchor MakeAnchor(Vector2 pos) {
             var anchor = new Anchor(this, pos) {
+                Stroke = AnchorStroke,
+                Fill = AnchorFill
+            };
+            return anchor;
+        }
+
+        private Anchor MakeAnchor(Vector2 pos, string interpolator) {
+            var anchor = new Anchor(this, pos, interpolator) {
                 Stroke = AnchorStroke,
                 Fill = AnchorFill
             };
@@ -203,7 +237,9 @@ namespace Mapping_Tools.Components.Graph {
                 return previousAnchor.Pos.Y;
             }
             var sectionProgress = (x - previousAnchor.Pos.X) / diff.X;
-            return diff.Y * sectionProgress + previousAnchor.Pos.Y;
+
+            return nextAnchor.Interpolator.GetInterpolation(sectionProgress, previousAnchor.Pos.Y, nextAnchor.Pos.Y,
+                nextAnchor.Tension);
         }
 
         private Point GetRelativePoint(Vector2 pos) {

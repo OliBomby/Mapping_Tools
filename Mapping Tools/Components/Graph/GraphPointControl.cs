@@ -3,7 +3,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Components.Graph.Interpolators;
 
 namespace Mapping_Tools.Components.Graph {
     public abstract class GraphPointControl : UserControl {

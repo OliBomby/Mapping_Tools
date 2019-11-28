@@ -3,6 +3,8 @@ using Mapping_Tools.Classes.MathUtil;
 using System;
 using System.Windows.Input;
 using System.Windows.Media;
+using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
+using Mapping_Tools.Components.Graph.Interpolators;
 
 namespace Mapping_Tools.Components.Graph {
     /// <summary>
@@ -79,7 +81,14 @@ namespace Mapping_Tools.Components.Graph {
                 drag.Y /= 10;
             }
 
-            SetTension(Tension - drag.Y / 1000);
+            if (ParentAnchor.PreviousAnchor != null &&
+                ParentAnchor.Interpolator is NaturalExponentialInterpolator &&
+                ParentAnchor.Pos.Y < ParentAnchor.PreviousAnchor.Pos.Y) {
+                drag.Y = -drag.Y;
+            }
+
+            IgnoreDrag = true;
+            SetTension(Tension - drag.Y / 100);
 
             // Move the cursor to this
             IgnoreDrag = true;
@@ -98,6 +107,7 @@ namespace Mapping_Tools.Components.Graph {
 
             if (IsDragging) {
                 SizeMultiplier = Math.Pow(1.5, Math.Min(Math.Abs(Tension) - 1, 1));
+                Graph.UpdateVisual();
             } else {
                 Graph.UpdateVisual();
             }

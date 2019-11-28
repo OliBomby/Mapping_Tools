@@ -1,11 +1,14 @@
-﻿using System;
+﻿using Mapping_Tools.Annotations;
+using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Components.Graph.Interpolators;
+using MaterialDesignThemes.Wpf;
+using System;
 using System.Windows;
 using System.Windows.Controls;
-using Mapping_Tools.Classes.MathUtil;
 using System.Windows.Input;
 using System.Windows.Media;
-using Mapping_Tools.Annotations;
-using MaterialDesignThemes.Wpf;
+using Mapping_Tools.Components.Graph.Interpolation;
+using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
 
 namespace Mapping_Tools.Components.Graph {
     /// <summary>
@@ -16,6 +19,13 @@ namespace Mapping_Tools.Components.Graph {
 
         [CanBeNull]
         public TensionAnchor TensionAnchor { get; set; }
+
+        [NotNull]
+        public IGraphInterpolator Interpolator { get => _interpolator;
+            set => SetInterpolator(value);
+        }
+
+        private IGraphInterpolator _interpolator;
 
         private Brush _stroke;
         public override Brush Stroke {
@@ -46,10 +56,19 @@ namespace Mapping_Tools.Components.Graph {
             }
         }
 
-        public Anchor(Graph parent, Vector2 pos) : base(parent, pos) {
+        [CanBeNull]
+        public Anchor PreviousAnchor { get; set; }
+
+        [CanBeNull]
+        public Anchor NextAnchor { get; set; }
+
+        public Anchor(Graph parent, Vector2 pos) : this(parent, pos, InterpolatorHelper.GetName(typeof(NaturalExponentialInterpolator))) { }
+
+        public Anchor(Graph parent, Vector2 pos, string interpolator) : base(parent, pos) {
             InitializeComponent();
             SetCursor();
             PopulateContextMenu();
+            SetInterpolator(interpolator);
         }
 
         private void SetCursor() {
@@ -96,23 +115,44 @@ namespace Mapping_Tools.Components.Graph {
             var cm = GetContextMenu();
             cm.Items.Add(GetDeleteMenuItem());
             cm.Items.Add(new Separator());
-            for (int i = 0; i < 5; i++) {
-                var menuItem = new MenuItem {Header = $"Mode {i + 1}", Icon = new PackIcon {Kind = PackIconKind.RadioboxBlank}};
+
+            foreach (var interpolator in InterpolatorHelper.GetInterpolators()) {
+                var name = InterpolatorHelper.GetName(interpolator);
+                var menuItem = new MenuItem {Header = name, Icon = new PackIcon {Kind = PackIconKind.RadioboxBlank}, Tag = name};
                 menuItem.Click += MenuItem_OnClick;
                 cm.Items.Add(menuItem);
             }
         }
 
         private void MenuItem_OnClick(object sender, RoutedEventArgs e) {
+            if (sender is MenuItem menu && menu.Tag is string name) {
+                SetInterpolator(name);
+            }
+        }
+
+        private void SetInterpolator(string name) {
+            SetInterpolator(InterpolatorHelper.GetInterpolator(name));
+        }
+
+        private void SetInterpolator(IGraphInterpolator p) {
+            if (_interpolator != null && _interpolator == p) return;
+
+            var name = InterpolatorHelper.GetName(p.GetType());
+
+            Graph.LastInterpolationSet = name;
+
             var cm = GetContextMenu();
             var items = cm.Items;
             foreach (var item in items) {
                 if (item is MenuItem mi && mi.Icon != null) {
-                    mi.Icon = new PackIcon {Kind = PackIconKind.RadioboxBlank};
+                    mi.Icon = mi.Tag.ToString() == name ? 
+                        new PackIcon {Kind = PackIconKind.RadioboxMarked} : 
+                        new PackIcon {Kind = PackIconKind.RadioboxBlank};
                 }
             }
 
-            if (sender is MenuItem menu) menu.Icon = new PackIcon {Kind = PackIconKind.RadioboxMarked};
+            _interpolator = p;
+            Graph.UpdateVisual();
         }
 
         private void DeleteMenuItem_OnClick(object sender, RoutedEventArgs e) {

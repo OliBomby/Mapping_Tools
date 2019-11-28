@@ -329,6 +329,15 @@
     <Compile Include="Components\Domain\ParsableDoubleListValidationRule.cs" />
     <Compile Include="Components\Domain\DoubleToStringConverter.cs" />
     <Compile Include="Components\Graph\GraphMarker.cs" />
+    <Compile Include="Components\Graph\Interpolation\Interpolators\ExponentialInterpolator.cs" />
+    <Compile Include="Components\Graph\Interpolation\IgnoreInterpolatorAttribute.cs" />
+    <Compile Include="Components\Graph\Interpolation\IGraphInterpolator.cs" />
+    <Compile Include="Components\Graph\Interpolation\InterpolatorHelper.cs" />
+    <Compile Include="Components\Graph\Interpolation\Interpolators\LinearInterpolator.cs" />
+    <Compile Include="Components\Graph\Interpolation\Interpolators\NaturalExponentialInterpolator.cs" />
+    <Compile Include="Components\Graph\Interpolation\Interpolators\ParabolaInterpolator.cs" />
+    <Compile Include="Components\Graph\Interpolation\Interpolators\PowerInterpolator.cs" />
+    <Compile Include="Components\Graph\Interpolation\Interpolators\SineInterpolator.cs" />
     <Compile Include="Components\Graph\TensionAnchor.xaml.cs">
       <DependentUpon>TensionAnchor.xaml</DependentUpon>
     </Compile>
