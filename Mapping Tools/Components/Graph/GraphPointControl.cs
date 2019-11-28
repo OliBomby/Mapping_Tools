@@ -10,6 +10,9 @@ namespace Mapping_Tools.Components.Graph {
         protected bool IsDragging;
         protected int IgnoreDrag;
 
+        protected bool AbsoluteDraggingMode;
+        protected Point LastMousePoint;
+
         protected abstract double DefaultSize { get; }
 
         protected double Size => DefaultSize * SizeMultiplier;
@@ -91,7 +94,10 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         protected void ThisLeftMouseDown(object sender, MouseButtonEventArgs e) {
+            LastMousePoint = e.GetPosition(Graph);
+
             // Move the cursor to the middle of this anchor
+            IgnoreDrag = 2;
             MoveCursorToThis(GetRelativeCursorPosition(e));
 
             EnableDragging();
@@ -99,6 +105,10 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         protected void ThisMouseUp(object sender, MouseButtonEventArgs e) {
+            // Move the cursor to this
+            IgnoreDrag = 2;
+            MoveCursorToThis(GetRelativeCursorPosition(e));
+
             DisableDragging();
             e.Handled = true;
         }
@@ -117,7 +127,9 @@ namespace Mapping_Tools.Components.Graph {
             }
 
             // Get the position of the mouse relative to the Canvas
-            var diff = GetRelativeCursorPosition(e);
+            var newMousePoint = e.GetPosition(Graph);
+            var diff = AbsoluteDraggingMode ? newMousePoint - LastMousePoint : GetRelativeCursorPosition(e);
+            LastMousePoint = newMousePoint;
 
             // Handle drag
             OnDrag(new Vector2(diff.X, diff.Y), e);

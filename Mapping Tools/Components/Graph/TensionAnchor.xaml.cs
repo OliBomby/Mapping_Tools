@@ -50,12 +50,12 @@ namespace Mapping_Tools.Components.Graph {
         public TensionAnchor(Graph parent, Vector2 pos, Anchor parentAnchor) : base(parent, pos) {
             InitializeComponent();
             SetCursor();
+            AbsoluteDraggingMode = true;
             ParentAnchor = parentAnchor;
         }
 
         private void SetCursor() {
             Cursor = IsDragging ? Cursors.None : Cursors.SizeNS;
-            Cursor = Cursors.SizeNS;
         }
 
         public override void EnableDragging() {
@@ -86,15 +86,9 @@ namespace Mapping_Tools.Components.Graph {
                 ParentAnchor.Pos.Y < ParentAnchor.PreviousAnchor.Pos.Y) {
                 drag.Y = -drag.Y;
             }
-            Console.WriteLine("before: " + GetRelativeCursorPosition(e));
-            IgnoreDrag = 1;
-            SetTension(Tension - drag.Y / 100);
-            Console.WriteLine("after: " + GetRelativeCursorPosition(e));
 
-            // Move the cursor to this
             IgnoreDrag = 1;
-            MoveCursorToThis(GetRelativeCursorPosition(e));
-            Console.WriteLine("after move: " + GetRelativeCursorPosition(e));
+            SetTension(Tension - drag.Y / 200);
         }
 
         private void Anchor_OnPreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e) {
