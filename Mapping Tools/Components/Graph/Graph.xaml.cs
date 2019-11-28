@@ -355,7 +355,12 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         public void SetMarkers(List<GraphMarker> markers) {
-            foreach (var graphMarker in markers) {
+            Markers = markers;
+            UpdateMarkers();
+        }
+
+        private void UpdateMarkers() {
+            foreach (var graphMarker in Markers) {
                 graphMarker.Stroke = EdgesBrush;
                 graphMarker.Width = Width;
                 graphMarker.Height = Height;
@@ -366,9 +371,15 @@ namespace Mapping_Tools.Components.Graph {
                     graphMarker.X = Width * ((graphMarker.Value - XMin) / (XMax - XMin));
                     graphMarker.Y = 0;
                 }
+                graphMarker.InvalidateVisual();
             }
+        }
 
-            Markers = markers;
+        public void SetSize(double width, double height) {
+            Width = width;
+            Height = height;
+            UpdateMarkers();
+            UpdateVisual();
         }
     }
 }

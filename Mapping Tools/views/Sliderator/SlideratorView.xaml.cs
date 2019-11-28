@@ -48,10 +48,15 @@ namespace Mapping_Tools.Views {
             Graph.MoveAnchorTo(Graph.Anchors[Graph.Anchors.Count - 1], Vector2.One);
 
             GraphHost.Content = Graph;
+            GraphHost.SizeChanged += GraphHostOnSizeChanged;
 
             timer = new DispatcherTimer(DispatcherPriority.Render) {Interval = TimeSpan.FromMilliseconds(16)};
             timer.Tick += TimerOnTick;
             //timer.Start();
+        }
+
+        private void GraphHostOnSizeChanged(object sender, SizeChangedEventArgs e) {
+            Graph.SetSize(e.NewSize.Width, e.NewSize.Height);
         }
 
         private void TimerOnTick(object sender, EventArgs e) {
