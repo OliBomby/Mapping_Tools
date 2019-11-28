@@ -18,9 +18,12 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         /// </summary>
         public ScaleRotateGenerator() : base(new ScaleRotateGeneratorSettings()) {
             Settings.Generator = this;
-            Settings.IsDeep = true;
 
-            MySettings.OriginInputPredicate.Predicates.Add(new SelectionPredicate {NeedLocked = true, NeedGeneratedNotByThis = true});
+            Settings.IsActive = true;
+            Settings.IsDeep = true;
+            MySettings.Angle = 180;
+            MySettings.Scalar = 1;
+            MySettings.OriginInputPredicate.Predicates.Add(new SelectionPredicate {NeedSelected = true, NeedLocked = true, NeedGeneratedNotByThis = true});
         }
 
         [RelevantObjectsGeneratorMethod]

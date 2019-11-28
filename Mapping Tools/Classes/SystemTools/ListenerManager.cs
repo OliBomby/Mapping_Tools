@@ -55,11 +55,19 @@ namespace Mapping_Tools.Classes.SystemTools {
         }
 
         public void AddActiveHotkey(string name, ActionHotkey actionHotkey) {
+            if (ActiveHotkeys.ContainsKey(name)) {
+                return;
+            }
+
             ActiveHotkeys.Add(name, actionHotkey);
             ReloadHotkeys();
         }
 
         public void RemoveActiveHotkey(string name) {
+            if (!ActiveHotkeys.ContainsKey(name)) {
+                return;
+            }
+
             ActiveHotkeys.Remove(name);
             ReloadHotkeys();
         }

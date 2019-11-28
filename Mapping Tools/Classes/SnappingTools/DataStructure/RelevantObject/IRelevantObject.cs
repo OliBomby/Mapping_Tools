@@ -28,6 +28,11 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject {
         bool DoNotDispose { get; set; }
 
         /// <summary>
+        /// Temporary variable telling something to dispose this object.
+        /// </summary>
+        bool DefinitelyDispose { get; set; }
+
+        /// <summary>
         /// With this enabled some changes made to this object cause it to automatically propagate.
         /// </summary>
         bool AutoPropagate { get; set; }

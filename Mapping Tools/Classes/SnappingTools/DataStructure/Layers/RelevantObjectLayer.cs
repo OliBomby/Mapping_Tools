@@ -56,18 +56,22 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                 relevantObject.Dispose();
                 return;
             }
-
+            
+            var previousCollection = GetAllPreviousLayersCollection();
             if (Objects.FindSimilar(relevantObject, ParentCollection.AcceptableDifference, out var similarObject)) {
                 // Consume object
                 similarObject.Consume(relevantObject);
                 // Dispose this relevant object
                 relevantObject.Dispose();
                 // Set DoNotDispose for the GenerateNewObjects method
-                similarObject.DoNotDispose = true;
+                if (!similarObject.DoNotDispose && !similarObject.DefinitelyDispose && previousCollection.FindSimilar(similarObject, ParentCollection.AcceptableDifference, out _)) {
+                    similarObject.DefinitelyDispose = true;
+                } else {
+                    similarObject.DoNotDispose = true;
+                }
                 return;  // return so the relevant object doesn't get added
             }
 
-            var previousCollection = GetAllPreviousLayersCollection();
             if (previousCollection != null && previousCollection.FindSimilar(relevantObject, ParentCollection.AcceptableDifference, out _)) {
                 // Don't consume because that causes inheritance issues
                 // Dispose this relevant object
@@ -85,9 +89,8 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
             relevantObject.Layer = this;
 
             // Propagate changes
-            if (propagate) {
-                NextLayer?.GenerateNewObjects();
-            }
+            if (!propagate || NextLayer == null) return;
+            NextLayer.GenerateNewObjects();
         }
 
         private RelevantObjectCollection.RelevantObjectCollection GetAllPreviousLayersCollection() {
@@ -199,7 +202,8 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
             var newCount = objectsToAdd.Count + Objects.GetCount();
             var overshot = newCount - ParentCollection.MaxObjects;
             if (overshot > 0) {
-                objectsToAdd.RemoveRange(objectsToAdd.Count - overshot, overshot);
+                return;
+                //objectsToAdd.RemoveRange(objectsToAdd.Count - overshot, overshot);
             }
 
             // Set all DoNotDispose to false
@@ -216,7 +220,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.Layers {
                 for (var i = 0; i < objectLayerObject.Count; i++) {
                     var obj = objectLayerObject[i];
                     // Continue for relevant objects with no generator or DoNotDispose
-                    if (obj.Generator == null || obj.DoNotDispose) continue;
+                    if (!obj.DefinitelyDispose && (obj.Generator == null || obj.DoNotDispose)) continue;
                     obj.Dispose();
                     i--;
                 }

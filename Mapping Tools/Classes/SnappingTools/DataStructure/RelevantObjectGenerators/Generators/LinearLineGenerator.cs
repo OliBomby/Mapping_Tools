@@ -11,6 +11,10 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         public override string Tooltip => "Takes a linear slider and generates a virtual line that matches it.";
         public override GeneratorType GeneratorType => GeneratorType.Basic;
 
+        public LinearLineGenerator() {
+            Settings.IsActive = true;
+        }
+
         [RelevantObjectsGeneratorMethod]
         public RelevantLine GetRelevantObjects(RelevantHitObject relevantHitObject) {
             var ho = relevantHitObject.HitObject;

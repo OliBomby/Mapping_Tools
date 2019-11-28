@@ -10,6 +10,10 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         public override string Tooltip => "Takes a circular arc slider and generates a virtual circle that completes the arc.";
         public override GeneratorType GeneratorType => GeneratorType.Basic;
 
+        public PerfectCircleGenerator() {
+            Settings.IsActive = true;
+        }
+
         [RelevantObjectsGeneratorMethod]
         public RelevantCircle GetRelevantObjects(RelevantHitObject relevantHitObject) {
             var ho = relevantHitObject.HitObject;

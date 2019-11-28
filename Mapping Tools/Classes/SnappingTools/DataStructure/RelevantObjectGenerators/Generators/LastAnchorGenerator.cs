@@ -9,6 +9,10 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         public override string Tooltip => "Generates virtual points on the last anchors of sliders.";
         public override GeneratorType GeneratorType => GeneratorType.Basic;
 
+        public LastAnchorGenerator() {
+            Settings.IsActive = true;
+        }
+
         [RelevantObjectsGeneratorMethod]
         public RelevantPoint GetRelevantObjects(RelevantHitObject relevantHitObject) {
             var ho = relevantHitObject.HitObject;

@@ -15,22 +15,28 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid Name="FirstGrid" Grid.Row="0">
-            <StackPanel>
-              <StackPanel Orientation="Horizontal">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Orientation="Horizontal">
                     <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
                         <Run Text="Sliderator"/>
                     </TextBlock>
                     <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom">
                         <materialDesign:PopupBox.ToggleContent>
-                        <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
+                            <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
                         </materialDesign:PopupBox.ToggleContent>
                         <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
                         </TextBlock>
                     </materialDesign:PopupBox>
                 </StackPanel>
 
-                <ContentControl x:Name="GraphHost" Margin="0 20 0 0"></ContentControl>
-            </StackPanel>
+                <ContentControl Grid.Row="1" x:Name="GraphHost" Margin="20 20 20 100"></ContentControl>
+            </Grid>
+
             <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
                 <Button
                     Style="{StaticResource MaterialDesignFloatingActionButton}"

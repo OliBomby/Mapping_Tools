@@ -26,7 +26,7 @@ namespace Mapping_Tools.Views {
             Height = MainWindow.AppWindow.content_views.Height;
 
             Graph = new Graph {
-                Width = 400, Height = 400, XMax = 3, YMax = 10, YMin = 0.10
+                Width = 400, Height = 400, MinMarkerSpacing = 10, XMax = 3, YMax = 10, YMin = 0.10
             };
 
             var markers = new List<GraphMarker>();
@@ -48,10 +48,15 @@ namespace Mapping_Tools.Views {
             Graph.MoveAnchorTo(Graph.Anchors[Graph.Anchors.Count - 1], Vector2.One);
 
             GraphHost.Content = Graph;
+            GraphHost.SizeChanged += GraphHostOnSizeChanged;
 
             timer = new DispatcherTimer(DispatcherPriority.Render) {Interval = TimeSpan.FromMilliseconds(16)};
             timer.Tick += TimerOnTick;
             //timer.Start();
+        }
+
+        private void GraphHostOnSizeChanged(object sender, SizeChangedEventArgs e) {
+            Graph.SetSize(e.NewSize.Width, e.NewSize.Height);
         }
 
         private void TimerOnTick(object sender, EventArgs e) {

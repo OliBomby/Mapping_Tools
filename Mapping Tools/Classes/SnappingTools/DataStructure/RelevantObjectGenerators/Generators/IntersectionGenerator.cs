@@ -12,6 +12,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
         public override GeneratorType GeneratorType => GeneratorType.Advanced;
 
         public IntersectionGenerator() {
+            Settings.IsActive = true;
             Settings.IsDeep = true;
         }
 

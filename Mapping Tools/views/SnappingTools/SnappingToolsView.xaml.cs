@@ -19,6 +19,9 @@ namespace Mapping_Tools.Views {
             $@" Press and hold the Activation Key to let your cursor snap to the closest virtual object." +
             $@"{Environment.NewLine}⚠ You must specify your user config file in the Preferences for this tool to function.";
 
+        private double _scrollOffset;
+        private bool _resetScroll = true;
+
         public SnappingToolsVm ViewModel {
             get => (SnappingToolsVm) DataContext;
             set => DataContext = value;
@@ -77,6 +80,17 @@ namespace Mapping_Tools.Views {
         public override void Dispose() {
             ViewModel.Dispose();
             base.Dispose();
+        }
+
+        private void ScrollViewer_OnScrollChanged(object sender, ScrollChangedEventArgs e) {
+            var scv = (ScrollViewer) sender;
+            if (_resetScroll && Math.Abs(_scrollOffset - scv.VerticalOffset) > Precision.DOUBLE_EPSILON) {
+                scv.ScrollToVerticalOffset(_scrollOffset);
+            }
+        }
+
+        private void UIElement_OnPreviewMouseDown(object sender, MouseButtonEventArgs e) {
+            _resetScroll = !Equals(e.Source, GeneratorsScrollViewer);
         }
     }
 }
