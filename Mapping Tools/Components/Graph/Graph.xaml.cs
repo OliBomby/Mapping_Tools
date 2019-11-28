@@ -295,7 +295,7 @@ namespace Mapping_Tools.Components.Graph {
             points.Add(GetRelativePoint(Anchors[Anchors.Count - 1].Pos));
 
             // Draw line
-            var line = new Polyline {Points = points, Stroke = Stroke, StrokeThickness = 2,
+            var line = new Polyline {Points = points, Stroke = Stroke, StrokeThickness = 2, IsHitTestVisible = false,
                 StrokeEndLineCap = PenLineCap.Round, StrokeStartLineCap = PenLineCap.Round, StrokeLineJoin = PenLineJoin.Round};
             MainCanvas.Children.Add(line);
 
@@ -304,7 +304,7 @@ namespace Mapping_Tools.Components.Graph {
                 GetRelativePoint(new Vector2(1, 0)), GetRelativePoint(new Vector2(0, 0))
             };
 
-            var polygon = new Polygon {Points = points2, Fill = Fill};
+            var polygon = new Polygon {Points = points2, Fill = Fill, IsHitTestVisible = false};
             MainCanvas.Children.Add(polygon);
 
             // Return if we dont draw Anchors

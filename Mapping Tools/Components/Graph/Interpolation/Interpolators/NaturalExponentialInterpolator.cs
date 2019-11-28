@@ -18,7 +18,9 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
             if (Math.Abs(parameter) < Precision.DOUBLE_EPSILON) {
                 return linearDegenerate.GetInterpolation(t, h1, h2, parameter);
             }
-            return h1 + (h2 - h1) * (Math.Exp(-parameter * t) - 1) / (Math.Exp(-parameter) - 1);
+
+            var p = -MathHelper.Clamp(parameter, -1, 1) * 10;
+            return h1 + (h2 - h1) * (Math.Exp(p * t) - 1) / (Math.Exp(p) - 1);
         }
     }
 }

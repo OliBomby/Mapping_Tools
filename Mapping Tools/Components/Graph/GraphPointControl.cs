@@ -1,16 +1,14 @@
-﻿using System;
+﻿using Mapping_Tools.Classes.MathUtil;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Mapping_Tools.Annotations;
-using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Components.Graph.Interpolators;
 
 namespace Mapping_Tools.Components.Graph {
     public abstract class GraphPointControl : UserControl {
         protected bool IsDragging;
-        protected bool IgnoreDrag;
+        protected int IgnoreDrag;
 
         protected abstract double DefaultSize { get; }
 
@@ -106,8 +104,8 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         protected void ThisMouseMove(object sender, MouseEventArgs e) {
-            if (IgnoreDrag) {
-                IgnoreDrag = false;
+            if (IgnoreDrag > 0) {
+                IgnoreDrag--;
                 return;
             }
 

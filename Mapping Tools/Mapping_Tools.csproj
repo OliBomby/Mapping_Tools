@@ -337,7 +337,7 @@
     <Compile Include="Components\Graph\Interpolation\Interpolators\NaturalExponentialInterpolator.cs" />
     <Compile Include="Components\Graph\Interpolation\Interpolators\ParabolaInterpolator.cs" />
     <Compile Include="Components\Graph\Interpolation\Interpolators\PowerInterpolator.cs" />
-    <Compile Include="Components\Graph\Interpolation\Interpolators\SineInterpolator.cs" />
+    <Compile Include="Components\Graph\Interpolation\Interpolators\WaveInterpolator.cs" />
     <Compile Include="Components\Graph\TensionAnchor.xaml.cs">
       <DependentUpon>TensionAnchor.xaml</DependentUpon>
     </Compile>
