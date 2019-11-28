@@ -61,6 +61,7 @@ namespace Mapping_Tools.Views {
                 beatmap.Metadata["Creator"].StringValue = arg.BeatmapCreator;
                 beatmap.Metadata["Source"].StringValue = arg.Source;
                 beatmap.Metadata["Tags"].StringValue = arg.Tags;
+                beatmap.General["PreviewTime"] = new TValue(arg.PreviewTime.ToRoundInvariant());
 
                 // Save the file
                 editor.SaveFile();

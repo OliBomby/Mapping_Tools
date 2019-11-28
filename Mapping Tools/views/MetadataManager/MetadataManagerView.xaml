@@ -9,9 +9,10 @@
              xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
              mc:Ignorable="d" 
              x:Name="This"
-             d:DesignHeight="650" Width="759.5">
+             d:DesignHeight="650" Width="759.5" d:DataContext="{d:DesignData MetadataManagerVm}">
     <UserControl.Resources>
         <domain:IsASCIIValidationRule x:Key="IsASCIIValidationRule"/>
+        <domain:DoubleToStringConverter x:Key="DoubleToStringConverter"/>
     </UserControl.Resources>
     <Grid Name="MasterGrid">
         <Grid.RowDefinitions>
@@ -92,6 +93,7 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Column="0" Grid.Row="0" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Artist"/>
                     <TextBlock Grid.Column="0" Grid.Row="1" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Romanised Artist"/>
@@ -100,6 +102,7 @@
                     <TextBlock Grid.Column="0" Grid.Row="4" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Beatmap Creator"/>
                     <TextBlock Grid.Column="0" Grid.Row="5" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Source"/>
                     <TextBlock Grid.Column="0" Grid.Row="6" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Tags"/>
+                    <TextBlock Grid.Column="0" Grid.Row="7" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Preview Time"/>
 
                     <TextBox Grid.Column="2" Grid.Row="0" Text="{Binding Artist}"/>
                     <TextBox Grid.Column="2" Grid.Row="1">
@@ -124,6 +127,7 @@
                     <TextBox Grid.Column="2" Grid.Row="4" Text="{Binding BeatmapCreator}"/>
                     <TextBox Grid.Column="2" Grid.Row="5" Text="{Binding Source}"/>
                     <TextBox Grid.Column="2" Grid.Row="6" Text="{Binding Tags}" TextWrapping="Wrap"/>
+                    <TextBox Grid.Column="2" Grid.Row="7" Text="{Binding PreviewTime, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=0}" TextWrapping="Wrap"/>
                 </Grid>
             </StackPanel>
             <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">

@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using Mapping_Tools.Annotations;
+using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Viewmodels {
 
@@ -21,6 +22,7 @@ namespace Mapping_Tools.Viewmodels {
         private string _beatmapCreator;
         private string _source;
         private string _tags;
+        private double _previewTime;
 
         public MetadataManagerVm() {
             _importPath = "";
@@ -76,6 +78,7 @@ namespace Mapping_Tools.Viewmodels {
                 BeatmapCreator = beatmap.Metadata["Creator"].StringValue;
                 Source = beatmap.Metadata["Source"].StringValue;
                 Tags = beatmap.Metadata["Tags"].StringValue;
+                PreviewTime = beatmap.General["PreviewTime"].Value;
             }
             catch( Exception ex ) {
                 MessageBox.Show($"{ex.Message}{Environment.NewLine}{ex.StackTrace}", "Error");
@@ -173,6 +176,16 @@ namespace Mapping_Tools.Viewmodels {
                 if( _tags == value )
                     return;
                 _tags = RemoveDuplicateTags(value);
+                OnPropertyChanged();
+            }
+        }
+
+        public double PreviewTime {
+            get => _previewTime;
+            set {
+                if( Math.Abs(_previewTime - value) < Precision.DOUBLE_EPSILON )
+                    return;
+                _previewTime = value;
                 OnPropertyChanged();
             }
         }
