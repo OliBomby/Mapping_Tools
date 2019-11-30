@@ -9,10 +9,14 @@ namespace Mapping_Tools.Components.Graph.Interpolation {
 
         private static Type[] _interpolators;
         public static Type[] GetInterpolators() {
-            return _interpolators ?? (_interpolators = AppDomain.CurrentDomain.GetAssemblies()
-                       .SelectMany(x => x.GetTypes())
-                       .Where(x => InterfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract &&
-                                   x.GetCustomAttribute<IgnoreInterpolatorAttribute>() == null).ToArray());
+            try {
+                return _interpolators ?? (_interpolators = AppDomain.CurrentDomain.GetAssemblies()
+                           .SelectMany(x => x.GetTypes())
+                           .Where(x => InterfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract &&
+                                       x.GetCustomAttribute<IgnoreInterpolatorAttribute>() == null).OrderBy(GetName, new InterpolatorComparer()).ToArray());
+            } catch (ReflectionTypeLoadException) {
+                return new Type[0];
+            }
         }
 
         public static string GetName(Type type) {

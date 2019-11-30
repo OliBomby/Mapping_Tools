@@ -4,14 +4,12 @@ using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Components.Graph.Interpolators;
 
 namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
-    [DisplayName("Double curve")]
+    [DisplayName("Double curve 3")]
     [VerticalMirrorInterpolator]
-    public class DoubleCurveInterpolator : IGraphInterpolator {
+    public class DoubleCurveInterpolator3 : IGraphInterpolator {
         private readonly LinearInterpolator _linearDegenerate;
 
-        public string Name => "Double curve";
-
-        public DoubleCurveInterpolator() {
+        public DoubleCurveInterpolator3() {
             _linearDegenerate = new LinearInterpolator();
         }
 
@@ -28,7 +26,7 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
         }
 
         private static double F(double t, double k) {
-            return (Math.Exp(k * t) - 1) / (Math.Exp(k) - 1);
+            return (Math.Pow(2, k) * t) / ((Math.Pow(2, k) - 1) * t + 1);
         }
     }
 }

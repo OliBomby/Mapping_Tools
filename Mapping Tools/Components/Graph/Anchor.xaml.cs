@@ -4,6 +4,7 @@ using Mapping_Tools.Components.Graph.Interpolation;
 using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
 using MaterialDesignThemes.Wpf;
 using System;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -14,7 +15,7 @@ namespace Mapping_Tools.Components.Graph {
     /// Interaction logic for Anchor.xaml
     /// </summary>
     public partial class Anchor {
-        protected override double DefaultSize { get; } = 10;
+        protected override double DefaultSize { get; } = 14;
 
         [CanBeNull]
         public TensionAnchor TensionAnchor { get; set; }
@@ -61,7 +62,7 @@ namespace Mapping_Tools.Components.Graph {
         [CanBeNull]
         public Anchor NextAnchor { get; set; }
 
-        public Anchor(Graph parent, Vector2 pos) : this(parent, pos, InterpolatorHelper.GetName(typeof(NaturalExponentialInterpolator))) { }
+        public Anchor(Graph parent, Vector2 pos) : this(parent, pos, InterpolatorHelper.GetName(typeof(SingleCurveInterpolator))) { }
 
         public Anchor(Graph parent, Vector2 pos, string interpolator) : base(parent, pos) {
             InitializeComponent();

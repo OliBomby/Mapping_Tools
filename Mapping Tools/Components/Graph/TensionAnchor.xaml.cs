@@ -2,15 +2,18 @@
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
 using System;
+using System.Reflection;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using Mapping_Tools.Components.Graph.Interpolation;
 
 namespace Mapping_Tools.Components.Graph {
     /// <summary>
     /// Interaction logic for TensionAnchor.xaml
     /// </summary>
     public partial class TensionAnchor {
-        protected override double DefaultSize { get; } = 6;
+        protected override double DefaultSize { get; } = 10;
         
         [NotNull]
         public Anchor ParentAnchor { get; set; }
@@ -76,19 +79,26 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         protected override void OnDrag(Vector2 drag, MouseEventArgs e) {
+            var verticalDrag = drag.Y;
+
             // Ctrl on tension point makes it more precise
             if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)) {
-                drag.Y /= 10;
+                verticalDrag /= 10;
             }
 
             if (ParentAnchor.PreviousAnchor != null &&
-                ParentAnchor.Interpolator is NaturalExponentialInterpolator &&
+                ParentAnchor.Interpolator.GetType().GetCustomAttribute<VerticalMirrorInterpolatorAttribute>() != null &&
                 ParentAnchor.Pos.Y < ParentAnchor.PreviousAnchor.Pos.Y) {
-                drag.Y = -drag.Y;
+                verticalDrag = -verticalDrag;
             }
 
             IgnoreDrag = 1;
-            SetTension(Tension - drag.Y / 200);
+            SetTension(Tension - verticalDrag / 200);
+
+            IgnoreDrag = 1;
+            var p = e.GetPosition(Graph);
+            MoveCursorToThis(new Vector(p.X, p.Y));
+            LastMousePoint = new Point(0, 0);
         }
 
         private void Anchor_OnPreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e) {
