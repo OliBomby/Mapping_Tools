@@ -130,6 +130,10 @@ namespace Mapping_Tools.Components.Graph {
             return FindResource("DeleteMenuItem") as MenuItem;
         }
 
+        private MenuItem GetTypeInMenuItem() {
+            return FindResource("TypeInMenuItem") as MenuItem;
+        }
+
         private void PopulateContextMenu() {
             var cm = GetContextMenu();
             cm.Items.Add(GetDeleteMenuItem());
@@ -141,6 +145,9 @@ namespace Mapping_Tools.Components.Graph {
                 menuItem.Click += MenuItem_OnClick;
                 cm.Items.Add(menuItem);
             }
+
+            cm.Items.Add(new Separator());
+            cm.Items.Add(GetTypeInMenuItem());
         }
 
         private void MenuItem_OnClick(object sender, RoutedEventArgs e) {
@@ -176,6 +183,10 @@ namespace Mapping_Tools.Components.Graph {
 
         private void DeleteMenuItem_OnClick(object sender, RoutedEventArgs e) {
             Graph.RemoveAnchor(GetContextMenu().PlacementTarget as Anchor);
+        }
+
+        private void TypeInMenuItem_OnClick(object sender, RoutedEventArgs e) {
+            Graph.OpenTypeValueDialog(this);
         }
     }
 }

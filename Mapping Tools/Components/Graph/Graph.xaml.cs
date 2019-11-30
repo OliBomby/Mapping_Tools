@@ -1,18 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Components.Domain;
 
 namespace Mapping_Tools.Components.Graph {
     /// <summary>
     /// Interaction logic for Graph.xaml
     /// </summary>
-    public partial class Graph {
+    public partial class Graph : INotifyPropertyChanged {
         private bool _drawAnchors;
 
         public List<TensionAnchor> TensionAnchors { get; }
@@ -90,6 +94,13 @@ namespace Mapping_Tools.Components.Graph {
 
         public Graph() {
             InitializeComponent();
+
+            DataContext = this;
+
+            OpenTypeValueCommand = new CommandImplementation(OpenTypeValueDialog);
+            AcceptTypeValueDialogCommand = new CommandImplementation(AcceptTypeValueDialog);
+            CancelTypeValueDialogCommand = new CommandImplementation(CancelTypeValueDialog);
+
             TensionAnchors = new List<TensionAnchor>();
             Anchors = new List<Anchor>();
             Markers = new List<GraphMarker>();
@@ -256,6 +267,14 @@ namespace Mapping_Tools.Components.Graph {
 
         private Vector2 GetPosition(GraphMarker marker) {
             return GetPosition(new Point(marker.X, marker.Y));
+        }
+
+        private Vector2 GetPosition(Vector2 value) {
+            return new Vector2((value.X - XMin) / (XMax - XMin), (value.Y - YMin) / (YMax - YMin));
+        }
+
+        private Vector2 GetValue(Vector2 position) {
+            return new Vector2(XMin + (XMax - XMin) * position.X, YMin + (YMax - YMin) * position.Y);
         }
 
         public void UpdateVisual() {
@@ -428,5 +447,70 @@ namespace Mapping_Tools.Components.Graph {
             UpdateMarkers();
             UpdateVisual();
         }
+
+        #region TypeInDialog
+
+        public ICommand OpenTypeValueCommand { get; }
+        public ICommand AcceptTypeValueDialogCommand { get; }
+        public ICommand CancelTypeValueDialogCommand { get; }
+
+        private bool _isDialogOpen;
+        private object _dialogHostContent;
+        private Anchor _anchorEditing;
+
+        public bool IsDialogOpen
+        {
+            get => _isDialogOpen;
+            set
+            {
+                if (_isDialogOpen == value) return;
+                _isDialogOpen = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public object DialogHostContent
+        {
+            get => _dialogHostContent;
+            set
+            {
+                if (_dialogHostContent == value) return;
+                _dialogHostContent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public void OpenTypeValueDialog(object sender)
+        {
+            _anchorEditing = sender as Anchor;
+            if (_anchorEditing == null) return;
+            DialogHostContent = new TypeValueDialog(GetValue(_anchorEditing.Pos).Y);
+            IsDialogOpen = true;
+        }
+
+        private void CancelTypeValueDialog(object obj)
+        {
+            IsDialogOpen = false;
+            _anchorEditing = null;
+        }
+
+        private void AcceptTypeValueDialog(object obj) {
+            IsDialogOpen = false;
+            if (_anchorEditing == null || !(DialogHostContent is TypeValueDialog d)) return;
+            if (TypeConverters.TryParseDouble(d.ValueBox.Text, out double result)) {
+                _anchorEditing.Pos = new Vector2(_anchorEditing.Pos.X, GetPosition(new Vector2(0, result)).Y);
+            }
+            _anchorEditing = null;
+            UpdateVisual();
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        #endregion
     }
 }

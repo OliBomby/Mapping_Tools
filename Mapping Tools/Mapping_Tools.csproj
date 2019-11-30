@@ -350,6 +350,9 @@
       <DependentUpon>TensionAnchor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Components\Graph\GraphPointControl.cs" />
+    <Compile Include="Components\Graph\TypeValueDialog.xaml.cs">
+      <DependentUpon>TypeValueDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Components\ViewHeaderComponent.xaml.cs">
       <DependentUpon>ViewHeaderComponent.xaml</DependentUpon>
     </Compile>
@@ -456,6 +459,10 @@
     <Page Include="Components\Graph\TensionAnchor.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Components\Graph\TypeValueDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Components\ViewHeaderComponent.xaml">
       <Generator>MSBuild:Compile</Generator>

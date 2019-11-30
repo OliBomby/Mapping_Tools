@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Mapping_Tools.Components.Graph"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d"
              MouseLeftButtonDown="ThisLeftMouseDown"
              PreviewMouseRightButtonDown="Anchor_OnPreviewMouseRightButtonDown"
@@ -12,6 +13,7 @@
              MouseMove="ThisMouseMove">
     <local:GraphPointControl.Resources>
         <MenuItem x:Key="DeleteMenuItem" Header="Delete" Click="DeleteMenuItem_OnClick"/>
+        <MenuItem x:Key="TypeInMenuItem" Header="Type in value..." Click="TypeInMenuItem_OnClick"/>
         <ContextMenu x:Key="ContextMenu"></ContextMenu>
     </local:GraphPointControl.Resources>
 
