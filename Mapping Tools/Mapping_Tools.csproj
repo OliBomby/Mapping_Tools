@@ -334,6 +334,7 @@
     <Compile Include="Components\Graph\Interpolation\IGraphInterpolator.cs" />
     <Compile Include="Components\Graph\Interpolation\InterpolatorHelper.cs" />
     <Compile Include="Components\Graph\Interpolation\Interpolators\LinearInterpolator.cs" />
+    <Compile Include="Components\Graph\Interpolation\Interpolators\DoubleCurveInterpolator.cs" />
     <Compile Include="Components\Graph\Interpolation\Interpolators\NaturalExponentialInterpolator.cs" />
     <Compile Include="Components\Graph\Interpolation\Interpolators\ParabolaInterpolator.cs" />
     <Compile Include="Components\Graph\Interpolation\Interpolators\PowerInterpolator.cs" />
