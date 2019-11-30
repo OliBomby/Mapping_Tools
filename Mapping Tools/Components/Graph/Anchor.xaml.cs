@@ -4,7 +4,6 @@ using Mapping_Tools.Components.Graph.Interpolation;
 using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
 using MaterialDesignThemes.Wpf;
 using System;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -107,6 +106,14 @@ namespace Mapping_Tools.Components.Graph {
             var deleteMenuItem = GetDeleteMenuItem();
             if (deleteMenuItem != null) {
                 GetDeleteMenuItem().IsEnabled = !Graph.IsEdgeAnchor(this);
+            }
+
+            if (PreviousAnchor == null) {
+                foreach (var item in GetContextMenu().Items) {
+                    if (!(item is MenuItem menuItem) || !(menuItem.Tag is string)) continue;
+                    menuItem.IsEnabled = false;
+                    menuItem.Icon = null;
+                }
             }
 
             cm.PlacementTarget = sender as Anchor;
