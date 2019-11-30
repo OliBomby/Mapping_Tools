@@ -74,6 +74,18 @@ namespace Mapping_Tools.Components.Graph {
             Cursor = Cursors.Cross;
         }
 
+        public override void EnableDragging() {
+            base.EnableDragging();
+
+            SizeMultiplier = 1.25;
+        }
+
+        public override void DisableDragging() {
+            base.DisableDragging();
+
+            SizeMultiplier = 1;
+        }
+
         protected override void OnDrag(Vector2 drag, MouseEventArgs e) {
             // Shift makes it move horizontally
             if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)) {
