@@ -27,7 +27,7 @@ Collection of tools for manipulating osu! beatmaps
 
 ## Future implementations
 - Sliderator (tool for making variable velocity sliders)
-- Timing Studio (Tool for creating perfect timing from odd-time signatures and )
+- Timing Studio (Tool for creating perfect timing from odd-time signatures and smart timing points)
 
 ## Used libraries
 - [MaterialDesignInXamlToolkit](https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit)
