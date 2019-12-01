@@ -309,7 +309,8 @@
     <Compile Include="Classes\SystemTools\Settings.cs" />
     <Compile Include="Classes\SystemTools\SettingsManager.cs" />
     <Compile Include="Classes\SystemTools\TypeConverters.cs" />
-    <Compile Include="Classes\TimingHelper\Serialization\TimingHelperProject.cs" />
+    <Compile Include="Classes\TimingStudio\Serialization\TimingHelperProject.cs" />
+    <Compile Include="Classes\TimingStudio\Serialization\TimingStudioPreferences.cs" />
     <Compile Include="Classes\Tools\BezierConverter.cs" />
     <Compile Include="Classes\Tools\CircleBezierPreset.cs" />
     <Compile Include="Classes\Tools\EditorReaderStuff.cs" />
@@ -373,7 +374,7 @@
     <Compile Include="Viewmodels\SliderMergerVM.cs" />
     <Compile Include="Viewmodels\PreferencesVM.cs" />
     <Compile Include="Viewmodels\StandardVM.cs" />
-    <Compile Include="Viewmodels\TimingHelperVM.cs" />
+    <Compile Include="Viewmodels\TimingStudioVM.cs" />
     <Compile Include="Views\HiddenToolAttribute.cs" />
     <Compile Include="Views\DontShowTitleAttribute.cs" />
     <Compile Include="Views\Extensions.cs" />
@@ -407,9 +408,9 @@
     <Compile Include="Views\MetadataManager\MetadataManagerView.xaml.cs">
       <DependentUpon>MetadataManagerView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Classes\TimingHelper\Marker.cs" />
-    <Compile Include="Views\TimingHelper\TimingHelperView.xaml.cs">
-      <DependentUpon>TimingHelperView.xaml</DependentUpon>
+    <Compile Include="Classes\TimingStudio\Marker.cs" />
+    <Compile Include="Views\TimingStudio\TimingStudioView.xaml.cs">
+      <DependentUpon>TimingStudioView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\PropertyTransformer\PropertyTransformerView.xaml.cs">
       <DependentUpon>PropertyTransformerView.xaml</DependentUpon>
@@ -534,7 +535,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\TimingHelper\TimingHelperView.xaml">
+    <Page Include="Views\TimingStudio\TimingStudioView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -627,6 +628,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Classes\SpectrumUtil\" />
+    <Folder Include="Components\TimingStudio\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="BeforeBuild" />

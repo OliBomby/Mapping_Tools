@@ -1,6 +1,6 @@
 ﻿namespace Mapping_Tools.Views
 {
-    namespace TimingHelper.Serialization
+    namespace TimingStudio
     {
         public class Marker {
             public double Time { get; }

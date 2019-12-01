@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace Mapping_Tools.Viewmodels
 {
-    public class TimingHelperVM
+    public class TimingStudioVM
     {
+        private string baseBeatmap { get; set; }
+
     }
 }

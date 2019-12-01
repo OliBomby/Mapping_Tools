@@ -1,34 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.SliderPathStuff;
 using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.TimingHelper.Serialization;
+using Mapping_Tools.Classes.TimingStudio.Serialization;
+
 using Mapping_Tools.Classes.Tools;
-using Mapping_Tools.Views.TimingHelper.Serialization;
+using Mapping_Tools.Viewmodels;
+using Mapping_Tools.Views.TimingStudio;
 
 namespace Mapping_Tools.Views
 {
     /// <summary>
-    /// Interactielogica voor TimingHelperView.xaml
+    /// TimingStudioView Tool for Mapping Tools
     /// </summary>
-    public partial class TimingHelperView : ISavable<TimingHelperProject> {
-        public static readonly string ToolName = "Timing Helper";
+    [HiddenTool]
+    public partial class TimingStudioView : ISavable<TimingStudioProject> {
+        public static readonly string ToolName = "Timing Studio";
 
-        public static readonly string ToolDescription = $@"Timing Helper is meant to speed up your timing job by placing the redlines for you. You only have to tell it where exactly all the sounds are.{Environment.NewLine}What you do is place 'markers' exactly on the correct timing of sounds. These markers can be hit objects, bookmarks, greenlines and redlines.{Environment.NewLine}Timing Helper will then adjust BPM and/or add redlines to make every marker be snapped.";
+        public static readonly string ToolDescription = $@"Timing Helper is meant to speed up your timing job by placing the redlines for you. You only have to tell it where exactly all the sounds are."
+            +$"{Environment.NewLine}What you do is place 'markers' exactly on the correct timing of sounds. These markers can be hit objects, bookmarks, greenlines and redlines.{Environment.NewLine}Timing Helper will then adjust BPM and/or add redlines to make every marker be snapped.";
+
+
+        public TimingStudioVM ViewModel
+        {
+            get => (TimingStudioVM) DataContext;
+            set => DataContext = value;
+        }
 
         public string AutoSavePath => throw new NotImplementedException();
 
         public string DefaultSaveFolder => throw new NotImplementedException();
 
-        public TimingHelperView() {
+        public TimingStudioView() {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
@@ -45,10 +52,14 @@ namespace Mapping_Tools.Views
 
             BackgroundWorker.RunWorkerAsync(
                 new Arguments(filesToCopy, 
-                    (bool)ObjectsBox.IsChecked, (bool)BookmarkBox.IsChecked, (bool)GreenlinesBox.IsChecked,
-                                                          (bool)RedlinesBox.IsChecked, (bool)OmitBarlineBox.IsChecked,
-                                                          LeniencyBox.GetDouble(defaultValue: 3), TemporalBox.GetDouble(),
-                                                          int.Parse(Snap1.Text.Split('/')[1]), int.Parse(Snap2.Text.Split('/')[1])));
+                    (bool)ObjectsBox.IsChecked, 
+                    (bool)BookmarkBox.IsChecked, 
+                    (bool)GreenlinesBox.IsChecked,
+                    (bool)RedlinesBox.IsChecked, 
+                    (bool)OmitBarlineBox.IsChecked,
+                    LeniencyBox.GetDouble(defaultValue: 3), 
+                    TemporalBox.GetDouble(),
+                    int.Parse(Snap1.Text.Split('/')[1]), int.Parse(Snap2.Text.Split('/')[1])));
             CanRun = false;
         }
 
@@ -387,12 +398,12 @@ namespace Mapping_Tools.Views
             return Math.Abs(resnappedTime - time) <= leniency;
         }
 
-        public TimingHelperProject GetSaveData()
+        public TimingStudioProject GetSaveData()
         {
             throw new NotImplementedException();
         }
 
-        public void SetSaveData(TimingHelperProject saveData)
+        public void SetSaveData(TimingStudioProject saveData)
         {
             
         }
