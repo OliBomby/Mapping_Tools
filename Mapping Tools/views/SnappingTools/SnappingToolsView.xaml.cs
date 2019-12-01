@@ -1,33 +1,34 @@
-﻿using Mapping_Tools.Classes.SnappingTools;
+﻿using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SnappingTools.Serialization;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Viewmodels;
 using Mapping_Tools.Views.SnappingTools;
 using System;
 using System.IO;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 
-namespace Mapping_Tools.Views {
-    
-    public partial class SnappingToolsView : ISavable<SnappingToolsPreferences> {
+namespace Mapping_Tools.Views
+{
+    public partial class SnappingToolsView : ISavable<SnappingToolsProject>
+    {
 
         public static readonly string ToolName = "Geometry Dashboard";
 
-        public static readonly string ToolDescription =
-            $@"Generates and keeps track of a list virtual objects that are geometrically relevant to the objects visible on your screen." +
-            $@" Press and hold the Activation Key to let your cursor snap to the closest virtual object." +
-            $@"{Environment.NewLine}⚠ You must specify your user config file in the Preferences for this tool to function.";
+        public static readonly string ToolDescription = $@"Generates and keeps track of a list virtual objects that are geometrically relevant to the objects visible on your screen. Press and hold the Activation Key to let your cursor snap to the closest virtual object.{Environment.NewLine}⚠ You must specify your user config file in the Preferences for this tool to function.";
 
         private double _scrollOffset;
         private bool _resetScroll = true;
 
-        public SnappingToolsVm ViewModel {
-            get => (SnappingToolsVm) DataContext;
+        public SnappingToolsVm ViewModel
+        {
+            get => (SnappingToolsVm)DataContext;
             set => DataContext = value;
         }
+        public SnappingToolsProjectWindow ProjectWindow;
 
-        public SnappingToolsView() {
+        public SnappingToolsView()
+        {
             DataContext = new SnappingToolsVm();
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
@@ -35,61 +36,82 @@ namespace Mapping_Tools.Views {
             ProjectManager.LoadProject(this, message: false);
         }
 
-        private void PreferencesButton_Click(object sender, System.Windows.RoutedEventArgs e) {
-            var preferencesWindow = new SnappingToolsPreferencesWindow(GetSaveData());
+        private void PreferencesButton_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            var preferencesWindow = new SnappingToolsPreferencesWindow(ViewModel.Project.GetCurrentPreferences());
             var result = preferencesWindow.ShowDialog();
-            if (result.GetValueOrDefault()) {
-                SetSaveData(preferencesWindow.Preferences);
-            } 
+            if (result.GetValueOrDefault())
+            {
+                ViewModel.Project.SetCurrentPreferences(preferencesWindow.Preferences);
+            }
         }
 
-        public SnappingToolsPreferences GetSaveData() => ViewModel.GetPreferences();
+        private void ProjectsButton_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (ProjectWindow == null)
+            {
+                ProjectWindow = new SnappingToolsProjectWindow(ViewModel.GetProject());
+                ProjectWindow.Closed += ProjectWindowOnClosed;
+                ProjectWindow.Show();
+            }
+            else
+            {
+                ProjectWindow.Activate();
+            }
+        }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="saveData"></param>
-        public void SetSaveData(SnappingToolsPreferences saveData) {
-            ViewModel.SetPreferences(saveData);
+        private void ProjectWindowOnClosed(object sender, EventArgs e)
+        {
+            ProjectWindow = null;
+        }
+
+        public SnappingToolsProject GetSaveData() => ViewModel.GetProject();
+
+        public void SetSaveData(SnappingToolsProject saveData)
+        {
+            ViewModel.SetProject(saveData);
         }
 
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "geometrydashboardproject.json");
         public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Geometry Dashboard Projects");
 
-        private void UIElement_OnPreviewMouseWheel(object sender, MouseWheelEventArgs e) {
+        private void UIElement_OnPreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
             var scv = (ScrollViewer)sender;
+            _scrollOffset = scv.VerticalOffset - e.Delta;
             scv.ScrollToVerticalOffset(scv.VerticalOffset - e.Delta);
             e.Handled = true;
         }
 
-        private void UIElement_OnPreviewMouseDown(object sender, MouseButtonEventArgs e) {
-            if (sender is ToggleButton toggleButton) toggleButton.IsChecked = !toggleButton.IsChecked.GetValueOrDefault();
-            e.Handled = true;
-        }
-
-        public override void Activate() {
+        public override void Activate()
+        {
             ViewModel.Activate();
             base.Activate();
         }
 
-        public override void Deactivate() {
+        public override void Deactivate()
+        {
             ViewModel.Deactivate();
             base.Deactivate();
         }
 
-        public override void Dispose() {
+        public override void Dispose()
+        {
             ViewModel.Dispose();
             base.Dispose();
         }
 
-        private void ScrollViewer_OnScrollChanged(object sender, ScrollChangedEventArgs e) {
-            var scv = (ScrollViewer) sender;
-            if (_resetScroll && Math.Abs(_scrollOffset - scv.VerticalOffset) > Precision.DOUBLE_EPSILON) {
+        private void ScrollViewer_OnScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            var scv = (ScrollViewer)sender;
+            if (_resetScroll && Math.Abs(_scrollOffset - scv.VerticalOffset) > Precision.DOUBLE_EPSILON)
+            {
                 scv.ScrollToVerticalOffset(_scrollOffset);
             }
         }
 
-        private void UIElement_OnPreviewMouseDown(object sender, MouseButtonEventArgs e) {
+        private void UIElement_OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
             _resetScroll = !Equals(e.Source, GeneratorsScrollViewer);
         }
     }

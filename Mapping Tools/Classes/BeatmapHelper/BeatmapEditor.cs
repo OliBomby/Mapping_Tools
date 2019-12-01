@@ -2,47 +2,34 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace Mapping_Tools.Classes.BeatmapHelper {
+namespace Mapping_Tools.Classes.BeatmapHelper
+{
+    public class BeatmapEditor : Editor
+    {
+        public Beatmap Beatmap { get => (Beatmap)TextFile; }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public class BeatmapEditor : Editor {
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public Beatmap Beatmap => (Beatmap)TextFile;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="lines"></param>
-        public BeatmapEditor(List<string> lines) {
+        public BeatmapEditor(List<string> lines)
+        {
             TextFile = new Beatmap(lines);
         }
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="path"></param>
-        public BeatmapEditor(string path) {
+
+        public BeatmapEditor(string path)
+        {
             Path = path;
             TextFile = new Beatmap(ReadFile(Path));
         }
-        
-        /// <summary>
-        /// Saves the current file within a temporary file before using CoolSave
-        /// </summary>
-        public override void SaveFile() {
+
+        public override void SaveFile()
+        {
             var tempPath = System.IO.Path.Combine(MainWindow.AppDataPath, "temp.osu");
 
-            if (!File.Exists(tempPath)) {
+            if (!File.Exists(tempPath))
+            {
                 File.Create(tempPath).Dispose();
             }
             File.WriteAllLines(tempPath, TextFile.GetLines());
 
-            EditorReaderStuff.Md5ComparisionString = EditorReaderStuff.GetMD5FromPath(tempPath);
+            EditorReaderStuff.DontCoolSaveWhenMD5EqualsThisString = EditorReaderStuff.GetMD5FromPath(tempPath);
 
             base.SaveFile();
         }
