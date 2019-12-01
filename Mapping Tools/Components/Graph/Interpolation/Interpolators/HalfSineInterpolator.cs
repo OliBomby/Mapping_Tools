@@ -20,7 +20,7 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
 
             var p = MathHelper.Clamp(parameter, -1, 1);
             if (p < 0) {
-                return h1 + (h2 - h1) * 1 - F(1 - t, -p);
+                return h1 + (h2 - h1) * (1 - F(1 - t, -p));
             }
             return h1 + (h2 - h1) * F(t, p);
         }
