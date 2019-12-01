@@ -10,16 +10,23 @@ using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SliderPathStuff;
 using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.TimingHelper.Serialization;
 using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Views.TimingHelper.Serialization;
 
-namespace Mapping_Tools.Views {
+namespace Mapping_Tools.Views
+{
     /// <summary>
     /// Interactielogica voor TimingHelperView.xaml
     /// </summary>
-    public partial class TimingHelperView {
+    public partial class TimingHelperView : ISavable<TimingHelperProject> {
         public static readonly string ToolName = "Timing Helper";
 
         public static readonly string ToolDescription = $@"Timing Helper is meant to speed up your timing job by placing the redlines for you. You only have to tell it where exactly all the sounds are.{Environment.NewLine}What you do is place 'markers' exactly on the correct timing of sounds. These markers can be hit objects, bookmarks, greenlines and redlines.{Environment.NewLine}Timing Helper will then adjust BPM and/or add redlines to make every marker be snapped.";
+
+        public string AutoSavePath => throw new NotImplementedException();
+
+        public string DefaultSaveFolder => throw new NotImplementedException();
 
         public TimingHelperView() {
             InitializeComponent();
@@ -36,7 +43,9 @@ namespace Mapping_Tools.Views {
             string[] filesToCopy = MainWindow.AppWindow.GetCurrentMaps();
             IOHelper.SaveMapBackup(filesToCopy);
 
-            BackgroundWorker.RunWorkerAsync(new Arguments(filesToCopy, (bool)ObjectsBox.IsChecked, (bool)BookmarkBox.IsChecked, (bool)GreenlinesBox.IsChecked,
+            BackgroundWorker.RunWorkerAsync(
+                new Arguments(filesToCopy, 
+                    (bool)ObjectsBox.IsChecked, (bool)BookmarkBox.IsChecked, (bool)GreenlinesBox.IsChecked,
                                                           (bool)RedlinesBox.IsChecked, (bool)OmitBarlineBox.IsChecked,
                                                           LeniencyBox.GetDouble(defaultValue: 3), TemporalBox.GetDouble(),
                                                           int.Parse(Snap1.Text.Split('/')[1]), int.Parse(Snap2.Text.Split('/')[1])));
@@ -378,14 +387,14 @@ namespace Mapping_Tools.Views {
             return Math.Abs(resnappedTime - time) <= leniency;
         }
 
-        private class Marker {
-            public double Time { get; }
-            public double BeatsFromLastMarker { get; set; }
+        public TimingHelperProject GetSaveData()
+        {
+            throw new NotImplementedException();
+        }
 
-            public Marker(double time) {
-                Time = time;
-                BeatsFromLastMarker = 0;
-            }
+        public void SetSaveData(TimingHelperProject saveData)
+        {
+            
         }
     }
 }

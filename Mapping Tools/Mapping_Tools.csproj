@@ -309,6 +309,7 @@
     <Compile Include="Classes\SystemTools\Settings.cs" />
     <Compile Include="Classes\SystemTools\SettingsManager.cs" />
     <Compile Include="Classes\SystemTools\TypeConverters.cs" />
+    <Compile Include="Classes\TimingHelper\Serialization\TimingHelperProject.cs" />
     <Compile Include="Classes\Tools\BezierConverter.cs" />
     <Compile Include="Classes\Tools\CircleBezierPreset.cs" />
     <Compile Include="Classes\Tools\EditorReaderStuff.cs" />
@@ -372,6 +373,7 @@
     <Compile Include="Viewmodels\SliderMergerVM.cs" />
     <Compile Include="Viewmodels\PreferencesVM.cs" />
     <Compile Include="Viewmodels\StandardVM.cs" />
+    <Compile Include="Viewmodels\TimingHelperVM.cs" />
     <Compile Include="Views\HiddenToolAttribute.cs" />
     <Compile Include="Views\DontShowTitleAttribute.cs" />
     <Compile Include="Views\Extensions.cs" />
@@ -405,6 +407,7 @@
     <Compile Include="Views\MetadataManager\MetadataManagerView.xaml.cs">
       <DependentUpon>MetadataManagerView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Classes\TimingHelper\Marker.cs" />
     <Compile Include="Views\TimingHelper\TimingHelperView.xaml.cs">
       <DependentUpon>TimingHelperView.xaml</DependentUpon>
     </Compile>
@@ -622,7 +625,9 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Classes\SpectrumUtil\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="BeforeBuild" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

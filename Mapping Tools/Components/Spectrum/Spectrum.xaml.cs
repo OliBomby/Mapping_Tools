@@ -20,9 +20,9 @@ namespace Mapping_Tools.Components.Spectrum
     /// </summary>
     public partial class Spectrum : UserControl
     {
+
         public Spectrum()
         {
-            InitializeComponent();
         }
     }
 }
