@@ -20,7 +20,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 }
             }
             // Packages without a hitnormal sample
-            foreach (SamplePackage p in packages.Where(o => !o.Samples.Any(s => s.Hitsound == 0))) {
+            foreach (SamplePackage p in packages.Where(o => o.Samples.All(s => s.Hitsound != 0))) {
                 p.Samples.Add(defaultSample.Copy());
             }
             packages = packages.OrderBy(o => o.Time).ToList();
@@ -38,7 +38,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     if (sample.SampleArgs.Volume == -0.01) sample.SampleArgs.Volume = 1;
 
                     double newVolume = sample.SampleArgs.Volume * sampleMultiplier;
-                    if (Math.Abs(newVolume - 1) > args.Roughness && !args.AllwaysFullVolume) {
+                    if (Math.Abs(newVolume - 1) > args.Roughness && !args.AlwaysFullVolume) {
                         sample.SampleArgs.Volume = args.Roughness * Math.Round(newVolume / args.Roughness);
                     } else {
                         sample.SampleArgs.Volume = 1;
@@ -74,13 +74,13 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
 
             // Remove any CustomIndices that might be obsolete
-            newCustomIndices.RemoveAll(o => !IsUsefull(o, newCustomIndices.Except(new CustomIndex[] { o }).ToList(), customIndices));
+            newCustomIndices.RemoveAll(o => !IsUseful(o, newCustomIndices.Except(new CustomIndex[] { o }).ToList(), customIndices));
 
             return newCustomIndices;
         }
 
-        private static bool IsUsefull(CustomIndex subject, List<CustomIndex> otherCustomIndices, List<CustomIndex> supportedCustomIndices) {
-            // Subject is usefull if it can fit a CustomIndex that no other can fit
+        private static bool IsUseful(CustomIndex subject, List<CustomIndex> otherCustomIndices, List<CustomIndex> supportedCustomIndices) {
+            // Subject is useful if it can fit a CustomIndex that no other can fit
             if (supportedCustomIndices.Any(ci => subject.Fits(ci) && !otherCustomIndices.Any(o => o.Fits(ci)))) {
                 return true;
             }
@@ -122,8 +122,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     throw new Exception("Custom indices can't fit the sample packages.");
                 } else {
                     // Add all the fitted packages as hitsounds
-                    for (int i = 0; i < bestFits; i++) {
-                        hitsounds.Add(packages[index + i].GetHitsound(bestCustomIndex.Index));
+                    for (int i = 0; i < bestFits; i++)
+                    {
+                        if (bestCustomIndex != null)
+                            hitsounds.Add(packages[index + i].GetHitsound(bestCustomIndex.Index));
                     }
                     index += bestFits;
                 }

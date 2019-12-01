@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 
 namespace Mapping_Tools.Views {
+    /// <summary>
+    /// TODO: Change class to different name as it's similar to file extensions.
+    /// </summary>
     public static class Extensions {
         public static double GetDouble(this TextBox textBox, double defaultValue=-1) {
             try {

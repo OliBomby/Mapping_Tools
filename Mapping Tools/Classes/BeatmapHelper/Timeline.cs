@@ -7,9 +7,16 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
+    /// <summary>
+    /// 
+    /// </summary>
     public class Timeline {
+        /// <summary>
+        /// 
+        /// </summary>
         public List<TimelineObject> TimelineObjects { get; set; }
 
+        /// <inheritdoc />
         public Timeline(List<HitObject> hitObjects, Timing timing) {
             // Convert all the HitObjects to TimeLineObjects
             TimelineObjects = new List<TimelineObject>();
@@ -50,26 +57,43 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             TimelineObjects = TimelineObjects.OrderBy(o => o.Time).ToList();
         }
 
+        /// <inheritdoc />
         public Timeline(List<TimelineObject> timeLineObjects) {
             TimelineObjects = timeLineObjects;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
         public List<TimelineObject> GetTimeLineObjectsInRange(double start, double end) {
             return TimelineObjects.FindAll(o => o.Time >= start && o.Time <= end);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="timing"></param>
         public void GiveTimingPoints(Timing timing) {
             foreach (TimelineObject tlo in TimelineObjects) {
                 TimingPoint hstp = timing.GetTimingPointAtTime(tlo.Time + 5); // +5 for the weird offset in hitsounding greenlines
                 tlo.GiveHitsoundTimingPoint(hstp);
                 TimingPoint tp = timing.GetTimingPointAtTime(tlo.Time);
-                tlo.TP = tp;
+                tlo.TimingPoint = tp;
                 TimingPoint red = timing.GetRedlineAtTime(tlo.Time);
-                tlo.Redline = tp;
+                tlo.UninheritedTimingPoint = tp;
             }
         }
 
-        public TimelineObject GetNearestTLO(double time, bool needCopyable = false) {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="time"></param>
+        /// <param name="needCopyable"></param>
+        /// <returns></returns>
+        public TimelineObject GetNearestTlo(double time, bool needCopyable = false) {
             if (TimelineObjects.Count == 0) {
                 return null;
             }
@@ -79,7 +103,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             foreach (TimelineObject tlo in TimelineObjects) {
                 double d = Math.Abs(tlo.Time - time);
                 if (d < dist) {
-                    if (needCopyable && !tlo.canCopy)
+                    if (needCopyable && !tlo.CanCopy)
                         continue;
                     closest = tlo;
                     dist = d;

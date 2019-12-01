@@ -8,15 +8,50 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
     public class TimingPoint : ITextLine {
         // Offset, Milliseconds per Beat, Meter, Sample Set, Sample Index, Volume, Inherited, Kiai Mode
         public double Offset { get; set; }
+        /// <summary>
+        /// Milliseconds per Beat
+        /// </summary>
         public double MpB { get; set; }
+        /// <summary>
+        /// Time signature to x/4
+        /// </summary>
         public int Meter { get; set; }
+        /// <summary>
+        /// The sample set from the <see cref="TimingPoint"/>
+        /// </summary>
         public SampleSet SampleSet { get; set; }
+        /// <summary>
+        /// The custom index number from the <see cref="TimingPoint"/>
+        /// </summary>
         public int SampleIndex { get; set; }
+        /// <summary>
+        /// The volume based from 0 - 100 %
+        /// </summary>
         public double Volume { get; set; }
+
+        /// <summary />
         public bool Inherited { get; set; } // True is red line
+
+        /// <summary />
         public bool Kiai { get; set; }
+        /// <summary>
+        /// A taiko implementation that removes the first instance of the bar,
+        /// it is used when multiple and/or conflicting timing points are used throughout the map.
+        /// </summary>
         public bool OmitFirstBarLine { get; set; }
 
+        /// <summary>
+        /// Creates a new <see cref="TimingPoint"/>
+        /// </summary>
+        /// <param name="offset">The offset from the start of the audio in milliseconds</param>
+        /// <param name="mpb">The milliseconds per beat. (Quarter Note in Music Theory terms.) </param>
+        /// <param name="meter">The time signature in x / 4</param>
+        /// <param name="sampleSet">The <see cref="SampleSet"/> that is used from the timing point</param>
+        /// <param name="sampleIndex"></param>
+        /// <param name="volume"></param>
+        /// <param name="inherited"></param>
+        /// <param name="kiai"></param>
+        /// <param name="omitFirstBarLine"></param>
         public TimingPoint(double offset, double mpb, int meter, SampleSet sampleSet, int sampleIndex, double volume, bool inherited, bool kiai, bool omitFirstBarLine) {
             Offset = offset;
             MpB = mpb;
@@ -41,19 +76,37 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Inherited = cp.TimingChange;
         }
 
+        /// <summary>
+        /// Creates a new Timing Point from the <see cref="Editor_Reader.ControlPoint"/>
+        /// </summary>
+        /// <param name="cp">A <see cref="Editor_Reader.ControlPoint"/> from the <see cref="Beatmap"/>.</param>
+        /// <returns></returns>
         public static explicit operator TimingPoint(Editor_Reader.ControlPoint cp) {
             return new TimingPoint(cp);
         }
 
+        /// <summary>
+        /// Creates a new Timing Point from the string line of the .osu .
+        /// </summary>
+        /// <param name="line"></param>
         public TimingPoint(string line) {
             SetLine(line);
         }
 
+        /// <summary>
+        /// Generates the line from the selected <see cref="TimingPoint"/>
+        /// </summary>
+        /// <returns></returns>
         public string GetLine() {
             int style = MathHelper.GetIntFromBitArray(new BitArray(new bool[] { Kiai, false, false, OmitFirstBarLine }));
             return $"{Offset.ToRoundInvariant()},{MpB.ToInvariant()},{Meter.ToInvariant()},{SampleSet.ToIntInvariant()},{SampleIndex.ToInvariant()},{Volume.ToRoundInvariant()},{Convert.ToInt32(Inherited).ToInvariant()},{style.ToInvariant()}";
         }
 
+        /// <summary>
+        /// Sets a <see cref="TimingPoint"/> from the line of the beatmap file.
+        /// </summary>
+        /// <param name="line"></param>
+        /// <exception cref="BeatmapParsingException">If the beatmap can not be read correctly.</exception>
         public void SetLine(string line) {
             string[] values = line.Split(',');
 
@@ -75,7 +128,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
             if (TryParseInt(values[4], out int ind))
                 SampleIndex = ind;
-            else throw new BeatmapParsingException("Failed to parse samle index of timing point", line);
+            else throw new BeatmapParsingException("Failed to parse sample index of timing point", line);
 
             if (TryParseDouble(values[5], out double vol))
                 Volume = vol;
@@ -83,19 +136,32 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
             Inherited = values[6] == "1";
 
-            if (values.Length > 7) {
-                if (TryParseInt(values[7], out int style)) {
-                    BitArray b = new BitArray(new int[] { style });
-                    Kiai = b[0];
-                    OmitFirstBarLine = b[3];
-                } else throw new BeatmapParsingException("Failed to style of timing point", line);
-            }
+            if (values.Length <= 7) return;
+            if (TryParseInt(values[7], out int style)) {
+                BitArray b = new BitArray(new int[] { style });
+                Kiai = b[0];
+                OmitFirstBarLine = b[3];
+            } else throw new BeatmapParsingException("Failed to style of timing point", line);
         }
 
+        /// <summary>
+        /// Creates a new <see cref="TimingPoint"/> from the selected <see cref="TimingPoint"/>.
+        /// </summary>
+        /// <returns>An exact replica of the <see cref="TimingPoint"/></returns>
         public TimingPoint Copy() {
             return new TimingPoint(Offset, MpB, Meter, SampleSet, SampleIndex, Volume, Inherited, Kiai, OmitFirstBarLine);
         }
 
+        /// <summary>
+        /// Can clarify if the current timing point should snap to the nearest beat of the previous timing point.
+        /// </summary>
+        /// <param name="timing"></param>
+        /// <param name="snap1"></param>
+        /// <param name="snap2"></param>
+        /// <param name="floor"></param>
+        /// <param name="tp"></param>
+        /// <param name="firstTP"></param>
+        /// <returns></returns>
         public bool ResnapSelf(Timing timing, int snap1, int snap2, bool floor=true, TimingPoint tp=null, TimingPoint firstTP = null) {
             double newTime = timing.Resnap(Offset, snap1, snap2, floor, tp, firstTP);
             double deltaTime = newTime - Offset;
@@ -112,16 +178,30 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 Volume == tp.Volume &&
                 Inherited == tp.Inherited &&
                 Kiai == tp.Kiai &&
-                OmitFirstBarLine == OmitFirstBarLine;
+                OmitFirstBarLine == tp.OmitFirstBarLine;
         }
 
         public bool SameEffect(TimingPoint tp) {
             if (tp.Inherited && !Inherited) {
-                return MpB == -100 && Meter == tp.Meter && SampleSet == tp.SampleSet && SampleIndex == tp.SampleIndex && Volume == tp.Volume && Kiai == tp.Kiai;
+                return MpB == -100 &&
+                       Meter == tp.Meter &&
+                       SampleSet == tp.SampleSet &&
+                       SampleIndex == tp.SampleIndex &&
+                       Volume == tp.Volume &&
+                       Kiai == tp.Kiai;
             }
-            return MpB == tp.MpB && Meter == tp.Meter && SampleSet == tp.SampleSet && SampleIndex == tp.SampleIndex && Volume == tp.Volume && Kiai == tp.Kiai;
+            return MpB == tp.MpB &&
+                   Meter == tp.Meter &&
+                   SampleSet == tp.SampleSet &&
+                   SampleIndex == tp.SampleIndex &&
+                   Volume == tp.Volume &&
+                   Kiai == tp.Kiai;
         }
 
+        /// <summary>
+        /// Grabs the current Beats Per Minute from the <see cref="TimingPoint"/>
+        /// </summary>
+        /// <returns></returns>
         public double GetBPM() {
             if( Inherited ) {
                 return 60000 / MpB;

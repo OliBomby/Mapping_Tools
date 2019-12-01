@@ -3,9 +3,19 @@ using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
+    /// <summary>
+    /// 
+    /// </summary>
     public class SampleGeneratingArgs : INotifyPropertyChanged, IEquatable<SampleGeneratingArgs> {
+        /// <summary>
+        /// 
+        /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="propName"></param>
         public void NotifyPropertyChanged(string propName) {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
         }
@@ -41,7 +51,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Velocity = velocity;
         }
 
-        public bool UsesSoundFont { get { return System.IO.Path.GetExtension(Path) == ".sf2"; } }
+        /// <summary>
+        /// Checks if the specified path is a cafewalk soundfont file.
+        /// </summary>
+        public bool UsesSoundFont => System.IO.Path.GetExtension(Path) == ".sf2";
 
         private string path;
         public string Path {
@@ -131,11 +144,13 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
+        /// <summary>Returns a string that represents the current object.</summary>
+        /// <returns>A string that represents the current object.</returns>
         public override string ToString() {
             if (System.IO.Path.GetExtension(Path) == ".sf2") {
-                return string.Format("{0} {1},{2},{3},{4},{5},{6}", Path, Bank, Patch, Instrument, Key, Length, Velocity);
+                return $"{Path} {Bank},{Patch},{Instrument},{Key},{Length},{Velocity}";
             } else {
-                return string.Format("{0} {1}%", Path, Volume * 100);
+                return $"{Path} {Volume * 100}%";
             }
         }
 
@@ -166,6 +181,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return Equals((SampleGeneratingArgs)obj);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         public bool ExactlyEquals(SampleGeneratingArgs other) {
             return Path == other.Path &&
             Volume == other.Volume &&
@@ -176,16 +196,18 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Length == other.Length;
         }
 
+        /// <summary>Serves as the default hash function. </summary>
+        /// <returns>A hash code for the current object.</returns>
         public override int GetHashCode() {
-            var hashCode = 881410169;
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Path);
-            hashCode = hashCode * -1521134295 + Volume.GetHashCode();
+            var hashCode = 0x34894079;
+            hashCode = hashCode * -0x5AAAAAD7 + EqualityComparer<string>.Default.GetHashCode(Path);
+            hashCode = hashCode * -0x5AAAAAD7 + Volume.GetHashCode();
             if (System.IO.Path.GetExtension(Path) == ".sf2") {
-                hashCode = hashCode * -1521134295 + Bank.GetHashCode();
-                hashCode = hashCode * -1521134295 + Patch.GetHashCode();
-                hashCode = hashCode * -1521134295 + Instrument.GetHashCode();
-                hashCode = hashCode * -1521134295 + Key.GetHashCode();
-                hashCode = hashCode * -1521134295 + Length.GetHashCode();
+                hashCode = hashCode * -0x5AAAAAD7 + Bank.GetHashCode();
+                hashCode = hashCode * -0x5AAAAAD7 + Patch.GetHashCode();
+                hashCode = hashCode * -0x5AAAAAD7 + Instrument.GetHashCode();
+                hashCode = hashCode * -0x5AAAAAD7 + Key.GetHashCode();
+                hashCode = hashCode * -0x5AAAAAD7 + Length.GetHashCode();
             }
             return hashCode;
         }

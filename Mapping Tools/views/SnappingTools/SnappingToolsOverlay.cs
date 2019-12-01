@@ -9,6 +9,9 @@ using System.Windows.Media;
 using OverlayWindow = Overlay.NET.Wpf.OverlayWindow;
 
 namespace Mapping_Tools.Views.SnappingTools {
+    /// <summary>
+    /// 
+    /// </summary>
     public class SnappingToolsOverlay : WpfOverlayPlugin {
         // Used to limit update rates via timestamps 
         // This way we can avoid thread issues with wanting to delay updates
@@ -28,6 +31,10 @@ namespace Mapping_Tools.Views.SnappingTools {
             _tickEngine.Tick += OnTick;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="enabled"></param>
         public void SetBorder(bool enabled) {
             if (enabled) {
                 OverlayWindow.BorderBrush = Brushes.GreenYellow;
@@ -100,8 +107,7 @@ namespace Mapping_Tools.Views.SnappingTools {
             }
         }
 
-        ~SnappingToolsOverlay() {
-            Dispose();
-        }
+        /// <summary>Allows an object to try to free resources and perform other cleanup operations before it is reclaimed by garbage collection.</summary>
+        ~SnappingToolsOverlay() => Dispose();
     }
 }

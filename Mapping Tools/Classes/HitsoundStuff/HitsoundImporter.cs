@@ -30,12 +30,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         public static HitsoundLayer ImportStack(string path, double x, double y) {
-            HitsoundLayer layer = new HitsoundLayer();
-            layer.ImportArgs.ImportType = ImportType.Stack;
-            layer.ImportArgs.Path = path;
-            layer.ImportArgs.X = x;
-            layer.ImportArgs.Y = y;
-            layer.Times = TimesFromStack(path, x, y);
+            HitsoundLayer layer = new HitsoundLayer
+            {
+                ImportArgs = {ImportType = ImportType.Stack, Path = path, X = x, Y = y},
+                Times = TimesFromStack(path, x, y)
+            };
             return layer;
         }
 
@@ -81,7 +80,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     }
                     
                     string samplePath = samplePaths[i];
-                    string fullPathExtLess = Path.Combine(Path.GetDirectoryName(samplePath), Path.GetFileNameWithoutExtension(samplePath));
+                    string fullPathExtLess = Path.Combine(Path.GetDirectoryName(samplePath) ?? throw new InvalidOperationException(), Path.GetFileNameWithoutExtension(samplePath));
                     dict[fullPathExtLess] = samplePaths[k];
                     break;
                 }
@@ -116,7 +115,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     Hitsound hitsound = isFilename ? tlo.GetHitsound() : GetHitsoundFromFilename(filename);
 
                     string samplePath = Path.Combine(mapDir, filename);
-                    string fullPathExtLess = Path.Combine(Path.GetDirectoryName(samplePath), Path.GetFileNameWithoutExtension(samplePath));
+                    string fullPathExtLess = Path.Combine(
+                        Path.GetDirectoryName(samplePath) ?? throw new InvalidOperationException(),
+                        Path.GetFileNameWithoutExtension(samplePath));
 
                     // Get the first occurence of this sound to not get duplicated
                     if (firstSamples.Keys.Contains(fullPathExtLess)) {
@@ -124,7 +125,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     } else {
                         // Sample doesn't exist
                         if (!isFilename) {
-                            samplePath = Path.Combine(Path.GetDirectoryName(samplePath), string.Format("{0}-hit{1}-1.wav", sampleSet.ToString().ToLower(), hitsound.ToString().ToLower()));
+                            samplePath = Path.Combine(
+                                Path.GetDirectoryName(samplePath) ?? throw new InvalidOperationException(),
+                                $"{sampleSet.ToString().ToLower()}-hit{hitsound.ToString().ToLower()}-1.wav");
                         }
                     }
                     
@@ -139,7 +142,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         layer.Times.Add(tlo.Time);
                     } else {
                         // Add new hitsound layer with this path
-                        HitsoundLayer newLayer = new HitsoundLayer(extLessFilename, sampleSet, hitsound, new SampleGeneratingArgs(samplePath), importArgs);
+                        HitsoundLayer newLayer = new HitsoundLayer(extLessFilename,
+                            sampleSet,
+                            hitsound,
+                            new SampleGeneratingArgs(samplePath),
+                            importArgs);
                         newLayer.Times.Add(tlo.Time);
 
                         hitsoundLayers.Add(newLayer);
@@ -188,14 +195,16 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return Hitsound.Normal;
         }
 
-        public static List<HitsoundLayer> ImportMIDI(string path, bool instruments=true, bool keysounds=true, bool lengths=true, double lengthRoughness=1, bool velocities=true, double velocityRoughness=1) {
+        public static List<HitsoundLayer> ImportMidi(string path, bool instruments=true, bool keysounds=true, bool lengths=true, double lengthRoughness=1, bool velocities=true, double velocityRoughness=1) {
             List<HitsoundLayer> hitsoundLayers = new List<HitsoundLayer>();
 
             var strictMode = false;
             var mf = new MidiFile(path, strictMode);
 
-            Console.WriteLine("Format {0}, Tracks {1}, Delta Ticks Per Quarter Note {2}",
-                mf.FileFormat, mf.Tracks, mf.DeltaTicksPerQuarterNote);
+            Console.WriteLine(
+                $@"Format {mf.FileFormat}, " +
+                $@"Tracks {mf.Tracks}, " +
+                $@"Delta Ticks Per Quarter Note {mf.DeltaTicksPerQuarterNote}");
 
             List<TempoEvent> tempos = new List<TempoEvent>();
             foreach (var track in mf.Events) {
@@ -213,7 +222,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 foreach (var midiEvent in mf.Events[track]) {
                     if (midiEvent is PatchChangeEvent pc) {
                         channelPatches[pc.Channel] = pc.Patch;
-                        continue;
                     }
                     else if (midiEvent is ControlChangeEvent co) {
                         if (co.Controller == MidiController.BankSelect) {
@@ -227,13 +235,24 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         var on = midiEvent as NoteOnEvent;
 
                         double time = CalculateTime(on.AbsoluteTime, tempos, cumulativeTime, mf.DeltaTicksPerQuarterNote);
-                        double length = on.OffEvent != null ? CalculateTime(on.OffEvent.AbsoluteTime, tempos, cumulativeTime, mf.DeltaTicksPerQuarterNote) - time : -1;
+                        double length = on.OffEvent != null
+                            ? CalculateTime(on.OffEvent.AbsoluteTime,
+                                  tempos,
+                                  cumulativeTime,
+                                  mf.DeltaTicksPerQuarterNote) -
+                              time
+                            : -1;
                         length = RoundLength(length, lengthRoughness);
 
                         bool keys = keysounds || on.Channel == 10;
 
-                        int bank = instruments ? on.Channel == 10 ? 128 : channelBanks.ContainsKey(on.Channel) ? channelBanks[on.Channel] : 0 : -1;
-                        int patch = instruments && channelPatches.ContainsKey(on.Channel) ? channelPatches[on.Channel] : -1;
+                        int bank = instruments
+                            ? on.Channel == 10 ? 128 :
+                            channelBanks.ContainsKey(on.Channel) ? channelBanks[on.Channel] : 0
+                            : -1;
+                        int patch = instruments && channelPatches.ContainsKey(on.Channel)
+                            ? channelPatches[on.Channel]
+                            : -1;
                         int instrument = -1;
                         int key = keys ? on.NoteNumber : -1;
                         length = lengths ? length : -1;
@@ -241,9 +260,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         velocity = (int)RoundVelocity(velocity, velocityRoughness);
 
                         string lengthString = Math.Round(length).ToString(CultureInfo.InvariantCulture);
-                        string filename = string.Format("{0}\\{1}\\{2}\\{3}\\{4}\\{5}.wav", bank, patch, instrument, key, lengthString, velocity);
+                        string filename = $"{bank}\\{patch}\\{instrument}\\{key}\\{lengthString}\\{velocity}.wav";
 
-                        string instrumentName = on.Channel == 10 ? "Percussion" : patch >= 0 && patch <= 127 ? PatchChangeEvent.GetPatchName(patch) : "Undefined";
+                        string instrumentName = on.Channel == 10 ? "Percussion" :
+                            patch >= 0 && patch <= 127 ? PatchChangeEvent.GetPatchName(patch) : "Undefined";
                         string keyName = on.NoteName;
 
                         string name = instrumentName;
@@ -301,11 +321,14 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public static List<HitsoundLayer> ImportReloading(ImportReloadingArgs reloadingArgs) {
             switch (reloadingArgs.ImportType) {
                 case ImportType.Stack:
-                    return new List<HitsoundLayer>() { ImportStack(reloadingArgs.Path, reloadingArgs.X, reloadingArgs.Y) };
+                    return new List<HitsoundLayer>()
+                        {ImportStack(reloadingArgs.Path, reloadingArgs.X, reloadingArgs.Y)};
                 case ImportType.Hitsounds:
                     return ImportHitsounds(reloadingArgs.Path);
                 case ImportType.MIDI:
-                    return ImportMIDI(reloadingArgs.Path, lengthRoughness: reloadingArgs.LengthRoughness, velocityRoughness: reloadingArgs.VelocityRoughness);
+                    return ImportMidi(reloadingArgs.Path,
+                        lengthRoughness: reloadingArgs.LengthRoughness,
+                        velocityRoughness: reloadingArgs.VelocityRoughness);
                 default:
                     return new List<HitsoundLayer>();
             }
@@ -316,8 +339,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 return length;
             }
 
-            var mult = length / roughness;
-            var round = Math.Round(mult);
+            var multi = length / roughness;
+            var round = Math.Round(multi);
             return round * roughness;
         }
 
@@ -326,8 +349,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 return length;
             }
 
-            var mult = Math.Pow(length, 1 / roughness);
-            var round = Math.Ceiling(mult);
+            var pow = Math.Pow(length, 1 / roughness);
+            var round = Math.Ceiling(pow);
             return Math.Pow(round, roughness);
         }
 
@@ -350,7 +373,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return prevTime + deltaTime;
         }
 
-        private static List<double> CalculateCumulativeTime(List<TempoEvent> tempos, int dtpq) {
+        private static List<double> CalculateCumulativeTime(List<TempoEvent> tempos, int deltaTicksPerQuarter) {
             // Time is in miliseconds
             List<double> times = new List<double>(tempos.Count);
 
@@ -360,13 +383,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     times.Add(te.AbsoluteTime);
                 } else {
                     long deltaTicks = te.AbsoluteTime - last.AbsoluteTime;
-                    double deltaTime = last.MicrosecondsPerQuarterNote / 1000d * deltaTicks / dtpq;
+                    double deltaTime = last.MicrosecondsPerQuarterNote / 1000d * deltaTicks / deltaTicksPerQuarter;
 
                     times.Add(times.Last() + deltaTime);
                 }
 
                 last = te;
-                //Console.WriteLine(string.Format("{0},359.842,4,2,1,100,1,0", (int)times.Last(), (last.MicrosecondsPerQuarterNote / 1000f).ToString(CultureInfo.InvariantCulture)));
             }
             return times;
         }

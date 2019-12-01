@@ -5,7 +5,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
     /// Sample Provider to allow fading in and out
     /// </summary>
     public class DelayFadeOutSampleProvider : ISampleProvider {
-        enum FadeState {
+        private enum FadeState {
             Waiting,
             Silence,
             FadingIn,
@@ -46,6 +46,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// <summary>
         /// Requests that a fade-out begins (will start on the next call to Read)
         /// </summary>
+        /// <param name="fadeAfterMilliseconds">Duration of Fade after in milliseconds</param>
         /// <param name="fadeDurationInMilliseconds">Duration of fade in milliseconds</param>
         public void BeginFadeOut(double fadeAfterMilliseconds, double fadeDurationInMilliseconds) {
             lock (lockObject) {
@@ -69,7 +70,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public int Read(float[] buffer, int offset, int count) {
             int sourceSamplesRead = source.Read(buffer, offset, count);
 
-            lock (lockObject) {
+            lock (lockObject)
+            {
                 if (fadeState == FadeState.Waiting) {
                     fadeOutDelayPosition += sourceSamplesRead / WaveFormat.Channels;
                     if (fadeOutDelayPosition >= fadeOutDelaySamples) {
@@ -78,12 +80,18 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         fadeState = FadeState.FadingOut;
                     }
                 }
-                if (fadeState == FadeState.FadingIn) {
-                    FadeIn(buffer, offset, sourceSamplesRead);
-                } else if (fadeState == FadeState.FadingOut) {
-                    FadeOut(buffer, offset, sourceSamplesRead);
-                } else if (fadeState == FadeState.Silence) {
-                    ClearBuffer(buffer, offset, count);
+
+                switch (fadeState)
+                {
+                    case FadeState.FadingIn:
+                        FadeIn(buffer, offset, sourceSamplesRead);
+                        break;
+                    case FadeState.FadingOut:
+                        FadeOut(buffer, offset, sourceSamplesRead);
+                        break;
+                    case FadeState.Silence:
+                        ClearBuffer(buffer, offset, count);
+                        break;
                 }
             }
             return sourceSamplesRead;
@@ -134,8 +142,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// <summary>
         /// WaveFormat of this SampleProvider
         /// </summary>
-        public WaveFormat WaveFormat {
-            get { return source.WaveFormat; }
-        }
+        public WaveFormat WaveFormat => source.WaveFormat;
     }
 }

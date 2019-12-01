@@ -9,20 +9,40 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
+    /// <summary>
+    /// 
+    /// </summary>
     public class Timing {
+        /// <summary>
+        /// 
+        /// </summary>
         public List<TimingPoint> TimingPoints { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public double SliderMultiplier { get; set; }
 
+        /// <inheritdoc />
         public Timing(List<string> timingLines, double sliderMultiplier) {
             TimingPoints = GetTimingPoints(timingLines);
             SliderMultiplier = sliderMultiplier;
             Sort();
         }
 
+        /// <summary>
+        /// Sorts all <see cref="TimingPoint"/> in order of time.
+        /// </summary>
         public void Sort() {
             TimingPoints = TimingPoints.OrderBy(o => o.Offset).ThenByDescending(o => o.Inherited).ToList();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="time"></param>
+        /// <param name="tp"></param>
+        /// <param name="divisor"></param>
+        /// <returns></returns>
         public static double GetNearestTimeMeter(double time, TimingPoint tp, int divisor) {
             double d = tp.MpB / divisor;
             double remainder = ( time - tp.Offset ) % d;
@@ -34,6 +54,12 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="duration"></param>
+        /// <param name="divisor"></param>
+        /// <returns></returns>
         public static double GetNearestMultiple(double duration, double divisor) {
             double remainder = duration % divisor;
 
@@ -44,6 +70,16 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="time"></param>
+        /// <param name="divisor2"></param>
+        /// <param name="divisor3"></param>
+        /// <param name="floor"></param>
+        /// <param name="tp"></param>
+        /// <param name="firstTP"></param>
+        /// <returns></returns>
         public double Resnap(double time, int divisor2, int divisor3, bool floor=true, TimingPoint tp=null, TimingPoint firstTP=null) {
             TimingPoint beforeTP = tp ?? GetRedlineAtTime(time, firstTP);
             TimingPoint afterTP = tp == null ? GetRedlineAfterTime(time) : null;
@@ -66,6 +102,15 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="time"></param>
+        /// <param name="divisor2"></param>
+        /// <param name="divisor3"></param>
+        /// <param name="ho"></param>
+        /// <param name="floor"></param>
+        /// <returns></returns>
         public double ResnapInRange(double time, int divisor2, int divisor3, HitObject ho, bool floor=true) {
             TimingPoint beforeTP = GetRedlineAtTime(time);
             TimingPoint afterTP = GetRedlineAfterTime(time);
@@ -93,6 +138,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ttp"></param>
+        /// <returns></returns>
         public double GetTimingPointEffectiveRange(TimingPoint ttp) {
             foreach( TimingPoint tp in TimingPoints ) {
                 if(Precision.DefinitelyBigger(tp.Offset, ttp.Offset) ) {
@@ -102,6 +152,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return double.PositiveInfinity; // Being the last timingpoint, the effective range is infinite (very big)
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="time"></param>
+        /// <returns></returns>
         public TimingPoint GetTimingPointAtTime(double time) {
             TimingPoint lastTP = GetFirstTimingPointExtended();
             foreach( TimingPoint tp in TimingPoints ) {
@@ -113,6 +168,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return lastTP;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="time"></param>
+        /// <param name="timingPoints"></param>
+        /// <param name="firstTimingpoint"></param>
+        /// <returns></returns>
         public static TimingPoint GetTimingPointAtTime(double time, List<TimingPoint> timingPoints, TimingPoint firstTimingpoint) {
             TimingPoint lastTP = firstTimingpoint;
             foreach (TimingPoint tp in timingPoints) {
@@ -124,6 +186,12 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return lastTP;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="startTime"></param>
+        /// <param name="endTime"></param>
+        /// <returns></returns>
         public List<TimingPoint> GetTimingPointsInTimeRange(double startTime, double endTime) {
             List<TimingPoint> TPs = new List<TimingPoint>();
             foreach( TimingPoint tp in TimingPoints ) {
@@ -134,14 +202,29 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return TPs;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="time"></param>
+        /// <returns></returns>
         public double GetBPMAtTime(double time) {
             return 60000 / GetMpBAtTime(time);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="time"></param>
+        /// <returns></returns>
         public double GetMpBAtTime(double time) {
             return GetRedlineAtTime(time).MpB;
         }
 
+        /// <summary>
+        /// Returns with the inherited <see cref="TimingPoint"/> from the selected time in ms.
+        /// </summary>
+        /// <param name="time"></param>
+        /// <returns></returns>
         public TimingPoint GetGreenlineAtTime(double time) {
             TimingPoint lastTP = GetFirstTimingPointExtended();
             foreach (TimingPoint tp in TimingPoints) {
@@ -155,6 +238,12 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return lastTP;
         }
 
+        /// <summary>
+        /// Returns the <see cref="TimingPoint"/> 
+        /// </summary>
+        /// <param name="time"></param>
+        /// <param name="firstTimingPoint"></param>
+        /// <returns></returns>
         public TimingPoint GetRedlineAtTime(double time, TimingPoint firstTimingPoint=null) {
             TimingPoint lastTP = firstTimingPoint ?? GetFirstTimingPointExtended();
             foreach( TimingPoint tp in TimingPoints ) {
@@ -168,6 +257,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return lastTP;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="time"></param>
+        /// <returns></returns>
         public TimingPoint GetRedlineAfterTime(double time) {
             foreach( TimingPoint tp in TimingPoints ) {
                 if( Precision.DefinitelyBigger(tp.Offset, time) && tp.Inherited) {
@@ -177,10 +271,20 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return null;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="time"></param>
+        /// <returns></returns>
         public double GetSVMultiplierAtTime(double time) {
             return -100 / GetSVAtTime(time);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="time"></param>
+        /// <returns></returns>
         public double GetSVAtTime(double time) {
             double lastSV = -100;
             foreach( TimingPoint tp in TimingPoints ) {
@@ -197,10 +301,22 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return MathHelper.Clamp(lastSV, -1000, -10);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="time"></param>
+        /// <param name="length"></param>
+        /// <returns></returns>
         public double CalculateSliderTemporalLength(double time, double length) {
             return ( length * GetMpBAtTime(time) * GetSVAtTime(time) ) / ( -10000 * SliderMultiplier );
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="time"></param>
+        /// <param name="temporalLength"></param>
+        /// <returns></returns>
         public double CalculateSliderLength(double time, double temporalLength) {
             return ( -10000 * temporalLength * SliderMultiplier ) / ( GetMpBAtTime(time) * GetSVAtTime(time) );
         }
@@ -243,7 +359,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             // Add an extra timingpoint that is the same as the first redline but like 10 x meter beats earlier so any objects before the first redline can use that thing
 
             // When you have a greenline before the first redline, the greenline will act like the first redline and you can snap objects to the greenline's bpm. 
-            // The value in the greenline will be used as the milliseconds per beat, so for example a 1x SV slider will be 600 bpm.
+            // The value in the greenline will be used as the milliseconds per beat, so for example a 1x SliderVelocity slider will be 600 bpm.
             // The timeline will work like a redline on 0 offset and 1000 milliseconds per beat
 
             TimingPoint firstTP = TimingPoints.FirstOrDefault();

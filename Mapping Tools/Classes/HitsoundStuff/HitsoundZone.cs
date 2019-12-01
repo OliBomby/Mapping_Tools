@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.HitsoundStuff
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class HitsoundZone : INotifyPropertyChanged
     {
         private bool _isSelected;
@@ -19,6 +22,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
         private SampleSet _sampleSet;
         private Hitsound _hitsound;
 
+        /// <inheritdoc />
         public HitsoundZone() {
             _isSelected = false;
             _name = "";
@@ -29,6 +33,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
             _hitsound = Hitsound.Normal;
         }
 
+        /// <inheritdoc />
         public HitsoundZone(bool isSelected, string name, string filename, double xPos, double yPos, SampleSet sampleSet, Hitsound hitsound) {
             _isSelected = isSelected;
             _name = name;
@@ -39,12 +44,21 @@ namespace Mapping_Tools.Classes.HitsoundStuff
             _hitsound = hitsound;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <returns></returns>
         public double Distance(Vector2 pos) {
             double dx = XPos == -1 ? 0 : XPos - pos.X;
             double dy = YPos == -1 ? 0 : YPos - pos.Y;
             return Math.Sqrt(dx * dx + dy * dy);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public HitsoundZone Copy() {
             return new HitsoundZone(IsSelected, Name, Filename, XPos, YPos, SampleSet, Hitsound);
         }
@@ -59,7 +73,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
         }
 
         public string Filename {
-            get { return _filename; }
+            get => _filename;
             set {
                 if (_filename == value) return;
                 _filename = value;
@@ -68,7 +82,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
         }
 
         public string Name {
-            get { return _name; }
+            get => _name;
             set {
                 if (_name == value) return;
                 _name = value;
@@ -77,7 +91,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
         }
 
         public double XPos {
-            get { return _xPos; }
+            get => _xPos;
             set {
                 if (_xPos == value) return;
                 _xPos = value;
@@ -86,7 +100,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
         }
 
         public double YPos {
-            get { return _yPos; }
+            get => _yPos;
             set {
                 if (_yPos == value) return;
                 _yPos = value;
@@ -95,7 +109,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
         }
 
         public SampleSet SampleSet {
-            get { return _sampleSet; }
+            get => _sampleSet;
             set {
                 if (_sampleSet == value) return;
                 _sampleSet = value;
@@ -104,7 +118,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
         }
 
         public Hitsound Hitsound {
-            get { return _hitsound; }
+            get => _hitsound;
             set {
                 if (_hitsound == value) return;
                 _hitsound = value;
@@ -112,8 +126,15 @@ namespace Mapping_Tools.Classes.HitsoundStuff
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="propertyName"></param>
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

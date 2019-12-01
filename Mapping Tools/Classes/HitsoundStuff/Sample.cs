@@ -3,12 +3,18 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
+    /// <summary>
+    /// 
+    /// </summary>
     public class Sample : INotifyPropertyChanged {
         private SampleGeneratingArgs _sampleArgs;
         private int _priority;
         private SampleSet _sampleSet;
         private Hitsound _hitsound;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public SampleGeneratingArgs SampleArgs {
             get { return _sampleArgs; }
             set {
@@ -66,12 +72,18 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             _hitsound = hl.Hitsound;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public Sample Copy() {
             return new Sample(SampleSet, Hitsound, SampleArgs.Copy(), Priority);
         }
 
+        /// <summary>Returns a string that represents the current object.</summary>
+        /// <returns>A string that represents the current object.</returns>
         public override string ToString() {
-            return string.Format("{0}, priority: {1}, sampleset: {2}, hitsound: {3}", SampleArgs, Priority, SampleSet, Hitsound);
+            return $"{SampleArgs}, priority: {Priority}, sampleset: {SampleSet}, hitsound: {Hitsound}";
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

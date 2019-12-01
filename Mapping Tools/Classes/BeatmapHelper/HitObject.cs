@@ -9,6 +9,9 @@ using System.Text;
 using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
+    /// <summary>
+    /// 
+    /// </summary>
     public class HitObject : ITextLine {
         private int repeat;
 
@@ -46,7 +49,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public List<SampleSet> EdgeSampleSets { get; set; }
         public List<SampleSet> EdgeAdditionSets { get; set; }
 
-        public bool SliderExtras { get => GetSliderExtras(); }
+        public bool SliderExtras => GetSliderExtras();
 
         public double TemporalLength { get; set; } // Duration of one repeat
         public double EndTime { get => GetEndTime(); set => SetEndTime(value); } // Includes all repeats
@@ -60,10 +63,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         // Special combined with greenline
-        public double SV { get; set; }
-        public TimingPoint TP { get; set; }
-        public TimingPoint HitsoundTP { get; set; }
-        public TimingPoint Redline { get; set; }
+        public double SliderVelocity { get; set; }
+        public TimingPoint TimingPoint { get; set; }
+        public TimingPoint HitsoundTimingPoint { get; set; }
+        public TimingPoint UnInheritedTimingPoint { get; set; }
         public List<TimingPoint> BodyHitsounds = new List<TimingPoint>();
 
         // Special combined with timeline
@@ -144,6 +147,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             IsSelected = ob.IsSelected;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ob"></param>
+        /// <returns></returns>
         public static explicit operator HitObject(Editor_Reader.HitObject ob) {
             return new HitObject(ob);
         }
@@ -152,11 +160,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             List<string> samples = new List<string>();
             if (IsSlider) {
                 // Get sliderslide hitsounds for every timingpoint in the slider
-                if (includeDefaults || TP.SampleIndex != 0) {
-                    SampleSet firstSampleSet = SampleSet == SampleSet.Auto ? TP.SampleSet : SampleSet;
-                    samples.Add(GetSliderFilename(firstSampleSet, "slide", TP.SampleIndex));
+                if (includeDefaults || TimingPoint.SampleIndex != 0) {
+                    SampleSet firstSampleSet = SampleSet == SampleSet.Auto ? TimingPoint.SampleSet : SampleSet;
+                    samples.Add(GetSliderFilename(firstSampleSet, "slide", TimingPoint.SampleIndex));
                     if (Whistle)
-                        samples.Add(GetSliderFilename(firstSampleSet, "whistle", TP.SampleIndex));
+                        samples.Add(GetSliderFilename(firstSampleSet, "whistle", TimingPoint.SampleIndex));
                 }
 
                 foreach (TimingPoint bodyTP in BodyHitsounds) {
@@ -170,14 +178,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
                 // Add tick samples
                 // 10 ms over tick time is tick
-                double t = Time + Redline.MpB / sliderTickRate;
+                double t = Time + UnInheritedTimingPoint.MpB / sliderTickRate;
                 while (t + 10 < EndTime) {
-                    TimingPoint bodyTP = Timing.GetTimingPointAtTime(t, BodyHitsounds, TP);
+                    TimingPoint bodyTP = Timing.GetTimingPointAtTime(t, BodyHitsounds, TimingPoint);
                     if (includeDefaults || bodyTP.SampleIndex != 0) {
                         SampleSet sampleSet = SampleSet == SampleSet.Auto ? bodyTP.SampleSet : SampleSet;
                         samples.Add(GetSliderFilename(sampleSet, "tick", bodyTP.SampleIndex));
                     }
-                    t += Redline.MpB / sliderTickRate;
+                    t += UnInheritedTimingPoint.MpB / sliderTickRate;
                 }
             }
             return samples;
@@ -209,12 +217,12 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         private string GetSliderFilename(SampleSet sampleSet, string sampleName, int index) {
             if (index == 0) {
-                return string.Format("{0}-slider{1}-default.wav", sampleSet.ToString().ToLower(), sampleName);
+                return $"{sampleSet.ToString().ToLower()}-slider{sampleName}-default.wav";
             }
             if (index == 1) {
-                return string.Format("{0}-slider{1}.wav", sampleSet.ToString().ToLower(), sampleName);
+                return $"{sampleSet.ToString().ToLower()}-slider{sampleName}.wav";
             }
-            return string.Format("{0}-slider{1}{2}.wav", sampleSet.ToString().ToLower(), sampleName, index);
+            return $"{sampleSet.ToString().ToLower()}-slider{sampleName}{index}.wav";
         }
 
         public List<double> GetAllTloTimes(Timing timing) {
@@ -238,6 +246,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return times;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="deltaTime"></param>
         public void MoveTime(double deltaTime) {
             Time += deltaTime;
             EndTime += deltaTime;
@@ -260,8 +272,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             if (Repeat == 0) { return; }
 
             if (IsSlider) {
-                double deltaLength = (-10000 * timing.SliderMultiplier * deltaTemporalTime) / (Redline.MpB * SV);  // Divide by repeats because the endtime is multiplied by repeats
-                PixelLength += deltaLength; // Change the pixellength to match the new time
+                double deltaLength = (-10000 * timing.SliderMultiplier * deltaTemporalTime) / (UnInheritedTimingPoint.MpB * SliderVelocity);  // Divide by repeats because the endtime is multiplied by repeats
+                PixelLength += deltaLength; // Change the pixel length to match the new time
             }
 
             // Change
@@ -272,6 +284,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             BodyHitsounds.RemoveAll(s => s.Offset >= EndTime);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="delta"></param>
         public void Move(Vector2 delta) {
             Pos += delta;
             if (!IsSlider) return;
@@ -345,6 +361,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return EdgeHitsounds.Any(o => o != 0) || EdgeSampleSets.Any(o => o != SampleSet.Auto) || EdgeAdditionSets.Any(o => o != SampleSet.Auto) || SampleSet != SampleSet.Auto || AdditionSet != SampleSet.Auto || CustomIndex != 0 || SampleVolume != 0 || Filename != "";
         }
 
+
+        /// <inheritdoc />
         public void SetLine(string line) {
             var values = line.Split(',');
 
@@ -463,6 +481,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
+        /// <inheritdoc />
         public string GetLine() {
             var values = new List<string> {
                 Pos.X.ToRoundInvariant(),

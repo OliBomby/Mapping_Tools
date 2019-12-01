@@ -449,7 +449,7 @@ namespace Mapping_Tools.Annotations
   /// </summary>
   [Flags]
   public enum ImplicitUseTargetFlags
-  {
+    {
     Default = Itself,
     Itself = 1,
     /// <summary>Members of entity marked with attribute are considered used.</summary>

@@ -189,7 +189,7 @@ namespace Mapping_Tools.Classes.MathUtil {
 
         private static readonly string listSeparator = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
         /// <summary>
-        /// Returns a <see cref="System.string"/> describing the current instance.
+        /// Returns a <see cref="string"/> describing the current instance.
         /// </summary>
         /// <returns></returns>
         public override string ToString() {

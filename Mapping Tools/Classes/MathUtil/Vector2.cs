@@ -608,7 +608,6 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// Compute the angle between two vectors.
         /// </summary>
         /// <param name="vec1">The first vector</param>
-        /// <param name="vec2">The second vector</param>
         /// <returns>The angle</returns>
         public static double Angle(Vector2 vec1)
         {
@@ -620,7 +619,6 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// Compute angle between two vectors.
         /// </summary>
         /// <param name="vec1">The first vector</param>
-        /// <param name="vec2">The second vector</param>
         /// <param name="result">The angle</param>
         public static void Angle(ref Vector2 vec1, out double result)
         {
