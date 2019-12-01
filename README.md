@@ -12,6 +12,7 @@ Collection of tools for manipulating osu! beatmaps
 [![CodeFactor](https://www.codefactor.io/repository/github/olibomby/mapping_tools/badge/master)](https://www.codefactor.io/repository/github/olibomby/mapping_tools/overview/master)
 
 ## Tools included
+- [Geometry Dashboard]() by [OliBomby](https://github.com/OliBomby) | [CrazyRabbitKGe](https://github.com/CrazyRabbitKGe)
 - [Map Cleaner](https://github.com/OliBomby/Map-Cleaner) by [OliBomby](https://github.com/OliBomby) 
 - [Slider Merger]() by [OliBomby](https://github.com/OliBomby) 
 - [Slider Completionator]() by [OliBomby](https://github.com/OliBomby) 
@@ -25,8 +26,8 @@ Collection of tools for manipulating osu! beatmaps
 - [Rhythm Guide]() by [OliBomby](https://github.com/OliBomby)
 
 ## Future implementations
-- Snapping Tools (Geo-Triangle & Drafting Compass)
 - Sliderator (tool for making variable velocity sliders)
+- Timing Studio (Tool for creating perfect timing from odd-time signatures and )
 
 ## Used libraries
 - [MaterialDesignInXamlToolkit](https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit)
