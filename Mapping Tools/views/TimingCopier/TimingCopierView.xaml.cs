@@ -1,17 +1,13 @@
-﻿using System;
+﻿using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Viewmodels;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.HitsoundStuff;
-using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.Tools;
-using Mapping_Tools.Viewmodels;
-using static System.Console;
 
 namespace Mapping_Tools.Views {
     /// <summary>
@@ -122,7 +118,7 @@ namespace Mapping_Tools.Views {
 
                         // Last time is the time of the last redline in between
                         double newTime = lastTime + redline.MpB * beatsFromLastTime;
-                        newTime = timingTo.Resnap(newTime, arg.Snap1, arg.Snap2, firstTP: redlines.FirstOrDefault());
+                        newTime = timingTo.Resnap(newTime, arg.Snap1, arg.Snap2, firstTp: redlines.FirstOrDefault());
                         marker.Time = newTime;
 
                         lastTime = marker.Time;
@@ -142,8 +138,8 @@ namespace Mapping_Tools.Views {
                     // Resnap hitobjects
                     foreach (HitObject ho in beatmapTo.HitObjects)
                     {
-                        ho.ResnapSelf(timingTo, arg.Snap1, arg.Snap2, firstTP: redlines.FirstOrDefault());
-                        ho.ResnapEnd(timingTo, arg.Snap1, arg.Snap2, firstTP: redlines.FirstOrDefault());
+                        ho.ResnapSelf(timingTo, arg.Snap1, arg.Snap2, firstTp: redlines.FirstOrDefault());
+                        ho.ResnapEnd(timingTo, arg.Snap1, arg.Snap2, firstTp: redlines.FirstOrDefault());
                     }
 
                     // Resnap greenlines
@@ -165,7 +161,7 @@ namespace Mapping_Tools.Views {
             }
 
             // Make an accurate message
-            string message = string.Format("Successfully copied timing to {0} {1}!", mapsDone, mapsDone == 1 ? "beatmap" : "beatmaps");
+            string message = $"Successfully copied timing to {mapsDone} {(mapsDone == 1 ? "beatmap" : "beatmaps")}!";
             return message;
         }
 
