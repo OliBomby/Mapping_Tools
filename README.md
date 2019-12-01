@@ -9,7 +9,7 @@ Collection of tools for manipulating osu! beatmaps
   <br/>Logo by <a href="https://osu.ppy.sh/users/1882522">Karoo</a>
 </p>
 
-[![CodeFactor](https://www.codefactor.io/repository/github/coppertine/mapping_tools/badge/master)](https://www.codefactor.io/repository/github/coppertine/mapping_tools/overview/master)
+[![CodeFactor](https://www.codefactor.io/repository/github/olibomby/mapping_tools/badge/master)](https://www.codefactor.io/repository/github/olibomby/mapping_tools/overview/master)
 
 ## Tools included
 - [Map Cleaner](https://github.com/OliBomby/Map-Cleaner) by [OliBomby](https://github.com/OliBomby) 
