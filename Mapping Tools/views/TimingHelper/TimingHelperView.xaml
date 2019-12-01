@@ -1,4 +1,19 @@
-﻿<local:SingleRunMappingTool x:Class="Mapping_Tools.Views.TimingHelperView"
+﻿<!--
+    TODO: Change layout to timeline layout using spectrum using the currently selected beatmaps' audio file.
+    Timeline layout should have a button to toggle between osu! view and "daw" view 
+        (show beats and ms like in Reaper)
+    Show an envelope like line in the timeline with adjustable range of bpm (15 - 960)
+    osu! view should include all previewed bpm points with the time, signature (x/4 - x being from 1 - inf)
+        and the reccomended snap divisor for that section if needed (e.g. if 7/5 is used)
+        User can decide if bpm should double or half depending on the current time signature 
+            (this can increase and/or decrease the number of timing points in the beatmap/project)
+        User can decide the snap divisor (in preferences) when using gradual bpm increase/decrease 
+            (this can increase and/or decrease the number of timing points in the beatmap)
+    Implement an import, project and prefferences section to Timing Helper
+    Allow import of midi, rpp (reaper project file), current beatmap (using Timing Helpers importer).
+    -->
+    
+<local:SingleRunMappingTool x:Class="Mapping_Tools.Views.TimingHelperView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
