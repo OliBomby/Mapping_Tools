@@ -86,7 +86,7 @@ namespace Mapping_Tools.Views {
                         double newSpatialLength = arg.SpatialLength != -1 ? ho.GetSliderPath(fullLength: true).Distance * arg.SpatialLength : oldSpatialLength;
                         double oldTemporalLength = timing.CalculateSliderTemporalLength(ho.Time, ho.PixelLength);
                         double newTemporalLength = arg.TemporalLength != -1 ? timing.GetMpBAtTime(ho.Time) * arg.TemporalLength : oldTemporalLength;
-                        double oldSV = timing.GetSVAtTime(ho.Time);
+                        double oldSV = timing.GetSvAtTime(ho.Time);
                         double newSV = oldSV / ((newSpatialLength / oldSpatialLength) / (newTemporalLength / oldTemporalLength));
                         ho.SliderVelocity = newSV;
                         ho.PixelLength = newSpatialLength;

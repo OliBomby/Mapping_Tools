@@ -3,13 +3,14 @@ using System.IO;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     /// <summary>
-    /// TODO: Explain what this class is meant to be. Please.
+    /// This is a class that sits around a <see cref="ITextFile"/> and gives it IO helper methods. This makes the <see cref="ITextFile"/> more like an actual file.
     /// </summary>
     public class Editor {
         /// <summary>
         /// The file path to the beatmap or storyboard file.
         /// </summary>
         public string Path { get; set; }
+
         /// <summary>
         /// The text file interface used as an object.
         /// </summary>

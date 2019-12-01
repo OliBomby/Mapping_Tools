@@ -6,7 +6,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper
 {
     public class BeatmapEditor : Editor
     {
-        public Beatmap Beatmap { get => (Beatmap)TextFile; }
+        public Beatmap Beatmap => (Beatmap)TextFile;
 
         public BeatmapEditor(List<string> lines)
         {

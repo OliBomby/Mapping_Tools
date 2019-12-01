@@ -2,29 +2,34 @@
 using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
-    // TODO: Complete Comments
     /// <summary>
-    /// 
+    /// This represents a storyboarded sound sample for osu! storyboards. These can always be found under the [Events] -> (Storyboard Sound Samples) section.
     /// </summary>
+    /// <example>
+    /// Sample,56056,0,"soft-hitnormal.wav",30
+    /// </example>
     public class StoryboardSoundSample : IEquatable<StoryboardSoundSample>, ITextLine {
         /// <summary>
-        /// 
+        /// The time when this sound event occurs.
         /// </summary>
         public double Time { get; set; }
+
         /// <summary>
-        /// 
+        /// The storyboard layer this event belongs to.
         /// </summary>
         public StoryboardLayer Layer { get; set; }
+
         /// <summary>
-        /// 
+        /// The name of the sample file which is the sound of this storyboard sample.
+        /// This is a partial path.
         /// </summary>
         public string FilePath { get; set; }
+
         /// <summary>
-        /// 
+        /// The volume of this sound. Ranges from 0 to 100.
         /// </summary>
         public double Volume { get; set; }
 
-        // Sample,56056,0,"soft-hitnormal.wav",30
         /// <inheritdoc />
         public StoryboardSoundSample(double time, StoryboardLayer layer, string filePath, double volume) {
             Time = time;
@@ -39,7 +44,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         /// <summary>
-        /// 
+        /// Serializes this object to .osu code.
         /// </summary>
         /// <returns></returns>
         public string GetLine() {
@@ -47,7 +52,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         /// <summary>
-        /// 
+        /// Deserializes a string of .osu code and populates the properties of this object.
         /// </summary>
         /// <param name="line"></param>
         public void SetLine(string line) {
@@ -81,10 +86,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <returns>true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.</returns>
         public bool Equals(StoryboardSoundSample other) {
             return
-                Time == other.Time &&
-                Layer == other.Layer &&
-                FilePath == other.FilePath &&
-                Volume == other.Volume;
+                other != null && (Time == other.Time &&
+                                  Layer == other.Layer &&
+                                  FilePath == other.FilePath &&
+                                  Volume == other.Volume);
         }
     }
 }
