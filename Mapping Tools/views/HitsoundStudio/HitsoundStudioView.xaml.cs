@@ -81,7 +81,7 @@ namespace Mapping_Tools.Views
                 UpdateProgressBar(worker, 10);
 
                 // Balance the volume between greenlines and samples
-                HitsoundConverter.BalanceVolumes(samplePackages, new VolumeBalancingArgs(0.1, false));
+                HitsoundConverter.BalanceVolumes(samplePackages, new VolumeBalancingArgs(0, false));
                 UpdateProgressBar(worker, 20);
 
                 // Load the samples so validation can be done

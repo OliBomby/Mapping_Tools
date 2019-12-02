@@ -1,10 +1,7 @@
-﻿using NAudio.Wave;
+﻿using Mapping_Tools.Classes.MathUtil;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     class HitsoundConverter {
@@ -31,19 +28,41 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public static void BalanceVolumes(List<SamplePackage> packages, VolumeBalancingArgs args) {
             foreach (SamplePackage package in packages) {
                 double maxVolume = package.Samples.Max(o => o.SampleArgs.Volume);
-                if (maxVolume == -0.01)
+                if (Math.Abs(maxVolume - -0.01) < Precision.DOUBLE_EPSILON) {
                     maxVolume = 1;
-                double sampleMultiplier = 1 / maxVolume;
-                package.Volume = maxVolume;
-                foreach (Sample sample in package.Samples) {
-                    if (sample.SampleArgs.Volume == -0.01) sample.SampleArgs.Volume = 1;
+                }
 
-                    double newVolume = sample.SampleArgs.Volume * sampleMultiplier;
+                foreach (Sample sample in package.Samples) {
+                    if (Math.Abs(sample.SampleArgs.Volume - -0.01) < Precision.DOUBLE_EPSILON) {
+                        sample.SampleArgs.Volume = 1;
+                    }
+
+                    // I pick the new volume such that the samples have a volume as high as possible and the greenline brings the volume down.
+                    // With this equation the final amplitude stays the same while the greenline has the volume of the loudest sample at this time.
+                    double newVolume = SampleImporter.AmplitudeToOsuVolume(
+                        SampleImporter.OsuVolumeToAmplitude(package.Volume) *
+                        SampleImporter.OsuVolumeToAmplitude(sample.SampleArgs.Volume) /
+                        SampleImporter.OsuVolumeToAmplitude(maxVolume));
+
+
                     if (Math.Abs(newVolume - 1) > args.Roughness && !args.AlwaysFullVolume) {
-                        sample.SampleArgs.Volume = Math.Abs(args.Roughness) > Precision.DOUBLE_EPSILON ? args.Roughness * Math.Round(newVolume / args.Roughness) : newVolume;
+                        // If roughness is not 0 it will quantize the new volume in order to reduce the number of different volumes
+                        sample.SampleArgs.Volume = Math.Abs(args.Roughness) > Precision.DOUBLE_EPSILON ? 
+                            args.Roughness * Math.Round(newVolume / args.Roughness) : 
+                            newVolume;
                     } else {
                         sample.SampleArgs.Volume = 1;
                     }
+                }
+
+                if (args.AlwaysFullVolume) {
+                    // Assuming the volume of the sample is always maximum, this equation makes sure that 
+                    // the loudest sample at this time has the wanted amplitude using the volume change from the greenline.
+                    package.Volume = SampleImporter.AmplitudeToOsuVolume(
+                        SampleImporter.OsuVolumeToAmplitude(package.Volume) *
+                        SampleImporter.OsuVolumeToAmplitude(maxVolume));
+                } else {
+                    package.Volume = maxVolume;
                 }
             }
         }
