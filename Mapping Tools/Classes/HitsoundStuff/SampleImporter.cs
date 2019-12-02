@@ -368,8 +368,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return shifter;
         }
 
-        public static ISampleProvider VolumeChange(ISampleProvider sample, float mult) {
-            return new VolumeSampleProvider(sample) { Volume = mult };
+        public static ISampleProvider VolumeChange(ISampleProvider sample, double volume) {
+            // This formula seems to convert osu! volume to amplitude multiplier
+            var mult = 0.995 * Math.Pow(volume, 1.5) + 0.005;
+            return new VolumeSampleProvider(sample) { Volume = (float) mult };
         }
     }
 }

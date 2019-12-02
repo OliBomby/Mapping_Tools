@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     class HitsoundConverter {
@@ -39,7 +40,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
                     double newVolume = sample.SampleArgs.Volume * sampleMultiplier;
                     if (Math.Abs(newVolume - 1) > args.Roughness && !args.AlwaysFullVolume) {
-                        sample.SampleArgs.Volume = args.Roughness * Math.Round(newVolume / args.Roughness);
+                        sample.SampleArgs.Volume = Math.Abs(args.Roughness) > Precision.DOUBLE_EPSILON ? args.Roughness * Math.Round(newVolume / args.Roughness) : newVolume;
                     } else {
                         sample.SampleArgs.Volume = 1;
                     }

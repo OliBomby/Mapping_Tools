@@ -13,7 +13,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// 
         /// </summary>
         public int KeyCorrection { get; set; }
-        public float VolumeCorrection { get; set; }
+        public double VolumeCorrection { get; set; }
         public double FadeStart { get; set; }
         public double FadeLength { get; set; }
 
@@ -45,7 +45,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
             if (FadeStart != -1 && FadeLength != -1) {
                 output = new DelayFadeOutSampleProvider(output);
-                (output as DelayFadeOutSampleProvider).BeginFadeOut(FadeStart * 1000, FadeLength * 1000);
+                ((DelayFadeOutSampleProvider) output).BeginFadeOut(FadeStart * 1000, FadeLength * 1000);
             }
             if (KeyCorrection != 0) {
                 output = SampleImporter.PitchShift(output, KeyCorrection);

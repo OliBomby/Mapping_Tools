@@ -97,32 +97,19 @@ namespace Mapping_Tools.Views
                 CompleteHitsounds completeHitsounds = HitsoundConverter.GetCompleteHitsounds(samplePackages, loadedSamples);
                 UpdateProgressBar(worker, 60);
 
-                int samples = 0;
-                foreach (CustomIndex ci in completeHitsounds.CustomIndices)
-                {
-                    foreach (HashSet<SampleGeneratingArgs> h in ci.Samples.Values)
-                    {
-                        if (h.Any(o => SampleImporter.ValidateSampleArgs(o)))
-                        {
-                            samples++;
-                        }
-                    }
-                }
+                int samples = completeHitsounds.CustomIndices.SelectMany(ci => ci.Samples.Values).Count(h => h.Any(SampleImporter.ValidateSampleArgs));
                 UpdateProgressBar(worker, 80);
 
                 int greenlines = 0;
                 int lastIndex = -1;
-                foreach (HitsoundEvent hit in completeHitsounds.Hitsounds)
-                {
-                    if (hit.CustomIndex != lastIndex)
-                    {
-                        lastIndex = hit.CustomIndex;
-                        greenlines++;
-                    }
+                foreach (var hit in completeHitsounds.Hitsounds.Where(hit => hit.CustomIndex != lastIndex)) {
+                    lastIndex = hit.CustomIndex;
+                    greenlines++;
                 }
                 UpdateProgressBar(worker, 100);
 
-                MessageBox.Show(string.Format("Number of sample indices: {0}, Number of samples: {1}, Number of greenlines: {2}", completeHitsounds.CustomIndices.Count, samples, greenlines));
+                MessageBox.Show(
+                    $"Number of sample indices: {completeHitsounds.CustomIndices.Count}, Number of samples: {samples}, Number of greenlines: {greenlines}");
             }
             else
             {
@@ -131,7 +118,7 @@ namespace Mapping_Tools.Views
                 UpdateProgressBar(worker, 10);
 
                 // Balance the volume between greenlines and samples
-                HitsoundConverter.BalanceVolumes(samplePackages, new VolumeBalancingArgs(0.1, false));
+                HitsoundConverter.BalanceVolumes(samplePackages, new VolumeBalancingArgs(0, false));
                 UpdateProgressBar(worker, 20);
 
                 // Load the samples so validation can be done

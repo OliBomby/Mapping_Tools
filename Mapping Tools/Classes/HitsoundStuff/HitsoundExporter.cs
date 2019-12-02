@@ -67,7 +67,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
                         continue;
                     }
                     var samples = new List<ISampleProvider>();
-                    var volumes = new List<float>();
+                    var volumes = new List<double>();
                     int soundsAdded = 0;
                     
                     if (loadedSamples != null) {
@@ -101,7 +101,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
                     var mixer = new MixingSampleProvider(sameFormatSamples);
 
                     VolumeSampleProvider volumed = new VolumeSampleProvider(mixer) {
-                        Volume = 1 / (float)Math.Sqrt(soundsAdded * volumes.Average())
+                        Volume = (float)(1 / Math.Sqrt(soundsAdded * volumes.Average()))
                     };
 
                     // TODO: Allow mp3, ogg and aif export.
