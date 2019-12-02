@@ -201,14 +201,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             int sampleMode = izone.SampleModes();
 
             byte key = izone.Key();
-            //int keyCorrection = args.Key != -1 ? args.Key - key : 0;
-            int keyCorrection = 0;
             byte velocity = izone.Velocity();
             double volumeCorrection = args.Velocity != -1 ? (double)args.Velocity / velocity : 1d;
 
             var output = GetSampleWithLength(sh, izone, sampleMode, sample, args);
 
-            output.KeyCorrection = keyCorrection;
+            output.KeyCorrection = 0;
             output.VolumeCorrection = volumeCorrection;
 
             return output;
