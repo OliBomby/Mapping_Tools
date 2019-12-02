@@ -201,9 +201,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             int sampleMode = izone.SampleModes();
 
             byte key = izone.Key();
-            int keyCorrection = args.Key != -1 ? args.Key - key : 0;
+            //int keyCorrection = args.Key != -1 ? args.Key - key : 0;
+            int keyCorrection = 0;
             byte velocity = izone.Velocity();
-            float volumeCorrection = args.Velocity != -1 ? (float)args.Velocity / velocity : 1f;
+            double volumeCorrection = args.Velocity != -1 ? (double)args.Velocity / velocity : 1d;
 
             var output = GetSampleWithLength(sh, izone, sampleMode, sample, args);
 
@@ -234,6 +235,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             int length = end - start;
 
             double lengthInSeconds = args.Length != -1 ? (args.Length / 1000) + 0.4 : length / (double)sh.SampleRate;
+
+            // Sample rate key correction
+            int keyCorrection = args.Key != -1 ? args.Key - izone.Key() : 0;
+            double factor = Math.Pow(2, keyCorrection / 12d);
+            lengthInSeconds *= factor;
+
             lengthInSeconds = Math.Min(lengthInSeconds, length / (double)sh.SampleRate);
 
             int numberOfSamples = (int)Math.Ceiling(lengthInSeconds * sh.SampleRate);
@@ -242,7 +249,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             byte[] buffer = new byte[numberOfBytes];
             Array.Copy(sample, start * 2, buffer, 0, numberOfBytes);
 
-            var output = new SampleSoundGenerator(BufferToWaveStream(buffer, sh.SampleRate));
+            var output = new SampleSoundGenerator(BufferToWaveStream(buffer, (uint)(sh.SampleRate * factor)));
 
             if (lengthInSeconds <= 0.4) {
                 output.FadeStart = lengthInSeconds * 0.7;
@@ -268,6 +275,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             int loopLengthBytes = loopLength * 2;
 
             double lengthInSeconds = args.Length != -1 ? (args.Length / 1000) + 0.4 : length / (double)sh.SampleRate + 0.4;
+
+            // Sample rate key correction
+            int keyCorrection = args.Key != -1 ? args.Key - izone.Key() : 0;
+            double factor = Math.Pow(2, keyCorrection / 12d);
+            lengthInSeconds *= factor;
+
             int numberOfSamples = (int)Math.Ceiling(lengthInSeconds * sh.SampleRate);
             int numberOfLoopSamples = numberOfSamples - length;
 
@@ -284,7 +297,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 Array.Copy(sample, startLoop * 2, buffer, lengthBytes + i * loopLengthBytes, Math.Min(loopLengthBytes, numberOfBytes - (lengthBytes + i * loopLengthBytes)));
             }
 
-            var output = new SampleSoundGenerator(BufferToWaveStream(buffer, sh.SampleRate)) {
+            var output = new SampleSoundGenerator(BufferToWaveStream(buffer, (uint)(sh.SampleRate * factor))) {
                 FadeStart = lengthInSeconds - 0.4,
                 FadeLength = 0.3
             };
@@ -292,12 +305,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return output;
         }
 
-        private static SampleSoundGenerator GetSampleRemainder(SampleHeader sh, Zone instrumentZone, byte[] sample, SampleGeneratingArgs args) {
+        private static SampleSoundGenerator GetSampleRemainder(SampleHeader sh, Zone izone, byte[] sample, SampleGeneratingArgs args) {
             // Indices in sf2 are numbers of samples, not byte length. So double them
-            int start = (int)sh.Start + instrumentZone.FullStartAddressOffset();
-            int end = (int)sh.End + instrumentZone.FullEndAddressOffset();
-            int startLoop = (int)sh.StartLoop + instrumentZone.FullStartLoopAddressOffset();
-            int endLoop = (int)sh.EndLoop + instrumentZone.FullEndLoopAddressOffset();
+            int start = (int)sh.Start + izone.FullStartAddressOffset();
+            int end = (int)sh.End + izone.FullEndAddressOffset();
+            int startLoop = (int)sh.StartLoop + izone.FullStartLoopAddressOffset();
+            int endLoop = (int)sh.EndLoop + izone.FullEndLoopAddressOffset();
 
             int length = end - start;
             int loopLength = endLoop - startLoop;
@@ -310,12 +323,18 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             int lengthSecondHalfBytes = lengthSecondHalf * 2;
             
             double lengthInSeconds = args.Length != -1 ? (args.Length / 1000) : length / (double)sh.SampleRate;
+
+            // Sample rate key correction
+            int keyCorrection = args.Key != -1 ? args.Key - izone.Key() : 0;
+            double factor = Math.Pow(2, keyCorrection / 12d);
+            lengthInSeconds *= factor;
+
             int numberOfSamples = (int)Math.Ceiling(lengthInSeconds * sh.SampleRate);
             numberOfSamples += lengthSecondHalf;
             int numberOfLoopSamples = numberOfSamples - lengthFirstHalf - lengthSecondHalf;
 
             if (numberOfLoopSamples < loopLength) {
-                return GetSampleWithoutLoop(sh, instrumentZone, sample, args);
+                return GetSampleWithoutLoop(sh, izone, sample, args);
             }
 
             int numberOfBytes = numberOfSamples * 2;
@@ -331,7 +350,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             bufferLoop.CopyTo(buffer, lengthFirstHalfBytes);
             Array.Copy(sample, start * 2, buffer, lengthFirstHalfBytes + numberOfLoopBytes, lengthSecondHalfBytes);
 
-            return new SampleSoundGenerator(BufferToWaveStream(buffer, sh.SampleRate));
+            return new SampleSoundGenerator(BufferToWaveStream(buffer, (uint)(sh.SampleRate * factor)));
         }
 
         private static WaveStream BufferToWaveStream(byte[] buffer, uint sampleRate) {
