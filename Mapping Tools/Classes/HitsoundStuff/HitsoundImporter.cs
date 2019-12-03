@@ -195,7 +195,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return Hitsound.Normal;
         }
 
-        public static List<HitsoundLayer> ImportMidi(string path, bool instruments=true, bool keysounds=true, bool lengths=true, double lengthRoughness=1, bool velocities=true, double velocityRoughness=1) {
+        public static List<HitsoundLayer> ImportMidi(string path, double offset=0, bool instruments=true, bool keysounds=true, bool lengths=true, double lengthRoughness=1, bool velocities=true, double velocityRoughness=1) {
             List<HitsoundLayer> hitsoundLayers = new List<HitsoundLayer>();
 
             var strictMode = false;
@@ -292,11 +292,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
                         if (layer != null) {
                             // Find hitsound layer with this path and add this time
-                            layer.Times.Add(time);
+                            layer.Times.Add(time + offset);
                         } else {
                             // Add new hitsound layer with this path
                             HitsoundLayer newLayer = new HitsoundLayer(name, SampleSet.Normal, Hitsound.Normal, sampleArgs, importArgs);
-                            newLayer.Times.Add(time);
+                            newLayer.Times.Add(time + offset);
 
                             hitsoundLayers.Add(newLayer);
                         }
