@@ -158,7 +158,7 @@ namespace Mapping_Tools.Classes.Tools {
             var newBeatmap = new Beatmap(beatmaps[0].GetLines());
 
             // Remove all greenlines
-            newBeatmap.BeatmapTiming.TimingPoints.RemoveAll(o => !o.Inherited);
+            newBeatmap.BeatmapTiming.TimingPoints.RemoveAll(o => !o.Uninherited);
 
             // Remove all hitobjects
             newBeatmap.HitObjects.Clear();

@@ -91,7 +91,7 @@ namespace Mapping_Tools.Classes.Tools {
                     kiaiToggles.Add(tp.Copy());
                     lastKiai = tp.Kiai;
                 }
-                if (tp.Inherited) {
+                if (tp.Uninherited) {
                     lastSV = -100;
                 } else {
                     if (tp.MpB != lastSV) {

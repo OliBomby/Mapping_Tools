@@ -309,9 +309,11 @@
     <Compile Include="Classes\SystemTools\Settings.cs" />
     <Compile Include="Classes\SystemTools\SettingsManager.cs" />
     <Compile Include="Classes\SystemTools\TypeConverters.cs" />
+    <Compile Include="Classes\TimingStudio\BeatTime.cs" />
     <Compile Include="Classes\TimingStudio\Serialization\TimingHelperProject.cs" />
+    <Compile Include="Classes\TimingStudio\Serialization\TimingPointType.cs" />
     <Compile Include="Classes\TimingStudio\Serialization\TimingStudioPreferences.cs" />
-    <Compile Include="Classes\TimingStudio\TimingPoint.cs" />
+    <Compile Include="Classes\TimingStudio\StudioTimingPoint.cs" />
     <Compile Include="Classes\Tools\BezierConverter.cs" />
     <Compile Include="Classes\Tools\CircleBezierPreset.cs" />
     <Compile Include="Classes\Tools\EditorReaderStuff.cs" />

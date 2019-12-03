@@ -7,6 +7,9 @@ using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
 namespace Mapping_Tools.Classes.BeatmapHelper {
     public class TimingPoint : ITextLine {
         // Offset, Milliseconds per Beat, Meter, Sample Set, Sample Index, Volume, Inherited, Kiai Mode
+        /// <summary>
+        /// The millisecond value of the timing point.
+        /// </summary>
         public double Offset { get; set; }
         /// <summary>
         /// Milliseconds per Beat
@@ -15,7 +18,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <summary>
         /// Time signature to x/4
         /// </summary>
-        public int Meter { get; set; }
+        public double Meter { get; set; }
         /// <summary>
         /// The sample set from the <see cref="TimingPoint"/>
         /// </summary>
@@ -29,14 +32,23 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         public double Volume { get; set; }
 
-        /// <summary />
-        public bool Inherited { get; set; } // True is red line
+        /// <summary>
+        /// An instance of the <see cref="TimingPoint"/> 
+        /// that does not rely on the previous timing point 
+        /// and instead creates a new Bpm, offset, and/or time signature change to the timing section.
+        /// <para/>
+        /// True for Uninherited control points. False, for Inherited control points.
+        /// </summary>
+        public bool Uninherited { get; set; } // True is red line
 
-        /// <summary />
+        /// <summary>
+        /// </summary>
         public bool Kiai { get; set; }
+
         /// <summary>
         /// A taiko implementation that removes the first instance of the bar,
         /// it is used when multiple and/or conflicting timing points are used throughout the map.
+        /// It can also be utilised for the Nightcore mod of standard by removing a finish sample at the timing point.
         /// </summary>
         public bool OmitFirstBarLine { get; set; }
 
@@ -52,18 +64,22 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="inherited"></param>
         /// <param name="kiai"></param>
         /// <param name="omitFirstBarLine"></param>
-        public TimingPoint(double offset, double mpb, int meter, SampleSet sampleSet, int sampleIndex, double volume, bool inherited, bool kiai, bool omitFirstBarLine) {
+        public TimingPoint(double offset, double mpb, double meter, SampleSet sampleSet, int sampleIndex, double volume, bool inherited, bool kiai, bool omitFirstBarLine) {
             Offset = offset;
             MpB = mpb;
             Meter = meter;
             SampleSet = sampleSet;
             SampleIndex = sampleIndex;
             Volume = volume;
-            Inherited = inherited;
+            Uninherited = inherited;
             Kiai = kiai;
             OmitFirstBarLine = omitFirstBarLine;
         }
 
+        /// <summary>
+        /// Creates a new Timing Point from the <see cref="Editor_Reader.ControlPoint"/>.
+        /// </summary>
+        /// <param name="cp">The control point value from <see cref="Editor_Reader"/></param>
         public TimingPoint(Editor_Reader.ControlPoint cp) {
             MpB = cp.BeatLength;
             Offset = cp.Offset;
@@ -73,7 +89,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Volume = cp.Volume;
             Kiai = (cp.EffectFlags & 1) > 0;
             OmitFirstBarLine = (cp.EffectFlags & 8) > 0;
-            Inherited = cp.TimingChange;
+            Uninherited = cp.TimingChange;
         }
 
         /// <summary>
@@ -86,7 +102,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         /// <summary>
-        /// Creates a new Timing Point from the string line of the .osu .
+        /// Creates a new Timing Point from the string line of the .osu file.
         /// </summary>
         /// <param name="line"></param>
         public TimingPoint(string line) {
@@ -99,7 +115,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <returns></returns>
         public string GetLine() {
             int style = MathHelper.GetIntFromBitArray(new BitArray(new bool[] { Kiai, false, false, OmitFirstBarLine }));
-            return $"{Offset.ToRoundInvariant()},{MpB.ToInvariant()},{Meter.ToInvariant()},{SampleSet.ToIntInvariant()},{SampleIndex.ToInvariant()},{Volume.ToRoundInvariant()},{Convert.ToInt32(Inherited).ToInvariant()},{style.ToInvariant()}";
+            return $"{Offset.ToRoundInvariant()},{MpB.ToInvariant()},{Meter.ToInvariant()},{SampleSet.ToIntInvariant()},{SampleIndex.ToInvariant()},{Volume.ToRoundInvariant()},{Convert.ToInt32(Uninherited).ToInvariant()},{style.ToInvariant()}";
         }
 
         /// <summary>
@@ -134,7 +150,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 Volume = vol;
             else throw new BeatmapParsingException("Failed to parse volume of timing point", line);
 
-            Inherited = values[6] == "1";
+            Uninherited = values[6] == "1";
 
             if (values.Length <= 7) return;
             if (TryParseInt(values[7], out int style)) {
@@ -149,7 +165,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         /// <returns>An exact replica of the <see cref="TimingPoint"/></returns>
         public TimingPoint Copy() {
-            return new TimingPoint(Offset, MpB, Meter, SampleSet, SampleIndex, Volume, Inherited, Kiai, OmitFirstBarLine);
+            return new TimingPoint(Offset, MpB, Meter, SampleSet, SampleIndex, Volume, Uninherited, Kiai, OmitFirstBarLine);
         }
 
         /// <summary>
@@ -176,13 +192,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 SampleSet == tp.SampleSet &&
                 SampleIndex == tp.SampleIndex &&
                 Volume == tp.Volume &&
-                Inherited == tp.Inherited &&
+                Uninherited == tp.Uninherited &&
                 Kiai == tp.Kiai &&
                 OmitFirstBarLine == tp.OmitFirstBarLine;
         }
 
         public bool SameEffect(TimingPoint tp) {
-            if (tp.Inherited && !Inherited) {
+            if (tp.Uninherited && !Uninherited) {
                 return MpB == -100 &&
                        Meter == tp.Meter &&
                        SampleSet == tp.SampleSet &&
@@ -203,7 +219,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         /// <returns></returns>
         public double GetBPM() {
-            if( Inherited ) {
+            if( Uninherited ) {
                 return 60000 / MpB;
             }
             else {

@@ -470,7 +470,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public bool ResnapEnd(Timing timing, int snap1, int snap2, bool floor = true, TimingPoint tp = null,
             TimingPoint firstTp = null) {
             // If there is a redline in the sliderbody then the sliderend gets snapped to a tick of the latest redline
-            if (!IsSlider || timing.TimingPoints.Any(o => o.Inherited && o.Offset <= EndTime + 20 && o.Offset > Time))
+            if (!IsSlider || timing.TimingPoints.Any(o => o.Uninherited && o.Offset <= EndTime + 20 && o.Offset > Time))
                 return ResnapEndTime(timing, snap1, snap2, floor, tp, firstTp);
             return ResnapEndClassic(timing, snap1, snap2, firstTp);
         }
