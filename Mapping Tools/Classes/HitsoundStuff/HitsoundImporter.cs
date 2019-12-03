@@ -1,16 +1,12 @@
 ﻿using Mapping_Tools.Classes.BeatmapHelper;
-using NAudio.Wave;
-using NAudio.Vorbis;
+using Mapping_Tools.Classes.Tools;
 using NAudio.Midi;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Globalization;
 using System.Windows;
-using Mapping_Tools.Classes.Tools;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     class HitsoundImporter {
