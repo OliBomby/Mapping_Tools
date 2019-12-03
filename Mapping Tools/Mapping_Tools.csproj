@@ -311,6 +311,7 @@
     <Compile Include="Classes\SystemTools\TypeConverters.cs" />
     <Compile Include="Classes\TimingStudio\Serialization\TimingHelperProject.cs" />
     <Compile Include="Classes\TimingStudio\Serialization\TimingStudioPreferences.cs" />
+    <Compile Include="Classes\TimingStudio\TimingPoint.cs" />
     <Compile Include="Classes\Tools\BezierConverter.cs" />
     <Compile Include="Classes\Tools\CircleBezierPreset.cs" />
     <Compile Include="Classes\Tools\EditorReaderStuff.cs" />
@@ -337,6 +338,9 @@
     <Compile Include="Components\Graph\GraphPointControl.cs" />
     <Compile Include="Components\Spectrum\Spectrum.xaml.cs">
       <DependentUpon>Spectrum.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Components\TimingStudio\TimingStudioTimeline.xaml.cs">
+      <DependentUpon>TimingStudioTimeline.xaml</DependentUpon>
     </Compile>
     <Compile Include="Components\ViewHeaderComponent.xaml.cs">
       <DependentUpon>ViewHeaderComponent.xaml</DependentUpon>
@@ -448,6 +452,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Components\Spectrum\Spectrum.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Components\TimingStudio\TimingStudioTimeline.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -628,7 +636,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Classes\SpectrumUtil\" />
-    <Folder Include="Components\TimingStudio\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="BeforeBuild" />

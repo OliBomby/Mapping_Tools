@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using Mapping_Tools.Classes.BeatmapHelper;
@@ -17,13 +18,13 @@ namespace Mapping_Tools.Views
     /// <summary>
     /// TimingStudioView Tool for Mapping Tools
     /// </summary>
-    [HiddenTool]
+    //[HiddenTool]
     public partial class TimingStudioView : ISavable<TimingStudioProject> {
         public static readonly string ToolName = "Timing Studio";
 
-        public static readonly string ToolDescription = $@"Timing Helper is meant to speed up your timing job by placing the redlines for you. You only have to tell it where exactly all the sounds are."
-            +$"{Environment.NewLine}What you do is place 'markers' exactly on the correct timing of sounds. These markers can be hit objects, bookmarks, greenlines and redlines.{Environment.NewLine}Timing Helper will then adjust BPM and/or add redlines to make every marker be snapped.";
-
+        //public static readonly string ToolDescription = $@"Timing Helper is meant to speed up your timing job by placing the redlines for you. You only have to tell it where exactly all the sounds are."
+        //    +$"{Environment.NewLine}What you do is place 'markers' exactly on the correct timing of sounds. These markers can be hit objects, bookmarks, greenlines and redlines.{Environment.NewLine}Timing Helper will then adjust BPM and/or add redlines to make every marker be snapped.";
+        public static readonly string ToolDescription = $@"Timing Studio allows you to property sync the song using the Advanced Timeline. You can import .mid, .rpp, and a beatmap of choice.";
 
         public TimingStudioVM ViewModel
         {
@@ -31,9 +32,9 @@ namespace Mapping_Tools.Views
             set => DataContext = value;
         }
 
-        public string AutoSavePath => throw new NotImplementedException();
+        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "timingstudioproject.json");
 
-        public string DefaultSaveFolder => throw new NotImplementedException();
+        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Timing Studio Projects");
 
         public TimingStudioView() {
             InitializeComponent();
@@ -50,16 +51,16 @@ namespace Mapping_Tools.Views
             string[] filesToCopy = MainWindow.AppWindow.GetCurrentMaps();
             IOHelper.SaveMapBackup(filesToCopy);
 
-            BackgroundWorker.RunWorkerAsync(
-                new Arguments(filesToCopy, 
-                    (bool)ObjectsBox.IsChecked, 
-                    (bool)BookmarkBox.IsChecked, 
-                    (bool)GreenlinesBox.IsChecked,
-                    (bool)RedlinesBox.IsChecked, 
-                    (bool)OmitBarlineBox.IsChecked,
-                    LeniencyBox.GetDouble(defaultValue: 3), 
-                    TemporalBox.GetDouble(),
-                    int.Parse(Snap1.Text.Split('/')[1]), int.Parse(Snap2.Text.Split('/')[1])));
+            //BackgroundWorker.RunWorkerAsync(
+            //    new Arguments(filesToCopy, 
+            //        (bool)ObjectsBox.IsChecked, 
+            //        (bool)BookmarkBox.IsChecked, 
+            //        (bool)GreenlinesBox.IsChecked,
+            //        (bool)RedlinesBox.IsChecked, 
+            //        (bool)OmitBarlineBox.IsChecked,
+            //        LeniencyBox.GetDouble(defaultValue: 3), 
+            //        TemporalBox.GetDouble(),
+            //        int.Parse(Snap1.Text.Split('/')[1]), int.Parse(Snap2.Text.Split('/')[1])));
             CanRun = false;
         }
 

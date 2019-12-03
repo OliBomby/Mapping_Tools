@@ -9,6 +9,6 @@ namespace Mapping_Tools.Viewmodels
     public class TimingStudioVM
     {
         private string baseBeatmap { get; set; }
-
+        private ObservableList<TimingPoint>
     }
 }
