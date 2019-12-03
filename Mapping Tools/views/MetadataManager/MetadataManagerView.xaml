@@ -20,116 +20,192 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid Name="FirstGrid" Grid.Row="0">
-            <StackPanel Grid.Row="0" Margin="0,0,120,0">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
-                    <Run Text="Metadata Manager"/>
-                    </TextBlock>
-                    <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom">
-                        <materialDesign:PopupBox.ToggleContent>
-                            <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
-                        </materialDesign:PopupBox.ToggleContent>
-                        <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
-                      To save you the time of editing metadata on every individual difficulty, edit metadata in this tool and copy it to multiple diffs anytime.
-                      <LineBreak/>
-                      You can also import metadata from beatmaps, so you can copy metadata from A to B.
-                      <LineBreak/>
-                      Save and load metadata configurations, so you can work on multiple mapsets without hassle.
+            <ScrollViewer Margin="0,0,120,0" VerticalScrollBarVisibility="Hidden">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
+                        <Run Text="Metadata Manager"/>
                         </TextBlock>
-                    </materialDesign:PopupBox>
+                        <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom">
+                            <materialDesign:PopupBox.ToggleContent>
+                                <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
+                            </materialDesign:PopupBox.ToggleContent>
+                            <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
+                          To save you the time of editing metadata on every individual difficulty, edit metadata in this tool and copy it to multiple diffs anytime.
+                          <LineBreak/>
+                          You can also import metadata from beatmaps, so you can copy metadata from A to B.
+                          <LineBreak/>
+                          Save and load metadata configurations, so you can work on multiple mapsets without hassle.
+                            </TextBlock>
+                        </materialDesign:PopupBox>
+                    </StackPanel>
+
+                    <Grid Margin="0,20,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="5"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="5"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" x:Name="BeatmapFromBox" Margin="0,0,5,0" Text="{Binding ImportPath}"
+                            Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Import metadata from"/>
+                        <Button Grid.Column="1" Cursor="Hand" Command="{Binding ImportLoadCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
+                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Download" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                        </Button >
+                        <Button Grid.Column="3" Cursor="Hand" Command="{Binding ImportBrowseCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
+                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                        </Button >
+                        <Button Grid.Column="5" Cursor="Hand" Command="{Binding ImportCommand}" VerticalAlignment="Bottom">
+                            Import metadata
+                        </Button >
+                    </Grid>
+                    <Grid Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="5"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" x:Name="BeatmapToBox" Margin="0,0,5,0" Text="{Binding ExportPath}"
+                            Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Export metadata to"/>
+                        <Button Grid.Column="1" Cursor="Hand" Command="{Binding ExportLoadCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
+                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Download" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                        </Button >
+                        <Button Grid.Column="3" Cursor="Hand" Command="{Binding ExportBrowseCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
+                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                        </Button >
+                    </Grid>
+
+                    <Separator Style="{StaticResource MaterialDesignLightSeparator}" Background="{DynamicResource MaterialDesignDivider}" Margin="0,10,0,10"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Column="0" Grid.Row="0" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Artist"/>
+                        <TextBlock Grid.Column="0" Grid.Row="1" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Romanised Artist"/>
+                        <TextBlock Grid.Column="0" Grid.Row="2" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Title"/>
+                        <TextBlock Grid.Column="0" Grid.Row="3" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Romanised Title"/>
+                        <TextBlock Grid.Column="0" Grid.Row="4" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Beatmap Creator"/>
+                        <TextBlock Grid.Column="0" Grid.Row="5" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Source"/>
+                        <TextBlock Grid.Column="0" Grid.Row="6" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Tags"/>
+                        <TextBlock Grid.Column="0" Grid.Row="7" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Preview Time" Margin="0 50 0 0"/>
+
+                        <TextBox Grid.Column="2" Grid.Row="0">
+                            <TextBox.Text>
+                                <Binding Path="Artist" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" NotifyOnValidationError="True">
+                                    <Binding.ValidationRules>
+                                        <domain:CharacterLimitValidationRule>
+                                            <domain:CharacterLimitValidationRule.Wrapper>
+                                                <domain:Wrapper CharacterLimit="81"/>
+                                            </domain:CharacterLimitValidationRule.Wrapper>
+                                        </domain:CharacterLimitValidationRule>
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </TextBox.Text>
+                        </TextBox>
+                        <TextBox Grid.Column="2" Grid.Row="1">
+                            <TextBox.Text>
+                                <Binding Path="RomanisedArtist" UpdateSourceTrigger="PropertyChanged">
+                                    <Binding.ValidationRules>
+                                        <domain:IsASCIIValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain:CharacterLimitValidationRule>
+                                            <domain:CharacterLimitValidationRule.Wrapper>
+                                                <domain:Wrapper CharacterLimit="81"/>
+                                            </domain:CharacterLimitValidationRule.Wrapper>
+                                        </domain:CharacterLimitValidationRule>
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </TextBox.Text>
+                        </TextBox>
+                        <TextBox Grid.Column="2" Grid.Row="2">
+                            <TextBox.Text>
+                                <Binding Path="Title" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" NotifyOnValidationError="True">
+                                    <Binding.ValidationRules>
+                                        <domain:CharacterLimitValidationRule>
+                                            <domain:CharacterLimitValidationRule.Wrapper>
+                                                <domain:Wrapper CharacterLimit="81"/>
+                                            </domain:CharacterLimitValidationRule.Wrapper>
+                                        </domain:CharacterLimitValidationRule>
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </TextBox.Text>
+                        </TextBox>
+                        <TextBox Grid.Column="2" Grid.Row="3">
+                            <TextBox.Text>
+                                <Binding Path="RomanisedTitle" UpdateSourceTrigger="PropertyChanged">
+                                    <Binding.ValidationRules>
+                                        <domain:IsASCIIValidationRule ValidatesOnTargetUpdated="True"/>
+                                        <domain:CharacterLimitValidationRule>
+                                            <domain:CharacterLimitValidationRule.Wrapper>
+                                                <domain:Wrapper CharacterLimit="81"/>
+                                            </domain:CharacterLimitValidationRule.Wrapper>
+                                        </domain:CharacterLimitValidationRule>
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </TextBox.Text>
+                        </TextBox>
+                        <TextBox Grid.Column="2" Grid.Row="4">
+                            <TextBox.Text>
+                                <Binding Path="BeatmapCreator" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" NotifyOnValidationError="True">
+                                    <Binding.ValidationRules>
+                                        <domain:CharacterLimitValidationRule>
+                                            <domain:CharacterLimitValidationRule.Wrapper>
+                                                <domain:Wrapper CharacterLimit="81"/>
+                                            </domain:CharacterLimitValidationRule.Wrapper>
+                                        </domain:CharacterLimitValidationRule>
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </TextBox.Text>
+                        </TextBox>
+                        <TextBox Grid.Column="2" Grid.Row="5">
+                            <TextBox.Text>
+                                <Binding Path="Source" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" NotifyOnValidationError="True">
+                                    <Binding.ValidationRules>
+                                        <domain:CharacterLimitValidationRule>
+                                            <domain:CharacterLimitValidationRule.Wrapper>
+                                                <domain:Wrapper CharacterLimit="81"/>
+                                            </domain:CharacterLimitValidationRule.Wrapper>
+                                        </domain:CharacterLimitValidationRule>
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </TextBox.Text>
+                        </TextBox>
+                        <TextBox Grid.Column="2" Grid.Row="6" TextWrapping="Wrap">
+                            <TextBox.Text>
+                                <Binding Path="Tags" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" NotifyOnValidationError="True">
+                                    <Binding.ValidationRules>
+                                        <domain:CharacterLimitValidationRule>
+                                            <domain:CharacterLimitValidationRule.Wrapper>
+                                                <domain:Wrapper CharacterLimit="1000"/>
+                                            </domain:CharacterLimitValidationRule.Wrapper>
+                                        </domain:CharacterLimitValidationRule>
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </TextBox.Text>
+                        </TextBox>
+
+                        <TextBox Grid.Column="2" Grid.Row="7" Text="{Binding PreviewTime, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=-1}" TextWrapping="Wrap" Margin="0 50 0 0"/>
+                    </Grid>
+
+                    <TextBlock Text="Beatmap file name can not be over 255 characters long." Foreground="Red" Margin="30" Visibility="{Binding BeatmapFileNameOverflowErrorVisibility}"/>
                 </StackPanel>
-
-                <Grid Margin="0,20,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="5"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="5"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBox Grid.Column="0" x:Name="BeatmapFromBox" Margin="0,0,5,0" Text="{Binding ImportPath}"
-                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Import metadata from"/>
-                    <Button Grid.Column="1" Cursor="Hand" Command="{Binding ImportLoadCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
-                        <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Download" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
-                    </Button >
-                    <Button Grid.Column="3" Cursor="Hand" Command="{Binding ImportBrowseCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
-                        <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
-                    </Button >
-                    <Button Grid.Column="5" Cursor="Hand" Command="{Binding ImportCommand}" VerticalAlignment="Bottom">
-                        Import metadata
-                    </Button >
-                </Grid>
-                <Grid Margin="0,10,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="5"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBox Grid.Column="0" x:Name="BeatmapToBox" Margin="0,0,5,0" Text="{Binding ExportPath}"
-                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Export metadata to"/>
-                    <Button Grid.Column="1" Cursor="Hand" Command="{Binding ExportLoadCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
-                        <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Download" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
-                    </Button >
-                    <Button Grid.Column="3" Cursor="Hand" Command="{Binding ExportBrowseCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
-                        <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
-                    </Button >
-                </Grid>
-
-                <Separator Style="{StaticResource MaterialDesignLightSeparator}" Background="{DynamicResource MaterialDesignDivider}" Margin="0,10,0,10"/>
-
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="150"/>
-                        <ColumnDefinition Width="10"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <TextBlock Grid.Column="0" Grid.Row="0" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Artist"/>
-                    <TextBlock Grid.Column="0" Grid.Row="1" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Romanised Artist"/>
-                    <TextBlock Grid.Column="0" Grid.Row="2" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Title"/>
-                    <TextBlock Grid.Column="0" Grid.Row="3" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Romanised Title"/>
-                    <TextBlock Grid.Column="0" Grid.Row="4" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Beatmap Creator"/>
-                    <TextBlock Grid.Column="0" Grid.Row="5" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Source"/>
-                    <TextBlock Grid.Column="0" Grid.Row="6" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Tags"/>
-                    <TextBlock Grid.Column="0" Grid.Row="7" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Preview Time"/>
-
-                    <TextBox Grid.Column="2" Grid.Row="0" Text="{Binding Artist}"/>
-                    <TextBox Grid.Column="2" Grid.Row="1">
-                        <TextBox.Text>
-                            <Binding Path="RomanisedArtist" UpdateSourceTrigger="PropertyChanged">
-                                <Binding.ValidationRules>
-                                    <domain:IsASCIIValidationRule ValidatesOnTargetUpdated="True"/>
-                                </Binding.ValidationRules>
-                            </Binding>
-                        </TextBox.Text>
-                    </TextBox>
-                    <TextBox Grid.Column="2" Grid.Row="2" Text="{Binding Title}"/>
-                    <TextBox Grid.Column="2" Grid.Row="3">
-                        <TextBox.Text>
-                            <Binding Path="RomanisedTitle" UpdateSourceTrigger="PropertyChanged">
-                                <Binding.ValidationRules>
-                                    <domain:IsASCIIValidationRule ValidatesOnTargetUpdated="True"/>
-                                </Binding.ValidationRules>
-                            </Binding>
-                        </TextBox.Text>
-                    </TextBox>
-                    <TextBox Grid.Column="2" Grid.Row="4" Text="{Binding BeatmapCreator}"/>
-                    <TextBox Grid.Column="2" Grid.Row="5" Text="{Binding Source}"/>
-                    <TextBox Grid.Column="2" Grid.Row="6" Text="{Binding Tags}" TextWrapping="Wrap"/>
-                    <TextBox Grid.Column="2" Grid.Row="7" Text="{Binding PreviewTime, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=0}" TextWrapping="Wrap"/>
-                </Grid>
-            </StackPanel>
+            </ScrollViewer>
+            
             <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
                 <Button
                     IsEnabled="{Binding ElementName=This, Path=CanRun}"

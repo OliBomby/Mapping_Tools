@@ -442,7 +442,18 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         /// <returns>String of file name.</returns>
         public string GetFileName() {
-            string fileName = $"{Metadata["Artist"].StringValue} - {Metadata["Title"].StringValue} ({Metadata["Creator"].StringValue}) [{Metadata["Version"].StringValue}].osu";
+            return GetFileName(Metadata["Artist"].StringValue, Metadata["Title"].StringValue,
+                Metadata["Creator"].StringValue, Metadata["Version"].StringValue);
+        }
+
+        /// <summary>
+        /// Grabs the specified file name of beatmap file.
+        /// with format of:
+        /// <c>Artist - Title (Host) [Difficulty].osu</c>
+        /// </summary>
+        /// <returns>String of file name.</returns>
+        public static string GetFileName(string artist, string title, string creator, string version) {
+            string fileName = $"{artist} - {title} ({creator}) [{version}].osu";
 
             string regexSearch = new string(Path.GetInvalidFileNameChars());
             Regex r = new Regex($"[{Regex.Escape(regexSearch)}]");

@@ -319,6 +319,7 @@
     <Compile Include="Components\Domain\FlagToBoolConverter.cs" />
     <Compile Include="Components\Domain\IntToStringConverter.cs" />
     <Compile Include="Components\Domain\EnumToBoolConverter.cs" />
+    <Compile Include="Components\Domain\CharacterLimitValidationRule.cs" />
     <Compile Include="Components\Domain\StringArrayToStringConverter.cs" />
     <Compile Include="Components\Domain\IsASCIIValidationRule.cs" />
     <Compile Include="Components\Domain\SnapDivisorToStringConverter.cs" />

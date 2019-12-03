@@ -12,6 +12,8 @@ using Mapping_Tools.Classes.MathUtil;
 namespace Mapping_Tools.Viewmodels {
 
     public class MetadataManagerVm :INotifyPropertyChanged {
+        private Visibility _beatmapFileNameOverflowErrorVisibility;
+
         private string _importPath;
         private string _exportPath;
 
@@ -64,6 +66,16 @@ namespace Mapping_Tools.Viewmodels {
                         ExportPath = string.Join("|", paths);
                     }
                 });
+
+            PropertyChanged += OnPropertyChanged;
+        }
+
+        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
+            if (e.PropertyName == "Artist" || e.PropertyName == "Title" || e.PropertyName == "BeatmapCreator") {
+                // Update error visibility if there is an error
+                string filename = Beatmap.GetFileName(Artist, Title, BeatmapCreator, "");
+                BeatmapFileNameOverflowErrorVisibility = filename.Length > 255 ? Visibility.Visible : Visibility.Hidden;
+            }
         }
 
         private void ImportFromBeatmap(string importPath) {
@@ -186,6 +198,16 @@ namespace Mapping_Tools.Viewmodels {
                 if( Math.Abs(_previewTime - value) < Precision.DOUBLE_EPSILON )
                     return;
                 _previewTime = value;
+                OnPropertyChanged();
+            }
+        }
+
+
+        public Visibility BeatmapFileNameOverflowErrorVisibility {
+            get => _beatmapFileNameOverflowErrorVisibility;
+            set {
+                if (_beatmapFileNameOverflowErrorVisibility == value) return;
+                _beatmapFileNameOverflowErrorVisibility = value;
                 OnPropertyChanged();
             }
         }
