@@ -3,9 +3,11 @@ using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Components.Domain;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Media;
 using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.MathUtil;
 
@@ -24,11 +26,17 @@ namespace Mapping_Tools.Viewmodels {
         private string _beatmapCreator;
         private string _source;
         private string _tags;
+
         private double _previewTime;
+        private bool _useComboColours;
+        private ObservableCollection<ComboColour> _comboColours;
 
         public MetadataManagerVm() {
             _importPath = "";
             _exportPath = "";
+
+            _useComboColours = true;
+            ComboColours = new ObservableCollection<ComboColour>();
 
             ImportLoadCommand = new CommandImplementation(
                 _ => {
@@ -67,6 +75,19 @@ namespace Mapping_Tools.Viewmodels {
                     }
                 });
 
+            AddCommand = new CommandImplementation(_ => {
+                ComboColours.Add(ComboColours.Count > 0
+                    ? new ComboColour(ComboColours[ComboColours.Count - 1].Color)
+                    : new ComboColour(Colors.Aqua));
+            });
+
+            RemoveCommand = new CommandImplementation(_ => {
+                if (ComboColours.Count > 0) {
+                    ComboColours.RemoveAt(ComboColours.Count - 1);
+                }
+            });
+
+
             PropertyChanged += OnPropertyChanged;
         }
 
@@ -90,7 +111,9 @@ namespace Mapping_Tools.Viewmodels {
                 BeatmapCreator = beatmap.Metadata["Creator"].StringValue;
                 Source = beatmap.Metadata["Source"].StringValue;
                 Tags = beatmap.Metadata["Tags"].StringValue;
+
                 PreviewTime = beatmap.General["PreviewTime"].Value;
+                ComboColours = new ObservableCollection<ComboColour>(beatmap.ComboColours);
             }
             catch( Exception ex ) {
                 MessageBox.Show($"{ex.Message}{Environment.NewLine}{ex.StackTrace}", "Error");
@@ -202,6 +225,23 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
+        public bool UseComboColours {
+            get => _useComboColours;
+            set {
+                if( _useComboColours == value ) return;
+                _useComboColours = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ObservableCollection<ComboColour> ComboColours {
+            get => _comboColours;
+            set {
+                if (_comboColours == value) return;
+                _comboColours = value;
+                OnPropertyChanged();
+            }
+        }
 
         public Visibility BeatmapFileNameOverflowErrorVisibility {
             get => _beatmapFileNameOverflowErrorVisibility;
@@ -217,6 +257,9 @@ namespace Mapping_Tools.Viewmodels {
         public CommandImplementation ImportCommand { get; }
         public CommandImplementation ExportLoadCommand { get; }
         public CommandImplementation ExportBrowseCommand { get; }
+
+        public CommandImplementation AddCommand { get; }
+        public CommandImplementation RemoveCommand { get; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

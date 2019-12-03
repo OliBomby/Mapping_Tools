@@ -502,7 +502,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Classes\BeatmapHelper\Beatmap.cs" />
-    <Compile Include="Classes\BeatmapHelper\Colour.cs" />
+    <Compile Include="Classes\BeatmapHelper\ComboColour.cs" />
     <Compile Include="Classes\BeatmapHelper\Editor.cs" />
     <Compile Include="Classes\BeatmapHelper\HitObject.cs" />
     <Compile Include="Classes\BeatmapHelper\Timeline.cs" />

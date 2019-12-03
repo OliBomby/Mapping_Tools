@@ -69,13 +69,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// Contains all the basic combo colours. The order of this list is the same as how they are numbered in the .osu.
         /// <c>Combo1 : 245,222,139</c>
         /// </summary>
-        public List<Colour> ComboColours { get; set; }
+        public List<ComboColour> ComboColours { get; set; }
 
         /// <summary>
         /// Contains all the special colours. These include the colours of slider bodies or slider outlines.
         /// The key is the name of the special colour and the value is the actual colour.
         /// </summary>
-        public Dictionary<string, Colour> SpecialColours { get; set; }
+        public Dictionary<string, ComboColour> SpecialColours { get; set; }
 
         /// <summary>
         /// The timing of this beatmap. This objects contains all the timing points (data from the [TimingPoints] section) plus the global slider multiplier.
@@ -184,8 +184,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Editor = new Dictionary<string, TValue>();
             Metadata = new Dictionary<string, TValue>();
             Difficulty = new Dictionary<string, TValue>();
-            ComboColours = new List<Colour>();
-            SpecialColours = new Dictionary<string, Colour>();
+            ComboColours = new List<ComboColour>();
+            SpecialColours = new Dictionary<string, ComboColour>();
             Events = new List<string>();
             BackgroundAndVideoEvents = new List<string>();
             BreakPeriods = new List<string>();
@@ -204,9 +204,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
             foreach (string line in colourLines) {
                 if (line.Substring(0, 5) == "Combo") {
-                    ComboColours.Add(new Colour(line));
+                    ComboColours.Add(new ComboColour(line));
                 } else {
-                    SpecialColours[SplitKeyValue(line)[0].Trim()] = new Colour(line);
+                    SpecialColours[SplitKeyValue(line)[0].Trim()] = new ComboColour(line);
                 }
             }
             foreach (string line in eventsLines) {
@@ -422,7 +422,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 for (int i = 0; i < ComboColours.Count; i++) {
                     lines.Add("Combo" + (i + 1) + " : " + ComboColours[i]);
                 }
-                foreach (KeyValuePair<string, Colour> specialColour in SpecialColours) {
+                foreach (KeyValuePair<string, ComboColour> specialColour in SpecialColours) {
                     lines.Add(specialColour.Key + " : " + specialColour.Value);
                 }
             }
