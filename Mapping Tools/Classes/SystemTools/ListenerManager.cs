@@ -1,4 +1,5 @@
-﻿using Mapping_Tools.Classes.Tools;
+﻿using Mapping_Tools.Classes.SystemTools.QuickRun;
+using Mapping_Tools.Classes.Tools;
 using NonInvasiveKeyboardHookLibrary;
 using System;
 using System.Collections.Generic;
@@ -11,13 +12,16 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using ModifierKeys = NonInvasiveKeyboardHookLibrary.ModifierKeys;
 
-namespace Mapping_Tools.Classes.SystemTools {
-    public class ListenerManager {
+namespace Mapping_Tools.Classes.SystemTools
+{
+    public class ListenerManager
+    {
         public readonly FileSystemWatcher FsWatcher = new FileSystemWatcher();
         public readonly KeyboardHookManager KeyboardHookManager = new KeyboardHookManager();
         public Dictionary<string, ActionHotkey> ActiveHotkeys = new Dictionary<string, ActionHotkey>();
-        
-        public ListenerManager() {
+
+        public ListenerManager()
+        {
             InitFsWatcher();
 
             LoadHotkeys();
@@ -27,15 +31,20 @@ namespace Mapping_Tools.Classes.SystemTools {
             SettingsManager.Settings.PropertyChanged += OnSettingsChanged;
         }
 
-        private void OnSettingsChanged(object sender, PropertyChangedEventArgs e) {
-            switch (e.PropertyName) {
+        private void OnSettingsChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
                 case "OverrideOsuSave":
                     FsWatcher.EnableRaisingEvents = SettingsManager.Settings.OverrideOsuSave;
                     break;
                 case "SongsPath":
-                    try {
+                    try
+                    {
                         FsWatcher.Path = SettingsManager.GetSongsPath();
-                    } catch {
+                    }
+                    catch
+                    {
                         // ignored
                     }
 
@@ -49,13 +58,16 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
         }
 
-        private void LoadHotkeys() {
+        private void LoadHotkeys()
+        {
             AddActiveHotkey("QuickRunHotkey", new ActionHotkey(SettingsManager.Settings.QuickRunHotkey, SmartQuickRun));
             AddActiveHotkey("BetterSaveHotkey", new ActionHotkey(SettingsManager.Settings.BetterSaveHotkey, QuickBetterSave));
         }
 
-        public void AddActiveHotkey(string name, ActionHotkey actionHotkey) {
-            if (ActiveHotkeys.ContainsKey(name)) {
+        public void AddActiveHotkey(string name, ActionHotkey actionHotkey)
+        {
+            if (ActiveHotkeys.ContainsKey(name))
+            {
                 return;
             }
 
@@ -63,8 +75,10 @@ namespace Mapping_Tools.Classes.SystemTools {
             ReloadHotkeys();
         }
 
-        public void RemoveActiveHotkey(string name) {
-            if (!ActiveHotkeys.ContainsKey(name)) {
+        public void RemoveActiveHotkey(string name)
+        {
+            if (!ActiveHotkeys.ContainsKey(name))
+            {
                 return;
             }
 
@@ -72,8 +86,10 @@ namespace Mapping_Tools.Classes.SystemTools {
             ReloadHotkeys();
         }
 
-        public bool ChangeActiveHotkeyHotkey(string name, Hotkey hotkey) {
-            if (ActiveHotkeys.ContainsKey(name)) {
+        public bool ChangeActiveHotkeyHotkey(string name, Hotkey hotkey)
+        {
+            if (ActiveHotkeys.ContainsKey(name))
+            {
                 ActiveHotkeys[name].Hotkey = hotkey;
                 ReloadHotkeys();
                 return true;
@@ -81,32 +97,40 @@ namespace Mapping_Tools.Classes.SystemTools {
 
             return false;
         }
-        
-        public void ReloadHotkeys() {
-            try {
+
+        public void ReloadHotkeys()
+        {
+            try
+            {
                 KeyboardHookManager.UnregisterAll();
 
                 foreach (var ah in ActiveHotkeys.Values.Where(ah =>
-                    ah.Hotkey != null && ah.Action != null && ah.Hotkey.Key != Key.None)) {
+                    ah.Hotkey != null && ah.Action != null && ah.Hotkey.Key != Key.None))
+                {
                     RegisterHotkey(ah.Hotkey, ah.Action);
                 }
-            } catch (HotkeyAlreadyRegisteredException) {
+            }
+            catch (HotkeyAlreadyRegisteredException)
+            {
                 MessageBox.Show(@"Can not register duplicate hotkeys.", @"Warning");
             }
             catch { MessageBox.Show(@"Could not reload hotkeys.", @"Warning"); }
         }
 
-        private void RegisterHotkey(Hotkey hotkey, Action action) {
+        private void RegisterHotkey(Hotkey hotkey, Action action)
+        {
             if (hotkey != null)
                 KeyboardHookManager.RegisterHotkey(WindowsModifiersToOtherModifiers(hotkey.Modifiers), ResolveKey(hotkey.Key), action);
             //Console.WriteLine($"Registered hotkey {hotkey.Modifiers}, {hotkey.Key}, {action}");
         }
 
-        public static int ResolveKey(Key key) {
+        public static int ResolveKey(Key key)
+        {
             return KeyInterop.VirtualKeyFromKey(key);
         }
 
-        private ModifierKeys[] WindowsModifiersToOtherModifiers(System.Windows.Input.ModifierKeys modifierKeys) {
+        private ModifierKeys[] WindowsModifiersToOtherModifiers(System.Windows.Input.ModifierKeys modifierKeys)
+        {
             List<ModifierKeys> otherModifiers = new List<ModifierKeys>();
 
             if ((modifierKeys & System.Windows.Input.ModifierKeys.Alt) > 0)
@@ -121,12 +145,15 @@ namespace Mapping_Tools.Classes.SystemTools {
             return otherModifiers.ToArray();
         }
 
-        private void QuickBetterSave() {
+        private void QuickBetterSave()
+        {
             EditorReaderStuff.CoolSave();
         }
 
-        private static void SmartQuickRun() {
-            try {
+        private static void SmartQuickRun()
+        {
+            try
+            {
                 if (!SettingsManager.Settings.SmartQuickRunEnabled) { QuickRunCurrentTool(); return; }
 
                 if (!EditorReaderStuff.TryGetFullEditorReader(out var reader)) return;
@@ -136,18 +163,23 @@ namespace Mapping_Tools.Classes.SystemTools {
                 if (System.Windows.Application.Current.Dispatcher == null) return;
 
                 System.Windows.Application.Current.Dispatcher.Invoke(() => {
-                    if (so == 0) {
+                    if (so == 0)
+                    {
                         if (SettingsManager.Settings.NoneQuickRunTool == "<Current Tool>") { QuickRunCurrentTool(); return; }
                         if (!(MainWindow.AppWindow.Views.GetView(SettingsManager.Settings.NoneQuickRunTool) is IQuickRun noneTool)) return;
 
                         tool = noneTool;
-                    } else if (so == 1) {
+                    }
+                    else if (so == 1)
+                    {
                         if (SettingsManager.Settings.SingleQuickRunTool == "<Current Tool>") { QuickRunCurrentTool(); return; }
                         if (!(MainWindow.AppWindow.Views.GetView(SettingsManager.Settings.SingleQuickRunTool) is IQuickRun singleTool)) return;
 
                         tool = singleTool;
-                    } else if (so > 1) {
-                        if (SettingsManager.Settings.MultipleQuickRunTool == "<Current Tool>") { QuickRunCurrentTool(); return; } 
+                    }
+                    else if (so > 1)
+                    {
+                        if (SettingsManager.Settings.MultipleQuickRunTool == "<Current Tool>") { QuickRunCurrentTool(); return; }
                         if (!(MainWindow.AppWindow.Views.GetView(SettingsManager.Settings.MultipleQuickRunTool) is IQuickRun multiTool)) return;
 
                         tool = multiTool;
@@ -159,13 +191,17 @@ namespace Mapping_Tools.Classes.SystemTools {
                     tool.RunFinished += Reload;
                     tool.QuickRun();
                 });
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 // Ignored
             }
         }
 
-        private static void QuickRunCurrentTool() {
-            try {
+        private static void QuickRunCurrentTool()
+        {
+            try
+            {
                 if (System.Windows.Application.Current.Dispatcher == null) return;
 
                 System.Windows.Application.Current.Dispatcher.Invoke(() => {
@@ -174,7 +210,9 @@ namespace Mapping_Tools.Classes.SystemTools {
                     tool.RunFinished += Reload;
                     tool.QuickRun();
                 });
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 // Ignored
             }
         }
@@ -185,14 +223,17 @@ namespace Mapping_Tools.Classes.SystemTools {
         [DllImport("user32.dll")]
         private static extern bool SetForegroundWindow(IntPtr hWnd);
 
-        private static void Reload(object sender, EventArgs e) {
-            if (!((RunToolCompletedEventArgs) e).NeedReload || !SettingsManager.Settings.AutoReload) return;
+        private static void Reload(object sender, EventArgs e)
+        {
+            if (!((RunToolCompletedEventArgs)e).NeedReload || !SettingsManager.Settings.AutoReload) return;
 
             var proc = System.Diagnostics.Process.GetProcessesByName("osu!").FirstOrDefault();
-            
-            if (proc != null) {
+
+            if (proc != null)
+            {
                 var oldHandle = GetForegroundWindow();
-                if (oldHandle != proc.MainWindowHandle) {
+                if (oldHandle != proc.MainWindowHandle)
+                {
                     SetForegroundWindow(proc.MainWindowHandle);
                     Thread.Sleep(300);
                 }
@@ -202,10 +243,14 @@ namespace Mapping_Tools.Classes.SystemTools {
             SendKeys.SendWait("{ENTER}");
         }
 
-        private void InitFsWatcher() {
-            try {
+        private void InitFsWatcher()
+        {
+            try
+            {
                 FsWatcher.Path = SettingsManager.GetSongsPath();
-            } catch {
+            }
+            catch
+            {
                 // ignored
             }
 
@@ -215,32 +260,40 @@ namespace Mapping_Tools.Classes.SystemTools {
             FsWatcher.IncludeSubdirectories = true;
         }
 
-        private static void OnChangedFsWatcher(object sender, FileSystemEventArgs e) {
+        private static void OnChangedFsWatcher(object sender, FileSystemEventArgs e)
+        {
             var currentPath = IOHelper.GetCurrentBeatmap();
 
-            if (e.FullPath != currentPath) {
+            if (e.FullPath != currentPath)
+            {
                 return;
             }
 
             var proc = System.Diagnostics.Process.GetProcessesByName("osu!").FirstOrDefault();
-            if (proc != null) {
+            if (proc != null)
+            {
                 var oldHandle = GetForegroundWindow();
-                if (oldHandle != proc.MainWindowHandle) {
+                if (oldHandle != proc.MainWindowHandle)
+                {
                     return;
                 }
             }
 
             string hashString = "";
-            try {
-                if (File.Exists(currentPath)) {
+            try
+            {
+                if (File.Exists(currentPath))
+                {
                     hashString = EditorReaderStuff.GetMD5FromPath(currentPath);
                 }
             }
-            catch {
+            catch
+            {
                 return;
             }
 
-            if (EditorReaderStuff.DontCoolSaveWhenMD5EqualsThisString == hashString) {
+            if (EditorReaderStuff.DontCoolSaveWhenMD5EqualsThisString == hashString)
+            {
                 return;
             }
 

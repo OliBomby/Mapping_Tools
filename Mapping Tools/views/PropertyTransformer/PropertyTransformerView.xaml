@@ -49,35 +49,35 @@
                 </StackPanel.Resources>
                 <TextBlock Text="Timingpoints:" FontWeight="Bold" Margin="0,10,0,0"/>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="New offset = Offset " MinWidth="350"/>
+                    <TextBlock Text="Offset" MinWidth="350"/>
                     <TextBlock Text="x "/>
                     <TextBox x:Name="TPOffsetMultiplierBox" Text="{Binding Path=TimingpointOffsetMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1}" MinWidth="120"/>
                     <TextBlock Text=" + "/>
                     <TextBox x:Name="TPOffsetOffsetBox" Text="{Binding Path=TimingpointOffsetOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0}" MinWidth="120"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="New BPM = BPM " MinWidth="350"/>
+                    <TextBlock Text="BPM" MinWidth="350"/>
                     <TextBlock Text="x "/>
                     <TextBox x:Name="TPBPMMultiplierBox" Text="{Binding Path=TimingpointBPMMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1}" MinWidth="120"/>
                     <TextBlock Text=" + "/>
                     <TextBox x:Name="TPBPMOffsetBox" Text="{Binding Path=TimingpointBPMOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0}" MinWidth="120"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="New slider velocity = SV " MinWidth="350"/>
+                    <TextBlock Text="Slider Velocity" MinWidth="350"/>
                     <TextBlock Text="x "/>
                     <TextBox x:Name="TPSVMultiplierBox" Text="{Binding Path=TimingpointSVMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1}" MinWidth="120"/>
                     <TextBlock Text=" + "/>
                     <TextBox x:Name="TPSVOffsetBox" Text="{Binding Path=TimingpointSVOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0}" MinWidth="120"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="New custom index = Index " MinWidth="350"/>
+                    <TextBlock Text="Custom index" MinWidth="350"/>
                     <TextBlock Text="x "/>
                     <TextBox x:Name="TPIndexMultiplierBox" Text="{Binding Path=TimingpointIndexMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1}" MinWidth="120"/>
                     <TextBlock Text=" + "/>
                     <TextBox x:Name="TPIndexOffsetBox" Text="{Binding Path=TimingpointIndexOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0}" MinWidth="120"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="New volume = Volume " MinWidth="350"/>
+                    <TextBlock Text="Volume" MinWidth="350"/>
                     <TextBlock Text="x "/>
                     <TextBox x:Name="TPVolumeMultiplierBox" Text="{Binding Path=TimingpointVolumeMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1}" MinWidth="120"/>
                     <TextBlock Text=" + "/>
@@ -85,21 +85,21 @@
                 </StackPanel>
                 <TextBlock Text="Other:" FontWeight="Bold" Margin="0,10,0,0"/>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="New hitobject time = Time " MinWidth="350"/>
+                    <TextBlock Text="Hitobject time" MinWidth="350"/>
                     <TextBlock Text="x "/>
                     <TextBox x:Name="HOTimeMultiplierBox" Text="{Binding Path=HitObjectTimeMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1}" MinWidth="120"/>
                     <TextBlock Text=" + "/>
                     <TextBox x:Name="HOTimeOffsetBox" Text="{Binding Path=HitObjectTimeOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0}" MinWidth="120"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="New bookmark time = Time " MinWidth="350"/>
+                    <TextBlock Text="Bookmark time" MinWidth="350"/>
                     <TextBlock Text="x "/>
                     <TextBox x:Name="BookTimeMultiplierBox" Text="{Binding Path=BookmarkTimeMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1}" MinWidth="120"/>
                     <TextBlock Text=" + "/>
                     <TextBox x:Name="BookTimeOffsetBox" Text="{Binding Path=BookmarkTimeOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0}" MinWidth="120"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="New SB sample time = Time " MinWidth="350"/>
+                    <TextBlock Text="SB sample time" MinWidth="350"/>
                     <TextBlock Text="x "/>
                     <TextBox x:Name="SBSampleTimeMultiplierBox" Text="{Binding Path=SBSampleTimeMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1}" MinWidth="120"/>
                     <TextBlock Text=" + "/>

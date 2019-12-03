@@ -29,7 +29,6 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <summary>
         /// Constructs a new Circle using two points.
         /// </summary>
-        /// <param name="points">List containing the points.</param>
         public Circle(Vector2 centre, Vector2 outerPoint) {
             Centre = centre;
             Radius = Vector2.Distance(centre, outerPoint);

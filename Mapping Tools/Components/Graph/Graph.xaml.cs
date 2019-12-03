@@ -1,18 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Components.Domain;
 
 namespace Mapping_Tools.Components.Graph {
     /// <summary>
     /// Interaction logic for Graph.xaml
     /// </summary>
-    public partial class Graph {
+    public partial class Graph : INotifyPropertyChanged {
         private bool _drawAnchors;
 
         public List<TensionAnchor> TensionAnchors { get; }
@@ -20,6 +24,8 @@ namespace Mapping_Tools.Components.Graph {
         public List<GraphMarker> Markers { get; set; }
 
         public double MinMarkerSpacing { get; set; }
+
+        public string LastInterpolationSet { get; set; }
 
         public double XMin { get; set; }
         public double YMin { get; set; }
@@ -88,6 +94,13 @@ namespace Mapping_Tools.Components.Graph {
 
         public Graph() {
             InitializeComponent();
+
+            DataContext = this;
+
+            OpenTypeValueCommand = new CommandImplementation(OpenTypeValueDialog);
+            AcceptTypeValueDialogCommand = new CommandImplementation(AcceptTypeValueDialog);
+            CancelTypeValueDialogCommand = new CommandImplementation(CancelTypeValueDialog);
+
             TensionAnchors = new List<TensionAnchor>();
             Anchors = new List<Anchor>();
             Markers = new List<GraphMarker>();
@@ -125,21 +138,31 @@ namespace Mapping_Tools.Components.Graph {
             var index = Anchors.FindIndex(o => o.Pos.X > pos.X);
             index = index == -1 ? Math.Max(Anchors.Count - 1, 1) : index;
 
+            // Get the next anchor
+            Anchor nextAnchor = null;
+            if (index < Anchors.Count) {
+                nextAnchor = Anchors[index];
+            }
+
             // Make anchor
-            var anchor = MakeAnchor(pos);
+            var anchor = LastInterpolationSet != null ? MakeAnchor(pos, LastInterpolationSet) : MakeAnchor(pos);
 
             // Make tension anchor
             var tensionAnchor = MakeTensionAnchor(pos, anchor);
 
             // Link Anchors
             anchor.TensionAnchor = tensionAnchor;
+
+            // Add tension
+            anchor.Tension = nextAnchor?.Tension ?? 0;
             
             // Insert anchor
             Anchors.Insert(index, anchor);
 
             // Add tension anchor
             TensionAnchors.Add(tensionAnchor);
-
+            
+            UpdateAnchorNeighbors();
             UpdateVisual();
 
             return anchor;
@@ -151,7 +174,21 @@ namespace Mapping_Tools.Components.Graph {
 
             Anchors.Remove(anchor);
             TensionAnchors.Remove(anchor.TensionAnchor);
+
+            UpdateAnchorNeighbors();
             UpdateVisual();
+        }
+
+        private void UpdateAnchorNeighbors() {
+            Anchor previousAnchor = null;
+            foreach (var anchor in Anchors) {
+                anchor.PreviousAnchor = previousAnchor;
+                if (previousAnchor != null) {
+                    previousAnchor.NextAnchor = anchor;
+                }
+
+                previousAnchor = anchor;
+            }
         }
 
         public bool IsEdgeAnchor(Anchor anchor) {
@@ -160,6 +197,14 @@ namespace Mapping_Tools.Components.Graph {
 
         private Anchor MakeAnchor(Vector2 pos) {
             var anchor = new Anchor(this, pos) {
+                Stroke = AnchorStroke,
+                Fill = AnchorFill
+            };
+            return anchor;
+        }
+
+        private Anchor MakeAnchor(Vector2 pos, string interpolator) {
+            var anchor = new Anchor(this, pos, interpolator) {
                 Stroke = AnchorStroke,
                 Fill = AnchorFill
             };
@@ -203,7 +248,9 @@ namespace Mapping_Tools.Components.Graph {
                 return previousAnchor.Pos.Y;
             }
             var sectionProgress = (x - previousAnchor.Pos.X) / diff.X;
-            return diff.Y * sectionProgress + previousAnchor.Pos.Y;
+
+            return nextAnchor.Interpolator.GetInterpolation(sectionProgress, previousAnchor.Pos.Y, nextAnchor.Pos.Y,
+                nextAnchor.Tension);
         }
 
         private Point GetRelativePoint(Vector2 pos) {
@@ -220,6 +267,14 @@ namespace Mapping_Tools.Components.Graph {
 
         private Vector2 GetPosition(GraphMarker marker) {
             return GetPosition(new Point(marker.X, marker.Y));
+        }
+
+        private Vector2 GetPosition(Vector2 value) {
+            return new Vector2((value.X - XMin) / (XMax - XMin), (value.Y - YMin) / (YMax - YMin));
+        }
+
+        private Vector2 GetValue(Vector2 position) {
+            return new Vector2(XMin + (XMax - XMin) * position.X, YMin + (YMax - YMin) * position.Y);
         }
 
         public void UpdateVisual() {
@@ -259,7 +314,7 @@ namespace Mapping_Tools.Components.Graph {
             points.Add(GetRelativePoint(Anchors[Anchors.Count - 1].Pos));
 
             // Draw line
-            var line = new Polyline {Points = points, Stroke = Stroke, StrokeThickness = 2,
+            var line = new Polyline {Points = points, Stroke = Stroke, StrokeThickness = 2, IsHitTestVisible = false,
                 StrokeEndLineCap = PenLineCap.Round, StrokeStartLineCap = PenLineCap.Round, StrokeLineJoin = PenLineJoin.Round};
             MainCanvas.Children.Add(line);
 
@@ -268,7 +323,7 @@ namespace Mapping_Tools.Components.Graph {
                 GetRelativePoint(new Vector2(1, 0)), GetRelativePoint(new Vector2(0, 0))
             };
 
-            var polygon = new Polygon {Points = points2, Fill = Fill};
+            var polygon = new Polygon {Points = points2, Fill = Fill, IsHitTestVisible = false};
             MainCanvas.Children.Add(polygon);
 
             // Return if we dont draw Anchors
@@ -392,5 +447,70 @@ namespace Mapping_Tools.Components.Graph {
             UpdateMarkers();
             UpdateVisual();
         }
+
+        #region TypeInDialog
+
+        public ICommand OpenTypeValueCommand { get; }
+        public ICommand AcceptTypeValueDialogCommand { get; }
+        public ICommand CancelTypeValueDialogCommand { get; }
+
+        private bool _isDialogOpen;
+        private object _dialogHostContent;
+        private Anchor _anchorEditing;
+
+        public bool IsDialogOpen
+        {
+            get => _isDialogOpen;
+            set
+            {
+                if (_isDialogOpen == value) return;
+                _isDialogOpen = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public object DialogHostContent
+        {
+            get => _dialogHostContent;
+            set
+            {
+                if (_dialogHostContent == value) return;
+                _dialogHostContent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public void OpenTypeValueDialog(object sender)
+        {
+            _anchorEditing = sender as Anchor;
+            if (_anchorEditing == null) return;
+            DialogHostContent = new TypeValueDialog(GetValue(_anchorEditing.Pos).Y);
+            IsDialogOpen = true;
+        }
+
+        private void CancelTypeValueDialog(object obj)
+        {
+            IsDialogOpen = false;
+            _anchorEditing = null;
+        }
+
+        private void AcceptTypeValueDialog(object obj) {
+            IsDialogOpen = false;
+            if (_anchorEditing == null || !(DialogHostContent is TypeValueDialog d)) return;
+            if (TypeConverters.TryParseDouble(d.ValueBox.Text, out double result)) {
+                _anchorEditing.Pos = new Vector2(_anchorEditing.Pos.X, GetPosition(new Vector2(0, result)).Y);
+            }
+            _anchorEditing = null;
+            UpdateVisual();
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        #endregion
     }
 }

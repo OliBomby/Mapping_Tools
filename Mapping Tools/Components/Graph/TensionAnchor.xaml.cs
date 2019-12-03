@@ -1,15 +1,19 @@
 ﻿using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
 using System;
+using System.Reflection;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using Mapping_Tools.Components.Graph.Interpolation;
 
 namespace Mapping_Tools.Components.Graph {
     /// <summary>
     /// Interaction logic for TensionAnchor.xaml
     /// </summary>
     public partial class TensionAnchor {
-        protected override double DefaultSize { get; } = 6;
+        protected override double DefaultSize { get; } = 10;
         
         [NotNull]
         public Anchor ParentAnchor { get; set; }
@@ -49,6 +53,7 @@ namespace Mapping_Tools.Components.Graph {
         public TensionAnchor(Graph parent, Vector2 pos, Anchor parentAnchor) : base(parent, pos) {
             InitializeComponent();
             SetCursor();
+            AbsoluteDraggingMode = true;
             ParentAnchor = parentAnchor;
         }
 
@@ -74,16 +79,26 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         protected override void OnDrag(Vector2 drag, MouseEventArgs e) {
+            var verticalDrag = drag.Y;
+
             // Ctrl on tension point makes it more precise
             if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)) {
-                drag.Y /= 10;
+                verticalDrag /= 10;
             }
 
-            SetTension(Tension - drag.Y / 1000);
+            if (ParentAnchor.PreviousAnchor != null &&
+                ParentAnchor.Interpolator.GetType().GetCustomAttribute<VerticalMirrorInterpolatorAttribute>() != null &&
+                ParentAnchor.Pos.Y < ParentAnchor.PreviousAnchor.Pos.Y) {
+                verticalDrag = -verticalDrag;
+            }
 
-            // Move the cursor to this
-            IgnoreDrag = true;
-            MoveCursorToThis(GetRelativeCursorPosition(e));
+            IgnoreDrag = 1;
+            SetTension(Tension - verticalDrag / 200);
+
+            IgnoreDrag = 1;
+            var p = e.GetPosition(Graph);
+            MoveCursorToThis(new Vector(p.X, p.Y));
+            LastMousePoint = new Point(0, 0);
         }
 
         private void Anchor_OnPreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e) {
@@ -97,7 +112,7 @@ namespace Mapping_Tools.Components.Graph {
             Tension = tension;
 
             if (IsDragging) {
-                SizeMultiplier = Math.Pow(1.5, Math.Min(Math.Abs(Tension) - 1, 1));
+                SizeMultiplier = Math.Pow(1.5, Math.Abs(MathHelper.Clamp(Tension, -1, 1)) * 2 - 1);
             } else {
                 Graph.UpdateVisual();
             }

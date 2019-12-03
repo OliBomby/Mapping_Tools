@@ -2,23 +2,29 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace Mapping_Tools.Classes.BeatmapHelper {
-    public class BeatmapEditor : Editor {
-        public Beatmap Beatmap { get => (Beatmap)TextFile; }
+namespace Mapping_Tools.Classes.BeatmapHelper
+{
+    public class BeatmapEditor : Editor
+    {
+        public Beatmap Beatmap => (Beatmap)TextFile;
 
-        public BeatmapEditor(List<string> lines) {
+        public BeatmapEditor(List<string> lines)
+        {
             TextFile = new Beatmap(lines);
         }
 
-        public BeatmapEditor(string path) {
+        public BeatmapEditor(string path)
+        {
             Path = path;
             TextFile = new Beatmap(ReadFile(Path));
         }
 
-        public override void SaveFile() {
+        public override void SaveFile()
+        {
             var tempPath = System.IO.Path.Combine(MainWindow.AppDataPath, "temp.osu");
 
-            if (!File.Exists(tempPath)) {
+            if (!File.Exists(tempPath))
+            {
                 File.Create(tempPath).Dispose();
             }
             File.WriteAllLines(tempPath, TextFile.GetLines());

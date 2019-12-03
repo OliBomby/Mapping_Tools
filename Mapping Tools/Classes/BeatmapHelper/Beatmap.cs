@@ -1,37 +1,166 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
+
+    /// <summary>
+    /// Class containing all the data from a .osu beatmap file. It also supports serialization to .osu format and helper methods to get data in specific ways.
+    /// </summary>
     public class Beatmap : ITextFile {
+
+        /// <summary>
+        /// Contains all the values in the [General] section of a .osu file. The key is the variable name and the value is the value.
+        /// This section typically contains:
+        /// AudioFilename,
+        /// AudioLeadIn,
+        /// PreviewTime,
+        /// Countdown,
+        /// SampleSet,
+        /// StackLeniency,
+        /// Mode,
+        /// LetterboxInBreaks,
+        /// WidescreenStoryboard
+        /// </summary>
         public Dictionary<string, TValue> General { get; set; }
+
+        /// <summary>
+        /// Contains all the values in the [Editor] section of a .osu file. The key is the variable name and the value is the value.
+        /// This section typically contains:
+        /// Bookmarks,
+        /// DistanceSpacing,
+        /// BeatDivisor,
+        /// GridSize,
+        /// TimelineZoom
+        /// </summary>
         public Dictionary<string, TValue> Editor { get; set; }
+
+        /// <summary>
+        /// Contains all the values in the [Metadata] section of a .osu file. The key is the variable name and the value is the value.
+        /// This section typically contains:
+        /// Title,
+        /// TitleUnicode,
+        /// Artist,
+        /// ArtistUnicode,
+        /// Creator,
+        /// Version,
+        /// Source,
+        /// Tags,
+        /// BeatmapID,
+        /// BeatmapSetID
+        /// </summary>
         public Dictionary<string, TValue> Metadata { get; set; }
+
+        /// <summary>
+        /// Contains all the values in the [Difficulty] section of a .osu file. The key is the variable name and the value is the value.
+        /// This section typically contains:
+        /// HPDrainRate,
+        /// CircleSize,
+        /// OverallDifficulty,
+        /// ApproachRate,
+        /// SliderMultiplier,
+        /// SliderTickRate
+        /// </summary>
         public Dictionary<string, TValue> Difficulty { get; set; }
+
+        /// <summary>
+        /// Contains all the basic combo colours. The order of this list is the same as how they are numbered in the .osu.
+        /// <c>Combo1 : 245,222,139</c>
+        /// </summary>
         public List<Colour> ComboColours { get; set; }
+
+        /// <summary>
+        /// Contains all the special colours. These include the colours of slider bodies or slider outlines.
+        /// The key is the name of the special colour and the value is the actual colour.
+        /// </summary>
         public Dictionary<string, Colour> SpecialColours { get; set; }
+
+        /// <summary>
+        /// The timing of this beatmap. This objects contains all the timing points (data from the [TimingPoints] section) plus the global slider multiplier.
+        /// It also has a number of helper methods to fetch data from the timing points.
+        /// With this object you can always calculate the slider velocity at any time.
+        /// Any changes to the slider multiplier property in this object will not be serialized. Change the value in <see cref="Difficulty"/> instead.
+        /// </summary>
         public Timing BeatmapTiming { get; set; }
+
+        /// <summary>
+        /// A list of all the lines of .osu code under the [Events] section. These strings are the actual .osu code and must be deserialized before use.
+        /// Any changes to this property will not be serialized. Use <see cref="BackgroundAndVideoEvents"/> and the other sub-headers instead.
+        /// </summary>
         public List<string> Events { get; set; }
+
+        /// <summary>
+        /// A list of all the lines of .osu code under the [Events] -> (Background and Video events) section.
+        /// These strings are the actual .osu code and must be deserialized before use.
+        /// </summary>
         public List<string> BackgroundAndVideoEvents { get; set; }
+
+        /// <summary>
+        /// A list of all the lines of .osu code under the [Events] -> (Break Periods) section.
+        /// These strings are the actual .osu code and must be deserialized before use.
+        /// </summary>
         public List<string> BreakPeriods { get; set; }
-        public List<string> StoryboardLayer0 { get; set; }
-        public List<string> StoryboardLayer1 { get; set; }
-        public List<string> StoryboardLayer2 { get; set; }
-        public List<string> StoryboardLayer3 { get; set; }
-        public List<string> StoryboardLayer4 { get; set; }
+
+        /// <summary>
+        /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 0 (Background)) section.
+        /// These strings are the actual .osu code and must be deserialized before use.
+        /// </summary>
+        public List<string> StoryboardLayerBackground { get; set; }
+
+        /// <summary>
+        /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 1 (Fail)) section.
+        /// These strings are the actual .osu code and must be deserialized before use.
+        /// </summary>
+        public List<string> StoryboardLayerFail { get; set; }
+
+        /// <summary>
+        /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 2 (Pass)) section.
+        /// These strings are the actual .osu code and must be deserialized before use.
+        /// </summary>
+        public List<string> StoryboardLayerPass { get; set; }
+
+        /// <summary>
+        /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 3 (Foreground)) section.
+        /// These strings are the actual .osu code and must be deserialized before use.
+        /// </summary>
+        public List<string> StoryboardLayerForeground { get; set; }
+
+        /// <summary>
+        /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 4 (Overlay)) section.
+        /// These strings are the actual .osu code and must be deserialized before use.
+        /// </summary>
+        public List<string> StoryboardLayerOverlay { get; set; }
+        
+        /// <summary>
+        /// A list of all storyboarded sound sample events under the [Events] -> (Storyboard Sound Samples) section.
+        /// </summary>
         public List<StoryboardSoundSample> StoryboardSoundSamples { get; set; }
+
+        /// <summary>
+        /// List of all the hit objects in this beatmap.
+        /// </summary>
         public List<HitObject> HitObjects { get; set; }
+
+        /// <summary>
+        /// Gets or sets the bookmarks of this beatmap. This returns a clone of the real bookmarks which are stored in the <see cref="Editor"/> property.
+        /// The bookmarks are represented with just a double which is the time of the bookmark.
+        /// </summary>
         public List<double> Bookmarks { get => GetBookmarks(); set => SetBookmarks(value); }
 
+        /// <summary>
+        /// Initializes the Beatmap file format.
+        /// </summary>
+        /// <param name="lines">List of strings where each string is another line in the .osu file.</param>
         public Beatmap(List<string> lines) {
             SetLines(lines);
         }
 
+        /// <summary>
+        /// Deserializes an entire .osu file and stores the data to this object.
+        /// </summary>
+        /// <param name="lines">List of strings where each string is another line in the .osu file.</param>
         public void SetLines(List<string> lines) {
             // Load up all the shit
             List<string> generalLines = GetCategoryLines(lines, "[General]");
@@ -41,8 +170,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             List<string> eventsLines = GetCategoryLines(lines, "[Events]");
             List<string> backgroundAndVideoEventsLines = GetCategoryLines(lines, "//Background and Video events", new[] { "[", "//" });
             List<string> breakPeriodsLines = GetCategoryLines(lines, "//Break Periods", new[] { "[", "//" });
-            List<string> storyboardLayer0Lines = GetCategoryLines(lines, "//Storyboard Layer 0 (Background)", new[] { "[", "//" });
-            List<string> storyboardLayer1Lines = GetCategoryLines(lines, "//Storyboard Layer 1 (Fail)", new[] { "[", "//" });
+            List<string> storyboardLayerBackgroundLines = GetCategoryLines(lines, "//Storyboard Layer 0 (Background)", new[] { "[", "//" });
+            List<string> storyboardLayerPassLines = GetCategoryLines(lines, "//Storyboard Layer 1 (Fail)", new[] { "[", "//" });
             List<string> storyboardLayer2Lines = GetCategoryLines(lines, "//Storyboard Layer 2 (Pass)", new[] { "[", "//" });
             List<string> storyboardLayer3Lines = GetCategoryLines(lines, "//Storyboard Layer 3 (Foreground)", new[] { "[", "//" });
             List<string> storyboardLayer4Lines = GetCategoryLines(lines, "//Storyboard Layer 4 (Overlay)", new[] { "[", "//" });
@@ -60,11 +189,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Events = new List<string>();
             BackgroundAndVideoEvents = new List<string>();
             BreakPeriods = new List<string>();
-            StoryboardLayer0 = new List<string>();
-            StoryboardLayer1 = new List<string>();
-            StoryboardLayer2 = new List<string>();
-            StoryboardLayer3 = new List<string>();
-            StoryboardLayer4 = new List<string>();
+            StoryboardLayerBackground = new List<string>();
+            StoryboardLayerPass = new List<string>();
+            StoryboardLayerFail = new List<string>();
+            StoryboardLayerForeground = new List<string>();
+            StoryboardLayerOverlay = new List<string>();
             StoryboardSoundSamples = new List<StoryboardSoundSample>();
             HitObjects = new List<HitObject>();
 
@@ -89,20 +218,20 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             foreach (string line in breakPeriodsLines) {
                 BreakPeriods.Add(line);
             }
-            foreach (string line in storyboardLayer0Lines) {
-                StoryboardLayer0.Add(line);
+            foreach (string line in storyboardLayerBackgroundLines) {
+                StoryboardLayerBackground.Add(line);
             }
-            foreach (string line in storyboardLayer1Lines) {
-                StoryboardLayer1.Add(line);
+            foreach (string line in storyboardLayerPassLines) {
+                StoryboardLayerPass.Add(line);
             }
             foreach (string line in storyboardLayer2Lines) {
-                StoryboardLayer2.Add(line);
+                StoryboardLayerFail.Add(line);
             }
             foreach (string line in storyboardLayer3Lines) {
-                StoryboardLayer3.Add(line);
+                StoryboardLayerForeground.Add(line);
             }
             foreach (string line in storyboardLayer4Lines) {
-                StoryboardLayer4.Add(line);
+                StoryboardLayerOverlay.Add(line);
             }
             foreach (string line in storyboardSoundSamplesLines) {
                 StoryboardSoundSamples.Add(new StoryboardSoundSample(line));
@@ -119,26 +248,32 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             GiveObjectsGreenlines();
         }
 
+        /// <summary>
+        /// Sorts all hitobjects in map by order of time.
+        /// </summary>
         public void SortHitObjects() {
-            // Sort the HitObjects
             HitObjects = HitObjects.OrderBy(o => o.Time).ToList();
         }
 
+        /// <summary>
+        /// Calculates the temporal length for all <see cref="HitObject"/> sliders and stores it to their internal property.
+        /// </summary>
         public void CalculateSliderEndTimes() {
-            foreach (HitObject ho in HitObjects) {
-                if (ho.IsSlider) {
-                    ho.TemporalLength = BeatmapTiming.CalculateSliderTemporalLength(ho.Time, ho.PixelLength);
-                    ho.EndTime = Math.Floor(ho.Time + ho.TemporalLength * ho.Repeat);
-                }
+            foreach (var ho in HitObjects.Where(ho => ho.IsSlider)) {
+                ho.TemporalLength = BeatmapTiming.CalculateSliderTemporalLength(ho.Time, ho.PixelLength);
             }
         }
 
+        /// <summary>
+        /// For each hit object it stores the timingpoints from <see cref="BeatmapTiming"/> which are affecting that hit object.
+        /// Basically making all hit objects aware of the effects on themselves coming from the <see cref="BeatmapTiming"/>.
+        /// </summary>
         public void GiveObjectsGreenlines() {
             foreach (var ho in HitObjects) {
-                ho.SV = BeatmapTiming.GetSVAtTime(ho.Time);
-                ho.TP = BeatmapTiming.GetTimingPointAtTime(ho.Time);
-                ho.HitsoundTP = BeatmapTiming.GetTimingPointAtTime(ho.Time + 5);
-                ho.Redline = BeatmapTiming.GetRedlineAtTime(ho.Time);
+                ho.SliderVelocity = BeatmapTiming.GetSvAtTime(ho.Time);
+                ho.TimingPoint = BeatmapTiming.GetTimingPointAtTime(ho.Time);
+                ho.HitsoundTimingPoint = BeatmapTiming.GetTimingPointAtTime(ho.Time + 5);
+                ho.UnInheritedTimingPoint = BeatmapTiming.GetRedlineAtTime(ho.Time);
                 ho.BodyHitsounds = BeatmapTiming.GetTimingPointsInTimeRange(ho.Time, ho.EndTime);
                 foreach (var time in ho.GetAllTloTimes(BeatmapTiming)) {
                     ho.BodyHitsounds.RemoveAll(o => Math.Abs(time - o.Offset) <= 5);
@@ -146,6 +281,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
+        /// <summary>
+        /// Calculates the time in milliseconds between a hit object appearing on screen and getting perfectly hit for a given approach rate value.
+        /// </summary>
+        /// <param name="approachRate">The approach rate difficulty setting.</param>
+        /// <returns>The time in milliseconds between a hit object appearing on screen and getting perfectly hit.</returns>
         public static double ApproachRateToMs(double approachRate) {
             if (approachRate < 5) {
                 return 1800 - 120 * approachRate;
@@ -154,44 +294,71 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return 1200 - 150 * (approachRate - 5);
         }
 
+        /// <summary>
+        /// Finds all hit objects from this beatmap which are within a specified range.
+        /// Just any part of the hit object has to overlap with the time range in order to be included.
+        /// </summary>
+        /// <param name="start">The start of the time range.</param>
+        /// <param name="end">The end of the time range.</param>
+        /// <returns>All <see cref="HitObject"/> that are found within specified range.</returns>
         public List<HitObject> GetHitObjectsWithRangeInRange(double start, double end) {
             return HitObjects.FindAll(o => o.EndTime >= start && o.Time <= end);
         }
 
+        /// <summary>
+        /// Creates a new <see cref="Timeline"/> for this Beatmap.
+        /// Upon creation the timeline is updated with all the current timing and hitsounds of this beatmap,
+        /// but later changes wont be automatically synchronized.
+        /// </summary>
+        /// <returns></returns>
         public Timeline GetTimeline() {
             Timeline tl = new Timeline(HitObjects, BeatmapTiming);
             tl.GiveTimingPoints(BeatmapTiming);
             return tl;
         }
 
+        /// <summary>
+        /// Grabs all bookmarks
+        /// </summary>
+        /// <returns>The list of Bookmarks.</returns>
         public List<double> GetBookmarks() {
             try {
-                return Editor["Bookmarks"].GetStringValue().Split(',').Select(p => Double.Parse(p)).ToList();
+                return Editor["Bookmarks"].GetStringValue().Split(',').Select(double.Parse).ToList();
             }
             catch (KeyNotFoundException) {
                 return new List<double>();
             }
         }
 
+        /// <summary>
+        /// Sets the bookmarks value in <see cref="Editor"/> with a new list of bookmarks.
+        /// Decimal values will be rounded in this process.
+        /// </summary>
+        /// <param name="bookmarks"></param>
         public void SetBookmarks(List<double> bookmarks) {
             if (bookmarks.Count > 0) {
-                Editor["Bookmarks"] = new TValue(String.Join(",", bookmarks.Select(d => Math.Round(d))));
+                Editor["Bookmarks"] = new TValue(string.Join(",", bookmarks.Select(d => Math.Round(d))));
             }
         }
 
         /// <summary>
-        /// Returns all hit objects that have a bookmark in their range
+        /// Returns all hit objects that have a bookmark in their range.
         /// </summary>
-        /// <returns>A list of hit objects that have a bookmark in their range</returns>
+        /// <returns>A list of hit objects that have a bookmark in their range.</returns>
         public List<HitObject> GetBookmarkedObjects() {
             List<double> bookmarks = GetBookmarks();
             List<HitObject> markedObjects = HitObjects.FindAll(ho => bookmarks.Exists(o => (ho.Time <= o && o <= ho.EndTime)));
             return markedObjects;
         }
 
+        /// <summary>
+        /// Serializes all data of this beatmap to .osu format.
+        /// </summary>
+        /// <returns>List of lines of .osu code.</returns>
         public List<string> GetLines() {
-            // Getting all the shit
-            List<string> lines = new List<string> {
+            // Getting all the stuff
+            List<string> lines = new List<string>
+            {
                 "osu file format v14",
                 "",
                 "[General]"
@@ -217,23 +384,23 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 lines.Add(line);
             }
             lines.Add("//Storyboard Layer 0 (Background)");
-            foreach (string line in StoryboardLayer0) {
+            foreach (string line in StoryboardLayerBackground) {
                 lines.Add(line);
             }
             lines.Add("//Storyboard Layer 1 (Fail)");
-            foreach (string line in StoryboardLayer1) {
+            foreach (string line in StoryboardLayerPass) {
                 lines.Add(line);
             }
             lines.Add("//Storyboard Layer 2 (Pass)");
-            foreach (string line in StoryboardLayer2) {
+            foreach (string line in StoryboardLayerFail) {
                 lines.Add(line);
             }
             lines.Add("//Storyboard Layer 3 (Foreground)");
-            foreach (string line in StoryboardLayer3) {
+            foreach (string line in StoryboardLayerForeground) {
                 lines.Add(line);
             }
             lines.Add("//Storyboard Layer 4 (Overlay)");
-            foreach (string line in StoryboardLayer4) {
+            foreach (string line in StoryboardLayerOverlay) {
                 lines.Add(line);
             }
             lines.Add("//Storyboard Sound Samples");
@@ -249,14 +416,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 lines.Add(tp.GetLine());
             }
             lines.Add("");
-            if (ComboColours.Count() > 0) {
+            if (ComboColours.Any()) {
                 lines.Add("");
                 lines.Add("[Colours]");
                 for (int i = 0; i < ComboColours.Count; i++) {
-                    lines.Add("Combo" + (i + 1) + " : " + ComboColours[i].ToString());
+                    lines.Add("Combo" + (i + 1) + " : " + ComboColours[i]);
                 }
                 foreach (KeyValuePair<string, Colour> specialColour in SpecialColours) {
-                    lines.Add(specialColour.Key + " : " + specialColour.Value.ToString());
+                    lines.Add(specialColour.Key + " : " + specialColour.Value);
                 }
             }
             lines.Add("");
@@ -268,33 +435,36 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return lines;
         }
 
+        /// <summary>
+        /// Grabs the specified file name of beatmap file.
+        /// with format of:
+        /// <c>Artist - Title (Host) [Difficulty].osu</c>
+        /// </summary>
+        /// <returns>String of file name.</returns>
         public string GetFileName() {
-            string fileName = String.Format("{0} - {1} ({2}) [{3}].osu", Metadata["Artist"].StringValue, Metadata["Title"].StringValue, Metadata["Creator"].StringValue, Metadata["Version"].StringValue);
+            string fileName = $"{Metadata["Artist"].StringValue} - {Metadata["Title"].StringValue} ({Metadata["Creator"].StringValue}) [{Metadata["Version"].StringValue}].osu";
 
             string regexSearch = new string(Path.GetInvalidFileNameChars());
-            Regex r = new Regex(String.Format("[{0}]", Regex.Escape(regexSearch)));
+            Regex r = new Regex($"[{Regex.Escape(regexSearch)}]");
             fileName = r.Replace(fileName, "");
             return fileName;
         }
 
-        private void AddDictionaryToLines(Dictionary<string, TValue> dict, List<string> lines) {
-            foreach (KeyValuePair<string, TValue> kvp in dict) {
-                lines.Add(kvp.Key + ":" + kvp.Value.StringValue);
-            }
+        private static void AddDictionaryToLines(Dictionary<string, TValue> dict, List<string> lines) {
+            lines.AddRange(dict.Select(kvp => kvp.Key + ":" + kvp.Value.StringValue));
         }
 
-        private void FillDictionary(Dictionary<string, TValue> dict, List<string> lines) {
-            foreach (string line in lines) {
-                string[] split = SplitKeyValue(line);
+        private static void FillDictionary(Dictionary<string, TValue> dict, List<string> lines) {
+            foreach (var split in lines.Select(SplitKeyValue)) {
                 dict[split[0]] = new TValue(split[1]);
             }
         }
 
-        private string[] SplitKeyValue(string line) {
+        private static string[] SplitKeyValue(string line) {
             return line.Split(new[] { ':' }, 2);
         }
 
-        private List<string> GetCategoryLines(List<string> lines, string category, string[] categoryIdentifiers=null) {
+        private static List<string> GetCategoryLines(List<string> lines, string category, string[] categoryIdentifiers=null) {
             if (categoryIdentifiers == null)
                 categoryIdentifiers = new[] { "[" };
 

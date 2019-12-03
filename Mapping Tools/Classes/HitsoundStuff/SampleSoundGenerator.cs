@@ -3,13 +3,21 @@ using NAudio.Wave.SampleProviders;
 using System;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
+    /// <summary>
+    /// TODO: Complete comments.
+    /// </summary>
     public class SampleSoundGenerator {
+        /// <summary />
         public WaveStream Wave { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public int KeyCorrection { get; set; }
-        public float VolumeCorrection { get; set; }
+        public double VolumeCorrection { get; set; }
         public double FadeStart { get; set; }
         public double FadeLength { get; set; }
 
+        /// <inheritdoc />
         public SampleSoundGenerator(WaveStream wave) {
             Wave = wave;
             KeyCorrection = 0;
@@ -18,6 +26,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             FadeLength = -1;
         }
 
+        /// <inheritdoc />
         public SampleSoundGenerator(WaveStream wave, double fadeStart, double fadeLength) {
             Wave = wave;
             KeyCorrection = 0;
@@ -26,13 +35,17 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             FadeLength = fadeLength;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public ISampleProvider GetSampleProvider() {
             Wave.Position = 0;
             ISampleProvider output = WaveToSampleProvider(Wave);
 
             if (FadeStart != -1 && FadeLength != -1) {
                 output = new DelayFadeOutSampleProvider(output);
-                (output as DelayFadeOutSampleProvider).BeginFadeOut(FadeStart * 1000, FadeLength * 1000);
+                ((DelayFadeOutSampleProvider) output).BeginFadeOut(FadeStart * 1000, FadeLength * 1000);
             }
             if (KeyCorrection != 0) {
                 output = SampleImporter.PitchShift(output, KeyCorrection);

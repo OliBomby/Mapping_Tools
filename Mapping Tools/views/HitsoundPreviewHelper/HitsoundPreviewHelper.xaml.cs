@@ -11,12 +11,14 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 
-namespace Mapping_Tools.Views {
+namespace Mapping_Tools.Views
+{
     /// <summary>
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
-    public partial class HitsoundPreviewHelperView : ISavable<HitsoundPreviewHelperVM>, IQuickRun {
+    public partial class HitsoundPreviewHelperView : ISavable<HitsoundPreviewHelperVM>, IQuickRun
+    {
         public event EventHandler RunFinished;
 
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "hspreviewproject.json");
@@ -24,20 +26,29 @@ namespace Mapping_Tools.Views {
         public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Hitsound Preview Projects");
 
         public static readonly string ToolName = "Hitsound Preview Helper";
+        public static readonly string ToolDescription =
+            $@"Hitsound Preview Helper helps by placing hitsounds on all the objects of the current map based on the positions of the objects. " +
+            $@"That way you can hear the hitsounds play while you hitsound without having to assign them manually and later import them to Hitsound Studio." +
+            $@"{Environment.NewLine}This tool is meant to help a very specific hitsounding workflow." +
+            $@" If you hitsound by placing circles on different parts on the screen and treat each position as a different layer of hitsounds." +
+            $@" For example using a mania map and have each column represent a different sound.";
 
-        public static readonly string ToolDescription = $@"Hitsound Preview Helper helps by placing hitsounds on all the objects of the current map based on the positions of the objects. That way you can hear the hitsounds play while you hitsound without having to assign them manually and later import them to Hitsound Studio.{Environment.NewLine}This tool is meant to help a very specific hitsounding workflow. If you hitsound by placing circles on different parts on the screen and treat each position as a different layer of hitsounds. For example using a mania map and have each column represent a different sound.";
-
-        public HitsoundPreviewHelperView() {
+        /// <summary>
+        /// 
+        /// </summary>
+        public HitsoundPreviewHelperView()
+        {
             InitializeComponent();
             DataContext = new HitsoundPreviewHelperVM();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
-            ProjectManager.LoadProject(this, message:false);
+            ProjectManager.LoadProject(this, message: false);
         }
 
-        protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
+        protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
             var bgw = sender as BackgroundWorker;
-            e.Result = PlaceHitsounds((Arguments)e.Argument, bgw, e);
+            e.Result = PlaceHitsounds((Arguments) e.Argument, bgw, e);
         }
 
         private struct Arguments
@@ -45,32 +56,40 @@ namespace Mapping_Tools.Views {
             public string[] Paths;
             public bool Quick;
             public List<HitsoundZone> Zones;
-            public Arguments(string[] paths, bool quick, List<HitsoundZone> zones) {
+
+            public Arguments(string[] paths, bool quick, List<HitsoundZone> zones)
+            {
                 Paths = paths;
                 Quick = quick;
                 Zones = zones;
             }
         }
 
-        private string PlaceHitsounds(Arguments args, BackgroundWorker worker, DoWorkEventArgs _) {
+        private string PlaceHitsounds(Arguments args, BackgroundWorker worker, DoWorkEventArgs _)
+        {
             if (args.Zones.Count == 0)
                 return "There are no zones!";
 
             bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
 
-            foreach (string path in args.Paths) {
-                BeatmapEditor editor = editorRead ? EditorReaderStuff.GetNewestVersion(path, reader) : new BeatmapEditor(path);
+            foreach (string path in args.Paths)
+            {
+                BeatmapEditor editor =
+                    editorRead ? EditorReaderStuff.GetNewestVersion(path, reader) : new BeatmapEditor(path);
                 Beatmap beatmap = editor.Beatmap;
                 Timeline timeline = beatmap.GetTimeline();
 
-                for (int i = 0; i < timeline.TimelineObjects.Count; i++) {
+                for (int i = 0; i < timeline.TimelineObjects.Count; i++)
+                {
                     var tlo = timeline.TimelineObjects[i];
 
                     var column = args.Zones.FirstOrDefault();
                     double best = double.MaxValue;
-                    foreach (var c in args.Zones) {
+                    foreach (var c in args.Zones)
+                    {
                         double dist = c.Distance(tlo.Origin.Pos);
-                        if (dist < best) {
+                        if (dist < best)
+                        {
                             best = dist;
                             column = c;
                         }
@@ -83,7 +102,7 @@ namespace Mapping_Tools.Views {
                     tlo.SetHitsound(column.Hitsound);
                     tlo.HitsoundsToOrigin();
 
-                    UpdateProgressBar(worker, (int)(100f * i / beatmap.HitObjects.Count));
+                    UpdateProgressBar(worker, (int) (100f * i / beatmap.HitObjects.Count));
                 }
 
                 // Save the file
@@ -96,31 +115,40 @@ namespace Mapping_Tools.Views {
 
             return args.Quick ? "" : "Done!";
         }
-        private void Start_Click(object sender, RoutedEventArgs e) {
+
+        private void Start_Click(object sender, RoutedEventArgs e)
+        {
             RunTool(MainWindow.AppWindow.GetCurrentMaps(), quick: false);
         }
 
-        public void QuickRun() {
-            RunTool(new[] { IOHelper.GetCurrentBeatmap() }, quick: true);
+        public void QuickRun()
+        {
+            RunTool(new[] {IOHelper.GetCurrentBeatmap()}, quick: true);
         }
 
 
-        private void RunTool(string[] paths, bool quick = false) {
+        private void RunTool(string[] paths, bool quick = false)
+        {
             if (!CanRun) return;
 
             IOHelper.SaveMapBackup(paths);
 
-            BackgroundWorker.RunWorkerAsync(new Arguments(paths, quick, ((HitsoundPreviewHelperVM)DataContext).Items.ToList()));
+            BackgroundWorker.RunWorkerAsync(new Arguments(paths, quick,
+                ((HitsoundPreviewHelperVM) DataContext).Items.ToList()));
 
             CanRun = false;
         }
 
-        public HitsoundPreviewHelperVM GetSaveData() {
-            return (HitsoundPreviewHelperVM)DataContext;
+        public HitsoundPreviewHelperVM GetSaveData()
+        {
+            return (HitsoundPreviewHelperVM) DataContext;
         }
 
-        public void SetSaveData(HitsoundPreviewHelperVM saveData) {
+        public void SetSaveData(HitsoundPreviewHelperVM saveData)
+        {
             DataContext = saveData;
+
         }
+
     }
 }

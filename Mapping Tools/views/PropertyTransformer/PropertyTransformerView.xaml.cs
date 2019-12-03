@@ -79,9 +79,9 @@ namespace Mapping_Tools.Views {
 
                     // Slider Velocity
                     if (vm.TimingpointSVMultiplier != 1 || vm.TimingpointSVOffset != 0) {
-                        if (Filter(beatmap.BeatmapTiming.GetSVMultiplierAtTime(tp.Offset), tp.Offset, doFilterMatch, doFilterRange, vm.MatchFilter, min, max)) {
+                        if (Filter(beatmap.BeatmapTiming.GetSvMultiplierAtTime(tp.Offset), tp.Offset, doFilterMatch, doFilterRange, vm.MatchFilter, min, max)) {
                             TimingPoint tpchanger = tp.Copy();
-                            double newSV = beatmap.BeatmapTiming.GetSVMultiplierAtTime(tp.Offset) * vm.TimingpointSVMultiplier + vm.TimingpointSVOffset;
+                            double newSV = beatmap.BeatmapTiming.GetSvMultiplierAtTime(tp.Offset) * vm.TimingpointSVMultiplier + vm.TimingpointSVOffset;
                             newSV = vm.ClipProperties ? MathHelper.Clamp(newSV, 0.1, 10) : newSV;  // Clip the value if specified
                             tpchanger.MpB = -100 / newSV;
                             timingPointsChanges.Add(new TimingPointsChange(tpchanger, mpb: true));

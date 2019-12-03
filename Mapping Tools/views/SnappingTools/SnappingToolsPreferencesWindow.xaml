@@ -19,13 +19,13 @@
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" Background="{DynamicResource MaterialDesignPaper}"
         d:DataContext="{d:DesignData SnappingToolsPreferences}">
-    
+
     <WindowChrome.WindowChrome>
         <WindowChrome 
             CaptionHeight="35"
             ResizeBorderThickness="5" />
     </WindowChrome.WindowChrome>
- 
+
     <Window.Resources>
         <components:EnumToBoolConverter x:Key="EnumToBoolConverter"/>
         <components:FlagToBoolConverter x:Key="FlagToBoolConverter"/>
@@ -218,5 +218,5 @@
         <Border BorderThickness="1" Grid.Row="0" Grid.RowSpan="3" Background="{x:Null}" BorderBrush="{DynamicResource PrimaryHueDarkBrush}"/>
 
     </Grid>
-    
+
 </Window>

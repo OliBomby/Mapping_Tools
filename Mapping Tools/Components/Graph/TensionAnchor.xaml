@@ -12,6 +12,6 @@
              MouseMove="ThisMouseMove">
     <Grid>
         <Rectangle Fill="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="-5"></Rectangle>
-        <Ellipse x:Name="MainShape" Stroke="#AAAAAA" Fill="#55AAAAAA" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+        <Ellipse x:Name="MainShape" Stroke="#AAAAAA" Fill="#55AAAAAA" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" StrokeThickness="1.4"/>
     </Grid>
 </local:GraphPointControl>

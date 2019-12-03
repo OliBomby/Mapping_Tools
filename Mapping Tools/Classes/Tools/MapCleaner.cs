@@ -81,7 +81,7 @@ namespace Mapping_Tools.Classes.Tools {
             int objectsResnapped = 0;
             int samplesRemoved = 0;
 
-            // Collect Kiai toggles and SV changes for mania/taiko
+            // Collect Kiai toggles and SliderVelocity changes for mania/taiko
             List<TimingPoint> kiaiToggles = new List<TimingPoint>();
             List<TimingPoint> svChanges = new List<TimingPoint>();
             bool lastKiai = false;
@@ -121,7 +121,7 @@ namespace Mapping_Tools.Classes.Tools {
                 }
                 UpdateProgressBar(worker, 27);
 
-                // Resnap SV changes
+                // Resnap SliderVelocity changes
                 foreach (TimingPoint tp in svChanges) {
                     tp.ResnapSelf(timing, args.Snap1, args.Snap2);
                 }
@@ -160,7 +160,7 @@ namespace Mapping_Tools.Classes.Tools {
             }
             UpdateProgressBar(worker, 55);
 
-            // Add SV changes for taiko and mania
+            // Add SliderVelocity changes for taiko and mania
             if (mode == GameMode.Taiko || mode == GameMode.Mania) {
                 foreach (TimingPoint tp in svChanges) {
                     timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true));
@@ -176,11 +176,11 @@ namespace Mapping_Tools.Classes.Tools {
 
             // Add Hitobject stuff
             foreach (HitObject ho in beatmap.HitObjects) {
-                if (ho.IsSlider) // SV changes
+                if (ho.IsSlider) // SliderVelocity changes
                 {
-                    TimingPoint tp = ho.TP.Copy();
+                    TimingPoint tp = ho.TimingPoint.Copy();
                     tp.Offset = ho.Time;
-                    tp.MpB = ho.SV;
+                    tp.MpB = ho.SliderVelocity;
                     timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true));
                 }
                 // Body hitsounds
@@ -194,16 +194,16 @@ namespace Mapping_Tools.Classes.Tools {
                         ind = false;  // Removing silent custom index
                     }
                     timingPointsChanges.Add(new TimingPointsChange(tp, volume: vol, index: ind, sampleset: sam));
-                    if (tp.SampleSet != ho.HitsoundTP.SampleSet) {
+                    if (tp.SampleSet != ho.HitsoundTimingPoint.SampleSet) {
                         samplesetActuallyChanged = args.SamplesetSliders && ho.SampleSet == 0; }  // True for sampleset change in sliderbody
                 }
                 if (ho.IsSlider && (!samplesetActuallyChanged) && ho.SampleSet == 0)  // Case can put sampleset on sliderbody
                 {
-                    ho.SampleSet = ho.HitsoundTP.SampleSet;
+                    ho.SampleSet = ho.HitsoundTimingPoint.SampleSet;
                 }
                 if (ho.IsSlider && samplesetActuallyChanged) // Make it start out with the right sampleset
                 {
-                    TimingPoint tp = ho.HitsoundTP.Copy();
+                    TimingPoint tp = ho.HitsoundTimingPoint.Copy();
                     tp.Offset = ho.Time;
                     timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: true));
                 }
@@ -247,7 +247,7 @@ namespace Mapping_Tools.Classes.Tools {
                 }
                 if (tlo.HasHitsound) // Add greenlines for custom indexes and volumes
                 {
-                    TimingPoint tp = tlo.HitsoundTP.Copy();
+                    TimingPoint tp = tlo.HitsoundTimingPoint.Copy();
 
                     bool doUnmute = tlo.FenoSampleVolume == 5 && args.RemoveMuting;
                     bool ind = !tlo.UsesFilename && !doUnmute;  // Index doesnt have to change if custom is overridden by Filename

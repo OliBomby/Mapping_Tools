@@ -3,6 +3,7 @@ using Mapping_Tools.Viewmodels;
 using System;
 using System.ComponentModel;
 using System.Windows;
+using Mapping_Tools.Annotations;
 
 namespace Mapping_Tools.Views.RhythmGuide {
 
@@ -14,8 +15,14 @@ namespace Mapping_Tools.Views.RhythmGuide {
 
         public static readonly string ToolName = "Rhythm Guide";
 
-        public static readonly string ToolDescription = $@"Make a beatmap with circles from the rhythm of multiple maps, so you have a reference for hitsounding.{Environment.NewLine}You can add the circles to an existing map or make a new map with the circles.{Environment.NewLine}Use the browse button to choose mutliple maps at the same time.";
+        public static readonly string ToolDescription =
+            $@"Make a beatmap with circles from the rhythm of multiple maps, so you have a reference for hitsounding." +
+            $@"{Environment.NewLine}You can add the circles to an existing map or make a new map with the circles." +
+            $@"{Environment.NewLine}Use the browse button to choose multiple maps at the same time.";
 
+        /// <summary>
+        /// 
+        /// </summary>
         public RhythmGuideView() {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;

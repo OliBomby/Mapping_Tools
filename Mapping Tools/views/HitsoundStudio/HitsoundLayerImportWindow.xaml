@@ -188,6 +188,9 @@
                             <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                         </Button >
                     </Grid>
+                    <TextBox x:Name="OffsetBox3" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,15,0,0"
+                             Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Offset"
+                             ToolTip="The start time of the MIDI in milliseconds." Text="0"/>
                     <CheckBox x:Name="InstrumentBox3" Content="Discriminate instruments" IsChecked="True" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,15,0,0"/>
                     <CheckBox x:Name="KeysoundBox3" Content="Discriminate keysounds" IsChecked="True" Foreground="{DynamicResource MaterialDesignBody}"/>
                     <CheckBox x:Name="LengthBox3" Content="Discriminate lengths" IsChecked="False" Foreground="{DynamicResource MaterialDesignBody}"/>

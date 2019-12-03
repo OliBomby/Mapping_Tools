@@ -5,6 +5,13 @@ using System.Linq;
 using System.Windows;
 
 namespace Mapping_Tools.Classes.SystemTools {
+    public enum ErrorType
+    {
+        Success,
+        Error,
+        Warning
+    }
+
     public static class ProjectManager {
         private static readonly JsonSerializer Serializer = new JsonSerializer {
             NullValueHandling = NullValueHandling.Ignore,

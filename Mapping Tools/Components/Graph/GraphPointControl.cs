@@ -1,14 +1,17 @@
-﻿using System;
+﻿using Mapping_Tools.Classes.MathUtil;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Components.Graph {
     public abstract class GraphPointControl : UserControl {
         protected bool IsDragging;
-        protected bool IgnoreDrag;
+        protected int IgnoreDrag;
+
+        protected bool AbsoluteDraggingMode;
+        protected Point LastMousePoint;
 
         protected abstract double DefaultSize { get; }
 
@@ -91,7 +94,10 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         protected void ThisLeftMouseDown(object sender, MouseButtonEventArgs e) {
+            LastMousePoint = e.GetPosition(Graph);
+
             // Move the cursor to the middle of this anchor
+            IgnoreDrag = 2;
             MoveCursorToThis(GetRelativeCursorPosition(e));
 
             EnableDragging();
@@ -99,13 +105,17 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         protected void ThisMouseUp(object sender, MouseButtonEventArgs e) {
+            // Move the cursor to this
+            IgnoreDrag = 2;
+            MoveCursorToThis(GetRelativeCursorPosition(e));
+
             DisableDragging();
             e.Handled = true;
         }
 
         protected void ThisMouseMove(object sender, MouseEventArgs e) {
-            if (IgnoreDrag) {
-                IgnoreDrag = false;
+            if (IgnoreDrag > 0) {
+                IgnoreDrag--;
                 return;
             }
 
@@ -117,7 +127,9 @@ namespace Mapping_Tools.Components.Graph {
             }
 
             // Get the position of the mouse relative to the Canvas
-            var diff = GetRelativeCursorPosition(e);
+            var newMousePoint = e.GetPosition(Graph);
+            var diff = AbsoluteDraggingMode ? newMousePoint - LastMousePoint : GetRelativeCursorPosition(e);
+            LastMousePoint = newMousePoint;
 
             // Handle drag
             OnDrag(new Vector2(diff.X, diff.Y), e);

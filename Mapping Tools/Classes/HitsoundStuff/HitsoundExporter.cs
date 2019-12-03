@@ -6,11 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Text.RegularExpressions;
 
-namespace Mapping_Tools.Classes.HitsoundStuff {
+namespace Mapping_Tools.Classes.HitsoundStuff
+{
     class HitsoundExporter {
         public static void ExportCompleteHitsounds(string exportFolder, string baseBeatmap, CompleteHitsounds ch, Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null) {
             // Export the beatmap with all hitsounds
@@ -24,12 +22,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             BeatmapEditor editor = EditorReaderStuff.GetNewestVersion(baseBeatmap);
             Beatmap beatmap = editor.Beatmap;
 
-            // Make new timingpoints
+            // Make new timing points
             List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
 
-            // Add redlines
-            List<TimingPoint> redlines = beatmap.BeatmapTiming.GetAllRedlines();
-            foreach (TimingPoint tp in redlines) {
+            // Add red lines
+            List<TimingPoint> timingPoints = beatmap.BeatmapTiming.GetAllRedlines();
+            foreach (TimingPoint tp in timingPoints) {
                 timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, meter: true, inherited: true, omitFirstBarLine: true));
             }
 
@@ -69,7 +67,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         continue;
                     }
                     var samples = new List<ISampleProvider>();
-                    var volumes = new List<float>();
+                    var volumes = new List<double>();
                     int soundsAdded = 0;
                     
                     if (loadedSamples != null) {
@@ -103,9 +101,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     var mixer = new MixingSampleProvider(sameFormatSamples);
 
                     VolumeSampleProvider volumed = new VolumeSampleProvider(mixer) {
-                        Volume = 1 / (float)Math.Sqrt(soundsAdded * volumes.Average())
+                        Volume = (float)(1 / Math.Sqrt(soundsAdded * volumes.Average()))
                     };
 
+                    // TODO: Allow mp3, ogg and aif export.
                     string filename = ci.Index == 1 ? kvp.Key + ".wav" : kvp.Key + ci.Index + ".wav";
                     CreateWaveFile(Path.Combine(exportFolder, filename), volumed.ToWaveProvider16());
                 }
@@ -128,5 +127,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 }
             } catch (IndexOutOfRangeException) { }
         }
+
+      
     }
 }
