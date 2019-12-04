@@ -57,9 +57,9 @@ namespace Mapping_Tools.Views {
                 var editor = editorRead ? EditorReaderStuff.GetNewestVersion(path, reader) : new BeatmapEditor(path);
                 var beatmap = editor.Beatmap;
 
-                beatmap.ComboColours = new List<ComboColour>(arg.ComboColours);
+                beatmap.ComboColours = new List<ComboColour>(arg.Project.ComboColours);
                 beatmap.SpecialColours.Clear();
-                foreach (var specialColour in arg.SpecialColours) {
+                foreach (var specialColour in arg.Project.SpecialColours) {
                     beatmap.SpecialColours.Add(specialColour.Name, specialColour);
                 }
 

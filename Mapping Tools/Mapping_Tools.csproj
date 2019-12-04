@@ -173,6 +173,7 @@
     <Compile Include="Classes\BeatmapHelper\StoryboardSoundSample.cs" />
     <Compile Include="Classes\ComboColourStudio\ColourPoint.cs" />
     <Compile Include="Classes\ComboColourStudio\ColourPointMode.cs" />
+    <Compile Include="Classes\ComboColourStudio\ComboColourProject.cs" />
     <Compile Include="Classes\GenericExtensions.cs" />
     <Compile Include="Classes\HitsoundStuff\DelayFadeOutSampleProvider.cs" />
     <Compile Include="Classes\HitsoundStuff\Hitsound.cs" />
