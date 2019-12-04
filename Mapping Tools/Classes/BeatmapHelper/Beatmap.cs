@@ -67,6 +67,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         /// <summary>
         /// Contains all the basic combo colours. The order of this list is the same as how they are numbered in the .osu.
+        /// There can not be more than 8 combo colours.
         /// <c>Combo1 : 245,222,139</c>
         /// </summary>
         public List<ComboColour> ComboColours { get; set; }
