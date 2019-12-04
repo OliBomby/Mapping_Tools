@@ -4,8 +4,11 @@ using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.SystemTools;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Controls;
+using System.Windows.Media;
 using Mapping_Tools.Annotations;
 using Mapping_Tools.Components.Domain;
+using MaterialDesignThemes.Wpf;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Classes.ComboColourStudio {
@@ -25,13 +28,42 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
             ParentProject = parentProject;
 
             
-            AddCommand = new CommandImplementation(_ => {
-
+            AddCommand = new CommandImplementation(sender => {
+                var cm = GetContextMenu(ParentProject);
+                cm.PlacementTarget = sender as Button;
+                cm.IsOpen = true;
             });
 
-            RemoveCommand = new CommandImplementation(_ => {
-
+            RemoveCommand = new CommandImplementation(item => {
+                if (item == null) {
+                    ColourSequence.RemoveAt(ColourSequence.Count - 1);
+                } else {
+                    ColourSequence.Remove(item as SpecialColour);
+                }
             });
+        }
+
+        private ContextMenu GetContextMenu(ComboColourProject colourSource) {
+            var cm = new ContextMenu();
+
+            if (colourSource.ComboColours.Count == 0) {
+                cm.Items.Add(new MenuItem
+                    {Header = "Add at least one combo colour before adding colours to this sequence."});
+            } else {
+                foreach (var comboColour in colourSource.ComboColours) {
+                    cm.Items.Add(new MenuItem {
+                        Header = comboColour.Name,
+                        Icon = new PackIcon
+                            {Kind = PackIconKind.Circle, Foreground = new SolidColorBrush(comboColour.Color)},
+                        Command = new CommandImplementation(_ => {
+                            ColourSequence.Add(comboColour);
+                        }),
+                        Tag = comboColour
+                    });
+                }
+            }
+
+            return cm;
         }
 
         public double Time {

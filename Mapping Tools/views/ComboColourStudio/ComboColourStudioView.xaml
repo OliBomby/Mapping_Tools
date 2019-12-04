@@ -51,66 +51,136 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <ListBox Grid.Row="0" ItemsSource="{Binding Project.ColourPoints}" SelectionMode="Extended">
-                    <ListBox.Resources>
-                        <Style TargetType="ListBoxItem" BasedOn="{StaticResource MaterialDesignListBoxItem}">
+                <DataGrid Grid.Row="0" ItemsSource="{Binding Project.ColourPoints}" SelectionMode="Extended"
+                          CanUserSortColumns="True"
+                          CanUserAddRows="False"
+                          AutoGenerateColumns="False"
+                          materialDesign:DataGridAssist.CellPadding="13 8 8 8"
+                          materialDesign:DataGridAssist.ColumnHeaderPadding="8"
+                          VerticalScrollBarVisibility="Auto">
+                    <DataGrid.Resources>
+                        <Style TargetType="DataGridRow" BasedOn="{StaticResource MaterialDesignDataGridRow}">
                             <Setter Property="IsSelected"
                                     Value="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         </Style>
-                    </ListBox.Resources>
-                    <ListBox.ItemTemplate>
-                        <DataTemplate DataType="comboColourStudio:ColourPoint">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBox Text="{Binding Time}" Margin="10 0 10 0" Width="50" VerticalAlignment="Center"/>
-                                <ListBox ItemsSource="{Binding ColourSequence}">
-                                    <ListBox.ItemTemplate>
-                                        <DataTemplate DataType="beatmapHelper:SpecialColour">
-                                            <StackPanel Orientation="Horizontal">
-                                                <materialDesign:PopupBox StaysOpen="True">
-                                                    <materialDesign:PopupBox.ToggleContent>
-                                                        <materialDesign:PackIcon Kind="Circle" Foreground="{Binding Color, Converter={StaticResource ColorToBrushConverter}}" Width="35" Height="35"/>
-                                                    </materialDesign:PopupBox.ToggleContent>
-                                                    <StackPanel Orientation="Horizontal" Margin="20">
-                                                        <TextBox Text="{Binding Color, ElementName=ColorPicker}"
-                                                                 Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" materialDesign:HintAssist.Hint="Color HEX value"
-                                                                 Width="120" Margin="2,0,10,2"/>
-                                                        <materialDesign:ColorPicker Color="{Binding Color}" x:Name="ColorPicker" Width="300"/>
+                    </DataGrid.Resources>
+                    <DataGrid.Columns>
+                        <materialDesign:MaterialDataGridTextColumn
+                            Binding="{Binding Time, UpdateSourceTrigger=PropertyChanged}"
+                            Header="Offset"
+                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}" />
+                        <materialDesign:MaterialDataGridComboBoxColumn
+                            Header="SampleSet"
+                            SelectedValueBinding="{Binding Mode, UpdateSourceTrigger=PropertyChanged}"
+                            ItemsSourceBinding="{Binding ColourPointModes}" />
+                        <DataGridTemplateColumn Header="Colour Sequence" Width="{Binding Width, ElementName=SmallColourSequence}">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate DataType="comboColourStudio:ColourPoint">
+                                    <ItemsControl ItemsSource="{Binding ColourSequence}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <materialDesign:PackIcon Kind="Circle" Width="24" Height="24" Foreground="{Binding Color, Converter={StaticResource ColorToBrushConverter}}"/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                            <DataGridTemplateColumn.CellEditingTemplate>
+                                <DataTemplate DataType="comboColourStudio:ColourPoint">
+                                    <StackPanel Orientation="Horizontal">
+                                        <ListBox ItemsSource="{Binding ColourSequence}">
+                                            <ListBox.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel Orientation="Horizontal"/>
+                                                </ItemsPanelTemplate>
+                                            </ListBox.ItemsPanel>
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate DataType="beatmapHelper:SpecialColour">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <materialDesign:Chip Content="{Binding Name}" IconBackground="{Binding Color, Converter={StaticResource ColorToBrushConverter}}" Icon="" 
+                                                                             IsDeletable="True" DeleteCommand="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}, Path=DataContext.RemoveCommand}" DeleteCommandParameter="{Binding}"/>
                                                     </StackPanel>
-                                                </materialDesign:PopupBox>
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </ListBox.ItemTemplate>
-                                </ListBox>
-                                <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a new colour." VerticalAlignment="Bottom" Margin="5" Command="{Binding AddCommand}">
-                                    <materialDesign:PackIcon Kind="Plus" Width="24" Height="24"/>
-                                </Button>
-                                <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove last colour." VerticalAlignment="Bottom" Margin="5" Command="{Binding RemoveCommand}">
-                                    <materialDesign:PackIcon Kind="Minus" Width="24" Height="24"/>
-                                </Button>
-                                <ComboBox ItemsSource="{Binding ColourPointModes}" SelectedItem="{Binding Mode}"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
-                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a new colour point." VerticalAlignment="Bottom" Margin="5" Command="{Binding Project.AddColourPointCommand}">
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
+                                        <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a new colour." VerticalAlignment="Center" Margin="5 0 5 0" Command="{Binding AddCommand}" CommandParameter="{Binding ElementName=This}">
+                                            <materialDesign:PackIcon Kind="Plus" Width="24" Height="24"/>
+                                        </Button>
+                                        <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove last colour." VerticalAlignment="Center" Margin="5 0 5 0" Command="{Binding RemoveCommand}">
+                                            <materialDesign:PackIcon Kind="Minus" Width="24" Height="24"/>
+                                        </Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellEditingTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" VerticalAlignment="Top" Orientation="Horizontal">
+                    <materialDesign:Card UniformCornerRadius="5">
+                        <ListBox ItemsSource="{Binding Project.ComboColours}">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate DataType="beatmapHelper:ComboColour">
+                                    <materialDesign:PopupBox StaysOpen="True">
+                                        <materialDesign:PopupBox.ToggleContent>
+                                            <materialDesign:PackIcon Kind="Circle" Foreground="{Binding Color, Converter={StaticResource ColorToBrushConverter}}" Width="35" Height="35"/>
+                                        </materialDesign:PopupBox.ToggleContent>
+                                        <StackPanel Orientation="Horizontal" Margin="20">
+                                            <TextBox Text="{Binding Color, ElementName=ColorPicker}"
+                                                     Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" materialDesign:HintAssist.Hint="Color HEX value"
+                                                     Width="120" Margin="2,0,10,2"/>
+                                            <materialDesign:ColorPicker Color="{Binding Color}" x:Name="ColorPicker" Width="300"/>
+                                        </StackPanel>
+                                    </materialDesign:PopupBox>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </materialDesign:Card>
+                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a new combo colour." VerticalAlignment="Bottom" Margin="5" Command="{Binding Project.AddComboCommand}">
                         <materialDesign:PackIcon Kind="Plus" Width="24" Height="24"/>
                     </Button>
-                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove last colour point." VerticalAlignment="Bottom" Margin="5" Command="{Binding Project.RemoveColourPointCommand}">
+                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove last combo colour." VerticalAlignment="Bottom" Margin="5" Command="{Binding Project.RemoveComboCommand}">
                         <materialDesign:PackIcon Kind="Minus" Width="24" Height="24"/>
                     </Button>
                 </StackPanel>
-            </Grid>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a new colour point." VerticalAlignment="Bottom" Margin="5" Command="{Binding Project.AddColourPointCommand}">
+                        <materialDesign:PackIcon Kind="Plus" Width="24" Height="24"/>
+                    </Button>
+                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove selected colour points or last colour point." VerticalAlignment="Bottom" Margin="5" Command="{Binding Project.RemoveColourPointCommand}">
+                        <materialDesign:PackIcon Kind="Minus" Width="24" Height="24"/>
+                    </Button>
+                </StackPanel>
             
-            <Viewbox Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
-                <Button
-                    IsEnabled="{Binding ElementName=This, Path=CanRun}"
-                    Style="{StaticResource MaterialDesignFloatingActionButton}"
-                    Click="Start_Click">
-                    <materialDesign:PackIcon
-                        Kind="Play" Height="36" Width="36" />
-                </Button>
-            </Viewbox>
+                <Viewbox Grid.Column="2" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
+                    <Button
+                        IsEnabled="{Binding ElementName=This, Path=CanRun}"
+                        Style="{StaticResource MaterialDesignFloatingActionButton}"
+                        Click="Start_Click">
+                        <materialDesign:PackIcon
+                            Kind="Play" Height="36" Width="36" />
+                    </Button>
+                </Viewbox>
+            </Grid>
         </Grid>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>

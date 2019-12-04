@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using Mapping_Tools.Classes.BeatmapHelper;
@@ -10,20 +13,24 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
     public class ComboColourProject : BindableBase {
         private ObservableCollection<ColourPoint> _colourPoints;
         private ObservableCollection<SpecialColour> _comboColours;
-        private ObservableCollection<SpecialColour> _specialColours;
 
         public ComboColourProject() {
             ColourPoints = new ObservableCollection<ColourPoint>();
             ComboColours = new ObservableCollection<SpecialColour>();
-            SpecialColours = new ObservableCollection<SpecialColour>();
+
+            ColourPoints.CollectionChanged += ColourPointsOnCollectionChanged;
 
             AddColourPointCommand = new CommandImplementation(_ => {
                 ColourPoints.Add(ColourPoints.Count > 0
-                    ? GenerateNewColourPoint(ColourPoints[ColourPoints.Count - 1].Time)
+                    ? (ColourPoint)ColourPoints[ColourPoints.Count - 1].Clone()
                     : GenerateNewColourPoint());
             });
 
             RemoveColourPointCommand = new CommandImplementation(_ => {
+                if (ColourPoints.Any(o => o.IsSelected)) {
+                    ColourPoints.RemoveAll(o => o.IsSelected);
+                    return;
+                }
                 if (ColourPoints.Count > 0) {
                     ColourPoints.RemoveAt(ColourPoints.Count - 1);
                 }
@@ -32,31 +39,35 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
             AddComboCommand = new CommandImplementation(_ => {
                 if (ComboColours.Count >= 8) return;
                 ComboColours.Add(ComboColours.Count > 0
-                    ? new SpecialColour(ComboColours[ComboColours.Count - 1].Color)
-                    : new SpecialColour(Colors.White));
+                    ? new SpecialColour(ComboColours[ComboColours.Count - 1].Color, $"Combo{ComboColours.Count + 1}")
+                    : new SpecialColour(Colors.White, $"Combo{ComboColours.Count + 1}"));
             });
 
             RemoveComboCommand = new CommandImplementation(_ => {
                 if (ComboColours.Count > 0) {
+                    var removing = ComboColours[ComboColours.Count - 1];
                     ComboColours.RemoveAt(ComboColours.Count - 1);
-                }
-            });
-
-            AddSpecialCommand = new CommandImplementation(_ => {
-                SpecialColours.Add(SpecialColours.Count > 0
-                    ? new SpecialColour(SpecialColours[SpecialColours.Count - 1].Color)
-                    : new SpecialColour(Colors.White));
-            });
-
-            RemoveSpecialCommand = new CommandImplementation(_ => {
-                if (SpecialColours.Count > 0) {
-                    SpecialColours.RemoveAt(SpecialColours.Count - 1);
+                    foreach (var colourPoint in ColourPoints) {
+                        colourPoint.ColourSequence.Remove(removing);
+                    }
                 }
             });
         }
 
-        private ColourPoint GenerateNewColourPoint(double time = 0) {
-            return new ColourPoint(time, new SpecialColour[0], ColourPointMode.Normal, this);
+        private void ColourPointsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+            if (e.OldItems != null) {
+                foreach (var oldItem in e.OldItems) {
+                    ((ColourPoint) oldItem).ParentProject = null;
+                }
+            }
+            if (e.NewItems == null) return;
+            foreach (var newItem in e.NewItems) {
+                ((ColourPoint) newItem).ParentProject = this;
+            }
+        }
+
+        private ColourPoint GenerateNewColourPoint(double time = 0, IEnumerable<SpecialColour> colours = null) {
+            return new ColourPoint(time, colours ?? new SpecialColour[0], ColourPointMode.Normal, this);
         }
 
         public void ImportFromBeatmap(string importPath) {
@@ -67,10 +78,6 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
                 ComboColours.Clear();
                 for (int i = 0; i < beatmap.ComboColours.Count; i++) {
                     ComboColours.Add(new SpecialColour(beatmap.ComboColours[i].Color, $"Combo{i}"));
-                }
-                SpecialColours.Clear();
-                foreach (var specialColour in beatmap.SpecialColours) {
-                    SpecialColours.Add(new SpecialColour(specialColour.Value.Color, specialColour.Key));
                 }
             }
             catch( Exception ex ) {
@@ -89,16 +96,9 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
             set => Set(ref _comboColours, value);
         }
 
-        public ObservableCollection<SpecialColour> SpecialColours {
-            get => _specialColours;
-            set => Set(ref _specialColours, value);
-        }
-
         public CommandImplementation AddColourPointCommand { get; }
         public CommandImplementation RemoveColourPointCommand { get; }
         public CommandImplementation AddComboCommand { get; }
         public CommandImplementation RemoveComboCommand { get; }
-        public CommandImplementation AddSpecialCommand { get; }
-        public CommandImplementation RemoveSpecialCommand { get; }
     }
 }

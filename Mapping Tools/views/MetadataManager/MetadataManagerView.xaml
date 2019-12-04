@@ -223,7 +223,7 @@
                                                 </ListBox.ItemsPanel>
                                                 <ListBox.ItemTemplate>
                                                     <DataTemplate DataType="beatmapHelper:ComboColour">
-                                                        <materialDesign:PopupBox Content="Test" StaysOpen="True">
+                                                        <materialDesign:PopupBox StaysOpen="True">
                                                             <materialDesign:PopupBox.ToggleContent>
                                                                 <materialDesign:PackIcon Kind="Circle" Foreground="{Binding Color, Converter={StaticResource ColorToBrushConverter}}" Width="35" Height="35"/>
                                                             </materialDesign:PopupBox.ToggleContent>
@@ -252,7 +252,7 @@
                                                     <DataTemplate DataType="beatmapHelper:SpecialColour">
                                                         <StackPanel Orientation="Horizontal">
                                                             <TextBox Text="{Binding Name}" Width="202" Margin="0 0 10 0" ToolTip="Special colour name. Some example keywords are 'SliderTrackOverride' and 'SliderBorder'."/>
-                                                            <materialDesign:PopupBox Content="Test" StaysOpen="True">
+                                                            <materialDesign:PopupBox StaysOpen="True">
                                                                 <materialDesign:PopupBox.ToggleContent>
                                                                     <materialDesign:PackIcon Kind="Circle" Foreground="{Binding Color, Converter={StaticResource ColorToBrushConverter}}" Width="35" Height="35"/>
                                                                 </materialDesign:PopupBox.ToggleContent>
