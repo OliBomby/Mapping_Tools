@@ -19,6 +19,7 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
             ComboColours = new ObservableCollection<SpecialColour>();
 
             ColourPoints.CollectionChanged += ColourPointsOnCollectionChanged;
+            ComboColours.CollectionChanged += ComboColoursOnCollectionChanged;
 
             AddColourPointCommand = new CommandImplementation(_ => {
                 ColourPoints.Add(ColourPoints.Count > 0
@@ -54,6 +55,10 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
             });
         }
 
+        private void ComboColoursOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+            MatchComboColourReferences();
+        }
+
         private void ColourPointsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
             if (e.OldItems != null) {
                 foreach (var oldItem in e.OldItems) {
@@ -62,7 +67,24 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
             }
             if (e.NewItems == null) return;
             foreach (var newItem in e.NewItems) {
-                ((ColourPoint) newItem).ParentProject = this;
+                var newColourPoint = (ColourPoint) newItem;
+                newColourPoint.ParentProject = this;
+                // Match object references with the combo colours
+                MatchComboColourReferences();
+            }
+        }
+
+        /// <summary>
+        /// This method makes sure the SpecialColour objects in the colour sequences are the same objects as in the combo colours.
+        /// With this the colours of the colour sequences update when the combo colours get changed.
+        /// </summary>
+        private void MatchComboColourReferences() {
+            foreach (var colourPoint in ColourPoints) {
+                for (int i = 0; i < colourPoint.ColourSequence.Count; i++) {
+                    colourPoint.ColourSequence[i] =
+                        ComboColours.FirstOrDefault(o => o.Name == colourPoint.ColourSequence[i].Name) ??
+                        colourPoint.ColourSequence[i];
+                }
             }
         }
 

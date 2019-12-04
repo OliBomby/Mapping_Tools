@@ -70,7 +70,7 @@
                             Header="Offset"
                             EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}" />
                         <materialDesign:MaterialDataGridComboBoxColumn
-                            Header="SampleSet"
+                            Header="Mode"
                             SelectedValueBinding="{Binding Mode, UpdateSourceTrigger=PropertyChanged}"
                             ItemsSourceBinding="{Binding ColourPointModes}" />
                         <DataGridTemplateColumn Header="Colour Sequence" Width="{Binding Width, ElementName=SmallColourSequence}">
@@ -84,7 +84,7 @@
                                         </ItemsControl.ItemsPanel>
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <materialDesign:PackIcon Kind="Circle" Width="24" Height="24" Foreground="{Binding Color, Converter={StaticResource ColorToBrushConverter}}"/>
+                                                <materialDesign:PackIcon Kind="Circle" Width="24" Height="24" ToolTip="{Binding Name}" Foreground="{Binding Color, Converter={StaticResource ColorToBrushConverter}}"/>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
@@ -102,7 +102,7 @@
                                             <ListBox.ItemTemplate>
                                                 <DataTemplate DataType="beatmapHelper:SpecialColour">
                                                     <StackPanel Orientation="Horizontal">
-                                                        <materialDesign:Chip Content="{Binding Name}" IconBackground="{Binding Color, Converter={StaticResource ColorToBrushConverter}}" Icon="" 
+                                                        <materialDesign:Chip Content="{Binding Name}" ToolTip="{Binding Name}" IconBackground="{Binding Color, Converter={StaticResource ColorToBrushConverter}}" Icon="" 
                                                                              IsDeletable="True" DeleteCommand="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}, Path=DataContext.RemoveCommand}" DeleteCommandParameter="{Binding}"/>
                                                     </StackPanel>
                                                 </DataTemplate>
@@ -138,8 +138,8 @@
                                 </ItemsPanelTemplate>
                             </ListBox.ItemsPanel>
                             <ListBox.ItemTemplate>
-                                <DataTemplate DataType="beatmapHelper:ComboColour">
-                                    <materialDesign:PopupBox StaysOpen="True">
+                                <DataTemplate DataType="beatmapHelper:SpecialColour">
+                                    <materialDesign:PopupBox StaysOpen="True" ToolTip="{Binding Name}">
                                         <materialDesign:PopupBox.ToggleContent>
                                             <materialDesign:PackIcon Kind="Circle" Foreground="{Binding Color, Converter={StaticResource ColorToBrushConverter}}" Width="35" Height="35"/>
                                         </materialDesign:PopupBox.ToggleContent>
