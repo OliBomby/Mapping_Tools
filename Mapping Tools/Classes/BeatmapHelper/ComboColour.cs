@@ -4,7 +4,8 @@ using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     /// <summary>
-    /// The british alternative because main developer wants to keep the spelling. 
+    /// The british alternative because main developer wants to keep the spelling.
+    /// Its spelled "Colours" in the game.
     /// </summary>
     public class ComboColour : BindableBase {
         private Color _color;
