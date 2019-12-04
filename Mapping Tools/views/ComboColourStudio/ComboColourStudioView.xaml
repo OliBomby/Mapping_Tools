@@ -39,7 +39,7 @@
                       <LineBreak/>
                             You define colored sections much like how you use timing points in the osu! editor. Just add a new colour point and define the sequence of combo colours.
                       <LineBreak/>
-                            You can also define colour points which only work for one combo, so you can emphasize specific patterns using colour.
+                            You can also define 'burst' colour points which only work for one combo, so you can emphasize specific patterns using colour.
                         </TextBlock>
                     </materialDesign:PopupBox>
                 </StackPanel>
