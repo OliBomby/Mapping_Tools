@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Mapping_Tools.Views"
-             xmlns:cm="clr-namespace:System.ComponentModel;assembly=System"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
              xmlns:beatmapHelper="clr-namespace:Mapping_Tools.Classes.BeatmapHelper"
@@ -12,7 +11,6 @@
              x:Name="This"
              d:DesignHeight="650" Width="759.5" d:DataContext="{d:DesignData MetadataManagerVm}">
     <UserControl.Resources>
-        <domain:IsASCIIValidationRule x:Key="IsASCIIValidationRule"/>
         <domain:DoubleToStringConverter x:Key="DoubleToStringConverter"/>
         <domain:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
     </UserControl.Resources>
