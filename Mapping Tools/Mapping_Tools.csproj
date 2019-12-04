@@ -165,6 +165,7 @@
     <Compile Include="Classes\BeatmapHelper\HitObjectComparer.cs" />
     <Compile Include="Classes\BeatmapHelper\HitObjectType.cs" />
     <Compile Include="Classes\BeatmapHelper\ITextLine.cs" />
+    <Compile Include="Classes\BeatmapHelper\SpecialColour.cs" />
     <Compile Include="Classes\BeatmapHelper\StoryboardEditor.cs" />
     <Compile Include="Classes\BeatmapHelper\ITextFile.cs" />
     <Compile Include="Classes\BeatmapHelper\Storyboard.cs" />

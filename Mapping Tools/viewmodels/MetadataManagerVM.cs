@@ -30,6 +30,7 @@ namespace Mapping_Tools.Viewmodels {
         private double _previewTime;
         private bool _useComboColours;
         private ObservableCollection<ComboColour> _comboColours;
+        private ObservableCollection<SpecialColour> _specialColours;
 
         public MetadataManagerVm() {
             _importPath = "";
@@ -37,6 +38,7 @@ namespace Mapping_Tools.Viewmodels {
 
             _useComboColours = true;
             ComboColours = new ObservableCollection<ComboColour>();
+            SpecialColours = new ObservableCollection<SpecialColour>();
 
             ImportLoadCommand = new CommandImplementation(
                 _ => {
@@ -88,6 +90,18 @@ namespace Mapping_Tools.Viewmodels {
                 }
             });
 
+            AddSpecialCommand = new CommandImplementation(_ => {
+                SpecialColours.Add(SpecialColours.Count > 0
+                    ? new SpecialColour(SpecialColours[SpecialColours.Count - 1].Color)
+                    : new SpecialColour(Colors.White));
+            });
+
+            RemoveSpecialCommand = new CommandImplementation(_ => {
+                if (SpecialColours.Count > 0) {
+                    SpecialColours.RemoveAt(SpecialColours.Count - 1);
+                }
+            });
+
 
             PropertyChanged += OnPropertyChanged;
         }
@@ -96,7 +110,7 @@ namespace Mapping_Tools.Viewmodels {
             if (e.PropertyName == "Artist" || e.PropertyName == "Title" || e.PropertyName == "BeatmapCreator") {
                 // Update error visibility if there is an error
                 string filename = Beatmap.GetFileName(Artist, Title, BeatmapCreator, "");
-                BeatmapFileNameOverflowErrorVisibility = filename.Length > 255 ? Visibility.Visible : Visibility.Hidden;
+                BeatmapFileNameOverflowErrorVisibility = filename.Length > 255 ? Visibility.Visible : Visibility.Collapsed;
             }
         }
 
@@ -115,6 +129,10 @@ namespace Mapping_Tools.Viewmodels {
 
                 PreviewTime = beatmap.General["PreviewTime"].Value;
                 ComboColours = new ObservableCollection<ComboColour>(beatmap.ComboColours);
+                SpecialColours.Clear();
+                foreach (var specialColour in beatmap.SpecialColours) {
+                    SpecialColours.Add(new SpecialColour(specialColour.Value.Color, specialColour.Key));
+                }
             }
             catch( Exception ex ) {
                 MessageBox.Show($"{ex.Message}{Environment.NewLine}{ex.StackTrace}", "Error");
@@ -244,6 +262,15 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
+        public ObservableCollection<SpecialColour> SpecialColours {
+            get => _specialColours;
+            set {
+                if (_specialColours == value) return;
+                _specialColours = value;
+                OnPropertyChanged();
+            }
+        }
+
         public Visibility BeatmapFileNameOverflowErrorVisibility {
             get => _beatmapFileNameOverflowErrorVisibility;
             set {
@@ -261,6 +288,8 @@ namespace Mapping_Tools.Viewmodels {
 
         public CommandImplementation AddCommand { get; }
         public CommandImplementation RemoveCommand { get; }
+        public CommandImplementation AddSpecialCommand { get; }
+        public CommandImplementation RemoveSpecialCommand { get; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
