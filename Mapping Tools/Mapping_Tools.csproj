@@ -382,6 +382,7 @@
     <Compile Include="Viewmodels\HitsoundPreviewHelperVM.cs" />
     <Compile Include="Viewmodels\HitsoundStudioVM.cs" />
     <Compile Include="Viewmodels\HitsoundCopierVM.cs" />
+    <Compile Include="Viewmodels\ComboColourStudioVm.cs" />
     <Compile Include="Viewmodels\RhythmGuideVm.cs" />
     <Compile Include="Viewmodels\TimingCopierVM.cs" />
     <Compile Include="Viewmodels\MetadataManagerVm.cs" />
@@ -394,6 +395,9 @@
     <Compile Include="Views\HiddenToolAttribute.cs" />
     <Compile Include="Views\DontShowTitleAttribute.cs" />
     <Compile Include="Views\Extensions.cs" />
+    <Compile Include="Views\ComboColourStudio\ComboColourStudioView.xaml.cs">
+      <DependentUpon>ComboColourStudioView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Sliderator\SlideratorView.xaml.cs">
       <DependentUpon>SlideratorView.xaml</DependentUpon>
     </Compile>
@@ -514,6 +518,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\ComboColourStudio\ComboColourStudioView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\Sliderator\SlideratorView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
