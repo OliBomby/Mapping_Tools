@@ -216,7 +216,7 @@
                                 <ToggleButton x:Name="ComboColourToggle" HorizontalAlignment="Left" Margin="5 10 0 10" IsChecked="{Binding UseComboColours}"/>
                                 <StackPanel IsEnabled="{Binding Path=IsChecked, ElementName=ComboColourToggle}">
                                     <StackPanel Orientation="Horizontal">
-                                        <materialDesign:Card>
+                                        <materialDesign:Card UniformCornerRadius="5">
                                             <ListBox ItemsSource="{Binding ComboColours}">
                                                 <ListBox.ItemsPanel>
                                                     <ItemsPanelTemplate>
@@ -248,7 +248,7 @@
                                         </Button>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="0 10 0 0">
-                                        <materialDesign:Card>
+                                        <materialDesign:Card UniformCornerRadius="5">
                                             <ListBox ItemsSource="{Binding SpecialColours}">
                                                 <ListBox.ItemTemplate>
                                                     <DataTemplate DataType="beatmapHelper:SpecialColour">
