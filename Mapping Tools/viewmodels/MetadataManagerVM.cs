@@ -76,9 +76,10 @@ namespace Mapping_Tools.Viewmodels {
                 });
 
             AddCommand = new CommandImplementation(_ => {
+                if (ComboColours.Count >= 8) return;
                 ComboColours.Add(ComboColours.Count > 0
                     ? new ComboColour(ComboColours[ComboColours.Count - 1].Color)
-                    : new ComboColour(Colors.Aqua));
+                    : new ComboColour(Colors.White));
             });
 
             RemoveCommand = new CommandImplementation(_ => {
