@@ -179,6 +179,17 @@ namespace Mapping_Tools.Classes.MathUtil {
         }
 
         /// <summary>
+        /// Returns the positive remainder of x / m.
+        /// </summary>
+        /// <param name="x">The number</param>
+        /// <param name="m">The divisor</param>
+        /// <returns></returns>
+        public static int Mod(int x, int m) {
+            int r = x % m;
+            return r < 0 ? r + m : r;
+        }
+
+        /// <summary>
         /// Clamps a number between a minimum and a maximum.
         /// </summary>
         /// <param name="n">The number to clamp.</param>

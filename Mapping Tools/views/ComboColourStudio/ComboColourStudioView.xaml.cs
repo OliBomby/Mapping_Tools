@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Views {
     /// <summary>
@@ -56,6 +57,7 @@ namespace Mapping_Tools.Views {
             var paths = arg.ExportPath.Split('|');
             var mapsDone = 0;
 
+            var orderedColourPoints = arg.Project.ColourPoints.OrderBy(o => o.Time).ToList();
             var orderedComboColours = arg.Project.ComboColours.OrderBy(o => o.Name).ToList();
 
             var editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
@@ -68,14 +70,15 @@ namespace Mapping_Tools.Views {
                 beatmap.ComboColours = new List<ComboColour>(arg.Project.ComboColours);
 
                 // Setting the combo skips
-                if (beatmap.HitObjects.Count > 0 && arg.Project.ColourPoints.Count > 0) {
+                if (beatmap.HitObjects.Count > 0 && orderedColourPoints.Count > 0) {
                     int lastColourPointColourIndex = -1;
-                    var lastColourPoint = arg.Project.ColourPoints[0];
+                    var lastColourPoint = orderedColourPoints[0];
                     int lastColourIndex = 0;
                     var exceptions = new List<ColourPoint>();
                     foreach (var newCombo in beatmap.HitObjects.Where(o => o.NewCombo || o == beatmap.HitObjects[0])) {
                         // Get the colour point for this new combo
-                        var colourPoint = GetColourPoint(arg.Project.ColourPoints, newCombo.Time, exceptions);
+                        var colourPoint = GetColourPoint(orderedColourPoints, newCombo.Time, exceptions);
+                        var colourSequence = colourPoint.ColourSequence.ToList();
 
                         // Add the colour point to the exceptions so it doesnt get used again
                         if (colourPoint.Mode == ColourPointMode.Burst) {
@@ -85,24 +88,27 @@ namespace Mapping_Tools.Views {
                         // Get the last colour index on the sequence of this colour point
                         lastColourPointColourIndex = lastColourPointColourIndex == -1 || lastColourPoint.Equals(colourPoint) ? 
                             lastColourPointColourIndex : 
-                            colourPoint.ColourSequence.IndexOf(lastColourPoint.ColourSequence[lastColourPointColourIndex]);
+                            colourSequence.FindIndex(o => o.Name == orderedComboColours[lastColourIndex].Name);
                         // Get the next colour index on this colour point
-                        var colourPointColourIndex = lastColourPointColourIndex == -1
+                        // Check if colourSequence count is 0 to prevent division by 0
+                        var colourPointColourIndex = lastColourPointColourIndex == -1 || colourSequence.Count == 0
                             ? 0
-                            : Mod(lastColourPointColourIndex + 1, colourPoint.ColourSequence.Count);
+                            : MathHelper.Mod(lastColourPointColourIndex + 1, colourSequence.Count);
                         //Console.WriteLine("colourPointColourIndex: " + colourPointColourIndex);
                         //Console.WriteLine("colourPointColour: " + colourPoint.ColourSequence[colourPointColourIndex].Name);
 
                         // Find the combo index of the chosen colour in the sequence
-                        var colourIndex =
-                            orderedComboColours.FindIndex(o => o.Name == colourPoint.ColourSequence[colourPointColourIndex].Name);
+                        // Check if the colourSequence count is 0 to prevent an out-of-range exception
+                        var colourIndex = colourSequence.Count == 0 ? MathHelper.Mod(lastColourIndex + 1, orderedComboColours.Count) :
+                            orderedComboColours.FindIndex(o => o.Name == colourSequence[colourPointColourIndex].Name);
 
                         //Console.WriteLine("colourIndex: " + colourIndex);
 
                         var comboChange = colourIndex - lastColourIndex;
 
                         // Do -1 combo skip since it always does +1 combo colour for each new combo
-                        newCombo.ComboSkip = Mod(comboChange - 1, arg.Project.ComboColours.Count);
+                        newCombo.ComboSkip = MathHelper.Mod(comboChange - 1, arg.Project.ComboColours.Count);
+
                         // Set new combo to true for the case this is the first object and new combo is false
                         if (!newCombo.NewCombo && newCombo.ComboSkip != 0) {
                             newCombo.NewCombo = true;
@@ -130,12 +136,10 @@ namespace Mapping_Tools.Views {
             return message;
         }
 
-        private static ColourPoint GetColourPoint(ObservableCollection<ColourPoint> colourPoints, double time, List<ColourPoint> exceptions) {
-            return colourPoints.Except(exceptions).LastOrDefault(o => o.Time <= time) ?? colourPoints.Except(exceptions).FirstOrDefault() ?? colourPoints[0];
-        }
-        private static int Mod(int x, int m) {
-            int r = x % m;
-            return r < 0 ? r + m : r;
+        private static ColourPoint GetColourPoint(IReadOnlyList<ColourPoint> colourPoints, double time, IReadOnlyCollection<ColourPoint> exceptions) {
+            return colourPoints.Except(exceptions).LastOrDefault(o => o.Time <= time + 5 && (o.Mode != ColourPointMode.Burst || o.Time >= time - 5)) ?? 
+                                                                      colourPoints.Except(exceptions).FirstOrDefault(o => o.Mode != ColourPointMode.Burst) ?? 
+                                                                      colourPoints[0];
         }
 
         public ComboColourProject GetSaveData() {
