@@ -41,6 +41,11 @@
                         You define colored sections much like how you use timing points in the osu! editor. Just add a new colour point and define the sequence of combo colours.
                         <LineBreak/>
                         You can also define 'burst' colour points which only work for one combo, so you can emphasize specific patterns using colour.
+                        <LineBreak/>
+                        You can get started by adding a combo colour using the plus on the bottom left or by importing combo colours from an existing map.
+                        Combo colours can be edited by clicking on the coloured circle.
+                        <LineBreak/>
+                        Add a colour point by clicking on the plus on the bottom right. You can edit the colour sequence by double clicking the colour sequence cell.
                     </TextBlock>
                 </materialDesign:PopupBox>
             </StackPanel>

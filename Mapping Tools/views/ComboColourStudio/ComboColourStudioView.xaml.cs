@@ -1,16 +1,15 @@
 ﻿using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.ComboColourStudio;
+using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Viewmodels;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
-using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Views {
     /// <summary>
@@ -23,7 +22,7 @@ namespace Mapping_Tools.Views {
 
         public static readonly string ToolName = "Combo Colour Studio";
 
-        public static readonly string ToolDescription = $@"With Combo Colour Studio you can easily customize the combo colours of your beatmap.{Environment.NewLine}You define colored sections much like how you use timing points in the osu! editor. Just add a new colour point and define the sequence of combo colours.{Environment.NewLine}You can also define colour points which only work for one combo, so you can emphasize specific patterns using colour.";
+        public static readonly string ToolDescription = $@"With Combo Colour Studio you can easily customize the combo colours of your beatmap.{Environment.NewLine}You define colored sections much like how you use timing points in the osu! editor. Just add a new colour point and define the sequence of combo colours.{Environment.NewLine}You can also define colour points which only work for one combo, so you can emphasize specific patterns using colour.{Environment.NewLine}You can get started by adding a combo colour using the plus on the bottom left or by importing combo colours from an existing map. The combo colours can be edited by clicking on the coloured circles.{Environment.NewLine}Add a colour point by clicking on the plus on the bottom right. You can edit the colour sequence by double clicking the colour sequence cell.";
 
         private ComboColourStudioVm ViewModel => (ComboColourStudioVm) DataContext;
 
