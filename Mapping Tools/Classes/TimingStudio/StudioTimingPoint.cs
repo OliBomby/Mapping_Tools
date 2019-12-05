@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Editor_Reader;
+﻿using Editor_Reader;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.HitsoundStuff;
 
@@ -16,13 +11,18 @@ namespace Mapping_Tools.Classes.TimingStudio
         public double NumeratorMeter { get; set; }
         public BeatTime Beat { get; set; }
 
-        public StudioTimingPoint(ControlPoint cp) : base(cp)
+        public StudioTimingPoint(ControlPoint cp) 
+            : base(cp)
         {
-            
+            NumeratorMeter = 4;
+            Beat = new BeatTime();
         }
 
-        public StudioTimingPoint(string line) : base(line)
+        public StudioTimingPoint(string line)
+            : base(line)
         {
+            NumeratorMeter = 4;
+            Beat = new BeatTime();
         }
 
         /// <summary>
@@ -37,20 +37,27 @@ namespace Mapping_Tools.Classes.TimingStudio
         /// <param name="inherited"></param>
         /// <param name="kiai"></param>
         /// <param name="omitFirstBarLine"></param>
-        public StudioTimingPoint(double offset, double mpb, int meter, SampleSet sampleSet, int sampleIndex, double volume, bool inherited, bool kiai, bool omitFirstBarLine) : base(offset, mpb, meter, sampleSet, sampleIndex, volume, inherited, kiai, omitFirstBarLine)
+        public StudioTimingPoint(double offset, double mpb, int meter, SampleSet sampleSet, int sampleIndex, double volume, bool inherited, bool kiai, bool omitFirstBarLine) 
+            : base(offset, mpb, meter, sampleSet, sampleIndex, volume, inherited, kiai, omitFirstBarLine)
         {
-            
+            NumeratorMeter = 4;
+            Beat = new BeatTime();
         }
 
-        public StudioTimingPoint(double numeratorMeter, BeatTime beat)
+        public StudioTimingPoint(double offset, double mpb, int meter, SampleSet sampleSet, int sampleIndex, double volume, bool inherited, bool kiai, bool omitFirstBarLine, double numeratorMeter, BeatTime beat) 
+            : base(offset, mpb, meter, sampleSet, sampleIndex, volume, inherited, kiai, omitFirstBarLine)
         {
-            ;
+            
             NumeratorMeter = numeratorMeter;
             Beat = beat;
         }
 
-        public StudioTimingPoint()
+        public StudioTimingPoint() : base()
         {
+            NumeratorMeter = 4;
+            Beat = new BeatTime();
         }
+
+
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Mapping_Tools.Classes.TimingStudio
 {
-    public abstract class BeatTime : IEquatable<BeatTime>
+    public class BeatTime : IEquatable<BeatTime>
     {
         /// <summary>
         /// The measure in terms of the current bpm track.
@@ -13,9 +13,6 @@ namespace Mapping_Tools.Classes.TimingStudio
         /// <summary>
         /// The beat of the current measure.
         /// </summary>
-        /// <remarks>
-        /// Seperated using the <see cref="BeatmapHelper.TimingPoint.Meter"></see> property.
-        /// </remarks>
         public int Beat { get; set; }
 
         /// <summary>
@@ -24,9 +21,32 @@ namespace Mapping_Tools.Classes.TimingStudio
         public int Fraction { get; set; }
 
         /// <summary>
+        /// The constuctor of the BeatTime object.
+        /// </summary>
+        /// <param name="measure"></param>
+        /// <param name="beat"></param>
+        /// <param name="fraction"></param>
+        public BeatTime(int measure, int beat, int fraction)
+        {
+            Measure = measure;
+            Beat = beat;
+            Fraction = fraction;
+        }
+
+        /// <summary>
+        /// The constuctor of the BeatTime object.
+        /// </summary>
+        public BeatTime()
+        {
+            Measure = 0;
+            Beat = 0;
+            Fraction = 0;
+        }
+
+        /// <summary>
         /// The string represenation of the time.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The format of 0.0.00 (Measure.Beat.Fraction)</returns>
         public override string ToString()
         {
             return $"{this.Measure}.{this.Beat}.{this.Fraction}";
@@ -64,6 +84,6 @@ namespace Mapping_Tools.Classes.TimingStudio
             return !(time1 == time2);
         }
 
-
+        
     }
 }

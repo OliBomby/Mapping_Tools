@@ -61,17 +61,17 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="sampleSet">The <see cref="SampleSet"/> that is used from the timing point</param>
         /// <param name="sampleIndex"></param>
         /// <param name="volume"></param>
-        /// <param name="inherited"></param>
+        /// <param name="uninherited"></param>
         /// <param name="kiai"></param>
         /// <param name="omitFirstBarLine"></param>
-        public TimingPoint(double offset, double mpb, double meter, SampleSet sampleSet, int sampleIndex, double volume, bool inherited, bool kiai, bool omitFirstBarLine) {
+        public TimingPoint(double offset, double mpb, double meter, SampleSet sampleSet, int sampleIndex, double volume, bool uninherited, bool kiai, bool omitFirstBarLine) {
             Offset = offset;
             MpB = mpb;
             Meter = meter;
             SampleSet = sampleSet;
             SampleIndex = sampleIndex;
             Volume = volume;
-            Uninherited = inherited;
+            Uninherited = uninherited;
             Kiai = kiai;
             OmitFirstBarLine = omitFirstBarLine;
         }
@@ -108,6 +108,21 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public TimingPoint(string line) {
             SetLine(line);
         }
+
+        public TimingPoint()
+        {
+            MpB = 60000;
+            Offset = 0;
+            Meter = 4;
+            SampleSet = new SampleSet();
+            SampleIndex = 0;
+            Volume = 100;
+            Uninherited = false;
+            Kiai = false;
+            OmitFirstBarLine = false;
+
+        }
+
 
         /// <summary>
         /// Generates the line from the selected <see cref="TimingPoint"/>

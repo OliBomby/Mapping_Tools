@@ -295,6 +295,8 @@
     <Compile Include="Classes\SnappingTools\Serialization\SnappingToolsSaveSlot.cs" />
     <Compile Include="Classes\SnappingTools\Serialization\SnappingToolsPreferences.cs" />
     <Compile Include="Classes\SnappingTools\Serialization\SnappingToolsProject.cs" />
+    <Compile Include="Classes\SpectrumUtil\TrackBass.cs" />
+    <Compile Include="Classes\SpectrumUtil\Waveform.cs" />
     <Compile Include="Classes\SystemTools\ActionHotkey.cs" />
     <Compile Include="Classes\SystemTools\BindableBase.cs" />
     <Compile Include="Classes\SystemTools\Hotkey.cs" />
@@ -659,9 +661,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Classes\SpectrumUtil\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="BeforeBuild" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

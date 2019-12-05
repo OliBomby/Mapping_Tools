@@ -19,18 +19,14 @@ namespace Mapping_Tools.Views
     /// TimingStudioView Tool for Mapping Tools
     /// </summary>
     //[HiddenTool]
-    public partial class TimingStudioView : ISavable<TimingStudioProject> {
+    public partial class TimingStudioView : ISavable<TimingStudioVM> {
         public static readonly string ToolName = "Timing Studio";
 
         //public static readonly string ToolDescription = $@"Timing Helper is meant to speed up your timing job by placing the redlines for you. You only have to tell it where exactly all the sounds are."
         //    +$"{Environment.NewLine}What you do is place 'markers' exactly on the correct timing of sounds. These markers can be hit objects, bookmarks, greenlines and redlines.{Environment.NewLine}Timing Helper will then adjust BPM and/or add redlines to make every marker be snapped.";
         public static readonly string ToolDescription = $@"Timing Studio allows you to property sync the song using the Advanced Timeline. You can import .mid, .rpp, and a beatmap of choice.";
 
-        public TimingStudioVM ViewModel
-        {
-            get => (TimingStudioVM) DataContext;
-            set => DataContext = value;
-        }
+        
 
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "timingstudioproject.json");
 
@@ -38,6 +34,7 @@ namespace Mapping_Tools.Views
 
         public TimingStudioView() {
             InitializeComponent();
+            DataContext = new TimingStudioVM();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
         }
@@ -399,14 +396,14 @@ namespace Mapping_Tools.Views
             return Math.Abs(resnappedTime - time) <= leniency;
         }
 
-        public TimingStudioProject GetSaveData()
+        public TimingStudioVM GetSaveData()
         {
             throw new NotImplementedException();
         }
 
-        public void SetSaveData(TimingStudioProject saveData)
+        public void SetSaveData(TimingStudioVM saveData)
         {
-            
+            throw new NotImplementedException();
         }
     }
 }
