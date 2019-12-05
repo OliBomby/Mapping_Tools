@@ -10,6 +10,9 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls.Primitives;
+using Mapping_Tools.Components.SampleDialog;
+using MaterialDesignThemes.Wpf;
 
 namespace Mapping_Tools.Views {
     /// <summary>
@@ -32,6 +35,15 @@ namespace Mapping_Tools.Views {
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
             ProjectManager.LoadProject(this, message: false);
+        }
+
+        private async void ImportColoursButton_OnClick(object sender, RoutedEventArgs e) {
+            var sampleDialog = new SampleDialog();
+
+            var result = await DialogHost.Show(sampleDialog, "RootDialog");
+
+            Console.WriteLine((bool)result);
+            Console.WriteLine(sampleDialog.ViewModel.Name);
         }
 
         protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {

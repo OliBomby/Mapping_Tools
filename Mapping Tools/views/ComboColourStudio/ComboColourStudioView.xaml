@@ -140,10 +140,14 @@
                     </Grid.RowDefinitions>
 
                     <Grid Grid.Row="1">
-                        <materialDesign:Card VerticalAlignment="Bottom" HorizontalAlignment="Stretch" UniformCornerRadius="5" Padding="2" Margin="0 5 5 0">
+                        <materialDesign:Card VerticalAlignment="Bottom" HorizontalAlignment="Stretch" UniformCornerRadius="5" Padding="2" Margin="0 10 5 5">
                             <StackPanel Orientation="Horizontal">
-                                <materialDesign:PopupBox x:Name="SettingsPopupBox" StaysOpen="True">
+                                <materialDesign:PopupBox PlacementMode="TopAndAlignLeftEdges">
+                                    <StackPanel>
+                                        <Button Content="Import colours" Click="ImportColoursButton_OnClick"/>
+                                    </StackPanel>
                                 </materialDesign:PopupBox>
+
                                 <TextBox Width="120" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="10 0 10 5"
                                          materialDesign:HintAssist.Hint="Max burst length" ToolTip="Determines the maximum combo size for burst combos. Combos longer than this cant get burst colours."
                                          Text="{Binding Project.MaxBurstLength}"/>

@@ -325,6 +325,7 @@
     <Compile Include="Components\Domain\IntToStringConverter.cs" />
     <Compile Include="Components\Domain\EnumToBoolConverter.cs" />
     <Compile Include="Components\Domain\CharacterLimitValidationRule.cs" />
+    <Compile Include="Components\Domain\NotEmptyValidationRule.cs" />
     <Compile Include="Components\Domain\StringArrayToStringConverter.cs" />
     <Compile Include="Components\Domain\IsASCIIValidationRule.cs" />
     <Compile Include="Components\Domain\SnapDivisorToStringConverter.cs" />
@@ -360,6 +361,10 @@
     <Compile Include="Components\Graph\TypeValueDialog.xaml.cs">
       <DependentUpon>TypeValueDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Components\SampleDialog\SampleDialog.xaml.cs">
+      <DependentUpon>SampleDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Components\SampleDialog\SampleDialogViewModel.cs" />
     <Compile Include="Components\ViewHeaderComponent.xaml.cs">
       <DependentUpon>ViewHeaderComponent.xaml</DependentUpon>
     </Compile>
@@ -472,6 +477,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Components\Graph\TypeValueDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Components\SampleDialog\SampleDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -61,10 +61,7 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="35"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height="35"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
             <Grid x:Name="FirstGrid" Grid.Row="0">
@@ -82,64 +79,79 @@
                     <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowCLose}" Click="CloseWin" Foreground="{DynamicResource MaterialDesignBody}"/>
                 </StackPanel>
             </Grid>
-            <Grid x:Name="SecondGrid" Grid.Column="0" Grid.Row="1">
-                <Menu Foreground="{DynamicResource MaterialDesignBody}">
-                    <MenuItem Height="31" Header="_File" Padding="12,0,0,0" MinWidth="50">
-                        <MenuItem Header="_Open beatmap" Click="OpenBeatmap" Icon="{materialDesign:PackIcon Folder}"
-                                  ToolTip="Set the current beatmap using the file explorer."/>
-                        <MenuItem Header="_Open current beatmap" Click="OpenGetCurrentBeatmap" Icon="{materialDesign:PackIcon Download}"
-                                  ToolTip="Set the current beatmap to the selected beatmap in your osu! client."/>
-                        <MenuItem Header="_Generate backup" Click="SaveBackup" Icon="{materialDesign:PackIcon Backup}"
-                                  ToolTip="Save a backup of the current beatmap to the backups folder."/>
-                        <MenuItem Header="_BetterSave™ current beatmap" Click="CoolSave" Icon="{materialDesign:PackIcon ContentSave}"
-                                  ToolTip="Save the beatmap which is currently open in your osu! editor. BetterSave™ saves the beatmap just like the vanilla editor, but decimal values get rounded instead of truncated."/>
-                    </MenuItem>
-                    <MenuItem x:Name="ToolsMenu" Height="31" Header="_Tools" Padding="12,0,0,0" MinWidth="65">
-                    </MenuItem>
-                    <MenuItem Height="31" Header="_Options" Padding="12,0,0,0" MinWidth="80">
-                        <MenuItem Header="_Get started" Click="ViewSelectMenuItemOnClick" Icon="{materialDesign:PackIcon ArrowRight}"
-                                  ToolTip="Open the Get Started page."/>
-                        <MenuItem Header="_Preferences" Click="ViewSelectMenuItemOnClick" Icon="{materialDesign:PackIcon Settings}"
-                                  ToolTip="Open the Preferences page."/>
-                        <MenuItem Header="_Open backups folder" Click="OpenBackups" Icon="{materialDesign:PackIcon FolderOpen}"
-                                  ToolTip="Open the backups folder."/>
-                    </MenuItem>
-                    <MenuItem Height="31" Header="_About" Padding="12,0,0,0" MinWidth="67">
-                        <MenuItem Header="_Website" Click="OpenWebsite" Icon="{materialDesign:PackIcon OpenInBrowser}"
-                                  ToolTip="Open the official Mapping Tools website in your browser."/>
-                        <MenuItem Header="_Github" Click="OpenGitHub" Icon="{materialDesign:PackIcon GithubCircle}"
-                                  ToolTip="Go to the Mapping Tools Github."/>
-                        <MenuItem Header="_Info" Click="OpenInfo" Icon="{materialDesign:PackIcon InfoCircle}"
-                                  ToolTip="Basic information about your Mapping Tools client."/>
-                    </MenuItem>
-                    <MenuItem x:Name="project" Visibility="Collapsed" Height="31" Header="_Project" Padding="12,0,0,0" MinWidth="67">
-                        <MenuItem Header="_Save project" Click="SaveProject" Icon="{materialDesign:PackIcon ContentSave}"
-                                  ToolTip="Save tool settings to file."/>
-                        <MenuItem Header="_Load project" Click="LoadProject" Icon="{materialDesign:PackIcon Folder}"
-                                  ToolTip="Load tool settings from file."/>
-                    </MenuItem>
-                </Menu>
-            </Grid>
-            <Separator Background="{DynamicResource MaterialDesignDivider}" Grid.Row="2"/>
-            <Grid x:Name="ThirdGrid" Grid.Row="3">
-                <ContentControl Margin="20" Name="content_views" Content="{Binding}"></ContentControl>
 
-                <materialDesign:Snackbar x:Name="MainSnackbar"/>
-            </Grid>
-            <materialDesign:ColorZone Mode="PrimaryDark" Grid.Row="4">
-                <Grid x:Name="ForthGrid">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid Grid.Column="0">
-                        <TextBlock Padding="10,10,0,0" Text="Current Map:" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontWeight="Normal"/>
+            <materialDesign:DialogHost Grid.Row="1" Identifier="RootDialog" 
+                                       SnackbarMessageQueue="{Binding ElementName=MainSnackbar, Path=MessageQueue}" 
+                                       Style="{StaticResource MaterialDesignEmbeddedDialogHost}">
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="35"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid x:Name="SecondGrid" Grid.Row="0">
+                        <Menu Foreground="{DynamicResource MaterialDesignBody}">
+                            <MenuItem Height="31" Header="_File" Padding="12,0,0,0" MinWidth="50">
+                                <MenuItem Header="_Open beatmap" Click="OpenBeatmap" Icon="{materialDesign:PackIcon Folder}"
+                                          ToolTip="Set the current beatmap using the file explorer."/>
+                                <MenuItem Header="_Open current beatmap" Click="OpenGetCurrentBeatmap" Icon="{materialDesign:PackIcon Download}"
+                                          ToolTip="Set the current beatmap to the selected beatmap in your osu! client."/>
+                                <MenuItem Header="_Generate backup" Click="SaveBackup" Icon="{materialDesign:PackIcon Backup}"
+                                          ToolTip="Save a backup of the current beatmap to the backups folder."/>
+                                <MenuItem Header="_BetterSave™ current beatmap" Click="CoolSave" Icon="{materialDesign:PackIcon ContentSave}"
+                                          ToolTip="Save the beatmap which is currently open in your osu! editor. BetterSave™ saves the beatmap just like the vanilla editor, but decimal values get rounded instead of truncated."/>
+                            </MenuItem>
+                            <MenuItem x:Name="ToolsMenu" Height="31" Header="_Tools" Padding="12,0,0,0" MinWidth="65">
+                            </MenuItem>
+                            <MenuItem Height="31" Header="_Options" Padding="12,0,0,0" MinWidth="80">
+                                <MenuItem Header="_Get started" Click="ViewSelectMenuItemOnClick" Icon="{materialDesign:PackIcon ArrowRight}"
+                                          ToolTip="Open the Get Started page."/>
+                                <MenuItem Header="_Preferences" Click="ViewSelectMenuItemOnClick" Icon="{materialDesign:PackIcon Settings}"
+                                          ToolTip="Open the Preferences page."/>
+                                <MenuItem Header="_Open backups folder" Click="OpenBackups" Icon="{materialDesign:PackIcon FolderOpen}"
+                                          ToolTip="Open the backups folder."/>
+                            </MenuItem>
+                            <MenuItem Height="31" Header="_About" Padding="12,0,0,0" MinWidth="67">
+                                <MenuItem Header="_Website" Click="OpenWebsite" Icon="{materialDesign:PackIcon OpenInBrowser}"
+                                          ToolTip="Open the official Mapping Tools website in your browser."/>
+                                <MenuItem Header="_Github" Click="OpenGitHub" Icon="{materialDesign:PackIcon GithubCircle}"
+                                          ToolTip="Go to the Mapping Tools Github."/>
+                                <MenuItem Header="_Info" Click="OpenInfo" Icon="{materialDesign:PackIcon InfoCircle}"
+                                          ToolTip="Basic information about your Mapping Tools client."/>
+                            </MenuItem>
+                            <MenuItem x:Name="project" Visibility="Collapsed" Height="31" Header="_Project" Padding="12,0,0,0" MinWidth="67">
+                                <MenuItem Header="_Save project" Click="SaveProject" Icon="{materialDesign:PackIcon ContentSave}"
+                                          ToolTip="Save tool settings to file."/>
+                                <MenuItem Header="_Load project" Click="LoadProject" Icon="{materialDesign:PackIcon Folder}"
+                                          ToolTip="Load tool settings from file."/>
+                            </MenuItem>
+                        </Menu>
                     </Grid>
-                    <Grid Grid.Column="1">
-                        <TextBlock x:FieldModifier="public" Name="currentMap" Height="35" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Padding="10,10,0,0" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontWeight="Normal"/>
+                    <Separator Background="{DynamicResource MaterialDesignDivider}" Grid.Row="1"/>
+                    <Grid x:Name="ThirdGrid" Grid.Row="2">
+                        <ContentControl Margin="20" Name="content_views" Content="{Binding}"></ContentControl>
+
+                        <materialDesign:Snackbar x:Name="MainSnackbar"/>
                     </Grid>
+                    <materialDesign:ColorZone Mode="PrimaryDark" Grid.Row="3">
+                        <Grid x:Name="ForthGrid">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0">
+                                <TextBlock Padding="10,10,0,0" Text="Current Map:" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontWeight="Normal"/>
+                            </Grid>
+                            <Grid Grid.Column="1">
+                                <TextBlock x:FieldModifier="public" Name="currentMap" Height="35" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Padding="10,10,0,0" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontWeight="Normal"/>
+                            </Grid>
+                        </Grid>
+                    </materialDesign:ColorZone>
                 </Grid>
-            </materialDesign:ColorZone>
+            </materialDesign:DialogHost>
         </Grid>
         <Border Name="window_border" BorderThickness="1" Background="{x:Null}" BorderBrush="{DynamicResource PrimaryHueDarkBrush}"/>
     </Grid>
