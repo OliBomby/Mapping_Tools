@@ -4,15 +4,13 @@ using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Viewmodels;
+using MaterialDesignThemes.Wpf;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls.Primitives;
-using Mapping_Tools.Components.SampleDialog;
-using MaterialDesignThemes.Wpf;
 
 namespace Mapping_Tools.Views {
     /// <summary>
@@ -38,12 +36,13 @@ namespace Mapping_Tools.Views {
         }
 
         private async void ImportColoursButton_OnClick(object sender, RoutedEventArgs e) {
-            var sampleDialog = new SampleDialog();
+            var sampleDialog = new BeatmapImportDialog();
 
             var result = await DialogHost.Show(sampleDialog, "RootDialog");
 
-            Console.WriteLine((bool)result);
-            Console.WriteLine(sampleDialog.ViewModel.Name);
+            if ((bool) result) {
+                ViewModel.Project.ImportFromBeatmap(sampleDialog.Path);
+            }
         }
 
         protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {

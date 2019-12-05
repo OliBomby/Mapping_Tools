@@ -402,6 +402,9 @@
     <Compile Include="Viewmodels\SliderMergerVM.cs" />
     <Compile Include="Viewmodels\PreferencesVM.cs" />
     <Compile Include="Viewmodels\StandardVM.cs" />
+    <Compile Include="Views\ComboColourStudio\BeatmapImportDialog.xaml.cs">
+      <DependentUpon>BeatmapImportDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\HiddenToolAttribute.cs" />
     <Compile Include="Views\DontShowTitleAttribute.cs" />
     <Compile Include="Views\Extensions.cs" />
@@ -533,6 +536,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\ComboColourStudio\ComboColourStudioView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ComboColourStudio\BeatmapImportDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -50,16 +50,21 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
 
             RemoveComboCommand = new CommandImplementation(_ => {
                 if (ComboColours.Count > 0) {
-                    var removing = ComboColours[ComboColours.Count - 1];
                     ComboColours.RemoveAt(ComboColours.Count - 1);
-                    foreach (var colourPoint in ColourPoints) {
-                        colourPoint.ColourSequence.Remove(removing);
-                    }
                 }
             });
         }
 
         private void ComboColoursOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+            if (e.OldItems != null) {
+                foreach (var oldItem in e.OldItems) {
+                    var removed = (SpecialColour) oldItem;
+                    foreach (var colourPoint in ColourPoints) {
+                        colourPoint.ColourSequence.Remove(removed);
+                    }
+                }
+            }
+
             MatchComboColourReferences();
         }
 
@@ -103,7 +108,7 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
 
                 ComboColours.Clear();
                 for (int i = 0; i < beatmap.ComboColours.Count; i++) {
-                    ComboColours.Add(new SpecialColour(beatmap.ComboColours[i].Color, $"Combo{i}"));
+                    ComboColours.Add(new SpecialColour(beatmap.ComboColours[i].Color, $"Combo{i + 1}"));
                 }
             }
             catch( Exception ex ) {
