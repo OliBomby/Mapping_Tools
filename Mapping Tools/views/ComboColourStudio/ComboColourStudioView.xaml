@@ -36,7 +36,7 @@
                         <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
                     </materialDesign:PopupBox.ToggleContent>
                     <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
-                        With Combo Colour Studio you can easily customize the combo colours of your beatmap.
+                        With Combo Colour Studio you can easily customize the combo colours of your beatmap. AKA colour haxing.
                         <LineBreak/>
                         You define colored sections much like how you use timing points in the osu! editor. Just add a new colour point and define the sequence of combo colours.
                         <LineBreak/>
