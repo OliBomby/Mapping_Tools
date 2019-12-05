@@ -14,9 +14,13 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
         private ObservableCollection<ColourPoint> _colourPoints;
         private ObservableCollection<SpecialColour> _comboColours;
 
+        private int _maxBurstLength;
+
         public ComboColourProject() {
             ColourPoints = new ObservableCollection<ColourPoint>();
             ComboColours = new ObservableCollection<SpecialColour>();
+
+            MaxBurstLength = 1;
 
             ColourPoints.CollectionChanged += ColourPointsOnCollectionChanged;
             ComboColours.CollectionChanged += ComboColoursOnCollectionChanged;
@@ -116,6 +120,11 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
         public ObservableCollection<SpecialColour> ComboColours {
             get => _comboColours;
             set => Set(ref _comboColours, value);
+        }
+
+        public int MaxBurstLength {
+            get => _maxBurstLength;
+            set => Set(ref _maxBurstLength, value);
         }
 
         public CommandImplementation AddColourPointCommand { get; }

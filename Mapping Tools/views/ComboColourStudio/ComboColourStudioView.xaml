@@ -43,7 +43,7 @@
                         You can also define 'burst' colour points which only work for one combo, so you can emphasize specific patterns using colour.
                         <LineBreak/>
                         You can get started by adding a combo colour using the plus on the bottom left or by importing combo colours from an existing map.
-                        Combo colours can be edited by clicking on the coloured circle.
+                        The combo colours can be edited by clicking on the coloured circles.
                         <LineBreak/>
                         Add a colour point by clicking on the plus on the bottom right. You can edit the colour sequence by double clicking the colour sequence cell.
                     </TextBlock>
@@ -131,52 +131,78 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Column="0" VerticalAlignment="Top" Orientation="Horizontal">
-                    <materialDesign:Card UniformCornerRadius="5">
-                        <ListBox ItemsSource="{Binding Project.ComboColours}">
-                            <ListBox.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Horizontal"/>
-                                </ItemsPanelTemplate>
-                            </ListBox.ItemsPanel>
-                            <ListBox.ItemTemplate>
-                                <DataTemplate DataType="beatmapHelper:SpecialColour">
-                                    <materialDesign:PopupBox StaysOpen="True" ToolTip="{Binding Name}">
-                                        <materialDesign:PopupBox.ToggleContent>
-                                            <materialDesign:PackIcon Kind="Circle" Foreground="{Binding Color, Converter={StaticResource ColorToBrushConverter}}" Width="35" Height="35"/>
-                                        </materialDesign:PopupBox.ToggleContent>
-                                        <StackPanel Orientation="Horizontal" Margin="20">
-                                            <TextBox Text="{Binding Color, ElementName=ColorPicker}"
-                                                     Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" materialDesign:HintAssist.Hint="Color HEX value"
-                                                     Width="120" Margin="2,0,10,2"/>
-                                            <materialDesign:ColorPicker Color="{Binding Color}" x:Name="ColorPicker" Width="300"/>
-                                        </StackPanel>
-                                    </materialDesign:PopupBox>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
-                    </materialDesign:Card>
-                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a new combo colour." VerticalAlignment="Bottom" Margin="5" Command="{Binding Project.AddComboCommand}">
-                        <materialDesign:PackIcon Kind="Plus" Width="24" Height="24"/>
-                    </Button>
-                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove last combo colour." VerticalAlignment="Bottom" Margin="5" Command="{Binding Project.RemoveComboCommand}">
-                        <materialDesign:PackIcon Kind="Minus" Width="24" Height="24"/>
-                    </Button>
-                </StackPanel>
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
-                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a new colour point." VerticalAlignment="Bottom" Margin="5" Command="{Binding Project.AddColourPointCommand}">
-                        <materialDesign:PackIcon Kind="Plus" Width="24" Height="24"/>
-                    </Button>
-                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove selected colour points or last colour point." VerticalAlignment="Bottom" Margin="5" Command="{Binding Project.RemoveColourPointCommand}">
-                        <materialDesign:PackIcon Kind="Minus" Width="24" Height="24"/>
-                    </Button>
-                </StackPanel>
-            
-                <Viewbox Grid.Column="2" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
+                    <Grid Grid.Row="1">
+                        <materialDesign:Card VerticalAlignment="Bottom" HorizontalAlignment="Stretch" UniformCornerRadius="5" Padding="2" Margin="0 5 6 0">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PopupBox x:Name="SettingsPopupBox" StaysOpen="True">
+                                </materialDesign:PopupBox>
+                                <TextBox Width="120" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="10 0 10 5"
+                                         materialDesign:HintAssist.Hint="Max burst length" ToolTip="Determines the maximum combo size for burst combos. Combos longer than this cant get burst colours."
+                                         Text="{Binding Project.MaxBurstLength}"/>
+                            </StackPanel>
+                        </materialDesign:Card>
+                    </Grid>
+
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" VerticalAlignment="Top" Orientation="Horizontal">
+                            <materialDesign:Card UniformCornerRadius="5">
+                                <ListBox ItemsSource="{Binding Project.ComboColours}">
+                                    <ListBox.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ListBox.ItemsPanel>
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate DataType="beatmapHelper:SpecialColour">
+                                            <materialDesign:PopupBox StaysOpen="True" ToolTip="{Binding Name}">
+                                                <materialDesign:PopupBox.ToggleContent>
+                                                    <materialDesign:PackIcon Kind="Circle" Foreground="{Binding Color, Converter={StaticResource ColorToBrushConverter}}" Width="35" Height="35"/>
+                                                </materialDesign:PopupBox.ToggleContent>
+                                                <StackPanel Orientation="Horizontal" Margin="20">
+                                                    <TextBox Text="{Binding Color, ElementName=ColorPicker}"
+                                                             Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" materialDesign:HintAssist.Hint="Color HEX value"
+                                                             Width="120" Margin="2,0,10,2"/>
+                                                    <materialDesign:ColorPicker Color="{Binding Color}" x:Name="ColorPicker" Width="300"/>
+                                                </StackPanel>
+                                            </materialDesign:PopupBox>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </materialDesign:Card>
+                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a new combo colour." VerticalAlignment="Center" Margin="5" Command="{Binding Project.AddComboCommand}">
+                                <materialDesign:PackIcon Kind="Plus" Width="24" Height="24"/>
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove last combo colour." VerticalAlignment="Center" Margin="5" Command="{Binding Project.RemoveComboCommand}">
+                                <materialDesign:PackIcon Kind="Minus" Width="24" Height="24"/>
+                            </Button>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal">
+                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a new colour point." VerticalAlignment="Center" Margin="5" Command="{Binding Project.AddColourPointCommand}">
+                                <materialDesign:PackIcon Kind="Plus" Width="24" Height="24"/>
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove selected colour points or last colour point." VerticalAlignment="Center" Margin="5" Command="{Binding Project.RemoveColourPointCommand}">
+                                <materialDesign:PackIcon Kind="Minus" Width="24" Height="24"/>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+
+                
+                <Viewbox Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
                     <Button
                         IsEnabled="{Binding ElementName=This, Path=CanRun}"
                         Style="{StaticResource MaterialDesignFloatingActionButton}"

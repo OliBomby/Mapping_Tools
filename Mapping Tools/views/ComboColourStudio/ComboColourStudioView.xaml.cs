@@ -75,8 +75,11 @@ namespace Mapping_Tools.Views {
                     int lastColourIndex = 0;
                     var exceptions = new List<ColourPoint>();
                     foreach (var newCombo in beatmap.HitObjects.Where(o => o.NewCombo || o == beatmap.HitObjects[0])) {
+                        int comboLength = GetComboLength(newCombo, beatmap.HitObjects);
+                        //Console.WriteLine(comboLength);
+
                         // Get the colour point for this new combo
-                        var colourPoint = GetColourPoint(orderedColourPoints, newCombo.Time, exceptions);
+                        var colourPoint = GetColourPoint(orderedColourPoints, newCombo.Time, exceptions, comboLength <= arg.Project.MaxBurstLength);
                         var colourSequence = colourPoint.ColourSequence.ToList();
 
                         // Add the colour point to the exceptions so it doesnt get used again
@@ -135,8 +138,28 @@ namespace Mapping_Tools.Views {
             return message;
         }
 
-        private static ColourPoint GetColourPoint(IReadOnlyList<ColourPoint> colourPoints, double time, IReadOnlyCollection<ColourPoint> exceptions) {
-            return colourPoints.Except(exceptions).LastOrDefault(o => o.Time <= time + 5 && (o.Mode != ColourPointMode.Burst || o.Time >= time - 5)) ?? 
+        private static int GetComboLength(HitObject newCombo, List<HitObject> hitObjects) {
+            int count = 1;
+            var index = hitObjects.IndexOf(newCombo);
+
+            if (index == -1) {
+                return 0;
+            }
+
+            while (++index < hitObjects.Count) {
+                var hitObject = hitObjects[index];
+                if (hitObject.NewCombo) {
+                    return count;
+                }
+
+                count++;
+            }
+
+            return count;
+        }
+
+        private static ColourPoint GetColourPoint(IReadOnlyList<ColourPoint> colourPoints, double time, IReadOnlyCollection<ColourPoint> exceptions, bool includeBurst) {
+            return colourPoints.Except(exceptions).LastOrDefault(o => o.Time <= time + 5 && (o.Mode != ColourPointMode.Burst || o.Time >= time - 5 && includeBurst)) ?? 
                                                                       colourPoints.Except(exceptions).FirstOrDefault(o => o.Mode != ColourPointMode.Burst) ?? 
                                                                       colourPoints[0];
         }
@@ -147,6 +170,11 @@ namespace Mapping_Tools.Views {
 
         public void SetSaveData(ComboColourProject saveData) {
             ViewModel.Project = saveData;
+        }
+
+        private void SettingsButton_OnClick(object sender, RoutedEventArgs e) {
+            SettingsPopupBox.IsPopupOpen = !SettingsPopupBox.IsPopupOpen;
+            e.Handled = true;
         }
     }
 }
