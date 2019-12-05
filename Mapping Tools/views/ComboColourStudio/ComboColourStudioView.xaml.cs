@@ -171,10 +171,5 @@ namespace Mapping_Tools.Views {
         public void SetSaveData(ComboColourProject saveData) {
             ViewModel.Project = saveData;
         }
-
-        private void SettingsButton_OnClick(object sender, RoutedEventArgs e) {
-            SettingsPopupBox.IsPopupOpen = !SettingsPopupBox.IsPopupOpen;
-            e.Handled = true;
-        }
     }
 }

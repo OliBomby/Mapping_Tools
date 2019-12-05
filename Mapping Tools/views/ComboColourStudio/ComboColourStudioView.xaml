@@ -140,7 +140,7 @@
                     </Grid.RowDefinitions>
 
                     <Grid Grid.Row="1">
-                        <materialDesign:Card VerticalAlignment="Bottom" HorizontalAlignment="Stretch" UniformCornerRadius="5" Padding="2" Margin="0 5 6 0">
+                        <materialDesign:Card VerticalAlignment="Bottom" HorizontalAlignment="Stretch" UniformCornerRadius="5" Padding="2" Margin="0 5 5 0">
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PopupBox x:Name="SettingsPopupBox" StaysOpen="True">
                                 </materialDesign:PopupBox>
