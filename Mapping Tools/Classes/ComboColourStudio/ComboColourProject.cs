@@ -22,9 +22,6 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
 
             MaxBurstLength = 1;
 
-            ColourPoints.CollectionChanged += ColourPointsOnCollectionChanged;
-            ComboColours.CollectionChanged += ComboColoursOnCollectionChanged;
-
             AddColourPointCommand = new CommandImplementation(_ => {
                 ColourPoints.Add(ColourPoints.Count > 0
                     ? (ColourPoint)ColourPoints[ColourPoints.Count - 1].Clone()
@@ -119,12 +116,16 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
         
         public ObservableCollection<ColourPoint> ColourPoints {
             get => _colourPoints;
-            set => Set(ref _colourPoints, value);
+            set { Set(ref _colourPoints, value);
+                ColourPoints.CollectionChanged += ColourPointsOnCollectionChanged;
+            }
         }
 
         public ObservableCollection<SpecialColour> ComboColours {
             get => _comboColours;
-            set => Set(ref _comboColours, value);
+            set { Set(ref _comboColours, value);
+                ComboColours.CollectionChanged += ComboColoursOnCollectionChanged;
+            }
         }
 
         public int MaxBurstLength {
