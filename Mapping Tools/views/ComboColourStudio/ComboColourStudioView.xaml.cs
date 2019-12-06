@@ -115,6 +115,10 @@ namespace Mapping_Tools.Views {
                         var colourIndex = colourSequence.Count == 0 ? MathHelper.Mod(lastColourIndex + 1, orderedComboColours.Count) :
                             orderedComboColours.FindIndex(o => o.Name == colourSequence[colourPointColourIndex].Name);
 
+                        if (colourIndex == -1) {
+                            throw new ArgumentException($"Can not use colour {colourSequence[colourPointColourIndex].Name} of colour point at offset {colourPoint.Time} because it does not exist in the combo colours.");
+                        }
+
                         //Console.WriteLine("colourIndex: " + colourIndex);
 
                         var comboChange = colourIndex - lastColourIndex;

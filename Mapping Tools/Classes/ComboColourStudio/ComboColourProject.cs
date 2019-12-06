@@ -53,14 +53,14 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
         }
 
         private void ComboColoursOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
-            if (e.OldItems != null) {
+            /*if (e.OldItems != null) {
                 foreach (var oldItem in e.OldItems) {
                     var removed = (SpecialColour) oldItem;
                     foreach (var colourPoint in ColourPoints) {
                         colourPoint.ColourSequence.Remove(removed);
                     }
                 }
-            }
+            }*/
 
             MatchComboColourReferences();
         }
