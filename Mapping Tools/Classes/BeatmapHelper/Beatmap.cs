@@ -211,6 +211,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                     SpecialColours[SplitKeyValue(line)[0].Trim()] = new ComboColour(line);
                 }
             }
+            // Add default colours to ComboColours if there are no combo colours at all
+            if (ComboColours.Count == 0) {
+                ComboColours.Add(new ComboColour(255, 192, 0));
+                ComboColours.Add(new ComboColour(0, 202, 0));
+                ComboColours.Add(new ComboColour(18, 124, 255));
+                ComboColours.Add(new ComboColour(242, 24, 57));
+            }
+
             foreach (string line in eventsLines) {
                 Events.Add(line);
             }
