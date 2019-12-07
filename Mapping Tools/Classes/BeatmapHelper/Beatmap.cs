@@ -309,7 +309,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public static bool IsNewCombo(HitObject hitObject, HitObject previousHitObject) {
-            return hitObject.NewCombo || previousHitObject == null || previousHitObject.IsSpinner;
+            return hitObject.NewCombo || hitObject.IsSpinner || previousHitObject == null || previousHitObject.IsSpinner;
         }
 
         /// <summary>
