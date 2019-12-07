@@ -85,7 +85,7 @@ namespace Mapping_Tools.Views {
                     var lastColourPoint = orderedColourPoints[0];
                     int lastColourIndex = 0;
                     var exceptions = new List<ColourPoint>();
-                    foreach (var newCombo in beatmap.HitObjects.Where(o => o.NewCombo || o == beatmap.HitObjects[0])) {
+                    foreach (var newCombo in beatmap.HitObjects.Where(o => o.ActualNewCombo)) {
                         int comboLength = GetComboLength(newCombo, beatmap.HitObjects);
                         //Console.WriteLine(comboLength);
 
@@ -123,8 +123,8 @@ namespace Mapping_Tools.Views {
 
                         var comboChange = colourIndex - lastColourIndex;
 
-                        // Do -1 combo skip since it always does +1 combo colour for each new combo
-                        newCombo.ComboSkip = MathHelper.Mod(comboChange - 1, arg.Project.ComboColours.Count);
+                        // Do -1 combo skip since it always does +1 combo colour for each new combo which is not on a spinner
+                        newCombo.ComboSkip = newCombo.IsSpinner ? comboChange : MathHelper.Mod(comboChange - 1, arg.Project.ComboColours.Count);
 
                         // Set new combo to true for the case this is the first object and new combo is false
                         if (!newCombo.NewCombo && newCombo.ComboSkip != 0) {
