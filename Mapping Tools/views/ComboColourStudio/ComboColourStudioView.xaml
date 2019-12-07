@@ -142,8 +142,10 @@
                     <Grid Grid.Row="1">
                         <materialDesign:Card VerticalAlignment="Bottom" HorizontalAlignment="Stretch" UniformCornerRadius="5" Padding="2" Margin="0 10 5 5">
                             <StackPanel Orientation="Horizontal">
-                                <Button Content="Import colours" Click="ImportColoursButton_OnClick" Margin="5 0 20 0"
+                                <Button Content="Import colours" Click="ImportColoursButton_OnClick" Margin="5 0 5 0"
                                         ToolTip="Import combo colours from a beatmap."/>
+                                <Button Content="Import colorhax" Click="ImportColourHaxButton_OnClick" Margin="5 0 20 0"
+                                        ToolTip="Import colour haxing from a beatmap and populate the colour points."/>
 
                                 <TextBox Width="120" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="10 0 10 5"
                                          materialDesign:HintAssist.Hint="Max burst length" ToolTip="Determines the maximum combo size for burst combos. Combos longer than this cant get burst colours."

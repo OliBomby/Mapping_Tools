@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Components.Domain;
 
@@ -98,7 +99,48 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
             return new ColourPoint(time, colours ?? new SpecialColour[0], ColourPointMode.Normal, this);
         }
 
-        public void ImportFromBeatmap(string importPath) {
+        public void ImportColourHaxFromBeatmap(string importPath) {
+            try {
+                var editor = new BeatmapEditor(importPath);
+                var beatmap = editor.Beatmap;
+
+                ComboColours.Clear();
+                for (int i = 0; i < beatmap.ComboColours.Count; i++) {
+                    ComboColours.Add(new SpecialColour(beatmap.ComboColours[i].Color, $"Combo{i + 1}"));
+                }
+
+
+            }
+            catch( Exception ex ) {
+                MessageBox.Show($"{ex.Message}{Environment.NewLine}{ex.StackTrace}", "Error");
+            }
+        }
+
+        private static int[] GetColourSequence(IReadOnlyList<HitObject> hitObjects, int startIndex, int sequenceLength) {
+            int[] colourSequence = new int[sequenceLength];
+
+            for (int i = 0; i < sequenceLength; i++) {
+                colourSequence[i] = hitObjects[startIndex + i].ColourIndex;
+            }
+
+            return colourSequence;
+        }
+
+        private static int GetSequenceScore(IReadOnlyList<HitObject> hitObjects, int startIndex, IReadOnlyList<int> colourSequence) {
+            int index = startIndex;
+            int sequenceIndex = 0;
+            int score = 0;
+
+            while (index < hitObjects.Count && hitObjects[index].ColourIndex == colourSequence[sequenceIndex]) {
+                score++;
+                index++;
+                sequenceIndex = MathHelper.Mod(sequenceIndex + 1, colourSequence.Count);
+            }
+
+            return score;
+        }
+
+        public void ImportComboColoursFromBeatmap(string importPath) {
             try {
                 var editor = new BeatmapEditor(importPath);
                 var beatmap = editor.Beatmap;
