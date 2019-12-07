@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
 
@@ -245,6 +246,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             BeatmapTiming = new Timing(timingLines, Difficulty["SliderMultiplier"].Value);
 
             SortHitObjects();
+            CalculateHitObjectComboStuff();
             CalculateSliderEndTimes();
             GiveObjectsGreenlines();
         }
@@ -263,6 +265,43 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             foreach (var ho in HitObjects.Where(ho => ho.IsSlider)) {
                 ho.TemporalLength = BeatmapTiming.CalculateSliderTemporalLength(ho.Time, ho.PixelLength);
             }
+        }
+        
+        /// <summary>
+        /// Calculates the which hit objects actually have a new combo.
+        /// Calculates the combo index and combo colours for each hit object.
+        /// This includes cases where the previous hit object is a spinner or doesnt exist.
+        /// </summary>
+        public void CalculateHitObjectComboStuff() {
+            HitObject previousHitObject = null;
+            int colourIndex = 0;
+            int comboIndex = 0;
+
+            foreach (var hitObject in HitObjects) {
+                hitObject.ActualNewCombo = IsNewCombo(hitObject, previousHitObject);
+
+                if (hitObject.ActualNewCombo) {
+                    var colourIncrement = hitObject.ComboSkip;
+                    if (!hitObject.IsSpinner) {
+                        colourIncrement++;
+                    }
+
+                    colourIndex = MathHelper.Mod(colourIndex + colourIncrement, ComboColours.Count);
+                    comboIndex = 1;
+                } else {
+                    comboIndex++;
+                }
+
+                hitObject.ComboIndex = comboIndex;
+                hitObject.ColourIndex = colourIndex;
+                hitObject.Colour = ComboColours[colourIndex];
+
+                previousHitObject = hitObject;
+            }
+        }
+
+        public static bool IsNewCombo(HitObject hitObject, HitObject previousHitObject) {
+            return hitObject.NewCombo || previousHitObject == null || previousHitObject.IsSpinner;
         }
 
         /// <summary>

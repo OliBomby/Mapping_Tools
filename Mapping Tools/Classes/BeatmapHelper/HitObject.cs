@@ -143,6 +143,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public bool SliderExtras => GetSliderExtras();
 
+        public bool ActualNewCombo { get; set; }
+        public int ComboIndex { get; set; }
+        public int ColourIndex { get; set; }
+        public ComboColour Colour { get; set; }
+
         public double TemporalLength { get; set; } // Duration of one repeat
 
         public double EndTime {
