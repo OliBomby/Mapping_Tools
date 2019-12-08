@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Mapping_Tools.Classes.BeatmapHelper;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -29,8 +30,15 @@ namespace Mapping_Tools.Classes.ExternalFileUtil.Reaper
         }
 
 
+        private ObservableCollection<TrackItem> _trackItem;
 
+        public ObservableCollection<TrackItem> TrackItem
+        {
+            get { return _trackItem; }
+            set { _trackItem = value; }
+        }
 
+          
 
 
 
