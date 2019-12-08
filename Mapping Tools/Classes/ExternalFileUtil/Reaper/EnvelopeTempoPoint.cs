@@ -50,15 +50,73 @@ namespace Mapping_Tools.Classes.ExternalFileUtil.Reaper
 
         private TempoSignature tempoSignature;
 
+        
+
         public TempoSignature TempoSignature
         {
             get { return tempoSignature; }
             set { tempoSignature = value; }
         }
 
+        /// <summary>
+        /// PT 0.000000000000 72.0000000000 1
+        /// 
+        /// </summary>
+        /// <param name="line"></param>
+        public EnvelopeTempoPoint(string line)
+        {
+            string[] timingInformation = line.Split(char.Parse(""));
+            time = decimal.Parse(timingInformation[1]);
+            bpm = decimal.Parse(timingInformation[2]);
+            envelopeShape = (EnvelopeShape)int.Parse(timingInformation[3]);
+            tempoSignature = timingInformation[4] != null ? GetTempoSignature(timingInformation[4]) : new TempoSignature(4);
+        }
+
+        private TempoSignature GetTempoSignature(string signatureValue)
+        {
+            numeratorIncrementalValue = PopulateDictionary();
+            int numeratorValue = int.Parse(signatureValue.Substring(signatureValue.Length - 3));
+            int denominatorValue = int.Parse(signatureValue.Substring(0, signatureValue.Length - 3));
+
+            // Denominator value always increases by 65
+            int nearestDenominatorValue = numeratorIncrementalValue.First(t => t.Key == denominatorValue).Key;
+            // We need to get the difference, divide that by 65 and add that to the index number of the found key.
+            int denominator = ((denominatorValue - nearestDenominatorValue) / 65) 
+                + numeratorIncrementalValue.ToList().FindIndex(t => t.Key == denominatorValue);
+
+            int numerator = (numeratorIncrementalValue.First(t => t.Key == denominatorValue).Value - numeratorValue) + 1;
+            return new TempoSignature(denominator, numerator);
+        }
 
 
+        private Dictionary<int, int> numeratorIncrementalValue;
 
+        private Dictionary<int, int> PopulateDictionary()
+        {
+            Dictionary<int, int> keyValues = new Dictionary<int, int>();
+            int evenNumber = 73;
+            int oddNumber = 537;
+
+            // There are only 255 avaliable denominators in reaper.
+            for (int i = 1; i <= 255; i++)
+            {
+                int denominatorValue = (65 * i) + (int)Math.Round((decimal) i / 2);
+                keyValues.Add(denominatorValue, i % 2 == 0 ? evenNumber : oddNumber);
+                Console.WriteLine($"{denominatorValue} : {(i % 2 == 0 ? evenNumber : oddNumber)}");
+                switch (i % 2)
+                {
+                    case 0:
+                        evenNumber += 72;
+                        break;
+                    default:
+                        oddNumber += 72;
+                        break;
+                }
+                evenNumber = evenNumber >= 1000 ? evenNumber -= 1000 : evenNumber;
+                oddNumber = oddNumber >= 1000 ? oddNumber -= 1000 : oddNumber;
+            }
+            return keyValues;
+        }
 
     }
 }
