@@ -18,10 +18,10 @@ namespace Mapping_Tools.Components.Domain
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            string format = @"mm\:ss\:fff";
             try
             {
-                return TimeSpan.ParseExact(((string)value).Substring(0, ((string)value).IndexOf("(") - 1), format, culture, TimeSpanStyles.AssumeNegative);
+                return TimeSpan.ParseExact(((string)value).Substring(0, ((string)value).IndexOf("(") - 1),
+                                                @"mm\:ss\:fff", culture, TimeSpanStyles.AssumeNegative);
             }
             catch (FormatException)
             {
