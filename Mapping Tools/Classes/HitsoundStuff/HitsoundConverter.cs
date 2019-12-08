@@ -39,10 +39,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
                     // I pick the new volume such that the samples have a volume as high as possible and the greenline brings the volume down.
                     // With this equation the final amplitude stays the same while the greenline has the volume of the loudest sample at this time.
-                    double newVolume = SampleImporter.AmplitudeToOsuVolume(
-                        SampleImporter.OsuVolumeToAmplitude(package.Volume) *
-                        SampleImporter.OsuVolumeToAmplitude(sample.SampleArgs.Volume) /
-                        SampleImporter.OsuVolumeToAmplitude(maxVolume));
+                    double newVolume = SampleImporter.AmplitudeToVolume(
+                        SampleImporter.VolumeToAmplitude(package.Volume) *
+                        SampleImporter.VolumeToAmplitude(sample.SampleArgs.Volume) /
+                        SampleImporter.VolumeToAmplitude(maxVolume));
 
 
                     if (Math.Abs(newVolume - 1) > args.Roughness && !args.AlwaysFullVolume) {
@@ -58,9 +58,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 if (args.AlwaysFullVolume) {
                     // Assuming the volume of the sample is always maximum, this equation makes sure that 
                     // the loudest sample at this time has the wanted amplitude using the volume change from the greenline.
-                    package.Volume = SampleImporter.AmplitudeToOsuVolume(
-                        SampleImporter.OsuVolumeToAmplitude(package.Volume) *
-                        SampleImporter.OsuVolumeToAmplitude(maxVolume));
+                    package.Volume = SampleImporter.AmplitudeToVolume(
+                        SampleImporter.VolumeToAmplitude(package.Volume) *
+                        SampleImporter.VolumeToAmplitude(maxVolume));
                 } else {
                     package.Volume = maxVolume;
                 }

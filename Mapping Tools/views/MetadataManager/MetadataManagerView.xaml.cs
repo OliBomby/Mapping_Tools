@@ -3,6 +3,7 @@ using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Viewmodels;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Windows;
@@ -61,7 +62,15 @@ namespace Mapping_Tools.Views {
                 beatmap.Metadata["Creator"].StringValue = arg.BeatmapCreator;
                 beatmap.Metadata["Source"].StringValue = arg.Source;
                 beatmap.Metadata["Tags"].StringValue = arg.Tags;
+
                 beatmap.General["PreviewTime"] = new TValue(arg.PreviewTime.ToRoundInvariant());
+                if (arg.UseComboColours) {
+                    beatmap.ComboColours = new List<ComboColour>(arg.ComboColours);
+                    beatmap.SpecialColours.Clear();
+                    foreach (var specialColour in arg.SpecialColours) {
+                        beatmap.SpecialColours.Add(specialColour.Name, specialColour);
+                    }
+                }
 
                 // Save the file
                 editor.SaveFile();

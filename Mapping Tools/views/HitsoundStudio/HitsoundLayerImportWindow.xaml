@@ -171,6 +171,7 @@
                             <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                         </Button >
                     </Grid>
+                    <CheckBox x:Name="VolumesBox2" Content="Discriminate volumes" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,15,0,0"/>
                 </StackPanel>
             </TabItem>
             <TabItem Header="Import MIDI" Background="Transparent">

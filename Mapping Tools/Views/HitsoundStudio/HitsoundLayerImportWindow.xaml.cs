@@ -85,14 +85,17 @@ namespace Mapping_Tools.Views {
                 else if( Tabs.SelectedIndex == 2 ) {
                     // Import complete hitsounds
                     foreach( string path in BeatmapPathBox2.Text.Split('|') ) {
-                        HitsoundLayers.AddRange(HitsoundImporter.ImportHitsounds(path));
+                        HitsoundLayers.AddRange(HitsoundImporter.ImportHitsounds(path, VolumesBox2.IsChecked.GetValueOrDefault()));
                     }
-                    HitsoundLayers.ForEach(o => o.Name = string.Format("{0}: {1}", NameBox2.Text, o.Name));
+                    HitsoundLayers.ForEach(o => o.Name = $"{NameBox2.Text}: {o.Name}");
                 }
                 else if( Tabs.SelectedIndex == 3 ) {
                     // Import MIDI
-                    HitsoundLayers = HitsoundImporter.ImportMidi(BeatmapPathBox3.Text, OffsetBox3.GetDouble(0), (bool) InstrumentBox3.IsChecked, (bool) KeysoundBox3.IsChecked, (bool) LengthBox3.IsChecked, LengthRoughnessBox3.GetDouble(2), (bool) VelocityBox3.IsChecked, VelocityRoughnessBox3.GetDouble(10));
-                    HitsoundLayers.ForEach(o => o.Name = string.Format("{0}: {1}", NameBox3.Text, o.Name));
+                    HitsoundLayers = HitsoundImporter.ImportMidi(BeatmapPathBox3.Text, OffsetBox3.GetDouble(0),
+                        InstrumentBox3.IsChecked.GetValueOrDefault(), KeysoundBox3.IsChecked.GetValueOrDefault(),
+                        LengthBox3.IsChecked.GetValueOrDefault(), LengthRoughnessBox3.GetDouble(2),
+                        VelocityBox3.IsChecked.GetValueOrDefault(), VelocityRoughnessBox3.GetDouble(10));
+                    HitsoundLayers.ForEach(o => o.Name = $"{NameBox3.Text}: {o.Name}");
                 }
                 else {
                     // Import none
