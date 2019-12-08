@@ -186,10 +186,6 @@
     <Compile Include="Classes\ExternalFileUtil\Reaper\ReaperEditor.cs" />
     <Compile Include="Classes\ExternalFileUtil\Reaper\TrackItem.cs" />
     <Compile Include="Classes\ExternalFileUtil\TempoSignature.cs" />
-    <Compile Include="Classes\ComboColourStudio\ColourPoint.cs" />
-    <Compile Include="Classes\ComboColourStudio\ColourPointMode.cs" />
-    <Compile Include="Classes\ComboColourStudio\ComboColourProject.cs" />
-    <Compile Include="Classes\ComboColourStudio\SpecialColourDragAndDropListBox.cs" />
 
     <Compile Include="Classes\GenericExtensions.cs" />
     <Compile Include="Classes\HitsoundStuff\DelayFadeOutSampleProvider.cs" />
@@ -383,13 +379,6 @@
     <Compile Include="Components\Graph\GraphPointControl.cs" />
     <Compile Include="Components\Graph\TypeValueDialog.xaml.cs">
       <DependentUpon>TypeValueDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Components\SampleDialog\SampleDialog.xaml.cs">
-      <DependentUpon>SampleDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Components\SampleDialog\SampleDialogViewModel.cs" />
-    <Compile Include="Components\Spectrum\Spectrum.xaml.cs">
-      <DependentUpon>Spectrum.xaml</DependentUpon>
     </Compile>
     <Compile Include="Components\TimingStudio\StudioTimingPointGraphic.xaml.cs">
       <DependentUpon>StudioTimingPointGraphic.xaml</DependentUpon>

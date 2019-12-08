@@ -68,7 +68,7 @@ namespace Mapping_Tools.Classes.ExternalFileUtil.Reaper
         private ObservableCollection<EnvelopeTempoPoint> GetCategoryChunk(List<String> lines, string category, string[] categoryIdentifiers = null)
         {
             if (categoryIdentifiers == null)
-                categoryIdentifiers = new[] { "<" };
+                categoryIdentifiers = new[] { "<" , ">"};
 
             ObservableCollection<EnvelopeTempoPoint> categoryLines = new ObservableCollection<EnvelopeTempoPoint>();
             bool atCategory = false;

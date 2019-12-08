@@ -25,7 +25,7 @@ namespace Mapping_Tools.Components.TimingStudio
         /// <summary>
         /// The spectrum that is shown behind the timeline.
         /// </summary>
-        private Spectrum.Spectrum TimelineSpectrum = new Spectrum.Spectrum();
+        //private Spectrum.Spectrum TimelineSpectrum = new Spectrum.Spectrum();
 
         private List<StudioTimingPointGraphic> timingPoints = new List<StudioTimingPointGraphic>();
 
