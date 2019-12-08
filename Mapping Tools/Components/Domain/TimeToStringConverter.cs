@@ -28,7 +28,7 @@ namespace Mapping_Tools.Components.Domain
                 return null;
             }
             catch (OverflowException) { return null; }
-            catch { ArgumentNullException}
+            catch ( ArgumentNullException)
             { return null; }
 
 
