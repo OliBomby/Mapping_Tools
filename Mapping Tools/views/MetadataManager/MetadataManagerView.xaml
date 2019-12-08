@@ -12,6 +12,7 @@
              d:DesignHeight="650" Width="759.5" d:DataContext="{d:DesignData MetadataManagerVm}">
     <UserControl.Resources>
         <domain:DoubleToStringConverter x:Key="DoubleToStringConverter"/>
+        <domain:TimeToStringConverter x:Key="TimeToStringConverter"/>
         <domain:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
     </UserControl.Resources>
     <Grid Name="MasterGrid">
@@ -208,7 +209,7 @@
                                 </TextBox.Text>
                             </TextBox>
 
-                            <TextBox Grid.Column="2" Grid.Row="7" Text="{Binding PreviewTime, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=-1}" TextWrapping="Wrap" Margin="0 50 0 0"/>
+                            <TextBox Grid.Column="2" Grid.Row="7" Text="{Binding PreviewTime, Converter={StaticResource TimeToStringConverter}, ConverterParameter=-1}" TextWrapping="Wrap" Margin="0 50 0 0"/>
 
                             <StackPanel Grid.Column="2" Grid.Row="8">
                                 <ToggleButton x:Name="ComboColourToggle" HorizontalAlignment="Left" Margin="5 10 0 10" IsChecked="{Binding UseComboColours}"/>
