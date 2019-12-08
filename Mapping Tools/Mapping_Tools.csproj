@@ -109,6 +109,9 @@
     <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.3.3, Culture=neutral, PublicKeyToken=8985beaab7ea3f04, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft-WindowsAPICodePack-Shell.1.1.3.3\lib\net452\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
     </Reference>
+    <Reference Include="MoreLinq, Version=3.2.0.0, Culture=neutral, PublicKeyToken=384d532d7e88985d, processorArchitecture=MSIL">
+      <HintPath>..\packages\morelinq.3.2.0\lib\net451\MoreLinq.dll</HintPath>
+    </Reference>
     <Reference Include="NAudio, Version=1.9.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\NAudio.1.9.0\lib\net35\NAudio.dll</HintPath>
     </Reference>
@@ -139,6 +142,9 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\net461\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -175,6 +181,11 @@
     <Compile Include="Classes\ComboColourStudio\ColourPointMode.cs" />
     <Compile Include="Classes\ComboColourStudio\ComboColourProject.cs" />
     <Compile Include="Classes\ComboColourStudio\SpecialColourDragAndDropListBox.cs" />
+    <Compile Include="Classes\ExternalFileUtil\Reaper\EnvelopeShape.cs" />
+    <Compile Include="Classes\ExternalFileUtil\Reaper\EnvelopeTempoPoint.cs" />
+    <Compile Include="Classes\ExternalFileUtil\Reaper\ReaperEditor.cs" />
+    <Compile Include="Classes\ExternalFileUtil\Reaper\TrackItem.cs" />
+    <Compile Include="Classes\ExternalFileUtil\TempoSignature.cs" />
     <Compile Include="Classes\GenericExtensions.cs" />
     <Compile Include="Classes\HitsoundStuff\DelayFadeOutSampleProvider.cs" />
     <Compile Include="Classes\HitsoundStuff\Hitsound.cs" />
@@ -300,6 +311,7 @@
     <Compile Include="Classes\SnappingTools\Serialization\SnappingToolsSaveSlot.cs" />
     <Compile Include="Classes\SnappingTools\Serialization\SnappingToolsPreferences.cs" />
     <Compile Include="Classes\SnappingTools\Serialization\SnappingToolsProject.cs" />
+    <Compile Include="Classes\SpectrumUtil\Waveform.cs" />
     <Compile Include="Classes\SystemTools\ActionHotkey.cs" />
     <Compile Include="Classes\SystemTools\BindableBase.cs" />
     <Compile Include="Classes\SystemTools\Hotkey.cs" />
@@ -314,6 +326,12 @@
     <Compile Include="Classes\SystemTools\Settings.cs" />
     <Compile Include="Classes\SystemTools\SettingsManager.cs" />
     <Compile Include="Classes\SystemTools\TypeConverters.cs" />
+    <Compile Include="Classes\TimingStudio\BeatTime.cs" />
+    <Compile Include="Classes\ExternalFileUtil\Reaper\ReaperProject.cs" />
+    <Compile Include="Classes\TimingStudio\Serialization\TimingHelperProject.cs" />
+    <Compile Include="Classes\TimingStudio\Serialization\TimingPointType.cs" />
+    <Compile Include="Classes\TimingStudio\Serialization\TimingStudioPreferences.cs" />
+    <Compile Include="Classes\TimingStudio\StudioTimingPoint.cs" />
     <Compile Include="Classes\Tools\BezierConverter.cs" />
     <Compile Include="Classes\Tools\CircleBezierPreset.cs" />
     <Compile Include="Classes\Tools\EditorReaderStuff.cs" />
@@ -361,6 +379,12 @@
     <Compile Include="Components\Graph\TypeValueDialog.xaml.cs">
       <DependentUpon>TypeValueDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Components\TimingStudio\StudioTimingPointGraphic.xaml.cs">
+      <DependentUpon>StudioTimingPointGraphic.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Components\TimingStudio\TimingStudioTimeline.xaml.cs">
+      <DependentUpon>TimingStudioTimeline.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Components\SampleDialog\SampleDialog.xaml.cs">
       <DependentUpon>SampleDialog.xaml</DependentUpon>
     </Compile>
@@ -402,6 +426,7 @@
     <Compile Include="Viewmodels\SliderMergerVM.cs" />
     <Compile Include="Viewmodels\PreferencesVM.cs" />
     <Compile Include="Viewmodels\StandardVM.cs" />
+    <Compile Include="Viewmodels\TimingStudioVM.cs" />
     <Compile Include="Views\ComboColourStudio\BeatmapImportDialog.xaml.cs">
       <DependentUpon>BeatmapImportDialog.xaml</DependentUpon>
     </Compile>
@@ -441,8 +466,9 @@
     <Compile Include="Views\MetadataManager\MetadataManagerView.xaml.cs">
       <DependentUpon>MetadataManagerView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\TimingHelper\TimingHelperView.xaml.cs">
-      <DependentUpon>TimingHelperView.xaml</DependentUpon>
+    <Compile Include="Classes\TimingStudio\Marker.cs" />
+    <Compile Include="Views\TimingStudio\TimingStudioView.xaml.cs">
+      <DependentUpon>TimingStudioView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\PropertyTransformer\PropertyTransformerView.xaml.cs">
       <DependentUpon>PropertyTransformerView.xaml</DependentUpon>
@@ -477,6 +503,17 @@
     </Compile>
     <Page Include="Components\Graph\TensionAnchor.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Components\Spectrum\Spectrum.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Components\TimingStudio\StudioTimingPointGraphic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Components\TimingStudio\TimingStudioTimeline.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Components\Graph\TypeValueDialog.xaml">
@@ -579,7 +616,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\TimingHelper\TimingHelperView.xaml">
+    <Page Include="Views\TimingStudio\TimingStudioView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

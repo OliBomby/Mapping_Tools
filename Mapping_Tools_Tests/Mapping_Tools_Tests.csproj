@@ -57,6 +57,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\ExternalFileUtil\Reaper\SerializationTests.cs" />
     <Compile Include="Classes\ComboColourStudio\ComboColourProjectTests.cs" />
     <Compile Include="Classes\SystemTools\ListenerManagerTests.cs" />
     <Compile Include="SerializationTests.cs" />

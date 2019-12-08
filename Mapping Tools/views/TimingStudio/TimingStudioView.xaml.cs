@@ -1,28 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.SliderPathStuff;
 using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.TimingStudio.Serialization;
+
 using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Viewmodels;
+using Mapping_Tools.Views.TimingStudio;
 
-namespace Mapping_Tools.Views {
+namespace Mapping_Tools.Views
+{
     /// <summary>
-    /// Interactielogica voor TimingHelperView.xaml
+    /// TimingStudioView Tool for Mapping Tools
     /// </summary>
-    public partial class TimingHelperView {
-        public static readonly string ToolName = "Timing Helper";
+    //[HiddenTool]
+    public partial class TimingStudioView : ISavable<TimingStudioVM> {
+        public static readonly string ToolName = "Timing Studio";
 
-        public static readonly string ToolDescription = $@"Timing Helper is meant to speed up your timing job by placing the redlines for you. You only have to tell it where exactly all the sounds are.{Environment.NewLine}What you do is place 'markers' exactly on the correct timing of sounds. These markers can be hit objects, bookmarks, greenlines and redlines.{Environment.NewLine}Timing Helper will then adjust BPM and/or add redlines to make every marker be snapped.";
+        //public static readonly string ToolDescription = $@"Timing Helper is meant to speed up your timing job by placing the redlines for you. You only have to tell it where exactly all the sounds are."
+        //    +$"{Environment.NewLine}What you do is place 'markers' exactly on the correct timing of sounds. These markers can be hit objects, bookmarks, greenlines and redlines.{Environment.NewLine}Timing Helper will then adjust BPM and/or add redlines to make every marker be snapped.";
+        public static readonly string ToolDescription = $@"Timing Studio allows you to property sync the song using the Advanced Timeline. You can import .mid, .rpp, and a beatmap of choice.";
 
-        public TimingHelperView() {
+        
+
+        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "timingstudioproject.json");
+
+        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Timing Studio Projects");
+
+        public TimingStudioView() {
             InitializeComponent();
+            DataContext = new TimingStudioVM();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
         }
@@ -36,10 +48,16 @@ namespace Mapping_Tools.Views {
             string[] filesToCopy = MainWindow.AppWindow.GetCurrentMaps();
             IOHelper.SaveMapBackup(filesToCopy);
 
-            BackgroundWorker.RunWorkerAsync(new Arguments(filesToCopy, (bool)ObjectsBox.IsChecked, (bool)BookmarkBox.IsChecked, (bool)GreenlinesBox.IsChecked,
-                                                          (bool)RedlinesBox.IsChecked, (bool)OmitBarlineBox.IsChecked,
-                                                          LeniencyBox.GetDouble(defaultValue: 3), TemporalBox.GetDouble(),
-                                                          int.Parse(Snap1.Text.Split('/')[1]), int.Parse(Snap2.Text.Split('/')[1])));
+            //BackgroundWorker.RunWorkerAsync(
+            //    new Arguments(filesToCopy, 
+            //        (bool)ObjectsBox.IsChecked, 
+            //        (bool)BookmarkBox.IsChecked, 
+            //        (bool)GreenlinesBox.IsChecked,
+            //        (bool)RedlinesBox.IsChecked, 
+            //        (bool)OmitBarlineBox.IsChecked,
+            //        LeniencyBox.GetDouble(defaultValue: 3), 
+            //        TemporalBox.GetDouble(),
+            //        int.Parse(Snap1.Text.Split('/')[1]), int.Parse(Snap2.Text.Split('/')[1])));
             CanRun = false;
         }
 
@@ -96,7 +114,7 @@ namespace Mapping_Tools.Views {
                 if (arg.Greenlines) {
                     // Get the offsets of greenlines
                     foreach (TimingPoint tp in timing.TimingPoints) {
-                        if (tp.Inherited == false) {
+                        if (tp.Uninherited == false) {
                             markers.Add(new Marker(tp.Offset));
                         }
                     }
@@ -104,7 +122,7 @@ namespace Mapping_Tools.Views {
                 if (arg.Redlines) {
                     // Get the offsets of redlines
                     foreach (TimingPoint tp in timing.TimingPoints) {
-                        if (tp.Inherited == true) {
+                        if (tp.Uninherited == true) {
                             markers.Add(new Marker(tp.Offset));
                         }
                     }
@@ -170,8 +188,8 @@ namespace Mapping_Tools.Views {
 
                 // Remove redlines except the first redline
                 if (!arg.Redlines) {
-                    var first = timing.TimingPoints.FirstOrDefault(o => o.Inherited);
-                    timing.TimingPoints.RemoveAll(o => o.Inherited && o != first);
+                    var first = timing.TimingPoints.FirstOrDefault(o => o.Uninherited);
+                    timing.TimingPoints.RemoveAll(o => o.Uninherited && o != first);
                 }
 
                 // Update progressbar
@@ -378,14 +396,14 @@ namespace Mapping_Tools.Views {
             return Math.Abs(resnappedTime - time) <= leniency;
         }
 
-        private class Marker {
-            public double Time { get; }
-            public double BeatsFromLastMarker { get; set; }
+        public TimingStudioVM GetSaveData()
+        {
+            throw new NotImplementedException();
+        }
 
-            public Marker(double time) {
-                Time = time;
-                BeatsFromLastMarker = 0;
-            }
+        public void SetSaveData(TimingStudioVM saveData)
+        {
+            throw new NotImplementedException();
         }
     }
 }

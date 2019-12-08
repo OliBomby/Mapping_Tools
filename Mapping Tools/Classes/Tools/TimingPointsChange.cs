@@ -44,8 +44,8 @@ namespace Mapping_Tools.Classes.Tools {
                 }
                 if (Math.Abs(tp.Offset - MyTP.Offset) < 2) {
                     onTimingPoints.Add(tp);
-                    onHasRed = tp.Inherited || onHasRed;
-                    onHasGreen = !tp.Inherited || onHasGreen;
+                    onHasRed = tp.Uninherited || onHasRed;
+                    onHasGreen = !tp.Uninherited || onHasGreen;
                 }
             }
 
@@ -60,7 +60,7 @@ namespace Mapping_Tools.Classes.Tools {
                 } else {
                     addingTimingPoint = prevTimingPoint.Copy();
                     addingTimingPoint.Offset = MyTP.Offset;
-                    addingTimingPoint.Inherited = true;
+                    addingTimingPoint.Uninherited = true;
                 }
                 onTimingPoints.Add(addingTimingPoint);
             }
@@ -71,20 +71,20 @@ namespace Mapping_Tools.Classes.Tools {
                 } else {
                     addingTimingPoint = prevTimingPoint.Copy();
                     addingTimingPoint.Offset = MyTP.Offset;
-                    addingTimingPoint.Inherited = false;
-                    if (prevTimingPoint.Inherited) { addingTimingPoint.MpB = -100; }
+                    addingTimingPoint.Uninherited = false;
+                    if (prevTimingPoint.Uninherited) { addingTimingPoint.MpB = -100; }
                 }
                 onTimingPoints.Add(addingTimingPoint);
             }
 
             foreach (TimingPoint on in onTimingPoints) {
-                if (MpB && (Inherited ? on.Inherited : !on.Inherited)) { on.MpB = MyTP.MpB; }
-                if (Meter && Inherited && on.Inherited) { on.Meter = MyTP.Meter; }
+                if (MpB && (Inherited ? on.Uninherited : !on.Uninherited)) { on.MpB = MyTP.MpB; }
+                if (Meter && Inherited && on.Uninherited) { on.Meter = MyTP.Meter; }
                 if (Sampleset) { on.SampleSet = MyTP.SampleSet; }
                 if (Index) { on.SampleIndex = MyTP.SampleIndex; }
                 if (Volume) { on.Volume = MyTP.Volume; }
                 if (Kiai) { on.Kiai = MyTP.Kiai; }
-                if (OmitFirstBarLine && Inherited && on.Inherited) { on.OmitFirstBarLine = MyTP.OmitFirstBarLine; }
+                if (OmitFirstBarLine && Inherited && on.Uninherited) { on.OmitFirstBarLine = MyTP.OmitFirstBarLine; }
             }
 
             if (addingTimingPoint != null && (prevTimingPoint == null || !addingTimingPoint.SameEffect(prevTimingPoint) || Inherited)) {
@@ -132,7 +132,7 @@ namespace Mapping_Tools.Classes.Tools {
                     prev = tp;
                 }
                 if (tp.Offset == MyTP.Offset) {
-                    if (tp.Inherited && MpB) {
+                    if (tp.Uninherited && MpB) {
                         prev = tp;
                     } else {
                         on = tp;
@@ -146,13 +146,13 @@ namespace Mapping_Tools.Classes.Tools {
                 if (Sampleset) { on.SampleSet = MyTP.SampleSet; }
                 if (Index) { on.SampleIndex = MyTP.SampleIndex; }
                 if (Volume) { on.Volume = MyTP.Volume; }
-                if (Inherited) { on.Inherited = MyTP.Inherited; }
+                if (Inherited) { on.Uninherited = MyTP.Uninherited; }
                 if (Kiai) { on.Kiai = MyTP.Kiai; }
                 if (OmitFirstBarLine) { on.OmitFirstBarLine = MyTP.OmitFirstBarLine; }
             } else {
                 if (prev != null) {
                     // Make new timingpoint
-                    if (prev.Inherited) {
+                    if (prev.Uninherited) {
                         on = new TimingPoint(MyTP.Offset, -100, prev.Meter, prev.SampleSet, prev.SampleIndex, prev.Volume, false, prev.Kiai, prev.OmitFirstBarLine);
                     } else {
                         on = new TimingPoint(MyTP.Offset, prev.MpB, prev.Meter, prev.SampleSet, prev.SampleIndex, prev.Volume, false, prev.Kiai, prev.OmitFirstBarLine);
@@ -162,7 +162,7 @@ namespace Mapping_Tools.Classes.Tools {
                     if (Sampleset) { on.SampleSet = MyTP.SampleSet; }
                     if (Index) { on.SampleIndex = MyTP.SampleIndex; }
                     if (Volume) { on.Volume = MyTP.Volume; }
-                    if (Inherited) { on.Inherited = MyTP.Inherited; }
+                    if (Inherited) { on.Uninherited = MyTP.Uninherited; }
                     if (Kiai) { on.Kiai = MyTP.Kiai; }
                     if (OmitFirstBarLine) { on.OmitFirstBarLine = MyTP.OmitFirstBarLine; }
 

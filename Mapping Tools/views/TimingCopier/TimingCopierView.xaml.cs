@@ -74,7 +74,7 @@ namespace Mapping_Tools.Views {
                     if (greenlineHere.Offset == redline.Offset) {
                         removeList.Add(redline);
                     } else {
-                        redline.Inherited = false;
+                        redline.Uninherited = false;
                         redline.MpB = -100;
                     }
                 }

@@ -34,7 +34,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// Sorts all <see cref="TimingPoint"/> in order of time.
         /// </summary>
         public void Sort() {
-            TimingPoints = TimingPoints.OrderBy(o => o.Offset).ThenByDescending(o => o.Inherited).ToList();
+            TimingPoints = TimingPoints.OrderBy(o => o.Offset).ThenByDescending(o => o.Uninherited).ToList();
         }
 
         /// <summary>
@@ -217,7 +217,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 if (Precision.DefinitelyBigger(tp.Offset, time)) {
                     return lastTp;
                 }
-                if (!tp.Inherited) {
+                if (!tp.Uninherited) {
                     lastTp = tp;
                 }
             }
@@ -236,7 +236,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 if( Precision.DefinitelyBigger(tp.Offset, time) ) {
                     return lastTp;
                 }
-                if( tp.Inherited ) {
+                if( tp.Uninherited ) {
                     lastTp = tp;
                 }
             }
@@ -249,7 +249,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="time"></param>
         /// <returns></returns>
         public TimingPoint GetRedlineAfterTime(double time) {
-            return TimingPoints.FirstOrDefault(tp => Precision.DefinitelyBigger(tp.Offset, time) && tp.Inherited);
+            return TimingPoints.FirstOrDefault(tp => Precision.DefinitelyBigger(tp.Offset, time) && tp.Uninherited);
         }
 
         /// <summary>
@@ -275,7 +275,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 if( Precision.DefinitelyBigger(tp.Offset, time) ) {
                     return MathHelper.Clamp(lastSv, -1000, -10);
                 }
-                if( !tp.Inherited ) {
+                if( !tp.Uninherited ) {
                     lastSv = tp.MpB;
                 }
                 else {
@@ -310,11 +310,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public List<TimingPoint> GetAllRedlines() {
-            return TimingPoints.Where(tp => tp.Inherited).ToList();
+            return TimingPoints.Where(tp => tp.Uninherited).ToList();
         }
 
         public List<TimingPoint> GetAllGreenlines() {
-            return TimingPoints.Where(tp => !tp.Inherited).ToList();
+            return TimingPoints.Where(tp => !tp.Uninherited).ToList();
         }
 
         private static List<TimingPoint> GetTimingPoints(List<string> timingLines) {
@@ -329,14 +329,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             // The timeline will work like a redline on 0 offset and 1000 milliseconds per beat
 
             TimingPoint firstTp = TimingPoints.FirstOrDefault();
-            if( firstTp != null && firstTp.Inherited ) {
-                return new TimingPoint(firstTp.Offset - firstTp.MpB * firstTp.Meter * 10, firstTp.MpB,
-                                        firstTp.Meter, firstTp.SampleSet, firstTp.SampleIndex, firstTp.Volume, firstTp.Inherited, false, false);
+            if( firstTp != null && firstTp.Uninherited ) {
+                return new TimingPoint(firstTp.Offset - firstTp.MpB * firstTp.Meter.TempoDenominator * 10, firstTp.MpB,
+                                        firstTp.Meter, firstTp.SampleSet, firstTp.SampleIndex, firstTp.Volume, firstTp.Uninherited, false, false);
             }
 
             if (firstTp != null)
                 return new TimingPoint(0, 1000, firstTp.Meter, firstTp.SampleSet, firstTp.SampleIndex, firstTp.Volume,
-                    firstTp.Inherited, false, false);
+                    firstTp.Uninherited, false, false);
 
             return new TimingPoint(0, 0, 0, SampleSet.Auto, 0, 0, true, false, false);
         }

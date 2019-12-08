@@ -210,7 +210,7 @@ namespace Mapping_Tools.Views {
                         foreach (var tp in from ho in beatmapTo.HitObjects
                             from tp in ho.BodyHitsounds
                             where beatmapFrom.HitObjects.Any(o => o.Time < tp.Offset && o.EndTime > tp.Offset)
-                            where !tp.Inherited
+                            where !tp.Uninherited
                             select tp) {
                             beatmapTo.BeatmapTiming.TimingPoints.Remove(tp);
                         }
