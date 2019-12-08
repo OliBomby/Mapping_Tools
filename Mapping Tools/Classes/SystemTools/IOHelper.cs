@@ -2,6 +2,7 @@
 using System.IO;
 using System.Windows.Forms;
 using Editor_Reader;
+using Mapping_Tools.Classes.BeatmapHelper;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using OsuMemoryDataProvider;
 
@@ -140,10 +141,10 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
         }
 
-        public static string[] BeatmapFileDialog(bool multiselect = false) {
+        public static string[] BeatmapFileDialog(bool multiselect = false, bool restore = false) {
             string path = MainWindow.AppWindow.GetCurrentMaps()[0];
             using( OpenFileDialog openFileDialog = new OpenFileDialog {
-                InitialDirectory = path != "" ? Directory.GetParent(path).FullName : SettingsManager.GetSongsPath(),
+                InitialDirectory = restore ? "" : path != "" ? Editor.GetBeatmapFolder(path) : SettingsManager.GetSongsPath(),
                 Filter = "Osu files (*.osu)|*.osu",
                 FilterIndex = 1,
                 RestoreDirectory = true,

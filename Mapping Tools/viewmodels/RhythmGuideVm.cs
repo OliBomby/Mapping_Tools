@@ -24,7 +24,7 @@ namespace Mapping_Tools.Viewmodels {
 
             ImportBrowseCommand = new CommandImplementation(
                 _ => {
-                    var paths = IOHelper.BeatmapFileDialog(true);
+                    var paths = IOHelper.BeatmapFileDialog(true, true);
                     if (paths.Length != 0) {
                         GuideGeneratorArgs.Paths = paths;
                     }
@@ -40,7 +40,7 @@ namespace Mapping_Tools.Viewmodels {
 
             ExportBrowseCommand = new CommandImplementation(
                 _ => {
-                    var paths = IOHelper.BeatmapFileDialog();
+                    var paths = IOHelper.BeatmapFileDialog(restore: true);
                     if (paths.Length != 0) {
                         GuideGeneratorArgs.ExportPath = paths[0];
                     }

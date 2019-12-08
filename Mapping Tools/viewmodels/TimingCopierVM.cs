@@ -29,7 +29,7 @@ namespace Mapping_Tools.Viewmodels {
 
             ImportBrowseCommand = new CommandImplementation(
                 _ => {
-                    string[] paths = IOHelper.BeatmapFileDialog(multiselect: false);
+                    string[] paths = IOHelper.BeatmapFileDialog(restore: true);
                     if( paths.Length != 0 ) {
                         ImportPath = paths[0];
                     }
@@ -45,7 +45,7 @@ namespace Mapping_Tools.Viewmodels {
 
             ExportBrowseCommand = new CommandImplementation(
                 _ => {
-                    string[] paths = IOHelper.BeatmapFileDialog(multiselect: true);
+                    string[] paths = IOHelper.BeatmapFileDialog(true, true);
                     if( paths.Length != 0 ) {
                         ExportPath = string.Join("|", paths);
                     }

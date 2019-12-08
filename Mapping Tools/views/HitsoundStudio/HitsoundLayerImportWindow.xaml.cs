@@ -36,7 +36,7 @@ namespace Mapping_Tools.Views {
         }
 
         private void BeatmapBrowse_Click(object sender, RoutedEventArgs e) {
-            string[] paths = IOHelper.BeatmapFileDialog();
+            string[] paths = IOHelper.BeatmapFileDialog(restore: true);
             if( paths.Length != 0 ) { BeatmapPathBox.Text = paths[0]; }
         }
 
@@ -46,7 +46,7 @@ namespace Mapping_Tools.Views {
         }
 
         private void BeatmapBrowse2_Click(object sender, RoutedEventArgs e) {
-            string[] paths = IOHelper.BeatmapFileDialog();
+            string[] paths = IOHelper.BeatmapFileDialog(restore: true);
             if( paths.Length != 0 ) { BeatmapPathBox2.Text = string.Join("|", paths); }
         }
 
