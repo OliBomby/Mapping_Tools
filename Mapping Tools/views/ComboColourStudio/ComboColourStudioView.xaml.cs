@@ -112,11 +112,16 @@ namespace Mapping_Tools.Views {
                         lastColourPointColourIndex = lastColourPointColourIndex == -1 || lastColourPoint.Equals(colourPoint) ? 
                             lastColourPointColourIndex : 
                             colourSequence.FindIndex(o => o.Name == orderedComboColours[lastColourIndex].Name);
+
                         // Get the next colour index on this colour point
                         // Check if colourSequence count is 0 to prevent division by 0
                         var colourPointColourIndex = lastColourPointColourIndex == -1 || colourSequence.Count == 0
                             ? 0
-                            : MathHelper.Mod(lastColourPointColourIndex + 1, colourSequence.Count);
+                            : lastColourPoint.Equals(colourPoint) ? 
+                            MathHelper.Mod(lastColourPointColourIndex + 1, colourSequence.Count) :
+                            // If the colour point changed try going back to index 0
+                            lastColourPointColourIndex == 0 && colourSequence.Count > 1 ? 1 : 0;
+
                         //Console.WriteLine("colourPointColourIndex: " + colourPointColourIndex);
                         //Console.WriteLine("colourPointColour: " + colourPoint.ColourSequence[colourPointColourIndex].Name);
 
