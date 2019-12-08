@@ -42,16 +42,12 @@ namespace Mapping_Tools.Classes.ExternalFileUtil.Reaper
         }
 
        
-
-        //1114124 should be 12/17
-        //524296 should be 8/8
-        //1638425 should be 25/25
-        //1638417 should be 17/25
-
         private TempoSignature tempoSignature;
 
         
-
+        /// <summary>
+        /// The Time Signature of the tempo point.
+        /// </summary>
         public TempoSignature TempoSignature
         {
             get { return tempoSignature; }
@@ -59,7 +55,7 @@ namespace Mapping_Tools.Classes.ExternalFileUtil.Reaper
         }
 
         /// <summary>
-        /// PT 0.000000000000 72.0000000000 1
+        /// The constructor of the tempo point in terms of the envelope.
         /// 
         /// </summary>
         /// <param name="line"></param>
@@ -94,10 +90,12 @@ namespace Mapping_Tools.Classes.ExternalFileUtil.Reaper
         private Dictionary<int, int> PopulateDictionary()
         {
             Dictionary<int, int> keyValues = new Dictionary<int, int>();
+
+            //No idea why these numbers are throught about but, they work.
             int evenNumber = 73;
             int oddNumber = 537;
 
-            // There are only 255 avaliable denominators in reaper.
+            // There are only 255 avaliable denominators in Reaper.
             for (int i = 1; i <= 255; i++)
             {
                 int denominatorValue = (65 * i) + (int)Math.Round((decimal) i / 2);
@@ -112,6 +110,8 @@ namespace Mapping_Tools.Classes.ExternalFileUtil.Reaper
                         oddNumber += 72;
                         break;
                 }
+
+                // Reaper only allows 3 digits max for the numerator values.
                 evenNumber = evenNumber >= 1000 ? evenNumber -= 1000 : evenNumber;
                 oddNumber = oddNumber >= 1000 ? oddNumber -= 1000 : oddNumber;
             }

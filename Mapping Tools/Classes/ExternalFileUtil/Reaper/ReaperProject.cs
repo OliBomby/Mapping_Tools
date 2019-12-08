@@ -75,13 +75,15 @@ namespace Mapping_Tools.Classes.ExternalFileUtil.Reaper
 
             foreach (string line in lines)
             {
-                if (atCategory && line != "" && line.StartsWith("    PT"))
+                if (atCategory && line != "")
                 {
                     if (categoryIdentifiers.Any(o => line.StartsWith(o))) // Reached another category
                     {
                         break;
                     }
-                    categoryLines.Add(new EnvelopeTempoPoint(line));
+                    
+                    if (line.StartsWith("    PT"))
+                        categoryLines.Add(new EnvelopeTempoPoint(line));
                 }
                 else
                 {
