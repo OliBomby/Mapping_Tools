@@ -8,8 +8,15 @@ using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.ExternalFileUtil.Reaper
 {
-    public class ReaperProject
+    public class ReaperProject : ITextFile
     {
+        public List<decimal> ProjectOffsets { get; set; }
+
+        public List<int> MaxProjectLength { get; set; }
+
+        public List<decimal> Grid { get; set; }
+
+
         private ObservableCollection<EnvelopeTempoPoint> _masterTempoPoints;
 
         /// <summary>
@@ -32,15 +39,60 @@ namespace Mapping_Tools.Classes.ExternalFileUtil.Reaper
 
         private ObservableCollection<TrackItem> _trackItem;
 
+        public ReaperProject(List<string> lines)
+        {
+
+        }
+
+        public ReaperProject(string path)
+        {
+        }
+
         public ObservableCollection<TrackItem> TrackItem
         {
             get { return _trackItem; }
             set { _trackItem = value; }
         }
 
-          
+        public List<string> GetLines()
+        {
+            throw new NotImplementedException();
+        }
 
+        public void SetLines(List<string> lines)
+        {
+            _masterTempoPoints = GetCategoryChunk(lines, "TEMPOENVEX");
 
+        }
 
+        private ObservableCollection<EnvelopeTempoPoint> GetCategoryChunk(List<String> lines, string category, string[] categoryIdentifiers = null)
+        {
+            if (categoryIdentifiers == null)
+                categoryIdentifiers = new[] { "<" };
+
+            ObservableCollection<EnvelopeTempoPoint> categoryLines = new ObservableCollection<EnvelopeTempoPoint>();
+            bool atCategory = false;
+
+            foreach (string line in lines)
+            {
+                if (atCategory && line != "" && line.StartsWith("    PT"))
+                {
+                    if (categoryIdentifiers.Any(o => line.StartsWith(o))) // Reached another category
+                    {
+                        break;
+                    }
+                    categoryLines.Add(new EnvelopeTempoPoint(line));
+                }
+                else
+                {
+                    if (line == category)
+                    {
+                        atCategory = true;
+                    }
+                }
+            }
+            return categoryLines;
+        }
     }
-}
+ }
+
