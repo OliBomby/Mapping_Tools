@@ -342,6 +342,7 @@
     <Compile Include="Components\Domain\StringArrayToStringConverter.cs" />
     <Compile Include="Components\Domain\IsASCIIValidationRule.cs" />
     <Compile Include="Components\Domain\SnapDivisorToStringConverter.cs" />
+    <Compile Include="Components\Domain\TimeToStringConverter.cs" />
     <Compile Include="Components\Domain\VolumeToPercentageConverter.cs" />
     <Compile Include="Components\Domain\HitsoundToStringConverter.cs" />
     <Compile Include="Components\Domain\SampleSetToStringConverter.cs" />
