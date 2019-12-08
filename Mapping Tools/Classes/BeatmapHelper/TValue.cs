@@ -35,5 +35,15 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public string GetStringValue() {
             return StringValue;
         }
+
+        public int GetInt() => GetValue();
+
+        public bool IsInt(dynamic value) => value == typeof(int);
+
+        public double GetDouble() => GetValue();
+
+        public bool IsDouble(dynamic value) => value == typeof(double);
+
+
     }
 }

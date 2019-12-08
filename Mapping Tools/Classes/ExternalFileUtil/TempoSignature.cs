@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.ExternalFileUtil
 {
-    public class TempoSignature
+#pragma warning disable CS0660 // Type defines operator == or operator != but does not override Object.Equals(object o)
+    public class TempoSignature : IEquatable<TempoSignature>
+#pragma warning restore CS0660 // Type defines operator == or operator != but does not override Object.Equals(object o)
     {
         private int _tempoDenominator;
 
@@ -41,6 +43,16 @@ namespace Mapping_Tools.Classes.ExternalFileUtil
             TempoNumerator = tempoNumerator;
         }
 
+        /// <summary>
+        /// The constructor for a new Tempo Signature where the Denominator value is 4.
+        /// </summary>
+        /// <param name="tempoNumerator">The top value of the signature.</param>
+        public TempoSignature(int tempoNumerator)
+        {
+            TempoNumerator = tempoNumerator;
+            TempoDenominator = 4;
+        }
+
         private bool _partialMeasure;
 
         /// <summary>
@@ -53,6 +65,31 @@ namespace Mapping_Tools.Classes.ExternalFileUtil
         {
             get { return _partialMeasure; }
             set { _partialMeasure = value; }
+        }
+
+        public bool Equals(TempoSignature other)
+        {
+            return _tempoDenominator == other.TempoDenominator
+                && _tempoNumerator == other._tempoNumerator;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = -175245820;
+            hashCode = hashCode * -1521134295 + _tempoDenominator.GetHashCode();
+            hashCode = hashCode * -1521134295 + _tempoNumerator.GetHashCode();
+            hashCode = hashCode * -1521134295 + _partialMeasure.GetHashCode();
+            return hashCode;
+        }
+
+        public static bool operator ==(TempoSignature signature1, TempoSignature signature2)
+        {
+            return EqualityComparer<TempoSignature>.Default.Equals(signature1, signature2);
+        }
+
+        public static bool operator !=(TempoSignature signature1, TempoSignature signature2)
+        {
+            return !(signature1 == signature2);
         }
 
         // TODO: Metronome pattern.

@@ -1,4 +1,5 @@
-﻿using Mapping_Tools.Classes.HitsoundStuff;
+﻿using Mapping_Tools.Classes.ExternalFileUtil;
+using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
 using System;
 using System.Collections;
@@ -20,7 +21,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <summary>
         /// Time signature to x/4
         /// </summary>
-        public double Meter { get; set; }
+        public TempoSignature Meter { get; set; }
 
         /// <summary>
         /// The sample set from the <see cref="TimingPoint"/>
@@ -71,7 +72,32 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="uninherited"></param>
         /// <param name="kiai"></param>
         /// <param name="omitFirstBarLine"></param>
-        public TimingPoint(double offset, double mpb, double meter, SampleSet sampleSet, int sampleIndex, double volume, bool uninherited, bool kiai, bool omitFirstBarLine) {
+        public TimingPoint(double offset, double mpb, int meter, SampleSet sampleSet, int sampleIndex, double volume, bool uninherited, bool kiai, bool omitFirstBarLine) {
+            Offset = offset;
+            MpB = mpb;
+            Meter = new TempoSignature(meter);
+            SampleSet = sampleSet;
+            SampleIndex = sampleIndex;
+            Volume = volume;
+            Uninherited = uninherited;
+            Kiai = kiai;
+            OmitFirstBarLine = omitFirstBarLine;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="TimingPoint"/>
+        /// </summary>
+        /// <param name="offset">The offset from the start of the audio in milliseconds</param>
+        /// <param name="mpb">The milliseconds per beat. (Quarter Note in Music Theory terms.) </param>
+        /// <param name="meter">The tempo signature object.</param>
+        /// <param name="sampleSet">The <see cref="SampleSet"/> that is used from the timing point</param>
+        /// <param name="sampleIndex"></param>
+        /// <param name="volume"></param>
+        /// <param name="uninherited"></param>
+        /// <param name="kiai"></param>
+        /// <param name="omitFirstBarLine"></param>
+        public TimingPoint(double offset, double mpb, TempoSignature meter, SampleSet sampleSet, int sampleIndex, double volume, bool uninherited, bool kiai, bool omitFirstBarLine)
+        {
             Offset = offset;
             MpB = mpb;
             Meter = meter;
@@ -92,7 +118,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Offset = cp.Offset;
             SampleIndex = cp.CustomSamples;
             SampleSet = (SampleSet)cp.SampleSet;
-            Meter = cp.TimeSignature;
+            Meter = new TempoSignature(cp.TimeSignature);
             Volume = cp.Volume;
             Kiai = (cp.EffectFlags & 1) > 0;
             OmitFirstBarLine = (cp.EffectFlags & 8) > 0;
@@ -120,7 +146,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         {
             MpB = 60000;
             Offset = 0;
-            Meter = 4;
+            Meter = new TempoSignature(4,4);
             SampleSet = new SampleSet();
             SampleIndex = 0;
             Volume = 100;
@@ -157,7 +183,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             else throw new BeatmapParsingException("Failed to parse milliseconds per beat of timing point", line);
 
             if (TryParseInt(values[2], out int meter))
-                Meter = meter;
+                Meter = new TempoSignature(meter);
             else throw new BeatmapParsingException("Failed to parse meter of timing point", line);
 
             if (Enum.TryParse(values[3], out SampleSet ss))

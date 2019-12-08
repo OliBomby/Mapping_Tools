@@ -330,7 +330,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
             TimingPoint firstTp = TimingPoints.FirstOrDefault();
             if( firstTp != null && firstTp.Uninherited ) {
-                return new TimingPoint(firstTp.Offset - firstTp.MpB * firstTp.Meter * 10, firstTp.MpB,
+                return new TimingPoint(firstTp.Offset - firstTp.MpB * firstTp.Meter.TempoDenominator * 10, firstTp.MpB,
                                         firstTp.Meter, firstTp.SampleSet, firstTp.SampleIndex, firstTp.Volume, firstTp.Uninherited, false, false);
             }
 
