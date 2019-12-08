@@ -1,16 +1,12 @@
 ﻿using Mapping_Tools.Classes.BeatmapHelper;
-using NAudio.Wave;
-using NAudio.Vorbis;
+using Mapping_Tools.Classes.Tools;
 using NAudio.Midi;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Globalization;
 using System.Windows;
-using Mapping_Tools.Classes.Tools;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     class HitsoundImporter {
@@ -89,11 +85,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         /// <summary>
-        /// Extract every used sample in a beatmap and return them as hitsound layers
+        /// Extract every used sample in a beatmap and return them as hitsound layers.
         /// </summary>
-        /// <param name="path">The path to the beatmap</param>
+        /// <param name="path">The path to the beatmap.</param>
+        /// <param name="volumes">Taking the volumes from the map and making different layers for different volumes.</param>
         /// <returns>The hitsound layers</returns>
-        public static List<HitsoundLayer> ImportHitsounds(string path) {
+        public static List<HitsoundLayer> ImportHitsounds(string path, bool volumes = false) {
             BeatmapEditor editor = EditorReaderStuff.GetNewestVersion(path);
             Beatmap beatmap = editor.Beatmap;
             Timeline timeline = beatmap.GetTimeline();
@@ -106,6 +103,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
             foreach (TimelineObject tlo in timeline.TimelineObjects) {
                 if (!tlo.HasHitsound) { continue; }
+
+                double volume = volumes ? tlo.FenoSampleVolume / 100 : 1;
 
                 List<string> samples = tlo.GetPlayingFilenames(mode);
 
@@ -132,7 +131,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     }
                     
                     string extLessFilename = Path.GetFileNameWithoutExtension(samplePath);
-                    var importArgs = new LayerImportArgs(ImportType.Hitsounds) { Path = path, SamplePath = samplePath };
+                    var importArgs = new LayerImportArgs(ImportType.Hitsounds) { Path = path, SamplePath = samplePath, Volume = volume};
 
                     // Find the hitsoundlayer with this path
                     HitsoundLayer layer = hitsoundLayers.Find(o => o.ImportArgs == importArgs);
@@ -145,7 +144,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         HitsoundLayer newLayer = new HitsoundLayer(extLessFilename,
                             sampleSet,
                             hitsound,
-                            new SampleGeneratingArgs(samplePath),
+                            new SampleGeneratingArgs(samplePath) {Volume = volume},
                             importArgs);
                         newLayer.Times.Add(tlo.Time);
 

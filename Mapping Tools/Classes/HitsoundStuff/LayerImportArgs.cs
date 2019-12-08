@@ -132,6 +132,17 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
+        private double volume;
+        public double Volume {
+            get => volume;
+            set {
+                if (volume == value) return;
+                volume = value;
+                NotifyPropertyChanged("Volume");
+                NotifyPropertyChanged("Velocity");
+            }
+        }
+
         private int bank;
         /// <summary>
         /// 
@@ -199,17 +210,15 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
-        private int velocity;
         /// <summary>
         /// 
         /// </summary>
         public int Velocity {
-            get => velocity;
+            get => (int)Math.Round(Volume * 127);
             set {
-                if (velocity != value) {
-                    velocity = value;
-                    NotifyPropertyChanged("Velocity");
-                }
+                if (Velocity == value) return;
+                Volume = value / 127d;
+                NotifyPropertyChanged("Velocity");
             }
         }
 

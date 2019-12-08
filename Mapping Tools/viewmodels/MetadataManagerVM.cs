@@ -3,15 +3,19 @@ using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Components.Domain;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Media;
 using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Viewmodels {
 
     public class MetadataManagerVm :INotifyPropertyChanged {
+        private Visibility _beatmapFileNameOverflowErrorVisibility;
+
         private string _importPath;
         private string _exportPath;
 
@@ -22,11 +26,19 @@ namespace Mapping_Tools.Viewmodels {
         private string _beatmapCreator;
         private string _source;
         private string _tags;
+
         private double _previewTime;
+        private bool _useComboColours;
+        private ObservableCollection<ComboColour> _comboColours;
+        private ObservableCollection<SpecialColour> _specialColours;
 
         public MetadataManagerVm() {
             _importPath = "";
             _exportPath = "";
+
+            _useComboColours = true;
+            ComboColours = new ObservableCollection<ComboColour>();
+            SpecialColours = new ObservableCollection<SpecialColour>();
 
             ImportLoadCommand = new CommandImplementation(
                 _ => {
@@ -64,6 +76,42 @@ namespace Mapping_Tools.Viewmodels {
                         ExportPath = string.Join("|", paths);
                     }
                 });
+
+            AddCommand = new CommandImplementation(_ => {
+                if (ComboColours.Count >= 8) return;
+                ComboColours.Add(ComboColours.Count > 0
+                    ? new ComboColour(ComboColours[ComboColours.Count - 1].Color)
+                    : new ComboColour(Colors.White));
+            });
+
+            RemoveCommand = new CommandImplementation(_ => {
+                if (ComboColours.Count > 0) {
+                    ComboColours.RemoveAt(ComboColours.Count - 1);
+                }
+            });
+
+            AddSpecialCommand = new CommandImplementation(_ => {
+                SpecialColours.Add(SpecialColours.Count > 0
+                    ? new SpecialColour(SpecialColours[SpecialColours.Count - 1].Color)
+                    : new SpecialColour(Colors.White));
+            });
+
+            RemoveSpecialCommand = new CommandImplementation(_ => {
+                if (SpecialColours.Count > 0) {
+                    SpecialColours.RemoveAt(SpecialColours.Count - 1);
+                }
+            });
+
+
+            PropertyChanged += OnPropertyChanged;
+        }
+
+        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
+            if (e.PropertyName == "Artist" || e.PropertyName == "Title" || e.PropertyName == "BeatmapCreator") {
+                // Update error visibility if there is an error
+                string filename = Beatmap.GetFileName(Artist, Title, BeatmapCreator, "");
+                BeatmapFileNameOverflowErrorVisibility = filename.Length > 255 ? Visibility.Visible : Visibility.Collapsed;
+            }
         }
 
         private void ImportFromBeatmap(string importPath) {
@@ -78,7 +126,13 @@ namespace Mapping_Tools.Viewmodels {
                 BeatmapCreator = beatmap.Metadata["Creator"].StringValue;
                 Source = beatmap.Metadata["Source"].StringValue;
                 Tags = beatmap.Metadata["Tags"].StringValue;
+
                 PreviewTime = beatmap.General["PreviewTime"].Value;
+                ComboColours = new ObservableCollection<ComboColour>(beatmap.ComboColours);
+                SpecialColours.Clear();
+                foreach (var specialColour in beatmap.SpecialColours) {
+                    SpecialColours.Add(new SpecialColour(specialColour.Value.Color, specialColour.Key));
+                }
             }
             catch( Exception ex ) {
                 MessageBox.Show($"{ex.Message}{Environment.NewLine}{ex.StackTrace}", "Error");
@@ -190,11 +244,52 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
+        public bool UseComboColours {
+            get => _useComboColours;
+            set {
+                if( _useComboColours == value ) return;
+                _useComboColours = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ObservableCollection<ComboColour> ComboColours {
+            get => _comboColours;
+            set {
+                if (_comboColours == value) return;
+                _comboColours = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ObservableCollection<SpecialColour> SpecialColours {
+            get => _specialColours;
+            set {
+                if (_specialColours == value) return;
+                _specialColours = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Visibility BeatmapFileNameOverflowErrorVisibility {
+            get => _beatmapFileNameOverflowErrorVisibility;
+            set {
+                if (_beatmapFileNameOverflowErrorVisibility == value) return;
+                _beatmapFileNameOverflowErrorVisibility = value;
+                OnPropertyChanged();
+            }
+        }
+
         public CommandImplementation ImportLoadCommand { get; }
         public CommandImplementation ImportBrowseCommand { get; }
         public CommandImplementation ImportCommand { get; }
         public CommandImplementation ExportLoadCommand { get; }
         public CommandImplementation ExportBrowseCommand { get; }
+
+        public CommandImplementation AddCommand { get; }
+        public CommandImplementation RemoveCommand { get; }
+        public CommandImplementation AddSpecialCommand { get; }
+        public CommandImplementation RemoveSpecialCommand { get; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

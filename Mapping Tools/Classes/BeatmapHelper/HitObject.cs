@@ -143,6 +143,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public bool SliderExtras => GetSliderExtras();
 
+        public bool ActualNewCombo { get; set; }
+        public int ComboIndex { get; set; }
+        public int ColourIndex { get; set; }
+        public ComboColour Colour { get; set; }
+
         public double TemporalLength { get; set; } // Duration of one repeat
 
         public double EndTime {
@@ -542,7 +547,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             IsSlider = b[1];
             NewCombo = b[2];
             IsSpinner = b[3];
-            ComboSkip = MathHelper.GetIntFromBitArray(new BitArray(new[] {b[4], b[5], b[6]}));
+            // Spinners ignore combo skip on .osu parsing
+            ComboSkip = IsSpinner ? 0 : MathHelper.GetIntFromBitArray(new BitArray(new[] {b[4], b[5], b[6]}));
             IsHoldNote = b[7];
         }
 

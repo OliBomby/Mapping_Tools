@@ -6,9 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     class SampleImporter {
@@ -386,15 +383,25 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         public static ISampleProvider VolumeChange(ISampleProvider sample, double volume) {
-            return new VolumeSampleProvider(sample) { Volume = (float) OsuVolumeToAmplitude(volume) };
+            return new VolumeSampleProvider(sample) { Volume = (float) VolumeToAmplitude(volume) };
         }
 
-        public static double OsuVolumeToAmplitude(double volume) {
+        private static double HeightAt005 => 0.995 * Math.Pow(0.05, 1.5) + 0.005;
+
+        public static double VolumeToAmplitude(double volume) {
+            if (volume < 0.05) {
+                return HeightAt005 / 0.05 * volume;
+            }
+
             // This formula seems to convert osu! volume to amplitude multiplier
             return 0.995 * Math.Pow(volume, 1.5) + 0.005;
         }
 
-        public static double AmplitudeToOsuVolume(double amplitude) {
+        public static double AmplitudeToVolume(double amplitude) {
+            if (amplitude < HeightAt005) {
+                return 0.05 / HeightAt005 * amplitude;
+            }
+
             return Math.Pow((amplitude - 0.005) / 0.995, 1 / 1.5);
         }
     }

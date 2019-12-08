@@ -139,7 +139,6 @@ namespace Mapping_Tools.Views.SnappingTools {
                         Content = new PackIcon {Kind = PackIconKind.Plus, Width = 24, Height = 24},
                         Margin = new Thickness(5),
                         Command = new CommandImplementation(_ => c.Predicates.Add(new SelectionPredicate()))};
-                    addButton.SetValue(Grid.ColumnProperty, 1);
 
                     var removeButton = new Button {Style = FindResource("MaterialDesignFloatingActionMiniLightButton") as Style,
                         ToolTip = "Remove all selected predicates or the last predicate if nothing is selected.",
@@ -153,7 +152,6 @@ namespace Mapping_Tools.Views.SnappingTools {
                             }
                             c.Predicates.RemoveAll(o => list.SelectedItems.Contains(o));
                         })};
-                    removeButton.SetValue(Grid.ColumnProperty, 2);
 
                     horizontalPanel.Children.Add(list);
                     horizontalPanel.Children.Add(addButton);

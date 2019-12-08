@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
 
@@ -67,15 +68,16 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         /// <summary>
         /// Contains all the basic combo colours. The order of this list is the same as how they are numbered in the .osu.
+        /// There can not be more than 8 combo colours.
         /// <c>Combo1 : 245,222,139</c>
         /// </summary>
-        public List<Colour> ComboColours { get; set; }
+        public List<ComboColour> ComboColours { get; set; }
 
         /// <summary>
         /// Contains all the special colours. These include the colours of slider bodies or slider outlines.
         /// The key is the name of the special colour and the value is the actual colour.
         /// </summary>
-        public Dictionary<string, Colour> SpecialColours { get; set; }
+        public Dictionary<string, ComboColour> SpecialColours { get; set; }
 
         /// <summary>
         /// The timing of this beatmap. This objects contains all the timing points (data from the [TimingPoints] section) plus the global slider multiplier.
@@ -184,8 +186,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Editor = new Dictionary<string, TValue>();
             Metadata = new Dictionary<string, TValue>();
             Difficulty = new Dictionary<string, TValue>();
-            ComboColours = new List<Colour>();
-            SpecialColours = new Dictionary<string, Colour>();
+            ComboColours = new List<ComboColour>();
+            SpecialColours = new Dictionary<string, ComboColour>();
             Events = new List<string>();
             BackgroundAndVideoEvents = new List<string>();
             BreakPeriods = new List<string>();
@@ -204,11 +206,19 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
             foreach (string line in colourLines) {
                 if (line.Substring(0, 5) == "Combo") {
-                    ComboColours.Add(new Colour(line));
+                    ComboColours.Add(new ComboColour(line));
                 } else {
-                    SpecialColours[SplitKeyValue(line)[0].Trim()] = new Colour(line);
+                    SpecialColours[SplitKeyValue(line)[0].Trim()] = new ComboColour(line);
                 }
             }
+            // Add default colours to ComboColours if there are no combo colours at all
+            if (ComboColours.Count == 0) {
+                ComboColours.Add(new ComboColour(255, 192, 0));
+                ComboColours.Add(new ComboColour(0, 202, 0));
+                ComboColours.Add(new ComboColour(18, 124, 255));
+                ComboColours.Add(new ComboColour(242, 24, 57));
+            }
+
             foreach (string line in eventsLines) {
                 Events.Add(line);
             }
@@ -244,6 +254,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             BeatmapTiming = new Timing(timingLines, Difficulty["SliderMultiplier"].Value);
 
             SortHitObjects();
+            CalculateHitObjectComboStuff();
             CalculateSliderEndTimes();
             GiveObjectsGreenlines();
         }
@@ -262,6 +273,43 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             foreach (var ho in HitObjects.Where(ho => ho.IsSlider)) {
                 ho.TemporalLength = BeatmapTiming.CalculateSliderTemporalLength(ho.Time, ho.PixelLength);
             }
+        }
+        
+        /// <summary>
+        /// Calculates the which hit objects actually have a new combo.
+        /// Calculates the combo index and combo colours for each hit object.
+        /// This includes cases where the previous hit object is a spinner or doesnt exist.
+        /// </summary>
+        public void CalculateHitObjectComboStuff() {
+            HitObject previousHitObject = null;
+            int colourIndex = 0;
+            int comboIndex = 0;
+
+            foreach (var hitObject in HitObjects) {
+                hitObject.ActualNewCombo = IsNewCombo(hitObject, previousHitObject);
+
+                if (hitObject.ActualNewCombo) {
+                    var colourIncrement = hitObject.ComboSkip;
+                    if (!hitObject.IsSpinner) {
+                        colourIncrement++;
+                    }
+
+                    colourIndex = MathHelper.Mod(colourIndex + colourIncrement, ComboColours.Count);
+                    comboIndex = 1;
+                } else {
+                    comboIndex++;
+                }
+
+                hitObject.ComboIndex = comboIndex;
+                hitObject.ColourIndex = colourIndex;
+                hitObject.Colour = ComboColours[colourIndex];
+
+                previousHitObject = hitObject;
+            }
+        }
+
+        public static bool IsNewCombo(HitObject hitObject, HitObject previousHitObject) {
+            return hitObject.NewCombo || hitObject.IsSpinner || previousHitObject == null || previousHitObject.IsSpinner;
         }
 
         /// <summary>
@@ -422,7 +470,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 for (int i = 0; i < ComboColours.Count; i++) {
                     lines.Add("Combo" + (i + 1) + " : " + ComboColours[i]);
                 }
-                foreach (KeyValuePair<string, Colour> specialColour in SpecialColours) {
+                foreach (KeyValuePair<string, ComboColour> specialColour in SpecialColours) {
                     lines.Add(specialColour.Key + " : " + specialColour.Value);
                 }
             }
@@ -442,7 +490,18 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         /// <returns>String of file name.</returns>
         public string GetFileName() {
-            string fileName = $"{Metadata["Artist"].StringValue} - {Metadata["Title"].StringValue} ({Metadata["Creator"].StringValue}) [{Metadata["Version"].StringValue}].osu";
+            return GetFileName(Metadata["Artist"].StringValue, Metadata["Title"].StringValue,
+                Metadata["Creator"].StringValue, Metadata["Version"].StringValue);
+        }
+
+        /// <summary>
+        /// Grabs the specified file name of beatmap file.
+        /// with format of:
+        /// <c>Artist - Title (Host) [Difficulty].osu</c>
+        /// </summary>
+        /// <returns>String of file name.</returns>
+        public static string GetFileName(string artist, string title, string creator, string version) {
+            string fileName = $"{artist} - {title} ({creator}) [{version}].osu";
 
             string regexSearch = new string(Path.GetInvalidFileNameChars());
             Regex r = new Regex($"[{Regex.Escape(regexSearch)}]");
