@@ -291,6 +291,7 @@ namespace Mapping_Tools.Classes.Tools
             beatmap.HitObjects = beatmap.HitObjects.OrderBy(o => o.Time).ToList();
             beatmap.BeatmapTiming.Sort();
 
+            beatmap.CalculateHitObjectComboStuff();
             beatmap.CalculateSliderEndTimes();
             beatmap.GiveObjectsGreenlines();
 

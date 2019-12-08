@@ -186,6 +186,11 @@
     <Compile Include="Classes\ExternalFileUtil\Reaper\ReaperEditor.cs" />
     <Compile Include="Classes\ExternalFileUtil\Reaper\TrackItem.cs" />
     <Compile Include="Classes\ExternalFileUtil\TempoSignature.cs" />
+    <Compile Include="Classes\ComboColourStudio\ColourPoint.cs" />
+    <Compile Include="Classes\ComboColourStudio\ColourPointMode.cs" />
+    <Compile Include="Classes\ComboColourStudio\ComboColourProject.cs" />
+    <Compile Include="Classes\ComboColourStudio\SpecialColourDragAndDropListBox.cs" />
+
     <Compile Include="Classes\GenericExtensions.cs" />
     <Compile Include="Classes\HitsoundStuff\DelayFadeOutSampleProvider.cs" />
     <Compile Include="Classes\HitsoundStuff\Hitsound.cs" />
@@ -392,6 +397,12 @@
     <Compile Include="Components\TimingStudio\TimingStudioTimeline.xaml.cs">
       <DependentUpon>TimingStudioTimeline.xaml</DependentUpon>
     </Compile>
+
+    <Compile Include="Components\SampleDialog\SampleDialog.xaml.cs">
+      <DependentUpon>SampleDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Components\SampleDialog\SampleDialogViewModel.cs" />
+
     <Compile Include="Components\ViewHeaderComponent.xaml.cs">
       <DependentUpon>ViewHeaderComponent.xaml</DependentUpon>
     </Compile>
@@ -429,7 +440,13 @@
     <Compile Include="Viewmodels\SliderMergerVM.cs" />
     <Compile Include="Viewmodels\PreferencesVM.cs" />
     <Compile Include="Viewmodels\StandardVM.cs" />
+
     <Compile Include="Viewmodels\TimingStudioVM.cs" />
+
+    <Compile Include="Views\ComboColourStudio\BeatmapImportDialog.xaml.cs">
+      <DependentUpon>BeatmapImportDialog.xaml</DependentUpon>
+    </Compile>
+
     <Compile Include="Views\HiddenToolAttribute.cs" />
     <Compile Include="Views\DontShowTitleAttribute.cs" />
     <Compile Include="Views\Extensions.cs" />
@@ -573,6 +590,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\ComboColourStudio\ComboColourStudioView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ComboColourStudio\BeatmapImportDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Components.Domain;
 
@@ -21,9 +22,6 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
             ComboColours = new ObservableCollection<SpecialColour>();
 
             MaxBurstLength = 1;
-
-            ColourPoints.CollectionChanged += ColourPointsOnCollectionChanged;
-            ComboColours.CollectionChanged += ComboColoursOnCollectionChanged;
 
             AddColourPointCommand = new CommandImplementation(_ => {
                 ColourPoints.Add(ColourPoints.Count > 0
@@ -50,16 +48,21 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
 
             RemoveComboCommand = new CommandImplementation(_ => {
                 if (ComboColours.Count > 0) {
-                    var removing = ComboColours[ComboColours.Count - 1];
                     ComboColours.RemoveAt(ComboColours.Count - 1);
-                    foreach (var colourPoint in ColourPoints) {
-                        colourPoint.ColourSequence.Remove(removing);
-                    }
                 }
             });
         }
 
         private void ComboColoursOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+            /*if (e.OldItems != null) {
+                foreach (var oldItem in e.OldItems) {
+                    var removed = (SpecialColour) oldItem;
+                    foreach (var colourPoint in ColourPoints) {
+                        colourPoint.ColourSequence.Remove(removed);
+                    }
+                }
+            }*/
+
             MatchComboColourReferences();
         }
 
@@ -96,14 +99,55 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
             return new ColourPoint(time, colours ?? new SpecialColour[0], ColourPointMode.Normal, this);
         }
 
-        public void ImportFromBeatmap(string importPath) {
+        public void ImportColourHaxFromBeatmap(string importPath) {
             try {
                 var editor = new BeatmapEditor(importPath);
                 var beatmap = editor.Beatmap;
 
                 ComboColours.Clear();
                 for (int i = 0; i < beatmap.ComboColours.Count; i++) {
-                    ComboColours.Add(new SpecialColour(beatmap.ComboColours[i].Color, $"Combo{i}"));
+                    ComboColours.Add(new SpecialColour(beatmap.ComboColours[i].Color, $"Combo{i + 1}"));
+                }
+
+
+            }
+            catch( Exception ex ) {
+                MessageBox.Show($"{ex.Message}{Environment.NewLine}{ex.StackTrace}", "Error");
+            }
+        }
+
+        private static int[] GetColourSequence(IReadOnlyList<HitObject> hitObjects, int startIndex, int sequenceLength) {
+            int[] colourSequence = new int[sequenceLength];
+
+            for (int i = 0; i < sequenceLength; i++) {
+                colourSequence[i] = hitObjects[startIndex + i].ColourIndex;
+            }
+
+            return colourSequence;
+        }
+
+        private static int GetSequenceScore(IReadOnlyList<HitObject> hitObjects, int startIndex, IReadOnlyList<int> colourSequence) {
+            int index = startIndex;
+            int sequenceIndex = 0;
+            int score = 0;
+
+            while (index < hitObjects.Count && hitObjects[index].ColourIndex == colourSequence[sequenceIndex]) {
+                score++;
+                index++;
+                sequenceIndex = MathHelper.Mod(sequenceIndex + 1, colourSequence.Count);
+            }
+
+            return score;
+        }
+
+        public void ImportComboColoursFromBeatmap(string importPath) {
+            try {
+                var editor = new BeatmapEditor(importPath);
+                var beatmap = editor.Beatmap;
+
+                ComboColours.Clear();
+                for (int i = 0; i < beatmap.ComboColours.Count; i++) {
+                    ComboColours.Add(new SpecialColour(beatmap.ComboColours[i].Color, $"Combo{i + 1}"));
                 }
             }
             catch( Exception ex ) {
@@ -114,12 +158,16 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
         
         public ObservableCollection<ColourPoint> ColourPoints {
             get => _colourPoints;
-            set => Set(ref _colourPoints, value);
+            set { Set(ref _colourPoints, value);
+                ColourPoints.CollectionChanged += ColourPointsOnCollectionChanged;
+            }
         }
 
         public ObservableCollection<SpecialColour> ComboColours {
             get => _comboColours;
-            set => Set(ref _comboColours, value);
+            set { Set(ref _comboColours, value);
+                ComboColours.CollectionChanged += ComboColoursOnCollectionChanged;
+            }
         }
 
         public int MaxBurstLength {

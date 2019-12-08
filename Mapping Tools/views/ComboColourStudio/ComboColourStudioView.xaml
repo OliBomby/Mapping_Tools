@@ -36,7 +36,7 @@
                         <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
                     </materialDesign:PopupBox.ToggleContent>
                     <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
-                        With Combo Colour Studio you can easily customize the combo colours of your beatmap.
+                        With Combo Colour Studio you can easily customize the combo colours of your beatmap. AKA colour haxing.
                         <LineBreak/>
                         You define colored sections much like how you use timing points in the osu! editor. Just add a new colour point and define the sequence of combo colours.
                         <LineBreak/>
@@ -142,11 +142,10 @@
                     <Grid Grid.Row="1">
                         <materialDesign:Card VerticalAlignment="Bottom" HorizontalAlignment="Stretch" UniformCornerRadius="5" Padding="2" Margin="0 10 5 5">
                             <StackPanel Orientation="Horizontal">
-                                <materialDesign:PopupBox PlacementMode="TopAndAlignLeftEdges">
-                                    <StackPanel>
-                                        <Button Content="Import colours" Click="ImportColoursButton_OnClick"/>
-                                    </StackPanel>
-                                </materialDesign:PopupBox>
+                                <Button Content="Import colours" Click="ImportColoursButton_OnClick" Margin="5 0 5 0"
+                                        ToolTip="Import combo colours from a beatmap."/>
+                                <Button Content="Import colorhax" Click="ImportColourHaxButton_OnClick" Margin="5 0 20 0"
+                                        ToolTip="Import colour haxing from a beatmap and populate the colour points."/>
 
                                 <TextBox Width="120" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="10 0 10 5"
                                          materialDesign:HintAssist.Hint="Max burst length" ToolTip="Determines the maximum combo size for burst combos. Combos longer than this cant get burst colours."
@@ -186,7 +185,7 @@
                                     </ListBox.ItemTemplate>
                                 </ListBox>
                             </materialDesign:Card>
-                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a new combo colour." VerticalAlignment="Center" Margin="5" Command="{Binding Project.AddComboCommand}">
+                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a new combo colour." VerticalAlignment="Center" Margin="10 5 5 5" Command="{Binding Project.AddComboCommand}">
                                 <materialDesign:PackIcon Kind="Plus" Width="24" Height="24"/>
                             </Button>
                             <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove last combo colour." VerticalAlignment="Center" Margin="5" Command="{Binding Project.RemoveComboCommand}">

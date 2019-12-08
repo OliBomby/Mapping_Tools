@@ -4,15 +4,13 @@ using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Viewmodels;
+using MaterialDesignThemes.Wpf;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls.Primitives;
-using Mapping_Tools.Components.SampleDialog;
-using MaterialDesignThemes.Wpf;
 
 namespace Mapping_Tools.Views {
     /// <summary>
@@ -25,7 +23,7 @@ namespace Mapping_Tools.Views {
 
         public static readonly string ToolName = "Combo Colour Studio";
 
-        public static readonly string ToolDescription = $@"With Combo Colour Studio you can easily customize the combo colours of your beatmap.{Environment.NewLine}You define colored sections much like how you use timing points in the osu! editor. Just add a new colour point and define the sequence of combo colours.{Environment.NewLine}You can also define colour points which only work for one combo, so you can emphasize specific patterns using colour.{Environment.NewLine}You can get started by adding a combo colour using the plus on the bottom left or by importing combo colours from an existing map. The combo colours can be edited by clicking on the coloured circles.{Environment.NewLine}Add a colour point by clicking on the plus on the bottom right. You can edit the colour sequence by double clicking the colour sequence cell.";
+        public static readonly string ToolDescription = $@"With Combo Colour Studio you can easily customize the combo colours of your beatmap. AKA colour haxing.{Environment.NewLine}You define colored sections much like how you use timing points in the osu! editor. Just add a new colour point and define the sequence of combo colours.{Environment.NewLine}You can also define colour points which only work for one combo, so you can emphasize specific patterns using colour.{Environment.NewLine}You can get started by adding a combo colour using the plus on the bottom left or by importing combo colours from an existing map. The combo colours can be edited by clicking on the coloured circles.{Environment.NewLine}Add a colour point by clicking on the plus on the bottom right. You can edit the colour sequence by double clicking the colour sequence cell.";
 
         private ComboColourStudioVm ViewModel => (ComboColourStudioVm) DataContext;
 
@@ -38,12 +36,23 @@ namespace Mapping_Tools.Views {
         }
 
         private async void ImportColoursButton_OnClick(object sender, RoutedEventArgs e) {
-            var sampleDialog = new SampleDialog();
+            var sampleDialog = new BeatmapImportDialog();
 
             var result = await DialogHost.Show(sampleDialog, "RootDialog");
 
-            Console.WriteLine((bool)result);
-            Console.WriteLine(sampleDialog.ViewModel.Name);
+            if ((bool) result) {
+                ViewModel.Project.ImportComboColoursFromBeatmap(sampleDialog.Path);
+            }
+        }
+
+        private async void ImportColourHaxButton_OnClick(object sender, RoutedEventArgs e) {
+            var sampleDialog = new BeatmapImportDialog();
+
+            var result = await DialogHost.Show(sampleDialog, "RootDialog");
+
+            if ((bool) result) {
+                ViewModel.Project.ImportColourHaxFromBeatmap(sampleDialog.Path);
+            }
         }
 
         protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
@@ -86,7 +95,7 @@ namespace Mapping_Tools.Views {
                     var lastColourPoint = orderedColourPoints[0];
                     int lastColourIndex = 0;
                     var exceptions = new List<ColourPoint>();
-                    foreach (var newCombo in beatmap.HitObjects.Where(o => o.NewCombo || o == beatmap.HitObjects[0])) {
+                    foreach (var newCombo in beatmap.HitObjects.Where(o => o.ActualNewCombo && !o.IsSpinner)) {
                         int comboLength = GetComboLength(newCombo, beatmap.HitObjects);
                         //Console.WriteLine(comboLength);
 
@@ -116,12 +125,16 @@ namespace Mapping_Tools.Views {
                         var colourIndex = colourSequence.Count == 0 ? MathHelper.Mod(lastColourIndex + 1, orderedComboColours.Count) :
                             orderedComboColours.FindIndex(o => o.Name == colourSequence[colourPointColourIndex].Name);
 
+                        if (colourIndex == -1) {
+                            throw new ArgumentException($"Can not use colour {colourSequence[colourPointColourIndex].Name} of colour point at offset {colourPoint.Time} because it does not exist in the combo colours.");
+                        }
+
                         //Console.WriteLine("colourIndex: " + colourIndex);
 
-                        var comboChange = colourIndex - lastColourIndex;
+                        var comboIncrease = MathHelper.Mod(colourIndex - lastColourIndex, arg.Project.ComboColours.Count);
 
-                        // Do -1 combo skip since it always does +1 combo colour for each new combo
-                        newCombo.ComboSkip = MathHelper.Mod(comboChange - 1, arg.Project.ComboColours.Count);
+                        // Do -1 combo skip since it always does +1 combo colour for each new combo which is not on a spinner
+                        newCombo.ComboSkip = MathHelper.Mod(comboIncrease - 1, arg.Project.ComboColours.Count);
 
                         // Set new combo to true for the case this is the first object and new combo is false
                         if (!newCombo.NewCombo && newCombo.ComboSkip != 0) {

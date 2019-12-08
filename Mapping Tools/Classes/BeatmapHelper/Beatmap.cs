@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
 
@@ -210,6 +211,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                     SpecialColours[SplitKeyValue(line)[0].Trim()] = new ComboColour(line);
                 }
             }
+            // Add default colours to ComboColours if there are no combo colours at all
+            if (ComboColours.Count == 0) {
+                ComboColours.Add(new ComboColour(255, 192, 0));
+                ComboColours.Add(new ComboColour(0, 202, 0));
+                ComboColours.Add(new ComboColour(18, 124, 255));
+                ComboColours.Add(new ComboColour(242, 24, 57));
+            }
+
             foreach (string line in eventsLines) {
                 Events.Add(line);
             }
@@ -245,6 +254,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             BeatmapTiming = new Timing(timingLines, Difficulty["SliderMultiplier"].Value);
 
             SortHitObjects();
+            CalculateHitObjectComboStuff();
             CalculateSliderEndTimes();
             GiveObjectsGreenlines();
         }
@@ -263,6 +273,43 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             foreach (var ho in HitObjects.Where(ho => ho.IsSlider)) {
                 ho.TemporalLength = BeatmapTiming.CalculateSliderTemporalLength(ho.Time, ho.PixelLength);
             }
+        }
+        
+        /// <summary>
+        /// Calculates the which hit objects actually have a new combo.
+        /// Calculates the combo index and combo colours for each hit object.
+        /// This includes cases where the previous hit object is a spinner or doesnt exist.
+        /// </summary>
+        public void CalculateHitObjectComboStuff() {
+            HitObject previousHitObject = null;
+            int colourIndex = 0;
+            int comboIndex = 0;
+
+            foreach (var hitObject in HitObjects) {
+                hitObject.ActualNewCombo = IsNewCombo(hitObject, previousHitObject);
+
+                if (hitObject.ActualNewCombo) {
+                    var colourIncrement = hitObject.ComboSkip;
+                    if (!hitObject.IsSpinner) {
+                        colourIncrement++;
+                    }
+
+                    colourIndex = MathHelper.Mod(colourIndex + colourIncrement, ComboColours.Count);
+                    comboIndex = 1;
+                } else {
+                    comboIndex++;
+                }
+
+                hitObject.ComboIndex = comboIndex;
+                hitObject.ColourIndex = colourIndex;
+                hitObject.Colour = ComboColours[colourIndex];
+
+                previousHitObject = hitObject;
+            }
+        }
+
+        public static bool IsNewCombo(HitObject hitObject, HitObject previousHitObject) {
+            return hitObject.NewCombo || hitObject.IsSpinner || previousHitObject == null || previousHitObject.IsSpinner;
         }
 
         /// <summary>
