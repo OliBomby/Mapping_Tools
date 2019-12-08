@@ -11,22 +11,27 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// The millisecond value of the timing point.
         /// </summary>
         public double Offset { get; set; }
+
         /// <summary>
         /// Milliseconds per Beat
         /// </summary>
         public double MpB { get; set; }
+
         /// <summary>
         /// Time signature to x/4
         /// </summary>
         public double Meter { get; set; }
+
         /// <summary>
         /// The sample set from the <see cref="TimingPoint"/>
         /// </summary>
         public SampleSet SampleSet { get; set; }
+
         /// <summary>
         /// The custom index number from the <see cref="TimingPoint"/>
         /// </summary>
         public int SampleIndex { get; set; }
+
         /// <summary>
         /// The volume based from 0 - 100 %
         /// </summary>
@@ -39,15 +44,17 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <para/>
         /// True for Uninherited control points. False, for Inherited control points.
         /// </summary>
-        public bool Uninherited { get; set; } // True is red line
+        public bool Uninherited { get; set; }
 
         /// <summary>
+        /// A special section which represents a chorus or big moment within the song.
         /// </summary>
         public bool Kiai { get; set; }
 
         /// <summary>
         /// A taiko implementation that removes the first instance of the bar,
         /// it is used when multiple and/or conflicting timing points are used throughout the map.
+        /// <para/>
         /// It can also be utilised for the Nightcore mod of standard by removing a finish sample at the timing point.
         /// </summary>
         public bool OmitFirstBarLine { get; set; }
