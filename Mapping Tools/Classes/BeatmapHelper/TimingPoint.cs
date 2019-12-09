@@ -163,7 +163,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <returns></returns>
         public string GetLine() {
             int style = MathHelper.GetIntFromBitArray(new BitArray(new bool[] { Kiai, false, false, OmitFirstBarLine }));
-            return $"{Offset.ToRoundInvariant()},{MpB.ToInvariant()},{Meter.ToInvariant()},{SampleSet.ToIntInvariant()},{SampleIndex.ToInvariant()},{Volume.ToRoundInvariant()},{Convert.ToInt32(Uninherited).ToInvariant()},{style.ToInvariant()}";
+            return $"{Offset.ToRoundInvariant()},{MpB.ToInvariant()},{Meter.TempoDenominator.ToInvariant()},{SampleSet.ToIntInvariant()},{SampleIndex.ToInvariant()},{Volume.ToRoundInvariant()},{Convert.ToInt32(Uninherited).ToInvariant()},{style.ToInvariant()}";
         }
 
         /// <summary>
