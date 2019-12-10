@@ -1,12 +1,8 @@
-﻿using Mapping_Tools.Components.Graph.Interpolators;
-
-namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
+﻿namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
     [IgnoreInterpolator]
-    public class ParabolaInterpolator : IGraphInterpolator {
+    public class ParabolaInterpolator : CustomInterpolator {
         public string Name => "Parabola";
 
-        public double GetInterpolation(double t, double h1, double h2, double parameter) {
-            return h1 + (h2 - h1) * (-2 * parameter * t * t + (2 * parameter + 1) * t);
-        }
+        public ParabolaInterpolator() : base((t, p) => -2 * p * t * t + (2 * p + 1) * t) {}
     }
 }

@@ -1,5 +1,6 @@
 ﻿namespace Mapping_Tools.Components.Graph.Interpolation {
     public interface IDerivableInterpolator {
-        IGraphInterpolator GetDerivative();
+        IGraphInterpolator GetDerivativeInterpolator();
+        double GetDerivative(double t);
     }
 }

@@ -1,21 +1,25 @@
-﻿using System.Security.Cryptography;
-using Mapping_Tools.Components.Graph.Interpolation;
-using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
+﻿using System.ComponentModel;
 
-namespace Mapping_Tools.Components.Graph.Interpolators {
+namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
     [IgnoreInterpolator]
-    public class LinearInterpolator : IGraphInterpolator, IDerivableInterpolator, IIntegrableInterpolator {
-        public string Name => "Linear";
-        public double GetInterpolation(double t, double h1, double h2, double parameter) {
-            return h1 + (h2 - h1) * t;
+    [DisplayName("Linear")]
+    public class LinearInterpolator : CustomInterpolator, IDerivableInterpolator, IIntegrableInterpolator {
+        public LinearInterpolator() : base((t, p) => t) {}
+
+        public IGraphInterpolator GetDerivativeInterpolator() {
+            return new LinearInterpolator();
         }
 
-        public IGraphInterpolator GetDerivative() {
-            return new CustomInterpolator(((t, h1, h2, parameter) => h2 - h1));
+        public double GetDerivative(double t) {
+            return 1;
         }
 
-        public IGraphInterpolator GetPrimitive() {
-            return new CustomInterpolator(((t, h1, h2, parameter) => h1 * t + 0.5 * (h2 - h1) * t * t));
+        public IGraphInterpolator GetPrimitiveInterpolator() {
+            return new CustomInterpolator((t, p) => t * (p * (t - 1) + 1)) {P = 1};
+        }
+
+        public double GetIntegral(double t) {
+            return 0.5 * t * t;
         }
     }
 }

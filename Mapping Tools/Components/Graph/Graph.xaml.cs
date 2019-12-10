@@ -249,8 +249,10 @@ namespace Mapping_Tools.Components.Graph {
             }
             var sectionProgress = (x - previousAnchor.Pos.X) / diff.X;
 
-            return nextAnchor.Interpolator.GetInterpolation(sectionProgress, previousAnchor.Pos.Y, nextAnchor.Pos.Y,
-                nextAnchor.Tension);
+            var interpolator = nextAnchor.Interpolator;
+            interpolator.P = nextAnchor.Tension;
+
+            return previousAnchor.Pos.Y + diff.Y * interpolator.GetInterpolation(sectionProgress);
         }
 
         private Point GetRelativePoint(Vector2 pos) {
