@@ -351,7 +351,10 @@
     <Compile Include="Components\Domain\DoubleToStringConverter.cs" />
     <Compile Include="Components\DragAndDropListBox.cs" />
     <Compile Include="Components\Graph\GraphMarker.cs" />
+    <Compile Include="Components\Graph\Interpolation\IDerivableInterpolator.cs" />
+    <Compile Include="Components\Graph\Interpolation\IIntegrableInterpolator.cs" />
     <Compile Include="Components\Graph\Interpolation\InterpolatorComparer.cs" />
+    <Compile Include="Components\Graph\Interpolation\Interpolators\CustomInterpolator.cs" />
     <Compile Include="Components\Graph\Interpolation\Interpolators\DoubleCurveInterpolator3.cs" />
     <Compile Include="Components\Graph\Interpolation\Interpolators\DoubleCurveInterpolator2.cs" />
     <Compile Include="Components\Graph\Interpolation\Interpolators\HalfSineInterpolator.cs" />
