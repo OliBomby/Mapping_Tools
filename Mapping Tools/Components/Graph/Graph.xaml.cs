@@ -15,14 +15,18 @@ namespace Mapping_Tools.Components.Graph {
     /// </summary>
     public partial class Graph {
         private bool _drawAnchors;
-        private GraphState _state;
+        
+        public static readonly DependencyProperty StateProperty =
+            DependencyProperty.Register("State",
+                typeof (GraphState),
+                typeof (GraphDoubleAnimation),
+                new PropertyMetadata(null));
 
         [NotNull]
         public GraphState State {
-            get => _state;
+            get => (GraphState) GetValue(StateProperty);
             set {
-                if (_state == value) return;
-                _state = value;
+                SetValue(StateProperty, value);
                 UpdateVisual();
             }
         }
@@ -125,7 +129,7 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private Point GetRelativePoint(Vector2 pos) {
-            return new Point(pos.X * Width, Height - pos.Y * Height);
+            return new Point(pos.X * ActualWidth, ActualHeight - pos.Y * ActualHeight);
         }
 
         private Point GetRelativePoint(double x) {
@@ -133,7 +137,7 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private Vector2 GetPosition(Point pos) {
-            return new Vector2(pos.X / Width, (Height - pos.Y) / Height);
+            return new Vector2(pos.X / ActualWidth, (ActualHeight - pos.Y) / ActualHeight);
         }
 
         private Vector2 GetPosition(GraphMarker marker) {
@@ -147,13 +151,13 @@ namespace Mapping_Tools.Components.Graph {
             MainCanvas.Children.Clear();
 
             // Add markers
-            foreach (var marker in Markers.Where(marker => !(marker.X < 0) && !(marker.X > Width) && !(marker.Y < 0) && !(marker.Y > Height))) {
+            foreach (var marker in Markers.Where(marker => !(marker.X < 0) && !(marker.X > ActualWidth) && !(marker.Y < 0) && !(marker.Y > ActualHeight))) {
                 MainCanvas.Children.Add(marker);
             }
 
             // Add border
             var rect = new Rectangle {
-                Stroke = EdgesBrush, Width = Width, Height = Height, StrokeThickness = 2
+                Stroke = EdgesBrush, Width = ActualWidth, Height = ActualHeight, StrokeThickness = 2
             };
             Canvas.SetLeft(rect, 0);
             Canvas.SetTop(rect, 0);
@@ -170,8 +174,8 @@ namespace Mapping_Tools.Components.Graph {
 
                 points.Add(GetRelativePoint(previous.Pos));
 
-                for (int k = 1; k < Width * (next.Pos.X - previous.Pos.X); k++) {
-                    var x = previous.Pos.X + k / Width;
+                for (int k = 1; k < ActualWidth * (next.Pos.X - previous.Pos.X); k++) {
+                    var x = previous.Pos.X + k / ActualWidth;
 
                     points.Add(GetRelativePoint(x));
                 }
@@ -285,17 +289,17 @@ namespace Mapping_Tools.Components.Graph {
             var prevVertical = double.NegativeInfinity;
             foreach (var graphMarker in Markers) {
                 graphMarker.Stroke = EdgesBrush;
-                graphMarker.Width = Width;
-                graphMarker.Height = Height;
+                graphMarker.Width = ActualWidth;
+                graphMarker.Height = ActualHeight;
                 if (graphMarker.Orientation == Orientation.Horizontal) {
                     graphMarker.X = 0;
-                    graphMarker.Y = Height - Height * ((graphMarker.Value - State.YMin) / (State.YMax - State.YMin));
+                    graphMarker.Y = ActualHeight - ActualHeight * ((graphMarker.Value - State.YMin) / (State.YMax - State.YMin));
                     graphMarker.Visible = Math.Abs(prevHorizontal - graphMarker.Y) >= MinMarkerSpacing;
                     if (graphMarker.Visible) {
                         prevHorizontal = graphMarker.Y;
                     }
                 } else {
-                    graphMarker.X = Width * ((graphMarker.Value - State.XMin) / (State.XMax - State.XMin));
+                    graphMarker.X = ActualWidth * ((graphMarker.Value - State.XMin) / (State.XMax - State.XMin));
                     graphMarker.Y = 0;
                     graphMarker.Visible = Math.Abs(prevVertical - graphMarker.X) >= MinMarkerSpacing;
                     if (graphMarker.Visible) {
@@ -306,9 +310,7 @@ namespace Mapping_Tools.Components.Graph {
             }
         }
 
-        public void SetSize(double width, double height) {
-            Width = width;
-            Height = height;
+        private void Graph_OnSizeChanged(object sender, SizeChangedEventArgs e) {
             UpdateMarkers();
             UpdateVisual();
         }

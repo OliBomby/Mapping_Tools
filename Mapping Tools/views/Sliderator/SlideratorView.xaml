@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Mapping_Tools.Views"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:graph="clr-namespace:Mapping_Tools.Components.Graph"
              mc:Ignorable="d" 
              x:Name="This"
              d:DesignHeight="450" Width="759.5">
@@ -17,6 +18,7 @@
         <Grid Name="FirstGrid" Grid.Row="0">
             <Grid>
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
@@ -34,7 +36,29 @@
                     </materialDesign:PopupBox>
                 </StackPanel>
 
-                <ContentControl Grid.Row="1" x:Name="GraphHost" Margin="20 20 20 120"></ContentControl>
+                <graph:Graph Grid.Row="2" x:Name="Graph" Margin="20 0 20 120" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                             MinMarkerSpacing="10"/>
+
+                <StackPanel Margin="20" Grid.Row="1">
+                    <ProgressBar
+                        Name="MyRectangle" HorizontalAlignment="Stretch" Maximum="10">
+                        <ProgressBar.Triggers>
+                            <!-- Animates the rectangle's opacity. -->
+                            <EventTrigger RoutedEvent="Rectangle.Loaded">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <graph:GraphDoubleAnimation
+                                            Storyboard.TargetName="MyRectangle" 
+                                            Storyboard.TargetProperty="Value"
+                                            GraphState="{Binding ElementName=Graph, Path=State}"
+                                            From="0.0" To="1.0" Duration="0:0:5" 
+                                            RepeatBehavior="Forever" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </ProgressBar.Triggers>
+                    </ProgressBar>
+                </StackPanel>
             </Grid>
 
             <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">

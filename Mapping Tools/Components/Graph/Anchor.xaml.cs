@@ -102,7 +102,7 @@ namespace Mapping_Tools.Components.Graph {
                 drag.X = 0;
             }
 
-            var movement = new Vector2(drag.X / Graph.Width, -drag.Y / Graph.Height);
+            var movement = new Vector2(drag.X / Graph.ActualWidth, -drag.Y / Graph.ActualHeight);
             Graph.MoveAnchorTo(this, Pos + movement);
         }
 
