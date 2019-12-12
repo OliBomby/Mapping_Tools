@@ -1,14 +1,19 @@
 ﻿using System.Globalization;
-using System.Windows.Controls;
+using System.Windows;
 
 namespace Mapping_Tools.Components.Graph {
     /// <summary>
     /// Interaction logic for TypeValueDialog.xaml
     /// </summary>
-    public partial class TypeValueDialog : UserControl {
+    public partial class TypeValueDialog {
         public TypeValueDialog(double initialValue = 0) {
             InitializeComponent();
             ValueBox.Text = initialValue.ToString(CultureInfo.InvariantCulture);
+        }
+
+        private void TypeValueDialog_OnLoaded(object sender, RoutedEventArgs e) {
+            ValueBox.Focus();
+            ValueBox.SelectAll();
         }
     }
 }

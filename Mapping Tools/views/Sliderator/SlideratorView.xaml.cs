@@ -26,7 +26,7 @@ namespace Mapping_Tools.Views {
             Height = MainWindow.AppWindow.content_views.Height;
 
             Graph = new Graph {
-                Width = 400, Height = 400, MinMarkerSpacing = 10, XMax = 3, YMax = 10, YMin = 0.10
+                Width = 400, Height = 400, MinMarkerSpacing = 10, State = {XMax = 3, YMax = 10, YMin = 0.10}
             };
 
             var markers = new List<GraphMarker>();
@@ -44,8 +44,8 @@ namespace Mapping_Tools.Views {
 
             Graph.SetBrush(new SolidColorBrush(Color.FromArgb(255, 0, 255, 255)));
 
-            Graph.MoveAnchorTo(Graph.Anchors[0], Vector2.Zero);
-            Graph.MoveAnchorTo(Graph.Anchors[Graph.Anchors.Count - 1], Vector2.One);
+            Graph.MoveAnchorTo(Graph.State.Anchors[0], Vector2.Zero);
+            Graph.MoveAnchorTo(Graph.State.Anchors[Graph.State.Anchors.Count - 1], Vector2.One);
 
             GraphHost.Content = Graph;
             GraphHost.SizeChanged += GraphHostOnSizeChanged;

@@ -52,7 +52,7 @@ namespace Mapping_Tools.Components.Graph {
         private void SetSize(double size) {
             Width = size;
             Height = size;
-            Graph.UpdateVisual();
+            Graph?.UpdateVisual();
         }
 
         public virtual void EnableDragging() {
