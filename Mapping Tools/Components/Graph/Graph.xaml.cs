@@ -1,36 +1,39 @@
-﻿using System;
+﻿using Mapping_Tools.Annotations;
+using Mapping_Tools.Classes.MathUtil;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Components.Domain;
 
 namespace Mapping_Tools.Components.Graph {
     /// <summary>
     /// Interaction logic for Graph.xaml
     /// </summary>
-    public partial class Graph : INotifyPropertyChanged {
+    public partial class Graph {
         private bool _drawAnchors;
+        
+        public static readonly DependencyProperty StateProperty =
+            DependencyProperty.Register("State",
+                typeof (GraphState),
+                typeof (GraphDoubleAnimation),
+                new PropertyMetadata(null));
 
-        public List<TensionAnchor> TensionAnchors { get; }
-        public List<Anchor> Anchors { get; }
+        [NotNull]
+        public GraphState State {
+            get => (GraphState) GetValue(StateProperty);
+            set {
+                SetValue(StateProperty, value);
+                UpdateVisual();
+            }
+        }
+
         public List<GraphMarker> Markers { get; set; }
 
         public double MinMarkerSpacing { get; set; }
-
-        public string LastInterpolationSet { get; set; }
-
-        public double XMin { get; set; }
-        public double YMin { get; set; }
-        public double XMax { get; set; }
-        public double YMax { get; set; }
 
         private Brush _stroke;
         public Brush Stroke {
@@ -55,7 +58,7 @@ namespace Mapping_Tools.Components.Graph {
             get => _edgesBrush;
             set {
                 _edgesBrush = value;
-                Anchors.ForEach(o => o.Stroke = value);
+                State.Anchors.ForEach(o => o.Stroke = value);
             }
         }
 
@@ -63,7 +66,7 @@ namespace Mapping_Tools.Components.Graph {
         public Brush AnchorStroke { get => _anchorStroke;
             set {
                 _anchorStroke = value;
-                Anchors.ForEach(o => o.Stroke = value);
+                State.Anchors.ForEach(o => o.Stroke = value);
             }
         }
 
@@ -71,7 +74,7 @@ namespace Mapping_Tools.Components.Graph {
         public Brush AnchorFill { get => _anchorFill;
             set {
                 _anchorFill = value;
-                Anchors.ForEach(o => o.Fill = value);
+                State.Anchors.ForEach(o => o.Fill = value);
             }
         }
 
@@ -79,7 +82,7 @@ namespace Mapping_Tools.Components.Graph {
         public Brush TensionAnchorStroke { get => _tensionAnchorStroke;
             set {
                 _tensionAnchorStroke = value;
-                TensionAnchors.ForEach(o => o.Stroke = value);
+                State.TensionAnchors.ForEach(o => o.Stroke = value);
             }
         }
 
@@ -87,35 +90,25 @@ namespace Mapping_Tools.Components.Graph {
         public Brush TensionAnchorFill { get => _tensionAnchorFill;
             set {
                 _tensionAnchorFill = value;
-                TensionAnchors.ForEach(o => o.Fill = value);
+                State.TensionAnchors.ForEach(o => o.Fill = value);
             }
         }
 
 
         public Graph() {
             InitializeComponent();
+            
+            Markers = new List<GraphMarker>();
+            State = new GraphState(this);
 
             DataContext = this;
-
-            OpenTypeValueCommand = new CommandImplementation(OpenTypeValueDialog);
-            AcceptTypeValueDialogCommand = new CommandImplementation(AcceptTypeValueDialog);
-            CancelTypeValueDialogCommand = new CommandImplementation(CancelTypeValueDialog);
-
-            TensionAnchors = new List<TensionAnchor>();
-            Anchors = new List<Anchor>();
-            Markers = new List<GraphMarker>();
 
             Background = new SolidColorBrush(Color.FromArgb(30, 0, 0, 0));
             EdgesBrush = new SolidColorBrush(Color.FromArgb(255, 100, 100, 100));
 
-            XMin = 0;
-            YMin = 0;
-            XMax = 1;
-            YMax = 1;
-
             // Initialize Anchors
-            Anchors.Add(MakeAnchor(new Vector2(0, 0.5)));
-            AddAnchor(new Vector2(1, 0.5));
+            State.Anchors.Add(State.MakeAnchor(new Vector2(0, 0.5)));
+            State.AddAnchor(new Vector2(1, 0.5));
         }
 
         public void SetBrush(Brush brush) {
@@ -130,188 +123,64 @@ namespace Mapping_Tools.Components.Graph {
             TensionAnchorFill = transparentBrush;
         }
 
-        public Anchor AddAnchor(Vector2 pos) {
-            // Clamp the position withing bounds
-            pos = Vector2.Clamp(pos, Vector2.Zero, Vector2.One);
-
-            // Find the correct index
-            var index = Anchors.FindIndex(o => o.Pos.X > pos.X);
-            index = index == -1 ? Math.Max(Anchors.Count - 1, 1) : index;
-
-            // Get the next anchor
-            Anchor nextAnchor = null;
-            if (index < Anchors.Count) {
-                nextAnchor = Anchors[index];
-            }
-
-            // Make anchor
-            var anchor = LastInterpolationSet != null ? MakeAnchor(pos, LastInterpolationSet) : MakeAnchor(pos);
-
-            // Make tension anchor
-            var tensionAnchor = MakeTensionAnchor(pos, anchor);
-
-            // Link Anchors
-            anchor.TensionAnchor = tensionAnchor;
-
-            // Add tension
-            anchor.Tension = nextAnchor?.Tension ?? 0;
-            
-            // Insert anchor
-            Anchors.Insert(index, anchor);
-
-            // Add tension anchor
-            TensionAnchors.Add(tensionAnchor);
-            
-            UpdateAnchorNeighbors();
-            UpdateVisual();
-
-            return anchor;
-        }
-
-        public void RemoveAnchor(Anchor anchor) {
-            // Dont remove the anchors on the left and right edge
-            if (IsEdgeAnchor(anchor)) return;
-
-            Anchors.Remove(anchor);
-            TensionAnchors.Remove(anchor.TensionAnchor);
-
-            UpdateAnchorNeighbors();
-            UpdateVisual();
-        }
-
-        private void UpdateAnchorNeighbors() {
-            Anchor previousAnchor = null;
-            foreach (var anchor in Anchors) {
-                anchor.PreviousAnchor = previousAnchor;
-                if (previousAnchor != null) {
-                    previousAnchor.NextAnchor = anchor;
-                }
-
-                previousAnchor = anchor;
-            }
-        }
-
-        public bool IsEdgeAnchor(Anchor anchor) {
-            return anchor == Anchors[0] || anchor == Anchors[Anchors.Count - 1];
-        }
-
-        private Anchor MakeAnchor(Vector2 pos) {
-            var anchor = new Anchor(this, pos) {
-                Stroke = AnchorStroke,
-                Fill = AnchorFill
-            };
-            return anchor;
-        }
-
-        private Anchor MakeAnchor(Vector2 pos, string interpolator) {
-            var anchor = new Anchor(this, pos, interpolator) {
-                Stroke = AnchorStroke,
-                Fill = AnchorFill
-            };
-            return anchor;
-        }
-
-        private TensionAnchor MakeTensionAnchor(Vector2 pos, Anchor parentAnchor) {
-            var anchor = new TensionAnchor(this, pos, parentAnchor) {
-                Stroke = TensionAnchorStroke,
-                Fill = TensionAnchorFill
-            };
-            return anchor;
-        }
-
         private void ThisMouseRightButtonDown(object sender, MouseButtonEventArgs e) {
-            var newAnchor = AddAnchor(GetPosition(e.GetPosition(this)));
+            var newAnchor = State.AddAnchor(GetPosition(e.GetPosition(this)));
             newAnchor.EnableDragging();
         }
 
-        /// <summary>
-        /// Calculates the height of the curve for a given X value.
-        /// </summary>
-        /// <param name="x">The progression along the curve (0-1)</param>
-        /// <returns>The height of the curve (0-1)</returns>
-        public double GetValue(double x) {
-            // Find the section
-            var previousAnchor = Anchors[0];
-            var nextAnchor = Anchors[1];
-            foreach (var anchor in Anchors) {
-                if (anchor.Pos.X < x) {
-                    previousAnchor = anchor;
-                } else {
-                    nextAnchor = anchor;
-                    break;
-                }
-            }
-
-            // Calculate the value via interpolation
-            var diff = nextAnchor.Pos - previousAnchor.Pos;
-            if (Math.Abs(diff.X) < Precision.DOUBLE_EPSILON) {
-                return previousAnchor.Pos.Y;
-            }
-            var sectionProgress = (x - previousAnchor.Pos.X) / diff.X;
-
-            return nextAnchor.Interpolator.GetInterpolation(sectionProgress, previousAnchor.Pos.Y, nextAnchor.Pos.Y,
-                nextAnchor.Tension);
-        }
-
         private Point GetRelativePoint(Vector2 pos) {
-            return new Point(pos.X * Width, Height - pos.Y * Height);
+            return new Point(pos.X * ActualWidth, ActualHeight - pos.Y * ActualHeight);
         }
 
         private Point GetRelativePoint(double x) {
-            return GetRelativePoint(new Vector2(x, GetValue(x)));
+            return GetRelativePoint(new Vector2(x, State.GetPosition(x)));
         }
 
         private Vector2 GetPosition(Point pos) {
-            return new Vector2(pos.X / Width, (Height - pos.Y) / Height);
+            return new Vector2(pos.X / ActualWidth, (ActualHeight - pos.Y) / ActualHeight);
         }
 
         private Vector2 GetPosition(GraphMarker marker) {
             return GetPosition(new Point(marker.X, marker.Y));
         }
 
-        private Vector2 GetPosition(Vector2 value) {
-            return new Vector2((value.X - XMin) / (XMax - XMin), (value.Y - YMin) / (YMax - YMin));
-        }
-
-        private Vector2 GetValue(Vector2 position) {
-            return new Vector2(XMin + (XMax - XMin) * position.X, YMin + (YMax - YMin) * position.Y);
-        }
-
         public void UpdateVisual() {
+            if (!IsInitialized) return;
+
             // Clear canvas
             MainCanvas.Children.Clear();
 
             // Add markers
-            foreach (var marker in Markers.Where(marker => !(marker.X < 0) && !(marker.X > Width) && !(marker.Y < 0) && !(marker.Y > Height))) {
+            foreach (var marker in Markers.Where(marker => !(marker.X < 0) && !(marker.X > ActualWidth) && !(marker.Y < 0) && !(marker.Y > ActualHeight))) {
                 MainCanvas.Children.Add(marker);
             }
 
             // Add border
             var rect = new Rectangle {
-                Stroke = EdgesBrush, Width = Width, Height = Height, StrokeThickness = 2
+                Stroke = EdgesBrush, Width = ActualWidth, Height = ActualHeight, StrokeThickness = 2
             };
             Canvas.SetLeft(rect, 0);
             Canvas.SetTop(rect, 0);
             MainCanvas.Children.Add(rect);
 
             // Check if there are at least 2 anchors
-            if (Anchors.Count < 2) return;
+            if (State.Anchors.Count < 2) return;
 
             // Calculate interpolation line
             var points = new PointCollection();
-            for (int i = 1; i < Anchors.Count; i++) {
-                var previous = Anchors[i - 1];
-                var next = Anchors[i];
+            for (int i = 1; i < State.Anchors.Count; i++) {
+                var previous = State.Anchors[i - 1];
+                var next = State.Anchors[i];
 
                 points.Add(GetRelativePoint(previous.Pos));
 
-                for (int k = 1; k < Width * (next.Pos.X - previous.Pos.X); k++) {
-                    var x = previous.Pos.X + k / Width;
+                for (int k = 1; k < ActualWidth * (next.Pos.X - previous.Pos.X); k++) {
+                    var x = previous.Pos.X + k / ActualWidth;
 
                     points.Add(GetRelativePoint(x));
                 }
             }
-            points.Add(GetRelativePoint(Anchors[Anchors.Count - 1].Pos));
+            points.Add(GetRelativePoint(State.Anchors[State.Anchors.Count - 1].Pos));
 
             // Draw line
             var line = new Polyline {Points = points, Stroke = Stroke, StrokeThickness = 2, IsHitTestVisible = false,
@@ -326,14 +195,14 @@ namespace Mapping_Tools.Components.Graph {
             var polygon = new Polygon {Points = points2, Fill = Fill, IsHitTestVisible = false};
             MainCanvas.Children.Add(polygon);
 
-            // Return if we dont draw Anchors
+            // Return if we dont draw State.Anchors
             if (!_drawAnchors) return;
 
-            // Add tension Anchors
-            foreach (var tensionAnchor in TensionAnchors) {
+            // Add tension State.Anchors
+            foreach (var tensionAnchor in State.TensionAnchors) {
                 // Find x position in the middle
                 var next = tensionAnchor.ParentAnchor;
-                var previous = Anchors[Anchors.IndexOf(next) - 1];
+                var previous = State.Anchors[State.Anchors.IndexOf(next) - 1];
 
                 if (Math.Abs(next.Pos.X - previous.Pos.X) < Precision.DOUBLE_EPSILON) {
                     continue;
@@ -341,14 +210,14 @@ namespace Mapping_Tools.Components.Graph {
                 var x = (next.Pos.X + previous.Pos.X) / 2;
 
                 // Get y on the graph and set position
-                var y = GetValue(x);
+                var y = State.GetPosition(x);
                 tensionAnchor.Pos = new Vector2(x, y);
 
                 RenderGraphPoint(tensionAnchor);
             }
 
-            // Add Anchors
-            foreach (var anchor in Anchors) {
+            // Add State.Anchors
+            foreach (var anchor in State.Anchors) {
                 RenderGraphPoint(anchor);
             }
         }
@@ -361,9 +230,9 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         public void MoveAnchorTo(Anchor anchor, Vector2 pos) {
-            var index = Anchors.IndexOf(anchor);
-            var previous = Anchors.ElementAtOrDefault(index - 1);
-            var next = Anchors.ElementAtOrDefault(index + 1);
+            var index = State.Anchors.IndexOf(anchor);
+            var previous = State.Anchors.ElementAtOrDefault(index - 1);
+            var next = State.Anchors.ElementAtOrDefault(index + 1);
             if (previous == null || next == null) {
                 // Is edge anchor so dont move it
                 pos.X = anchor.Pos.X;
@@ -420,17 +289,17 @@ namespace Mapping_Tools.Components.Graph {
             var prevVertical = double.NegativeInfinity;
             foreach (var graphMarker in Markers) {
                 graphMarker.Stroke = EdgesBrush;
-                graphMarker.Width = Width;
-                graphMarker.Height = Height;
+                graphMarker.Width = ActualWidth;
+                graphMarker.Height = ActualHeight;
                 if (graphMarker.Orientation == Orientation.Horizontal) {
                     graphMarker.X = 0;
-                    graphMarker.Y = Height - Height * ((graphMarker.Value - YMin) / (YMax - YMin));
+                    graphMarker.Y = ActualHeight - ActualHeight * ((graphMarker.Value - State.YMin) / (State.YMax - State.YMin));
                     graphMarker.Visible = Math.Abs(prevHorizontal - graphMarker.Y) >= MinMarkerSpacing;
                     if (graphMarker.Visible) {
                         prevHorizontal = graphMarker.Y;
                     }
                 } else {
-                    graphMarker.X = Width * ((graphMarker.Value - XMin) / (XMax - XMin));
+                    graphMarker.X = ActualWidth * ((graphMarker.Value - State.XMin) / (State.XMax - State.XMin));
                     graphMarker.Y = 0;
                     graphMarker.Visible = Math.Abs(prevVertical - graphMarker.X) >= MinMarkerSpacing;
                     if (graphMarker.Visible) {
@@ -441,76 +310,9 @@ namespace Mapping_Tools.Components.Graph {
             }
         }
 
-        public void SetSize(double width, double height) {
-            Width = width;
-            Height = height;
+        private void Graph_OnSizeChanged(object sender, SizeChangedEventArgs e) {
             UpdateMarkers();
             UpdateVisual();
         }
-
-        #region TypeInDialog
-
-        public ICommand OpenTypeValueCommand { get; }
-        public ICommand AcceptTypeValueDialogCommand { get; }
-        public ICommand CancelTypeValueDialogCommand { get; }
-
-        private bool _isDialogOpen;
-        private object _dialogHostContent;
-        private Anchor _anchorEditing;
-
-        public bool IsDialogOpen
-        {
-            get => _isDialogOpen;
-            set
-            {
-                if (_isDialogOpen == value) return;
-                _isDialogOpen = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public object DialogHostContent
-        {
-            get => _dialogHostContent;
-            set
-            {
-                if (_dialogHostContent == value) return;
-                _dialogHostContent = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public void OpenTypeValueDialog(object sender)
-        {
-            _anchorEditing = sender as Anchor;
-            if (_anchorEditing == null) return;
-            DialogHostContent = new TypeValueDialog(GetValue(_anchorEditing.Pos).Y);
-            IsDialogOpen = true;
-        }
-
-        private void CancelTypeValueDialog(object obj)
-        {
-            IsDialogOpen = false;
-            _anchorEditing = null;
-        }
-
-        private void AcceptTypeValueDialog(object obj) {
-            IsDialogOpen = false;
-            if (_anchorEditing == null || !(DialogHostContent is TypeValueDialog d)) return;
-            if (TypeConverters.TryParseDouble(d.ValueBox.Text, out double result)) {
-                _anchorEditing.Pos = new Vector2(_anchorEditing.Pos.X, GetPosition(new Vector2(0, result)).Y);
-            }
-            _anchorEditing = null;
-            UpdateVisual();
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        #endregion
     }
 }

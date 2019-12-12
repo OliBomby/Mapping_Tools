@@ -1,6 +1,4 @@
-﻿using System.Windows.Controls;
-
-namespace Mapping_Tools.Components.SampleDialog {
+﻿namespace Mapping_Tools.Components.SampleDialog {
     /// <summary>
     /// Interaction logic for SampleDialog.xaml
     /// </summary>

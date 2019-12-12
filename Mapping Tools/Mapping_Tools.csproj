@@ -139,9 +139,6 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\net461\System.ValueTuple.dll</HintPath>
-    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -308,6 +305,7 @@
     <Compile Include="Classes\SnappingTools\Serialization\SnappingToolsSaveSlot.cs" />
     <Compile Include="Classes\SnappingTools\Serialization\SnappingToolsPreferences.cs" />
     <Compile Include="Classes\SnappingTools\Serialization\SnappingToolsProject.cs" />
+    <Compile Include="Classes\SoundFontUtil\SoundFontImporter.cs" />
     <Compile Include="Classes\SpectrumUtil\Waveform.cs" />
     <Compile Include="Classes\SystemTools\ActionHotkey.cs" />
     <Compile Include="Classes\SystemTools\BindableBase.cs" />
@@ -352,13 +350,17 @@
     <Compile Include="Components\Domain\ParsableDoubleListValidationRule.cs" />
     <Compile Include="Components\Domain\DoubleToStringConverter.cs" />
     <Compile Include="Components\DragAndDropListBox.cs" />
+    <Compile Include="Components\Graph\GraphDoubleAnimation.cs" />
     <Compile Include="Components\Graph\GraphMarker.cs" />
+    <Compile Include="Components\Graph\GraphState.cs" />
+    <Compile Include="Components\Graph\Interpolation\IDerivableInterpolator.cs" />
+    <Compile Include="Components\Graph\Interpolation\IIntegrableInterpolator.cs" />
     <Compile Include="Components\Graph\Interpolation\InterpolatorComparer.cs" />
+    <Compile Include="Components\Graph\Interpolation\CustomInterpolator.cs" />
     <Compile Include="Components\Graph\Interpolation\Interpolators\DoubleCurveInterpolator3.cs" />
     <Compile Include="Components\Graph\Interpolation\Interpolators\DoubleCurveInterpolator2.cs" />
     <Compile Include="Components\Graph\Interpolation\Interpolators\HalfSineInterpolator.cs" />
     <Compile Include="Components\Graph\Interpolation\VerticalMirrorInterpolatorAttribute.cs" />
-    <Compile Include="Components\Graph\Interpolation\Interpolators\ExponentialInterpolator.cs" />
     <Compile Include="Components\Graph\Interpolation\IgnoreInterpolatorAttribute.cs" />
     <Compile Include="Components\Graph\Interpolation\IGraphInterpolator.cs" />
     <Compile Include="Components\Graph\Interpolation\InterpolatorHelper.cs" />
@@ -368,7 +370,6 @@
     <Compile Include="Components\Graph\Interpolation\Interpolators\SingleCurveInterpolator2.cs" />
     <Compile Include="Components\Graph\Interpolation\Interpolators\SingleCurveInterpolator.cs" />
     <Compile Include="Components\Graph\Interpolation\Interpolators\ParabolaInterpolator.cs" />
-    <Compile Include="Components\Graph\Interpolation\Interpolators\PowerInterpolator.cs" />
     <Compile Include="Components\Graph\Interpolation\Interpolators\WaveInterpolator.cs" />
     <Compile Include="Components\Graph\TensionAnchor.xaml.cs">
       <DependentUpon>TensionAnchor.xaml</DependentUpon>
@@ -376,6 +377,18 @@
     <Compile Include="Components\Graph\GraphPointControl.cs" />
     <Compile Include="Components\Graph\TypeValueDialog.xaml.cs">
       <DependentUpon>TypeValueDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Components\ObjectVisualiser\HitObject.xaml.cs">
+      <DependentUpon>HitObject.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Components\ObjectVisualiser\ObjectPlayfield.xaml.cs">
+      <DependentUpon>ObjectPlayfield.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Components\ObjectVisualiser\SliderAnchor.xaml.cs">
+      <DependentUpon>SliderAnchor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Components\ObjectVisualiser\SliderAnchorLine.xaml.cs">
+      <DependentUpon>SliderAnchorLine.xaml</DependentUpon>
     </Compile>
     <Compile Include="Components\TimingStudio\StudioTimingPointGraphic.xaml.cs">
       <DependentUpon>StudioTimingPointGraphic.xaml</DependentUpon>
@@ -465,6 +478,9 @@
       <DependentUpon>MetadataManagerView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Classes\TimingStudio\Marker.cs" />
+    <Compile Include="Views\TimingHelper\TimingHelperView.xaml.cs">
+      <DependentUpon>TimingHelperView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\TimingStudio\TimingStudioView.xaml.cs">
       <DependentUpon>TimingStudioView.xaml</DependentUpon>
     </Compile>
@@ -500,6 +516,22 @@
       <DependentUpon>HitsoundLayerImportWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="Components\Graph\TensionAnchor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Components\ObjectVisualiser\HitObject.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Components\ObjectVisualiser\ObjectPlayfield.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Components\ObjectVisualiser\SliderAnchor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Components\ObjectVisualiser\SliderAnchorLine.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -611,6 +643,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\MetadataManager\MetadataManagerView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\TimingHelper\TimingHelperView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -24,10 +24,6 @@ namespace Mapping_Tools.Components.Graph.Interpolation {
             return nameAttribute != null ? nameAttribute.DisplayName : type.Name;
         }
 
-        public static IGraphInterpolator GetInterpolator(string name) {
-            return (from interpolator in GetInterpolators() where GetName(interpolator) == name select GetInterpolator(interpolator)).FirstOrDefault();
-        }
-
         public static IGraphInterpolator GetInterpolator(Type type) {
             return (IGraphInterpolator) Activator.CreateInstance(type);
         }

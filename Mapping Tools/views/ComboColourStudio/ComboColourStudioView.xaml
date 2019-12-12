@@ -13,6 +13,7 @@
              d:DesignHeight="650" Width="759.5" d:DataContext="{d:DesignData ComboColourStudioVm}">
     <UserControl.Resources>
         <domain:DoubleToStringConverter x:Key="DoubleToStringConverter"/>
+        <domain:TimeToStringConverter x:Key="TimeToStringConverter"/>
         <domain:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
     </UserControl.Resources>
     <Grid>
@@ -71,7 +72,7 @@
                     </DataGrid.Resources>
                     <DataGrid.Columns>
                         <materialDesign:MaterialDataGridTextColumn
-                            Binding="{Binding Time, UpdateSourceTrigger=PropertyChanged}"
+                            Binding="{Binding Time, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TimeToStringConverter}}"
                             Header="Offset"
                             EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}" />
                         <materialDesign:MaterialDataGridComboBoxColumn

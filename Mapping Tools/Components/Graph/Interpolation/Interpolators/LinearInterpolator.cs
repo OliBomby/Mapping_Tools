@@ -1,11 +1,25 @@
-﻿using Mapping_Tools.Components.Graph.Interpolation;
+﻿using System.ComponentModel;
 
-namespace Mapping_Tools.Components.Graph.Interpolators {
+namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
     [IgnoreInterpolator]
-    public class LinearInterpolator : IGraphInterpolator {
-        public string Name => "Linear";
-        public double GetInterpolation(double t, double h1, double h2, double parameter) {
-            return h1 + (h2 - h1) * t;
+    [DisplayName("Linear")]
+    public class LinearInterpolator : CustomInterpolator, IDerivableInterpolator, IIntegrableInterpolator {
+        public LinearInterpolator() : base((t, p) => t) {}
+
+        public IGraphInterpolator GetDerivativeInterpolator() {
+            return new LinearInterpolator();
+        }
+
+        public double GetDerivative(double t) {
+            return 1;
+        }
+
+        public IGraphInterpolator GetPrimitiveInterpolator() {
+            return new CustomInterpolator((t, p) => t * (p * (t - 1) + 1)) {P = 1};
+        }
+
+        public double GetIntegral(double t1, double t2) {
+            return 0.5 * t2 * t2 - 0.5 * t1 * t1;
         }
     }
 }

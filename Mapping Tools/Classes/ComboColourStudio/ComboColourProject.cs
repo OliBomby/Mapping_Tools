@@ -116,7 +116,7 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
                 var colorHaxObjects = beatmap.HitObjects.Where(o => o.ActualNewCombo && !o.IsSpinner).ToArray();
 
                 // Get the array with all the lengths of sequences that are going to be checked
-                var sequenceLengthChecks = Enumerable.Range(1, ComboColours.Count).ToArray();
+                var sequenceLengthChecks = Enumerable.Range(1, ComboColours.Count * 2 + 2).ToArray();
 
                 int sequenceStartIndex = 0;
                 int[] lastNormalSequence = null;
@@ -126,7 +126,7 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
 
                     var bestSequence = GetBestSequenceAtIndex(
                         sequenceStartIndex,
-                        4,
+                        3,
                         colorHaxObjects,
                         beatmap,
                         sequenceLengthChecks,
@@ -217,15 +217,15 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
                     );
 
                     if (nextBest != null) {
-                        contribution += nextBest.Item2;
-                        cost += nextBest.Item3;
+                        contribution += nextBest.Item2 / 2;
+                        cost += nextBest.Item3 / 2;
                     }
                 }
 
                 // Factor the contribution over the cost
                 var score = contribution / cost;
                 
-                if (bestSequence != null && score <= bestScore) continue;
+                if (bestSequence != null && (score < bestScore || Math.Abs(score - bestScore) < Precision.DOUBLE_EPSILON && cost >= bestCost)) continue;
 
                 bestScore = score;
                 bestSequence = sequence;

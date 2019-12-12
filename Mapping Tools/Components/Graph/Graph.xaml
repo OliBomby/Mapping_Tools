@@ -8,9 +8,9 @@
              Loaded="Graph_OnLoaded"
              MouseEnter="Graph_OnMouseEnter"
              MouseLeave="Graph_OnMouseLeave"
+             SizeChanged="Graph_OnSizeChanged"
              d:DesignHeight="300" d:DesignWidth="300">
-    <materialDesign:DialogHost IsOpen="{Binding IsDialogOpen}"
-                               DialogContent="{Binding DialogHostContent}"
+    <materialDesign:DialogHost x:Name="GraphDialogHost"
                                Style="{StaticResource MaterialDesignEmbeddedDialogHost}"
                                CloseOnClickAway="True">
         <Canvas x:Name="MainCanvas"

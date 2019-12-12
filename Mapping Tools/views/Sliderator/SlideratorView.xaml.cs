@@ -16,7 +16,6 @@ namespace Mapping_Tools.Views {
 
         public static readonly string ToolDescription = "";
 
-        public Graph Graph;
         private DispatcherTimer timer;
         private double hue;
 
@@ -25,9 +24,9 @@ namespace Mapping_Tools.Views {
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
 
-            Graph = new Graph {
-                Width = 400, Height = 400, MinMarkerSpacing = 10, XMax = 3, YMax = 10, YMin = 0.10
-            };
+            Graph.State.XMax = 3;
+            Graph.State.YMax = 10;
+            Graph.State.YMin = 0.10;
 
             var markers = new List<GraphMarker>();
             for (int i = 0; i <= 10; i++) {
@@ -44,19 +43,12 @@ namespace Mapping_Tools.Views {
 
             Graph.SetBrush(new SolidColorBrush(Color.FromArgb(255, 0, 255, 255)));
 
-            Graph.MoveAnchorTo(Graph.Anchors[0], Vector2.Zero);
-            Graph.MoveAnchorTo(Graph.Anchors[Graph.Anchors.Count - 1], Vector2.One);
-
-            GraphHost.Content = Graph;
-            GraphHost.SizeChanged += GraphHostOnSizeChanged;
+            Graph.MoveAnchorTo(Graph.State.Anchors[0], Vector2.Zero);
+            Graph.MoveAnchorTo(Graph.State.Anchors[Graph.State.Anchors.Count - 1], Vector2.One);
 
             timer = new DispatcherTimer(DispatcherPriority.Render) {Interval = TimeSpan.FromMilliseconds(16)};
             timer.Tick += TimerOnTick;
             //timer.Start();
-        }
-
-        private void GraphHostOnSizeChanged(object sender, SizeChangedEventArgs e) {
-            Graph.SetSize(e.NewSize.Width, e.NewSize.Height);
         }
 
         private void TimerOnTick(object sender, EventArgs e) {

@@ -1,5 +1,6 @@
 ﻿using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Components.Graph.Interpolation;
 using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
 using MaterialDesignThemes.Wpf;
@@ -8,6 +9,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using ContextMenu = System.Windows.Controls.ContextMenu;
+using Cursors = System.Windows.Input.Cursors;
+using MenuItem = System.Windows.Controls.MenuItem;
+using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 
 namespace Mapping_Tools.Components.Graph {
     /// <summary>
@@ -20,7 +25,8 @@ namespace Mapping_Tools.Components.Graph {
         public TensionAnchor TensionAnchor { get; set; }
 
         [NotNull]
-        public IGraphInterpolator Interpolator { get => _interpolator;
+        public IGraphInterpolator Interpolator {
+            get => _interpolator;
             set => SetInterpolator(value);
         }
 
@@ -61,9 +67,9 @@ namespace Mapping_Tools.Components.Graph {
         [CanBeNull]
         public Anchor NextAnchor { get; set; }
 
-        public Anchor(Graph parent, Vector2 pos) : this(parent, pos, InterpolatorHelper.GetName(typeof(SingleCurveInterpolator))) { }
+        public Anchor(Graph parent, Vector2 pos) : this(parent, pos, typeof(SingleCurveInterpolator)) { }
 
-        public Anchor(Graph parent, Vector2 pos, string interpolator) : base(parent, pos) {
+        public Anchor(Graph parent, Vector2 pos, Type interpolator) : base(parent, pos) {
             InitializeComponent();
             SetCursor();
             PopulateContextMenu();
@@ -96,7 +102,7 @@ namespace Mapping_Tools.Components.Graph {
                 drag.X = 0;
             }
 
-            var movement = new Vector2(drag.X / Graph.Width, -drag.Y / Graph.Height);
+            var movement = new Vector2(drag.X / Graph.ActualWidth, -drag.Y / Graph.ActualHeight);
             Graph.MoveAnchorTo(this, Pos + movement);
         }
 
@@ -105,7 +111,7 @@ namespace Mapping_Tools.Components.Graph {
 
             var deleteMenuItem = GetDeleteMenuItem();
             if (deleteMenuItem != null) {
-                GetDeleteMenuItem().IsEnabled = !Graph.IsEdgeAnchor(this);
+                GetDeleteMenuItem().IsEnabled = !Graph.State.IsEdgeAnchor(this);
             }
 
             if (PreviousAnchor == null) {
@@ -141,7 +147,7 @@ namespace Mapping_Tools.Components.Graph {
 
             foreach (var interpolator in InterpolatorHelper.GetInterpolators()) {
                 var name = InterpolatorHelper.GetName(interpolator);
-                var menuItem = new MenuItem {Header = name, Icon = new PackIcon {Kind = PackIconKind.RadioboxBlank}, Tag = name};
+                var menuItem = new MenuItem {Header = name, Icon = new PackIcon {Kind = PackIconKind.RadioboxBlank}, Tag = interpolator};
                 menuItem.Click += MenuItem_OnClick;
                 cm.Items.Add(menuItem);
             }
@@ -151,42 +157,51 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private void MenuItem_OnClick(object sender, RoutedEventArgs e) {
-            if (sender is MenuItem menu && menu.Tag is string name) {
-                SetInterpolator(name);
+            if (sender is MenuItem menu && menu.Tag is Type interpolator) {
+                SetInterpolator(interpolator);
             }
         }
 
-        private void SetInterpolator(string name) {
-            SetInterpolator(InterpolatorHelper.GetInterpolator(name));
+        private void SetInterpolator(Type type) {
+            SetInterpolator(InterpolatorHelper.GetInterpolator(type));
         }
 
         private void SetInterpolator(IGraphInterpolator p) {
             if (_interpolator != null && _interpolator == p) return;
 
-            var name = InterpolatorHelper.GetName(p.GetType());
-
-            Graph.LastInterpolationSet = name;
+            var type = p.GetType();
 
             var cm = GetContextMenu();
             var items = cm.Items;
             foreach (var item in items) {
-                if (item is MenuItem mi && mi.Icon != null) {
-                    mi.Icon = mi.Tag.ToString() == name ? 
+                if (item is MenuItem mi && mi.Icon != null && mi.Tag is Type interpolator) {
+                    mi.Icon = interpolator == type ? 
                         new PackIcon {Kind = PackIconKind.RadioboxMarked} : 
                         new PackIcon {Kind = PackIconKind.RadioboxBlank};
                 }
             }
-
+            
             _interpolator = p;
+
+            if (Graph == null) return;
+            Graph.State.LastInterpolationSet = type;
             Graph.UpdateVisual();
         }
 
         private void DeleteMenuItem_OnClick(object sender, RoutedEventArgs e) {
-            Graph.RemoveAnchor(GetContextMenu().PlacementTarget as Anchor);
+            Graph.State.RemoveAnchor(GetContextMenu().PlacementTarget as Anchor);
         }
 
-        private void TypeInMenuItem_OnClick(object sender, RoutedEventArgs e) {
-            Graph.OpenTypeValueDialog(this);
+        private async void TypeInMenuItem_OnClick(object sender, RoutedEventArgs e) {
+            var dialog = new TypeValueDialog(Graph.State.GetValue(Pos).Y);
+            var result = await Graph.GraphDialogHost.ShowDialog(dialog);
+
+            if (!(bool) result) return;
+        
+            if (TypeConverters.TryParseDouble(dialog.ValueBox.Text, out double value)) {
+                Pos = new Vector2(Pos.X, Graph.State.GetPosition(new Vector2(0, value)).Y);
+            }
+            Graph.UpdateVisual();
         }
     }
 }

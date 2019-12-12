@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Mapping_Tools.Classes.SystemTools
-{
+namespace Mapping_Tools.Classes.SystemTools {
     public class TypeConverters {
         public static double ParseDouble(string str) {
             using (DataTable dt = new DataTable()) {

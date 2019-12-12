@@ -12,7 +12,6 @@ Collection of tools for manipulating osu! beatmaps
 [![CodeFactor](https://www.codefactor.io/repository/github/olibomby/mapping_tools/badge/master)](https://www.codefactor.io/repository/github/olibomby/mapping_tools/overview/master)
 
 ## Tools included
-- [Geometry Dashboard]() by [OliBomby](https://github.com/OliBomby) | [CrazyRabbitKGe](https://github.com/CrazyRabbitKGe)
 - [Map Cleaner](https://github.com/OliBomby/Map-Cleaner) by [OliBomby](https://github.com/OliBomby) 
 - [Slider Merger]() by [OliBomby](https://github.com/OliBomby) 
 - [Slider Completionator]() by [OliBomby](https://github.com/OliBomby) 
@@ -24,6 +23,8 @@ Collection of tools for manipulating osu! beatmaps
 - [Metadata Manager]() by [OliBomby](https://github.com/OliBomby)
 - [Timing Copier]() by [OliBomby](https://github.com/OliBomby)
 - [Rhythm Guide]() by [OliBomby](https://github.com/OliBomby)
+- [Geometry Dashboard]() by [OliBomby](https://github.com/OliBomby) | [CrazyRabbitKGe](https://github.com/CrazyRabbitKGe)
+- [Combo Colour Studio]() by [OliBomby](https://github.com/OliBomby)
 
 ## Future implementations
 - Sliderator (tool for making variable velocity sliders)

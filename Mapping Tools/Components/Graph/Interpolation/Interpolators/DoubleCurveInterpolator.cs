@@ -1,30 +1,30 @@
 ﻿using System;
 using System.ComponentModel;
 using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Components.Graph.Interpolators;
 
 namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
     [DisplayName("Double curve")]
     [VerticalMirrorInterpolator]
-    public class DoubleCurveInterpolator : IGraphInterpolator {
+    public class DoubleCurveInterpolator : CustomInterpolator {
         private readonly LinearInterpolator _linearDegenerate;
 
         public string Name => "Double curve";
 
         public DoubleCurveInterpolator() {
             _linearDegenerate = new LinearInterpolator();
+            InterpolationFunction = Function;
         }
 
-        public double GetInterpolation(double t, double h1, double h2, double parameter) {
-            if (Math.Abs(parameter) < Precision.DOUBLE_EPSILON) {
-                return _linearDegenerate.GetInterpolation(t, h1, h2, parameter);
+        public double Function(double t, double p) {
+            if (Math.Abs(p) < Precision.DOUBLE_EPSILON) {
+                return _linearDegenerate.GetInterpolation(t);
             }
 
-            var p = -MathHelper.Clamp(parameter, -1, 1) * 10;
+            p = -MathHelper.Clamp(p, -1, 1) * 10;
             if (t < 0.5) {
-                return h1 + (h2 - h1) * 0.5 * F(t * 2, p);
+                return 0.5 * F(t * 2, p);
             }
-            return h1 + (h2 - h1) * (0.5 + 0.5 * F(t * 2 - 1, -p));
+            return 0.5 + 0.5 * F(t * 2 - 1, -p);
         }
 
         private static double F(double t, double k) {

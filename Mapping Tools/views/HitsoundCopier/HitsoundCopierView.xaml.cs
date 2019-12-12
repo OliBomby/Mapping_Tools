@@ -503,7 +503,7 @@ namespace Mapping_Tools.Views {
 
         private void BeatmapFromBrowse_Click(object sender, RoutedEventArgs e) {
             try {
-                var paths = IOHelper.BeatmapFileDialog();
+                var paths = IOHelper.BeatmapFileDialog(restore: true);
                 if (paths.Length != 0) {
                     BeatmapFromBox.Text = paths[0];
                 }
@@ -525,7 +525,7 @@ namespace Mapping_Tools.Views {
 
         private void BeatmapToBrowse_Click(object sender, RoutedEventArgs e) {
             try {
-                var paths = IOHelper.BeatmapFileDialog(multiselect: true);
+                var paths = IOHelper.BeatmapFileDialog(true, true);
                 if (paths.Length != 0) {
                     BeatmapToBox.Text = string.Join("|", paths);
                 }

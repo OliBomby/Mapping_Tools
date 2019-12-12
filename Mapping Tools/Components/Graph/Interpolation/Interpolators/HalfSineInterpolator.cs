@@ -1,28 +1,28 @@
 ﻿using System;
 using System.ComponentModel;
 using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Components.Graph.Interpolators;
 
 namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
     [DisplayName("Half sine")]
     [VerticalMirrorInterpolator]
-    public class HalfSineInterpolator : IGraphInterpolator {
+    public class HalfSineInterpolator : CustomInterpolator {
         private readonly LinearInterpolator _linearDegenerate;
 
         public HalfSineInterpolator() {
             _linearDegenerate = new LinearInterpolator();
+            InterpolationFunction = Function;
         }
 
-        public double GetInterpolation(double t, double h1, double h2, double parameter) {
-            if (Math.Abs(parameter) < Precision.DOUBLE_EPSILON) {
-                return _linearDegenerate.GetInterpolation(t, h1, h2, parameter);
+        private double Function(double t, double p) {
+            if (Math.Abs(p) < Precision.DOUBLE_EPSILON) {
+                return _linearDegenerate.GetInterpolation(t);
             }
 
-            var p = MathHelper.Clamp(parameter, -1, 1);
+            p = MathHelper.Clamp(p, -1, 1);
             if (p < 0) {
-                return h1 + (h2 - h1) * (1 - F(1 - t, -p));
+                return 1 - F(1 - t, -p);
             }
-            return h1 + (h2 - h1) * F(t, p);
+            return F(t, p);
         }
 
         private static double F(double t, double k) {
