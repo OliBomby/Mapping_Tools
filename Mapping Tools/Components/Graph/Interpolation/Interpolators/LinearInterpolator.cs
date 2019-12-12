@@ -18,8 +18,8 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
             return new CustomInterpolator((t, p) => t * (p * (t - 1) + 1)) {P = 1};
         }
 
-        public double GetIntegral(double t) {
-            return 0.5 * t * t;
+        public double GetIntegral(double t1, double t2) {
+            return 0.5 * t2 * t2 - 0.5 * t1 * t1;
         }
     }
 }
