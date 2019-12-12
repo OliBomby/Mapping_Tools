@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:Mapping_Tools.Views"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:graph="clr-namespace:Mapping_Tools.Components.Graph"
+             xmlns:objectVisualiser="clr-namespace:Mapping_Tools.Components.ObjectVisualiser"
              mc:Ignorable="d" 
              x:Name="This"
              d:DesignHeight="450" Width="759.5">
@@ -36,8 +37,17 @@
                     </materialDesign:PopupBox>
                 </StackPanel>
 
-                <graph:Graph Grid.Row="2" x:Name="Graph" Margin="20 0 20 120" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                             MinMarkerSpacing="10"/>
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="200"/>
+                    </Grid.ColumnDefinitions>
+
+                    <graph:Graph Grid.Column="0" x:Name="Graph" Margin="20 0 20 120" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                 MinMarkerSpacing="10"/>
+
+                    <objectVisualiser:HitObjectElement Grid.Column="1" x:Name="GraphHitObjectElement" Stretch="Uniform" Stroke="Red" Fill="Red"/>
+                </Grid>
 
                 <StackPanel Margin="20" Grid.Row="1">
                     <ProgressBar

@@ -390,6 +390,7 @@
     <Compile Include="Components\ObjectVisualiser\SliderAnchorLine.xaml.cs">
       <DependentUpon>SliderAnchorLine.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Components\ObjectVisualiser\HitObjectElement.cs" />
     <Compile Include="Components\TimingStudio\StudioTimingPointGraphic.xaml.cs">
       <DependentUpon>StudioTimingPointGraphic.xaml</DependentUpon>
     </Compile>
