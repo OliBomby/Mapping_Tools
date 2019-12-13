@@ -52,7 +52,7 @@ namespace Mapping_Tools.Components.Graph {
 
             if (clock.CurrentProgress == null) return start;
 
-            return GraphState.GetValue(clock.CurrentProgress.Value) * delta + start;
+            return GraphState.GetValue(start + clock.CurrentProgress.Value * delta);
         }
 
         protected override Freezable CreateInstanceCore() {
