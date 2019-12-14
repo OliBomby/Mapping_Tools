@@ -66,6 +66,12 @@
                             </objectVisualiser:HitObjectElement.Triggers>
                         </objectVisualiser:HitObjectElement>
                     </materialDesign:Card>
+                    <Button
+                    Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}"
+                    
+                    Click="Import_Slider" Grid.Column="0" Grid.Row="2" ToolTip="Imports the selected slider into the preview." HorizontalAlignment="Left" VerticalAlignment="Top">
+                        <materialDesign:PackIcon Kind="SelectAll" Height="24" Width="24" />
+                    </Button>
                 </Grid>
             </Grid>
 

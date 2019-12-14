@@ -9,6 +9,7 @@ using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Components.Graph;
 using MaterialDesignColors.ColorManipulation;
+using Mapping_Tools.Classes.Tools;
 
 namespace Mapping_Tools.Views {
     //[HiddenTool]
@@ -18,6 +19,7 @@ namespace Mapping_Tools.Views {
         public static readonly string ToolDescription = "";
 
         private DispatcherTimer timer;
+        public Boolean IsEditorEnabled { get; set; }
         private double hue;
 
         public SlideratorView() {
@@ -47,6 +49,8 @@ namespace Mapping_Tools.Views {
             Graph.MoveAnchorTo(Graph.State.Anchors[0], Vector2.Zero);
             Graph.MoveAnchorTo(Graph.State.Anchors[Graph.State.Anchors.Count - 1], Vector2.One);
 
+            IsEditorEnabled = SettingsManager.Settings.UseEditorReader;
+
             timer = new DispatcherTimer(DispatcherPriority.Render) {Interval = TimeSpan.FromMilliseconds(16)};
             timer.Tick += TimerOnTick;
             //timer.Start();
@@ -70,7 +74,26 @@ namespace Mapping_Tools.Views {
             CanRun = false;
         }
 
-        private void SlideratorView_OnLoaded(object sender, RoutedEventArgs e) {
+        private void Import_Slider(object sender, RoutedEventArgs e)
+        {
+            bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+                foreach (string path in MainWindow.AppWindow.GetCurrentMaps())
+                {
+                    var selected = new List<HitObject>();
+                    BeatmapEditor editor = editorRead ? EditorReaderStuff.GetNewestVersion(path, out selected, reader) : new BeatmapEditor(path);
+                    Beatmap beatmap = editor.Beatmap;
+                    Timing timing = beatmap.BeatmapTiming;
+                    List<HitObject> markedObjects = selected;
+                if (markedObjects.Count > 1 || markedObjects.Count < 1)
+                    continue;
+                if (!markedObjects.ToArray()[0].IsSlider)
+                    continue;
+                GraphHitObjectElement.HitObject = markedObjects.ToArray()[0];
+                            
+                }
+            }
+
+            private void SlideratorView_OnLoaded(object sender, RoutedEventArgs e) {
             GraphHitObjectElement.HitObject = new HitObject("159,226,0,2,0,B|299:155|275:42|143:56|139:176|263:232|263:232|315:193|319:105,1,489.9999833107");
             //GraphHitObjectElement.HitObject = new HitObject("74,270,665,1,0,0:0:0:0:");
         }
