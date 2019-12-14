@@ -86,10 +86,9 @@ namespace Mapping_Tools.Views {
                 Timing timing = beatmap.BeatmapTiming;
                 List<HitObject> markedObjects = selected;
 
-                try {
+                if(markedObjects.Find(s => s.IsSlider) != null)
                     GraphHitObjectElement.HitObject = markedObjects.Find(s => s.IsSlider);
-                } catch (ArgumentNullException) { }
-                            
+                                            
             }
         }
 
