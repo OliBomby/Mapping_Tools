@@ -77,20 +77,23 @@ namespace Mapping_Tools.Views {
         private void Import_Slider(object sender, RoutedEventArgs e)
         {
             bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
-                foreach (string path in MainWindow.AppWindow.GetCurrentMaps())
-                {
-                    var selected = new List<HitObject>();
-                    BeatmapEditor editor = editorRead ? EditorReaderStuff.GetNewestVersion(path, out selected, reader) : new BeatmapEditor(path);
-                    Beatmap beatmap = editor.Beatmap;
-                    Timing timing = beatmap.BeatmapTiming;
-                    List<HitObject> markedObjects = selected;
-                    
-                    GraphHitObjectElement.HitObject = markedObjects.Find(s => s.IsSlider);
-                            
-                }
-            }
+            foreach (string path in MainWindow.AppWindow.GetCurrentMaps())
+            {
+                var selected = new List<HitObject>();
+                HitObject CurrentViewed = GraphHitObjectElement.HitObject;
+                BeatmapEditor editor = editorRead ? EditorReaderStuff.GetNewestVersion(path, out selected, reader) : new BeatmapEditor(path);
+                Beatmap beatmap = editor.Beatmap;
+                Timing timing = beatmap.BeatmapTiming;
+                List<HitObject> markedObjects = selected;
 
-            private void SlideratorView_OnLoaded(object sender, RoutedEventArgs e) {
+                try {
+                    GraphHitObjectElement.HitObject = markedObjects.Find(s => s.IsSlider);
+                } catch (ArgumentNullException) { }
+                            
+            }
+        }
+
+        private void SlideratorView_OnLoaded(object sender, RoutedEventArgs e) {
             GraphHitObjectElement.HitObject = new HitObject("159,226,0,2,0,B|299:155|275:42|143:56|139:176|263:232|263:232|315:193|319:105,1,489.9999833107");
             //GraphHitObjectElement.HitObject = new HitObject("74,270,665,1,0,0:0:0:0:");
         }
