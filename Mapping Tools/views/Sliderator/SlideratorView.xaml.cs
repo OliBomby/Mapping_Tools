@@ -10,6 +10,7 @@ using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Components.Graph;
 using MaterialDesignColors.ColorManipulation;
 using Mapping_Tools.Classes.Tools;
+using System.Linq;
 
 namespace Mapping_Tools.Views {
     //[HiddenTool]
@@ -86,8 +87,12 @@ namespace Mapping_Tools.Views {
                 Timing timing = beatmap.BeatmapTiming;
                 List<HitObject> markedObjects = selected;
 
-                if(markedObjects.Find(s => s.IsSlider) != null)
-                    GraphHitObjectElement.HitObject = markedObjects.Find(s => s.IsSlider);
+
+                try
+                {
+                    GraphHitObjectElement.HitObject = markedObjects.First(s => s.IsSlider);
+                }
+                catch (InvalidOperationException) {}
                                             
             }
         }
