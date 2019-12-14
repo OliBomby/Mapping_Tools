@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 using System.Windows;
 using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
 
@@ -135,11 +136,12 @@ namespace Mapping_Tools.Classes.Tools
                 }
                 var editor = GetNewestVersion(IOHelper.GetCurrentBeatmap());
                 editor.SaveFile();
-                MainWindow.Snackbar.MessageQueue.Enqueue("Succesfully saved current beatmap!");
+
+                Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue("Succesfully saved current beatmap!"));
             }
             catch (Exception e)
             {
-                MessageBox.Show($"BetterSave™ wasn't better after all\n{e.Message}");
+                MessageBox.Show($"BetterSave™ wasn't better after all.\n{e.Message}");
             }
         }
 

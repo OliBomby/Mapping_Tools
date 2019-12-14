@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
+using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Components.Graph;
 using MaterialDesignColors.ColorManipulation;
@@ -25,8 +26,8 @@ namespace Mapping_Tools.Views {
             Height = MainWindow.AppWindow.content_views.Height;
 
             Graph.State.XMax = 3;
-            Graph.State.YMax = 10;
-            Graph.State.YMin = 0.10;
+            Graph.State.YMax = 1;
+            Graph.State.YMin = 0;
 
             var markers = new List<GraphMarker>();
             for (int i = 0; i <= 10; i++) {
@@ -67,6 +68,11 @@ namespace Mapping_Tools.Views {
 
             //BackgroundWorker.RunWorkerAsync(arguments);
             CanRun = false;
+        }
+
+        private void SlideratorView_OnLoaded(object sender, RoutedEventArgs e) {
+            GraphHitObjectElement.HitObject = new HitObject("159,226,0,2,0,B|299:155|275:42|143:56|139:176|263:232|263:232|315:193|319:105,1,489.9999833107");
+            //GraphHitObjectElement.HitObject = new HitObject("74,270,665,1,0,0:0:0:0:");
         }
     }
 }

@@ -6,8 +6,10 @@
              xmlns:local="clr-namespace:Mapping_Tools.Views"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:graph="clr-namespace:Mapping_Tools.Components.Graph"
+             xmlns:objectVisualiser="clr-namespace:Mapping_Tools.Components.ObjectVisualiser"
              mc:Ignorable="d" 
              x:Name="This"
+             Loaded="SlideratorView_OnLoaded"
              d:DesignHeight="450" Width="759.5">
     <Grid Name="MasterGrid">
         <Grid.RowDefinitions>
@@ -36,29 +38,35 @@
                     </materialDesign:PopupBox>
                 </StackPanel>
 
-                <graph:Graph Grid.Row="2" x:Name="Graph" Margin="20 0 20 120" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                             MinMarkerSpacing="10"/>
+                <Grid Grid.Row="2" Margin="0 20 0 0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-                <StackPanel Margin="20" Grid.Row="1">
-                    <ProgressBar
-                        Name="MyRectangle" HorizontalAlignment="Stretch" Maximum="10">
-                        <ProgressBar.Triggers>
-                            <!-- Animates the rectangle's opacity. -->
-                            <EventTrigger RoutedEvent="Rectangle.Loaded">
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <graph:GraphDoubleAnimation
-                                            Storyboard.TargetName="MyRectangle" 
-                                            Storyboard.TargetProperty="Value"
-                                            GraphState="{Binding ElementName=Graph, Path=State}"
-                                            From="0.0" To="1.0" Duration="0:0:5" 
-                                            RepeatBehavior="Forever" />
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </EventTrigger>
-                        </ProgressBar.Triggers>
-                    </ProgressBar>
-                </StackPanel>
+                    <graph:Graph Grid.Column="0" x:Name="Graph" Margin="20 0 20 120" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                 MinMarkerSpacing="10"/>
+
+                    <materialDesign:Card Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0 0 0 120" Padding="20">
+                        <objectVisualiser:HitObjectElement x:Name="GraphHitObjectElement" Width="200"
+                                                           Stroke="YellowGreen" Fill="DarkSlateGray" SliderBallStroke="White" Thickness="50">
+                            <objectVisualiser:HitObjectElement.Triggers>
+                                <EventTrigger RoutedEvent="objectVisualiser:HitObjectElement.Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <graph:GraphDoubleAnimation
+                                                Storyboard.TargetName="GraphHitObjectElement" 
+                                                Storyboard.TargetProperty="Progress"
+                                                GraphState="{Binding ElementName=Graph, Path=State}"
+                                                From="0.0" To="1.0" Duration="0:0:2" 
+                                                RepeatBehavior="Forever" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </objectVisualiser:HitObjectElement.Triggers>
+                        </objectVisualiser:HitObjectElement>
+                    </materialDesign:Card>
+                </Grid>
             </Grid>
 
             <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
