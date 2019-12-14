@@ -9,6 +9,8 @@ using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Components.Graph;
 using MaterialDesignColors.ColorManipulation;
+using Mapping_Tools.Classes.Tools;
+using System.Linq;
 
 namespace Mapping_Tools.Views {
     //[HiddenTool]
@@ -18,6 +20,7 @@ namespace Mapping_Tools.Views {
         public static readonly string ToolDescription = "";
 
         private DispatcherTimer timer;
+        public Boolean IsEditorEnabled { get; set; }
         private double hue;
 
         public SlideratorView() {
@@ -47,6 +50,8 @@ namespace Mapping_Tools.Views {
             Graph.MoveAnchorTo(Graph.State.Anchors[0], Vector2.Zero);
             Graph.MoveAnchorTo(Graph.State.Anchors[Graph.State.Anchors.Count - 1], Vector2.One);
 
+            IsEditorEnabled = SettingsManager.Settings.UseEditorReader;
+
             timer = new DispatcherTimer(DispatcherPriority.Render) {Interval = TimeSpan.FromMilliseconds(16)};
             timer.Tick += TimerOnTick;
             //timer.Start();
@@ -68,6 +73,28 @@ namespace Mapping_Tools.Views {
 
             //BackgroundWorker.RunWorkerAsync(arguments);
             CanRun = false;
+        }
+
+        private void Import_Slider(object sender, RoutedEventArgs e)
+        {
+            bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+            foreach (string path in MainWindow.AppWindow.GetCurrentMaps())
+            {
+                var selected = new List<HitObject>();
+                HitObject CurrentViewed = GraphHitObjectElement.HitObject;
+                BeatmapEditor editor = editorRead ? EditorReaderStuff.GetNewestVersion(path, out selected, reader) : new BeatmapEditor(path);
+                Beatmap beatmap = editor.Beatmap;
+                Timing timing = beatmap.BeatmapTiming;
+                List<HitObject> markedObjects = selected;
+
+
+                try
+                {
+                    GraphHitObjectElement.HitObject = markedObjects.First(s => s.IsSlider);
+                }
+                catch (InvalidOperationException) {}
+                                            
+            }
         }
 
         private void SlideratorView_OnLoaded(object sender, RoutedEventArgs e) {

@@ -20,7 +20,7 @@
                 </Grid.ColumnDefinitions>
                 <TextBox x:Name="OsuPathBox" Text="{Binding OsuPath, Mode=TwoWay}" MinWidth="220" Margin="0,0,5,0"
                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="osu! folder"/>
-                <Button Grid.Column="1" Cursor="Hand" Click="Button_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
+                <Button Grid.Column="1" Cursor="Hand" Click="Button_LoadGameImport_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
                     <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                 </Button >
             </Grid>
@@ -32,7 +32,7 @@
                 </Grid.ColumnDefinitions>
                 <TextBox x:Name="SongsPathBox" Text="{Binding SongsPath, Mode=TwoWay}" MinWidth="220" Margin="0,0,5,0"
                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Songs folder"/>
-                <Button Grid.Column="1" Cursor="Hand" Click="Button_Click_1" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
+                <Button Grid.Column="1" Cursor="Hand" Click="Button_LoadSongsImport_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
                     <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                 </Button >
             </Grid>
@@ -44,7 +44,7 @@
                 </Grid.ColumnDefinitions>
                 <TextBox x:Name="BackupsPathBox" Text="{Binding BackupsPath, Mode=TwoWay}" MinWidth="220" Margin="0,0,5,0"
                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Backups folder"/>
-                <Button Grid.Column="1" Cursor="Hand" Click="Button_Click_2" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
+                <Button Grid.Column="1" Cursor="Hand" Click="Button_LoadBackupImport_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
                     <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                 </Button >
             </Grid>
@@ -56,7 +56,7 @@
                 </Grid.ColumnDefinitions>
                 <TextBox x:Name="OsuConfigPathBox" Text="{Binding OsuConfigPath, Mode=TwoWay}" MinWidth="220" Margin="0,0,5,0"
                          Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="osu! user config file"/>
-                <Button Grid.Column="1" Cursor="Hand" Click="Button_Click_4" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
+                <Button Grid.Column="1" Cursor="Hand" Click="Button_LoadConfigImport_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
                     <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                 </Button >
             </Grid>
@@ -93,7 +93,7 @@
                 </StackPanel>
             </StackPanel>
 
-            <Button Content="Reload hotkeys" Click="Button_Click_3" Width="140" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5 10 0 0" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
+            <Button Content="Reload hotkeys" Click="Button_ReloadHotkeys_Click" Width="140" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5 10 0 0" Style="{StaticResource MaterialDesignRaisedLightButton}"/>
 
             <StackPanel Orientation="Horizontal" Margin="0 15 0 0">
                 <TextBlock Text="Light"/>

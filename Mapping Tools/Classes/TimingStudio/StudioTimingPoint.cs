@@ -8,20 +8,19 @@ namespace Mapping_Tools.Classes.TimingStudio
     public class StudioTimingPoint : TimingPoint
     {
 
-        public double NumeratorMeter { get; set; }
+        
         public BeatTime Beat { get; set; }
 
         public StudioTimingPoint(ControlPoint cp) 
             : base(cp)
         {
-            NumeratorMeter = 4;
+            
             Beat = new BeatTime();
         }
 
         public StudioTimingPoint(string line)
             : base(line)
         {
-            NumeratorMeter = 4;
             Beat = new BeatTime();
         }
 
@@ -40,7 +39,7 @@ namespace Mapping_Tools.Classes.TimingStudio
         public StudioTimingPoint(double offset, double mpb, int meter, SampleSet sampleSet, int sampleIndex, double volume, bool inherited, bool kiai, bool omitFirstBarLine) 
             : base(offset, mpb, meter, sampleSet, sampleIndex, volume, inherited, kiai, omitFirstBarLine)
         {
-            NumeratorMeter = 4;
+            
             Beat = new BeatTime();
         }
 
@@ -48,13 +47,13 @@ namespace Mapping_Tools.Classes.TimingStudio
             : base(offset, mpb, meter, sampleSet, sampleIndex, volume, inherited, kiai, omitFirstBarLine)
         {
             
-            NumeratorMeter = numeratorMeter;
+            
             Beat = beat;
         }
 
         public StudioTimingPoint() : base()
         {
-            NumeratorMeter = 4;
+            
             Beat = new BeatTime();
         }
 
