@@ -84,11 +84,8 @@ namespace Mapping_Tools.Views {
                     Beatmap beatmap = editor.Beatmap;
                     Timing timing = beatmap.BeatmapTiming;
                     List<HitObject> markedObjects = selected;
-                if (markedObjects.Count > 1 || markedObjects.Count < 1)
-                    continue;
-                if (!markedObjects.ToArray()[0].IsSlider)
-                    continue;
-                GraphHitObjectElement.HitObject = markedObjects.ToArray()[0];
+                    
+                    GraphHitObjectElement.HitObject = markedObjects.Find(s => s.IsSlider);
                             
                 }
             }
