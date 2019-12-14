@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.SoundFontUtil
 {
-    class SoundFontImporter
+    public class SoundFontImporter
     {
     }
 }
