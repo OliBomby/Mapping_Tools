@@ -839,7 +839,7 @@ namespace Mapping_Tools.Viewmodels {
             try {
                 _configWatcher.EnableRaisingEvents = true;
             } catch {
-                MessageBox.Show("Can't enable filesystem watcher. osu! config path is probably incorrect.", "Warning");
+                MessageBox.Show("Can't enable filesystem watcher. osu! config path is probably incorrect. You can fix this in the Options > Preferences.", "Warning");
             }
 
             _state = State.LookingForProcess;
@@ -855,7 +855,7 @@ namespace Mapping_Tools.Viewmodels {
             try {
                 _configWatcher.EnableRaisingEvents = false;
             } catch {
-                MessageBox.Show("Can't disable filesystem watcher. osu! config path is probably incorrect.", "Warning");
+                MessageBox.Show("Can't disable filesystem watcher. osu! config path is probably incorrect. You can fix this in the Options > Preferences.", "Warning");
             }
 
             _state = State.Disabled;
