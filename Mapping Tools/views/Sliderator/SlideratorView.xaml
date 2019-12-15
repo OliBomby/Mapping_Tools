@@ -45,7 +45,7 @@
                     </Grid.ColumnDefinitions>
 
                     <graph:Graph Grid.Column="0" x:Name="Graph" Margin="20 0 20 120" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                                 MinMarkerSpacing="10"/>
+                                 MinMarkerSpacing="10" XMax="3"/>
 
                     <materialDesign:Card Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0 0 0 120" Padding="20">
                         <objectVisualiser:HitObjectElement x:Name="GraphHitObjectElement" Width="200"

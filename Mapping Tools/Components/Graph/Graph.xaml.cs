@@ -35,6 +35,23 @@ namespace Mapping_Tools.Components.Graph {
 
         public double MinMarkerSpacing { get; set; }
 
+        public double XMin {
+            get => State.XMin;
+            set => State.XMin = value;
+        }
+        public double XMax {
+            get => State.XMax;
+            set => State.XMax = value;
+        }
+        public double YMin {
+            get => State.YMin;
+            set => State.YMin = value;
+        }
+        public double YMax {
+            get => State.YMax;
+            set => State.YMax = value;
+        }
+
         private Brush _stroke;
         public Brush Stroke {
             get => _stroke;

@@ -27,10 +27,6 @@ namespace Mapping_Tools.Views {
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
 
-            Graph.State.XMax = 3;
-            Graph.State.YMax = 1;
-            Graph.State.YMin = 0;
-
             var markers = new List<GraphMarker>();
             for (int i = 0; i <= 10; i++) {
                 markers.Add(new GraphMarker {Orientation = Orientation.Horizontal, Text = $"{i}x", Value = i});
