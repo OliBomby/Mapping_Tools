@@ -13,69 +13,65 @@
              d:DesignHeight="450" Width="759.5">
     <Grid Name="MasterGrid">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Grid Name="FirstGrid" Grid.Row="0">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
 
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
-                        <Run Text="Sliderator"/>
-                    </TextBlock>
-                    <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom">
-                        <materialDesign:PopupBox.ToggleContent>
-                            <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
-                        </materialDesign:PopupBox.ToggleContent>
-                        <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
-                        </TextBlock>
-                    </materialDesign:PopupBox>
-                </StackPanel>
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
+                <Run Text="Sliderator"/>
+            </TextBlock>
+            <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom">
+                <materialDesign:PopupBox.ToggleContent>
+                    <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
+                </materialDesign:PopupBox.ToggleContent>
+                <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
+                </TextBlock>
+            </materialDesign:PopupBox>
+        </StackPanel>
 
-                <Grid Grid.Row="2" Margin="0 20 0 0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+        <Grid Name="FirstGrid" Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="*" MinHeight="90"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="90"/>
+            </Grid.ColumnDefinitions>
 
-                    <graph:Graph Grid.Column="0" x:Name="Graph" Margin="20 0 20 120" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                                 MinMarkerSpacing="10" XMax="3"/>
+            <graph:Graph Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" x:Name="Graph" Margin="30 0 0 45" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                         MinMarkerSpacing="10" XMax="3"/>
 
-                    <materialDesign:Card Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0 0 0 120" Padding="20">
-                        <objectVisualiser:HitObjectElement x:Name="GraphHitObjectElement" Width="200"
-                                                           Stroke="YellowGreen" Fill="DarkSlateGray" SliderBallStroke="White" Thickness="50">
-                            <objectVisualiser:HitObjectElement.Triggers>
-                                <EventTrigger RoutedEvent="objectVisualiser:HitObjectElement.Loaded">
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <graph:GraphDoubleAnimation
-                                                Storyboard.TargetName="GraphHitObjectElement" 
-                                                Storyboard.TargetProperty="Progress"
-                                                GraphState="{Binding ElementName=Graph, Path=State}"
-                                                From="0.0" To="1.0" Duration="0:0:2" 
-                                                RepeatBehavior="Forever" />
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </EventTrigger>
-                            </objectVisualiser:HitObjectElement.Triggers>
-                        </objectVisualiser:HitObjectElement>
-                    </materialDesign:Card>
-                    <Button
-                    Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}"
-                    
-                    Click="Import_Slider" Grid.Column="0" Grid.Row="2" ToolTip="Imports the selected slider into the preview." HorizontalAlignment="Left" VerticalAlignment="Top">
-                        <materialDesign:PackIcon Kind="SelectAll" Height="24" Width="24" />
-                    </Button>
-                </Grid>
-            </Grid>
+            <materialDesign:Card Grid.Column="2" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0" Padding="10">
+                <objectVisualiser:HitObjectElement x:Name="GraphHitObjectElement" Width="200"
+                                                   Stroke="YellowGreen" Fill="DarkSlateGray" SliderBallStroke="White" Thickness="50">
+                    <objectVisualiser:HitObjectElement.Triggers>
+                        <EventTrigger RoutedEvent="objectVisualiser:HitObjectElement.Loaded">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <graph:GraphDoubleAnimation
+                                        Storyboard.TargetName="GraphHitObjectElement" 
+                                        Storyboard.TargetProperty="Progress"
+                                        GraphState="{Binding ElementName=Graph, Path=State}"
+                                        From="0.0" To="1.0" Duration="0:0:2" 
+                                        RepeatBehavior="Forever" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </objectVisualiser:HitObjectElement.Triggers>
+                </objectVisualiser:HitObjectElement>
+            </materialDesign:Card>
 
-            <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
+            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" Click="Import_Slider" 
+                    Grid.Column="0" Grid.Row="0" ToolTip="Imports the selected slider into the preview." HorizontalAlignment="Right" VerticalAlignment="Top">
+                <materialDesign:PackIcon Kind="SelectAll" Height="24" Width="24" />
+            </Button>
+
+            <Viewbox Grid.Row="1" Grid.Column="3" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
                 <Button
                     Style="{StaticResource MaterialDesignFloatingActionButton}"
                     IsEnabled="{Binding ElementName=This, Path=CanRun}"
@@ -85,7 +81,8 @@
                 </Button>
             </Viewbox>
         </Grid>
-        <Grid Name="SecondGrid" Grid.Row="1">
+
+        <Grid Name="SecondGrid" Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
