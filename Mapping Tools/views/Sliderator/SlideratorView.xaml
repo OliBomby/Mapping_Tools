@@ -6,11 +6,15 @@
              xmlns:local="clr-namespace:Mapping_Tools.Views"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:graph="clr-namespace:Mapping_Tools.Components.Graph"
+             xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
              xmlns:objectVisualiser="clr-namespace:Mapping_Tools.Components.ObjectVisualiser"
              mc:Ignorable="d" 
              x:Name="This"
              Loaded="SlideratorView_OnLoaded"
-             d:DesignHeight="450" Width="759.5">
+             d:DesignHeight="450" Width="759.5" d:DataContext="{d:DesignData SlideratorVm}">
+    <local:SingleRunMappingTool.Resources>
+        <domain:DoubleToStringConverter x:Key="DoubleToStringConverter"/>
+    </local:SingleRunMappingTool.Resources>
     <Grid Name="MasterGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -43,33 +47,40 @@
                 <ColumnDefinition Width="90"/>
             </Grid.ColumnDefinitions>
 
-            <graph:Graph Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" x:Name="Graph" Margin="30 0 0 45" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+            <graph:Graph Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" x:Name="Graph" Margin="30 0 0 43" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                          MinMarkerSpacing="10" XMax="3"/>
 
             <materialDesign:Card Grid.Column="2" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0" Padding="10">
-                <objectVisualiser:HitObjectElement x:Name="GraphHitObjectElement" Width="200"
-                                                   Stroke="YellowGreen" Fill="DarkSlateGray" SliderBallStroke="White" Thickness="50">
-                    <objectVisualiser:HitObjectElement.Triggers>
-                        <EventTrigger RoutedEvent="objectVisualiser:HitObjectElement.Loaded">
-                            <BeginStoryboard>
-                                <Storyboard>
-                                    <graph:GraphDoubleAnimation
-                                        Storyboard.TargetName="GraphHitObjectElement" 
-                                        Storyboard.TargetProperty="Progress"
-                                        GraphState="{Binding ElementName=Graph, Path=State}"
-                                        From="0.0" To="1.0" Duration="0:0:2" 
-                                        RepeatBehavior="Forever" />
-                                </Storyboard>
-                            </BeginStoryboard>
-                        </EventTrigger>
-                    </objectVisualiser:HitObjectElement.Triggers>
-                </objectVisualiser:HitObjectElement>
+                <objectVisualiser:HitObjectElement x:Name="GraphHitObjectElement" Width="200" HitObject="{Binding VisibleHitObject}"
+                                                   Stroke="YellowGreen" Fill="DarkSlateGray" SliderBallStroke="White" Thickness="50"/>
             </materialDesign:Card>
 
-            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" Click="Import_Slider" 
-                    Grid.Column="0" Grid.Row="0" ToolTip="Imports the selected slider into the preview." HorizontalAlignment="Right" VerticalAlignment="Top">
-                <materialDesign:PackIcon Kind="SelectAll" Height="24" Width="24" />
-            </Button>
+            <StackPanel Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Margin="0 10 0 0">
+                <Button Style="{StaticResource MaterialDesignRaisedButton}" Click="Import_Slider" 
+                        ToolTip="Imports the selected slider into the preview." HorizontalAlignment="Right" VerticalAlignment="Top">
+                    Import sliders
+                </Button>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBox Grid.Column="0" Margin="5" Text="{Binding GraphBeats, Converter={StaticResource DoubleToStringConverter}}"
+                             materialDesign:HintAssist.Hint="Beat length" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
+                    <TextBox Grid.Column="1" Margin="5" Text="{Binding BeatsPerMinute, Mode=TwoWay}"
+                             materialDesign:HintAssist.Hint="BPM" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
+                </Grid>
+            </StackPanel>
+
+            <Grid Grid.Row="1" Grid.Column="1" Margin="5 0 5 0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Slider Grid.Row="0" Minimum="1" Maximum="16" Value="{Binding BeatSnapDivisor}" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
+            </Grid>
 
             <Viewbox Grid.Row="1" Grid.Column="3" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
                 <Button

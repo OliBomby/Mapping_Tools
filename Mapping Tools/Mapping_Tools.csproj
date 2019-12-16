@@ -430,6 +430,7 @@
     <Compile Include="Viewmodels\HitsoundCopierVM.cs" />
     <Compile Include="Viewmodels\ComboColourStudioVm.cs" />
     <Compile Include="Viewmodels\RhythmGuideVm.cs" />
+    <Compile Include="Viewmodels\SlideratorVm.cs" />
     <Compile Include="Viewmodels\TimingCopierVM.cs" />
     <Compile Include="Viewmodels\MetadataManagerVm.cs" />
     <Compile Include="Viewmodels\PropertyTransformerVM.cs" />

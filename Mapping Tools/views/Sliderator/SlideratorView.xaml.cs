@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Mapping_Tools.Classes.SystemTools;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,6 +12,10 @@ using Mapping_Tools.Components.Graph;
 using MaterialDesignColors.ColorManipulation;
 using Mapping_Tools.Classes.Tools;
 using System.Linq;
+using System.Windows.Media.Animation;
+using Mapping_Tools.Components.ObjectVisualiser;
+using Mapping_Tools.Viewmodels;
+using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
 
 namespace Mapping_Tools.Views {
     //[HiddenTool]
@@ -19,13 +24,15 @@ namespace Mapping_Tools.Views {
 
         public static readonly string ToolDescription = "";
 
-        private DispatcherTimer timer;
-        private double hue;
+        private SlideratorVm ViewModel => (SlideratorVm) DataContext;
 
         public SlideratorView() {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
+
+            DataContext = new SlideratorVm();
+            ViewModel.PropertyChanged += ViewModelOnPropertyChanged;
 
             var markers = new List<GraphMarker>();
             for (int i = 0; i <= 10; i++) {
@@ -44,15 +51,40 @@ namespace Mapping_Tools.Views {
 
             Graph.MoveAnchorTo(Graph.State.Anchors[0], Vector2.Zero);
             Graph.MoveAnchorTo(Graph.State.Anchors[Graph.State.Anchors.Count - 1], Vector2.One);
-
-            timer = new DispatcherTimer(DispatcherPriority.Render) {Interval = TimeSpan.FromMilliseconds(16)};
-            timer.Tick += TimerOnTick;
-            //timer.Start();
         }
 
-        private void TimerOnTick(object sender, EventArgs e) {
-            Graph.SetBrush(new SolidColorBrush(new Hsb(hue, 1, 1).ToColor()));
-            hue = (hue + 1) % 360;
+        private void ViewModelOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
+            switch (e.PropertyName) {
+                case "GraphDuration":
+                    AnimateProgress(GraphHitObjectElement);
+                    break;
+            }
+        }
+
+        private void AnimateProgress(HitObjectElement element) {
+            var graphDuration = ViewModel.GraphDuration;
+            var doubleDuration = graphDuration.Add(graphDuration);
+
+            var animation = new GraphDoubleAnimation {
+                GraphState = Graph.State, From = 0, To = 1,
+                Duration = graphDuration,
+                BeginTime = TimeSpan.Zero
+            };
+            var animation2 = new DoubleAnimation(0, 0, graphDuration) {BeginTime = graphDuration};
+
+            Storyboard.SetTarget(animation, element);
+            Storyboard.SetTarget(animation2, element);
+            Storyboard.SetTargetProperty(animation, new PropertyPath(HitObjectElement.ProgressProperty));
+            Storyboard.SetTargetProperty(animation2, new PropertyPath(HitObjectElement.ProgressProperty));
+
+            var timeline = new ParallelTimeline {RepeatBehavior = RepeatBehavior.Forever, Duration = doubleDuration};
+            timeline.Children.Add(animation);
+            timeline.Children.Add(animation2);
+
+            var storyboard = new Storyboard();
+            storyboard.Children.Add(timeline);
+
+            element.BeginStoryboard(storyboard);
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
@@ -89,6 +121,7 @@ namespace Mapping_Tools.Views {
         private void SlideratorView_OnLoaded(object sender, RoutedEventArgs e) {
             GraphHitObjectElement.HitObject = new HitObject("159,226,0,2,0,B|299:155|275:42|143:56|139:176|263:232|263:232|315:193|319:105,1,489.9999833107");
             //GraphHitObjectElement.HitObject = new HitObject("74,270,665,1,0,0:0:0:0:");
+            AnimateProgress(GraphHitObjectElement);
         }
     }
 }
