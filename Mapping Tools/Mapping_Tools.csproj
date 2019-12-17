@@ -350,8 +350,12 @@
     <Compile Include="Components\Domain\ParsableDoubleListValidationRule.cs" />
     <Compile Include="Components\Domain\DoubleToStringConverter.cs" />
     <Compile Include="Components\DragAndDropListBox.cs" />
+    <Compile Include="Components\Graph\Anchor2.cs" />
+    <Compile Include="Components\Graph\Graph2.cs" />
     <Compile Include="Components\Graph\GraphDoubleAnimation.cs" />
     <Compile Include="Components\Graph\GraphMarker.cs" />
+    <Compile Include="Components\Graph\GraphPointControl2.cs" />
+    <Compile Include="Components\Graph\GraphState2.cs" />
     <Compile Include="Components\Graph\GraphState.cs" />
     <Compile Include="Components\Graph\Interpolation\IDerivableInterpolator.cs" />
     <Compile Include="Components\Graph\Interpolation\IIntegrableInterpolator.cs" />
@@ -375,6 +379,7 @@
       <DependentUpon>TensionAnchor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Components\Graph\GraphPointControl.cs" />
+    <Compile Include="Components\Graph\TensionAnchor2.cs" />
     <Compile Include="Components\Graph\TypeValueDialog.xaml.cs">
       <DependentUpon>TypeValueDialog.xaml</DependentUpon>
     </Compile>
@@ -604,6 +609,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\ComboColourStudio\ComboColourStudioView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

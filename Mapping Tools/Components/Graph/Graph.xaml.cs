@@ -19,7 +19,7 @@ namespace Mapping_Tools.Components.Graph {
         public static readonly DependencyProperty StateProperty =
             DependencyProperty.Register("State",
                 typeof (GraphState),
-                typeof (GraphDoubleAnimation),
+                typeof (Graph),
                 new PropertyMetadata(null));
 
         [NotNull]
