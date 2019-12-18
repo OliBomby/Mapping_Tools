@@ -13,6 +13,7 @@ using MaterialDesignColors.ColorManipulation;
 using Mapping_Tools.Classes.Tools;
 using System.Linq;
 using System.Windows.Media.Animation;
+using Mapping_Tools.Components.Graph.Markers;
 using Mapping_Tools.Components.ObjectVisualiser;
 using Mapping_Tools.Viewmodels;
 using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
@@ -34,18 +35,8 @@ namespace Mapping_Tools.Views {
             DataContext = new SlideratorVm();
             ViewModel.PropertyChanged += ViewModelOnPropertyChanged;
 
-            var markers = new List<GraphMarker>();
-            for (int i = 0; i <= 10; i++) {
-                markers.Add(new GraphMarker {Orientation = Orientation.Horizontal, Text = $"{i}x", Value = i});
-            }
-            for (int i = 0; i <= 12; i++) {
-                markers.Add(new GraphMarker {Orientation = Orientation.Vertical, Value = i / 4d, DrawMarker = true,
-                    MarkerColor = i % 4 == 0 ? Colors.White : i % 2 == 0 ? Colors.Red : Colors.DodgerBlue,
-                    MarkerLength = i % 4 == 0 ? 12 : 7, Text = i % 4 == 0 ? (i / 4).ToString() : null
-                });
-            }
-
-            Graph.SetMarkers(markers);
+            Graph.VerticalMarkerGenerator = new DoubleMarkerGenerator(0, 0.25);
+            Graph.HorizontalMarkerGenerator = new DividedBeatMarkerGenerator(4);
 
             Graph.SetBrush(new SolidColorBrush(Color.FromArgb(255, 0, 255, 255)));
 

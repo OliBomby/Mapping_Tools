@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Mapping_Tools.Components.Graph.Markers;
 
 namespace Mapping_Tools.Components.Graph {
     /// <summary>
@@ -28,6 +29,26 @@ namespace Mapping_Tools.Components.Graph {
             set {
                 SetValue(StateProperty, value);
                 UpdateVisual();
+            }
+        }
+
+        private IMarkerGenerator _horizontalMarkerGenerator;
+        private IMarkerGenerator _verticalMarkerGenerator;
+
+        public IMarkerGenerator HorizontalMarkerGenerator {
+            get => _horizontalMarkerGenerator;
+            set {
+                if (_horizontalMarkerGenerator == value) return;
+                _horizontalMarkerGenerator = value;
+                RegenerateMarkers();
+            }
+        }
+        public IMarkerGenerator VerticalMarkerGenerator {
+            get => _verticalMarkerGenerator;
+            set {
+                if (_verticalMarkerGenerator == value) return;
+                _verticalMarkerGenerator = value;
+                RegenerateMarkers();
             }
         }
 
@@ -138,6 +159,17 @@ namespace Mapping_Tools.Components.Graph {
             AnchorFill = transparentBrush;
             TensionAnchorStroke = brush;
             TensionAnchorFill = transparentBrush;
+        }
+
+        private void RegenerateMarkers() {
+            Markers.Clear();
+            if (HorizontalMarkerGenerator != null)
+                Markers.AddRange(HorizontalMarkerGenerator.GenerateMarkers(XMin, XMax, Orientation.Vertical));
+            if (VerticalMarkerGenerator != null)
+                Markers.AddRange(VerticalMarkerGenerator.GenerateMarkers(XMin, XMax, Orientation.Horizontal));
+
+            UpdateMarkers();
+            UpdateVisual();
         }
 
         private void ThisMouseRightButtonDown(object sender, MouseButtonEventArgs e) {
@@ -294,11 +326,6 @@ namespace Mapping_Tools.Components.Graph {
             if (!_drawAnchors) return;
             _drawAnchors = false;
             UpdateVisual();
-        }
-
-        public void SetMarkers(List<GraphMarker> markers) {
-            Markers = markers;
-            UpdateMarkers();
         }
 
         private void UpdateMarkers() {

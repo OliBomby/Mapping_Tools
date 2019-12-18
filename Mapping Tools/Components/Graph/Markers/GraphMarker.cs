@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace Mapping_Tools.Components.Graph {
+namespace Mapping_Tools.Components.Graph.Markers {
     public class GraphMarker : UIElement {
         private double MarkerLengthExtra => DrawMarker ? MarkerLength : 0;
         private Pen Pen => new Pen(Stroke, 1.0);

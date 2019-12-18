@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Windows;
-using Mapping_Tools.Classes.BeatmapHelper;
+﻿using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.SystemTools;
+using System;
+using System.Collections.ObjectModel;
 
 namespace Mapping_Tools.Viewmodels {
     public class SlideratorVm : BindableBase {

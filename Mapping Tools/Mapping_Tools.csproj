@@ -351,7 +351,9 @@
     <Compile Include="Components\Domain\DoubleToStringConverter.cs" />
     <Compile Include="Components\DragAndDropListBox.cs" />
     <Compile Include="Components\Graph\GraphDoubleAnimation.cs" />
-    <Compile Include="Components\Graph\GraphMarker.cs" />
+    <Compile Include="Components\Graph\Markers\DividedBeatMarkerGenerator.cs" />
+    <Compile Include="Components\Graph\Markers\DoubleMarkerGenerator.cs" />
+    <Compile Include="Components\Graph\Markers\GraphMarker.cs" />
     <Compile Include="Components\Graph\GraphState.cs" />
     <Compile Include="Components\Graph\Interpolation\IDerivableInterpolator.cs" />
     <Compile Include="Components\Graph\Interpolation\IIntegrableInterpolator.cs" />
@@ -371,6 +373,7 @@
     <Compile Include="Components\Graph\Interpolation\Interpolators\SingleCurveInterpolator.cs" />
     <Compile Include="Components\Graph\Interpolation\Interpolators\ParabolaInterpolator.cs" />
     <Compile Include="Components\Graph\Interpolation\Interpolators\WaveInterpolator.cs" />
+    <Compile Include="Components\Graph\Markers\IMarkerGenerator.cs" />
     <Compile Include="Components\Graph\TensionAnchor.xaml.cs">
       <DependentUpon>TensionAnchor.xaml</DependentUpon>
     </Compile>
