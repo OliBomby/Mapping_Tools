@@ -120,9 +120,9 @@
                                     <Binding Path="Artist" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" NotifyOnValidationError="True">
                                         <Binding.ValidationRules>
                                             <domain:CharacterLimitValidationRule>
-                                                <domain:CharacterLimitValidationRule.Wrapper>
-                                                    <domain:Wrapper CharacterLimit="81"/>
-                                                </domain:CharacterLimitValidationRule.Wrapper>
+                                                <domain:CharacterLimitValidationRule.LimitWrapper>
+                                                    <domain:IntWrapper Value="81"/>
+                                                </domain:CharacterLimitValidationRule.LimitWrapper>
                                             </domain:CharacterLimitValidationRule>
                                         </Binding.ValidationRules>
                                     </Binding>
@@ -134,9 +134,9 @@
                                         <Binding.ValidationRules>
                                             <domain:IsASCIIValidationRule ValidatesOnTargetUpdated="True"/>
                                             <domain:CharacterLimitValidationRule>
-                                                <domain:CharacterLimitValidationRule.Wrapper>
-                                                    <domain:Wrapper CharacterLimit="81"/>
-                                                </domain:CharacterLimitValidationRule.Wrapper>
+                                                <domain:CharacterLimitValidationRule.LimitWrapper>
+                                                    <domain:IntWrapper Value="81"/>
+                                                </domain:CharacterLimitValidationRule.LimitWrapper>
                                             </domain:CharacterLimitValidationRule>
                                         </Binding.ValidationRules>
                                     </Binding>
@@ -147,9 +147,9 @@
                                     <Binding Path="Title" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" NotifyOnValidationError="True">
                                         <Binding.ValidationRules>
                                             <domain:CharacterLimitValidationRule>
-                                                <domain:CharacterLimitValidationRule.Wrapper>
-                                                    <domain:Wrapper CharacterLimit="81"/>
-                                                </domain:CharacterLimitValidationRule.Wrapper>
+                                                <domain:CharacterLimitValidationRule.LimitWrapper>
+                                                    <domain:IntWrapper Value="81"/>
+                                                </domain:CharacterLimitValidationRule.LimitWrapper>
                                             </domain:CharacterLimitValidationRule>
                                         </Binding.ValidationRules>
                                     </Binding>
@@ -161,9 +161,9 @@
                                         <Binding.ValidationRules>
                                             <domain:IsASCIIValidationRule ValidatesOnTargetUpdated="True"/>
                                             <domain:CharacterLimitValidationRule>
-                                                <domain:CharacterLimitValidationRule.Wrapper>
-                                                    <domain:Wrapper CharacterLimit="81"/>
-                                                </domain:CharacterLimitValidationRule.Wrapper>
+                                                <domain:CharacterLimitValidationRule.LimitWrapper>
+                                                    <domain:IntWrapper Value="81"/>
+                                                </domain:CharacterLimitValidationRule.LimitWrapper>
                                             </domain:CharacterLimitValidationRule>
                                         </Binding.ValidationRules>
                                     </Binding>
@@ -174,9 +174,9 @@
                                     <Binding Path="BeatmapCreator" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" NotifyOnValidationError="True">
                                         <Binding.ValidationRules>
                                             <domain:CharacterLimitValidationRule>
-                                                <domain:CharacterLimitValidationRule.Wrapper>
-                                                    <domain:Wrapper CharacterLimit="81"/>
-                                                </domain:CharacterLimitValidationRule.Wrapper>
+                                                <domain:CharacterLimitValidationRule.LimitWrapper>
+                                                    <domain:IntWrapper Value="81"/>
+                                                </domain:CharacterLimitValidationRule.LimitWrapper>
                                             </domain:CharacterLimitValidationRule>
                                         </Binding.ValidationRules>
                                     </Binding>
@@ -187,9 +187,9 @@
                                     <Binding Path="Source" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" NotifyOnValidationError="True">
                                         <Binding.ValidationRules>
                                             <domain:CharacterLimitValidationRule>
-                                                <domain:CharacterLimitValidationRule.Wrapper>
-                                                    <domain:Wrapper CharacterLimit="81"/>
-                                                </domain:CharacterLimitValidationRule.Wrapper>
+                                                <domain:CharacterLimitValidationRule.LimitWrapper>
+                                                    <domain:IntWrapper Value="81"/>
+                                                </domain:CharacterLimitValidationRule.LimitWrapper>
                                             </domain:CharacterLimitValidationRule>
                                         </Binding.ValidationRules>
                                     </Binding>
@@ -200,9 +200,9 @@
                                     <Binding Path="Tags" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" NotifyOnValidationError="True">
                                         <Binding.ValidationRules>
                                             <domain:CharacterLimitValidationRule>
-                                                <domain:CharacterLimitValidationRule.Wrapper>
-                                                    <domain:Wrapper CharacterLimit="1000"/>
-                                                </domain:CharacterLimitValidationRule.Wrapper>
+                                                <domain:CharacterLimitValidationRule.LimitWrapper>
+                                                    <domain:IntWrapper Value="1000"/>
+                                                </domain:CharacterLimitValidationRule.LimitWrapper>
                                             </domain:CharacterLimitValidationRule>
                                         </Binding.ValidationRules>
                                     </Binding>

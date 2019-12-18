@@ -22,7 +22,7 @@ namespace Mapping_Tools.Components.Graph {
                 new PropertyMetadata(null));
 
         /// <summary>
-        ///     Specifies which graph state to use for the values.
+        ///     Specifies which graph to use for the values.
         /// </summary>
         public GraphState GraphState {
             get => (GraphState) GetValue(GraphStateProperty);
@@ -50,9 +50,7 @@ namespace Mapping_Tools.Components.Graph {
             var start = From ?? defaultOriginValue;
             var delta = To - start ?? defaultOriginValue - start;
 
-            if (clock.CurrentProgress == null) return start;
-
-            return GraphState.GetValue(start + clock.CurrentProgress.Value * delta);
+            return clock.CurrentProgress == null ? start : GraphState.GetValue(start + clock.CurrentProgress.Value * delta);
         }
 
         protected override Freezable CreateInstanceCore() {

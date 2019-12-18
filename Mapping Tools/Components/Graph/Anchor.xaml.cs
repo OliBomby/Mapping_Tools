@@ -111,7 +111,7 @@ namespace Mapping_Tools.Components.Graph {
 
             var deleteMenuItem = GetDeleteMenuItem();
             if (deleteMenuItem != null) {
-                GetDeleteMenuItem().IsEnabled = !Graph.State.IsEdgeAnchor(this);
+                GetDeleteMenuItem().IsEnabled = !Graph.IsEdgeAnchor(this);
             }
 
             if (PreviousAnchor == null) {
@@ -184,22 +184,22 @@ namespace Mapping_Tools.Components.Graph {
             _interpolator = p;
 
             if (Graph == null) return;
-            Graph.State.LastInterpolationSet = type;
+            Graph.LastInterpolationSet = type;
             Graph.UpdateVisual();
         }
 
         private void DeleteMenuItem_OnClick(object sender, RoutedEventArgs e) {
-            Graph.State.RemoveAnchor(GetContextMenu().PlacementTarget as Anchor);
+            Graph.RemoveAnchor(GetContextMenu().PlacementTarget as Anchor);
         }
 
         private async void TypeInMenuItem_OnClick(object sender, RoutedEventArgs e) {
-            var dialog = new TypeValueDialog(Graph.State.GetValue(Pos).Y);
+            var dialog = new TypeValueDialog(Graph.GetValue(Pos).Y);
             var result = await Graph.GraphDialogHost.ShowDialog(dialog);
 
             if (!(bool) result) return;
         
             if (TypeConverters.TryParseDouble(dialog.ValueBox.Text, out double value)) {
-                Pos = new Vector2(Pos.X, Graph.State.GetPosition(new Vector2(0, value)).Y);
+                Pos = new Vector2(Pos.X, Graph.GetPosition(new Vector2(0, value)).Y);
             }
             Graph.UpdateVisual();
         }

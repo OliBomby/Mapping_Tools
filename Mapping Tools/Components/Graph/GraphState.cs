@@ -1,162 +1,82 @@
-﻿using System;
-using Mapping_Tools.Classes.SystemTools;
+﻿using Mapping_Tools.Classes.MathUtil;
+using System;
 using System.Collections.Generic;
-using Mapping_Tools.Annotations;
-using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
+using System.Windows;
 
 namespace Mapping_Tools.Components.Graph {
-    public class GraphState : BindableBase {
-        private Graph _parentGraph;
+    public class GraphState : Freezable {
+        #region DependencyProperties
 
-        public Graph ParentGraph {
-            get => _parentGraph;
-            set => Set(ref _parentGraph, value);
+        public static readonly DependencyProperty TensionAnchorsProperty =
+            DependencyProperty.Register(nameof(TensionAnchors),
+                typeof(List<TensionAnchor>), 
+                typeof(GraphState), 
+                new FrameworkPropertyMetadata(null));
+
+        public List<TensionAnchor> TensionAnchors {
+            get => (List<TensionAnchor>) GetValue(TensionAnchorsProperty);
+            set => SetValue(TensionAnchorsProperty, value);
         }
 
-        public List<TensionAnchor> TensionAnchors { get; }
-        public List<Anchor> Anchors { get; }
+        public static readonly DependencyProperty AnchorsProperty =
+            DependencyProperty.Register(nameof(Anchors),
+                typeof(List<Anchor>), 
+                typeof(GraphState), 
+                new FrameworkPropertyMetadata(null));
 
-        [NotNull]
-        public Type LastInterpolationSet { get; set; }
-
-        private double _xMin;
-        private double _yMin;
-        private double _xMax;
-        private double _yMax;
-
-        public double XMin {
-            get => _xMin;
-            set {
-                if (Set(ref _xMin, value)) {
-                    ParentGraph?.RegenerateMarkers();
-                }
-            }
-        }
-        public double YMin {
-            get => _yMin;
-            set {
-                if (Set(ref _yMin, value)) {
-                    ParentGraph?.RegenerateMarkers();
-                }
-            }
-        }
-        public double XMax {
-            get => _xMax;
-            set {
-                if (Set(ref _xMax, value)) {
-                    ParentGraph?.RegenerateMarkers();
-                }
-            }
-        }
-        public double YMax {
-            get => _yMax;
-            set {
-                if (Set(ref _yMax, value)) {
-                    ParentGraph?.RegenerateMarkers();
-                }
-            }
+        public List<Anchor> Anchors {
+            get => (List<Anchor>) GetValue(AnchorsProperty);
+            set => SetValue(AnchorsProperty, value);
         }
 
-        public GraphState(Graph parentGraph) {
-            ParentGraph = parentGraph;
-            TensionAnchors = new List<TensionAnchor>();
-            Anchors = new List<Anchor>();
-            LastInterpolationSet = typeof(SingleCurveInterpolator);
+        public static readonly DependencyProperty MinXProperty =
+            DependencyProperty.Register(nameof(MinX),
+                typeof(double), 
+                typeof(GraphState), 
+                new FrameworkPropertyMetadata(0d));
 
-            XMin = 0;
-            YMin = 0;
-            XMax = 1;
-            YMax = 1;
+        public double MinX {
+            get => (double) GetValue(MinXProperty);
+            set => SetValue(MinXProperty, value);
         }
 
-        public Anchor AddAnchor(Vector2 pos) {
-            // Clamp the position withing bounds
-            pos = Vector2.Clamp(pos, Vector2.Zero, Vector2.One);
+        public static readonly DependencyProperty MinYProperty =
+            DependencyProperty.Register(nameof(MinY),
+                typeof(double), 
+                typeof(GraphState), 
+                new FrameworkPropertyMetadata(0d));
 
-            // Find the correct index
-            var index = Anchors.FindIndex(o => o.Pos.X > pos.X);
-            index = index == -1 ? Math.Max(Anchors.Count - 1, 1) : index;
-
-            // Get the next anchor
-            Anchor nextAnchor = null;
-            if (index < Anchors.Count) {
-                nextAnchor = Anchors[index];
-            }
-
-            // Make anchor
-            var anchor = LastInterpolationSet != null ? MakeAnchor(pos, LastInterpolationSet) : MakeAnchor(pos);
-
-            // Make tension anchor
-            var tensionAnchor = MakeTensionAnchor(pos, anchor);
-
-            // Link State.Anchors
-            anchor.TensionAnchor = tensionAnchor;
-
-            // Add tension
-            anchor.Tension = nextAnchor?.Tension ?? 0;
-            
-            // Insert anchor
-            Anchors.Insert(index, anchor);
-
-            // Add tension anchor
-            TensionAnchors.Add(tensionAnchor);
-            
-            UpdateAnchorNeighbors();
-            ParentGraph?.UpdateVisual();
-
-            return anchor;
+        public double MinY {
+            get => (double) GetValue(MinYProperty);
+            set => SetValue(MinYProperty, value);
         }
 
-        public Anchor MakeAnchor(Vector2 pos) {
-            var anchor = new Anchor(ParentGraph, pos) {
-                Stroke = ParentGraph?.AnchorStroke,
-                Fill = ParentGraph?.AnchorFill
-            };
-            return anchor;
+        public static readonly DependencyProperty MaxXProperty =
+            DependencyProperty.Register(nameof(MaxX),
+                typeof(double), 
+                typeof(GraphState), 
+                new FrameworkPropertyMetadata(1d));
+
+        public double MaxX {
+            get => (double) GetValue(MaxXProperty);
+            set => SetValue(MaxXProperty, value);
         }
 
-        public Anchor MakeAnchor(Vector2 pos, Type interpolator) {
-            var anchor = new Anchor(ParentGraph, pos, interpolator) {
-                Stroke = ParentGraph?.AnchorStroke,
-                Fill = ParentGraph?.AnchorFill
-            };
-            return anchor;
+        public static readonly DependencyProperty MaxYProperty =
+            DependencyProperty.Register(nameof(MaxY),
+                typeof(double), 
+                typeof(GraphState), 
+                new FrameworkPropertyMetadata(1d));
+
+        public double MaxY {
+            get => (double) GetValue(MaxYProperty);
+            set => SetValue(MaxYProperty, value);
         }
 
-        public TensionAnchor MakeTensionAnchor(Vector2 pos, Anchor parentAnchor) {
-            var anchor = new TensionAnchor(ParentGraph, pos, parentAnchor) {
-                Stroke = ParentGraph?.AnchorStroke,
-                Fill = ParentGraph?.AnchorFill
-            };
-            return anchor;
-        }
+        #endregion
 
-        public void RemoveAnchor(Anchor anchor) {
-            // Dont remove the anchors on the left and right edge
-            if (IsEdgeAnchor(anchor)) return;
-
-            Anchors.Remove(anchor);
-            TensionAnchors.Remove(anchor.TensionAnchor);
-
-            UpdateAnchorNeighbors();
-            ParentGraph?.UpdateVisual();
-        }
-
-        private void UpdateAnchorNeighbors() {
-            Anchor previousAnchor = null;
-            foreach (var anchor in Anchors) {
-                anchor.PreviousAnchor = previousAnchor;
-                if (previousAnchor != null) {
-                    previousAnchor.NextAnchor = anchor;
-                }
-
-                previousAnchor = anchor;
-            }
-        }
-
-        public bool IsEdgeAnchor(Anchor anchor) {
-            return anchor == Anchors[0] || anchor == Anchors[Anchors.Count - 1];
+        protected override Freezable CreateInstanceCore() {
+            return new GraphState();
         }
 
         /// <summary>
@@ -191,30 +111,12 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         /// <summary>
-        /// Converts a value from the coordinate system to the absolute coordinate system [0-1]x[0-1].
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public Vector2 GetPosition(Vector2 value) {
-            return new Vector2((value.X - XMin) / (XMax - XMin), (value.Y - YMin) / (YMax - YMin));
-        }
-
-        /// <summary>
-        /// Calculates the height of the curve from <see cref="YMin"/> to <see cref="YMax"/> for a given progression allong the graph [0-1].
+        /// Calculates the height of the curve from <see cref="MinY"/> to <see cref="MaxY"/> for a given progression allong the graph [0-1].
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
         public double GetValue(double x) {
-            return YMin + (YMax - YMin) * GetPosition(x);
-        }
-
-        /// <summary>
-        /// Converts a value from the absolute coordinate system to a value.
-        /// </summary>
-        /// <param name="position"></param>
-        /// <returns></returns>
-        public Vector2 GetValue(Vector2 position) {
-            return new Vector2(XMin + (XMax - XMin) * position.X, YMin + (YMax - YMin) * position.Y);
+            return MinY + (MaxY - MinY) * GetPosition(x);
         }
     }
 }

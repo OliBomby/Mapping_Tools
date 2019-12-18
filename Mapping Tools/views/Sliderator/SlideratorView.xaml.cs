@@ -1,21 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using Mapping_Tools.Classes.SystemTools;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Threading;
-using Mapping_Tools.Classes.BeatmapHelper;
+﻿using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Components.Graph;
-using MaterialDesignColors.ColorManipulation;
+using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
-using System.Linq;
-using System.Windows.Media.Animation;
+using Mapping_Tools.Components.Graph;
 using Mapping_Tools.Components.Graph.Markers;
 using Mapping_Tools.Components.ObjectVisualiser;
 using Mapping_Tools.Viewmodels;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Windows;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
 using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
 
 namespace Mapping_Tools.Views {
@@ -40,14 +37,23 @@ namespace Mapping_Tools.Views {
 
             Graph.SetBrush(new SolidColorBrush(Color.FromArgb(255, 0, 255, 255)));
 
-            Graph.MoveAnchorTo(Graph.State.Anchors[0], Vector2.Zero);
-            Graph.MoveAnchorTo(Graph.State.Anchors[Graph.State.Anchors.Count - 1], Vector2.One);
+            Graph.MoveAnchorTo(Graph.Anchors[0], Vector2.Zero);
+            Graph.MoveAnchorTo(Graph.Anchors[Graph.Anchors.Count - 1], Vector2.One);
+
+            Graph.GraphStateChanged += GraphOnGraphStateChanged;
+        }
+
+        private void GraphOnGraphStateChanged(object sender, DependencyPropertyChangedEventArgs e) {
+            AnimateProgress(GraphHitObjectElement);
         }
 
         private void ViewModelOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
             switch (e.PropertyName) {
                 case "GraphDuration":
                     AnimateProgress(GraphHitObjectElement);
+                    break;
+                case "BeatSnapDivisor":
+                    Graph.HorizontalMarkerGenerator = new DividedBeatMarkerGenerator(ViewModel.BeatSnapDivisor);
                     break;
             }
         }
@@ -57,7 +63,7 @@ namespace Mapping_Tools.Views {
             var doubleDuration = graphDuration.Add(graphDuration);
 
             var animation = new GraphDoubleAnimation {
-                GraphState = Graph.State, From = 0, To = 1,
+                GraphState = Graph.GetGraphState(), From = 0, To = 1,
                 Duration = graphDuration,
                 BeginTime = TimeSpan.Zero
             };

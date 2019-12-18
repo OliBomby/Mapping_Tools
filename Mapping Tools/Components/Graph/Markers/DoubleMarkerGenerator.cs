@@ -21,10 +21,12 @@ namespace Mapping_Tools.Components.Graph.Markers {
 
         public IEnumerable<GraphMarker> GenerateMarkers(double start, double end, Orientation orientation) {
             var markers = new List<GraphMarker>();
-            var v = Math.Ceiling((start - Offset) / Step) * Step + Offset;
+            var vStart = Math.Ceiling((start - Offset) / Step) * Step + Offset;
+            var v = vStart;
+            int i = 0;
             while (v <= end) {
                 markers.Add(new GraphMarker {Orientation = orientation, Text = $"{v:g2}{Unit}", Value = v});
-                v += Step;
+                v = vStart + Step * ++i;
             }
 
             return markers;

@@ -6,20 +6,21 @@ namespace Mapping_Tools.Components.Domain {
     internal class CharacterLimitValidationRule : ValidationRule
     {
         public override ValidationResult Validate(object value, CultureInfo cultureInfo) {
-            int limit = Wrapper.CharacterLimit;
+            int limit = LimitWrapper.Value;
             string str = (value ?? "").ToString();
             return str.Length <= limit ? ValidationResult.ValidResult : new ValidationResult(false, $"Field can not be over {limit} characters long.");
         }
 
-        public Wrapper Wrapper { get; set; }
+        public IntWrapper LimitWrapper { get; set; }
     }
-    public class Wrapper : DependencyObject
+
+    public class IntWrapper : DependencyObject
     {
         public static readonly DependencyProperty FormatProperty =
-            DependencyProperty.Register("CharacterLimit", typeof(int),
-                typeof(Wrapper), new FrameworkPropertyMetadata(null));
+            DependencyProperty.Register("Value", typeof(int),
+                typeof(IntWrapper), new FrameworkPropertyMetadata(null));
 
-        public int CharacterLimit {
+        public int Value {
             get => (int)GetValue(FormatProperty);
             set => SetValue(FormatProperty, value);
         }
