@@ -1,8 +1,8 @@
-﻿using Mapping_Tools.Classes.SliderPathStuff;
+﻿using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SliderPathStuff;
 using System;
 using System.Windows;
 using System.Windows.Media;
-using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Components.ObjectVisualiser {
     public class HitObjectElement : FrameworkElement {
@@ -11,7 +11,7 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
 
         private Geometry sliderPathGeometry;
 
-        private Rect Bounds;
+        private Rect bounds;
 
         private TranslateTransform figureTranslate;
         private double scale;
@@ -28,7 +28,10 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
 
         public Classes.BeatmapHelper.HitObject HitObject {
             get => (Classes.BeatmapHelper.HitObject) GetValue(HitObjectProperty);
-            set => SetValue(HitObjectProperty, value);
+            set {
+                SetValue(HitObjectProperty, value); 
+                Console.WriteLine("Hit object changed!");
+            }
         }
 
         public static readonly DependencyProperty ProgressProperty =
@@ -110,9 +113,9 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
         }
 
         private void UpdateGeometryTransform() {
-            scale = Math.Min(ActualWidth / Bounds.Width,
-                ActualHeight / Bounds.Height);
-            figureTranslate = new TranslateTransform(-Bounds.Left, -Bounds.Top);
+            scale = Math.Min(ActualWidth / bounds.Width,
+                ActualHeight / bounds.Height);
+            figureTranslate = new TranslateTransform(-bounds.Left, -bounds.Top);
             figureTransform = new TransformGroup {
                 Children = new TransformCollection {
                     figureTranslate,
@@ -141,7 +144,6 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
                     drawingContext.DrawGeometry(Fill, GetSliderBallPen(), GetCircleGeometryAtProgress(Progress));
                 }
             } else if (HitObject.IsCircle) {
-                Console.WriteLine("Drawing circle!");
                 var geom = GetCircleGeometry(HitObject.Pos);
                 Console.WriteLine(geom.Bounds);
                 drawingContext.DrawGeometry(Fill, outlinePen, GetCircleGeometry(HitObject.Pos));
@@ -207,7 +209,7 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
                 me.simpleSliderPathGeometry = geom;
                 me.UpdateSliderPathGeometry();
             } else {
-                me.Bounds = new Rect(new Point(hitObject.Pos.X - me.Thickness * 0.5, hitObject.Pos.Y - me.Thickness * 0.5),
+                me.bounds = new Rect(new Point(hitObject.Pos.X - me.Thickness * 0.5, hitObject.Pos.Y - me.Thickness * 0.5),
                     new Size(me.Thickness, me.Thickness));
                 me.UpdateGeometryTransform();
             }
@@ -219,8 +221,8 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
             var geom2 = simpleSliderPathGeometry.GetWidenedPathGeometry(new Pen(null, ThicknessWithoutOutline)).GetOutlinedPathGeometry();
 
             sliderPathGeometry = geom2;
-            Bounds = simpleSliderPathGeometry.Bounds;
-            Bounds.Inflate(Thickness * 0.5, Thickness * 0.5);
+            bounds = simpleSliderPathGeometry.Bounds;
+            bounds.Inflate(Thickness * 0.5, Thickness * 0.5);
             UpdateGeometryTransform();
         }
 

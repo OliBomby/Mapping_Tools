@@ -268,6 +268,43 @@ namespace Mapping_Tools.Classes.Tools
         }
 
         /// <summary>
+        /// Returns an editor for the beatmap which is currently open in the editor. Returns null if there is no beatmap open in the editor.
+        /// </summary>
+        /// <param name="selected">List of selected hit objects</param>
+        /// <param name="fullReader">Reader object that has already fetched all</param>
+        /// <returns>An editor for the beatmap</returns>
+        public static BeatmapEditor GetEditor(out List<HitObject> selected, EditorReader fullReader = null) {
+            selected = new List<HitObject>();
+            BeatmapEditor editor = null;
+
+            // Get a reader object that has everything fetched
+            var reader = fullReader;
+            if (reader == null)
+                if (!TryGetFullEditorReader(out reader))
+                    return editor;
+
+            // Get the path from the beatmap in memory
+            // This can only crash if the provided fullReader didn't fetch all values
+            try
+            {
+                string songs = SettingsManager.GetSongsPath();
+                string folder = reader.ContainingFolder;
+                string filename = reader.Filename;
+                string memoryPath = Path.Combine(songs, folder, filename);
+
+                // Update the beatmap with memory values
+                editor = new BeatmapEditor(memoryPath);
+                selected = UpdateBeatmap(editor.Beatmap, reader);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Exception ({ex.Message}) while editor reading.");
+            }
+
+            return editor;
+        }
+
+        /// <summary>
         /// Replaces hit objects and timing points with the values in the editor reader
         /// </summary>
         /// <param name="beatmap">Beatmap to replace values in</param>

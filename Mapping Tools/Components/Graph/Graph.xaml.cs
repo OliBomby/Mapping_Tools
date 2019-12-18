@@ -535,7 +535,10 @@ namespace Mapping_Tools.Components.Graph {
             MainCanvas.Children.Clear();
 
             // Add markers
-            foreach (var marker in _markers.Where(marker => !(marker.X < 0) && !(marker.X > ActualWidth) && !(marker.Y < 0) && !(marker.Y > ActualHeight))) {
+            foreach (var marker in _markers.Where(marker => marker.X > -Precision.DOUBLE_EPSILON && 
+                                                            marker.X < ActualWidth + Precision.DOUBLE_EPSILON && 
+                                                            marker.Y > -Precision.DOUBLE_EPSILON && 
+                                                            marker.Y < ActualHeight + Precision.DOUBLE_EPSILON)) {
                 MainCanvas.Children.Add(marker);
             }
 

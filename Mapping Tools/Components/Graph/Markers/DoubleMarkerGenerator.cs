@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Controls;
 using Mapping_Tools.Annotations;
+using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Components.Graph.Markers {
     public class DoubleMarkerGenerator : IMarkerGenerator {
@@ -24,7 +25,7 @@ namespace Mapping_Tools.Components.Graph.Markers {
             var vStart = Math.Ceiling((start - Offset) / Step) * Step + Offset;
             var v = vStart;
             int i = 0;
-            while (v <= end) {
+            while (v <= end + Precision.DOUBLE_EPSILON) {
                 markers.Add(new GraphMarker {Orientation = orientation, Text = $"{v:g2}{Unit}", Value = v});
                 v = vStart + Step * ++i;
             }

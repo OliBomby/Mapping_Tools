@@ -19,7 +19,7 @@ namespace Mapping_Tools.Components.Graph.Markers {
             var markers = new List<GraphMarker>();
             var v = start;
             int i = 0;
-            while (v <= end) {
+            while (v <= end + Precision.DOUBLE_EPSILON) {
                 Color markerColor;
                 double markerLength;
 

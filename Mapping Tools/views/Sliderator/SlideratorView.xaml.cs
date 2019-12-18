@@ -1,15 +1,11 @@
-﻿using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.MathUtil;
+﻿using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Components.Graph;
 using Mapping_Tools.Components.Graph.Markers;
 using Mapping_Tools.Components.ObjectVisualiser;
 using Mapping_Tools.Viewmodels;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -49,6 +45,7 @@ namespace Mapping_Tools.Views {
 
         private void ViewModelOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
             switch (e.PropertyName) {
+                case "VisibleHitObject":
                 case "GraphDuration":
                     AnimateProgress(GraphHitObjectElement);
                     break;
@@ -59,22 +56,24 @@ namespace Mapping_Tools.Views {
         }
 
         private void AnimateProgress(HitObjectElement element) {
+            if (ViewModel.VisibleHitObject == null) return;
+
             var graphDuration = ViewModel.GraphDuration;
-            var doubleDuration = graphDuration.Add(graphDuration);
+            var extraDuration = graphDuration.Add(TimeSpan.FromSeconds(1));
 
             var animation = new GraphDoubleAnimation {
                 GraphState = Graph.GetGraphState(), From = 0, To = 1,
                 Duration = graphDuration,
                 BeginTime = TimeSpan.Zero
             };
-            var animation2 = new DoubleAnimation(0, 0, graphDuration) {BeginTime = graphDuration};
+            var animation2 = new DoubleAnimation(0, 0, TimeSpan.FromSeconds(1)) {BeginTime = graphDuration};
 
             Storyboard.SetTarget(animation, element);
             Storyboard.SetTarget(animation2, element);
             Storyboard.SetTargetProperty(animation, new PropertyPath(HitObjectElement.ProgressProperty));
             Storyboard.SetTargetProperty(animation2, new PropertyPath(HitObjectElement.ProgressProperty));
 
-            var timeline = new ParallelTimeline {RepeatBehavior = RepeatBehavior.Forever, Duration = doubleDuration};
+            var timeline = new ParallelTimeline {RepeatBehavior = RepeatBehavior.Forever, Duration = extraDuration};
             timeline.Children.Add(animation);
             timeline.Children.Add(animation2);
 
@@ -85,7 +84,7 @@ namespace Mapping_Tools.Views {
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
-            RunTool(MainWindow.AppWindow.GetCurrentMaps(), quick: false);
+            RunTool(MainWindow.AppWindow.GetCurrentMaps());
         }
 
         private void RunTool(string[] paths, bool quick = false) {
@@ -95,30 +94,6 @@ namespace Mapping_Tools.Views {
 
             //BackgroundWorker.RunWorkerAsync(arguments);
             CanRun = false;
-        }
-
-        private void Import_Slider(object sender, RoutedEventArgs e)
-        {
-            bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
-            foreach (string path in MainWindow.AppWindow.GetCurrentMaps())
-            {
-                var selected = new List<HitObject>();
-                BeatmapEditor editor = editorRead ? EditorReaderStuff.GetNewestVersion(path, out selected, reader) : new BeatmapEditor(path);
-                Beatmap beatmap = editor.Beatmap;
-                Timing timing = beatmap.BeatmapTiming;
-                List<HitObject> markedObjects = selected;
-
-                try {
-                    GraphHitObjectElement.HitObject = markedObjects.First(s => s.IsSlider);
-                }
-                catch (InvalidOperationException) {}
-            }
-        }
-
-        private void SlideratorView_OnLoaded(object sender, RoutedEventArgs e) {
-            GraphHitObjectElement.HitObject = new HitObject("159,226,0,2,0,B|299:155|275:42|143:56|139:176|263:232|263:232|315:193|319:105,1,489.9999833107");
-            //GraphHitObjectElement.HitObject = new HitObject("74,270,665,1,0,0:0:0:0:");
-            AnimateProgress(GraphHitObjectElement);
         }
     }
 }
