@@ -20,10 +20,43 @@ namespace Mapping_Tools.Components.Graph {
         [NotNull]
         public Type LastInterpolationSet { get; set; }
 
-        public double XMin { get; set; }
-        public double YMin { get; set; }
-        public double XMax { get; set; }
-        public double YMax { get; set; }
+        private double _xMin;
+        private double _yMin;
+        private double _xMax;
+        private double _yMax;
+
+        public double XMin {
+            get => _xMin;
+            set {
+                if (Set(ref _xMin, value)) {
+                    ParentGraph?.RegenerateMarkers();
+                }
+            }
+        }
+        public double YMin {
+            get => _yMin;
+            set {
+                if (Set(ref _yMin, value)) {
+                    ParentGraph?.RegenerateMarkers();
+                }
+            }
+        }
+        public double XMax {
+            get => _xMax;
+            set {
+                if (Set(ref _xMax, value)) {
+                    ParentGraph?.RegenerateMarkers();
+                }
+            }
+        }
+        public double YMax {
+            get => _yMax;
+            set {
+                if (Set(ref _yMax, value)) {
+                    ParentGraph?.RegenerateMarkers();
+                }
+            }
+        }
 
         public GraphState(Graph parentGraph) {
             ParentGraph = parentGraph;

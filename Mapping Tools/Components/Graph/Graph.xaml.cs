@@ -161,7 +161,7 @@ namespace Mapping_Tools.Components.Graph {
             TensionAnchorFill = transparentBrush;
         }
 
-        private void RegenerateMarkers() {
+        public void RegenerateMarkers() {
             Markers.Clear();
             if (HorizontalMarkerGenerator != null)
                 Markers.AddRange(HorizontalMarkerGenerator.GenerateMarkers(XMin, XMax, Orientation.Vertical));
