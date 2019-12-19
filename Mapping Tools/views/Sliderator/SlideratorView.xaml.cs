@@ -83,6 +83,13 @@ namespace Mapping_Tools.Views {
             element.BeginStoryboard(storyboard);
         }
 
+        private void ClearButton_OnClick(object sender, RoutedEventArgs e) {
+            var messageBoxResult = MessageBox.Show("Clear the graph?", "Confirm deletion", MessageBoxButton.YesNoCancel);
+            if (messageBoxResult != MessageBoxResult.Yes) return;
+
+            Graph.Clear();
+        }
+
         private void Start_Click(object sender, RoutedEventArgs e) {
             RunTool(MainWindow.AppWindow.GetCurrentMaps());
         }

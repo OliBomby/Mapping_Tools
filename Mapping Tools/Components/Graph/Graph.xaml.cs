@@ -338,6 +338,29 @@ namespace Mapping_Tools.Components.Graph {
             UpdateVisual();
         }
 
+        public void RemoveAnchorAt(int index) {
+            if (index <= 0 || index >= Anchors.Count - 1) return;
+            
+            TensionAnchors.Remove(Anchors[index].TensionAnchor);
+            Anchors.RemoveAt(index);
+
+            UpdateAnchorNeighbors();
+            UpdateVisual();
+        }
+        
+        /// <summary>
+        /// Removes all anchors between the first and last anchor and resets all tension values.
+        /// </summary>
+        public void Clear() {
+            for (int i = 1; i < Anchors.Count - 1; ) {
+                RemoveAnchorAt(i);
+            }
+
+            foreach (var anchor in Anchors) {
+                anchor.SetTension(0);
+            }
+        }
+
         private void UpdateAnchorNeighbors() {
             Anchor previousAnchor = null;
             foreach (var anchor in Anchors) {

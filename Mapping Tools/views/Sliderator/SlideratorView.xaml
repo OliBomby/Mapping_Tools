@@ -124,16 +124,25 @@
                 </Grid>
             </StackPanel>
 
-            <Grid Grid.Row="1" Grid.Column="1" Margin="5 0 5 0">
+            <Grid Grid.Row="1" Grid.Column="1" Margin="10 0 10 0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <Slider Grid.Row="0" Minimum="1" Maximum="16" Value="{Binding BeatSnapDivisor}" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
+                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}"
+                            ToolTip="Clear graph." Click="ClearButton_OnClick">
+                        <Button.Content>
+                            <materialDesign:PackIcon Kind="Rocket" Width="24" Height="24"/>
+                        </Button.Content>
+                    </Button>
+                </StackPanel>
+
+                <Slider Grid.Row="1" Minimum="1" Maximum="16" Value="{Binding BeatSnapDivisor}" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
             </Grid>
 
-            <Viewbox Grid.Row="1" Grid.Column="3" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
+            <Viewbox Grid.Row="1" Grid.Column="3" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70">
                 <Button
                     Style="{StaticResource MaterialDesignFloatingActionButton}"
                     IsEnabled="{Binding ElementName=This, Path=CanRun}"
