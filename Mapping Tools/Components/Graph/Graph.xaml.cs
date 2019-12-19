@@ -524,7 +524,7 @@ namespace Mapping_Tools.Components.Graph {
             if (HorizontalMarkerGenerator != null)
                 _markers.AddRange(HorizontalMarkerGenerator.GenerateMarkers(MinX, MaxX, Orientation.Vertical));
             if (VerticalMarkerGenerator != null)
-                _markers.AddRange(VerticalMarkerGenerator.GenerateMarkers(MinX, MaxX, Orientation.Horizontal));
+                _markers.AddRange(VerticalMarkerGenerator.GenerateMarkers(MinY, MaxY, Orientation.Horizontal));
 
             UpdateMarkers();
             UpdateVisual();

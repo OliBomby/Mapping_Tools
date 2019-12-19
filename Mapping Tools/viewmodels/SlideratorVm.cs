@@ -21,6 +21,9 @@ namespace Mapping_Tools.Viewmodels {
         private ImportMode _importMode;
         private double _exactTime;
         private Visibility _exactTimeBoxVisibility;
+        private double _exportTime;
+        private ExportMode _exportMode;
+        private double _velocityLimit;
 
         #region Properties
 
@@ -82,6 +85,23 @@ namespace Mapping_Tools.Viewmodels {
         public Visibility ExactTimeBoxVisibility {
             get => _exactTimeBoxVisibility;
             set => Set(ref _exactTimeBoxVisibility, value);
+        }
+
+        public double ExportTime {
+            get => _exportTime;
+            set => Set(ref _exportTime, value);
+        }
+
+        public ExportMode ExportMode {
+            get => _exportMode;
+            set => Set(ref _exportMode, value);
+        }
+        
+        public IEnumerable<ExportMode> ExportModes => Enum.GetValues(typeof(ExportMode)).Cast<ExportMode>();
+
+        public double VelocityLimit {
+            get => _velocityLimit;
+            set => Set(ref _velocityLimit, value);
         }
 
         public CommandImplementation ImportCommand { get; }
@@ -171,5 +191,10 @@ namespace Mapping_Tools.Viewmodels {
         Selected,
         Bookmarked,
         Time
+    }
+
+    public enum ExportMode {
+        Add,
+        Override
     }
 }

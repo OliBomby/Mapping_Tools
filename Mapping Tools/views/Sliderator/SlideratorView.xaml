@@ -122,6 +122,13 @@
                     <TextBox Grid.Column="1" Margin="0" Text="{Binding BeatsPerMinute, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              materialDesign:HintAssist.Hint="BPM" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
                 </Grid>
+
+                <TextBox Margin="0 30 0 0" materialDesign:HintAssist.Hint="Time" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                         ToolTip="The time in the current beatmap to export the sliderated slider to."
+                         Text="{Binding ExportTime, Converter={StaticResource TimeToStringConverter}}"/>
+
+                <ComboBox Margin="0 10 0 0" ToolTip="Choose how you want to export sliders." ItemsSource="{Binding ExportModes}"
+                          SelectedItem="{Binding ExportMode}"/>
             </StackPanel>
 
             <Grid Grid.Row="1" Grid.Column="1" Margin="10 0 10 0">
@@ -129,6 +136,11 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
+
+                <TextBox Grid.Column="0" Margin="8 0 0 0" HorizontalAlignment="Left"
+                         materialDesign:HintAssist.Hint="SV limit" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                         Width="140" Text="{Binding VelocityLimit, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=-1}"
+                         ToolTip="Self-imposed SV limit to help you make sure the slope in the graph doesn't become greater than this speed limit. For example use 10x SV limit to match the osu! speed limit."/>
 
                 <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}"
