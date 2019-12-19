@@ -338,7 +338,10 @@
     <Compile Include="Components\Domain\IntToStringConverter.cs" />
     <Compile Include="Components\Domain\EnumToBoolConverter.cs" />
     <Compile Include="Components\Domain\CharacterLimitValidationRule.cs" />
-    <Compile Include="Components\Domain\ValueLimitValidationRule.cs" />
+    <Compile Include="Components\Domain\IsGreaterOrEqualValidationRule.cs" />
+    <Compile Include="Components\Domain\IsGreaterValidationRule.cs" />
+    <Compile Include="Components\Domain\IsLessValidationRule.cs" />
+    <Compile Include="Components\Domain\IsLessOrEqualValidationRule.cs" />
     <Compile Include="Components\Domain\NotEmptyValidationRule.cs" />
     <Compile Include="Components\Domain\StringArrayToStringConverter.cs" />
     <Compile Include="Components\Domain\IsASCIIValidationRule.cs" />

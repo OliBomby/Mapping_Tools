@@ -110,17 +110,36 @@
                                     <domain:DoubleToStringConverter/>
                                 </Binding.Converter>
                                 <Binding.ValidationRules>
-                                    <domain:ValueLimitValidationRule>
-                                        <domain:ValueLimitValidationRule.LimitWrapper>
+                                    <domain:IsLessOrEqualValidationRule>
+                                        <domain:IsLessOrEqualValidationRule.ValueWrapper>
                                             <domain:DoubleWrapper Value="10000"/>
-                                        </domain:ValueLimitValidationRule.LimitWrapper>
-                                    </domain:ValueLimitValidationRule>
+                                        </domain:IsLessOrEqualValidationRule.ValueWrapper>
+                                    </domain:IsLessOrEqualValidationRule>
+                                    <domain:IsGreaterOrEqualValidationRule>
+                                        <domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                            <domain:DoubleWrapper Value="0"/>
+                                        </domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                    </domain:IsGreaterOrEqualValidationRule>
                                 </Binding.ValidationRules>
                             </Binding>
                         </TextBox.Text>
                     </TextBox>
-                    <TextBox Grid.Column="1" Margin="0" Text="{Binding BeatsPerMinute, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             materialDesign:HintAssist.Hint="BPM" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
+                    <TextBox Grid.Column="1" Margin="0" materialDesign:HintAssist.Hint="BPM" Style="{StaticResource MaterialDesignFloatingHintTextBox}">
+                        <TextBox.Text>
+                            <Binding Path="BeatsPerMinute" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" NotifyOnValidationError="True">
+                                <Binding.Converter>
+                                    <domain:DoubleToStringConverter/>
+                                </Binding.Converter>
+                                <Binding.ValidationRules>
+                                    <domain:IsGreaterValidationRule>
+                                        <domain:IsGreaterValidationRule.ValueWrapper>
+                                            <domain:DoubleWrapper Value="0"/>
+                                        </domain:IsGreaterValidationRule.ValueWrapper>
+                                    </domain:IsGreaterValidationRule>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
                 </Grid>
 
                 <TextBox Margin="0 30 0 0" materialDesign:HintAssist.Hint="Time" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
@@ -139,7 +158,7 @@
 
                 <TextBox Grid.Column="0" Margin="8 0 0 0" HorizontalAlignment="Left"
                          materialDesign:HintAssist.Hint="SV limit" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                         Width="140" Text="{Binding VelocityLimit, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=-1}"
+                         Width="140" Text="{Binding VelocityLimit, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=10}"
                          ToolTip="Self-imposed SV limit to help you make sure the slope in the graph doesn't become greater than this speed limit. For example use 10x SV limit to match the osu! speed limit."/>
 
                 <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">

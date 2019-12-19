@@ -4,18 +4,18 @@ using System.Windows.Controls;
 using Mapping_Tools.Classes.SystemTools;
 
 namespace Mapping_Tools.Components.Domain {
-    internal class ValueLimitValidationRule : ValidationRule
+    internal class IsLessOrEqualValidationRule : ValidationRule
     {
         public override ValidationResult Validate(object value, CultureInfo cultureInfo) {
-            double limit = LimitWrapper.Value;
+            double limit = ValueWrapper.Value;
             string str = (value ?? "").ToString();
             if (!TypeConverters.TryParseDouble(str, out double result)) {
                 return new ValidationResult(false, "Double format error.");
             }
-            return result <= limit ? ValidationResult.ValidResult : new ValidationResult(false, $"Value can not be over {limit}.");
+            return result <= limit ? ValidationResult.ValidResult : new ValidationResult(false, $"Value can not be greater than {limit}.");
         }
 
-        public DoubleWrapper LimitWrapper { get; set; }
+        public DoubleWrapper ValueWrapper { get; set; }
     }
 
     public class DoubleWrapper : DependencyObject

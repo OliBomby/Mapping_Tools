@@ -507,6 +507,10 @@ namespace Mapping_Tools.Components.Graph {
 
         #endregion
 
+        /// <summary>
+        /// Instantly sets all brushes to one specified colour theme.
+        /// </summary>
+        /// <param name="brush"></param>
         public void SetBrush(Brush brush) {
             var transparentBrush = brush.Clone();
             transparentBrush.Opacity = 0.2;

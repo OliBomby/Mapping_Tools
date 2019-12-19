@@ -168,6 +168,7 @@ namespace Mapping_Tools.Viewmodels {
             if (!Set(ref _visibleHitObject, value, nameof(VisibleHitObject))) return;
             BeatsPerMinute = VisibleHitObject.UnInheritedTimingPoint.GetBPM();
             GraphBeats = VisibleHitObject.TemporalLength * BeatsPerMinute / 60000;
+            ExportTime = VisibleHitObject.Time;
         }
 
         private void SetCurrentHitObjectIndex(int value) {
