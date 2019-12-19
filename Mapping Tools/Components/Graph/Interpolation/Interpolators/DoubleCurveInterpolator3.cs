@@ -18,7 +18,7 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
                 return _linearDegenerate.GetInterpolation(t);
             }
 
-            p = -MathHelper.Clamp(p, -1, 1) * 10;
+            p = MathHelper.Clamp(p, -1, 1) * 10;
             if (t < 0.5) {
                 return 0.5 * F(t * 2, p);
             }
