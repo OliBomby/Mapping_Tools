@@ -378,7 +378,7 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         /// <summary>
-        /// Calculates the height of the curve [0-1] for a given progression allong the graph [0-1].
+        /// Calculates the height of the curve [0-1] for a given progression along the graph [0-1].
         /// </summary>
         /// <param name="x">The progression along the curve (0-1)</param>
         /// <returns>The height of the curve (0-1)</returns>
@@ -418,7 +418,7 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         /// <summary>
-        /// Calculates the height of the curve from <see cref="MinY"/> to <see cref="MaxY"/> for a given progression allong the graph [0-1].
+        /// Calculates the height of the curve from <see cref="MinY"/> to <see cref="MaxY"/> for a given progression along the graph [0-1].
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
@@ -433,6 +433,25 @@ namespace Mapping_Tools.Components.Graph {
         /// <returns></returns>
         public Vector2 GetValue(Vector2 position) {
             return new Vector2(MinX + (MaxX - MinX) * position.X, MinY + (MaxY - MinY) * position.Y);
+        }
+
+        /// <summary>
+        /// Calculates the derivative in the [0-1] coordinate system for a given progression along the graph [0-1].
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
+        public double GetDerivative(double x) {
+            // TODO: Need derivates of interpolators for this
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Calculates the height of the heighest point in the graph.
+        /// </summary>
+        /// <returns></returns>
+        public double GetMaxPosition() {
+            // It suffices to find the highest Y value of the anchors, because the interpolated parts never stick out above or below the anchors.
+            return Anchors.Max(o => o.Pos.Y);
         }
 
         #endregion
