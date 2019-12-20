@@ -105,7 +105,7 @@
 
                     <TextBox Grid.Column="0" Margin="0 0 10 0" materialDesign:HintAssist.Hint="Beat length" Style="{StaticResource MaterialDesignFloatingHintTextBox}">
                         <TextBox.Text>
-                            <Binding Path="GraphBeats" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" NotifyOnValidationError="True">
+                            <Binding Path="GraphBeats" Mode="TwoWay" UpdateSourceTrigger="LostFocus"  NotifyOnValidationError="True">
                                 <Binding.Converter>
                                     <domain:DoubleToStringConverter/>
                                 </Binding.Converter>
@@ -126,7 +126,7 @@
                     </TextBox>
                     <TextBox Grid.Column="1" Margin="0" materialDesign:HintAssist.Hint="BPM" Style="{StaticResource MaterialDesignFloatingHintTextBox}">
                         <TextBox.Text>
-                            <Binding Path="BeatsPerMinute" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" NotifyOnValidationError="True">
+                            <Binding Path="BeatsPerMinute" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
                                 <Binding.Converter>
                                     <domain:DoubleToStringConverter/>
                                 </Binding.Converter>

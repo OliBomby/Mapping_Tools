@@ -128,39 +128,43 @@ namespace Mapping_Tools.Viewmodels {
     }
 
         private void Import(object _) {
-            bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
-            string path = MainWindow.AppWindow.GetCurrentMaps()[0];
-            BeatmapEditor editor;
-            List<HitObject> markedObjects = null;
+            try {
+                bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+                string path = MainWindow.AppWindow.GetCurrentMaps()[0];
+                BeatmapEditor editor;
+                List<HitObject> markedObjects = null;
 
-            switch (ImportMode) {
-                case ImportMode.Selected:
-                    if (!editorRead) break;
-                    EditorReaderStuff.GetEditor(out var selected, reader);
-                    markedObjects = selected;
-                    break;
-                case ImportMode.Bookmarked:
-                    editor = new BeatmapEditor(path);
-                    markedObjects = editor.Beatmap.GetBookmarkedObjects();
-                    break;
-                case ImportMode.Time:
-                    editor = new BeatmapEditor(path);
-                    markedObjects =
-                        new List<HitObject>(editor.Beatmap.GetHitObjectsWithRangeInRange(
-                            ExactTime - 5,
-                            ExactTime + 5));
-                    break;
+                switch (ImportMode) {
+                    case ImportMode.Selected:
+                        if (!editorRead) break;
+                        EditorReaderStuff.GetEditor(out var selected, reader);
+                        markedObjects = selected;
+                        break;
+                    case ImportMode.Bookmarked:
+                        editor = new BeatmapEditor(path);
+                        markedObjects = editor.Beatmap.GetBookmarkedObjects();
+                        break;
+                    case ImportMode.Time:
+                        editor = new BeatmapEditor(path);
+                        markedObjects =
+                            new List<HitObject>(editor.Beatmap.GetHitObjectsWithRangeInRange(
+                                ExactTime - 5,
+                                ExactTime + 5));
+                        break;
+                }
+
+                if (markedObjects == null || markedObjects.Count(o => o.IsSlider) == 0) return;
+
+                LoadedHitObjects = new ObservableCollection<HitObject>(markedObjects.Where(s => s.IsSlider));
+            } catch (Exception ex) {
+                MessageBox.Show(ex.Message + ex.StackTrace, "Error");
             }
-
-            if (markedObjects == null || markedObjects.Count(o => o.IsSlider) == 0) return;
-
-            LoadedHitObjects = new ObservableCollection<HitObject>(markedObjects.Where(s => s.IsSlider));
         }
 
         private void SetLoadedHitObjects(ObservableCollection<HitObject> value) {
             if (!Set(ref _loadedHitObjects, value, nameof(LoadedHitObjects))) return;
             if (LoadedHitObjects.Count == 0) return;
-            VisibleHitObject = LoadedHitObjects[VisibleHitObjectIndex];
+            VisibleHitObject = LoadedHitObjects[0];
             VisibleHitObjectIndex = 0;
         }
 
