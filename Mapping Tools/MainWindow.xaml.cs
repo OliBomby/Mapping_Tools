@@ -101,6 +101,8 @@ namespace Mapping_Tools {
         }
 
         public void SetCurrentView(object view) {
+            if (view == null) return;
+
             var type = view.GetType();
 
             if (FindName("header") is TextBlock txt) {
