@@ -15,7 +15,7 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
         }
 
         public IGraphInterpolator GetPrimitiveInterpolator() {
-            return new CustomInterpolator((t, p) => t * (p * (t - 1) + 1)) {P = 1};
+            return new ParabolaInterpolator {P = -1};
         }
 
         public double GetIntegral(double t1, double t2) {

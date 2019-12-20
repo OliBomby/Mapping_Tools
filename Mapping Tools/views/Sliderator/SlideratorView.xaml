@@ -70,7 +70,7 @@
                              Width="100" Visibility="{Binding ExactTimeBoxVisibility, FallbackValue=Collapsed}" Margin="5 0 5 2"/>
 
                     <Button Grid.Column="2" Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ImportCommand}" Margin="5 0 0 0"
-                            ToolTip="Imports the selected slider into the preview." HorizontalAlignment="Right" VerticalAlignment="Top">
+                            ToolTip="Import sliders into the preview." HorizontalAlignment="Right" VerticalAlignment="Top">
                         Import sliders
                     </Button>
                 </Grid>
@@ -156,19 +156,34 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <TextBox Grid.Column="0" Margin="8 0 0 0" HorizontalAlignment="Left"
-                         materialDesign:HintAssist.Hint="SV limit" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                         Width="140" Text="{Binding VelocityLimit, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=10}"
-                         ToolTip="Self-imposed SV limit to help you make sure the slope in the graph doesn't become greater than this speed limit. For example use 10x SV limit to match the osu! speed limit."/>
+                <Grid Grid.Row="0" Margin="8 0 8 0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}"
-                            ToolTip="Clear graph." Click="ClearButton_OnClick">
-                        <Button.Content>
-                            <materialDesign:PackIcon Kind="Rocket" Width="24" Height="24"/>
-                        </Button.Content>
-                    </Button>
-                </StackPanel>
+                    <TextBox Grid.Column="0" Margin="0 0 8 0" HorizontalAlignment="Left"
+                             materialDesign:HintAssist.Hint="SV limit" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                             MaxWidth="140" MinWidth="100" Text="{Binding VelocityLimit, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=10}"
+                             ToolTip="Self-imposed SV limit to help you make sure the slope in the graph doesn't become greater than this speed limit. For example use 10x SV limit to match the osu! speed limit."/>
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" Margin="0 0 5 0"
+                                ToolTip="Clear graph." Click="ClearButton_OnClick">
+                            <Button.Content>
+                                <materialDesign:PackIcon Kind="Rocket" Width="24" Height="24"/>
+                            </Button.Content>
+                        </Button>
+                        <Button Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Margin="5 0 0 0"
+                                ToolTip="Toggle graph mode." Click="GraphToggleButton_OnClick">
+                            <Button.Content>
+                                <Viewbox Width="24" Height="24">
+                                    <TextBlock x:Name="GraphToggleContentTextBlock" FontWeight="Bold">V</TextBlock>
+                                </Viewbox>
+                            </Button.Content>
+                        </Button>
+                    </StackPanel>
+                </Grid>
 
                 <Slider Grid.Row="1" Minimum="1" Maximum="16" Value="{Binding BeatSnapDivisor}" Style="{StaticResource MaterialDesignDiscreteSlider}"/>
             </Grid>

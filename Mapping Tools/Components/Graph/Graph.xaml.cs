@@ -460,6 +460,17 @@ namespace Mapping_Tools.Components.Graph {
 
         private static void OnAnchorsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             var g = (Graph) d;
+            g.TensionAnchors.Clear();
+            foreach (var anchor in g.Anchors) {
+                anchor.Graph = g;
+                anchor.Stroke = g.AnchorStroke;
+                anchor.Fill = g.AnchorFill;
+                if (anchor.TensionAnchor == null) continue;
+                anchor.TensionAnchor.Stroke = g.TensionAnchorStroke;
+                anchor.TensionAnchor.Fill = g.TensionAnchorFill;
+                g.TensionAnchors.Add(anchor.TensionAnchor);
+            }
+            g.UpdateAnchorNeighbors();
             g.UpdateVisual();
             g.GraphStateChanged?.Invoke(d, e);
         }
@@ -635,9 +646,9 @@ namespace Mapping_Tools.Components.Graph {
             foreach (var tensionAnchor in TensionAnchors) {
                 // Find x position in the middle
                 var next = tensionAnchor.ParentAnchor;
-                var previous = Anchors[Anchors.IndexOf(next) - 1];
+                var previous = next.PreviousAnchor;
 
-                if (Math.Abs(next.Pos.X - previous.Pos.X) < Precision.DOUBLE_EPSILON) {
+                if (previous == null || Math.Abs(next.Pos.X - previous.Pos.X) < Precision.DOUBLE_EPSILON) {
                     continue;
                 }
                 var x = (next.Pos.X + previous.Pos.X) / 2;

@@ -117,6 +117,7 @@ namespace Mapping_Tools.Viewmodels {
             BeatSnapDivisor = 4;
             ImportMode = ImportMode.Selected;
             ExactTimeBoxVisibility = Visibility.Collapsed;
+            VelocityLimit = 10;
 
             ImportCommand = new CommandImplementation(Import);
             MoveLeftCommand = new CommandImplementation(_ => {
