@@ -9,7 +9,6 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
 
 namespace Mapping_Tools.Views {
     //[HiddenTool]
@@ -84,7 +83,7 @@ namespace Mapping_Tools.Views {
         }
 
         private void ClearButton_OnClick(object sender, RoutedEventArgs e) {
-            var messageBoxResult = MessageBox.Show("Clear the graph?", "Confirm deletion", MessageBoxButton.YesNoCancel);
+            var messageBoxResult = MessageBox.Show("Clear the graph?", "Confirm deletion", MessageBoxButton.YesNo);
             if (messageBoxResult != MessageBoxResult.Yes) return;
 
             Graph.Clear();
