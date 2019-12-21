@@ -482,7 +482,7 @@ namespace Mapping_Tools.Components.Graph {
 
                     if (anchor.Interpolator is IIntegrableInterpolator integrableInterpolator) {
                         integral = integrableInterpolator.GetIntegral(0, 1);
-                        primitiveInterpolator = integrableInterpolator.GetPrimitiveInterpolator();
+                        primitiveInterpolator = integrableInterpolator.GetPrimitiveInterpolator(p1.X, p1.Y, p2.X, p2.Y);
                     } else {
                         integral = 0.5;
                         primitiveInterpolator = new LinearInterpolator();

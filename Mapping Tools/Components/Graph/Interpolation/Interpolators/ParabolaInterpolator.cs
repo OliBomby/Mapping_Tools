@@ -25,7 +25,7 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
             return -2 * P * t + P + 1;
         }
 
-        public IGraphInterpolator GetPrimitiveInterpolator() {
+        public IGraphInterpolator GetPrimitiveInterpolator(double x1, double y1, double x2, double y2) {
             return new PrimitiveParabolaInterpolator {P = P};
         }
 
