@@ -18,7 +18,7 @@ namespace Mapping_Tools.Components.Graph {
         public Anchor ParentAnchor { get; set; }
 
         private Brush _stroke;
-        public override Brush Stroke {
+        public sealed override Brush Stroke {
             get => _stroke;
             set { 
                 _stroke = value;
@@ -30,7 +30,7 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private Brush _fill;
-        public override Brush Fill {
+        public sealed override Brush Fill {
             get => _fill;
             set {
                 _fill = value;
@@ -54,6 +54,8 @@ namespace Mapping_Tools.Components.Graph {
             SetCursor();
             AbsoluteDraggingMode = true;
             ParentAnchor = parentAnchor;
+            Stroke = parent?.TensionAnchorStroke;
+            Fill = parent?.TensionAnchorFill;
         }
 
         private void SetCursor() {

@@ -21,7 +21,7 @@ namespace Mapping_Tools.Components.Graph {
     public partial class Anchor {
         protected override double DefaultSize { get; } = 14;
 
-        [CanBeNull]
+        [NotNull]
         public TensionAnchor TensionAnchor { get; set; }
 
         [NotNull]
@@ -33,7 +33,7 @@ namespace Mapping_Tools.Components.Graph {
         private IGraphInterpolator _interpolator;
 
         private Brush _stroke;
-        public override Brush Stroke {
+        public sealed override Brush Stroke {
             get => _stroke;
             set { 
                 _stroke = value;
@@ -42,7 +42,7 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private Brush _fill;
-        public override Brush Fill {
+        public sealed override Brush Fill {
             get => _fill;
             set {
                 _fill = value;
@@ -51,13 +51,12 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private double _tension;
-        public override double Tension {
+        public sealed override double Tension {
             get => _tension;
             set {
                 if (Math.Abs(_tension - value) < Precision.DOUBLE_EPSILON) return;
                 _tension = value;
-                if (TensionAnchor != null)
-                    TensionAnchor.Tension = value;
+                TensionAnchor.Tension = value;
             }
         }
 
@@ -67,13 +66,23 @@ namespace Mapping_Tools.Components.Graph {
         [CanBeNull]
         public Anchor NextAnchor { get; set; }
 
-        public Anchor(Graph parent, Vector2 pos) : this(parent, pos, typeof(SingleCurveInterpolator)) { }
+        public Anchor(Graph parent, Vector2 pos) : this(parent, pos, null) { }
 
-        public Anchor(Graph parent, Vector2 pos, Type interpolator) : base(parent, pos) {
+        public Anchor(Graph parent, Vector2 pos, IGraphInterpolator interpolator) : this(parent, pos, interpolator, null) { }
+
+        public Anchor(Graph parent, Vector2 pos, IGraphInterpolator interpolator, TensionAnchor tensionAnchor) : base(parent, pos) {
             InitializeComponent();
             SetCursor();
             PopulateContextMenu();
-            SetInterpolator(interpolator);
+            TensionAnchor = tensionAnchor ?? new TensionAnchor(Graph, pos, this);
+            TensionAnchor.ParentAnchor = this;
+            TensionAnchor.Graph = Graph;
+            SetInterpolator(interpolator ?? new SingleCurveInterpolator());
+            if (Interpolator is CustomInterpolator c) {
+                Tension = c.P;
+            }
+            Stroke = parent?.AnchorStroke;
+            Fill = parent?.AnchorFill;
         }
 
         private void SetCursor() {
@@ -167,7 +176,7 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private void SetInterpolator(IGraphInterpolator p) {
-            if (_interpolator != null && _interpolator == p) return;
+            if (p == null || _interpolator != null && _interpolator == p) return;
 
             var type = p.GetType();
 

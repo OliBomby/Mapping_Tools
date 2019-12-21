@@ -131,101 +131,11 @@ namespace Mapping_Tools.Views {
 
             if (_graphMode == GraphMode.Position && graphMode == GraphMode.Velocity) {
                 // Differentiate graph
-                var newAnchors = new List<Anchor>();
-                var newHeight = ViewModel.VelocityLimit;
-                Anchor previousAnchor = null;
-                foreach (var anchor in Graph.Anchors) {
-                    if (previousAnchor != null) {
-                        var p1 = Graph.GetValue(previousAnchor.Pos);
-                        var p2 = Graph.GetValue(anchor.Pos);
-
-                        var difference = p2 - p1;
-
-                        if (anchor.Interpolator is IDerivableInterpolator derivableInterpolator) {
-                            var startSlope = derivableInterpolator.GetDerivative(0) * difference.Y / difference.X;
-                            var endSlope = derivableInterpolator.GetDerivative(1) * difference.Y / difference.X;
-
-                            var a1 = new Anchor(Graph, new Vector2(previousAnchor.Pos.X, startSlope / newHeight / 2 + 0.5)) {
-                                Interpolator = new LinearInterpolator()
-                            };
-                            var t1 = new TensionAnchor(Graph, Vector2.Zero, a1);
-                            a1.TensionAnchor = t1;
-                            newAnchors.Add(a1);
-                            var a2 = new Anchor(Graph, new Vector2(anchor.Pos.X, endSlope / newHeight / 2 + 0.5)) {
-                                Interpolator = derivableInterpolator.GetDerivativeInterpolator()
-                            };
-                            var t2 = new TensionAnchor(Graph, Vector2.Zero, a2);
-                            a2.TensionAnchor = t2;
-                            newAnchors.Add(a2);
-                        } else {
-                            var slope = difference.Y / difference.X;
-                            
-                            var a1 = new Anchor(Graph, new Vector2(previousAnchor.Pos.X, slope / newHeight / 2 + 0.5)) {
-                                Interpolator = new LinearInterpolator()
-                            };
-                            var t1 = new TensionAnchor(Graph, Vector2.Zero, a1);
-                            a1.TensionAnchor = t1;
-                            newAnchors.Add(a1);
-                            var a2 = new Anchor(Graph, new Vector2(anchor.Pos.X, slope / newHeight / 2 + 0.5)) {
-                                Interpolator = new LinearInterpolator()
-                            };
-                            var t2 = new TensionAnchor(Graph, Vector2.Zero, a2);
-                            a2.TensionAnchor = t2;
-                            newAnchors.Add(a2);
-                        }
-                    }
-
-                    previousAnchor = anchor;
-                }
-
-                Graph.Anchors = new ObservableCollection<Anchor>(newAnchors);
-                Graph.MinY = -newHeight;
-                Graph.MaxY = newHeight;
+                Graph.Differentiate(-ViewModel.VelocityLimit, ViewModel.VelocityLimit);
                 Graph.VerticalMarkerGenerator = new DoubleMarkerGenerator(0, 1, "x");
             } else if (_graphMode == GraphMode.Velocity && graphMode == GraphMode.Position) {
                 // Integrate graph
-                var newAnchors = new List<Anchor> {new Anchor(Graph, new Vector2(0, 0))};
-                double height = 0;
-                Anchor previousAnchor = null;
-                foreach (var anchor in Graph.Anchors) {
-                    if (previousAnchor != null) {
-                        var p1 = Graph.GetValue(previousAnchor.Pos);
-                        var p2 = Graph.GetValue(anchor.Pos);
-
-                        var difference = p2 - p1;
-
-                        if (difference.X < Precision.DOUBLE_EPSILON) {
-                            previousAnchor = anchor;
-                            continue;
-                        }
-
-                        if (anchor.Interpolator is IIntegrableInterpolator integrableInterpolator) {
-                            height += integrableInterpolator.GetIntegral(0, 1) * difference.X * difference.Y + difference.X * p1.Y;
-
-                            var a = new Anchor(Graph, new Vector2(anchor.Pos.X, height)) {
-                                Interpolator = integrableInterpolator.GetPrimitiveInterpolator()
-                            };
-                            var t = new TensionAnchor(Graph, Vector2.Zero, a);
-                            a.TensionAnchor = t;
-                            newAnchors.Add(a);
-                        } else {
-                            height += 0.5 * difference.X * difference.Y;
-
-                            var a = new Anchor(Graph, new Vector2(anchor.Pos.X, height)) {
-                                Interpolator = new LinearInterpolator()
-                            };
-                            var t = new TensionAnchor(Graph, Vector2.Zero, a);
-                            a.TensionAnchor = t;
-                            newAnchors.Add(a);
-                        }
-                    }
-
-                    previousAnchor = anchor;
-                }
-
-                Graph.Anchors = new ObservableCollection<Anchor>(newAnchors);
-                Graph.MinY = 0;
-                Graph.MaxY = 1;
+                Graph.Integrate(0, 1);
                 Graph.VerticalMarkerGenerator = new DoubleMarkerGenerator(0, 0.25);
             }
 

@@ -10,6 +10,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Mapping_Tools.Components.Graph.Interpolation;
 using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
 using Mapping_Tools.Components.Graph.Markers;
 
@@ -24,17 +25,6 @@ namespace Mapping_Tools.Components.Graph {
         public event DependencyPropertyChangedEventHandler GraphStateChanged;
 
         #region DependencyProperties
-
-        public static readonly DependencyProperty TensionAnchorsProperty =
-            DependencyProperty.Register(nameof(TensionAnchors),
-                typeof(ObservableCollection<TensionAnchor>), 
-                typeof(Graph), 
-                new FrameworkPropertyMetadata(null));
-
-        public ObservableCollection<TensionAnchor> TensionAnchors {
-            get => (ObservableCollection<TensionAnchor>) GetValue(TensionAnchorsProperty);
-            set => SetValue(TensionAnchorsProperty, value);
-        }
 
         public static readonly DependencyProperty AnchorsProperty =
             DependencyProperty.Register(nameof(Anchors),
@@ -234,7 +224,6 @@ namespace Mapping_Tools.Components.Graph {
             InitializeComponent();
             
             _markers = new List<GraphMarker>();
-            TensionAnchors = new ObservableCollection<TensionAnchor>();
             Anchors = new ObservableCollection<Anchor>();
             LastInterpolationSet = typeof(SingleCurveInterpolator);
 
@@ -258,7 +247,7 @@ namespace Mapping_Tools.Components.Graph {
         /// <returns></returns>
         public GraphState GetGraphState() {
             return new GraphState {
-                Anchors = Anchors.ToList(), TensionAnchors = TensionAnchors.ToList(),
+                Anchors = Anchors.ToList(),
                 MinX = MinX, MinY = MinY, MaxX = MaxX, MaxY = MaxY
             };
         }
@@ -282,20 +271,11 @@ namespace Mapping_Tools.Components.Graph {
             // Make anchor
             var anchor = MakeAnchor(pos, LastInterpolationSet);
 
-            // Make tension anchor
-            var tensionAnchor = MakeTensionAnchor(pos, anchor);
-
-            // Link State.Anchors
-            anchor.TensionAnchor = tensionAnchor;
-
             // Add tension
             anchor.Tension = nextAnchor?.Tension ?? 0;
             
             // Insert anchor
             Anchors.Insert(index, anchor);
-
-            // Add tension anchor
-            TensionAnchors.Add(tensionAnchor);
             
             UpdateAnchorNeighbors();
             UpdateVisual();
@@ -304,26 +284,12 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         public Anchor MakeAnchor(Vector2 pos) {
-            var anchor = new Anchor(this, pos) {
-                Stroke = AnchorStroke,
-                Fill = AnchorFill
-            };
+            var anchor = new Anchor(this, pos);
             return anchor;
         }
 
         public Anchor MakeAnchor(Vector2 pos, Type interpolator) {
-            var anchor = new Anchor(this, pos, interpolator) {
-                Stroke = AnchorStroke,
-                Fill = AnchorFill
-            };
-            return anchor;
-        }
-
-        public TensionAnchor MakeTensionAnchor(Vector2 pos, Anchor parentAnchor) {
-            var anchor = new TensionAnchor(this, pos, parentAnchor) {
-                Stroke = AnchorStroke,
-                Fill = AnchorFill
-            };
+            var anchor = new Anchor(this, pos, InterpolatorHelper.GetInterpolator(interpolator));
             return anchor;
         }
 
@@ -332,7 +298,6 @@ namespace Mapping_Tools.Components.Graph {
             if (IsEdgeAnchor(anchor)) return;
 
             Anchors.Remove(anchor);
-            TensionAnchors.Remove(anchor.TensionAnchor);
 
             UpdateAnchorNeighbors();
             UpdateVisual();
@@ -341,7 +306,6 @@ namespace Mapping_Tools.Components.Graph {
         public void RemoveAnchorAt(int index) {
             if (index <= 0 || index >= Anchors.Count - 1) return;
             
-            TensionAnchors.Remove(Anchors[index].TensionAnchor);
             Anchors.RemoveAt(index);
 
             UpdateAnchorNeighbors();
@@ -454,21 +418,100 @@ namespace Mapping_Tools.Components.Graph {
             return Anchors.Max(o => o.Pos.Y);
         }
 
+        public void Differentiate(double newMinY, double newMaxY) {
+            // Differentiate graph
+            var newAnchors = new List<Anchor>();
+            Anchor previousAnchor = null;
+            foreach (var anchor in Anchors) {
+                if (previousAnchor != null) {
+                    var p1 = GetValue(previousAnchor.Pos);
+                    var p2 = GetValue(anchor.Pos);
+
+                    var difference = p2 - p1;
+
+                    double startSlope;
+                    double endSlope;
+                    IGraphInterpolator derivativeInterpolator;
+
+                    if (anchor.Interpolator is IDerivableInterpolator derivableInterpolator) {
+                        startSlope = derivableInterpolator.GetDerivative(0) * difference.Y / difference.X;
+                        endSlope = derivableInterpolator.GetDerivative(1) * difference.Y / difference.X;
+                        derivativeInterpolator = derivableInterpolator.GetDerivativeInterpolator();
+
+                    } else {
+                        startSlope = difference.Y / difference.X;
+                        endSlope = startSlope;
+                        derivativeInterpolator = new LinearInterpolator();
+                    }
+
+                    var np1 = new Vector2(previousAnchor.Pos.X, (startSlope - newMinY) / (newMaxY - newMinY));
+                    var np2 = new Vector2(anchor.Pos.X, (endSlope - newMinY) / (newMaxY - newMinY));
+
+                    if (!(newAnchors.Count > 0 && newAnchors[newAnchors.Count - 1].Pos.Equals(np1))) {
+                        newAnchors.Add(new Anchor(this, np1, new LinearInterpolator()));
+                    }
+                    newAnchors.Add(new Anchor(this, np2, derivativeInterpolator));
+                }
+
+                previousAnchor = anchor;
+            }
+
+            Anchors = new ObservableCollection<Anchor>(newAnchors);
+            MinY = newMinY;
+            MaxY = newMaxY;
+        }
+
+        public void Integrate(double newMinY, double newMaxY) {
+            var newAnchors = new List<Anchor> {new Anchor(this, new Vector2(0, -newMinY / (newMaxY - newMinY)))};
+            double height = 0;
+            Anchor previousAnchor = null;
+            foreach (var anchor in Anchors) {
+                if (previousAnchor != null) {
+                    var p1 = GetValue(previousAnchor.Pos);
+                    var p2 = GetValue(anchor.Pos);
+
+                    var difference = p2 - p1;
+
+                    if (difference.X < Precision.DOUBLE_EPSILON) {
+                        previousAnchor = anchor;
+                        continue;
+                    }
+
+                    double integral;
+                    IGraphInterpolator primitiveInterpolator;
+
+                    if (anchor.Interpolator is IIntegrableInterpolator integrableInterpolator) {
+                        integral = integrableInterpolator.GetIntegral(0, 1);
+                        primitiveInterpolator = integrableInterpolator.GetPrimitiveInterpolator();
+                    } else {
+                        integral = 0.5;
+                        primitiveInterpolator = new LinearInterpolator();
+                    }
+                    
+                    height += integral * difference.X * difference.Y + difference.X * p1.Y;
+                    newAnchors.Add(new Anchor(this, new Vector2(anchor.Pos.X, (height - newMinY) / (newMaxY - newMinY)), primitiveInterpolator));
+                }
+
+                previousAnchor = anchor;
+            }
+
+            Anchors = new ObservableCollection<Anchor>(newAnchors);
+            MinY = newMinY;
+            MaxY = newMaxY;
+        }
+
         #endregion
 
         #region ChangeEventHandlers
 
         private static void OnAnchorsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             var g = (Graph) d;
-            g.TensionAnchors.Clear();
             foreach (var anchor in g.Anchors) {
                 anchor.Graph = g;
                 anchor.Stroke = g.AnchorStroke;
                 anchor.Fill = g.AnchorFill;
-                if (anchor.TensionAnchor == null) continue;
                 anchor.TensionAnchor.Stroke = g.TensionAnchorStroke;
                 anchor.TensionAnchor.Fill = g.TensionAnchorFill;
-                g.TensionAnchors.Add(anchor.TensionAnchor);
             }
             g.UpdateAnchorNeighbors();
             g.UpdateVisual();
@@ -521,16 +564,16 @@ namespace Mapping_Tools.Components.Graph {
 
         private static void OnTensionAnchorStrokeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             var g = (Graph) d;
-            foreach (var anchor in g.TensionAnchors) {
-                anchor.Stroke = g.TensionAnchorStroke;
+            foreach (var anchor in g.Anchors) {
+                anchor.TensionAnchor.Stroke = g.TensionAnchorStroke;
             }
             g.UpdateVisual();
         }
 
         private static void OnTensionAnchorFillChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             var g = (Graph) d;
-            foreach (var anchor in g.TensionAnchors) {
-                anchor.Fill = g.TensionAnchorFill;
+            foreach (var anchor in g.Anchors) {
+                anchor.TensionAnchor.Fill = g.TensionAnchorFill;
             }
             g.UpdateVisual();
         }
@@ -643,10 +686,10 @@ namespace Mapping_Tools.Components.Graph {
             if (!_drawAnchors) return;
 
             // Add tension State.Anchors
-            foreach (var tensionAnchor in TensionAnchors) {
+            foreach (var anchor in Anchors) {
                 // Find x position in the middle
-                var next = tensionAnchor.ParentAnchor;
-                var previous = next.PreviousAnchor;
+                var next = anchor;
+                var previous = anchor.PreviousAnchor;
 
                 if (previous == null || Math.Abs(next.Pos.X - previous.Pos.X) < Precision.DOUBLE_EPSILON) {
                     continue;
@@ -655,9 +698,9 @@ namespace Mapping_Tools.Components.Graph {
 
                 // Get y on the graph and set position
                 var y = GetPosition(x);
-                tensionAnchor.Pos = new Vector2(x, y);
+                anchor.TensionAnchor.Pos = new Vector2(x, y);
 
-                RenderGraphPoint(tensionAnchor);
+                RenderGraphPoint(anchor.TensionAnchor);
             }
 
             // Add State.Anchors

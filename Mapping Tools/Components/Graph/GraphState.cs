@@ -7,17 +7,6 @@ namespace Mapping_Tools.Components.Graph {
     public class GraphState : Freezable {
         #region DependencyProperties
 
-        public static readonly DependencyProperty TensionAnchorsProperty =
-            DependencyProperty.Register(nameof(TensionAnchors),
-                typeof(List<TensionAnchor>), 
-                typeof(GraphState), 
-                new FrameworkPropertyMetadata(null));
-
-        public List<TensionAnchor> TensionAnchors {
-            get => (List<TensionAnchor>) GetValue(TensionAnchorsProperty);
-            set => SetValue(TensionAnchorsProperty, value);
-        }
-
         public static readonly DependencyProperty AnchorsProperty =
             DependencyProperty.Register(nameof(Anchors),
                 typeof(List<Anchor>), 

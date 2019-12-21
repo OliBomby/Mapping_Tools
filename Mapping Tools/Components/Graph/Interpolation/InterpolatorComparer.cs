@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Mapping_Tools.Components.Graph.Interpolation {
     public class InterpolatorComparer : IComparer<string> {
         public static string[] InterpolatorOrder = {"Single curve", "Single curve 2", "Single curve 3", 
-            "Double curve", "Double curve 2", "Double curve 3", "Half sine", "Wave", "Parabola"};
+            "Double curve", "Double curve 2", "Double curve 3", "Half sine", "Wave", "Parabola", "Linear"};
 
         public int Compare(string x, string y) {
             // ReSharper disable once ConvertIfStatementToSwitchStatement
