@@ -22,7 +22,8 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
         }
 
         public double GetDerivative(double t) {
-            return -2 * P * t + P + 1;
+            var p = MathHelper.Clamp(P, -1, 1);
+            return -2 * p * t + p + 1;
         }
 
         public IGraphInterpolator GetPrimitiveInterpolator(double x1, double y1, double x2, double y2) {
@@ -34,7 +35,8 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
         }
 
         private double Primitive(double t) {
-            return 1d / 3 * -P * Math.Pow(t, 3) + 0.5 * (P + 1) * t * t;
+            var p = MathHelper.Clamp(P, -1, 1);
+            return 1d / 3 * -p * Math.Pow(t, 3) + 0.5 * (p + 1) * t * t;
         }
     }
 }
