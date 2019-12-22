@@ -186,6 +186,12 @@
 
                     <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                         <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" Margin="0 0 5 0"
+                                ToolTip="Scale graph to completion." Click="ScaleCompleteButton_OnClick">
+                            <Button.Content>
+                                <materialDesign:PackIcon Kind="RelativeScale" Width="24" Height="24"/>
+                            </Button.Content>
+                        </Button>
+                        <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" Margin="0 0 5 0"
                                 ToolTip="Clear graph." Click="ClearButton_OnClick">
                             <Button.Content>
                                 <materialDesign:PackIcon Kind="Rocket" Width="24" Height="24"/>

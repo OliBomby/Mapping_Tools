@@ -1,7 +1,6 @@
 ﻿using AutoUpdaterDotNET;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
-using Mapping_Tools.Viewmodels;
 using Mapping_Tools.Views;
 using MaterialDesignThemes.Wpf;
 using Newtonsoft.Json;

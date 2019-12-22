@@ -338,7 +338,7 @@ namespace Mapping_Tools.Components.Graph {
 
         public Anchor AddAnchor(Vector2 pos) {
             // Clamp the position withing bounds
-            pos = Vector2.Clamp(pos, Vector2.Zero, Vector2.One);
+            pos = Vector2.Clamp(pos, new Vector2(MinX, MinY), new Vector2(MaxX, MaxY));
 
             // Find the correct index
             var rightAnchor = Anchors.FirstOrDefault(o => o.Pos.X >= pos.X);
@@ -404,6 +404,16 @@ namespace Mapping_Tools.Components.Graph {
 
             foreach (var anchor in Anchors) {
                 anchor.SetTension(0);
+            }
+        }
+
+        /// <summary>
+        /// Multiplies the positions of all anchors by a X-scalar and a Y-scalar.
+        /// </summary>
+        /// <param name="scalar"></param>
+        public void ScaleAnchors(Size scalar) {
+            foreach (var anchor in Anchors) {
+                anchor.Pos = new Vector2(anchor.Pos.X * scalar.Width, anchor.Pos.Y * scalar.Height);
             }
         }
 
@@ -503,7 +513,7 @@ namespace Mapping_Tools.Components.Graph {
         /// Calculates the height of the heighest point in the graph.
         /// </summary>
         /// <returns></returns>
-        public double GetMaxPosition() {
+        public double GetMaxHeight() {
             // It suffices to find the highest Y value of the anchors, because the interpolated parts never stick out above or below the anchors.
             return Anchors.Max(o => o.Pos.Y);
         }
@@ -588,6 +598,83 @@ namespace Mapping_Tools.Components.Graph {
             Anchors = new ObservableCollection<Anchor>(newAnchors);
             MinY = newMinY;
             MaxY = newMaxY;
+        }
+
+        public double GetIntegral(double t1, double t2) {
+            double height = 0;
+            Anchor previousAnchor = null;
+            foreach (var anchor in Anchors) {
+                if (previousAnchor != null) {
+                    var p1 = new Vector2(MathHelper.Clamp(previousAnchor.Pos.X, t1, t2), previousAnchor.Pos.Y);
+                    var p2 = new Vector2(MathHelper.Clamp(anchor.Pos.X, t1, t2), anchor.Pos.Y);
+
+                    if (p2.X < t1 || p1.X > t2) {
+                        previousAnchor = anchor;
+                        continue;
+                    }
+
+                    var difference = p2 - p1;
+
+                    if (difference.X < Precision.DOUBLE_EPSILON) {
+                        previousAnchor = anchor;
+                        continue;
+                    }
+
+                    double integral;
+                    if (anchor.Interpolator is IIntegrableInterpolator integrableInterpolator) {
+                        integral = integrableInterpolator.GetIntegral(0, 1);
+                    } else {
+                        integral = 0.5;
+                    }
+                    
+                    height += integral * difference.X * difference.Y + difference.X * p1.Y;
+                }
+
+                previousAnchor = anchor;
+            }
+
+            return height;
+        }
+
+        public double GetMaxIntegral(double t1, double t2) {
+            double height = 0;
+            double maxHeight = height;
+            Anchor previousAnchor = null;
+            foreach (var anchor in Anchors) {
+                if (previousAnchor != null) {
+                    var p1 = new Vector2(MathHelper.Clamp(previousAnchor.Pos.X, t1, t2), previousAnchor.Pos.Y);
+                    var p2 = new Vector2(MathHelper.Clamp(anchor.Pos.X, t1, t2), anchor.Pos.Y);
+
+                    if (p2.X < t1 || p1.X > t2) {
+                        previousAnchor = anchor;
+                        continue;
+                    }
+
+                    var difference = p2 - p1;
+
+                    if (difference.X < Precision.DOUBLE_EPSILON) {
+                        previousAnchor = anchor;
+                        continue;
+                    }
+
+                    double integral;
+                    if (anchor.Interpolator is IIntegrableInterpolator integrableInterpolator) {
+                        integral = integrableInterpolator.GetIntegral(0, 1);
+                    } else {
+                        integral = 0.5;
+                    }
+                    
+                    height += integral * difference.X * difference.Y + difference.X * p1.Y;
+
+                    if (height > maxHeight) {
+                        maxHeight = height;
+                    }
+                }
+
+                previousAnchor = anchor;
+            }
+
+            return maxHeight;
         }
 
         #endregion
@@ -824,6 +911,7 @@ namespace Mapping_Tools.Components.Graph {
             foreach (var anchor in Anchors) {
                 RenderGraphPoint(anchor);
             }
+            Console.WriteLine("test2");
         }
 
         private void RenderGraphPoint(GraphPointControl point) {
@@ -837,9 +925,11 @@ namespace Mapping_Tools.Components.Graph {
             var index = Anchors.IndexOf(anchor);
             var previous = Anchors.ElementAtOrDefault(index - 1);
             var next = Anchors.ElementAtOrDefault(index + 1);
-            if (LimitedEndPointMovement && (previous == null || next == null)) {
-                // Is edge anchor so dont move it
-                pos.X = anchor.Pos.X;
+            if (previous == null || next == null) {
+                if (LimitedEndPointMovement) {
+                    // Is edge anchor so dont move it
+                    pos.X = anchor.Pos.X;
+                }
             } else {
                 // Snap to nearest vertical marker unless left alt is held
                 if (!Keyboard.IsKeyDown(Key.LeftAlt)) {
@@ -898,7 +988,7 @@ namespace Mapping_Tools.Components.Graph {
                         prevHorizontal = graphMarker.Y;
                     }
                 } else {
-                    graphMarker.X = GetRelativePointX(graphMarker.Value);;
+                    graphMarker.X = GetRelativePointX(graphMarker.Value);
                     graphMarker.Y = 0;
                     graphMarker.Visible = Math.Abs(prevVertical - graphMarker.X) >= MinMarkerSpacing;
                     if (graphMarker.Visible) {

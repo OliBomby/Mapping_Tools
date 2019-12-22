@@ -4,15 +4,12 @@ using Mapping_Tools.Components.Graph;
 using Mapping_Tools.Components.Graph.Markers;
 using Mapping_Tools.Components.ObjectVisualiser;
 using Mapping_Tools.Viewmodels;
+using MaterialDesignThemes.Wpf;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using Mapping_Tools.Components.Graph.Interpolation;
-using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
 
 namespace Mapping_Tools.Views {
     //[HiddenTool]
@@ -75,12 +72,13 @@ namespace Mapping_Tools.Views {
 
         private void AnimateProgress(HitObjectElement element) {
             if (ViewModel.VisibleHitObject == null) return;
+            Console.WriteLine("test");
 
             var graphDuration = ViewModel.GraphDuration;
             var extraDuration = graphDuration.Add(TimeSpan.FromSeconds(1));
 
             var animation = new GraphDoubleAnimation {
-                GraphState = Graph.GetGraphState(), From = 0, To = 1,
+                GraphState = Graph.GetGraphState(), From = Graph.MinX, To = Graph.MaxX,
                 Duration = graphDuration,
                 BeginTime = TimeSpan.Zero
             };
@@ -99,6 +97,24 @@ namespace Mapping_Tools.Views {
             storyboard.Children.Add(timeline);
 
             element.BeginStoryboard(storyboard);
+        }
+
+        private async void ScaleCompleteButton_OnClick(object sender, RoutedEventArgs e) {
+            var dialog = new TypeValueDialog(1);
+
+            var result = await DialogHost.Show(dialog, "RootDialog");
+
+            if (!(bool) result) return;
+            if (!TypeConverters.TryParseDouble(dialog.ValueBox.Text, out double value)) return;
+
+            var maxValue = value;
+            if (_graphMode == GraphMode.Velocity) {
+                // Integrate the graph to get the end value
+                maxValue = Graph.GetMaxIntegral(Graph.MinX, Graph.MaxX);
+            } else if (_graphMode == GraphMode.Position) {
+                maxValue = Graph.GetMaxHeight();
+            }
+            Graph.ScaleAnchors(new Size(1, value / maxValue));
         }
 
         private void ClearButton_OnClick(object sender, RoutedEventArgs e) {
