@@ -164,8 +164,25 @@
 
                     <TextBox Grid.Column="0" Margin="0 0 8 0" HorizontalAlignment="Left"
                              materialDesign:HintAssist.Hint="SV limit" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                             MaxWidth="140" MinWidth="100" Text="{Binding VelocityLimit, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=10}"
-                             ToolTip="Self-imposed SV limit to help you make sure the slope in the graph doesn't become greater than this speed limit. For example use 10x SV limit to match the osu! speed limit."/>
+                             MaxWidth="140" MinWidth="100"
+                             ToolTip="Self-imposed SV limit to help you make sure the slope in the graph doesn't become greater than this speed limit. For example use 10x SV limit to match the osu! speed limit.">
+                        <TextBox.Text>
+                            <Binding Path="VelocityLimit" Mode="TwoWay" Converter="{StaticResource DoubleToStringConverter}" ConverterParameter="10" UpdateSourceTrigger="LostFocus"  NotifyOnValidationError="True">
+                                <Binding.ValidationRules>
+                                    <domain:IsLessOrEqualValidationRule>
+                                        <domain:IsLessOrEqualValidationRule.ValueWrapper>
+                                            <domain:DoubleWrapper Value="10000"/>
+                                        </domain:IsLessOrEqualValidationRule.ValueWrapper>
+                                    </domain:IsLessOrEqualValidationRule>
+                                    <domain:IsGreaterOrEqualValidationRule>
+                                        <domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                            <domain:DoubleWrapper Value="0"/>
+                                        </domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                    </domain:IsGreaterOrEqualValidationRule>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
 
                     <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                         <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" Margin="0 0 5 0"

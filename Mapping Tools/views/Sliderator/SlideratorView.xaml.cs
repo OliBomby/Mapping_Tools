@@ -57,12 +57,18 @@ namespace Mapping_Tools.Views {
 
         private void ViewModelOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
             switch (e.PropertyName) {
-                case "VisibleHitObject":
-                case "GraphDuration":
+                case nameof(ViewModel.VisibleHitObject):
+                case nameof(ViewModel.GraphDuration):
                     AnimateProgress(GraphHitObjectElement);
                     break;
-                case "BeatSnapDivisor":
+                case nameof(ViewModel.BeatSnapDivisor):
                     Graph.HorizontalMarkerGenerator = new DividedBeatMarkerGenerator(ViewModel.BeatSnapDivisor);
+                    break;
+                case nameof(ViewModel.VelocityLimit):
+                    if (_graphMode == GraphMode.Velocity) {
+                        Graph.MinY = -ViewModel.VelocityLimit;
+                        Graph.MaxY = ViewModel.VelocityLimit;
+                    }
                     break;
             }
         }
