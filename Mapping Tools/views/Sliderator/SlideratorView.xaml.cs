@@ -76,11 +76,20 @@ namespace Mapping_Tools.Views {
             var graphDuration = ViewModel.GraphDuration;
             var extraDuration = graphDuration.Add(TimeSpan.FromSeconds(1));
 
-            var animation = new GraphDoubleAnimation {
-                GraphState = Graph.GetGraphState(), From = Graph.MinX, To = Graph.MaxX,
-                Duration = graphDuration,
-                BeginTime = TimeSpan.Zero
-            };
+            DoubleAnimationBase animation;
+            if (_graphMode == GraphMode.Velocity) {
+                animation = new GraphIntegralDoubleAnimation {
+                    GraphState = Graph.GetGraphState(), From = Graph.MinX, To = Graph.MaxX,
+                    Duration = graphDuration,
+                    BeginTime = TimeSpan.Zero
+                };
+            } else {
+                animation = new GraphDoubleAnimation {
+                    GraphState = Graph.GetGraphState(), From = Graph.MinX, To = Graph.MaxX,
+                    Duration = graphDuration,
+                    BeginTime = TimeSpan.Zero
+                };
+            }
             var animation2 = new DoubleAnimation(0, 0, TimeSpan.FromSeconds(1)) {BeginTime = graphDuration};
 
             Storyboard.SetTarget(animation, element);
@@ -165,6 +174,8 @@ namespace Mapping_Tools.Views {
             }
 
             _graphMode = graphMode;
+
+            AnimateProgress(GraphHitObjectElement);
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {

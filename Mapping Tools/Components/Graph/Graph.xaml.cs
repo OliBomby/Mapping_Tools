@@ -415,6 +415,8 @@ namespace Mapping_Tools.Components.Graph {
             foreach (var anchor in Anchors) {
                 anchor.Pos = new Vector2(anchor.Pos.X * scalar.Width, anchor.Pos.Y * scalar.Height);
             }
+
+            UpdateVisual();
         }
 
         private void UpdateAnchorNeighbors() {
@@ -866,7 +868,7 @@ namespace Mapping_Tools.Components.Graph {
                 points.Add(GetRelativePoint(previous.Pos));
 
                 for (int k = 1; k < GetRelativePointX(next.Pos.X) - GetRelativePointX(previous.Pos.X); k++) {
-                    var x = previous.Pos.X + k / ActualWidth;
+                    var x = previous.Pos.X + k / ActualWidth * (MaxX - MinX);
 
                     points.Add(GetRelativePoint(new Vector2(x, GetInterpolation(x))));
                 }
