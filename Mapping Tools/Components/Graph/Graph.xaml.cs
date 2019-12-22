@@ -182,6 +182,40 @@ namespace Mapping_Tools.Components.Graph {
             set => SetValue(MinMarkerSpacingProperty, value);
         }
 
+        public static readonly DependencyProperty LimitedEndPointMovementProperty =
+            DependencyProperty.Register(nameof(LimitedEndPointMovement),
+                typeof(bool), 
+                typeof(Graph), 
+                new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.None,
+                    OnMarkersChanged));
+
+        public bool LimitedEndPointMovement {
+            get => (bool) GetValue(LimitedEndPointMovementProperty);
+            set => SetValue(LimitedEndPointMovementProperty, value);
+        }
+
+        public static readonly DependencyProperty ScaleOnBoundChangeHorizontalProperty =
+            DependencyProperty.Register(nameof(ScaleOnBoundChangeHorizontal),
+                typeof(bool), 
+                typeof(Graph), 
+                new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.None));
+
+        public bool ScaleOnBoundChangeHorizontal {
+            get => (bool) GetValue(ScaleOnBoundChangeHorizontalProperty);
+            set => SetValue(ScaleOnBoundChangeHorizontalProperty, value);
+        }
+
+        public static readonly DependencyProperty ScaleOnBoundChangeVerticalProperty =
+            DependencyProperty.Register(nameof(ScaleOnBoundChangeVertical),
+                typeof(bool), 
+                typeof(Graph), 
+                new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.None));
+
+        public bool ScaleOnBoundChangeVertical {
+            get => (bool) GetValue(ScaleOnBoundChangeVerticalProperty);
+            set => SetValue(ScaleOnBoundChangeVerticalProperty, value);
+        }
+
         public static readonly DependencyProperty StrokeProperty =
             DependencyProperty.Register(nameof(Stroke),
                 typeof(Brush), 
@@ -576,6 +610,28 @@ namespace Mapping_Tools.Components.Graph {
 
         private static void OnBoundsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             var g = (Graph) d;
+            var oldMinX = g.MinX;
+            var oldMaxX = g.MaxX;
+            var oldMinY = g.MinY;
+            var oldMaxY = g.MaxY;
+            switch (e.Property.Name) {
+                case nameof(MinX):
+                    oldMinX = (double) e.OldValue;
+                    break;
+                case nameof(MaxX):
+                    oldMaxX = (double) e.OldValue;
+                    break;
+                case nameof(MinY):
+                    oldMinY = (double) e.OldValue;
+                    break;
+                case nameof(MaxY):
+                    oldMaxY = (double) e.OldValue;
+                    break;
+            }
+            foreach (var anchor in g.Anchors) {
+                anchor.Pos = new Vector2(g.ScaleOnBoundChangeHorizontal ? g.MinX + (g.MaxX - g.MinX) * (anchor.Pos.X - oldMinX) / (oldMaxX - oldMinX) : anchor.Pos.X,
+                                         g.ScaleOnBoundChangeVertical ? g.MinY + (g.MaxY - g.MinY) * (anchor.Pos.Y - oldMinY) / (oldMaxY - oldMinY) : anchor.Pos.Y);
+            }
             g.RegenerateMarkers();
             g.GraphStateChanged?.Invoke(d, e);
         }
@@ -691,14 +747,14 @@ namespace Mapping_Tools.Components.Graph {
             if (HorizontalAxisVisible) {
                 var y = GetRelativePointY(HorizontalAxis);
                 var  horizontalLine = new Line {
-                    Stroke = EdgesBrush, StrokeThickness = 2, X1 = 0, X2 = ActualWidth, Y1 = y, Y2 = y
+                    Stroke = EdgesBrush, StrokeThickness = 3, X1 = 0, X2 = ActualWidth, Y1 = y, Y2 = y
                 };
                 MainCanvas.Children.Add(horizontalLine);
             }
             if (VerticalAxisVisible) {
                 var x = GetRelativePointX(VerticalAxis);
                 var  verticalLine = new Line {
-                    Stroke = EdgesBrush, StrokeThickness = 2, X1 = x, X2 = x, Y1 = 0, Y2 = ActualHeight
+                    Stroke = EdgesBrush, StrokeThickness = 3, X1 = x, X2 = x, Y1 = 0, Y2 = ActualHeight
                 };
                 MainCanvas.Children.Add(verticalLine);
             }
@@ -781,7 +837,7 @@ namespace Mapping_Tools.Components.Graph {
             var index = Anchors.IndexOf(anchor);
             var previous = Anchors.ElementAtOrDefault(index - 1);
             var next = Anchors.ElementAtOrDefault(index + 1);
-            if (previous == null || next == null) {
+            if (LimitedEndPointMovement && (previous == null || next == null)) {
                 // Is edge anchor so dont move it
                 pos.X = anchor.Pos.X;
             } else {
