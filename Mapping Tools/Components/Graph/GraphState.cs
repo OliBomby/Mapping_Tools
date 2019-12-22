@@ -68,12 +68,7 @@ namespace Mapping_Tools.Components.Graph {
             return new GraphState();
         }
 
-        /// <summary>
-        /// Calculates the height of the curve [0-1] for a given progression allong the graph [0-1].
-        /// </summary>
-        /// <param name="x">The progression along the curve (0-1)</param>
-        /// <returns>The height of the curve (0-1)</returns>
-        public double GetPosition(double x) {
+        public double GetInterpolation(double x) {
             // Find the section
             var previousAnchor = Anchors[0];
             var nextAnchor = Anchors[1];
@@ -97,15 +92,6 @@ namespace Mapping_Tools.Components.Graph {
             interpolator.P = nextAnchor.Tension;
 
             return previousAnchor.Pos.Y + diff.Y * interpolator.GetInterpolation(sectionProgress);
-        }
-
-        /// <summary>
-        /// Calculates the height of the curve from <see cref="MinY"/> to <see cref="MaxY"/> for a given progression allong the graph [0-1].
-        /// </summary>
-        /// <param name="x"></param>
-        /// <returns></returns>
-        public double GetValue(double x) {
-            return MinY + (MaxY - MinY) * GetPosition(x);
         }
     }
 }

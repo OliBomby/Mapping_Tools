@@ -72,7 +72,6 @@ namespace Mapping_Tools.Views {
 
         private void AnimateProgress(HitObjectElement element) {
             if (ViewModel.VisibleHitObject == null) return;
-            Console.WriteLine("test");
 
             var graphDuration = ViewModel.GraphDuration;
             var extraDuration = graphDuration.Add(TimeSpan.FromSeconds(1));

@@ -18,7 +18,7 @@
     </local:GraphPointControl.Resources>
 
     <Grid>
-        <Rectangle Fill="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="-5"></Rectangle>
+        <Rectangle Fill="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="-2"></Rectangle>
         <Ellipse x:Name="MainShape" Stroke="#AAAAAA" Fill="#55AAAAAA" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" StrokeThickness="1.5"/>
     </Grid>
 </local:GraphPointControl>

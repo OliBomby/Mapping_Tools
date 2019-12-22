@@ -44,9 +44,9 @@ namespace Mapping_Tools.Components.Graph {
         public abstract Brush Fill { get; set; }
 
         protected GraphPointControl(Graph parent, Vector2 pos) {
-            Graph = parent;
             Pos = pos;
             SizeMultiplier = 1;
+            Graph = parent; // Set graph after size multiplier to prevent an UpdateVisual call
         }
 
         private void SetSize(double size) {

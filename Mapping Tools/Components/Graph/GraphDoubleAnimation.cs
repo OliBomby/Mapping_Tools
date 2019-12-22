@@ -50,7 +50,7 @@ namespace Mapping_Tools.Components.Graph {
             var start = From ?? defaultOriginValue;
             var delta = To - start ?? defaultOriginValue - start;
 
-            return clock.CurrentProgress == null ? start : GraphState.GetValue(start + clock.CurrentProgress.Value * delta);
+            return clock.CurrentProgress == null ? start : GraphState.GetInterpolation(start + clock.CurrentProgress.Value * delta);
         }
 
         protected override Freezable CreateInstanceCore() {

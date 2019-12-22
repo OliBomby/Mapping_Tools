@@ -12,7 +12,7 @@ namespace Mapping_Tools.Components.Graph {
     /// Interaction logic for TensionAnchor.xaml
     /// </summary>
     public partial class TensionAnchor {
-        protected override double DefaultSize { get; } = 10;
+        protected override double DefaultSize { get; } = 7;
         
         [NotNull]
         public Anchor ParentAnchor { get; set; }

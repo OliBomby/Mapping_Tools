@@ -547,7 +547,7 @@ namespace Mapping_Tools.Components.Graph {
                     var np1 = new Vector2(previousAnchor.Pos.X, startSlope);
                     var np2 = new Vector2(anchor.Pos.X, endSlope);
 
-                    if (!(newAnchors.Count > 0 && newAnchors[newAnchors.Count - 1].Pos.Equals(np1))) {
+                    if (!(newAnchors.Count > 0 && Vector2.DistanceSquared(newAnchors[newAnchors.Count - 1].Pos, np1) < Precision.DOUBLE_EPSILON)) {
                         newAnchors.Add(new Anchor(this, np1, new LinearInterpolator()));
                     }
                     newAnchors.Add(new Anchor(this, np2, derivativeInterpolator));
@@ -594,7 +594,7 @@ namespace Mapping_Tools.Components.Graph {
 
                 previousAnchor = anchor;
             }
-
+            
             Anchors = new ObservableCollection<Anchor>(newAnchors);
             MinY = newMinY;
             MaxY = newMaxY;
@@ -865,7 +865,7 @@ namespace Mapping_Tools.Components.Graph {
 
                 points.Add(GetRelativePoint(previous.Pos));
 
-                for (int k = 1; k < ActualWidth * (next.Pos.X - previous.Pos.X); k++) {
+                for (int k = 1; k < GetRelativePointX(next.Pos.X) - GetRelativePointX(previous.Pos.X); k++) {
                     var x = previous.Pos.X + k / ActualWidth;
 
                     points.Add(GetRelativePoint(new Vector2(x, GetInterpolation(x))));
@@ -911,7 +911,6 @@ namespace Mapping_Tools.Components.Graph {
             foreach (var anchor in Anchors) {
                 RenderGraphPoint(anchor);
             }
-            Console.WriteLine("test2");
         }
 
         private void RenderGraphPoint(GraphPointControl point) {
