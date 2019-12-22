@@ -111,7 +111,7 @@ namespace Mapping_Tools.Components.Graph {
                 drag.X = 0;
             }
 
-            var movement = new Vector2(drag.X / Graph.ActualWidth, -drag.Y / Graph.ActualHeight);
+            var movement = Graph.GetValueRelative(new Point(drag.X, drag.Y));
             Graph.MoveAnchorTo(this, Pos + movement);
         }
 
@@ -202,13 +202,13 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private async void TypeInMenuItem_OnClick(object sender, RoutedEventArgs e) {
-            var dialog = new TypeValueDialog(Graph.GetValue(Pos).Y);
+            var dialog = new TypeValueDialog(Pos.Y);
             var result = await Graph.GraphDialogHost.ShowDialog(dialog);
 
             if (!(bool) result) return;
         
             if (TypeConverters.TryParseDouble(dialog.ValueBox.Text, out double value)) {
-                Pos = new Vector2(Pos.X, Graph.GetPosition(new Vector2(0, value)).Y);
+                Pos = new Vector2(Pos.X, value);
             }
             Graph.UpdateVisual();
         }

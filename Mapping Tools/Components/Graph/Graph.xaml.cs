@@ -98,6 +98,54 @@ namespace Mapping_Tools.Components.Graph {
             set => SetValue(MaxYProperty, value);
         }
 
+        public static readonly DependencyProperty HorizontalAxisProperty =
+            DependencyProperty.Register(nameof(HorizontalAxis),
+                typeof(double), 
+                typeof(Graph), 
+                new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.None,
+                    OnAxisChanged));
+
+        public double HorizontalAxis {
+            get => (double) GetValue(HorizontalAxisProperty);
+            set => SetValue(HorizontalAxisProperty, value);
+        }
+
+        public static readonly DependencyProperty VerticalAxisProperty =
+            DependencyProperty.Register(nameof(VerticalAxis),
+                typeof(double), 
+                typeof(Graph), 
+                new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.None,
+                    OnAxisChanged));
+
+        public double VerticalAxis {
+            get => (double) GetValue(VerticalAxisProperty);
+            set => SetValue(VerticalAxisProperty, value);
+        }
+
+        public static readonly DependencyProperty VerticalAxisVisibleProperty =
+            DependencyProperty.Register(nameof(VerticalAxisVisible),
+                typeof(bool), 
+                typeof(Graph), 
+                new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.None,
+                    OnAxisChanged));
+
+        public bool VerticalAxisVisible {
+            get => (bool) GetValue(VerticalAxisVisibleProperty);
+            set => SetValue(VerticalAxisVisibleProperty, value);
+        }
+
+        public static readonly DependencyProperty HorizontalAxisVisibleProperty =
+            DependencyProperty.Register(nameof(HorizontalAxisVisible),
+                typeof(bool), 
+                typeof(Graph), 
+                new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.None,
+                    OnAxisChanged));
+
+        public bool HorizontalAxisVisible {
+            get => (bool) GetValue(HorizontalAxisVisibleProperty);
+            set => SetValue(HorizontalAxisVisibleProperty, value);
+        }
+
         public static readonly DependencyProperty HorizontalMarkerGeneratorProperty =
             DependencyProperty.Register(nameof(HorizontalMarkerGenerator),
                 typeof(IMarkerGenerator), 
@@ -346,7 +394,7 @@ namespace Mapping_Tools.Components.Graph {
         /// </summary>
         /// <param name="x">The progression along the curve (0-1)</param>
         /// <returns>The height of the curve (0-1)</returns>
-        public double GetPosition(double x) {
+        public double GetInterpolation(double x) {
             // Find the section
             var previousAnchor = Anchors[0];
             var nextAnchor = Anchors[1];
@@ -372,31 +420,39 @@ namespace Mapping_Tools.Components.Graph {
             return previousAnchor.Pos.Y + diff.Y * interpolator.GetInterpolation(sectionProgress);
         }
 
-        /// <summary>
-        /// Converts a value from the coordinate system to the absolute coordinate system [0-1]x[0-1].
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public Vector2 GetPosition(Vector2 value) {
-            return new Vector2((value.X - MinX) / (MaxX - MinX), (value.Y - MinY) / (MaxY - MinY));
+        public Point GetRelativePoint(Vector2 value) {
+            var t = new Vector2((value.X - MinX) / (MaxX - MinX), (value.Y - MinY) / (MaxY - MinY));
+            return new Point(t.X * ActualWidth, ActualHeight - t.Y * ActualHeight);
         }
 
-        /// <summary>
-        /// Calculates the height of the curve from <see cref="MinY"/> to <see cref="MaxY"/> for a given progression along the graph [0-1].
-        /// </summary>
-        /// <param name="x"></param>
-        /// <returns></returns>
-        public double GetValue(double x) {
-            return MinY + (MaxY - MinY) * GetPosition(x);
+        public double GetRelativePointX(double valueX) {
+            return (valueX - MinX) / (MaxX - MinX) * ActualWidth;
         }
 
-        /// <summary>
-        /// Converts a value from the absolute coordinate system to a value.
-        /// </summary>
-        /// <param name="position"></param>
-        /// <returns></returns>
-        public Vector2 GetValue(Vector2 position) {
-            return new Vector2(MinX + (MaxX - MinX) * position.X, MinY + (MaxY - MinY) * position.Y);
+        public double GetRelativePointY(double valueY) {
+            return  ActualHeight - (valueY - MinY) / (MaxY - MinY) * ActualHeight;
+        }
+
+        public Vector2 GetValue(Point pos) {
+            var t = new Vector2(pos.X / ActualWidth, (ActualHeight - pos.Y) / ActualHeight);
+            return new Vector2(MinX + (MaxX - MinX) * t.X, MinY + (MaxY - MinY) * t.Y);
+        }
+
+        public Vector2 GetValueRelative(Point pos) {
+            var t = new Vector2(pos.X / ActualWidth, - pos.Y / ActualHeight);
+            return new Vector2((MaxX - MinX) * t.X,  (MaxY - MinY) * t.Y);
+        }
+
+        public double GetValueX(double pointX) {
+            return MinX + (MaxX - MinX) * (pointX / ActualWidth);
+        }
+
+        public double GetValueY(double pointY) {
+            return MinY + (MaxY - MinY) * ((ActualHeight - pointY) / ActualHeight);
+        }
+
+        public Vector2 GetValue(GraphMarker marker) {
+            return GetValue(new Point(marker.X, marker.Y));
         }
 
         /// <summary>
@@ -424,8 +480,8 @@ namespace Mapping_Tools.Components.Graph {
             Anchor previousAnchor = null;
             foreach (var anchor in Anchors) {
                 if (previousAnchor != null) {
-                    var p1 = GetValue(previousAnchor.Pos);
-                    var p2 = GetValue(anchor.Pos);
+                    var p1 = previousAnchor.Pos;
+                    var p2 = anchor.Pos;
 
                     var difference = p2 - p1;
 
@@ -444,8 +500,8 @@ namespace Mapping_Tools.Components.Graph {
                         derivativeInterpolator = new LinearInterpolator();
                     }
 
-                    var np1 = new Vector2(previousAnchor.Pos.X, (startSlope - newMinY) / (newMaxY - newMinY));
-                    var np2 = new Vector2(anchor.Pos.X, (endSlope - newMinY) / (newMaxY - newMinY));
+                    var np1 = new Vector2(previousAnchor.Pos.X, startSlope);
+                    var np2 = new Vector2(anchor.Pos.X, endSlope);
 
                     if (!(newAnchors.Count > 0 && newAnchors[newAnchors.Count - 1].Pos.Equals(np1))) {
                         newAnchors.Add(new Anchor(this, np1, new LinearInterpolator()));
@@ -467,8 +523,8 @@ namespace Mapping_Tools.Components.Graph {
             Anchor previousAnchor = null;
             foreach (var anchor in Anchors) {
                 if (previousAnchor != null) {
-                    var p1 = GetValue(previousAnchor.Pos);
-                    var p2 = GetValue(anchor.Pos);
+                    var p1 = previousAnchor.Pos;
+                    var p2 = anchor.Pos;
 
                     var difference = p2 - p1;
 
@@ -489,7 +545,7 @@ namespace Mapping_Tools.Components.Graph {
                     }
                     
                     height += integral * difference.X * difference.Y + difference.X * p1.Y;
-                    newAnchors.Add(new Anchor(this, new Vector2(anchor.Pos.X, (height - newMinY) / (newMaxY - newMinY)), primitiveInterpolator));
+                    newAnchors.Add(new Anchor(this, new Vector2(anchor.Pos.X, height), primitiveInterpolator));
                 }
 
                 previousAnchor = anchor;
@@ -522,6 +578,11 @@ namespace Mapping_Tools.Components.Graph {
             var g = (Graph) d;
             g.RegenerateMarkers();
             g.GraphStateChanged?.Invoke(d, e);
+        }
+
+        private static void OnAxisChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            var g = (Graph) d;
+            g.UpdateVisual();
         }
 
         private static void OnMarkerGeneratorsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
@@ -608,24 +669,8 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private void ThisMouseRightButtonDown(object sender, MouseButtonEventArgs e) {
-            var newAnchor = AddAnchor(GetPosition(e.GetPosition(this)));
+            var newAnchor = AddAnchor(GetValue(e.GetPosition(this)));
             newAnchor.EnableDragging();
-        }
-
-        private Point GetRelativePoint(Vector2 pos) {
-            return new Point(pos.X * ActualWidth, ActualHeight - pos.Y * ActualHeight);
-        }
-
-        private Point GetRelativePoint(double x) {
-            return GetRelativePoint(new Vector2(x, GetPosition(x)));
-        }
-
-        private Vector2 GetPosition(Point pos) {
-            return new Vector2(pos.X / ActualWidth, (ActualHeight - pos.Y) / ActualHeight);
-        }
-
-        private Vector2 GetPosition(GraphMarker marker) {
-            return GetPosition(new Point(marker.X, marker.Y));
         }
 
         public void UpdateVisual() {
@@ -640,6 +685,22 @@ namespace Mapping_Tools.Components.Graph {
                                                             marker.Y > -Precision.DOUBLE_EPSILON && 
                                                             marker.Y < ActualHeight + Precision.DOUBLE_EPSILON)) {
                 MainCanvas.Children.Add(marker);
+            }
+
+            // Add axis
+            if (HorizontalAxisVisible) {
+                var y = GetRelativePointY(HorizontalAxis);
+                var  horizontalLine = new Line {
+                    Stroke = EdgesBrush, StrokeThickness = 2, X1 = 0, X2 = ActualWidth, Y1 = y, Y2 = y
+                };
+                MainCanvas.Children.Add(horizontalLine);
+            }
+            if (VerticalAxisVisible) {
+                var x = GetRelativePointX(VerticalAxis);
+                var  verticalLine = new Line {
+                    Stroke = EdgesBrush, StrokeThickness = 2, X1 = x, X2 = x, Y1 = 0, Y2 = ActualHeight
+                };
+                MainCanvas.Children.Add(verticalLine);
             }
 
             // Add border
@@ -664,7 +725,7 @@ namespace Mapping_Tools.Components.Graph {
                 for (int k = 1; k < ActualWidth * (next.Pos.X - previous.Pos.X); k++) {
                     var x = previous.Pos.X + k / ActualWidth;
 
-                    points.Add(GetRelativePoint(x));
+                    points.Add(GetRelativePoint(new Vector2(x, GetInterpolation(x))));
                 }
             }
             points.Add(GetRelativePoint(Anchors[Anchors.Count - 1].Pos));
@@ -676,16 +737,16 @@ namespace Mapping_Tools.Components.Graph {
 
             // Draw area under line
             var points2 = new PointCollection(points) {
-                GetRelativePoint(new Vector2(1, 0)), GetRelativePoint(new Vector2(0, 0))
+                GetRelativePoint(new Vector2(Anchors[Anchors.Count - 1].Pos.X, VerticalAxis)), GetRelativePoint(new Vector2(Anchors[0].Pos.X, VerticalAxis))
             };
 
             var polygon = new Polygon {Points = points2, Fill = Fill, IsHitTestVisible = false};
             MainCanvas.Children.Add(polygon);
 
-            // Return if we dont draw State.Anchors
+            // Return if we dont draw Anchors
             if (!_drawAnchors) return;
 
-            // Add tension State.Anchors
+            // Add tension Anchors
             foreach (var anchor in Anchors) {
                 // Find x position in the middle
                 var next = anchor;
@@ -697,13 +758,13 @@ namespace Mapping_Tools.Components.Graph {
                 var x = (next.Pos.X + previous.Pos.X) / 2;
 
                 // Get y on the graph and set position
-                var y = GetPosition(x);
+                var y = GetInterpolation(x);
                 anchor.TensionAnchor.Pos = new Vector2(x, y);
 
                 RenderGraphPoint(anchor.TensionAnchor);
             }
 
-            // Add State.Anchors
+            // Add Anchors
             foreach (var anchor in Anchors) {
                 RenderGraphPoint(anchor);
             }
@@ -730,7 +791,7 @@ namespace Mapping_Tools.Components.Graph {
                     GraphMarker nearestMarker = null;
                     double nearestDistance = double.PositiveInfinity;
                     foreach (var marker in _markers.Where(o => o.Orientation == Orientation.Vertical)) {
-                        var markerPos = GetPosition(marker);
+                        var markerPos = GetValue(marker);
                         var dist = Math.Abs(pos.X - markerPos.X);
                         if (!(dist < nearestDistance)) continue;
                         nearestDistance = dist;
@@ -738,12 +799,12 @@ namespace Mapping_Tools.Components.Graph {
                     }
                     // Set X to that marker's value
                     if (nearestMarker != null)
-                        pos.X = GetPosition(nearestMarker).X;
+                        pos.X = GetValueX(nearestMarker.X);
                 }
                 pos.X = MathHelper.Clamp(pos.X, previous.Pos.X, next.Pos.X);
             }
 
-            pos.Y = MathHelper.Clamp(pos.Y, 0, 1);
+            pos.Y = MathHelper.Clamp(pos.Y, MinY, MaxY);
 
             anchor.Pos = pos;
 
@@ -775,13 +836,13 @@ namespace Mapping_Tools.Components.Graph {
                 graphMarker.Height = ActualHeight;
                 if (graphMarker.Orientation == Orientation.Horizontal) {
                     graphMarker.X = 0;
-                    graphMarker.Y = ActualHeight - ActualHeight * ((graphMarker.Value - MinY) / (MaxY - MinY));
+                    graphMarker.Y = GetRelativePointY(graphMarker.Value);
                     graphMarker.Visible = Math.Abs(prevHorizontal - graphMarker.Y) >= MinMarkerSpacing;
                     if (graphMarker.Visible) {
                         prevHorizontal = graphMarker.Y;
                     }
                 } else {
-                    graphMarker.X = ActualWidth * ((graphMarker.Value - MinX) / (MaxX - MinX));
+                    graphMarker.X = GetRelativePointX(graphMarker.Value);;
                     graphMarker.Y = 0;
                     graphMarker.Visible = Math.Abs(prevVertical - graphMarker.X) >= MinMarkerSpacing;
                     if (graphMarker.Visible) {

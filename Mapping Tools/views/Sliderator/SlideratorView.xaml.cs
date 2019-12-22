@@ -120,9 +120,13 @@ namespace Mapping_Tools.Views {
             switch (graphMode) {
                 case GraphMode.Position:
                     GraphToggleContentTextBlock.Text = "X";
+                    Graph.HorizontalAxisVisible = false;
+                    Graph.VerticalAxisVisible = false;
                     break;
                 case GraphMode.Velocity:
                     GraphToggleContentTextBlock.Text = "V";
+                    Graph.HorizontalAxisVisible = true;
+                    Graph.VerticalAxisVisible = false;
                     break;
                 default:
                     GraphToggleContentTextBlock.Text = "";
