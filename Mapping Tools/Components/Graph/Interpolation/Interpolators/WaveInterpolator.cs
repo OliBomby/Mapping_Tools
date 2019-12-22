@@ -11,10 +11,10 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
             InterpolationFunction = Function;
         }
 
-        public double Function(double t, double p) {
-            var cycles = Math.Round((1 - Math.Abs(MathHelper.Clamp(p, -1, 1))) * 50);
+        public double Function(double t) {
+            var cycles = Math.Round((1 - Math.Abs(MathHelper.Clamp(P, -1, 1))) * 50);
 
-            if (p < 0) {
+            if (P < 0) {
                 return SharpWave((cycles + 0.5) * t);
             }
 

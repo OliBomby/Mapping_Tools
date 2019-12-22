@@ -12,9 +12,9 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
             InterpolationFunction = Function;
         }
 
-        public double Function(double t, double p) {
-            p = MathHelper.Clamp(p, -1, 1);
-            return -p * t * t + (p + 1) * t;
+        public double Function(double t) {
+            var p = MathHelper.Clamp(P, -1, 1);
+            return -p * Math.Pow(t, 2) + (p + 1) * t;
         }
 
         public IGraphInterpolator GetDerivativeInterpolator() {
@@ -27,7 +27,7 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
         }
 
         public IGraphInterpolator GetPrimitiveInterpolator(double x1, double y1, double x2, double y2) {
-            return new PrimitiveParabolaInterpolator {P = P};
+            return new PrimitiveParabolaInterpolator {P = P, C = y1, D = y2};
         }
 
         public double GetIntegral(double t1, double t2) {
@@ -36,7 +36,7 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
 
         private double Primitive(double t) {
             var p = MathHelper.Clamp(P, -1, 1);
-            return 1d / 3 * -p * Math.Pow(t, 3) + 0.5 * (p + 1) * t * t;
+            return 1d / 3 * -p * Math.Pow(t, 3) + 0.5 * (p + 1) * Math.Pow(t, 2);
         }
     }
 }

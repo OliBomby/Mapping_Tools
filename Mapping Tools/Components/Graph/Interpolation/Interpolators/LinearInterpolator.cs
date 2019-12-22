@@ -4,7 +4,7 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
     [IgnoreInterpolator]
     [DisplayName("Linear")]
     public class LinearInterpolator : CustomInterpolator, IDerivableInterpolator, IIntegrableInterpolator {
-        public LinearInterpolator() : base((t, p) => t) {}
+        public LinearInterpolator() : base(t => t) {}
 
         public IGraphInterpolator GetDerivativeInterpolator() {
             return new LinearInterpolator();

@@ -13,12 +13,12 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
             InterpolationFunction = Function;
         }
 
-        private double Function(double t, double p) {
-            if (Math.Abs(p) < Precision.DOUBLE_EPSILON) {
+        private double Function(double t) {
+            if (Math.Abs(P) < Precision.DOUBLE_EPSILON) {
                 return _linearDegenerate.GetInterpolation(t);
             }
 
-            p = MathHelper.Clamp(p, -1, 1);
+            var p = MathHelper.Clamp(P, -1, 1);
             if (p < 0) {
                 return 1 - F(1 - t, -p);
             }
