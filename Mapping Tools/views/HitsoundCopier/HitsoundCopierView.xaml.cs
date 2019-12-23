@@ -149,12 +149,10 @@ namespace Mapping_Tools.Views {
                     }
 
                     // Save tlo times where volume is 5%
-                    if (volumeMuteTimes != null) {
-                        // Timingpointchange all the undefined tlo from copyFrom
-                        volumeMuteTimes.AddRange(from tloTo in tlTo.TimelineObjects
-                            where tloTo.CanCopy && Math.Abs(tloTo.FenoSampleVolume - 5) < Precision.DOUBLE_EPSILON
-                            select tloTo.Time);
-                    }
+                    // Timingpointchange all the undefined tlo from copyFrom
+                    volumeMuteTimes?.AddRange(from tloTo in tlTo.TimelineObjects
+                        where tloTo.CanCopy && Math.Abs(tloTo.FenoSampleVolume - 5) < Precision.DOUBLE_EPSILON
+                        select tloTo.Time);
 
                     // Volumes and samplesets and customindices greenlines get copied with timingpointchanges and allafter enabled
                     var timingPointsChanges = beatmapFrom.BeatmapTiming.TimingPoints.Select(tp =>

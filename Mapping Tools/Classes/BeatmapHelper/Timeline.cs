@@ -99,14 +99,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
 
             TimelineObject closest = null;
-            double dist = double.PositiveInfinity;
+            double closestDist = double.PositiveInfinity;
             foreach (TimelineObject tlo in TimelineObjects) {
-                double d = Math.Abs(tlo.Time - time);
-                if (d < dist) {
+                double dist = Math.Abs(tlo.Time - time);
+                if (dist <= closestDist) {
                     if (needCopyable && !tlo.CanCopy)
                         continue;
                     closest = tlo;
-                    dist = d;
+                    closestDist = dist;
                 } else {
                     return closest;
                 }
