@@ -40,6 +40,7 @@ namespace Mapping_Tools.Classes.Tools {
 
         private static List<LatticePoint> LatticePoints(double tolerance, List<Vector2> path, List<Vector2> diff,
             List<double> diffL, List<double> pathL) {
+
             var lattice = new List<LatticePoint>();
             for (var n = 0; n < diff.Count; n++) {
                 var l = diffL[n];
