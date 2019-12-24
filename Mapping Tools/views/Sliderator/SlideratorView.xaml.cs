@@ -6,10 +6,17 @@ using Mapping_Tools.Components.ObjectVisualiser;
 using Mapping_Tools.Viewmodels;
 using MaterialDesignThemes.Wpf;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.HitsoundStuff;
+using Mapping_Tools.Classes.SliderPathStuff;
+using Mapping_Tools.Classes.Tools;
+using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
 
 namespace Mapping_Tools.Views {
     //[HiddenTool]
@@ -179,16 +186,67 @@ namespace Mapping_Tools.Views {
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
-            RunTool(MainWindow.AppWindow.GetCurrentMaps());
+            RunTool(MainWindow.AppWindow.GetCurrentMaps()[0]);
         }
 
-        private void RunTool(string[] paths, bool quick = false) {
+        private void RunTool(string path, bool quick = false) {
             if (!CanRun) return;
 
-            IOHelper.SaveMapBackup(paths);
+            IOHelper.SaveMapBackup(path);
 
-            //BackgroundWorker.RunWorkerAsync(arguments);
+            ViewModel.Path = path;
+            ViewModel.GraphState = Graph.GetGraphState();
+            if (ViewModel.GraphState.CanFreeze) {
+                ViewModel.GraphState.Freeze();
+            }
+
+            BackgroundWorker.RunWorkerAsync(ViewModel);
             CanRun = false;
+        }
+
+        protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
+            var bgw = sender as BackgroundWorker;
+            e.Result = Sliderate((SlideratorVm) e.Argument, bgw);
+        }
+
+        private string Sliderate(SlideratorVm arg, BackgroundWorker worker) {
+            var sliderPath = arg.VisibleHitObject.GetSliderPath();
+            var path = new List<Vector2>();
+            sliderPath.GetPathToProgress(path, 0, 1);
+
+            var sliderator = new Sliderator {
+                PositionFunction = arg.GraphState.GetInterpolation, MaxT = arg.GraphState.MaxX
+            };
+            sliderator.SetPath(path);
+
+            var slideration = sliderator.Sliderate();
+
+            // Exporting stuff
+            var editor = new BeatmapEditor(arg.Path);
+            var beatmap = editor.Beatmap;
+
+            var hitObjectHere = beatmap.HitObjects.FirstOrDefault(o => Math.Abs(arg.ExportTime - o.Time) < 5) ??
+                                new HitObject(arg.ExportTime, 0, SampleSet.Auto, SampleSet.Auto);
+
+            var clone = new HitObject(hitObjectHere.GetLine()) {
+                IsCircle = false, IsSpinner = false, IsHoldNote = false, IsSlider = true
+            };
+            clone.SetSliderPath(new SliderPath(PathType.Bezier, slideration.ToArray()));
+
+            if (arg.ExportMode == ExportMode.Add) {
+                beatmap.HitObjects.Add(clone);
+            } else {
+                beatmap.HitObjects.Remove(hitObjectHere);
+                beatmap.HitObjects.Add(clone);
+            }
+            beatmap.SortHitObjects();
+
+            editor.SaveFile();
+
+            // Complete progressbar
+            if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(100);
+
+            return "Done!";
         }
     }
 }

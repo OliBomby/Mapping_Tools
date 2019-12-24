@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
+using Mapping_Tools.Components.Graph;
+using Newtonsoft.Json;
 
 namespace Mapping_Tools.Viewmodels {
     public class SlideratorVm : BindableBase {
@@ -107,6 +109,12 @@ namespace Mapping_Tools.Viewmodels {
         public CommandImplementation ImportCommand { get; }
         public CommandImplementation MoveLeftCommand { get; }
         public CommandImplementation MoveRightCommand { get; }
+
+        [JsonIgnore]
+        public GraphState GraphState { get; set; }
+
+        [JsonIgnore]
+        public string Path { get; set; }
 
         #endregion
 

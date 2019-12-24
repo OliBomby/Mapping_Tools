@@ -12,17 +12,16 @@ namespace Mapping_Tools.Classes.Tools {
 
         private List<Vector2> _path;
         private List<double> _pathL;
+        private double _totalPathL;
         private List<LatticePoint> _reds;
         private List<List<Tumour>> _tumours;
         private List<Interpolation> _whites;
 
-        private static double Tmax => 1000; // TODO: Connect this to UI
+        public double MaxT { get; set; }
 
+        public delegate double PositionFunctionDelegate(double t);
 
-        private static double X(double t) {
-            return t - Math.Pow(t, 2) / 400 +
-                   Math.Pow(t, 3) / 600000; // t from 0 to 1000, x from 0 to 166.7,  max slope 1, has reverse
-        }
+        public PositionFunctionDelegate PositionFunction { get; set; }
 
         public void SetPath(List<Vector2> pathPoints) {
             _path = pathPoints.Copy();
@@ -34,6 +33,7 @@ namespace Mapping_Tools.Classes.Tools {
                 sum += l;
                 _pathL.Add(sum);
             }
+            _totalPathL = sum;
 
             if (Math.Abs(sum) < Precision.DOUBLE_EPSILON) throw new InvalidOperationException("Zero length path.");
         }
@@ -82,7 +82,7 @@ namespace Mapping_Tools.Classes.Tools {
         private void GetReds() {
             // version a.1, retarded because it handles negative v and starting at an arbitrary x, so it cant just use the already known anchor visitation order. also just not optimized or good in general.
             double t = 0;
-            var x = X(t);
+            var x = PositionFunction(t) * _totalPathL;
             var xprev = x;
             var n = _lattice.Select(y => y.PathPosition).ToList().BinarySearch(x);
             if (n < 0) n = ~n;
@@ -90,14 +90,14 @@ namespace Mapping_Tools.Classes.Tools {
                 ? n - 1
                 : n; // closer to left?
             _reds = new List<LatticePoint> {_lattice[n]};
-            while (t < Tmax) {
+            while (t < MaxT) {
                 xprev = x;
-                t += 0.25; // 0.25 < 1 - sqrt(2)/2
-                x = X(t);
-                if (n != 0 && x - _lattice[n - 1].PathPosition < _lattice[n].PathPosition - x) {
+                t += 0.0025; // 0.25 < 1 - sqrt(2)/2
+                x = PositionFunction(t) * _totalPathL;
+                if (n > 0 && x - _lattice[n - 1].PathPosition < _lattice[n].PathPosition - x) {
                     n -= 1;
                     _reds.Add(_lattice[n]);
-                } else if (n != _lattice.Count && _lattice[n + 1].PathPosition - x < x - _lattice[n].PathPosition) {
+                } else if (n <= _lattice.Count - 2 && _lattice[n + 1].PathPosition - x < x - _lattice[n].PathPosition) {
                     n += 1;
                     _reds.Add(_lattice[n]);
                 }
@@ -145,11 +145,11 @@ namespace Mapping_Tools.Classes.Tools {
             _tumours = new List<List<Tumour>>();
             double t = 0;
             double d = 0;
-            var x = X(t);
+            var x = PositionFunction(t) * _totalPathL;
             var n = 0;
-            while (t < Tmax) {
-                t += 0.25;
-                x = X(t);
+            while (t < MaxT) {
+                t += 0.0025;
+                x = PositionFunction(t) * _totalPathL;
                 if (n < _reds.Count - 1 &&
                     Math.Abs(_reds[n + 1].PathPosition - x) < Math.Abs(x - _reds[n].PathPosition)) {
                     d += _whites[n].Length + Math.Round(t - d + _whites[n].Length / 2);
