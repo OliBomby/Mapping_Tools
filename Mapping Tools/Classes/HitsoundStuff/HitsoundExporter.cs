@@ -98,23 +98,25 @@ namespace Mapping_Tools.Classes.HitsoundStuff
                     int maxChannels = samples.Max(o => o.WaveFormat.Channels);
                     IEnumerable<ISampleProvider> sameFormatSamples = samples.Select(o => (ISampleProvider)new WdlResamplingSampleProvider(SampleImporter.SetChannels(o, maxChannels), maxSampleRate));
 
-                    var mixer = new MixingSampleProvider(sameFormatSamples);
+                    ISampleProvider result = new MixingSampleProvider(sameFormatSamples);
 
-                    VolumeSampleProvider volumed = new VolumeSampleProvider(mixer) {
-                        Volume = (float)(1 / Math.Sqrt(soundsAdded * volumes.Average()))
-                    };
-                    var compressed = new SimpleCompressorEffect(volumed) {
-                        Threshold = 16,
-                        Ratio = 6,
-                        Attack = 0.1,
-                        Release = 0.1,
-                        Enabled = true,
-                        MakeUpGain = 10 * Math.Log10(Math.Sqrt(soundsAdded * volumes.Average()))
-                    };
+                    if (soundsAdded > 1) {
+                        result = new VolumeSampleProvider(result) {
+                            Volume = (float)(1 / Math.Sqrt(soundsAdded * volumes.Average()))
+                        };
+                        result = new SimpleCompressorEffect(result) {
+                            Threshold = 16,
+                            Ratio = 6,
+                            Attack = 0.1,
+                            Release = 0.1,
+                            Enabled = true,
+                            MakeUpGain = 15 * Math.Log10(Math.Sqrt(soundsAdded * volumes.Average()))
+                        };
+                    }
 
                     // TODO: Allow mp3, ogg and aif export.
                     string filename = ci.Index == 1 ? kvp.Key + ".wav" : kvp.Key + ci.Index + ".wav";
-                    CreateWaveFile(Path.Combine(exportFolder, filename), compressed.ToWaveProvider16());
+                    CreateWaveFile(Path.Combine(exportFolder, filename), result.ToWaveProvider16());
                 }
             }
         }
