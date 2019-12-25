@@ -5,17 +5,16 @@ using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.Tools {
     public class Sliderator {
-        private List<Vector2> _diff;
-        private List<double> _diffL;
-        private List<double> _interpL;
-        private List<LatticePoint> _lattice;
+        private List<Vector2> _path; // input path
+        private List<Vector2> _diff; // path segments
+        private List<double> _diffL; // length of segments
+        private List<double> _pathL; // cumulative length
+        private double _totalPathL => _pathL.Last(); // total length
 
-        private List<Vector2> _path;
-        private List<double> _pathL;
-        private double _totalPathL;
-        private List<LatticePoint> _reds;
-        private List<List<Tumour>> _tumours;
-        private List<Interpolation> _whites;
+        private List<LatticePoint> _lattice; // path lattice points
+        private List<LatticePoint> _reds; // slider red anchors for growing tumours on
+        private List<Interpolation> _whites; // slider white anchors for interpolating between reds
+        private List<double> _interpL; // cumulative length of interpolations
 
         public double MaxT { get; set; }
 
@@ -33,41 +32,39 @@ namespace Mapping_Tools.Classes.Tools {
                 sum += l;
                 _pathL.Add(sum);
             }
-            _totalPathL = sum;
-
             if (Math.Abs(sum) < Precision.DOUBLE_EPSILON) throw new InvalidOperationException("Zero length path.");
         }
 
         private static List<LatticePoint> LatticePoints(double tolerance, List<Vector2> path, List<Vector2> diff,
             List<double> diffL, List<double> pathL) {
-
             var lattice = new List<LatticePoint>();
-            for (var n = 0; n < diff.Count; n++) {
-                var l = diffL[n];
-                if (Math.Abs(l) < Precision.DOUBLE_EPSILON) continue;
-                var a = path[n];
-                var d = diff[n];
+
+            for (var n = 0; n < diff.Count; n++) { // iterate through path segments
+                var l = diffL[n]; // segment length
+                if (Math.Abs(l) < Precision.DOUBLE_EPSILON) continue; // skip segment if degenerate
+                var a = path[n]; // start point
+                var d = diff[n]; // vector to end point
                 var l2 = d.LengthSquared;
                 var ax = Math.Abs(d[0]) < Math.Abs(d[1]) ? 1 : 0; // axis to iterate along
                 var dr = Math.Sign(d[ax]); // direction of iteration
-                for (var i = (int) Math.Round(a[ax]); i != (int) Math.Round(a[ax] + d[ax]) + dr; i += dr) {
-                    var s = (i - a[ax]) / d[ax];
-                    var r = a[1 - ax] + s * d[1 - ax];
-                    var j = (int) Math.Round(r);
-                    var k = ax == 1 ? new Vector2(j, i) : new Vector2(i, j);
-                    var t = MathHelper.Clamp(s + (j - r) * d[1 - ax] / l2, 0, 1);
-                    var p = a + t * d;
-                    var x = pathL[n] + t * l;
-                    var e = (k - p).Length;
-                    var es = Math.Sign((j - r) * dr * (1 - 2 * ax));
-                    if (!(e < tolerance)) continue; // close enough
+                for (var i = (int) Math.Round(a[ax]); i != (int) Math.Round(a[ax] + d[ax]) + dr; i += dr) { // major axis lattice coordinate
+                    var s = (i - a[ax]) / d[ax]; // progress along segment in major axis
+                    var r = a[1 - ax] + s * d[1 - ax]; // minor axis coordinate
+                    var j = (int) Math.Round(r); // minor axis lattice coordinate
+                    var k = ax == 1 ? new Vector2(j, i) : new Vector2(i, j); // lattice point
+                    var t = MathHelper.Clamp(s + (j - r) * d[1 - ax] / l2, 0, 1); // projected progress along segment
+                    var p = a + t * d; // projected point on segment
+                    var x = pathL[n] + t * l; // total distance along path
+                    var e = (k - p).Length; // error
+                    var ep = (j - r) * d[ax] / l * (1 - 2 * ax); // right handed perpendicular error
+
+                    if (e > tolerance) continue;
                     if (Math.Abs(t - 1) < Precision.DOUBLE_EPSILON && n + 1 < diff.Count) continue;
-                    if (lattice.Count > 0 && k == lattice.Last().Pos) {
-                        // repeated point
+                    if (lattice.Count > 0 && k == lattice.Last().Pos) { // repeated point
                         if (e <= lattice.Last().Error)
-                            lattice[lattice.Count - 1] = new LatticePoint(k, p, x, 0, e, es, n);
+                            lattice[lattice.Count - 1] = new LatticePoint(k, p, x, e, ep, n);
                     } else {
-                        lattice.Add(new LatticePoint(k, p, x, 0, e, es, n));
+                        lattice.Add(new LatticePoint(k, p, x, e, ep, n));
                     }
                 }
             }
@@ -115,7 +112,7 @@ namespace Mapping_Tools.Classes.Tools {
                 var rm = _reds[i];
                 var rr = _reds[i + 1];
                 if (rm.Error < 0.125 || rm.Error < rl.Error && rm.Error < rr.Error) continue;
-                if (Math.Abs(rm.Error * rm.ErrorSide - rl.Error * rl.ErrorSide - rr.Error * rr.ErrorSide) > 0.25) {
+                if (Math.Abs(rm.ErrorPerp - rl.ErrorPerp - rr.ErrorPerp) > 0.25) {
                     _reds.RemoveAt(i);
                     i -= i > 1 ? 2 : 1;
                 }
@@ -142,7 +139,6 @@ namespace Mapping_Tools.Classes.Tools {
 
         private void GetTumours() {
             // version a.0, not functional, i just put some crap so u can test
-            _tumours = new List<List<Tumour>>();
             double t = 0;
             double d = 0;
             var x = PositionFunction(t) * _totalPathL;
@@ -153,16 +149,30 @@ namespace Mapping_Tools.Classes.Tools {
                 if (n < _reds.Count - 1 &&
                     Math.Abs(_reds[n + 1].PathPosition - x) < Math.Abs(x - _reds[n].PathPosition)) {
                     d += _whites[n].Length + Math.Round(t - d + _whites[n].Length / 2);
-                    var redLatticePoint = _reds[n];
-                    var whiteLatticePoint = redLatticePoint;
-                    whiteLatticePoint.Pos =
-                        redLatticePoint.Pos + new Vector2(Math.Round(t - d + _whites[n].Length / 2), 0);
-                    _tumours.Add(new List<Tumour> {
-                        new Tumour(redLatticePoint, whiteLatticePoint)
-                    });
+                    _reds[n].Tumours.Add(new Vector2(Math.Round(t - d + _whites[n].Length / 2), 0));
                     n += 1;
                 }
             }
+        }
+
+        private static List<Vector2> AnchorsList(List<LatticePoint> reds, List<Interpolation> whites) {
+            var anchors = new List<Vector2>();
+
+            for (var n = 0; n < reds.Count; n++) {
+                foreach (var t in reds[n].Tumours) {
+                    anchors.Add(reds[n].Pos);
+                    anchors.Add(reds[n].Pos + t);
+                    anchors.Add(reds[n].Pos);
+                }
+                if (n < whites.Count) {
+                    anchors.Add(whites[n].StartPos);
+                foreach (var a in whites[n].Anchors)
+                    anchors.Add(a);
+                anchors.Add(whites[n].EndPos);
+                }
+            }
+
+            return anchors;
         }
 
         public List<Vector2> Sliderate() {
@@ -170,71 +180,53 @@ namespace Mapping_Tools.Classes.Tools {
             GetReds();
             GetInterpolation();
             GetTumours();
-            var anchors = new List<Vector2>();
-            for (var n = 0; n < _reds.Count - 1; n++) {
-                anchors.Add(_reds[n].Pos);
-                foreach (var t in _tumours[n].Where(t => t.RedLatticePoint.Pos != t.WhiteLatticePoint.Pos))
-                    anchors.AddRange(new[] {t.WhiteLatticePoint.Pos, t.RedLatticePoint.Pos, t.RedLatticePoint.Pos});
-                anchors.Add(_whites[n].StartLatticePoint.Pos);
-                anchors.Add(_whites[n].EndLatticePoint.Pos);
-                anchors.Add(_reds[n + 1].Pos);
-            }
-
-            return anchors;
+            return AnchorsList(_reds, _whites);
         }
 
         internal struct LatticePoint {
             public Vector2 Pos; // lattice point
             public Vector2 PathPoint; // point on path
             public double PathPosition; // position along path
-            public double Time; // time (when the slider passes it)
             public double Error; // error ||k - p||
-            public int ErrorSide; // error side (1 = right handed)
+            public double ErrorPerp; // perpendicular error (positive = right handed)
             public int SegmentIndex; // segment index
+            public double Time; // placeholder
+            public double Length; // placeholder
+            public List<Vector2> Tumours; // tumour vectors (offset from main anchor)
 
-            public LatticePoint(Vector2 pos, Vector2 pathPoint, double pathPosition, double time, double error,
-                int errorSide, int segmentIndex) {
+            public LatticePoint(Vector2 pos, Vector2 pathPoint, double pathPosition, double error,
+                double errorPerp, int segmentIndex) {
                 Pos = pos;
                 PathPoint = pathPoint;
                 PathPosition = pathPosition;
-                Time = time;
                 Error = error;
-                ErrorSide = errorSide;
+                ErrorPerp = errorPerp;
                 SegmentIndex = segmentIndex;
+                Time = 0;
+                Length = 0;
+                Tumours = new List<Vector2>();
             }
         }
 
         internal struct Interpolation {
+            public Vector2 StartPos; // start lattice point
+            public Vector2 EndPos; // end lattice point
             public Vector2 StartPathPoint; // start point on path
             public Vector2 EndPathPoint; // end point on path
-            public LatticePoint StartLatticePoint; // start lattice point
-            public LatticePoint EndLatticePoint; // end lattice point
             public double Length; // length
             public double Error; // error
             public Vector2[] Anchors; // anchors
 
             public Interpolation(LatticePoint startLatticePoint, LatticePoint endLatticePoint) {
+                StartPos = startLatticePoint.Pos;
+                EndPos = endLatticePoint.Pos;
                 StartPathPoint = startLatticePoint.PathPoint;
                 EndPathPoint = endLatticePoint.PathPoint;
-                StartLatticePoint = startLatticePoint;
-                EndLatticePoint = endLatticePoint;
-                Length = (EndLatticePoint.Pos - StartLatticePoint.Pos)
-                    .Length; // replace with path approximator on {c, k, d} eventually
+                Length = (EndPos - StartPos).Length;
                 Error = 0;
-                Anchors = null;
+                Anchors = new Vector2[0];
             }
         }
 
-        internal struct Tumour {
-            public LatticePoint RedLatticePoint; // red lattice point
-            public LatticePoint WhiteLatticePoint; // white lattice point
-            public double Length; // length
-
-            public Tumour(LatticePoint redLatticePoint, LatticePoint whiteLatticePoint) {
-                RedLatticePoint = redLatticePoint;
-                WhiteLatticePoint = whiteLatticePoint;
-                Length = (WhiteLatticePoint.Pos - RedLatticePoint.Pos).Length;
-            }
-        }
     }
 }
