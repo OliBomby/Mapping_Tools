@@ -28,7 +28,7 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
         }
 
         public IGraphInterpolator GetPrimitiveInterpolator(double x1, double y1, double x2, double y2) {
-            return new PrimitiveParabolaInterpolator {P = P, C = y1, D = y2};
+            return new PrimitiveParabolaInterpolator(y1, y2) {P = P};
         }
 
         public double GetIntegral(double t1, double t2) {

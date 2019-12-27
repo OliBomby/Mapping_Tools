@@ -370,8 +370,8 @@ namespace Mapping_Tools.Components.Graph {
             return anchor;
         }
 
-        public Anchor MakeAnchor(Vector2 pos, Type interpolator) {
-            var anchor = new Anchor(this, pos, InterpolatorHelper.GetInterpolator(interpolator));
+        public Anchor MakeAnchor(Vector2 pos, Type lastInterpolatorSet) {
+            var anchor = new Anchor(this, pos, InterpolatorHelper.GetInterpolator(lastInterpolatorSet));
             return anchor;
         }
 
