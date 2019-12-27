@@ -435,37 +435,6 @@ namespace Mapping_Tools.Components.Graph {
             return anchor == Anchors[0] || anchor == Anchors[Anchors.Count - 1];
         }
 
-        /// <summary>
-        /// Calculates the height of the curve [0-1] for a given progression along the graph [0-1].
-        /// </summary>
-        /// <param name="x">The progression along the curve (0-1)</param>
-        /// <returns>The height of the curve (0-1)</returns>
-        public double GetInterpolation(double x) {
-            // Find the section
-            var previousAnchor = Anchors[0];
-            var nextAnchor = Anchors[1];
-            foreach (var anchor in Anchors) {
-                if (anchor.Pos.X < x) {
-                    previousAnchor = anchor;
-                } else {
-                    nextAnchor = anchor;
-                    break;
-                }
-            }
-
-            // Calculate the value via interpolation
-            var diff = nextAnchor.Pos - previousAnchor.Pos;
-            if (Math.Abs(diff.X) < Precision.DOUBLE_EPSILON) {
-                return previousAnchor.Pos.Y;
-            }
-            var sectionProgress = (x - previousAnchor.Pos.X) / diff.X;
-
-            var interpolator = nextAnchor.Interpolator;
-            interpolator.P = nextAnchor.Tension;
-
-            return previousAnchor.Pos.Y + diff.Y * interpolator.GetInterpolation(sectionProgress);
-        }
-
         public Point GetRelativePoint(Vector2 value) {
             var t = new Vector2((value.X - MinX) / (MaxX - MinX), (value.Y - MinY) / (MaxY - MinY));
             return new Point(t.X * ActualWidth, ActualHeight - t.Y * ActualHeight);
@@ -502,181 +471,48 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         /// <summary>
-        /// Calculates the derivative in the [0-1] coordinate system for a given progression along the graph [0-1].
+        /// Calculates the height of the curve [0-1] for a given progression along the graph [0-1].
         /// </summary>
-        /// <param name="x"></param>
-        /// <returns></returns>
+        /// <param name="x">The progression along the curve (0-1)</param>
+        /// <returns>The height of the curve (0-1)</returns>
+        public double GetValue(double x) {
+            return GraphState.GetValue(x, Anchors);
+        }
+
         public double GetDerivative(double x) {
-            // TODO: Need derivates of interpolators for this
-            throw new NotImplementedException();
+            return GraphState.GetDerivative(x, Anchors);
+        }
+
+        public double GetIntegral(double t1, double t2) {
+            return GraphState.GetIntegral(t1, t2, Anchors);
         }
 
         /// <summary>
         /// Calculates the height of the heighest point in the graph.
         /// </summary>
         /// <returns></returns>
-        public double GetMaxHeight() {
-            // It suffices to find the highest Y value of the anchors, because the interpolated parts never stick out above or below the anchors.
-            return Anchors.Max(o => o.Pos.Y);
+        public double GetMaxValue() {
+            return GraphState.GetMaxValue(Anchors);
+        }
+
+        public double GetMaxDerivative() {
+            return GraphState.GetMaxDerivative(Anchors);
+        }
+
+        public double GetMaxIntegral() {
+            return GraphState.GetMaxIntegral(Anchors);
         }
 
         public void Differentiate(double newMinY, double newMaxY) {
-            // Differentiate graph
-            var newAnchors = new List<Anchor>();
-            Anchor previousAnchor = null;
-            foreach (var anchor in Anchors) {
-                if (previousAnchor != null) {
-                    var p1 = previousAnchor.Pos;
-                    var p2 = anchor.Pos;
-
-                    var difference = p2 - p1;
-
-                    double startSlope;
-                    double endSlope;
-                    IGraphInterpolator derivativeInterpolator;
-
-                    if (anchor.Interpolator is IDerivableInterpolator derivableInterpolator) {
-                        startSlope = derivableInterpolator.GetDerivative(0) * difference.Y / difference.X;
-                        endSlope = derivableInterpolator.GetDerivative(1) * difference.Y / difference.X;
-                        derivativeInterpolator = derivableInterpolator.GetDerivativeInterpolator();
-
-                    } else {
-                        startSlope = difference.Y / difference.X;
-                        endSlope = startSlope;
-                        derivativeInterpolator = new LinearInterpolator();
-                    }
-
-                    var np1 = new Vector2(previousAnchor.Pos.X, startSlope);
-                    var np2 = new Vector2(anchor.Pos.X, endSlope);
-
-                    if (!(newAnchors.Count > 0 && Vector2.DistanceSquared(newAnchors[newAnchors.Count - 1].Pos, np1) < Precision.DOUBLE_EPSILON)) {
-                        newAnchors.Add(new Anchor(this, np1, new LinearInterpolator()));
-                    }
-                    newAnchors.Add(new Anchor(this, np2, derivativeInterpolator));
-                }
-
-                previousAnchor = anchor;
-            }
-
-            Anchors = new ObservableCollection<Anchor>(newAnchors);
+            Anchors = new ObservableCollection<Anchor>(GraphState.DifferentiateGraph(newMinY, newMaxY, Anchors, this));
             MinY = newMinY;
             MaxY = newMaxY;
         }
 
         public void Integrate(double newMinY, double newMaxY) {
-            var newAnchors = new List<Anchor> {new Anchor(this, new Vector2(0, -newMinY / (newMaxY - newMinY)))};
-            double height = 0;
-            Anchor previousAnchor = null;
-            foreach (var anchor in Anchors) {
-                if (previousAnchor != null) {
-                    var p1 = previousAnchor.Pos;
-                    var p2 = anchor.Pos;
-
-                    var difference = p2 - p1;
-
-                    if (difference.X < Precision.DOUBLE_EPSILON) {
-                        previousAnchor = anchor;
-                        continue;
-                    }
-
-                    double integral;
-                    IGraphInterpolator primitiveInterpolator;
-
-                    if (anchor.Interpolator is IIntegrableInterpolator integrableInterpolator) {
-                        integral = integrableInterpolator.GetIntegral(0, 1);
-                        primitiveInterpolator = integrableInterpolator.GetPrimitiveInterpolator(p1.X, p1.Y, p2.X, p2.Y);
-                    } else {
-                        integral = 0.5;
-                        primitiveInterpolator = new LinearInterpolator();
-                    }
-                    
-                    height += integral * difference.X * difference.Y + difference.X * p1.Y;
-                    newAnchors.Add(new Anchor(this, new Vector2(anchor.Pos.X, height), primitiveInterpolator));
-                }
-
-                previousAnchor = anchor;
-            }
-            
-            Anchors = new ObservableCollection<Anchor>(newAnchors);
+            Anchors = new ObservableCollection<Anchor>(GraphState.IntegrateGraph(newMinY, newMaxY, Anchors, this));
             MinY = newMinY;
             MaxY = newMaxY;
-        }
-
-        public double GetIntegral(double t1, double t2) {
-            double height = 0;
-            Anchor previousAnchor = null;
-            foreach (var anchor in Anchors) {
-                if (previousAnchor != null) {
-                    var p1 = new Vector2(MathHelper.Clamp(previousAnchor.Pos.X, t1, t2), previousAnchor.Pos.Y);
-                    var p2 = new Vector2(MathHelper.Clamp(anchor.Pos.X, t1, t2), anchor.Pos.Y);
-
-                    if (p2.X < t1 || p1.X > t2) {
-                        previousAnchor = anchor;
-                        continue;
-                    }
-
-                    var difference = p2 - p1;
-
-                    if (difference.X < Precision.DOUBLE_EPSILON) {
-                        previousAnchor = anchor;
-                        continue;
-                    }
-
-                    double integral;
-                    if (anchor.Interpolator is IIntegrableInterpolator integrableInterpolator) {
-                        integral = integrableInterpolator.GetIntegral(0, 1);
-                    } else {
-                        integral = 0.5;
-                    }
-                    
-                    height += integral * difference.X * difference.Y + difference.X * p1.Y;
-                }
-
-                previousAnchor = anchor;
-            }
-
-            return height;
-        }
-
-        public double GetMaxIntegral(double t1, double t2) {
-            double height = 0;
-            double maxHeight = height;
-            Anchor previousAnchor = null;
-            foreach (var anchor in Anchors) {
-                if (previousAnchor != null) {
-                    var p1 = new Vector2(MathHelper.Clamp(previousAnchor.Pos.X, t1, t2), previousAnchor.Pos.Y);
-                    var p2 = new Vector2(MathHelper.Clamp(anchor.Pos.X, t1, t2), anchor.Pos.Y);
-
-                    if (p2.X < t1 || p1.X > t2) {
-                        previousAnchor = anchor;
-                        continue;
-                    }
-
-                    var difference = p2 - p1;
-
-                    if (difference.X < Precision.DOUBLE_EPSILON) {
-                        previousAnchor = anchor;
-                        continue;
-                    }
-
-                    double integral;
-                    if (anchor.Interpolator is IIntegrableInterpolator integrableInterpolator) {
-                        integral = integrableInterpolator.GetIntegral(0, 1);
-                    } else {
-                        integral = 0.5;
-                    }
-                    
-                    height += integral * difference.X * difference.Y + difference.X * p1.Y;
-
-                    if (height > maxHeight) {
-                        maxHeight = height;
-                    }
-                }
-
-                previousAnchor = anchor;
-            }
-
-            return maxHeight;
         }
 
         #endregion
@@ -870,7 +706,7 @@ namespace Mapping_Tools.Components.Graph {
                 for (int k = 1; k < GetRelativePointX(next.Pos.X) - GetRelativePointX(previous.Pos.X); k++) {
                     var x = previous.Pos.X + k / ActualWidth * (MaxX - MinX);
 
-                    points.Add(GetRelativePoint(new Vector2(x, GetInterpolation(x))));
+                    points.Add(GetRelativePoint(new Vector2(x, GetValue(x))));
                 }
             }
             points.Add(GetRelativePoint(Anchors[Anchors.Count - 1].Pos));
@@ -903,7 +739,7 @@ namespace Mapping_Tools.Components.Graph {
                 var x = (next.Pos.X + previous.Pos.X) / 2;
 
                 // Get y on the graph and set position
-                var y = GetInterpolation(x);
+                var y = GetValue(x);
                 anchor.TensionAnchor.Pos = new Vector2(x, y);
 
                 RenderGraphPoint(anchor.TensionAnchor);

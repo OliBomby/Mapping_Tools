@@ -125,9 +125,9 @@ namespace Mapping_Tools.Views {
             var maxValue = value;
             if (_graphMode == GraphMode.Velocity) {
                 // Integrate the graph to get the end value
-                maxValue = Graph.GetMaxIntegral(Graph.MinX, Graph.MaxX);
+                maxValue = Graph.GetMaxIntegral();
             } else if (_graphMode == GraphMode.Position) {
-                maxValue = Graph.GetMaxHeight();
+                maxValue = Graph.GetMaxValue();
             }
             Graph.ScaleAnchors(new Size(1, value / maxValue));
         }
@@ -215,7 +215,7 @@ namespace Mapping_Tools.Views {
             sliderPath.GetPathToProgress(path, 0, 1);
 
             var sliderator = new Sliderator {
-                PositionFunction = arg.GraphState.GetInterpolation, MaxT = arg.GraphState.MaxX
+                PositionFunction = arg.GraphState.GetValue, MaxT = arg.GraphState.MaxX
             };
             sliderator.SetPath(path);
 
