@@ -357,7 +357,7 @@
     <Compile Include="Components\DragAndDropListBox.cs" />
     <Compile Include="Components\Graph\GraphIntegralDoubleAnimation.cs" />
     <Compile Include="Components\Graph\GraphDoubleAnimation.cs" />
-    <Compile Include="Components\Graph\Interpolation\Interpolators\PrimitiveParabolaInterpolator.cs" />
+    <Compile Include="Components\Graph\Interpolation\Interpolators\Helper Interpolators\PrimitiveParabolaInterpolator.cs" />
     <Compile Include="Components\Graph\Markers\DividedBeatMarkerGenerator.cs" />
     <Compile Include="Components\Graph\Markers\DoubleMarkerGenerator.cs" />
     <Compile Include="Components\Graph\Markers\GraphMarker.cs" />

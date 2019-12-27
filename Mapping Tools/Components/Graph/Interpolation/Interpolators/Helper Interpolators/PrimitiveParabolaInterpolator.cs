@@ -1,7 +1,7 @@
 ﻿using System;
 using Mapping_Tools.Classes.MathUtil;
 
-namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
+namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators.Helper_Interpolators {
     [IgnoreInterpolator]
     public class PrimitiveParabolaInterpolator : CustomInterpolator, IDerivableInterpolator {
         public double C { get; set; }
