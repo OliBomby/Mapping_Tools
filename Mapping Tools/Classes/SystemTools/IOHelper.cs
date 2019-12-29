@@ -20,7 +20,7 @@ namespace Mapping_Tools.Classes.SystemTools {
                 File.Copy(fileToCopy, Path.Combine(destinationDirectory, now.ToString("yyyy-MM-dd HH-mm-ss") + "___" + Path.GetFileName(fileToCopy)));
 
                 // Delete old files if the number of backup files are over the limit
-                foreach (var fi in new DirectoryInfo(SettingsManager.GetBackupsPath()).GetFiles().OrderByDescending(x => x.LastWriteTime).Skip(3000))
+                foreach (var fi in new DirectoryInfo(SettingsManager.GetBackupsPath()).GetFiles().OrderByDescending(x => x.CreationTime).Skip(SettingsManager.Settings.MaxBackupFiles))
                     fi.Delete();
 
                 return true;
