@@ -152,6 +152,16 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
         }
 
+        private int _maxBackupFiles;
+        public int MaxBackupFiles {
+            get => _maxBackupFiles;
+            set {
+                if (_maxBackupFiles == value) return;
+                _maxBackupFiles = value;
+                OnPropertyChanged();
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
@@ -175,6 +185,7 @@ namespace Mapping_Tools.Classes.SystemTools {
             NoneQuickRunTool = "<Current Tool>";
             SingleQuickRunTool = "<Current Tool>";
             MultipleQuickRunTool = "<Current Tool>";
+            MaxBackupFiles = 1000;
         }
 
         public void CopyTo(Settings other) {

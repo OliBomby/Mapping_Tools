@@ -134,7 +134,11 @@ namespace Mapping_Tools.Classes.Tools
                     MessageBox.Show(EditorReaderIsDisabledText);
                     return;
                 }
-                var editor = GetNewestVersion(IOHelper.GetCurrentBeatmap());
+
+                var path = IOHelper.GetCurrentBeatmap();
+                IOHelper.SaveMapBackup(path);
+
+                var editor = GetNewestVersion(path);
                 editor.SaveFile();
 
                 Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue("Succesfully saved current beatmap!"));
