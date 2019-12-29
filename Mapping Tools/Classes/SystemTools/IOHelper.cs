@@ -1,13 +1,12 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
-using Editor_Reader;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using OsuMemoryDataProvider;
 
 namespace Mapping_Tools.Classes.SystemTools {
-
     public class IOHelper {
         private static readonly IOsuMemoryReader PioReader = OsuMemoryReader.Instance;
 
@@ -19,6 +18,11 @@ namespace Mapping_Tools.Classes.SystemTools {
             string destinationDirectory = SettingsManager.GetBackupsPath();
             try {
                 File.Copy(fileToCopy, Path.Combine(destinationDirectory, now.ToString("yyyy-MM-dd HH-mm-ss") + "___" + Path.GetFileName(fileToCopy)));
+
+                // Delete old files if the number of backup files are over the limit
+                foreach (var fi in new DirectoryInfo(SettingsManager.GetBackupsPath()).GetFiles().OrderByDescending(x => x.LastWriteTime).Skip(3000))
+                    fi.Delete();
+
                 return true;
             }
             catch( Exception ex ) {
