@@ -12,17 +12,20 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
         }
 
         public double Function(double t) {
-            var cycles = Math.Round((1 - Math.Abs(MathHelper.Clamp(P, -1, 1))) * 50);
+            var cycles = Math.Round((1 - Math.Abs(MathHelper.Clamp(P, -1, 1))) * 50) + 0.5;
 
-            if (P < 0) {
-                return SharpWave((cycles + 0.5) * t);
-            }
-
-            return (Math.Sin((cycles * 2 + 1) * Math.PI * t - Math.PI / 2) + 1) / 2;
+            return P < 0 ? 
+                TriangleWave(t, 1 / cycles) : 
+                SineWave(t * cycles * 2 * Math.PI);
         }
 
-        private static double SharpWave(double t) {
-            return 1 - 2 * Math.Abs(Math.Truncate(t) - t + 0.5);
+        private static double SineWave(double t) {
+            return (Math.Sin(t - Math.PI / 2) + 1) / 2;
+        }
+
+        private static double TriangleWave(double t, double T) {
+            var modT = t % T;
+            return modT < T / 2 ? 2 * modT / T : 2 - 2 * modT / T;
         }
     }
 }
