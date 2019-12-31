@@ -35,6 +35,7 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
             });
 
             RemoveCommand = new CommandImplementation(item => {
+                if (ColourSequence.Count == 0) return;
                 if (item == null) {
                     ColourSequence.RemoveAt(ColourSequence.Count - 1);
                 } else {
