@@ -503,18 +503,6 @@ namespace Mapping_Tools.Components.Graph {
             return GraphState.GetMaxIntegral(Anchors);
         }
 
-        public void Differentiate(double newMinY, double newMaxY) {
-            Anchors = new ObservableCollection<Anchor>(GraphState.DifferentiateGraph(newMinY, newMaxY, Anchors, this));
-            MinY = newMinY;
-            MaxY = newMaxY;
-        }
-
-        public void Integrate(double newMinY, double newMaxY) {
-            Anchors = new ObservableCollection<Anchor>(GraphState.IntegrateGraph(newMinY, newMaxY, Anchors, this));
-            MinY = newMinY;
-            MaxY = newMaxY;
-        }
-
         #endregion
 
         #region ChangeEventHandlers
