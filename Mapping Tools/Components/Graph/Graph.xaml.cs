@@ -403,6 +403,7 @@ namespace Mapping_Tools.Components.Graph {
             }
 
             foreach (var anchor in Anchors) {
+                anchor.Pos = Vector2.Clamp(anchor.Pos, new Vector2(MinX, MinY), new Vector2(MaxX, MaxY));
                 anchor.SetTension(0);
             }
         }
