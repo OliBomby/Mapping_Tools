@@ -18,17 +18,9 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
             return -p * Math.Pow(t, 2) + (p + 1) * t;
         }
 
-        public IGraphInterpolator GetDerivativeInterpolator() {
-            return new LinearInterpolator();
-        }
-
         public double GetDerivative(double t) {
             var p = MathHelper.Clamp(P, -1, 1);
             return -2 * p * t + p + 1;
-        }
-
-        public IGraphInterpolator GetPrimitiveInterpolator(double x1, double y1, double x2, double y2) {
-            return new PrimitiveParabolaInterpolator(y1, y2) {P = P};
         }
 
         public double GetIntegral(double t1, double t2) {

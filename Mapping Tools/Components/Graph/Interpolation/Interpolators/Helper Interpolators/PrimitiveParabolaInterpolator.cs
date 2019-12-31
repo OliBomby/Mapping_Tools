@@ -22,10 +22,6 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators.Helper_Inte
             return (t * (2 * p * Math.Pow(t, 2) * (_y2 - _y1) + 3 * (p + 1) * t * (_y1 - _y2) - 6 * _y1)) / (_y1 * (p - 3) - _y2 * (p + 3));
         }
 
-        public IGraphInterpolator GetDerivativeInterpolator() {
-            return new ParabolaInterpolator {P = P};
-        }
-
         public double GetDerivative(double t) {
             var p = MathHelper.Clamp(P, -1, 1);
             return -(6 * (_y1 * (t - 1) * (p * t - 1) + _y2 * t * (p * -t + p + 1))) / (_y1 * (p - 3) - _y2 * (p + 3));

@@ -172,11 +172,13 @@ namespace Mapping_Tools.Views {
 
             if (_graphMode == GraphMode.Position && graphMode == GraphMode.Velocity) {
                 // Differentiate graph
-                Graph.Differentiate(-ViewModel.VelocityLimit, ViewModel.VelocityLimit);
+                Graph.MinY = -ViewModel.VelocityLimit;
+                Graph.MaxY = ViewModel.VelocityLimit;
                 Graph.VerticalMarkerGenerator = new DoubleMarkerGenerator(0, 1, "x");
             } else if (_graphMode == GraphMode.Velocity && graphMode == GraphMode.Position) {
                 // Integrate graph
-                Graph.Integrate(0, 1);
+                Graph.MinY = 0;
+                Graph.MaxY = 1;
                 Graph.VerticalMarkerGenerator = new DoubleMarkerGenerator(0, 0.25);
             }
 
