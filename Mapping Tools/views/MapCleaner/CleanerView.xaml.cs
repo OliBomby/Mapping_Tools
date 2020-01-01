@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
+using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Views {
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
@@ -161,10 +162,10 @@ namespace Mapping_Tools.Views {
             
             foreach (TimingPoint tp in originalInNew) {
                 bool different = true;
-                List<TimingPoint> newTPs = newInOriginal.Where(o => o.Offset == tp.Offset).ToList();
+                List<TimingPoint> newTPs = newInOriginal.Where(o => Math.Abs(o.Offset - tp.Offset) < Precision.DOUBLE_EPSILON).ToList();
                 if (newTPs.Count == 0) { different = false; }
-                foreach (TimingPoint newTP in newTPs) {
-                    if (tp.Equals(newTP)) { different = false; }
+                foreach (TimingPoint newTp in newTPs) {
+                    if (tp.Equals(newTp)) { different = false; }
                 }
                 if (different) { TimingpointsChanged.Add(tp.Offset); }
             }
@@ -176,33 +177,28 @@ namespace Mapping_Tools.Views {
 
             TimingpointsRemoved = originalOffsets.Except(newOffsets).ToList();
             TimingpointsAdded = newOffsets.Except(originalOffsets).ToList();
-            double endTimeOriginal = originalTimingPoints.Last().Offset;
-            double endTimeNew = newTimingPoints.Last().Offset;
-            EndTime_monitor = endTimeOriginal > endTimeNew ? endTimeOriginal : endTimeNew;
+            double endTimeOriginal = originalTimingPoints.Count > 0 ? originalTimingPoints.Last().Offset : 0;
+            double endTimeNew = newTimingPoints.Count > 0 ? newTimingPoints.Last().Offset : 0;
+            EndTime_monitor = Math.Max(endTimeOriginal, endTimeNew);
         }
 
         private void FillTimeLine() {
-            if (TL != null) {
-                TL.mainCanvas.Children.Clear();
-            }
+            TL?.mainCanvas.Children.Clear();
             try {
                 TL = new TimeLine(MainWindow.AppWindow.ActualWidth, 100.0, EndTime_monitor);
-                foreach (double timing_s in TimingpointsAdded) {
-                    TL.AddElement(timing_s, 1);
+                foreach (double timingS in TimingpointsAdded) {
+                    TL.AddElement(timingS, 1);
                 }
-                foreach (double timing_s in TimingpointsChanged) {
-                    TL.AddElement(timing_s, 2);
+                foreach (double timingS in TimingpointsChanged) {
+                    TL.AddElement(timingS, 2);
                 }
-                foreach (double timing_s in TimingpointsRemoved) {
-                    TL.AddElement(timing_s, 3);
+                foreach (double timingS in TimingpointsRemoved) {
+                    TL.AddElement(timingS, 3);
                 }
                 tl_host.Children.Clear();
                 tl_host.Children.Add(TL);
             } catch (Exception ex) {
                 Console.WriteLine(ex.Message);
-                return;
-            } finally {
-
             }
         }
     }
