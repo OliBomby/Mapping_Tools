@@ -4,7 +4,7 @@ using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
     [DisplayName("Wave")]
-    public class WaveInterpolator : CustomInterpolator, IIntegrableInterpolator {
+    public class WaveInterpolator : CustomInterpolator, IDerivableInterpolator, IIntegrableInterpolator {
         public string Name => "Wave";
 
         public WaveInterpolator() {
@@ -23,6 +23,10 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
             return (-Math.Cos(t) + 1) / 2;
         }
 
+        private static double SineWaveDerivative(double t) {
+            return Math.Sin(t) / 2;
+        }
+
         private static double SineWavePrimitive(double t, double c) {
             return t / 2 - Math.Sin(2 * Math.PI * c * t) / (4 * Math.PI * c);
         }
@@ -30,6 +34,12 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
         private static double TriangleWave(double t, double T) {
             var modT = t % T;
             return modT < T / 2 ? 2 * modT / T : 2 - 2 * modT / T;
+        }
+
+        // This is a square wave
+        private static double TriangleWaveDerivative(double t, double T) {
+            var modT = t % T;
+            return modT < T / 2 ? 2 / T : -2 / T;
         }
 
         /// <summary>
@@ -51,6 +61,14 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
             return P < 0 ? 
                 TriangleWaveIntegral(t2, 1 / cycles) - TriangleWaveIntegral(t1, 1 / cycles) : 
                 SineWavePrimitive(t2, cycles) - SineWavePrimitive(t1, cycles);
+        }
+
+        public double GetDerivative(double t) {
+            var cycles = Math.Round((1 - Math.Abs(MathHelper.Clamp(P, -1, 1))) * 50) + 0.5;
+
+            return P < 0 ? 
+                TriangleWaveDerivative(t, 1 / cycles) : 
+                SineWaveDerivative(t * cycles * 2 * Math.PI);
         }
     }
 }

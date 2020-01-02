@@ -29,10 +29,6 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
             return (Math.Pow(2, k * t) - 1) / (Math.Pow(2, k) - 1);
         }
 
-        public IGraphInterpolator GetDerivativeInterpolator() {
-            throw new NotImplementedException();
-        }
-
         public double GetDerivative(double t) {
             if (t < 0.5) {
                 return 0.5 * Derivative(t * 2, P);
