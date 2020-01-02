@@ -44,7 +44,7 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
             return Primitive(t2, p) - Primitive(t1, p);
         }
 
-        private double Primitive(double t, double p) {
+        private static double Primitive(double t, double p) {
             return (Math.Exp(p * t) / p - t) / (Math.Exp(p) - 1) - 1 / (p * (Math.Exp(p) - 1));
         }
     }
