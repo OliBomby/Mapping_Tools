@@ -42,6 +42,7 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
                   (4 * (Math.Exp(p) - 1) * p);
         }
 
+        // TODO: The concatenated nature of this interpolator makes the derivative not have the maximal/minimal values at the endpoints, but at the midpoint too
         public double GetDerivative(double t) {
             if (Math.Abs(P) < Precision.DOUBLE_EPSILON) {
                 return _linearDegenerate.GetDerivative(t);
