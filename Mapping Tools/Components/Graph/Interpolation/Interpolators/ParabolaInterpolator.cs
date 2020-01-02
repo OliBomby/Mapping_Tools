@@ -1,7 +1,6 @@
-﻿using System;
+﻿using Mapping_Tools.Classes.MathUtil;
+using System;
 using System.ComponentModel;
-using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Components.Graph.Interpolation.Interpolators.Helper_Interpolators;
 
 namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
     [DisplayName("Parabola")]

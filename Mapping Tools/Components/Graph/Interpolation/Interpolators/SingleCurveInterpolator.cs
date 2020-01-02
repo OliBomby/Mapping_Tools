@@ -1,7 +1,6 @@
-﻿using System;
+﻿using Mapping_Tools.Classes.MathUtil;
+using System;
 using System.ComponentModel;
-using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Components.Graph.Interpolation.Interpolators.Helper_Interpolators;
 
 namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
     [DisplayName("Single curve")]
@@ -27,11 +26,6 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
             return (Math.Exp(k * t) - 1) / (Math.Exp(k) - 1);
         }
 
-        public IGraphInterpolator GetDerivativeInterpolator() {
-            // Can return the same interpolator type, because this interpolator is based on the natural exponent
-            return new SingleCurveInterpolator {P = P};
-        }
-
         public double GetDerivative(double t) {
             if (Math.Abs(P) < Precision.DOUBLE_EPSILON) {
                 return _linearDegenerate.GetDerivative(t);
@@ -41,20 +35,16 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
             return p * Math.Exp(p * t) / (Math.Exp(p) - 1);
         }
 
-        public IGraphInterpolator GetPrimitiveInterpolator(double x1, double y1, double x2, double y2) {
-            return new SingleCurveInterpolator {P = P};
-        }
-
         public double GetIntegral(double t1, double t2) {
             if (Math.Abs(P) < Precision.DOUBLE_EPSILON) {
                 return _linearDegenerate.GetIntegral(t1, t2);
             }
-
-            return Primitive(t2) - Primitive(t1);
+            
+            var p = -MathHelper.Clamp(P, -1, 1) * 10;
+            return Primitive(t2, p) - Primitive(t1, p);
         }
 
-        private double Primitive(double t) {
-            var p = -MathHelper.Clamp(P, -1, 1) * 10;
+        private double Primitive(double t, double p) {
             return (Math.Exp(p * t) / p - t) / (Math.Exp(p) - 1) - 1 / (p * (Math.Exp(p) - 1));
         }
     }
