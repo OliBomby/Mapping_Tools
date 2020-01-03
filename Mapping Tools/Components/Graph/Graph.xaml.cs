@@ -238,6 +238,28 @@ namespace Mapping_Tools.Components.Graph {
             set => SetValue(EndPointLockedYProperty, value);
         }
 
+        public static readonly DependencyProperty MarkerSnappingHorizontalProperty =
+            DependencyProperty.Register(nameof(MarkerSnappingHorizontal),
+                typeof(bool), 
+                typeof(Graph), 
+                new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.None));
+
+        public bool MarkerSnappingHorizontal {
+            get => (bool) GetValue(MarkerSnappingHorizontalProperty);
+            set => SetValue(MarkerSnappingHorizontalProperty, value);
+        }
+
+        public static readonly DependencyProperty MarkerSnappingVerticalProperty =
+            DependencyProperty.Register(nameof(MarkerSnappingVertical),
+                typeof(bool), 
+                typeof(Graph), 
+                new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.None));
+
+        public bool MarkerSnappingVertical {
+            get => (bool) GetValue(MarkerSnappingVerticalProperty);
+            set => SetValue(MarkerSnappingVerticalProperty, value);
+        }
+
         public static readonly DependencyProperty ScaleOnBoundChangeHorizontalProperty =
             DependencyProperty.Register(nameof(ScaleOnBoundChangeHorizontal),
                 typeof(bool), 
@@ -801,21 +823,38 @@ namespace Mapping_Tools.Components.Graph {
             var previous = Anchors.ElementAtOrDefault(index - 1);
             var next = Anchors.ElementAtOrDefault(index + 1);
 
-            // Snap to nearest vertical marker unless left alt is held
+            // Snap to nearest marker unless left alt is held
             if (!Keyboard.IsKeyDown(Key.LeftAlt)) {
-                // Find the nearest marker
-                GraphMarker nearestMarker = null;
-                double nearestDistance = double.PositiveInfinity;
-                foreach (var marker in _markers.Where(o => o.Orientation == Orientation.Vertical)) {
-                    var markerPos = GetValue(marker);
-                    var dist = Math.Abs(pos.X - markerPos.X);
-                    if (!(dist < nearestDistance)) continue;
-                    nearestDistance = dist;
-                    nearestMarker = marker;
+                if (MarkerSnappingHorizontal) {
+                    // Find the nearest marker
+                    GraphMarker nearestMarkerHorizontal = null;
+                    double nearestDistance = double.PositiveInfinity;
+                    foreach (var marker in _markers.Where(o => o.Orientation == Orientation.Vertical)) {
+                        var markerPos = GetValue(marker);
+                        var dist = Math.Abs(pos.X - markerPos.X);
+                        if (!(dist < nearestDistance)) continue;
+                        nearestDistance = dist;
+                        nearestMarkerHorizontal = marker;
+                    }
+                    // Set X to that marker's value
+                    if (nearestMarkerHorizontal != null)
+                        pos.X = GetValueX(nearestMarkerHorizontal.X);
                 }
-                // Set X to that marker's value
-                if (nearestMarker != null)
-                    pos.X = GetValueX(nearestMarker.X);
+                if (MarkerSnappingVertical) {
+                    // Find the nearest marker
+                    GraphMarker nearestMarkerVertical = null;
+                    double nearestDistance = double.PositiveInfinity;
+                    foreach (var marker in _markers.Where(o => o.Orientation == Orientation.Horizontal)) {
+                        var markerPos = GetValue(marker);
+                        var dist = Math.Abs(pos.Y - markerPos.Y);
+                        if (!(dist < nearestDistance)) continue;
+                        nearestDistance = dist;
+                        nearestMarkerVertical = marker;
+                    }
+                    // Set Y to that marker's value
+                    if (nearestMarkerVertical != null)
+                        pos.Y = GetValueY(nearestMarkerVertical.Y);
+                }
             }
 
             // Clip the new position between the previous and the next anchor
