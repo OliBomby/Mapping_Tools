@@ -182,6 +182,18 @@ namespace Mapping_Tools.Components.Graph {
             set => SetValue(MinMarkerSpacingProperty, value);
         }
 
+        public static readonly DependencyProperty UserEditableProperty =
+            DependencyProperty.Register(nameof(UserEditable),
+                typeof(bool), 
+                typeof(Graph), 
+                new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.None,
+                    OnEditableChanged));
+
+        public bool UserEditable {
+            get => (bool) GetValue(UserEditableProperty);
+            set => SetValue(UserEditableProperty, value);
+        }
+
         public static readonly DependencyProperty LimitedEndPointMovementProperty =
             DependencyProperty.Register(nameof(LimitedEndPointMovement),
                 typeof(bool), 
@@ -560,6 +572,11 @@ namespace Mapping_Tools.Components.Graph {
             g.RegenerateMarkers();
         }
 
+        private static void OnEditableChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            var g = (Graph) d;
+            g.UpdateVisual();
+        }
+
         private static void OnMarkersChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             var g = (Graph) d;
             g.UpdateMarkers();
@@ -713,8 +730,8 @@ namespace Mapping_Tools.Components.Graph {
             var polygon = new Polygon {Points = points2, Fill = Fill, IsHitTestVisible = false};
             MainCanvas.Children.Add(polygon);
 
-            // Return if we dont draw Anchors
-            if (!_drawAnchors) return;
+            // Return if we dont draw Anchors or if the graph is not user editable. Having invisible anchors makes it impossible to edit
+            if (!_drawAnchors || !Editable) return;
 
             // Add tension Anchors
             foreach (var anchor in Anchors) {
