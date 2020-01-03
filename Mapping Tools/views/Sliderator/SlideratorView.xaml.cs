@@ -159,27 +159,31 @@ namespace Mapping_Tools.Views {
                     GraphToggleContentTextBlock.Text = "X";
                     Graph.HorizontalAxisVisible = false;
                     Graph.VerticalAxisVisible = false;
+
+                    // Make sure the start point is locked at y = 0
+                    Graph.StartPointLockedY = true;
+                    var firstAnchor = Graph.Anchors.FirstOrDefault();
+                    if (firstAnchor != null) {
+                        firstAnchor.Pos = new Vector2(firstAnchor.Pos.X, 0);
+                    }
+                    
+                    Graph.MinY = 0;
+                    Graph.MaxY = 1;
+                    Graph.VerticalMarkerGenerator = new DoubleMarkerGenerator(0, 0.25);
                     break;
                 case GraphMode.Velocity:
                     GraphToggleContentTextBlock.Text = "V";
                     Graph.HorizontalAxisVisible = true;
                     Graph.VerticalAxisVisible = false;
+                    Graph.StartPointLockedY = false;
+
+                    Graph.MinY = -ViewModel.VelocityLimit;
+                    Graph.MaxY = ViewModel.VelocityLimit;
+                    Graph.VerticalMarkerGenerator = new DoubleMarkerGenerator(0, 1, "x");
                     break;
                 default:
                     GraphToggleContentTextBlock.Text = "";
                     break;
-            }
-
-            if (_graphMode == GraphMode.Position && graphMode == GraphMode.Velocity) {
-                // Differentiate graph
-                Graph.MinY = -ViewModel.VelocityLimit;
-                Graph.MaxY = ViewModel.VelocityLimit;
-                Graph.VerticalMarkerGenerator = new DoubleMarkerGenerator(0, 1, "x");
-            } else if (_graphMode == GraphMode.Velocity && graphMode == GraphMode.Position) {
-                // Integrate graph
-                Graph.MinY = 0;
-                Graph.MaxY = 1;
-                Graph.VerticalMarkerGenerator = new DoubleMarkerGenerator(0, 0.25);
             }
 
             _graphMode = graphMode;

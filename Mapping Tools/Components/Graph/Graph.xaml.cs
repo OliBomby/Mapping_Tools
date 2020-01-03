@@ -194,16 +194,48 @@ namespace Mapping_Tools.Components.Graph {
             set => SetValue(UserEditableProperty, value);
         }
 
-        public static readonly DependencyProperty LimitedEndPointMovementProperty =
-            DependencyProperty.Register(nameof(LimitedEndPointMovement),
+        public static readonly DependencyProperty StartPointLockedXProperty =
+            DependencyProperty.Register(nameof(StartPointLockedX),
                 typeof(bool), 
                 typeof(Graph), 
-                new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.None,
-                    OnMarkersChanged));
+                new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.None));
 
-        public bool LimitedEndPointMovement {
-            get => (bool) GetValue(LimitedEndPointMovementProperty);
-            set => SetValue(LimitedEndPointMovementProperty, value);
+        public bool StartPointLockedX {
+            get => (bool) GetValue(StartPointLockedXProperty);
+            set => SetValue(StartPointLockedXProperty, value);
+        }
+
+        public static readonly DependencyProperty StartPointLockedYProperty =
+            DependencyProperty.Register(nameof(StartPointLockedY),
+                typeof(bool), 
+                typeof(Graph), 
+                new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.None));
+
+        public bool StartPointLockedY {
+            get => (bool) GetValue(StartPointLockedYProperty);
+            set => SetValue(StartPointLockedYProperty, value);
+        }
+
+        public static readonly DependencyProperty EndPointLockedXProperty =
+            DependencyProperty.Register(nameof(EndPointLockedX),
+                typeof(bool), 
+                typeof(Graph), 
+                new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.None));
+
+        public bool EndPointLockedX {
+            get => (bool) GetValue(EndPointLockedXProperty);
+            set => SetValue(EndPointLockedXProperty, value);
+        }
+
+        public static readonly DependencyProperty EndPointLockedYProperty =
+            DependencyProperty.Register(nameof(EndPointLockedY),
+                typeof(bool), 
+                typeof(Graph), 
+                new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.None));
+
+        public bool EndPointLockedY {
+            get => (bool) GetValue(EndPointLockedYProperty);
+            set => SetValue(EndPointLockedYProperty, value);
         }
 
         public static readonly DependencyProperty ScaleOnBoundChangeHorizontalProperty =
@@ -731,7 +763,7 @@ namespace Mapping_Tools.Components.Graph {
             MainCanvas.Children.Add(polygon);
 
             // Return if we dont draw Anchors or if the graph is not user editable. Having invisible anchors makes it impossible to edit
-            if (!_drawAnchors || !Editable) return;
+            if (!_drawAnchors || !UserEditable) return;
 
             // Add tension Anchors
             foreach (var anchor in Anchors) {
@@ -768,32 +800,51 @@ namespace Mapping_Tools.Components.Graph {
             var index = Anchors.IndexOf(anchor);
             var previous = Anchors.ElementAtOrDefault(index - 1);
             var next = Anchors.ElementAtOrDefault(index + 1);
-            if (previous == null || next == null) {
-                if (LimitedEndPointMovement) {
-                    // Is edge anchor so dont move it
-                    pos.X = anchor.Pos.X;
+
+            // Snap to nearest vertical marker unless left alt is held
+            if (!Keyboard.IsKeyDown(Key.LeftAlt)) {
+                // Find the nearest marker
+                GraphMarker nearestMarker = null;
+                double nearestDistance = double.PositiveInfinity;
+                foreach (var marker in _markers.Where(o => o.Orientation == Orientation.Vertical)) {
+                    var markerPos = GetValue(marker);
+                    var dist = Math.Abs(pos.X - markerPos.X);
+                    if (!(dist < nearestDistance)) continue;
+                    nearestDistance = dist;
+                    nearestMarker = marker;
                 }
-            } else {
-                // Snap to nearest vertical marker unless left alt is held
-                if (!Keyboard.IsKeyDown(Key.LeftAlt)) {
-                    // Find the nearest marker
-                    GraphMarker nearestMarker = null;
-                    double nearestDistance = double.PositiveInfinity;
-                    foreach (var marker in _markers.Where(o => o.Orientation == Orientation.Vertical)) {
-                        var markerPos = GetValue(marker);
-                        var dist = Math.Abs(pos.X - markerPos.X);
-                        if (!(dist < nearestDistance)) continue;
-                        nearestDistance = dist;
-                        nearestMarker = marker;
-                    }
-                    // Set X to that marker's value
-                    if (nearestMarker != null)
-                        pos.X = GetValueX(nearestMarker.X);
-                }
-                pos.X = MathHelper.Clamp(pos.X, previous.Pos.X, next.Pos.X);
+                // Set X to that marker's value
+                if (nearestMarker != null)
+                    pos.X = GetValueX(nearestMarker.X);
             }
 
+            // Clip the new position between the previous and the next anchor
+            if (previous != null) {
+                pos.X = Math.Max(pos.X, previous.Pos.X);
+            }
+            if (next != null) {
+                pos.X = Math.Min(pos.X, next.Pos.X);
+            }
+
+            // Clip the new Y position between the bounds of the graph
             pos.Y = MathHelper.Clamp(pos.Y, MinY, MaxY);
+            
+            // Handle lockedness of start/end point
+            if (previous == null) {
+                if (StartPointLockedX) {
+                    pos.X = anchor.Pos.X;
+                }
+                if (StartPointLockedY) {
+                    pos.Y = anchor.Pos.Y;
+                }
+            } else if (next == null) {
+                if (EndPointLockedX) {
+                    pos.X = anchor.Pos.X;
+                }
+                if (EndPointLockedY) {
+                    pos.Y = anchor.Pos.Y;
+                }
+            }
 
             anchor.Pos = pos;
 
