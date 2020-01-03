@@ -21,10 +21,7 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
             }
 
             var p = -MathHelper.Clamp(P, -1, 1) * 10;
-            if (t < 0.5) {
-                return 0.5 * F(t * 2, p);
-            }
-            return 0.5 + 0.5 * F(t * 2 - 1, -p);
+            return t < 0.5 ? 0.5 * F(t * 2, p) : 0.5 + 0.5 * F(t * 2 - 1, -p);
         }
 
         private static double F(double t, double p) {
@@ -49,10 +46,7 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
             }
 
             var p = -MathHelper.Clamp(P, -1, 1) * 10;
-            if (t < 0.5) {
-                return Derivative(2 * t, p);
-            }
-            return Derivative(2 - 2 * t, p);
+            return t < 0.5 ? Derivative(2 * t, p) : Derivative(2 - 2 * t, p);
         }
 
         public double GetIntegral(double t1, double t2) {

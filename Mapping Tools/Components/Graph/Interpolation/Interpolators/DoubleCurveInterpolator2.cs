@@ -5,7 +5,7 @@ using Mapping_Tools.Classes.MathUtil;
 namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
     [DisplayName("Double curve 2")]
     [VerticalMirrorInterpolator]
-    public class DoubleCurveInterpolator2 : CustomInterpolator, IDerivableInterpolator {
+    public class DoubleCurveInterpolator2 : CustomInterpolator, IDerivableInterpolator, IIntegrableInterpolator {
         private readonly LinearInterpolator _linearDegenerate;
 
         public DoubleCurveInterpolator2() {
@@ -19,26 +19,41 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
             }
 
             var p = -MathHelper.Clamp(P, -1, 1) * 10;
-            if (t < 0.5) {
-                return 0.5 * F(t * 2, p);
-            }
-            return 0.5 + 0.5 * F(t * 2 - 1, -p);
+            return t < 0.5 ? 0.5 * F(t * 2, p) : 0.5 + 0.5 * F(t * 2 - 1, -p);
         }
 
         private static double F(double t, double k) {
             return (Math.Pow(2, k * t) - 1) / (Math.Pow(2, k) - 1);
         }
 
-        public double GetDerivative(double t) {
-            if (t < 0.5) {
-                return 0.5 * Derivative(t * 2, P);
-            }
-
-            return 0.5 * Derivative(t * 2 - 1, -P);
+        private static double Derivative(double t, double p) {
+            return p * Math.Log(2) * Math.Pow(2, p * t) / (Math.Pow(2, p) - 1);
         }
 
-        private static double Derivative(double t, double k) {
-            return (k * Math.Log(2) * Math.Pow(2, k * t)) / (Math.Pow(2, k) - 1);
+        private static double Primitive(double t, double p) {
+            return t < 0.5 ? 
+                ((Math.Pow(4, p * t)) / (p * Math.Log(4)) - t) / (2 * (Math.Pow(2, p) - 1)) : 
+                ((Math.Pow(2, p + 2) - 2) * t + (Math.Pow(2, p) * (Math.Pow(2, p - 2 * p * t) - p * Math.Log(4))) /
+                   (p * Math.Log(2))) / (4 * (Math.Pow(2, p) - 1));
+        }
+
+        // TODO: The concatenated nature of this interpolator makes the derivative not have the maximal/minimal values at the endpoints, but at the midpoint too
+        public double GetDerivative(double t) {
+            if (Math.Abs(P) < Precision.DOUBLE_EPSILON) {
+                return _linearDegenerate.GetDerivative(t);
+            }
+
+            var p = -MathHelper.Clamp(P, -1, 1) * 10;
+            return t < 0.5 ? Derivative(2 * t, p) : Derivative(2 - 2 * t, p);
+        }
+
+        public double GetIntegral(double t1, double t2) {
+            if (Math.Abs(P) < Precision.DOUBLE_EPSILON) {
+                return _linearDegenerate.GetIntegral(t1, t2);
+            }
+
+            var p = -MathHelper.Clamp(P, -1, 1) * 10;
+            return Primitive(t2, p) - Primitive(t1, p);
         }
     }
 }
