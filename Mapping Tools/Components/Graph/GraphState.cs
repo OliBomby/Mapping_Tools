@@ -252,7 +252,11 @@ namespace Mapping_Tools.Components.Graph {
                     } else {
                         integral = 0.5;
                     }
-                    
+
+                    if (difference.Y * p1.Y < 0) {
+                        // TODO: Possibility of max/min not at endpoints. Need to calculate the hard way. Binary search?
+                    }
+
                     height += integral * difference.X * difference.Y + difference.X * p1.Y;
 
                     if (height > maxValue) {
