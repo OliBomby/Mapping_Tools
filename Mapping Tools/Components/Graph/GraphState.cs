@@ -1,10 +1,10 @@
 ﻿using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Components.Graph.Interpolation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
-using Mapping_Tools.Components.Graph.Interpolation;
-using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
 
 namespace Mapping_Tools.Components.Graph {
     public class GraphState : Freezable {
@@ -185,8 +185,50 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         public static double GetMaxValue(IReadOnlyList<Anchor> anchors) {
-            // It suffices to find the highest Y value of the anchors, because the interpolated parts never stick out above or below the anchors.
-            return anchors.Max(o => o.Pos.Y);
+            var customExtrema = anchors.Any(o =>
+                o.Interpolator.GetType().GetCustomAttribute<CustomExtremaAttribute>() != null);
+
+            if (!customExtrema) {
+                // It suffices to find the highest Y value of the anchors, because the interpolated parts never stick out above or below the anchors.
+                return anchors.Max(o => o.Pos.Y);
+            }
+
+            Anchor previousAnchor = null;
+            double maxValue = double.NegativeInfinity;
+            foreach (var anchor in anchors) {
+                if (previousAnchor != null) {
+                    var p1 = previousAnchor.Pos;
+                    var p2 = anchor.Pos;
+
+                    var difference = p2 - p1;
+
+                    IEnumerable<double> values;
+                    
+                    // If the interpolator has a CustomExtremaAttribute than we check the min/max value for all the specified locations
+                    var customExtremaAttribute =
+                        anchor.Interpolator.GetType().GetCustomAttribute<CustomExtremaAttribute>();
+
+                    if (customExtremaAttribute != null) {
+                        // Update the interpolator with the tension of the anchor. This doesn't happen automatically
+                        anchor.Interpolator.P = anchor.Tension;
+
+                        values = customExtremaAttribute.ExtremaPositions
+                            .Select(o => p1.Y + difference.Y * anchor.Interpolator.GetInterpolation(o));
+                    } else {
+                        values = new[] {p1.Y, p2.Y};
+                    }
+
+                    var localMaxValue = values.Max();
+
+                    if (localMaxValue > maxValue) {
+                        maxValue = localMaxValue;
+                    }
+                }
+
+                previousAnchor = anchor;
+            }
+
+            return maxValue;
         }
 
         public static double GetMaxDerivative(IReadOnlyList<Anchor> anchors) {
@@ -201,23 +243,29 @@ namespace Mapping_Tools.Components.Graph {
                     
                     // Update the interpolator with the tension of the anchor. This doesn't happen automatically
                     anchor.Interpolator.P = anchor.Tension;
-
-                    double startSlope;
-                    double endSlope;
+                    
+                    IEnumerable<double> values;
 
                     if (anchor.Interpolator is IDerivableInterpolator derivableInterpolator) {
-                        startSlope = derivableInterpolator.GetDerivative(0) * difference.Y / difference.X;
-                        endSlope = derivableInterpolator.GetDerivative(1) * difference.Y / difference.X;
-                    } else {
-                        startSlope = difference.Y / difference.X;
-                        endSlope = startSlope;
-                    }
+                        // If the interpolator has a CustomDerivativeExtremaAttribute than we check the min/max derivative for all the specified locations
+                        var customExtremaAttribute =
+                            anchor.Interpolator.GetType().GetCustomAttribute<CustomDerivativeExtremaAttribute>();
 
-                    if (startSlope > maxValue) {
-                        maxValue = startSlope;
+                        if (customExtremaAttribute != null) {
+                            values = customExtremaAttribute.ExtremaPositions
+                                .Select(o => derivableInterpolator.GetDerivative(o) * difference.Y / difference.X);
+                        } else {
+                            values = new[] {0, 1}
+                                .Select(o => derivableInterpolator.GetDerivative(o) * difference.Y / difference.X);
+                        }
+                    } else {
+                        values = new[] {difference.Y / difference.X};
                     }
-                    if (endSlope > maxValue) {
-                        maxValue = endSlope;
+                    
+                    var localMaxValue = values.Max();
+
+                    if (localMaxValue > maxValue) {
+                        maxValue = localMaxValue;
                     }
                 }
 
@@ -246,18 +294,27 @@ namespace Mapping_Tools.Components.Graph {
                     // Update the interpolator with the tension of the anchor. This doesn't happen automatically
                     anchor.Interpolator.P = anchor.Tension;
 
-                    double integral;
+                    double maxIntegral;
                     if (anchor.Interpolator is IIntegrableInterpolator integrableInterpolator) {
-                        integral = integrableInterpolator.GetIntegral(0, 1);
+                        // If the interpolator has a CustomIntegralExtremaAttribute than we check the min/max integral for all the specified locations
+                        var customExtremaAttribute =
+                            anchor.Interpolator.GetType().GetCustomAttribute<CustomIntegralExtremaAttribute>();
+
+                        if (customExtremaAttribute != null) {
+                            maxIntegral = customExtremaAttribute.ExtremaPositions
+                                .Select(o => integrableInterpolator.GetIntegral(0, o)).Max();
+                        } else {
+                            maxIntegral = integrableInterpolator.GetIntegral(0, 1);
+                        }
                     } else {
-                        integral = 0.5;
+                        maxIntegral = 0.5;
                     }
 
                     if (difference.Y * p1.Y < 0) {
                         // TODO: Possibility of max/min not at endpoints. Need to calculate the hard way. Binary search?
                     }
 
-                    height += integral * difference.X * difference.Y + difference.X * p1.Y;
+                    height += maxIntegral * difference.X * difference.Y + difference.X * p1.Y;
 
                     if (height > maxValue) {
                         maxValue = height;
@@ -271,8 +328,50 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         public static double GetMinValue(IReadOnlyList<Anchor> anchors) {
-            // It suffices to find the smallest Y value of the anchors, because the interpolated parts never stick out above or below the anchors.
-            return anchors.Min(o => o.Pos.Y);
+            var customExtrema = anchors.Any(o =>
+                o.Interpolator.GetType().GetCustomAttribute<CustomExtremaAttribute>() != null);
+
+            if (!customExtrema) {
+                // It suffices to find the smallest Y value of the anchors, because the interpolated parts never stick out above or below the anchors.
+                return anchors.Min(o => o.Pos.Y);
+            }
+
+            Anchor previousAnchor = null;
+            double minValue = double.PositiveInfinity;
+            foreach (var anchor in anchors) {
+                if (previousAnchor != null) {
+                    var p1 = previousAnchor.Pos;
+                    var p2 = anchor.Pos;
+
+                    var difference = p2 - p1;
+
+                    IEnumerable<double> values;
+                    
+                    // If the interpolator has a CustomExtremaAttribute than we check the min/max value for all the specified locations
+                    var customExtremaAttribute =
+                        anchor.Interpolator.GetType().GetCustomAttribute<CustomExtremaAttribute>();
+
+                    if (customExtremaAttribute != null) {
+                        // Update the interpolator with the tension of the anchor. This doesn't happen automatically
+                        anchor.Interpolator.P = anchor.Tension;
+
+                        values = customExtremaAttribute.ExtremaPositions
+                            .Select(o => p1.Y + difference.Y * anchor.Interpolator.GetInterpolation(o));
+                    } else {
+                        values = new[] {p1.Y, p2.Y};
+                    }
+
+                    var localMinValue = values.Max();
+
+                    if (localMinValue < minValue) {
+                        minValue = localMinValue;
+                    }
+                }
+
+                previousAnchor = anchor;
+            }
+
+            return minValue;
         }
 
         public static double GetMinDerivative(IReadOnlyList<Anchor> anchors) {
@@ -288,22 +387,28 @@ namespace Mapping_Tools.Components.Graph {
                     // Update the interpolator with the tension of the anchor. This doesn't happen automatically
                     anchor.Interpolator.P = anchor.Tension;
 
-                    double startSlope;
-                    double endSlope;
+                    IEnumerable<double> values;
 
                     if (anchor.Interpolator is IDerivableInterpolator derivableInterpolator) {
-                        startSlope = derivableInterpolator.GetDerivative(0) * difference.Y / difference.X;
-                        endSlope = derivableInterpolator.GetDerivative(1) * difference.Y / difference.X;
-                    } else {
-                        startSlope = difference.Y / difference.X;
-                        endSlope = startSlope;
-                    }
+                        // If the interpolator has a CustomDerivativeExtremaAttribute than we check the min/max derivative for all the specified locations
+                        var customExtremaAttribute =
+                            anchor.Interpolator.GetType().GetCustomAttribute<CustomDerivativeExtremaAttribute>();
 
-                    if (startSlope < minValue) {
-                        minValue = startSlope;
+                        if (customExtremaAttribute != null) {
+                            values = customExtremaAttribute.ExtremaPositions
+                                .Select(o => derivableInterpolator.GetDerivative(o) * difference.Y / difference.X);
+                        } else {
+                            values = new[] {0, 1}
+                                .Select(o => derivableInterpolator.GetDerivative(o) * difference.Y / difference.X);
+                        }
+                    } else {
+                        values = new[] {difference.Y / difference.X};
                     }
-                    if (endSlope < minValue) {
-                        minValue = endSlope;
+                    
+                    var localMinValue = values.Max();
+
+                    if (localMinValue < minValue) {
+                        minValue = localMinValue;
                     }
                 }
 
@@ -332,14 +437,23 @@ namespace Mapping_Tools.Components.Graph {
                     // Update the interpolator with the tension of the anchor. This doesn't happen automatically
                     anchor.Interpolator.P = anchor.Tension;
 
-                    double integral;
+                    double minIntegral;
                     if (anchor.Interpolator is IIntegrableInterpolator integrableInterpolator) {
-                        integral = integrableInterpolator.GetIntegral(0, 1);
+                        // If the interpolator has a CustomIntegralExtremaAttribute than we check the min/max integral for all the specified locations
+                        var customExtremaAttribute =
+                            anchor.Interpolator.GetType().GetCustomAttribute<CustomIntegralExtremaAttribute>();
+
+                        if (customExtremaAttribute != null) {
+                            minIntegral = customExtremaAttribute.ExtremaPositions
+                                .Select(o => integrableInterpolator.GetIntegral(0, o)).Min();
+                        } else {
+                            minIntegral = integrableInterpolator.GetIntegral(0, 1);
+                        }
                     } else {
-                        integral = 0.5;
+                        minIntegral = 0.5;
                     }
                     
-                    height += integral * difference.X * difference.Y + difference.X * p1.Y;
+                    height += minIntegral * difference.X * difference.Y + difference.X * p1.Y;
 
                     if (height < minValue) {
                         minValue = height;

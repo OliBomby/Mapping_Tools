@@ -357,6 +357,9 @@
     <Compile Include="Components\DragAndDropListBox.cs" />
     <Compile Include="Components\Graph\GraphIntegralDoubleAnimation.cs" />
     <Compile Include="Components\Graph\GraphDoubleAnimation.cs" />
+    <Compile Include="Components\Graph\Interpolation\CustomIntegralExtremaAttribute.cs" />
+    <Compile Include="Components\Graph\Interpolation\CustomExtremaAttribute.cs" />
+    <Compile Include="Components\Graph\Interpolation\CustomDerivativeExtremaAttribute.cs" />
     <Compile Include="Components\Graph\Interpolation\Interpolators\Helper Interpolators\PrimitiveSingleCurveInterpolator.cs" />
     <Compile Include="Components\Graph\Interpolation\Interpolators\Helper Interpolators\PrimitiveParabolaInterpolator.cs" />
     <Compile Include="Components\Graph\Markers\DividedBeatMarkerGenerator.cs" />

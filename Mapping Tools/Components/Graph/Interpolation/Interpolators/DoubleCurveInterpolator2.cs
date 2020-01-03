@@ -5,6 +5,7 @@ using Mapping_Tools.Classes.MathUtil;
 namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
     [DisplayName("Double curve 2")]
     [VerticalMirrorInterpolator]
+    [CustomDerivativeExtrema(new []{0, 0.5, 1})]
     public class DoubleCurveInterpolator2 : CustomInterpolator, IDerivableInterpolator, IIntegrableInterpolator {
         private readonly LinearInterpolator _linearDegenerate;
 
@@ -37,7 +38,6 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
                    (p * Math.Log(2))) / (4 * (Math.Pow(2, p) - 1));
         }
 
-        // TODO: The concatenated nature of this interpolator makes the derivative not have the maximal/minimal values at the endpoints, but at the midpoint too
         public double GetDerivative(double t) {
             if (Math.Abs(P) < Precision.DOUBLE_EPSILON) {
                 return _linearDegenerate.GetDerivative(t);
