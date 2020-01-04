@@ -207,12 +207,14 @@ namespace Mapping_Tools.Views {
             sliderPath.GetPathToProgress(path, 0, 1);
 
             Sliderator.PositionFunctionDelegate positionFunction;
+            // We convert the graph GetValue function to a function that works like px -> px
+            // d is a value representing the position along the graph in osu! pixels
             if (ViewModel.GraphMode == GraphMode.Velocity) {
                 // Here we use SvGraphMultiplier to get an accurate conversion from SV to slider completion per beat
                 // Completion = (100 * SliderMultiplier / PixelLength) * SV * Beats
-                positionFunction = d => arg.GraphState.GetIntegral(0, d) * arg.SvGraphMultiplier;
+                positionFunction = d => arg.GraphState.GetIntegral(0, d / arg.PixelLength * arg.GraphBeats) * arg.SvGraphMultiplier * arg.PixelLength;
             } else {
-                positionFunction = arg.GraphState.GetValue;
+                positionFunction = d => arg.GraphState.GetValue(d / arg.PixelLength * arg.GraphBeats) * arg.PixelLength;
             }
 
             var sliderator = new Sliderator {
