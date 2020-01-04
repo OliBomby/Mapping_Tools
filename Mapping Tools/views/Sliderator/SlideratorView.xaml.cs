@@ -45,7 +45,7 @@ namespace Mapping_Tools.Views {
 
             Graph.GraphStateChanged += GraphOnGraphStateChanged;
 
-            SetGraphMode(GraphMode.Position);
+            UpdateGraphModeStuff();
         }
 
         private void GraphOnGraphStateChanged(object sender, DependencyPropertyChangedEventArgs e) {
@@ -67,6 +67,9 @@ namespace Mapping_Tools.Views {
                         Graph.MinY = -ViewModel.VelocityLimit;
                         Graph.MaxY = ViewModel.VelocityLimit;
                     }
+                    break;
+                case nameof(ViewModel.GraphMode):
+                    UpdateGraphModeStuff();
                     break;
             }
         }
@@ -138,22 +141,8 @@ namespace Mapping_Tools.Views {
             Graph.Clear();
         }
 
-        private void GraphToggleButton_OnClick(object sender, RoutedEventArgs e) {
+        public void UpdateGraphModeStuff() {
             switch (ViewModel.GraphMode) {
-                case GraphMode.Position:
-                    SetGraphMode(GraphMode.Velocity);
-                    break;
-                case GraphMode.Velocity:
-                    SetGraphMode(GraphMode.Position);
-                    break;
-                default:
-                    SetGraphMode(GraphMode.Position);
-                    break;
-            }
-        }
-
-        public void SetGraphMode(GraphMode graphMode) {
-            switch (graphMode) {
                 case GraphMode.Position:
                     GraphToggleContentTextBlock.Text = "X";
                     Graph.HorizontalAxisVisible = false;
@@ -184,8 +173,6 @@ namespace Mapping_Tools.Views {
                     GraphToggleContentTextBlock.Text = "";
                     break;
             }
-
-            ViewModel.GraphMode = graphMode;
 
             AnimateProgress(GraphHitObjectElement);
         }

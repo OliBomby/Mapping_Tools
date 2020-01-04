@@ -144,6 +144,7 @@ namespace Mapping_Tools.Viewmodels {
         public CommandImplementation ImportCommand { get; }
         public CommandImplementation MoveLeftCommand { get; }
         public CommandImplementation MoveRightCommand { get; }
+        public CommandImplementation GraphToggleCommand { get; }
 
         [JsonIgnore]
         public GraphState GraphState { get; set; }
@@ -156,11 +157,13 @@ namespace Mapping_Tools.Viewmodels {
         public SlideratorVm() {
             LoadedHitObjects = new ObservableCollection<HitObject>();
             BeatsPerMinute = 180;
+            GlobalSv = 1.4;
             GraphBeats = 3;
             BeatSnapDivisor = 4;
             ImportMode = ImportMode.Selected;
             ExactTimeBoxVisibility = Visibility.Collapsed;
             VelocityLimit = 10;
+            GraphMode = GraphMode.Position;
 
             ImportCommand = new CommandImplementation(Import);
             MoveLeftCommand = new CommandImplementation(_ => {
@@ -169,7 +172,8 @@ namespace Mapping_Tools.Viewmodels {
             MoveRightCommand = new CommandImplementation(_ => {
                 VisibleHitObjectIndex = MathHelper.Clamp(VisibleHitObjectIndex + 1, 0, LoadedHitObjects.Count - 1);
             });
-    }
+            GraphToggleCommand = new CommandImplementation(ToggleGraphMode);
+        }
 
         private void Import(object _) {
             try {
@@ -206,6 +210,20 @@ namespace Mapping_Tools.Viewmodels {
                 }
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message + ex.StackTrace, "Error");
+            }
+        }
+
+        private void ToggleGraphMode(object _) {
+            switch (GraphMode) {
+                case GraphMode.Position:
+                    GraphMode = GraphMode.Velocity;
+                    break;
+                case GraphMode.Velocity:
+                    GraphMode = GraphMode.Position;
+                    break;
+                default:
+                    GraphMode = GraphMode.Position;
+                    break;
             }
         }
 

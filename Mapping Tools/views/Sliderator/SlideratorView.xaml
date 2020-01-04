@@ -220,7 +220,7 @@
                             </Button.Content>
                         </Button>
                         <Button Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Margin="5 0 0 0"
-                                ToolTip="Toggle graph mode." Click="GraphToggleButton_OnClick">
+                                ToolTip="Toggle graph mode." Command="{Binding GraphToggleCommand}">
                             <Button.Content>
                                 <Viewbox Width="24" Height="24">
                                     <TextBlock x:Name="GraphToggleContentTextBlock" FontWeight="Bold">V</TextBlock>
