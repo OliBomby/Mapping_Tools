@@ -75,6 +75,10 @@ namespace Mapping_Tools.Components.Graph {
             return GetValue(x, Anchors);
         }
 
+        public double GetDerivative(double x) {
+            return GetDerivative(x, Anchors);
+        }
+
         public double GetIntegral(double t1, double t2) {
             return GetIntegral(t1, t2, Anchors);
         }

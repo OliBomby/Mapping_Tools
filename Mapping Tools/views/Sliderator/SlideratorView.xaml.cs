@@ -27,13 +27,6 @@ namespace Mapping_Tools.Views {
 
         private SlideratorVm ViewModel => (SlideratorVm) DataContext;
 
-        private GraphMode _graphMode;
-
-        public enum GraphMode {
-            Position,
-            Velocity
-        }
-
         public SlideratorView() {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
@@ -61,6 +54,7 @@ namespace Mapping_Tools.Views {
 
         private void ViewModelOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
             switch (e.PropertyName) {
+                case nameof(ViewModel.SvGraphMultiplier):
                 case nameof(ViewModel.VisibleHitObject):
                 case nameof(ViewModel.GraphDuration):
                     AnimateProgress(GraphHitObjectElement);
@@ -69,7 +63,7 @@ namespace Mapping_Tools.Views {
                     Graph.HorizontalMarkerGenerator = new DividedBeatMarkerGenerator(ViewModel.BeatSnapDivisor);
                     break;
                 case nameof(ViewModel.VelocityLimit):
-                    if (_graphMode == GraphMode.Velocity) {
+                    if (ViewModel.GraphMode == GraphMode.Velocity) {
                         Graph.MinY = -ViewModel.VelocityLimit;
                         Graph.MaxY = ViewModel.VelocityLimit;
                     }
@@ -84,11 +78,14 @@ namespace Mapping_Tools.Views {
             var extraDuration = graphDuration.Add(TimeSpan.FromSeconds(1));
 
             DoubleAnimationBase animation;
-            if (_graphMode == GraphMode.Velocity) {
+            if (ViewModel.GraphMode == GraphMode.Velocity) {
                 animation = new GraphIntegralDoubleAnimation {
                     GraphState = Graph.GetGraphState(), From = Graph.MinX, To = Graph.MaxX,
                     Duration = graphDuration,
-                    BeginTime = TimeSpan.Zero
+                    BeginTime = TimeSpan.Zero,
+                    // Here we use SvGraphMultiplier to get an accurate conversion from SV to slider completion per beat
+                    // Completion = (100 * SliderMultiplier / PixelLength) * SV * Beats
+                    Multiplier = ViewModel.SvGraphMultiplier
                 };
             } else {
                 animation = new GraphDoubleAnimation {
@@ -123,10 +120,12 @@ namespace Mapping_Tools.Views {
             if (!TypeConverters.TryParseDouble(dialog.ValueBox.Text, out double value)) return;
 
             var maxValue = value;
-            if (_graphMode == GraphMode.Velocity) {
+            if (ViewModel.GraphMode == GraphMode.Velocity) {
                 // Integrate the graph to get the end value
-                maxValue = Graph.GetMaxIntegral();
-            } else if (_graphMode == GraphMode.Position) {
+                // Here we use SvGraphMultiplier to get an accurate conversion from SV to slider completion per beat
+                // Completion = (100 * SliderMultiplier / PixelLength) * SV * Beats
+                maxValue = Graph.GetMaxIntegral() * ViewModel.SvGraphMultiplier;
+            } else if (ViewModel.GraphMode == GraphMode.Position) {
                 maxValue = Graph.GetMaxValue();
             }
             Graph.ScaleAnchors(new Size(1, value / maxValue));
@@ -140,7 +139,7 @@ namespace Mapping_Tools.Views {
         }
 
         private void GraphToggleButton_OnClick(object sender, RoutedEventArgs e) {
-            switch (_graphMode) {
+            switch (ViewModel.GraphMode) {
                 case GraphMode.Position:
                     SetGraphMode(GraphMode.Velocity);
                     break;
@@ -186,7 +185,7 @@ namespace Mapping_Tools.Views {
                     break;
             }
 
-            _graphMode = graphMode;
+            ViewModel.GraphMode = graphMode;
 
             AnimateProgress(GraphHitObjectElement);
         }
@@ -220,8 +219,17 @@ namespace Mapping_Tools.Views {
             var path = new List<Vector2>();
             sliderPath.GetPathToProgress(path, 0, 1);
 
+            Sliderator.PositionFunctionDelegate positionFunction;
+            if (ViewModel.GraphMode == GraphMode.Velocity) {
+                // Here we use SvGraphMultiplier to get an accurate conversion from SV to slider completion per beat
+                // Completion = (100 * SliderMultiplier / PixelLength) * SV * Beats
+                positionFunction = d => arg.GraphState.GetIntegral(0, d) * arg.SvGraphMultiplier;
+            } else {
+                positionFunction = arg.GraphState.GetValue;
+            }
+
             var sliderator = new Sliderator {
-                PositionFunction = arg.GraphState.GetValue, MaxT = arg.GraphState.MaxX
+                PositionFunction = positionFunction, MaxT = arg.GraphState.MaxX
             };
             sliderator.SetPath(path);
 

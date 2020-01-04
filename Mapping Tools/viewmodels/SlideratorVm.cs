@@ -16,15 +16,19 @@ namespace Mapping_Tools.Viewmodels {
         private ObservableCollection<HitObject> _loadedHitObjects;
         private HitObject _visibleHitObject;
         private int _visibleHitObjectIndex;
+        private double _pixelLength;
+        private double _globalSv;
         private double _graphBeats;
         private double _beatsPerMinute;
         private int _beatSnapDivisor;
         private TimeSpan _graphDuration;
+        private double _svGraphMultiplier;
         private ImportMode _importMode;
         private double _exactTime;
         private Visibility _exactTimeBoxVisibility;
         private double _exportTime;
         private ExportMode _exportMode;
+        private GraphMode _graphMode;
         private double _velocityLimit;
 
         #region Properties
@@ -42,6 +46,24 @@ namespace Mapping_Tools.Viewmodels {
         public int VisibleHitObjectIndex {
             get => _visibleHitObjectIndex;
             set => SetCurrentHitObjectIndex(value);
+        }
+
+        public double PixelLength {
+            get => _pixelLength;
+            set {
+                if (Set(ref _pixelLength, value)) {
+                    UpdateSvGraphMultiplier();
+                }
+            } 
+        }
+
+        public double GlobalSv {
+            get => _globalSv;
+            set {
+                if (Set(ref _globalSv, value)) {
+                    UpdateSvGraphMultiplier();
+                }
+            } 
         }
 
         public double GraphBeats {
@@ -72,6 +94,14 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _graphDuration, value);
         }
 
+        public double SvGraphMultiplier {
+            get => _svGraphMultiplier;
+            set {
+                if (Set(ref _svGraphMultiplier, value)) {
+                }
+            }
+        }
+
         public ImportMode ImportMode {
             get => _importMode;
             set => SetImportMode(value);
@@ -100,6 +130,11 @@ namespace Mapping_Tools.Viewmodels {
         }
         
         public IEnumerable<ExportMode> ExportModes => Enum.GetValues(typeof(ExportMode)).Cast<ExportMode>();
+
+        public GraphMode GraphMode {
+            get => _graphMode;
+            set => Set(ref _graphMode, value);
+        }
 
         public double VelocityLimit {
             get => _velocityLimit;
@@ -140,13 +175,13 @@ namespace Mapping_Tools.Viewmodels {
             try {
                 bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
                 string path = MainWindow.AppWindow.GetCurrentMaps()[0];
-                BeatmapEditor editor;
+                BeatmapEditor editor = null;
                 List<HitObject> markedObjects = null;
 
                 switch (ImportMode) {
                     case ImportMode.Selected:
                         if (!editorRead) break;
-                        EditorReaderStuff.GetEditor(out var selected, reader);
+                        editor = EditorReaderStuff.GetEditor(out var selected, reader);
                         markedObjects = selected;
                         break;
                     case ImportMode.Bookmarked:
@@ -165,6 +200,10 @@ namespace Mapping_Tools.Viewmodels {
                 if (markedObjects == null || markedObjects.Count(o => o.IsSlider) == 0) return;
 
                 LoadedHitObjects = new ObservableCollection<HitObject>(markedObjects.Where(s => s.IsSlider));
+
+                if (editor != null) {
+                    GlobalSv = editor.Beatmap.Difficulty["SliderMultiplier"].GetDouble();
+                }
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message + ex.StackTrace, "Error");
             }
@@ -182,6 +221,7 @@ namespace Mapping_Tools.Viewmodels {
             BeatsPerMinute = VisibleHitObject.UnInheritedTimingPoint.GetBPM();
             GraphBeats = VisibleHitObject.TemporalLength * BeatsPerMinute / 60000;
             ExportTime = VisibleHitObject.Time;
+            PixelLength = VisibleHitObject.PixelLength;
         }
 
         private void SetCurrentHitObjectIndex(int value) {
@@ -193,6 +233,10 @@ namespace Mapping_Tools.Viewmodels {
         private void UpdateAnimationDuration() {
             if (BeatsPerMinute < 1) return;
             GraphDuration = TimeSpan.FromMinutes(GraphBeats / BeatsPerMinute);
+        }
+
+        private void UpdateSvGraphMultiplier() {
+            SvGraphMultiplier = 100 * GlobalSv / PixelLength;
         }
 
         private void SetImportMode(ImportMode value) {
@@ -210,5 +254,10 @@ namespace Mapping_Tools.Viewmodels {
     public enum ExportMode {
         Add,
         Override
+    }
+
+    public enum GraphMode {
+        Position,
+        Velocity
     }
 }

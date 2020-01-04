@@ -469,6 +469,13 @@ namespace Mapping_Tools.Components.Graph {
             }
 
             foreach (var anchor in Anchors) {
+                // Remove NaNs from the position
+                if (double.IsNaN(anchor.Pos.X)) {
+                    anchor.Pos = new Vector2(0, anchor.Pos.Y);
+                }
+                if (double.IsNaN(anchor.Pos.Y)) {
+                    anchor.Pos = new Vector2(anchor.Pos.X, 0);
+                }
                 anchor.Pos = Vector2.Clamp(anchor.Pos, new Vector2(MinX, MinY), new Vector2(MaxX, MaxY));
                 anchor.SetTension(0);
             }
@@ -479,6 +486,8 @@ namespace Mapping_Tools.Components.Graph {
         /// </summary>
         /// <param name="scalar"></param>
         public void ScaleAnchors(Size scalar) {
+            if (double.IsNaN(scalar.Width) || double.IsNaN(scalar.Height)) return;
+
             foreach (var anchor in Anchors) {
                 anchor.Pos = new Vector2(anchor.Pos.X * scalar.Width, anchor.Pos.Y * scalar.Height);
             }
