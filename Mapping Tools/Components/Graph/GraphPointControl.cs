@@ -27,20 +27,6 @@ namespace Mapping_Tools.Components.Graph {
             }
         }
 
-        public static readonly DependencyProperty PosProperty =
-            DependencyProperty.Register(nameof(Pos),
-                typeof(Vector2), 
-                typeof(GraphPointControl), 
-                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None));
-        
-        /// <summary>
-        /// Ranges from (0,0) bottom left to (1,1) top right
-        /// </summary>
-        public Vector2 Pos {
-            get => (Vector2) GetValue(PosProperty);
-            set => SetValue(PosProperty, value);
-        }
-
         public static readonly DependencyProperty GraphProperty =
             DependencyProperty.Register(nameof(Graph),
                 typeof(Graph), 
@@ -52,6 +38,8 @@ namespace Mapping_Tools.Components.Graph {
             set => SetValue(GraphProperty, value);
         }
 
+        public abstract Vector2 Pos { get; set; }
+
         /// <summary>
         /// Goes from -1 to 1
         /// </summary>
@@ -61,8 +49,7 @@ namespace Mapping_Tools.Components.Graph {
 
         public abstract Brush Fill { get; set; }
 
-        protected GraphPointControl(Graph parent, Vector2 pos) {
-            Pos = pos;
+        protected GraphPointControl(Graph parent) {
             SizeMultiplier = 1;
             Graph = parent; // Set graph after size multiplier to prevent an UpdateVisual call
         }
@@ -164,7 +151,7 @@ namespace Mapping_Tools.Components.Graph {
         public virtual void SetTension(double tension) {
             Tension = tension;
 
-            Graph.UpdateVisual();
+            Graph?.UpdateVisual();
         }
     }
 }

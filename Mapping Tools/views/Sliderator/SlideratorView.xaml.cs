@@ -7,6 +7,7 @@ using Mapping_Tools.Viewmodels;
 using MaterialDesignThemes.Wpf;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
@@ -43,12 +44,17 @@ namespace Mapping_Tools.Views {
             Graph.MoveAnchorTo(Graph.Anchors[0], Vector2.Zero);
             Graph.MoveAnchorTo(Graph.Anchors[Graph.Anchors.Count - 1], Vector2.One);
 
-            Graph.GraphStateChanged += GraphOnGraphStateChanged;
+            Graph.Anchors.CollectionChanged += AnchorsOnCollectionChanged;
+            Graph.Anchors.AnchorsChanged += AnchorsOnAnchorsChanged;
 
             UpdateGraphModeStuff();
         }
 
-        private void GraphOnGraphStateChanged(object sender, DependencyPropertyChangedEventArgs e) {
+        private void AnchorsOnAnchorsChanged(object sender, DependencyPropertyChangedEventArgs e) {
+            AnimateProgress(GraphHitObjectElement);
+        }
+
+        private void AnchorsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
             AnimateProgress(GraphHitObjectElement);
         }
 
@@ -127,9 +133,9 @@ namespace Mapping_Tools.Views {
                 // Integrate the graph to get the end value
                 // Here we use SvGraphMultiplier to get an accurate conversion from SV to slider completion per beat
                 // Completion = (100 * SliderMultiplier / PixelLength) * SV * Beats
-                maxValue = Graph.GetMaxIntegral() * ViewModel.SvGraphMultiplier;
+                maxValue = AnchorCollection.GetMaxIntegral(Graph.Anchors) * ViewModel.SvGraphMultiplier;
             } else if (ViewModel.GraphMode == GraphMode.Position) {
-                maxValue = Graph.GetMaxValue();
+                maxValue = AnchorCollection.GetMaxValue(Graph.Anchors);
             }
             Graph.ScaleAnchors(new Size(1, value / maxValue));
         }

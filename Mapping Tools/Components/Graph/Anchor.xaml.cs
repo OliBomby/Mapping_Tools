@@ -20,6 +20,29 @@ namespace Mapping_Tools.Components.Graph {
     /// </summary>
     public partial class Anchor {
         protected override double DefaultSize { get; } = 12;
+
+        public event DependencyPropertyChangedEventHandler GraphStateChangedEvent;
+
+        public static readonly DependencyProperty PosProperty =
+            DependencyProperty.Register(nameof(Pos),
+                typeof(Vector2), 
+                typeof(Anchor), 
+                new FrameworkPropertyMetadata(Vector2.Zero, FrameworkPropertyMetadataOptions.None,
+                    OnPosChanged));
+
+        /// <summary>
+        /// Ranges from (0,0) bottom left to (1,1) top right
+        /// </summary>
+        public sealed override Vector2 Pos {
+            get => (Vector2) GetValue(PosProperty);
+            set => SetValue(PosProperty, value);
+        }
+
+        private static void OnPosChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            if (d == null) return;
+            var a = (Anchor) d;
+            a.GraphStateChangedEvent?.Invoke(d, e);
+        }
         
         public static readonly DependencyProperty TensionAnchorProperty =
             DependencyProperty.Register(nameof(TensionAnchor),
@@ -45,6 +68,14 @@ namespace Mapping_Tools.Components.Graph {
             get => (IGraphInterpolator) GetValue(InterpolatorProperty);
             set => SetValue(InterpolatorProperty, value);
         }
+
+        private static void OnInterpolatorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            if (d == null) return;
+            if (e.NewValue == null) return;
+            var a = (Anchor) d;
+            a.UpdateInterpolatorStuff();
+            a.GraphStateChangedEvent?.Invoke(d, e);
+        }
         
         public static readonly DependencyProperty StrokeProperty =
             DependencyProperty.Register(nameof(Stroke),
@@ -59,6 +90,7 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private static void OnStrokeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            if (d == null) return;
             var a = (Anchor) d;
             a.MainShape.Stroke = (Brush) e.NewValue;
         }
@@ -76,6 +108,7 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private static void OnFillChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            if (d == null) return;
             var a = (Anchor) d;
             a.MainShape.Fill = (Brush) e.NewValue;
         }
@@ -93,8 +126,10 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private static void OnTensionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            if (d == null) return;
             var a = (Anchor) d;
             a.TensionAnchor.Tension = (double) e.NewValue;
+            a.GraphStateChangedEvent?.Invoke(d, e);
         }
         
         public static readonly DependencyProperty PreviousAnchorProperty =
@@ -125,10 +160,11 @@ namespace Mapping_Tools.Components.Graph {
 
         public Anchor(Graph parent, Vector2 pos, IGraphInterpolator interpolator) : this(parent, pos, interpolator, null) { }
 
-        public Anchor(Graph parent, Vector2 pos, IGraphInterpolator interpolator, TensionAnchor tensionAnchor) : base(parent, pos) {
+        public Anchor(Graph parent, Vector2 pos, IGraphInterpolator interpolator, TensionAnchor tensionAnchor) : base(parent) {
             InitializeComponent();
             SetCursor();
             PopulateContextMenu();
+            Pos = pos;
             TensionAnchor = tensionAnchor ?? new TensionAnchor(Graph, pos, this);
             TensionAnchor.ParentAnchor = this;
             TensionAnchor.Graph = Graph;
@@ -228,12 +264,6 @@ namespace Mapping_Tools.Components.Graph {
 
         private void SetInterpolator(Type type) {
             Interpolator = InterpolatorHelper.GetInterpolator(type);
-        }
-
-        private static void OnInterpolatorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            if (e.NewValue == null) return;
-            var a = (Anchor) d;
-            a.UpdateInterpolatorStuff();
         }
 
         private void UpdateInterpolatorStuff() {

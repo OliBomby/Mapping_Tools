@@ -13,6 +13,20 @@ namespace Mapping_Tools.Components.Graph {
     /// </summary>
     public partial class TensionAnchor {
         protected override double DefaultSize { get; } = 7;
+
+        public static readonly DependencyProperty PosProperty =
+            DependencyProperty.Register(nameof(Pos),
+                typeof(Vector2), 
+                typeof(TensionAnchor), 
+                new FrameworkPropertyMetadata(Vector2.Zero, FrameworkPropertyMetadataOptions.None));
+        
+        /// <summary>
+        /// Ranges from (0,0) bottom left to (1,1) top right
+        /// </summary>
+        public sealed override Vector2 Pos {
+            get => (Vector2) GetValue(PosProperty);
+            set => SetValue(PosProperty, value);
+        }
         
         public static readonly DependencyProperty ParentAnchorProperty =
             DependencyProperty.Register(nameof(ParentAnchor),
@@ -39,6 +53,7 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private static void OnStrokeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            if (d == null) return;
             var a = (TensionAnchor) d;
             a.MainShape.Stroke = (Brush) e.NewValue;
             if (a.IsDragging) {
@@ -59,6 +74,7 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private static void OnFillChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            if (d == null) return;
             var a = (TensionAnchor) d;
             if (!a.IsDragging) {
                 a.MainShape.Fill = (Brush) e.NewValue;
@@ -78,13 +94,15 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private static void OnTensionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            if (d == null) return;
             var a = (TensionAnchor) d;
             a.ParentAnchor.Tension = (double) e.NewValue;
         }
 
-        public TensionAnchor(Graph parent, Vector2 pos, Anchor parentAnchor) : base(parent, pos) {
+        public TensionAnchor(Graph parent, Vector2 pos, Anchor parentAnchor) : base(parent) {
             InitializeComponent();
             SetCursor();
+            Pos = pos;
             AbsoluteDraggingMode = true;
             ParentAnchor = parentAnchor;
             Stroke = parent?.TensionAnchorStroke;

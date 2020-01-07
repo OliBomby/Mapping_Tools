@@ -1,8 +1,10 @@
 ﻿using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Components.Graph.Interpolation;
+using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
+using Mapping_Tools.Components.Graph.Markers;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
@@ -10,9 +12,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using Mapping_Tools.Components.Graph.Interpolation;
-using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
-using Mapping_Tools.Components.Graph.Markers;
 
 namespace Mapping_Tools.Components.Graph {
     /// <summary>
@@ -22,19 +21,17 @@ namespace Mapping_Tools.Components.Graph {
         private bool _drawAnchors;
         private readonly List<GraphMarker> _markers;
 
-        public event DependencyPropertyChangedEventHandler GraphStateChanged;
-
         #region DependencyProperties
 
         public static readonly DependencyProperty AnchorsProperty =
             DependencyProperty.Register(nameof(Anchors),
-                typeof(ObservableCollection<Anchor>), 
+                typeof(AnchorCollection), 
                 typeof(Graph), 
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None,
                     OnAnchorsChanged));
 
-        public ObservableCollection<Anchor> Anchors {
-            get => (ObservableCollection<Anchor>) GetValue(AnchorsProperty);
+        public AnchorCollection Anchors {
+            get => (AnchorCollection) GetValue(AnchorsProperty);
             set => SetValue(AnchorsProperty, value);
         }
 
@@ -372,7 +369,7 @@ namespace Mapping_Tools.Components.Graph {
             InitializeComponent();
             
             _markers = new List<GraphMarker>();
-            Anchors = new ObservableCollection<Anchor>();
+            Anchors = new AnchorCollection();
             LastInterpolationSet = typeof(SingleCurveInterpolator);
 
             Background = new SolidColorBrush(Color.FromArgb(30, 0, 0, 0));
@@ -383,10 +380,15 @@ namespace Mapping_Tools.Components.Graph {
             AddAnchor(new Vector2(1, 0.5));
 
             Anchors.CollectionChanged += AnchorsOnCollectionChanged;
+            Anchors.AnchorsChanged += AnchorsOnAnchorsChanged;
+        }
+
+        private void AnchorsOnAnchorsChanged(object sender, DependencyPropertyChangedEventArgs e) {
+            UpdateVisual();
         }
 
         private void AnchorsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
-            GraphStateChanged?.Invoke(this, new DependencyPropertyChangedEventArgs(AnchorsProperty, Anchors, Anchors));
+            UpdateVisual();
         }
 
         /// <summary>
@@ -424,9 +426,6 @@ namespace Mapping_Tools.Components.Graph {
             
             // Insert anchor
             Anchors.Insert(index, anchor);
-            
-            UpdateAnchorNeighbors();
-            UpdateVisual();
 
             return anchor;
         }
@@ -446,18 +445,12 @@ namespace Mapping_Tools.Components.Graph {
             if (IsEdgeAnchor(anchor)) return;
 
             Anchors.Remove(anchor);
-
-            UpdateAnchorNeighbors();
-            UpdateVisual();
         }
 
         public void RemoveAnchorAt(int index) {
             if (index <= 0 || index >= Anchors.Count - 1) return;
             
             Anchors.RemoveAt(index);
-
-            UpdateAnchorNeighbors();
-            UpdateVisual();
         }
         
         /// <summary>
@@ -493,18 +486,6 @@ namespace Mapping_Tools.Components.Graph {
             }
 
             UpdateVisual();
-        }
-
-        private void UpdateAnchorNeighbors() {
-            Anchor previousAnchor = null;
-            foreach (var anchor in Anchors) {
-                anchor.PreviousAnchor = previousAnchor;
-                if (previousAnchor != null) {
-                    previousAnchor.NextAnchor = anchor;
-                }
-
-                previousAnchor = anchor;
-            }
         }
 
         public bool IsEdgeAnchor(Anchor anchor) {
@@ -552,31 +533,15 @@ namespace Mapping_Tools.Components.Graph {
         /// <param name="x">The progression along the curve (0-1)</param>
         /// <returns>The height of the curve (0-1)</returns>
         public double GetValue(double x) {
-            return GraphState.GetValue(x, Anchors);
+            return Anchors.GetValue(x);
         }
 
         public double GetDerivative(double x) {
-            return GraphState.GetDerivative(x, Anchors);
+            return Anchors.GetDerivative(x);
         }
 
         public double GetIntegral(double t1, double t2) {
-            return GraphState.GetIntegral(t1, t2, Anchors);
-        }
-
-        /// <summary>
-        /// Calculates the height of the heighest point in the graph.
-        /// </summary>
-        /// <returns></returns>
-        public double GetMaxValue() {
-            return GraphState.GetMaxValue(Anchors);
-        }
-
-        public double GetMaxDerivative() {
-            return GraphState.GetMaxDerivative(Anchors);
-        }
-
-        public double GetMaxIntegral() {
-            return GraphState.GetMaxIntegral(Anchors);
+            return Anchors.GetIntegral(t1, t2);
         }
 
         #endregion
@@ -592,9 +557,8 @@ namespace Mapping_Tools.Components.Graph {
                 anchor.TensionAnchor.Stroke = g.TensionAnchorStroke;
                 anchor.TensionAnchor.Fill = g.TensionAnchorFill;
             }
-            g.UpdateAnchorNeighbors();
+
             g.UpdateVisual();
-            g.GraphStateChanged?.Invoke(d, e);
         }
 
         private static void OnBoundsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
@@ -622,7 +586,6 @@ namespace Mapping_Tools.Components.Graph {
                                          g.ScaleOnBoundChangeVertical ? g.MinY + (g.MaxY - g.MinY) * (anchor.Pos.Y - oldMinY) / (oldMaxY - oldMinY) : anchor.Pos.Y);
             }
             g.RegenerateMarkers();
-            g.GraphStateChanged?.Invoke(d, e);
         }
 
         private static void OnAxisChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
