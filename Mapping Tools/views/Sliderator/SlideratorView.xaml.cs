@@ -1,5 +1,9 @@
-﻿using Mapping_Tools.Classes.MathUtil;
+﻿using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.HitsoundStuff;
+using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SliderPathStuff;
 using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Components.Graph;
 using Mapping_Tools.Components.Graph.Markers;
 using Mapping_Tools.Components.ObjectVisualiser;
@@ -13,11 +17,8 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.HitsoundStuff;
-using Mapping_Tools.Classes.SliderPathStuff;
-using Mapping_Tools.Classes.Tools;
 using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
+using MessageBox = System.Windows.MessageBox;
 
 namespace Mapping_Tools.Views {
     //[HiddenTool]
@@ -27,6 +28,8 @@ namespace Mapping_Tools.Views {
         public static readonly string ToolDescription = "";
 
         private SlideratorVm ViewModel => (SlideratorVm) DataContext;
+
+        private bool _ignoreAnchorsChange;
 
         public SlideratorView() {
             InitializeComponent();
@@ -51,7 +54,88 @@ namespace Mapping_Tools.Views {
         }
 
         private void AnchorsOnAnchorsChanged(object sender, DependencyPropertyChangedEventArgs e) {
+            if (_ignoreAnchorsChange) return;
+
+            _ignoreAnchorsChange = true;
+            Graph.IgnoreAnchorUpdates = true;
+
+            var anchor = (Anchor) sender;
+
+            // Revert if the action resulted in SV above the limit
+            if (IsGraphOverSpeedLimit() || IsGraphUnderSpeedLimit()) {
+                anchor.SetValue(e.Property, e.OldValue);
+
+                if (IsGraphOverSpeedLimit() || IsGraphUnderSpeedLimit()) {
+                    // Both old and new value result in illegal speed, so just allow the new value
+                    anchor.SetValue(e.Property, e.NewValue);
+                } else {
+                    // Use binary search to find the closest value to the limit
+                    const double d = 0.001;
+
+                    switch (e.OldValue) {
+                        case double oldDouble:
+                            anchor.SetValue(e.Property, BinarySearch(oldDouble, (double) e.NewValue, 
+                                (d1, d2) => Math.Abs(d2 - d1), d,
+                                (d1, d2) => (d1 + d2) / 2,
+                                mid => {anchor.SetValue(e.Property, mid);
+                                    return IsGraphOverSpeedLimit() || IsGraphUnderSpeedLimit();
+                                }));
+                            break;
+                        case Vector2 oldVector2:
+                            anchor.SetValue(e.Property, BinarySearch(oldVector2, (Vector2) e.NewValue, 
+                                Vector2.DistanceSquared, Math.Pow(d, 2),
+                                (v1, v2) => Vector2.Lerp(v1, v2, 0.5),
+                                mid => {anchor.SetValue(e.Property, mid);
+                                    return IsGraphOverSpeedLimit() || IsGraphUnderSpeedLimit();
+                                }));
+                            break;
+                        default:
+                            // Allow the change to happen, because otherwise the interpolator is impossible to set
+                            // Its better to let the user change interpolator and fix the limit later
+                            anchor.SetValue(e.Property, e.NewValue);
+                            break;
+                    }
+                }
+
+                Graph.UpdateVisual();
+            }
+
             AnimateProgress(GraphHitObjectElement);
+
+            _ignoreAnchorsChange = false;
+            Graph.IgnoreAnchorUpdates = false;
+        }
+
+        private T BinarySearch<T>(T low, T high, Func<T, T, double> distanceFunc, double delta, Func<T, T, T> midFunc, Func<T,bool> checkFunc) {
+            while (distanceFunc(low, high) > delta) {
+                var mid = midFunc(low, high);
+
+                if (checkFunc(mid)) {
+                    high = mid;
+                } else {
+                    low = mid;
+                }
+            }
+
+            return low;
+        }
+
+        private bool IsGraphOverSpeedLimit() {
+            if (ViewModel.GraphMode == GraphMode.Position) {
+                return AnchorCollection.GetMaxDerivative(Graph.Anchors) / ViewModel.SvGraphMultiplier >
+                       ViewModel.VelocityLimit;
+            }
+
+            return AnchorCollection.GetMaxValue(Graph.Anchors) > ViewModel.VelocityLimit;
+        }
+
+        private bool IsGraphUnderSpeedLimit() {
+            if (ViewModel.GraphMode == GraphMode.Position) {
+                return AnchorCollection.GetMinDerivative(Graph.Anchors) / ViewModel.SvGraphMultiplier <
+                       -ViewModel.VelocityLimit;
+            }
+
+            return AnchorCollection.GetMinValue(Graph.Anchors) < -ViewModel.VelocityLimit;
         }
 
         private void AnchorsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {

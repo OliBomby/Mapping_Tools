@@ -156,6 +156,7 @@ namespace Mapping_Tools.Viewmodels {
 
         public SlideratorVm() {
             LoadedHitObjects = new ObservableCollection<HitObject>();
+            PixelLength = 100;
             BeatsPerMinute = 180;
             GlobalSv = 1.4;
             GraphBeats = 3;

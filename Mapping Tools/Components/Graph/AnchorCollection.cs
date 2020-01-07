@@ -350,7 +350,7 @@ namespace Mapping_Tools.Components.Graph {
                         values = new[] {p1.Y, p2.Y};
                     }
 
-                    var localMinValue = values.Max();
+                    var localMinValue = values.Min();
 
                     if (localMinValue < minValue) {
                         minValue = localMinValue;
@@ -394,7 +394,7 @@ namespace Mapping_Tools.Components.Graph {
                         values = new[] {difference.Y / difference.X};
                     }
                     
-                    var localMinValue = values.Max();
+                    var localMinValue = values.Min();
 
                     if (localMinValue < minValue) {
                         minValue = localMinValue;

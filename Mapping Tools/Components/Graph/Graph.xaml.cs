@@ -21,6 +21,8 @@ namespace Mapping_Tools.Components.Graph {
         private bool _drawAnchors;
         private readonly List<GraphMarker> _markers;
 
+        public bool IgnoreAnchorUpdates { get; set; }
+
         #region DependencyProperties
 
         public static readonly DependencyProperty AnchorsProperty =
@@ -384,10 +386,12 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private void AnchorsOnAnchorsChanged(object sender, DependencyPropertyChangedEventArgs e) {
+            if (IgnoreAnchorUpdates) return;
             UpdateVisual();
         }
 
         private void AnchorsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+            if (IgnoreAnchorUpdates) return;
             UpdateVisual();
         }
 

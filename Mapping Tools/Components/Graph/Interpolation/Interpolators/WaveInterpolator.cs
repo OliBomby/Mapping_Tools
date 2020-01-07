@@ -4,6 +4,7 @@ using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
     [DisplayName("Wave")]
+    [CustomDerivativeExtrema(new []{0, 0.5, 1})]
     public class WaveInterpolator : CustomInterpolator, IDerivableInterpolator, IIntegrableInterpolator {
         public string Name => "Wave";
 
@@ -68,7 +69,7 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
 
             return P < 0 ? 
                 TriangleWaveDerivative(t, 1 / cycles) : 
-                SineWaveDerivative(t * cycles * 2 * Math.PI);
+                SineWaveDerivative(t * cycles * 2 * Math.PI) * cycles * 2 * Math.PI;
         }
     }
 }
