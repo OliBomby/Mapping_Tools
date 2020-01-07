@@ -27,17 +27,35 @@ namespace Mapping_Tools.Components.Graph {
             }
         }
 
+        public static readonly DependencyProperty PosProperty =
+            DependencyProperty.Register(nameof(Pos),
+                typeof(Vector2), 
+                typeof(GraphPointControl), 
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None));
+        
         /// <summary>
         /// Ranges from (0,0) bottom left to (1,1) top right
         /// </summary>
-        public Vector2 Pos { get; set; }
+        public Vector2 Pos {
+            get => (Vector2) GetValue(PosProperty);
+            set => SetValue(PosProperty, value);
+        }
 
-        public Graph Graph { get; set; }
+        public static readonly DependencyProperty GraphProperty =
+            DependencyProperty.Register(nameof(Graph),
+                typeof(Graph), 
+                typeof(GraphPointControl), 
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None));
+        
+        public Graph Graph {
+            get => (Graph) GetValue(GraphProperty);
+            set => SetValue(GraphProperty, value);
+        }
 
         /// <summary>
         /// Goes from -1 to 1
         /// </summary>
-        public virtual double Tension { get; set; }
+        public abstract double Tension { get; set; }
 
         public abstract Brush Stroke { get; set; }
 

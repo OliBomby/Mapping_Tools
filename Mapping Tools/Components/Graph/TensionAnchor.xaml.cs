@@ -14,39 +14,72 @@ namespace Mapping_Tools.Components.Graph {
     public partial class TensionAnchor {
         protected override double DefaultSize { get; } = 7;
         
+        public static readonly DependencyProperty ParentAnchorProperty =
+            DependencyProperty.Register(nameof(ParentAnchor),
+                typeof(Anchor), 
+                typeof(TensionAnchor), 
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None));
+        
         [NotNull]
-        public Anchor ParentAnchor { get; set; }
-
-        private Brush _stroke;
+        public Anchor ParentAnchor {
+            get => (Anchor) GetValue(ParentAnchorProperty);
+            set => SetValue(ParentAnchorProperty, value);
+        }
+        
+        public static readonly DependencyProperty StrokeProperty =
+            DependencyProperty.Register(nameof(Stroke),
+                typeof(Brush), 
+                typeof(TensionAnchor), 
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None,
+                    OnStrokeChanged));
+        
         public sealed override Brush Stroke {
-            get => _stroke;
-            set { 
-                _stroke = value;
-                MainShape.Stroke = value;
-                if (IsDragging) {
-                    MainShape.Fill = value;
-                }
-            }
+            get => (Brush) GetValue(StrokeProperty);
+            set => SetValue(StrokeProperty, value);
         }
 
-        private Brush _fill;
+        private static void OnStrokeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            var a = (TensionAnchor) d;
+            a.MainShape.Stroke = (Brush) e.NewValue;
+            if (a.IsDragging) {
+                a.MainShape.Fill = (Brush) e.NewValue;
+            }
+        }
+        
+        public static readonly DependencyProperty FillProperty =
+            DependencyProperty.Register(nameof(Fill),
+                typeof(Brush), 
+                typeof(TensionAnchor), 
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None,
+                    OnFillChanged));
+        
         public sealed override Brush Fill {
-            get => _fill;
-            set {
-                _fill = value;
-                if (!IsDragging) {
-                    MainShape.Fill = value;
-                }
-            }
+            get => (Brush) GetValue(FillProperty);
+            set => SetValue(FillProperty, value);
         }
 
-        private double _tension;
-        public override double Tension {
-            get => _tension; set {
-                if (Math.Abs(_tension - value) < Precision.DOUBLE_EPSILON) return;
-                _tension = value;
-                ParentAnchor.Tension = value;
+        private static void OnFillChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            var a = (TensionAnchor) d;
+            if (!a.IsDragging) {
+                a.MainShape.Fill = (Brush) e.NewValue;
             }
+        }
+        
+        public static readonly DependencyProperty TensionProperty =
+            DependencyProperty.Register(nameof(Tension),
+                typeof(double), 
+                typeof(TensionAnchor), 
+                new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.None,
+                    OnTensionChanged));
+        
+        public sealed override double Tension {
+            get => (double) GetValue(TensionProperty);
+            set => SetValue(TensionProperty, value);
+        }
+
+        private static void OnTensionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            var a = (TensionAnchor) d;
+            a.ParentAnchor.Tension = (double) e.NewValue;
         }
 
         public TensionAnchor(Graph parent, Vector2 pos, Anchor parentAnchor) : base(parent, pos) {
