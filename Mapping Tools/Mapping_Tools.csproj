@@ -213,6 +213,7 @@
     <Compile Include="Classes\MathUtil\Box2.cs" />
     <Compile Include="Classes\MathUtil\Box2d.cs" />
     <Compile Include="Classes\MathUtil\CircleArc.cs" />
+    <Compile Include="Classes\MathUtil\GradientDescentUtil.cs" />
     <Compile Include="Classes\MathUtil\LineSegment.cs" />
     <Compile Include="Classes\MathUtil\MathHelper.cs" />
     <Compile Include="Classes\MathUtil\Matrix2.cs" />

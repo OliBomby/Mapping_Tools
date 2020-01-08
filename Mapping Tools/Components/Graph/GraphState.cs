@@ -2,6 +2,10 @@
 using System.Windows;
 
 namespace Mapping_Tools.Components.Graph {
+    /// <summary>
+    /// This class is meant to contain all the defining information for a <see cref="Graph"/> instance.
+    /// You can use this for serialization or to transport information of a <see cref="Graph"/> between threads.
+    /// </summary>
     public class GraphState : Freezable {
         #region DependencyProperties
 
