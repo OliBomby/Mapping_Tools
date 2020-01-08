@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Components.Graph.Interpolation;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
-using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Components.Graph.Interpolation;
 
 namespace Mapping_Tools.Components.Graph {
     public sealed class AnchorCollection : ObservableCollection<Anchor> {
@@ -284,31 +284,63 @@ namespace Mapping_Tools.Components.Graph {
                     anchor.Interpolator.P = anchor.Tension;
 
                     double maxIntegral;
+                    double endIntegral;
                     if (anchor.Interpolator is IIntegrableInterpolator integrableInterpolator) {
+                        endIntegral = integrableInterpolator.GetIntegral(0, 1) * difference.X * difference.Y +
+                                      difference.X * p1.Y;
+
                         // If the interpolator has a CustomIntegralExtremaAttribute than we check the min/max integral for all the specified locations
                         var customExtremaAttribute =
                             anchor.Interpolator.GetType().GetCustomAttribute<CustomIntegralExtremaAttribute>();
 
                         if (customExtremaAttribute != null) {
                             maxIntegral = customExtremaAttribute.ExtremaPositions
-                                .Select(o => integrableInterpolator.GetIntegral(0, o)).Max();
+                                .Select(o => integrableInterpolator.GetIntegral(0, o)).Max()
+                                          * difference.X * difference.Y + difference.X * p1.Y;
                         } else {
-                            maxIntegral = integrableInterpolator.GetIntegral(0, 1);
+                            maxIntegral = integrableInterpolator.GetIntegral(0, 1)
+                                          * difference.X * difference.Y + difference.X * p1.Y;
+                        }
+
+                        // Check if the interpolation passes through 0
+                        if (difference.Y * p1.Y < 0) {
+                            // Possibility of max/min not at endpoints. Need to calculate the hard way
+                            double newMaxIntegralPosition = GradientDescentUtil.GradientAscent(
+                                d => integrableInterpolator.GetIntegral(0, d) * difference.X * difference.Y + d * difference.X * p1.Y,
+                                0, 1, 0.1);
+
+                            var newMaxIntegral = integrableInterpolator.GetIntegral(0, newMaxIntegralPosition) * difference.X * difference.Y +
+                                                 newMaxIntegralPosition * difference.X * p1.Y;
+
+                            if (newMaxIntegral > maxIntegral) {
+                                maxIntegral = newMaxIntegral;
+                            }
                         }
                     } else {
-                        maxIntegral = 0.5;
+                        endIntegral = 0.5 * difference.X * difference.Y + difference.X * p1.Y;
+                        maxIntegral = endIntegral;
+
+                        // Check if the interpolation passes through 0
+                        if (difference.Y * p1.Y < 0) {
+                            // Possibility of max/min not at endpoints. For a linear interpolator this is possible to solve algebraically
+                            var x = -p1.Y / difference.Y;
+                            if (x >= 0 && x <= 1) {
+                                double newMaxIntegral = 0.5 * Math.Pow(x, 2)
+                                                            * difference.X * difference.Y + x * difference.X * p1.Y;
+
+                                if (newMaxIntegral > maxIntegral) {
+                                    maxIntegral = newMaxIntegral;
+                                }
+                            }
+                        }
                     }
 
-                    // Check if the interpolation passes through 0
-                    if (difference.Y * p1.Y < 0) {
-                        // TODO: Possibility of max/min not at endpoints. Need to calculate the hard way. Binary search?
+                    var possibleMaxValue = height + maxIntegral;
+                    if (possibleMaxValue > maxValue) {
+                        maxValue = possibleMaxValue;
                     }
 
-                    height += maxIntegral * difference.X * difference.Y + difference.X * p1.Y;
-
-                    if (height > maxValue) {
-                        maxValue = height;
-                    }
+                    height += endIntegral;
                 }
 
                 previousAnchor = anchor;
@@ -428,26 +460,62 @@ namespace Mapping_Tools.Components.Graph {
                     anchor.Interpolator.P = anchor.Tension;
 
                     double minIntegral;
+                    double endIntegral;
                     if (anchor.Interpolator is IIntegrableInterpolator integrableInterpolator) {
+                        endIntegral = integrableInterpolator.GetIntegral(0, 1) * difference.X * difference.Y +
+                                      difference.X * p1.Y;
+
                         // If the interpolator has a CustomIntegralExtremaAttribute than we check the min/max integral for all the specified locations
                         var customExtremaAttribute =
                             anchor.Interpolator.GetType().GetCustomAttribute<CustomIntegralExtremaAttribute>();
 
                         if (customExtremaAttribute != null) {
                             minIntegral = customExtremaAttribute.ExtremaPositions
-                                .Select(o => integrableInterpolator.GetIntegral(0, o)).Min();
+                                .Select(o => integrableInterpolator.GetIntegral(0, o) * difference.X * difference.Y + o * difference.X * p1.Y).Min();
                         } else {
-                            minIntegral = integrableInterpolator.GetIntegral(0, 1);
+                            minIntegral = integrableInterpolator.GetIntegral(0, 1)
+                                          * difference.X * difference.Y + difference.X * p1.Y;
+                        }
+
+                        // Check if the interpolation passes through 0
+                        if (difference.Y * p1.Y < 0) {
+                            // Possibility of max/min not at endpoints. Need to calculate the hard way
+                            double newMinIntegralPosition = GradientDescentUtil.GradientDescent(
+                                d => integrableInterpolator.GetIntegral(0, d) * difference.X * difference.Y + d * difference.X * p1.Y,
+                                0, 1, 0.1);
+
+                            double newMinIntegral = integrableInterpolator.GetIntegral(0, newMinIntegralPosition) * difference.X * difference.Y + 
+                                                    newMinIntegralPosition * difference.X * p1.Y;
+
+                            if (newMinIntegral > minIntegral) {
+                                minIntegral = newMinIntegral;
+                            }
                         }
                     } else {
-                        minIntegral = 0.5;
-                    }
-                    
-                    height += minIntegral * difference.X * difference.Y + difference.X * p1.Y;
+                        endIntegral = 0.5 * difference.X * difference.Y + difference.X * p1.Y;
+                        minIntegral = endIntegral;
 
-                    if (height < minValue) {
-                        minValue = height;
+                        // Check if the interpolation passes through 0
+                        if (difference.Y * p1.Y < 0) {
+                            // Possibility of max/min not at endpoints. For a linear interpolator this is possible to solve algebraically
+                            var x = -p1.Y / difference.Y;
+                            if (x >= 0 && x <= 1) {
+                                double newMinIntegral = 0.5 * Math.Pow(x, 2)
+                                                            * difference.X * difference.Y + x * difference.X * p1.Y;
+
+                                if (newMinIntegral > minIntegral) {
+                                    minIntegral = newMinIntegral;
+                                }
+                            }
+                        }
                     }
+
+                    var possibleMinValue = height + minIntegral;
+                    if (possibleMinValue < minValue) {
+                        minValue = possibleMinValue;
+                    }
+
+                    height += endIntegral;
                 }
 
                 previousAnchor = anchor;

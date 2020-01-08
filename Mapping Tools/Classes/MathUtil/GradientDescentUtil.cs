@@ -9,32 +9,25 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="lower"></param>
         /// <param name="upper"></param>
         /// <param name="rate"></param>
+        /// <param name="maxSteps"></param>
         /// <returns></returns>
-        public static double GradientDescent(Func<double, double> func, double lower, double upper, double rate) {
+        public static double GradientDescent(Func<double, double> func, double lower, double upper, double rate, int maxSteps = 1024) {
             const double d = 1E-6;
             double x = (lower + upper) / 2;
 
-            while (true) {
+            for (int i = 0; i < maxSteps; i++) {
                 var gradient = (func(x + d) - func(x)) / d;
 
                 if (Math.Abs(gradient) < Precision.DOUBLE_EPSILON) {
                     break;
                 }
 
-                if (x < lower) {
-                    return lower;
-                }
-
-                if (x > upper) {
-                    return upper;
-                }
-
                 x -= gradient * rate;
             }
 
-            return x;
+            return x < lower ? lower : x > upper ? upper : x;
         }
-        
+
         /// <summary>
         /// Attempts to find a local maximum of specified function.
         /// </summary>
@@ -42,30 +35,23 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="lower"></param>
         /// <param name="upper"></param>
         /// <param name="rate"></param>
+        /// <param name="maxSteps"></param>
         /// <returns></returns>
-        public static double GradientAscent(Func<double, double> func, double lower, double upper, double rate) {
+        public static double GradientAscent(Func<double, double> func, double lower, double upper, double rate, int maxSteps = 1024) {
             const double d = 1E-6;
             double x = (lower + upper) / 2;
 
-            while (true) {
+            for (int i = 0; i < maxSteps; i++) {
                 var gradient = (func(x + d) - func(x)) / d;
 
                 if (Math.Abs(gradient) < Precision.DOUBLE_EPSILON) {
                     break;
                 }
 
-                if (x < lower) {
-                    return lower;
-                }
-
-                if (x > upper) {
-                    return upper;
-                }
-
                 x += gradient * rate;
             }
 
-            return x;
+            return x < lower ? lower : x > upper ? upper : x;
         }
     }
 }
