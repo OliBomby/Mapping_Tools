@@ -74,19 +74,17 @@ namespace Mapping_Tools.Views {
 
                     switch (e.OldValue) {
                         case double oldDouble:
-                            anchor.SetValue(e.Property, BinarySearch(oldDouble, (double) e.NewValue, 
-                                (d1, d2) => Math.Abs(d2 - d1), d,
-                                (d1, d2) => (d1 + d2) / 2,
+                            anchor.SetValue(e.Property, BinarySearchUtil.DoubleBinarySearch(
+                                oldDouble, (double) e.NewValue, d,
                                 mid => {anchor.SetValue(e.Property, mid);
-                                    return IsGraphOverSpeedLimit() || IsGraphUnderSpeedLimit();
+                                    return !IsGraphOverSpeedLimit() && !IsGraphUnderSpeedLimit();
                                 }));
                             break;
                         case Vector2 oldVector2:
-                            anchor.SetValue(e.Property, BinarySearch(oldVector2, (Vector2) e.NewValue, 
-                                Vector2.DistanceSquared, Math.Pow(d, 2),
-                                (v1, v2) => Vector2.Lerp(v1, v2, 0.5),
+                            anchor.SetValue(e.Property, BinarySearchUtil.Vector2BinarySearch(
+                                oldVector2, (Vector2) e.NewValue, d,
                                 mid => {anchor.SetValue(e.Property, mid);
-                                    return IsGraphOverSpeedLimit() || IsGraphUnderSpeedLimit();
+                                    return !IsGraphOverSpeedLimit() && !IsGraphUnderSpeedLimit();
                                 }));
                             break;
                         default:
@@ -104,20 +102,6 @@ namespace Mapping_Tools.Views {
 
             _ignoreAnchorsChange = false;
             Graph.IgnoreAnchorUpdates = false;
-        }
-
-        private T BinarySearch<T>(T low, T high, Func<T, T, double> distanceFunc, double delta, Func<T, T, T> midFunc, Func<T,bool> checkFunc) {
-            while (distanceFunc(low, high) > delta) {
-                var mid = midFunc(low, high);
-
-                if (checkFunc(mid)) {
-                    high = mid;
-                } else {
-                    low = mid;
-                }
-            }
-
-            return low;
         }
 
         private bool IsGraphOverSpeedLimit() {
