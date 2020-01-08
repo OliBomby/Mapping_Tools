@@ -151,6 +151,10 @@ namespace Mapping_Tools.Views {
         private void AnimateProgress(HitObjectElement element) {
             if (ViewModel.VisibleHitObject == null) return;
 
+            // Set the pixel length to the pixel length of the graph
+            var maxCompletion = GetMaxCompletion();
+            element.CustomPixelLength = maxCompletion * ViewModel.PixelLength;
+
             var graphDuration = ViewModel.GraphDuration;
             var extraDuration = graphDuration.Add(TimeSpan.FromSeconds(1));
 
@@ -162,13 +166,14 @@ namespace Mapping_Tools.Views {
                     BeginTime = TimeSpan.Zero,
                     // Here we use SvGraphMultiplier to get an accurate conversion from SV to slider completion per beat
                     // Completion = (100 * SliderMultiplier / PixelLength) * SV * Beats
-                    Multiplier = ViewModel.SvGraphMultiplier
+                    Multiplier = ViewModel.SvGraphMultiplier / maxCompletion 
                 };
             } else {
                 animation = new GraphDoubleAnimation {
                     GraphState = Graph.GetGraphState(), From = Graph.MinX, To = Graph.MaxX,
                     Duration = graphDuration,
-                    BeginTime = TimeSpan.Zero
+                    BeginTime = TimeSpan.Zero,
+                    Multiplier = 1 / maxCompletion
                 };
             }
             var animation2 = new DoubleAnimation(0, 0, TimeSpan.FromSeconds(1)) {BeginTime = graphDuration};
@@ -188,6 +193,20 @@ namespace Mapping_Tools.Views {
             element.BeginStoryboard(storyboard);
         }
 
+        private double GetMaxCompletion() {
+            double maxValue;
+            if (ViewModel.GraphMode == GraphMode.Velocity) {
+                // Integrate the graph to get the end value
+                // Here we use SvGraphMultiplier to get an accurate conversion from SV to slider completion per beat
+                // Completion = (100 * SliderMultiplier / PixelLength) * SV * Beats
+                maxValue = AnchorCollection.GetMaxIntegral(Graph.Anchors) * ViewModel.SvGraphMultiplier;
+            } else {
+                maxValue = AnchorCollection.GetMaxValue(Graph.Anchors);
+            }
+
+            return maxValue;
+        }
+
         private async void ScaleCompleteButton_OnClick(object sender, RoutedEventArgs e) {
             var dialog = new TypeValueDialog(1);
 
@@ -196,15 +215,8 @@ namespace Mapping_Tools.Views {
             if (!(bool) result) return;
             if (!TypeConverters.TryParseDouble(dialog.ValueBox.Text, out double value)) return;
 
-            var maxValue = value;
-            if (ViewModel.GraphMode == GraphMode.Velocity) {
-                // Integrate the graph to get the end value
-                // Here we use SvGraphMultiplier to get an accurate conversion from SV to slider completion per beat
-                // Completion = (100 * SliderMultiplier / PixelLength) * SV * Beats
-                maxValue = AnchorCollection.GetMaxIntegral(Graph.Anchors) * ViewModel.SvGraphMultiplier;
-            } else if (ViewModel.GraphMode == GraphMode.Position) {
-                maxValue = AnchorCollection.GetMaxValue(Graph.Anchors);
-            }
+            var maxValue = GetMaxCompletion();
+            if (Math.Abs(maxValue) < Precision.DOUBLE_EPSILON) return;
             Graph.ScaleAnchors(new Size(1, value / maxValue));
         }
 
