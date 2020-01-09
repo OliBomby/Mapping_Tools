@@ -1,4 +1,4 @@
-﻿namespace Mapping_Tools.Components.SampleDialog {
+﻿namespace Mapping_Tools.Components.Dialogs.SampleDialog {
     /// <summary>
     /// Interaction logic for SampleDialog.xaml
     /// </summary>

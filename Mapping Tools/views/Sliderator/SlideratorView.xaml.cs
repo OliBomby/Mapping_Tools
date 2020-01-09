@@ -12,6 +12,7 @@ using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SliderPathStuff;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Components.Dialogs;
 using Mapping_Tools.Components.Graph;
 using Mapping_Tools.Components.Graph.Interpolation;
 using Mapping_Tools.Components.Graph.Markers;
@@ -244,6 +245,18 @@ namespace Mapping_Tools.Views {
             return maxValue;
         }
 
+        private double GetMinCompletion() {
+            double minValue;
+            if (ViewModel.GraphMode == GraphMode.Velocity) // Integrate the graph to get the end value
+                // Here we use SvGraphMultiplier to get an accurate conversion from SV to slider completion per beat
+                // Completion = (100 * SliderMultiplier / PixelLength) * SV * Beats
+                minValue = AnchorCollection.GetMinIntegral(Graph.Anchors) * ViewModel.SvGraphMultiplier;
+            else
+                minValue = AnchorCollection.GetMinValue(Graph.Anchors);
+
+            return minValue;
+        }
+
         private async void ScaleCompleteButton_OnClick(object sender, RoutedEventArgs e) {
             var dialog = new TypeValueDialog(1);
 
@@ -298,7 +311,24 @@ namespace Mapping_Tools.Views {
             AnimateProgress(GraphHitObjectElement);
         }
 
-        private void Start_Click(object sender, RoutedEventArgs e) {
+        private bool ValidateToolInput(out string message) {
+            if (GetMinCompletion() < 0) {
+                message = "Negative position is illegal.";
+                return false;
+            }
+
+            message = string.Empty;
+            return true;
+        }
+
+        private async void Start_Click(object sender, RoutedEventArgs e) {
+            if (!ValidateToolInput(out var message)) {
+                var dialog = new MessageDialog(message);
+                await DialogHost.Show(dialog, "RootDialog");
+                return;
+            }
+
+
             RunTool(MainWindow.AppWindow.GetCurrentMaps()[0]);
         }
 

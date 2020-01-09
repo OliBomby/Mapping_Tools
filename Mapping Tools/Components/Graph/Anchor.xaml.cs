@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Mapping_Tools.Components.Dialogs;
 using ContextMenu = System.Windows.Controls.ContextMenu;
 using Cursors = System.Windows.Input.Cursors;
 using MenuItem = System.Windows.Controls.MenuItem;

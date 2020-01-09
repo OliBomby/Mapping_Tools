@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Windows;
 
-namespace Mapping_Tools.Components.Graph {
+namespace Mapping_Tools.Components.Dialogs {
     /// <summary>
     /// Interaction logic for TypeValueDialog.xaml
     /// </summary>

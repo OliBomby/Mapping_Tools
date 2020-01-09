@@ -1,11 +1,11 @@
-﻿using Mapping_Tools.Annotations;
-using Mapping_Tools.Classes.SystemTools;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using Mapping_Tools.Annotations;
+using Mapping_Tools.Classes.SystemTools;
 
-namespace Mapping_Tools.Views {
+namespace Mapping_Tools.Components.Dialogs {
     /// <summary>
     /// Interaction logic for BeatmapImportDialog.xaml
     /// </summary>
