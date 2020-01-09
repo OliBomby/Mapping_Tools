@@ -12,8 +12,8 @@
             <RowDefinition />
             <RowDefinition />            
         </Grid.RowDefinitions>
-        <TextBlock x:Name="MessageTextBlock"
-                 Margin="0 6 0 0" 
+        <TextBlock x:Name="MessageTextBlock" MaxWidth="331"
+                 Margin="0 6 0 0" TextWrapping="Wrap"
                  FontSize="18" Grid.Row="0"/>
         <StackPanel Orientation="Horizontal" Grid.Row="1"
                     Margin="0 16 0 0">
