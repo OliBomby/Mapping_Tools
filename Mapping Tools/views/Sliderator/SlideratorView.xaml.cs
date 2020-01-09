@@ -234,25 +234,33 @@ namespace Mapping_Tools.Views {
         }
 
         private double GetMaxCompletion() {
+            return GetMaxCompletion(ViewModel, Graph.Anchors);
+        }
+
+        private static double GetMaxCompletion(SlideratorVm viewModel, IReadOnlyList<Anchor> anchors) {
             double maxValue;
-            if (ViewModel.GraphMode == GraphMode.Velocity) // Integrate the graph to get the end value
+            if (viewModel.GraphMode == GraphMode.Velocity) // Integrate the graph to get the end value
                 // Here we use SvGraphMultiplier to get an accurate conversion from SV to slider completion per beat
                 // Completion = (100 * SliderMultiplier / PixelLength) * SV * Beats
-                maxValue = AnchorCollection.GetMaxIntegral(Graph.Anchors) * ViewModel.SvGraphMultiplier;
+                maxValue = AnchorCollection.GetMaxIntegral(anchors) * viewModel.SvGraphMultiplier;
             else
-                maxValue = AnchorCollection.GetMaxValue(Graph.Anchors);
+                maxValue = AnchorCollection.GetMaxValue(anchors);
 
             return maxValue;
         }
 
         private double GetMinCompletion() {
+            return GetMinCompletion(ViewModel, Graph.Anchors);
+        }
+
+        private static double GetMinCompletion(SlideratorVm viewModel, IReadOnlyList<Anchor> anchors) {
             double minValue;
-            if (ViewModel.GraphMode == GraphMode.Velocity) // Integrate the graph to get the end value
+            if (viewModel.GraphMode == GraphMode.Velocity) // Integrate the graph to get the end value
                 // Here we use SvGraphMultiplier to get an accurate conversion from SV to slider completion per beat
                 // Completion = (100 * SliderMultiplier / PixelLength) * SV * Beats
-                minValue = AnchorCollection.GetMinIntegral(Graph.Anchors) * ViewModel.SvGraphMultiplier;
+                minValue = AnchorCollection.GetMinIntegral(anchors) * viewModel.SvGraphMultiplier;
             else
-                minValue = AnchorCollection.GetMinValue(Graph.Anchors);
+                minValue = AnchorCollection.GetMinValue(anchors);
 
             return minValue;
         }
@@ -351,7 +359,8 @@ namespace Mapping_Tools.Views {
         }
 
         private string Sliderate(SlideratorVm arg, BackgroundWorker worker) {
-            var sliderPath = arg.VisibleHitObject.GetSliderPath();
+            var sliderPath = new SliderPath(arg.VisibleHitObject.SliderType,
+                arg.VisibleHitObject.GetAllCurvePoints().ToArray(), GetMaxCompletion(arg, arg.GraphState.Anchors));
             var path = new List<Vector2>();
             sliderPath.GetPathToProgress(path, 0, 1);
 
