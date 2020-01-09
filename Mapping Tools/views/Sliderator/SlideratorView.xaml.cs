@@ -1,15 +1,4 @@
-﻿using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.HitsoundStuff;
-using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.SliderPathStuff;
-using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.Tools;
-using Mapping_Tools.Components.Graph;
-using Mapping_Tools.Components.Graph.Markers;
-using Mapping_Tools.Components.ObjectVisualiser;
-using Mapping_Tools.Viewmodels;
-using MaterialDesignThemes.Wpf;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -17,8 +6,19 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.HitsoundStuff;
+using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SliderPathStuff;
+using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Components.Graph;
+using Mapping_Tools.Components.Graph.Interpolation;
+using Mapping_Tools.Components.Graph.Markers;
+using Mapping_Tools.Components.ObjectVisualiser;
+using Mapping_Tools.Viewmodels;
+using MaterialDesignThemes.Wpf;
 using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
-using MessageBox = System.Windows.MessageBox;
 
 namespace Mapping_Tools.Views {
     //[HiddenTool]
@@ -26,8 +26,6 @@ namespace Mapping_Tools.Views {
         public static readonly string ToolName = "Sliderator";
 
         public static readonly string ToolDescription = "";
-
-        private SlideratorVm ViewModel => (SlideratorVm) DataContext;
 
         private bool _ignoreAnchorsChange;
 
@@ -53,73 +51,106 @@ namespace Mapping_Tools.Views {
             UpdateGraphModeStuff();
         }
 
+        private SlideratorVm ViewModel => (SlideratorVm) DataContext;
+
         private void AnchorsOnAnchorsChanged(object sender, DependencyPropertyChangedEventArgs e) {
             if (_ignoreAnchorsChange) return;
 
-            _ignoreAnchorsChange = true;
-            Graph.IgnoreAnchorUpdates = true;
-
             var anchor = (Anchor) sender;
 
-            // Revert if the action resulted in SV above the limit
-            if (IsGraphOverSpeedLimit() || IsGraphUnderSpeedLimit()) {
-                anchor.SetValue(e.Property, e.OldValue);
+            // Correct the anchor change if it resulted in a speed limit violation
+            if (PrevOverSpeedLimit(anchor) || NextOverSpeedLimit(anchor)) {
+                _ignoreAnchorsChange = true;
+                Graph.IgnoreAnchorUpdates = true;
 
-                if (IsGraphOverSpeedLimit() || IsGraphUnderSpeedLimit()) {
-                    // Both old and new value result in illegal speed, so just allow the new value
-                    anchor.SetValue(e.Property, e.NewValue);
-                } else {
-                    // Use binary search to find the closest value to the limit
-                    const double d = 0.001;
+                // Use binary search to find the closest value to the limit
+                const double d = 0.001;
 
-                    switch (e.OldValue) {
-                        case double oldDouble:
-                            anchor.SetValue(e.Property, BinarySearchUtil.DoubleBinarySearch(
-                                oldDouble, (double) e.NewValue, d,
-                                mid => {anchor.SetValue(e.Property, mid);
-                                    return !IsGraphOverSpeedLimit() && !IsGraphUnderSpeedLimit();
-                                }));
-                            break;
-                        case Vector2 oldVector2:
-                            anchor.SetValue(e.Property, BinarySearchUtil.Vector2BinarySearch(
-                                oldVector2, (Vector2) e.NewValue, d,
-                                mid => {anchor.SetValue(e.Property, mid);
-                                    return !IsGraphOverSpeedLimit() && !IsGraphUnderSpeedLimit();
-                                }));
-                            break;
-                        default:
-                            // Allow the change to happen, because otherwise the interpolator is impossible to set
-                            // Its better to let the user change interpolator and fix the limit later
-                            anchor.SetValue(e.Property, e.NewValue);
-                            break;
-                    }
+                switch (e.NewValue) {
+                    case double newDouble:
+                        var oldDouble = (double) e.OldValue;
+                        anchor.SetValue(e.Property, BinarySearchUtil.DoubleBinarySearch(
+                            oldDouble, newDouble, d,
+                            mid => {
+                                anchor.SetValue(e.Property, mid);
+                                return !PrevOverSpeedLimit(anchor) && !NextOverSpeedLimit(anchor);
+                            }));
+                        break;
+                    case Vector2 newVector2:
+                        if (ViewModel.GraphMode == GraphMode.Position &&
+                            (anchor.PreviousAnchor != null || anchor.NextAnchor != null)) {
+                            // List of bounds. X represents the minimum Y value and Y represents the maximum Y value
+                            // I use Vector2 here because it has usefull math methods
+                            var bounds = new List<Vector2>();
+
+                            if (anchor.PreviousAnchor != null) {
+                                var maxSpeed = InterpolatorHelper.GetBiggestDerivative(anchor.Interpolator);
+
+                                if (Math.Abs(newVector2.X - anchor.PreviousAnchor.Pos.X) < Precision.DOUBLE_EPSILON)
+                                    bounds.Add(new Vector2(anchor.PreviousAnchor.Pos.Y));
+                                else
+                                    bounds.Add(new Vector2(anchor.PreviousAnchor.Pos.Y) +
+                                               new Vector2(Precision.DOUBLE_EPSILON).PerpendicularRight +
+                                               new Vector2(ViewModel.VelocityLimit * ViewModel.SvGraphMultiplier *
+                                                           (newVector2.X - anchor.PreviousAnchor.Pos.X) / maxSpeed)
+                                                   .PerpendicularLeft);
+                            }
+
+                            if (anchor.NextAnchor != null) {
+                                var maxSpeed = InterpolatorHelper.GetBiggestDerivative(anchor.NextAnchor.Interpolator);
+
+                                if (Math.Abs(newVector2.X - anchor.NextAnchor.Pos.X) < Precision.DOUBLE_EPSILON)
+                                    bounds.Add(new Vector2(anchor.NextAnchor.Pos.Y));
+                                else
+                                    bounds.Add(new Vector2(anchor.NextAnchor.Pos.Y) +
+                                               new Vector2(Precision.DOUBLE_EPSILON).PerpendicularRight +
+                                               new Vector2(ViewModel.VelocityLimit * ViewModel.SvGraphMultiplier *
+                                                           (newVector2.X - anchor.NextAnchor.Pos.X) / maxSpeed)
+                                                   .PerpendicularRight);
+                            }
+
+                            // Clamp the new Y value between all the bounds
+                            var newY = bounds.Aggregate(newVector2.Y,
+                                (current, bound) => MathHelper.Clamp(current, bound.X, bound.Y));
+
+                            // Break if the resulting value is not inside all the bounds
+                            if (!bounds.All(b => newY >= b.X && newY <= b.Y)) break;
+
+                            anchor.SetValue(e.Property, new Vector2(newVector2.X, newY));
+                        }
+
+                        break;
                 }
 
-                Graph.UpdateVisual();
+                _ignoreAnchorsChange = false;
+                Graph.IgnoreAnchorUpdates = false;
             }
 
             AnimateProgress(GraphHitObjectElement);
-
-            _ignoreAnchorsChange = false;
-            Graph.IgnoreAnchorUpdates = false;
         }
 
-        private bool IsGraphOverSpeedLimit() {
-            if (ViewModel.GraphMode == GraphMode.Position) {
-                return AnchorCollection.GetMaxDerivative(Graph.Anchors) / ViewModel.SvGraphMultiplier >
-                       ViewModel.VelocityLimit;
-            }
+        private bool NextOverSpeedLimit(Anchor anchor) {
+            if (anchor.NextAnchor == null) return false;
 
-            return AnchorCollection.GetMaxValue(Graph.Anchors) > ViewModel.VelocityLimit;
+            var diff = anchor.NextAnchor.Pos - anchor.Pos;
+
+            if (ViewModel.GraphMode == GraphMode.Position)
+                return Math.Abs(InterpolatorHelper.GetBiggestDerivative(anchor.NextAnchor.Interpolator) * diff.Y /
+                                diff.X)
+                       / ViewModel.SvGraphMultiplier > ViewModel.VelocityLimit;
+            return Math.Abs(InterpolatorHelper.GetBiggestValue(anchor.NextAnchor.Interpolator)) >
+                   ViewModel.VelocityLimit;
         }
 
-        private bool IsGraphUnderSpeedLimit() {
-            if (ViewModel.GraphMode == GraphMode.Position) {
-                return AnchorCollection.GetMinDerivative(Graph.Anchors) / ViewModel.SvGraphMultiplier <
-                       -ViewModel.VelocityLimit;
-            }
+        private bool PrevOverSpeedLimit(Anchor anchor) {
+            if (anchor.PreviousAnchor == null) return false;
 
-            return AnchorCollection.GetMinValue(Graph.Anchors) < -ViewModel.VelocityLimit;
+            var diff = anchor.Pos - anchor.PreviousAnchor.Pos;
+
+            if (ViewModel.GraphMode == GraphMode.Position)
+                return Math.Abs(InterpolatorHelper.GetBiggestDerivative(anchor.Interpolator) * diff.Y / diff.X)
+                       / ViewModel.SvGraphMultiplier > ViewModel.VelocityLimit;
+            return Math.Abs(InterpolatorHelper.GetBiggestValue(anchor.Interpolator)) > ViewModel.VelocityLimit;
         }
 
         private void AnchorsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
@@ -141,6 +172,7 @@ namespace Mapping_Tools.Views {
                         Graph.MinY = -ViewModel.VelocityLimit;
                         Graph.MaxY = ViewModel.VelocityLimit;
                     }
+
                     break;
                 case nameof(ViewModel.GraphMode):
                     UpdateGraphModeStuff();
@@ -159,23 +191,22 @@ namespace Mapping_Tools.Views {
             var extraDuration = graphDuration.Add(TimeSpan.FromSeconds(1));
 
             DoubleAnimationBase animation;
-            if (ViewModel.GraphMode == GraphMode.Velocity) {
+            if (ViewModel.GraphMode == GraphMode.Velocity)
                 animation = new GraphIntegralDoubleAnimation {
                     GraphState = Graph.GetGraphState(), From = Graph.MinX, To = Graph.MaxX,
                     Duration = graphDuration,
                     BeginTime = TimeSpan.Zero,
                     // Here we use SvGraphMultiplier to get an accurate conversion from SV to slider completion per beat
                     // Completion = (100 * SliderMultiplier / PixelLength) * SV * Beats
-                    Multiplier = ViewModel.SvGraphMultiplier / maxCompletion 
+                    Multiplier = ViewModel.SvGraphMultiplier / maxCompletion
                 };
-            } else {
+            else
                 animation = new GraphDoubleAnimation {
                     GraphState = Graph.GetGraphState(), From = Graph.MinX, To = Graph.MaxX,
                     Duration = graphDuration,
                     BeginTime = TimeSpan.Zero,
                     Multiplier = 1 / maxCompletion
                 };
-            }
             var animation2 = new DoubleAnimation(0, 0, TimeSpan.FromSeconds(1)) {BeginTime = graphDuration};
 
             Storyboard.SetTarget(animation, element);
@@ -195,14 +226,12 @@ namespace Mapping_Tools.Views {
 
         private double GetMaxCompletion() {
             double maxValue;
-            if (ViewModel.GraphMode == GraphMode.Velocity) {
-                // Integrate the graph to get the end value
+            if (ViewModel.GraphMode == GraphMode.Velocity) // Integrate the graph to get the end value
                 // Here we use SvGraphMultiplier to get an accurate conversion from SV to slider completion per beat
                 // Completion = (100 * SliderMultiplier / PixelLength) * SV * Beats
                 maxValue = AnchorCollection.GetMaxIntegral(Graph.Anchors) * ViewModel.SvGraphMultiplier;
-            } else {
+            else
                 maxValue = AnchorCollection.GetMaxValue(Graph.Anchors);
-            }
 
             return maxValue;
         }
@@ -213,7 +242,7 @@ namespace Mapping_Tools.Views {
             var result = await DialogHost.Show(dialog, "RootDialog");
 
             if (!(bool) result) return;
-            if (!TypeConverters.TryParseDouble(dialog.ValueBox.Text, out double value)) return;
+            if (!TypeConverters.TryParseDouble(dialog.ValueBox.Text, out var value)) return;
 
             var maxValue = GetMaxCompletion();
             if (Math.Abs(maxValue) < Precision.DOUBLE_EPSILON) return;
@@ -237,10 +266,8 @@ namespace Mapping_Tools.Views {
                     // Make sure the start point is locked at y = 0
                     Graph.StartPointLockedY = true;
                     var firstAnchor = Graph.Anchors.FirstOrDefault();
-                    if (firstAnchor != null) {
-                        firstAnchor.Pos = new Vector2(firstAnchor.Pos.X, 0);
-                    }
-                    
+                    if (firstAnchor != null) firstAnchor.Pos = new Vector2(firstAnchor.Pos.X, 0);
+
                     Graph.MinY = 0;
                     Graph.MaxY = 1;
                     Graph.VerticalMarkerGenerator = new DoubleMarkerGenerator(0, 0.25);
@@ -274,9 +301,7 @@ namespace Mapping_Tools.Views {
 
             ViewModel.Path = path;
             ViewModel.GraphState = Graph.GetGraphState();
-            if (ViewModel.GraphState.CanFreeze) {
-                ViewModel.GraphState.Freeze();
-            }
+            if (ViewModel.GraphState.CanFreeze) ViewModel.GraphState.Freeze();
 
             BackgroundWorker.RunWorkerAsync(ViewModel);
             CanRun = false;
@@ -295,13 +320,14 @@ namespace Mapping_Tools.Views {
             Sliderator.PositionFunctionDelegate positionFunction;
             // We convert the graph GetValue function to a function that works like px -> px
             // d is a value representing the position along the graph in osu! pixels
-            if (ViewModel.GraphMode == GraphMode.Velocity) {
-                // Here we use SvGraphMultiplier to get an accurate conversion from SV to slider completion per beat
+            if (ViewModel.GraphMode == GraphMode.Velocity
+                ) // Here we use SvGraphMultiplier to get an accurate conversion from SV to slider completion per beat
                 // Completion = (100 * SliderMultiplier / PixelLength) * SV * Beats
-                positionFunction = d => arg.GraphState.GetIntegral(0, d / arg.PixelLength * arg.GraphBeats) * arg.SvGraphMultiplier * arg.PixelLength;
-            } else {
+                positionFunction = d =>
+                    arg.GraphState.GetIntegral(0, d / arg.PixelLength * arg.GraphBeats) * arg.SvGraphMultiplier *
+                    arg.PixelLength;
+            else
                 positionFunction = d => arg.GraphState.GetValue(d / arg.PixelLength * arg.GraphBeats) * arg.PixelLength;
-            }
 
             var sliderator = new Sliderator {
                 PositionFunction = positionFunction, MaxT = arg.GraphState.MaxX
@@ -328,6 +354,7 @@ namespace Mapping_Tools.Views {
                 beatmap.HitObjects.Remove(hitObjectHere);
                 beatmap.HitObjects.Add(clone);
             }
+
             beatmap.SortHitObjects();
 
             editor.SaveFile();

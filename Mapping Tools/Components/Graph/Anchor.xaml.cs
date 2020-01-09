@@ -129,6 +129,7 @@ namespace Mapping_Tools.Components.Graph {
             if (d == null) return;
             var a = (Anchor) d;
             a.TensionAnchor.Tension = (double) e.NewValue;
+            a.Interpolator.P = (double) e.NewValue;
             a.GraphStateChangedEvent?.Invoke(d, e);
         }
         
