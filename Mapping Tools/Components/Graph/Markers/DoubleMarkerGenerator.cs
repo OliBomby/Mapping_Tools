@@ -20,14 +20,20 @@ namespace Mapping_Tools.Components.Graph.Markers {
             Unit = unit;
         }
 
-        public IEnumerable<GraphMarker> GenerateMarkers(double start, double end, Orientation orientation) {
+        public IEnumerable<GraphMarker> GenerateMarkers(double start, double end, Orientation orientation, int maxMarkers) {
             var markers = new List<GraphMarker>();
-            var vStart = Math.Ceiling((start - Offset) / Step) * Step + Offset;
+
+            double step = Step;
+            while ((end - start) / step > maxMarkers) {
+                step *= 2;
+            }
+
+            var vStart = Math.Ceiling((start - Offset) / step) * step + Offset;
             var v = vStart;
             int i = 0;
             while (v <= end + Precision.DOUBLE_EPSILON) {
                 markers.Add(new GraphMarker {Orientation = orientation, Text = $"{v:g2}{Unit}", Value = v});
-                v = vStart + Step * ++i;
+                v = vStart + step * ++i;
             }
 
             return markers;

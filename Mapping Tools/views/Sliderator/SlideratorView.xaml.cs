@@ -38,7 +38,7 @@ namespace Mapping_Tools.Views {
             DataContext = new SlideratorVm();
             ViewModel.PropertyChanged += ViewModelOnPropertyChanged;
 
-            Graph.VerticalMarkerGenerator = new DoubleMarkerGenerator(0, 0.25);
+            Graph.VerticalMarkerGenerator = new DoubleMarkerGenerator(0, 1/4d);
             Graph.HorizontalMarkerGenerator = new DividedBeatMarkerGenerator(4);
 
             Graph.SetBrush(new SolidColorBrush(Color.FromArgb(255, 0, 255, 255)));
@@ -299,7 +299,7 @@ namespace Mapping_Tools.Views {
 
                     Graph.MinY = 0;
                     Graph.MaxY = 1;
-                    Graph.VerticalMarkerGenerator = new DoubleMarkerGenerator(0, 0.25);
+                    Graph.VerticalMarkerGenerator = new DoubleMarkerGenerator(0, 1/4d);
                     break;
                 case GraphMode.Velocity:
                     GraphToggleContentTextBlock.Text = "V";
@@ -309,7 +309,7 @@ namespace Mapping_Tools.Views {
 
                     Graph.MinY = -ViewModel.VelocityLimit;
                     Graph.MaxY = ViewModel.VelocityLimit;
-                    Graph.VerticalMarkerGenerator = new DoubleMarkerGenerator(0, 1, "x");
+                    Graph.VerticalMarkerGenerator = new DoubleMarkerGenerator(0, 1/4d, "x");
                     break;
                 default:
                     GraphToggleContentTextBlock.Text = "";

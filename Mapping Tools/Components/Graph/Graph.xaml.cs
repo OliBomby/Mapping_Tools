@@ -677,9 +677,11 @@ namespace Mapping_Tools.Components.Graph {
         public void RegenerateMarkers() {
             _markers.Clear();
             if (HorizontalMarkerGenerator != null)
-                _markers.AddRange(HorizontalMarkerGenerator.GenerateMarkers(MinX, MaxX, Orientation.Vertical));
+                _markers.AddRange(HorizontalMarkerGenerator.GenerateMarkers(MinX, MaxX, Orientation.Vertical,
+                    (int)(ActualWidth / MinMarkerSpacing)));
             if (VerticalMarkerGenerator != null)
-                _markers.AddRange(VerticalMarkerGenerator.GenerateMarkers(MinY, MaxY, Orientation.Horizontal));
+                _markers.AddRange(VerticalMarkerGenerator.GenerateMarkers(MinY, MaxY, Orientation.Horizontal,
+                    (int)(ActualHeight / MinMarkerSpacing)));
 
             UpdateMarkers();
             UpdateVisual();
@@ -883,8 +885,6 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private void UpdateMarkers() {
-            var prevHorizontal = double.NegativeInfinity;
-            var prevVertical = double.NegativeInfinity;
             foreach (var graphMarker in _markers) {
                 graphMarker.Stroke = EdgesBrush;
                 graphMarker.Width = ActualWidth;
@@ -892,25 +892,16 @@ namespace Mapping_Tools.Components.Graph {
                 if (graphMarker.Orientation == Orientation.Horizontal) {
                     graphMarker.X = 0;
                     graphMarker.Y = GetRelativePointY(graphMarker.Value);
-                    graphMarker.Visible = Math.Abs(prevHorizontal - graphMarker.Y) >= MinMarkerSpacing;
-                    if (graphMarker.Visible) {
-                        prevHorizontal = graphMarker.Y;
-                    }
                 } else {
                     graphMarker.X = GetRelativePointX(graphMarker.Value);
                     graphMarker.Y = 0;
-                    graphMarker.Visible = Math.Abs(prevVertical - graphMarker.X) >= MinMarkerSpacing;
-                    if (graphMarker.Visible) {
-                        prevVertical = graphMarker.X;
-                    }
                 }
                 graphMarker.InvalidateVisual();
             }
         }
 
         private void Graph_OnSizeChanged(object sender, SizeChangedEventArgs e) {
-            UpdateMarkers();
-            UpdateVisual();
+            RegenerateMarkers();
         }
     }
 }
