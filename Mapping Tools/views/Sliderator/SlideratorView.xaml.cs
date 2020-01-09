@@ -69,6 +69,14 @@ namespace Mapping_Tools.Views {
                 switch (e.NewValue) {
                     case double newDouble:
                         var oldDouble = (double) e.OldValue;
+
+                        // Test if the old value is also a illegal speed violation
+                        anchor.SetValue(e.Property, oldDouble);
+                        if (PrevOverSpeedLimit(anchor) || NextOverSpeedLimit(anchor)) {
+                            anchor.SetValue(e.Property, newDouble);
+                            break;
+                        }
+
                         anchor.SetValue(e.Property, BinarySearchUtil.DoubleBinarySearch(
                             oldDouble, newDouble, d,
                             mid => {
