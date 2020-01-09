@@ -320,7 +320,7 @@ namespace Mapping_Tools.Views {
         }
 
         private bool ValidateToolInput(out string message) {
-            if (GetMinCompletion() < 0) {
+            if (GetMinCompletion() < -1E-4) {
                 message = "Negative position is illegal.";
                 return false;
             }
