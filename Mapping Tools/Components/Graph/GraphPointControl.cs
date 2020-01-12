@@ -27,24 +27,29 @@ namespace Mapping_Tools.Components.Graph {
             }
         }
 
-        /// <summary>
-        /// Ranges from (0,0) bottom left to (1,1) top right
-        /// </summary>
-        public Vector2 Pos { get; set; }
+        public static readonly DependencyProperty GraphProperty =
+            DependencyProperty.Register(nameof(Graph),
+                typeof(Graph), 
+                typeof(GraphPointControl), 
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None));
+        
+        public Graph Graph {
+            get => (Graph) GetValue(GraphProperty);
+            set => SetValue(GraphProperty, value);
+        }
 
-        public Graph Graph { get; set; }
+        public abstract Vector2 Pos { get; set; }
 
         /// <summary>
         /// Goes from -1 to 1
         /// </summary>
-        public virtual double Tension { get; set; }
+        public abstract double Tension { get; set; }
 
         public abstract Brush Stroke { get; set; }
 
         public abstract Brush Fill { get; set; }
 
-        protected GraphPointControl(Graph parent, Vector2 pos) {
-            Pos = pos;
+        protected GraphPointControl(Graph parent) {
             SizeMultiplier = 1;
             Graph = parent; // Set graph after size multiplier to prevent an UpdateVisual call
         }
@@ -146,7 +151,7 @@ namespace Mapping_Tools.Components.Graph {
         public virtual void SetTension(double tension) {
             Tension = tension;
 
-            Graph.UpdateVisual();
+            Graph?.UpdateVisual();
         }
     }
 }

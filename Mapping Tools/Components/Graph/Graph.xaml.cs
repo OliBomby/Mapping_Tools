@@ -1,8 +1,10 @@
 ﻿using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Components.Graph.Interpolation;
+using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
+using Mapping_Tools.Components.Graph.Markers;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
@@ -10,9 +12,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using Mapping_Tools.Components.Graph.Interpolation;
-using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
-using Mapping_Tools.Components.Graph.Markers;
 
 namespace Mapping_Tools.Components.Graph {
     /// <summary>
@@ -22,19 +21,19 @@ namespace Mapping_Tools.Components.Graph {
         private bool _drawAnchors;
         private readonly List<GraphMarker> _markers;
 
-        public event DependencyPropertyChangedEventHandler GraphStateChanged;
+        public bool IgnoreAnchorUpdates { get; set; }
 
         #region DependencyProperties
 
         public static readonly DependencyProperty AnchorsProperty =
             DependencyProperty.Register(nameof(Anchors),
-                typeof(ObservableCollection<Anchor>), 
+                typeof(AnchorCollection), 
                 typeof(Graph), 
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None,
                     OnAnchorsChanged));
 
-        public ObservableCollection<Anchor> Anchors {
-            get => (ObservableCollection<Anchor>) GetValue(AnchorsProperty);
+        public AnchorCollection Anchors {
+            get => (AnchorCollection) GetValue(AnchorsProperty);
             set => SetValue(AnchorsProperty, value);
         }
 
@@ -182,16 +181,82 @@ namespace Mapping_Tools.Components.Graph {
             set => SetValue(MinMarkerSpacingProperty, value);
         }
 
-        public static readonly DependencyProperty LimitedEndPointMovementProperty =
-            DependencyProperty.Register(nameof(LimitedEndPointMovement),
+        public static readonly DependencyProperty UserEditableProperty =
+            DependencyProperty.Register(nameof(UserEditable),
                 typeof(bool), 
                 typeof(Graph), 
                 new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.None,
-                    OnMarkersChanged));
+                    OnEditableChanged));
 
-        public bool LimitedEndPointMovement {
-            get => (bool) GetValue(LimitedEndPointMovementProperty);
-            set => SetValue(LimitedEndPointMovementProperty, value);
+        public bool UserEditable {
+            get => (bool) GetValue(UserEditableProperty);
+            set => SetValue(UserEditableProperty, value);
+        }
+
+        public static readonly DependencyProperty StartPointLockedXProperty =
+            DependencyProperty.Register(nameof(StartPointLockedX),
+                typeof(bool), 
+                typeof(Graph), 
+                new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.None));
+
+        public bool StartPointLockedX {
+            get => (bool) GetValue(StartPointLockedXProperty);
+            set => SetValue(StartPointLockedXProperty, value);
+        }
+
+        public static readonly DependencyProperty StartPointLockedYProperty =
+            DependencyProperty.Register(nameof(StartPointLockedY),
+                typeof(bool), 
+                typeof(Graph), 
+                new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.None));
+
+        public bool StartPointLockedY {
+            get => (bool) GetValue(StartPointLockedYProperty);
+            set => SetValue(StartPointLockedYProperty, value);
+        }
+
+        public static readonly DependencyProperty EndPointLockedXProperty =
+            DependencyProperty.Register(nameof(EndPointLockedX),
+                typeof(bool), 
+                typeof(Graph), 
+                new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.None));
+
+        public bool EndPointLockedX {
+            get => (bool) GetValue(EndPointLockedXProperty);
+            set => SetValue(EndPointLockedXProperty, value);
+        }
+
+        public static readonly DependencyProperty EndPointLockedYProperty =
+            DependencyProperty.Register(nameof(EndPointLockedY),
+                typeof(bool), 
+                typeof(Graph), 
+                new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.None));
+
+        public bool EndPointLockedY {
+            get => (bool) GetValue(EndPointLockedYProperty);
+            set => SetValue(EndPointLockedYProperty, value);
+        }
+
+        public static readonly DependencyProperty MarkerSnappingHorizontalProperty =
+            DependencyProperty.Register(nameof(MarkerSnappingHorizontal),
+                typeof(bool), 
+                typeof(Graph), 
+                new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.None));
+
+        public bool MarkerSnappingHorizontal {
+            get => (bool) GetValue(MarkerSnappingHorizontalProperty);
+            set => SetValue(MarkerSnappingHorizontalProperty, value);
+        }
+
+        public static readonly DependencyProperty MarkerSnappingVerticalProperty =
+            DependencyProperty.Register(nameof(MarkerSnappingVertical),
+                typeof(bool), 
+                typeof(Graph), 
+                new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.None));
+
+        public bool MarkerSnappingVertical {
+            get => (bool) GetValue(MarkerSnappingVerticalProperty);
+            set => SetValue(MarkerSnappingVerticalProperty, value);
         }
 
         public static readonly DependencyProperty ScaleOnBoundChangeHorizontalProperty =
@@ -306,7 +371,7 @@ namespace Mapping_Tools.Components.Graph {
             InitializeComponent();
             
             _markers = new List<GraphMarker>();
-            Anchors = new ObservableCollection<Anchor>();
+            Anchors = new AnchorCollection();
             LastInterpolationSet = typeof(SingleCurveInterpolator);
 
             Background = new SolidColorBrush(Color.FromArgb(30, 0, 0, 0));
@@ -317,10 +382,17 @@ namespace Mapping_Tools.Components.Graph {
             AddAnchor(new Vector2(1, 0.5));
 
             Anchors.CollectionChanged += AnchorsOnCollectionChanged;
+            Anchors.AnchorsChanged += AnchorsOnAnchorsChanged;
+        }
+
+        private void AnchorsOnAnchorsChanged(object sender, DependencyPropertyChangedEventArgs e) {
+            if (IgnoreAnchorUpdates) return;
+            UpdateVisual();
         }
 
         private void AnchorsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
-            GraphStateChanged?.Invoke(this, new DependencyPropertyChangedEventArgs(AnchorsProperty, Anchors, Anchors));
+            if (IgnoreAnchorUpdates) return;
+            UpdateVisual();
         }
 
         /// <summary>
@@ -358,9 +430,6 @@ namespace Mapping_Tools.Components.Graph {
             
             // Insert anchor
             Anchors.Insert(index, anchor);
-            
-            UpdateAnchorNeighbors();
-            UpdateVisual();
 
             return anchor;
         }
@@ -370,8 +439,8 @@ namespace Mapping_Tools.Components.Graph {
             return anchor;
         }
 
-        public Anchor MakeAnchor(Vector2 pos, Type interpolator) {
-            var anchor = new Anchor(this, pos, InterpolatorHelper.GetInterpolator(interpolator));
+        public Anchor MakeAnchor(Vector2 pos, Type lastInterpolatorSet) {
+            var anchor = new Anchor(this, pos, InterpolatorHelper.GetInterpolator(lastInterpolatorSet));
             return anchor;
         }
 
@@ -380,18 +449,12 @@ namespace Mapping_Tools.Components.Graph {
             if (IsEdgeAnchor(anchor)) return;
 
             Anchors.Remove(anchor);
-
-            UpdateAnchorNeighbors();
-            UpdateVisual();
         }
 
         public void RemoveAnchorAt(int index) {
             if (index <= 0 || index >= Anchors.Count - 1) return;
             
             Anchors.RemoveAt(index);
-
-            UpdateAnchorNeighbors();
-            UpdateVisual();
         }
         
         /// <summary>
@@ -403,6 +466,14 @@ namespace Mapping_Tools.Components.Graph {
             }
 
             foreach (var anchor in Anchors) {
+                // Remove NaNs from the position
+                if (double.IsNaN(anchor.Pos.X)) {
+                    anchor.Pos = new Vector2(0, anchor.Pos.Y);
+                }
+                if (double.IsNaN(anchor.Pos.Y)) {
+                    anchor.Pos = new Vector2(anchor.Pos.X, 0);
+                }
+                anchor.Pos = Vector2.Clamp(anchor.Pos, new Vector2(MinX, MinY), new Vector2(MaxX, MaxY));
                 anchor.SetTension(0);
             }
         }
@@ -412,6 +483,8 @@ namespace Mapping_Tools.Components.Graph {
         /// </summary>
         /// <param name="scalar"></param>
         public void ScaleAnchors(Size scalar) {
+            if (double.IsNaN(scalar.Width) || double.IsNaN(scalar.Height)) return;
+
             foreach (var anchor in Anchors) {
                 anchor.Pos = new Vector2(anchor.Pos.X * scalar.Width, anchor.Pos.Y * scalar.Height);
             }
@@ -419,51 +492,8 @@ namespace Mapping_Tools.Components.Graph {
             UpdateVisual();
         }
 
-        private void UpdateAnchorNeighbors() {
-            Anchor previousAnchor = null;
-            foreach (var anchor in Anchors) {
-                anchor.PreviousAnchor = previousAnchor;
-                if (previousAnchor != null) {
-                    previousAnchor.NextAnchor = anchor;
-                }
-
-                previousAnchor = anchor;
-            }
-        }
-
         public bool IsEdgeAnchor(Anchor anchor) {
             return anchor == Anchors[0] || anchor == Anchors[Anchors.Count - 1];
-        }
-
-        /// <summary>
-        /// Calculates the height of the curve [0-1] for a given progression along the graph [0-1].
-        /// </summary>
-        /// <param name="x">The progression along the curve (0-1)</param>
-        /// <returns>The height of the curve (0-1)</returns>
-        public double GetInterpolation(double x) {
-            // Find the section
-            var previousAnchor = Anchors[0];
-            var nextAnchor = Anchors[1];
-            foreach (var anchor in Anchors) {
-                if (anchor.Pos.X < x) {
-                    previousAnchor = anchor;
-                } else {
-                    nextAnchor = anchor;
-                    break;
-                }
-            }
-
-            // Calculate the value via interpolation
-            var diff = nextAnchor.Pos - previousAnchor.Pos;
-            if (Math.Abs(diff.X) < Precision.DOUBLE_EPSILON) {
-                return previousAnchor.Pos.Y;
-            }
-            var sectionProgress = (x - previousAnchor.Pos.X) / diff.X;
-
-            var interpolator = nextAnchor.Interpolator;
-            interpolator.P = nextAnchor.Tension;
-
-            return previousAnchor.Pos.Y + diff.Y * interpolator.GetInterpolation(sectionProgress);
         }
 
         public Point GetRelativePoint(Vector2 value) {
@@ -502,181 +532,20 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         /// <summary>
-        /// Calculates the derivative in the [0-1] coordinate system for a given progression along the graph [0-1].
+        /// Calculates the height of the curve [0-1] for a given progression along the graph [0-1].
         /// </summary>
-        /// <param name="x"></param>
-        /// <returns></returns>
+        /// <param name="x">The progression along the curve (0-1)</param>
+        /// <returns>The height of the curve (0-1)</returns>
+        public double GetValue(double x) {
+            return Anchors.GetValue(x);
+        }
+
         public double GetDerivative(double x) {
-            // TODO: Need derivates of interpolators for this
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Calculates the height of the heighest point in the graph.
-        /// </summary>
-        /// <returns></returns>
-        public double GetMaxHeight() {
-            // It suffices to find the highest Y value of the anchors, because the interpolated parts never stick out above or below the anchors.
-            return Anchors.Max(o => o.Pos.Y);
-        }
-
-        public void Differentiate(double newMinY, double newMaxY) {
-            // Differentiate graph
-            var newAnchors = new List<Anchor>();
-            Anchor previousAnchor = null;
-            foreach (var anchor in Anchors) {
-                if (previousAnchor != null) {
-                    var p1 = previousAnchor.Pos;
-                    var p2 = anchor.Pos;
-
-                    var difference = p2 - p1;
-
-                    double startSlope;
-                    double endSlope;
-                    IGraphInterpolator derivativeInterpolator;
-
-                    if (anchor.Interpolator is IDerivableInterpolator derivableInterpolator) {
-                        startSlope = derivableInterpolator.GetDerivative(0) * difference.Y / difference.X;
-                        endSlope = derivableInterpolator.GetDerivative(1) * difference.Y / difference.X;
-                        derivativeInterpolator = derivableInterpolator.GetDerivativeInterpolator();
-
-                    } else {
-                        startSlope = difference.Y / difference.X;
-                        endSlope = startSlope;
-                        derivativeInterpolator = new LinearInterpolator();
-                    }
-
-                    var np1 = new Vector2(previousAnchor.Pos.X, startSlope);
-                    var np2 = new Vector2(anchor.Pos.X, endSlope);
-
-                    if (!(newAnchors.Count > 0 && Vector2.DistanceSquared(newAnchors[newAnchors.Count - 1].Pos, np1) < Precision.DOUBLE_EPSILON)) {
-                        newAnchors.Add(new Anchor(this, np1, new LinearInterpolator()));
-                    }
-                    newAnchors.Add(new Anchor(this, np2, derivativeInterpolator));
-                }
-
-                previousAnchor = anchor;
-            }
-
-            Anchors = new ObservableCollection<Anchor>(newAnchors);
-            MinY = newMinY;
-            MaxY = newMaxY;
-        }
-
-        public void Integrate(double newMinY, double newMaxY) {
-            var newAnchors = new List<Anchor> {new Anchor(this, new Vector2(0, -newMinY / (newMaxY - newMinY)))};
-            double height = 0;
-            Anchor previousAnchor = null;
-            foreach (var anchor in Anchors) {
-                if (previousAnchor != null) {
-                    var p1 = previousAnchor.Pos;
-                    var p2 = anchor.Pos;
-
-                    var difference = p2 - p1;
-
-                    if (difference.X < Precision.DOUBLE_EPSILON) {
-                        previousAnchor = anchor;
-                        continue;
-                    }
-
-                    double integral;
-                    IGraphInterpolator primitiveInterpolator;
-
-                    if (anchor.Interpolator is IIntegrableInterpolator integrableInterpolator) {
-                        integral = integrableInterpolator.GetIntegral(0, 1);
-                        primitiveInterpolator = integrableInterpolator.GetPrimitiveInterpolator(p1.X, p1.Y, p2.X, p2.Y);
-                    } else {
-                        integral = 0.5;
-                        primitiveInterpolator = new LinearInterpolator();
-                    }
-                    
-                    height += integral * difference.X * difference.Y + difference.X * p1.Y;
-                    newAnchors.Add(new Anchor(this, new Vector2(anchor.Pos.X, height), primitiveInterpolator));
-                }
-
-                previousAnchor = anchor;
-            }
-            
-            Anchors = new ObservableCollection<Anchor>(newAnchors);
-            MinY = newMinY;
-            MaxY = newMaxY;
+            return Anchors.GetDerivative(x);
         }
 
         public double GetIntegral(double t1, double t2) {
-            double height = 0;
-            Anchor previousAnchor = null;
-            foreach (var anchor in Anchors) {
-                if (previousAnchor != null) {
-                    var p1 = new Vector2(MathHelper.Clamp(previousAnchor.Pos.X, t1, t2), previousAnchor.Pos.Y);
-                    var p2 = new Vector2(MathHelper.Clamp(anchor.Pos.X, t1, t2), anchor.Pos.Y);
-
-                    if (p2.X < t1 || p1.X > t2) {
-                        previousAnchor = anchor;
-                        continue;
-                    }
-
-                    var difference = p2 - p1;
-
-                    if (difference.X < Precision.DOUBLE_EPSILON) {
-                        previousAnchor = anchor;
-                        continue;
-                    }
-
-                    double integral;
-                    if (anchor.Interpolator is IIntegrableInterpolator integrableInterpolator) {
-                        integral = integrableInterpolator.GetIntegral(0, 1);
-                    } else {
-                        integral = 0.5;
-                    }
-                    
-                    height += integral * difference.X * difference.Y + difference.X * p1.Y;
-                }
-
-                previousAnchor = anchor;
-            }
-
-            return height;
-        }
-
-        public double GetMaxIntegral(double t1, double t2) {
-            double height = 0;
-            double maxHeight = height;
-            Anchor previousAnchor = null;
-            foreach (var anchor in Anchors) {
-                if (previousAnchor != null) {
-                    var p1 = new Vector2(MathHelper.Clamp(previousAnchor.Pos.X, t1, t2), previousAnchor.Pos.Y);
-                    var p2 = new Vector2(MathHelper.Clamp(anchor.Pos.X, t1, t2), anchor.Pos.Y);
-
-                    if (p2.X < t1 || p1.X > t2) {
-                        previousAnchor = anchor;
-                        continue;
-                    }
-
-                    var difference = p2 - p1;
-
-                    if (difference.X < Precision.DOUBLE_EPSILON) {
-                        previousAnchor = anchor;
-                        continue;
-                    }
-
-                    double integral;
-                    if (anchor.Interpolator is IIntegrableInterpolator integrableInterpolator) {
-                        integral = integrableInterpolator.GetIntegral(0, 1);
-                    } else {
-                        integral = 0.5;
-                    }
-                    
-                    height += integral * difference.X * difference.Y + difference.X * p1.Y;
-
-                    if (height > maxHeight) {
-                        maxHeight = height;
-                    }
-                }
-
-                previousAnchor = anchor;
-            }
-
-            return maxHeight;
+            return Anchors.GetIntegral(t1, t2);
         }
 
         #endregion
@@ -692,9 +561,8 @@ namespace Mapping_Tools.Components.Graph {
                 anchor.TensionAnchor.Stroke = g.TensionAnchorStroke;
                 anchor.TensionAnchor.Fill = g.TensionAnchorFill;
             }
-            g.UpdateAnchorNeighbors();
+
             g.UpdateVisual();
-            g.GraphStateChanged?.Invoke(d, e);
         }
 
         private static void OnBoundsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
@@ -722,7 +590,6 @@ namespace Mapping_Tools.Components.Graph {
                                          g.ScaleOnBoundChangeVertical ? g.MinY + (g.MaxY - g.MinY) * (anchor.Pos.Y - oldMinY) / (oldMaxY - oldMinY) : anchor.Pos.Y);
             }
             g.RegenerateMarkers();
-            g.GraphStateChanged?.Invoke(d, e);
         }
 
         private static void OnAxisChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
@@ -733,6 +600,11 @@ namespace Mapping_Tools.Components.Graph {
         private static void OnMarkerGeneratorsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             var g = (Graph) d;
             g.RegenerateMarkers();
+        }
+
+        private static void OnEditableChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            var g = (Graph) d;
+            g.UpdateVisual();
         }
 
         private static void OnMarkersChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
@@ -805,9 +677,11 @@ namespace Mapping_Tools.Components.Graph {
         public void RegenerateMarkers() {
             _markers.Clear();
             if (HorizontalMarkerGenerator != null)
-                _markers.AddRange(HorizontalMarkerGenerator.GenerateMarkers(MinX, MaxX, Orientation.Vertical));
+                _markers.AddRange(HorizontalMarkerGenerator.GenerateMarkers(MinX, MaxX, Orientation.Vertical,
+                    (int)(ActualWidth / MinMarkerSpacing)));
             if (VerticalMarkerGenerator != null)
-                _markers.AddRange(VerticalMarkerGenerator.GenerateMarkers(MinY, MaxY, Orientation.Horizontal));
+                _markers.AddRange(VerticalMarkerGenerator.GenerateMarkers(MinY, MaxY, Orientation.Horizontal,
+                    (int)(ActualHeight / MinMarkerSpacing)));
 
             UpdateMarkers();
             UpdateVisual();
@@ -870,7 +744,7 @@ namespace Mapping_Tools.Components.Graph {
                 for (int k = 1; k < GetRelativePointX(next.Pos.X) - GetRelativePointX(previous.Pos.X); k++) {
                     var x = previous.Pos.X + k / ActualWidth * (MaxX - MinX);
 
-                    points.Add(GetRelativePoint(new Vector2(x, GetInterpolation(x))));
+                    points.Add(GetRelativePoint(new Vector2(x, GetValue(x))));
                 }
             }
             points.Add(GetRelativePoint(Anchors[Anchors.Count - 1].Pos));
@@ -888,8 +762,8 @@ namespace Mapping_Tools.Components.Graph {
             var polygon = new Polygon {Points = points2, Fill = Fill, IsHitTestVisible = false};
             MainCanvas.Children.Add(polygon);
 
-            // Return if we dont draw Anchors
-            if (!_drawAnchors) return;
+            // Return if we dont draw Anchors or if the graph is not user editable. Having invisible anchors makes it impossible to edit
+            if (!_drawAnchors || !UserEditable) return;
 
             // Add tension Anchors
             foreach (var anchor in Anchors) {
@@ -903,7 +777,7 @@ namespace Mapping_Tools.Components.Graph {
                 var x = (next.Pos.X + previous.Pos.X) / 2;
 
                 // Get y on the graph and set position
-                var y = GetInterpolation(x);
+                var y = GetValue(x);
                 anchor.TensionAnchor.Pos = new Vector2(x, y);
 
                 RenderGraphPoint(anchor.TensionAnchor);
@@ -926,32 +800,68 @@ namespace Mapping_Tools.Components.Graph {
             var index = Anchors.IndexOf(anchor);
             var previous = Anchors.ElementAtOrDefault(index - 1);
             var next = Anchors.ElementAtOrDefault(index + 1);
-            if (previous == null || next == null) {
-                if (LimitedEndPointMovement) {
-                    // Is edge anchor so dont move it
-                    pos.X = anchor.Pos.X;
-                }
-            } else {
-                // Snap to nearest vertical marker unless left alt is held
-                if (!Keyboard.IsKeyDown(Key.LeftAlt)) {
+
+            // Snap to nearest marker unless left alt is held
+            if (!Keyboard.IsKeyDown(Key.LeftAlt)) {
+                if (MarkerSnappingHorizontal) {
                     // Find the nearest marker
-                    GraphMarker nearestMarker = null;
+                    GraphMarker nearestMarkerHorizontal = null;
                     double nearestDistance = double.PositiveInfinity;
                     foreach (var marker in _markers.Where(o => o.Orientation == Orientation.Vertical)) {
                         var markerPos = GetValue(marker);
                         var dist = Math.Abs(pos.X - markerPos.X);
                         if (!(dist < nearestDistance)) continue;
                         nearestDistance = dist;
-                        nearestMarker = marker;
+                        nearestMarkerHorizontal = marker;
                     }
                     // Set X to that marker's value
-                    if (nearestMarker != null)
-                        pos.X = GetValueX(nearestMarker.X);
+                    if (nearestMarkerHorizontal != null)
+                        pos.X = GetValueX(nearestMarkerHorizontal.X);
                 }
-                pos.X = MathHelper.Clamp(pos.X, previous.Pos.X, next.Pos.X);
+                if (MarkerSnappingVertical) {
+                    // Find the nearest marker
+                    GraphMarker nearestMarkerVertical = null;
+                    double nearestDistance = double.PositiveInfinity;
+                    foreach (var marker in _markers.Where(o => o.Orientation == Orientation.Horizontal)) {
+                        var markerPos = GetValue(marker);
+                        var dist = Math.Abs(pos.Y - markerPos.Y);
+                        if (!(dist < nearestDistance)) continue;
+                        nearestDistance = dist;
+                        nearestMarkerVertical = marker;
+                    }
+                    // Set Y to that marker's value
+                    if (nearestMarkerVertical != null)
+                        pos.Y = GetValueY(nearestMarkerVertical.Y);
+                }
             }
 
+            // Clip the new position between the previous and the next anchor
+            if (previous != null) {
+                pos.X = Math.Max(pos.X, previous.Pos.X);
+            }
+            if (next != null) {
+                pos.X = Math.Min(pos.X, next.Pos.X);
+            }
+
+            // Clip the new Y position between the bounds of the graph
             pos.Y = MathHelper.Clamp(pos.Y, MinY, MaxY);
+            
+            // Handle lockedness of start/end point
+            if (previous == null) {
+                if (StartPointLockedX) {
+                    pos.X = anchor.Pos.X;
+                }
+                if (StartPointLockedY) {
+                    pos.Y = anchor.Pos.Y;
+                }
+            } else if (next == null) {
+                if (EndPointLockedX) {
+                    pos.X = anchor.Pos.X;
+                }
+                if (EndPointLockedY) {
+                    pos.Y = anchor.Pos.Y;
+                }
+            }
 
             anchor.Pos = pos;
 
@@ -975,8 +885,6 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private void UpdateMarkers() {
-            var prevHorizontal = double.NegativeInfinity;
-            var prevVertical = double.NegativeInfinity;
             foreach (var graphMarker in _markers) {
                 graphMarker.Stroke = EdgesBrush;
                 graphMarker.Width = ActualWidth;
@@ -984,25 +892,16 @@ namespace Mapping_Tools.Components.Graph {
                 if (graphMarker.Orientation == Orientation.Horizontal) {
                     graphMarker.X = 0;
                     graphMarker.Y = GetRelativePointY(graphMarker.Value);
-                    graphMarker.Visible = Math.Abs(prevHorizontal - graphMarker.Y) >= MinMarkerSpacing;
-                    if (graphMarker.Visible) {
-                        prevHorizontal = graphMarker.Y;
-                    }
                 } else {
                     graphMarker.X = GetRelativePointX(graphMarker.Value);
                     graphMarker.Y = 0;
-                    graphMarker.Visible = Math.Abs(prevVertical - graphMarker.X) >= MinMarkerSpacing;
-                    if (graphMarker.Visible) {
-                        prevVertical = graphMarker.X;
-                    }
                 }
                 graphMarker.InvalidateVisual();
             }
         }
 
         private void Graph_OnSizeChanged(object sender, SizeChangedEventArgs e) {
-            UpdateMarkers();
-            UpdateVisual();
+            RegenerateMarkers();
         }
     }
 }

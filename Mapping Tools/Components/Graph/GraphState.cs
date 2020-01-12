@@ -1,10 +1,11 @@
-﻿using Mapping_Tools.Classes.MathUtil;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Windows;
-using Mapping_Tools.Components.Graph.Interpolation;
 
 namespace Mapping_Tools.Components.Graph {
+    /// <summary>
+    /// This class is meant to contain all the defining information for a <see cref="Graph"/> instance.
+    /// You can use this for serialization or to transport information of a <see cref="Graph"/> between threads.
+    /// </summary>
     public class GraphState : Freezable {
         #region DependencyProperties
 
@@ -69,68 +70,16 @@ namespace Mapping_Tools.Components.Graph {
             return new GraphState();
         }
 
-        public double GetInterpolation(double x) {
-            // Find the section
-            var previousAnchor = Anchors[0];
-            var nextAnchor = Anchors[1];
-            foreach (var anchor in Anchors) {
-                if (anchor.Pos.X < x) {
-                    previousAnchor = anchor;
-                } else {
-                    nextAnchor = anchor;
-                    break;
-                }
-            }
+        public double GetValue(double x) {
+            return AnchorCollection.GetValue(x, Anchors);
+        }
 
-            // Calculate the value via interpolation
-            var diff = nextAnchor.Pos - previousAnchor.Pos;
-            if (Math.Abs(diff.X) < Precision.DOUBLE_EPSILON) {
-                return previousAnchor.Pos.Y;
-            }
-            var sectionProgress = (x - previousAnchor.Pos.X) / diff.X;
-
-            var interpolator = nextAnchor.Interpolator;
-            interpolator.P = nextAnchor.Tension;
-
-            return previousAnchor.Pos.Y + diff.Y * interpolator.GetInterpolation(sectionProgress);
+        public double GetDerivative(double x) {
+            return AnchorCollection.GetDerivative(x, Anchors);
         }
 
         public double GetIntegral(double t1, double t2) {
-            double height = 0;
-            Anchor previousAnchor = null;
-            foreach (var anchor in Anchors) {
-                if (previousAnchor != null) {
-                    var p1 = new Vector2(MathHelper.Clamp(previousAnchor.Pos.X, t1, t2), previousAnchor.Pos.Y);
-                    var p2 = new Vector2(MathHelper.Clamp(anchor.Pos.X, t1, t2), anchor.Pos.Y);
-
-                    if (p2.X < t1 || p1.X > t2) {
-                        previousAnchor = anchor;
-                        continue;
-                    }
-
-                    var difference = p2 - p1;
-
-                    if (difference.X < Precision.DOUBLE_EPSILON) {
-                        previousAnchor = anchor;
-                        continue;
-                    }
-
-                    double integral;
-                    if (anchor.Interpolator is IIntegrableInterpolator integrableInterpolator) {
-                        integral = integrableInterpolator.GetIntegral((p1.X - previousAnchor.Pos.X) / (anchor.Pos.X - previousAnchor.Pos.X), 
-                                                                      (p2.X - previousAnchor.Pos.X) / (anchor.Pos.X - previousAnchor.Pos.X));
-                    } else {
-                        integral = 0.5;
-                    }
-                    
-                    // TODO: FIX THIS
-                    height += integral * difference.X * difference.Y + difference.X * p1.Y;
-                }
-
-                previousAnchor = anchor;
-            }
-
-            return height;
+            return AnchorCollection.GetIntegral(t1, t2, Anchors);
         }
     }
 }

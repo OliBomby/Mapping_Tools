@@ -27,5 +27,31 @@ namespace Mapping_Tools.Components.Graph.Interpolation {
         public static IGraphInterpolator GetInterpolator(Type type) {
             return (IGraphInterpolator) Activator.CreateInstance(type);
         }
+
+        public static double GetBiggestValue(IGraphInterpolator interpolator) {
+            // If the interpolator has a CustomExtremaAttribute than we check the min/max value for all the specified locations
+            var customExtremaAttribute =
+                interpolator.GetType().GetCustomAttribute<CustomExtremaAttribute>();
+
+            var values = customExtremaAttribute != null
+                ? customExtremaAttribute.ExtremaPositions.Select(o => Math.Abs(interpolator.GetInterpolation(o)))
+                : new[] {0, 1}.Select(o => Math.Abs(interpolator.GetInterpolation(o)));
+                    
+            return values.Max();
+        }
+
+        public static double GetBiggestDerivative(IGraphInterpolator interpolator) {
+            if (!(interpolator is IDerivableInterpolator derivableInterpolator)) return 1;
+
+            // If the interpolator has a CustomDerivativeExtremaAttribute than we check the min/max derivative for all the specified locations
+            var customExtremaAttribute =
+                derivableInterpolator.GetType().GetCustomAttribute<CustomDerivativeExtremaAttribute>();
+
+            var values = customExtremaAttribute != null
+                ? customExtremaAttribute.ExtremaPositions.Select(o => Math.Abs(derivableInterpolator.GetDerivative(o)))
+                : new[] {0, 1}.Select(o => Math.Abs(derivableInterpolator.GetDerivative(o)));
+                    
+            return values.Max();
+        }
     }
 }

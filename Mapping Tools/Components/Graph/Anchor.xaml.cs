@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Mapping_Tools.Components.Dialogs;
 using ContextMenu = System.Windows.Controls.ContextMenu;
 using Cursors = System.Windows.Input.Cursors;
 using MenuItem = System.Windows.Controls.MenuItem;
@@ -21,63 +22,155 @@ namespace Mapping_Tools.Components.Graph {
     public partial class Anchor {
         protected override double DefaultSize { get; } = 12;
 
-        [NotNull]
-        public TensionAnchor TensionAnchor { get; set; }
+        public event DependencyPropertyChangedEventHandler GraphStateChangedEvent;
 
+        public static readonly DependencyProperty PosProperty =
+            DependencyProperty.Register(nameof(Pos),
+                typeof(Vector2), 
+                typeof(Anchor), 
+                new FrameworkPropertyMetadata(Vector2.Zero, FrameworkPropertyMetadataOptions.None,
+                    OnPosChanged));
+
+        /// <summary>
+        /// Ranges from (0,0) bottom left to (1,1) top right
+        /// </summary>
+        public sealed override Vector2 Pos {
+            get => (Vector2) GetValue(PosProperty);
+            set => SetValue(PosProperty, value);
+        }
+
+        private static void OnPosChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            if (d == null) return;
+            var a = (Anchor) d;
+            a.GraphStateChangedEvent?.Invoke(d, e);
+        }
+        
+        public static readonly DependencyProperty TensionAnchorProperty =
+            DependencyProperty.Register(nameof(TensionAnchor),
+                typeof(TensionAnchor), 
+                typeof(Anchor), 
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None));
+        
+        [NotNull]
+        public TensionAnchor TensionAnchor {
+            get => (TensionAnchor) GetValue(TensionAnchorProperty);
+            set => SetValue(TensionAnchorProperty, value);
+        }
+        
+        public static readonly DependencyProperty InterpolatorProperty =
+            DependencyProperty.Register(nameof(Interpolator),
+                typeof(IGraphInterpolator), 
+                typeof(Anchor), 
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None,
+                    OnInterpolatorChanged));
+        
         [NotNull]
         public IGraphInterpolator Interpolator {
-            get => _interpolator;
-            set => SetInterpolator(value);
+            get => (IGraphInterpolator) GetValue(InterpolatorProperty);
+            set => SetValue(InterpolatorProperty, value);
         }
 
-        private IGraphInterpolator _interpolator;
-
-        private Brush _stroke;
+        private static void OnInterpolatorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            if (d == null) return;
+            if (e.NewValue == null) return;
+            var a = (Anchor) d;
+            a.UpdateInterpolatorStuff();
+            a.GraphStateChangedEvent?.Invoke(d, e);
+        }
+        
+        public static readonly DependencyProperty StrokeProperty =
+            DependencyProperty.Register(nameof(Stroke),
+                typeof(Brush), 
+                typeof(Anchor), 
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None,
+                    OnStrokeChanged));
+        
         public sealed override Brush Stroke {
-            get => _stroke;
-            set { 
-                _stroke = value;
-                MainShape.Stroke = value;
-            }
+            get => (Brush) GetValue(StrokeProperty);
+            set => SetValue(StrokeProperty, value);
         }
 
-        private Brush _fill;
+        private static void OnStrokeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            if (d == null) return;
+            var a = (Anchor) d;
+            a.MainShape.Stroke = (Brush) e.NewValue;
+        }
+        
+        public static readonly DependencyProperty FillProperty =
+            DependencyProperty.Register(nameof(Fill),
+                typeof(Brush), 
+                typeof(Anchor), 
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None,
+                    OnFillChanged));
+        
         public sealed override Brush Fill {
-            get => _fill;
-            set {
-                _fill = value;
-                MainShape.Fill = value;
-            }
+            get => (Brush) GetValue(FillProperty);
+            set => SetValue(FillProperty, value);
         }
 
-        private double _tension;
+        private static void OnFillChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            if (d == null) return;
+            var a = (Anchor) d;
+            a.MainShape.Fill = (Brush) e.NewValue;
+        }
+        
+        public static readonly DependencyProperty TensionProperty =
+            DependencyProperty.Register(nameof(Tension),
+                typeof(double), 
+                typeof(Anchor), 
+                new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.None,
+                    OnTensionChanged));
+        
         public sealed override double Tension {
-            get => _tension;
-            set {
-                if (Math.Abs(_tension - value) < Precision.DOUBLE_EPSILON) return;
-                _tension = value;
-                TensionAnchor.Tension = value;
-            }
+            get => (double) GetValue(TensionProperty);
+            set => SetValue(TensionProperty, value);
         }
 
+        private static void OnTensionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            if (d == null) return;
+            var a = (Anchor) d;
+            a.TensionAnchor.Tension = (double) e.NewValue;
+            a.Interpolator.P = (double) e.NewValue;
+            a.GraphStateChangedEvent?.Invoke(d, e);
+        }
+        
+        public static readonly DependencyProperty PreviousAnchorProperty =
+            DependencyProperty.Register(nameof(PreviousAnchor),
+                typeof(Anchor), 
+                typeof(Anchor), 
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None));
+        
         [CanBeNull]
-        public Anchor PreviousAnchor { get; set; }
-
+        public Anchor PreviousAnchor {
+            get => (Anchor) GetValue(PreviousAnchorProperty);
+            set => SetValue(PreviousAnchorProperty, value);
+        }
+        
+        public static readonly DependencyProperty NextAnchorProperty =
+            DependencyProperty.Register(nameof(NextAnchor),
+                typeof(Anchor), 
+                typeof(Anchor), 
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None));
+        
         [CanBeNull]
-        public Anchor NextAnchor { get; set; }
+        public Anchor NextAnchor {
+            get => (Anchor) GetValue(NextAnchorProperty);
+            set => SetValue(NextAnchorProperty, value);
+        }
 
         public Anchor(Graph parent, Vector2 pos) : this(parent, pos, null) { }
 
         public Anchor(Graph parent, Vector2 pos, IGraphInterpolator interpolator) : this(parent, pos, interpolator, null) { }
 
-        public Anchor(Graph parent, Vector2 pos, IGraphInterpolator interpolator, TensionAnchor tensionAnchor) : base(parent, pos) {
+        public Anchor(Graph parent, Vector2 pos, IGraphInterpolator interpolator, TensionAnchor tensionAnchor) : base(parent) {
             InitializeComponent();
             SetCursor();
             PopulateContextMenu();
+            Pos = pos;
             TensionAnchor = tensionAnchor ?? new TensionAnchor(Graph, pos, this);
             TensionAnchor.ParentAnchor = this;
             TensionAnchor.Graph = Graph;
-            SetInterpolator(interpolator ?? new SingleCurveInterpolator());
+            Interpolator = interpolator ?? new SingleCurveInterpolator();
             if (Interpolator is CustomInterpolator c) {
                 Tension = c.P;
             }
@@ -172,13 +265,11 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private void SetInterpolator(Type type) {
-            SetInterpolator(InterpolatorHelper.GetInterpolator(type));
+            Interpolator = InterpolatorHelper.GetInterpolator(type);
         }
 
-        private void SetInterpolator(IGraphInterpolator p) {
-            if (p == null || _interpolator != null && _interpolator == p) return;
-
-            var type = p.GetType();
+        private void UpdateInterpolatorStuff() {
+            var type = Interpolator.GetType();
 
             var cm = GetContextMenu();
             var items = cm.Items;
@@ -189,8 +280,6 @@ namespace Mapping_Tools.Components.Graph {
                         new PackIcon {Kind = PackIconKind.RadioboxBlank};
                 }
             }
-            
-            _interpolator = p;
 
             if (Graph == null) return;
             Graph.LastInterpolationSet = type;

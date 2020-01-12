@@ -1,7 +1,6 @@
-﻿using System;
-using Mapping_Tools.Classes.SystemTools;
+﻿using Mapping_Tools.Classes.SystemTools;
 
-namespace Mapping_Tools.Components.SampleDialog {
+namespace Mapping_Tools.Components.Dialogs.SampleDialog {
     public class SampleDialogViewModel : BindableBase
     {
         private string _name;

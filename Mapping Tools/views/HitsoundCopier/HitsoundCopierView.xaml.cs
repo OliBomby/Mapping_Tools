@@ -501,7 +501,7 @@ namespace Mapping_Tools.Views {
 
         private void BeatmapFromBrowse_Click(object sender, RoutedEventArgs e) {
             try {
-                var paths = IOHelper.BeatmapFileDialog(restore: true);
+                var paths = IOHelper.BeatmapFileDialog(restore: !SettingsManager.Settings.CurrentBeatmapDefaultFolder);
                 if (paths.Length != 0) {
                     BeatmapFromBox.Text = paths[0];
                 }
@@ -523,7 +523,7 @@ namespace Mapping_Tools.Views {
 
         private void BeatmapToBrowse_Click(object sender, RoutedEventArgs e) {
             try {
-                var paths = IOHelper.BeatmapFileDialog(true, true);
+                var paths = IOHelper.BeatmapFileDialog(true, !SettingsManager.Settings.CurrentBeatmapDefaultFolder);
                 if (paths.Length != 0) {
                     BeatmapToBox.Text = string.Join("|", paths);
                 }

@@ -220,7 +220,7 @@ namespace Mapping_Tools.Views
         {
             try
             {
-                string[] paths = IOHelper.BeatmapFileDialog(restore: true);
+                string[] paths = IOHelper.BeatmapFileDialog(restore: !SettingsManager.Settings.CurrentBeatmapDefaultFolder);
                 if (paths.Length != 0)
                 {
                     SelectedImportPathBox.Text = paths[0];
@@ -260,7 +260,7 @@ namespace Mapping_Tools.Views
         {
             try
             {
-                string[] paths = IOHelper.BeatmapFileDialog(restore: true);
+                string[] paths = IOHelper.BeatmapFileDialog(restore: !SettingsManager.Settings.CurrentBeatmapDefaultFolder);
                 if (paths.Length != 0)
                 {
                     Settings.BaseBeatmap = paths[0];

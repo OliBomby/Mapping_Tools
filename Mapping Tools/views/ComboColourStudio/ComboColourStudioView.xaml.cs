@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using Mapping_Tools.Components.Dialogs;
 
 namespace Mapping_Tools.Views {
     /// <summary>

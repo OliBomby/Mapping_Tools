@@ -5,10 +5,15 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:components="clr-namespace:Mapping_Tools.Components"
+             xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
              xmlns:syst="clr-namespace:Mapping_Tools.Classes.SystemTools"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" MinWidth="500" MinHeight="600"
              d:DataContext="{d:DesignData Settings}">
+    <UserControl.Resources>
+        <domain:IntToStringConverter x:Key="IntToStringConverter"/>
+        <domain:TimeToStringConverter x:Key="TimeToStringConverter"/>
+    </UserControl.Resources>
     <Grid>
         <StackPanel Margin="0,0,100,0">
             <TextBlock Foreground="{DynamicResource PrimaryHueMidBrush}" FontSize="40" FontWeight="Bold"><Run Text="Preferences"/></TextBlock>
@@ -61,13 +66,21 @@
                 </Button >
             </Grid>
 
-            <TextBox x:Name="MaxBackupFilesBox" Text="{Binding MaxBackupFiles, Mode=TwoWay}" MaxWidth="150" Margin="0,10,0,0" HorizontalAlignment="Left"
+            <TextBox x:Name="MaxBackupFilesBox" Text="{Binding MaxBackupFiles, Mode=TwoWay, Converter={StaticResource IntToStringConverter}}" MaxWidth="150" Margin="0,10,0,0" HorizontalAlignment="Left"
                      Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Max backup files"
                      ToolTip="The oldest beatmap backups in the backups folder will automatically get deleted if there are too many files."/>
 
             <StackPanel Margin="5 10 0 0">
-                <CheckBox HorizontalAlignment="Left" Content="Make automatic backups" IsChecked="{Binding MakeBackups, Mode=TwoWay}" ToolTip="Make automatic backups whenever you run tools."/>
-                <CheckBox HorizontalAlignment="Left" Content="Enable Editor Reader" IsChecked="{Binding UseEditorReader, Mode=TwoWay}" ToolTip="Enable functionality of Editor Reader. Editor Reader reads the memory of your osu! client to get live data from your editor."/>
+                <CheckBox HorizontalAlignment="Left" Content="Make automatic backups" IsChecked="{Binding MakeBackups, Mode=TwoWay}" ToolTip="Make automatic backups whenever you run mapping tools."/>
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox x:Name="PeriodicBackupsCheckBox" HorizontalAlignment="Left" Content="Make periodic backups" IsChecked="{Binding PeriodicBackups, Mode=TwoWay}" ToolTip="Periodically make automatic backups when the editor is open and you forget to save often."/>
+                    <TextBox Text="{Binding PeriodicBackupPeriod, Mode=TwoWay}" MaxWidth="150" Margin="20,0,0,0" HorizontalAlignment="Left"
+                             Visibility="{Binding ElementName=PeriodicBackupsCheckBox, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}"
+                             Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Backup period"
+                             ToolTip="The time between each automatic periodic backup while the editor is open."/>
+                </StackPanel>
+                <CheckBox HorizontalAlignment="Left" Content="Current beatmap default folder in all tools" IsChecked="{Binding CurrentBeatmapDefaultFolder, Mode=TwoWay}" ToolTip="Enable this to get the current beatmap folder as the default folder whenever you open a file explorer in a tool which doesn't use current beatmap (e.g. Hitsound Copier). Else it will default to the last used folder."/>
+                <CheckBox HorizontalAlignment="Left" Content="Enable Editor Reader" IsChecked="{Binding UseEditorReader, Mode=TwoWay}" ToolTip="Enable functionality of Editor Reader. Editor Reader reads the memory of your osu! client to get live data from your editor. It can sometimes break, so you can choose to not use it."/>
                 <CheckBox HorizontalAlignment="Left" Content="Override osu! save with BetterSave™" IsChecked="{Binding OverrideOsuSave, Mode=TwoWay}" ToolTip="Automatically BetterSave after every osu! save."/>
                 <CheckBox HorizontalAlignment="Left" Content="Auto reload after QuickRun" IsChecked="{Binding AutoReload, Mode=TwoWay}" ToolTip="Tries to reload the editor after every QuickRun."/>
             </StackPanel>

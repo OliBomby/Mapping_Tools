@@ -204,6 +204,7 @@
     <Compile Include="Classes\HitsoundStuff\SampleSoundGenerator.cs" />
     <Compile Include="Classes\HitsoundStuff\SF2Extension.cs" />
     <Compile Include="Classes\HitsoundStuff\VolumeBalancingArgs.cs" />
+    <Compile Include="Classes\MathUtil\BinarySearchUtil.cs" />
     <Compile Include="Classes\MathUtil\Circle.cs" />
     <Compile Include="Classes\MathUtil\Extensions.cs" />
     <Compile Include="Classes\MathUtil\BezierCurve.cs" />
@@ -212,6 +213,7 @@
     <Compile Include="Classes\MathUtil\Box2.cs" />
     <Compile Include="Classes\MathUtil\Box2d.cs" />
     <Compile Include="Classes\MathUtil\CircleArc.cs" />
+    <Compile Include="Classes\MathUtil\GradientDescentUtil.cs" />
     <Compile Include="Classes\MathUtil\LineSegment.cs" />
     <Compile Include="Classes\MathUtil\MathHelper.cs" />
     <Compile Include="Classes\MathUtil\Matrix2.cs" />
@@ -241,6 +243,7 @@
     <Compile Include="Classes\MathUtil\Vector3d.cs" />
     <Compile Include="Classes\MathUtil\Vector4.cs" />
     <Compile Include="Classes\MathUtil\Vector4d.cs" />
+    <Compile Include="Classes\Sliderator\GraphStateValueGetter.cs" />
     <Compile Include="Classes\SliderPathStuff\PathApproximator.cs" />
     <Compile Include="Classes\SliderPathStuff\PathType.cs" />
     <Compile Include="Classes\MathUtil\Precision.cs" />
@@ -332,6 +335,10 @@
     <Compile Include="Classes\Tools\EditorReaderStuff.cs" />
     <Compile Include="Classes\Tools\MapCleaner.cs" />
     <Compile Include="Classes\Tools\RhythmGuide.cs" />
+    <Compile Include="Classes\Tools\Sliderator.cs" />
+    <Compile Include="Components\Dialogs\MessageDialog.xaml.cs">
+      <DependentUpon>MessageDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Components\Domain\ColorToBrushConverter.cs" />
     <Compile Include="Components\Domain\CommandImplementation.cs" />
     <Compile Include="Components\Domain\FlagToBoolConverter.cs" />
@@ -354,9 +361,14 @@
     <Compile Include="Components\Domain\ParsableDoubleListValidationRule.cs" />
     <Compile Include="Components\Domain\DoubleToStringConverter.cs" />
     <Compile Include="Components\DragAndDropListBox.cs" />
+    <Compile Include="Components\Graph\AnchorCollection.cs" />
     <Compile Include="Components\Graph\GraphIntegralDoubleAnimation.cs" />
     <Compile Include="Components\Graph\GraphDoubleAnimation.cs" />
-    <Compile Include="Components\Graph\Interpolation\Interpolators\PrimitiveParabolaInterpolator.cs" />
+    <Compile Include="Components\Graph\Interpolation\CustomIntegralExtremaAttribute.cs" />
+    <Compile Include="Components\Graph\Interpolation\CustomExtremaAttribute.cs" />
+    <Compile Include="Components\Graph\Interpolation\CustomDerivativeExtremaAttribute.cs" />
+    <Compile Include="Components\Graph\Interpolation\Interpolators\Helper Interpolators\PrimitiveSingleCurveInterpolator.cs" />
+    <Compile Include="Components\Graph\Interpolation\Interpolators\Helper Interpolators\PrimitiveParabolaInterpolator.cs" />
     <Compile Include="Components\Graph\Markers\DividedBeatMarkerGenerator.cs" />
     <Compile Include="Components\Graph\Markers\DoubleMarkerGenerator.cs" />
     <Compile Include="Components\Graph\Markers\GraphMarker.cs" />
@@ -384,7 +396,7 @@
       <DependentUpon>TensionAnchor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Components\Graph\GraphPointControl.cs" />
-    <Compile Include="Components\Graph\TypeValueDialog.xaml.cs">
+    <Compile Include="Components\Dialogs\TypeValueDialog.xaml.cs">
       <DependentUpon>TypeValueDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Components\ObjectVisualiser\HitObject.xaml.cs">
@@ -406,10 +418,10 @@
     <Compile Include="Components\TimingStudio\TimingStudioTimeline.xaml.cs">
       <DependentUpon>TimingStudioTimeline.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Components\SampleDialog\SampleDialog.xaml.cs">
+    <Compile Include="Components\Dialogs\SampleDialog\SampleDialog.xaml.cs">
       <DependentUpon>SampleDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Components\SampleDialog\SampleDialogViewModel.cs" />
+    <Compile Include="Components\Dialogs\SampleDialog\SampleDialogViewModel.cs" />
     <Compile Include="Components\ViewHeaderComponent.xaml.cs">
       <DependentUpon>ViewHeaderComponent.xaml</DependentUpon>
     </Compile>
@@ -449,7 +461,7 @@
     <Compile Include="Viewmodels\PreferencesVM.cs" />
     <Compile Include="Viewmodels\StandardVM.cs" />
     <Compile Include="Viewmodels\TimingStudioVM.cs" />
-    <Compile Include="Views\ComboColourStudio\BeatmapImportDialog.xaml.cs">
+    <Compile Include="Components\Dialogs\BeatmapImportDialog.xaml.cs">
       <DependentUpon>BeatmapImportDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\HiddenToolAttribute.cs" />
@@ -526,6 +538,10 @@
     <Compile Include="Views\HitsoundStudio\HitsoundLayerImportWindow.xaml.cs">
       <DependentUpon>HitsoundLayerImportWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="Components\Dialogs\MessageDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Components\Graph\TensionAnchor.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -557,11 +573,11 @@
     <Page Include="Components\TimingStudio\TimingStudioTimeline.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Components\Graph\TypeValueDialog.xaml">
+    <Page Include="Components\Dialogs\TypeValueDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Components\SampleDialog\SampleDialog.xaml">
+    <Page Include="Components\Dialogs\SampleDialog\SampleDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -617,7 +633,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\ComboColourStudio\BeatmapImportDialog.xaml">
+    <Page Include="Components\Dialogs\BeatmapImportDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

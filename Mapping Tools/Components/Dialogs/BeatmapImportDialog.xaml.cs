@@ -1,11 +1,11 @@
-﻿using Mapping_Tools.Annotations;
-using Mapping_Tools.Classes.SystemTools;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using Mapping_Tools.Annotations;
+using Mapping_Tools.Classes.SystemTools;
 
-namespace Mapping_Tools.Views {
+namespace Mapping_Tools.Components.Dialogs {
     /// <summary>
     /// Interaction logic for BeatmapImportDialog.xaml
     /// </summary>
@@ -28,7 +28,7 @@ namespace Mapping_Tools.Views {
         }
 
         private void BeatmapBrowse_Click(object sender, RoutedEventArgs e) {
-            string[] paths = IOHelper.BeatmapFileDialog();
+            string[] paths = IOHelper.BeatmapFileDialog(restore: !SettingsManager.Settings.CurrentBeatmapDefaultFolder);
             if( paths.Length != 0 ) { Path = paths[0]; }
         }
 

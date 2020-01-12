@@ -28,10 +28,7 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
 
         public Classes.BeatmapHelper.HitObject HitObject {
             get => (Classes.BeatmapHelper.HitObject) GetValue(HitObjectProperty);
-            set {
-                SetValue(HitObjectProperty, value); 
-                Console.WriteLine("Hit object changed!");
-            }
+            set => SetValue(HitObjectProperty, value);
         }
 
         public static readonly DependencyProperty ProgressProperty =
@@ -43,6 +40,18 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
         public double Progress {
             get => (double) GetValue(ProgressProperty);
             set => SetValue(ProgressProperty, value);
+        }
+
+        public static readonly DependencyProperty CustomPixelLengthProperty =
+            DependencyProperty.Register("CustomPixelLength",
+                typeof(double?), 
+                typeof(HitObjectElement), 
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender,
+                    OnCustomPixelLengthChanged));
+
+        public double? CustomPixelLength {
+            get => (double?) GetValue(CustomPixelLengthProperty);
+            set => SetValue(CustomPixelLengthProperty, value);
         }
 
         public static readonly DependencyProperty ThicknessProperty =
@@ -190,10 +199,22 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
             var me = (HitObjectElement) d; 
 
             var hitObject = (Classes.BeatmapHelper.HitObject) e.NewValue;
-            if (hitObject.IsSlider) {
+            me.SetHitObject(hitObject);
+        }
 
+        private static void OnCustomPixelLengthChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            var me = (HitObjectElement) d; 
+
+            me.SetHitObject(me.HitObject);
+        }
+
+        private void SetHitObject(Classes.BeatmapHelper.HitObject hitObject) {
+            if (hitObject == null) return;
+
+            if (hitObject.IsSlider) {
                 var geom = new StreamGeometry();
-                var path = hitObject.GetSliderPath();
+                var path = CustomPixelLength == null ? hitObject.GetSliderPath() :
+                    new SliderPath(hitObject.SliderType, hitObject.GetAllCurvePoints().ToArray(), CustomPixelLength);
 
                 var num = Math.Ceiling(path.Distance / 6);
 
@@ -205,13 +226,13 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
                     }
                 }
 
-                me.sliderPath = path;
-                me.simpleSliderPathGeometry = geom;
-                me.UpdateSliderPathGeometry();
+                sliderPath = path;
+                simpleSliderPathGeometry = geom;
+                UpdateSliderPathGeometry();
             } else {
-                me.bounds = new Rect(new Point(hitObject.Pos.X - me.Thickness * 0.5, hitObject.Pos.Y - me.Thickness * 0.5),
-                    new Size(me.Thickness, me.Thickness));
-                me.UpdateGeometryTransform();
+                bounds = new Rect(new Point(hitObject.Pos.X - Thickness * 0.5, hitObject.Pos.Y - Thickness * 0.5),
+                    new Size(Thickness, Thickness));
+                UpdateGeometryTransform();
             }
         }
 

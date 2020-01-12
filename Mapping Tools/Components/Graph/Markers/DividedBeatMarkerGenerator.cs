@@ -15,8 +15,14 @@ namespace Mapping_Tools.Components.Graph.Markers {
             BeatDivisor = beatDivisor;
         }
 
-        public IEnumerable<GraphMarker> GenerateMarkers(double start, double end, Orientation orientation) {
+        public IEnumerable<GraphMarker> GenerateMarkers(double start, double end, Orientation orientation, int maxMarkers) {
             var markers = new List<GraphMarker>();
+
+            double step = 1d / BeatDivisor;
+            while ((end - start) / step > maxMarkers) {
+                step *= 2;
+            }
+
             var v = start;
             int i = 0;
             while (v <= end + Precision.DOUBLE_EPSILON) {
@@ -50,7 +56,7 @@ namespace Mapping_Tools.Components.Graph.Markers {
                     MarkerColor = markerColor, MarkerLength = markerLength, Text = null
                 });
 
-                v = start + ++i / (double)BeatDivisor;
+                v = start + step * ++i;
             }
 
             return markers;

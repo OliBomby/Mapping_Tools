@@ -104,6 +104,11 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
                 var editor = new BeatmapEditor(importPath);
                 var beatmap = editor.Beatmap;
 
+                // Add default colours if there are no colours
+                if (beatmap.ComboColours.Count == 0) {
+                    beatmap.ComboColours.AddRange(ComboColour.GetDefaultComboColours());
+                }
+
                 ComboColours.Clear();
                 for (int i = 0; i < beatmap.ComboColours.Count; i++) {
                     ComboColours.Add(new SpecialColour(beatmap.ComboColours[i].Color, $"Combo{i + 1}"));

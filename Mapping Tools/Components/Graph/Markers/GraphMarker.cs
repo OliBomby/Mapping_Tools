@@ -28,7 +28,7 @@ namespace Mapping_Tools.Components.Graph.Markers {
 
         public bool DrawMarker { get; set; }
 
-        public bool Visible { get; set; }
+        public bool Visible { get; set; } = true;
  
         protected override void OnRender(DrawingContext drawingContext)
         {
