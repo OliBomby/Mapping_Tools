@@ -73,10 +73,10 @@
             <StackPanel Margin="5 10 0 0">
                 <CheckBox HorizontalAlignment="Left" Content="Make automatic backups" IsChecked="{Binding MakeBackups, Mode=TwoWay}" ToolTip="Make automatic backups whenever you run mapping tools."/>
                 <StackPanel Orientation="Horizontal">
-                    <CheckBox x:Name="PeriodicBackupsCheckBox" HorizontalAlignment="Left" Content="Make periodic backups" IsChecked="{Binding PeriodicBackups, Mode=TwoWay}" ToolTip="Periodically make automatic backups when the editor is open and you forget to save often."/>
-                    <TextBox Text="{Binding PeriodicBackupPeriod, Mode=TwoWay}" MaxWidth="150" Margin="20,0,0,0" HorizontalAlignment="Left"
+                    <CheckBox x:Name="PeriodicBackupsCheckBox" HorizontalAlignment="Left" Content="Make periodic backups" IsChecked="{Binding MakePeriodicBackups, Mode=TwoWay}" ToolTip="Periodically make automatic backups when the editor is open and you forget to save often. This will try to only make backups if there are actually changes as to not spam the backups too much."/>
+                    <TextBox Text="{Binding PeriodicBackupInterval, Mode=TwoWay}" MaxWidth="150" Margin="20,0,0,0" HorizontalAlignment="Left"
                              Visibility="{Binding ElementName=PeriodicBackupsCheckBox, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}"
-                             Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Backup period"
+                             Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Backup interval"
                              ToolTip="The time between each automatic periodic backup while the editor is open."/>
                 </StackPanel>
                 <CheckBox HorizontalAlignment="Left" Content="Current beatmap default folder in all tools" IsChecked="{Binding CurrentBeatmapDefaultFolder, Mode=TwoWay}" ToolTip="Enable this to get the current beatmap folder as the default folder whenever you open a file explorer in a tool which doesn't use current beatmap (e.g. Hitsound Copier). Else it will default to the last used folder."/>

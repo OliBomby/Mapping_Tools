@@ -101,16 +101,16 @@ namespace Mapping_Tools.Classes.SystemTools {
             set => Set(ref _maxBackupFiles, value);
         }
 
-        private bool _periodicBackups;
-        public bool PeriodicBackups {
-            get => _periodicBackups;
-            set => Set(ref _periodicBackups, value);
+        private bool _makePeriodicBackups;
+        public bool MakePeriodicBackups {
+            get => _makePeriodicBackups;
+            set => Set(ref _makePeriodicBackups, value);
         }
 
-        private TimeSpan _periodicBackupPeriod;
-        public TimeSpan PeriodicBackupPeriod {
-            get => _periodicBackupPeriod;
-            set => Set(ref _periodicBackupPeriod, value);
+        private TimeSpan _periodicBackupInterval;
+        public TimeSpan PeriodicBackupInterval {
+            get => _periodicBackupInterval;
+            set => Set(ref _periodicBackupInterval, value);
         }
 
         private bool _currentBeatmapDefaultFolder;
@@ -136,7 +136,7 @@ namespace Mapping_Tools.Classes.SystemTools {
             SingleQuickRunTool = "<Current Tool>";
             MultipleQuickRunTool = "<Current Tool>";
             MaxBackupFiles = 1000;
-            PeriodicBackupPeriod = TimeSpan.FromMinutes(10);
+            PeriodicBackupInterval = TimeSpan.FromMinutes(10);
             CurrentBeatmapDefaultFolder = true;
         }
 
