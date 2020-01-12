@@ -50,7 +50,7 @@ namespace Mapping_Tools.Viewmodels {
 
             ImportBrowseCommand = new CommandImplementation(
                 _ => {
-                    var paths = IOHelper.BeatmapFileDialog(restore: true);
+                    var paths = IOHelper.BeatmapFileDialog(restore: !SettingsManager.Settings.CurrentBeatmapDefaultFolder);
                     if( paths.Length != 0 ) {
                         ImportPath = paths[0];
                     }
@@ -71,7 +71,7 @@ namespace Mapping_Tools.Viewmodels {
 
             ExportBrowseCommand = new CommandImplementation(
                 _ => {
-                    var paths = IOHelper.BeatmapFileDialog(true, true);
+                    var paths = IOHelper.BeatmapFileDialog(true, !SettingsManager.Settings.CurrentBeatmapDefaultFolder);
                     if( paths.Length != 0 ) {
                         ExportPath = string.Join("|", paths);
                     }

@@ -28,7 +28,7 @@ namespace Mapping_Tools.Components.Dialogs {
         }
 
         private void BeatmapBrowse_Click(object sender, RoutedEventArgs e) {
-            string[] paths = IOHelper.BeatmapFileDialog();
+            string[] paths = IOHelper.BeatmapFileDialog(restore: !SettingsManager.Settings.CurrentBeatmapDefaultFolder);
             if( paths.Length != 0 ) { Path = paths[0]; }
         }
 
