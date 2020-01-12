@@ -1,12 +1,11 @@
-﻿using Mapping_Tools.Annotations;
-using System;
+﻿using System;
+using Mapping_Tools.Annotations;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Mapping_Tools.Classes.SystemTools {
-    public class Settings : INotifyPropertyChanged {
+    public class Settings : BindableBase {
         public List<string[]> RecentMaps { get; set; }
         public double? MainWindowWidth { get; set; }
         public double? MainWindowHeight { get; set; }
@@ -15,158 +14,109 @@ namespace Mapping_Tools.Classes.SystemTools {
         private string _osuPath;
         public string OsuPath {
             get => _osuPath;
-            set {
-                if (_osuPath == value) return;
-                _osuPath = value;
-                OnPropertyChanged();
-            }
+            set => Set(ref _osuPath, value);
         }
 
         private string _songsPath;
         public string SongsPath {
             get => _songsPath;
-            set {
-                if (_songsPath == value) return;
-                _songsPath = value;
-                OnPropertyChanged();
-            }
+            set => Set(ref _songsPath, value);
         }
 
         private string _backupsPath;
         public string BackupsPath {
             get => _backupsPath;
-            set {
-                if (_backupsPath == value) return;
-                _backupsPath = value;
-                OnPropertyChanged();
-            }
+            set => Set(ref _backupsPath, value);
         }
 
         private string _osuConfigPath;
         public string OsuConfigPath {
             get => _osuConfigPath;
-            set {
-                if (_osuConfigPath == value) return;
-                _osuConfigPath = value;
-                OnPropertyChanged();
-            }
+            set => Set(ref _osuConfigPath, value);
         }
 
         private bool _makeBackups;
         public bool MakeBackups {
             get => _makeBackups;
-            set {
-                if (_makeBackups == value) return;
-                _makeBackups = value;
-                OnPropertyChanged();
-            }
+            set => Set(ref _makeBackups, value);
         }
 
         private bool _useEditorReader;
         public bool UseEditorReader {
             get => _useEditorReader;
-            set {
-                if (_useEditorReader == value) return;
-                _useEditorReader = value;
-                OnPropertyChanged();
-            }
+            set => Set(ref _useEditorReader, value);
         }
 
         private bool _overrideOsuSave;
         public bool OverrideOsuSave {
             get => _overrideOsuSave;
-            set {
-                if (_overrideOsuSave == value) return;
-                _overrideOsuSave = value;
-                OnPropertyChanged();
-            }
+            set => Set(ref _overrideOsuSave, value);
         }
 
         private bool _autoReload;
         public bool AutoReload {
             get => _autoReload;
-            set {
-                if (_autoReload == value) return;
-                _autoReload = value;
-                OnPropertyChanged();
-            }
+            set => Set(ref _autoReload, value);
         }
 
         private Hotkey _quickRunHotkey;
         public Hotkey QuickRunHotkey {
             get => _quickRunHotkey;
-            set {
-                if (_quickRunHotkey == value) return;
-                _quickRunHotkey = value;
-                OnPropertyChanged();
-            }
+            set => Set(ref _quickRunHotkey, value);
         }
 
         private bool _smartQuickRunEnabled;
         public bool SmartQuickRunEnabled {
             get => _smartQuickRunEnabled;
-            set {
-                if (_smartQuickRunEnabled == value) return;
-                _smartQuickRunEnabled = value;
-                OnPropertyChanged();
-            }
+            set => Set(ref _smartQuickRunEnabled, value);
         }
 
         private string _noneQuickRunTool;
         public string NoneQuickRunTool {
             get => _noneQuickRunTool;
-            set {
-                if (_noneQuickRunTool == value) return;
-                _noneQuickRunTool = value;
-                OnPropertyChanged();
-            }
+            set => Set(ref _noneQuickRunTool, value);
         }
 
         private string _singleQuickRunTool;
         public string SingleQuickRunTool {
             get => _singleQuickRunTool;
-            set {
-                if (_singleQuickRunTool == value) return;
-                _singleQuickRunTool = value;
-                OnPropertyChanged();
-            }
+            set => Set(ref _singleQuickRunTool, value);
         }
 
         private string _multipleQuickRunTool;
         public string MultipleQuickRunTool {
             get => _multipleQuickRunTool;
-            set {
-                if (_multipleQuickRunTool == value) return;
-                _multipleQuickRunTool = value;
-                OnPropertyChanged();
-            }
+            set => Set(ref _multipleQuickRunTool, value);
         }
 
         private Hotkey _betterSaveHotkey;
         public Hotkey BetterSaveHotkey {
             get => _betterSaveHotkey;
-            set {
-                if (_betterSaveHotkey == value) return;
-                _betterSaveHotkey = value;
-                OnPropertyChanged();
-            }
+            set => Set(ref _betterSaveHotkey, value);
         }
 
         private int _maxBackupFiles;
         public int MaxBackupFiles {
             get => _maxBackupFiles;
-            set {
-                if (_maxBackupFiles == value) return;
-                _maxBackupFiles = value;
-                OnPropertyChanged();
-            }
+            set => Set(ref _maxBackupFiles, value);
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        private bool _periodicBackups;
+        public bool PeriodicBackups {
+            get => _periodicBackups;
+            set => Set(ref _periodicBackups, value);
+        }
 
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        private TimeSpan _periodicBackupPeriod;
+        public TimeSpan PeriodicBackupPeriod {
+            get => _periodicBackupPeriod;
+            set => Set(ref _periodicBackupPeriod, value);
+        }
+
+        private bool _currentBeatmapDefaultFolder;
+        public bool CurrentBeatmapDefaultFolder {
+            get => _currentBeatmapDefaultFolder;
+            set => Set(ref _currentBeatmapDefaultFolder, value);
         }
 
         public Settings() {
@@ -186,6 +136,8 @@ namespace Mapping_Tools.Classes.SystemTools {
             SingleQuickRunTool = "<Current Tool>";
             MultipleQuickRunTool = "<Current Tool>";
             MaxBackupFiles = 1000;
+            PeriodicBackupPeriod = TimeSpan.FromMinutes(10);
+            CurrentBeatmapDefaultFolder = true;
         }
 
         public void CopyTo(Settings other) {
