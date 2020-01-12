@@ -56,5 +56,12 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public override string ToString() {
             return $"{Color.R.ToInvariant()},{Color.G.ToInvariant()},{Color.B.ToInvariant()}";
         }
+
+        public static ComboColour[] GetDefaultComboColours() {
+            return new []{new ComboColour(255, 192, 0),
+                new ComboColour(0, 202, 0),
+                new ComboColour(18, 124, 255),
+                new ComboColour(242, 24, 57)};
+        }
     }
 }

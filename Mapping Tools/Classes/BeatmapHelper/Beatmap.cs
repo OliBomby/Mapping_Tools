@@ -211,13 +211,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                     SpecialColours[SplitKeyValue(line)[0].Trim()] = new ComboColour(line);
                 }
             }
-            // Add default colours to ComboColours if there are no combo colours at all
-            if (ComboColours.Count == 0) {
-                ComboColours.Add(new ComboColour(255, 192, 0));
-                ComboColours.Add(new ComboColour(0, 202, 0));
-                ComboColours.Add(new ComboColour(18, 124, 255));
-                ComboColours.Add(new ComboColour(242, 24, 57));
-            }
 
             foreach (string line in eventsLines) {
                 Events.Add(line);
@@ -285,6 +278,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             int colourIndex = 0;
             int comboIndex = 0;
 
+            // If there are no combo colours use the default combo colours so the hitobjects still have something
+            var actingComboColours = ComboColours.Count == 0 ? ComboColour.GetDefaultComboColours() : ComboColours.ToArray();
+
             foreach (var hitObject in HitObjects) {
                 hitObject.ActualNewCombo = IsNewCombo(hitObject, previousHitObject);
 
@@ -294,7 +290,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                         colourIncrement++;
                     }
 
-                    colourIndex = MathHelper.Mod(colourIndex + colourIncrement, ComboColours.Count);
+                    colourIndex = MathHelper.Mod(colourIndex + colourIncrement, actingComboColours.Length);
                     comboIndex = 1;
                 } else {
                     comboIndex++;
@@ -302,7 +298,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
                 hitObject.ComboIndex = comboIndex;
                 hitObject.ColourIndex = colourIndex;
-                hitObject.Colour = ComboColours[colourIndex];
+                hitObject.Colour = actingComboColours[colourIndex];
 
                 previousHitObject = hitObject;
             }
