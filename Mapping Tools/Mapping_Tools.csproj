@@ -244,6 +244,7 @@
     <Compile Include="Classes\MathUtil\Vector4.cs" />
     <Compile Include="Classes\MathUtil\Vector4d.cs" />
     <Compile Include="Classes\Sliderator\GraphStateValueGetter.cs" />
+    <Compile Include="Classes\SliderPathStuff\BezierSubdivision.cs" />
     <Compile Include="Classes\SliderPathStuff\PathApproximator.cs" />
     <Compile Include="Classes\SliderPathStuff\PathType.cs" />
     <Compile Include="Classes\MathUtil\Precision.cs" />
