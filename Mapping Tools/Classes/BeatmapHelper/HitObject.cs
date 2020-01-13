@@ -628,8 +628,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public void SetSliderPath(SliderPath sliderPath) {
             var controlPoints = sliderPath.ControlPoints;
-            Pos = controlPoints.First();
-            CurvePoints = controlPoints.GetRange(1, controlPoints.Count - 1);
+            SetAllCurvePoints(controlPoints);
             SliderType = sliderPath.Type;
             PixelLength = sliderPath.Distance;
         }
@@ -638,6 +637,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             var controlPoints = new List<Vector2> {Pos};
             controlPoints.AddRange(CurvePoints);
             return controlPoints;
+        }
+
+        public void SetAllCurvePoints(List<Vector2> controlPoints) {
+            Pos = controlPoints.First();
+            CurvePoints = controlPoints.GetRange(1, controlPoints.Count - 1);
         }
 
         private PathType GetPathType(string[] sliderData) {

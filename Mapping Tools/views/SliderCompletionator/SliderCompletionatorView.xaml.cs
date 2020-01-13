@@ -46,7 +46,7 @@ namespace Mapping_Tools.Views {
 
             IOHelper.SaveMapBackup(paths);
 
-            BackgroundWorker.RunWorkerAsync(new Arguments(paths, TemporalBox.GetDouble(), SpatialBox.GetDouble(), ScaleAnchorsBox.IsChecked.GetValueOrDefault(), SelectionModeBox.SelectedIndex, quick));
+            BackgroundWorker.RunWorkerAsync(new Arguments(paths, TemporalBox.GetDouble(), SpatialBox.GetDouble(), MoveAnchorsBox.IsChecked.GetValueOrDefault(), SelectionModeBox.SelectedIndex, quick));
             CanRun = false;
         }
 
@@ -54,15 +54,15 @@ namespace Mapping_Tools.Views {
             public string[] Paths;
             public double TemporalLength;
             public double SpatialLength;
-            public bool ScaleAnchors;
+            public bool MoveAnchors;
             public int SelectionMode;
             public bool Quick;
-            public Arguments(string[] paths, double temporal, double spatial, bool scaleAnchors, int selectionMode, bool quick)
+            public Arguments(string[] paths, double temporal, double spatial, bool moveAnchors, int selectionMode, bool quick)
             {
                 Paths = paths;
                 TemporalLength = temporal;
                 SpatialLength = spatial;
-                ScaleAnchors = scaleAnchors;
+                MoveAnchors = moveAnchors;
                 SelectionMode = selectionMode;
                 Quick = quick;
             }
@@ -98,28 +98,10 @@ namespace Mapping_Tools.Views {
                         ho.PixelLength = newSpatialLength;
 
                         // Scale anchors to completion
-                        if (arg.ScaleAnchors) {
-                            var sliderPath = ho.GetSliderPath();
-                            switch (sliderPath.Type) {
-                                case PathType.Bezier:
-                                    if (arg.SpatialLength > 1) {
-                                        // Extend linearly
-                                    } else {
-                                        // Find the last bezier segment and the pixel length at that part
-                                        // Find T for the remaining pixel length
-                                        // ScaleRight the BezierSubdivision
-                                        // Replace the anchors
-                                    }
-                                    ho.CurvePoints[1] = sliderPath.PositionAt(1);
-                                    break;
-                                case PathType.PerfectCurve:
-                                    ho.CurvePoints[0] = sliderPath.PositionAt(0.5);
-                                    ho.CurvePoints[1] = sliderPath.PositionAt(1);
-                                    break;
-                                default:
-                                    ho.CurvePoints[1] = sliderPath.PositionAt(1);
-                                    break;
-                            }
+                        if (arg.MoveAnchors) {
+                            ho.SetAllCurvePoints(SliderPathUtil.MoveAnchorsToLength(
+                                ho.GetAllCurvePoints(), ho.SliderType, ho.PixelLength, out var pathType));
+                            ho.SliderType = pathType;
                         }
 
                         slidersCompleted++;
