@@ -12,7 +12,7 @@ namespace Mapping_Tools.Classes.SliderPathStuff
     // with added functionality which should be kept separate from PathApproximator.
     public class BezierSubdivision : ICloneable
     {
-        public List<Vector2> Points; // List of bezier control points
+        public List<Vector2> Points; // List of bezier control Points
         public int Order => Points.Count - 1; // Bezier polynomial order
         public int Level; // Depth of subdivision
         public int Index; // Index of subdivision
@@ -27,8 +27,9 @@ namespace Mapping_Tools.Classes.SliderPathStuff
         public double Flatness() // Max of the flatness metric
         {
             double worst = 0;
-            for (int i = 1; i < Order; i++)
+            for (int i = 1; i < Order; i++) {
                 worst = Math.Max(worst, (Points[i - 1] - 2 * Points[i] + Points[i + 1]).LengthSquared);
+            }
             return Math.Sqrt(worst) / 2;
         }
 
@@ -45,7 +46,7 @@ namespace Mapping_Tools.Classes.SliderPathStuff
             return length;
         }
 
-        public void Reverse() // Reverse the points
+        public void Reverse() // Reverse the Points
         {
             Points.Reverse();
         }
@@ -61,7 +62,7 @@ namespace Mapping_Tools.Classes.SliderPathStuff
         {
             for (int j = Order; j > 0; j--)
                 for (int i = 0; i < j; i++)
-                    points[i] = points[i] * (1 - t) + points[i + 1] * t;
+                    Points[i] = Points[i] * (1 - t) + Points[i + 1] * t;
         }
 
         public BezierSubdivision Next() // Next index at current level
@@ -97,7 +98,7 @@ namespace Mapping_Tools.Classes.SliderPathStuff
             for (int j = 0; j < Order; j++)
                 for (int i = Order; i > j; i--) {
                     left[i] = (left[i] + left[i - 1]) / 2;
-                    right[n - i] = (right[Order - i] + right[Order - i + 1]) / 2;
+                    right[Order - i] = (right[Order - i] + right[Order - i + 1]) / 2;
                 }
             leftChild = new BezierSubdivision(left, Level + 1, Index << 1);
             rightChild = new BezierSubdivision(right, Level + 1, Index << 1 | 1);
@@ -132,8 +133,7 @@ namespace Mapping_Tools.Classes.SliderPathStuff
             double l = 0;
             double lnext = 0;
             while (length > lnext) {
-                if (current != null)
-                    current = current.Next;
+                current = current?.Next;
                 if (current == null) {
                     var pathApproximation = new LinkedList<BezierSubdivision>();
                     pathApproximation.AddLast(this);
@@ -143,6 +143,8 @@ namespace Mapping_Tools.Classes.SliderPathStuff
                 l = lnext;
                 lnext += current.Value.Length();
             }
+
+            if (current == null) return 0;
 
             BezierSubdivision curr = current.Value;
             while (curr.Length() > precision) {
