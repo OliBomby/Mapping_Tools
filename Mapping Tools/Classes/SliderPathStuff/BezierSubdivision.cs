@@ -9,7 +9,7 @@ namespace Mapping_Tools.Classes.SliderPathStuff
     /// </summary>
     // Many of these functions are designed to simulate PathApproximator methods, but
     // with added functionality which should be kept separate from PathApproximator.
-    class BezierSubdivision
+    public class BezierSubdivision
     {
         public List<Vector2> points; // List of bezier control points
         public int n => points.Count - 1; // Bezier polynomial order
@@ -65,7 +65,7 @@ namespace Mapping_Tools.Classes.SliderPathStuff
         {
             for (int j = n; j > 0; j--)
                 for (int i = 0; i < j; i++)
-                    points[i] = points[i] * t + points[i + 1] * (1 - t);
+                    points[i] = points[i] * (1 - t) + points[i + 1] * t;
         }
 
         public BezierSubdivision Next() // Next index at current level
@@ -101,7 +101,7 @@ namespace Mapping_Tools.Classes.SliderPathStuff
             for (int j = 0; j < n; j++)
                 for (int i = n; i > j; i--) {
                     left[i] = (left[i] + left[i - 1]) / 2;
-                    right[i] = (right[n - i] + right[n - i + 1]) / 2;
+                    right[n - i] = (right[n - i] + right[n - i + 1]) / 2;
                 }
             leftChild = new BezierSubdivision(left, level + 1, index << 1);
             rightChild = new BezierSubdivision(right, level + 1, index << 1 | 1);
@@ -140,6 +140,8 @@ namespace Mapping_Tools.Classes.SliderPathStuff
             double l = 0;
             double lnext = 0;
             while (length > lnext) {
+                if (current != null)
+                    current = current.Next;
                 if (current == null) {
                     if (baseSubdivision == null) {
                         baseSubdivision = this;
@@ -150,8 +152,6 @@ namespace Mapping_Tools.Classes.SliderPathStuff
                     pathApproximation.AddLast(baseSubdivision);
                     Subdivide(ref pathApproximation, tolerance);
                     current = pathApproximation.First;
-                } else {
-                    current = current.Next;
                 }
                 l = lnext;
                 lnext += current.Value.Length();
