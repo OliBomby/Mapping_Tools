@@ -55,7 +55,7 @@ namespace Mapping_Tools.Classes.SliderPathStuff {
 
                             var cpSpan = convert.GetRange(start, end - start);
                             subdivision = new BezierSubdivision(cpSpan);
-                            var length = subdivision.SubdividedLength();
+                            var length = subdivision.SubdividedApproximationLength();
 
                             if (totalLength + length > newLength) {
                                 break;
