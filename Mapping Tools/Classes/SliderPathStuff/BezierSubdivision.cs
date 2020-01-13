@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.SliderPathStuff
@@ -116,6 +117,18 @@ namespace Mapping_Tools.Classes.SliderPathStuff
                     subdivisions.AddAfter(current, right);
                 }
             }
+        }
+
+        /// <summary>
+        /// Subdivided the <see cref="BezierSubdivision"/> and calculates the aggregate length.
+        /// </summary>
+        /// <param name="tolerance"></param>
+        /// <returns></returns>
+        public double SubdividedLength(double tolerance = 0.25) {
+            var pathApproximation = new LinkedList<BezierSubdivision>();
+            pathApproximation.AddLast(this);
+            Subdivide(ref pathApproximation, tolerance);
+            return pathApproximation.Sum(o => o.Length());
         }
 
         public void Increase(int k = 1) // Increase bezier order by k

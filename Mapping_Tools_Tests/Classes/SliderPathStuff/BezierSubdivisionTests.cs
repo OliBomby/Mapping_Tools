@@ -104,8 +104,10 @@ namespace Mapping_Tools_Tests.Classes.SliderPathStuff {
         [TestMethod]
         public void Test4() {
             List<Vector2> points = new List<Vector2> { new Vector2(0, 0), new Vector2(100, 100), new Vector2(200, 0) };
-            var length = new SliderPath(PathType.Bezier, points.ToArray()).Distance;
             BezierSubdivision subdivision = new BezierSubdivision(points);
+            var length = new SliderPath(PathType.Bezier, points.ToArray()).Distance;
+            var length2 = subdivision.SubdividedLength(0.01);
+            Assert.AreEqual(length, length2, 0.01);
             Assert.AreEqual(0.5, subdivision.LengthToT(length / 2), 0.01);
             Assert.AreEqual(1, subdivision.LengthToT(length), 0.01);
             Assert.AreEqual(0, subdivision.LengthToT(0), 0.01);
