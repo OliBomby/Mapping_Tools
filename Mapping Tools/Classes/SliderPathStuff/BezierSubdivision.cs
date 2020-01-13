@@ -36,7 +36,7 @@ namespace Mapping_Tools.Classes.SliderPathStuff
 
         public bool Flat(double tolerance = 0.25) // Whether it would satisfy BezierIsFlatEnough
         {
-            return Flatness() <= tolerance;
+            return Flatness() <= tolerance * tolerance * 4;  // Tolerance is squared because the flatness is squared
         }
 
         public double Length() // Euclidean length of subdivision segments
