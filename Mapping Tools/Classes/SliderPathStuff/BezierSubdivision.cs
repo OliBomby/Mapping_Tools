@@ -11,7 +11,7 @@ namespace Mapping_Tools.Classes.SliderPathStuff
     /// </summary>
     // Many of these functions are designed to simulate PathApproximator methods, but
     // with added functionality which should be kept separate from PathApproximator.
-    public class BezierSubdivision : ICloneable
+    public class BezierSubdivision
     {
         public List<Vector2> Points; // List of bezier control Points
         public int Order => Points.Count - 1; // Bezier polynomial order
@@ -23,6 +23,10 @@ namespace Mapping_Tools.Classes.SliderPathStuff
             Points = points;
             Level = level;
             Index = index;
+        }
+
+        public BezierSubdivision Copy() {
+            return new BezierSubdivision(new List<Vector2>(Points), Level, Index);
         }
 
         public double Flatness() // Max of the flatness metric
@@ -105,7 +109,7 @@ namespace Mapping_Tools.Classes.SliderPathStuff
             rightChild = new BezierSubdivision(right, Level + 1, Index << 1 | 1);
         }
 
-        public static void Subdivide(ref LinkedList<BezierSubdivision> subdivisions, double tolerance = 0.25) // Simulate BezierApproximate on a linked list
+        public static void Subdivide(ref LinkedList<BezierSubdivision> subdivisions, double tolerance = 0.25) // Simulate the first part of ApproximateBezier on a linked list
         {
             var current = subdivisions.First;
             while (current != null) {
@@ -119,16 +123,33 @@ namespace Mapping_Tools.Classes.SliderPathStuff
             }
         }
 
-        /// <summary>
-        /// Subdivided the <see cref="BezierSubdivision"/> and calculates the aggregate length.
-        /// </summary>
-        /// <param name="tolerance"></param>
-        /// <returns></returns>
-        public double SubdividedLength(double tolerance = 0.25) {
+        public List<Vector2> Approximation() // BezierApproximate (the second part of ApproximateBezier)
+        {
+            Children(out var left, out var right);
+            left.Points.RemoveAt(Order);
+            left.Points.AddRange(right.Points);
+            var output = new List<Vector2> { left.Points[0] };
+            for (int i = 2; i < 2 * Order; i += 2)
+                output.Add(0.25 * ( left.Points[i - 1] + 2 * left.Points[i] + left.Points[i + 1] ));
+            output.Add(right.Points[Order]);
+            return output;
+        }
+
+        public double ApproximationLength() // Euclidean length of approximation segments
+        {
+            var approximation = Approximation();
+            double length = 0;
+            for (int i = 0; i < Order; i++)
+                length += (approximation[i + 1] - approximation[i]).Length;
+            return length;
+        }
+
+        public double SubdividedApproximationLength(double tolerance = 0.25) // Length of path approximation
+        {
             var pathApproximation = new LinkedList<BezierSubdivision>();
             pathApproximation.AddLast(this);
             Subdivide(ref pathApproximation, tolerance);
-            return pathApproximation.Sum(o => o.Length());
+            return pathApproximation.Sum(o => o.ApproximationLength());
         }
 
         public void Increase(int k = 1) // Increase bezier order by k
@@ -140,29 +161,34 @@ namespace Mapping_Tools.Classes.SliderPathStuff
             }
         }
 
-        public double LengthToT(double length, double precision = 0.1, double tolerance = 0.25) // approximate bezier progress t for a desired path length
+        public double LengthToT(double length, double precision = 0.1, double tolerance = 0.25) // approximate bezier progress t for a desired path length, t can be > 1
         {
+            if (Length() == 0)
+                return double.NaN;
+            if (length <= 0)
+                return 0;
+
+            BezierSubdivision baseSubdivision = null;
             LinkedListNode<BezierSubdivision> current = null;
             double l = 0;
             double lnext = 0;
             while (length > lnext) {
                 current = current?.Next;
                 if (current == null) {
+                    baseSubdivision = baseSubdivision == null ? this : baseSubdivision.Next();
                     var pathApproximation = new LinkedList<BezierSubdivision>();
-                    pathApproximation.AddLast(this);
+                    pathApproximation.AddLast(baseSubdivision);
                     Subdivide(ref pathApproximation, tolerance);
                     current = pathApproximation.First;
                 }
                 l = lnext;
-                lnext += current.Value.Length();
+                lnext += current.Value.ApproximationLength();
             }
 
-            if (current == null) return 0;
-
-            BezierSubdivision curr = current.Value;
-            while (curr.Length() > precision) {
+            var curr = current.Value;
+            while (curr.ApproximationLength() > precision) {
                 curr.Children(out var left, out var right);
-                lnext = l + left.Length();
+                lnext = l + left.ApproximationLength();
                 if (length > lnext) {
                     curr = right;
                     l = lnext;
@@ -171,11 +197,7 @@ namespace Mapping_Tools.Classes.SliderPathStuff
                 }
             }
 
-            return (curr.Index + (length - l) / curr.Length()) / (1 << curr.Level);
-        }
-
-        public object Clone() {
-            return new BezierSubdivision(new List<Vector2>(Points), Level, Index);
+            return (curr.Index + (length - l) / curr.ApproximationLength()) / (1 << curr.Level);
         }
     }
 }
