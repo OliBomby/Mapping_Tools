@@ -10,15 +10,17 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Input;
+using System.Windows.Threading;
 using ModifierKeys = NonInvasiveKeyboardHookLibrary.ModifierKeys;
 
-namespace Mapping_Tools.Classes.SystemTools
-{
-    public class ListenerManager
-    {
+namespace Mapping_Tools.Classes.SystemTools {
+    public class ListenerManager {
+        private string previousPeriodicBackupHash;
+
         public readonly FileSystemWatcher FsWatcher = new FileSystemWatcher();
         public readonly KeyboardHookManager KeyboardHookManager = new KeyboardHookManager();
         public Dictionary<string, ActionHotkey> ActiveHotkeys = new Dictionary<string, ActionHotkey>();
+        public DispatcherTimer PeriodicBackupTimer;
 
         public ListenerManager()
         {
@@ -28,7 +30,48 @@ namespace Mapping_Tools.Classes.SystemTools
             ReloadHotkeys();
             KeyboardHookManager.Start();
 
+            InitPeriodicBackupTimer();
+
             SettingsManager.Settings.PropertyChanged += OnSettingsChanged;
+        }
+
+        private void InitPeriodicBackupTimer() {
+            previousPeriodicBackupHash = string.Empty;
+
+            PeriodicBackupTimer = new DispatcherTimer(DispatcherPriority.Background)
+                {Interval = SettingsManager.Settings.PeriodicBackupInterval};
+            PeriodicBackupTimer.Tick += PeriodicBackupTimerOnTick;
+
+            if (SettingsManager.Settings.MakePeriodicBackups) {
+                PeriodicBackupTimer.Start();
+            }
+        }
+
+        private void PeriodicBackupTimerOnTick(object sender, EventArgs e) {
+            // Get the newest beatmap, save a temp version, get the hash and compare it to the previous hash, backup temp file
+            var path = IOHelper.GetCurrentBeatmap();
+            var editor = EditorReaderStuff.GetNewestVersion(path);
+
+            // Save temp version
+            var tempPath = Path.Combine(MainWindow.AppDataPath, "temp.osu");
+
+            if (!File.Exists(tempPath)) {
+                File.Create(tempPath).Dispose();
+            }
+            File.WriteAllLines(tempPath, editor.Beatmap.GetLines());
+
+            // Get MD5 from temp file
+            var currentMapHash = EditorReaderStuff.GetMD5FromPath(tempPath);
+
+            // Comparing with previously made periodic backup
+            if (currentMapHash == previousPeriodicBackupHash) {
+                return;
+            }
+
+            // Saving backup of the map
+            IOHelper.SaveMapBackup(tempPath, true, Path.GetFileName(path));
+
+            previousPeriodicBackupHash = currentMapHash;
         }
 
         private void OnSettingsChanged(object sender, PropertyChangedEventArgs e)
@@ -54,6 +97,16 @@ namespace Mapping_Tools.Classes.SystemTools
                     break;
                 case "BetterSaveHotkey":
                     ChangeActiveHotkeyHotkey("BetterSaveHotkey", SettingsManager.Settings.BetterSaveHotkey);
+                    break;
+                case "MakePeriodicBackups":
+                    if (SettingsManager.Settings.MakePeriodicBackups) {
+                        PeriodicBackupTimer.Start();
+                    } else {
+                        PeriodicBackupTimer.Stop();
+                    }
+                    break;
+                case "PeriodicBackupInterval":
+                    PeriodicBackupTimer.Interval = SettingsManager.Settings.PeriodicBackupInterval;
                     break;
             }
         }
