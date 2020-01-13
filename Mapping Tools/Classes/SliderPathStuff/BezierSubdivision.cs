@@ -61,7 +61,7 @@ namespace Mapping_Tools.Classes.SliderPathStuff
         {
             for (int j = Order; j > 0; j--)
                 for (int i = 0; i < j; i++)
-                    Points[i] = Points[i] * t + Points[i + 1] * (1 - t);
+                    points[i] = points[i] * (1 - t) + points[i + 1] * t;
         }
 
         public BezierSubdivision Next() // Next index at current level
@@ -97,7 +97,7 @@ namespace Mapping_Tools.Classes.SliderPathStuff
             for (int j = 0; j < Order; j++)
                 for (int i = Order; i > j; i--) {
                     left[i] = (left[i] + left[i - 1]) / 2;
-                    right[i] = (right[Order - i] + right[Order - i + 1]) / 2;
+                    right[n - i] = (right[Order - i] + right[Order - i + 1]) / 2;
                 }
             leftChild = new BezierSubdivision(left, Level + 1, Index << 1);
             rightChild = new BezierSubdivision(right, Level + 1, Index << 1 | 1);
@@ -132,13 +132,13 @@ namespace Mapping_Tools.Classes.SliderPathStuff
             double l = 0;
             double lnext = 0;
             while (length > lnext) {
+                if (current != null)
+                    current = current.Next;
                 if (current == null) {
                     var pathApproximation = new LinkedList<BezierSubdivision>();
                     pathApproximation.AddLast(this);
                     Subdivide(ref pathApproximation, tolerance);
                     current = pathApproximation.First;
-                } else {
-                    current = current.Next;
                 }
                 l = lnext;
                 lnext += current.Value.Length();
