@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
+using Mapping_Tools.Classes.SliderPathStuff;
 
 namespace Mapping_Tools.Views {
     /// <summary>
@@ -45,7 +46,7 @@ namespace Mapping_Tools.Views {
 
             IOHelper.SaveMapBackup(paths);
 
-            BackgroundWorker.RunWorkerAsync(new Arguments(paths, TemporalBox.GetDouble(), SpatialBox.GetDouble(), SelectionModeBox.SelectedIndex, quick));
+            BackgroundWorker.RunWorkerAsync(new Arguments(paths, TemporalBox.GetDouble(), SpatialBox.GetDouble(), ScaleAnchorsBox.IsChecked.GetValueOrDefault(), SelectionModeBox.SelectedIndex, quick));
             CanRun = false;
         }
 
@@ -53,13 +54,15 @@ namespace Mapping_Tools.Views {
             public string[] Paths;
             public double TemporalLength;
             public double SpatialLength;
+            public bool ScaleAnchors;
             public int SelectionMode;
             public bool Quick;
-            public Arguments(string[] paths, double temporal, double spatial, int selectionMode, bool quick)
+            public Arguments(string[] paths, double temporal, double spatial, bool scaleAnchors, int selectionMode, bool quick)
             {
                 Paths = paths;
                 TemporalLength = temporal;
                 SpatialLength = spatial;
+                ScaleAnchors = scaleAnchors;
                 SelectionMode = selectionMode;
                 Quick = quick;
             }
@@ -84,12 +87,41 @@ namespace Mapping_Tools.Views {
                     if (ho.IsSlider) {
                         double oldSpatialLength = ho.PixelLength;
                         double newSpatialLength = arg.SpatialLength != -1 ? ho.GetSliderPath(fullLength: true).Distance * arg.SpatialLength : oldSpatialLength;
+
                         double oldTemporalLength = timing.CalculateSliderTemporalLength(ho.Time, ho.PixelLength);
                         double newTemporalLength = arg.TemporalLength != -1 ? timing.GetMpBAtTime(ho.Time) * arg.TemporalLength : oldTemporalLength;
-                        double oldSV = timing.GetSvAtTime(ho.Time);
-                        double newSV = oldSV / ((newSpatialLength / oldSpatialLength) / (newTemporalLength / oldTemporalLength));
-                        ho.SliderVelocity = newSV;
+
+                        double oldSv = timing.GetSvAtTime(ho.Time);
+                        double newSv = oldSv / ((newSpatialLength / oldSpatialLength) / (newTemporalLength / oldTemporalLength));
+
+                        ho.SliderVelocity = newSv;
                         ho.PixelLength = newSpatialLength;
+
+                        // Scale anchors to completion
+                        if (arg.ScaleAnchors) {
+                            var sliderPath = ho.GetSliderPath();
+                            switch (sliderPath.Type) {
+                                case PathType.Bezier:
+                                    if (arg.SpatialLength > 1) {
+                                        // Extend linearly
+                                    } else {
+                                        // Find the last bezier segment and the pixel length at that part
+                                        // Find T for the remaining pixel length
+                                        // ScaleRight the BezierSubdivision
+                                        // Replace the anchors
+                                    }
+                                    ho.CurvePoints[1] = sliderPath.PositionAt(1);
+                                    break;
+                                case PathType.PerfectCurve:
+                                    ho.CurvePoints[0] = sliderPath.PositionAt(0.5);
+                                    ho.CurvePoints[1] = sliderPath.PositionAt(1);
+                                    break;
+                                default:
+                                    ho.CurvePoints[1] = sliderPath.PositionAt(1);
+                                    break;
+                            }
+                        }
+
                         slidersCompleted++;
                     }
                     if (worker != null && worker.WorkerReportsProgress) {
