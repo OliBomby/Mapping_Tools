@@ -401,7 +401,7 @@ namespace Mapping_Tools.Views {
                 positionFunction = d => arg.GraphState.GetValue(d / arg.PixelLength * arg.GraphBeats) * arg.PixelLength;
 
             var sliderator = new Sliderator {
-                PositionFunction = positionFunction, MaxT = arg.GraphState.MaxX
+                PositionFunction = positionFunction, MaxT = arg.PixelLength
             };
             sliderator.SetPath(path);
 
