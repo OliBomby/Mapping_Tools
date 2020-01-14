@@ -73,7 +73,7 @@ namespace Mapping_Tools.Components.Graph {
         public static double GetValue(double x, IReadOnlyList<Anchor> anchors) {
             // Find the section
             var previousAnchor = anchors[0];
-            var nextAnchor = anchors[1];
+            var nextAnchor = anchors[anchors.Count - 1];
             foreach (var anchor in anchors) {
                 if (anchor.Pos.X < x) {
                     previousAnchor = anchor;
