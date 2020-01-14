@@ -52,7 +52,7 @@ namespace Mapping_Tools.Views {
             Graph.Anchors.AnchorsChanged += AnchorsOnAnchorsChanged;
 
             UpdateGraphModeStuff();
-            UpdatePointsOfInterest();
+            UpdateRedAnchorPreview();
         }
 
         private SlideratorVm ViewModel => (SlideratorVm) DataContext;
@@ -171,9 +171,12 @@ namespace Mapping_Tools.Views {
 
         private void ViewModelOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
             switch (e.PropertyName) {
+                case nameof(ViewModel.ShowRedAnchors):
+                    UpdateRedAnchorPreview();
+                    break;
                 case nameof(ViewModel.VisibleHitObject):
                     AnimateProgress(GraphHitObjectElement);
-                    UpdatePointsOfInterest();
+                    UpdateRedAnchorPreview();
                     break;
                 case nameof(ViewModel.SvGraphMultiplier):
                 case nameof(ViewModel.GraphDuration):
@@ -191,23 +194,30 @@ namespace Mapping_Tools.Views {
                     break;
                 case nameof(ViewModel.GraphMode):
                     UpdateGraphModeStuff();
-                    UpdatePointsOfInterest();
+                    UpdateRedAnchorPreview();
                     break;
             }
         }
 
-        private void UpdatePointsOfInterest() {
-            if (ViewModel.GraphMode == GraphMode.Position && ViewModel.VisibleHitObject != null && ViewModel.VisibleHitObject.IsSlider) {
-                var markers = new List<GraphMarker>();
+        private void UpdateRedAnchorPreview() {
+            if (ViewModel.ShowRedAnchors && ViewModel.VisibleHitObject != null && ViewModel.VisibleHitObject.IsSlider) {
                 var sliderPath = ViewModel.VisibleHitObject.GetSliderPath();
-                double totalLength = 0;
-                foreach (var bezierSubdivision in SliderPathUtil.ChopAnchors(sliderPath)) {
-                    totalLength += bezierSubdivision.SubdividedApproximationLength();
-                    markers.Add(new GraphMarker {Orientation = Orientation.Horizontal, Value = totalLength / ViewModel.VisibleHitObject.PixelLength,
-                        CustomLineBrush = new SolidColorBrush(Colors.Red), Text = null
-                    });
+                var redAnchorCompletions = SliderPathUtil.GetRedAnchorCompletions(sliderPath);
+                
+
+                if (ViewModel.GraphMode == GraphMode.Position) {
+                    var markers = new ObservableCollection<GraphMarker>();
+
+                    foreach (var completion in redAnchorCompletions) {
+                        markers.Add(new GraphMarker {Orientation = Orientation.Horizontal, Value = completion,
+                            CustomLineBrush = new SolidColorBrush(Colors.Red), Text = null
+                        });
+                    }
+
+                    Graph.ExtraMarkers = markers;
+                } else {
+                    Graph.ExtraMarkers.Clear();
                 }
-                Graph.ExtraMarkers = new ObservableCollection<GraphMarker>(markers);
             } else {
                 Graph.ExtraMarkers.Clear();
             }

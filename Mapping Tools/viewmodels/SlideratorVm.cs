@@ -30,6 +30,8 @@ namespace Mapping_Tools.Viewmodels {
         private ExportMode _exportMode;
         private GraphMode _graphMode;
         private double _velocityLimit;
+        private bool _showRedAnchors;
+        private bool _showGraphAnchors;
 
         #region Properties
 
@@ -141,6 +143,16 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _velocityLimit, value);
         }
 
+        public bool ShowRedAnchors {
+            get => _showRedAnchors;
+            set => Set(ref _showRedAnchors, value);
+        }
+
+        public bool ShowGraphAnchors {
+            get => _showGraphAnchors;
+            set => Set(ref _showGraphAnchors, value);
+        }
+
         public CommandImplementation ImportCommand { get; }
         public CommandImplementation MoveLeftCommand { get; }
         public CommandImplementation MoveRightCommand { get; }
@@ -165,6 +177,8 @@ namespace Mapping_Tools.Viewmodels {
             ExactTimeBoxVisibility = Visibility.Collapsed;
             VelocityLimit = 10;
             GraphMode = GraphMode.Position;
+            ShowRedAnchors = false;
+            ShowGraphAnchors = false;
 
             ImportCommand = new CommandImplementation(Import);
             MoveLeftCommand = new CommandImplementation(_ => {

@@ -102,6 +102,27 @@ namespace Mapping_Tools.Classes.SliderPathStuff {
             return newAnchors;
         }
 
+        public static IEnumerable<double> GetRedAnchorCompletions(SliderPath sliderPath) {
+            int start = 0;
+            int end = 0;
+            double totalLength = 0;
+            var anchors = sliderPath.ControlPoints;
+
+            for (int i = 0; i < anchors.Count; i++) {
+                end++;
+
+                if (i == anchors.Count - 1 || anchors[i] != anchors[i + 1]) continue;
+
+                var cpSpan = anchors.GetRange(start, end - start);
+                var subdivision = new BezierSubdivision(cpSpan);
+                totalLength += subdivision.SubdividedApproximationLength();
+
+                yield return totalLength / sliderPath.Distance;
+                
+                start = end;
+            }
+        }
+
         public static IEnumerable<BezierSubdivision> ChopAnchors(SliderPath sliderPath) {
             switch (sliderPath.Type) {
                 case PathType.Catmull:
