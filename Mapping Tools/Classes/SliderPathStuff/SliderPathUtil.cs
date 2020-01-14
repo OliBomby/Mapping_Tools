@@ -102,6 +102,16 @@ namespace Mapping_Tools.Classes.SliderPathStuff {
             return newAnchors;
         }
 
+        public static IEnumerable<BezierSubdivision> ChopAnchors(SliderPath sliderPath) {
+            switch (sliderPath.Type) {
+                case PathType.Catmull:
+                case PathType.Linear:
+                    return ChopAnchorsLinear(sliderPath.ControlPoints);
+                default:
+                    return ChopAnchors(sliderPath.ControlPoints);
+            }
+        }
+
         public static IEnumerable<BezierSubdivision> ChopAnchors(List<Vector2> anchors) {
             int start = 0;
             int end = 0;

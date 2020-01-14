@@ -6,9 +6,11 @@ using System.Windows.Media;
 namespace Mapping_Tools.Components.Graph.Markers {
     public class GraphMarker : UIElement {
         private double MarkerLengthExtra => DrawMarker ? MarkerLength : 0;
-        private Pen Pen => new Pen(Stroke, 1.0);
+        private Pen Pen => new Pen(CustomLineBrush ?? Stroke, 1.0);
 
         public Brush Stroke { get; set; }
+
+        public Brush CustomLineBrush { get; set; }
 
         public double MarkerLength { get; set; }
 
@@ -45,6 +47,7 @@ namespace Mapping_Tools.Components.Graph.Markers {
             if (Orientation == Orientation.Horizontal) {
                 drawingContext.DrawLine(Pen, new Point(X, Y), new Point(X + Width, Y));
 
+                // This draws the little extension beyond the bounds of the graph
                 if (DrawMarker) {
                     drawingContext.DrawLine(new Pen(new SolidColorBrush(MarkerColor), 1.0),
                         new Point(X - MarkerLength, Y), new Point(X, Y));
@@ -55,6 +58,7 @@ namespace Mapping_Tools.Components.Graph.Markers {
             } else {
                 drawingContext.DrawLine(Pen, new Point(X, Y), new Point(X, Y + Height));
                 
+                // This draws the little extension beyond the bounds of the graph
                 if (DrawMarker) {
                     drawingContext.DrawLine(new Pen(new SolidColorBrush(MarkerColor), 1.0),
                         new Point(X, Y + Height), new Point(X, Y + Height + MarkerLength));

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using Mapping_Tools.Classes.BeatmapHelper;
@@ -50,6 +52,7 @@ namespace Mapping_Tools.Views {
             Graph.Anchors.AnchorsChanged += AnchorsOnAnchorsChanged;
 
             UpdateGraphModeStuff();
+            UpdatePointsOfInterest();
         }
 
         private SlideratorVm ViewModel => (SlideratorVm) DataContext;
@@ -168,8 +171,11 @@ namespace Mapping_Tools.Views {
 
         private void ViewModelOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
             switch (e.PropertyName) {
-                case nameof(ViewModel.SvGraphMultiplier):
                 case nameof(ViewModel.VisibleHitObject):
+                    AnimateProgress(GraphHitObjectElement);
+                    UpdatePointsOfInterest();
+                    break;
+                case nameof(ViewModel.SvGraphMultiplier):
                 case nameof(ViewModel.GraphDuration):
                     AnimateProgress(GraphHitObjectElement);
                     break;
@@ -185,7 +191,25 @@ namespace Mapping_Tools.Views {
                     break;
                 case nameof(ViewModel.GraphMode):
                     UpdateGraphModeStuff();
+                    UpdatePointsOfInterest();
                     break;
+            }
+        }
+
+        private void UpdatePointsOfInterest() {
+            if (ViewModel.GraphMode == GraphMode.Position && ViewModel.VisibleHitObject != null && ViewModel.VisibleHitObject.IsSlider) {
+                var markers = new List<GraphMarker>();
+                var sliderPath = ViewModel.VisibleHitObject.GetSliderPath();
+                double totalLength = 0;
+                foreach (var bezierSubdivision in SliderPathUtil.ChopAnchors(sliderPath)) {
+                    totalLength += bezierSubdivision.SubdividedApproximationLength();
+                    markers.Add(new GraphMarker {Orientation = Orientation.Horizontal, Value = totalLength / ViewModel.VisibleHitObject.PixelLength,
+                        CustomLineBrush = new SolidColorBrush(Colors.Red), Text = null
+                    });
+                }
+                Graph.ExtraMarkers = new ObservableCollection<GraphMarker>(markers);
+            } else {
+                Graph.ExtraMarkers.Clear();
             }
         }
 

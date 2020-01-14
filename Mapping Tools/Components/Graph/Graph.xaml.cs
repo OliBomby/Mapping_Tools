@@ -5,6 +5,7 @@ using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
 using Mapping_Tools.Components.Graph.Markers;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
@@ -18,6 +19,7 @@ namespace Mapping_Tools.Components.Graph {
     /// Interaction logic for Graph.xaml
     /// </summary>
     public partial class Graph {
+        private bool _initialized;
         private bool _drawAnchors;
         private readonly List<GraphMarker> _markers;
 
@@ -179,6 +181,18 @@ namespace Mapping_Tools.Components.Graph {
         public double MinMarkerSpacing {
             get => (double) GetValue(MinMarkerSpacingProperty);
             set => SetValue(MinMarkerSpacingProperty, value);
+        }
+
+        public static readonly DependencyProperty ExtraMarkersProperty =
+            DependencyProperty.Register(nameof(ExtraMarkers),
+                typeof(ObservableCollection<GraphMarker>), 
+                typeof(Graph), 
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None,
+                    OnExtraMarkersChanged));
+
+        public ObservableCollection<GraphMarker> ExtraMarkers {
+            get => (ObservableCollection<GraphMarker>) GetValue(ExtraMarkersProperty);
+            set => SetValue(ExtraMarkersProperty, value);
         }
 
         public static readonly DependencyProperty UserEditableProperty =
@@ -372,6 +386,7 @@ namespace Mapping_Tools.Components.Graph {
             
             _markers = new List<GraphMarker>();
             Anchors = new AnchorCollection();
+            ExtraMarkers = new ObservableCollection<GraphMarker>();
             LastInterpolationSet = typeof(SingleCurveInterpolator);
 
             Background = new SolidColorBrush(Color.FromArgb(30, 0, 0, 0));
@@ -383,6 +398,15 @@ namespace Mapping_Tools.Components.Graph {
 
             Anchors.CollectionChanged += AnchorsOnCollectionChanged;
             Anchors.AnchorsChanged += AnchorsOnAnchorsChanged;
+            ExtraMarkers.CollectionChanged += ExtraMarkersOnCollectionChanged;
+
+            _initialized = true;
+            UpdateVisual();
+        }
+
+        private void ExtraMarkersOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+            UpdateMarkers();
+            UpdateVisual();
         }
 
         private void AnchorsOnAnchorsChanged(object sender, DependencyPropertyChangedEventArgs e) {
@@ -613,6 +637,13 @@ namespace Mapping_Tools.Components.Graph {
             g.UpdateVisual();
         }
 
+        private static void OnExtraMarkersChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            var g = (Graph) d;
+            g.ExtraMarkers.CollectionChanged += g.ExtraMarkersOnCollectionChanged;
+            g.UpdateMarkers();
+            g.UpdateVisual();
+        }
+
         private static void OnVisualChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             var g = (Graph) d;
             g.UpdateVisual();
@@ -693,13 +724,13 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         public void UpdateVisual() {
-            if (!IsInitialized) return;
+            if (!_initialized) return;
 
             // Clear canvas
             MainCanvas.Children.Clear();
 
             // Add markers
-            foreach (var marker in _markers.Where(marker => marker.X > -Precision.DOUBLE_EPSILON && 
+            foreach (var marker in _markers.Concat(ExtraMarkers).Where(marker => marker.X > -Precision.DOUBLE_EPSILON && 
                                                             marker.X < ActualWidth + Precision.DOUBLE_EPSILON && 
                                                             marker.Y > -Precision.DOUBLE_EPSILON && 
                                                             marker.Y < ActualHeight + Precision.DOUBLE_EPSILON)) {
@@ -731,7 +762,7 @@ namespace Mapping_Tools.Components.Graph {
             MainCanvas.Children.Add(rect);
 
             // Check if there are at least 2 anchors
-            if (Anchors.Count < 2) return;
+            if (Anchors == null || Anchors.Count < 2) return;
 
             // Calculate interpolation line
             var points = new PointCollection();
@@ -748,7 +779,7 @@ namespace Mapping_Tools.Components.Graph {
                 }
             }
             points.Add(GetRelativePoint(Anchors[Anchors.Count - 1].Pos));
-
+            
             // Draw line
             var line = new Polyline {Points = points, Stroke = Stroke, StrokeThickness = 2, IsHitTestVisible = false,
                 StrokeEndLineCap = PenLineCap.Round, StrokeStartLineCap = PenLineCap.Round, StrokeLineJoin = PenLineJoin.Round};
@@ -764,7 +795,7 @@ namespace Mapping_Tools.Components.Graph {
 
             // Return if we dont draw Anchors or if the graph is not user editable. Having invisible anchors makes it impossible to edit
             if (!_drawAnchors || !UserEditable) return;
-
+            
             // Add tension Anchors
             foreach (var anchor in Anchors) {
                 // Find x position in the middle
@@ -782,7 +813,7 @@ namespace Mapping_Tools.Components.Graph {
 
                 RenderGraphPoint(anchor.TensionAnchor);
             }
-
+            
             // Add Anchors
             foreach (var anchor in Anchors) {
                 RenderGraphPoint(anchor);
@@ -885,7 +916,7 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private void UpdateMarkers() {
-            foreach (var graphMarker in _markers) {
+            foreach (var graphMarker in _markers.Concat(ExtraMarkers)) {
                 graphMarker.Stroke = EdgesBrush;
                 graphMarker.Width = ActualWidth;
                 graphMarker.Height = ActualHeight;
