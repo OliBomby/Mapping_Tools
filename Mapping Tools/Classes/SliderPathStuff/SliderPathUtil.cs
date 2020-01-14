@@ -43,33 +43,22 @@ namespace Mapping_Tools.Classes.SliderPathStuff {
                         var convert = BezierConverter.ConvertToBezier(sliderPath).ControlPoints;
 
                         // Find the last bezier segment and the pixel length at that part
-                        int start = 0;
-                        int end = 0;
                         BezierSubdivision subdivision = null;
                         double totalLength = 0;
 
-                        for (int i = 0; i < convert.Count; i++) {
-                            end++;
-
-                            if (i != convert.Count - 1 && convert[i] != convert[i + 1]) continue;
-
-                            var cpSpan = convert.GetRange(start, end - start);
-                            subdivision = new BezierSubdivision(cpSpan);
-                            var length = subdivision.SubdividedApproximationLength();
+                        foreach (var bezierSubdivision in ChopAnchors(convert)) {
+                            subdivision = bezierSubdivision;
+                            var length = bezierSubdivision.SubdividedApproximationLength();
 
                             if (totalLength + length > newLength) {
                                 break;
                             }
 
                             totalLength += length;
-                            newAnchors.AddRange(cpSpan);
-
-                            start = end;
+                            newAnchors.AddRange(bezierSubdivision.Points);
                         }
 
-                        if (subdivision == null) {
-                            break;
-                        }
+                        if (subdivision == null) break;
 
                         // Find T for the remaining pixel length
                         var t = subdivision.LengthToT(newLength - totalLength);
@@ -90,17 +79,16 @@ namespace Mapping_Tools.Classes.SliderPathStuff {
                         newPathType = pathType;
                         if (anchors.Count > 2) {
                             // Find the section of the linear slider which contains the slider end
-                            newAnchors.Add(anchors[0]);
                             totalLength = 0;
-                            for (int i = 1; i < anchors.Count; i++) {
-                                var length = (anchors[i] - anchors[i - 1]).Length;
+                            foreach (var bezierSubdivision in ChopAnchorsLinear(anchors)) {
+                                newAnchors.Add(bezierSubdivision.Points[0]);
+                                var length = bezierSubdivision.Length();
 
                                 if (totalLength + length > newLength) {
                                     break;
                                 }
 
                                 totalLength += length;
-                                newAnchors.Add(anchors[i]);
                             }
                             newAnchors.Add(sliderPath.PositionAt(1));
                         } else {
@@ -112,6 +100,31 @@ namespace Mapping_Tools.Classes.SliderPathStuff {
             }
 
             return newAnchors;
+        }
+
+        public static IEnumerable<BezierSubdivision> ChopAnchors(List<Vector2> anchors) {
+            int start = 0;
+            int end = 0;
+
+            for (int i = 0; i < anchors.Count; i++) {
+                end++;
+
+                if (i != anchors.Count - 1 && anchors[i] != anchors[i + 1]) continue;
+
+                var cpSpan = anchors.GetRange(start, end - start);
+                var subdivision = new BezierSubdivision(cpSpan);
+
+                yield return subdivision;
+                
+                start = end;
+            }
+        }
+
+        public static IEnumerable<BezierSubdivision> ChopAnchorsLinear(List<Vector2> anchors) {
+            for (int i = 1; i < anchors.Count; i++) {
+                var subdivision = new BezierSubdivision(new List<Vector2> {anchors[i - 1], anchors[i]});
+                yield return subdivision;
+            }
         }
     }
 }
