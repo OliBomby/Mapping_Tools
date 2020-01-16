@@ -202,15 +202,23 @@ namespace Mapping_Tools.Views {
         private void UpdateRedAnchorPreview() {
             if (ViewModel.ShowRedAnchors && ViewModel.VisibleHitObject != null && ViewModel.VisibleHitObject.IsSlider) {
                 var sliderPath = ViewModel.VisibleHitObject.GetSliderPath();
-                var redAnchorCompletions = SliderPathUtil.GetRedAnchorCompletions(sliderPath);
+                var redAnchorCompletions = SliderPathUtil.GetRedAnchorCompletions(sliderPath).ToArray();
                 
+                // Add red anchors to hit object preview
+                var hitObjectMarkers = new ObservableCollection<HitObjectElementMarker>();
+                foreach (var completion in redAnchorCompletions) {
+                    hitObjectMarkers.Add(new HitObjectElementMarker(completion, 0.2, Brushes.Red));
+                }
 
+                GraphHitObjectElement.ExtraMarkers = hitObjectMarkers;
+
+                // Add red anchors to graph
                 if (ViewModel.GraphMode == GraphMode.Position) {
                     var markers = new ObservableCollection<GraphMarker>();
 
                     foreach (var completion in redAnchorCompletions) {
                         markers.Add(new GraphMarker {Orientation = Orientation.Horizontal, Value = completion,
-                            CustomLineBrush = new SolidColorBrush(Colors.Red), Text = null
+                            CustomLineBrush = Brushes.Red, Text = null
                         });
                     }
 
@@ -219,6 +227,7 @@ namespace Mapping_Tools.Views {
                     Graph.ExtraMarkers.Clear();
                 }
             } else {
+                GraphHitObjectElement.ExtraMarkers.Clear();
                 Graph.ExtraMarkers.Clear();
             }
         }
@@ -250,7 +259,7 @@ namespace Mapping_Tools.Views {
                     BeginTime = TimeSpan.Zero,
                     Multiplier = 1 / maxCompletion
                 };
-            var animation2 = new DoubleAnimation(0, 0, TimeSpan.FromSeconds(1)) {BeginTime = graphDuration};
+            var animation2 = new DoubleAnimation(-1, -1, TimeSpan.FromSeconds(1)) {BeginTime = graphDuration};
 
             Storyboard.SetTarget(animation, element);
             Storyboard.SetTarget(animation2, element);

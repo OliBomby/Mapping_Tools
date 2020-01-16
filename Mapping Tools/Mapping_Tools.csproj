@@ -404,6 +404,7 @@
     <Compile Include="Components\ObjectVisualiser\HitObject.xaml.cs">
       <DependentUpon>HitObject.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Components\ObjectVisualiser\HitObjectElementMarker.cs" />
     <Compile Include="Components\ObjectVisualiser\ObjectPlayfield.xaml.cs">
       <DependentUpon>ObjectPlayfield.xaml</DependentUpon>
     </Compile>
