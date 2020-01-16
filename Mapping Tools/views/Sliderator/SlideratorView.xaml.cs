@@ -53,7 +53,7 @@ namespace Mapping_Tools.Views {
             Graph.Anchors.AnchorsChanged += AnchorsOnAnchorsChanged;
 
             UpdateGraphModeStuff();
-            UpdateRedAnchorPreview();
+            UpdatePointsOfInterest();
 
             ProjectManager.LoadProject(this, message: false);
         }
@@ -142,7 +142,7 @@ namespace Mapping_Tools.Views {
             }
 
             AnimateProgress(GraphHitObjectElement);
-            UpdateRedAnchorPreview();
+            UpdatePointsOfInterest();
         }
 
         private bool NextOverSpeedLimit(Anchor anchor) {
@@ -171,23 +171,23 @@ namespace Mapping_Tools.Views {
 
         private void AnchorsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
             AnimateProgress(GraphHitObjectElement);
-            UpdateRedAnchorPreview();
+            UpdatePointsOfInterest();
         }
 
         private void ViewModelOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
             switch (e.PropertyName) {
+                case nameof(ViewModel.ShowGraphAnchors):
                 case nameof(ViewModel.ShowRedAnchors):
-                    UpdateRedAnchorPreview();
+                    UpdatePointsOfInterest();
                     break;
                 case nameof(ViewModel.VisibleHitObject):
                     AnimateProgress(GraphHitObjectElement);
-                    UpdateRedAnchorPreview();
+                    UpdatePointsOfInterest();
                     break;
                 case nameof(ViewModel.SvGraphMultiplier):
                 case nameof(ViewModel.GraphDuration):
                     AnimateProgress(GraphHitObjectElement);
-                    if (ViewModel.GraphMode == GraphMode.Velocity)
-                        UpdateRedAnchorPreview();
+                    UpdatePointsOfInterest();
                     break;
                 case nameof(ViewModel.BeatSnapDivisor):
                     Graph.HorizontalMarkerGenerator = new DividedBeatMarkerGenerator(ViewModel.BeatSnapDivisor);
@@ -201,7 +201,7 @@ namespace Mapping_Tools.Views {
                     break;
                 case nameof(ViewModel.GraphMode):
                     UpdateGraphModeStuff();
-                    UpdateRedAnchorPreview();
+                    UpdatePointsOfInterest();
                     break;
             }
         }
@@ -209,40 +209,54 @@ namespace Mapping_Tools.Views {
         private void UpdateEverything() {
             UpdateGraphModeStuff();
             AnimateProgress(GraphHitObjectElement);
-            UpdateRedAnchorPreview();
+            UpdatePointsOfInterest();
             Graph.HorizontalMarkerGenerator = new DividedBeatMarkerGenerator(ViewModel.BeatSnapDivisor);
             Graph.Anchors.CollectionChanged += AnchorsOnCollectionChanged;
             Graph.Anchors.AnchorsChanged += AnchorsOnAnchorsChanged;
         }
 
-        private void UpdateRedAnchorPreview() {
-            if (ViewModel.ShowRedAnchors && ViewModel.VisibleHitObject != null && ViewModel.VisibleHitObject.IsSlider) {
+        private void UpdatePointsOfInterest() {
+            if ((ViewModel.ShowRedAnchors || ViewModel.ShowGraphAnchors) && ViewModel.VisibleHitObject != null && ViewModel.VisibleHitObject.IsSlider) {
                 var sliderPath = ViewModel.VisibleHitObject.GetSliderPath();
-                var redAnchorCompletions = SliderPathUtil.GetRedAnchorCompletions(sliderPath).ToArray();
                 var maxCompletion = GetMaxCompletion();
-                
-                // Add red anchors to hit object preview
                 var hitObjectMarkers = new ObservableCollection<HitObjectElementMarker>();
-                foreach (var completion in redAnchorCompletions) {
-                    hitObjectMarkers.Add(new HitObjectElementMarker(completion / maxCompletion, 0.2, Brushes.Red));
+
+                if (ViewModel.ShowRedAnchors) {
+                    var redAnchorCompletions = SliderPathUtil.GetRedAnchorCompletions(sliderPath).ToArray();
+
+                    // Add red anhors to hit object preview
+                    foreach (var completion in redAnchorCompletions) {
+                        hitObjectMarkers.Add(new HitObjectElementMarker(completion / maxCompletion, 0.2, Brushes.Red));
+                    }
+
+                    // Add red anchors to graph
+                    if (ViewModel.GraphMode == GraphMode.Position) {
+                        var markers = new ObservableCollection<GraphMarker>();
+
+                        foreach (var completion in redAnchorCompletions) {
+                            markers.Add(new GraphMarker {Orientation = Orientation.Horizontal, Value = completion,
+                                CustomLineBrush = Brushes.Red, Text = null
+                            });
+                        }
+
+                        Graph.ExtraMarkers = markers;
+                    } else {
+                        Graph.ExtraMarkers.Clear();
+                    }
+                }
+                if (ViewModel.ShowGraphAnchors) {
+                    // Add graph anchors to hit objects preview
+                    var graphAnchorCompletions = ViewModel.GraphMode == GraphMode.Velocity
+                        ? Graph.Anchors.Select(a => Graph.Anchors.GetIntegral(0, a.Pos.X) * ViewModel.SvGraphMultiplier)
+                        : Graph.Anchors.Select(a => a.Pos.Y);
+
+                    foreach (var completion in graphAnchorCompletions) {
+                        hitObjectMarkers.Add(new HitObjectElementMarker(completion / maxCompletion, 0.2, Brushes.DodgerBlue));
+                    }
                 }
 
                 GraphHitObjectElement.ExtraMarkers = hitObjectMarkers;
 
-                // Add red anchors to graph
-                if (ViewModel.GraphMode == GraphMode.Position) {
-                    var markers = new ObservableCollection<GraphMarker>();
-
-                    foreach (var completion in redAnchorCompletions) {
-                        markers.Add(new GraphMarker {Orientation = Orientation.Horizontal, Value = completion,
-                            CustomLineBrush = Brushes.Red, Text = null
-                        });
-                    }
-
-                    Graph.ExtraMarkers = markers;
-                } else {
-                    Graph.ExtraMarkers.Clear();
-                }
             } else {
                 GraphHitObjectElement.ExtraMarkers.Clear();
                 Graph.ExtraMarkers.Clear();
