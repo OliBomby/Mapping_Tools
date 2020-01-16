@@ -3,6 +3,7 @@ using Mapping_Tools.Classes.SliderPathStuff;
 using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 
@@ -169,14 +170,14 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
                 drawingContext.DrawGeometry(Fill, outlinePen, GetCircleGeometryAtProgress(0));
                 drawingContext.DrawGeometry(Fill, outlinePen, GetCircleGeometryAtProgress(1));
 
-                // Draw extra markers
-                foreach (var marker in ExtraMarkers) {
-                    drawingContext.DrawGeometry(marker.Brush, new Pen(Brushes.Black, 1), 
-                        GetSquareGeometryAtProgress(marker.Progress, marker.Size));
-                }
-
                 if (Progress <= 1 && Progress >= 0) {
                     drawingContext.DrawGeometry(Fill, GetSliderBallPen(), GetCircleGeometryAtProgress(Progress));
+                }
+
+                // Draw extra markers
+                foreach (var marker in ExtraMarkers.Where(o => o.Progress >= 0 && o.Progress <= 1)) {
+                    drawingContext.DrawGeometry(marker.Brush, new Pen(Brushes.Black, 1), 
+                        GetSquareGeometryAtProgress(marker.Progress, marker.Size));
                 }
             } else if (HitObject.IsCircle) {
                 var geom = GetCircleGeometry(HitObject.Pos);

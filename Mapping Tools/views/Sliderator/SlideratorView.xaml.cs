@@ -54,6 +54,8 @@ namespace Mapping_Tools.Views {
 
             UpdateGraphModeStuff();
             UpdateRedAnchorPreview();
+
+            ProjectManager.LoadProject(this, message: false);
         }
 
         private SlideratorVm ViewModel => (SlideratorVm) DataContext;
@@ -140,6 +142,7 @@ namespace Mapping_Tools.Views {
             }
 
             AnimateProgress(GraphHitObjectElement);
+            UpdateRedAnchorPreview();
         }
 
         private bool NextOverSpeedLimit(Anchor anchor) {
@@ -168,6 +171,7 @@ namespace Mapping_Tools.Views {
 
         private void AnchorsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
             AnimateProgress(GraphHitObjectElement);
+            UpdateRedAnchorPreview();
         }
 
         private void ViewModelOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
@@ -182,6 +186,8 @@ namespace Mapping_Tools.Views {
                 case nameof(ViewModel.SvGraphMultiplier):
                 case nameof(ViewModel.GraphDuration):
                     AnimateProgress(GraphHitObjectElement);
+                    if (ViewModel.GraphMode == GraphMode.Velocity)
+                        UpdateRedAnchorPreview();
                     break;
                 case nameof(ViewModel.BeatSnapDivisor):
                     Graph.HorizontalMarkerGenerator = new DividedBeatMarkerGenerator(ViewModel.BeatSnapDivisor);
@@ -205,17 +211,20 @@ namespace Mapping_Tools.Views {
             AnimateProgress(GraphHitObjectElement);
             UpdateRedAnchorPreview();
             Graph.HorizontalMarkerGenerator = new DividedBeatMarkerGenerator(ViewModel.BeatSnapDivisor);
+            Graph.Anchors.CollectionChanged += AnchorsOnCollectionChanged;
+            Graph.Anchors.AnchorsChanged += AnchorsOnAnchorsChanged;
         }
 
         private void UpdateRedAnchorPreview() {
             if (ViewModel.ShowRedAnchors && ViewModel.VisibleHitObject != null && ViewModel.VisibleHitObject.IsSlider) {
                 var sliderPath = ViewModel.VisibleHitObject.GetSliderPath();
                 var redAnchorCompletions = SliderPathUtil.GetRedAnchorCompletions(sliderPath).ToArray();
+                var maxCompletion = GetMaxCompletion();
                 
                 // Add red anchors to hit object preview
                 var hitObjectMarkers = new ObservableCollection<HitObjectElementMarker>();
                 foreach (var completion in redAnchorCompletions) {
-                    hitObjectMarkers.Add(new HitObjectElementMarker(completion, 0.2, Brushes.Red));
+                    hitObjectMarkers.Add(new HitObjectElementMarker(completion / maxCompletion, 0.2, Brushes.Red));
                 }
 
                 GraphHitObjectElement.ExtraMarkers = hitObjectMarkers;
@@ -387,7 +396,6 @@ namespace Mapping_Tools.Views {
                 return;
             }
 
-
             RunTool(MainWindow.AppWindow.GetCurrentMaps()[0]);
         }
 
@@ -474,6 +482,7 @@ namespace Mapping_Tools.Views {
             DataContext = saveData;
             Graph.SetGraphState(saveData.GraphState);
             UpdateEverything();
+            ViewModel.PropertyChanged += ViewModelOnPropertyChanged;
         }
         
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "slideratorproject.json");

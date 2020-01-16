@@ -6,6 +6,7 @@ using Mapping_Tools.Components.Domain;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
 using Mapping_Tools.Components.Graph;
@@ -40,6 +41,7 @@ namespace Mapping_Tools.Viewmodels {
             set => SetLoadedHitObjects(value);
         }
 
+        [JsonIgnore]
         public HitObject VisibleHitObject {
             get => _visibleHitObject;
             set => SetCurrentHitObject(value);
@@ -49,7 +51,8 @@ namespace Mapping_Tools.Viewmodels {
             get => _visibleHitObjectIndex;
             set => SetCurrentHitObjectIndex(value);
         }
-
+        
+        [JsonIgnore]
         public double PixelLength {
             get => _pixelLength;
             set {
@@ -67,7 +70,8 @@ namespace Mapping_Tools.Viewmodels {
                 }
             } 
         }
-
+        
+        [JsonIgnore]
         public double GraphBeats {
             get => _graphBeats;
             set {
@@ -76,7 +80,8 @@ namespace Mapping_Tools.Viewmodels {
                 }
             }
         }
-
+        
+        [JsonIgnore]
         public double BeatsPerMinute {
             get => _beatsPerMinute;
             set {
@@ -90,12 +95,14 @@ namespace Mapping_Tools.Viewmodels {
             get => _beatSnapDivisor;
             set => Set(ref _beatSnapDivisor, value);
         }
-
+        
+        [JsonIgnore]
         public TimeSpan GraphDuration {
             get => _graphDuration;
             set => Set(ref _graphDuration, value);
         }
-
+        
+        [JsonIgnore]
         public double SvGraphMultiplier {
             get => _svGraphMultiplier;
             set {
@@ -109,6 +116,7 @@ namespace Mapping_Tools.Viewmodels {
             set => SetImportMode(value);
         }
 
+        [JsonIgnore]
         public IEnumerable<ImportMode> ImportModes => Enum.GetValues(typeof(ImportMode)).Cast<ImportMode>();
 
         public double ExactTime {
@@ -131,6 +139,7 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _exportMode, value);
         }
         
+        [JsonIgnore]
         public IEnumerable<ExportMode> ExportModes => Enum.GetValues(typeof(ExportMode)).Cast<ExportMode>();
 
         public GraphMode GraphMode {
@@ -153,9 +162,13 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _showGraphAnchors, value);
         }
 
+        [JsonIgnore]
         public CommandImplementation ImportCommand { get; }
+        [JsonIgnore]
         public CommandImplementation MoveLeftCommand { get; }
+        [JsonIgnore]
         public CommandImplementation MoveRightCommand { get; }
+        [JsonIgnore]
         public CommandImplementation GraphToggleCommand { get; }
 
         public GraphState GraphState { get; set; }
@@ -243,13 +256,22 @@ namespace Mapping_Tools.Viewmodels {
 
         private void SetLoadedHitObjects(ObservableCollection<HitObject> value) {
             if (!Set(ref _loadedHitObjects, value, nameof(LoadedHitObjects))) return;
+            LoadedHitObjects.CollectionChanged += LoadedHitObjectsOnCollectionChanged;
             if (LoadedHitObjects.Count == 0) return;
             VisibleHitObject = LoadedHitObjects[0];
             VisibleHitObjectIndex = 0;
         }
 
+        private void LoadedHitObjectsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+            if (VisibleHitObject == null && LoadedHitObjects.Count > 0) {
+                VisibleHitObject = LoadedHitObjects[0];
+                VisibleHitObjectIndex = 0;
+            }
+        }
+
         private void SetCurrentHitObject(HitObject value) {
             if (!Set(ref _visibleHitObject, value, nameof(VisibleHitObject))) return;
+            if (VisibleHitObject.UnInheritedTimingPoint == null) return;
             BeatsPerMinute = VisibleHitObject.UnInheritedTimingPoint.GetBPM();
             GraphBeats = VisibleHitObject.TemporalLength * BeatsPerMinute / 60000;
             ExportTime = VisibleHitObject.Time;

@@ -20,6 +20,7 @@ namespace Mapping_Tools.Components.Graph {
     /// <summary>
     /// Interaction logic for Anchor.xaml
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public partial class Anchor {
         protected override double DefaultSize { get; } = 12;
 
@@ -35,6 +36,7 @@ namespace Mapping_Tools.Components.Graph {
         /// <summary>
         /// Ranges from (0,0) bottom left to (1,1) top right
         /// </summary>
+        [JsonProperty]
         public sealed override Vector2 Pos {
             get => (Vector2) GetValue(PosProperty);
             set => SetValue(PosProperty, value);
@@ -53,6 +55,7 @@ namespace Mapping_Tools.Components.Graph {
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None));
         
         [NotNull]
+        [JsonProperty]
         public TensionAnchor TensionAnchor {
             get => (TensionAnchor) GetValue(TensionAnchorProperty);
             set => SetValue(TensionAnchorProperty, value);
@@ -66,6 +69,7 @@ namespace Mapping_Tools.Components.Graph {
                     OnInterpolatorChanged));
         
         [NotNull]
+        [JsonProperty]
         public IGraphInterpolator Interpolator {
             get => (IGraphInterpolator) GetValue(InterpolatorProperty);
             set => SetValue(InterpolatorProperty, value);
@@ -86,6 +90,7 @@ namespace Mapping_Tools.Components.Graph {
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None,
                     OnStrokeChanged));
         
+        [JsonProperty]
         public sealed override Brush Stroke {
             get => (Brush) GetValue(StrokeProperty);
             set => SetValue(StrokeProperty, value);
@@ -104,6 +109,7 @@ namespace Mapping_Tools.Components.Graph {
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None,
                     OnFillChanged));
         
+        [JsonProperty]
         public sealed override Brush Fill {
             get => (Brush) GetValue(FillProperty);
             set => SetValue(FillProperty, value);
@@ -122,6 +128,7 @@ namespace Mapping_Tools.Components.Graph {
                 new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.None,
                     OnTensionChanged));
         
+        [JsonProperty]
         public sealed override double Tension {
             get => (double) GetValue(TensionProperty);
             set => SetValue(TensionProperty, value);
@@ -141,7 +148,6 @@ namespace Mapping_Tools.Components.Graph {
                 typeof(Anchor), 
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None));
         
-        [JsonIgnore]
         [CanBeNull]
         public Anchor PreviousAnchor {
             get => (Anchor) GetValue(PreviousAnchorProperty);
@@ -154,7 +160,6 @@ namespace Mapping_Tools.Components.Graph {
                 typeof(Anchor), 
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None));
         
-        [JsonIgnore]
         [CanBeNull]
         public Anchor NextAnchor {
             get => (Anchor) GetValue(NextAnchorProperty);

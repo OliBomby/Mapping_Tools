@@ -431,11 +431,11 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         public void SetGraphState(GraphState graphState) {
-            Anchors = new AnchorCollection(graphState.Anchors);
             MinX = graphState.MinX;
             MinY = graphState.MinY;
             MaxX = graphState.MaxX;
             MaxY = graphState.MaxY;
+            Anchors = new AnchorCollection(graphState.Anchors);
         }
 
         #region GraphStuff
@@ -590,11 +590,15 @@ namespace Mapping_Tools.Components.Graph {
             foreach (var anchor in g.Anchors) {
                 anchor.Graph = g;
                 anchor.TensionAnchor.ParentAnchor = anchor;
+                anchor.TensionAnchor.Graph = g;
                 anchor.Stroke = g.AnchorStroke;
                 anchor.Fill = g.AnchorFill;
                 anchor.TensionAnchor.Stroke = g.TensionAnchorStroke;
                 anchor.TensionAnchor.Fill = g.TensionAnchorFill;
             }
+            
+            g.Anchors.CollectionChanged += g.AnchorsOnCollectionChanged;
+            g.Anchors.AnchorsChanged += g.AnchorsOnAnchorsChanged;
 
             g.UpdateVisual();
         }

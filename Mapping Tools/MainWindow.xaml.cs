@@ -77,7 +77,7 @@ namespace Mapping_Tools {
             Views = new ViewCollection(); // Make a ViewCollection object
             ToolsMenu.ItemsSource = ViewCollection.GetAllToolTypes().Where(o => o.GetCustomAttribute<HiddenToolAttribute>() == null).Select(o => {
                 var name = ViewCollection.GetName(o);
-                var item = new MenuItem() {Header = "_" + name, ToolTip = $"Open {name}."};
+                var item = new MenuItem {Header = "_" + name, ToolTip = $"Open {name}."};
                 item.Click += ViewSelectMenuItemOnClick;
                 return item;
             }).OrderBy(o => o.Header);

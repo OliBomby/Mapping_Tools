@@ -49,7 +49,7 @@
 
             <graph:Graph Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" x:Name="Graph" MinMarkerSpacing="20"
                          Margin="43 0 0 43" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                         MaxX="{Binding GraphBeats}"/>
+                         MaxX="{Binding GraphBeats, Mode=TwoWay}"/>
 
             <materialDesign:Card Grid.Column="2" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0" Padding="10">
                 <objectVisualiser:HitObjectElement x:Name="GraphHitObjectElement" Width="200" HitObject="{Binding VisibleHitObject}"
