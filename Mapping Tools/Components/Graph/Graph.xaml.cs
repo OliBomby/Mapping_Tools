@@ -430,6 +430,14 @@ namespace Mapping_Tools.Components.Graph {
             };
         }
 
+        public void SetGraphState(GraphState graphState) {
+            Anchors = new AnchorCollection(graphState.Anchors);
+            MinX = graphState.MinX;
+            MinY = graphState.MinY;
+            MaxX = graphState.MaxX;
+            MaxY = graphState.MaxY;
+        }
+
         #region GraphStuff
 
         public Anchor AddAnchor(Vector2 pos) {
@@ -578,8 +586,10 @@ namespace Mapping_Tools.Components.Graph {
 
         private static void OnAnchorsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             var g = (Graph) d;
+            g.Anchors.UpdateAnchorNeighbors();
             foreach (var anchor in g.Anchors) {
                 anchor.Graph = g;
+                anchor.TensionAnchor.ParentAnchor = anchor;
                 anchor.Stroke = g.AnchorStroke;
                 anchor.Fill = g.AnchorFill;
                 anchor.TensionAnchor.Stroke = g.TensionAnchorStroke;

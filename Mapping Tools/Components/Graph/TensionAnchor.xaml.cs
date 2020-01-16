@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using Newtonsoft.Json;
 
 namespace Mapping_Tools.Components.Graph {
     /// <summary>
@@ -34,6 +35,7 @@ namespace Mapping_Tools.Components.Graph {
                 typeof(TensionAnchor), 
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None));
         
+        [JsonIgnore]
         [NotNull]
         public Anchor ParentAnchor {
             get => (Anchor) GetValue(ParentAnchorProperty);
@@ -99,6 +101,7 @@ namespace Mapping_Tools.Components.Graph {
             a.ParentAnchor.Tension = (double) e.NewValue;
         }
 
+        [JsonConstructor]
         public TensionAnchor(Graph parent, Vector2 pos, Anchor parentAnchor) : base(parent) {
             InitializeComponent();
             SetCursor();

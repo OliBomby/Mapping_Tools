@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -25,7 +26,7 @@ using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
 
 namespace Mapping_Tools.Views {
     //[HiddenTool]
-    public partial class SlideratorView {
+    public partial class SlideratorView : ISavable<SlideratorVm> {
         public static readonly string ToolName = "Sliderator";
 
         public static readonly string ToolDescription = "";
@@ -197,6 +198,13 @@ namespace Mapping_Tools.Views {
                     UpdateRedAnchorPreview();
                     break;
             }
+        }
+
+        private void UpdateEverything() {
+            UpdateGraphModeStuff();
+            AnimateProgress(GraphHitObjectElement);
+            UpdateRedAnchorPreview();
+            Graph.HorizontalMarkerGenerator = new DividedBeatMarkerGenerator(ViewModel.BeatSnapDivisor);
         }
 
         private void UpdateRedAnchorPreview() {
@@ -454,5 +462,22 @@ namespace Mapping_Tools.Views {
 
             return "Done!";
         }
+
+        public SlideratorVm GetSaveData() {
+            ViewModel.GraphState = Graph.GetGraphState();
+            if (ViewModel.GraphState.CanFreeze) ViewModel.GraphState.Freeze();
+
+            return ViewModel;
+        }
+
+        public void SetSaveData(SlideratorVm saveData) {
+            DataContext = saveData;
+            Graph.SetGraphState(saveData.GraphState);
+            UpdateEverything();
+        }
+        
+        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "slideratorproject.json");
+
+        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Sliderator Projects");
     }
 }

@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Newtonsoft.Json;
 
 namespace Mapping_Tools.Components.Graph {
     public abstract class GraphPointControl : UserControl {
@@ -33,6 +34,7 @@ namespace Mapping_Tools.Components.Graph {
                 typeof(GraphPointControl), 
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None));
         
+        [JsonIgnore]
         public Graph Graph {
             get => (Graph) GetValue(GraphProperty);
             set => SetValue(GraphProperty, value);

@@ -158,7 +158,6 @@ namespace Mapping_Tools.Viewmodels {
         public CommandImplementation MoveRightCommand { get; }
         public CommandImplementation GraphToggleCommand { get; }
 
-        [JsonIgnore]
         public GraphState GraphState { get; set; }
 
         [JsonIgnore]

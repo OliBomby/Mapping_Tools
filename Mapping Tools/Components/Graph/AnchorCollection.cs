@@ -16,6 +16,14 @@ namespace Mapping_Tools.Components.Graph {
             CollectionChanged += OnCollectionChanged;
         }
 
+        public AnchorCollection(IEnumerable<Anchor> anchors) : base(anchors) {
+            CollectionChanged += OnCollectionChanged;
+        }
+
+        public AnchorCollection(List<Anchor> anchors) : base(anchors) {
+            CollectionChanged += OnCollectionChanged;
+        }
+
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
             if (e == null) return;
 
@@ -40,7 +48,7 @@ namespace Mapping_Tools.Components.Graph {
             AnchorsChanged?.Invoke(sender, e);
         }
 
-        private void UpdateAnchorNeighbors() {
+        public void UpdateAnchorNeighbors() {
             Anchor previousAnchor = null;
             foreach (var anchor in this) {
                 anchor.PreviousAnchor = previousAnchor;

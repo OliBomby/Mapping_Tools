@@ -10,6 +10,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Mapping_Tools.Components.Dialogs;
+using Newtonsoft.Json;
 using ContextMenu = System.Windows.Controls.ContextMenu;
 using Cursors = System.Windows.Input.Cursors;
 using MenuItem = System.Windows.Controls.MenuItem;
@@ -140,6 +141,7 @@ namespace Mapping_Tools.Components.Graph {
                 typeof(Anchor), 
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None));
         
+        [JsonIgnore]
         [CanBeNull]
         public Anchor PreviousAnchor {
             get => (Anchor) GetValue(PreviousAnchorProperty);
@@ -152,6 +154,7 @@ namespace Mapping_Tools.Components.Graph {
                 typeof(Anchor), 
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None));
         
+        [JsonIgnore]
         [CanBeNull]
         public Anchor NextAnchor {
             get => (Anchor) GetValue(NextAnchorProperty);
@@ -162,6 +165,7 @@ namespace Mapping_Tools.Components.Graph {
 
         public Anchor(Graph parent, Vector2 pos, IGraphInterpolator interpolator) : this(parent, pos, interpolator, null) { }
 
+        [JsonConstructor]
         public Anchor(Graph parent, Vector2 pos, IGraphInterpolator interpolator, TensionAnchor tensionAnchor) : base(parent) {
             InitializeComponent();
             SetCursor();
