@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -339,6 +340,19 @@ namespace Mapping_Tools.Views {
             return minValue;
         }
 
+        // Gets max velocity in SV
+        private static double GetMaxVelocity(SlideratorVm viewModel, IReadOnlyList<IGraphAnchor> anchors) {
+            double maxValue;
+            if (viewModel.GraphMode == GraphMode.Velocity) // Integrate the graph to get the end value
+                // Here we use SvGraphMultiplier to get an accurate conversion from SV to slider completion per beat
+                // Completion = (100 * SliderMultiplier / PixelLength) * SV * Beats
+                maxValue = Math.Max(AnchorCollection.GetMaxValue(anchors), -AnchorCollection.GetMinValue(anchors));
+            else
+                maxValue = Math.Max(AnchorCollection.GetMaxDerivative(anchors), -AnchorCollection.GetMinDerivative(anchors)) / viewModel.SvGraphMultiplier;
+
+            return maxValue;
+        }
+
         private async void ScaleCompleteButton_OnClick(object sender, RoutedEventArgs e) {
             var dialog = new TypeValueDialog(1);
 
@@ -432,25 +446,36 @@ namespace Mapping_Tools.Views {
         }
 
         private string Sliderate(SlideratorVm arg, BackgroundWorker worker) {
+            // Get slider path like from the hit object preview
             var sliderPath = new SliderPath(arg.VisibleHitObject.SliderType,
                 arg.VisibleHitObject.GetAllCurvePoints().ToArray(), GetMaxCompletion(arg, arg.GraphState.Anchors) * arg.PixelLength);
             var path = new List<Vector2>();
             sliderPath.GetPathToProgress(path, 0, 1);
 
+            // Get the highest velocity occuring in the graph
+            double velocity = GetMaxVelocity(arg, arg.GraphState.Anchors); // Velocity is in SV
+            // Do bad stuff to the velocity to make sure its the same SV as after writing it to .osu code
+            velocity = -100 / double.Parse((-100 / velocity).ToInvariant(), CultureInfo.InvariantCulture);
+            // Other velocity is in px / ms
+            var otherVelocity = velocity * arg.SvGraphMultiplier * arg.PixelLength * arg.BeatsPerMinute / 60000;
+
+            // make a position function for Sliderator
             Sliderator.PositionFunctionDelegate positionFunction;
-            // We convert the graph GetValue function to a function that works like px -> px
-            // d is a value representing the position along the graph in osu! pixels
+            // We convert the graph GetValue function to a function that works like ms -> px
+            // d is a value representing the number of milliseconds into the slider
             if (ViewModel.GraphMode == GraphMode.Velocity
                 ) // Here we use SvGraphMultiplier to get an accurate conversion from SV to slider completion per beat
                 // Completion = (100 * SliderMultiplier / PixelLength) * SV * Beats
                 positionFunction = d =>
-                    arg.GraphState.GetIntegral(0, d / arg.PixelLength * arg.GraphBeats) * arg.SvGraphMultiplier *
+                    arg.GraphState.GetIntegral(0, d * arg.BeatsPerMinute / 60000) * arg.SvGraphMultiplier *
                     arg.PixelLength;
             else
-                positionFunction = d => arg.GraphState.GetValue(d / arg.PixelLength * arg.GraphBeats) * arg.PixelLength;
+                positionFunction = d => arg.GraphState.GetValue(d * arg.BeatsPerMinute / 60000) * arg.PixelLength;
 
+            // Do Sliderator
             var sliderator = new Sliderator {
-                PositionFunction = positionFunction, MaxT = arg.PixelLength
+                PositionFunction = positionFunction, MaxT = arg.PixelLength,
+                Velocity = otherVelocity
             };
             sliderator.SetPath(path);
 
@@ -459,15 +484,36 @@ namespace Mapping_Tools.Views {
             // Exporting stuff
             var editor = new BeatmapEditor(arg.Path);
             var beatmap = editor.Beatmap;
+            var timing = beatmap.BeatmapTiming;
 
+            // Get hit object that might be present at the export time or make a new one
             var hitObjectHere = beatmap.HitObjects.FirstOrDefault(o => Math.Abs(arg.ExportTime - o.Time) < 5) ??
                                 new HitObject(arg.ExportTime, 0, SampleSet.Auto, SampleSet.Auto);
 
+            // Clone the hit object to not affect the already existing hit object instance with changes
             var clone = new HitObject(hitObjectHere.GetLine()) {
                 IsCircle = false, IsSpinner = false, IsHoldNote = false, IsSlider = true
             };
+
+            // Give the new hit object the sliderated anchors
             clone.SetSliderPath(new SliderPath(PathType.Bezier, slideration.ToArray()));
 
+            // Add SV
+            var timingPointsChanges = new List<TimingPointsChange>();
+            var newTp = timing.GetTimingPointAtTime(arg.ExportTime).Copy();
+            newTp.MpB = -100 / (velocity * 60000 / arg.BeatsPerMinute / arg.PixelLength / arg.SvGraphMultiplier);
+            newTp.Offset = arg.ExportTime;
+            timingPointsChanges.Add(new TimingPointsChange(newTp, mpb: true));
+            timingPointsChanges.AddRange(beatmap.HitObjects.Select(ho => {
+                var sv = timing.GetSvAtTime(ho.Time);
+                var tp = timing.GetTimingPointAtTime(ho.Time).Copy();
+                tp.MpB = sv;
+                tp.Offset = ho.Time;
+                return new TimingPointsChange(tp, mpb: true);
+            }));
+            TimingPointsChange.ApplyChanges(timing, timingPointsChanges);
+            
+            // Add hit object after SV
             if (arg.ExportMode == ExportMode.Add) {
                 beatmap.HitObjects.Add(clone);
             } else {

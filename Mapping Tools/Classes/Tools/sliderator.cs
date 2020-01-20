@@ -17,6 +17,7 @@ namespace Mapping_Tools.Classes.Tools {
         private List<double> _interpL; // cumulative length of interpolations
 
         public double MaxT { get; set; }
+        public double Velocity { get; set; }
 
         public delegate double PositionFunctionDelegate(double t);
 
