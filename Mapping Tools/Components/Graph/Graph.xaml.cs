@@ -425,7 +425,7 @@ namespace Mapping_Tools.Components.Graph {
         /// <returns></returns>
         public GraphState GetGraphState() {
             return new GraphState {
-                Anchors = Anchors.ToList(),
+                Anchors = Anchors.Select(a => a.GetAnchorState()).ToList(),
                 MinX = MinX, MinY = MinY, MaxX = MaxX, MaxY = MaxY
             };
         }
@@ -435,7 +435,7 @@ namespace Mapping_Tools.Components.Graph {
             MinY = graphState.MinY;
             MaxX = graphState.MaxX;
             MaxY = graphState.MaxY;
-            Anchors = new AnchorCollection(graphState.Anchors);
+            Anchors = new AnchorCollection(graphState.Anchors.Select(a => a.GetAnchor()));
         }
 
         #region GraphStuff

@@ -21,7 +21,7 @@ namespace Mapping_Tools.Components.Graph {
     /// Interaction logic for Anchor.xaml
     /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
-    public partial class Anchor {
+    public partial class Anchor : IGraphAnchor {
         protected override double DefaultSize { get; } = 12;
 
         public event DependencyPropertyChangedEventHandler GraphStateChangedEvent;
@@ -185,6 +185,16 @@ namespace Mapping_Tools.Components.Graph {
             }
             Stroke = parent?.AnchorStroke;
             Fill = parent?.AnchorFill;
+        }
+
+        public AnchorState GetAnchorState() {
+            return new AnchorState {Interpolator = Interpolator, Pos = Pos, Tension = Tension};
+        }
+
+        public void SetAnchorState(AnchorState anchorState) {
+            Pos = anchorState.Pos;
+            Interpolator = anchorState.Interpolator;
+            Tension = anchorState.Tension;
         }
 
         private void SetCursor() {
