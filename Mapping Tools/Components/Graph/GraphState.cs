@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 
 namespace Mapping_Tools.Components.Graph {
@@ -11,12 +12,12 @@ namespace Mapping_Tools.Components.Graph {
 
         public static readonly DependencyProperty AnchorsProperty =
             DependencyProperty.Register(nameof(Anchors),
-                typeof(List<Anchor>), 
+                typeof(List<AnchorState>), 
                 typeof(GraphState), 
                 new FrameworkPropertyMetadata(null));
 
-        public List<Anchor> Anchors {
-            get => (List<Anchor>) GetValue(AnchorsProperty);
+        public List<AnchorState> Anchors {
+            get => (List<AnchorState>) GetValue(AnchorsProperty);
             set => SetValue(AnchorsProperty, value);
         }
 
@@ -68,6 +69,18 @@ namespace Mapping_Tools.Components.Graph {
 
         protected override Freezable CreateInstanceCore() {
             return new GraphState();
+        }
+
+        protected override bool FreezeCore(bool isChecking) {
+            if (isChecking) {
+                if (Anchors.Any(a => !a.CanFreeze)) {
+                    return false;
+                }
+            } else {
+                Anchors.ForEach(a => a.Freeze());
+            }
+
+            return base.FreezeCore(isChecking);
         }
 
         public double GetValue(double x) {

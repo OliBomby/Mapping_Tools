@@ -311,7 +311,7 @@ namespace Mapping_Tools.Views {
             return GetMaxCompletion(ViewModel, Graph.Anchors);
         }
 
-        private static double GetMaxCompletion(SlideratorVm viewModel, IReadOnlyList<Anchor> anchors) {
+        private static double GetMaxCompletion(SlideratorVm viewModel, IReadOnlyList<IGraphAnchor> anchors) {
             double maxValue;
             if (viewModel.GraphMode == GraphMode.Velocity) // Integrate the graph to get the end value
                 // Here we use SvGraphMultiplier to get an accurate conversion from SV to slider completion per beat
@@ -433,7 +433,7 @@ namespace Mapping_Tools.Views {
 
         private string Sliderate(SlideratorVm arg, BackgroundWorker worker) {
             var sliderPath = new SliderPath(arg.VisibleHitObject.SliderType,
-                arg.VisibleHitObject.GetAllCurvePoints().ToArray(), GetMaxCompletion(arg, arg.GraphState.Anchors));
+                arg.VisibleHitObject.GetAllCurvePoints().ToArray(), GetMaxCompletion(arg, arg.GraphState.Anchors) * arg.PixelLength);
             var path = new List<Vector2>();
             sliderPath.GetPathToProgress(path, 0, 1);
 
