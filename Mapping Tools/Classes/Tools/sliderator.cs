@@ -17,6 +17,7 @@ namespace Mapping_Tools.Classes.Tools {
         private List<double> _interpL; // cumulative length of interpolations
 
         public double MaxT { get; set; }
+        public double Velocity { get; set; }
 
         public delegate double PositionFunctionDelegate(double t);
 
@@ -33,6 +34,21 @@ namespace Mapping_Tools.Classes.Tools {
                 _pathL.Add(sum);
             }
             if (Math.Abs(sum) < Precision.DOUBLE_EPSILON) throw new InvalidOperationException("Zero length path.");
+        }
+
+        private Vector2 PositionAt(double x) {
+            for (int n = 0; n + 1 < _pathL.Count; n++) {
+                var length = _pathL[n];
+                var pos = _path[n];
+                var nextLength = _pathL[n + 1];
+                var nextPos = _path[n + 1];
+
+                if (length <= x && nextLength >= x) {
+                    return pos + (nextPos - pos) * (x - length) / (nextLength - length);
+                }
+            }
+
+            return _path.Last();
         }
 
         private static List<LatticePoint> LatticePoints(double tolerance, List<Vector2> path, List<Vector2> diff,
@@ -79,7 +95,7 @@ namespace Mapping_Tools.Classes.Tools {
         private void GetReds() {
             // version a.1, retarded because it handles negative v and starting at an arbitrary x, so it cant just use the already known anchor visitation order. also just not optimized or good in general.
             double t = 0;
-            var x = PositionFunction(t) * _totalPathL;
+            var x = PositionFunction(t);
             var xprev = x;
             var n = _lattice.Select(y => y.PathPosition).ToList().BinarySearch(x);
             if (n < 0) n = ~n;
@@ -90,7 +106,7 @@ namespace Mapping_Tools.Classes.Tools {
             while (t < MaxT) {
                 xprev = x;
                 t += 0.0025; // 0.25 < 1 - sqrt(2)/2
-                x = PositionFunction(t) * _totalPathL;
+                x = PositionFunction(t);
                 if (n > 0 && x - _lattice[n - 1].PathPosition < _lattice[n].PathPosition - x) {
                     n -= 1;
                     _reds.Add(_lattice[n]);
@@ -128,9 +144,9 @@ namespace Mapping_Tools.Classes.Tools {
             _whites = new List<Interpolation>();
             double sum = 0;
             _interpL = new List<double> {sum};
-            for (var n = 0; n < _reds.Count - 1; n++) {
-                var a = _reds[n];
-                var b = _reds[n + 1];
+            for (var n = 0; n < _lattice.Count - 1; n++) {
+                var a = _lattice[n];
+                var b = _lattice[n + 1];
                 _whites.Add(new Interpolation(a, b));
                 sum += _whites.Last().Length;
                 _interpL.Add(sum);
@@ -139,7 +155,8 @@ namespace Mapping_Tools.Classes.Tools {
 
         private void GetTumours() {
             // version a.0, not functional, i just put some crap so u can test
-            double t = 0;
+            /*
+             double t = 0;
             double d = 0;
             var x = PositionFunction(t) * _totalPathL;
             var n = 0;
@@ -153,23 +170,120 @@ namespace Mapping_Tools.Classes.Tools {
                     n += 1;
                 }
             }
+            */
+            
+            _reds = new List<LatticePoint>();
+            var lastLatticePoint = _lattice.First();
+            double actualTime = 0;
+            for (double t = 0; t < MaxT; t++) {
+                var x = PositionFunction(t);
+                var pos = PositionAt(x);
+                var closestLatticePoint = GetClosestLatticePoint(x).Clone();
+
+                // Go the nearest lattice point, then add tumours such that the position is pos when actualTime == t
+                var latticeDist = (closestLatticePoint.Pos - lastLatticePoint.Pos).Length;
+                actualTime += latticeDist / Velocity;
+
+                Console.WriteLine("Time: " + t);
+                Console.WriteLine("actualTime: " + actualTime);
+
+                if (actualTime < t) {
+                    var timeDiff = t - actualTime;
+                    var tumour = (2 * (pos - closestLatticePoint.Pos)).Rounded();
+                    ReduceTumour(tumour);
+                    var remainingTime = timeDiff - tumour.Length / Velocity / 2;
+                    while (remainingTime > 12 / Velocity) {
+                        closestLatticePoint.Tumours.Add(new Vector2(12, 0));
+                        actualTime += 1 / Velocity;
+                        remainingTime -= 1 / Velocity;
+                    }
+
+                    if (remainingTime > 1 / Velocity) {
+                        closestLatticePoint.Tumours.Add(new Vector2(Math.Round(remainingTime * Velocity), 0));
+                        actualTime += Math.Round(remainingTime * Velocity) / Velocity;
+                    }
+                    closestLatticePoint.Tumours.Add(tumour);
+                    actualTime -= tumour.Length / Velocity;
+                }
+
+                if (latticeDist < Precision.DOUBLE_EPSILON && closestLatticePoint.Tumours.Count == 0) continue;
+
+                Console.WriteLine("Added red anchor with " + closestLatticePoint.Tumours.Count + " tumours!");
+                _reds.Add(closestLatticePoint);
+
+                lastLatticePoint = closestLatticePoint;
+            }
+
+            var last = GetClosestLatticePoint(PositionFunction(MaxT));
+            var lastLatticeDist = (last.Pos - lastLatticePoint.Pos).Length;
+            actualTime += lastLatticeDist / Velocity;
+            if (actualTime < MaxT) {
+                var tumour = new Vector2(Math.Round((MaxT - actualTime) * Velocity), 0);
+                last.Tumours.Add(tumour);
+            }
+            _reds.Add(last);
+        }
+
+        private static void ReduceTumour(Vector2 tumour) {
+            bool reduceX = tumour.X > tumour.Y;
+            while (tumour.Length > 12) {
+                if (reduceX) {
+                    tumour.X--;
+                } else {
+                    tumour.Y--;
+                }
+
+                reduceX = !reduceX;
+            }
+        }
+
+        private static double TestTumours(List<Vector2> tumours, LatticePoint latticePoint, Vector2 targetPoint, double time, double velocity) {
+            Vector2 actualPoint = latticePoint.Pos;
+            foreach (var tumour in tumours) {
+                var newTime = time - tumour.Length / velocity;
+                if (newTime <= 0) {
+
+                } else {
+                    time = newTime;
+                }
+            }
+
+            return 0;
+        }
+
+        private LatticePoint GetClosestLatticePoint(double x) {
+            LatticePoint closest = _lattice.First();
+            var closestDist = double.PositiveInfinity;
+
+            foreach (var latticePoint in _lattice) {
+                var dist = Math.Abs(latticePoint.PathPosition - x) + latticePoint.Error;
+
+                if (!(dist < closestDist)) continue;
+
+                closest = latticePoint;
+                closestDist = dist;
+            }
+
+            return closest;
         }
 
         private static List<Vector2> AnchorsList(List<LatticePoint> reds, List<Interpolation> whites) {
             var anchors = new List<Vector2>();
 
             for (var n = 0; n < reds.Count; n++) {
+                anchors.Add(reds[n].Pos);
+                anchors.Add(reds[n].Pos);
                 foreach (var t in reds[n].Tumours) {
-                    anchors.Add(reds[n].Pos);
                     anchors.Add(reds[n].Pos + t);
                     anchors.Add(reds[n].Pos);
+                    anchors.Add(reds[n].Pos);
                 }
-                if (n < whites.Count) {
+                /*if (n < whites.Count) {
                     anchors.Add(whites[n].StartPos);
                 foreach (var a in whites[n].Anchors)
                     anchors.Add(a);
-                anchors.Add(whites[n].EndPos);
-                }
+                    anchors.Add(whites[n].EndPos);
+                }*/
             }
 
             return anchors;
@@ -177,7 +291,7 @@ namespace Mapping_Tools.Classes.Tools {
 
         public List<Vector2> Sliderate() {
             GetLatticePoints();
-            GetReds();
+            //GetReds();
             GetInterpolation();
             GetTumours();
             return AnchorsList(_reds, _whites);
@@ -205,6 +319,10 @@ namespace Mapping_Tools.Classes.Tools {
                 Time = 0;
                 Length = 0;
                 Tumours = new List<Vector2>();
+            }
+
+            public LatticePoint Clone() {
+                return new LatticePoint(Pos, PathPoint, PathPosition, Error, ErrorPerp, SegmentIndex);
             }
         }
 

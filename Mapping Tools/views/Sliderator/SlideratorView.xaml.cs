@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -438,19 +439,32 @@ namespace Mapping_Tools.Views {
             sliderPath.GetPathToProgress(path, 0, 1);
 
             Sliderator.PositionFunctionDelegate positionFunction;
-            // We convert the graph GetValue function to a function that works like px -> px
-            // d is a value representing the position along the graph in osu! pixels
-            if (ViewModel.GraphMode == GraphMode.Velocity
-                ) // Here we use SvGraphMultiplier to get an accurate conversion from SV to slider completion per beat
+            double velocity; // Velocity is px / ms
+            // We convert the graph GetValue function to a function that works like ms -> px
+            // d is a value representing the number of milliseconds into the slider
+            if (arg.GraphMode == GraphMode.Velocity) {
+                // Here we use SvGraphMultiplier to get an accurate conversion from SV to slider completion per beat
                 // Completion = (100 * SliderMultiplier / PixelLength) * SV * Beats
                 positionFunction = d =>
-                    arg.GraphState.GetIntegral(0, d / arg.PixelLength * arg.GraphBeats) * arg.SvGraphMultiplier *
+                    arg.GraphState.GetIntegral(0, d * arg.BeatsPerMinute / 60000) * arg.SvGraphMultiplier *
                     arg.PixelLength;
-            else
-                positionFunction = d => arg.GraphState.GetValue(d / arg.PixelLength * arg.GraphBeats) * arg.PixelLength;
+
+                velocity = AnchorCollection.GetMaxValue(arg.GraphState.Anchors);
+            }
+            else {
+                positionFunction = d => arg.GraphState.GetValue(d * arg.BeatsPerMinute / 60000) * arg.PixelLength;
+
+                velocity = AnchorCollection.GetMaxDerivative(arg.GraphState.Anchors) / arg.SvGraphMultiplier;
+            }
+
+            // Do bad stuff to the velocity to make sure its the same SV as after writing it to .osu code
+            velocity = -100 / double.Parse((-100 / velocity).ToInvariant(), CultureInfo.InvariantCulture);
+
+            var otherVelocity = velocity * arg.SvGraphMultiplier * arg.PixelLength * arg.BeatsPerMinute / 60000;
 
             var sliderator = new Sliderator {
-                PositionFunction = positionFunction, MaxT = arg.PixelLength
+                PositionFunction = positionFunction, MaxT = arg.GraphBeats / arg.BeatsPerMinute * 60000,
+                Velocity = otherVelocity
             };
             sliderator.SetPath(path);
 
@@ -459,6 +473,7 @@ namespace Mapping_Tools.Views {
             // Exporting stuff
             var editor = new BeatmapEditor(arg.Path);
             var beatmap = editor.Beatmap;
+            var timing = beatmap.BeatmapTiming;
 
             var hitObjectHere = beatmap.HitObjects.FirstOrDefault(o => Math.Abs(arg.ExportTime - o.Time) < 5) ??
                                 new HitObject(arg.ExportTime, 0, SampleSet.Auto, SampleSet.Auto);
@@ -468,6 +483,22 @@ namespace Mapping_Tools.Views {
             };
             clone.SetSliderPath(new SliderPath(PathType.Bezier, slideration.ToArray()));
 
+            // Add SV
+            var timingPointsChanges = new List<TimingPointsChange>();
+            var newTp = timing.GetTimingPointAtTime(arg.ExportTime).Copy();
+            newTp.MpB = -100 / (velocity * 60000 / arg.BeatsPerMinute / arg.PixelLength / arg.SvGraphMultiplier);
+            newTp.Offset = arg.ExportTime;
+            timingPointsChanges.Add(new TimingPointsChange(newTp, mpb: true));
+            timingPointsChanges.AddRange(beatmap.HitObjects.Select(ho => {
+                var sv = timing.GetSvAtTime(ho.Time);
+                var tp = timing.GetTimingPointAtTime(ho.Time).Copy();
+                tp.MpB = sv;
+                tp.Offset = ho.Time;
+                return new TimingPointsChange(tp, mpb: true);
+            }));
+            TimingPointsChange.ApplyChanges(timing, timingPointsChanges);
+            
+            // Add hit object after sv
             if (arg.ExportMode == ExportMode.Add) {
                 beatmap.HitObjects.Add(clone);
             } else {
