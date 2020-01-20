@@ -480,7 +480,7 @@ namespace Mapping_Tools.Views {
 
             // Do Sliderator
             var sliderator = new Sliderator {
-                PositionFunction = positionFunction, MaxT = arg.PixelLength,
+                PositionFunction = positionFunction, MaxT = arg.GraphBeats / arg.BeatsPerMinute * 60000,
                 Velocity = otherVelocity
             };
             sliderator.SetPath(path);
