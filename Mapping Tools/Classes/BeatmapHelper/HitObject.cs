@@ -546,9 +546,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         private bool GetSliderExtras() {
-            return EdgeHitsounds.Any(o => o != 0) || EdgeSampleSets.Any(o => o != SampleSet.Auto) ||
-                   EdgeAdditionSets.Any(o => o != SampleSet.Auto) || SampleSet != SampleSet.Auto ||
-                   AdditionSet != SampleSet.Auto || CustomIndex != 0 || Math.Abs(SampleVolume) > Precision.DOUBLE_EPSILON || Filename != "";
+            return (EdgeHitsounds != null && EdgeHitsounds.Any(o => o != 0)) ||
+                   (EdgeSampleSets != null && EdgeSampleSets.Any(o => o != SampleSet.Auto)) ||
+                   (EdgeAdditionSets != null && EdgeAdditionSets.Any(o => o != SampleSet.Auto)) ||
+                   SampleSet != SampleSet.Auto || AdditionSet != SampleSet.Auto || CustomIndex != 0 || 
+                   Math.Abs(SampleVolume) > Precision.DOUBLE_EPSILON || Filename != "";
         }
 
         public override string ToString() {
