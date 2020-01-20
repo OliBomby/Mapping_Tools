@@ -70,7 +70,7 @@ namespace Mapping_Tools.Classes.Tools
         private static bool ValidateFullReader(EditorReader reader)
         {
             bool result = !reader.hitObjects.Any(readerHitObject => readerHitObject.SegmentCount > 9000 || readerHitObject.Type == 0 || readerHitObject.SampleSet > 1000 || readerHitObject.SampleSetAdditions > 1000 || readerHitObject.SampleVolume > 1000)
-                && reader.numControlPoints > 0;
+                && reader.numControlPoints > 0 && reader.numObjects > 0;
             
             if (!result)
             {
@@ -109,7 +109,7 @@ namespace Mapping_Tools.Classes.Tools
 
                 File.WriteAllLines(path, lines);
 
-                MessageBox.Show("A problem has been encountered with editor reader. An error log has been saved to editor_reader_error.txt", "Warning");
+                //MessageBox.Show("A problem has been encountered with editor reader. An error log has been saved to editor_reader_error.txt", "Warning");
             }
 
             return result;
