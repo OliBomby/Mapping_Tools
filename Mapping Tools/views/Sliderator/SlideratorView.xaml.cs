@@ -452,6 +452,9 @@ namespace Mapping_Tools.Views {
             var path = new List<Vector2>();
             sliderPath.GetPathToProgress(path, 0, 1);
 
+            // Update progressbar
+            if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(10);
+
             // Get the highest velocity occuring in the graph
             double velocity = GetMaxVelocity(arg, arg.GraphState.Anchors); // Velocity is in SV
             // Do bad stuff to the velocity to make sure its the same SV as after writing it to .osu code
@@ -472,6 +475,9 @@ namespace Mapping_Tools.Views {
             else
                 positionFunction = d => arg.GraphState.GetValue(d * arg.BeatsPerMinute / 60000) * arg.PixelLength;
 
+            // Update progressbar
+            if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(20);
+
             // Do Sliderator
             var sliderator = new Sliderator {
                 PositionFunction = positionFunction, MaxT = arg.PixelLength,
@@ -480,6 +486,9 @@ namespace Mapping_Tools.Views {
             sliderator.SetPath(path);
 
             var slideration = sliderator.Sliderate();
+
+            // Update progressbar
+            if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(60);
 
             // Exporting stuff
             var editor = new BeatmapEditor(arg.Path);
@@ -497,6 +506,9 @@ namespace Mapping_Tools.Views {
 
             // Give the new hit object the sliderated anchors
             clone.SetSliderPath(new SliderPath(PathType.Bezier, slideration.ToArray()));
+
+            // Update progressbar
+            if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(70);
 
             // Add SV
             var timingPointsChanges = new List<TimingPointsChange>();
@@ -520,6 +532,9 @@ namespace Mapping_Tools.Views {
                 beatmap.HitObjects.Remove(hitObjectHere);
                 beatmap.HitObjects.Add(clone);
             }
+
+            // Update progressbar
+            if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(80);
 
             beatmap.SortHitObjects();
 
