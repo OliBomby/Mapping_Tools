@@ -35,8 +35,20 @@ namespace Mapping_Tools.Classes.Tools {
             if (Math.Abs(sum) < Precision.DOUBLE_EPSILON) throw new InvalidOperationException("Zero length path.");
         }
 
-        private static List<LatticePoint> LatticePoints(double tolerance, List<Vector2> path, List<Vector2> diff,
-            List<double> diffL, List<double> pathL) {
+        private static List<LatticePoint> LatticePoints(List<Vector2> path, double tolerance = 0.35) {
+            var diff = path.Zip(path.Skip(1), (x, y) => y - x).ToList();
+            var diffL = diff.Select(x => x.Length).ToList();
+            double sum = 0;
+            var pathL = new List<double> {sum};
+            foreach (var l in diffL) {
+                sum += l;
+                pathL.Add(sum);
+            }
+            return LatticePoints(path, diff, diffL, pathL, tolerance);
+        }
+
+        private static List<LatticePoint> LatticePoints(List<Vector2> path, List<Vector2> diff,
+            List<double> diffL, List<double> pathL, double tolerance = 0.35) { // tolerance >= sqrt(2)/4 may miss points
             var lattice = new List<LatticePoint>();
 
             for (var n = 0; n < diff.Count; n++) { // iterate through path segments
@@ -73,7 +85,30 @@ namespace Mapping_Tools.Classes.Tools {
         }
 
         private void GetLatticePoints() {
-            _lattice = LatticePoints(0.35, _path, _diff, _diffL, _pathL); // 0.35 < sqrt(2)/4
+            _lattice = LatticePoints(_path, _diff, _diffL, _pathL, 0.35);
+        }
+
+        private int NextCrossing(ref double t, double low, double high, double precision = 0.01) { // advance t to where it next crosses below a lower bound or above an upper bound
+            double dt = Math.Max(precision, 0.25);
+            var x = PositionFunction(t);
+            while (dt >= precision) {
+                t += dt;
+                if (t > MaxT) {
+                    t = MaxT;
+                    return 0;
+                }
+                x = PositionFunction(t);
+                if (x < low || x > high) {
+                    t -= dt;
+                    dt /= 2;
+                    if (dt < precision) {
+
+                    }
+                }
+            }
+            t += dt;
+
+            return MaxT;
         }
 
         private void GetReds() {
@@ -89,7 +124,7 @@ namespace Mapping_Tools.Classes.Tools {
             _reds = new List<LatticePoint> {_lattice[n]};
             while (t < MaxT) {
                 xprev = x;
-                t += 0.0025; // 0.25 < 1 - sqrt(2)/2
+                t += 0.25; // 0.25 < 1 - sqrt(2)/2
                 x = PositionFunction(t) * _totalPathL;
                 if (n > 0 && x - _lattice[n - 1].PathPosition < _lattice[n].PathPosition - x) {
                     n -= 1;
