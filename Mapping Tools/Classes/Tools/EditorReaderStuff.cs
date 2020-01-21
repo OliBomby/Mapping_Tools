@@ -52,10 +52,7 @@ namespace Mapping_Tools.Classes.Tools
                 editorReader.FetchBookmarks();*/
                 editorReader.FetchAll();
                 var removed = FixFullReader(editorReader);
-                if (removed > 1) {
-                    return false;
-                }
-                return ValidateFullReader(editorReader);
+                return removed <= 1 && ValidateFullReader(editorReader);
             }
             catch
             {
