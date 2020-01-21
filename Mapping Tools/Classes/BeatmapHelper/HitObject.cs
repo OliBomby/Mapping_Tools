@@ -6,17 +6,21 @@ using System.Text;
 using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SliderPathStuff;
+using Newtonsoft.Json;
 using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     /// <summary>
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class HitObject : ITextLine {
         public List<TimingPoint> BodyHitsounds = new List<TimingPoint>();
         private int _repeat;
 
         // Special combined with timeline
         public List<TimelineObject> TimelineObjects = new List<TimelineObject>();
+
+        public HitObject() { }
 
         public HitObject(string line) {
             // Example lines:
@@ -86,6 +90,12 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             IsSelected = ob.IsSelected;
         }
 
+        [JsonProperty]
+        public string Line {
+            get => GetLine();
+            set => SetLine(value);
+        }
+
         public Vector2 Pos { get; set; }
 
         public double Time { get; set; }
@@ -142,12 +152,17 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public List<SampleSet> EdgeAdditionSets { get; set; }
 
         public bool SliderExtras => GetSliderExtras();
-
+        
+        [JsonProperty]
         public bool ActualNewCombo { get; set; }
+        [JsonProperty]
         public int ComboIndex { get; set; }
+        [JsonProperty]
         public int ColourIndex { get; set; }
+        [JsonProperty]
         public ComboColour Colour { get; set; }
-
+        
+        [JsonProperty]
         public double TemporalLength { get; set; } // Duration of one repeat
 
         public double EndTime {
@@ -156,11 +171,16 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         } // Includes all repeats
 
         // Special combined with greenline
+        [JsonProperty]
         public double SliderVelocity { get; set; }
+        [JsonProperty]
         public TimingPoint TimingPoint { get; set; }
+        [JsonProperty]
         public TimingPoint HitsoundTimingPoint { get; set; }
+        [JsonProperty]
         public TimingPoint UnInheritedTimingPoint { get; set; }
-
+        
+        [JsonProperty]
         public bool IsSelected { get; set; }
 
 
@@ -526,9 +546,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         private bool GetSliderExtras() {
-            return EdgeHitsounds.Any(o => o != 0) || EdgeSampleSets.Any(o => o != SampleSet.Auto) ||
-                   EdgeAdditionSets.Any(o => o != SampleSet.Auto) || SampleSet != SampleSet.Auto ||
-                   AdditionSet != SampleSet.Auto || CustomIndex != 0 || Math.Abs(SampleVolume) > Precision.DOUBLE_EPSILON || Filename != "";
+            return (EdgeHitsounds != null && EdgeHitsounds.Any(o => o != 0)) ||
+                   (EdgeSampleSets != null && EdgeSampleSets.Any(o => o != SampleSet.Auto)) ||
+                   (EdgeAdditionSets != null && EdgeAdditionSets.Any(o => o != SampleSet.Auto)) ||
+                   SampleSet != SampleSet.Auto || AdditionSet != SampleSet.Auto || CustomIndex != 0 || 
+                   Math.Abs(SampleVolume) > Precision.DOUBLE_EPSILON || Filename != "";
         }
 
         public override string ToString() {

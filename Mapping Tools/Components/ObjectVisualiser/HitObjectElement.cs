@@ -1,6 +1,9 @@
 ﻿using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SliderPathStuff;
 using System;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 
@@ -52,6 +55,18 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
         public double? CustomPixelLength {
             get => (double?) GetValue(CustomPixelLengthProperty);
             set => SetValue(CustomPixelLengthProperty, value);
+        }
+
+        public static readonly DependencyProperty ExtraMarkersProperty =
+            DependencyProperty.Register(nameof(ExtraMarkers),
+                typeof(ObservableCollection<HitObjectElementMarker>), 
+                typeof(HitObjectElement), 
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender,
+                    OnExtraMarkersChanged));
+
+        public ObservableCollection<HitObjectElementMarker> ExtraMarkers {
+            get => (ObservableCollection<HitObjectElementMarker>) GetValue(ExtraMarkersProperty);
+            set => SetValue(ExtraMarkersProperty, value);
         }
 
         public static readonly DependencyProperty ThicknessProperty =
@@ -114,7 +129,13 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
         private double ThicknessWithoutOutline => (1 - BorderThickness) * Thickness;
 
         public HitObjectElement() {
+            ExtraMarkers = new ObservableCollection<HitObjectElementMarker>();
+            ExtraMarkers.CollectionChanged += ExtraMarkersOnCollectionChanged;
             SizeChanged += OnSizeChanged;
+        }
+
+        private void ExtraMarkersOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+            InvalidateVisual();
         }
 
         private void OnSizeChanged(object sender, SizeChangedEventArgs e) {
@@ -149,8 +170,14 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
                 drawingContext.DrawGeometry(Fill, outlinePen, GetCircleGeometryAtProgress(0));
                 drawingContext.DrawGeometry(Fill, outlinePen, GetCircleGeometryAtProgress(1));
 
-                if (Progress < 1 && Progress > 0) {
+                if (Progress <= 1 && Progress >= 0) {
                     drawingContext.DrawGeometry(Fill, GetSliderBallPen(), GetCircleGeometryAtProgress(Progress));
+                }
+
+                // Draw extra markers
+                foreach (var marker in ExtraMarkers.Where(o => o.Progress >= 0 && o.Progress <= 1)) {
+                    drawingContext.DrawGeometry(marker.Brush, new Pen(Brushes.Black, 1), 
+                        GetSquareGeometryAtProgress(marker.Progress, marker.Size));
                 }
             } else if (HitObject.IsCircle) {
                 var geom = GetCircleGeometry(HitObject.Pos);
@@ -185,13 +212,26 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
             return geom;
         }
 
-        private Geometry GetCircleGeometryAtProgress(double progress) {
+        private Geometry GetCircleGeometryAtProgress(double progress, double size = 1) {
             var pos = sliderPath.PositionAt(progress);
-            return GetCircleGeometry(pos);
+            return GetCircleGeometry(pos, size);
         }
 
-        private Geometry GetCircleGeometry(Vector2 pos) {
-            var geom = new EllipseGeometry(new Point(pos.X, pos.Y), ThicknessWithoutOutline * 0.5, ThicknessWithoutOutline * 0.5, figureTransform);
+        private Geometry GetCircleGeometry(Vector2 pos, double size = 1) {
+            var geom = new EllipseGeometry(new Point(pos.X, pos.Y), ThicknessWithoutOutline * 0.5 * size, ThicknessWithoutOutline * 0.5 * size, figureTransform);
+            return geom;
+        }
+
+        private Geometry GetSquareGeometryAtProgress(double progress, double size = 1) {
+            var pos = sliderPath.PositionAt(progress);
+            return GetSquareGeometry(pos, size);
+        }
+
+        private Geometry GetSquareGeometry(Vector2 pos, double size = 1) {
+            var geom = new RectangleGeometry(new Rect(
+                new Point(pos.X - ThicknessWithoutOutline * 0.5 * size, pos.Y - ThicknessWithoutOutline * 0.5 * size),
+                new Point(pos.X + ThicknessWithoutOutline * 0.5 * size, pos.Y + ThicknessWithoutOutline * 0.5 * size)), 
+                0, 0, figureTransform);
             return geom;
         }
 
@@ -206,6 +246,12 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
             var me = (HitObjectElement) d; 
 
             me.SetHitObject(me.HitObject);
+        }
+
+        private static void OnExtraMarkersChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            var me = (HitObjectElement) d; 
+
+            me.ExtraMarkers.CollectionChanged += me.ExtraMarkersOnCollectionChanged;
         }
 
         private void SetHitObject(Classes.BeatmapHelper.HitObject hitObject) {

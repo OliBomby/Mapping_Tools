@@ -16,6 +16,16 @@ namespace Mapping_Tools.Components.Graph {
             CollectionChanged += OnCollectionChanged;
         }
 
+        public AnchorCollection(IEnumerable<Anchor> anchors) : base(anchors) {
+            CollectionChanged += OnCollectionChanged;
+            InitAllAnchors();
+        }
+
+        public AnchorCollection(List<Anchor> anchors) : base(anchors) {
+            CollectionChanged += OnCollectionChanged;
+            InitAllAnchors();
+        }
+
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
             if (e == null) return;
 
@@ -36,11 +46,18 @@ namespace Mapping_Tools.Components.Graph {
             UpdateAnchorNeighbors();
         }
 
+        private void InitAllAnchors() {
+            foreach (var anchor in this) {
+                anchor.GraphStateChangedEvent += AnchorOnGraphStateChangedEvent;
+            }
+            UpdateAnchorNeighbors();
+        }
+
         private void AnchorOnGraphStateChangedEvent(object sender, DependencyPropertyChangedEventArgs e) {
             AnchorsChanged?.Invoke(sender, e);
         }
 
-        private void UpdateAnchorNeighbors() {
+        public void UpdateAnchorNeighbors() {
             Anchor previousAnchor = null;
             foreach (var anchor in this) {
                 anchor.PreviousAnchor = previousAnchor;
@@ -70,10 +87,10 @@ namespace Mapping_Tools.Components.Graph {
 
         #region StaticGraphValueGettingStuff
 
-        public static double GetValue(double x, IReadOnlyList<Anchor> anchors) {
+        public static double GetValue(double x, IReadOnlyList<IGraphAnchor> anchors) {
             // Find the section
             var previousAnchor = anchors[0];
-            var nextAnchor = anchors[1];
+            var nextAnchor = anchors[anchors.Count - 1];
             foreach (var anchor in anchors) {
                 if (anchor.Pos.X < x) {
                     previousAnchor = anchor;
@@ -97,7 +114,7 @@ namespace Mapping_Tools.Components.Graph {
             return previousAnchor.Pos.Y + difference.Y * interpolator.GetInterpolation((x - previousAnchor.Pos.X) / difference.X);
         }
 
-        public static double GetDerivative(double x, IReadOnlyList<Anchor> anchors) {
+        public static double GetDerivative(double x, IReadOnlyList<IGraphAnchor> anchors) {
             // Find the section
             var previousAnchor = anchors[0];
             var nextAnchor = anchors[1];
@@ -129,9 +146,9 @@ namespace Mapping_Tools.Components.Graph {
             return derivative * difference.Y / difference.X;
         }
 
-        public static double GetIntegral(double t1, double t2, IReadOnlyList<Anchor> anchors) {
+        public static double GetIntegral(double t1, double t2, IReadOnlyList<IGraphAnchor> anchors) {
             double height = 0;
-            Anchor previousAnchor = null;
+            IGraphAnchor previousAnchor = null;
             foreach (var anchor in anchors) {
                 if (previousAnchor != null) {
                     var p1 = previousAnchor.Pos;
@@ -173,7 +190,7 @@ namespace Mapping_Tools.Components.Graph {
             return height;
         }
 
-        public static double GetMaxValue(IReadOnlyList<Anchor> anchors) {
+        public static double GetMaxValue(IReadOnlyList<IGraphAnchor> anchors) {
             var customExtrema = anchors.Any(o =>
                 o.Interpolator.GetType().GetCustomAttribute<CustomExtremaAttribute>() != null);
 
@@ -182,7 +199,7 @@ namespace Mapping_Tools.Components.Graph {
                 return anchors.Max(o => o.Pos.Y);
             }
 
-            Anchor previousAnchor = null;
+            IGraphAnchor previousAnchor = null;
             double maxValue = double.NegativeInfinity;
             foreach (var anchor in anchors) {
                 if (previousAnchor != null) {
@@ -220,8 +237,8 @@ namespace Mapping_Tools.Components.Graph {
             return maxValue;
         }
 
-        public static double GetMaxDerivative(IReadOnlyList<Anchor> anchors) {
-            Anchor previousAnchor = null;
+        public static double GetMaxDerivative(IReadOnlyList<IGraphAnchor> anchors) {
+            IGraphAnchor previousAnchor = null;
             double maxValue = double.NegativeInfinity;
             foreach (var anchor in anchors) {
                 if (previousAnchor != null) {
@@ -264,10 +281,10 @@ namespace Mapping_Tools.Components.Graph {
             return maxValue;
         }
 
-        public static double GetMaxIntegral(IReadOnlyList<Anchor> anchors) {
+        public static double GetMaxIntegral(IReadOnlyList<IGraphAnchor> anchors) {
             double height = 0;
             double maxValue = height;
-            Anchor previousAnchor = null;
+            IGraphAnchor previousAnchor = null;
             foreach (var anchor in anchors) {
                 if (previousAnchor != null) {
                     var p1 = previousAnchor.Pos;
@@ -349,7 +366,7 @@ namespace Mapping_Tools.Components.Graph {
             return maxValue;
         }
 
-        public static double GetMinValue(IReadOnlyList<Anchor> anchors) {
+        public static double GetMinValue(IReadOnlyList<IGraphAnchor> anchors) {
             var customExtrema = anchors.Any(o =>
                 o.Interpolator.GetType().GetCustomAttribute<CustomExtremaAttribute>() != null);
 
@@ -358,7 +375,7 @@ namespace Mapping_Tools.Components.Graph {
                 return anchors.Min(o => o.Pos.Y);
             }
 
-            Anchor previousAnchor = null;
+            IGraphAnchor previousAnchor = null;
             double minValue = double.PositiveInfinity;
             foreach (var anchor in anchors) {
                 if (previousAnchor != null) {
@@ -396,8 +413,8 @@ namespace Mapping_Tools.Components.Graph {
             return minValue;
         }
 
-        public static double GetMinDerivative(IReadOnlyList<Anchor> anchors) {
-            Anchor previousAnchor = null;
+        public static double GetMinDerivative(IReadOnlyList<IGraphAnchor> anchors) {
+            IGraphAnchor previousAnchor = null;
             double minValue = double.PositiveInfinity;
             foreach (var anchor in anchors) {
                 if (previousAnchor != null) {
@@ -440,10 +457,10 @@ namespace Mapping_Tools.Components.Graph {
             return minValue;
         }
 
-        public static double GetMinIntegral(IReadOnlyList<Anchor> anchors) {
+        public static double GetMinIntegral(IReadOnlyList<IGraphAnchor> anchors) {
             double height = 0;
             double minValue = double.PositiveInfinity;
-            Anchor previousAnchor = null;
+            IGraphAnchor previousAnchor = null;
             foreach (var anchor in anchors) {
                 if (previousAnchor != null) {
                     var p1 = previousAnchor.Pos;

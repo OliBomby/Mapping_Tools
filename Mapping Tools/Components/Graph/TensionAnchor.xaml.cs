@@ -6,11 +6,13 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using Newtonsoft.Json;
 
 namespace Mapping_Tools.Components.Graph {
     /// <summary>
     /// Interaction logic for TensionAnchor.xaml
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public partial class TensionAnchor {
         protected override double DefaultSize { get; } = 7;
 
@@ -23,6 +25,7 @@ namespace Mapping_Tools.Components.Graph {
         /// <summary>
         /// Ranges from (0,0) bottom left to (1,1) top right
         /// </summary>
+        [JsonProperty]
         public sealed override Vector2 Pos {
             get => (Vector2) GetValue(PosProperty);
             set => SetValue(PosProperty, value);
@@ -47,6 +50,7 @@ namespace Mapping_Tools.Components.Graph {
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None,
                     OnStrokeChanged));
         
+        [JsonProperty]
         public sealed override Brush Stroke {
             get => (Brush) GetValue(StrokeProperty);
             set => SetValue(StrokeProperty, value);
@@ -68,6 +72,7 @@ namespace Mapping_Tools.Components.Graph {
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None,
                     OnFillChanged));
         
+        [JsonProperty]
         public sealed override Brush Fill {
             get => (Brush) GetValue(FillProperty);
             set => SetValue(FillProperty, value);
@@ -99,6 +104,7 @@ namespace Mapping_Tools.Components.Graph {
             a.ParentAnchor.Tension = (double) e.NewValue;
         }
 
+        [JsonConstructor]
         public TensionAnchor(Graph parent, Vector2 pos, Anchor parentAnchor) : base(parent) {
             InitializeComponent();
             SetCursor();

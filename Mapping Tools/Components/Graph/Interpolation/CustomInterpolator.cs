@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using Newtonsoft.Json;
 
 namespace Mapping_Tools.Components.Graph.Interpolation {
     [IgnoreInterpolator]
@@ -6,11 +7,12 @@ namespace Mapping_Tools.Components.Graph.Interpolation {
     public class CustomInterpolator : IGraphInterpolator {
         public delegate double InterpolationDelegate(double t);
 
+        [JsonIgnore]
         public InterpolationDelegate InterpolationFunction { get; set; }
         public double P { get; set; } = 0;
 
         public CustomInterpolator() {
-            InterpolationFunction = (t) => t;
+            InterpolationFunction = t => t;
         }
 
         public CustomInterpolator(InterpolationDelegate interpolationFunction) {

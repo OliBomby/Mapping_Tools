@@ -10,6 +10,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Mapping_Tools.Components.Dialogs;
+using Newtonsoft.Json;
 using ContextMenu = System.Windows.Controls.ContextMenu;
 using Cursors = System.Windows.Input.Cursors;
 using MenuItem = System.Windows.Controls.MenuItem;
@@ -19,7 +20,8 @@ namespace Mapping_Tools.Components.Graph {
     /// <summary>
     /// Interaction logic for Anchor.xaml
     /// </summary>
-    public partial class Anchor {
+    [JsonObject(MemberSerialization.OptIn)]
+    public partial class Anchor : IGraphAnchor {
         protected override double DefaultSize { get; } = 12;
 
         public event DependencyPropertyChangedEventHandler GraphStateChangedEvent;
@@ -34,6 +36,7 @@ namespace Mapping_Tools.Components.Graph {
         /// <summary>
         /// Ranges from (0,0) bottom left to (1,1) top right
         /// </summary>
+        [JsonProperty]
         public sealed override Vector2 Pos {
             get => (Vector2) GetValue(PosProperty);
             set => SetValue(PosProperty, value);
@@ -52,6 +55,7 @@ namespace Mapping_Tools.Components.Graph {
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None));
         
         [NotNull]
+        [JsonProperty]
         public TensionAnchor TensionAnchor {
             get => (TensionAnchor) GetValue(TensionAnchorProperty);
             set => SetValue(TensionAnchorProperty, value);
@@ -65,6 +69,7 @@ namespace Mapping_Tools.Components.Graph {
                     OnInterpolatorChanged));
         
         [NotNull]
+        [JsonProperty]
         public IGraphInterpolator Interpolator {
             get => (IGraphInterpolator) GetValue(InterpolatorProperty);
             set => SetValue(InterpolatorProperty, value);
@@ -85,6 +90,7 @@ namespace Mapping_Tools.Components.Graph {
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None,
                     OnStrokeChanged));
         
+        [JsonProperty]
         public sealed override Brush Stroke {
             get => (Brush) GetValue(StrokeProperty);
             set => SetValue(StrokeProperty, value);
@@ -103,6 +109,7 @@ namespace Mapping_Tools.Components.Graph {
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None,
                     OnFillChanged));
         
+        [JsonProperty]
         public sealed override Brush Fill {
             get => (Brush) GetValue(FillProperty);
             set => SetValue(FillProperty, value);
@@ -121,6 +128,7 @@ namespace Mapping_Tools.Components.Graph {
                 new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.None,
                     OnTensionChanged));
         
+        [JsonProperty]
         public sealed override double Tension {
             get => (double) GetValue(TensionProperty);
             set => SetValue(TensionProperty, value);
@@ -162,6 +170,7 @@ namespace Mapping_Tools.Components.Graph {
 
         public Anchor(Graph parent, Vector2 pos, IGraphInterpolator interpolator) : this(parent, pos, interpolator, null) { }
 
+        [JsonConstructor]
         public Anchor(Graph parent, Vector2 pos, IGraphInterpolator interpolator, TensionAnchor tensionAnchor) : base(parent) {
             InitializeComponent();
             SetCursor();
@@ -176,6 +185,16 @@ namespace Mapping_Tools.Components.Graph {
             }
             Stroke = parent?.AnchorStroke;
             Fill = parent?.AnchorFill;
+        }
+
+        public AnchorState GetAnchorState() {
+            return new AnchorState {Interpolator = Interpolator, Pos = Pos, Tension = Tension};
+        }
+
+        public void SetAnchorState(AnchorState anchorState) {
+            Pos = anchorState.Pos;
+            Interpolator = anchorState.Interpolator;
+            Tension = anchorState.Tension;
         }
 
         private void SetCursor() {

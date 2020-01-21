@@ -364,8 +364,10 @@
     <Compile Include="Components\Domain\DoubleToStringConverter.cs" />
     <Compile Include="Components\DragAndDropListBox.cs" />
     <Compile Include="Components\Graph\AnchorCollection.cs" />
+    <Compile Include="Components\Graph\AnchorState.cs" />
     <Compile Include="Components\Graph\GraphIntegralDoubleAnimation.cs" />
     <Compile Include="Components\Graph\GraphDoubleAnimation.cs" />
+    <Compile Include="Components\Graph\IGraphAnchor.cs" />
     <Compile Include="Components\Graph\Interpolation\CustomIntegralExtremaAttribute.cs" />
     <Compile Include="Components\Graph\Interpolation\CustomExtremaAttribute.cs" />
     <Compile Include="Components\Graph\Interpolation\CustomDerivativeExtremaAttribute.cs" />
@@ -404,6 +406,7 @@
     <Compile Include="Components\ObjectVisualiser\HitObject.xaml.cs">
       <DependentUpon>HitObject.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Components\ObjectVisualiser\HitObjectElementMarker.cs" />
     <Compile Include="Components\ObjectVisualiser\ObjectPlayfield.xaml.cs">
       <DependentUpon>ObjectPlayfield.xaml</DependentUpon>
     </Compile>

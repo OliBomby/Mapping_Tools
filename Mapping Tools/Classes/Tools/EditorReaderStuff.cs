@@ -69,16 +69,9 @@ namespace Mapping_Tools.Classes.Tools
         /// <returns>A boolean whether the reader is valid</returns>
         private static bool ValidateFullReader(EditorReader reader)
         {
-            bool result = true;
-
-            foreach (var readerHitObject in reader.hitObjects)
-            {
-                if (readerHitObject.SegmentCount > 9000 || readerHitObject.Type == 0 || readerHitObject.SampleSet > 1000 || readerHitObject.SampleSetAdditions > 1000 || readerHitObject.SampleVolume > 1000)
-                {
-                    result = false;
-                }
-            }
-
+            bool result = !reader.hitObjects.Any(readerHitObject => readerHitObject.SegmentCount > 9000 || readerHitObject.Type == 0 || readerHitObject.SampleSet > 1000 || readerHitObject.SampleSetAdditions > 1000 || readerHitObject.SampleVolume > 1000)
+                && reader.numControlPoints > 0;
+            
             if (!result)
             {
                 // Save error log
