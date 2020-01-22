@@ -466,8 +466,8 @@ namespace Mapping_Tools.Views {
             Sliderator.PositionFunctionDelegate positionFunction;
             // We convert the graph GetValue function to a function that works like ms -> px
             // d is a value representing the number of milliseconds into the slider
-            if (ViewModel.GraphMode == GraphMode.Velocity
-                ) // Here we use SvGraphMultiplier to get an accurate conversion from SV to slider completion per beat
+            if (arg.GraphMode == GraphMode.Velocity)
+                // Here we use SvGraphMultiplier to get an accurate conversion from SV to slider completion per beat
                 // Completion = (100 * SliderMultiplier / PixelLength) * SV * Beats
                 positionFunction = d =>
                     arg.GraphState.GetIntegral(0, d * arg.BeatsPerMinute / 60000) * arg.SvGraphMultiplier *
