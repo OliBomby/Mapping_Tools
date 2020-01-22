@@ -11,7 +11,7 @@ namespace Mapping_Tools.Classes.Tools {
         public double MaxT { get; set; } // end time for PositionFunction, in ms
         public double Velocity { get; set; } // slider velocity, in px/ms
 
-        private double _Pos(double s) => PositionFunction(s * Velocity); // normalized position function, px -> px
+        private double _Pos(double s) => PositionFunction(Math.Min(s * Velocity, MaxT)); // normalized position function, px -> px
         private double _MaxS => MaxT * Velocity; // expected pixellength
 
         private List<Vector2> _path; // input path
@@ -24,13 +24,19 @@ namespace Mapping_Tools.Classes.Tools {
         private List<Neuron> _slider; // slider red anchors, tumours and interpolations
 
         public void SetPath(List<Vector2> pathPoints) {
-            _path = pathPoints.Copy();
-            _diff = _path.Zip(_path.Skip(1), (x, y) => y - x).ToList();
-            _diffL = _diff.Select(x => x.Length).ToList();
+            _path = new List<Vector2> {pathPoints.First()};
+            _diff = new List<Vector2>();
+            _diffL = new List<double>();
             double sum = 0;
             _pathL = new List<double> {sum};
-            foreach (var l in _diffL) {
-                sum += l;
+            foreach (var p in pathPoints.Skip(1)) {
+                var d = p - _path.Last();
+                var dl = d.Length;
+                if (dl < Precision.DOUBLE_EPSILON) continue;
+                _path.Add(p);
+                _diff.Add(d);
+                _diffL.Add(dl);
+                sum += dl;
                 _pathL.Add(sum);
             }
             if (Math.Abs(sum) < Precision.DOUBLE_EPSILON) throw new InvalidOperationException("Zero length path.");
@@ -42,6 +48,24 @@ namespace Mapping_Tools.Classes.Tools {
             if (n == -1) n += 1;
             if (n == _diff.Count) n -= 1;
             return _path[n] + _diff[n] / _diffL[n] * (x - _pathL[n]);
+        }
+
+        private double NextCrossing(double start, double low, double high, out int side, double precision = 0.01, double resolution = 0.25) { // where it next crosses below a lower bound or above an upper bound
+            double s = start;
+            double ds = resolution;
+            double x;
+            do {
+                x = _Pos(s + ds);
+                if (low <= x && x <= high)
+                    s += ds;
+                else
+                    ds /= 2;
+            } while (ds >= precision && s < _MaxS);
+
+            if (x > high) side = 1;
+            else if (x < low) side = -1;
+            else side = 0;
+            return Math.Min(s + ds, _MaxS);
         }
 
         private static List<LatticePoint> LatticePoints(List<Vector2> path, double tolerance = 0.35) {
@@ -97,119 +121,24 @@ namespace Mapping_Tools.Classes.Tools {
             _lattice = LatticePoints(_path, _diff, _diffL, _pathL, 0.35);
         }
 
-        private double NextCrossing(double start, double low, double high, out int side, double precision = 0.01, double resolution = 0.25) { // where it next crosses below a lower bound or above an upper bound
-            double s = start;
-            double ds = resolution;
-            double x = _Pos(_MaxS);
-            while (ds >= precision) {
-                if (s + ds <= _MaxS) {
-                    x = _Pos(s + ds);
-                    if (low <= x && x <= high) {
-                        s += ds;
-                        continue;
-                    }
-                }
-                ds /= 2;
-            }
-            s += ds;
-            side = 0;
-            if (x > high)
-                side = 1;
-            else if (x < low)
-                side = -1;
-            if (s + precision >= _MaxS)
-                s = _MaxS;
-            return s;
-        }
-
         private void GetReds() {
-            // version a.1, retarded because it handles negative v and starting at an arbitrary x, so it cant just use the already known anchor visitation order. also just not optimized or good in general.
-            double t = 0;
-            var x = PositionFunction(t) * _totalPathL;
-            var xprev = x;
-            var n = _lattice.Select(y => y.PathPosition).ToList().BinarySearch(x);
-            if (n < 0) n = ~n;
-            n = n != 0 && (n == _lattice.Count || x - _lattice[n - 1].PathPosition <= _lattice[n].PathPosition - x)
-                ? n - 1
-                : n; // closer to left?
-            _slider = new List<Neuron> {new Neuron(_lattice[n])};
-            while (t < MaxT) {
-                xprev = x;
-                t += 0.25; // 0.25 < 1 - sqrt(2)/2
-                x = PositionFunction(t) * _totalPathL;
-                if (n > 0 && x - _lattice[n - 1].PathPosition < _lattice[n].PathPosition - x) {
-                    n -= 1;
-                    _slider.Add(_lattice[n]);
-                } else if (n <= _lattice.Count - 2 && _lattice[n + 1].PathPosition - x < x - _lattice[n].PathPosition) {
-                    n += 1;
-                    _slider.Add(_lattice[n]);
-                }
-
-                //if ((x - _lattice[n].x) * (xprev - _lattice[n].x) <= 0) {
-                //    _reds[_reds.Count - 1].t = t; // dont use this
-                //}
-            }
-
-            var i = 0;
-            while (i < _slider.Count - 2) {
-                // bad algorithm improve later
-                i++;
-                var rl = _slider[i - 1];
-                var rm = _slider[i];
-                var rr = _slider[i + 1];
-                if (rm.Error < 0.125 || rm.Error < rl.Error && rm.Error < rr.Error) continue;
-                if (Math.Abs(rm.ErrorPerp - rl.ErrorPerp - rr.ErrorPerp) > 0.25) {
-                    _slider.RemoveAt(i);
-                    i -= i > 1 ? 2 : 1;
-                }
-
-                //double dx = Math.Abs(rr.x - rl.x);
-                //double dt = Math.Abs(rr.t - rl.t);
-                //(dx / dt * (dt - dx) - 2) * (dt - dx); // dont know what tolerance to use but this might be a useful measurement of error
-            }
         }
 
         private void GetInterpolation() {
-            // version a.0, not even functional, just does linear between all
-            _whites = new List<Interpolation>();
-            double sum = 0;
-            _interpL = new List<double> {sum};
-            for (var n = 0; n < _slider.Count - 1; n++) {
-                var a = _slider[n];
-                var b = _slider[n + 1];
-                _whites.Add(new Interpolation(a, b));
-                sum += _whites.Last().Length;
-                _interpL.Add(sum);
-            }
         }
 
         private void GetTumours() {
-            // version a.0, not functional, i just put some crap so u can test
-            double t = 0;
-            double d = 0;
-            var x = PositionFunction(t) * _totalPathL;
-            var n = 0;
-            while (t < MaxT) {
-                t += 0.0025;
-                x = PositionFunction(t) * _totalPathL;
-                if (n < _slider.Count - 1 &&
-                    Math.Abs(_slider[n + 1].PathPosition - x) < Math.Abs(x - _slider[n].PathPosition)) {
-                    d += _whites[n].Length + Math.Round(t - d + _whites[n].Length / 2);
-                    _slider[n].Tumours.Add(new Vector2(Math.Round(t - d + _whites[n].Length / 2), 0));
-                    n += 1;
-                }
-            }
         }
 
-        private static List<Vector2> AnchorsList(List<Neuron> slider) {
+        private List<Vector2> AnchorsList() {
             var anchors = new List<Vector2>();
-            for (int n = 0; n < slider.Count; n++) {
-                foreach (var t in slider[n].Dendrites) {
-                    anchors.Add(slider[n].Nucleus.Pos);
-                    anchors.Add(slider[n].Nucleus.Pos + t);
-                    anchors.Add(slider[n].Nucleus.Pos);
+            for (int n = 0; n < _slider.Count; n++) {
+                foreach (var t in _slider[n].Dendrites) {
+                    anchors.Add(_slider[n].Nucleus.Pos);
+                    anchors.Add(_slider[n].Nucleus.Pos + t);
+                    anchors.Add(_slider[n].Nucleus.Pos);
                 }
-                anchors.AddRange(slider[n].Axon.Points);
+                anchors.AddRange(_slider[n].Axon.Points);
             }
             return anchors;
         }
@@ -219,7 +148,7 @@ namespace Mapping_Tools.Classes.Tools {
             GetReds();
             GetInterpolation();
             GetTumours();
-            return AnchorsList(_slider);
+            return AnchorsList();
         }
 
         internal struct LatticePoint {
