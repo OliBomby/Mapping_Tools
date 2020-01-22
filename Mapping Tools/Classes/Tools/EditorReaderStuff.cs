@@ -41,9 +41,18 @@ namespace Mapping_Tools.Classes.Tools
 
             try
             {
+                /*editorReader.FetchEditor();
+                editorReader.SetHOM();
+                editorReader.ReadHOM();
+                editorReader.FetchBeatmap();
+                editorReader.FetchControlPoints();
+                editorReader.SetObjects();
+                Console.WriteLine(editorReader.numObjects);
+                editorReader.ReadObjects();
+                editorReader.FetchBookmarks();*/
                 editorReader.FetchAll();
-                FixFullReader(editorReader);
-                return ValidateFullReader(editorReader);
+                var removed = FixFullReader(editorReader);
+                return ValidateFullReader(editorReader) && removed <= 1;
             }
             catch
             {
@@ -55,9 +64,9 @@ namespace Mapping_Tools.Classes.Tools
         /// Removes all invalid hit objects from the reader object
         /// </summary>
         /// <param name="reader">The fully fetched editor reader</param>
-        private static void FixFullReader(EditorReader reader)
+        private static int FixFullReader(EditorReader reader)
         {
-            reader.hitObjects.RemoveAll(readerHitObject =>
+            return reader.hitObjects.RemoveAll(readerHitObject =>
                 readerHitObject.SegmentCount > 9000 || readerHitObject.Type == 0 || readerHitObject.SampleSet > 1000 ||
                 readerHitObject.SampleSetAdditions > 1000 || readerHitObject.SampleVolume > 1000);
         }
@@ -69,8 +78,14 @@ namespace Mapping_Tools.Classes.Tools
         /// <returns>A boolean whether the reader is valid</returns>
         private static bool ValidateFullReader(EditorReader reader)
         {
-            bool result = !reader.hitObjects.Any(readerHitObject => readerHitObject.SegmentCount > 9000 || readerHitObject.Type == 0 || readerHitObject.SampleSet > 1000 || readerHitObject.SampleSetAdditions > 1000 || readerHitObject.SampleVolume > 1000)
-                && reader.numControlPoints > 0;
+            bool result = !reader.hitObjects.Any(readerHitObject => readerHitObject.SegmentCount > 9000 || 
+                                                                    readerHitObject.Type == 0 || 
+                                                                    readerHitObject.SampleSet > 1000 || 
+                                                                    readerHitObject.SampleSetAdditions > 1000 || 
+                                                                    readerHitObject.SampleVolume > 1000)
+                && reader.numControlPoints > 0 && reader.numObjects > 0 && 
+                reader.controlPoints != null && reader.hitObjects != null && 
+                reader.numControlPoints == reader.controlPoints.Count && reader.numObjects == reader.hitObjects.Count;
             
             if (!result)
             {
@@ -109,7 +124,7 @@ namespace Mapping_Tools.Classes.Tools
 
                 File.WriteAllLines(path, lines);
 
-                MessageBox.Show("A problem has been encountered with editor reader. An error log has been saved to editor_reader_error.txt", "Warning");
+                //MessageBox.Show("A problem has been encountered with editor reader. An error log has been saved to editor_reader_error.txt", "Warning");
             }
 
             return result;
