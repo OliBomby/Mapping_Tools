@@ -114,14 +114,18 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 if (wave != null)
                     break;
             }
-            return wave;
+
+            return wave ?? ImportInstruments(sf2, args);
+        }
+
+        private static void SoundFontDebug(SoundFont sf) {
+            Console.WriteLine(sf);
+            Console.WriteLine(@"Number of presets: " + sf.Presets.Length);
+            Console.WriteLine(@"Number of instruments: " + sf.Instruments.Length);
+            Console.WriteLine(@"Number of instruments: " + sf.SampleHeaders.Length);
         }
 
         private static SampleSoundGenerator ImportPreset(SoundFont sf2, Preset preset, SampleGeneratingArgs args) {
-            SampleSoundGenerator wave = null;
-
-            Zone closest = null;
-            int bdist = int.MaxValue;
             /*
                 == Aproximate Pesdo Code of importing a preset from sf2 ==
                 -    Get all preset zones from soundfont (sf2)
@@ -140,54 +144,80 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     -   Is there a zone found from above?
                         - If so, create a wave from zone information using the SampleData.
             */
+            return ImportInstruments(sf2, preset.Zones.Select(z => z.Instrument()), args);
+        }
+
+        private static SampleSoundGenerator ImportInstruments(SoundFont sf2, SampleGeneratingArgs args) {
+            return ImportInstruments(sf2, sf2.Instruments, args);
+        }
+
+        private static SampleSoundGenerator ImportInstruments(SoundFont sf2, IEnumerable<Instrument> instruments, SampleGeneratingArgs args) {
+            Zone closest = null;
+            int i = 0;
+            int bdist = int.MaxValue;
             
-            for (int index = 0; index < preset.Zones.Length; index++) { // perccusion bank likely has more than one instrument here.
-                var pzone = preset.Zones[index];
-
-                var i = pzone.Instrument();
-                if (i == null)
+            foreach (var instrument in instruments) { // perccusion bank likely has more than one instrument here.
+                if (instrument == null)
                     continue;
 
-                if (index != args.Instrument && args.Instrument != -1) {
+                if (i++ != args.Instrument && args.Instrument != -1) {
                     continue;
                 }
 
-                // an Instrument contains a set of zones that contain sample headers.
-                foreach (var instrumentZone in i.Zones) {
-                    var sh = instrumentZone.SampleHeader();
-                    if (sh == null)
-                        continue;
+                var iZone = ImportInstrument(instrument, args);
 
-                    // Requested key/velocity must also fit in the key/velocity range of the sample
-                    ushort keyRange = instrumentZone.KeyRange();
-                    byte keyLow = (byte)keyRange;
-                    byte keyHigh = (byte)(keyRange >> 8);
-                    if (!(args.Key >= keyLow && args.Key <= keyHigh) && args.Key != -1 && keyRange != 0) {
-                        continue;
-                    }
-                    ushort velRange = instrumentZone.VelocityRange();
-                    byte velLow = (byte)keyRange;
-                    byte velHigh = (byte)(keyRange >> 8);
-                    if (!(args.Velocity >= velLow && args.Velocity <= velHigh) && args.Velocity != -1 && velRange != 0) {
-                        continue;
-                    }
+                if (iZone == null) continue;
 
-                    // Get the closest key possible
-                    int dist = Math.Abs(args.Key - instrumentZone.Key());
+                // Get closest instrument from the zones in the preset
+                int dist = Math.Abs(args.Key - iZone.Key());
 
-                    if (dist < bdist || args.Key == -1) {
-                        closest = instrumentZone;
-                        bdist = dist;
-                    }
+                if (dist < bdist || args.Key == -1) {
+                    closest = iZone;
+                    bdist = dist;
                 }
             }
-            if (closest != null) {
-                //Console.WriteLine("closest: " + closest.Key());
-                wave = GenerateSample(closest, sf2.SampleData, args);
-                return wave;
-            }
 
+            if (closest == null) return null;
+
+            //Console.WriteLine("closest: " + closest.Key());
+            var wave = GenerateSample(closest, sf2.SampleData, args);
             return wave;
+        }
+
+        private static Zone ImportInstrument(Instrument i, SampleGeneratingArgs args) {
+            Zone closest = null;
+            int bdist = int.MaxValue;
+
+            // an Instrument contains a set of zones that contain sample headers.
+            foreach (var instrumentZone in i.Zones) {
+                var sh = instrumentZone.SampleHeader();
+                if (sh == null)
+                    continue;
+
+                // Requested key/velocity must also fit in the key/velocity range of the sample
+                ushort keyRange = instrumentZone.KeyRange();
+                byte keyLow = (byte)keyRange;
+                byte keyHigh = (byte)(keyRange >> 8);
+                if (!(args.Key >= keyLow && args.Key <= keyHigh) && args.Key != -1 && keyRange != 0) {
+                    continue;
+                }
+                ushort velRange = instrumentZone.VelocityRange();
+                byte velLow = (byte)keyRange;
+                byte velHigh = (byte)(keyRange >> 8);
+                if (!(args.Velocity >= velLow && args.Velocity <= velHigh) && args.Velocity != -1 && velRange != 0) {
+                    continue;
+                }
+
+                // Get the closest key possible
+                int dist = Math.Abs(args.Key - instrumentZone.Key());
+
+                if (dist < bdist || args.Key == -1) {
+                    closest = instrumentZone;
+                    bdist = dist;
+                }
+            }
+
+            return closest;
         }
 
         private static SampleSoundGenerator GenerateSample(Zone izone, byte[] sample, SampleGeneratingArgs args) {
@@ -203,6 +233,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
             var output = GetSampleWithLength(sh, izone, sampleMode, sample, args);
 
+            // Key correction is 0 to not use the shitty pitch shifter
             output.KeyCorrection = 0;
             output.VolumeCorrection = volumeCorrection;
 
