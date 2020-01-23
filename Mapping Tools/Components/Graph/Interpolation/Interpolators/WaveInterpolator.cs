@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
     [DisplayName("Wave")]
     [CustomDerivativeExtrema(new []{0, 0.5, 1})]
-    public class WaveInterpolator : CustomInterpolator, IDerivableInterpolator, IIntegrableInterpolator {
+    public class WaveInterpolator : CustomInterpolator, IDerivableInterpolator, IIntegrableInterpolator, IInvertibleInterpolator {
         public string Name => "Wave";
 
         public WaveInterpolator() {
@@ -70,6 +71,50 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
             return P < 0 ? 
                 TriangleWaveDerivative(t, 1 / cycles) : 
                 SineWaveDerivative(t * cycles * 2 * Math.PI) * cycles * 2 * Math.PI;
+        }
+
+        public IEnumerable<double> GetInverse(double y) {
+            var cycles = Math.Round((1 - Math.Abs(MathHelper.Clamp(P, -1, 1))) * 50) + 0.5;
+            
+            return P < 0 ? 
+                TriangleWaveInverse(y, 1 / cycles) : 
+                SineWaveInverse(y, 1 / cycles);
+        }
+
+        private static IEnumerable<double> SineWaveInverse(double y, double T) {
+            if (Math.Abs(T) < Precision.DOUBLE_EPSILON) yield break;
+
+            var x1 = T * Math.Acos(1 - 2 * y) / (2 * Math.PI);
+            yield return x1;
+            var x2 = T * Math.Acos(2 * y - 1) / (2 * Math.PI) + T / 2;
+            yield return x2;
+
+            while (true) {
+                x1 += T;
+                if (x1 > 1) yield break;
+                yield return x1;
+                x2 += T;
+                if (x2 > 1) yield break;
+                yield return x2;
+            }
+        }
+
+        private IEnumerable<double> TriangleWaveInverse(double y, double T) {
+            if (Math.Abs(T) < Precision.DOUBLE_EPSILON) yield break;
+
+            var x1 = T * y / 2;
+            yield return x1;
+            var x2 = T * (2 - y) / 2;
+            yield return x2;
+
+            while (true) {
+                x1 += T;
+                if (x1 > 1) yield break;
+                yield return x1;
+                x2 += T;
+                if (x2 > 1) yield break;
+                yield return x2;
+            }
         }
     }
 }

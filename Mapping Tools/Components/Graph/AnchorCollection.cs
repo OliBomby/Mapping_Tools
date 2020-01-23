@@ -322,12 +322,23 @@ namespace Mapping_Tools.Components.Graph {
                         // Check if the interpolation passes through 0
                         if (difference.Y * p1.Y < 0) {
                             // Possibility of max/min not at endpoints. Need to calculate the hard way
-                            double newMaxIntegralPosition = GradientDescentUtil.GradientAscent(
-                                d => integrableInterpolator.GetIntegral(0, d) * difference.X * difference.Y + d * difference.X * p1.Y,
-                                0, 1, 0.1);
+                            double newMaxIntegral;
 
-                            var newMaxIntegral = integrableInterpolator.GetIntegral(0, newMaxIntegralPosition) * difference.X * difference.Y +
-                                                 newMaxIntegralPosition * difference.X * p1.Y;
+                            if (integrableInterpolator is IInvertibleInterpolator invertibleInterpolator) {
+                                // Calculate all the zeros of the interpolation
+                                var zeros = invertibleInterpolator.GetInverse(-p1.Y / difference.Y).Where(o => o <= 1 && o >= 0);
+
+                                newMaxIntegral = zeros.Select(z =>
+                                    integrableInterpolator.GetIntegral(0, z) * difference.X * difference.Y +
+                                    z * difference.X * p1.Y).Max();
+                            } else {
+                                double newMaxIntegralPosition = GradientDescentUtil.GradientAscent(
+                                    d => integrableInterpolator.GetIntegral(0, d) * difference.X * difference.Y + d * difference.X * p1.Y,
+                                    0, 1, 0.1);
+
+                                newMaxIntegral = integrableInterpolator.GetIntegral(0, newMaxIntegralPosition) * difference.X * difference.Y +
+                                                     newMaxIntegralPosition * difference.X * p1.Y;
+                            }
 
                             if (newMaxIntegral > maxIntegral) {
                                 maxIntegral = newMaxIntegral;
@@ -497,12 +508,23 @@ namespace Mapping_Tools.Components.Graph {
                         // Check if the interpolation passes through 0
                         if (difference.Y * p1.Y < 0) {
                             // Possibility of max/min not at endpoints. Need to calculate the hard way
-                            double newMinIntegralPosition = GradientDescentUtil.GradientDescent(
-                                d => integrableInterpolator.GetIntegral(0, d) * difference.X * difference.Y + d * difference.X * p1.Y,
-                                0, 1, 0.1);
+                            double newMinIntegral;
 
-                            double newMinIntegral = integrableInterpolator.GetIntegral(0, newMinIntegralPosition) * difference.X * difference.Y + 
-                                                    newMinIntegralPosition * difference.X * p1.Y;
+                            if (integrableInterpolator is IInvertibleInterpolator invertibleInterpolator) {
+                                // Calculate all the zeros of the interpolation
+                                var zeros = invertibleInterpolator.GetInverse(-p1.Y / difference.Y).Where(o => o <= 1 && o >= 0);
+
+                                newMinIntegral = zeros.Select(z =>
+                                    integrableInterpolator.GetIntegral(0, z) * difference.X * difference.Y +
+                                    z * difference.X * p1.Y).Min();
+                            } else {
+                                double newMinIntegralPosition = GradientDescentUtil.GradientDescent(
+                                    d => integrableInterpolator.GetIntegral(0, d) * difference.X * difference.Y + d * difference.X * p1.Y,
+                                    0, 1, 0.1);
+
+                                newMinIntegral = integrableInterpolator.GetIntegral(0, newMinIntegralPosition) * difference.X * difference.Y + 
+                                                        newMinIntegralPosition * difference.X * p1.Y;
+                            }
 
                             if (newMinIntegral > minIntegral) {
                                 minIntegral = newMinIntegral;
