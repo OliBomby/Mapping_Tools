@@ -123,12 +123,8 @@ namespace Mapping_Tools.Views {
             var editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
 
             foreach (var pathTo in paths) {
-                var editorTo = editorRead
-                    ? EditorReaderStuff.GetNewestVersion(pathTo, reader)
-                    : new BeatmapEditor(pathTo);
-                var editorFrom = editorRead
-                    ? EditorReaderStuff.GetNewestVersion(arg.PathFrom, reader)
-                    : new BeatmapEditor(arg.PathFrom);
+                var editorTo = EditorReaderStuff.GetBeatmapEditor(pathTo, reader, editorRead);
+                var editorFrom = EditorReaderStuff.GetBeatmapEditor(arg.PathFrom, reader, editorRead);
 
                 var beatmapTo = editorTo.Beatmap;
                 var beatmapFrom = editorFrom.Beatmap;

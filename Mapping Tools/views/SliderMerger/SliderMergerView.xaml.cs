@@ -62,10 +62,7 @@ namespace Mapping_Tools.Views {
             var editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
 
             foreach (var path in arg.Paths) {
-                var selected = new List<HitObject>();
-                var editor = editorRead
-                    ? EditorReaderStuff.GetNewestVersion(path, out selected, reader)
-                    : new BeatmapEditor(path);
+                var editor = EditorReaderStuff.GetBeatmapEditor(path, reader, editorRead, out var selected);
                 var beatmap = editor.Beatmap;
                 var markedObjects = arg.SelectionMode == 0 ? selected :
                     arg.SelectionMode == 1 ? beatmap.GetBookmarkedObjects() :

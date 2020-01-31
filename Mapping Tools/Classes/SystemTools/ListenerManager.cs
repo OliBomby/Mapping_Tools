@@ -50,7 +50,7 @@ namespace Mapping_Tools.Classes.SystemTools {
         private void PeriodicBackupTimerOnTick(object sender, EventArgs e) {
             // Get the newest beatmap, save a temp version, get the hash and compare it to the previous hash, backup temp file
             var path = IOHelper.GetCurrentBeatmap();
-            var editor = EditorReaderStuff.GetNewestVersion(path);
+            EditorReaderStuff.TryGetNewestVersion(path, out var editor);
 
             // Save temp version
             var tempPath = Path.Combine(MainWindow.AppDataPath, "temp.osu");
@@ -200,7 +200,7 @@ namespace Mapping_Tools.Classes.SystemTools {
 
         private void QuickBetterSave()
         {
-            EditorReaderStuff.CoolSave();
+            EditorReaderStuff.BetterSave();
         }
 
         private static void SmartQuickRun()
@@ -350,7 +350,7 @@ namespace Mapping_Tools.Classes.SystemTools {
                 return;
             }
 
-            EditorReaderStuff.CoolSave();
+            EditorReaderStuff.BetterSave();
         }
     }
 }

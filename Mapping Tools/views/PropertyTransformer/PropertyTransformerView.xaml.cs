@@ -44,7 +44,7 @@ namespace Mapping_Tools.Views {
             bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
 
             foreach (string path in vm.MapPaths) {
-                BeatmapEditor editor = editorRead ? EditorReaderStuff.GetNewestVersion(path, reader) : new BeatmapEditor(path);
+                var editor = EditorReaderStuff.GetBeatmapEditor(path, reader, editorRead);
                 Beatmap beatmap = editor.Beatmap;
 
                 // Count all the total amount of things to loop through

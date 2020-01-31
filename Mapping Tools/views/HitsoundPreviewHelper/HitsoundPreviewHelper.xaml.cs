@@ -74,8 +74,7 @@ namespace Mapping_Tools.Views
 
             foreach (string path in args.Paths)
             {
-                BeatmapEditor editor =
-                    editorRead ? EditorReaderStuff.GetNewestVersion(path, reader) : new BeatmapEditor(path);
+                var editor = EditorReaderStuff.GetBeatmapEditor(path, reader, editorRead);
                 Beatmap beatmap = editor.Beatmap;
                 Timeline timeline = beatmap.GetTimeline();
 

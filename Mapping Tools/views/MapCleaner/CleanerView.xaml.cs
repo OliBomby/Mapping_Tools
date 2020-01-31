@@ -101,7 +101,7 @@ namespace Mapping_Tools.Views {
             bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
 
             if (args.Paths.Length == 1) {
-                BeatmapEditor editor = editorRead ? EditorReaderStuff.GetNewestVersion(args.Paths[0], reader) : new BeatmapEditor(args.Paths[0]);
+                var editor = EditorReaderStuff.GetBeatmapEditor(args.Paths[0], reader, editorRead);
 
                 List<TimingPoint> orgininalTimingPoints = new List<TimingPoint>();
                 foreach (TimingPoint tp in editor.Beatmap.BeatmapTiming.TimingPoints) { orgininalTimingPoints.Add(tp.Copy()); }
@@ -120,7 +120,7 @@ namespace Mapping_Tools.Views {
                 editor.SaveFile();
             } else {
                 foreach (string path in args.Paths) {
-                    BeatmapEditor editor = editorRead ? EditorReaderStuff.GetNewestVersion(path, reader) : new BeatmapEditor(path);
+                    var editor = EditorReaderStuff.GetBeatmapEditor(path, reader, editorRead);
 
                     int oldTimingPointsCount = editor.Beatmap.BeatmapTiming.TimingPoints.Count;
 

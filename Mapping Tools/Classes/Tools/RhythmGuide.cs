@@ -128,7 +128,12 @@ namespace Mapping_Tools.Classes.Tools {
             var editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
             switch (args.ExportMode) {
                 case ExportMode.NewMap:
-                    var beatmap = MergeBeatmaps(args.Paths.Select(o => editorRead ? EditorReaderStuff.GetNewestVersion(o, reader) : new BeatmapEditor(o)).Select(o => o.Beatmap).ToArray(),
+                    var beatmap = MergeBeatmaps(args.Paths.Select(o => {
+                            if (!editorRead) return new BeatmapEditor(o);
+
+                            EditorReaderStuff.TryGetNewestVersion(o, out var e, reader);
+                            return e;
+                        }).Select(o => o.Beatmap).ToArray(),
                         args);
 
                     var editor = new Editor {TextFile = beatmap, Path = args.ExportPath};
@@ -137,9 +142,14 @@ namespace Mapping_Tools.Classes.Tools {
                                                      throw new ArgumentException("Export path must be a file."));
                     break;
                 case ExportMode.AddToMap:
-                    var editor2 = EditorReaderStuff.GetNewestVersion(args.ExportPath, reader);
+                    EditorReaderStuff.TryGetNewestVersion(args.ExportPath, out var editor2, reader);
                     PopulateBeatmap(editor2.Beatmap,
-                        args.Paths.Select(o => editorRead ? EditorReaderStuff.GetNewestVersion(o, reader) : new BeatmapEditor(o)).Select(o => o.Beatmap).ToArray(),
+                        args.Paths.Select(o => {
+                            if (!editorRead) return new BeatmapEditor(o);
+
+                            EditorReaderStuff.TryGetNewestVersion(o, out var e, reader);
+                            return e;
+                        }).Select(o => o.Beatmap).ToArray(),
                         args);
 
                     editor2.SaveFile();

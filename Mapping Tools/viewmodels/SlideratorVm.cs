@@ -212,7 +212,7 @@ namespace Mapping_Tools.Viewmodels {
                 switch (ImportMode) {
                     case ImportMode.Selected:
                         if (!editorRead) break;
-                        editor = EditorReaderStuff.GetEditor(out var selected, reader);
+                        editor = EditorReaderStuff.GetBeatmapEditor(out var selected, reader);
                         markedObjects = selected;
                         break;
                     case ImportMode.Bookmarked:

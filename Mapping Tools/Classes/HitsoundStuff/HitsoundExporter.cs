@@ -19,7 +19,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
         }
 
         public static void ExportHitsounds(List<HitsoundEvent> hitsounds, string baseBeatmap, string exportFolder) {
-            BeatmapEditor editor = EditorReaderStuff.GetNewestVersion(baseBeatmap);
+            EditorReaderStuff.TryGetNewestVersion(baseBeatmap, out var editor);
             Beatmap beatmap = editor.Beatmap;
 
             // Make new timing points

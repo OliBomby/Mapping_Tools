@@ -12,7 +12,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
     class HitsoundImporter {
         public static List<double> TimesFromStack(string path, double x, double y) {
             List<double> times = new List<double>();
-            BeatmapEditor editor = EditorReaderStuff.GetNewestVersion(path);
+            EditorReaderStuff.TryGetNewestVersion(path, out var editor);
 
             bool xIgnore = x == -1;
             bool yIgnore = y == -1;
@@ -91,7 +91,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// <param name="volumes">Taking the volumes from the map and making different layers for different volumes.</param>
         /// <returns>The hitsound layers</returns>
         public static List<HitsoundLayer> ImportHitsounds(string path, bool volumes = false) {
-            BeatmapEditor editor = EditorReaderStuff.GetNewestVersion(path);
+            EditorReaderStuff.TryGetNewestVersion(path, out var editor);
             Beatmap beatmap = editor.Beatmap;
             Timeline timeline = beatmap.GetTimeline();
 

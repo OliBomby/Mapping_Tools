@@ -50,8 +50,8 @@ namespace Mapping_Tools.Views {
             bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
 
             foreach (string exportPath in paths) {
-                BeatmapEditor editorTo = editorRead ? EditorReaderStuff.GetNewestVersion(exportPath, reader) : new BeatmapEditor(exportPath);
-                BeatmapEditor editorFrom = editorRead ? EditorReaderStuff.GetNewestVersion(arg.ImportPath, reader) : new BeatmapEditor(arg.ImportPath);
+                var editorTo = EditorReaderStuff.GetBeatmapEditor(exportPath, reader, editorRead);
+                var editorFrom = EditorReaderStuff.GetBeatmapEditor(arg.ImportPath, reader, editorRead);
 
                 Beatmap beatmapTo = editorTo.Beatmap;
                 Beatmap beatmapFrom = editorFrom.Beatmap;
@@ -185,7 +185,7 @@ namespace Mapping_Tools.Views {
             // Calculate the beats between this marker and the last marker
             // If there is a redline in between then calculate beats from last marker to the redline and beats from redline to this marker
             // Time the same is 0
-            double lastTime = redlines.FirstOrDefault().Offset;
+            double lastTime = redlines.First().Offset;
             foreach (Marker marker in markers) {
                 // Get redlines between this and last marker
                 List<TimingPoint> redlinesBetween = redlines.Where(o => o.Offset < marker.Time && o.Offset > lastTime).ToList();
@@ -210,28 +210,34 @@ namespace Mapping_Tools.Views {
 
         private class Marker
         {
-            public object Object { get; set; }
+            public object Object { get; private set; }
             public double BeatsFromLastMarker { get; set; }
             public double Time { get => GetTime(); set => SetTime(value); }
 
-            public double GetTime() {
-                if (Object is double) {
-                    return (double)Object;
-                } else if (Object is HitObject) {
-                    return ((HitObject)Object).Time;
-                } else if (Object is TimingPoint) {
-                    return ((TimingPoint)Object).Offset;
+            private double GetTime() {
+                switch (Object) {
+                    case double d:
+                        return d;
+                    case HitObject hitObject:
+                        return hitObject.Time;
+                    case TimingPoint point:
+                        return point.Offset;
+                    default:
+                        return -1;
                 }
-                return -1;
             }
 
             private void SetTime(double value) {
-                if (Object is double) {
-                    Object = value;
-                } else if (Object is HitObject) {
-                    ((HitObject)Object).Time = value;
-                } else if (Object is TimingPoint) {
-                    ((TimingPoint)Object).Offset = value;
+                switch (Object) {
+                    case double _:
+                        Object = value;
+                        break;
+                    case HitObject hitObject:
+                        hitObject.Time = value;
+                        break;
+                    case TimingPoint point:
+                        point.Offset = value;
+                        break;
                 }
             }
 

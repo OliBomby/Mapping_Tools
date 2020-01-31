@@ -233,7 +233,7 @@ namespace Mapping_Tools {
         }
 
         private void CoolSave(object sender, RoutedEventArgs e) {
-            EditorReaderStuff.CoolSave();
+            EditorReaderStuff.BetterSave();
         }
 
         //Open project in browser

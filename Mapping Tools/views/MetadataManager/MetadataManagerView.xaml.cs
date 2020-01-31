@@ -52,7 +52,7 @@ namespace Mapping_Tools.Views {
             var editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
 
             foreach (var path in paths) {
-                var editor = editorRead ? EditorReaderStuff.GetNewestVersion(path, reader) : new BeatmapEditor(path);
+                var editor = EditorReaderStuff.GetBeatmapEditor(path, reader, editorRead);
                 var beatmap = editor.Beatmap;
 
                 beatmap.Metadata["ArtistUnicode"].StringValue = arg.Artist;
