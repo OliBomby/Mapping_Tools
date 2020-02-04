@@ -34,7 +34,10 @@ namespace Mapping_Tools.Views {
 
        
         private void Start_Click(object sender, RoutedEventArgs e) {
-            RunTool(MainWindow.AppWindow.GetCurrentMaps(), quick: false);
+            // Get the current beatmap if the selection mode is 'Selected' because otherwise the selection would always fail
+            RunTool(SelectionModeBox.SelectedIndex == 0
+                ? new[] {IOHelper.GetCurrentBeatmap()}
+                : MainWindow.AppWindow.GetCurrentMaps());
         }
 
         public void QuickRun() {
@@ -74,7 +77,12 @@ namespace Mapping_Tools.Views {
             bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
 
             foreach (string path in arg.Paths) {
-                var editor = EditorReaderStuff.GetBeatmapEditor(path, reader, editorRead, out var selected);
+                var editor = EditorReaderStuff.GetBeatmapEditor(path, reader, editorRead, out var selected, out var editorActuallyRead);
+
+                if (arg.SelectionMode == 0 && !editorActuallyRead) {
+                    return EditorReaderStuff.SelectedObjectsReadFailText;
+                }
+
                 Beatmap beatmap = editor.Beatmap;
                 Timing timing = beatmap.BeatmapTiming;
                 List<HitObject> markedObjects = arg.SelectionMode == 0 ? selected :

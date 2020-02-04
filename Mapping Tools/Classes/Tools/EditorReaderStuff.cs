@@ -19,6 +19,7 @@ namespace Mapping_Tools.Classes.Tools
         private static readonly EditorReader editorReader = new EditorReader();
         public static string DontCoolSaveWhenMD5EqualsThisString = "";
         public static readonly string EditorReaderIsDisabledText = "You need to enable Editor Reader to use this feature.";
+        public static readonly string SelectedObjectsReadFailText = "Editor memory was not read. Could not get the selected hit objects.";
 
         /// <summary>
         /// Don't use this unless you know what you're doing
@@ -209,22 +210,12 @@ namespace Mapping_Tools.Classes.Tools
             }
         }
 
-        /// <summary>
-        /// Tries to get the newest version if editorRead is true otherwise just makes a normal <see cref="BeatmapEditor"/>
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="fullReader"></param>
-        /// <param name="editorRead"></param>
-        /// <returns></returns>
-        public static BeatmapEditor GetBeatmapEditor(string path, EditorReader fullReader, bool editorRead) {
-            BeatmapEditor editor;
-            if (editorRead) {
-                TryGetNewestVersion(path, out editor, fullReader);
-            } else {
-                editor = new BeatmapEditor(path);
-            }
+        public static BeatmapEditor GetBeatmapEditor(string path, EditorReader fullReader, bool readEditor) {
+            return GetBeatmapEditor(path, fullReader, readEditor, out _, out _);
+        }
 
-            return editor;
+        public static BeatmapEditor GetBeatmapEditor(string path, EditorReader fullReader, bool readEditor, out List<HitObject> selected) {
+            return GetBeatmapEditor(path, fullReader, readEditor, out selected, out _);
         }
 
         /// <summary>
@@ -232,16 +223,18 @@ namespace Mapping_Tools.Classes.Tools
         /// </summary>
         /// <param name="path"></param>
         /// <param name="fullReader"></param>
-        /// <param name="editorRead"></param>
+        /// <param name="readEditor"></param>
         /// <param name="selected"></param>
+        /// <param name="editorRead">Indicates true if the editor memory was actually read</param>
         /// <returns></returns>
-        public static BeatmapEditor GetBeatmapEditor(string path, EditorReader fullReader, bool editorRead, out List<HitObject> selected) {
+        public static BeatmapEditor GetBeatmapEditor(string path, EditorReader fullReader, bool readEditor, out List<HitObject> selected, out bool editorRead) {
             BeatmapEditor editor;
-            if (editorRead) {
-                TryGetNewestVersion(path, out editor, out selected, fullReader);
+            if (readEditor) {
+                editorRead = TryGetNewestVersion(path, out editor, out selected, fullReader);
             } else {
                 editor = new BeatmapEditor(path);
                 selected = new List<HitObject>();
+                editorRead = false;
             }
 
             return editor;
