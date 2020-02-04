@@ -476,6 +476,9 @@
     <Compile Include="Views\ComboColourStudio\ComboColourStudioView.xaml.cs">
       <DependentUpon>ComboColourStudioView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\HitsoundStudio\HitsoundStudioExportDialog.xaml.cs">
+      <DependentUpon>HitsoundStudioExportDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Sliderator\SlideratorView.xaml.cs">
       <DependentUpon>SlideratorView.xaml</DependentUpon>
     </Compile>
@@ -640,6 +643,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Components\Dialogs\BeatmapImportDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\HitsoundStudio\HitsoundStudioExportDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
