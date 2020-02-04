@@ -32,16 +32,13 @@ namespace Mapping_Tools.Viewmodels {
 
         public string EditTimes { get; set; }
 
-        public HitsoundStudioVm() {
-            BaseBeatmap = "";
-            DefaultSample = new Sample { Priority = int.MaxValue};
-            HitsoundLayers = new ObservableCollection<HitsoundLayer>();
-        }
+        public HitsoundStudioVm() : this("", new Sample {Priority = int.MaxValue}, new ObservableCollection<HitsoundLayer>()) { }
 
         public HitsoundStudioVm(string baseBeatmap, Sample defaultSample, ObservableCollection<HitsoundLayer> hitsoundLayers) {
             BaseBeatmap = baseBeatmap;
             DefaultSample = defaultSample;
             HitsoundLayers = hitsoundLayers;
+            ExportFolder = MainWindow.ExportPath;
         }
     }
 }
