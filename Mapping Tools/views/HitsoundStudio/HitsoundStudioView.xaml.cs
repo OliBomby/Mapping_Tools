@@ -148,7 +148,10 @@ namespace Mapping_Tools.Views
         }
 
         private async void Start_Click(object sender, RoutedEventArgs e) {
-            var dialog = new HitsoundStudioExportDialog();
+            Settings.ExportFolder = MainWindow.ExportPath;
+            Settings.ShowResults = false;
+
+            var dialog = new HitsoundStudioExportDialog(Settings);
             var result = await DialogHost.Show(dialog, "RootDialog");
 
             if (!(bool) result) return;
@@ -158,9 +161,6 @@ namespace Mapping_Tools.Views
                 MessageBox.Show("Please select a base beatmap and default hitsound first.");
                 return;
             }
-
-            Settings.ExportFolder = MainWindow.ExportPath;
-            Settings.ShowResults = false;
 
             BackgroundWorker.RunWorkerAsync(Settings);
             CanRun = false;

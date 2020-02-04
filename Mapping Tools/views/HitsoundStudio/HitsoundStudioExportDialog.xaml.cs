@@ -1,19 +1,25 @@
-﻿using System.Globalization;
+﻿using Mapping_Tools.Classes.SystemTools;
+using System;
 using System.Windows;
+using Mapping_Tools.Viewmodels;
 
 namespace Mapping_Tools.Views {
     /// <summary>
     /// Interaction logic for HitsoundStudioExportDialog.xaml
     /// </summary>
     public partial class HitsoundStudioExportDialog {
-        public HitsoundStudioExportDialog(double initialValue = 0) {
+        public HitsoundStudioVm Settings => (HitsoundStudioVm) DataContext;
+
+        public HitsoundStudioExportDialog(HitsoundStudioVm settings) {
             InitializeComponent();
-            ValueBox.Text = initialValue.ToString(CultureInfo.InvariantCulture);
+            DataContext = settings;
         }
 
-        private void TypeValueDialog_OnLoaded(object sender, RoutedEventArgs e) {
-            ValueBox.Focus();
-            ValueBox.SelectAll();
+        private void ExportFolderBrowseButton_OnClick(object sender, RoutedEventArgs e) {
+            string path = IOHelper.FolderDialog();
+            if (!string.IsNullOrWhiteSpace(path)) {
+                ExportFolderBox.Text = path;
+            }
         }
     }
 }
