@@ -49,7 +49,7 @@
         <DataTemplate DataType="{x:Type viewmodels:HitsoundCopierVM}">
             <views:HitsoundCopierView DataContext="{Binding}"/>
         </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodels:HitsoundStudioVM}">
+        <DataTemplate DataType="{x:Type viewmodels:HitsoundStudioVm}">
             <views:HitsoundStudioView DataContext="{Binding}"/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type viewmodels:PreferencesVM}">

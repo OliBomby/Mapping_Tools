@@ -11,6 +11,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using MaterialDesignThemes.Wpf;
 
 namespace Mapping_Tools.Views
 {
@@ -18,9 +19,9 @@ namespace Mapping_Tools.Views
     /// <summary>
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
-    public partial class HitsoundStudioView : ISavable<HitsoundStudioVM>
+    public partial class HitsoundStudioView : ISavable<HitsoundStudioVm>
     {
-        private HitsoundStudioVM Settings;
+        private HitsoundStudioVm Settings;
 
         private bool suppressEvents;
 
@@ -40,7 +41,7 @@ namespace Mapping_Tools.Views
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
-            Settings = new HitsoundStudioVM();
+            Settings = new HitsoundStudioVm();
             DataContext = Settings;
             LayersList.SelectedIndex = 0;
             Num_Layers_Changed();
@@ -51,33 +52,15 @@ namespace Mapping_Tools.Views
         protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             var bgw = sender as BackgroundWorker;
-            Make_Hitsounds((Arguments)e.Argument, bgw, e);
+            Make_Hitsounds((HitsoundStudioVm)e.Argument, bgw, e);
         }
 
-        private struct Arguments
+        private void Make_Hitsounds(HitsoundStudioVm arg, BackgroundWorker worker, DoWorkEventArgs _)
         {
-            public string ExportFolder;
-            public string BaseBeatmap;
-            public Sample DefaultSample;
-            public List<HitsoundLayer> HitsoundLayers;
-            public bool Debug;
-
-            public Arguments(string exportFolder, string baseBeatmap, Sample defaultSample, List<HitsoundLayer> hitsoundLayers, bool debug)
-            {
-                ExportFolder = exportFolder;
-                BaseBeatmap = baseBeatmap;
-                DefaultSample = defaultSample;
-                HitsoundLayers = hitsoundLayers;
-                Debug = debug;
-            }
-        }
-
-        private void Make_Hitsounds(Arguments arg, BackgroundWorker worker, DoWorkEventArgs _)
-        {
-            if (arg.Debug)
+            if (arg.ShowResults)
             {
                 // Convert the multiple layers into packages that have the samples from all the layers at one specific time
-                List<SamplePackage> samplePackages = HitsoundConverter.ZipLayers(arg.HitsoundLayers, arg.DefaultSample);
+                List<SamplePackage> samplePackages = HitsoundConverter.ZipLayers(arg.HitsoundLayers.ToList(), arg.DefaultSample);
                 UpdateProgressBar(worker, 10);
 
                 // Balance the volume between greenlines and samples
@@ -114,7 +97,7 @@ namespace Mapping_Tools.Views
             else
             {
                 // Convert the multiple layers into packages that have the samples from all the layers at one specific time
-                List<SamplePackage> samplePackages = HitsoundConverter.ZipLayers(arg.HitsoundLayers, arg.DefaultSample);
+                List<SamplePackage> samplePackages = HitsoundConverter.ZipLayers(arg.HitsoundLayers.ToList(), arg.DefaultSample);
                 UpdateProgressBar(worker, 10);
 
                 // Balance the volume between greenlines and samples
@@ -157,18 +140,29 @@ namespace Mapping_Tools.Views
 
         private void Startish_Click(object sender, RoutedEventArgs e)
         {
-            BackgroundWorker.RunWorkerAsync(new Arguments(MainWindow.ExportPath, Settings.BaseBeatmap, Settings.DefaultSample, Settings.HitsoundLayers.ToList(), true));
+            Settings.ExportFolder = MainWindow.ExportPath;
+            Settings.ShowResults = true;
+
+            BackgroundWorker.RunWorkerAsync(Settings);
             CanRun = false;
         }
 
-        private void Start_Click(object sender, RoutedEventArgs e)
-        {
+        private async void Start_Click(object sender, RoutedEventArgs e) {
+            var dialog = new HitsoundStudioExportDialog();
+            var result = await DialogHost.Show(dialog, "RootDialog");
+
+            if (!(bool) result) return;
+
             if (Settings.BaseBeatmap == null || Settings.DefaultSample == null)
             {
-                MessageBox.Show("Please import a base beatmap and default hitsound first.");
+                MessageBox.Show("Please select a base beatmap and default hitsound first.");
                 return;
             }
-            BackgroundWorker.RunWorkerAsync(new Arguments(MainWindow.ExportPath, Settings.BaseBeatmap, Settings.DefaultSample, Settings.HitsoundLayers.ToList(), false));
+
+            Settings.ExportFolder = MainWindow.ExportPath;
+            Settings.ShowResults = false;
+
+            BackgroundWorker.RunWorkerAsync(Settings);
             CanRun = false;
         }
 
@@ -895,12 +889,12 @@ namespace Mapping_Tools.Views
             }
         }
 
-        public HitsoundStudioVM GetSaveData()
+        public HitsoundStudioVm GetSaveData()
         {
             return Settings;
         }
 
-        public void SetSaveData(HitsoundStudioVM saveData)
+        public void SetSaveData(HitsoundStudioVm saveData)
         {
             suppressEvents = true;
 
