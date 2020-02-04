@@ -28,6 +28,18 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _showResults, value);
         }
 
+        private bool _exportMap;
+        public bool ExportMap {
+            get => _exportMap;
+            set => Set(ref _exportMap, value);
+        }
+
+        private bool _exportSamples;
+        public bool ExportSamples {
+            get => _exportSamples;
+            set => Set(ref _exportSamples, value);
+        }
+
         public ObservableCollection<HitsoundLayer> HitsoundLayers { get; set; }
 
         public string EditTimes { get; set; }
@@ -39,6 +51,9 @@ namespace Mapping_Tools.Viewmodels {
             DefaultSample = defaultSample;
             HitsoundLayers = hitsoundLayers;
             ExportFolder = MainWindow.ExportPath;
+            ShowResults = false;
+            ExportMap = true;
+            ExportSamples = true;
         }
     }
 }

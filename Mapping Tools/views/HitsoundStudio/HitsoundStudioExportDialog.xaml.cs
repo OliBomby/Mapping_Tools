@@ -1,7 +1,6 @@
 ﻿using Mapping_Tools.Classes.SystemTools;
-using System;
-using System.Windows;
 using Mapping_Tools.Viewmodels;
+using System.Windows;
 
 namespace Mapping_Tools.Views {
     /// <summary>

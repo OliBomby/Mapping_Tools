@@ -237,16 +237,7 @@
             </StackPanel>
         </Grid>
         <Grid Name="SecondGrid" Grid.Row="2" Grid.Column="1">
-            <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Right" Orientation="Horizontal">
-                <Viewbox Margin="10">
-                    <Button
-                        IsEnabled="{Binding ElementName=This, Path=CanRun}"
-                        Style="{StaticResource MaterialDesignFloatingActionButton}"
-                        Click="Startish_Click">
-                            <materialDesign:PackIcon
-                                Kind="QuestionMark" Height="36" Width="36" />
-                    </Button>
-                </Viewbox>
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Right" Orientation="Horizontal">
                 <Viewbox Margin="10">
                     <Button
                         IsEnabled="{Binding ElementName=This, Path=CanRun}"
