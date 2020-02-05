@@ -50,6 +50,7 @@
                     <TextBox Grid.Column="0" x:Name="ImportPathBox" Text="{Binding GuideGeneratorArgs.Paths, Converter={StaticResource Sa2SConverter}}"
                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Copy rhythm from"/>
                     <TextBlock Grid.Column="1" Margin="3 15 5 0" FontStyle="Italic"
+                               ToolTip="Multiple beatmaps can be inputted in this field. Separate the paths with the '|' character."
                                Text="{Binding ElementName=ImportPathBox, Path=Text, Converter={StaticResource MapPathStringToCountStringConverter}}"/>
                     <Button Grid.Column="2" Cursor="Hand" Command="{Binding ImportLoadCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
                         <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Download" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
