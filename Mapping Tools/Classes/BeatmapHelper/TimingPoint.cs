@@ -162,8 +162,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         /// <returns></returns>
         public string GetLine() {
-            int style = MathHelper.GetIntFromBitArray(new BitArray(new bool[] { Kiai, false, false, OmitFirstBarLine }));
-            return $"{Offset.ToRoundInvariant()},{MpB.ToInvariant()},{Meter.TempoDenominator.ToInvariant()},{SampleSet.ToIntInvariant()},{SampleIndex.ToInvariant()},{Volume.ToRoundInvariant()},{Convert.ToInt32(Uninherited).ToInvariant()},{style.ToInvariant()}";
+            int style = MathHelper.GetIntFromBitArray(new BitArray(new[] { Kiai, false, false, OmitFirstBarLine }));
+            return $"{Offset.ToRoundInvariant()},{MpB.ToInvariant()},{Meter.TempoNumerator.ToInvariant()},{SampleSet.ToIntInvariant()},{SampleIndex.ToInvariant()},{Volume.ToRoundInvariant()},{Convert.ToInt32(Uninherited).ToInvariant()},{style.ToInvariant()}";
         }
 
         /// <summary>
