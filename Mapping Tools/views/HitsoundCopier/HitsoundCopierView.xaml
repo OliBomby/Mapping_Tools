@@ -5,9 +5,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Mapping_Tools.Views"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
              mc:Ignorable="d" 
              x:Name="This"
              d:DesignHeight="650" Width="759.5">
+    <local:SingleRunMappingTool.Resources>
+        <domain:MapPathStringToCountStringConverter x:Key="MapPathStringToCountStringConverter"/>
+    </local:SingleRunMappingTool.Resources>
     <Grid Name="MasterGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -53,15 +57,18 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="5"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBox Grid.Column="0" x:Name="BeatmapToBox" Margin="0,0,5,0"
                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Copy hitsounds to"/>
-                    <Button Grid.Column="1" Cursor="Hand" Click="BeatmapToLoad_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
+                    <TextBlock Grid.Column="1" Margin="3 15 5 0" FontStyle="Italic"
+                               Text="{Binding ElementName=BeatmapToBox, Path=Text, Converter={StaticResource MapPathStringToCountStringConverter}}"/>
+                    <Button Grid.Column="2" Cursor="Hand" Click="BeatmapToLoad_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
                         <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Download" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                     </Button >
-                    <Button Grid.Column="3" Cursor="Hand" Click="BeatmapToBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
+                    <Button Grid.Column="4" Cursor="Hand" Click="BeatmapToBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
                         <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                     </Button >
                 </Grid>
