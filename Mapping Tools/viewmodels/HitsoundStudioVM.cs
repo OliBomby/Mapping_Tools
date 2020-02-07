@@ -40,6 +40,12 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _exportSamples, value);
         }
 
+        private bool _deleteAllInExportFirst;
+        public bool DeleteAllInExportFirst {
+            get => _deleteAllInExportFirst;
+            set => Set(ref _deleteAllInExportFirst, value);
+        }
+
         public ObservableCollection<HitsoundLayer> HitsoundLayers { get; set; }
 
         public string EditTimes { get; set; }
@@ -54,6 +60,7 @@ namespace Mapping_Tools.Viewmodels {
             ShowResults = false;
             ExportMap = true;
             ExportSamples = true;
+            DeleteAllInExportFirst = false;
         }
     }
 }

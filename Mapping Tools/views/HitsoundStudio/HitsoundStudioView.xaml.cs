@@ -95,7 +95,7 @@ namespace Mapping_Tools.Views
                     $"Number of samples: {samples}, Number of greenlines: {greenlines}";
             }
 
-            if (arg.ExportSamples || arg.ExportMap) {
+            if (arg.DeleteAllInExportFirst && (arg.ExportSamples || arg.ExportMap)) {
                 // Delete all files in the export folder before filling it again
                 DirectoryInfo di = new DirectoryInfo(arg.ExportFolder);
                 foreach (FileInfo file in di.GetFiles()) {

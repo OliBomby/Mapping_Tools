@@ -33,6 +33,8 @@
                       ToolTip="Check this to export the custom hitsound samples."/>
             <CheckBox Content="Show results" IsChecked="{Binding ShowResults}"
                       ToolTip="Check this to see the resulting number of custom indices, hitsound samples, and index changes."/>
+            <CheckBox Content="Delete all file sin export folder" IsChecked="{Binding DeleteAllInExportFirst}"
+                      ToolTip="Check this to automatically delete all files in the export folder before exporting. When using this be sure there aren't any important files in your export folder."/>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" Grid.Row="1"
