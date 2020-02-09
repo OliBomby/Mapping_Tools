@@ -1,6 +1,9 @@
 ﻿using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.SystemTools;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Mapping_Tools.Viewmodels {
     public class HitsoundStudioVm : BindableBase {
@@ -46,6 +49,14 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _deleteAllInExportFirst, value);
         }
 
+        private HitsoundExportMode hitsoundExportModeSetting;
+        public HitsoundExportMode HitsoundExportModeSetting {
+            get => hitsoundExportModeSetting;
+            set => Set(ref hitsoundExportModeSetting, value);
+        }
+        
+        public IEnumerable<HitsoundExportMode> HitsoundExportModes => Enum.GetValues(typeof(HitsoundExportMode)).Cast<HitsoundExportMode>();
+
         public ObservableCollection<HitsoundLayer> HitsoundLayers { get; set; }
 
         public string EditTimes { get; set; }
@@ -61,6 +72,12 @@ namespace Mapping_Tools.Viewmodels {
             ExportMap = true;
             ExportSamples = true;
             DeleteAllInExportFirst = false;
+            HitsoundExportModeSetting = HitsoundExportMode.Standard;
+        }
+        public enum HitsoundExportMode {
+            Standard,
+            Coinciding,
+            Storyboard
         }
     }
 }

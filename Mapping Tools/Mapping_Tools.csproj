@@ -453,7 +453,7 @@
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Viewmodels\CleanerVM.cs" />
     <Compile Include="Viewmodels\HitsoundPreviewHelperVM.cs" />
-    <Compile Include="Viewmodels\HitsoundStudioVM.cs" />
+    <Compile Include="Viewmodels\HitsoundStudioVm.cs" />
     <Compile Include="Viewmodels\HitsoundCopierVM.cs" />
     <Compile Include="Viewmodels\ComboColourStudioVm.cs" />
     <Compile Include="Viewmodels\RhythmGuideVm.cs" />
