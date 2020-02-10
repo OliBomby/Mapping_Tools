@@ -152,6 +152,7 @@ namespace Mapping_Tools.Classes.Tools {
             const double maxOvershot = 12;
             const double maxVisualError = 1;
             const double epsilon = 0.01;
+            const double deltaT = 0.01;
 
             _slider = new List<Neuron>();
 
@@ -159,7 +160,8 @@ namespace Mapping_Tools.Classes.Tools {
             double nucleusTime = 0;
             int lastDirection = 1;
             Neuron currentNeuron = new Neuron(_lattice.First());
-            for (double time = 0; time <= MaxT; time += 1) {
+            for (double t = 0; t <= MaxT; t += deltaT) {
+                var time = Math.Min(t, MaxT);
                 var wantedProgression = PositionFunction(time);
                 var wantedLength = wantedProgression * _totalPathL;
                 var wantedPosition = PositionAt(wantedLength);
@@ -175,6 +177,8 @@ namespace Mapping_Tools.Classes.Tools {
                 }
 
                 // Make a new neuron if the path turns around
+                // The position of this turn-around is not entirely accurate because the actual turn-around happens somewhere in between the time steps
+                // This is the cause behind most of the error compared to the expected total length
                 if (direction != lastDirection) {
                     var newNeuron = new Neuron(nearestLatticePoint);
                     currentNeuron.Terminal = newNeuron;
@@ -183,7 +187,7 @@ namespace Mapping_Tools.Classes.Tools {
                     _slider.Add(currentNeuron);
 
                     currentNeuron = newNeuron;
-                    nucleusTime = time - 1;  // This -1 is very important because this nucleus reset happens before actualLength gets calculated
+                    nucleusTime = time - deltaT;  // This subtraction is very important because this nucleus reset happens before actualLength gets calculated
                 }
 
                 actualLength = (time - nucleusTime) * Velocity;
@@ -199,13 +203,15 @@ namespace Mapping_Tools.Classes.Tools {
                     currentNeuron = newNeuron;
                     nucleusTime = time;
                 }
+
+                lastDirection = direction;
             }
             currentNeuron.WantedLength = actualLength;
             _slider.Add(currentNeuron);
 
             double totalWantedLength = _slider.Sum(n => n.WantedLength);
-            Console.WriteLine("Total wanted length: " + totalWantedLength);
-            Console.WriteLine("Expected total wanted length: " + _MaxS);
+            Console.WriteLine(@"Total wanted length: " + totalWantedLength);
+            Console.WriteLine(@"Expected total wanted length: " + _MaxS);
 
             // Multiply with ratio to exactly match the expected total length
             var ratio = _MaxS / totalWantedLength;
@@ -214,8 +220,8 @@ namespace Mapping_Tools.Classes.Tools {
             }
 
             totalWantedLength = _slider.Sum(n => n.WantedLength);
-            Console.WriteLine("Total wanted length after scale: " + totalWantedLength);
-            Console.WriteLine("Expected total wanted length: " + _MaxS);
+            Console.WriteLine(@"Total wanted length after scale: " + totalWantedLength);
+            Console.WriteLine(@"Expected total wanted length: " + _MaxS);
         }
 
         private List<Vector2> AnchorsList() {
