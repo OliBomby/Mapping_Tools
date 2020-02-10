@@ -207,6 +207,7 @@ namespace Mapping_Tools.Classes.Tools {
 
                 lastDirection = direction;
             }
+            // Need to add currentNeuron at the end otherwise the last neuron would get ignored
             currentNeuron.WantedLength = actualLength;
             _slider.Add(currentNeuron);
 
