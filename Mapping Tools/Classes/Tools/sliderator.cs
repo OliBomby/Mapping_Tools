@@ -1,8 +1,8 @@
+using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SliderPathStuff;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.SliderPathStuff;
 
 namespace Mapping_Tools.Classes.Tools {
     public class Sliderator {
@@ -48,6 +48,23 @@ namespace Mapping_Tools.Classes.Tools {
             if (n == -1) n += 1;
             if (n == _diff.Count) n -= 1;
             return _path[n] + _diff[n] / _diffL[n] * (x - _pathL[n]);
+        }
+
+        private LatticePoint GetNearestLatticePoint(double progression, double maxError) {
+            LatticePoint nearest = null;
+            double bestDist = double.PositiveInfinity;
+
+            foreach (var latticePoint in _lattice.Where(l => l.Error <= maxError)) {
+                var dist = Math.Abs(latticePoint.PathPosition - progression);
+                if (dist < bestDist) {
+                    bestDist = dist;
+                    nearest = latticePoint;
+                } else {
+                    return nearest;
+                }
+            }
+
+            return nearest;
         }
 
         private double NextCrossing(double start, double low, double high, out int side, double precision = 0.01, double resolution = 0.25) { // where it next crosses below a lower bound or above an upper bound
@@ -130,6 +147,77 @@ namespace Mapping_Tools.Classes.Tools {
         private void GetTumours() {
         }
 
+        private void DoSlideration() {
+            // Variable for how much the position can deviate compared to the wanted position before adding more dendrites
+            const double maxOvershot = 12;
+            const double maxVisualError = 1;
+            const double epsilon = 0.01;
+
+            _slider = new List<Neuron>();
+
+            double actualLength = 0;
+            double nucleusTime = 0;
+            int lastDirection = 1;
+            Neuron currentNeuron = new Neuron(_lattice.First());
+            for (double time = 0; time <= MaxT; time += 1) {
+                var wantedProgression = PositionFunction(time);
+                var wantedLength = wantedProgression * _totalPathL;
+                var wantedPosition = PositionAt(wantedLength);
+
+                var speed = (PositionFunction(time + epsilon) * _totalPathL - wantedLength) / epsilon;
+                var direction = Math.Sign(speed);
+                var velocity = Math.Abs(speed);
+
+                var nearestLatticePoint = GetNearestLatticePoint(wantedProgression, maxVisualError);
+
+                if (nearestLatticePoint == null) {
+                    throw new InvalidOperationException($"Can not find nearest lattice point for progression ({wantedProgression}) and maxError ({maxVisualError * velocity}).");
+                }
+
+                // Make a new neuron if the path turns around
+                if (direction != lastDirection) {
+                    var newNeuron = new Neuron(nearestLatticePoint);
+                    currentNeuron.Terminal = newNeuron;
+
+                    currentNeuron.WantedLength = actualLength;
+                    _slider.Add(currentNeuron);
+
+                    currentNeuron = newNeuron;
+                    nucleusTime = time - 1;  // This -1 is very important because this nucleus reset happens before actualLength gets calculated
+                }
+
+                actualLength = (time - nucleusTime) * Velocity;
+
+                // Make a new neuron when the error in the length becomes too large
+                if (Math.Abs(Math.Abs(wantedLength - currentNeuron.Nucleus.PathPosition * _totalPathL) - actualLength) > maxOvershot * velocity) {
+                    var newNeuron = new Neuron(nearestLatticePoint);
+                    currentNeuron.Terminal = newNeuron;
+
+                    currentNeuron.WantedLength = actualLength;
+                    _slider.Add(currentNeuron);
+
+                    currentNeuron = newNeuron;
+                    nucleusTime = time;
+                }
+            }
+            currentNeuron.WantedLength = actualLength;
+            _slider.Add(currentNeuron);
+
+            double totalWantedLength = _slider.Sum(n => n.WantedLength);
+            Console.WriteLine("Total wanted length: " + totalWantedLength);
+            Console.WriteLine("Expected total wanted length: " + _MaxS);
+
+            // Multiply with ratio to exactly match the expected total length
+            var ratio = _MaxS / totalWantedLength;
+            foreach (var neuron in _slider) {
+                neuron.WantedLength *= ratio;
+            }
+
+            totalWantedLength = _slider.Sum(n => n.WantedLength);
+            Console.WriteLine("Total wanted length after scale: " + totalWantedLength);
+            Console.WriteLine("Expected total wanted length: " + _MaxS);
+        }
+
         private List<Vector2> AnchorsList() {
             var anchors = new List<Vector2>();
             for (int n = 0; n < _slider.Count; n++) {
@@ -145,13 +233,11 @@ namespace Mapping_Tools.Classes.Tools {
 
         public List<Vector2> Sliderate() {
             GetLatticePoints();
-            GetReds();
-            GetInterpolation();
-            GetTumours();
+            DoSlideration();
             return AnchorsList();
         }
 
-        internal struct LatticePoint {
+        internal class LatticePoint {
             public Vector2 Pos; // lattice point
             public Vector2 PathPoint; // point on path
             public double PathPosition; // position along path
@@ -181,6 +267,9 @@ namespace Mapping_Tools.Classes.Tools {
             public Neuron Terminal; // end lattice point
             public double Length; // placeholder
             public double Error; // placeholder
+            public double WantedLength;
+            public double DendriteLength;
+            public double AxonLenth;
 
             public Neuron(LatticePoint startLatticePoint) {
                 Nucleus = startLatticePoint;
@@ -189,6 +278,9 @@ namespace Mapping_Tools.Classes.Tools {
                 Terminal = null;
                 Length = 0;
                 Error = 0;
+                WantedLength = 0;
+                DendriteLength = 0;
+                AxonLenth = 0;
             }
         }
 
