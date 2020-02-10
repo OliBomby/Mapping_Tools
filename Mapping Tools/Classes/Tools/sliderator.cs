@@ -54,6 +54,7 @@ namespace Mapping_Tools.Classes.Tools {
             LatticePoint nearest = null;
             double bestDist = double.PositiveInfinity;
 
+            // TODO: Might want to change this for when there are no close lattice points with low enough error
             foreach (var latticePoint in _lattice.Where(l => l.Error <= maxError)) {
                 var dist = Math.Abs(latticePoint.PathPosition - progression);
                 if (dist < bestDist) {
@@ -148,11 +149,11 @@ namespace Mapping_Tools.Classes.Tools {
         }
 
         private void DoSlideration() {
-            // Variable for how much the position can deviate compared to the wanted position before adding more dendrites
-            const double maxOvershot = 12;
-            const double maxVisualError = 1;
-            const double epsilon = 0.01;
-            const double deltaT = 0.01;
+            // These values are placeholders. Experimentation has to be done to find better parameters
+            const double maxOvershot = 12;  // Max error in wantedLength
+            const double maxVisualError = 1;  // Max error in lattice points
+            const double epsilon = 0.01;  // Resolution for for speed differentiation
+            const double deltaT = 0.01;  // Size of time step
 
             _slider = new List<Neuron>();
 
@@ -164,7 +165,7 @@ namespace Mapping_Tools.Classes.Tools {
                 var time = Math.Min(t, MaxT);
                 var wantedProgression = PositionFunction(time);
                 var wantedLength = wantedProgression * _totalPathL;
-                var wantedPosition = PositionAt(wantedLength);
+                // var wantedPosition = PositionAt(wantedLength);
 
                 var speed = (PositionFunction(time + epsilon) * _totalPathL - wantedLength) / epsilon;
                 var direction = Math.Sign(speed);
