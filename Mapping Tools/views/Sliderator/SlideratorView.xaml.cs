@@ -506,32 +506,29 @@ namespace Mapping_Tools.Views {
 
             // Give the new hit object the sliderated anchors
             clone.SetSliderPath(new SliderPath(PathType.Bezier, slideration.ToArray()));
+            clone.PixelLength = sliderator.MaxS;
 
             // Update progressbar
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(70);
-
-            // Add SV
-            var timingPointsChanges = new List<TimingPointsChange>();
-            var newTp = timing.GetTimingPointAtTime(arg.ExportTime).Copy();
-            newTp.MpB = -100 / (velocity * 60000 / arg.BeatsPerMinute / arg.PixelLength / arg.SvGraphMultiplier);
-            newTp.Offset = arg.ExportTime;
-            timingPointsChanges.Add(new TimingPointsChange(newTp, mpb: true));
-            timingPointsChanges.AddRange(beatmap.HitObjects.Select(ho => {
-                var sv = timing.GetSvAtTime(ho.Time);
-                var tp = timing.GetTimingPointAtTime(ho.Time).Copy();
-                tp.MpB = sv;
-                tp.Offset = ho.Time;
-                return new TimingPointsChange(tp, mpb: true);
-            }));
-            TimingPointsChange.ApplyChanges(timing, timingPointsChanges);
             
-            // Add hit object after SV
+            // Add hit object
             if (arg.ExportMode == ExportMode.Add) {
                 beatmap.HitObjects.Add(clone);
             } else {
                 beatmap.HitObjects.Remove(hitObjectHere);
                 beatmap.HitObjects.Add(clone);
             }
+
+            // Add SV
+            clone.SliderVelocity = velocity;
+            var timingPointsChanges = beatmap.HitObjects.Select(ho => {
+                    var sv = ho.SliderVelocity;
+                    var tp = timing.GetTimingPointAtTime(ho.Time).Copy();
+                    tp.MpB = -100 / sv;
+                    tp.Offset = ho.Time;
+                    return new TimingPointsChange(tp, mpb: true);
+                }).ToList();
+            TimingPointsChange.ApplyChanges(timing, timingPointsChanges);
 
             // Update progressbar
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(80);
