@@ -217,6 +217,7 @@ namespace Mapping_Tools.Classes.Tools {
             Console.WriteLine(@"Number of neurons: " + _slider.Count);
         }
 
+        // TODO: Improve this
         private void GenerateAxons() {
             // Generate bezier points that approximate the paths between neurons
             foreach (var neuron in _slider.Where(n => n.Terminal != null)) {
@@ -253,10 +254,14 @@ namespace Mapping_Tools.Classes.Tools {
         private void GenerateDendrites() {
             double leftovers = 0;
             foreach (var neuron in _slider.Where(n => n.Terminal != null)) {
-                Vector2 dendriteDir;
+                Vector2 dendriteDir1;
+                Vector2 dendriteDir2;
                 if (Vector2.Distance(neuron.Nucleus.Pos, neuron.Terminal.Nucleus.Pos) > Precision.DOUBLE_EPSILON) {
-                    var middlePoint = PositionAt((neuron.Nucleus.PathPosition + neuron.Terminal.Nucleus.PathPosition) / 2);
-                    dendriteDir = (middlePoint - neuron.Nucleus.Pos).Normalized();
+                    var dir = Math.Sign(neuron.Terminal.Nucleus.SegmentIndex - neuron.Nucleus.SegmentIndex);
+                    var nextPoint1 = _path[neuron.Nucleus.SegmentIndex + dir];
+                    var nextPoint2 = _path[neuron.Terminal.Nucleus.SegmentIndex - dir];
+                    dendriteDir1 = (nextPoint1 - neuron.Nucleus.Pos).Normalized();
+                    dendriteDir2 = (nextPoint2 - neuron.Nucleus.Pos).Normalized();
                     /*if (Math.Abs(dendriteDir.X) > Math.Abs(dendriteDir.Y)) {
                         dendriteDir.X = dendriteDir.X > 0 ? 1 : -1;
                         dendriteDir.Y = 0;
@@ -265,7 +270,8 @@ namespace Mapping_Tools.Classes.Tools {
                         dendriteDir.Y = dendriteDir.Y > 0 ? 1 : -1;
                     }*/
                 } else {
-                    dendriteDir = Vector2.UnitX;
+                    dendriteDir1 = Vector2.UnitX;
+                    dendriteDir2 = Vector2.UnitX;
                 }
 
                 // Do an even split of dendrites between this neuron and the terminal
@@ -274,32 +280,32 @@ namespace Mapping_Tools.Classes.Tools {
                 var dendriteToAddRight = dendriteToAdd / 2;
 
                 while (dendriteToAddLeft > 1) {
-                    var size = MathHelper.Clamp(Math.Floor(dendriteToAddLeft), 1, Math.Min(neuron.AxonLenth * 2, 12));
+                    var size = MathHelper.Clamp(Math.Floor(dendriteToAddLeft), 1, Math.Min(neuron.AxonLenth * 2 + 2, 12));
 
-                    var dendrite = (dendriteDir * size).Rounded();
+                    var dendrite = (dendriteDir1 * size).Rounded();
                     while (dendrite.Length > 12) {
-                        size -= 1;
-                        dendrite = (dendriteDir * size).Rounded();
+                        size -= 0.5;
+                        dendrite = (dendriteDir1 * size).Rounded();
                     }
 
                     neuron.Dendrites.Add(dendrite);
-                    dendriteToAddLeft -= size;
+                    dendriteToAddLeft -= dendrite.Length;
                 }
 
                 dendriteToAddRight += dendriteToAddLeft;
 
                 // Add dendrites to the terminal pointed the opposite direction
                 while (dendriteToAddRight > 1) {
-                    var size = MathHelper.Clamp(Math.Floor(dendriteToAddRight), 1, Math.Min(neuron.AxonLenth * 2, 12));
+                    var size = MathHelper.Clamp(Math.Floor(dendriteToAddRight), 1, Math.Min(neuron.AxonLenth * 2 + 2, 12));
 
-                    var dendrite = (dendriteDir * -size).Rounded();
+                    var dendrite = (dendriteDir2 * -size).Rounded();
                     while (dendrite.Length > 12) {
-                        size -= 1;
-                        dendrite = (dendriteDir * -size).Rounded();
+                        size -= 0.5;
+                        dendrite = (dendriteDir2 * -size).Rounded();
                     }
 
                     neuron.Terminal.Dendrites.Add(dendrite);
-                    dendriteToAddRight -= size;
+                    dendriteToAddRight -= dendrite.Length;
                 }
 
                 leftovers = dendriteToAddRight;
