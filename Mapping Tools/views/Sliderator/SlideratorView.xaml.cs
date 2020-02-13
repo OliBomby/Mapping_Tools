@@ -499,13 +499,15 @@ namespace Mapping_Tools.Views {
             var hitObjectHere = beatmap.HitObjects.FirstOrDefault(o => Math.Abs(arg.ExportTime - o.Time) < 5) ??
                                 new HitObject(arg.ExportTime, 0, SampleSet.Auto, SampleSet.Auto);
 
+            
             // Clone the hit object to not affect the already existing hit object instance with changes
             var clone = new HitObject(hitObjectHere.GetLine()) {
                 IsCircle = false, IsSpinner = false, IsHoldNote = false, IsSlider = true
             };
-
+            
             // Give the new hit object the sliderated anchors
-            clone.SetSliderPath(new SliderPath(PathType.Bezier, slideration.ToArray()));
+            clone.SetAllCurvePoints(slideration);
+            clone.SliderType = PathType.Bezier;
             clone.PixelLength = sliderator.MaxS;
 
             // Update progressbar

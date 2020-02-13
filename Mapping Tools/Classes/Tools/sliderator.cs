@@ -147,7 +147,7 @@ namespace Mapping_Tools.Classes.Tools {
             // These values are placeholders. Experimentation has to be done to find better parameters
             const double maxOvershot = 64;  // Max error in wantedLength
             const double epsilon = 0.01;  // Resolution for for speed differentiation
-            const double deltaT = 0.01;  // Size of time step
+            const double deltaT = 0.02;  // Size of time step
 
             _slider = new List<Neuron>();
 
