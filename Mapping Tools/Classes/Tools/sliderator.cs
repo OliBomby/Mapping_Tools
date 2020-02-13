@@ -284,41 +284,46 @@ namespace Mapping_Tools.Classes.Tools {
         private void GenerateDendrites() {
             double leftovers = 0;
             foreach (var neuron in _slider.Where(n => n.Terminal != null)) {
+                // Find angles for the neuron and the terminal to point the dendrites towards
                 Vector2 dendriteDir1;
                 Vector2 dendriteDir2;
-                if (Vector2.Distance(neuron.Nucleus.Pos, neuron.Terminal.Nucleus.Pos) > Precision.DOUBLE_EPSILON) {
+                if (neuron.Terminal.Nucleus.SegmentIndex != neuron.Nucleus.SegmentIndex) {
                     var dir = Math.Sign(neuron.Terminal.Nucleus.SegmentIndex - neuron.Nucleus.SegmentIndex);
                     var nextPoint1 = _path[neuron.Nucleus.SegmentIndex + dir];
                     var nextPoint2 = _path[neuron.Terminal.Nucleus.SegmentIndex - dir];
                     dendriteDir1 = (nextPoint1 - neuron.Nucleus.PathPoint).Normalized();
-                    dendriteDir2 = (nextPoint2 - neuron.Nucleus.PathPoint).Normalized();
+                    dendriteDir2 = (nextPoint2 - neuron.Terminal.Nucleus.PathPoint).Normalized();
                 } else {
                     var nextPoint1 = _path[neuron.Nucleus.SegmentIndex + 1];
-                    var nextPoint2 = _path[neuron.Terminal.Nucleus.SegmentIndex - 1];
+                    // Prevent NaN
+                    if (neuron.Nucleus.PathPoint == nextPoint1) {
+                        nextPoint1 = _path[neuron.Nucleus.SegmentIndex - 1];
+                    }
                     dendriteDir1 = (nextPoint1 - neuron.Nucleus.PathPoint).Normalized();
-                    dendriteDir2 = (nextPoint2 - neuron.Nucleus.PathPoint).Normalized();
+                    dendriteDir2 = dendriteDir1;
                 }
 
                 // Do an even split of dendrites between this neuron and the terminal
                 var dendriteToAdd = neuron.DendriteLength + leftovers;
 
+                // Find the time at which the position function goes in between the neuron and the terminal
                 var width = neuron.Terminal.Time - neuron.Time;
                 var axonWidth = neuron.AxonLenth / Velocity;
-
                 var middleTime = BinarySearchUtil.DoubleBinarySearch(neuron.Time, neuron.Terminal.Time, 0.01,
                     d => PositionFunction(d) <= (neuron.Nucleus.PathPosition + neuron.Terminal.Nucleus.PathPosition) / 2);
 
+                // Calculate the distribution of dendrites to let the axon pass through the middle at the same time as the position funciton does
                 var leftPortion = MathHelper.Clamp((2 * (middleTime - neuron.Time) - axonWidth) / (2 * (width - axonWidth)), 0, 1);
                 var rightPortion = 1 - leftPortion;
 
                 var dendriteToAddLeft = dendriteToAdd * leftPortion;
                 var dendriteToAddRight = dendriteToAdd * rightPortion;
 
+                // Get the speeds at the times of the dendrites to give the dendrites appriopriate lengths to the speed at the time
                 var speedLeft = GetSpeedAtTime(neuron.Time + dendriteToAddLeft / Velocity / 2, 0.01);
                 var speedRight = GetSpeedAtTime(neuron.Terminal.Time - dendriteToAddRight / Velocity / 2, 0.01);
 
                 dendriteToAddRight += AddDendriteLength(neuron, dendriteToAddLeft, dendriteDir1, 2, Math.Pow(10 * speedLeft, 2));
-
                 leftovers = AddDendriteLength(neuron.Terminal, dendriteToAddRight, dendriteDir2, 2, Math.Pow(10 * speedRight, 2));
             }
         }
