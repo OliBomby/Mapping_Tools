@@ -413,6 +413,35 @@ namespace Mapping_Tools.Views {
                 return false;
             }
 
+            var maxVelocity = GetMaxVelocity(ViewModel, Graph.Anchors);
+            if (double.IsInfinity(maxVelocity)) {
+                message = "Infinite slope on the path is illegal.";
+                return false;
+            }
+
+            if (maxVelocity > ViewModel.VelocityLimit + Precision.DOUBLE_EPSILON) {
+                message = "A velocity faster than the SV limit is illegal. Please check your graph or increase the SV limit.";
+                return false;
+            }
+
+            if (double.IsInfinity(ViewModel.BeatsPerMinute) || double.IsNaN(ViewModel.BeatsPerMinute) ||
+                Math.Abs(ViewModel.BeatsPerMinute) < Precision.DOUBLE_EPSILON) {
+                message = "The beats per minute field has an illegal value";
+                return false;
+            }
+
+            if (double.IsInfinity(ViewModel.GraphBeats) || double.IsNaN(ViewModel.GraphBeats) ||
+                Math.Abs(ViewModel.GraphBeats) < Precision.DOUBLE_EPSILON) {
+                message = "The beat length field has an illegal value";
+                return false;
+            }
+
+            if (double.IsInfinity(ViewModel.GlobalSv) || double.IsNaN(ViewModel.GlobalSv) ||
+                Math.Abs(ViewModel.GlobalSv) < Precision.DOUBLE_EPSILON) {
+                message = "The global SV field has an illegal value";
+                return false;
+            }
+
             message = string.Empty;
             return true;
         }
@@ -448,7 +477,8 @@ namespace Mapping_Tools.Views {
         private string Sliderate(SlideratorVm arg, BackgroundWorker worker) {
             // Get slider path like from the hit object preview
             var sliderPath = new SliderPath(arg.VisibleHitObject.SliderType,
-                arg.VisibleHitObject.GetAllCurvePoints().ToArray(), GetMaxCompletion(arg, arg.GraphState.Anchors) * arg.PixelLength);
+                arg.VisibleHitObject.GetAllCurvePoints().ToArray(),
+                GetMaxCompletion(arg, arg.GraphState.Anchors) * arg.PixelLength);
             var path = new List<Vector2>();
             sliderPath.GetPathToProgress(path, 0, 1);
 
@@ -487,6 +517,12 @@ namespace Mapping_Tools.Views {
 
             var slideration = sliderator.Sliderate();
 
+            // Check for some illegal output
+            if (double.IsInfinity(sliderator.MaxS) || double.IsNaN(sliderator.MaxS) ||
+                slideration.Any(v => double.IsNaN(v.X) || double.IsNaN(v.Y))) {
+                return "Encountered unexpected values from Sliderator. Please check your input.";
+            }
+
             // Update progressbar
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(60);
 
@@ -499,12 +535,12 @@ namespace Mapping_Tools.Views {
             var hitObjectHere = beatmap.HitObjects.FirstOrDefault(o => Math.Abs(arg.ExportTime - o.Time) < 5) ??
                                 new HitObject(arg.ExportTime, 0, SampleSet.Auto, SampleSet.Auto);
 
-            
+
             // Clone the hit object to not affect the already existing hit object instance with changes
             var clone = new HitObject(hitObjectHere.GetLine()) {
                 IsCircle = false, IsSpinner = false, IsHoldNote = false, IsSlider = true
             };
-            
+
             // Give the new hit object the sliderated anchors
             clone.SetAllCurvePoints(slideration);
             clone.SliderType = PathType.Bezier;
