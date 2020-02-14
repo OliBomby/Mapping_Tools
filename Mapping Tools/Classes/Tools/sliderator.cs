@@ -248,7 +248,7 @@ namespace Mapping_Tools.Classes.Tools {
             }
         }
 
-        private BezierSubdivision DoubleMiddleApproximation(Neuron neuron, Vector2 middlePoint, out double length) {
+        private static BezierSubdivision DoubleMiddleApproximation(Neuron neuron, Vector2 middlePoint, out double length) {
             var firstPoint = neuron.Nucleus.Pos;
             var lastPoint = neuron.Terminal.Nucleus.Pos;
 
@@ -281,27 +281,25 @@ namespace Mapping_Tools.Classes.Tools {
             return bs;
         }
 
+        private Vector2 NearbyNonZeroDiff(int index) {
+            Vector2 diff = Vector2.UnitX;
+            for (int i = 0; i < 10; i++) {
+                diff = _diff[MathHelper.Clamp(index + i, 0, _diff.Count - 1)];
+                if (diff.X > Precision.DOUBLE_EPSILON || diff.Y > Precision.DOUBLE_EPSILON) {
+                    return diff;
+                }
+            }
+
+            return diff;
+        }
+
         private void GenerateDendrites() {
             double leftovers = 0;
             foreach (var neuron in _slider.Where(n => n.Terminal != null)) {
                 // Find angles for the neuron and the terminal to point the dendrites towards
-                Vector2 dendriteDir1;
-                Vector2 dendriteDir2;
-                if (neuron.Terminal.Nucleus.SegmentIndex != neuron.Nucleus.SegmentIndex) {
-                    var dir = Math.Sign(neuron.Terminal.Nucleus.SegmentIndex - neuron.Nucleus.SegmentIndex);
-                    var nextPoint1 = _path[neuron.Nucleus.SegmentIndex + dir];
-                    var nextPoint2 = _path[neuron.Terminal.Nucleus.SegmentIndex - dir];
-                    dendriteDir1 = (nextPoint1 - neuron.Nucleus.PathPoint).Normalized();
-                    dendriteDir2 = (nextPoint2 - neuron.Terminal.Nucleus.PathPoint).Normalized();
-                } else {
-                    var nextPoint1 = _path[neuron.Nucleus.SegmentIndex + 1];
-                    // Prevent NaN
-                    if (neuron.Nucleus.PathPoint == nextPoint1) {
-                        nextPoint1 = _path[neuron.Nucleus.SegmentIndex - 1];
-                    }
-                    dendriteDir1 = (nextPoint1 - neuron.Nucleus.PathPoint).Normalized();
-                    dendriteDir2 = dendriteDir1;
-                }
+                var dir = Math.Sign(neuron.Terminal.Nucleus.PathPosition - neuron.Nucleus.PathPosition);
+                var dendriteDir1 = dir * NearbyNonZeroDiff(neuron.Nucleus.SegmentIndex).Normalized();
+                var dendriteDir2 = -dir * NearbyNonZeroDiff(neuron.Terminal.Nucleus.SegmentIndex).Normalized();
 
                 // Do an even split of dendrites between this neuron and the terminal
                 var dendriteToAdd = neuron.DendriteLength + leftovers;
@@ -333,13 +331,23 @@ namespace Mapping_Tools.Classes.Tools {
                 var size = MathHelper.Clamp(Math.Floor(length), Math.Max(minLength, 1), Math.Min(maxLength, 12));
 
                 var dendrite = (dir * -size).Rounded();
-                while (dendrite.Length > 12) {
+                var dendriteLength = dendrite.Length;
+
+                // Shorten dendrites longer than 12 pixels to keep dendrites invisible
+                while (dendriteLength > 12) {
                     size -= 0.5;
                     dendrite = (dir * -size).Rounded();
+                    dendriteLength = dendrite.Length;
+                }
+
+                // Prevent any dendrites shorter than 1 to never get an infinite loop
+                if (dendriteLength < 1) {
+                    dendrite = Vector2.UnitX;
+                    dendriteLength = 1;
                 }
 
                 neuron.Dendrites.Add(dendrite);
-                length -= dendrite.Length;
+                length -= dendriteLength;
             }
 
             return length;

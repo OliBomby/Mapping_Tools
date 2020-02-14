@@ -93,8 +93,7 @@ namespace Mapping_Tools.Views {
                             }));
                         break;
                     case Vector2 newVector2:
-                        if (ViewModel.GraphMode == GraphMode.Position &&
-                            (anchor.PreviousAnchor != null || anchor.NextAnchor != null)) {
+                        if (ViewModel.GraphMode == GraphMode.Position && anchor.PreviousAnchor != null) {
                             // List of bounds. X represents the minimum Y value and Y represents the maximum Y value
                             // I use Vector2 here because it has usefull math methods
                             var bounds = new List<Vector2>();
