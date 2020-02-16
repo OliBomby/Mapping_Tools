@@ -218,9 +218,9 @@
 
                     <StackPanel Orientation="Horizontal" Margin="0 10 0 0">
                         <TextBlock Text="Expected segment count: "
-                                   ToolTip="This is the estimated segment count for your result. More segments means more lag, so try to optimise this value."/>
+                                   ToolTip="This is the estimated segment count for your result. Less segments means less lag, so try to optimise this value."/>
                         <TextBlock Text="{Binding ExpectedSegments}"
-                                   ToolTip="This is the estimated segment count for your result. More segments means more lag, so try to optimise this value."/>
+                                   ToolTip="This is the estimated segment count for your result. Less segments means less lag, so try to optimise this value."/>
                     </StackPanel>
 
                     <CheckBox x:Name="DelegateSvToBpmBox" Content="Delegate SV to BPM" Margin="0 15 0 0"
