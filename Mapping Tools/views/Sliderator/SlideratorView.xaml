@@ -56,142 +56,181 @@
                                                    Stroke="YellowGreen" Fill="DarkSlateGray" SliderBallStroke="White" Thickness="50"/>
             </materialDesign:Card>
 
-            <StackPanel Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Margin="0 10 0 0">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+            <ScrollViewer Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Margin="0 10 0 0" VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
 
-                    <ComboBox Grid.Column="0" ItemsSource="{Binding ImportModes}" SelectedItem="{Binding ImportMode}" Margin="0 0 5 0"/>
+                        <ComboBox Grid.Column="0" ItemsSource="{Binding ImportModes}" SelectedItem="{Binding ImportMode}" Margin="0 0 5 0"/>
 
-                    <TextBox Grid.Column="1" Text="{Binding ExactTime, Converter={StaticResource TimeToStringConverter}}" materialDesign:HintAssist.Hint="Time"
-                             Width="100" Visibility="{Binding ExactTimeBoxVisibility, FallbackValue=Collapsed}" Margin="5 0 5 2"/>
+                        <TextBox Grid.Column="1" Text="{Binding ExactTime, Converter={StaticResource TimeToStringConverter}}" materialDesign:HintAssist.Hint="Time"
+                                 Width="100" Visibility="{Binding ExactTimeBoxVisibility, FallbackValue=Collapsed}" Margin="5 0 5 2"/>
 
-                    <Button Grid.Column="2" Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ImportCommand}" Margin="5 0 0 0"
-                            ToolTip="Import sliders into the preview." HorizontalAlignment="Right" VerticalAlignment="Top">
-                        Import sliders
-                    </Button>
-                </Grid>
-                <Grid Margin="0 10 0 0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock Grid.Column="0" Text="{Binding LoadedHitObjects.Count, StringFormat={}Loaded {0} slider(s)}"/>
-
-                    <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal">
-                        <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" Margin="0 0 5 0"
-                                Command="{Binding MoveLeftCommand}">
-                            <Button.Content>
-                                <materialDesign:PackIcon Kind="KeyboardArrowLeft" Width="24" Height="24"/>
-                            </Button.Content>
+                        <Button Grid.Column="2" Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ImportCommand}" Margin="5 0 0 0"
+                                ToolTip="Import sliders into the preview." HorizontalAlignment="Right" VerticalAlignment="Top">
+                            Import sliders
                         </Button>
-                        <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}"
-                                Command="{Binding MoveRightCommand}">
-                            <Button.Content>
-                                <materialDesign:PackIcon Kind="KeyboardArrowRight" Width="24" Height="24"/>
-                            </Button.Content>
-                        </Button>
+                    </Grid>
+                    <Grid Margin="0 10 0 0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0" Text="{Binding LoadedHitObjects.Count, StringFormat={}Loaded {0} slider(s)}"/>
+
+                        <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal">
+                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" Margin="0 0 5 0"
+                                    Command="{Binding MoveLeftCommand}">
+                                <Button.Content>
+                                    <materialDesign:PackIcon Kind="KeyboardArrowLeft" Width="24" Height="24"/>
+                                </Button.Content>
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}"
+                                    Command="{Binding MoveRightCommand}">
+                                <Button.Content>
+                                    <materialDesign:PackIcon Kind="KeyboardArrowRight" Width="24" Height="24"/>
+                                </Button.Content>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                    <Grid Margin="0 10 0 0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox Grid.Column="0" Margin="0 0 10 0" materialDesign:HintAssist.Hint="Beat length" Style="{StaticResource MaterialDesignFloatingHintTextBox}">
+                            <TextBox.Text>
+                                <Binding Path="GraphBeats" Mode="TwoWay" UpdateSourceTrigger="LostFocus"  NotifyOnValidationError="True">
+                                    <Binding.Converter>
+                                        <domain:DoubleToStringConverter/>
+                                    </Binding.Converter>
+                                    <Binding.ValidationRules>
+                                        <domain:IsLessOrEqualValidationRule>
+                                            <domain:IsLessOrEqualValidationRule.ValueWrapper>
+                                                <domain:DoubleWrapper Value="10000"/>
+                                            </domain:IsLessOrEqualValidationRule.ValueWrapper>
+                                        </domain:IsLessOrEqualValidationRule>
+                                        <domain:IsGreaterOrEqualValidationRule>
+                                            <domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                                <domain:DoubleWrapper Value="0"/>
+                                            </domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                        </domain:IsGreaterOrEqualValidationRule>
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </TextBox.Text>
+                        </TextBox>
+                        <TextBox Grid.Column="1" Margin="0 0 10 0" materialDesign:HintAssist.Hint="BPM" Style="{StaticResource MaterialDesignFloatingHintTextBox}">
+                            <TextBox.Text>
+                                <Binding Path="BeatsPerMinute" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
+                                    <Binding.Converter>
+                                        <domain:DoubleToStringConverter/>
+                                    </Binding.Converter>
+                                    <Binding.ValidationRules>
+                                        <domain:IsGreaterValidationRule>
+                                            <domain:IsGreaterValidationRule.ValueWrapper>
+                                                <domain:DoubleWrapper Value="0"/>
+                                            </domain:IsGreaterValidationRule.ValueWrapper>
+                                        </domain:IsGreaterValidationRule>
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </TextBox.Text>
+                        </TextBox>
+                        <TextBox Grid.Column="2" Margin="0" materialDesign:HintAssist.Hint="Global SV" Style="{StaticResource MaterialDesignFloatingHintTextBox}">
+                            <TextBox.Text>
+                                <Binding Path="GlobalSv" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
+                                    <Binding.Converter>
+                                        <domain:DoubleToStringConverter/>
+                                    </Binding.Converter>
+                                    <Binding.ValidationRules>
+                                        <domain:IsLessOrEqualValidationRule>
+                                            <domain:IsLessOrEqualValidationRule.ValueWrapper>
+                                                <domain:DoubleWrapper Value="3.6"/>
+                                            </domain:IsLessOrEqualValidationRule.ValueWrapper>
+                                        </domain:IsLessOrEqualValidationRule>
+                                        <domain:IsGreaterOrEqualValidationRule>
+                                            <domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                                <domain:DoubleWrapper Value="0.4"/>
+                                            </domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                        </domain:IsGreaterOrEqualValidationRule>
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </TextBox.Text>
+                        </TextBox>
+                    </Grid>
+
+                    <TextBox Margin="0 20 0 0" materialDesign:HintAssist.Hint="Time" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                             ToolTip="The time in the current beatmap to export the sliderated slider to."
+                             Text="{Binding ExportTime, Converter={StaticResource TimeToStringConverter}}"/>
+
+                    <ComboBox Margin="0 10 0 0" ToolTip="Choose how you want to export sliders." ItemsSource="{Binding ExportModes}"
+                              SelectedItem="{Binding ExportMode}"/>
+
+                    <CheckBox x:Name="ManualSvBox" Content="Manually choose new SV" Margin="0 30 0 0"
+                              ToolTip="Allows you to manually choose the SV for the sliderator algorithm. Lower SV generally reduces lag from the resulting slider."
+                              IsChecked="{Binding ManualVelocity}"/>
+                    <TextBox materialDesign:HintAssist.Hint="New SV" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                             ToolTip="The new SV for the sliderated slider. This SV inlfuences the Sliderator algorithm. Use lower SV for less lag."
+                             IsEnabled="{Binding ManualVelocity}">
+                        <TextBox.Text>
+                            <Binding Path="NewVelocity" Mode="TwoWay" UpdateSourceTrigger="LostFocus"  NotifyOnValidationError="True">
+                                <Binding.Converter>
+                                    <domain:DoubleToStringConverter/>
+                                </Binding.Converter>
+                                <Binding.ValidationRules>
+                                    <domain:IsGreaterOrEqualValidationRule>
+                                        <domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                            <domain:DoubleWrapper Value="0"/>
+                                        </domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                    </domain:IsGreaterOrEqualValidationRule>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
+                    <TextBox materialDesign:HintAssist.Hint="Minimum tumour length" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                             ToolTip="Determines the minimum length for tumours which slow down the sliderball in the sliderated slider. Longer tumours result in less lag but a more shaky sliderball.">
+                        <TextBox.Text>
+                            <Binding Path="MinDendrite" Mode="TwoWay" UpdateSourceTrigger="LostFocus"  NotifyOnValidationError="True">
+                                <Binding.Converter>
+                                    <domain:DoubleToStringConverter/>
+                                </Binding.Converter>
+                                <Binding.ValidationRules>
+                                    <domain:IsLessOrEqualValidationRule>
+                                        <domain:IsLessOrEqualValidationRule.ValueWrapper>
+                                            <domain:DoubleWrapper Value="12"/>
+                                        </domain:IsLessOrEqualValidationRule.ValueWrapper>
+                                    </domain:IsLessOrEqualValidationRule>
+                                    <domain:IsGreaterOrEqualValidationRule>
+                                        <domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                            <domain:DoubleWrapper Value="1"/>
+                                        </domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                    </domain:IsGreaterOrEqualValidationRule>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
+
+                    <StackPanel Orientation="Horizontal" Margin="0 10 0 0">
+                        <TextBlock Text="Expected segment count: "
+                                   ToolTip="This is the estimated segment count for your result. More segments means more lag, so try to optimise this value."/>
+                        <TextBlock Text="{Binding ExpectedSegments}"
+                                   ToolTip="This is the estimated segment count for your result. More segments means more lag, so try to optimise this value."/>
                     </StackPanel>
-                </Grid>
-                <Grid Margin="0 10 0 0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
 
-                    <TextBox Grid.Column="0" Margin="0 0 10 0" materialDesign:HintAssist.Hint="Beat length" Style="{StaticResource MaterialDesignFloatingHintTextBox}">
-                        <TextBox.Text>
-                            <Binding Path="GraphBeats" Mode="TwoWay" UpdateSourceTrigger="LostFocus"  NotifyOnValidationError="True">
-                                <Binding.Converter>
-                                    <domain:DoubleToStringConverter/>
-                                </Binding.Converter>
-                                <Binding.ValidationRules>
-                                    <domain:IsLessOrEqualValidationRule>
-                                        <domain:IsLessOrEqualValidationRule.ValueWrapper>
-                                            <domain:DoubleWrapper Value="10000"/>
-                                        </domain:IsLessOrEqualValidationRule.ValueWrapper>
-                                    </domain:IsLessOrEqualValidationRule>
-                                    <domain:IsGreaterOrEqualValidationRule>
-                                        <domain:IsGreaterOrEqualValidationRule.ValueWrapper>
-                                            <domain:DoubleWrapper Value="0"/>
-                                        </domain:IsGreaterOrEqualValidationRule.ValueWrapper>
-                                    </domain:IsGreaterOrEqualValidationRule>
-                                </Binding.ValidationRules>
-                            </Binding>
-                        </TextBox.Text>
-                    </TextBox>
-                    <TextBox Grid.Column="1" Margin="0 0 10 0" materialDesign:HintAssist.Hint="BPM" Style="{StaticResource MaterialDesignFloatingHintTextBox}">
-                        <TextBox.Text>
-                            <Binding Path="BeatsPerMinute" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
-                                <Binding.Converter>
-                                    <domain:DoubleToStringConverter/>
-                                </Binding.Converter>
-                                <Binding.ValidationRules>
-                                    <domain:IsGreaterValidationRule>
-                                        <domain:IsGreaterValidationRule.ValueWrapper>
-                                            <domain:DoubleWrapper Value="0"/>
-                                        </domain:IsGreaterValidationRule.ValueWrapper>
-                                    </domain:IsGreaterValidationRule>
-                                </Binding.ValidationRules>
-                            </Binding>
-                        </TextBox.Text>
-                    </TextBox>
-                    <TextBox Grid.Column="2" Margin="0" materialDesign:HintAssist.Hint="Global SV" Style="{StaticResource MaterialDesignFloatingHintTextBox}">
-                        <TextBox.Text>
-                            <Binding Path="GlobalSv" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
-                                <Binding.Converter>
-                                    <domain:DoubleToStringConverter/>
-                                </Binding.Converter>
-                                <Binding.ValidationRules>
-                                    <domain:IsLessOrEqualValidationRule>
-                                        <domain:IsLessOrEqualValidationRule.ValueWrapper>
-                                            <domain:DoubleWrapper Value="3.6"/>
-                                        </domain:IsLessOrEqualValidationRule.ValueWrapper>
-                                    </domain:IsLessOrEqualValidationRule>
-                                    <domain:IsGreaterOrEqualValidationRule>
-                                        <domain:IsGreaterOrEqualValidationRule.ValueWrapper>
-                                            <domain:DoubleWrapper Value="0.4"/>
-                                        </domain:IsGreaterOrEqualValidationRule.ValueWrapper>
-                                    </domain:IsGreaterOrEqualValidationRule>
-                                </Binding.ValidationRules>
-                            </Binding>
-                        </TextBox.Text>
-                    </TextBox>
-                </Grid>
-
-                <TextBox Margin="0 30 0 0" materialDesign:HintAssist.Hint="Time" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                         ToolTip="The time in the current beatmap to export the sliderated slider to."
-                         Text="{Binding ExportTime, Converter={StaticResource TimeToStringConverter}}"/>
-
-                <ComboBox Margin="0 10 0 0" ToolTip="Choose how you want to export sliders." ItemsSource="{Binding ExportModes}"
-                          SelectedItem="{Binding ExportMode}"/>
-
-                <CheckBox x:Name="ManualSvBox" Content="Manually choose new SV" Margin="0 30 0 0"
-                          ToolTip="Allows you to manually choose the SV for the sliderator algorithm. Lower SV generally reduces lag from the resulting slider."/>
-                <TextBox materialDesign:HintAssist.Hint="New SV" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                         ToolTip="The new SV for the sliderated slider. This SV inlfuences the Sliderator algorithm. Use lower SV for less lag."
-                         IsEnabled="{Binding ElementName=ManualSvBox, Path=IsChecked}"/>
-                <TextBox materialDesign:HintAssist.Hint="Minimum tumour length" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                         ToolTip="Determines the minimum length for tumours which slow down the sliderball in the sliderated slider. Longer tumours result in less lag but a more shaky sliderball."/>
-
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Expected segment count: "
-                               ToolTip="This is the estimated segment count for your result. More segments means more lag, so try to optimise this value."/>
-                    <TextBlock Text="todo"
-                               ToolTip="This is the estimated segment count for your result. More segments means more lag, so try to optimise this value."/>
+                    <CheckBox x:Name="DelegateSvToBpmBox" Content="Delegate SV to BPM" Margin="0 15 0 0"
+                              ToolTip="Use BPM to determine the velocity of the resulting slider instead of greenline SV."
+                              IsChecked="{Binding DelegateToBpm}"/>
+                    <CheckBox Content="Remove slider ticks"
+                              ToolTip="Use a NaN greenline to remove slider ticks from the resulting slider."
+                              IsEnabled="{Binding DelegateToBpm}"/>
                 </StackPanel>
-
-                <CheckBox x:Name="DelegateSvToBpmBox" Content="Delegate SV to BPM"
-                          ToolTip="Use BPM to determine the velocity of the resulting slider instead of greenline SV."/>
-                <CheckBox Content="Remove slider ticks"
-                          ToolTip="Use a NaN greenline to remove slider ticks from the resulting slider."
-                          IsEnabled="{Binding ElementName=DelegateSvToBpmBox, Path=IsChecked}"/>
-            </StackPanel>
+            </ScrollViewer>
 
             <Grid Grid.Row="1" Grid.Column="1" Margin="10 0 10 0">
                 <Grid.RowDefinitions>

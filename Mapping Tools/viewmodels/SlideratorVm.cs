@@ -33,6 +33,12 @@ namespace Mapping_Tools.Viewmodels {
         private double _velocityLimit;
         private bool _showRedAnchors;
         private bool _showGraphAnchors;
+        private bool _manualVelocity;
+        private double _newVelocity;
+        private double _minDendrite;
+        private int _expectedSegments;
+        private bool _delegateToBpm;
+        private bool _removeSliderTicks;
 
         #region Properties
 
@@ -162,6 +168,36 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _showGraphAnchors, value);
         }
 
+        public bool ManualVelocity {
+            get => _manualVelocity;
+            set => Set(ref _manualVelocity, value);
+        }
+
+        public double NewVelocity {
+            get => _newVelocity;
+            set => Set(ref _newVelocity, value);
+        }
+
+        public double MinDendrite {
+            get => _minDendrite;
+            set => Set(ref _minDendrite, value);
+        }
+
+        public int ExpectedSegments {
+            get => _expectedSegments;
+            set => Set(ref _expectedSegments, value);
+        }
+
+        public bool DelegateToBpm {
+            get => _delegateToBpm;
+            set => Set(ref _delegateToBpm, value);
+        }
+
+        public bool RemoveSliderTicks {
+            get => _removeSliderTicks;
+            set => Set(ref _removeSliderTicks, value);
+        }
+
         [JsonIgnore]
         public CommandImplementation ImportCommand { get; }
         [JsonIgnore]
@@ -191,6 +227,12 @@ namespace Mapping_Tools.Viewmodels {
             GraphMode = GraphMode.Position;
             ShowRedAnchors = false;
             ShowGraphAnchors = false;
+            ManualVelocity = false;
+            NewVelocity = 1;
+            MinDendrite = 2;
+            ExpectedSegments = 0;
+            DelegateToBpm = false;
+            RemoveSliderTicks = false;
 
             ImportCommand = new CommandImplementation(Import);
             MoveLeftCommand = new CommandImplementation(_ => {
