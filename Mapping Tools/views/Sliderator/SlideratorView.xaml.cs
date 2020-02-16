@@ -519,7 +519,8 @@ namespace Mapping_Tools.Views {
             // Do Sliderator
             var sliderator = new Sliderator {
                 PositionFunction = positionFunction, MaxT = arg.GraphBeats / arg.BeatsPerMinute * 60000,
-                Velocity = otherVelocity
+                Velocity = otherVelocity,
+                MinDendriteLength = arg.MinDendrite
             };
             sliderator.SetPath(path);
 
