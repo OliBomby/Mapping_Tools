@@ -326,11 +326,14 @@ namespace Mapping_Tools.Components.Graph {
 
                             if (integrableInterpolator is IInvertibleInterpolator invertibleInterpolator) {
                                 // Calculate all the zeros of the interpolation
-                                var zeros = invertibleInterpolator.GetInverse(-p1.Y / difference.Y).Where(o => o <= 1 && o >= 0);
-
-                                newMaxIntegral = zeros.Select(z =>
-                                    integrableInterpolator.GetIntegral(0, z) * difference.X * difference.Y +
-                                    z * difference.X * p1.Y).Max();
+                                var zeros = invertibleInterpolator.GetInverse(-p1.Y / difference.Y).Where(o => o <= 1 && o >= 0).ToArray();
+                                if (zeros.Length > 0) {
+                                    newMaxIntegral = zeros.Select(z =>
+                                        integrableInterpolator.GetIntegral(0, z) * difference.X * difference.Y +
+                                        z * difference.X * p1.Y).Max();
+                                } else {
+                                    newMaxIntegral = double.NegativeInfinity;
+                                }
                             } else {
                                 double newMaxIntegralPosition = GradientDescentUtil.GradientAscent(
                                     d => integrableInterpolator.GetIntegral(0, d) * difference.X * difference.Y + d * difference.X * p1.Y,
@@ -512,11 +515,14 @@ namespace Mapping_Tools.Components.Graph {
 
                             if (integrableInterpolator is IInvertibleInterpolator invertibleInterpolator) {
                                 // Calculate all the zeros of the interpolation
-                                var zeros = invertibleInterpolator.GetInverse(-p1.Y / difference.Y).Where(o => o <= 1 && o >= 0);
-
-                                newMinIntegral = zeros.Select(z =>
-                                    integrableInterpolator.GetIntegral(0, z) * difference.X * difference.Y +
-                                    z * difference.X * p1.Y).Min();
+                                var zeros = invertibleInterpolator.GetInverse(-p1.Y / difference.Y).Where(o => o <= 1 && o >= 0).ToArray();
+                                if (zeros.Length > 0) {
+                                    newMinIntegral = zeros.Select(z =>
+                                        integrableInterpolator.GetIntegral(0, z) * difference.X * difference.Y +
+                                        z * difference.X * p1.Y).Min();
+                                } else {
+                                    newMinIntegral = double.PositiveInfinity;
+                                }
                             } else {
                                 double newMinIntegralPosition = GradientDescentUtil.GradientDescent(
                                     d => integrableInterpolator.GetIntegral(0, d) * difference.X * difference.Y + d * difference.X * p1.Y,
@@ -526,7 +532,7 @@ namespace Mapping_Tools.Components.Graph {
                                                         newMinIntegralPosition * difference.X * p1.Y;
                             }
 
-                            if (newMinIntegral > minIntegral) {
+                            if (newMinIntegral < minIntegral) {
                                 minIntegral = newMinIntegral;
                             }
                         }

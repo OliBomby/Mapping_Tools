@@ -82,14 +82,12 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
         }
 
         private static IEnumerable<double> SineWaveInverse(double y, double T) {
-            if (Math.Abs(T) < Precision.DOUBLE_EPSILON) yield break;
-
             var x1 = T * Math.Acos(1 - 2 * y) / (2 * Math.PI);
             yield return x1;
             var x2 = T * Math.Acos(2 * y - 1) / (2 * Math.PI) + T / 2;
             yield return x2;
 
-            while (true) {
+            for (int i = 0; i < 1000; i++) {
                 x1 += T;
                 if (x1 > 1) yield break;
                 yield return x1;
@@ -100,14 +98,12 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
         }
 
         private IEnumerable<double> TriangleWaveInverse(double y, double T) {
-            if (Math.Abs(T) < Precision.DOUBLE_EPSILON) yield break;
-
             var x1 = T * y / 2;
             yield return x1;
             var x2 = T * (2 - y) / 2;
             yield return x2;
-
-            while (true) {
+            
+            for (int i = 0; i < 1000; i++) {
                 x1 += T;
                 if (x1 > 1) yield break;
                 yield return x1;
