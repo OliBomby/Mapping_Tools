@@ -36,7 +36,7 @@ namespace Mapping_Tools.Viewmodels {
         private bool _manualVelocity;
         private double _newVelocity;
         private double _minDendrite;
-        private int _expectedSegments;
+        private double _distanceTraveled;
         private bool _delegateToBpm;
         private bool _removeSliderTicks;
 
@@ -73,6 +73,7 @@ namespace Mapping_Tools.Viewmodels {
             set {
                 if (Set(ref _globalSv, value)) {
                     UpdateSvGraphMultiplier();
+                    RaisePropertyChanged(nameof(ExpectedSegments));
                 }
             } 
         }
@@ -83,6 +84,7 @@ namespace Mapping_Tools.Viewmodels {
             set {
                 if (Set(ref _graphBeats, value)) {
                     UpdateAnimationDuration();
+                    RaisePropertyChanged(nameof(ExpectedSegments));
                 }
             }
         }
@@ -175,17 +177,36 @@ namespace Mapping_Tools.Viewmodels {
 
         public double NewVelocity {
             get => _newVelocity;
-            set => Set(ref _newVelocity, value);
+            set  {
+                if (Set(ref _newVelocity, value)) {
+                    RaisePropertyChanged(nameof(ExpectedSegments));
+                }
+            }
         }
 
         public double MinDendrite {
             get => _minDendrite;
-            set => Set(ref _minDendrite, value);
+            set {
+                if (Set(ref _minDendrite, value)) {
+                    RaisePropertyChanged(nameof(ExpectedSegments));
+                }
+            }
+        }
+
+        public double DistanceTraveled {
+            get => _distanceTraveled;
+            set {
+                if (Set(ref _distanceTraveled, value)) {
+                    RaisePropertyChanged(nameof(ExpectedSegments));
+                }
+            }
         }
 
         public int ExpectedSegments {
-            get => _expectedSegments;
-            set => Set(ref _expectedSegments, value);
+            get {
+                var newLength = NewVelocity * 100 * GlobalSv * GraphBeats;
+                return (int)((newLength - DistanceTraveled) / MinDendrite + DistanceTraveled / 10);
+            }
         }
 
         public bool DelegateToBpm {
@@ -230,7 +251,7 @@ namespace Mapping_Tools.Viewmodels {
             ManualVelocity = false;
             NewVelocity = 1;
             MinDendrite = 2;
-            ExpectedSegments = 0;
+            DistanceTraveled = 0;
             DelegateToBpm = false;
             RemoveSliderTicks = false;
 

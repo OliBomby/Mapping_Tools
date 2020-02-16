@@ -177,6 +177,9 @@ namespace Mapping_Tools.Views {
         }
 
         private void UpdateVelocity() {
+            ViewModel.DistanceTraveled = ViewModel.GraphMode == GraphMode.Position ? 
+                Graph.Anchors.GetDistanceTraveled() * ViewModel.PixelLength : 
+                Graph.Anchors.GetIntegralDistanceTraveled() * ViewModel.SvGraphMultiplier * ViewModel.PixelLength;
             if (!ViewModel.ManualVelocity) {
                 ViewModel.NewVelocity = GetMaxVelocity(ViewModel, Graph.Anchors);
             }
