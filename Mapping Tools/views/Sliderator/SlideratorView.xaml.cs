@@ -143,6 +143,7 @@ namespace Mapping_Tools.Views {
 
             AnimateProgress(GraphHitObjectElement);
             UpdatePointsOfInterest();
+            UpdateVelocity();
         }
 
         private bool NextOverSpeedLimit(Anchor anchor) {
@@ -172,6 +173,13 @@ namespace Mapping_Tools.Views {
         private void AnchorsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
             AnimateProgress(GraphHitObjectElement);
             UpdatePointsOfInterest();
+            UpdateVelocity();
+        }
+
+        private void UpdateVelocity() {
+            if (!ViewModel.ManualVelocity) {
+                ViewModel.NewVelocity = GetMaxVelocity(ViewModel, Graph.Anchors);
+            }
         }
 
         private void ViewModelOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
@@ -210,6 +218,7 @@ namespace Mapping_Tools.Views {
             UpdateGraphModeStuff();
             AnimateProgress(GraphHitObjectElement);
             UpdatePointsOfInterest();
+            UpdateVelocity();
             Graph.HorizontalMarkerGenerator = new DividedBeatMarkerGenerator(ViewModel.BeatSnapDivisor);
             Graph.Anchors.CollectionChanged += AnchorsOnCollectionChanged;
             Graph.Anchors.AnchorsChanged += AnchorsOnAnchorsChanged;
@@ -412,7 +421,7 @@ namespace Mapping_Tools.Views {
                 return false;
             }
 
-            var maxVelocity = GetMaxVelocity(ViewModel, Graph.Anchors);
+            var maxVelocity = ViewModel.NewVelocity;
             if (double.IsInfinity(maxVelocity)) {
                 message = "Infinite slope on the path is illegal.";
                 return false;
@@ -485,7 +494,7 @@ namespace Mapping_Tools.Views {
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(10);
 
             // Get the highest velocity occuring in the graph
-            double velocity = GetMaxVelocity(arg, arg.GraphState.Anchors); // Velocity is in SV
+            double velocity = arg.NewVelocity; // Velocity is in SV
             // Do bad stuff to the velocity to make sure its the same SV as after writing it to .osu code
             velocity = -100 / double.Parse((-100 / velocity).ToInvariant(), CultureInfo.InvariantCulture);
             // Other velocity is in px / ms
