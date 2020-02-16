@@ -557,6 +557,7 @@ namespace Mapping_Tools.Views {
             clone.SetAllCurvePoints(slideration);
             clone.SliderType = PathType.Bezier;
             clone.PixelLength = sliderator.MaxS;
+            clone.SliderVelocity = velocity;
 
             // Update progressbar
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(70);
@@ -570,14 +571,39 @@ namespace Mapping_Tools.Views {
             }
 
             // Add SV
-            clone.SliderVelocity = velocity;
-            var timingPointsChanges = beatmap.HitObjects.Select(ho => {
+            var timingPointsChanges = new List<TimingPointsChange>();
+
+            if (arg.DelegateToBpm) {
+                var tpAfter = timing.GetRedlineAtTime(clone.Time).Copy();
+                var tpOn = tpAfter.Copy();
+
+                tpAfter.Offset = clone.Time;
+                tpOn.Offset = clone.Time - 1;  // This one will be on the slider
+
+                tpAfter.OmitFirstBarLine = true;
+                tpOn.OmitFirstBarLine = true;
+
+                // Express velocity in BPM
+                tpOn.MpB /= clone.SliderVelocity;
+                // NaN SV results in removal of slider ticks
+                clone.SliderVelocity = arg.RemoveSliderTicks ? double.NaN : 1;
+                
+                // Add redlines
+                timingPointsChanges.Add(new TimingPointsChange(tpOn, mpb:true, inherited:true, omitFirstBarLine:true, fuzzyness:0));
+                timingPointsChanges.Add(new TimingPointsChange(tpAfter, mpb:true, inherited:true, omitFirstBarLine:true, fuzzyness:0));
+
+                clone.Time -= 1;
+            }
+
+            // Add SV for every hit object so the SV doesnt change for anything else than the sliderated slider
+            timingPointsChanges.AddRange(beatmap.HitObjects.Select(ho => {
                     var sv = ho.SliderVelocity;
                     var tp = timing.GetTimingPointAtTime(ho.Time).Copy();
                     tp.MpB = -100 / sv;
                     tp.Offset = ho.Time;
-                    return new TimingPointsChange(tp, mpb: true);
-                }).ToList();
+                    return new TimingPointsChange(tp, mpb: true, fuzzyness:0);
+                }));
+
             TimingPointsChange.ApplyChanges(timing, timingPointsChanges);
 
             // Update progressbar

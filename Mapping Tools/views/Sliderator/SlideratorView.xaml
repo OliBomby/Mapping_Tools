@@ -228,7 +228,8 @@
                               IsChecked="{Binding DelegateToBpm}"/>
                     <CheckBox Content="Remove slider ticks"
                               ToolTip="Use a NaN greenline to remove slider ticks from the resulting slider."
-                              IsEnabled="{Binding DelegateToBpm}"/>
+                              IsEnabled="{Binding DelegateToBpm}"
+                              IsChecked="{Binding RemoveSliderTicks}"/>
                 </StackPanel>
             </ScrollViewer>
 

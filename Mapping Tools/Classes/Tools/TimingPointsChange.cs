@@ -17,8 +17,9 @@ namespace Mapping_Tools.Classes.Tools {
         public bool Inherited;
         public bool Kiai;
         public bool OmitFirstBarLine;
+        public double Fuzzyness;
 
-        public TimingPointsChange(TimingPoint tpNew, bool mpb = false, bool meter = false, bool sampleset = false, bool index = false, bool volume = false, bool inherited = false, bool kiai = false, bool omitFirstBarLine = false) {
+        public TimingPointsChange(TimingPoint tpNew, bool mpb = false, bool meter = false, bool sampleset = false, bool index = false, bool volume = false, bool inherited = false, bool kiai = false, bool omitFirstBarLine = false, double fuzzyness=2) {
             MyTP = tpNew;
             MpB = mpb;
             Meter = meter;
@@ -28,6 +29,7 @@ namespace Mapping_Tools.Classes.Tools {
             Inherited = inherited;
             Kiai = kiai;
             OmitFirstBarLine = omitFirstBarLine;
+            Fuzzyness = fuzzyness;
         }
 
         public void AddChange(List<TimingPoint> list, bool allAfter = false) {
@@ -42,7 +44,7 @@ namespace Mapping_Tools.Classes.Tools {
                 if (tp.Offset < MyTP.Offset && (prevTimingPoint == null || tp.Offset >= prevTimingPoint.Offset)) {
                     prevTimingPoint = tp;
                 }
-                if (Math.Abs(tp.Offset - MyTP.Offset) < 2) {
+                if (Math.Abs(tp.Offset - MyTP.Offset) <= Fuzzyness) {
                     onTimingPoints.Add(tp);
                     onHasRed = tp.Uninherited || onHasRed;
                     onHasGreen = !tp.Uninherited || onHasGreen;
