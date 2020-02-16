@@ -170,6 +170,27 @@
 
                 <ComboBox Margin="0 10 0 0" ToolTip="Choose how you want to export sliders." ItemsSource="{Binding ExportModes}"
                           SelectedItem="{Binding ExportMode}"/>
+
+                <CheckBox x:Name="ManualSvBox" Content="Manually choose new SV" Margin="0 30 0 0"
+                          ToolTip="Allows you to manually choose the SV for the sliderator algorithm. Lower SV generally reduces lag from the resulting slider."/>
+                <TextBox materialDesign:HintAssist.Hint="New SV" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                         ToolTip="The new SV for the sliderated slider. This SV inlfuences the Sliderator algorithm. Use lower SV for less lag."
+                         IsEnabled="{Binding ElementName=ManualSvBox, Path=IsChecked}"/>
+                <TextBox materialDesign:HintAssist.Hint="Minimum tumour length" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                         ToolTip="Determines the minimum length for tumours which slow down the sliderball in the sliderated slider. Longer tumours result in less lag but a more shaky sliderball."/>
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Expected segment count: "
+                               ToolTip="This is the estimated segment count for your result. More segments means more lag, so try to optimise this value."/>
+                    <TextBlock Text="todo"
+                               ToolTip="This is the estimated segment count for your result. More segments means more lag, so try to optimise this value."/>
+                </StackPanel>
+
+                <CheckBox x:Name="DelegateSvToBpmBox" Content="Delegate SV to BPM"
+                          ToolTip="Use BPM to determine the velocity of the resulting slider instead of greenline SV."/>
+                <CheckBox Content="Remove slider ticks"
+                          ToolTip="Use a NaN greenline to remove slider ticks from the resulting slider."
+                          IsEnabled="{Binding ElementName=DelegateSvToBpmBox, Path=IsChecked}"/>
             </StackPanel>
 
             <Grid Grid.Row="1" Grid.Column="1" Margin="10 0 10 0">

@@ -30,7 +30,7 @@ namespace Mapping_Tools.Views {
     public partial class SlideratorView : ISavable<SlideratorVm> {
         public static readonly string ToolName = "Sliderator";
 
-        public static readonly string ToolDescription = "";
+        public static readonly string ToolDescription = "test";
 
         private bool _ignoreAnchorsChange;
 
