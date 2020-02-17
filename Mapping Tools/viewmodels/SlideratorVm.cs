@@ -232,7 +232,11 @@ namespace Mapping_Tools.Viewmodels {
 
         public bool ExportAsStream {
             get => _exportAsStream;
-            set => Set(ref _exportAsStream, value);
+            set {
+                if (Set(ref _exportAsStream, value)) {
+                    RaisePropertyChanged(nameof(ExpectedSegments));
+                }
+            }
         }
 
         [JsonIgnore]
