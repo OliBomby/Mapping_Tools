@@ -172,6 +172,10 @@
                     <ComboBox Margin="0 10 0 0" ToolTip="Choose how you want to export sliders." ItemsSource="{Binding ExportModes}"
                               SelectedItem="{Binding ExportMode}"/>
 
+                    <CheckBox Content="Export as stream instead" Margin="0 10 0 0"
+                              ToolTip="Instead of exporting a slider, export an accelerating stream instead."
+                              IsChecked="{Binding ExportAsStream}"/>
+
                     <CheckBox x:Name="ManualSvBox" Content="Manually choose new SV" Margin="0 20 0 1"
                               ToolTip="Allows you to manually choose the SV for the sliderator algorithm. Lower SV generally reduces lag from the resulting slider."
                               IsChecked="{Binding ManualVelocity}"/>
@@ -255,7 +259,7 @@
                                 <Binding.ValidationRules>
                                     <domain:IsLessOrEqualValidationRule>
                                         <domain:IsLessOrEqualValidationRule.ValueWrapper>
-                                            <domain:DoubleWrapper Value="10000"/>
+                                            <domain:DoubleWrapper Value="100000"/>
                                         </domain:IsLessOrEqualValidationRule.ValueWrapper>
                                     </domain:IsLessOrEqualValidationRule>
                                     <domain:IsGreaterOrEqualValidationRule>

@@ -387,6 +387,16 @@ namespace Mapping_Tools.Classes.Tools {
             GenerateDendrites();
             return AnchorsList();
         }
+         
+        public List<Vector2> SliderateStream(double deltaT) {
+            var points = new List<Vector2>();
+
+            for (double t = 0; t <= MaxT + Precision.DOUBLE_EPSILON; t += deltaT) {
+                points.Add(PositionAt(PositionFunction(t)).Rounded());
+            }
+
+            return points;
+        }
 
         internal class LatticePoint {
             public Vector2 Pos; // lattice point

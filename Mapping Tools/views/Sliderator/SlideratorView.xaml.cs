@@ -475,7 +475,7 @@ namespace Mapping_Tools.Views {
             RunTool(MainWindow.AppWindow.GetCurrentMaps()[0]);
         }
 
-        private void RunTool(string path, bool quick = false) {
+        private void RunTool(string path) {
             if (!CanRun) return;
 
             IOHelper.SaveMapBackup(path);
@@ -511,6 +511,9 @@ namespace Mapping_Tools.Views {
             // Other velocity is in px / ms
             var otherVelocity = velocity * arg.SvGraphMultiplier * arg.PixelLength * arg.BeatsPerMinute / 60000;
 
+            // Time between timeline ticks for stream export
+            var deltaT = 60000 / arg.BeatsPerMinute / arg.BeatSnapDivisor;
+
             // make a position function for Sliderator
             Sliderator.PositionFunctionDelegate positionFunction;
             // We convert the graph GetValue function to a function that works like ms -> px
@@ -535,7 +538,9 @@ namespace Mapping_Tools.Views {
             };
             sliderator.SetPath(path);
 
-            var slideration = sliderator.Sliderate();
+            var slideration = arg.ExportAsStream ? 
+                sliderator.SliderateStream(deltaT) : 
+                sliderator.Sliderate();
 
             // Check for some illegal output
             if (double.IsInfinity(sliderator.MaxS) || double.IsNaN(sliderator.MaxS) ||
@@ -558,61 +563,80 @@ namespace Mapping_Tools.Views {
 
             // Clone the hit object to not affect the already existing hit object instance with changes
             var clone = new HitObject(hitObjectHere.GetLine()) {
-                IsCircle = false, IsSpinner = false, IsHoldNote = false, IsSlider = true
+                IsCircle = arg.ExportAsStream, IsSpinner = false, IsHoldNote = false, IsSlider = !arg.ExportAsStream
             };
-
-            // Give the new hit object the sliderated anchors
-            clone.SetAllCurvePoints(slideration);
-            clone.SliderType = PathType.Bezier;
-            clone.PixelLength = sliderator.MaxS;
-            clone.SliderVelocity = velocity;
 
             // Update progressbar
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(70);
-            
-            // Add hit object
-            if (arg.ExportMode == ExportMode.Add) {
-                beatmap.HitObjects.Add(clone);
-            } else {
-                beatmap.HitObjects.Remove(hitObjectHere);
-                beatmap.HitObjects.Add(clone);
-            }
 
-            // Add SV
-            var timingPointsChanges = new List<TimingPointsChange>();
-
-            if (arg.DelegateToBpm) {
-                var tpAfter = timing.GetRedlineAtTime(clone.Time).Copy();
-                var tpOn = tpAfter.Copy();
-
-                tpAfter.Offset = clone.Time;
-                tpOn.Offset = clone.Time - 1;  // This one will be on the slider
-
-                tpAfter.OmitFirstBarLine = true;
-                tpOn.OmitFirstBarLine = true;
-
-                // Express velocity in BPM
-                tpOn.MpB /= clone.SliderVelocity;
-                // NaN SV results in removal of slider ticks
-                clone.SliderVelocity = arg.RemoveSliderTicks ? double.NaN : 1;
+            if (!arg.ExportAsStream) {
+                // Give the new hit object the sliderated anchors
+                clone.SetAllCurvePoints(slideration);
+                clone.SliderType = PathType.Bezier;
+                clone.PixelLength = sliderator.MaxS;
+                clone.SliderVelocity = velocity;
                 
-                // Add redlines
-                timingPointsChanges.Add(new TimingPointsChange(tpOn, mpb:true, inherited:true, omitFirstBarLine:true, fuzzyness:0));
-                timingPointsChanges.Add(new TimingPointsChange(tpAfter, mpb:true, inherited:true, omitFirstBarLine:true, fuzzyness:0));
+                // Add hit object
+                if (arg.ExportMode == ExportMode.Add) {
+                    beatmap.HitObjects.Add(clone);
+                } else {
+                    beatmap.HitObjects.Remove(hitObjectHere);
+                    beatmap.HitObjects.Add(clone);
+                }
 
-                clone.Time -= 1;
+                // Add SV
+                var timingPointsChanges = new List<TimingPointsChange>();
+
+                if (arg.DelegateToBpm) {
+                    var tpAfter = timing.GetRedlineAtTime(clone.Time).Copy();
+                    var tpOn = tpAfter.Copy();
+
+                    tpAfter.Offset = clone.Time;
+                    tpOn.Offset = clone.Time - 1;  // This one will be on the slider
+
+                    tpAfter.OmitFirstBarLine = true;
+                    tpOn.OmitFirstBarLine = true;
+
+                    // Express velocity in BPM
+                    tpOn.MpB /= clone.SliderVelocity;
+                    // NaN SV results in removal of slider ticks
+                    clone.SliderVelocity = arg.RemoveSliderTicks ? double.NaN : 1;
+                    
+                    // Add redlines
+                    timingPointsChanges.Add(new TimingPointsChange(tpOn, mpb:true, inherited:true, omitFirstBarLine:true, fuzzyness:0));
+                    timingPointsChanges.Add(new TimingPointsChange(tpAfter, mpb:true, inherited:true, omitFirstBarLine:true, fuzzyness:0));
+
+                    clone.Time -= 1;
+                }
+
+                // Add SV for every hit object so the SV doesnt change for anything else than the sliderated slider
+                timingPointsChanges.AddRange(beatmap.HitObjects.Select(ho => {
+                        var sv = ho.SliderVelocity;
+                        var tp = timing.GetTimingPointAtTime(ho.Time).Copy();
+                        tp.MpB = -100 / sv;
+                        tp.Offset = ho.Time;
+                        return new TimingPointsChange(tp, mpb: true, fuzzyness:0);
+                    }));
+
+                TimingPointsChange.ApplyChanges(timing, timingPointsChanges);
+            } else {
+                // Add hit objects
+                if (arg.ExportMode == ExportMode.Override) {
+                    beatmap.HitObjects.Remove(hitObjectHere);
+                }
+
+                double t = arg.ExportTime;
+                foreach (var pos in slideration) {
+                    clone.Pos = pos;
+                    clone.Time = t;
+                    beatmap.HitObjects.Add(clone);
+
+                    clone = new HitObject(clone.GetLine()) {
+                        IsCircle = true, IsSpinner = false, IsHoldNote = false, IsSlider = false, NewCombo = false
+                    };
+                    t += deltaT;
+                }
             }
-
-            // Add SV for every hit object so the SV doesnt change for anything else than the sliderated slider
-            timingPointsChanges.AddRange(beatmap.HitObjects.Select(ho => {
-                    var sv = ho.SliderVelocity;
-                    var tp = timing.GetTimingPointAtTime(ho.Time).Copy();
-                    tp.MpB = -100 / sv;
-                    tp.Offset = ho.Time;
-                    return new TimingPointsChange(tp, mpb: true, fuzzyness:0);
-                }));
-
-            TimingPointsChange.ApplyChanges(timing, timingPointsChanges);
 
             // Update progressbar
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(80);

@@ -39,6 +39,7 @@ namespace Mapping_Tools.Viewmodels {
         private double _distanceTraveled;
         private bool _delegateToBpm;
         private bool _removeSliderTicks;
+        private bool _exportAsStream;
 
         #region Properties
 
@@ -211,8 +212,11 @@ namespace Mapping_Tools.Viewmodels {
 
         public int ExpectedSegments {
             get {
+                if (ExportAsStream) {
+                    return (int) (GraphBeats * BeatSnapDivisor) + 1;
+                }
                 var newLength = NewVelocity * 100 * GlobalSv * GraphBeats;
-                return (int)((newLength - DistanceTraveled) / MinDendrite + DistanceTraveled / 10);
+                return (int) ((newLength - DistanceTraveled) / MinDendrite + DistanceTraveled / 10);
             }
         }
 
@@ -224,6 +228,11 @@ namespace Mapping_Tools.Viewmodels {
         public bool RemoveSliderTicks {
             get => _removeSliderTicks;
             set => Set(ref _removeSliderTicks, value);
+        }
+
+        public bool ExportAsStream {
+            get => _exportAsStream;
+            set => Set(ref _exportAsStream, value);
         }
 
         [JsonIgnore]
@@ -261,6 +270,7 @@ namespace Mapping_Tools.Viewmodels {
             DistanceTraveled = 0;
             DelegateToBpm = false;
             RemoveSliderTicks = false;
+            ExportAsStream = false;
 
             ImportCommand = new CommandImplementation(Import);
             MoveLeftCommand = new CommandImplementation(_ => {
