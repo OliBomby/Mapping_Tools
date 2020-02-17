@@ -266,12 +266,19 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// Grabs the current Beats Per Minute from the <see cref="TimingPoint"/>
         /// </summary>
         /// <returns></returns>
-        public double GetBPM() {
+        public double GetBpm() {
             if( Uninherited ) {
                 return 60000 / MpB;
             }
-            else {
-                return -100 / MpB;
+
+            return -100 / MpB;
+        }
+
+        public void SetBpm(double bpm) {
+            if (Uninherited) {
+                MpB = 60000 / bpm;
+            } else {
+                MpB = -100 / bpm;
             }
         }
     }

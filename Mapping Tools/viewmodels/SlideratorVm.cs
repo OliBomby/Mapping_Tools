@@ -62,19 +62,19 @@ namespace Mapping_Tools.Viewmodels {
         public double PixelLength {
             get => _pixelLength;
             set {
-                if (Set(ref _pixelLength, value)) {
-                    UpdateSvGraphMultiplier();
-                }
+                if (!Set(ref _pixelLength, value)) return;
+                UpdateSvGraphMultiplier();
+                if (VisibleHitObject == null) return;
+                VisibleHitObject.PixelLength = value;
             } 
         }
 
         public double GlobalSv {
             get => _globalSv;
             set {
-                if (Set(ref _globalSv, value)) {
-                    UpdateSvGraphMultiplier();
-                    RaisePropertyChanged(nameof(ExpectedSegments));
-                }
+                if (!Set(ref _globalSv, value)) return;
+                UpdateSvGraphMultiplier();
+                RaisePropertyChanged(nameof(ExpectedSegments));
             } 
         }
         
@@ -82,10 +82,11 @@ namespace Mapping_Tools.Viewmodels {
         public double GraphBeats {
             get => _graphBeats;
             set {
-                if (Set(ref _graphBeats, value)) {
-                    UpdateAnimationDuration();
-                    RaisePropertyChanged(nameof(ExpectedSegments));
-                }
+                if (!Set(ref _graphBeats, value)) return;
+                UpdateAnimationDuration();
+                RaisePropertyChanged(nameof(ExpectedSegments));
+                if (VisibleHitObject == null) return;
+                VisibleHitObject.TemporalLength = value / BeatsPerMinute * 60000;
             }
         }
         
@@ -93,9 +94,11 @@ namespace Mapping_Tools.Viewmodels {
         public double BeatsPerMinute {
             get => _beatsPerMinute;
             set {
-                if (Set(ref _beatsPerMinute, value)) {
-                    UpdateAnimationDuration();
-                }
+                if (!Set(ref _beatsPerMinute, value)) return;
+                UpdateAnimationDuration();
+                if (VisibleHitObject == null) return;
+                VisibleHitObject.TemporalLength = value / BeatsPerMinute * 60000;
+                VisibleHitObject.UnInheritedTimingPoint.SetBpm(value);
             } 
         }
 
@@ -139,7 +142,11 @@ namespace Mapping_Tools.Viewmodels {
 
         public double ExportTime {
             get => _exportTime;
-            set => Set(ref _exportTime, value);
+            set {
+                if (!Set(ref _exportTime, value)) return;
+                if (VisibleHitObject == null) return;
+                VisibleHitObject.Time = value;
+            }
         }
 
         public ExportMode ExportMode {
@@ -343,7 +350,7 @@ namespace Mapping_Tools.Viewmodels {
         private void SetCurrentHitObject(HitObject value) {
             if (!Set(ref _visibleHitObject, value, nameof(VisibleHitObject))) return;
             if (VisibleHitObject.UnInheritedTimingPoint == null) return;
-            BeatsPerMinute = VisibleHitObject.UnInheritedTimingPoint.GetBPM();
+            BeatsPerMinute = VisibleHitObject.UnInheritedTimingPoint.GetBpm();
             GraphBeats = VisibleHitObject.TemporalLength * BeatsPerMinute / 60000;
             ExportTime = VisibleHitObject.Time;
             PixelLength = VisibleHitObject.PixelLength;
