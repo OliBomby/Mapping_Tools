@@ -55,8 +55,6 @@ namespace Mapping_Tools.Views {
 
             UpdateGraphModeStuff();
             UpdatePointsOfInterest();
-
-            ProjectManager.LoadProject(this, message: false);
         }
 
         private SlideratorVm ViewModel => (SlideratorVm) DataContext;
@@ -668,5 +666,9 @@ namespace Mapping_Tools.Views {
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "slideratorproject.json");
 
         public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Sliderator Projects");
+
+        private void SlideratorView_OnLoaded(object sender, RoutedEventArgs e) {
+            ProjectManager.LoadProject(this, message: false);
+        }
     }
 }

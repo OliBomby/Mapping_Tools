@@ -10,6 +10,7 @@
              xmlns:objectVisualiser="clr-namespace:Mapping_Tools.Components.ObjectVisualiser"
              mc:Ignorable="d" 
              x:Name="This"
+             Loaded="SlideratorView_OnLoaded"
              d:DesignHeight="450" Width="759.5" d:DataContext="{d:DesignData SlideratorVm}">
     <local:SingleRunMappingTool.Resources>
         <domain:DoubleToStringConverter x:Key="DoubleToStringConverter"/>
@@ -176,7 +177,7 @@
                               ToolTip="Instead of exporting a slider, export an accelerating stream instead."
                               IsChecked="{Binding ExportAsStream}"/>
 
-                    <CheckBox x:Name="ManualSvBox" Content="Manually choose new SV" Margin="0 20 0 1"
+                    <CheckBox x:Name="ManualSvBox" Content="Manually choose new SV" Margin="0 10 0 5"
                               ToolTip="Allows you to manually choose the SV for the sliderator algorithm. Lower SV generally reduces lag from the resulting slider."
                               IsChecked="{Binding ManualVelocity}"/>
                     <TextBox materialDesign:HintAssist.Hint="New SV" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 0 5"

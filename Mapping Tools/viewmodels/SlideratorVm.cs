@@ -98,7 +98,7 @@ namespace Mapping_Tools.Viewmodels {
                 if (!Set(ref _beatsPerMinute, value)) return;
                 UpdateAnimationDuration();
                 if (VisibleHitObject == null) return;
-                VisibleHitObject.TemporalLength = value / BeatsPerMinute * 60000;
+                VisibleHitObject.TemporalLength = GraphBeats / value * 60000;
                 VisibleHitObject.UnInheritedTimingPoint.SetBpm(value);
             } 
         }
