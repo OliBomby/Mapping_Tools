@@ -382,6 +382,14 @@ namespace Mapping_Tools.Views {
             if (messageBoxResult != MessageBoxResult.Yes) return;
 
             Graph.Clear();
+            if (ViewModel.GraphMode == GraphMode.Velocity) {
+                var sv = ViewModel.PixelLength / ViewModel.GraphBeats / ViewModel.GlobalSv / 100;
+                Graph.Anchors.First().Pos = new Vector2(0, sv);
+                Graph.Anchors.Last().Pos = new Vector2(ViewModel.GraphBeats, sv);
+            } else {
+                Graph.Anchors.First().Pos = Vector2.Zero;
+                Graph.Anchors.Last().Pos = new Vector2(ViewModel.GraphBeats, 1);
+            }
         }
 
         public void UpdateGraphModeStuff() {
