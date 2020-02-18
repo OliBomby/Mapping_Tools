@@ -239,6 +239,8 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
+        public bool DoEditorRead { get; set; }
+
         [JsonIgnore]
         public CommandImplementation ImportCommand { get; }
         [JsonIgnore]
@@ -275,6 +277,7 @@ namespace Mapping_Tools.Viewmodels {
             DelegateToBpm = false;
             RemoveSliderTicks = false;
             ExportAsStream = false;
+            DoEditorRead = false;
 
             ImportCommand = new CommandImplementation(Import);
             MoveLeftCommand = new CommandImplementation(_ => {
@@ -327,6 +330,8 @@ namespace Mapping_Tools.Viewmodels {
                 if (editor != null) {
                     GlobalSv = editor.Beatmap.Difficulty["SliderMultiplier"].GetDouble();
                 }
+
+                DoEditorRead = true;
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message + ex.StackTrace, "Error");
             }

@@ -550,7 +550,14 @@ namespace Mapping_Tools.Views {
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(60);
 
             // Exporting stuff
-            var editor = new BeatmapEditor(arg.Path);
+            BeatmapEditor editor;
+            if (arg.DoEditorRead) {
+                EditorReaderStuff.TryGetNewestVersion(arg.Path, out editor);
+                arg.DoEditorRead = false;
+            } else {
+                editor = new BeatmapEditor(arg.Path);
+            }
+            
             var beatmap = editor.Beatmap;
             var timing = beatmap.BeatmapTiming;
 
