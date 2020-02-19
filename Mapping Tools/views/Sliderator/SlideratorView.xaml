@@ -32,6 +32,21 @@
                     <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
                 </materialDesign:PopupBox.ToggleContent>
                 <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
+                    Sliderator is a tool meant to make sliders with variable velocity. That means sliders that change speed during the animation. You can also make variable velocity streams with this tool.
+                    <LineBreak/>
+                    <LineBreak/>
+                    The UI consists of a slider import section, some options, a position/velocity graph, and a slider preview.
+                    <LineBreak/>
+                    <LineBreak/>
+                    To get started, simply import one or more sliders using the 'Import sliders' button. Use any of the three different import methods from the dropdown menu.
+                    <LineBreak/>
+                    <LineBreak/>
+                    The most important element is the position/velocity graph. This is where you tell Sliderator what you want your slider animation to look like. You can toggle between position and velocity mode by clicking the accent colored button below.
+                    <LineBreak/>
+                    Add, remove, or edit anchors with right click and move stuff by dragging with left click. While dragging, hold Shift for horizontal clipping, hold Ctrl for vertical clipping, and hold Alt to disable snapping.
+                    <LineBreak/>
+                    <LineBreak/>
+                    Check out all the options. The tooltips should help you further.
                 </TextBlock>
             </materialDesign:PopupBox>
         </StackPanel>
@@ -52,7 +67,8 @@
                          Margin="43 0 0 43" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                          MaxX="{Binding GraphBeats, Mode=TwoWay}"/>
 
-            <materialDesign:Card Grid.Column="2" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0" Padding="10">
+            <materialDesign:Card Grid.Column="2" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0" Padding="10"
+                                 ToolTip="Result preview">
                 <objectVisualiser:HitObjectElement x:Name="GraphHitObjectElement" Width="200" HitObject="{Binding VisibleHitObject}"
                                                    Stroke="YellowGreen" Fill="DarkSlateGray" SliderBallStroke="White" Thickness="50"/>
             </materialDesign:Card>
@@ -66,7 +82,8 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <ComboBox Grid.Column="0" ItemsSource="{Binding ImportModes}" SelectedItem="{Binding ImportMode}" Margin="0 0 5 0"/>
+                        <ComboBox Grid.Column="0" ItemsSource="{Binding ImportModes}" SelectedItem="{Binding ImportMode}" Margin="0 0 5 0"
+                                  ToolTip="Import mode"/>
 
                         <TextBox Grid.Column="1" Text="{Binding ExactTime, Converter={StaticResource TimeToStringConverter}}" materialDesign:HintAssist.Hint="Time"
                                  Width="100" Visibility="{Binding ExactTimeBoxVisibility, FallbackValue=Collapsed}" Margin="5 0 5 2"/>
@@ -86,13 +103,15 @@
 
                         <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal">
                             <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" Margin="0 0 5 0"
-                                    Command="{Binding MoveLeftCommand}">
+                                    Command="{Binding MoveLeftCommand}"
+                                    ToolTip="Go to previous slider.">
                                 <Button.Content>
                                     <materialDesign:PackIcon Kind="KeyboardArrowLeft" Width="24" Height="24"/>
                                 </Button.Content>
                             </Button>
                             <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}"
-                                    Command="{Binding MoveRightCommand}">
+                                    Command="{Binding MoveRightCommand}"
+                                    ToolTip="Go to next slider.">
                                 <Button.Content>
                                     <materialDesign:PackIcon Kind="KeyboardArrowRight" Width="24" Height="24"/>
                                 </Button.Content>
@@ -301,8 +320,10 @@
                         ToolTip="Beat snap divisor"/>
 
                 <ToolBarOverflowPanel HorizontalAlignment="Left" Grid.Row="2" Margin="5 10 5 0">
-                    <CheckBox IsChecked="{Binding ShowRedAnchors}" Content="Show red anchors" Margin="0 0 5 0"/>
-                    <CheckBox IsChecked="{Binding ShowGraphAnchors}" Content="Show graph anchors"/>
+                    <CheckBox IsChecked="{Binding ShowRedAnchors}" Content="Show red anchors" Margin="0 0 5 0"
+                              ToolTip="Show the positions of red anchors in the graph and preview."/>
+                    <CheckBox IsChecked="{Binding ShowGraphAnchors}" Content="Show graph anchors"
+                              ToolTip="Show the positions of graph anchors in the preview."/>
                 </ToolBarOverflowPanel>
             </Grid>
 

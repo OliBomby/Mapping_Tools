@@ -30,7 +30,17 @@ namespace Mapping_Tools.Views {
     public partial class SlideratorView : ISavable<SlideratorVm> {
         public static readonly string ToolName = "Sliderator";
 
-        public static readonly string ToolDescription = "test";
+        public static readonly string ToolDescription = "Sliderator is a tool meant to make sliders with variable velocity. That means sliders that change speed during the animation. You can also make variable velocity streams with this tool." +
+                                                        Environment.NewLine + Environment.NewLine +
+                                                        "The UI consists of a slider import section, some options, a position/velocity graph, and a slider preview." +
+                                                        Environment.NewLine + Environment.NewLine +
+                                                        "To get started, simply import one or more sliders using the 'Import sliders' button. Use any of the three different import methods from the dropdown menu." +
+                                                        Environment.NewLine + Environment.NewLine +
+                                                        "The most important element is the position/velocity graph. This is where you tell Sliderator what you want your slider animation to look like. You can toggle between position and velocity mode by clicking the accent colored button below." +
+                                                        Environment.NewLine +
+                                                        "Add, remove, or edit anchors with right click and move stuff by dragging with left click. While dragging, hold Shift for horizontal clipping, hold Ctrl for vertical clipping, and hold Alt to disable snapping." +
+                                                        Environment.NewLine + Environment.NewLine +
+                                                        "Check out all the options. The tooltips should help you further.";
 
         private bool _ignoreAnchorsChange;
 
