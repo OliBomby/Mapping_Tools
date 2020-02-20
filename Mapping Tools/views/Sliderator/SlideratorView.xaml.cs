@@ -589,7 +589,7 @@ namespace Mapping_Tools.Views {
                 clone.SetAllCurvePoints(slideration);
                 clone.SliderType = PathType.Bezier;
                 clone.PixelLength = sliderator.MaxS;
-                clone.SliderVelocity = velocity;
+                clone.SliderVelocity = -100 / velocity;
                 
                 // Add hit object
                 if (arg.ExportMode == ExportMode.Add) {
@@ -613,9 +613,9 @@ namespace Mapping_Tools.Views {
                     tpOn.OmitFirstBarLine = true;
 
                     // Express velocity in BPM
-                    tpOn.MpB /= clone.SliderVelocity;
+                    tpOn.MpB /= -100 / clone.SliderVelocity;
                     // NaN SV results in removal of slider ticks
-                    clone.SliderVelocity = arg.RemoveSliderTicks ? double.NaN : 1;
+                    clone.SliderVelocity = arg.RemoveSliderTicks ? double.NaN : -100;
                     
                     // Add redlines
                     timingPointsChanges.Add(new TimingPointsChange(tpOn, mpb:true, inherited:true, omitFirstBarLine:true, fuzzyness:0));
@@ -626,9 +626,9 @@ namespace Mapping_Tools.Views {
 
                 // Add SV for every hit object so the SV doesnt change for anything else than the sliderated slider
                 timingPointsChanges.AddRange(beatmap.HitObjects.Select(ho => {
-                        var sv = ho.SliderVelocity;
+                        var sv = ho == clone ? ho.SliderVelocity : timing.GetSvAtTime(ho.Time);
                         var tp = timing.GetTimingPointAtTime(ho.Time).Copy();
-                        tp.MpB = -100 / sv;
+                        tp.MpB = sv;
                         tp.Offset = ho.Time;
                         return new TimingPointsChange(tp, mpb: true, fuzzyness:0);
                     }));
