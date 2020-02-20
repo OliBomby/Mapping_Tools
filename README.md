@@ -25,9 +25,9 @@ Collection of tools for manipulating osu! beatmaps
 - [Rhythm Guide]() by [OliBomby](https://github.com/OliBomby)
 - [Geometry Dashboard]() by [OliBomby](https://github.com/OliBomby) | [CrazyRabbitKGe](https://github.com/CrazyRabbitKGe)
 - [Combo Colour Studio]() by [OliBomby](https://github.com/OliBomby)
+- [Sliderator]() by [OliBomby](https://github.com/OliBomby) | [Karoo](https://github.com/Karoo13)
 
 ## Future implementations
-- Sliderator (tool for making variable velocity sliders)
 - Timing Studio (Tool for creating perfect timing from odd-time signatures and smart timing points)
 
 ## Used libraries
