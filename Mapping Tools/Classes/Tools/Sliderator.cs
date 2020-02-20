@@ -300,6 +300,7 @@ namespace Mapping_Tools.Classes.Tools {
             foreach (var neuron in _slider.Where(n => n.Terminal != null)) {
                 // Find angles for the neuron and the terminal to point the dendrites towards
                 var dir = Math.Sign(neuron.Terminal.Nucleus.PathPosition - neuron.Nucleus.PathPosition);
+                dir = dir == 0 ? 1 : dir;
                 var dendriteDir1 = dir * NearbyNonZeroDiff(neuron.Nucleus.SegmentIndex).Normalized();
                 var dendriteDir2 = -dir * NearbyNonZeroDiff(neuron.Terminal.Nucleus.SegmentIndex).Normalized();
 
@@ -372,10 +373,9 @@ namespace Mapping_Tools.Classes.Tools {
                 }
 
                 anchors.AddRange(neuron.Axon.Points.GetRange(1, neuron.Axon.Points.Count - 2));
-                if (index == _slider.Count - 1) {
-                    anchors.Add(neuron.Axon.Points.Last());
-                }
             }
+
+            anchors.RemoveAt(anchors.Count - 1);
 
             return anchors;
         }
