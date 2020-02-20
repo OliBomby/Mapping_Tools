@@ -212,7 +212,7 @@ namespace Mapping_Tools.Classes.Tools {
             _slider.Add(currentNeuron);
 
             double totalWantedLength = _slider.Sum(n => n.WantedLength);
-            Console.WriteLine(@"Total wanted length: " + totalWantedLength);
+            //Console.WriteLine(@"Total wanted length: " + totalWantedLength);
 
             // Multiply with ratio to exactly match the expected total length
             var ratio = MaxS / totalWantedLength;
@@ -221,10 +221,10 @@ namespace Mapping_Tools.Classes.Tools {
             }
 
             totalWantedLength = _slider.Sum(n => n.WantedLength);
-            Console.WriteLine(@"Total wanted length after scale: " + totalWantedLength);
-            Console.WriteLine(@"Expected total wanted length: " + MaxS);
+            //Console.WriteLine(@"Total wanted length after scale: " + totalWantedLength);
+            //Console.WriteLine(@"Expected total wanted length: " + MaxS);
 
-            Console.WriteLine(@"Number of neurons: " + _slider.Count);
+            //Console.WriteLine(@"Number of neurons: " + _slider.Count);
         }
 
         private void GenerateAxons() {
