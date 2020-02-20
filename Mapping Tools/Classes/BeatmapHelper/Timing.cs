@@ -292,7 +292,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="length">Pixel length of slider.</param>
         /// <returns>The duration of the slider in milliseconds.</returns>
         public double CalculateSliderTemporalLength(double time, double length) {
-            return ( length * GetMpBAtTime(time) * GetSvAtTime(time) ) / ( -10000 * SliderMultiplier );
+            var sv = GetSvAtTime(time);
+            return ( length * GetMpBAtTime(time) * (double.IsNaN(sv) ? -100 : sv) ) / ( -10000 * SliderMultiplier );
         }
 
         /// <summary>
@@ -302,11 +303,12 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="temporalLength"></param>
         /// <returns></returns>
         public double CalculateSliderLength(double time, double temporalLength) {
-            return ( -10000 * temporalLength * SliderMultiplier ) / ( GetMpBAtTime(time) * GetSvAtTime(time) );
+            var sv = GetSvAtTime(time);
+            return ( -10000 * temporalLength * SliderMultiplier ) / ( GetMpBAtTime(time) * (double.IsNaN(sv) ? -100 : sv) );
         }
 
         public double CalculateSliderLengthCustomSv(double time, double temporalLength, double sv) {
-            return ( -10000 * temporalLength * SliderMultiplier ) / ( GetMpBAtTime(time) * sv );
+            return ( -10000 * temporalLength * SliderMultiplier ) / ( GetMpBAtTime(time) * (double.IsNaN(sv) ? -100 : sv) );
         }
 
         public List<TimingPoint> GetAllRedlines() {

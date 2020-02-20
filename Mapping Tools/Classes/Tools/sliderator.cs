@@ -11,6 +11,8 @@ namespace Mapping_Tools.Classes.Tools {
         public double MaxT { get; set; } // end time for PositionFunction, in ms
         public double Velocity { get; set; } // slider velocity, in px/ms
 
+        public double MinDendriteLength { get; set; } = 1;
+
         private double _Pos(double s) => PositionFunction(Math.Min(s * Velocity, MaxT)); // normalized position function, px -> px
         public double MaxS => MaxT * Velocity; // expected pixellength
 
@@ -321,8 +323,8 @@ namespace Mapping_Tools.Classes.Tools {
                 var speedLeft = GetSpeedAtTime(neuron.Time + dendriteToAddLeft / Velocity / 2, 0.01);
                 var speedRight = GetSpeedAtTime(neuron.Terminal.Time - dendriteToAddRight / Velocity / 2, 0.01);
 
-                dendriteToAddRight += AddDendriteLength(neuron, dendriteToAddLeft, dendriteDir1, 2, Math.Pow(10 * speedLeft, 2));
-                leftovers = AddDendriteLength(neuron.Terminal, dendriteToAddRight, dendriteDir2, 2, Math.Pow(10 * speedRight, 2));
+                dendriteToAddRight += AddDendriteLength(neuron, dendriteToAddLeft, dendriteDir1, MinDendriteLength, Math.Pow(10 * speedLeft, 2));
+                leftovers = AddDendriteLength(neuron.Terminal, dendriteToAddRight, dendriteDir2, MinDendriteLength, Math.Pow(10 * speedRight, 2));
             }
         }
         
@@ -384,6 +386,16 @@ namespace Mapping_Tools.Classes.Tools {
             GenerateAxons();
             GenerateDendrites();
             return AnchorsList();
+        }
+         
+        public List<Vector2> SliderateStream(double deltaT) {
+            var points = new List<Vector2>();
+
+            for (double t = 0; t <= MaxT + Precision.DOUBLE_EPSILON; t += deltaT) {
+                points.Add(PositionAt(PositionFunction(t)).Rounded());
+            }
+
+            return points;
         }
 
         internal class LatticePoint {

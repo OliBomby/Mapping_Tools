@@ -570,5 +570,38 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         #endregion
+
+        #region OtherValueGettingStuff
+        
+        public double GetDistanceTraveled() {
+            double distance = 0;
+            IGraphAnchor previousAnchor = null;
+            foreach (var anchor in this) {
+                if (previousAnchor != null) {
+                    distance += Math.Abs(GetValue(anchor.Pos.X) - GetValue(previousAnchor.Pos.X));
+                }
+
+                previousAnchor = anchor;
+            }
+
+            return distance;
+        }
+
+        // Note: This method is not accurate for segments passing through zero
+        public double GetIntegralDistanceTraveled() {
+            double distance = 0;
+            IGraphAnchor previousAnchor = null;
+            foreach (var anchor in this) {
+                if (previousAnchor != null) {
+                    distance += Math.Abs(GetIntegral(previousAnchor.Pos.X, anchor.Pos.X));
+                }
+
+                previousAnchor = anchor;
+            }
+
+            return distance;
+        }
+
+        #endregion
     }
 }
