@@ -39,3 +39,6 @@ Collection of tools for manipulating osu! beatmaps
 - [OsuMemoryDataProvider](https://github.com/Piotrekol)
 - [Microsoft Windows API Code Pack](https://github.com/aybe/Windows-API-Code-Pack-1.1)
 - [Editor Reader](https://github.com/Karoo13/EditorReader)
+- [NonInvasiveKeyboardHook](https://github.com/kfirprods/NonInvasiveKeyboardHook)
+- [Overlay.NET](https://github.com/lolp1/Overlay.NET)
+
