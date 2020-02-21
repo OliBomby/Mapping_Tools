@@ -149,7 +149,8 @@ namespace Mapping_Tools.Views {
                 Graph.IgnoreAnchorUpdates = false;
             }
 
-            AnimateProgress(GraphHitObjectElement);
+            if (ViewModel.PixelLength < 1e5)
+                AnimateProgress(GraphHitObjectElement);
             UpdatePointsOfInterest();
             UpdateVelocity();
         }
@@ -179,7 +180,8 @@ namespace Mapping_Tools.Views {
         }
 
         private void AnchorsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
-            AnimateProgress(GraphHitObjectElement);
+            if (ViewModel.PixelLength < 1e5)
+                AnimateProgress(GraphHitObjectElement);
             UpdatePointsOfInterest();
             UpdateVelocity();
         }
@@ -227,7 +229,8 @@ namespace Mapping_Tools.Views {
 
         private void UpdateEverything() {
             UpdateGraphModeStuff();
-            AnimateProgress(GraphHitObjectElement);
+            if (ViewModel.PixelLength < 1e5)
+                AnimateProgress(GraphHitObjectElement);
             UpdatePointsOfInterest();
             UpdateVelocity();
             Graph.HorizontalMarkerGenerator = new DividedBeatMarkerGenerator(ViewModel.BeatSnapDivisor);

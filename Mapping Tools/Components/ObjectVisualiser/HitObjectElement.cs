@@ -257,7 +257,7 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
         private void SetHitObject(Classes.BeatmapHelper.HitObject hitObject) {
             if (hitObject == null) return;
 
-            if (hitObject.IsSlider) {
+            if (hitObject.IsSlider && hitObject.PixelLength < 1e5) {
                 var geom = new StreamGeometry();
                 var path = CustomPixelLength == null ? hitObject.GetSliderPath() :
                     new SliderPath(hitObject.SliderType, hitObject.GetAllCurvePoints().ToArray(), CustomPixelLength);
