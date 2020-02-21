@@ -522,18 +522,28 @@ namespace Mapping_Tools.Views {
             // Time between timeline ticks for stream export
             var deltaT = 60000 / arg.BeatsPerMinute / arg.BeatSnapDivisor;
 
-            // make a position function for Sliderator
+            // Make a position function for Sliderator
             Sliderator.PositionFunctionDelegate positionFunction;
+            // Test if the function is a constant velocity
+            bool constantVelocity;
             // We convert the graph GetValue function to a function that works like ms -> px
             // d is a value representing the number of milliseconds into the slider
-            if (arg.GraphMode == GraphMode.Velocity)
+            if (arg.GraphMode == GraphMode.Velocity) {
                 // Here we use SvGraphMultiplier to get an accurate conversion from SV to slider completion per beat
                 // Completion = (100 * SliderMultiplier / PixelLength) * SV * Beats
                 positionFunction = d =>
                     arg.GraphState.GetIntegral(0, d * arg.BeatsPerMinute / 60000) * arg.SvGraphMultiplier *
                     arg.PixelLength;
-            else
+
+                constantVelocity = Precision.AlmostEquals(AnchorCollection.GetMaxValue(arg.GraphState.Anchors),
+                    AnchorCollection.GetMinValue(arg.GraphState.Anchors));
+            }
+            else {
                 positionFunction = d => arg.GraphState.GetValue(d * arg.BeatsPerMinute / 60000) * arg.PixelLength;
+
+                constantVelocity = Precision.AlmostEquals(AnchorCollection.GetMaxDerivative(arg.GraphState.Anchors),
+                    AnchorCollection.GetMinDerivative(arg.GraphState.Anchors));
+            }
 
             // Update progressbar
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(20);
@@ -586,8 +596,15 @@ namespace Mapping_Tools.Views {
 
             if (!arg.ExportAsStream) {
                 // Give the new hit object the sliderated anchors
-                clone.SetAllCurvePoints(slideration);
-                clone.SliderType = PathType.Bezier;
+                if (constantVelocity) {
+                    // The velocity is constant, so you can simplify to the original slider shape
+                    clone.SetAllCurvePoints(arg.VisibleHitObject.GetAllCurvePoints());
+                    clone.SliderType = arg.VisibleHitObject.SliderType;
+                } else {
+                    clone.SetAllCurvePoints(slideration);
+                    clone.SliderType = PathType.Bezier;
+                }
+
                 clone.PixelLength = sliderator.MaxS;
                 clone.SliderVelocity = -100 / velocity;
                 
