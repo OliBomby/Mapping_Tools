@@ -289,7 +289,7 @@ namespace Mapping_Tools.Classes.Tools {
             Vector2 diff = Vector2.UnitX;
             for (int i = 0; i < 10; i++) {
                 diff = _diff[MathHelper.Clamp(index + i, 0, _diff.Count - 1)];
-                if (diff.X > Precision.DOUBLE_EPSILON || diff.Y > Precision.DOUBLE_EPSILON) {
+                if (Math.Abs(diff.X) > Precision.DOUBLE_EPSILON || Math.Abs(diff.Y) > Precision.DOUBLE_EPSILON) {
                     return diff;
                 }
             }
