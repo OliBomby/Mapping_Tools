@@ -333,8 +333,8 @@ namespace Mapping_Tools.Classes.Tools {
                 //Console.WriteLine($@"Adding {dendriteToAddLeft + dendriteToAddRight} length to dendrites!");
                 //var beforeLength = neuron.Dendrites.Sum(d => d.Length) + neuron.Terminal.Dendrites.Sum(d => d.Length);
 
-                dendriteToAddRight += AddDendriteLength(neuron, dendriteToAddLeft, dendriteDir1, MinDendriteLength, Math.Pow(10 * speedLeft, 2));
-                leftovers = AddDendriteLength(neuron.Terminal, dendriteToAddRight, dendriteDir2, MinDendriteLength, Math.Pow(10 * speedRight, 2));
+                dendriteToAddRight += AddDendriteLength(neuron, dendriteToAddLeft, dendriteDir1, MinDendriteLength, 4 * Math.Pow(speedLeft * 2, 2));
+                leftovers = AddDendriteLength(neuron.Terminal, dendriteToAddRight, dendriteDir2, MinDendriteLength, 4 * Math.Pow(speedRight * 2, 2));
 
                 //var afterLength = neuron.Dendrites.Sum(d => d.Length) + neuron.Terminal.Dendrites.Sum(d => d.Length);
                 //Console.WriteLine($@"Actually added {afterLength - beforeLength} length to dendrites and got {leftovers} leftover!");
