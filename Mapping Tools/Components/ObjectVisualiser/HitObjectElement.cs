@@ -20,6 +20,8 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
         private double scale;
         private Transform figureTransform;
 
+        public static readonly double MaxPixelLength = 1e5;
+
         public static readonly DependencyProperty HitObjectProperty =
             DependencyProperty.Register("HitObject",
                 typeof(Classes.BeatmapHelper.HitObject), 
@@ -257,7 +259,7 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
         private void SetHitObject(Classes.BeatmapHelper.HitObject hitObject) {
             if (hitObject == null) return;
 
-            if (hitObject.IsSlider && hitObject.PixelLength < 1e5) {
+            if (hitObject.IsSlider && hitObject.PixelLength < MaxPixelLength) {
                 var geom = new StreamGeometry();
                 var path = CustomPixelLength == null ? hitObject.GetSliderPath() :
                     new SliderPath(hitObject.SliderType, hitObject.GetAllCurvePoints().ToArray(), CustomPixelLength);
