@@ -238,10 +238,9 @@ namespace Mapping_Tools.Classes.Tools {
 
                 var flatness = new BezierSubdivision(new List<Vector2> {firstPoint, middlePoint, lastPoint}).Flatness();
 
-                double length;
-                if (flatness < 0.1) {
+                double length = Vector2.Distance(firstPoint, lastPoint);
+                if (flatness < 0.1 || length < 8) {
                     neuron.Axon = new BezierSubdivision(new List<Vector2> {firstPoint, lastPoint});
-                    length = Vector2.Distance(firstPoint, lastPoint);
                 } else {
                     neuron.Axon = DoubleMiddleApproximation(neuron, middlePoint, out length);
                 }
