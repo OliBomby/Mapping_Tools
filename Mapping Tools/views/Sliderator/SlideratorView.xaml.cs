@@ -149,7 +149,7 @@ namespace Mapping_Tools.Views {
                 Graph.IgnoreAnchorUpdates = false;
             }
 
-            if (ViewModel.PixelLength < 1e5)
+            if (ViewModel.PixelLength < HitObjectElement.MaxPixelLength)
                 AnimateProgress(GraphHitObjectElement);
             UpdatePointsOfInterest();
             UpdateVelocity();
@@ -180,7 +180,7 @@ namespace Mapping_Tools.Views {
         }
 
         private void AnchorsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
-            if (ViewModel.PixelLength < 1e5)
+            if (ViewModel.PixelLength < HitObjectElement.MaxPixelLength)
                 AnimateProgress(GraphHitObjectElement);
             UpdatePointsOfInterest();
             UpdateVelocity();
@@ -202,12 +202,14 @@ namespace Mapping_Tools.Views {
                     UpdatePointsOfInterest();
                     break;
                 case nameof(ViewModel.VisibleHitObject):
-                    AnimateProgress(GraphHitObjectElement);
+                    if (ViewModel.PixelLength < HitObjectElement.MaxPixelLength)
+                        AnimateProgress(GraphHitObjectElement);
                     UpdatePointsOfInterest();
                     break;
                 case nameof(ViewModel.SvGraphMultiplier):
                 case nameof(ViewModel.GraphDuration):
-                    AnimateProgress(GraphHitObjectElement);
+                    if (ViewModel.PixelLength < HitObjectElement.MaxPixelLength)
+                        AnimateProgress(GraphHitObjectElement);
                     UpdatePointsOfInterest();
                     break;
                 case nameof(ViewModel.BeatSnapDivisor):
@@ -229,7 +231,7 @@ namespace Mapping_Tools.Views {
 
         private void UpdateEverything() {
             UpdateGraphModeStuff();
-            if (ViewModel.PixelLength < 1e5)
+            if (ViewModel.PixelLength < HitObjectElement.MaxPixelLength)
                 AnimateProgress(GraphHitObjectElement);
             UpdatePointsOfInterest();
             UpdateVelocity();
@@ -277,8 +279,9 @@ namespace Mapping_Tools.Views {
                         hitObjectMarkers.Add(new HitObjectElementMarker(completion / maxCompletion, 0.2, Brushes.DodgerBlue));
                     }
                 }
-
-                GraphHitObjectElement.ExtraMarkers = hitObjectMarkers;
+                
+                if (ViewModel.PixelLength < HitObjectElement.MaxPixelLength)
+                    GraphHitObjectElement.ExtraMarkers = hitObjectMarkers;
 
             } else {
                 GraphHitObjectElement.ExtraMarkers.Clear();
