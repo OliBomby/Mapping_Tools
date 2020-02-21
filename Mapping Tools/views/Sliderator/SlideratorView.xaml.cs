@@ -508,26 +508,6 @@ namespace Mapping_Tools.Views {
         }
 
         private string Sliderate(SlideratorVm arg, BackgroundWorker worker) {
-            // Get slider path like from the hit object preview
-            var sliderPath = new SliderPath(arg.VisibleHitObject.SliderType,
-                arg.VisibleHitObject.GetAllCurvePoints().ToArray(),
-                GetMaxCompletion(arg, arg.GraphState.Anchors) * arg.PixelLength);
-            var path = new List<Vector2>();
-            sliderPath.GetPathToProgress(path, 0, 1);
-
-            // Update progressbar
-            if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(10);
-
-            // Get the highest velocity occuring in the graph
-            double velocity = arg.NewVelocity; // Velocity is in SV
-            // Do bad stuff to the velocity to make sure its the same SV as after writing it to .osu code
-            velocity = -100 / double.Parse((-100 / velocity).ToInvariant(), CultureInfo.InvariantCulture);
-            // Other velocity is in px / ms
-            var otherVelocity = velocity * arg.SvGraphMultiplier * arg.PixelLength * arg.BeatsPerMinute / 60000;
-
-            // Time between timeline ticks for stream export
-            var deltaT = 60000 / arg.BeatsPerMinute / arg.BeatSnapDivisor;
-
             // Make a position function for Sliderator
             Sliderator.PositionFunctionDelegate positionFunction;
             // Test if the function is a constant velocity
@@ -551,27 +531,51 @@ namespace Mapping_Tools.Views {
                     AnchorCollection.GetMinDerivative(arg.GraphState.Anchors));
             }
 
-            // Update progressbar
-            if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(20);
+            // Get the highest velocity occuring in the graph
+            double velocity = arg.NewVelocity; // Velocity is in SV
+            // Do bad stuff to the velocity to make sure its the same SV as after writing it to .osu code
+            velocity = -100 / double.Parse((-100 / velocity).ToInvariant(), CultureInfo.InvariantCulture);
+            // Other velocity is in px / ms
+            var otherVelocity = velocity * arg.SvGraphMultiplier * arg.PixelLength * arg.BeatsPerMinute / 60000;
 
-            // Do Sliderator
+            // Time between timeline ticks for stream export
+            var deltaT = 60000 / arg.BeatsPerMinute / arg.BeatSnapDivisor;
+
+            // Update progressbar
+            if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(10);
+
+            List<Vector2> slideration = new List<Vector2>();
             var sliderator = new Sliderator {
                 PositionFunction = positionFunction, MaxT = arg.GraphBeats / arg.BeatsPerMinute * 60000,
                 Velocity = otherVelocity,
                 MinDendriteLength = arg.MinDendrite
             };
-            sliderator.SetPath(path);
 
-            var slideration = arg.ExportAsStream ? 
-                sliderator.SliderateStream(deltaT) : 
-                sliderator.Sliderate();
+            if (!constantVelocity) {
+                // Get slider path like from the hit object preview
+                var sliderPath = new SliderPath(arg.VisibleHitObject.SliderType,
+                    arg.VisibleHitObject.GetAllCurvePoints().ToArray(),
+                    GetMaxCompletion(arg, arg.GraphState.Anchors) * arg.PixelLength);
+                var path = new List<Vector2>();
+                sliderPath.GetPathToProgress(path, 0, 1);
 
-            // Check for some illegal output
-            if (double.IsInfinity(sliderator.MaxS) || double.IsNaN(sliderator.MaxS) ||
-                slideration.Any(v => double.IsNaN(v.X) || double.IsNaN(v.Y))) {
-                return "Encountered unexpected values from Sliderator. Please check your input.";
+                // Update progressbar
+                if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(20);
+
+                // Do Sliderator
+                sliderator.SetPath(path);
+
+                slideration = arg.ExportAsStream ? 
+                    sliderator.SliderateStream(deltaT) : 
+                    sliderator.Sliderate();
+
+                // Check for some illegal output
+                if (double.IsInfinity(sliderator.MaxS) || double.IsNaN(sliderator.MaxS) ||
+                    slideration.Any(v => double.IsNaN(v.X) || double.IsNaN(v.Y))) {
+                    return "Encountered unexpected values from Sliderator. Please check your input.";
+                }
             }
-
+            
             // Update progressbar
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(60);
 
