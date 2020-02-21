@@ -9,16 +9,13 @@ using System.Windows.Media;
 
 namespace Mapping_Tools.Components.ObjectVisualiser {
     public class HitObjectElement : FrameworkElement {
-        private SliderPath sliderPath;
-        private Geometry simpleSliderPathGeometry;
-
-        private Geometry sliderPathGeometry;
-
-        private Rect bounds;
-
-        private TranslateTransform figureTranslate;
-        private double scale;
-        private Transform figureTransform;
+        private SliderPath _sliderPath;
+        private Geometry _simpleSliderPathGeometry;
+        private Geometry _sliderPathGeometry;
+        private Rect _bounds;
+        private TranslateTransform _figureTranslate;
+        private double _scale;
+        private Transform _figureTransform;
 
         public static readonly double MaxPixelLength = 1e5;
 
@@ -145,18 +142,18 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
         }
 
         private void UpdateGeometryTransform() {
-            scale = Math.Min(ActualWidth / bounds.Width,
-                ActualHeight / bounds.Height);
-            figureTranslate = new TranslateTransform(-bounds.Left, -bounds.Top);
-            figureTransform = new TransformGroup {
+            _scale = Math.Min(ActualWidth / _bounds.Width,
+                ActualHeight / _bounds.Height);
+            _figureTranslate = new TranslateTransform(-_bounds.Left, -_bounds.Top);
+            _figureTransform = new TransformGroup {
                 Children = new TransformCollection {
-                    figureTranslate,
-                    new ScaleTransform(scale, scale, 0, 0)
+                    _figureTranslate,
+                    new ScaleTransform(_scale, _scale, 0, 0)
                 }
             };
 
-            if (sliderPathGeometry == null) return;
-            sliderPathGeometry.Transform = figureTransform;
+            if (_sliderPathGeometry == null) return;
+            _sliderPathGeometry.Transform = _figureTransform;
         }
 
         protected override void OnRender(DrawingContext drawingContext) {
@@ -166,8 +163,8 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
 
             var outlinePen = GetOutlinePen();
             
-            if (HitObject.IsSlider && sliderPathGeometry != null) {
-                drawingContext.DrawGeometry(Fill, outlinePen, sliderPathGeometry);
+            if (HitObject.IsSlider && _sliderPathGeometry != null) {
+                drawingContext.DrawGeometry(Fill, outlinePen, _sliderPathGeometry);
 
                 drawingContext.DrawGeometry(Fill, outlinePen, GetCircleGeometryAtProgress(0));
                 drawingContext.DrawGeometry(Fill, outlinePen, GetCircleGeometryAtProgress(1));
@@ -189,11 +186,11 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
         }
 
         private Pen GetOutlinePen() {
-            return Stroke == null ? null : new Pen(Stroke, Thickness * scale * BorderThickness);
+            return Stroke == null ? null : new Pen(Stroke, Thickness * _scale * BorderThickness);
         }
 
         private Pen GetSliderBallPen() {
-            return SliderBallStroke == null ? null : new Pen(SliderBallStroke, Thickness * scale * BorderThickness);
+            return SliderBallStroke == null ? null : new Pen(SliderBallStroke, Thickness * _scale * BorderThickness);
         }
 
         private Geometry GetProgressGeometry(double[] progresses) {
@@ -201,31 +198,31 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
 
             using (StreamGeometryContext gc = geom.Open()) {
                 foreach (var progress in progresses) {
-                    var pos = sliderPath.PositionAt(progress);
+                    var pos = _sliderPath.PositionAt(progress);
                     gc.BeginFigure(new Point(pos.X, pos.Y - 20), true, true);
                     gc.ArcTo(new Point(pos.X, pos.Y + 20), new Size(20, 20), Math.PI, true, SweepDirection.Clockwise, true, true);
                     gc.ArcTo(new Point(pos.X, pos.Y - 20), new Size(20, 20), Math.PI, true, SweepDirection.Clockwise, true, true);
                 }
             }
 
-            geom.Transform = figureTransform;
+            geom.Transform = _figureTransform;
             geom.FillRule = FillRule.Nonzero;
 
             return geom;
         }
 
         private Geometry GetCircleGeometryAtProgress(double progress, double size = 1) {
-            var pos = sliderPath.PositionAt(progress);
+            var pos = _sliderPath.PositionAt(progress);
             return GetCircleGeometry(pos, size);
         }
 
         private Geometry GetCircleGeometry(Vector2 pos, double size = 1) {
-            var geom = new EllipseGeometry(new Point(pos.X, pos.Y), ThicknessWithoutOutline * 0.5 * size, ThicknessWithoutOutline * 0.5 * size, figureTransform);
+            var geom = new EllipseGeometry(new Point(pos.X, pos.Y), ThicknessWithoutOutline * 0.5 * size, ThicknessWithoutOutline * 0.5 * size, _figureTransform);
             return geom;
         }
 
         private Geometry GetSquareGeometryAtProgress(double progress, double size = 1) {
-            var pos = sliderPath.PositionAt(progress);
+            var pos = _sliderPath.PositionAt(progress);
             return GetSquareGeometry(pos, size);
         }
 
@@ -233,7 +230,7 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
             var geom = new RectangleGeometry(new Rect(
                 new Point(pos.X - ThicknessWithoutOutline * 0.5 * size, pos.Y - ThicknessWithoutOutline * 0.5 * size),
                 new Point(pos.X + ThicknessWithoutOutline * 0.5 * size, pos.Y + ThicknessWithoutOutline * 0.5 * size)), 
-                0, 0, figureTransform);
+                0, 0, _figureTransform);
             return geom;
         }
 
@@ -274,24 +271,24 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
                     }
                 }
 
-                sliderPath = path;
-                simpleSliderPathGeometry = geom;
+                _sliderPath = path;
+                _simpleSliderPathGeometry = geom;
                 UpdateSliderPathGeometry();
             } else {
-                bounds = new Rect(new Point(hitObject.Pos.X - Thickness * 0.5, hitObject.Pos.Y - Thickness * 0.5),
+                _bounds = new Rect(new Point(hitObject.Pos.X - Thickness * 0.5, hitObject.Pos.Y - Thickness * 0.5),
                     new Size(Thickness, Thickness));
                 UpdateGeometryTransform();
             }
         }
 
         private void UpdateSliderPathGeometry() {
-            if (simpleSliderPathGeometry == null) return;
+            if (_simpleSliderPathGeometry == null) return;
 
-            var geom2 = simpleSliderPathGeometry.GetWidenedPathGeometry(new Pen(null, ThicknessWithoutOutline)).GetOutlinedPathGeometry();
+            var geom2 = _simpleSliderPathGeometry.GetWidenedPathGeometry(new Pen(null, ThicknessWithoutOutline)).GetOutlinedPathGeometry();
 
-            sliderPathGeometry = geom2;
-            bounds = simpleSliderPathGeometry.Bounds;
-            bounds.Inflate(Thickness * 0.5, Thickness * 0.5);
+            _sliderPathGeometry = geom2;
+            _bounds = _simpleSliderPathGeometry.Bounds;
+            _bounds.Inflate(Thickness * 0.5, Thickness * 0.5);
             UpdateGeometryTransform();
         }
 
