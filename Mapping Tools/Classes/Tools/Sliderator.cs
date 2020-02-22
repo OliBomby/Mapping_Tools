@@ -357,7 +357,7 @@ namespace Mapping_Tools.Classes.Tools {
         }
         
         private static double AddDendriteLength(Neuron neuron, double length, Vector2 dir, double minLength, double maxLength) {
-            while (length > 1) {
+            while (length > minLength) {
                 var size = MathHelper.Clamp(Math.Floor(length), Math.Max(minLength, 1), Math.Min(maxLength, 12));
 
                 var dendrite = (dir * -size).Rounded();
