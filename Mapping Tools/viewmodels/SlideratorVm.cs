@@ -387,8 +387,11 @@ namespace Mapping_Tools.Viewmodels {
             if (!Set(ref _loadedHitObjects, value, nameof(LoadedHitObjects))) return;
             LoadedHitObjects.CollectionChanged += LoadedHitObjectsOnCollectionChanged;
             if (LoadedHitObjects.Count == 0) return;
-            VisibleHitObject = LoadedHitObjects[0];
-            VisibleHitObjectIndex = 0;
+            if (VisibleHitObjectIndex == 0) {
+                VisibleHitObject = LoadedHitObjects[0];
+            } else {
+                VisibleHitObjectIndex = 0;
+            }
         }
 
         private void LoadedHitObjectsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
