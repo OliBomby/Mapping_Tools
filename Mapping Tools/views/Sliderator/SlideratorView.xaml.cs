@@ -28,6 +28,7 @@ using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
 
 namespace Mapping_Tools.Views {
     //[HiddenTool]
+    [SmartQuickRunUsage(SmartQuickRunTargets.SingleSelection)]
     public partial class SlideratorView : ISavable<SlideratorVm>, IQuickRun {
         public static readonly string ToolName = "Sliderator";
 
