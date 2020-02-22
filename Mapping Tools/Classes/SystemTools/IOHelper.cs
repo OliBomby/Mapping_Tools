@@ -17,7 +17,10 @@ namespace Mapping_Tools.Classes.SystemTools {
             DateTime now = DateTime.Now;
             string destinationDirectory = SettingsManager.GetBackupsPath();
             try {
-                File.Copy(fileToCopy, Path.Combine(destinationDirectory, now.ToString("yyyy-MM-dd HH-mm-ss") + "___" + (string.IsNullOrEmpty(customFileName) ? Path.GetFileName(fileToCopy) : customFileName)));
+                File.Copy(fileToCopy,
+                    Path.Combine(destinationDirectory, now.ToString("yyyy-MM-dd HH-mm-ss") + "___" + 
+                                                       (string.IsNullOrEmpty(customFileName) ? Path.GetFileName(fileToCopy) : customFileName)), 
+                    true);
 
                 // Delete old files if the number of backup files are over the limit
                 foreach (var fi in new DirectoryInfo(SettingsManager.GetBackupsPath()).GetFiles().OrderByDescending(x => x.CreationTime).Skip(SettingsManager.Settings.MaxBackupFiles))
