@@ -9,7 +9,9 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using Mapping_Tools.Components.Graph;
+using Mapping_Tools.Views;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Viewmodels {
@@ -255,6 +257,12 @@ namespace Mapping_Tools.Viewmodels {
         [JsonIgnore]
         public string Path { get; set; }
 
+        [JsonIgnore]
+        public SlideratorView SlideratorView { get; set; }
+
+        [JsonIgnore]
+        public bool Quick { get; set; }
+
         #endregion
 
         public SlideratorVm() {
@@ -278,21 +286,45 @@ namespace Mapping_Tools.Viewmodels {
             RemoveSliderTicks = false;
             ExportAsStream = false;
             DoEditorRead = false;
+            Quick = false;
 
-            ImportCommand = new CommandImplementation(Import);
+            ImportCommand = new CommandImplementation(_ => Import(MainWindow.AppWindow.GetCurrentMaps()[0]));
             MoveLeftCommand = new CommandImplementation(_ => {
-                VisibleHitObjectIndex = MathHelper.Clamp(VisibleHitObjectIndex - 1, 0, LoadedHitObjects.Count - 1);
+                if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)) {
+                    SlideratorView.RunFast();
+                    SlideratorView.RunFinished += SlideratorViewOnRunFinishedMoveLeftOnce;
+                } else {
+                    VisibleHitObjectIndex = MathHelper.Clamp(VisibleHitObjectIndex - 1, 0, LoadedHitObjects.Count - 1);
+                }
             });
             MoveRightCommand = new CommandImplementation(_ => {
-                VisibleHitObjectIndex = MathHelper.Clamp(VisibleHitObjectIndex + 1, 0, LoadedHitObjects.Count - 1);
+                if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)) {
+                    SlideratorView.RunFast();
+                    SlideratorView.RunFinished += SlideratorViewOnRunFinishedMoveRightOnce;
+                } else {
+                    VisibleHitObjectIndex = MathHelper.Clamp(VisibleHitObjectIndex + 1, 0, LoadedHitObjects.Count - 1);
+                }
             });
             GraphToggleCommand = new CommandImplementation(ToggleGraphMode);
         }
 
-        private void Import(object _) {
+        private void SlideratorViewOnRunFinishedMoveLeftOnce(object sender, EventArgs e) {
+            Application.Current.Dispatcher?.Invoke(() => {
+                VisibleHitObjectIndex = MathHelper.Clamp(VisibleHitObjectIndex - 1, 0, LoadedHitObjects.Count - 1);
+                SlideratorView.RunFinished -= SlideratorViewOnRunFinishedMoveLeftOnce;
+            });
+        }
+
+        private void SlideratorViewOnRunFinishedMoveRightOnce(object sender, EventArgs e) {
+            Application.Current.Dispatcher?.Invoke(() => {
+                VisibleHitObjectIndex = MathHelper.Clamp(VisibleHitObjectIndex + 1, 0, LoadedHitObjects.Count - 1);
+                SlideratorView.RunFinished -= SlideratorViewOnRunFinishedMoveRightOnce;
+            });
+        }
+
+        public void Import(string path) {
             try {
                 bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
-                string path = MainWindow.AppWindow.GetCurrentMaps()[0];
                 BeatmapEditor editor = null;
                 List<HitObject> markedObjects = null;
 

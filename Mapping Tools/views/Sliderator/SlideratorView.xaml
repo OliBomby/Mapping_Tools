@@ -104,14 +104,14 @@
                         <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal">
                             <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" Margin="0 0 5 0"
                                     Command="{Binding MoveLeftCommand}"
-                                    ToolTip="Go to previous slider.">
+                                    ToolTip="Go to previous slider. Hold Shift for quick run before going to previous slider.">
                                 <Button.Content>
                                     <materialDesign:PackIcon Kind="KeyboardArrowLeft" Width="24" Height="24"/>
                                 </Button.Content>
                             </Button>
                             <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}"
                                     Command="{Binding MoveRightCommand}"
-                                    ToolTip="Go to next slider.">
+                                    ToolTip="Go to next slider. Hold Shift for quick run before going to next slider.">
                                 <Button.Content>
                                     <materialDesign:PackIcon Kind="KeyboardArrowRight" Width="24" Height="24"/>
                                 </Button.Content>

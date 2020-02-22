@@ -15,6 +15,7 @@ using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SliderPathStuff;
 using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Components.Dialogs;
 using Mapping_Tools.Components.Graph;
@@ -27,7 +28,7 @@ using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
 
 namespace Mapping_Tools.Views {
     //[HiddenTool]
-    public partial class SlideratorView : ISavable<SlideratorVm> {
+    public partial class SlideratorView : ISavable<SlideratorVm>, IQuickRun {
         public static readonly string ToolName = "Sliderator";
 
         public static readonly string ToolDescription = "Sliderator is a tool meant to make sliders with variable velocity. That means sliders that change speed during the animation. You can also make variable velocity streams with this tool." +
@@ -51,6 +52,7 @@ namespace Mapping_Tools.Views {
 
             DataContext = new SlideratorVm();
             ViewModel.PropertyChanged += ViewModelOnPropertyChanged;
+            ViewModel.SlideratorView = this;
 
             Graph.VerticalMarkerGenerator = new DoubleMarkerGenerator(0, 1/4d);
             Graph.HorizontalMarkerGenerator = new DividedBeatMarkerGenerator(4);
@@ -230,6 +232,7 @@ namespace Mapping_Tools.Views {
         }
 
         private void UpdateEverything() {
+            ViewModel.SlideratorView = this;
             UpdateGraphModeStuff();
             if (ViewModel.PixelLength < HitObjectElement.MaxPixelLength)
                 AnimateProgress(GraphHitObjectElement);
@@ -479,22 +482,23 @@ namespace Mapping_Tools.Views {
             return true;
         }
 
-        private async void Start_Click(object sender, RoutedEventArgs e) {
+        private void Start_Click(object sender, RoutedEventArgs e) {
+            RunTool(MainWindow.AppWindow.GetCurrentMaps()[0]);
+        }
+
+        private async void RunTool(string path, bool quick = false) {
+            if (!CanRun) return;
+
             if (!ValidateToolInput(out var message)) {
                 var dialog = new MessageDialog(message);
                 await DialogHost.Show(dialog, "RootDialog");
                 return;
             }
 
-            RunTool(MainWindow.AppWindow.GetCurrentMaps()[0]);
-        }
-
-        private void RunTool(string path) {
-            if (!CanRun) return;
-
             IOHelper.SaveMapBackup(path);
 
             ViewModel.Path = path;
+            ViewModel.Quick = quick;
             ViewModel.GraphState = Graph.GetGraphState();
             if (ViewModel.GraphState.CanFreeze) ViewModel.GraphState.Freeze();
 
@@ -581,8 +585,9 @@ namespace Mapping_Tools.Views {
 
             // Exporting stuff
             BeatmapEditor editor;
+            bool editorRead = false;
             if (arg.DoEditorRead) {
-                EditorReaderStuff.TryGetNewestVersion(arg.Path, out editor);
+                editorRead = EditorReaderStuff.TryGetNewestVersion(arg.Path, out editor);
                 arg.DoEditorRead = false;
             } else {
                 editor = new BeatmapEditor(arg.Path);
@@ -689,8 +694,12 @@ namespace Mapping_Tools.Views {
 
             // Complete progressbar
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(100);
+            
+            // Do stuff
+            if (arg.Quick)
+                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, editorRead));
 
-            return "Done!";
+            return arg.Quick ? string.Empty : "Done!";
         }
 
         public SlideratorVm GetSaveData() {
@@ -714,5 +723,19 @@ namespace Mapping_Tools.Views {
         private void SlideratorView_OnLoaded(object sender, RoutedEventArgs e) {
             ProjectManager.LoadProject(this, message: false);
         }
+
+        public void RunFast() {
+            var currentMap = IOHelper.GetCurrentBeatmap();
+            RunTool(currentMap, true);
+        }
+
+        public void QuickRun() {
+            var currentMap = IOHelper.GetCurrentBeatmap();
+
+            ViewModel.Import(currentMap);
+            RunTool(currentMap, true);
+        }
+
+        public event EventHandler RunFinished;
     }
 }
