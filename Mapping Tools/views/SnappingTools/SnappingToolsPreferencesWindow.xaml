@@ -61,19 +61,19 @@
                     <Border Padding="5 10">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
-                                <TextBlock Width="100" Text="Snap Key" VerticalAlignment="Bottom" Margin="0 0 0 6" ToolTip="Press and hold this key to snap your cursor to the closest virtual object."/>
+                                <TextBlock Width="100" Text="Snap key" VerticalAlignment="Bottom" Margin="0 0 0 6" ToolTip="Press and hold this key to snap your cursor to the closest virtual object."/>
                                 <components1:HotkeyEditorControl Width="150" VerticalAlignment="Bottom" Hotkey="{Binding SnapHotkey}"/>
-                                <TextBlock Width="100" Text="Select Key" VerticalAlignment="Bottom" Margin="10 0 0 6" ToolTip="Press or hold this key to select virtual objects."/>
+                                <TextBlock Width="100" Text="Select key" VerticalAlignment="Bottom" Margin="10 0 0 6" ToolTip="Press or hold this key to select virtual objects."/>
                                 <components1:HotkeyEditorControl Width="150" VerticalAlignment="Bottom" Hotkey="{Binding SelectHotkey}"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
-                                <TextBlock Width="100" Text="Lock Key" VerticalAlignment="Bottom" Margin="0 0 0 6" ToolTip="Press or hold this key to lock virtual objects."/>
+                                <TextBlock Width="100" Text="Lock key" VerticalAlignment="Bottom" Margin="0 0 0 6" ToolTip="Press or hold this key to lock virtual objects."/>
                                 <components1:HotkeyEditorControl Width="150" VerticalAlignment="Bottom" Hotkey="{Binding LockHotkey}"/>
-                                <TextBlock Width="100" Text="Usability Key" VerticalAlignment="Bottom" Margin="10 0 0 6" ToolTip="Press or hold this key to select which virtual objects can get used by generators."/>
+                                <TextBlock Width="100" Text="Usability key" VerticalAlignment="Bottom" Margin="10 0 0 6" ToolTip="Press or hold this key to select which virtual objects can get used by generators."/>
                                 <components1:HotkeyEditorControl Width="150" VerticalAlignment="Bottom" Hotkey="{Binding InheritHotkey}"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
-                                <TextBlock Width="100" Text="Refresh Key" VerticalAlignment="Bottom" Margin="0 0 0 6" ToolTip="Press or hold this key to continuously refresh the hit objects in the root layer the object tree."/>
+                                <TextBlock Width="100" Text="Refresh key" VerticalAlignment="Bottom" Margin="0 0 0 6" ToolTip="Press or hold this key to continuously refresh the hit objects in the root layer the object tree."/>
                                 <components1:HotkeyEditorControl Width="150" VerticalAlignment="Bottom" Hotkey="{Binding RefreshHotkey}"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
@@ -147,7 +147,7 @@
                                 <TextBox Text="{Binding AcceptableDifference, Converter={StaticResource DoubleToStringConverter}}" Width="150" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Minimal difference" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
-                                <TextBlock Width="100" Margin="0 0 0 6" Text="Keep Running" VerticalAlignment="Center" ToolTip="Keeps Geometry Dashboard running in the background while other tools are open."/>
+                                <TextBlock Width="100" Margin="0 0 0 6" Text="Keep running" VerticalAlignment="Center" ToolTip="Keeps Geometry Dashboard running in the background while other tools are open."/>
                                 <ToggleButton IsChecked="{Binding KeepRunning}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignSwitchToggleButton}"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
