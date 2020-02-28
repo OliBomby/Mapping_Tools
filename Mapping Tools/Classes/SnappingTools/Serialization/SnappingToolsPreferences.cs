@@ -25,6 +25,7 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
         private double _offsetBottom;
         private double _acceptableDifference;
         private bool _keepRunning;
+        private bool _visiblePlayfieldBoundary;
         private bool _debugEnabled;
         private ViewMode _keyDownViewMode;
         private ViewMode _keyUpViewMode;
@@ -95,6 +96,11 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
         public bool KeepRunning {
             get => _keepRunning;
             set => Set(ref _keepRunning, value);
+        }
+
+        public bool VisiblePlayfieldBoundary {
+            get => _visiblePlayfieldBoundary;
+            set => Set(ref _visiblePlayfieldBoundary, value);
         }
 
         public bool DebugEnabled {

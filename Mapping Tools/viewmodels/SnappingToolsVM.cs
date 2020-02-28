@@ -215,6 +215,8 @@ namespace Mapping_Tools.Viewmodels {
                     _overlay.Initialize(_osuWindow);
                     _overlay.Enable();
 
+                    _overlay.SetBorder(Preferences.DebugEnabled);
+
                     _overlay.OverlayWindow.Draw += OnDraw;
 
                     _updateTimer.Interval = TimeSpan.FromMilliseconds(100);
@@ -301,8 +303,20 @@ namespace Mapping_Tools.Viewmodels {
         #endregion
 
         #region geometry dashboard helpers
+
+        private Point GetRelativeDpiPoint(Vector2 pos, Vector2 offset) {
+            var dpi = _coordinateConverter.ToDpi(_coordinateConverter.EditorToRelativeCoordinate(pos));
+            return new Point(dpi.X + offset.X, dpi.Y + offset.Y);
+        }
         
         private void OnDraw(object sender, DrawingContext context) {
+            if (Preferences.VisiblePlayfieldBoundary) {
+                const double thickness = 2;
+                context.DrawRectangle(null, new Pen(Brushes.Red, thickness), 
+                    new Rect(GetRelativeDpiPoint(new Vector2(-65, -57), new Vector2(-thickness / 2)), 
+                        GetRelativeDpiPoint(new Vector2(576, 423), new Vector2(thickness / 2))));
+            }
+
             //Console.WriteLine($@"Drawable count: {LayerCollection.GetAllRelevantDrawables().Count()}");
             if (IsHotkeyDown(Preferences.SnapHotkey)) {
                 // Handle key down rendering
@@ -605,11 +619,14 @@ namespace Mapping_Tools.Viewmodels {
                     LayerCollection.AcceptableDifference = Preferences.AcceptableDifference;
                     break;
                 case "DebugEnabled":
-                    _overlay.SetBorder(Preferences.DebugEnabled);
+                    _overlay?.SetBorder(Preferences.DebugEnabled);
+                    break;
+                case "VisiblePlayfieldBoundary":
+                    _overlay?.OverlayWindow.InvalidateVisual();
                     break;
                 case "InceptionLevel":
                     LayerCollection.SetInceptionLevel(Preferences.InceptionLevel);
-                    _overlay.OverlayWindow.InvalidateVisual();
+                    _overlay?.OverlayWindow.InvalidateVisual();
                     break;
             }
         }
