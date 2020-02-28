@@ -151,6 +151,10 @@
                                 <ToggleButton IsChecked="{Binding KeepRunning}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignSwitchToggleButton}"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
+                                <TextBlock Width="100" Margin="0 0 0 6" Text="See playfield" VerticalAlignment="Center" ToolTip="Visualize boundary of the play area on the overlay."/>
+                                <ToggleButton IsChecked="{Binding VisiblePlayfieldBoundary}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignSwitchToggleButton}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="10">
                                 <TextBlock Width="100" Margin="0 0 0 6" Text="Debug" VerticalAlignment="Center" ToolTip="Visualize boundaries of the overlay box for debugging purposes."/>
                                 <ToggleButton IsChecked="{Binding DebugEnabled}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignSwitchToggleButton}"/>
                             </StackPanel>
