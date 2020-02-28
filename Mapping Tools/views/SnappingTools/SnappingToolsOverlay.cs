@@ -36,6 +36,8 @@ namespace Mapping_Tools.Views.SnappingTools {
         /// </summary>
         /// <param name="enabled"></param>
         public void SetBorder(bool enabled) {
+            if (_isDisposed) return;
+
             if (enabled) {
                 OverlayWindow.BorderBrush = Brushes.GreenYellow;
                 OverlayWindow.BorderThickness = new Thickness(3);

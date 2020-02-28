@@ -215,6 +215,8 @@ namespace Mapping_Tools.Viewmodels {
                     _overlay.Initialize(_osuWindow);
                     _overlay.Enable();
 
+                    _overlay.SetBorder(Preferences.DebugEnabled);
+
                     _overlay.OverlayWindow.Draw += OnDraw;
 
                     _updateTimer.Interval = TimeSpan.FromMilliseconds(100);
@@ -617,11 +619,14 @@ namespace Mapping_Tools.Viewmodels {
                     LayerCollection.AcceptableDifference = Preferences.AcceptableDifference;
                     break;
                 case "DebugEnabled":
-                    _overlay.SetBorder(Preferences.DebugEnabled);
+                    _overlay?.SetBorder(Preferences.DebugEnabled);
+                    break;
+                case "VisiblePlayfieldBoundary":
+                    _overlay?.OverlayWindow.InvalidateVisual();
                     break;
                 case "InceptionLevel":
                     LayerCollection.SetInceptionLevel(Preferences.InceptionLevel);
-                    _overlay.OverlayWindow.InvalidateVisual();
+                    _overlay?.OverlayWindow.InvalidateVisual();
                     break;
             }
         }
