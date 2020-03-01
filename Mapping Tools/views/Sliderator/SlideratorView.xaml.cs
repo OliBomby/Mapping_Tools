@@ -401,7 +401,8 @@ namespace Mapping_Tools.Views {
 
             Graph.Clear();
             if (ViewModel.GraphMode == GraphMode.Velocity) {
-                var sv = ViewModel.PixelLength / ViewModel.GraphBeats / ViewModel.GlobalSv / 100;
+                var sv = MathHelper.Clamp(ViewModel.PixelLength / ViewModel.GraphBeats / ViewModel.GlobalSv / 100,
+                    -ViewModel.VelocityLimit, ViewModel.VelocityLimit);
                 Graph.Anchors.First().Pos = new Vector2(0, sv);
                 Graph.Anchors.Last().Pos = new Vector2(ViewModel.GraphBeats, sv);
             } else {
