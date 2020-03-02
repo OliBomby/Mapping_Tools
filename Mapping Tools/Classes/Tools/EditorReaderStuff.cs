@@ -19,7 +19,7 @@ namespace Mapping_Tools.Classes.Tools
         private static readonly EditorReader editorReader = new EditorReader();
         public static string DontCoolSaveWhenMD5EqualsThisString = "";
         public static readonly string EditorReaderIsDisabledText = "You need to enable Editor Reader to use this feature.";
-        public static readonly string SelectedObjectsReadFailText = "Editor memory was not read. Could not get the selected hit objects.";
+        public static readonly string SelectedObjectsReadFailText = "Editor memory was not read. Could not get the selected hit objects. Try again in 1 second.";
 
         /// <summary>
         /// Don't use this unless you know what you're doing
