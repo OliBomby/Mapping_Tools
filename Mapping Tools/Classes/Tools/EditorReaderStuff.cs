@@ -51,9 +51,16 @@ namespace Mapping_Tools.Classes.Tools
                 Console.WriteLine(editorReader.numObjects);
                 editorReader.ReadObjects();
                 editorReader.FetchBookmarks();*/
+
                 editorReader.FetchAll();
+
                 var removed = FixFullReader(editorReader);
-                return ValidateFullReader(editorReader) && removed <= 1;
+                if (removed > 1) {
+                    LogEditorReader(editorReader);
+                    return false;
+                }
+
+                return ValidateFullReader(editorReader);
             }
             catch
             {
@@ -91,44 +98,47 @@ namespace Mapping_Tools.Classes.Tools
             if (!result)
             {
                 // Save error log
-                var path = Path.Combine(MainWindow.AppDataPath, "editor_reader_error.txt");
-
-                if (!File.Exists(path))
-                {
-                    File.Create(path).Dispose();
-                }
-
-                var lines = new List<string> {
-                    @"ContainingFolder: " + reader.ContainingFolder,
-                    @"Filename: " + reader.Filename,
-                    @"ApproachRate: " + reader.ApproachRate,
-                    @"CircleSize: " + reader.CircleSize,
-                    @"HPDrainRate: " + reader.HPDrainRate,
-                    @"OverallDifficulty: " + reader.OverallDifficulty,
-                    @"PreviewTime: " + reader.PreviewTime,
-                    @"SliderMultiplier: " + reader.SliderMultiplier,
-                    @"SliderTickRate: " + reader.SliderTickRate,
-                    @"StackLeniency: " + reader.StackLeniency,
-                    @"TimelineZoom: " + reader.TimelineZoom,
-                    @"numBookmarks: " + reader.numBookmarks,
-                    @"numClipboard: " + reader.numClipboard,
-                    @"numControlPoints: " + reader.numControlPoints,
-                    @"numObjects: " + reader.numObjects,
-                    @"numSelected: " + reader.numSelected,
-                    @"EditorTime: " + reader.EditorTime(),
-                    @"ProcessTitle: " + reader.ProcessTitle(),
-                    @"[HitObjects]",
-                };
-                lines.AddRange(reader.hitObjects.Select(readerHitObject => readerHitObject.ToString()));
-                lines.Add(@"[TimingPoints]");
-                lines.AddRange(reader.controlPoints.Select(readerControlPoint => readerControlPoint.ToString()));
-
-                File.WriteAllLines(path, lines);
-
+                LogEditorReader(reader);
                 //MessageBox.Show("A problem has been encountered with editor reader. An error log has been saved to editor_reader_error.txt", "Warning");
             }
 
             return result;
+        }
+
+        private static void LogEditorReader(EditorReader reader) {
+            var path = Path.Combine(MainWindow.AppDataPath, "editor_reader_error.txt");
+
+            if (!File.Exists(path))
+            {
+                File.Create(path).Dispose();
+            }
+
+            var lines = new List<string> {
+                @"ContainingFolder: " + reader.ContainingFolder,
+                @"Filename: " + reader.Filename,
+                @"ApproachRate: " + reader.ApproachRate,
+                @"CircleSize: " + reader.CircleSize,
+                @"HPDrainRate: " + reader.HPDrainRate,
+                @"OverallDifficulty: " + reader.OverallDifficulty,
+                @"PreviewTime: " + reader.PreviewTime,
+                @"SliderMultiplier: " + reader.SliderMultiplier,
+                @"SliderTickRate: " + reader.SliderTickRate,
+                @"StackLeniency: " + reader.StackLeniency,
+                @"TimelineZoom: " + reader.TimelineZoom,
+                @"numBookmarks: " + reader.numBookmarks,
+                @"numClipboard: " + reader.numClipboard,
+                @"numControlPoints: " + reader.numControlPoints,
+                @"numObjects: " + reader.numObjects,
+                @"numSelected: " + reader.numSelected,
+                @"EditorTime: " + reader.EditorTime(),
+                @"ProcessTitle: " + reader.ProcessTitle(),
+                @"[HitObjects]",
+            };
+            lines.AddRange(reader.hitObjects.Select(readerHitObject => readerHitObject.ToString()));
+            lines.Add(@"[TimingPoints]");
+            lines.AddRange(reader.controlPoints.Select(readerControlPoint => readerControlPoint.ToString()));
+
+            File.WriteAllLines(path, lines);
         }
 
         /// <summary>
