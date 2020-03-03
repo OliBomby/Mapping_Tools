@@ -312,7 +312,7 @@ namespace Mapping_Tools.Viewmodels {
         private void OnDraw(object sender, DrawingContext context) {
             if (Preferences.VisiblePlayfieldBoundary) {
                 const double thickness = 2;
-                context.DrawRectangle(null, new Pen(Brushes.Red, thickness), 
+                context.DrawRectangle(null, new Pen(Brushes.DarkOrange, thickness), 
                     new Rect(GetRelativeDpiPoint(new Vector2(-65, -57), new Vector2(-thickness / 2)), 
                         GetRelativeDpiPoint(new Vector2(576, 423), new Vector2(thickness / 2))));
             }
