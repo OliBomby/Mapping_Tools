@@ -537,6 +537,11 @@ namespace Mapping_Tools.Views {
                     AnchorCollection.GetMinDerivative(arg.GraphState.Anchors));
             }
 
+            // Dont do Sliderator if the velocity is constant AND equal to the new velocity
+            var simplifyShape = constantVelocity && Precision.AlmostEquals(
+                                    arg.PixelLength / arg.GraphBeats / arg.GlobalSv / 100,
+                                    arg.NewVelocity);
+
             // Get the highest velocity occuring in the graph
             double velocity = arg.NewVelocity; // Velocity is in SV
             // Do bad stuff to the velocity to make sure its the same SV as after writing it to .osu code
@@ -557,7 +562,7 @@ namespace Mapping_Tools.Views {
                 MinDendriteLength = arg.MinDendrite
             };
 
-            if (!constantVelocity) {
+            if (!simplifyShape) {
                 // Get slider path like from the hit object preview
                 var sliderPath = new SliderPath(arg.VisibleHitObject.SliderType,
                     arg.VisibleHitObject.GetAllCurvePoints().ToArray(),
@@ -613,7 +618,7 @@ namespace Mapping_Tools.Views {
 
             if (!arg.ExportAsStream) {
                 // Give the new hit object the sliderated anchors
-                if (constantVelocity) {
+                if (simplifyShape) {
                     // The velocity is constant, so you can simplify to the original slider shape
                     clone.SetAllCurvePoints(arg.VisibleHitObject.GetAllCurvePoints());
                     clone.SliderType = arg.VisibleHitObject.SliderType;
