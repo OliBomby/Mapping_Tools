@@ -51,6 +51,7 @@ namespace Mapping_Tools.Viewmodels {
 
         private int _editorTime;
         private bool _osuActivated;
+        private int _fetchEditorFails;
 
         private string _filter = "";
         public string Filter { get => _filter; set => SetFilter(value); }
@@ -208,6 +209,12 @@ namespace Mapping_Tools.Viewmodels {
                         reader.FetchEditor();
                     }
                     catch {
+                        _fetchEditorFails++;
+                        if (_fetchEditorFails <= 3) return;
+
+                        MessageBox.Show(
+                            "Editor Reader seems to be failing a lot. Try restarting osu! and opening Geometry Dashboard again.");
+                        _updateTimer.IsEnabled = false;
                         return;
                     }
 
@@ -224,6 +231,9 @@ namespace Mapping_Tools.Viewmodels {
                     break;
                 case State.Active:
                     _updateTimer.Interval = TimeSpan.FromMilliseconds(100);
+
+                    // It successfully fetched editor so editor reader is probably working
+                    _fetchEditorFails = 0;
 
                     if (reader.ProcessNeedsReload()) {
                         _state = State.LookingForProcess;
