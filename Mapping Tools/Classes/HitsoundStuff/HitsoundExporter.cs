@@ -213,8 +213,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff
             var sampleCount = sampleArray.Length;
 
             // Find the biggest spacing that will still fit all the samples
-            var spacing = 64;
-            while ((int) (512 / spacing + 1) * (int) (384 / spacing + 1) < sampleCount && spacing > 1) {
+            int spacing = 64;
+            while ((int) (512d / spacing + 1) * (int) (384d / spacing + 1) < sampleCount && spacing > 1) {
                 spacing /= 2;
             }
 
