@@ -37,7 +37,7 @@
                       ToolTip="Check this to automatically delete all files in the export folder before exporting. When using this be sure there aren't any important files in your export folder."/>
             <ComboBox Margin="0 20 0 0" ItemsSource="{Binding HitsoundExportModes}" SelectedItem="{Binding HitsoundExportModeSetting}"
                       Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Export mode"
-                      ToolTip="Choose which format to export the hitsounds to. The 'Standard' option will generate hitsounds that work in osu! standard beatmaps."/>
+                      ToolTip="Choose which format to export the hitsounds as. The 'Standard' option will generate hitsounds that can be copied to osu! standard beatmaps."/>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" Grid.Row="1"

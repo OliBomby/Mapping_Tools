@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     /// <summary>
@@ -144,14 +145,22 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
+        /// <summary>Returns a string that represents the current object and can be used as a filename.</summary>
+        public string GetFilename() {
+            var filename = System.IO.Path.GetFileNameWithoutExtension(Path);
+            return System.IO.Path.GetExtension(Path) == ".sf2" ? 
+                $"{filename}-{Bank}-{Patch}-{Instrument}-{Key}-{(int)Length}-{Velocity}" : 
+                Math.Abs(Volume - 1) < Precision.DOUBLE_EPSILON ?
+                   filename :
+                $"{filename}-{(int)(Volume * 100)}";
+        }
+
         /// <summary>Returns a string that represents the current object.</summary>
         /// <returns>A string that represents the current object.</returns>
         public override string ToString() {
-            if (System.IO.Path.GetExtension(Path) == ".sf2") {
-                return $"{Path} {Bank},{Patch},{Instrument},{Key},{Length},{Velocity}";
-            } else {
-                return $"{Path} {Volume * 100}%";
-            }
+            return System.IO.Path.GetExtension(Path) == ".sf2" ? 
+                $"{Path} {Bank},{Patch},{Instrument},{Key},{Length},{Velocity}" : 
+                $"{Path} {Volume * 100}%";
         }
 
         public SampleGeneratingArgs Copy() {

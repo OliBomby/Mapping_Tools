@@ -40,7 +40,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 if (separatedByPath.TryGetValue(args.Path, out HashSet<SampleGeneratingArgs> value)) {
                     value.Add(args);
                 } else {
-                    separatedByPath.Add(args.Path, new HashSet<SampleGeneratingArgs>() { args });
+                    separatedByPath.Add(args.Path, new HashSet<SampleGeneratingArgs> { args });
                 }
             }
 
@@ -49,19 +49,26 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 if (!ValidateSampleArgs(path))
                     continue;
                 try {
-                    if (Path.GetExtension(path) == ".sf2") {
-                        var sf2 = new SoundFont(path);
-                        foreach (var args in pair.Value) {
-                            var sample = ImportFromSoundFont(args, sf2);
-                            samples.Add(args, sample);
+                    switch (Path.GetExtension(path)) {
+                        case ".sf2": {
+                            var sf2 = new SoundFont(path);
+                            foreach (var args in pair.Value) {
+                                var sample = ImportFromSoundFont(args, sf2);
+                                samples.Add(args, sample);
+                            }
+                            break;
                         }
-                    } else if (Path.GetExtension(path) == ".ogg") {
-                        foreach (var args in pair.Value) {
-                            samples.Add(args, ImportFromVorbis(args));
+                        case ".ogg": {
+                            foreach (var args in pair.Value) {
+                                samples.Add(args, ImportFromVorbis(args));
+                            }
+                            break;
                         }
-                    } else {
-                        foreach (var args in pair.Value) {
-                            samples.Add(args, ImportFromAudio(args));
+                        default: {
+                            foreach (var args in pair.Value) {
+                                samples.Add(args, ImportFromAudio(args));
+                            }
+                            break;
                         }
                     }
                 } catch (Exception ex) { Console.WriteLine(ex.Message); }
@@ -72,15 +79,17 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         public static SampleSoundGenerator ImportSample(SampleGeneratingArgs args) {
             string path = args.Path;
-            if (Path.GetExtension(path) == ".sf2") {
-                SoundFont sf2 = new SoundFont(path);
-                SampleSoundGenerator wave = ImportFromSoundFont(args, sf2);
-                GC.Collect();
-                return wave;
-            } else if (Path.GetExtension(path) == ".ogg") {
-                return ImportFromVorbis(args);
-            } else {
-                return ImportFromAudio(args);
+            switch (Path.GetExtension(path)) {
+                case ".sf2": {
+                    SoundFont sf2 = new SoundFont(path);
+                    SampleSoundGenerator wave = ImportFromSoundFont(args, sf2);
+                    GC.Collect();
+                    return wave;
+                }
+                case ".ogg":
+                    return ImportFromVorbis(args);
+                default:
+                    return ImportFromAudio(args);
             }
         }
 

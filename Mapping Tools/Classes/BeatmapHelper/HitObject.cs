@@ -33,6 +33,38 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             SetLine(line);
         }
 
+        public HitObject(Vector2 pos, double time, HitObjectType type, bool newCombo, int comboSkip,
+            bool normal, bool whistle, bool finish, bool clap, SampleSet sampleSet, SampleSet additionSet,
+            int index, double volume, string filename) {
+            Pos = pos;
+            Time = time;
+            SetObjectType(type);
+            NewCombo = newCombo;
+            ComboSkip = comboSkip;
+            Normal = normal;
+            Whistle = whistle;
+            Finish = finish;
+            Clap = clap;
+            SampleSet = sampleSet;
+            AdditionSet = additionSet;
+            CustomIndex = index;
+            SampleVolume = volume;
+            Filename = filename;
+        }
+
+        public HitObject(Vector2 pos, double time, int type, int hitsounds, SampleSet sampleSet, SampleSet additionSet,
+            int index, double volume, string filename) {
+            Pos = pos;
+            Time = time;
+            SetObjectType(type);
+            SetHitsounds(hitsounds);
+            SampleSet = sampleSet;
+            AdditionSet = additionSet;
+            CustomIndex = index;
+            SampleVolume = volume;
+            Filename = filename;
+        }
+
         public HitObject(double time, int hitsounds, SampleSet sampleSet, SampleSet additions) {
             // Basic hitsoundind circle
             Pos = new Vector2(256, 192);
@@ -572,6 +604,28 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             // Spinners ignore combo skip on .osu parsing
             ComboSkip = IsSpinner ? 0 : MathHelper.GetIntFromBitArray(new BitArray(new[] {b[4], b[5], b[6]}));
             IsHoldNote = b[7];
+        }
+
+        public void SetObjectType(HitObjectType type) {
+            IsCircle = false;
+            IsSlider = false;
+            IsSpinner = false;
+            IsHoldNote = false;
+
+            switch (type) {
+                case HitObjectType.Circle:
+                    IsCircle = true;
+                    break;
+                case HitObjectType.Slider:
+                    IsSlider = true;
+                    break;
+                case HitObjectType.Spinner:
+                    IsSpinner = true;
+                    break;
+                case HitObjectType.HoldNote:
+                    IsHoldNote = true;
+                    break;
+            }
         }
 
         public int GetHitsounds() {

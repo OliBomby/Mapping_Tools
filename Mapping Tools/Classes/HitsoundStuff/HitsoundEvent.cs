@@ -8,17 +8,13 @@ using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     /// <summary>
-    /// 
+    /// Represents a hitsound by a single circle in the editor
     /// </summary>
     public class HitsoundEvent {
-        /// <summary>
-        /// 
-        /// </summary>
         public double Time;
-        /// <summary>
-        /// 
-        /// </summary>
+        public Vector2 Pos;
         public double Volume;
+        public string Filename;
         public SampleSet SampleSet;
         public SampleSet Additions;
         public int CustomIndex;
@@ -26,9 +22,14 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public bool Finish;
         public bool Clap;
 
-        public HitsoundEvent(double time, double volume, SampleSet sampleSet, SampleSet additions, int customIndex, bool whistle, bool finish, bool clap) {
+        public HitsoundEvent(double time, double volume, SampleSet sampleSet, SampleSet additions, int customIndex, bool whistle, bool finish, bool clap) : this(
+            time, new Vector2(256, 192), volume, string.Empty, sampleSet, additions, customIndex, whistle, finish, clap) { }
+
+        public HitsoundEvent(double time, Vector2 pos, double volume, string filename, SampleSet sampleSet, SampleSet additions, int customIndex, bool whistle, bool finish, bool clap) {
             Time = time;
+            Pos = pos;
             Volume = volume;
+            Filename = filename;
             SampleSet = sampleSet;
             Additions = additions;
             CustomIndex = customIndex;

@@ -58,62 +58,105 @@ namespace Mapping_Tools.Views
         private string Make_Hitsounds(HitsoundStudioVm arg, BackgroundWorker worker, DoWorkEventArgs _) {
             string result = string.Empty;
 
-            // Convert the multiple layers into packages that have the samples from all the layers at one specific time
-            List<SamplePackage> samplePackages = HitsoundConverter.ZipLayers(arg.HitsoundLayers.ToList(), arg.DefaultSample);
-            UpdateProgressBar(worker, 10);
+            if (arg.HitsoundExportModeSetting == HitsoundStudioVm.HitsoundExportMode.Standard) {
+                // Convert the multiple layers into packages that have the samples from all the layers at one specific time
+                List<SamplePackage> samplePackages =
+                    HitsoundConverter.ZipLayers(arg.HitsoundLayers.ToList(), arg.DefaultSample);
+                UpdateProgressBar(worker, 10);
 
-            // Balance the volume between greenlines and samples
-            HitsoundConverter.BalanceVolumes(samplePackages, new VolumeBalancingArgs(0, false));
-            UpdateProgressBar(worker, 20);
+                // Balance the volume between greenlines and samples
+                HitsoundConverter.BalanceVolumes(samplePackages, new VolumeBalancingArgs(0, false));
+                UpdateProgressBar(worker, 20);
 
-            // Load the samples so validation can be done
-            HashSet<SampleGeneratingArgs> allSampleArgs = new HashSet<SampleGeneratingArgs>();
-            foreach (SamplePackage sp in samplePackages)
-            {
-                allSampleArgs.UnionWith(sp.Samples.Select(o => o.SampleArgs));
-            }
-            var loadedSamples = SampleImporter.ImportSamples(allSampleArgs);
-            UpdateProgressBar(worker, 30);
-
-            // Convert the packages to hitsounds that fit on an osu standard map
-            CompleteHitsounds completeHitsounds = HitsoundConverter.GetCompleteHitsounds(samplePackages, loadedSamples);
-            UpdateProgressBar(worker, 60);
-
-            if (arg.ShowResults) {
-                // Count the number of samples
-                int samples = completeHitsounds.CustomIndices.SelectMany(ci => ci.Samples.Values).Count(h => h.Any(SampleImporter.ValidateSampleArgs));
-
-                // Count the number of changes of custom index
-                int greenlines = 0;
-                int lastIndex = -1;
-                foreach (var hit in completeHitsounds.Hitsounds.Where(hit => hit.CustomIndex != lastIndex)) {
-                    lastIndex = hit.CustomIndex;
-                    greenlines++;
+                // Load the samples so validation can be done
+                HashSet<SampleGeneratingArgs> allSampleArgs = new HashSet<SampleGeneratingArgs>();
+                foreach (SamplePackage sp in samplePackages) {
+                    allSampleArgs.UnionWith(sp.Samples.Select(o => o.SampleArgs));
                 }
 
-                result = $"Number of sample indices: {completeHitsounds.CustomIndices.Count}, " +
-                    $"Number of samples: {samples}, Number of greenlines: {greenlines}";
-            }
+                var loadedSamples = SampleImporter.ImportSamples(allSampleArgs);
+                UpdateProgressBar(worker, 30);
 
-            if (arg.DeleteAllInExportFirst && (arg.ExportSamples || arg.ExportMap)) {
-                // Delete all files in the export folder before filling it again
-                DirectoryInfo di = new DirectoryInfo(arg.ExportFolder);
-                foreach (FileInfo file in di.GetFiles()) {
-                    file.Delete();
+                // Convert the packages to hitsounds that fit on an osu standard map
+                CompleteHitsounds completeHitsounds =
+                    HitsoundConverter.GetCompleteHitsounds(samplePackages, loadedSamples);
+                UpdateProgressBar(worker, 60);
+
+                if (arg.ShowResults) {
+                    // Count the number of samples
+                    int samples = completeHitsounds.CustomIndices.SelectMany(ci => ci.Samples.Values)
+                        .Count(h => h.Any(SampleImporter.ValidateSampleArgs));
+
+                    // Count the number of changes of custom index
+                    int greenlines = 0;
+                    int lastIndex = -1;
+                    foreach (var hit in completeHitsounds.Hitsounds.Where(hit => hit.CustomIndex != lastIndex)) {
+                        lastIndex = hit.CustomIndex;
+                        greenlines++;
+                    }
+
+                    result = $"Number of sample indices: {completeHitsounds.CustomIndices.Count}, " +
+                             $"Number of samples: {samples}, Number of greenlines: {greenlines}";
+                }
+
+                if (arg.DeleteAllInExportFirst && (arg.ExportSamples || arg.ExportMap)) {
+                    // Delete all files in the export folder before filling it again
+                    DirectoryInfo di = new DirectoryInfo(arg.ExportFolder);
+                    foreach (FileInfo file in di.GetFiles()) {
+                        file.Delete();
+                    }
+                }
+
+                UpdateProgressBar(worker, 70);
+
+                // Export the hitsound map and sound samples
+                if (arg.ExportMap) {
+                    HitsoundExporter.ExportHitsounds(completeHitsounds.Hitsounds, arg.BaseBeatmap, arg.ExportFolder);
+                }
+
+                UpdateProgressBar(worker, 80);
+
+                if (arg.ExportSamples) {
+                    HitsoundExporter.ExportCustomIndices(completeHitsounds.CustomIndices, arg.ExportFolder,
+                        loadedSamples);
+                }
+
+                UpdateProgressBar(worker, 99);
+            } else if (arg.HitsoundExportModeSetting == HitsoundStudioVm.HitsoundExportMode.Coinciding) {
+                // Load the samples so validation can be done
+                var loadedSamples = SampleImporter.ImportSamples(arg.HitsoundLayers.Select(layer => layer.SampleArgs));
+                UpdateProgressBar(worker, 20);
+
+                var sampleNames = HitsoundExporter.GenerateSampleNames(loadedSamples.Keys);
+                var samplePositions = HitsoundExporter.GenerateHitsoundPositions(loadedSamples.Keys);
+
+                var hitsounds = arg.HitsoundLayers.SelectMany(layer => layer.Times.Select(t =>
+                    new HitsoundEvent(t, samplePositions[layer.SampleArgs], layer.SampleArgs.Volume, sampleNames[layer.SampleArgs],
+                        layer.SampleSet, layer.SampleSet, 0, false, false, false)));
+
+                if (arg.ShowResults) {
+                    result = "Number of sample indices: 0, " +
+                             $"Number of samples: {loadedSamples.Count}, Number of greenlines: 0";
+                }
+
+                if (arg.DeleteAllInExportFirst && (arg.ExportSamples || arg.ExportMap)) {
+                    // Delete all files in the export folder before filling it again
+                    DirectoryInfo di = new DirectoryInfo(arg.ExportFolder);
+                    foreach (FileInfo file in di.GetFiles()) {
+                        file.Delete();
+                    }
+                }
+                UpdateProgressBar(worker, 50);
+
+                if (arg.ExportMap) {
+                    HitsoundExporter.ExportHitsounds(hitsounds, arg.BaseBeatmap, arg.ExportFolder, false);
+                }
+                UpdateProgressBar(worker, 70);
+
+                if (arg.ExportSamples) {
+                    HitsoundExporter.ExportLoadedSamples(loadedSamples, arg.ExportFolder, sampleNames);
                 }
             }
-            UpdateProgressBar(worker, 70);
-
-            // Export the hitsound map and sound samples
-            if (arg.ExportMap) {
-                HitsoundExporter.ExportHitsounds(completeHitsounds.Hitsounds, arg.BaseBeatmap, arg.ExportFolder);
-            }
-            UpdateProgressBar(worker, 80);
-
-            if (arg.ExportSamples) {
-                HitsoundExporter.ExportCustomIndices(completeHitsounds.CustomIndices, arg.ExportFolder, loadedSamples);
-            }
-            UpdateProgressBar(worker, 99);
 
             // Open export folder
             if (arg.ExportSamples || arg.ExportMap) {
