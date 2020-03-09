@@ -19,38 +19,44 @@ namespace Mapping_Tools.Classes.HitsoundStuff
             ExportCustomIndices(ch.CustomIndices, exportFolder, loadedSamples);
         }
 
-        public static void ExportHitsounds(IEnumerable<HitsoundEvent> hitsounds, string baseBeatmap, string exportFolder, bool useGreenlines=true) {
+        public static void ExportHitsounds(IEnumerable<HitsoundEvent> hitsounds, string baseBeatmap, string exportFolder, bool useGreenlines=true, bool useStoryboard=false) {
             EditorReaderStuff.TryGetNewestVersion(baseBeatmap, out var editor);
             Beatmap beatmap = editor.Beatmap;
 
-            // Make new timing points
+            if (useStoryboard) {
+                beatmap.StoryboardSoundSamples = hitsounds.Select(h =>
+                        new StoryboardSoundSample(h.Time, 0, h.Filename, h.Volume))
+                    .ToList();
+            } else {
+                // Make new timing points
+                // Add red lines
+                List<TimingPoint> timingPoints = beatmap.BeatmapTiming.GetAllRedlines();
+                List<TimingPointsChange> timingPointsChanges = timingPoints.Select(tp =>
+                        new TimingPointsChange(tp, mpb: true, meter: true, inherited: true, omitFirstBarLine: true))
+                    .ToList();
 
-            // Add red lines
-            List<TimingPoint> timingPoints = beatmap.BeatmapTiming.GetAllRedlines();
-            List<TimingPointsChange> timingPointsChanges = timingPoints.Select(tp => 
-                new TimingPointsChange(tp, mpb: true, meter: true, inherited: true, omitFirstBarLine: true)).ToList();
+                // Add hitsound stuff
+                // Replace all hitobjects with the hitsounds
+                beatmap.HitObjects.Clear();
+                foreach (HitsoundEvent h in hitsounds) {
+                    if (useGreenlines) {
+                        TimingPoint tp = beatmap.BeatmapTiming.GetTimingPointAtTime(h.Time + 5).Copy();
+                        tp.Offset = h.Time;
+                        tp.SampleIndex = h.CustomIndex;
+                        h.CustomIndex = 0; // Set it to default value because it gets handled by greenlines now
+                        tp.Volume = Math.Round(tp.Volume * h.Volume);
+                        h.Volume = 0; // Set it to default value because it gets handled by greenlines now
+                        timingPointsChanges.Add(new TimingPointsChange(tp, index: true, volume: true));
+                    }
 
-            // Add hitsound stuff
-            // Replace all hitobjects with the hitsounds
-            beatmap.HitObjects.Clear();
-            foreach (HitsoundEvent h in hitsounds) {
-                if (useGreenlines) {
-                    TimingPoint tp = beatmap.BeatmapTiming.GetTimingPointAtTime(h.Time + 5).Copy();
-                    tp.Offset = h.Time;
-                    tp.SampleIndex = h.CustomIndex;
-                    h.CustomIndex = 0; // Set it to default value because it gets handled by greenlines now
-                    tp.Volume = Math.Round(tp.Volume * h.Volume);
-                    h.Volume = 0; // Set it to default value because it gets handled by greenlines now
-                    timingPointsChanges.Add(new TimingPointsChange(tp, index: true, volume: true));
+                    beatmap.HitObjects.Add(new HitObject(h.Pos, h.Time, 5, h.GetHitsounds(), h.SampleSet, h.Additions,
+                        h.CustomIndex, h.Volume * 100, h.Filename));
                 }
 
-                beatmap.HitObjects.Add(new HitObject(h.Pos, h.Time, 5, h.GetHitsounds(), h.SampleSet, h.Additions, 
-                    h.CustomIndex, h.Volume * 100, h.Filename));
+                // Replace the old timingpoints
+                beatmap.BeatmapTiming.TimingPoints.Clear();
+                TimingPointsChange.ApplyChanges(beatmap.BeatmapTiming, timingPointsChanges);
             }
-
-            // Replace the old timingpoints
-            beatmap.BeatmapTiming.TimingPoints.Clear();
-            TimingPointsChange.ApplyChanges(beatmap.BeatmapTiming, timingPointsChanges);
 
             // Change version to hitsounds
             beatmap.General["StackLeniency"] = new TValue("0.0");
@@ -194,11 +200,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff
             var sampleNames = new Dictionary<SampleGeneratingArgs, string>();
             foreach (var sample in samples) {
                 var baseName = sample.GetFilename();
-                var name = baseName;
+                var ext = sample.GetExtension();
+                var name = baseName + ext;
                 int i = 1;
 
                 while (usedNames.Contains(name)) {
-                    name = baseName + "-" + ++i; 
+                    name = baseName + "-" + ++i + ext; 
                 }
 
                 usedNames.Add(name);

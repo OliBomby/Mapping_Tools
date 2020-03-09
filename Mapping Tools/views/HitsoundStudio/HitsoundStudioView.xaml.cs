@@ -11,6 +11,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Mapping_Tools.Classes.MathUtil;
 using MaterialDesignThemes.Wpf;
 
 namespace Mapping_Tools.Views
@@ -150,6 +151,39 @@ namespace Mapping_Tools.Views
 
                 if (arg.ExportMap) {
                     HitsoundExporter.ExportHitsounds(hitsounds, arg.BaseBeatmap, arg.ExportFolder, false);
+                }
+                UpdateProgressBar(worker, 70);
+
+                if (arg.ExportSamples) {
+                    HitsoundExporter.ExportLoadedSamples(loadedSamples, arg.ExportFolder, sampleNames);
+                }
+            } else if (arg.HitsoundExportModeSetting == HitsoundStudioVm.HitsoundExportMode.Storyboard) {
+                // Load the samples so validation can be done
+                var loadedSamples = SampleImporter.ImportSamples(arg.HitsoundLayers.Select(layer => layer.SampleArgs));
+                UpdateProgressBar(worker, 20);
+
+                var sampleNames = HitsoundExporter.GenerateSampleNames(loadedSamples.Keys);
+
+                var hitsounds = arg.HitsoundLayers.SelectMany(layer => layer.Times.Select(t =>
+                    new HitsoundEvent(t, Vector2.Zero, layer.SampleArgs.Volume, sampleNames[layer.SampleArgs],
+                        layer.SampleSet, layer.SampleSet, 0, false, false, false)));
+
+                if (arg.ShowResults) {
+                    result = "Number of sample indices: 0, " +
+                             $"Number of samples: {loadedSamples.Count}, Number of greenlines: 0";
+                }
+
+                if (arg.DeleteAllInExportFirst && (arg.ExportSamples || arg.ExportMap)) {
+                    // Delete all files in the export folder before filling it again
+                    DirectoryInfo di = new DirectoryInfo(arg.ExportFolder);
+                    foreach (FileInfo file in di.GetFiles()) {
+                        file.Delete();
+                    }
+                }
+                UpdateProgressBar(worker, 50);
+
+                if (arg.ExportMap) {
+                    HitsoundExporter.ExportHitsounds(hitsounds, arg.BaseBeatmap, arg.ExportFolder, false, true);
                 }
                 UpdateProgressBar(worker, 70);
 

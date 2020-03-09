@@ -155,6 +155,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 $"{filename}-{(int)(Volume * 100)}";
         }
 
+        // This will get expanded upon when I add new sample export formats
+        public string GetExtension() {
+            return ".wav";
+        }
+
         /// <summary>Returns a string that represents the current object.</summary>
         /// <returns>A string that represents the current object.</returns>
         public override string ToString() {
