@@ -48,30 +48,38 @@ namespace Mapping_Tools.Classes.SystemTools {
         }
 
         private void PeriodicBackupTimerOnTick(object sender, EventArgs e) {
-            // Get the newest beatmap, save a temp version, get the hash and compare it to the previous hash, backup temp file
-            var path = IOHelper.GetCurrentBeatmap();
-            EditorReaderStuff.TryGetNewestVersion(path, out var editor);
+            try {
+                // Get the newest beatmap, save a temp version, get the hash and compare it to the previous hash, backup temp file
+                var path = IOHelper.GetCurrentBeatmap();
 
-            // Save temp version
-            var tempPath = Path.Combine(MainWindow.AppDataPath, "temp.osu");
+                if (string.IsNullOrEmpty(path)) return;
 
-            if (!File.Exists(tempPath)) {
-                File.Create(tempPath).Dispose();
+                EditorReaderStuff.TryGetNewestVersion(path, out var editor);
+
+                // Save temp version
+                var tempPath = Path.Combine(MainWindow.AppDataPath, "temp.osu");
+
+                if (!File.Exists(tempPath)) {
+                    File.Create(tempPath).Dispose();
+                }
+
+                File.WriteAllLines(tempPath, editor.Beatmap.GetLines());
+
+                // Get MD5 from temp file
+                var currentMapHash = EditorReaderStuff.GetMD5FromPath(tempPath);
+
+                // Comparing with previously made periodic backup
+                if (currentMapHash == previousPeriodicBackupHash) {
+                    return;
+                }
+
+                // Saving backup of the map
+                IOHelper.SaveMapBackup(tempPath, true, Path.GetFileName(path));
+
+                previousPeriodicBackupHash = currentMapHash;
+            } catch (Exception ex) {
+                Console.WriteLine(ex.Message);
             }
-            File.WriteAllLines(tempPath, editor.Beatmap.GetLines());
-
-            // Get MD5 from temp file
-            var currentMapHash = EditorReaderStuff.GetMD5FromPath(tempPath);
-
-            // Comparing with previously made periodic backup
-            if (currentMapHash == previousPeriodicBackupHash) {
-                return;
-            }
-
-            // Saving backup of the map
-            IOHelper.SaveMapBackup(tempPath, true, Path.GetFileName(path));
-
-            previousPeriodicBackupHash = currentMapHash;
         }
 
         private void OnSettingsChanged(object sender, PropertyChangedEventArgs e)
