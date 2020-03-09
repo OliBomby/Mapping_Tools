@@ -202,6 +202,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
             foreach (var sample in samples) {
                 if (!SampleImporter.ValidateSampleArgs(sample, loadedSamples)) {
                     sampleNames[sample] = string.Empty;
+                    continue;
                 }
                 
                 var baseName = sample.GetFilename();
@@ -225,9 +226,15 @@ namespace Mapping_Tools.Classes.HitsoundStuff
             var sampleCount = sampleArray.Length;
 
             // Find the biggest spacing that will still fit all the samples
-            int spacing = 64;
-            while ((int) (512d / spacing + 1) * (int) (384d / spacing + 1) < sampleCount && spacing > 1) {
-                spacing /= 2;
+            int spacingX = 64;
+            int spacingY = 64;
+            bool reduceX = false;
+            while ((int) (512d / spacingX + 1) * (int) (384d / spacingY + 1) < sampleCount && spacingX > 1) {
+                reduceX = !reduceX;
+                if (reduceX)
+                    spacingX /= 2;
+                else
+                    spacingY /= 2;
             }
 
             var positions = new Dictionary<SampleGeneratingArgs, Vector2>();
@@ -236,10 +243,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff
             foreach (var sample in sampleArray) {
                 positions.Add(sample, new Vector2(x, y));
 
-                x += spacing;
+                x += spacingX;
                 if (x > 512) {
                     x = 0;
-                    y += spacing;
+                    y += spacingY;
 
                     if (y > 384) {
                         y = 0;
