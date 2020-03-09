@@ -24,9 +24,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff
             Beatmap beatmap = editor.Beatmap;
 
             if (useStoryboard) {
-                beatmap.StoryboardSoundSamples = hitsounds.Select(h =>
-                        new StoryboardSoundSample(h.Time, 0, h.Filename, h.Volume))
-                    .ToList();
+                beatmap.StoryboardSoundSamples.Clear();
+                foreach (var h in hitsounds) {
+                    if (string.IsNullOrEmpty(h.Filename)) continue;
+
+                    beatmap.StoryboardSoundSamples.Add(new StoryboardSoundSample(h.Time, 0, h.Filename, h.Volume * 100));
+                }
             } else {
                 // Make new timing points
                 // Add red lines
