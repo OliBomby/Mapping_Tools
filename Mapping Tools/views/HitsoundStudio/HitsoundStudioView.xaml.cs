@@ -61,12 +61,11 @@ namespace Mapping_Tools.Views
 
             if (arg.HitsoundExportModeSetting == HitsoundStudioVm.HitsoundExportMode.Standard) {
                 // Convert the multiple layers into packages that have the samples from all the layers at one specific time
-                List<SamplePackage> samplePackages =
-                    HitsoundConverter.ZipLayers(arg.HitsoundLayers.ToList(), arg.DefaultSample);
+                List<SamplePackage> samplePackages = HitsoundConverter.ZipLayers(arg.HitsoundLayers, arg.DefaultSample);
                 UpdateProgressBar(worker, 10);
 
                 // Balance the volume between greenlines and samples
-                HitsoundConverter.BalanceVolumes(samplePackages, new VolumeBalancingArgs(0, false));
+                HitsoundConverter.BalanceVolumes(samplePackages, 0, false);
                 UpdateProgressBar(worker, 20);
 
                 // Load the samples so validation can be done
@@ -124,16 +123,18 @@ namespace Mapping_Tools.Views
 
                 UpdateProgressBar(worker, 99);
             } else if (arg.HitsoundExportModeSetting == HitsoundStudioVm.HitsoundExportMode.Coinciding) {
-                // Load the samples so validation can be done
-                var loadedSamples = SampleImporter.ImportSamples(arg.HitsoundLayers.Select(layer => layer.SampleArgs));
+                List<SamplePackage> samplePackages = HitsoundConverter.ZipLayers(arg.HitsoundLayers, arg.DefaultSample, 0, false);
+
+                HitsoundConverter.BalanceVolumes(samplePackages, 0, false, true);
                 UpdateProgressBar(worker, 20);
 
-                var sampleNames = HitsoundExporter.GenerateSampleNames(loadedSamples.Keys);
-                var samplePositions = HitsoundExporter.GenerateHitsoundPositions(loadedSamples.Keys);
+                Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null;
+                Dictionary<SampleGeneratingArgs, string> sampleNames = null;
+                Dictionary<SampleGeneratingArgs, Vector2> samplePositions = null;
+                var hitsounds = HitsoundConverter.GetHitsounds(samplePackages, ref loadedSamples, ref sampleNames, ref samplePositions);
 
-                var hitsounds = arg.HitsoundLayers.SelectMany(layer => layer.Times.Select(t =>
-                    new HitsoundEvent(t, samplePositions[layer.SampleArgs], layer.SampleArgs.Volume, sampleNames[layer.SampleArgs],
-                        layer.SampleSet, layer.SampleSet, 0, false, false, false)));
+                // Load the samples so validation can be done
+                UpdateProgressBar(worker, 50);
 
                 if (arg.ShowResults) {
                     result = "Number of sample indices: 0, " +
@@ -147,7 +148,7 @@ namespace Mapping_Tools.Views
                         file.Delete();
                     }
                 }
-                UpdateProgressBar(worker, 50);
+                UpdateProgressBar(worker, 60);
 
                 if (arg.ExportMap) {
                     HitsoundExporter.ExportHitsounds(hitsounds, arg.BaseBeatmap, arg.ExportFolder, false);
@@ -158,15 +159,18 @@ namespace Mapping_Tools.Views
                     HitsoundExporter.ExportLoadedSamples(loadedSamples, arg.ExportFolder, sampleNames);
                 }
             } else if (arg.HitsoundExportModeSetting == HitsoundStudioVm.HitsoundExportMode.Storyboard) {
-                // Load the samples so validation can be done
-                var loadedSamples = SampleImporter.ImportSamples(arg.HitsoundLayers.Select(layer => layer.SampleArgs));
+                List<SamplePackage> samplePackages = HitsoundConverter.ZipLayers(arg.HitsoundLayers, arg.DefaultSample, 0, false);
+
+                HitsoundConverter.BalanceVolumes(samplePackages, 0, false, true);
                 UpdateProgressBar(worker, 20);
 
-                var sampleNames = HitsoundExporter.GenerateSampleNames(loadedSamples.Keys);
+                Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null;
+                Dictionary<SampleGeneratingArgs, string> sampleNames = null;
+                Dictionary<SampleGeneratingArgs, Vector2> samplePositions = null;
+                var hitsounds = HitsoundConverter.GetHitsounds(samplePackages, ref loadedSamples, ref sampleNames, ref samplePositions);
 
-                var hitsounds = arg.HitsoundLayers.SelectMany(layer => layer.Times.Select(t =>
-                    new HitsoundEvent(t, Vector2.Zero, layer.SampleArgs.Volume, sampleNames[layer.SampleArgs],
-                        layer.SampleSet, layer.SampleSet, 0, false, false, false)));
+                // Load the samples so validation can be done
+                UpdateProgressBar(worker, 50);
 
                 if (arg.ShowResults) {
                     result = "Number of sample indices: 0, " +
@@ -180,7 +184,7 @@ namespace Mapping_Tools.Views
                         file.Delete();
                     }
                 }
-                UpdateProgressBar(worker, 50);
+                UpdateProgressBar(worker, 60);
 
                 if (arg.ExportMap) {
                     HitsoundExporter.ExportHitsounds(hitsounds, arg.BaseBeatmap, arg.ExportFolder, false, true);

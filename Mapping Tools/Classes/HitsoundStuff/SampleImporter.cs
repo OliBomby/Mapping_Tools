@@ -32,6 +32,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return Path.GetExtension(path) == ".ogg" ? (WaveStream)new VorbisWaveReader(path) : new MediaFoundationReader(path);
         }
 
+        /// <summary>
+        /// Imports all samples specified by <see cref="SampleGeneratingArgs"/> and returns a dictionary which maps the <see cref="SampleGeneratingArgs"/>
+        /// to their <see cref="SampleSoundGenerator"/>. If a sample couldn't be imported then it has a null instead.
+        /// </summary>
+        /// <param name="argsList"></param>
+        /// <returns></returns>
         public static Dictionary<SampleGeneratingArgs, SampleSoundGenerator> ImportSamples(IEnumerable<SampleGeneratingArgs> argsList) {
             var samples = new Dictionary<SampleGeneratingArgs, SampleSoundGenerator>();
             var separatedByPath = new Dictionary<string, HashSet<SampleGeneratingArgs>>();
@@ -46,8 +52,13 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
             foreach (var pair in separatedByPath) {
                 var path = pair.Key;
-                if (!ValidateSampleArgs(path))
+                if (!ValidateSampleArgs(path)) {
+                    foreach (var args in pair.Value) {
+                        samples.Add(args, null);
+                    }
                     continue;
+                }
+
                 try {
                     switch (Path.GetExtension(path)) {
                         case ".sf2": {
@@ -56,22 +67,31 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                                 var sample = ImportFromSoundFont(args, sf2);
                                 samples.Add(args, sample);
                             }
+
                             break;
                         }
                         case ".ogg": {
                             foreach (var args in pair.Value) {
                                 samples.Add(args, ImportFromVorbis(args));
                             }
+
                             break;
                         }
                         default: {
                             foreach (var args in pair.Value) {
                                 samples.Add(args, ImportFromAudio(args));
                             }
+
                             break;
                         }
                     }
-                } catch (Exception ex) { Console.WriteLine(ex.Message); }
+                } catch (Exception ex) {
+                    Console.WriteLine(ex.Message); 
+                    
+                    foreach (var args in pair.Value) {
+                        samples.Add(args, null);
+                    }
+                }
                 GC.Collect();
             }
             return samples;

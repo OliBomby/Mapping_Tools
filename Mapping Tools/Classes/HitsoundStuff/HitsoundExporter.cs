@@ -71,7 +71,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
         public static void ExportLoadedSamples(Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples,
             string exportFolder, Dictionary<SampleGeneratingArgs, string> names = null) {
             if (names == null) {
-                names = GenerateSampleNames(loadedSamples.Keys);
+                names = GenerateSampleNames(loadedSamples.Keys, loadedSamples);
             }
 
             foreach (var sample in loadedSamples.Keys) {
@@ -195,10 +195,15 @@ namespace Mapping_Tools.Classes.HitsoundStuff
             }
         }
 
-        public static Dictionary<SampleGeneratingArgs, string> GenerateSampleNames(IEnumerable<SampleGeneratingArgs> samples) {
+        public static Dictionary<SampleGeneratingArgs, string> GenerateSampleNames(IEnumerable<SampleGeneratingArgs> samples, 
+            Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples) {
             var usedNames = new HashSet<string>();
             var sampleNames = new Dictionary<SampleGeneratingArgs, string>();
             foreach (var sample in samples) {
+                if (!SampleImporter.ValidateSampleArgs(sample, loadedSamples)) {
+                    sampleNames[sample] = string.Empty;
+                }
+                
                 var baseName = sample.GetFilename();
                 var ext = sample.GetExtension();
                 var name = baseName + ext;
@@ -209,7 +214,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
                 }
 
                 usedNames.Add(name);
-                sampleNames.Add(sample, name);
+                sampleNames[sample] = name;
             }
 
             return sampleNames;
