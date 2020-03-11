@@ -13,21 +13,19 @@ namespace Mapping_Tools.Classes.HitsoundStuff
     class HitsoundExporter {
         public static void ExportCompleteHitsounds(string exportFolder, string baseBeatmap, CompleteHitsounds ch, Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null) {
             // Export the beatmap with all hitsounds
-            ExportHitsounds(ch.Hitsounds, baseBeatmap, exportFolder);
+            ExportHitsounds(ch.Hitsounds, baseBeatmap, exportFolder, GameMode.Standard, true, false);
 
             // Export the sample files
             ExportCustomIndices(ch.CustomIndices, exportFolder, loadedSamples);
         }
 
-        public static void ExportHitsounds(IEnumerable<HitsoundEvent> hitsounds, string baseBeatmap, string exportFolder, bool useGreenlines=true, bool useStoryboard=false) {
+        public static void ExportHitsounds(List<HitsoundEvent> hitsounds, string baseBeatmap, string exportFolder, GameMode exportGameMode, bool useGreenlines, bool useStoryboard) {
             EditorReaderStuff.TryGetNewestVersion(baseBeatmap, out var editor);
             Beatmap beatmap = editor.Beatmap;
 
             if (useStoryboard) {
                 beatmap.StoryboardSoundSamples.Clear();
-                foreach (var h in hitsounds) {
-                    if (string.IsNullOrEmpty(h.Filename)) continue;
-
+                foreach (var h in hitsounds.Where(h => !string.IsNullOrEmpty(h.Filename))) {
                     beatmap.StoryboardSoundSamples.Add(new StoryboardSoundSample(h.Time, 0, h.Filename, h.Volume * 100));
                 }
             } else {
@@ -63,9 +61,18 @@ namespace Mapping_Tools.Classes.HitsoundStuff
 
             // Change version to hitsounds
             beatmap.General["StackLeniency"] = new TValue("0.0");
-            beatmap.General["Mode"] = new TValue("0");
+            beatmap.General["Mode"] = new TValue(((int) exportGameMode).ToInvariant());
             beatmap.Metadata["Version"] = new TValue("Hitsounds");
-            beatmap.Difficulty["CircleSize"] = new TValue("4");
+
+            if (exportGameMode == GameMode.Mania) {
+                // Count the number of distinct X positions
+                int numXPositions = new HashSet<double>(hitsounds.Select(h => h.Pos.X)).Count;
+                int numKeys = MathHelper.Clamp(numXPositions, 1, 18);
+
+                beatmap.Difficulty["CircleSize"] = new TValue(numKeys.ToInvariant());
+            } else {
+                beatmap.Difficulty["CircleSize"] = new TValue("4");
+            }
 
             // Save the file to the export folder
             editor.SaveFile(Path.Combine(exportFolder, beatmap.GetFileName()));
@@ -254,6 +261,27 @@ namespace Mapping_Tools.Classes.HitsoundStuff
                     if (y > 384) {
                         y = 0;
                     }
+                }
+            }
+
+            return positions;
+        }
+
+        public static Dictionary<SampleGeneratingArgs, Vector2> GenerateManiaHitsoundPositions(IEnumerable<SampleGeneratingArgs> samples) {
+            var sampleArray = samples.ToArray();
+            var sampleCount = sampleArray.Length;
+
+            // One key per unique sample but clamped between 1 and 18
+            int numKeys = MathHelper.Clamp(sampleCount, 1, 18);
+
+            var positions = new Dictionary<SampleGeneratingArgs, Vector2>();
+            int x = 256 / numKeys;
+            foreach (var sample in sampleArray) {
+                positions.Add(sample, new Vector2(x, 192));
+
+                x += 512 / numKeys;
+                if (x > 512) {
+                    x = 256 / numKeys;
                 }
             }
 

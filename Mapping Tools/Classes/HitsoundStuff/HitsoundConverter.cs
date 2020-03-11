@@ -139,7 +139,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public static List<HitsoundEvent> GetHitsounds(List<SamplePackage> samplePackages,
             ref Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples,
             ref Dictionary<SampleGeneratingArgs, string> names,
-            ref Dictionary<SampleGeneratingArgs, Vector2> positions) {
+            ref Dictionary<SampleGeneratingArgs, Vector2> positions,
+            bool maniaPositions=false) {
 
             HashSet<SampleGeneratingArgs> allSampleArgs = new HashSet<SampleGeneratingArgs>();
             foreach (SamplePackage sp in samplePackages) {
@@ -155,7 +156,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
 
             if (positions == null) {
-                positions = HitsoundExporter.GenerateHitsoundPositions(allSampleArgs);
+                positions = maniaPositions ? HitsoundExporter.GenerateManiaHitsoundPositions(allSampleArgs) :
+                    HitsoundExporter.GenerateHitsoundPositions(allSampleArgs);
             }
 
             var hitsounds = new List<HitsoundEvent>();

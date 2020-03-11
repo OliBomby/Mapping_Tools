@@ -111,7 +111,7 @@ namespace Mapping_Tools.Views
 
                 // Export the hitsound map and sound samples
                 if (arg.ExportMap) {
-                    HitsoundExporter.ExportHitsounds(completeHitsounds.Hitsounds, arg.BaseBeatmap, arg.ExportFolder);
+                    HitsoundExporter.ExportHitsounds(completeHitsounds.Hitsounds, arg.BaseBeatmap, arg.ExportFolder, arg.HitsoundExportGameMode, true, false);
                 }
 
                 UpdateProgressBar(worker, 80);
@@ -151,7 +151,7 @@ namespace Mapping_Tools.Views
                 UpdateProgressBar(worker, 60);
 
                 if (arg.ExportMap) {
-                    HitsoundExporter.ExportHitsounds(hitsounds, arg.BaseBeatmap, arg.ExportFolder, false);
+                    HitsoundExporter.ExportHitsounds(hitsounds, arg.BaseBeatmap, arg.ExportFolder, arg.HitsoundExportGameMode, false, false);
                 }
                 UpdateProgressBar(worker, 70);
 
@@ -187,7 +187,7 @@ namespace Mapping_Tools.Views
                 UpdateProgressBar(worker, 60);
 
                 if (arg.ExportMap) {
-                    HitsoundExporter.ExportHitsounds(hitsounds, arg.BaseBeatmap, arg.ExportFolder, false, true);
+                    HitsoundExporter.ExportHitsounds(hitsounds, arg.BaseBeatmap, arg.ExportFolder, arg.HitsoundExportGameMode, false, true);
                 }
                 UpdateProgressBar(worker, 70);
 
@@ -673,6 +673,8 @@ namespace Mapping_Tools.Views
             }
         }
 
+        #region HitsoundLayerChangeEventHandlers
+
         private void SelectedNameBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (suppressEvents) return;
@@ -947,6 +949,8 @@ namespace Mapping_Tools.Views
                 hitsoundLayer.ImportArgs.VelocityRoughness = t;
             }
         }
+
+        #endregion
 
         public HitsoundStudioVm GetSaveData()
         {
