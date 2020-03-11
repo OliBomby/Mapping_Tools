@@ -69,8 +69,8 @@ namespace Mapping_Tools.Views {
                     // BPM
                     if (vm.TimingpointBPMMultiplier != 1 || vm.TimingpointBPMOffset != 0) {
                         if (tp.Uninherited) {
-                            if (Filter(tp.GetBPM(), tp.Offset, doFilterMatch, doFilterRange, vm.MatchFilter, min, max)) {
-                                double newBPM = tp.GetBPM() * vm.TimingpointBPMMultiplier + vm.TimingpointBPMOffset;
+                            if (Filter(tp.GetBpm(), tp.Offset, doFilterMatch, doFilterRange, vm.MatchFilter, min, max)) {
+                                double newBPM = tp.GetBpm() * vm.TimingpointBPMMultiplier + vm.TimingpointBPMOffset;
                                 newBPM = vm.ClipProperties ? MathHelper.Clamp(newBPM, 15, 10000) : newBPM;  // Clip the value if specified
                                 tp.MpB = 60000 / newBPM;
                             }

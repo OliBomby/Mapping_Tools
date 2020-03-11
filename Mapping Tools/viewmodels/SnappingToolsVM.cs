@@ -51,6 +51,7 @@ namespace Mapping_Tools.Viewmodels {
 
         private int _editorTime;
         private bool _osuActivated;
+        private int _fetchEditorFails;
 
         private string _filter = "";
         public string Filter { get => _filter; set => SetFilter(value); }
@@ -208,12 +209,20 @@ namespace Mapping_Tools.Viewmodels {
                         reader.FetchEditor();
                     }
                     catch {
+                        _fetchEditorFails++;
+                        if (_fetchEditorFails <= 3) return;
+
+                        MessageBox.Show(
+                            "Editor Reader seems to be failing a lot. Try restarting osu! and opening Geometry Dashboard again.");
+                        _updateTimer.IsEnabled = false;
                         return;
                     }
 
                     _overlay = new SnappingToolsOverlay { Converter = _coordinateConverter };
                     _overlay.Initialize(_osuWindow);
                     _overlay.Enable();
+
+                    _overlay.SetBorder(Preferences.DebugEnabled);
 
                     _overlay.OverlayWindow.Draw += OnDraw;
 
@@ -222,6 +231,9 @@ namespace Mapping_Tools.Viewmodels {
                     break;
                 case State.Active:
                     _updateTimer.Interval = TimeSpan.FromMilliseconds(100);
+
+                    // It successfully fetched editor so editor reader is probably working
+                    _fetchEditorFails = 0;
 
                     if (reader.ProcessNeedsReload()) {
                         _state = State.LookingForProcess;
@@ -301,8 +313,20 @@ namespace Mapping_Tools.Viewmodels {
         #endregion
 
         #region geometry dashboard helpers
+
+        private Point GetRelativeDpiPoint(Vector2 pos, Vector2 offset) {
+            var dpi = _coordinateConverter.ToDpi(_coordinateConverter.EditorToRelativeCoordinate(pos));
+            return new Point(dpi.X + offset.X, dpi.Y + offset.Y);
+        }
         
         private void OnDraw(object sender, DrawingContext context) {
+            if (Preferences.VisiblePlayfieldBoundary) {
+                const double thickness = 2;
+                context.DrawRectangle(null, new Pen(Brushes.DarkOrange, thickness), 
+                    new Rect(GetRelativeDpiPoint(new Vector2(-65, -57), new Vector2(-thickness / 2)), 
+                        GetRelativeDpiPoint(new Vector2(576, 423), new Vector2(thickness / 2))));
+            }
+
             //Console.WriteLine($@"Drawable count: {LayerCollection.GetAllRelevantDrawables().Count()}");
             if (IsHotkeyDown(Preferences.SnapHotkey)) {
                 // Handle key down rendering
@@ -605,11 +629,14 @@ namespace Mapping_Tools.Viewmodels {
                     LayerCollection.AcceptableDifference = Preferences.AcceptableDifference;
                     break;
                 case "DebugEnabled":
-                    _overlay.SetBorder(Preferences.DebugEnabled);
+                    _overlay?.SetBorder(Preferences.DebugEnabled);
+                    break;
+                case "VisiblePlayfieldBoundary":
+                    _overlay?.OverlayWindow.InvalidateVisual();
                     break;
                 case "InceptionLevel":
                     LayerCollection.SetInceptionLevel(Preferences.InceptionLevel);
-                    _overlay.OverlayWindow.InvalidateVisual();
+                    _overlay?.OverlayWindow.InvalidateVisual();
                     break;
             }
         }

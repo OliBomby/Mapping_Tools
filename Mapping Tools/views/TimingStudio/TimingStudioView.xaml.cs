@@ -18,7 +18,7 @@ namespace Mapping_Tools.Views
     /// <summary>
     /// TimingStudioView Tool for Mapping Tools
     /// </summary>
-    //[HiddenTool]
+    [HiddenTool]
     public partial class TimingStudioView : ISavable<TimingStudioVM> {
         public static readonly string ToolName = "Timing Studio";
 

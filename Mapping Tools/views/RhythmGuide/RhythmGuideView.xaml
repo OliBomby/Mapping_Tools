@@ -12,6 +12,7 @@
              d:DesignHeight="650" Width="759.5" d:DataContext="{d:DesignData RhythmGuideVm}">
     <UserControl.Resources>
         <domain:StringArrayToStringConverter x:Key="Sa2SConverter"/>
+        <domain:MapPathStringToCountStringConverter x:Key="MapPathStringToCountStringConverter"/>
     </UserControl.Resources>
     <Grid Name="MasterGrid">
         <Grid.RowDefinitions>
@@ -42,15 +43,19 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="5"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBox Grid.Column="0" Text="{Binding GuideGeneratorArgs.Paths, Converter={StaticResource Sa2SConverter}}" Margin="0,0,5,0"
+                    <TextBox Grid.Column="0" x:Name="ImportPathBox" Text="{Binding GuideGeneratorArgs.Paths, Converter={StaticResource Sa2SConverter}}"
                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Copy rhythm from"/>
-                    <Button Grid.Column="1" Cursor="Hand" Command="{Binding ImportLoadCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
+                    <TextBlock Grid.Column="1" Margin="3 15 5 0" FontStyle="Italic"
+                               ToolTip="Multiple beatmaps can be inputted in this field. Separate the paths with the '|' character."
+                               Text="{Binding ElementName=ImportPathBox, Path=Text, Converter={StaticResource MapPathStringToCountStringConverter}}"/>
+                    <Button Grid.Column="2" Cursor="Hand" Command="{Binding ImportLoadCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
                         <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Download" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                     </Button >
-                    <Button Grid.Column="3" Cursor="Hand" Command="{Binding ImportBrowseCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
+                    <Button Grid.Column="4" Cursor="Hand" Command="{Binding ImportBrowseCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
                         <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                     </Button >
                 </Grid>

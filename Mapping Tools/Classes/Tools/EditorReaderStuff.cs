@@ -19,6 +19,7 @@ namespace Mapping_Tools.Classes.Tools
         private static readonly EditorReader editorReader = new EditorReader();
         public static string DontCoolSaveWhenMD5EqualsThisString = "";
         public static readonly string EditorReaderIsDisabledText = "You need to enable Editor Reader to use this feature.";
+        public static readonly string SelectedObjectsReadFailText = "Editor memory was not read. Could not get the selected hit objects. Try again in 1 second.";
 
         /// <summary>
         /// Don't use this unless you know what you're doing
@@ -50,9 +51,16 @@ namespace Mapping_Tools.Classes.Tools
                 Console.WriteLine(editorReader.numObjects);
                 editorReader.ReadObjects();
                 editorReader.FetchBookmarks();*/
+
                 editorReader.FetchAll();
+
                 var removed = FixFullReader(editorReader);
-                return ValidateFullReader(editorReader) && removed <= 1;
+                if (removed > 1) {
+                    LogEditorReader(editorReader);
+                    return false;
+                }
+
+                return ValidateFullReader(editorReader);
             }
             catch
             {
@@ -90,44 +98,47 @@ namespace Mapping_Tools.Classes.Tools
             if (!result)
             {
                 // Save error log
-                var path = Path.Combine(MainWindow.AppDataPath, "editor_reader_error.txt");
-
-                if (!File.Exists(path))
-                {
-                    File.Create(path).Dispose();
-                }
-
-                var lines = new List<string> {
-                    @"ContainingFolder: " + reader.ContainingFolder,
-                    @"Filename: " + reader.Filename,
-                    @"ApproachRate: " + reader.ApproachRate,
-                    @"CircleSize: " + reader.CircleSize,
-                    @"HPDrainRate: " + reader.HPDrainRate,
-                    @"OverallDifficulty: " + reader.OverallDifficulty,
-                    @"PreviewTime: " + reader.PreviewTime,
-                    @"SliderMultiplier: " + reader.SliderMultiplier,
-                    @"SliderTickRate: " + reader.SliderTickRate,
-                    @"StackLeniency: " + reader.StackLeniency,
-                    @"TimelineZoom: " + reader.TimelineZoom,
-                    @"numBookmarks: " + reader.numBookmarks,
-                    @"numClipboard: " + reader.numClipboard,
-                    @"numControlPoints: " + reader.numControlPoints,
-                    @"numObjects: " + reader.numObjects,
-                    @"numSelected: " + reader.numSelected,
-                    @"EditorTime: " + reader.EditorTime(),
-                    @"ProcessTitle: " + reader.ProcessTitle(),
-                    @"[HitObjects]",
-                };
-                lines.AddRange(reader.hitObjects.Select(readerHitObject => readerHitObject.ToString()));
-                lines.Add(@"[TimingPoints]");
-                lines.AddRange(reader.controlPoints.Select(readerControlPoint => readerControlPoint.ToString()));
-
-                File.WriteAllLines(path, lines);
-
+                LogEditorReader(reader);
                 //MessageBox.Show("A problem has been encountered with editor reader. An error log has been saved to editor_reader_error.txt", "Warning");
             }
 
             return result;
+        }
+
+        private static void LogEditorReader(EditorReader reader) {
+            var path = Path.Combine(MainWindow.AppDataPath, "editor_reader_error.txt");
+
+            if (!File.Exists(path))
+            {
+                File.Create(path).Dispose();
+            }
+
+            var lines = new List<string> {
+                @"ContainingFolder: " + reader.ContainingFolder,
+                @"Filename: " + reader.Filename,
+                @"ApproachRate: " + reader.ApproachRate,
+                @"CircleSize: " + reader.CircleSize,
+                @"HPDrainRate: " + reader.HPDrainRate,
+                @"OverallDifficulty: " + reader.OverallDifficulty,
+                @"PreviewTime: " + reader.PreviewTime,
+                @"SliderMultiplier: " + reader.SliderMultiplier,
+                @"SliderTickRate: " + reader.SliderTickRate,
+                @"StackLeniency: " + reader.StackLeniency,
+                @"TimelineZoom: " + reader.TimelineZoom,
+                @"numBookmarks: " + reader.numBookmarks,
+                @"numClipboard: " + reader.numClipboard,
+                @"numControlPoints: " + reader.numControlPoints,
+                @"numObjects: " + reader.numObjects,
+                @"numSelected: " + reader.numSelected,
+                @"EditorTime: " + reader.EditorTime(),
+                @"ProcessTitle: " + reader.ProcessTitle(),
+                @"[HitObjects]",
+            };
+            lines.AddRange(reader.hitObjects.Select(readerHitObject => readerHitObject.ToString()));
+            lines.Add(@"[TimingPoints]");
+            lines.AddRange(reader.controlPoints.Select(readerControlPoint => readerControlPoint.ToString()));
+
+            File.WriteAllLines(path, lines);
         }
 
         /// <summary>
@@ -209,22 +220,12 @@ namespace Mapping_Tools.Classes.Tools
             }
         }
 
-        /// <summary>
-        /// Tries to get the newest version if editorRead is true otherwise just makes a normal <see cref="BeatmapEditor"/>
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="fullReader"></param>
-        /// <param name="editorRead"></param>
-        /// <returns></returns>
-        public static BeatmapEditor GetBeatmapEditor(string path, EditorReader fullReader, bool editorRead) {
-            BeatmapEditor editor;
-            if (editorRead) {
-                TryGetNewestVersion(path, out editor, fullReader);
-            } else {
-                editor = new BeatmapEditor(path);
-            }
+        public static BeatmapEditor GetBeatmapEditor(string path, EditorReader fullReader, bool readEditor) {
+            return GetBeatmapEditor(path, fullReader, readEditor, out _, out _);
+        }
 
-            return editor;
+        public static BeatmapEditor GetBeatmapEditor(string path, EditorReader fullReader, bool readEditor, out List<HitObject> selected) {
+            return GetBeatmapEditor(path, fullReader, readEditor, out selected, out _);
         }
 
         /// <summary>
@@ -232,16 +233,18 @@ namespace Mapping_Tools.Classes.Tools
         /// </summary>
         /// <param name="path"></param>
         /// <param name="fullReader"></param>
-        /// <param name="editorRead"></param>
+        /// <param name="readEditor"></param>
         /// <param name="selected"></param>
+        /// <param name="editorRead">Indicates true if the editor memory was actually read</param>
         /// <returns></returns>
-        public static BeatmapEditor GetBeatmapEditor(string path, EditorReader fullReader, bool editorRead, out List<HitObject> selected) {
+        public static BeatmapEditor GetBeatmapEditor(string path, EditorReader fullReader, bool readEditor, out List<HitObject> selected, out bool editorRead) {
             BeatmapEditor editor;
-            if (editorRead) {
-                TryGetNewestVersion(path, out editor, out selected, fullReader);
+            if (readEditor) {
+                editorRead = TryGetNewestVersion(path, out editor, out selected, fullReader);
             } else {
                 editor = new BeatmapEditor(path);
                 selected = new List<HitObject>();
+                editorRead = false;
             }
 
             return editor;

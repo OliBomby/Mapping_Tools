@@ -9,6 +9,7 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:views="clr-namespace:Mapping_Tools.Views"
         xmlns:viewmodels="clr-namespace:Mapping_Tools.Viewmodels"
+        xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
         mc:Ignorable="d"
         Title="Mapping Tools"  
         WindowStyle="None"
@@ -31,6 +32,7 @@
     </WindowChrome.WindowChrome>
 
     <Window.Resources>
+        <domain:MapPathStringToCountStringConverter x:Key="MapPathStringToCountStringConverter"/>
         <DataTemplate DataType="{x:Type viewmodels:StandardVM}">
             <views:StandardView DataContext="{Binding}"/>
         </DataTemplate>
@@ -136,18 +138,21 @@
 
                         <materialDesign:Snackbar x:Name="MainSnackbar"/>
                     </Grid>
-                    <materialDesign:ColorZone Mode="PrimaryDark" Grid.Row="3">
+                    <materialDesign:ColorZone Mode="PrimaryDark" Grid.Row="3" Padding="10 10 10 0">
                         <Grid x:Name="ForthGrid">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <Grid Grid.Column="0">
-                                <TextBlock Padding="10,10,0,0" Text="Current Map:" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontWeight="Normal"/>
+                                <TextBlock Text="Current Map: " Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontWeight="Normal"/>
                             </Grid>
                             <Grid Grid.Column="1">
-                                <TextBlock x:FieldModifier="public" Name="currentMap" Height="35" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Padding="10,10,0,0" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontWeight="Normal"/>
+                                <TextBlock x:FieldModifier="public" Name="currentMap" Height="35" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontWeight="Normal"/>
                             </Grid>
+                            <TextBlock Grid.Column="2" Margin="2 0 0 0" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" Height="35" FontStyle="Italic"
+                                       Text="{Binding ElementName=currentMap, Path=Text, Converter={StaticResource MapPathStringToCountStringConverter}}"/>
                         </Grid>
                     </materialDesign:ColorZone>
                 </Grid>

@@ -9,7 +9,9 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using Mapping_Tools.Components.Graph;
+using Mapping_Tools.Views;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Viewmodels {
@@ -33,6 +35,13 @@ namespace Mapping_Tools.Viewmodels {
         private double _velocityLimit;
         private bool _showRedAnchors;
         private bool _showGraphAnchors;
+        private bool _manualVelocity;
+        private double _newVelocity;
+        private double _minDendrite;
+        private double _distanceTraveled;
+        private bool _delegateToBpm;
+        private bool _removeSliderTicks;
+        private bool _exportAsStream;
 
         #region Properties
 
@@ -56,18 +65,19 @@ namespace Mapping_Tools.Viewmodels {
         public double PixelLength {
             get => _pixelLength;
             set {
-                if (Set(ref _pixelLength, value)) {
-                    UpdateSvGraphMultiplier();
-                }
+                if (!Set(ref _pixelLength, value)) return;
+                UpdateSvGraphMultiplier();
+                if (VisibleHitObject == null) return;
+                VisibleHitObject.PixelLength = value;
             } 
         }
 
         public double GlobalSv {
             get => _globalSv;
             set {
-                if (Set(ref _globalSv, value)) {
-                    UpdateSvGraphMultiplier();
-                }
+                if (!Set(ref _globalSv, value)) return;
+                UpdateSvGraphMultiplier();
+                RaisePropertyChanged(nameof(ExpectedSegments));
             } 
         }
         
@@ -75,9 +85,11 @@ namespace Mapping_Tools.Viewmodels {
         public double GraphBeats {
             get => _graphBeats;
             set {
-                if (Set(ref _graphBeats, value)) {
-                    UpdateAnimationDuration();
-                }
+                if (!Set(ref _graphBeats, value)) return;
+                UpdateAnimationDuration();
+                RaisePropertyChanged(nameof(ExpectedSegments));
+                if (VisibleHitObject == null) return;
+                VisibleHitObject.TemporalLength = value / BeatsPerMinute * 60000;
             }
         }
         
@@ -85,9 +97,11 @@ namespace Mapping_Tools.Viewmodels {
         public double BeatsPerMinute {
             get => _beatsPerMinute;
             set {
-                if (Set(ref _beatsPerMinute, value)) {
-                    UpdateAnimationDuration();
-                }
+                if (!Set(ref _beatsPerMinute, value)) return;
+                UpdateAnimationDuration();
+                if (VisibleHitObject == null) return;
+                VisibleHitObject.TemporalLength = GraphBeats / value * 60000;
+                VisibleHitObject.UnInheritedTimingPoint.SetBpm(value);
             } 
         }
 
@@ -131,7 +145,11 @@ namespace Mapping_Tools.Viewmodels {
 
         public double ExportTime {
             get => _exportTime;
-            set => Set(ref _exportTime, value);
+            set {
+                if (!Set(ref _exportTime, value)) return;
+                if (VisibleHitObject == null) return;
+                VisibleHitObject.Time = value;
+            }
         }
 
         public ExportMode ExportMode {
@@ -162,6 +180,69 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _showGraphAnchors, value);
         }
 
+        public bool ManualVelocity {
+            get => _manualVelocity;
+            set => Set(ref _manualVelocity, value);
+        }
+
+        public double NewVelocity {
+            get => _newVelocity;
+            set  {
+                if (Set(ref _newVelocity, value)) {
+                    RaisePropertyChanged(nameof(ExpectedSegments));
+                }
+            }
+        }
+
+        public double MinDendrite {
+            get => _minDendrite;
+            set {
+                if (Set(ref _minDendrite, value)) {
+                    RaisePropertyChanged(nameof(ExpectedSegments));
+                }
+            }
+        }
+
+        public double DistanceTraveled {
+            get => _distanceTraveled;
+            set {
+                if (Set(ref _distanceTraveled, value)) {
+                    RaisePropertyChanged(nameof(ExpectedSegments));
+                }
+            }
+        }
+
+        public int ExpectedSegments {
+            get {
+                if (ExportAsStream) {
+                    return (int) (GraphBeats * BeatSnapDivisor) + 1;
+                }
+                var newLength = NewVelocity * 100 * GlobalSv * GraphBeats;
+                return (int) ((newLength - DistanceTraveled) / MinDendrite + DistanceTraveled / 10);
+            }
+        }
+
+        public bool DelegateToBpm {
+            get => _delegateToBpm;
+            set => Set(ref _delegateToBpm, value);
+        }
+
+        public bool RemoveSliderTicks {
+            get => _removeSliderTicks;
+            set => Set(ref _removeSliderTicks, value);
+        }
+
+        public bool ExportAsStream {
+            get => _exportAsStream;
+            set {
+                if (Set(ref _exportAsStream, value)) {
+                    RaisePropertyChanged(nameof(ExpectedSegments));
+                }
+            }
+        }
+
+        public bool DoEditorRead { get; set; }
+
         [JsonIgnore]
         public CommandImplementation ImportCommand { get; }
         [JsonIgnore]
@@ -175,6 +256,12 @@ namespace Mapping_Tools.Viewmodels {
 
         [JsonIgnore]
         public string Path { get; set; }
+
+        [JsonIgnore]
+        public SlideratorView SlideratorView { get; set; }
+
+        [JsonIgnore]
+        public bool Quick { get; set; }
 
         #endregion
 
@@ -191,28 +278,68 @@ namespace Mapping_Tools.Viewmodels {
             GraphMode = GraphMode.Position;
             ShowRedAnchors = false;
             ShowGraphAnchors = false;
+            ManualVelocity = false;
+            NewVelocity = 1;
+            MinDendrite = 2;
+            DistanceTraveled = 0;
+            DelegateToBpm = false;
+            RemoveSliderTicks = false;
+            ExportAsStream = false;
+            DoEditorRead = false;
+            Quick = false;
 
-            ImportCommand = new CommandImplementation(Import);
+            ImportCommand = new CommandImplementation(_ => Import(MainWindow.AppWindow.GetCurrentMaps()[0]));
             MoveLeftCommand = new CommandImplementation(_ => {
-                VisibleHitObjectIndex = MathHelper.Clamp(VisibleHitObjectIndex - 1, 0, LoadedHitObjects.Count - 1);
+                if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)) {
+                    SlideratorView.RunFast();
+                    SlideratorView.RunFinished += SlideratorViewOnRunFinishedMoveLeftOnce;
+                } else {
+                    VisibleHitObjectIndex = MathHelper.Clamp(VisibleHitObjectIndex - 1, 0, LoadedHitObjects.Count - 1);
+                }
             });
             MoveRightCommand = new CommandImplementation(_ => {
-                VisibleHitObjectIndex = MathHelper.Clamp(VisibleHitObjectIndex + 1, 0, LoadedHitObjects.Count - 1);
+                if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)) {
+                    SlideratorView.RunFast();
+                    SlideratorView.RunFinished += SlideratorViewOnRunFinishedMoveRightOnce;
+                } else {
+                    VisibleHitObjectIndex = MathHelper.Clamp(VisibleHitObjectIndex + 1, 0, LoadedHitObjects.Count - 1);
+                }
             });
             GraphToggleCommand = new CommandImplementation(ToggleGraphMode);
         }
 
-        private void Import(object _) {
+        private void SlideratorViewOnRunFinishedMoveLeftOnce(object sender, EventArgs e) {
+            Application.Current.Dispatcher?.Invoke(() => {
+                VisibleHitObjectIndex = MathHelper.Clamp(VisibleHitObjectIndex - 1, 0, LoadedHitObjects.Count - 1);
+                SlideratorView.RunFinished -= SlideratorViewOnRunFinishedMoveLeftOnce;
+            });
+        }
+
+        private void SlideratorViewOnRunFinishedMoveRightOnce(object sender, EventArgs e) {
+            Application.Current.Dispatcher?.Invoke(() => {
+                VisibleHitObjectIndex = MathHelper.Clamp(VisibleHitObjectIndex + 1, 0, LoadedHitObjects.Count - 1);
+                SlideratorView.RunFinished -= SlideratorViewOnRunFinishedMoveRightOnce;
+            });
+        }
+
+        public void Import(string path) {
             try {
                 bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
-                string path = MainWindow.AppWindow.GetCurrentMaps()[0];
                 BeatmapEditor editor = null;
                 List<HitObject> markedObjects = null;
 
                 switch (ImportMode) {
                     case ImportMode.Selected:
-                        if (!editorRead) break;
+                        if (!editorRead) {
+                            MessageBox.Show(EditorReaderStuff.SelectedObjectsReadFailText);
+                        };
+
                         editor = EditorReaderStuff.GetBeatmapEditor(out var selected, reader);
+
+                        if (editor == null) {
+                            MessageBox.Show(EditorReaderStuff.SelectedObjectsReadFailText);
+                        }
+
                         markedObjects = selected;
                         break;
                     case ImportMode.Bookmarked:
@@ -235,6 +362,8 @@ namespace Mapping_Tools.Viewmodels {
                 if (editor != null) {
                     GlobalSv = editor.Beatmap.Difficulty["SliderMultiplier"].GetDouble();
                 }
+
+                DoEditorRead = true;
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message + ex.StackTrace, "Error");
             }
@@ -258,8 +387,11 @@ namespace Mapping_Tools.Viewmodels {
             if (!Set(ref _loadedHitObjects, value, nameof(LoadedHitObjects))) return;
             LoadedHitObjects.CollectionChanged += LoadedHitObjectsOnCollectionChanged;
             if (LoadedHitObjects.Count == 0) return;
-            VisibleHitObject = LoadedHitObjects[0];
-            VisibleHitObjectIndex = 0;
+            if (VisibleHitObjectIndex == 0) {
+                VisibleHitObject = LoadedHitObjects[0];
+            } else {
+                VisibleHitObjectIndex = 0;
+            }
         }
 
         private void LoadedHitObjectsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
@@ -272,7 +404,7 @@ namespace Mapping_Tools.Viewmodels {
         private void SetCurrentHitObject(HitObject value) {
             if (!Set(ref _visibleHitObject, value, nameof(VisibleHitObject))) return;
             if (VisibleHitObject.UnInheritedTimingPoint == null) return;
-            BeatsPerMinute = VisibleHitObject.UnInheritedTimingPoint.GetBPM();
+            BeatsPerMinute = VisibleHitObject.UnInheritedTimingPoint.GetBpm();
             GraphBeats = VisibleHitObject.TemporalLength * BeatsPerMinute / 60000;
             ExportTime = VisibleHitObject.Time;
             PixelLength = VisibleHitObject.PixelLength;
