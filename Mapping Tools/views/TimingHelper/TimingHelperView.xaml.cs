@@ -1,22 +1,20 @@
-﻿using System;
+﻿using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.SystemTools.QuickRun;
+using Mapping_Tools.Classes.Tools;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.SliderPathStuff;
-using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.Tools;
 
 namespace Mapping_Tools.Views {
     /// <summary>
     /// Interactielogica voor TimingHelperView.xaml
     /// </summary>
-    public partial class TimingHelperView {
+    [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
+    public partial class TimingHelperView : IQuickRun {
         public static readonly string ToolName = "Timing Helper";
 
         public static readonly string ToolDescription = $@"Timing Helper is meant to speed up your timing job by placing the redlines for you. You only have to tell it where exactly all the sounds are.{Environment.NewLine}What you do is place 'markers' exactly on the correct timing of sounds. These markers can be hit objects, bookmarks, greenlines and redlines.{Environment.NewLine}Timing Helper will then adjust BPM and/or add redlines to make every marker be snapped.";
@@ -33,17 +31,31 @@ namespace Mapping_Tools.Views {
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
-            string[] filesToCopy = MainWindow.AppWindow.GetCurrentMaps();
-            IOHelper.SaveMapBackup(filesToCopy);
+            RunTool(MainWindow.AppWindow.GetCurrentMaps());
+        }
 
-            BackgroundWorker.RunWorkerAsync(new Arguments(filesToCopy, (bool)ObjectsBox.IsChecked, (bool)BookmarkBox.IsChecked, (bool)GreenlinesBox.IsChecked,
-                                                          (bool)RedlinesBox.IsChecked, (bool)OmitBarlineBox.IsChecked,
-                                                          LeniencyBox.GetDouble(defaultValue: 3), TemporalBox.GetDouble(),
-                                                          int.Parse(Snap1.Text.Split('/')[1]), int.Parse(Snap2.Text.Split('/')[1])));
+        public void QuickRun() {
+            RunTool(new[] {IOHelper.GetCurrentBeatmap()}, true);
+        }
+
+        private void RunTool(string[] paths, bool quick = false) {
+            if (!CanRun) return;
+
+            IOHelper.SaveMapBackup(paths);
+
+            var args = new Arguments(quick, paths, ObjectsBox.IsChecked.GetValueOrDefault(), BookmarkBox.IsChecked.GetValueOrDefault(),
+                GreenlinesBox.IsChecked.GetValueOrDefault(),
+                RedlinesBox.IsChecked.GetValueOrDefault(), OmitBarlineBox.IsChecked.GetValueOrDefault(),
+                LeniencyBox.GetDouble(defaultValue: 3), TemporalBox.GetDouble(),
+                int.Parse(Snap1.Text.Split('/')[1]), int.Parse(Snap2.Text.Split('/')[1]));
+
+            BackgroundWorker.RunWorkerAsync(args);
+
             CanRun = false;
         }
 
         private struct Arguments {
+            public bool Quick;
             public string[] Paths;
             public bool Objects;
             public bool Bookmarks;
@@ -54,8 +66,8 @@ namespace Mapping_Tools.Views {
             public double BeatsBetween;
             public int Snap1;
             public int Snap2;
-            public Arguments(string[] paths, bool objects, bool bookmarks, bool greenlines, bool redlines, bool omitBarline, double leniency, double beatsBetween, int snap1, int snap2)
-            {
+            public Arguments(bool quick, string[] paths, bool objects, bool bookmarks, bool greenlines, bool redlines, bool omitBarline, double leniency, double beatsBetween, int snap1, int snap2) {
+                Quick = quick;
                 Paths = paths;
                 Objects = objects;
                 Bookmarks = bookmarks;
@@ -257,6 +269,10 @@ namespace Mapping_Tools.Views {
                 worker.ReportProgress(100);
             }
 
+            // Do QuickRun stuff
+            if (arg.Quick)
+                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, editorRead));
+
             // Make an accurate message
             string message = "Successfully added ";
             message += RedlinesAdded;
@@ -265,7 +281,8 @@ namespace Mapping_Tools.Views {
             } else {
                 message += " redlines!";
             }
-            return message;
+
+            return arg.Quick ? string.Empty : message;
         }
 
         private bool CheckMpB(double mpbNew, List<Marker> markers, TimingPoint redline, Arguments arg) {
@@ -387,5 +404,7 @@ namespace Mapping_Tools.Views {
                 BeatsFromLastMarker = 0;
             }
         }
+
+        public event EventHandler RunFinished;
     }
 }
