@@ -43,7 +43,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             AdditionSet = additions;
             CustomIndex = 0;
             SampleVolume = 0;
-            Filename = "";
+            Filename = string.Empty;
         }
 
         public HitObject(Editor_Reader.HitObject ob) {
@@ -242,10 +242,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 if (values.Length > 8) {
                     var split = values[8].Split('|');
                     for (var i = 0; i < Math.Min(split.Length, Repeat + 1); i++)
-                        EdgeHitsounds.Add(TryParseInt(split[i], out var ehs) ? ehs : 0);
+                        EdgeHitsounds.Add(TryParseInt(split[i], out var ehs) ? ehs : hitsounds);
                 }
 
-                for (var i = EdgeHitsounds.Count; i < Repeat + 1; i++) EdgeHitsounds.Add(0);
+                for (var i = EdgeHitsounds.Count; i < Repeat + 1; i++) EdgeHitsounds.Add(hitsounds);
 
                 // Edge samplesets on 9
                 EdgeSampleSets = new List<SampleSet>(Repeat + 1);
@@ -546,11 +546,12 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         private bool GetSliderExtras() {
-            return (EdgeHitsounds != null && EdgeHitsounds.Any(o => o != 0)) ||
+            var hitsounds = GetHitsounds();
+            return (EdgeHitsounds != null && EdgeHitsounds.Any(o => o != hitsounds)) ||
                    (EdgeSampleSets != null && EdgeSampleSets.Any(o => o != SampleSet.Auto)) ||
                    (EdgeAdditionSets != null && EdgeAdditionSets.Any(o => o != SampleSet.Auto)) ||
                    SampleSet != SampleSet.Auto || AdditionSet != SampleSet.Auto || CustomIndex != 0 || 
-                   Math.Abs(SampleVolume) > Precision.DOUBLE_EPSILON || Filename != "";
+                   Math.Abs(SampleVolume) > Precision.DOUBLE_EPSILON || !string.IsNullOrEmpty(Filename);
         }
 
         public override string ToString() {
@@ -670,7 +671,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             for (var i = sliderData.Length - 1; i >= 0; i--) {
                 // Iterating in reverse to get the last valid letter
                 var letter =
-                    sliderData[i].Count() > 0 ? sliderData[i][0] : '0'; // 0 is not a letter so it will get ignored
+                    sliderData[i].Any() ? sliderData[i][0] : '0'; // 0 is not a letter so it will get ignored
                 if (char.IsLetter(letter))
                     switch (letter) {
                         case 'L':
