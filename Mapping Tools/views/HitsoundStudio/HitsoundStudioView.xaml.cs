@@ -11,6 +11,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using MaterialDesignThemes.Wpf;
 
@@ -131,7 +132,8 @@ namespace Mapping_Tools.Views
                 Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null;
                 Dictionary<SampleGeneratingArgs, string> sampleNames = null;
                 Dictionary<SampleGeneratingArgs, Vector2> samplePositions = null;
-                var hitsounds = HitsoundConverter.GetHitsounds(samplePackages, ref loadedSamples, ref sampleNames, ref samplePositions);
+                var hitsounds = HitsoundConverter.GetHitsounds(samplePackages, ref loadedSamples, ref sampleNames, ref samplePositions,
+                    arg.HitsoundExportGameMode == GameMode.Mania);
 
                 // Load the samples so validation can be done
                 UpdateProgressBar(worker, 50);

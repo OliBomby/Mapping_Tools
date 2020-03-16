@@ -108,7 +108,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
             }
 
             // TODO: Allow mp3, ogg and aif export.
-            string filename = name + ".wav";
+            string filename = name;
             CreateWaveFile(Path.Combine(exportFolder, filename), sampleSoundGenerator.GetSampleProvider().ToWaveProvider16());
 
             return true;
@@ -166,7 +166,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
             }
 
             // TODO: Allow mp3, ogg and aif export.
-            string filename = name + ".wav";
+            string filename = name;
             CreateWaveFile(Path.Combine(exportFolder, filename), result.ToWaveProvider16());
         }
 
@@ -177,7 +177,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
                         continue;
                     }
                     
-                    string filename = ci.Index == 1 ? kvp.Key : kvp.Key + ci.Index;
+                    string filename = ci.Index == 1 ? kvp.Key + ".wav" : kvp.Key + ci.Index + ".wav";
                     ExportMixedSample(kvp.Value, filename, exportFolder, loadedSamples);
                 }
             }
@@ -275,13 +275,14 @@ namespace Mapping_Tools.Classes.HitsoundStuff
             int numKeys = MathHelper.Clamp(sampleCount, 1, 18);
 
             var positions = new Dictionary<SampleGeneratingArgs, Vector2>();
-            int x = 256 / numKeys;
+            double x = 256d / numKeys;
             foreach (var sample in sampleArray) {
-                positions.Add(sample, new Vector2(x, 192));
+                Console.WriteLine(Math.Round(x));
+                positions.Add(sample, new Vector2(Math.Round(x), 192));
 
-                x += 512 / numKeys;
+                x += 512d / numKeys;
                 if (x > 512) {
-                    x = 256 / numKeys;
+                    x = 256d / numKeys;
                 }
             }
 
