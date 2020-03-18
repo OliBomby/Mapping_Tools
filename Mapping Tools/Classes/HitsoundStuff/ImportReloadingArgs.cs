@@ -16,15 +16,16 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public double LengthRoughness { get; }
         public double VelocityRoughness { get; }
         public bool DiscriminateVolumes { get; }
+        public bool DetectDuplicateSamples { get; }
         public bool RemoveDuplicates { get; }
 
         /// <inheritdoc />
-        public ImportReloadingArgs(string path) : this(ImportType.None, path, -1, -1, -1, -1, false, false) {
+        public ImportReloadingArgs(string path) : this(ImportType.None, path, -1, -1, -1, -1, false, false, false) {
         }
 
         /// <inheritdoc />
         public ImportReloadingArgs(ImportType importType, string path, double x, double y, double lengthRoughness, double velocityRoughness,
-            bool discriminateVolumes, bool removeDuplicates) {
+            bool discriminateVolumes, bool detectDuplicateSamples, bool removeDuplicates) {
             ImportType = importType;
             Path = path;
             X = x;
@@ -32,6 +33,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             LengthRoughness = lengthRoughness;
             VelocityRoughness = velocityRoughness;
             DiscriminateVolumes = discriminateVolumes;
+            DetectDuplicateSamples = detectDuplicateSamples;
             RemoveDuplicates = removeDuplicates;
         }
 
@@ -46,6 +48,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 LengthRoughness == other.LengthRoughness &&
                 VelocityRoughness == other.VelocityRoughness &&
                 DiscriminateVolumes == other.DiscriminateVolumes &&
+                DetectDuplicateSamples == other.DetectDuplicateSamples &&
                 RemoveDuplicates == other.RemoveDuplicates;
         }
 
@@ -72,6 +75,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             hashCode = hashCode * -1521134295 + VelocityRoughness.GetHashCode();
             hashCode = hashCode * -1521134295 + RemoveDuplicates.GetHashCode();
             hashCode = hashCode * -1521134295 + DiscriminateVolumes.GetHashCode();
+            hashCode = hashCode * -1521134295 + DetectDuplicateSamples.GetHashCode();
             return hashCode;
         }
     }

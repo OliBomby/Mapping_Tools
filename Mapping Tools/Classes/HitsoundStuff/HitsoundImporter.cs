@@ -34,7 +34,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return layer;
         }
 
-        public static Dictionary<string, string> AnalyzeSamples(string dir, bool extended=false) {
+        public static Dictionary<string, string> AnalyzeSamples(string dir, bool extended=false, bool detectDuplicateSamples=true) {
             var extList = new[] { ".wav", ".ogg", ".mp3" };
             List<string> samplePaths = Directory.GetFiles(dir, "*.*", extended ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly)
                 .Where(n => extList.Contains(Path.GetExtension(n), StringComparer.OrdinalIgnoreCase)).ToList();
@@ -43,45 +43,65 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             bool error = false;
             
             // Compare all samples to find ones with the same data
-            for (int i = 0; i < samplePaths.Count; i++) {
-                long thisLength = new FileInfo(samplePaths[i]).Length;
+            if (detectDuplicateSamples) {
+                for (int i = 0; i < samplePaths.Count; i++) {
+                    long thisLength = new FileInfo(samplePaths[i]).Length;
 
-                for (int k = i; k < samplePaths.Count; k++) {
-                    if (samplePaths[i] != samplePaths[k]) {
-                        long otherLength = new FileInfo(samplePaths[k]).Length;
-                        
-                        if (thisLength != otherLength) { continue; }
+                    for (int k = i; k < samplePaths.Count; k++) {
+                        if (samplePaths[i] != samplePaths[k]) {
+                            long otherLength = new FileInfo(samplePaths[k]).Length;
 
-                        try {
-                            using (var thisWave = SampleImporter.OpenSample(samplePaths[i])) {
-                                using (var otherWave = SampleImporter.OpenSample(samplePaths[k])) {
-                                    if (thisWave.Length != otherWave.Length) { continue; }
+                            if (thisLength != otherLength) {
+                                continue;
+                            }
 
-                                    byte[] thisBuffer = new byte[thisWave.Length];
-                                    thisWave.Read(thisBuffer, 0, (int)thisWave.Length);
+                            try {
+                                using (var thisWave = SampleImporter.OpenSample(samplePaths[i])) {
+                                    using (var otherWave = SampleImporter.OpenSample(samplePaths[k])) {
+                                        if (thisWave.Length != otherWave.Length) {
+                                            continue;
+                                        }
 
-                                    byte[] otherBuffer = new byte[otherWave.Length];
-                                    otherWave.Read(otherBuffer, 0, (int)otherWave.Length);
+                                        byte[] thisBuffer = new byte[thisWave.Length];
+                                        thisWave.Read(thisBuffer, 0, (int) thisWave.Length);
 
-                                    if (!thisBuffer.SequenceEqual(otherBuffer)) { continue; }
+                                        byte[] otherBuffer = new byte[otherWave.Length];
+                                        otherWave.Read(otherBuffer, 0, (int) otherWave.Length);
+
+                                        if (!thisBuffer.SequenceEqual(otherBuffer)) {
+                                            continue;
+                                        }
+                                    }
                                 }
+                            } catch (Exception ex) {
+                                // Something went wrong reading the samples. I'll just assume they weren't the same
+                                if (!error) {
+                                    MessageBox.Show($"Exception '{ex.Message}' while trying to analyze samples.",
+                                        "Warning");
+                                    error = true;
+                                }
+
+                                continue;
                             }
-                        } catch (Exception ex) {
-                            // Something went wrong reading the samples. I'll just assume they weren't the same
-                            if (!error) {
-                                MessageBox.Show($"Exception '{ex.Message}' while trying to analyze samples.", "Warning");
-                                error = true;
-                            }
-                            continue;
                         }
+
+                        string samplePath = samplePaths[i];
+                        string fullPathExtLess =
+                            Path.Combine(Path.GetDirectoryName(samplePath) ?? throw new InvalidOperationException(),
+                                Path.GetFileNameWithoutExtension(samplePath));
+                        dict[fullPathExtLess] = samplePaths[k];
+                        break;
                     }
-                    
-                    string samplePath = samplePaths[i];
-                    string fullPathExtLess = Path.Combine(Path.GetDirectoryName(samplePath) ?? throw new InvalidOperationException(), Path.GetFileNameWithoutExtension(samplePath));
-                    dict[fullPathExtLess] = samplePaths[k];
-                    break;
+                }
+            } else {
+                foreach (var samplePath in samplePaths) {
+                    string fullPathExtLess =
+                        Path.Combine(Path.GetDirectoryName(samplePath) ?? throw new InvalidOperationException(),
+                            Path.GetFileNameWithoutExtension(samplePath));
+                    dict[fullPathExtLess] = samplePath;
                 }
             }
+
             return dict;
         }
 
@@ -90,17 +110,18 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// </summary>
         /// <param name="path">The path to the beatmap.</param>
         /// <param name="volumes">Taking the volumes from the map and making different layers for different volumes.</param>
+        /// <param name="detectDuplicateSamples">Detect duplicate samples and optimise hitsound layer count with that.</param>
         /// <param name="removeDuplicates">Removes duplicate sounds at the same millisecond.</param>
         /// <param name="includeStoryboard">Also imports storyboarded samples.</param>
         /// <returns>The hitsound layers</returns>
-        public static List<HitsoundLayer> ImportHitsounds(string path, bool volumes, bool removeDuplicates, bool includeStoryboard) {
+        public static List<HitsoundLayer> ImportHitsounds(string path, bool volumes, bool detectDuplicateSamples, bool removeDuplicates, bool includeStoryboard) {
             EditorReaderStuff.TryGetNewestVersion(path, out var editor);
             Beatmap beatmap = editor.Beatmap;
             Timeline timeline = beatmap.GetTimeline();
 
             GameMode mode = (GameMode)beatmap.General["Mode"].Value;
             string mapDir = editor.GetBeatmapFolder();
-            Dictionary<string, string> firstSamples = AnalyzeSamples(mapDir);
+            Dictionary<string, string> firstSamples = AnalyzeSamples(mapDir, false, detectDuplicateSamples);
 
             List<HitsoundLayer> hitsoundLayers = new List<HitsoundLayer>();
 
@@ -136,7 +157,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     
                     string extLessFilename = Path.GetFileNameWithoutExtension(samplePath);
                     var importArgs = new LayerImportArgs(ImportType.Hitsounds) { Path = path, SamplePath = samplePath,
-                        Volume = volume, DiscriminateVolumes = volumes, RemoveDuplicates = removeDuplicates};
+                        Volume = volume, DetectDuplicateSamples = detectDuplicateSamples, DiscriminateVolumes = volumes, RemoveDuplicates = removeDuplicates};
 
                     // Find the hitsoundlayer with this path
                     HitsoundLayer layer = hitsoundLayers.Find(o => o.ImportArgs == importArgs);
@@ -396,7 +417,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     return new List<HitsoundLayer>
                         {ImportStack(reloadingArgs.Path, reloadingArgs.X, reloadingArgs.Y)};
                 case ImportType.Hitsounds:
-                    return ImportHitsounds(reloadingArgs.Path, reloadingArgs.DiscriminateVolumes, reloadingArgs.RemoveDuplicates, false);
+                    return ImportHitsounds(reloadingArgs.Path, reloadingArgs.DiscriminateVolumes, reloadingArgs.DetectDuplicateSamples, reloadingArgs.RemoveDuplicates, false);
                 case ImportType.Storyboard:
                     return ImportStoryboard(reloadingArgs.Path, reloadingArgs.DiscriminateVolumes, reloadingArgs.RemoveDuplicates);
                 case ImportType.MIDI:

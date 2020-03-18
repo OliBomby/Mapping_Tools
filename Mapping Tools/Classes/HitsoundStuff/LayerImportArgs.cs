@@ -26,6 +26,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             LengthRoughness = 1;
             Velocity = -1;
             VelocityRoughness = 1;
+            discriminateVolumes = false;
+            DetectDuplicateSamples = false;
             RemoveDuplicates = false;
         }
 
@@ -44,6 +46,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Velocity = -1;
             VelocityRoughness = 1;
             discriminateVolumes = false;
+            DetectDuplicateSamples = false;
             RemoveDuplicates = false;
         }
 
@@ -154,6 +157,16 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 if (discriminateVolumes == value) return;
                 discriminateVolumes = value;
                 NotifyPropertyChanged("DiscriminateVolumes");
+            }
+        }
+
+        private bool detectDuplicateSamples;
+        public bool DetectDuplicateSamples {
+            get => detectDuplicateSamples;
+            set {
+                if (detectDuplicateSamples == value) return;
+                detectDuplicateSamples = value;
+                NotifyPropertyChanged("DetectDuplicateSamples");
             }
         }
 
@@ -279,7 +292,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// </summary>
         /// <returns></returns>
         public ImportReloadingArgs GetImportReloadingArgs() {
-            return new ImportReloadingArgs(ImportType, Path, X, Y, LengthRoughness, VelocityRoughness, DiscriminateVolumes, RemoveDuplicates);
+            return new ImportReloadingArgs(ImportType, Path, X, Y, LengthRoughness, VelocityRoughness, DiscriminateVolumes, DetectDuplicateSamples, RemoveDuplicates);
         }
 
         /// <summary>
@@ -325,7 +338,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 Velocity == other.Velocity &&
                 VelocityRoughness == other.VelocityRoughness &&
                 RemoveDuplicates == other.RemoveDuplicates &&
-                DiscriminateVolumes == other.DiscriminateVolumes;
+                DiscriminateVolumes == other.DiscriminateVolumes &&
+                DetectDuplicateSamples == other.DetectDuplicateSamples;
         }
 
         /// <inheritdoc />
@@ -355,6 +369,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             hashCode = hashCode * -1521134295 + VelocityRoughness.GetHashCode();
             hashCode = hashCode * -1521134295 + RemoveDuplicates.GetHashCode();
             hashCode = hashCode * -1521134295 + DiscriminateVolumes.GetHashCode();
+            hashCode = hashCode * -1521134295 + DetectDuplicateSamples.GetHashCode();
             return hashCode;
         }
 

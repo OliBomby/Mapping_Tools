@@ -97,7 +97,8 @@ namespace Mapping_Tools.Views {
                 else if( Tabs.SelectedIndex == 2 ) {
                     // Import complete hitsounds
                     foreach( string path in BeatmapPathBox2.Text.Split('|') ) {
-                        HitsoundLayers.AddRange(HitsoundImporter.ImportHitsounds(path, VolumesBox2.IsChecked.GetValueOrDefault(), 
+                        HitsoundLayers.AddRange(HitsoundImporter.ImportHitsounds(path, VolumesBox2.IsChecked.GetValueOrDefault(),
+                            DetectDuplicateSamplesBox2.IsChecked.GetValueOrDefault(),
                             RemoveDuplicatesBox2.IsChecked.GetValueOrDefault(),
                             IncludeStoryboardBox2.IsChecked.GetValueOrDefault()));
                     }

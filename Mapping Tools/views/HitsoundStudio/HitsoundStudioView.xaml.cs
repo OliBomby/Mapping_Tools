@@ -409,6 +409,7 @@ namespace Mapping_Tools.Views
             SelectedImportYCoordBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.Y, CultureInfo.InvariantCulture);
             SelectedImportSamplePathBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.SamplePath);
             SelectedHitsoundImportDiscriminateVolumesBox.IsChecked = selectedLayers.All(o => o.ImportArgs.DiscriminateVolumes);
+            SelectedHitsoundImportDetectDuplicateSamplesBox.IsChecked = selectedLayers.All(o => o.ImportArgs.DetectDuplicateSamples);
             SelectedHitsoundImportRemoveDuplicatesBox.IsChecked = selectedLayers.All(o => o.ImportArgs.RemoveDuplicates);
             SelectedStoryboardImportSamplePathBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.SamplePath);
             SelectedStoryboardImportDiscriminateVolumesBox.IsChecked = selectedLayers.All(o => o.ImportArgs.DiscriminateVolumes);
@@ -999,6 +1000,22 @@ namespace Mapping_Tools.Views
 
             foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
                 hitsoundLayer.ImportArgs.RemoveDuplicates = false;
+            }
+        }
+
+        private void SelectedHitsoundImportDetectDuplicateSamplesBox_OnChecked(object sender, RoutedEventArgs e) {
+            if (suppressEvents) return;
+
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.ImportArgs.DetectDuplicateSamples = true;
+            }
+        }
+
+        private void SelectedHitsoundImportDetectDuplicateSamplesBox_OnUnchecked(object sender, RoutedEventArgs e) {
+            if (suppressEvents) return;
+
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.ImportArgs.DetectDuplicateSamples = false;
             }
         }
 
