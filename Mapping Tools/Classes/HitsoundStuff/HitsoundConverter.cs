@@ -117,7 +117,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
 
             // Remove any CustomIndices that might be obsolete
-            newCustomIndices.RemoveAll(o => !IsUseful(o, newCustomIndices.Except(new CustomIndex[] { o }).ToList(), customIndices));
+            newCustomIndices.RemoveAll(o => !IsUseful(o, newCustomIndices.Except(new[] { o }).ToList(), customIndices));
 
             return newCustomIndices;
         }
@@ -130,9 +130,25 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return false;
         }
 
-        public static void GiveCustomIndicesIndices(List<CustomIndex> customIndices) {
-            for (int i = 0; i < customIndices.Count; i++) {
-                customIndices[i].Index = i + 1;  // osu! CustomIndices start from 1
+        public static void GiveCustomIndicesIndices(List<CustomIndex> customIndices, bool keepExistingIndices) {
+            if (!keepExistingIndices) {
+                for (int i = 0; i < customIndices.Count; i++) {
+                    customIndices[i].Index = i + 1; // osu! CustomIndices start from 1
+                }
+            } else {
+                int i = 1;
+                HashSet<int> usedIndices = new HashSet<int>();
+                foreach (var customIndex in customIndices) {
+                    if (customIndex.Index == -1) {
+                        customIndex.Index = i++;
+                    }
+
+                    usedIndices.Add(customIndex.Index);
+
+                    while (usedIndices.Contains(i)) {
+                        i++;
+                    }
+                }
             }
         }
 
@@ -140,7 +156,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             ref Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples,
             ref Dictionary<SampleGeneratingArgs, string> names,
             ref Dictionary<SampleGeneratingArgs, Vector2> positions,
-            bool maniaPositions=false) {
+            bool maniaPositions=false, bool includeRegularHitsounds=true) {
 
             HashSet<SampleGeneratingArgs> allSampleArgs = new HashSet<SampleGeneratingArgs>();
             foreach (SamplePackage sp in samplePackages) {
@@ -163,9 +179,15 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             var hitsounds = new List<HitsoundEvent>();
             foreach (var p in samplePackages) {
                 foreach (var s in p.Samples) {
-                    hitsounds.Add( new HitsoundEvent(p.Time,
-                        positions[s.SampleArgs], s.OutsideVolume, names[s.SampleArgs], s.SampleSet, s.SampleSet,
-                        0, s.Whistle, s.Finish, s.Clap));
+                    if (includeRegularHitsounds) {
+                        hitsounds.Add(new HitsoundEvent(p.Time,
+                            positions[s.SampleArgs], s.OutsideVolume, names[s.SampleArgs], s.SampleSet, s.SampleSet,
+                            0, s.Whistle, s.Finish, s.Clap));
+                    } else {
+                        hitsounds.Add(new HitsoundEvent(p.Time,
+                            positions[s.SampleArgs], s.OutsideVolume, names[s.SampleArgs], SampleSet.Auto, SampleSet.Auto,
+                            0, false, false, false));
+                    }
                 }
             }
 
@@ -191,24 +213,23 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 foreach (CustomIndex ci in customIndices) {
                     int fits = NumSupportedPackages(packageCustomIndices, index, ci);
 
-                    if (fits > bestFits) {
-                        bestCustomIndex = ci;
-                        bestFits = fits;
-                    }
+                    if (fits <= bestFits) continue;
+                    bestCustomIndex = ci;
+                    bestFits = fits;
                 }
 
 
                 if (bestFits == 0) {
                     throw new Exception("Custom indices can't fit the sample packages.");
-                } else {
-                    // Add all the fitted packages as hitsounds
-                    for (int i = 0; i < bestFits; i++)
-                    {
-                        if (bestCustomIndex != null)
-                            hitsounds.Add(samplePackages[index + i].GetHitsound(bestCustomIndex.Index));
-                    }
-                    index += bestFits;
                 }
+
+                // Add all the fitted packages as hitsounds
+                for (int i = 0; i < bestFits; i++)
+                {
+                    if (bestCustomIndex != null)
+                        hitsounds.Add(samplePackages[index + i].GetHitsound(bestCustomIndex.Index));
+                }
+                index += bestFits;
             }
             return hitsounds;
         }
@@ -226,10 +247,13 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return supported;
         }
 
-        public static CompleteHitsounds GetCompleteHitsounds(List<SamplePackage> packages, Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null, List<CustomIndex> customIndices = null) {
+        public static CompleteHitsounds GetCompleteHitsounds(List<SamplePackage> packages, Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null, List<CustomIndex> customIndices = null, bool allowGrowth=false) {
             if (customIndices == null) {
                 customIndices = OptimizeCustomIndices(GetCustomIndices(packages, loadedSamples));
-                GiveCustomIndicesIndices(customIndices);
+                GiveCustomIndicesIndices(customIndices, false);
+            } else if (allowGrowth) {
+                customIndices = OptimizeCustomIndices(customIndices.Concat(GetCustomIndices(packages, loadedSamples)).ToList());
+                GiveCustomIndicesIndices(customIndices, true);
             }
 
             var hitsounds = GetHitsounds(packages, customIndices);

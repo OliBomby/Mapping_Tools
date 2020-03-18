@@ -22,14 +22,14 @@
                 <TextBox x:Name="ExportFolderBox" Text="{Binding ExportFolder, Mode=TwoWay}" MinWidth="220" Margin="0,0,5,0"
                          Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Export folder"
                          ToolTip="The folder to export the hitsound beatmap and hitsound samples to. Original items in this folder could be deleted."/>
-                <TextBox x:Name="HitsoundDiffNameBox" Text="{Binding HitsoundDiffName, Mode=TwoWay}" MinWidth="220" Margin="0,0,5,0"
-                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Hitsound map name"
-                         ToolTip="The folder to export the hitsound beatmap and hitsound samples to. Original items in this folder could be deleted."/>
                 <Button x:Name="ExportFolderBrowseButton" Grid.Column="1" Cursor="Hand" Click="ExportFolderBrowseButton_OnClick"
                         Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
                     <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                 </Button >
             </Grid>
+            <TextBox x:Name="HitsoundDiffNameBox" Text="{Binding HitsoundDiffName, Mode=TwoWay}" MinWidth="220" Margin="0,0,5,0"
+                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Hitsound map name"
+                     ToolTip="The folder to export the hitsound beatmap and hitsound samples to. Original items in this folder could be deleted."/>
             <CheckBox Content="Export hitsound map" IsChecked="{Binding ExportMap}"
                       ToolTip="Check this to export the hitsound beatmap."/>
             <CheckBox Content="Export hitsound samples" IsChecked="{Binding ExportSamples}"
@@ -40,9 +40,13 @@
                       ToolTip="Check this to automatically delete all files in the export folder before exporting. When using this be sure there aren't any important files in your export folder."/>
             <CheckBox Content="Use previous sample schema" IsChecked="{Binding UsePreviousSampleSchema}"
                       ToolTip="Check this to use the same samples as the previous export."/>
+            <CheckBox Content="Allow growth of previous sample schema" IsChecked="{Binding AllowGrowthPreviousSampleSchema}"
+                      ToolTip="Alows expansion of the previous sample schema to always fit the need of the current export. If you dont check this, then the sample schema of this export needs to be a subset of the previous sample schema."/>
             <ComboBox Margin="0 20 0 0" ItemsSource="{Binding HitsoundExportModes}" SelectedItem="{Binding HitsoundExportModeSetting}"
                       Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Export mode"
                       ToolTip="Choose which format to export the hitsounds as. The 'Standard' option will generate hitsounds that can be copied to osu! standard beatmaps. The 'Coinciding' option combined with the osu! mania gamemode will export a lossless representation of the hitsound layers."/>
+            <CheckBox Content="Add regular hitsounds" IsChecked="{Binding AddCoincidingRegularHitsounds}"
+                      ToolTip="Check this to add whistles, claps, finishes, and samplesets ontop of the filename hitsounding used by coinciding export."/>
             <ComboBox Margin="0 10 0 0" ItemsSource="{Binding HitsoundExportGameModes}" SelectedItem="{Binding HitsoundExportGameMode}"
                       Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Export gamemode"
                       ToolTip="Choose the gamemode for the exported hitsound map."/>

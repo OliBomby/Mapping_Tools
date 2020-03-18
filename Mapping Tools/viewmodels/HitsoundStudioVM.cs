@@ -62,6 +62,18 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _usePreviousSampleSchema, value);
         }
 
+        private bool _allowGrowthPreviousSampleSchema;
+        public bool AllowGrowthPreviousSampleSchema {
+            get => _allowGrowthPreviousSampleSchema;
+            set => Set(ref _allowGrowthPreviousSampleSchema, value);
+        }
+
+        private bool _addCoincidingRegularHitsounds;
+        public bool AddCoincidingRegularHitsounds {
+            get => _addCoincidingRegularHitsounds;
+            set => Set(ref _addCoincidingRegularHitsounds, value);
+        }
+
         public List<CustomIndex> PreviousSampleSchema { get; set; }
 
         private HitsoundExportMode hitsoundExportModeSetting;
@@ -96,6 +108,7 @@ namespace Mapping_Tools.Viewmodels {
             ExportMap = true;
             ExportSamples = true;
             DeleteAllInExportFirst = false;
+            AddCoincidingRegularHitsounds = true;
             HitsoundExportModeSetting = HitsoundExportMode.Standard;
             HitsoundExportGameMode = GameMode.Standard;
         }

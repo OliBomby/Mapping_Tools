@@ -81,7 +81,7 @@ namespace Mapping_Tools.Views
                 // Convert the packages to hitsounds that fit on an osu standard map
                 CompleteHitsounds completeHitsounds =
                     HitsoundConverter.GetCompleteHitsounds(samplePackages, loadedSamples, 
-                        arg.UsePreviousSampleSchema ? arg.PreviousSampleSchema : null);
+                        arg.UsePreviousSampleSchema ? arg.PreviousSampleSchema : null, arg.AllowGrowthPreviousSampleSchema);
                 UpdateProgressBar(worker, 60);
 
                 // Save current sample schema
@@ -137,7 +137,7 @@ namespace Mapping_Tools.Views
                 Dictionary<SampleGeneratingArgs, string> sampleNames = null;
                 Dictionary<SampleGeneratingArgs, Vector2> samplePositions = null;
                 var hitsounds = HitsoundConverter.GetHitsounds(samplePackages, ref loadedSamples, ref sampleNames, ref samplePositions,
-                    arg.HitsoundExportGameMode == GameMode.Mania);
+                    arg.HitsoundExportGameMode == GameMode.Mania, arg.AddCoincidingRegularHitsounds);
 
                 // Load the samples so validation can be done
                 UpdateProgressBar(worker, 50);
