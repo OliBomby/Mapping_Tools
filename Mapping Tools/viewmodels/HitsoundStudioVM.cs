@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
 using Mapping_Tools.Classes.BeatmapHelper;
 
 namespace Mapping_Tools.Viewmodels {
@@ -74,12 +75,19 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _addCoincidingRegularHitsounds, value);
         }
 
+        public Visibility AddCoincidingRegularHitsoundsVisibility =>
+            HitsoundExportModeSetting == HitsoundExportMode.Coinciding ? Visibility.Visible : Visibility.Collapsed;
+
         public List<CustomIndex> PreviousSampleSchema { get; set; }
 
         private HitsoundExportMode hitsoundExportModeSetting;
         public HitsoundExportMode HitsoundExportModeSetting {
             get => hitsoundExportModeSetting;
-            set => Set(ref hitsoundExportModeSetting, value);
+            set {
+                if (Set(ref hitsoundExportModeSetting, value)) {
+                    RaisePropertyChanged(nameof(AddCoincidingRegularHitsoundsVisibility));
+                }
+            }
         }
         
         public IEnumerable<HitsoundExportMode> HitsoundExportModes => Enum.GetValues(typeof(HitsoundExportMode)).Cast<HitsoundExportMode>();
