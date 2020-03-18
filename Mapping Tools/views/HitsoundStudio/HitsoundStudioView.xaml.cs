@@ -81,11 +81,15 @@ namespace Mapping_Tools.Views
                 // Convert the packages to hitsounds that fit on an osu standard map
                 CompleteHitsounds completeHitsounds =
                     HitsoundConverter.GetCompleteHitsounds(samplePackages, loadedSamples, 
-                        arg.UsePreviousSampleSchema ? arg.PreviousSampleSchema : null, arg.AllowGrowthPreviousSampleSchema);
+                        arg.UsePreviousSampleSchema ? arg.PreviousSampleSchema.GetCustomIndices() : null, arg.AllowGrowthPreviousSampleSchema);
                 UpdateProgressBar(worker, 60);
 
                 // Save current sample schema
-                arg.PreviousSampleSchema = completeHitsounds.CustomIndices;
+                if (!arg.UsePreviousSampleSchema) {
+                    arg.PreviousSampleSchema = new SampleSchema(completeHitsounds.CustomIndices);
+                } else if (arg.AllowGrowthPreviousSampleSchema) {
+                    arg.PreviousSampleSchema.MergeWith(new SampleSchema(completeHitsounds.CustomIndices));
+                }
 
                 if (arg.ShowResults) {
                     // Count the number of samples
@@ -134,10 +138,17 @@ namespace Mapping_Tools.Views
                 UpdateProgressBar(worker, 20);
 
                 Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null;
-                Dictionary<SampleGeneratingArgs, string> sampleNames = null;
+                Dictionary<SampleGeneratingArgs, string> sampleNames = arg.UsePreviousSampleSchema ? arg.PreviousSampleSchema.GetSampleNames() : null;
                 Dictionary<SampleGeneratingArgs, Vector2> samplePositions = null;
                 var hitsounds = HitsoundConverter.GetHitsounds(samplePackages, ref loadedSamples, ref sampleNames, ref samplePositions,
-                    arg.HitsoundExportGameMode == GameMode.Mania, arg.AddCoincidingRegularHitsounds);
+                    arg.HitsoundExportGameMode == GameMode.Mania, arg.AddCoincidingRegularHitsounds, arg.AllowGrowthPreviousSampleSchema);
+
+                // Save current sample schema
+                if (!arg.UsePreviousSampleSchema) {
+                    arg.PreviousSampleSchema = new SampleSchema(sampleNames);
+                } else if (arg.AllowGrowthPreviousSampleSchema) {
+                    arg.PreviousSampleSchema.MergeWith(new SampleSchema(sampleNames));
+                }
 
                 // Load the samples so validation can be done
                 UpdateProgressBar(worker, 50);
@@ -171,9 +182,17 @@ namespace Mapping_Tools.Views
                 UpdateProgressBar(worker, 20);
 
                 Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null;
-                Dictionary<SampleGeneratingArgs, string> sampleNames = null;
+                Dictionary<SampleGeneratingArgs, string> sampleNames = arg.UsePreviousSampleSchema ? arg.PreviousSampleSchema.GetSampleNames() : null;
                 Dictionary<SampleGeneratingArgs, Vector2> samplePositions = null;
-                var hitsounds = HitsoundConverter.GetHitsounds(samplePackages, ref loadedSamples, ref sampleNames, ref samplePositions);
+                var hitsounds = HitsoundConverter.GetHitsounds(samplePackages, ref loadedSamples, ref sampleNames, ref samplePositions,
+                    false, false, arg.AllowGrowthPreviousSampleSchema);
+
+                // Save current sample schema
+                if (!arg.UsePreviousSampleSchema) {
+                    arg.PreviousSampleSchema = new SampleSchema(sampleNames);
+                } else if (arg.AllowGrowthPreviousSampleSchema) {
+                    arg.PreviousSampleSchema.MergeWith(new SampleSchema(sampleNames));
+                }
 
                 // Load the samples so validation can be done
                 UpdateProgressBar(worker, 50);
@@ -193,7 +212,8 @@ namespace Mapping_Tools.Views
                 UpdateProgressBar(worker, 60);
 
                 if (arg.ExportMap) {
-                    HitsoundExporter.ExportHitsounds(hitsounds, arg.BaseBeatmap, arg.ExportFolder, arg.HitsoundDiffName, arg.HitsoundExportGameMode, false, true);
+                    HitsoundExporter.ExportHitsounds(hitsounds, arg.BaseBeatmap, arg.ExportFolder, arg.HitsoundDiffName
+                        , arg.HitsoundExportGameMode, false, true);
                 }
                 UpdateProgressBar(worker, 70);
 

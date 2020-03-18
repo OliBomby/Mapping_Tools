@@ -135,8 +135,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 foreach (string filename in samples) {
                     bool isFilename = tlo.UsesFilename;
 
-                    SampleSet sampleSet = tlo.FenoSampleSet;
-                    Hitsound hitsound = tlo.GetHitsound();
+                    SampleSet sampleSet = isFilename ? tlo.FenoSampleSet : GetSamplesetFromFilename(filename);
+                    Hitsound hitsound = isFilename ? tlo.GetHitsound() : GetHitsoundFromFilename(filename);
 
                     string samplePath = Path.Combine(mapDir, filename);
                     string fullPathExtLess = Path.Combine(

@@ -78,13 +78,13 @@ namespace Mapping_Tools.Viewmodels {
         public Visibility AddCoincidingRegularHitsoundsVisibility =>
             HitsoundExportModeSetting == HitsoundExportMode.Coinciding ? Visibility.Visible : Visibility.Collapsed;
 
-        public List<CustomIndex> PreviousSampleSchema { get; set; }
+        public SampleSchema PreviousSampleSchema { get; set; }
 
-        private HitsoundExportMode hitsoundExportModeSetting;
+        private HitsoundExportMode _hitsoundExportModeSetting;
         public HitsoundExportMode HitsoundExportModeSetting {
-            get => hitsoundExportModeSetting;
+            get => _hitsoundExportModeSetting;
             set {
-                if (Set(ref hitsoundExportModeSetting, value)) {
+                if (Set(ref _hitsoundExportModeSetting, value)) {
                     RaisePropertyChanged(nameof(AddCoincidingRegularHitsoundsVisibility));
                 }
             }
@@ -92,10 +92,10 @@ namespace Mapping_Tools.Viewmodels {
         
         public IEnumerable<HitsoundExportMode> HitsoundExportModes => Enum.GetValues(typeof(HitsoundExportMode)).Cast<HitsoundExportMode>();
 
-        private GameMode hitsoundExportGameMode;
+        private GameMode _hitsoundExportGameMode;
         public GameMode HitsoundExportGameMode {
-            get => hitsoundExportGameMode;
-            set => Set(ref hitsoundExportGameMode, value);
+            get => _hitsoundExportGameMode;
+            set => Set(ref _hitsoundExportGameMode, value);
         }
         
         public IEnumerable<GameMode> HitsoundExportGameModes => Enum.GetValues(typeof(GameMode)).Cast<GameMode>();

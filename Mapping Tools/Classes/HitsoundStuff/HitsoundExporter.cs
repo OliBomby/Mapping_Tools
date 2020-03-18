@@ -231,6 +231,25 @@ namespace Mapping_Tools.Classes.HitsoundStuff
             return sampleNames;
         }
 
+        public static void AddNewSampleName(Dictionary<SampleGeneratingArgs, string> sampleNames, SampleGeneratingArgs sample,
+            Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples) {
+            if (!SampleImporter.ValidateSampleArgs(sample, loadedSamples)) {
+                sampleNames[sample] = string.Empty;
+                return;
+            }
+            
+            var baseName = sample.GetFilename();
+            var ext = sample.GetExtension();
+            var name = baseName + ext;
+            int i = 1;
+
+            while (sampleNames.ContainsValue(name)) {
+                name = baseName + "-" + ++i + ext; 
+            }
+
+            sampleNames[sample] = name;
+        }
+
         public static Dictionary<SampleGeneratingArgs, Vector2> GenerateHitsoundPositions(IEnumerable<SampleGeneratingArgs> samples) {
             var sampleArray = samples.ToArray();
             var sampleCount = sampleArray.Length;
@@ -277,7 +296,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff
             var positions = new Dictionary<SampleGeneratingArgs, Vector2>();
             double x = 256d / numKeys;
             foreach (var sample in sampleArray) {
-                Console.WriteLine(Math.Round(x));
                 positions.Add(sample, new Vector2(Math.Round(x), 192));
 
                 x += 512d / numKeys;

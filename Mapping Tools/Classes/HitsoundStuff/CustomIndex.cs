@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Mapping_Tools.Classes.BeatmapHelper;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
 
@@ -165,13 +166,17 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             foreach (KeyValuePair<string, HashSet<SampleGeneratingArgs>> kvp in Samples) {
                 var sampleList = new StringBuilder();
                 foreach (var sga in kvp.Value) {
-                    sampleList.Append(string.Format("{0}|", sga.ToString()));
+                    sampleList.Append($"{sga}|");
                 }
                 if (sampleList.Length > 0)
                     sampleList.Remove(sampleList.Length - 1, 1);
-                accumulator.Append(string.Format("{0}: [{1}]", kvp.Key, sampleList.ToString()));
+                accumulator.Append($"{kvp.Key}: [{sampleList}]");
             }
             return accumulator.ToString();
+        }
+
+        public string GetNumberExtension() {
+            return Index == 1 ? string.Empty : Index.ToInvariant();
         }
     }
 }

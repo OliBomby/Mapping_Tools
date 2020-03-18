@@ -156,7 +156,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             ref Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples,
             ref Dictionary<SampleGeneratingArgs, string> names,
             ref Dictionary<SampleGeneratingArgs, Vector2> positions,
-            bool maniaPositions=false, bool includeRegularHitsounds=true) {
+            bool maniaPositions=false, bool includeRegularHitsounds=true, bool allowNamingGrowth=false) {
 
             HashSet<SampleGeneratingArgs> allSampleArgs = new HashSet<SampleGeneratingArgs>();
             foreach (SamplePackage sp in samplePackages) {
@@ -179,13 +179,31 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             var hitsounds = new List<HitsoundEvent>();
             foreach (var p in samplePackages) {
                 foreach (var s in p.Samples) {
+                    string filename;
+
+                    if (names.ContainsKey(s.SampleArgs)) {
+                        filename = names[s.SampleArgs];
+                    } else {
+                        // Validate the sample because we expect only valid samples to be present in the sample schema
+                        if (SampleImporter.ValidateSampleArgs(s.SampleArgs, loadedSamples)) {
+                            if (allowNamingGrowth) {
+                                HitsoundExporter.AddNewSampleName(names, s.SampleArgs, loadedSamples);
+                                filename = names[s.SampleArgs];
+                            } else {
+                                throw new Exception($"Given sample schema doesn't support sample ({s.SampleArgs}) and growth is disabled.");
+                            }
+                        } else {
+                            filename = string.Empty;
+                        }
+                    }
+
                     if (includeRegularHitsounds) {
                         hitsounds.Add(new HitsoundEvent(p.Time,
-                            positions[s.SampleArgs], s.OutsideVolume, names[s.SampleArgs], s.SampleSet, s.SampleSet,
+                            positions[s.SampleArgs], s.OutsideVolume, filename, s.SampleSet, s.SampleSet,
                             0, s.Whistle, s.Finish, s.Clap));
                     } else {
                         hitsounds.Add(new HitsoundEvent(p.Time,
-                            positions[s.SampleArgs], s.OutsideVolume, names[s.SampleArgs], SampleSet.Auto, SampleSet.Auto,
+                            positions[s.SampleArgs], s.OutsideVolume, filename, SampleSet.Auto, SampleSet.Auto,
                             0, false, false, false));
                     }
                 }
