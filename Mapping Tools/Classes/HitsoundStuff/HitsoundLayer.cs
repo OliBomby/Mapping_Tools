@@ -223,6 +223,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             for (int i = 1; i < Times.Count; i++) {
                 if (Math.Abs(Times[i] - Times[i - 1]) < Precision.DOUBLE_EPSILON) {
                     Times.RemoveAt(i);
+                    i--;
                 }    
             }
         }
