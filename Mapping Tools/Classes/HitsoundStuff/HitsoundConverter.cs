@@ -226,9 +226,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return supported;
         }
 
-        public static CompleteHitsounds GetCompleteHitsounds(List<SamplePackage> packages, Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null) {
-            var customIndices = OptimizeCustomIndices(GetCustomIndices(packages, loadedSamples));
-            GiveCustomIndicesIndices(customIndices);
+        public static CompleteHitsounds GetCompleteHitsounds(List<SamplePackage> packages, Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null, List<CustomIndex> customIndices = null) {
+            if (customIndices == null) {
+                customIndices = OptimizeCustomIndices(GetCustomIndices(packages, loadedSamples));
+                GiveCustomIndicesIndices(customIndices);
+            }
 
             var hitsounds = GetHitsounds(packages, customIndices);
 

@@ -80,8 +80,12 @@ namespace Mapping_Tools.Views
 
                 // Convert the packages to hitsounds that fit on an osu standard map
                 CompleteHitsounds completeHitsounds =
-                    HitsoundConverter.GetCompleteHitsounds(samplePackages, loadedSamples);
+                    HitsoundConverter.GetCompleteHitsounds(samplePackages, loadedSamples, 
+                        arg.UsePreviousSampleSchema ? arg.PreviousSampleSchema : null);
                 UpdateProgressBar(worker, 60);
+
+                // Save current sample schema
+                arg.PreviousSampleSchema = completeHitsounds.CustomIndices;
 
                 if (arg.ShowResults) {
                     // Count the number of samples

@@ -50,6 +50,14 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _deleteAllInExportFirst, value);
         }
 
+        private bool _usePreviousSampleSchema;
+        public bool UsePreviousSampleSchema {
+            get => _usePreviousSampleSchema;
+            set => Set(ref _usePreviousSampleSchema, value);
+        }
+
+        public List<CustomIndex> PreviousSampleSchema { get; set; }
+
         private HitsoundExportMode hitsoundExportModeSetting;
         public HitsoundExportMode HitsoundExportModeSetting {
             get => hitsoundExportModeSetting;

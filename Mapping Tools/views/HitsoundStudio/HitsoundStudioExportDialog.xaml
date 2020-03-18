@@ -35,6 +35,8 @@
                       ToolTip="Check this to see the resulting number of custom indices, hitsound samples, and index changes."/>
             <CheckBox Content="Delete all files in export folder" IsChecked="{Binding DeleteAllInExportFirst}"
                       ToolTip="Check this to automatically delete all files in the export folder before exporting. When using this be sure there aren't any important files in your export folder."/>
+            <CheckBox Content="Use previous sample schema" IsChecked="{Binding UsePreviousSampleSchema}"
+                      ToolTip="Check this to use the same samples as the previous export."/>
             <ComboBox Margin="0 20 0 0" ItemsSource="{Binding HitsoundExportModes}" SelectedItem="{Binding HitsoundExportModeSetting}"
                       Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Export mode"
                       ToolTip="Choose which format to export the hitsounds as. The 'Standard' option will generate hitsounds that can be copied to osu! standard beatmaps. The 'Coinciding' option combined with the osu! mania gamemode will export a lossless representation of the hitsound layers."/>
