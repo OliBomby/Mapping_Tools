@@ -31,8 +31,10 @@ namespace Mapping_Tools.Views {
             NameBox0.Text = string.Format("Layer {0}", index + 1);
             NameBox.Text = string.Format("Layer {0}", index + 1);
             NameBox2.Text = string.Format("Layer {0}", index + 1);
+            NameBox4.Text = string.Format("Layer {0}", index + 1);
             BeatmapPathBox.Text = MainWindow.AppWindow.GetCurrentMaps()[0];
             BeatmapPathBox2.Text = MainWindow.AppWindow.GetCurrentMapsString();
+            BeatmapPathBox4.Text = MainWindow.AppWindow.GetCurrentMapsString();
         }
 
         private void BeatmapBrowse_Click(object sender, RoutedEventArgs e) {
@@ -53,6 +55,16 @@ namespace Mapping_Tools.Views {
         private void BeatmapLoad2_Click(object sender, RoutedEventArgs e) {
             string path = IOHelper.GetCurrentBeatmap();
             if( path != "" ) { BeatmapPathBox2.Text = path; }
+        }
+
+        private void BeatmapBrowse4_Click(object sender, RoutedEventArgs e) {
+            string[] paths = IOHelper.BeatmapFileDialog(restore: !SettingsManager.Settings.CurrentBeatmapDefaultFolder);
+            if( paths.Length != 0 ) { BeatmapPathBox4.Text = string.Join("|", paths); }
+        }
+
+        private void BeatmapLoad4_Click(object sender, RoutedEventArgs e) {
+            string path = IOHelper.GetCurrentBeatmap();
+            if( path != "" ) { BeatmapPathBox4.Text = path; }
         }
 
         private void MIDIBrowse3_Click(object sender, RoutedEventArgs e) {
@@ -85,7 +97,9 @@ namespace Mapping_Tools.Views {
                 else if( Tabs.SelectedIndex == 2 ) {
                     // Import complete hitsounds
                     foreach( string path in BeatmapPathBox2.Text.Split('|') ) {
-                        HitsoundLayers.AddRange(HitsoundImporter.ImportHitsounds(path, VolumesBox2.IsChecked.GetValueOrDefault()));
+                        HitsoundLayers.AddRange(HitsoundImporter.ImportHitsounds(path, VolumesBox2.IsChecked.GetValueOrDefault(), 
+                            RemoveDuplicatesBox2.IsChecked.GetValueOrDefault(),
+                            IncludeStoryboardBox2.IsChecked.GetValueOrDefault()));
                     }
                     HitsoundLayers.ForEach(o => o.Name = $"{NameBox2.Text}: {o.Name}");
                 }
@@ -96,6 +110,14 @@ namespace Mapping_Tools.Views {
                         LengthBox3.IsChecked.GetValueOrDefault(), LengthRoughnessBox3.GetDouble(2),
                         VelocityBox3.IsChecked.GetValueOrDefault(), VelocityRoughnessBox3.GetDouble(10));
                     HitsoundLayers.ForEach(o => o.Name = $"{NameBox3.Text}: {o.Name}");
+                }
+                else if( Tabs.SelectedIndex == 4 ) {
+                    // Import storyboarded samples
+                    foreach( string path in BeatmapPathBox4.Text.Split('|') ) {
+                        HitsoundLayers.AddRange(HitsoundImporter.ImportStoryboard(path, VolumesBox4.IsChecked.GetValueOrDefault(), 
+                            RemoveDuplicatesBox4.IsChecked.GetValueOrDefault()));
+                    }
+                    HitsoundLayers.ForEach(o => o.Name = $"{NameBox4.Text}: {o.Name}");
                 }
                 else {
                     // Import none

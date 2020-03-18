@@ -367,7 +367,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             FenoSampleSet = SampleSet == 0 ? hstp.SampleSet : SampleSet;
             FenoAdditionSet = AdditionSet == 0 ? FenoSampleSet : AdditionSet;
             FenoCustomIndex = CustomIndex == 0 ? hstp.SampleIndex : CustomIndex;
-            FenoSampleVolume = SampleVolume == 0 ? hstp.Volume : SampleVolume;
+            FenoSampleVolume = Math.Abs(SampleVolume) < Precision.DOUBLE_EPSILON ? hstp.Volume : SampleVolume;
         }
 
         /// <summary>

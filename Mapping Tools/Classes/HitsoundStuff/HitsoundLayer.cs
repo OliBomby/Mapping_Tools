@@ -202,7 +202,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         /// <summary>
-        /// 
+        /// Reloads this hitsound layer with times from a list of hitsound layers that could be relevant to this one.
         /// </summary>
         /// <param name="layers"></param>
         public void Reload(List<HitsoundLayer> layers) {
@@ -212,8 +212,19 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             foreach (HitsoundLayer hsl in sameLayer) {
                 Times.AddRange(hsl.Times);
             }
-            Times.OrderBy(o => o);
+            Times.Sort();
+
             NotifyPropertyChanged("Times");
+        }
+
+        public void RemoveDuplicates() {
+            if (Times.Count < 2) return;
+
+            for (int i = 1; i < Times.Count; i++) {
+                if (Math.Abs(Times[i] - Times[i - 1]) < Precision.DOUBLE_EPSILON) {
+                    Times.RemoveAt(i);
+                }    
+            }
         }
     }
 }

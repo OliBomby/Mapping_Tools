@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     /// <summary>
@@ -25,6 +26,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             LengthRoughness = 1;
             Velocity = -1;
             VelocityRoughness = 1;
+            RemoveDuplicates = false;
         }
 
         /// <inheritdoc />
@@ -41,6 +43,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             LengthRoughness = 1;
             Velocity = -1;
             VelocityRoughness = 1;
+            discriminateVolumes = false;
+            RemoveDuplicates = false;
         }
 
         private ImportType importType;
@@ -140,6 +144,26 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 volume = value;
                 NotifyPropertyChanged("Volume");
                 NotifyPropertyChanged("Velocity");
+            }
+        }
+
+        private bool discriminateVolumes;
+        public bool DiscriminateVolumes {
+            get => discriminateVolumes;
+            set {
+                if (discriminateVolumes == value) return;
+                discriminateVolumes = value;
+                NotifyPropertyChanged("DiscriminateVolumes");
+            }
+        }
+
+        private bool removeDuplicates;
+        public bool RemoveDuplicates {
+            get => removeDuplicates;
+            set {
+                if (removeDuplicates == value) return;
+                removeDuplicates = value;
+                NotifyPropertyChanged("RemoveDuplicates");
             }
         }
 
@@ -255,7 +279,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// </summary>
         /// <returns></returns>
         public ImportReloadingArgs GetImportReloadingArgs() {
-            return new ImportReloadingArgs(ImportType, Path, X, Y, LengthRoughness, VelocityRoughness);
+            return new ImportReloadingArgs(ImportType, Path, X, Y, LengthRoughness, VelocityRoughness, DiscriminateVolumes, RemoveDuplicates);
         }
 
         /// <summary>
@@ -271,10 +295,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 case ImportType.Stack:
                     return Path == o.Path && (X == -1 || X == o.X) && (Y == -1 || Y == o.Y);
                 case ImportType.Hitsounds:
-                    return Path == o.Path && SamplePath == o.SamplePath;
+                    return Path == o.Path && SamplePath == o.SamplePath && (!discriminateVolumes || Math.Abs(Volume - o.Volume) < Precision.DOUBLE_EPSILON);
                 case ImportType.MIDI:
                     return Path == o.Path && (Bank == -1 || Bank == o.Bank) && (Patch == -1 || Patch == o.Patch) && (Key == -1 || Key == o.Key)
                                           && (Length == -1 || Length == o.Length) && (Velocity == -1 || Velocity == o.Velocity);
+                case ImportType.Storyboard:
+                    return Path == o.Path && SamplePath == o.SamplePath && (!discriminateVolumes || Math.Abs(Volume - o.Volume) < Precision.DOUBLE_EPSILON);
                 case ImportType.None:
                     return true;
                 default:
@@ -297,7 +323,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 Length == other.Length &&
                 LengthRoughness == other.LengthRoughness &&
                 Velocity == other.Velocity &&
-                VelocityRoughness == other.VelocityRoughness;
+                VelocityRoughness == other.VelocityRoughness &&
+                RemoveDuplicates == other.RemoveDuplicates &&
+                DiscriminateVolumes == other.DiscriminateVolumes;
         }
 
         /// <inheritdoc />
@@ -325,6 +353,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             hashCode = hashCode * -1521134295 + LengthRoughness.GetHashCode();
             hashCode = hashCode * -1521134295 + Velocity.GetHashCode();
             hashCode = hashCode * -1521134295 + VelocityRoughness.GetHashCode();
+            hashCode = hashCode * -1521134295 + RemoveDuplicates.GetHashCode();
+            hashCode = hashCode * -1521134295 + DiscriminateVolumes.GetHashCode();
             return hashCode;
         }
 

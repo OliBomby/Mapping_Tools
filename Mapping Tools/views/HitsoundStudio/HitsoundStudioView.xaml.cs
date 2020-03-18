@@ -270,6 +270,7 @@ namespace Mapping_Tools.Views
                 if (path != "")
                 {
                     SelectedImportSamplePathBox.Text = path;
+                    SelectedStoryboardImportSamplePathBox.Text = path;
                 }
             }
             catch (Exception) { }
@@ -356,7 +357,7 @@ namespace Mapping_Tools.Views
                     }
                     else
                     {
-                        seperatedByImportArgsForReloading.Add(reloadingArgs, new List<HitsoundLayer>() { layer });
+                        seperatedByImportArgsForReloading.Add(reloadingArgs, new List<HitsoundLayer> { layer });
                     }
                 }
 
@@ -407,6 +408,11 @@ namespace Mapping_Tools.Views
             SelectedImportXCoordBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.X, CultureInfo.InvariantCulture);
             SelectedImportYCoordBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.Y, CultureInfo.InvariantCulture);
             SelectedImportSamplePathBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.SamplePath);
+            SelectedHitsoundImportDiscriminateVolumesBox.IsChecked = selectedLayers.All(o => o.ImportArgs.DiscriminateVolumes);
+            SelectedHitsoundImportRemoveDuplicatesBox.IsChecked = selectedLayers.All(o => o.ImportArgs.RemoveDuplicates);
+            SelectedStoryboardImportSamplePathBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.SamplePath);
+            SelectedStoryboardImportDiscriminateVolumesBox.IsChecked = selectedLayers.All(o => o.ImportArgs.DiscriminateVolumes);
+            SelectedStoryboardImportRemoveDuplicatesBox.IsChecked = selectedLayers.All(o => o.ImportArgs.RemoveDuplicates);
             SelectedImportBankBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.Bank);
             SelectedImportPatchBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.Patch);
             SelectedImportKeyBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.Key);
@@ -439,6 +445,14 @@ namespace Mapping_Tools.Views
             else
             {
                 SelectedHitsoundsPanel.Visibility = Visibility.Collapsed;
+            }
+            if (selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Storyboard))
+            {
+                SelectedStoryboardPanel.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                SelectedStoryboardPanel.Visibility = Visibility.Collapsed;
             }
             if (selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.MIDI))
             {
@@ -953,6 +967,38 @@ namespace Mapping_Tools.Views
             foreach (HitsoundLayer hitsoundLayer in selectedLayers)
             {
                 hitsoundLayer.ImportArgs.VelocityRoughness = t;
+            }
+        }
+
+        private void SelectedImportDiscriminateVolumesBox_OnChecked(object sender, RoutedEventArgs e) {
+            if (suppressEvents) return;
+
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.ImportArgs.DiscriminateVolumes = true;
+            }
+        }
+
+        private void SelectedImportDiscriminateVolumesBox_OnUnchecked(object sender, RoutedEventArgs e) {
+            if (suppressEvents) return;
+
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.ImportArgs.DiscriminateVolumes = false;
+            }
+        }
+
+        private void SelectedImportRemoveDuplicatesBox_OnChecked(object sender, RoutedEventArgs e) {
+            if (suppressEvents) return;
+
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.ImportArgs.RemoveDuplicates = true;
+            }
+        }
+
+        private void SelectedImportRemoveDuplicatesBox_OnUnchecked(object sender, RoutedEventArgs e) {
+            if (suppressEvents) return;
+
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers) {
+                hitsoundLayer.ImportArgs.RemoveDuplicates = false;
             }
         }
 
