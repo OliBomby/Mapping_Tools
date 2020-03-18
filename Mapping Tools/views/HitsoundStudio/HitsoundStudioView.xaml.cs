@@ -423,54 +423,12 @@ namespace Mapping_Tools.Views
             SelectedImportVelocityRoughnessBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.VelocityRoughness, CultureInfo.InvariantCulture);
 
             // Update visibility
-            if (selectedLayers.Any(o => o.SampleArgs.UsesSoundFont))
-            {
-                SoundFontArgsPanel.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                SoundFontArgsPanel.Visibility = Visibility.Collapsed;
-            }
-            if (selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Stack))
-            {
-                SelectedStackPanel.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                SelectedStackPanel.Visibility = Visibility.Collapsed;
-            }
-            if (selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Hitsounds))
-            {
-                SelectedHitsoundsPanel.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                SelectedHitsoundsPanel.Visibility = Visibility.Collapsed;
-            }
-            if (selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Storyboard))
-            {
-                SelectedStoryboardPanel.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                SelectedStoryboardPanel.Visibility = Visibility.Collapsed;
-            }
-            if (selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.MIDI))
-            {
-                SelectedMIDIPanel.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                SelectedMIDIPanel.Visibility = Visibility.Collapsed;
-            }
-            if (selectedLayers.Any(o => o.ImportArgs.CanImport))
-            {
-                ImportArgsPanel.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                ImportArgsPanel.Visibility = Visibility.Collapsed;
-            }
+            SoundFontArgsPanel.Visibility = selectedLayers.Any(o => o.SampleArgs.UsesSoundFont) ? Visibility.Visible : Visibility.Collapsed;
+            SelectedStackPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Stack) ? Visibility.Visible : Visibility.Collapsed;
+            SelectedHitsoundsPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Hitsounds) ? Visibility.Visible : Visibility.Collapsed;
+            SelectedStoryboardPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Storyboard) ? Visibility.Visible : Visibility.Collapsed;
+            SelectedMIDIPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.MIDI) ? Visibility.Visible : Visibility.Collapsed;
+            ImportArgsPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.CanImport) ? Visibility.Visible : Visibility.Collapsed;
 
             suppressEvents = false;
         }
@@ -736,7 +694,7 @@ namespace Mapping_Tools.Views
 
             try
             {
-                List<double> t = (sender as TextBox).Text.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(o => double.Parse(o)).OrderBy(o => o).ToList();
+                List<double> t = (sender as TextBox).Text.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(double.Parse).OrderBy(o => o).ToList();
 
                 foreach (HitsoundLayer hitsoundLayer in selectedLayers)
                 {
