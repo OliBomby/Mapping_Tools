@@ -26,6 +26,12 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _exportFolder, value);
         }
 
+        private string _hitsoundDiffName;
+        public string HitsoundDiffName {
+            get => _hitsoundDiffName;
+            set => Set(ref _hitsoundDiffName, value);
+        }
+
         private bool _showResults;
         public bool ShowResults {
             get => _showResults;
@@ -85,6 +91,7 @@ namespace Mapping_Tools.Viewmodels {
             DefaultSample = defaultSample;
             HitsoundLayers = hitsoundLayers;
             ExportFolder = MainWindow.ExportPath;
+            HitsoundDiffName = "Hitsounds";
             ShowResults = false;
             ExportMap = true;
             ExportSamples = true;

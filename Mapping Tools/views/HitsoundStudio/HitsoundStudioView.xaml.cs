@@ -116,7 +116,7 @@ namespace Mapping_Tools.Views
 
                 // Export the hitsound map and sound samples
                 if (arg.ExportMap) {
-                    HitsoundExporter.ExportHitsounds(completeHitsounds.Hitsounds, arg.BaseBeatmap, arg.ExportFolder, arg.HitsoundExportGameMode, true, false);
+                    HitsoundExporter.ExportHitsounds(completeHitsounds.Hitsounds, arg.BaseBeatmap, arg.ExportFolder, arg.HitsoundDiffName, arg.HitsoundExportGameMode, true, false);
                 }
 
                 UpdateProgressBar(worker, 80);
@@ -157,7 +157,7 @@ namespace Mapping_Tools.Views
                 UpdateProgressBar(worker, 60);
 
                 if (arg.ExportMap) {
-                    HitsoundExporter.ExportHitsounds(hitsounds, arg.BaseBeatmap, arg.ExportFolder, arg.HitsoundExportGameMode, false, false);
+                    HitsoundExporter.ExportHitsounds(hitsounds, arg.BaseBeatmap, arg.ExportFolder, arg.HitsoundDiffName, arg.HitsoundExportGameMode, false, false);
                 }
                 UpdateProgressBar(worker, 70);
 
@@ -193,7 +193,7 @@ namespace Mapping_Tools.Views
                 UpdateProgressBar(worker, 60);
 
                 if (arg.ExportMap) {
-                    HitsoundExporter.ExportHitsounds(hitsounds, arg.BaseBeatmap, arg.ExportFolder, arg.HitsoundExportGameMode, false, true);
+                    HitsoundExporter.ExportHitsounds(hitsounds, arg.BaseBeatmap, arg.ExportFolder, arg.HitsoundDiffName, arg.HitsoundExportGameMode, false, true);
                 }
                 UpdateProgressBar(worker, 70);
 

@@ -22,6 +22,9 @@
                 <TextBox x:Name="ExportFolderBox" Text="{Binding ExportFolder, Mode=TwoWay}" MinWidth="220" Margin="0,0,5,0"
                          Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Export folder"
                          ToolTip="The folder to export the hitsound beatmap and hitsound samples to. Original items in this folder could be deleted."/>
+                <TextBox x:Name="HitsoundDiffNameBox" Text="{Binding HitsoundDiffName, Mode=TwoWay}" MinWidth="220" Margin="0,0,5,0"
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Hitsound map name"
+                         ToolTip="The folder to export the hitsound beatmap and hitsound samples to. Original items in this folder could be deleted."/>
                 <Button x:Name="ExportFolderBrowseButton" Grid.Column="1" Cursor="Hand" Click="ExportFolderBrowseButton_OnClick"
                         Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
                     <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>

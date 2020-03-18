@@ -11,15 +11,15 @@ using Mapping_Tools.Classes.MathUtil;
 namespace Mapping_Tools.Classes.HitsoundStuff
 {
     class HitsoundExporter {
-        public static void ExportCompleteHitsounds(string exportFolder, string baseBeatmap, CompleteHitsounds ch, Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null) {
+        public static void ExportCompleteHitsounds(string exportFolder, string exportMapName, string baseBeatmap, CompleteHitsounds ch, Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null) {
             // Export the beatmap with all hitsounds
-            ExportHitsounds(ch.Hitsounds, baseBeatmap, exportFolder, GameMode.Standard, true, false);
+            ExportHitsounds(ch.Hitsounds, baseBeatmap, exportFolder, exportMapName, GameMode.Standard, true, false);
 
             // Export the sample files
             ExportCustomIndices(ch.CustomIndices, exportFolder, loadedSamples);
         }
 
-        public static void ExportHitsounds(List<HitsoundEvent> hitsounds, string baseBeatmap, string exportFolder, GameMode exportGameMode, bool useGreenlines, bool useStoryboard) {
+        public static void ExportHitsounds(List<HitsoundEvent> hitsounds, string baseBeatmap, string exportFolder, string exportMapName, GameMode exportGameMode, bool useGreenlines, bool useStoryboard) {
             EditorReaderStuff.TryGetNewestVersion(baseBeatmap, out var editor);
             Beatmap beatmap = editor.Beatmap;
 
@@ -62,7 +62,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
             // Change version to hitsounds
             beatmap.General["StackLeniency"] = new TValue("0.0");
             beatmap.General["Mode"] = new TValue(((int) exportGameMode).ToInvariant());
-            beatmap.Metadata["Version"] = new TValue("Hitsounds");
+            beatmap.Metadata["Version"] = new TValue(exportMapName);
 
             if (exportGameMode == GameMode.Mania) {
                 // Count the number of distinct X positions
