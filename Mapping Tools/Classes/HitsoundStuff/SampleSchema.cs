@@ -70,8 +70,13 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         public void MergeWith(SampleSchema other) {
-            foreach (var kvp in other.Where(kvp => !ContainsKey(kvp.Key))) {
-                Add(kvp.Key, kvp.Value);
+            foreach (var kvp in other) {
+                if (!ContainsKey(kvp.Key)) {
+                    Add(kvp.Key, kvp.Value);
+                } else if (this[kvp.Key].Count == 0) {
+                    // Allow overwriting of value if the list of samples is empty, because those entries are useless
+                    this[kvp.Key] = kvp.Value;
+                }
             }
         }
 
