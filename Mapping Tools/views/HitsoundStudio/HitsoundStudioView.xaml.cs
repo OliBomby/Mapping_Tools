@@ -668,7 +668,7 @@ namespace Mapping_Tools.Views
         {
             for (int i = 0; i < Settings.HitsoundLayers.Count; i++)
             {
-                Settings.HitsoundLayers[i].SetPriority(i);
+                Settings.HitsoundLayers[i].Priority = i;
             }
         }
 
