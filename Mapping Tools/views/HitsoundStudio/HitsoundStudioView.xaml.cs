@@ -138,7 +138,7 @@ namespace Mapping_Tools.Views
                 UpdateProgressBar(worker, 20);
 
                 Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null;
-                Dictionary<SampleGeneratingArgs, string> sampleNames = arg.UsePreviousSampleSchema ? arg.PreviousSampleSchema.GetSampleNames() : null;
+                Dictionary<SampleGeneratingArgs, string> sampleNames = arg.UsePreviousSampleSchema ? arg.PreviousSampleSchema?.GetSampleNames() : null;
                 Dictionary<SampleGeneratingArgs, Vector2> samplePositions = null;
                 var hitsounds = HitsoundConverter.GetHitsounds(samplePackages, ref loadedSamples, ref sampleNames, ref samplePositions,
                     arg.HitsoundExportGameMode == GameMode.Mania, arg.AddCoincidingRegularHitsounds, arg.AllowGrowthPreviousSampleSchema);
@@ -182,7 +182,7 @@ namespace Mapping_Tools.Views
                 UpdateProgressBar(worker, 20);
 
                 Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null;
-                Dictionary<SampleGeneratingArgs, string> sampleNames = arg.UsePreviousSampleSchema ? arg.PreviousSampleSchema.GetSampleNames() : null;
+                Dictionary<SampleGeneratingArgs, string> sampleNames = arg.UsePreviousSampleSchema ? arg.PreviousSampleSchema?.GetSampleNames() : null;
                 Dictionary<SampleGeneratingArgs, Vector2> samplePositions = null;
                 var hitsounds = HitsoundConverter.GetHitsounds(samplePackages, ref loadedSamples, ref sampleNames, ref samplePositions,
                     false, false, arg.AllowGrowthPreviousSampleSchema);
