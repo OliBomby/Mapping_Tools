@@ -132,8 +132,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         public static void GiveCustomIndicesIndices(List<CustomIndex> customIndices, bool keepExistingIndices, int startOffset=1) {
             if (!keepExistingIndices) {
-                for (int i = startOffset; i < customIndices.Count + startOffset; i++) {
-                    customIndices[i].Index = i;
+                int i = startOffset;
+                foreach (var customIndex in customIndices) {
+                    customIndex.Index = i++;
                 }
             } else {
                 int i = startOffset;
