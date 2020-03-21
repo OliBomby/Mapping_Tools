@@ -62,7 +62,7 @@ namespace Mapping_Tools.Views
 
             if (arg.HitsoundExportModeSetting == HitsoundStudioVm.HitsoundExportMode.Standard) {
                 // Convert the multiple layers into packages that have the samples from all the layers at one specific time
-                List<SamplePackage> samplePackages = HitsoundConverter.ZipLayers(arg.HitsoundLayers, arg.DefaultSample);
+                List<SamplePackage> samplePackages = HitsoundConverter.ZipLayers(arg.HitsoundLayers, arg.DefaultSample, arg.ZipLayersLeniency);
                 UpdateProgressBar(worker, 10);
 
                 // Balance the volume between greenlines and samples
@@ -81,7 +81,8 @@ namespace Mapping_Tools.Views
                 // Convert the packages to hitsounds that fit on an osu standard map
                 CompleteHitsounds completeHitsounds =
                     HitsoundConverter.GetCompleteHitsounds(samplePackages, loadedSamples, 
-                        arg.UsePreviousSampleSchema ? arg.PreviousSampleSchema.GetCustomIndices() : null, arg.AllowGrowthPreviousSampleSchema);
+                        arg.UsePreviousSampleSchema ? arg.PreviousSampleSchema.GetCustomIndices() : null, 
+                        arg.AllowGrowthPreviousSampleSchema, arg.FirstCustomIndex);
                 UpdateProgressBar(worker, 60);
 
                 // Save current sample schema

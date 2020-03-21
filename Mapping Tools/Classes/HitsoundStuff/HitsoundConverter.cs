@@ -130,24 +130,21 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return false;
         }
 
-        public static void GiveCustomIndicesIndices(List<CustomIndex> customIndices, bool keepExistingIndices) {
+        public static void GiveCustomIndicesIndices(List<CustomIndex> customIndices, bool keepExistingIndices, int startOffset=1) {
             if (!keepExistingIndices) {
-                for (int i = 0; i < customIndices.Count; i++) {
-                    customIndices[i].Index = i + 1; // osu! CustomIndices start from 1
+                for (int i = startOffset; i < customIndices.Count + startOffset; i++) {
+                    customIndices[i].Index = i;
                 }
             } else {
-                int i = 1;
-                HashSet<int> usedIndices = new HashSet<int>();
-                foreach (var customIndex in customIndices) {
-                    if (customIndex.Index == -1) {
-                        customIndex.Index = i++;
-                    }
-
-                    usedIndices.Add(customIndex.Index);
-
+                int i = startOffset;
+                HashSet<int> usedIndices = new HashSet<int>(customIndices.Where(o => o.Index != -1).Select(o => o.Index));
+                foreach (var customIndex in customIndices.Where(o => o.Index == -1)) {
                     while (usedIndices.Contains(i)) {
                         i++;
                     }
+
+                    customIndex.Index = i++;
+                    usedIndices.Add(customIndex.Index);
                 }
             }
         }
@@ -265,13 +262,15 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return supported;
         }
 
-        public static CompleteHitsounds GetCompleteHitsounds(List<SamplePackage> packages, Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null, List<CustomIndex> customIndices = null, bool allowGrowth=false) {
+        public static CompleteHitsounds GetCompleteHitsounds(List<SamplePackage> packages, 
+            Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null, 
+            List<CustomIndex> customIndices = null, bool allowGrowth=false, int firstCustomIndex=1) {
             if (customIndices == null) {
                 customIndices = OptimizeCustomIndices(GetCustomIndices(packages, loadedSamples));
-                GiveCustomIndicesIndices(customIndices, false);
+                GiveCustomIndicesIndices(customIndices, false, firstCustomIndex);
             } else if (allowGrowth) {
                 customIndices = OptimizeCustomIndices(customIndices.Concat(GetCustomIndices(packages, loadedSamples)).ToList());
-                GiveCustomIndicesIndices(customIndices, true);
+                GiveCustomIndicesIndices(customIndices, true, firstCustomIndex);
             }
 
             var hitsounds = GetHitsounds(packages, customIndices);

@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800" d:DataContext="{d:DesignData HitsoundStudioVm}">
     <Grid Margin="16">
@@ -27,7 +28,7 @@
                     <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                 </Button >
             </Grid>
-            <TextBox x:Name="HitsoundDiffNameBox" Text="{Binding HitsoundDiffName, Mode=TwoWay}" MinWidth="220" Margin="0,0,5,0"
+            <TextBox x:Name="HitsoundDiffNameBox" Text="{Binding HitsoundDiffName, Mode=TwoWay}" Margin="0,0,5,0"
                      Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Hitsound map name"
                      ToolTip="The folder to export the hitsound beatmap and hitsound samples to. Original items in this folder could be deleted."/>
             <CheckBox Content="Export hitsound map" IsChecked="{Binding ExportMap}" Margin="0 15 0 0"
@@ -46,8 +47,46 @@
             <ComboBox Margin="0 20 0 0" ItemsSource="{Binding HitsoundExportModes}" SelectedItem="{Binding HitsoundExportModeSetting}"
                       Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Export mode"
                       ToolTip="Choose which format to export the hitsounds as. The 'Standard' option will generate hitsounds that can be copied to osu! standard beatmaps. The 'Coinciding' option combined with the osu! mania gamemode will export a lossless representation of the hitsound layers."/>
+            <TextBox Margin="0,5,0,0"
+                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Note grouping leniency"
+                     ToolTip="Maximum time in millisecond that can be between two hitsounds while treated as being at the same time."
+                     Visibility="{Binding StandardExtraSettingsVisibility}">
+                <TextBox.Text>
+                    <Binding Path="ZipLayersLeniency" Mode="TwoWay" NotifyOnValidationError="True">
+                        <Binding.Converter>
+                            <domain:DoubleToStringConverter/>
+                        </Binding.Converter>
+                        <Binding.ValidationRules>
+                            <domain:IsGreaterOrEqualValidationRule>
+                                <domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                    <domain:DoubleWrapper Value="0"/>
+                                </domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                            </domain:IsGreaterOrEqualValidationRule>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+            <TextBox Margin="0,5,5,0"
+                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="First custom index"
+                     ToolTip="The index of the first custom index of custom indices that get generated."
+                     Visibility="{Binding StandardExtraSettingsVisibility}">
+                <TextBox.Text>
+                    <Binding Path="FirstCustomIndex" Mode="TwoWay" NotifyOnValidationError="True" ConverterParameter="1">
+                        <Binding.Converter>
+                            <domain:IntToStringConverter/>
+                        </Binding.Converter>
+                        <Binding.ValidationRules>
+                            <domain:IsGreaterOrEqualValidationRule>
+                                <domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                    <domain:DoubleWrapper Value="0"/>
+                                </domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                            </domain:IsGreaterOrEqualValidationRule>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
             <CheckBox Content="Add regular hitsounds" IsChecked="{Binding AddCoincidingRegularHitsounds}" Margin="0 5 0 0"
-                      Visibility="{Binding AddCoincidingRegularHitsoundsVisibility}"
+                      Visibility="{Binding CoincidingExtraSettingsVisibility}"
                       ToolTip="Check this to add whistles, claps, finishes, and samplesets ontop of the filename hitsounding used by coinciding export."/>
             <ComboBox Margin="0 10 0 0" ItemsSource="{Binding HitsoundExportGameModes}" SelectedItem="{Binding HitsoundExportGameMode}"
                       Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Export gamemode"

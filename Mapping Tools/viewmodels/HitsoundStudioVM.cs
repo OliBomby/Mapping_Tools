@@ -75,9 +75,6 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _addCoincidingRegularHitsounds, value);
         }
 
-        public Visibility AddCoincidingRegularHitsoundsVisibility =>
-            HitsoundExportModeSetting == HitsoundExportMode.Coinciding ? Visibility.Visible : Visibility.Collapsed;
-
         public SampleSchema PreviousSampleSchema { get; set; }
 
         private HitsoundExportMode _hitsoundExportModeSetting;
@@ -85,10 +82,21 @@ namespace Mapping_Tools.Viewmodels {
             get => _hitsoundExportModeSetting;
             set {
                 if (Set(ref _hitsoundExportModeSetting, value)) {
-                    RaisePropertyChanged(nameof(AddCoincidingRegularHitsoundsVisibility));
+                    RaisePropertyChanged(nameof(StandardExtraSettingsVisibility));
+                    RaisePropertyChanged(nameof(CoincidingExtraSettingsVisibility));
+                    RaisePropertyChanged(nameof(StoryboardExtraSettingsVisibility));
                 }
             }
         }
+
+        public Visibility StandardExtraSettingsVisibility =>
+            HitsoundExportModeSetting == HitsoundExportMode.Standard ? Visibility.Visible : Visibility.Collapsed;
+
+        public Visibility CoincidingExtraSettingsVisibility =>
+            HitsoundExportModeSetting == HitsoundExportMode.Coinciding ? Visibility.Visible : Visibility.Collapsed;
+
+        public Visibility StoryboardExtraSettingsVisibility =>
+            HitsoundExportModeSetting == HitsoundExportMode.Storyboard ? Visibility.Visible : Visibility.Collapsed;
         
         public IEnumerable<HitsoundExportMode> HitsoundExportModes => Enum.GetValues(typeof(HitsoundExportMode)).Cast<HitsoundExportMode>();
 
@@ -99,6 +107,18 @@ namespace Mapping_Tools.Viewmodels {
         }
         
         public IEnumerable<GameMode> HitsoundExportGameModes => Enum.GetValues(typeof(GameMode)).Cast<GameMode>();
+
+        private double _zipLayersLeniency;
+        public double ZipLayersLeniency {
+            get => _zipLayersLeniency;
+            set => Set(ref _zipLayersLeniency, value);
+        }
+
+        private int _firstCustomIndex;
+        public int FirstCustomIndex {
+            get => _firstCustomIndex;
+            set => Set(ref _firstCustomIndex, value);
+        }
 
         public ObservableCollection<HitsoundLayer> HitsoundLayers { get; set; }
 
@@ -119,6 +139,8 @@ namespace Mapping_Tools.Viewmodels {
             AddCoincidingRegularHitsounds = true;
             HitsoundExportModeSetting = HitsoundExportMode.Standard;
             HitsoundExportGameMode = GameMode.Standard;
+            ZipLayersLeniency = 15;
+            FirstCustomIndex = 1;
         }
 
         public enum HitsoundExportMode {
