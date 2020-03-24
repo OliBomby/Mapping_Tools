@@ -6,11 +6,19 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Mapping_Tools.Classes.HitsoundStuff.Effects;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.HitsoundStuff
 {
-    class HitsoundExporter {
+    public class HitsoundExporter {
+        public enum SampleExportFormat {
+            Default,
+            WaveIeeeFloat,
+            WavePcm,
+            OggVorbis
+        }
+
         public static void ExportCompleteHitsounds(string exportFolder, string exportMapName, string baseBeatmap, CompleteHitsounds ch, Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null) {
             // Export the beatmap with all hitsounds
             ExportHitsounds(ch.Hitsounds, baseBeatmap, exportFolder, exportMapName, GameMode.Standard, true, false);
@@ -79,18 +87,53 @@ namespace Mapping_Tools.Classes.HitsoundStuff
         }
 
         public static void ExportLoadedSamples(Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples,
-            string exportFolder, Dictionary<SampleGeneratingArgs, string> names = null) {
+            string exportFolder, Dictionary<SampleGeneratingArgs, string> names = null, 
+            SampleExportFormat format=SampleExportFormat.Default) {
             if (names == null) {
                 names = GenerateSampleNames(loadedSamples.Keys, loadedSamples);
             }
 
             foreach (var sample in loadedSamples.Keys) {
-                ExportSample(sample, names[sample], exportFolder, loadedSamples);
+                ExportSample(sample, names[sample], exportFolder, loadedSamples, format);
+            }
+        }
+
+        private static bool CopySample(string path, string dest) {
+            try {
+                File.Copy(path, dest, true);
+                return true;
+            }
+            catch( Exception ex ) {
+                Console.WriteLine($@"{ex.Message} while copying sample {path} to {dest}.");
+                return false;
+            }
+        }
+
+        private static bool IsFormatEncodingCompatible(WaveFormatEncoding encoding, SampleExportFormat exportFormat) {
+            switch (exportFormat) {
+                case SampleExportFormat.WaveIeeeFloat:
+                    return encoding == WaveFormatEncoding.IeeeFloat;
+                case SampleExportFormat.WavePcm:
+                    return encoding == WaveFormatEncoding.Pcm;
+                case SampleExportFormat.OggVorbis:
+                    return encoding == WaveFormatEncoding.Vorbis1 || encoding == WaveFormatEncoding.Vorbis2 ||
+                           encoding == WaveFormatEncoding.Vorbis3 ||
+                           encoding == WaveFormatEncoding.Vorbis1P || encoding == WaveFormatEncoding.Vorbis2P ||
+                           encoding == WaveFormatEncoding.Vorbis3P;
+                default:
+                    return true;
             }
         }
 
         public static bool ExportSample(SampleGeneratingArgs sampleGeneratingArgs, string name,
-            string exportFolder, Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples=null) {
+            string exportFolder, Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples=null, 
+            SampleExportFormat format=SampleExportFormat.Default) {
+
+            if (sampleGeneratingArgs.CanCopyPaste && format == SampleExportFormat.Default) {
+                var dest = Path.Combine(exportFolder, name + sampleGeneratingArgs.GetExtension());
+                return CopySample(sampleGeneratingArgs.Path, dest);
+            }
+
             SampleSoundGenerator sampleSoundGenerator;
             if (loadedSamples != null) {
                 if (SampleImporter.ValidateSampleArgs(sampleGeneratingArgs, loadedSamples)) {
@@ -107,78 +150,138 @@ namespace Mapping_Tools.Classes.HitsoundStuff
                 }
             }
 
-            // TODO: Allow mp3, ogg and aif export.
-            string filename = name;
-            CreateWaveFile(Path.Combine(exportFolder, filename), sampleSoundGenerator.GetSampleProvider().ToWaveProvider16());
+            var sourceEncoding = sampleSoundGenerator.Wave.WaveFormat.Encoding;
+
+            // Either if it is the blank sample or the source file is literally what the user wants to be exported
+            if (sampleSoundGenerator.BlankSample && sampleGeneratingArgs.GetExtension() == ".wav" || 
+                sampleGeneratingArgs.CanCopyPaste && IsFormatEncodingCompatible(sourceEncoding, format)) {
+                var dest = Path.Combine(exportFolder, name + sampleGeneratingArgs.GetExtension());
+                return CopySample(sampleGeneratingArgs.Path, dest);
+            }
+
+            var sampleProvider = sampleSoundGenerator.GetSampleProvider();
+
+            if ((format == SampleExportFormat.WavePcm || format == SampleExportFormat.OggVorbis) && sourceEncoding == WaveFormatEncoding.IeeeFloat) {
+                // When the source is IEEE float and the export format is PCM or Vorbis, then clipping is possible, so we add a limiter
+                sampleProvider = new SoftLimiter(sampleProvider);
+            }
+
+            switch (format) {
+                case SampleExportFormat.WaveIeeeFloat:
+                    CreateWaveFile(Path.Combine(exportFolder, name + ".wav"), sampleProvider.ToWaveProvider());
+                    break;
+                case SampleExportFormat.WavePcm:
+                    CreateWaveFile(Path.Combine(exportFolder, name + ".wav"), sampleProvider.ToWaveProvider16());
+                    break;
+                case SampleExportFormat.OggVorbis:
+                    // TODO: Export vorbis mode
+                    throw new NotImplementedException();
+                default:
+                    switch (sourceEncoding) {
+                        case WaveFormatEncoding.IeeeFloat:
+                            CreateWaveFile(Path.Combine(exportFolder, name + ".wav"), sampleProvider.ToWaveProvider());
+                            break;
+                        case WaveFormatEncoding.Pcm:
+                            CreateWaveFile(Path.Combine(exportFolder, name + ".wav"), sampleProvider.ToWaveProvider16());
+                            break;
+                        case WaveFormatEncoding.Vorbis1:
+                        case WaveFormatEncoding.Vorbis2:
+                        case WaveFormatEncoding.Vorbis3:
+                        case WaveFormatEncoding.Vorbis1P:
+                        case WaveFormatEncoding.Vorbis2P:
+                        case WaveFormatEncoding.Vorbis3P:
+                            // Vorbis files default to being exported as 16-bit PCM wave files because that's lossless
+                            CreateWaveFile(Path.Combine(exportFolder, name + ".wav"), sampleProvider.ToWaveProvider16());
+                            break;
+                        default:
+                            CreateWaveFile(Path.Combine(exportFolder, name + ".wav"), sampleProvider.ToWaveProvider());
+                            break;
+                    }
+
+                    break;
+            }
 
             return true;
         }
 
         public static void ExportMixedSample(IEnumerable<SampleGeneratingArgs> sampleGeneratingArgses, string name,
-            string exportFolder, Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples=null) {
-            var samples = new List<ISampleProvider>();
-            var volumes = new List<double>();
-            int soundsAdded = 0;
+            string exportFolder, Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples=null, 
+            SampleExportFormat format=SampleExportFormat.Default, SampleExportFormat mixedFormat=SampleExportFormat.Default) {
+
+            // Try loading all the valid samples
+            var validLoadedSamples = new Dictionary<SampleGeneratingArgs, SampleSoundGenerator>();
             
             if (loadedSamples != null) {
-                foreach (var sample in from args in sampleGeneratingArgses where SampleImporter.ValidateSampleArgs(args, loadedSamples) select loadedSamples[args]) {
-                    samples.Add(sample.GetSampleProvider());
-                    volumes.Add(Math.Abs(sample.VolumeCorrection - -1) > Precision.DOUBLE_EPSILON ? sample.VolumeCorrection : 1f);
-                    soundsAdded++;
+                foreach (var args in sampleGeneratingArgses) {
+                    if (!SampleImporter.ValidateSampleArgs(args, loadedSamples)) continue;
+
+                    var sample = loadedSamples[args];
+                    validLoadedSamples.Add(args, sample);
                 }
             } else {
+                // Import each sample individually
                 foreach (SampleGeneratingArgs args in sampleGeneratingArgses) {
                     try {
                         var sample = SampleImporter.ImportSample(args);
-                        samples.Add(sample.GetSampleProvider());
-                        volumes.Add(Math.Abs(sample.VolumeCorrection - -1) > Precision.DOUBLE_EPSILON
-                            ? sample.VolumeCorrection
-                            : 1f);
-                        soundsAdded++;
+                        validLoadedSamples.Add(args, sample);
                     } catch (Exception ex) {
                         Console.WriteLine($@"{ex.Message} while importing sample {args}.");
                     }
                 }
             }
+            
+            // If all the valid samples are blank samples, then also export only a single blank sample
+            if (validLoadedSamples.Count == 1 || validLoadedSamples.All(o => o.Value.BlankSample)) {
+                // It has only one valid sample, so we can just export it with the single sample export
+                ExportSample(validLoadedSamples.Keys.First(), name, exportFolder, loadedSamples, format);
+            } else if (validLoadedSamples.Count > 1) {
+                // Synchronize the sample rate and channels for all samples and get the sample providers
+                int maxSampleRate = validLoadedSamples.Values.Max(o => o.Wave.WaveFormat.SampleRate);
+                int maxChannels = validLoadedSamples.Values.Max(o => o.Wave.WaveFormat.Channels);
 
-            if (soundsAdded == 0) {
-                return;
+                IEnumerable<ISampleProvider> sameFormatSamples = validLoadedSamples.Select(o =>
+                    (ISampleProvider) new WdlResamplingSampleProvider(SampleImporter.SetChannels(o.Value.GetSampleProvider(), maxChannels),
+                        maxSampleRate));
+
+                ISampleProvider sampleProvider = new MixingSampleProvider(sameFormatSamples);
+
+                // If the input is Ieee float or you are mixing multiple samples, then clipping is possible,
+                // so you can either export as IEEE float or use a compressor and export as 16-bit PCM (half filesize) or Vorbis (even smaller filesize)
+                // If the input is only The Blank Sample then it should export The Blank Sample
+
+                if (mixedFormat == SampleExportFormat.WavePcm || mixedFormat == SampleExportFormat.OggVorbis) {
+                    // When the sample is mixed and the export format is PCM or Vorbis, then clipping is possible, so we add a limiter
+                    sampleProvider = new SoftLimiter(sampleProvider);
+                }
+
+                switch (mixedFormat) {
+                    case SampleExportFormat.WaveIeeeFloat:
+                        CreateWaveFile(Path.Combine(exportFolder, name + ".wav"), sampleProvider.ToWaveProvider());
+                        break;
+                    case SampleExportFormat.WavePcm:
+                        CreateWaveFile(Path.Combine(exportFolder, name + ".wav"), sampleProvider.ToWaveProvider16());
+                        break;
+                    case SampleExportFormat.OggVorbis:
+                        // TODO: Export vorbis mode
+                        throw new NotImplementedException();
+                    default:
+                        CreateWaveFile(Path.Combine(exportFolder, name + ".wav"), sampleProvider.ToWaveProvider());
+                        break;
+                }
             }
-
-            int maxSampleRate = samples.Max(o => o.WaveFormat.SampleRate);
-            int maxChannels = samples.Max(o => o.WaveFormat.Channels);
-            IEnumerable<ISampleProvider> sameFormatSamples = samples.Select(o => (ISampleProvider)new WdlResamplingSampleProvider(SampleImporter.SetChannels(o, maxChannels), maxSampleRate));
-
-            ISampleProvider result = new MixingSampleProvider(sameFormatSamples);
-
-            if (soundsAdded > 1) {
-                result = new VolumeSampleProvider(result) {
-                    Volume = (float)(1 / Math.Sqrt(soundsAdded * volumes.Average()))
-                };
-                result = new SimpleCompressorEffect(result) {
-                    Threshold = 16,
-                    Ratio = 6,
-                    Attack = 0.1,
-                    Release = 0.1,
-                    Enabled = true,
-                    MakeUpGain = 15 * Math.Log10(Math.Sqrt(soundsAdded * volumes.Average()))
-                };
-            }
-
-            // TODO: Allow mp3, ogg and aif export.
-            string filename = name;
-            CreateWaveFile(Path.Combine(exportFolder, filename), result.ToWaveProvider16());
         }
 
-        public static void ExportCustomIndices(List<CustomIndex> customIndices, string exportFolder, Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples=null) {
+        public static void ExportCustomIndices(List<CustomIndex> customIndices, string exportFolder, 
+            Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples=null, 
+            SampleExportFormat format=SampleExportFormat.Default, SampleExportFormat mixedFormat=SampleExportFormat.Default) {
             foreach (CustomIndex ci in customIndices) {
                 foreach (KeyValuePair<string, HashSet<SampleGeneratingArgs>> kvp in ci.Samples) {
                     if (kvp.Value.Count == 0) {
                         continue;
                     }
                     
-                    string filename = ci.Index == 1 ? kvp.Key + ".wav" : kvp.Key + ci.Index + ".wav";
-                    ExportMixedSample(kvp.Value, filename, exportFolder, loadedSamples);
+                    string filename = ci.Index == 1 ? kvp.Key : kvp.Key + ci.Index;
+                    ExportMixedSample(kvp.Value, filename, exportFolder, loadedSamples, format, mixedFormat);
                 }
             }
         }
@@ -216,12 +319,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff
                 }
                 
                 var baseName = sample.GetFilename();
-                var ext = sample.GetExtension();
-                var name = baseName + ext;
+                var name = baseName;
                 int i = 1;
 
                 while (usedNames.Contains(name)) {
-                    name = baseName + "-" + ++i + ext; 
+                    name = baseName + "-" + ++i; 
                 }
 
                 usedNames.Add(name);
@@ -239,12 +341,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff
             }
             
             var baseName = sample.GetFilename();
-            var ext = sample.GetExtension();
-            var name = baseName + ext;
+            var name = baseName;
             int i = 1;
 
             while (sampleNames.ContainsValue(name)) {
-                name = baseName + "-" + ++i + ext; 
+                name = baseName + "-" + ++i; 
             }
 
             sampleNames[sample] = name;

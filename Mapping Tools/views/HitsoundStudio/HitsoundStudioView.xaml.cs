@@ -128,7 +128,7 @@ namespace Mapping_Tools.Views
 
                 if (arg.ExportSamples) {
                     HitsoundExporter.ExportCustomIndices(completeHitsounds.CustomIndices, arg.ExportFolder,
-                        loadedSamples);
+                        loadedSamples, arg.SingleSampleExportFormat, arg.MixedSampleExportFormat);
                 }
 
                 UpdateProgressBar(worker, 99);
@@ -145,7 +145,7 @@ namespace Mapping_Tools.Views
                     arg.HitsoundExportGameMode == GameMode.Mania, arg.AddCoincidingRegularHitsounds, arg.AllowGrowthPreviousSampleSchema);
 
                 // Save current sample schema
-                if (!arg.UsePreviousSampleSchema) {
+                if (!arg.UsePreviousSampleSchema || arg.PreviousSampleSchema == null) {
                     arg.PreviousSampleSchema = new SampleSchema(sampleNames);
                 } else if (arg.AllowGrowthPreviousSampleSchema) {
                     arg.PreviousSampleSchema.MergeWith(new SampleSchema(sampleNames));
@@ -174,7 +174,7 @@ namespace Mapping_Tools.Views
                 UpdateProgressBar(worker, 70);
 
                 if (arg.ExportSamples) {
-                    HitsoundExporter.ExportLoadedSamples(loadedSamples, arg.ExportFolder, sampleNames);
+                    HitsoundExporter.ExportLoadedSamples(loadedSamples, arg.ExportFolder, sampleNames, arg.SingleSampleExportFormat);
                 }
             } else if (arg.HitsoundExportModeSetting == HitsoundStudioVm.HitsoundExportMode.Storyboard) {
                 List<SamplePackage> samplePackages = HitsoundConverter.ZipLayers(arg.HitsoundLayers, arg.DefaultSample, 0, false);
@@ -189,7 +189,7 @@ namespace Mapping_Tools.Views
                     false, false, arg.AllowGrowthPreviousSampleSchema);
 
                 // Save current sample schema
-                if (!arg.UsePreviousSampleSchema) {
+                if (!arg.UsePreviousSampleSchema || arg.PreviousSampleSchema == null) {
                     arg.PreviousSampleSchema = new SampleSchema(sampleNames);
                 } else if (arg.AllowGrowthPreviousSampleSchema) {
                     arg.PreviousSampleSchema.MergeWith(new SampleSchema(sampleNames));
@@ -219,7 +219,7 @@ namespace Mapping_Tools.Views
                 UpdateProgressBar(worker, 70);
 
                 if (arg.ExportSamples) {
-                    HitsoundExporter.ExportLoadedSamples(loadedSamples, arg.ExportFolder, sampleNames);
+                    HitsoundExporter.ExportLoadedSamples(loadedSamples, arg.ExportFolder, sampleNames, arg.SingleSampleExportFormat);
                 }
             }
 

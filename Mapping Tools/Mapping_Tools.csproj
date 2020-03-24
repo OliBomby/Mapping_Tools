@@ -206,7 +206,10 @@
     <Compile Include="Classes\ExternalFileUtil\Reaper\TrackItem.cs" />
     <Compile Include="Classes\ExternalFileUtil\TempoSignature.cs" />
     <Compile Include="Classes\GenericExtensions.cs" />
-    <Compile Include="Classes\HitsoundStuff\DelayFadeOutSampleProvider.cs" />
+    <Compile Include="Classes\HitsoundStuff\Effects\DelayFadeOutSampleProvider.cs" />
+    <Compile Include="Classes\HitsoundStuff\Effects\Effect.cs" />
+    <Compile Include="Classes\HitsoundStuff\Effects\EffectParameter.cs" />
+    <Compile Include="Classes\HitsoundStuff\Effects\SoftLimiter.cs" />
     <Compile Include="Classes\HitsoundStuff\Hitsound.cs" />
     <Compile Include="Classes\HitsoundStuff\HitsoundLayerExtension.cs" />
     <Compile Include="Classes\HitsoundStuff\HitsoundZone.cs" />

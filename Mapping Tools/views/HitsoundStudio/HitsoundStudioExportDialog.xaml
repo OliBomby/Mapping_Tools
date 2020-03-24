@@ -91,6 +91,13 @@
             <ComboBox Margin="0 10 0 0" ItemsSource="{Binding HitsoundExportGameModes}" SelectedItem="{Binding HitsoundExportGameMode}"
                       Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Export gamemode"
                       ToolTip="Choose the gamemode for the exported hitsound map."/>
+
+            <ComboBox Margin="0 15 0 0" ItemsSource="{Binding SampleExportFormats}" SelectedItem="{Binding SingleSampleExportFormat}"
+                      Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Sample file format"
+                      ToolTip="Choose the file format for exported sound samples. Default will match the encoding of the source files."/>
+            <ComboBox Margin="0 5 0 0" ItemsSource="{Binding SampleExportFormats}" SelectedItem="{Binding MixedSampleExportFormat}"
+                      Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Mixed sample file format"
+                      ToolTip="Choose the file format for mixed exported sound samples. Mixing only occurs in the Standard hitsound export mode."/>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" Grid.Row="1"

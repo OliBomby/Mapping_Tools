@@ -1,6 +1,6 @@
 ﻿using NAudio.Wave;
 
-namespace Mapping_Tools.Classes.HitsoundStuff {
+namespace Mapping_Tools.Classes.HitsoundStuff.Effects {
     /// <summary>
     /// Sample Provider to allow fading in and out
     /// </summary>

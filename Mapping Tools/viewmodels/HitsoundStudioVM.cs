@@ -120,6 +120,21 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _firstCustomIndex, value);
         }
 
+        public IEnumerable<HitsoundExporter.SampleExportFormat> SampleExportFormats => 
+            Enum.GetValues(typeof(HitsoundExporter.SampleExportFormat)).Cast<HitsoundExporter.SampleExportFormat>();
+
+        private HitsoundExporter.SampleExportFormat _singleSampleExportFormat;
+        public HitsoundExporter.SampleExportFormat SingleSampleExportFormat {
+            get => _singleSampleExportFormat;
+            set => Set(ref _singleSampleExportFormat, value);
+        }
+
+        private HitsoundExporter.SampleExportFormat _mixedSampleExportFormat;
+        public HitsoundExporter.SampleExportFormat MixedSampleExportFormat {
+            get => _mixedSampleExportFormat;
+            set => Set(ref _mixedSampleExportFormat, value);
+        }
+
         public ObservableCollection<HitsoundLayer> HitsoundLayers { get; set; }
 
         public string EditTimes { get; set; }
@@ -141,6 +156,8 @@ namespace Mapping_Tools.Viewmodels {
             HitsoundExportGameMode = GameMode.Standard;
             ZipLayersLeniency = 15;
             FirstCustomIndex = 1;
+            SingleSampleExportFormat = HitsoundExporter.SampleExportFormat.Default;
+            MixedSampleExportFormat = HitsoundExporter.SampleExportFormat.Default;
         }
 
         public enum HitsoundExportMode {

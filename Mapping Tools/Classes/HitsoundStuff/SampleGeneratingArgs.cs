@@ -55,11 +55,16 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// <summary>
         /// Checks if the specified path is a cafewalk soundfont file.
         /// </summary>
-        public bool UsesSoundFont => System.IO.Path.GetExtension(Path) == ".sf2";
+        public bool UsesSoundFont => GetExtension() == ".sf2";
+
+        /// <summary>
+        /// Means you can export this sample by simply copy pasting the source file in <see cref="Path"/>.
+        /// </summary>
+        public bool CanCopyPaste => !UsesSoundFont && Math.Abs(Volume - 1) < Precision.DOUBLE_EPSILON;
 
         private string path;
         public string Path {
-            get { return path; }
+            get => path;
             set {
                 if (path != value) {
                     path = value;
@@ -70,7 +75,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         private double volume;
         public double Volume {
-            get { return volume; }
+            get => volume;
             set {
                 if (volume != value) {
                     volume = value;
@@ -82,7 +87,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         private int bank;
         public int Bank {
-            get { return bank; }
+            get => bank;
             set {
                 if (bank != value) {
                     bank = value;
@@ -93,7 +98,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         private int patch;
         public int Patch {
-            get { return patch; }
+            get => patch;
             set {
                 if (patch != value) {
                     patch = value;
@@ -104,7 +109,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         private int instrument;
         public int Instrument {
-            get { return instrument; }
+            get => instrument;
             set {
                 if (instrument != value) {
                     instrument = value;
@@ -115,7 +120,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         private int key;
         public int Key {
-            get { return key; }
+            get => key;
             set {
                 if (key != value) {
                     key = value;
@@ -126,7 +131,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         private double length;
         public double Length {
-            get { return length; }
+            get => length;
             set {
                 if (length != value) {
                     length = value;
@@ -136,7 +141,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         public int Velocity {
-            get { return (int)Math.Round(Volume * 127); }
+            get => (int)Math.Round(Volume * 127);
             set {
                 if (Velocity != value) {
                     Volume = value / 127d;
@@ -148,22 +153,25 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// <summary>Returns a string that represents the current object and can be used as a filename.</summary>
         public string GetFilename() {
             var filename = System.IO.Path.GetFileNameWithoutExtension(Path);
-            return System.IO.Path.GetExtension(Path) == ".sf2" ? 
+            return GetExtension() == ".sf2" ? 
                 $"{filename}-{Bank}-{Patch}-{Instrument}-{Key}-{(int)Length}-{Velocity}" : 
                 Math.Abs(Volume - 1) < Precision.DOUBLE_EPSILON ?
                    filename :
                 $"{filename}-{(int)(Volume * 100)}";
         }
 
-        // This will get expanded upon when I add new sample export formats
+        /// <summary>
+        /// Gets the extension of the file in <see cref="Path"/>
+        /// </summary>
+        /// <returns></returns>
         public string GetExtension() {
-            return ".wav";
+            return System.IO.Path.GetExtension(Path);
         }
 
         /// <summary>Returns a string that represents the current object.</summary>
         /// <returns>A string that represents the current object.</returns>
         public override string ToString() {
-            return System.IO.Path.GetExtension(Path) == ".sf2" ? 
+            return GetExtension() == ".sf2" ? 
                 $"{Path} {Bank},{Patch},{Instrument},{Key},{Length},{Velocity}" : 
                 $"{Path} {Volume * 100}%";
         }
@@ -174,7 +182,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         public bool Equals(SampleGeneratingArgs other) {
             // Equality method can ignore bank, patch etc when path is not a soundfont because then those variables have no effect on how a sample gets generated
-            if (System.IO.Path.GetExtension(Path) == ".sf2" && System.IO.Path.GetExtension(other.Path) == ".sf2") {
+            if (GetExtension() == ".sf2" && other.GetExtension() == ".sf2") {
                 return Path == other.Path &&
                 Bank == other.Bank &&
                 Patch == other.Patch &&
@@ -216,7 +224,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             var hashCode = 0x34894079;
             hashCode = hashCode * -0x5AAAAAD7 + EqualityComparer<string>.Default.GetHashCode(Path);
             hashCode = hashCode * -0x5AAAAAD7 + Volume.GetHashCode();
-            if (System.IO.Path.GetExtension(Path) == ".sf2") {
+            if (GetExtension() == ".sf2") {
                 hashCode = hashCode * -0x5AAAAAD7 + Bank.GetHashCode();
                 hashCode = hashCode * -0x5AAAAAD7 + Patch.GetHashCode();
                 hashCode = hashCode * -0x5AAAAAD7 + Instrument.GetHashCode();
