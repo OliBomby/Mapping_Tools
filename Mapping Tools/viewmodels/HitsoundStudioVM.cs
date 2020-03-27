@@ -120,9 +120,6 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _firstCustomIndex, value);
         }
 
-        public IEnumerable<HitsoundExporter.SampleExportFormat> SampleExportFormats => 
-            Enum.GetValues(typeof(HitsoundExporter.SampleExportFormat)).Cast<HitsoundExporter.SampleExportFormat>();
-
         private HitsoundExporter.SampleExportFormat _singleSampleExportFormat;
         public HitsoundExporter.SampleExportFormat SingleSampleExportFormat {
             get => _singleSampleExportFormat;
@@ -133,6 +130,34 @@ namespace Mapping_Tools.Viewmodels {
         public HitsoundExporter.SampleExportFormat MixedSampleExportFormat {
             get => _mixedSampleExportFormat;
             set => Set(ref _mixedSampleExportFormat, value);
+        }
+
+        public readonly Dictionary<HitsoundExporter.SampleExportFormat, string> SampleExportFormatDisplayNameMapping = 
+            new Dictionary<HitsoundExporter.SampleExportFormat, string> {{HitsoundExporter.SampleExportFormat.Default, "Default"}, 
+                {HitsoundExporter.SampleExportFormat.WaveIeeeFloat, "IEEE Float (.wav)"},
+                {HitsoundExporter.SampleExportFormat.WavePcm, "PCM 16-bit (.wav)"},
+                {HitsoundExporter.SampleExportFormat.OggVorbis, "Vorbis (.ogg)"}};
+
+        public IEnumerable<string> SampleExportFormatDisplayNames => SampleExportFormatDisplayNameMapping.Values;
+
+        public string SingleSampleExportFormatDisplay {
+            get => SampleExportFormatDisplayNameMapping[SingleSampleExportFormat];
+            set {
+                foreach (var kvp in SampleExportFormatDisplayNameMapping.Where(kvp => kvp.Value == value)) {
+                    SingleSampleExportFormat = kvp.Key;
+                    break;
+                }
+            }
+        }
+
+        public string MixedSampleExportFormatDisplay {
+            get => SampleExportFormatDisplayNameMapping[MixedSampleExportFormat];
+            set {
+                foreach (var kvp in SampleExportFormatDisplayNameMapping.Where(kvp => kvp.Value == value)) {
+                    MixedSampleExportFormat = kvp.Key;
+                    break;
+                }
+            }
         }
 
         public ObservableCollection<HitsoundLayer> HitsoundLayers { get; set; }
