@@ -149,6 +149,9 @@
     <Reference Include="NVorbis, Version=0.8.6.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\NVorbis.0.8.6\lib\net35\NVorbis.dll</HintPath>
     </Reference>
+    <Reference Include="OggVorbisEncoder, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\OggVorbisEncoder.1.1.0\lib\netstandard1.1\OggVorbisEncoder.dll</HintPath>
+    </Reference>
     <Reference Include="OsuMemoryDataProvider">
       <HintPath>..\packages\OsuMemoryDataProvider.dll</HintPath>
     </Reference>
@@ -232,6 +235,7 @@
     <Compile Include="Classes\HitsoundStuff\SampleSet.cs" />
     <Compile Include="Classes\HitsoundStuff\SampleSoundGenerator.cs" />
     <Compile Include="Classes\HitsoundStuff\SF2Extension.cs" />
+    <Compile Include="Classes\HitsoundStuff\VorbisFileWriter.cs" />
     <Compile Include="Classes\MathUtil\BinarySearchUtil.cs" />
     <Compile Include="Classes\MathUtil\Circle.cs" />
     <Compile Include="Classes\MathUtil\Extensions.cs" />
