@@ -174,8 +174,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff
                     CreateWaveFile(Path.Combine(exportFolder, name + ".wav"), sampleProvider.ToWaveProvider16());
                     break;
                 case SampleExportFormat.OggVorbis:
-                    // TODO: Export vorbis mode
-                    throw new NotImplementedException();
+                    VorbisFileWriter.CreateVorbisFile(Path.Combine(exportFolder, name + ".ogg"), sampleProvider.ToWaveProvider());
+                    break;
                 default:
                     switch (sourceEncoding) {
                         case WaveFormatEncoding.IeeeFloat:
@@ -262,8 +262,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff
                         CreateWaveFile(Path.Combine(exportFolder, name + ".wav"), sampleProvider.ToWaveProvider16());
                         break;
                     case SampleExportFormat.OggVorbis:
-                        // TODO: Export vorbis mode
-                        throw new NotImplementedException();
+                        VorbisFileWriter.CreateVorbisFile(Path.Combine(exportFolder, name + ".ogg"), sampleProvider.ToWaveProvider());
+                        break;
                     default:
                         CreateWaveFile(Path.Combine(exportFolder, name + ".wav"), sampleProvider.ToWaveProvider());
                         break;

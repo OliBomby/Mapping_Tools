@@ -1,8 +1,7 @@
-﻿using System;
-using System.IO;
-using NAudio.Wave;
-using NAudio.Wave.SampleProviders;
+﻿using NAudio.Wave;
 using OggVorbisEncoder;
+using System;
+using System.IO;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     public class VorbisFileWriter : IDisposable {
@@ -11,19 +10,22 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         private ProcessingState processingState;
 
         /// <summary>
-        ///     WaveFileWriter that actually writes to a stream
+        /// VorbisFileWriter that actually writes to a stream
         /// </summary>
         /// <param name="outStream">Stream to be written to</param>
-        /// <param name="format">Wave format to use</param>
-        public VorbisFileWriter(Stream outStream, WaveFormat format) {
+        /// <param name="sampleRate">The sample rate to use</param>
+        /// <param name="channels">The number of channels to use</param>
+        /// <param name="quality">The base quality for Vorbis encoding</param>
+        public VorbisFileWriter(Stream outStream, int sampleRate, int channels, float quality=0.5f) {
             this.outStream = outStream;
-            WaveFormat = format;
+            SampleRate = sampleRate;
+            Channels = channels;
             
             // Stores all the static vorbis bitstream settings
-            var info = VorbisInfo.InitVariableBitRate(format.Channels, format.SampleRate, 0.5f);
+            var info = VorbisInfo.InitVariableBitRate(channels, sampleRate, quality);
 
             // set up our packet->stream encoder
-            var serial = new Random().Next();
+            var serial = MainWindow.MainRandom.Next();
             oggStream = new OggStream(serial);
 
             // =========================================================
@@ -34,7 +36,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             // bitstream spec.  The second header holds any comment fields.  The
             // third header holds the bitstream codebook.
             var headerBuilder = new HeaderPacketBuilder();
-
+            
             var comments = new Comments();
 
             var infoPacket = headerBuilder.BuildInfoPacket(info);
@@ -55,12 +57,14 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         /// <summary>
-        ///     Creates a new WaveFileWriter
+        /// Creates a new VorbisFileWriter
         /// </summary>
         /// <param name="filename">The filename to write to</param>
-        /// <param name="format">The Wave Format of the output data</param>
-        public VorbisFileWriter(string filename, WaveFormat format)
-            : this(new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.Read), format) {
+        /// <param name="sampleRate">The sample rate to use</param>
+        /// <param name="channels">The number of channels to use</param>
+        /// <param name="quality">The base quality for Vorbis encoding</param>
+        public VorbisFileWriter(string filename, int sampleRate, int channels, float quality=0.5f)
+            : this(new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.Read), sampleRate, channels, quality) {
             Filename = filename;
         }
 
@@ -70,13 +74,18 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public string Filename { get; }
 
         /// <summary>
-        ///     WaveFormat of the input wave provider
+        /// The sample rate of the output audio
         /// </summary>
-        public WaveFormat WaveFormat { get; }
+        public int SampleRate { get; }
 
-        private static bool CreateVorbisFile(string filename, IWaveProvider sourceProvider) {
+        /// <summary>
+        /// The number of channels for the output audio
+        /// </summary>
+        public int Channels { get; }
+
+        public static bool CreateVorbisFile(string filename, IWaveProvider sourceProvider, float quality=0.5f) {
             try {
-                using (var writer = new VorbisFileWriter(filename, sourceProvider.WaveFormat)) {
+                using (var writer = new VorbisFileWriter(filename, sourceProvider.WaveFormat.SampleRate, sourceProvider.WaveFormat.Channels, quality)) {
                     var buffer = new byte[sourceProvider.WaveFormat.AverageBytesPerSecond * 4];
                     while (true) {
                         int bytesRead = sourceProvider.Read(buffer, 0, buffer.Length);
@@ -85,28 +94,23 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                             break;
                         }
 
-                        writer.Write(buffer, 0, bytesRead);
+                        writer.WriteWaveData(buffer, bytesRead, sourceProvider.WaveFormat);
                     }
                 }
 
                 return true;
-            } catch (IndexOutOfRangeException) {
+            } catch (FileNotFoundException) {
                 return false;
             }
         }
 
-        private static int FlushPages(OggStream oggStream, Stream Output, bool Force)
+        private static void FlushPages(OggStream oggStream, Stream Output, bool Force)
         {
-            int bytesWritten = 0;
             while (oggStream.PageOut(out var page, Force))
             {
                 Output.Write(page.Header, 0, page.Header.Length);
                 Output.Write(page.Body, 0, page.Body.Length);
-
-                bytesWritten += page.Header.Length + page.Body.Length;
             }
-
-            return bytesWritten;
         }
 
         /// <summary>
@@ -119,15 +123,79 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             outStream.Write(data, offset, count);
         }
 
+        /// <summary>
+        /// Encodes and writes a number of float samples
+        /// </summary>
+        /// <param name="floatSamples">The samples. The array shape is [channel][sample]</param>
+        /// <param name="count">The number of samples to write.</param>
         public void WriteFloatSamples(float[][] floatSamples, int count) {
             processingState.WriteData(floatSamples, count);
 
-            while (!oggStream.Finished && processingState.PacketOut(out var packet))
-            {
+            while (!oggStream.Finished && processingState.PacketOut(out var packet)) {
                 oggStream.PacketIn(packet);
 
                 FlushPages(oggStream, outStream, false);
             }
+        }
+
+        /// <summary>
+        /// Encodes and writes samples from raw Wave data
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="count"></param>
+        /// <param name="format"></param>
+        public void WriteWaveData(byte[] data, int count, WaveFormat format) {
+            int bytesPerSample = format.BitsPerSample / 8;
+
+            double sampleConversion = (float)format.SampleRate / SampleRate;
+
+            int numSamples = count / bytesPerSample / format.Channels;
+            int numOutputSamples = (int)(numSamples / sampleConversion);
+
+            float[][] outSamples = new float[Channels][];
+
+            for (int ch = 0; ch < Channels; ch++)
+                outSamples[ch] = new float[numOutputSamples];
+
+            switch (format.Encoding) {
+                case WaveFormatEncoding.Pcm:
+                    for(int sampleNumber = 0; sampleNumber < numOutputSamples; sampleNumber++) {
+                        for (int ch = 0; ch < Channels; ch++) {
+                            int sampleIndex = (int)(sampleNumber * sampleConversion) * format.Channels * bytesPerSample;
+
+                            if (ch < format.Channels) sampleIndex += ch * bytesPerSample;
+
+                            uint value = 0;
+                            for (int i = 0; i < bytesPerSample; i++) {
+                                value |= (uint)data[sampleIndex + i] << (8 * i);
+                            }
+
+                            var rawSample = value / (float)(1 << (format.BitsPerSample - 1));
+
+                            outSamples[ch][sampleNumber] = rawSample;
+                        }
+                    }
+
+                    break;
+                case WaveFormatEncoding.IeeeFloat:
+                    for(int sampleNumber = 0; sampleNumber < numOutputSamples; sampleNumber++) {
+                        for (int ch = 0; ch < Channels; ch++) {
+                            int sampleIndex = (int)(sampleNumber * sampleConversion) * format.Channels * bytesPerSample;
+
+                            if (ch < format.Channels) sampleIndex += ch * bytesPerSample;
+
+                            var rawSample = BitConverter.ToSingle(data, sampleIndex);
+
+                            outSamples[ch][sampleNumber] = rawSample;
+                        }
+                    }
+
+                    break;
+                default:
+                    throw new InvalidOperationException($"This Wave encoding is not supported by VorbisFileWriter: {format.Encoding}");
+            }
+
+            WriteFloatSamples(outSamples, numOutputSamples);
         }
 
         #region IDisposable Members
@@ -154,6 +222,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         private void ReleaseUnmanagedResources() {
             if (processingState != null && oggStream != null && outStream != null) {
                 processingState.WriteEndOfStream();
+
+                while (!oggStream.Finished && processingState.PacketOut(out var packet)) {
+                    oggStream.PacketIn(packet);
+
+                    FlushPages(oggStream, outStream, false);
+                }
                 FlushPages(oggStream, outStream, true);
             }
             oggStream = null;

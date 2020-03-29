@@ -150,7 +150,8 @@
       <HintPath>..\packages\NVorbis.0.8.6\lib\net35\NVorbis.dll</HintPath>
     </Reference>
     <Reference Include="OggVorbisEncoder, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\OggVorbisEncoder.1.1.0\lib\netstandard1.1\OggVorbisEncoder.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\OggVorbisEncoder.dll</HintPath>
     </Reference>
     <Reference Include="OsuMemoryDataProvider">
       <HintPath>..\packages\OsuMemoryDataProvider.dll</HintPath>
