@@ -12,7 +12,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         // Buffer sizes for various sample rates. These values were found empirically
         private readonly Dictionary<int, int> startBuffers = new Dictionary<int, int> {
-            {44100, 1024}, {32000, 1024}, {22050, 512}, {16000, 512}, {11025, 256}, {8000, 256}
+            {48000, 1024}, {44100, 1024}, {32000, 1024}, {22050, 512}, {16000, 512}, {11025, 256}, {8000, 256}
         };
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 }
 
                 return true;
-            } catch (FileNotFoundException) {
+            } catch (IndexOutOfRangeException) {
                 return false;
             }
         }

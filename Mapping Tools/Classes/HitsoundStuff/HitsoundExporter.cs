@@ -230,7 +230,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff
                     }
                 }
             }
-            
+
+            if (validLoadedSamples.Count == 0) return;
+
             // If all the valid samples are blank samples, then also export only a single blank sample
             if (validLoadedSamples.Count == 1 || validLoadedSamples.All(o => o.Value.BlankSample)) {
                 // It has only one valid sample, so we can just export it with the single sample export
