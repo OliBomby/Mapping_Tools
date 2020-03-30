@@ -124,11 +124,7 @@
                                 <MenuItem Header="_Info" Click="OpenInfo" Icon="{materialDesign:PackIcon InfoCircle}"
                                           ToolTip="Basic information about your Mapping Tools client."/>
                             </MenuItem>
-                            <MenuItem x:Name="project" Visibility="Collapsed" Height="31" Header="_Project" Padding="12,0,0,0" MinWidth="67">
-                                <MenuItem Header="_Save project" Click="SaveProject" Icon="{materialDesign:PackIcon ContentSave}"
-                                          ToolTip="Save tool settings to file."/>
-                                <MenuItem Header="_Load project" Click="LoadProject" Icon="{materialDesign:PackIcon Folder}"
-                                          ToolTip="Load tool settings from file."/>
+                            <MenuItem x:Name="ProjectMenu" Visibility="Collapsed" Height="31" Header="_Project" Padding="12,0,0,0" MinWidth="67">
                             </MenuItem>
                         </Menu>
                     </Grid>
