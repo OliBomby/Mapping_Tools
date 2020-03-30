@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     /// <summary>
@@ -10,19 +7,24 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
     /// </summary>
     public class SamplePackage {
         public double Time;
-        public double Volume;
         public HashSet<Sample> Samples;
+
+        public double MaxOutsideVolume => Samples.Max(s => s.OutsideVolume);
 
         public SamplePackage(double time, HashSet<Sample> samples) {
             Time = time;
-            Volume = 1;
             Samples = samples;
         }
 
         public SamplePackage(double time) {
             Time = time;
-            Volume = 1;
             Samples = new HashSet<Sample>();
+        }
+
+        public void SetAllOutsideVolume(double outsideVolume) {
+            foreach (var sample in Samples) {
+                sample.OutsideVolume = outsideVolume;
+            }
         }
 
         /// <summary>
@@ -104,7 +106,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             bool finish = Samples.Any(o => o.Hitsound == Hitsound.Finish);
             bool clap = Samples.Any(o => o.Hitsound == Hitsound.Clap);
 
-            return new HitsoundEvent(Time, Volume, sampleSet, additions, index, whistle, finish, clap);
+            return new HitsoundEvent(Time, MaxOutsideVolume, sampleSet, additions, index, whistle, finish, clap);
         }
     }
 }

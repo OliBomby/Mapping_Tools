@@ -149,6 +149,10 @@
     <Reference Include="NVorbis, Version=0.8.6.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\NVorbis.0.8.6\lib\net35\NVorbis.dll</HintPath>
     </Reference>
+    <Reference Include="OggVorbisEncoder, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\OggVorbisEncoder.dll</HintPath>
+    </Reference>
     <Reference Include="OsuMemoryDataProvider">
       <HintPath>..\packages\OsuMemoryDataProvider.dll</HintPath>
     </Reference>
@@ -206,7 +210,10 @@
     <Compile Include="Classes\ExternalFileUtil\Reaper\TrackItem.cs" />
     <Compile Include="Classes\ExternalFileUtil\TempoSignature.cs" />
     <Compile Include="Classes\GenericExtensions.cs" />
-    <Compile Include="Classes\HitsoundStuff\DelayFadeOutSampleProvider.cs" />
+    <Compile Include="Classes\HitsoundStuff\Effects\DelayFadeOutSampleProvider.cs" />
+    <Compile Include="Classes\HitsoundStuff\Effects\Effect.cs" />
+    <Compile Include="Classes\HitsoundStuff\Effects\EffectParameter.cs" />
+    <Compile Include="Classes\HitsoundStuff\Effects\SoftLimiter.cs" />
     <Compile Include="Classes\HitsoundStuff\Hitsound.cs" />
     <Compile Include="Classes\HitsoundStuff\HitsoundLayerExtension.cs" />
     <Compile Include="Classes\HitsoundStuff\HitsoundZone.cs" />
@@ -225,10 +232,11 @@
     <Compile Include="Classes\HitsoundStuff\HitsoundLayer.cs" />
     <Compile Include="Classes\HitsoundStuff\Sample.cs" />
     <Compile Include="Classes\HitsoundStuff\SamplePackage.cs" />
+    <Compile Include="Classes\HitsoundStuff\SampleSchema.cs" />
     <Compile Include="Classes\HitsoundStuff\SampleSet.cs" />
     <Compile Include="Classes\HitsoundStuff\SampleSoundGenerator.cs" />
     <Compile Include="Classes\HitsoundStuff\SF2Extension.cs" />
-    <Compile Include="Classes\HitsoundStuff\VolumeBalancingArgs.cs" />
+    <Compile Include="Classes\HitsoundStuff\VorbisFileWriter.cs" />
     <Compile Include="Classes\MathUtil\BinarySearchUtil.cs" />
     <Compile Include="Classes\MathUtil\Circle.cs" />
     <Compile Include="Classes\MathUtil\Extensions.cs" />
@@ -340,6 +348,7 @@
     <Compile Include="Classes\SystemTools\ActionHotkey.cs" />
     <Compile Include="Classes\SystemTools\BindableBase.cs" />
     <Compile Include="Classes\SystemTools\Hotkey.cs" />
+    <Compile Include="Classes\SystemTools\IHaveExtraProjectMenuItems.cs" />
     <Compile Include="Classes\SystemTools\IOHelper.cs" />
     <Compile Include="Classes\SystemTools\QuickRun\IQuickRun.cs" />
     <Compile Include="Classes\SystemTools\ListenerManager.cs" />
@@ -479,7 +488,7 @@
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Viewmodels\CleanerVM.cs" />
     <Compile Include="Viewmodels\HitsoundPreviewHelperVM.cs" />
-    <Compile Include="Viewmodels\HitsoundStudioVM.cs" />
+    <Compile Include="Viewmodels\HitsoundStudioVm.cs" />
     <Compile Include="Viewmodels\HitsoundCopierVM.cs" />
     <Compile Include="Viewmodels\ComboColourStudioVm.cs" />
     <Compile Include="Viewmodels\RhythmGuideVm.cs" />
@@ -501,6 +510,9 @@
     <Compile Include="Views\Extensions.cs" />
     <Compile Include="Views\ComboColourStudio\ComboColourStudioView.xaml.cs">
       <DependentUpon>ComboColourStudioView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\HitsoundStudio\HitsoundStudioExportDialog.xaml.cs">
+      <DependentUpon>HitsoundStudioExportDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Sliderator\SlideratorView.xaml.cs">
       <DependentUpon>SlideratorView.xaml</DependentUpon>
@@ -666,6 +678,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Components\Dialogs\BeatmapImportDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\HitsoundStudio\HitsoundStudioExportDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

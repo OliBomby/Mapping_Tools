@@ -196,12 +196,50 @@ namespace Mapping_Tools {
                 MessageBox.Show($"Beatmap{( paths.Length == 1 ? "" : "s" )} successfully copied!");
         }
 
-        private void ViewChanged() {
-            if (!(FindName("project") is MenuItem menuitem)) return;
+        private void ViewChanged() { 
+            if (!(FindName("ProjectMenu") is MenuItem projectMenu)) return;
+
             var isSavable = DataContext.GetType().GetInterfaces().Any(x =>
                               x.IsGenericType &&
                               x.GetGenericTypeDefinition() == typeof(ISavable<>));
-             menuitem.Visibility = isSavable ? Visibility.Visible : Visibility.Collapsed;
+
+            projectMenu.Visibility = Visibility.Collapsed;
+            projectMenu.Items.Clear();
+
+            if (isSavable) {
+                projectMenu.Visibility = Visibility.Visible;
+
+                projectMenu.Items.Add(GetSaveProjectMenuItem());
+                projectMenu.Items.Add(GetLoadProjectMenuItem());
+            }
+
+            if (DataContext is IHaveExtraProjectMenuItems havingExtraProjectMenuItems) {
+                projectMenu.Visibility = Visibility.Visible;
+
+                foreach (var menuItem in havingExtraProjectMenuItems.GetMenuItems()) {
+                    projectMenu.Items.Add(menuItem);
+                }
+            }
+        }
+
+        private MenuItem GetSaveProjectMenuItem() {
+            var menu = new MenuItem {
+                Header = "_Save project", Icon = new PackIcon {Kind = PackIconKind.ContentSave},
+                ToolTip = "Save tool settings to file."
+            };
+            menu.Click += SaveProject;
+
+            return menu;
+        }
+
+        private MenuItem GetLoadProjectMenuItem() {
+            var menu = new MenuItem {
+                Header = "_Load project", Icon = new PackIcon {Kind = PackIconKind.Folder},
+                ToolTip = "Load tool settings from file."
+            };
+            menu.Click += LoadProject;
+
+            return menu;
         }
 
         private void LoadProject(object sender, RoutedEventArgs e) {

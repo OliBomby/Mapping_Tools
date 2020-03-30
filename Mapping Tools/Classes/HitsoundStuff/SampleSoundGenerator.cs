@@ -1,6 +1,7 @@
 ﻿using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using System;
+using Mapping_Tools.Classes.HitsoundStuff.Effects;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     /// <summary>
@@ -16,6 +17,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public double VolumeCorrection { get; set; }
         public double FadeStart { get; set; }
         public double FadeLength { get; set; }
+
+        /// <summary>
+        /// This means that this is the blank sample. There is some special logic for this.
+        /// </summary>
+        public bool BlankSample => Wave.TotalTime.Equals(TimeSpan.Zero);
 
         /// <inheritdoc />
         public SampleSoundGenerator(WaveStream wave) {

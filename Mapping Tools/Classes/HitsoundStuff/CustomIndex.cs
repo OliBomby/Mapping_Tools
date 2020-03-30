@@ -1,10 +1,7 @@
-﻿using NAudio.Wave;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using Mapping_Tools.Classes.BeatmapHelper;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
 
@@ -113,6 +110,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             foreach (string key in AllKeys) {
                 Samples[key].UnionWith(other.Samples[key]);
             }
+
+            // If the other custom index has an assigned index and this one doesnt. Get the index, so optimised custom indices retain their indices.
+            if (Index == -1 && other.Index != -1) {
+                Index = other.Index;
+            }
         }
 
         /// <summary>
@@ -121,7 +123,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// <param name="other"></param>
         /// <returns></returns>
         public CustomIndex Merge(CustomIndex other) {
-            CustomIndex ci = new CustomIndex();
+            CustomIndex ci = new CustomIndex(Math.Max(Index, other.Index));
             foreach (string key in AllKeys) {
                 ci.Samples[key].UnionWith(other.Samples[key]);
             }
@@ -164,13 +166,17 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             foreach (KeyValuePair<string, HashSet<SampleGeneratingArgs>> kvp in Samples) {
                 var sampleList = new StringBuilder();
                 foreach (var sga in kvp.Value) {
-                    sampleList.Append(string.Format("{0}|", sga.ToString()));
+                    sampleList.Append($"{sga}|");
                 }
                 if (sampleList.Length > 0)
                     sampleList.Remove(sampleList.Length - 1, 1);
-                accumulator.Append(string.Format("{0}: [{1}]", kvp.Key, sampleList.ToString()));
+                accumulator.Append($"{kvp.Key}: [{sampleList}]");
             }
             return accumulator.ToString();
+        }
+
+        public string GetNumberExtension() {
+            return Index == 1 ? string.Empty : Index.ToInvariant();
         }
     }
 }

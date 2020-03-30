@@ -32,6 +32,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return Path.GetExtension(path) == ".ogg" ? (WaveStream)new VorbisWaveReader(path) : new MediaFoundationReader(path);
         }
 
+        /// <summary>
+        /// Imports all samples specified by <see cref="SampleGeneratingArgs"/> and returns a dictionary which maps the <see cref="SampleGeneratingArgs"/>
+        /// to their <see cref="SampleSoundGenerator"/>. If a sample couldn't be imported then it has a null instead.
+        /// </summary>
+        /// <param name="argsList"></param>
+        /// <returns></returns>
         public static Dictionary<SampleGeneratingArgs, SampleSoundGenerator> ImportSamples(IEnumerable<SampleGeneratingArgs> argsList) {
             var samples = new Dictionary<SampleGeneratingArgs, SampleSoundGenerator>();
             var separatedByPath = new Dictionary<string, HashSet<SampleGeneratingArgs>>();
@@ -40,31 +46,52 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 if (separatedByPath.TryGetValue(args.Path, out HashSet<SampleGeneratingArgs> value)) {
                     value.Add(args);
                 } else {
-                    separatedByPath.Add(args.Path, new HashSet<SampleGeneratingArgs>() { args });
+                    separatedByPath.Add(args.Path, new HashSet<SampleGeneratingArgs> { args });
                 }
             }
 
             foreach (var pair in separatedByPath) {
                 var path = pair.Key;
-                if (!ValidateSampleArgs(path))
+                if (!ValidateSampleArgs(path)) {
+                    foreach (var args in pair.Value) {
+                        samples.Add(args, null);
+                    }
                     continue;
+                }
+
                 try {
-                    if (Path.GetExtension(path) == ".sf2") {
-                        var sf2 = new SoundFont(path);
-                        foreach (var args in pair.Value) {
-                            var sample = ImportFromSoundFont(args, sf2);
-                            samples.Add(args, sample);
+                    switch (Path.GetExtension(path)) {
+                        case ".sf2": {
+                            var sf2 = new SoundFont(path);
+                            foreach (var args in pair.Value) {
+                                var sample = ImportFromSoundFont(args, sf2);
+                                samples.Add(args, sample);
+                            }
+
+                            break;
                         }
-                    } else if (Path.GetExtension(path) == ".ogg") {
-                        foreach (var args in pair.Value) {
-                            samples.Add(args, ImportFromVorbis(args));
+                        case ".ogg": {
+                            foreach (var args in pair.Value) {
+                                samples.Add(args, ImportFromVorbis(args));
+                            }
+
+                            break;
                         }
-                    } else {
-                        foreach (var args in pair.Value) {
-                            samples.Add(args, ImportFromAudio(args));
+                        default: {
+                            foreach (var args in pair.Value) {
+                                samples.Add(args, ImportFromAudio(args));
+                            }
+
+                            break;
                         }
                     }
-                } catch (Exception ex) { Console.WriteLine(ex.Message); }
+                } catch (Exception ex) {
+                    Console.WriteLine(ex.Message); 
+                    
+                    foreach (var args in pair.Value) {
+                        samples.Add(args, null);
+                    }
+                }
                 GC.Collect();
             }
             return samples;
@@ -72,15 +99,17 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         public static SampleSoundGenerator ImportSample(SampleGeneratingArgs args) {
             string path = args.Path;
-            if (Path.GetExtension(path) == ".sf2") {
-                SoundFont sf2 = new SoundFont(path);
-                SampleSoundGenerator wave = ImportFromSoundFont(args, sf2);
-                GC.Collect();
-                return wave;
-            } else if (Path.GetExtension(path) == ".ogg") {
-                return ImportFromVorbis(args);
-            } else {
-                return ImportFromAudio(args);
+            switch (Path.GetExtension(path)) {
+                case ".sf2": {
+                    SoundFont sf2 = new SoundFont(path);
+                    SampleSoundGenerator wave = ImportFromSoundFont(args, sf2);
+                    GC.Collect();
+                    return wave;
+                }
+                case ".ogg":
+                    return ImportFromVorbis(args);
+                default:
+                    return ImportFromAudio(args);
             }
         }
 

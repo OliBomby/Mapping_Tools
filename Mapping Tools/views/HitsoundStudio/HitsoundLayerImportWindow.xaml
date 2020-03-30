@@ -172,6 +172,9 @@
                         </Button >
                     </Grid>
                     <CheckBox x:Name="VolumesBox2" Content="Discriminate volumes" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,15,0,0"/>
+                    <CheckBox x:Name="DetectDuplicateSamplesBox2" Content="Detect duplicate samples" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,0,0,0"/>
+                    <CheckBox x:Name="RemoveDuplicatesBox2" Content="Remove duplicate hitsounds" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,0,0,0"/>
+                    <CheckBox x:Name="IncludeStoryboardBox2" Content="Include storyboarded samples" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,0,0,0"/>
                 </StackPanel>
             </TabItem>
             <TabItem Header="Import MIDI" Background="Transparent">
@@ -216,6 +219,30 @@
                         Visibility="{Binding Path=IsChecked, ElementName=VelocityBox3, UpdateSourceTrigger=PropertyChanged,  
                                  Converter={StaticResource BooleanToVisibilityConverter}, 
                                  FallbackValue=Collapsed}" />
+                </StackPanel>
+            </TabItem>
+            <TabItem Header="Import storyboard" Background="Transparent">
+                <StackPanel CanVerticallyScroll="True" CanHorizontallyScroll="True" Margin="10">
+                    <TextBox x:Name="NameBox4" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,5,0,0"
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Name"/>
+                    <Grid Margin="0,15,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="5"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" x:Name="BeatmapPathBox4" Foreground="{DynamicResource MaterialDesignBody}"
+                            Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Source beatmap"/>
+                        <Button Grid.Column="1" Cursor="Hand" Click="BeatmapLoad4_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
+                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Download" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                        </Button >
+                        <Button Grid.Column="3" Cursor="Hand" Click="BeatmapBrowse4_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
+                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                        </Button >
+                    </Grid>
+                    <CheckBox x:Name="VolumesBox4" Content="Discriminate volumes" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,15,0,0"/>
+                    <CheckBox x:Name="RemoveDuplicatesBox4" Content="Remove duplicate samples" Foreground="{DynamicResource MaterialDesignBody}" Margin="0,0,0,0"/>
                 </StackPanel>
             </TabItem>
         </TabControl>

@@ -71,6 +71,22 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
         }
 
+        /// <summary>
+        /// Gets the project file for a savable tool with optional dialog.
+        /// Uses default save path if no dialog is used.
+        /// </summary>
+        /// <typeparam name="T">The type of the project data</typeparam>
+        /// <param name="view">The tool to get the project from</param>
+        /// <param name="dialog">Whether to use a dialog</param>
+        /// <returns></returns>
+        public static T GetProject<T>(ISavable<T> view, bool dialog=false) {
+            if (dialog)
+                Directory.CreateDirectory(view.DefaultSaveFolder);
+            string path = dialog ? IOHelper.LoadProjectDialog(view.DefaultSaveFolder) : view.AutoSavePath;
+
+            return LoadJson<T>(path);
+        }
+
         public static bool IsSavable(object obj) {
             return IsSavable(obj.GetType());
         }

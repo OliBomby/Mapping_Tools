@@ -15,24 +15,26 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public double Y { get; }
         public double LengthRoughness { get; }
         public double VelocityRoughness { get; }
+        public bool DiscriminateVolumes { get; }
+        public bool DetectDuplicateSamples { get; }
+        public bool RemoveDuplicates { get; }
 
         /// <inheritdoc />
-        public ImportReloadingArgs(string path) {
-            Path = path;
-            LengthRoughness = -1;
-            VelocityRoughness = -1;
-            X = -1;
-            Y = -1;
+        public ImportReloadingArgs(string path) : this(ImportType.None, path, -1, -1, -1, -1, false, false, false) {
         }
 
         /// <inheritdoc />
-        public ImportReloadingArgs(ImportType importType, string path, double x, double y, double lengthRoughness, double velocityRoughness) {
+        public ImportReloadingArgs(ImportType importType, string path, double x, double y, double lengthRoughness, double velocityRoughness,
+            bool discriminateVolumes, bool detectDuplicateSamples, bool removeDuplicates) {
             ImportType = importType;
             Path = path;
             X = x;
             Y = y;
             LengthRoughness = lengthRoughness;
             VelocityRoughness = velocityRoughness;
+            DiscriminateVolumes = discriminateVolumes;
+            DetectDuplicateSamples = detectDuplicateSamples;
+            RemoveDuplicates = removeDuplicates;
         }
 
         /// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
@@ -44,7 +46,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 X == other.X &&
                 Y == other.Y &&
                 LengthRoughness == other.LengthRoughness &&
-                VelocityRoughness == other.VelocityRoughness;
+                VelocityRoughness == other.VelocityRoughness &&
+                DiscriminateVolumes == other.DiscriminateVolumes &&
+                DetectDuplicateSamples == other.DetectDuplicateSamples &&
+                RemoveDuplicates == other.RemoveDuplicates;
         }
 
         /// <summary>Determines whether the specified object is equal to the current object.</summary>
@@ -68,6 +73,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             hashCode = hashCode * -1521134295 + Y.GetHashCode();
             hashCode = hashCode * -1521134295 + LengthRoughness.GetHashCode();
             hashCode = hashCode * -1521134295 + VelocityRoughness.GetHashCode();
+            hashCode = hashCode * -1521134295 + RemoveDuplicates.GetHashCode();
+            hashCode = hashCode * -1521134295 + DiscriminateVolumes.GetHashCode();
+            hashCode = hashCode * -1521134295 + DetectDuplicateSamples.GetHashCode();
             return hashCode;
         }
     }

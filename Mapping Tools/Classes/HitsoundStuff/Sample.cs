@@ -1,14 +1,13 @@
-﻿using System;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+﻿using Mapping_Tools.Classes.SystemTools;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     /// <summary>
     /// 
     /// </summary>
-    public class Sample : INotifyPropertyChanged {
+    public class Sample : BindableBase {
         private SampleGeneratingArgs _sampleArgs;
         private int _priority;
+        private double _outsideVolume;
         private SampleSet _sampleSet;
         private Hitsound _hitsound;
 
@@ -16,57 +15,54 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// 
         /// </summary>
         public SampleGeneratingArgs SampleArgs {
-            get { return _sampleArgs; }
-            set {
-                if (_sampleArgs == value) return;
-                _sampleArgs = value;
-                OnPropertyChanged();
-            }
+            get => _sampleArgs;
+            set => Set(ref _sampleArgs, value);
         }
 
         public int Priority {
-            get { return _priority; }
-            set {
-                if (_priority == value) return;
-                _priority = value;
-                OnPropertyChanged();
-            }
+            get => _priority;
+            set => Set(ref _priority, value);
+        }
+
+        public double OutsideVolume {
+            get => _outsideVolume;
+            set => Set(ref _outsideVolume, value);
         }
 
         public SampleSet SampleSet {
-            get { return _sampleSet; }
-            set {
-                if (_sampleSet == value) return;
-                _sampleSet = value;
-                OnPropertyChanged();
-            }
+            get => _sampleSet;
+            set => Set(ref _sampleSet, value);
         }
 
         public Hitsound Hitsound {
-            get { return _hitsound; }
-            set {
-                if (_hitsound == value) return;
-                _hitsound = value;
-                OnPropertyChanged();
-            }
+            get => _hitsound;
+            set => Set(ref _hitsound, value);
         }
+
+        public bool Normal => Hitsound == Hitsound.Normal;
+        public bool Whistle => Hitsound == Hitsound.Whistle;
+        public bool Finish => Hitsound == Hitsound.Finish;
+        public bool Clap => Hitsound == Hitsound.Clap;
 
         public Sample() {
             _sampleArgs = new SampleGeneratingArgs();
+            _outsideVolume = 1;
             _priority = 0;
             _sampleSet = SampleSet.Normal;
             _hitsound = Hitsound.Normal;
         }
 
-        public Sample(SampleSet sampleSet, Hitsound hitsound, SampleGeneratingArgs sampleArgs, int priority) {
+        public Sample(SampleSet sampleSet, Hitsound hitsound, SampleGeneratingArgs sampleArgs, int priority, double outsideVolume) {
             _sampleArgs = sampleArgs;
+            _outsideVolume = outsideVolume;
             _priority = priority;
             _sampleSet = sampleSet;
             _hitsound = hitsound;
         }
 
         public Sample(HitsoundLayer hl) {
-            _sampleArgs = hl.SampleArgs.Copy();
+            _sampleArgs = hl.SampleArgs.Copy();  // Copy so any changes made to these sample args do not carry over to the layers
+            _outsideVolume = 1;
             _priority = hl.Priority;
             _sampleSet = hl.SampleSet;
             _hitsound = hl.Hitsound;
@@ -77,19 +73,13 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// </summary>
         /// <returns></returns>
         public Sample Copy() {
-            return new Sample(SampleSet, Hitsound, SampleArgs.Copy(), Priority);
+            return new Sample(SampleSet, Hitsound, SampleArgs.Copy(), Priority, OutsideVolume);
         }
 
         /// <summary>Returns a string that represents the current object.</summary>
         /// <returns>A string that represents the current object.</returns>
         public override string ToString() {
-            return $"{SampleArgs}, priority: {Priority}, sampleset: {SampleSet}, hitsound: {Hitsound}";
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            return $"{SampleArgs}, outside volume: {OutsideVolume}, priority: {Priority}, sampleset: {SampleSet}, hitsound: {Hitsound}";
         }
     }
 }
