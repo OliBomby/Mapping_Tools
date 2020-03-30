@@ -8,6 +8,6 @@ namespace Mapping_Tools.Classes.SystemTools {
         /// <summary>
         /// Gets the menu items that are going to be shown in the Project tab
         /// </summary>
-        MenuItem[] GetMenuItems { get; }
+        MenuItem[] GetMenuItems();
     }
 }

@@ -216,7 +216,7 @@ namespace Mapping_Tools {
             if (DataContext is IHaveExtraProjectMenuItems havingExtraProjectMenuItems) {
                 projectMenu.Visibility = Visibility.Visible;
 
-                foreach (var menuItem in havingExtraProjectMenuItems.GetMenuItems) {
+                foreach (var menuItem in havingExtraProjectMenuItems.GetMenuItems()) {
                     projectMenu.Items.Add(menuItem);
                 }
             }

@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -21,7 +22,7 @@ namespace Mapping_Tools.Views
     /// <summary>
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
-    public partial class HitsoundStudioView : ISavable<HitsoundStudioVm>
+    public partial class HitsoundStudioView : ISavable<HitsoundStudioVm>, IHaveExtraProjectMenuItems
     {
         private HitsoundStudioVm Settings;
 
@@ -1017,5 +1018,31 @@ namespace Mapping_Tools.Views
             LayersList.SelectedIndex = 0;
             Num_Layers_Changed();
         }
+
+        #region IHaveExtraMenuItems members
+
+        public MenuItem[] GetMenuItems() {
+            var menu = new MenuItem {
+                Header = "_Load sample schema", Icon = new PackIcon {Kind = PackIconKind.FileMusic},
+                ToolTip = "Load sample schema from a project file."
+            };
+            menu.Click += LoadSampleSchemaFromFile;
+
+            return new[] {menu};
+        }
+
+        private void LoadSampleSchemaFromFile(object sender, RoutedEventArgs e) {
+            try {
+                var project = ProjectManager.GetProject(this, true);
+                Settings.PreviousSampleSchema = project.PreviousSampleSchema;
+
+                Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue("Succesfully loaded sample schema!"));
+            } catch (ArgumentException) { }
+            catch (Exception exception) {
+                MessageBox.Show(exception.Message);
+            }
+        }
+
+        #endregion
     }
 }
