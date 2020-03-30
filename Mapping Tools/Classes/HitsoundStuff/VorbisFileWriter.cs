@@ -187,12 +187,15 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
                             if (ch < format.Channels) sampleIndex += ch * bytesPerSample;
 
-                            uint value = 0;
-                            for (int i = 0; i < bytesPerSample; i++) {
-                                value |= (uint)data[sampleIndex + i] << (8 * i);
+                            float rawSample = 0f;
+                            switch (format.BitsPerSample) {
+                                case 8:
+                                    rawSample = ByteToSample(data[sampleIndex]);
+                                    break;
+                                case 16:
+                                    rawSample = ShortToSample((short)(data[sampleIndex + 1] << 8 | data[sampleIndex]));
+                                    break;
                             }
-
-                            var rawSample = value / (float)(1 << (format.BitsPerSample - 1));
 
                             outSamples[ch][sampleNumber] = rawSample;
                         }
@@ -218,6 +221,16 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
 
             WriteFloatSamples(outSamples, numOutputSamples);
+        }
+
+        private static float ByteToSample(short pcmValue)
+        {
+            return pcmValue / 128f;
+        }
+
+        private static float ShortToSample(short pcmValue)
+        {
+            return pcmValue / 32768f;
         }
 
         #region IDisposable Members
