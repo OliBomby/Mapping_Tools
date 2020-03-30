@@ -155,6 +155,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
             // Either if it is the blank sample or the source file is literally what the user wants to be exported
             if (sampleSoundGenerator.BlankSample && sampleGeneratingArgs.GetExtension() == ".wav" || 
                 sampleGeneratingArgs.CanCopyPaste && IsFormatEncodingCompatible(sourceEncoding, format)) {
+
                 var dest = Path.Combine(exportFolder, name + sampleGeneratingArgs.GetExtension());
                 return CopySample(sampleGeneratingArgs.Path, dest);
             }

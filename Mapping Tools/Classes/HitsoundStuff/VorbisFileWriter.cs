@@ -1,6 +1,7 @@
 ﻿using NAudio.Wave;
 using OggVorbisEncoder;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
@@ -8,6 +9,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         private Stream outStream;
         private OggStream oggStream;
         private ProcessingState processingState;
+
+        // Buffer sizes for various sample rates. These values were found empirically
+        private readonly Dictionary<int, int> startBuffers = new Dictionary<int, int> {
+            {44100, 1024}, {32000, 1024}, {22050, 512}, {16000, 512}, {11025, 256}, {8000, 256}
+        };
 
         /// <summary>
         /// VorbisFileWriter that actually writes to a stream
@@ -20,8 +26,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             this.outStream = outStream;
             SampleRate = sampleRate;
             Channels = channels;
-            
+
+            if (!startBuffers.ContainsKey(sampleRate)) 
+                throw new InvalidOperationException($"Vorbis writer does not support {sampleRate} sample rate.");
+
             // Stores all the static vorbis bitstream settings
+            Console.WriteLine($"Initiating variable bit rate: {channels} channels, {sampleRate} sample rate, {quality} quality");
             var info = VorbisInfo.InitVariableBitRate(channels, sampleRate, quality);
 
             // set up our packet->stream encoder
@@ -54,6 +64,15 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             // BODY (Audio Data)
             // =========================================================
             processingState = ProcessingState.Create(info);
+
+            // Append some zeros at the start so the result has the same length as the input
+            int bufferSize = startBuffers[sampleRate];
+
+            float[][] outSamples = new float[channels][];
+            for (int ch = 0; ch < channels; ch++)
+                outSamples[ch] = new float[bufferSize];
+
+            processingState.WriteData(outSamples, bufferSize);
         }
 
         /// <summary>
@@ -106,9 +125,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         private static void FlushPages(OggStream oggStream, Stream Output, bool Force)
         {
-            while (oggStream.PageOut(out var page, Force))
-            {
+            while (oggStream.PageOut(out var page, Force)) {
+                //Console.WriteLine($"Writing page header with {page.Header.Length} bytes of data");
                 Output.Write(page.Header, 0, page.Header.Length);
+                //Console.WriteLine($"Writing page body with {page.Body.Length} bytes of data");
                 Output.Write(page.Body, 0, page.Body.Length);
             }
         }
@@ -129,9 +149,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// <param name="floatSamples">The samples. The array shape is [channel][sample]</param>
         /// <param name="count">The number of samples to write.</param>
         public void WriteFloatSamples(float[][] floatSamples, int count) {
+            //Console.WriteLine($"Writing {count} samples!");
             processingState.WriteData(floatSamples, count);
 
             while (!oggStream.Finished && processingState.PacketOut(out var packet)) {
+                //Console.WriteLine($"Got packet with {packet.PacketData.Length} bytes of data");
                 oggStream.PacketIn(packet);
 
                 FlushPages(oggStream, outStream, false);
