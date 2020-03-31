@@ -7,6 +7,10 @@ using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.BeatmapHelper;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
+    /// <summary>
+    /// Stores a dictionary with pairs (filename without ext., list of sample args which are satisfied by that file)
+    /// Represents a schema on how to exports sample packages.
+    /// </summary>
     public class SampleSchema : Dictionary<string, List<SampleGeneratingArgs>> {
         [UsedImplicitly]
         public SampleSchema() { }
@@ -14,7 +18,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public SampleSchema(IEnumerable<CustomIndex> customIndices) {
             foreach (var customIndex in customIndices) {
                 foreach (var customIndexSample in customIndex.Samples) {
-                    Add(customIndexSample.Key + customIndex.GetNumberExtension() + ".wav", customIndexSample.Value.ToList());
+                    Add(customIndexSample.Key + customIndex.GetNumberExtension(), customIndexSample.Value.ToList());
                 }
             }
         }
