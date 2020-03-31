@@ -20,7 +20,7 @@ namespace Mapping_Tools.Views
 {
 
     /// <summary>
-    /// Interactielogica voor HitsoundCopierView.xaml
+    /// Interactielogica voor HitsoundStudioView.xaml
     /// </summary>
     public partial class HitsoundStudioView : ISavable<HitsoundStudioVm>, IHaveExtraProjectMenuItems
     {

@@ -93,7 +93,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
                 names = GenerateSampleNames(loadedSamples.Keys, loadedSamples);
             }
 
-            foreach (var sample in loadedSamples.Keys) {
+            foreach (var sample in loadedSamples.Keys.Where(sample => SampleImporter.ValidateSampleArgs(sample, loadedSamples))) {
                 ExportSample(sample, names[sample], exportFolder, loadedSamples, format);
             }
         }
