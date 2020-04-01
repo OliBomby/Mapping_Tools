@@ -41,4 +41,5 @@ Collection of tools for manipulating osu! beatmaps
 - [Editor Reader](https://github.com/Karoo13/EditorReader)
 - [NonInvasiveKeyboardHook](https://github.com/kfirprods/NonInvasiveKeyboardHook)
 - [Overlay.NET](https://github.com/lolp1/Overlay.NET)
+- [.NET Ogg Vorbis Encoder](https://github.com/SteveLillis/.NET-Ogg-Vorbis-Encoder)
 
