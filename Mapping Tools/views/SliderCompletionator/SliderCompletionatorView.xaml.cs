@@ -101,6 +101,10 @@ namespace Mapping_Tools.Views {
                         double oldSv = timing.GetSvAtTime(ho.Time);
                         double newSv = oldSv / ((newSpatialLength / oldSpatialLength) / (newTemporalLength / oldTemporalLength));
 
+                        if (double.IsNaN(newSv)) {
+                            throw new Exception("Encountered NaN slider velocity. Make sure none of the inputs are zero.");
+                        }
+
                         ho.SliderVelocity = newSv;
                         ho.PixelLength = newSpatialLength;
 
