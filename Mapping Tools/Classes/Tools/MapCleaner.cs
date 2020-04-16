@@ -75,7 +75,7 @@ namespace Mapping_Tools.Classes.Tools {
 
             GameMode mode = (GameMode)beatmap.General["Mode"].IntValue;
             double circleSize = beatmap.Difficulty["CircleSize"].DoubleValue;
-            string mapDir = editor.GetBeatmapFolder();
+            string mapDir = editor.GetParentFolder();
             Dictionary<string, string> firstSamples = HitsoundImporter.AnalyzeSamples(mapDir);
 
             int objectsResnapped = 0;

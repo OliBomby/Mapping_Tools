@@ -194,7 +194,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
 
                     var timingPointsChanges = new List<TimingPointsChange>();
                     var mode = (GameMode) beatmapTo.General["Mode"].IntValue;
-                    var mapDir = editorTo.GetBeatmapFolder();
+                    var mapDir = editorTo.GetParentFolder();
                     var firstSamples = HitsoundImporter.AnalyzeSamples(mapDir);
 
                     if (copyHitsounds) {
@@ -233,7 +233,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                     beatmapTo.GiveObjectsGreenlines();
                     processedTimeline.GiveTimingPoints(beatmapTo.BeatmapTiming);
 
-                    var mapDir = editorTo.GetBeatmapFolder();
+                    var mapDir = editorTo.GetParentFolder();
                     var firstSamples = HitsoundImporter.AnalyzeSamples(mapDir, true);
 
                     var samplesTo = new HashSet<StoryboardSoundSample>(beatmapTo.StoryboardSoundSamples);

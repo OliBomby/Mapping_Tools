@@ -84,19 +84,19 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         /// <summary>
-        /// Grab the beatmap folder as absolute.
+        /// Grab the parent folder as absolute.
         /// </summary>
         /// <returns></returns>
-        public string GetBeatmapFolder() {
+        public string GetParentFolder() {
             return Directory.GetParent(Path).FullName;
         }
 
         /// <summary>
-        /// Grab the beatmap folder as absolute.
+        /// Grab the parent folder as absolute.
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static string GetBeatmapFolder(string path)
+        public static string GetParentFolder(string path)
         {
             return Directory.GetParent(path).FullName;
         }

@@ -120,7 +120,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Timeline timeline = beatmap.GetTimeline();
 
             GameMode mode = (GameMode)beatmap.General["Mode"].IntValue;
-            string mapDir = editor.GetBeatmapFolder();
+            string mapDir = editor.GetParentFolder();
             Dictionary<string, string> firstSamples = AnalyzeSamples(mapDir, false, detectDuplicateSamples);
 
             List<HitsoundLayer> hitsoundLayers = new List<HitsoundLayer>();
@@ -246,7 +246,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public static List<HitsoundLayer> ImportStoryboard(string path, bool volumes, bool removeDuplicates) {
             EditorReaderStuff.TryGetNewestVersion(path, out var editor);
             Beatmap beatmap = editor.Beatmap;
-            string mapDir = editor.GetBeatmapFolder();
+            string mapDir = editor.GetParentFolder();
 
             var hitsoundLayers = ImportStoryboard(path, volumes, removeDuplicates, beatmap, mapDir);
 
