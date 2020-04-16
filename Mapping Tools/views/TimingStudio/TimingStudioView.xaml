@@ -13,7 +13,7 @@
     Allow import of midi, rpp (reaper project file), current beatmap (using Timing Helpers importer).
     -->
     
-<local:SingleRunMappingTool x:Class="Mapping_Tools.Views.TimingStudioView"
+<local:SingleRunMappingTool x:Class="Mapping_Tools.Views.TimingStudio.TimingStudioView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 

@@ -1,8 +1,8 @@
-﻿using Mapping_Tools.Classes.SystemTools;
+﻿using System.Windows;
+using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Viewmodels;
-using System.Windows;
 
-namespace Mapping_Tools.Views {
+namespace Mapping_Tools.Views.HitsoundStudio {
     /// <summary>
     /// Interaction logic for HitsoundStudioExportDialog.xaml
     /// </summary>

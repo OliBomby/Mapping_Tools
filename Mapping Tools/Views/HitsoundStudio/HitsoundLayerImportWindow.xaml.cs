@@ -1,18 +1,18 @@
-﻿using Mapping_Tools.Classes.HitsoundStuff;
-using Mapping_Tools.Classes.SystemTools;
-using MaterialDesignThemes.Wpf;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Mapping_Tools.Classes.HitsoundStuff;
+using Mapping_Tools.Classes.SystemTools;
+using MaterialDesignThemes.Wpf;
 
-namespace Mapping_Tools.Views {
+namespace Mapping_Tools.Views.HitsoundStudio {
 
     /// <summary>
     /// Interaction logic for Window1.xaml
     /// </summary>
-    public partial class HitsoundLayerImportWindow :Window {
+    public partial class HitsoundLayerImportWindow : Window {
         private readonly int index;
         public List<HitsoundLayer> HitsoundLayers;
 

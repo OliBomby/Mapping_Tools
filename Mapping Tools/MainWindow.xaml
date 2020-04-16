@@ -7,9 +7,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        xmlns:views="clr-namespace:Mapping_Tools.Views"
         xmlns:viewmodels="clr-namespace:Mapping_Tools.Viewmodels"
         xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
+        xmlns:standard="clr-namespace:Mapping_Tools.Views.Standard"
         mc:Ignorable="d"
         Title="Mapping Tools"  
         WindowStyle="None"
@@ -34,28 +34,7 @@
     <Window.Resources>
         <domain:MapPathStringToCountStringConverter x:Key="MapPathStringToCountStringConverter"/>
         <DataTemplate DataType="{x:Type viewmodels:StandardVM}">
-            <views:StandardView DataContext="{Binding}"/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodels:CleanerVM}">
-            <views:CleanerView DataContext="{Binding}"/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodels:SliderMergerVM}">
-            <views:SliderMergerView DataContext="{Binding}"/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodels:SliderCompletionatorVM}">
-            <views:SliderCompletionatorView DataContext="{Binding}"/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodels:SnappingToolsVm}">
-            <views:SnappingToolsView DataContext="{Binding}"/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodels:HitsoundCopierVM}">
-            <views:HitsoundCopierView DataContext="{Binding}"/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodels:HitsoundStudioVm}">
-            <views:HitsoundStudioView DataContext="{Binding}"/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodels:PreferencesVM}">
-            <views:PreferencesView DataContext="{Binding}"/>
+            <standard:StandardView DataContext="{Binding}"/>
         </DataTemplate>
     </Window.Resources>
 

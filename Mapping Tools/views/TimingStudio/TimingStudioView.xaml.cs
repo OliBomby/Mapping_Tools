@@ -7,13 +7,10 @@ using System.Windows;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.TimingStudio.Serialization;
-
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Viewmodels;
-using Mapping_Tools.Views.TimingStudio;
 
-namespace Mapping_Tools.Views
+namespace Mapping_Tools.Views.TimingStudio
 {
     /// <summary>
     /// TimingStudioView Tool for Mapping Tools

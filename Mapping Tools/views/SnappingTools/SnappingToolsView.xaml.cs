@@ -1,14 +1,13 @@
-﻿using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.SnappingTools.Serialization;
-using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Viewmodels;
-using Mapping_Tools.Views.SnappingTools;
-using System;
+﻿using System;
 using System.IO;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SnappingTools.Serialization;
+using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Viewmodels;
 
-namespace Mapping_Tools.Views
+namespace Mapping_Tools.Views.SnappingTools
 {
     public partial class SnappingToolsView : ISavable<SnappingToolsProject>
     {

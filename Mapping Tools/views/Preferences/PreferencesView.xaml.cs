@@ -1,12 +1,10 @@
-﻿using Mapping_Tools.Classes.SystemTools;
-using MaterialDesignThemes.Wpf;
-using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
+using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
+using MaterialDesignThemes.Wpf;
 
-namespace Mapping_Tools.Views
+namespace Mapping_Tools.Views.Preferences
 {
     /// <summary>
     /// Interaktionslogik für UserControl2.xaml

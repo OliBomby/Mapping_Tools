@@ -3,7 +3,6 @@ using Mapping_Tools.Viewmodels;
 using System;
 using System.ComponentModel;
 using System.Windows;
-using Mapping_Tools.Annotations;
 
 namespace Mapping_Tools.Views.RhythmGuide {
 

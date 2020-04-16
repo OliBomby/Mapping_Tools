@@ -1,16 +1,16 @@
-﻿using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.SystemTools.QuickRun;
-using Mapping_Tools.Classes.Tools;
-using Mapping_Tools.Components.TimeLine;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
+using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.SystemTools.QuickRun;
+using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Components.TimeLine;
 
-namespace Mapping_Tools.Views {
+namespace Mapping_Tools.Views.MapCleaner {
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
     public partial class CleanerView : IQuickRun {
         List<double> TimingpointsRemoved;
@@ -60,7 +60,7 @@ namespace Mapping_Tools.Views {
             IOHelper.SaveMapBackup(paths);
 
             Arguments arguments = new Arguments(paths, quick,
-                                                new MapCleaner.MapCleanerArgs((bool)VolumeSliders.IsChecked, (bool)SamplesetSliders.IsChecked, (bool)VolumeSpinners.IsChecked,
+                                                new Classes.Tools.MapCleaner.MapCleanerArgs((bool)VolumeSliders.IsChecked, (bool)SamplesetSliders.IsChecked, (bool)VolumeSpinners.IsChecked,
                                                                          (bool)ResnapObjects.IsChecked, (bool)ResnapBookmarks.IsChecked,
                                                                          (bool)RemoveUnusedSamples.IsChecked,
                                                                          (bool)RemoveMuting.IsChecked,
@@ -86,9 +86,9 @@ namespace Mapping_Tools.Views {
         private struct Arguments {
             public string[] Paths;
             public bool Quick;
-            public MapCleaner.MapCleanerArgs CleanerArguments;
+            public Classes.Tools.MapCleaner.MapCleanerArgs CleanerArguments;
 
-            public Arguments(string[] paths, bool quick, MapCleaner.MapCleanerArgs cleanerArguments) {
+            public Arguments(string[] paths, bool quick, Classes.Tools.MapCleaner.MapCleanerArgs cleanerArguments) {
                 Paths = paths;
                 Quick = quick;
                 CleanerArguments = cleanerArguments;
@@ -96,7 +96,7 @@ namespace Mapping_Tools.Views {
         }
 
         private string Run_Program(Arguments args, BackgroundWorker worker, DoWorkEventArgs _) {
-            var result = new MapCleaner.MapCleanerResult();
+            var result = new Classes.Tools.MapCleaner.MapCleanerResult();
 
             bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
 
@@ -107,7 +107,7 @@ namespace Mapping_Tools.Views {
                 foreach (TimingPoint tp in editor.Beatmap.BeatmapTiming.TimingPoints) { orgininalTimingPoints.Add(tp.Copy()); }
                 int oldTimingPointsCount = editor.Beatmap.BeatmapTiming.TimingPoints.Count;
 
-                result.Add(MapCleaner.CleanMap(editor, args.CleanerArguments, worker));
+                result.Add(Classes.Tools.MapCleaner.CleanMap(editor, args.CleanerArguments, worker));
 
                 // Update result with removed count
                 int removed = oldTimingPointsCount - editor.Beatmap.BeatmapTiming.TimingPoints.Count;
@@ -124,7 +124,7 @@ namespace Mapping_Tools.Views {
 
                     int oldTimingPointsCount = editor.Beatmap.BeatmapTiming.TimingPoints.Count;
 
-                    result.Add(MapCleaner.CleanMap(editor, args.CleanerArguments, worker));
+                    result.Add(Classes.Tools.MapCleaner.CleanMap(editor, args.CleanerArguments, worker));
 
                     // Update result with removed count
                     int removed = oldTimingPointsCount - editor.Beatmap.BeatmapTiming.TimingPoints.Count;

@@ -1,15 +1,15 @@
-﻿using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.SystemTools.QuickRun;
-using Mapping_Tools.Classes.Tools;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
+using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.SystemTools.QuickRun;
+using Mapping_Tools.Classes.Tools;
 
-namespace Mapping_Tools.Views {
+namespace Mapping_Tools.Views.TimingHelper {
     /// <summary>
     /// Interactielogica voor TimingHelperView.xaml
     /// </summary>

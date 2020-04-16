@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Viewmodels;
 
-namespace Mapping_Tools.Views {
+namespace Mapping_Tools.Views.PropertyTransformer {
     /// <summary>
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>

@@ -1,15 +1,15 @@
-﻿using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.Tools;
-using Mapping_Tools.Viewmodels;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Viewmodels;
 
-namespace Mapping_Tools.Views {
+namespace Mapping_Tools.Views.TimingCopier {
     /// <summary>
     /// Interactielogica voor TimingCopierView.xaml
     /// </summary>

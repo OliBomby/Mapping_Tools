@@ -12,6 +12,7 @@ using System.Windows;
 using System.Windows.Input;
 using Mapping_Tools.Components.Graph;
 using Mapping_Tools.Views;
+using Mapping_Tools.Views.Sliderator;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Viewmodels {

@@ -1,8 +1,4 @@
-﻿using Mapping_Tools.Classes.HitsoundStuff;
-using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Viewmodels;
-using NAudio.Wave;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -13,10 +9,14 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Viewmodels;
 using MaterialDesignThemes.Wpf;
+using NAudio.Wave;
 
-namespace Mapping_Tools.Views
+namespace Mapping_Tools.Views.HitsoundStudio
 {
 
     /// <summary>

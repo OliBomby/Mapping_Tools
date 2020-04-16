@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
-using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SliderPathStuff;
@@ -12,7 +11,7 @@ using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Viewmodels;
 
-namespace Mapping_Tools.Views {
+namespace Mapping_Tools.Views.SliderMerger {
     /// <summary>
     ///     Interaktionslogik für UserControl1.xaml
     /// </summary>

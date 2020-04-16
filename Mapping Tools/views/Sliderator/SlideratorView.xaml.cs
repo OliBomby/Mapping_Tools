@@ -26,7 +26,7 @@ using Mapping_Tools.Viewmodels;
 using MaterialDesignThemes.Wpf;
 using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
 
-namespace Mapping_Tools.Views {
+namespace Mapping_Tools.Views.Sliderator {
     //[HiddenTool]
     [SmartQuickRunUsage(SmartQuickRunTargets.SingleSelection)]
     public partial class SlideratorView : ISavable<SlideratorVm>, IQuickRun {
@@ -515,7 +515,7 @@ namespace Mapping_Tools.Views {
 
         private string Sliderate(SlideratorVm arg, BackgroundWorker worker) {
             // Make a position function for Sliderator
-            Sliderator.PositionFunctionDelegate positionFunction;
+            Classes.Tools.Sliderator.PositionFunctionDelegate positionFunction;
             // Test if the function is a constant velocity
             bool constantVelocity;
             // We convert the graph GetValue function to a function that works like ms -> px
@@ -556,7 +556,7 @@ namespace Mapping_Tools.Views {
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(10);
 
             List<Vector2> slideration = new List<Vector2>();
-            var sliderator = new Sliderator {
+            var sliderator = new Classes.Tools.Sliderator {
                 PositionFunction = positionFunction, MaxT = arg.GraphBeats / arg.BeatsPerMinute * 60000,
                 Velocity = otherVelocity,
                 MinDendriteLength = arg.MinDendrite
