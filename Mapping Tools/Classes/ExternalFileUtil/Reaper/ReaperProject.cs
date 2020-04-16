@@ -3,11 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Mapping_Tools.Classes.ExternalFileUtil.Reaper
-{
+namespace Mapping_Tools.Classes.ExternalFileUtil.Reaper {
     public class ReaperProject : ITextFile
     {
         public List<decimal> ProjectOffsets { get; set; }
@@ -17,27 +14,13 @@ namespace Mapping_Tools.Classes.ExternalFileUtil.Reaper
         public List<decimal> Grid { get; set; }
 
 
-        private ObservableCollection<EnvelopeTempoPoint> _masterTempoPoints;
-
         /// <summary>
         /// The master list of <see cref="EnvelopeTempoPoint"/>s
         /// </summary>
-        public ObservableCollection<EnvelopeTempoPoint> MasterTempoPoints
-        {
-            get { return _masterTempoPoints; }
-            set { _masterTempoPoints = value; }
-        }
+        public ObservableCollection<EnvelopeTempoPoint> MasterTempoPoints { get; set; }
 
-        private ObservableCollection<TrackItem> _trackItems;
+        public ObservableCollection<TrackItem> TrackItems { get; set; }
 
-        public ObservableCollection<TrackItem> TrackItems
-        {
-            get { return _trackItems; }
-            set { _trackItems = value; }
-        }
-
-
-        private ObservableCollection<TrackItem> _trackItem;
 
         public ReaperProject(List<string> lines)
         {
@@ -48,11 +31,7 @@ namespace Mapping_Tools.Classes.ExternalFileUtil.Reaper
         {
         }
 
-        public ObservableCollection<TrackItem> TrackItem
-        {
-            get { return _trackItem; }
-            set { _trackItem = value; }
-        }
+        public ObservableCollection<TrackItem> TrackItem { get; set; }
 
         public List<string> GetLines()
         {
@@ -61,11 +40,11 @@ namespace Mapping_Tools.Classes.ExternalFileUtil.Reaper
 
         public void SetLines(List<string> lines)
         {
-            _masterTempoPoints = GetCategoryChunk(lines, "TEMPOENVEX");
+            MasterTempoPoints = GetCategoryChunk(lines, "TEMPOENVEX");
 
         }
 
-        private ObservableCollection<EnvelopeTempoPoint> GetCategoryChunk(List<String> lines, string category, string[] categoryIdentifiers = null)
+        private ObservableCollection<EnvelopeTempoPoint> GetCategoryChunk(IEnumerable<string> lines, string category, string[] categoryIdentifiers = null)
         {
             if (categoryIdentifiers == null)
                 categoryIdentifiers = new[] { "<" , ">"};

@@ -1,58 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Mapping_Tools.Classes.ExternalFileUtil.Reaper
-{
+namespace Mapping_Tools.Classes.ExternalFileUtil.Reaper {
     public class EnvelopeTempoPoint
     {
         /// <summary>
-        /// The time spesified in seconds to the precision of 12 decimal places.
-        /// </summary>
-        private decimal time;
-
-        /// <summary>
         /// The time position of the envelope tempo point spesified in seconds to the precision of 12 decimal places.
         /// </summary>
-        public decimal Time
-        {
-            get { return time; }
-            set { time = value; }
-        }
-
-        private decimal bpm;
+        public decimal Time { get; set; }
 
         /// <summary>
         /// The beats per minute value of the envelope tempo point with a precision of 10 decimal places.
         /// </summary>
-        public decimal BPM
-        {
-            get { return bpm; }
-            set { bpm = value; }
-        }
+        public decimal BPM { get; set; }
 
-        private EnvelopeShape envelopeShape;
+        public EnvelopeShape EnvelopeShape { get; set; }
 
-        public EnvelopeShape EnvelopeShape
-        {
-            get { return envelopeShape; }
-            set { envelopeShape = value; }
-        }
 
-       
-        private TempoSignature tempoSignature;
-
-        
         /// <summary>
         /// The Time Signature of the tempo point.
         /// </summary>
-        public TempoSignature TempoSignature
-        {
-            get { return tempoSignature; }
-            set { tempoSignature = value; }
-        }
+        public TempoSignature TempoSignature { get; set; }
 
         /// <summary>
         /// The constructor of the tempo point in terms of the envelope.
@@ -62,10 +31,10 @@ namespace Mapping_Tools.Classes.ExternalFileUtil.Reaper
         public EnvelopeTempoPoint(string line)
         {
             string[] timingInformation = line.Split(char.Parse(""));
-            time = decimal.Parse(timingInformation[1]);
-            bpm = decimal.Parse(timingInformation[2]);
-            envelopeShape = (EnvelopeShape)int.Parse(timingInformation[3]);
-            tempoSignature = timingInformation[4] != null ? GetTempoSignature(timingInformation[4]) : new TempoSignature(4);
+            Time = decimal.Parse(timingInformation[1]);
+            BPM = decimal.Parse(timingInformation[2]);
+            EnvelopeShape = (EnvelopeShape)int.Parse(timingInformation[3]);
+            TempoSignature = timingInformation[4] != null ? GetTempoSignature(timingInformation[4]) : new TempoSignature(4);
         }
 
         private TempoSignature GetTempoSignature(string signatureValue)
