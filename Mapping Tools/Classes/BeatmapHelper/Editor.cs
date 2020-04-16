@@ -51,7 +51,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// Saves the lines of string into the path provided.
         /// </summary>
         /// <param name="path"></param>
-        public void SaveFile(string path) {
+        public virtual void SaveFile(string path) {
             SaveFile(path, TextFile.GetLines());
         }
 
@@ -59,7 +59,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// Saves the lines of string into the path provided.
         /// </summary>
         /// <param name="lines"></param>
-        public void SaveFile(List<string> lines) {
+        public virtual void SaveFile(List<string> lines) {
             SaveFile(Path, lines);
         }
 
