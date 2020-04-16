@@ -73,7 +73,7 @@
                         <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                     </Button >
                 </Grid>
-                <ComboBox x:Name="CopyModeBox" Margin="0,20,0,0" SelectedIndex="1" Cursor="Hand"
+                <ComboBox x:Name="CopyModeBox" Margin="0,20,0,0" SelectedIndex="0" Cursor="Hand"
                     Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Copying mode">
                     <ComboBoxItem Content="Overwrite everything" Cursor="Hand"/>
                     <ComboBoxItem Content="Overwrite only defined" Cursor="Hand"/>
