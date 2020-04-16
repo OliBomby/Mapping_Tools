@@ -193,7 +193,7 @@ namespace Mapping_Tools.Views {
                     var tlFrom = beatmapFrom.GetTimeline();
 
                     var timingPointsChanges = new List<TimingPointsChange>();
-                    var mode = (GameMode) beatmapTo.General["Mode"].Value;
+                    var mode = (GameMode) beatmapTo.General["Mode"].IntValue;
                     var mapDir = editorTo.GetBeatmapFolder();
                     var firstSamples = HitsoundImporter.AnalyzeSamples(mapDir);
 
@@ -237,7 +237,7 @@ namespace Mapping_Tools.Views {
                     var firstSamples = HitsoundImporter.AnalyzeSamples(mapDir, true);
 
                     var samplesTo = new HashSet<StoryboardSoundSample>(beatmapTo.StoryboardSoundSamples);
-                    var mode = (GameMode) beatmapTo.General["Mode"].Value;
+                    var mode = (GameMode) beatmapTo.General["Mode"].IntValue;
 
                     foreach (var sampleFrom in beatmapFrom.StoryboardSoundSamples) {
                         if (ignoreHssbSamples) {

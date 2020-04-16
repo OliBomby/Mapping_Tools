@@ -119,7 +119,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Beatmap beatmap = editor.Beatmap;
             Timeline timeline = beatmap.GetTimeline();
 
-            GameMode mode = (GameMode)beatmap.General["Mode"].Value;
+            GameMode mode = (GameMode)beatmap.General["Mode"].IntValue;
             string mapDir = editor.GetBeatmapFolder();
             Dictionary<string, string> firstSamples = AnalyzeSamples(mapDir, false, detectDuplicateSamples);
 

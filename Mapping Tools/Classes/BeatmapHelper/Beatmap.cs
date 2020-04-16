@@ -244,7 +244,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
 
             // Set the timing object
-            BeatmapTiming = new Timing(timingLines, Difficulty["SliderMultiplier"].Value);
+            BeatmapTiming = new Timing(timingLines, Difficulty["SliderMultiplier"].DoubleValue);
 
             SortHitObjects();
             CalculateHitObjectComboStuff();
@@ -367,7 +367,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <returns>The list of Bookmarks.</returns>
         public List<double> GetBookmarks() {
             try {
-                return Editor["Bookmarks"].GetStringValue().Split(',').Select(double.Parse).ToList();
+                return Editor["Bookmarks"].GetDoubleList();
             }
             catch (KeyNotFoundException) {
                 return new List<double>();
@@ -486,8 +486,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         /// <returns>String of file name.</returns>
         public string GetFileName() {
-            return GetFileName(Metadata["Artist"].StringValue, Metadata["Title"].StringValue,
-                Metadata["Creator"].StringValue, Metadata["Version"].StringValue);
+            return GetFileName(Metadata["Artist"].Value, Metadata["Title"].Value,
+                Metadata["Creator"].Value, Metadata["Version"].Value);
         }
 
         /// <summary>
@@ -506,7 +506,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         private static void AddDictionaryToLines(Dictionary<string, TValue> dict, List<string> lines) {
-            lines.AddRange(dict.Select(kvp => kvp.Key + ":" + kvp.Value.StringValue));
+            lines.AddRange(dict.Select(kvp => kvp.Key + ":" + kvp.Value.Value));
         }
 
         private static void FillDictionary(Dictionary<string, TValue> dict, List<string> lines) {

@@ -119,15 +119,15 @@ namespace Mapping_Tools.Viewmodels {
                 var editor = new BeatmapEditor(importPath);
                 var beatmap = editor.Beatmap;
 
-                Artist = beatmap.Metadata["ArtistUnicode"].StringValue;
-                RomanisedArtist = beatmap.Metadata["Artist"].StringValue;
-                Title = beatmap.Metadata["TitleUnicode"].StringValue;
-                RomanisedTitle = beatmap.Metadata["Title"].StringValue;
-                BeatmapCreator = beatmap.Metadata["Creator"].StringValue;
-                Source = beatmap.Metadata["Source"].StringValue;
-                Tags = beatmap.Metadata["Tags"].StringValue;
+                Artist = beatmap.Metadata["ArtistUnicode"].Value;
+                RomanisedArtist = beatmap.Metadata["Artist"].Value;
+                Title = beatmap.Metadata["TitleUnicode"].Value;
+                RomanisedTitle = beatmap.Metadata["Title"].Value;
+                BeatmapCreator = beatmap.Metadata["Creator"].Value;
+                Source = beatmap.Metadata["Source"].Value;
+                Tags = beatmap.Metadata["Tags"].Value;
 
-                PreviewTime = beatmap.General["PreviewTime"].Value;
+                PreviewTime = beatmap.General["PreviewTime"].DoubleValue;
                 ComboColours = new ObservableCollection<ComboColour>(beatmap.ComboColours);
                 SpecialColours.Clear();
                 foreach (var specialColour in beatmap.SpecialColours) {

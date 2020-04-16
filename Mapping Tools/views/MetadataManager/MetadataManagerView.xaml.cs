@@ -55,13 +55,13 @@ namespace Mapping_Tools.Views {
                 var editor = EditorReaderStuff.GetBeatmapEditor(path, reader, editorRead);
                 var beatmap = editor.Beatmap;
 
-                beatmap.Metadata["ArtistUnicode"].StringValue = arg.Artist;
-                beatmap.Metadata["Artist"].StringValue = arg.RomanisedArtist;
-                beatmap.Metadata["TitleUnicode"].StringValue = arg.Title;
-                beatmap.Metadata["Title"].StringValue = arg.RomanisedTitle;
-                beatmap.Metadata["Creator"].StringValue = arg.BeatmapCreator;
-                beatmap.Metadata["Source"].StringValue = arg.Source;
-                beatmap.Metadata["Tags"].StringValue = arg.Tags;
+                beatmap.Metadata["ArtistUnicode"].Value = arg.Artist;
+                beatmap.Metadata["Artist"].Value = arg.RomanisedArtist;
+                beatmap.Metadata["TitleUnicode"].Value = arg.Title;
+                beatmap.Metadata["Title"].Value = arg.RomanisedTitle;
+                beatmap.Metadata["Creator"].Value = arg.BeatmapCreator;
+                beatmap.Metadata["Source"].Value = arg.Source;
+                beatmap.Metadata["Tags"].Value = arg.Tags;
 
                 beatmap.General["PreviewTime"] = new TValue(arg.PreviewTime.ToRoundInvariant());
                 if (arg.UseComboColours) {

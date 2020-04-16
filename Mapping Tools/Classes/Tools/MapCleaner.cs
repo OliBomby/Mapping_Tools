@@ -73,8 +73,8 @@ namespace Mapping_Tools.Classes.Tools {
             Timing timing = beatmap.BeatmapTiming;
             Timeline timeline = beatmap.GetTimeline();
 
-            GameMode mode = (GameMode)beatmap.General["Mode"].Value;
-            double circleSize = beatmap.Difficulty["CircleSize"].Value;
+            GameMode mode = (GameMode)beatmap.General["Mode"].IntValue;
+            double circleSize = beatmap.Difficulty["CircleSize"].DoubleValue;
             string mapDir = editor.GetBeatmapFolder();
             Dictionary<string, string> firstSamples = HitsoundImporter.AnalyzeSamples(mapDir);
 
@@ -316,13 +316,13 @@ namespace Mapping_Tools.Classes.Tools {
                 BeatmapEditor editor = new BeatmapEditor(path);
                 Beatmap beatmap = editor.Beatmap;
 
-                GameMode mode = (GameMode)beatmap.General["Mode"].Value;
-                double sliderTickRate = beatmap.Difficulty["SliderTickRate"].Value;
+                GameMode mode = (GameMode)beatmap.General["Mode"].IntValue;
+                double sliderTickRate = beatmap.Difficulty["SliderTickRate"].DoubleValue;
 
                 if (!anySpinners)
                     anySpinners = mode == 0 && beatmap.HitObjects.Any(o => o.IsSpinner);
 
-                allFilenames.Add(beatmap.General["AudioFilename"].StringValue.Trim());
+                allFilenames.Add(beatmap.General["AudioFilename"].Value.Trim());
 
                 foreach (HitObject ho in beatmap.HitObjects) {
                     allFilenames.UnionWith(ho.GetPlayingBodyFilenames(sliderTickRate, false));
