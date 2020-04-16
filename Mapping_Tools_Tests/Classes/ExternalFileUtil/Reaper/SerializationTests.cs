@@ -11,10 +11,5 @@ namespace Mapping_Tools.Classes.ExternalFileUtil.Reaper.Tests
     [TestClass()]
     public class SerializationTests
     {
-        [TestMethod()]
-        public void PopulateDictionaryTest()
-        {
-            Assert.Fail();
-        }
     }
 }
