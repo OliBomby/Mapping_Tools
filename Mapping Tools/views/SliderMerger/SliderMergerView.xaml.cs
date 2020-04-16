@@ -54,7 +54,7 @@ namespace Mapping_Tools.Views.SliderMerger {
 
             BackgroundWorker.RunWorkerAsync(new Arguments(paths, LeniencyBox.GetDouble(0),
                 SelectionModeBox.SelectedIndex, (ConnectionMode) ConnectionModeBox.SelectedItem,
-                LinearOnLinearBox.IsChecked.GetValueOrDefault(), quick));
+                LinearOnLinearBox.IsChecked.GetValueOrDefault(), MergeOnSliderEndBox.IsChecked.GetValueOrDefault(), quick));
             CanRun = false;
         }
 
@@ -79,7 +79,24 @@ namespace Mapping_Tools.Views.SliderMerger {
                 for (var i = 0; i < markedObjects.Count - 1; i++) {
                     var ho1 = markedObjects[i];
                     var ho2 = markedObjects[i + 1];
-                    if (ho1.IsSlider && ho2.IsSlider && (ho1.CurvePoints.Last() - ho2.Pos).Length <= arg.Leniency) {
+
+                    double dist;
+                    if (arg.MergeOnSliderEnd) {
+                        var sliderEnd = ho1.GetSliderPath().PositionAt(1);
+                        dist = (sliderEnd - ho2.Pos).Length;
+                    } else {
+                        dist = (ho1.CurvePoints.Last() - ho2.Pos).Length;
+                    }
+
+                    if (ho1.IsSlider && ho2.IsSlider && dist <= arg.Leniency) {
+                        if (arg.MergeOnSliderEnd) {
+                            // In order to merge on the slider end we first move the anchors such that the last anchor is exactly on the slider end
+                            // After that merge as usual
+                            ho1.SetAllCurvePoints(SliderPathUtil.MoveAnchorsToLength(
+                                ho1.GetAllCurvePoints(), ho1.SliderType, ho1.PixelLength, out var pathType));
+                            ho1.SliderType = pathType;
+                        }
+
                         var sp1 = BezierConverter.ConvertToBezier(ho1.SliderPath).ControlPoints;
                         var sp2 = BezierConverter.ConvertToBezier(ho2.SliderPath).ControlPoints;
 
@@ -246,15 +263,17 @@ namespace Mapping_Tools.Views.SliderMerger {
             public readonly int SelectionMode;
             public ConnectionMode ConnectionMode;
             public bool LinearOnLinear;
+            public bool MergeOnSliderEnd;
             public readonly bool Quick;
 
             public Arguments(string[] paths, double leniency, int selectionMode, ConnectionMode connectionMode,
-                bool linearOnLinear, bool quick) {
+                bool linearOnLinear, bool mergeOnSliderEnd, bool quick) {
                 Paths = paths;
                 Leniency = leniency;
                 SelectionMode = selectionMode;
                 ConnectionMode = connectionMode;
                 LinearOnLinear = linearOnLinear;
+                MergeOnSliderEnd = mergeOnSliderEnd;
                 Quick = quick;
             }
         }

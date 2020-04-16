@@ -58,7 +58,10 @@
                           ToolTip="This is how Slider Merger is going to deal with space gaps between hitobjects that it wants to merge.">
                 </ComboBox>
 
-                <CheckBox x:Name="LinearOnLinearBox" Margin="0,26,0,0" Content="Use linear curve type on fully linear merge"
+                <CheckBox x:Name="MergeOnSliderEndBox" Margin="0 26 0 0" Content="Merge on slider end" IsChecked="True"
+                          ToolTip="Merge on the slider end instead of the last anchor of the slider."/>
+
+                <CheckBox x:Name="LinearOnLinearBox" Margin="0,5,0,0" Content="Use linear curve type on fully linear merge"
                           ToolTip="This option will make Slider Merger, if possible, use linear curve type and no red anchors for the combined slider(s)."></CheckBox>
             </StackPanel>
 
