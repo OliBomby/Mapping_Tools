@@ -45,37 +45,37 @@
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Offset" MinWidth="250"/>
                             <TextBlock Text="x "/>
-                            <TextBox x:Name="TPOffsetMultiplierBox" Text="{Binding Path=TimingpointOffsetMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1, UpdateSourceTrigger=PropertyChanged}" MinWidth="120"/>
+                            <TextBox x:Name="TPOffsetMultiplierBox" Text="{Binding Path=TimingpointOffsetMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1, UpdateSourceTrigger=LostFocus}" MinWidth="120"/>
                             <TextBlock Text=" + "/>
-                            <TextBox x:Name="TPOffsetOffsetBox" Text="{Binding Path=TimingpointOffsetOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0, UpdateSourceTrigger=PropertyChanged}" MinWidth="120"/>
+                            <TextBox x:Name="TPOffsetOffsetBox" Text="{Binding Path=TimingpointOffsetOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0, UpdateSourceTrigger=LostFocus}" MinWidth="120"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="BPM" MinWidth="250"/>
                             <TextBlock Text="x "/>
-                            <TextBox x:Name="TPBPMMultiplierBox" Text="{Binding Path=TimingpointBPMMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1, UpdateSourceTrigger=PropertyChanged}" MinWidth="120"/>
+                            <TextBox x:Name="TPBPMMultiplierBox" Text="{Binding Path=TimingpointBPMMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1, UpdateSourceTrigger=LostFocus}" MinWidth="120"/>
                             <TextBlock Text=" + "/>
-                            <TextBox x:Name="TPBPMOffsetBox" Text="{Binding Path=TimingpointBPMOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0, UpdateSourceTrigger=PropertyChanged}" MinWidth="120"/>
+                            <TextBox x:Name="TPBPMOffsetBox" Text="{Binding Path=TimingpointBPMOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0, UpdateSourceTrigger=LostFocus}" MinWidth="120"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Slider Velocity" MinWidth="250"/>
                             <TextBlock Text="x "/>
-                            <TextBox x:Name="TPSVMultiplierBox" Text="{Binding Path=TimingpointSVMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1, UpdateSourceTrigger=PropertyChanged}" MinWidth="120"/>
+                            <TextBox x:Name="TPSVMultiplierBox" Text="{Binding Path=TimingpointSVMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1, UpdateSourceTrigger=LostFocus}" MinWidth="120"/>
                             <TextBlock Text=" + "/>
-                            <TextBox x:Name="TPSVOffsetBox" Text="{Binding Path=TimingpointSVOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0, UpdateSourceTrigger=PropertyChanged}" MinWidth="120"/>
+                            <TextBox x:Name="TPSVOffsetBox" Text="{Binding Path=TimingpointSVOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0, UpdateSourceTrigger=LostFocus}" MinWidth="120"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Custom index" MinWidth="250"/>
                             <TextBlock Text="x "/>
-                            <TextBox x:Name="TPIndexMultiplierBox" Text="{Binding Path=TimingpointIndexMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1, UpdateSourceTrigger=PropertyChanged}" MinWidth="120"/>
+                            <TextBox x:Name="TPIndexMultiplierBox" Text="{Binding Path=TimingpointIndexMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1, UpdateSourceTrigger=LostFocus}" MinWidth="120"/>
                             <TextBlock Text=" + "/>
-                            <TextBox x:Name="TPIndexOffsetBox" Text="{Binding Path=TimingpointIndexOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0, UpdateSourceTrigger=PropertyChanged}" MinWidth="120"/>
+                            <TextBox x:Name="TPIndexOffsetBox" Text="{Binding Path=TimingpointIndexOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0, UpdateSourceTrigger=LostFocus}" MinWidth="120"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Volume" MinWidth="250"/>
                             <TextBlock Text="x "/>
-                            <TextBox x:Name="TPVolumeMultiplierBox" Text="{Binding Path=TimingpointVolumeMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1, UpdateSourceTrigger=PropertyChanged}" MinWidth="120"/>
+                            <TextBox x:Name="TPVolumeMultiplierBox" Text="{Binding Path=TimingpointVolumeMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1, UpdateSourceTrigger=LostFocus}" MinWidth="120"/>
                             <TextBlock Text=" + "/>
-                            <TextBox x:Name="TPVolumeOffsetBox" Text="{Binding Path=TimingpointVolumeOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0, UpdateSourceTrigger=PropertyChanged}" MinWidth="120"/>
+                            <TextBox x:Name="TPVolumeOffsetBox" Text="{Binding Path=TimingpointVolumeOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0, UpdateSourceTrigger=LostFocus}" MinWidth="120"/>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
@@ -85,30 +85,30 @@
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Hitobject time" MinWidth="250"/>
                             <TextBlock Text="x "/>
-                            <TextBox x:Name="HOTimeMultiplierBox" Text="{Binding Path=HitObjectTimeMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1, UpdateSourceTrigger=PropertyChanged}" MinWidth="120"/>
+                            <TextBox x:Name="HOTimeMultiplierBox" Text="{Binding Path=HitObjectTimeMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1, UpdateSourceTrigger=LostFocus}" MinWidth="120"/>
                             <TextBlock Text=" + "/>
-                            <TextBox x:Name="HOTimeOffsetBox" Text="{Binding Path=HitObjectTimeOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0, UpdateSourceTrigger=PropertyChanged}" MinWidth="120"/>
+                            <TextBox x:Name="HOTimeOffsetBox" Text="{Binding Path=HitObjectTimeOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0, UpdateSourceTrigger=LostFocus}" MinWidth="120"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Bookmark time" MinWidth="250"/>
                             <TextBlock Text="x "/>
-                            <TextBox x:Name="BookTimeMultiplierBox" Text="{Binding Path=BookmarkTimeMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1, UpdateSourceTrigger=PropertyChanged}" MinWidth="120"/>
+                            <TextBox x:Name="BookTimeMultiplierBox" Text="{Binding Path=BookmarkTimeMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1, UpdateSourceTrigger=LostFocus}" MinWidth="120"/>
                             <TextBlock Text=" + "/>
-                            <TextBox x:Name="BookTimeOffsetBox" Text="{Binding Path=BookmarkTimeOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0, UpdateSourceTrigger=PropertyChanged}" MinWidth="120"/>
+                            <TextBox x:Name="BookTimeOffsetBox" Text="{Binding Path=BookmarkTimeOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0, UpdateSourceTrigger=LostFocus}" MinWidth="120"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="SB sample time" MinWidth="250"/>
                             <TextBlock Text="x "/>
-                            <TextBox x:Name="SBSampleTimeMultiplierBox" Text="{Binding Path=SBSampleTimeMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1, UpdateSourceTrigger=PropertyChanged}" MinWidth="120"/>
+                            <TextBox x:Name="SBSampleTimeMultiplierBox" Text="{Binding Path=SBSampleTimeMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1, UpdateSourceTrigger=LostFocus}" MinWidth="120"/>
                             <TextBlock Text=" + "/>
-                            <TextBox x:Name="SBSampleTimeOffsetBox" Text="{Binding Path=SBSampleTimeOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0, UpdateSourceTrigger=PropertyChanged}" MinWidth="120"/>
+                            <TextBox x:Name="SBSampleTimeOffsetBox" Text="{Binding Path=SBSampleTimeOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0, UpdateSourceTrigger=LostFocus}" MinWidth="120"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Preview time" MinWidth="250"/>
                             <TextBlock Text="x "/>
-                            <TextBox x:Name="PreviewTimeMultiplierBox" Text="{Binding Path=PreviewTimeMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1, UpdateSourceTrigger=PropertyChanged}" MinWidth="120"/>
+                            <TextBox x:Name="PreviewTimeMultiplierBox" Text="{Binding Path=PreviewTimeMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1, UpdateSourceTrigger=LostFocus}" MinWidth="120"/>
                             <TextBlock Text=" + "/>
-                            <TextBox x:Name="PreviewTimeOffsetBox" Text="{Binding Path=PreviewTimeOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0, UpdateSourceTrigger=PropertyChanged}" MinWidth="120"/>
+                            <TextBox x:Name="PreviewTimeOffsetBox" Text="{Binding Path=PreviewTimeOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0, UpdateSourceTrigger=LostFocus}" MinWidth="120"/>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
