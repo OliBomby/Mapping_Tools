@@ -134,6 +134,26 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
+        private double _previewTimeMultiplier;
+        public double PreviewTimeMultiplier {
+            get => _previewTimeMultiplier;
+            set {
+                if (Set(ref _previewTimeMultiplier, value) && SyncTimeFields) {
+                    SetAllTimeMultipliers(value);
+                }
+            }
+        }
+
+        private double _previewTimeOffset;
+        public double PreviewTimeOffset {
+            get => _previewTimeOffset;
+            set {
+                if (Set(ref _previewTimeOffset, value) && SyncTimeFields) {
+                    SetAllTimeOffsets(value);
+                }
+            }
+        }
+
         #endregion
 
         private bool _clipProperties;
@@ -208,6 +228,8 @@ namespace Mapping_Tools.Viewmodels {
             BookmarkTimeOffset = 0;
             SBSampleTimeMultiplier = 1;
             SBSampleTimeOffset = 0;
+            PreviewTimeMultiplier = 1;
+            PreviewTimeOffset = 0;
         }
 
         private void SetAllTimeMultipliers(double value) {
@@ -215,6 +237,7 @@ namespace Mapping_Tools.Viewmodels {
             HitObjectTimeMultiplier = value;
             BookmarkTimeMultiplier = value;
             SBSampleTimeMultiplier = value;
+            PreviewTimeMultiplier = value;
         }
 
         private void SetAllTimeOffsets(double value) {
@@ -222,6 +245,7 @@ namespace Mapping_Tools.Viewmodels {
             HitObjectTimeOffset = value;
             BookmarkTimeOffset = value;
             SBSampleTimeOffset = value;
+            PreviewTimeOffset = value;
         }
     }
 }

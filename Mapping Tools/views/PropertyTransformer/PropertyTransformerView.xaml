@@ -103,6 +103,13 @@
                             <TextBlock Text=" + "/>
                             <TextBox x:Name="SBSampleTimeOffsetBox" Text="{Binding Path=SBSampleTimeOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0, UpdateSourceTrigger=PropertyChanged}" MinWidth="120"/>
                         </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Preview time" MinWidth="250"/>
+                            <TextBlock Text="x "/>
+                            <TextBox x:Name="PreviewTimeMultiplierBox" Text="{Binding Path=PreviewTimeMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1, UpdateSourceTrigger=PropertyChanged}" MinWidth="120"/>
+                            <TextBlock Text=" + "/>
+                            <TextBox x:Name="PreviewTimeOffsetBox" Text="{Binding Path=PreviewTimeOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0, UpdateSourceTrigger=PropertyChanged}" MinWidth="120"/>
+                        </StackPanel>
                     </StackPanel>
                 </GroupBox>
 

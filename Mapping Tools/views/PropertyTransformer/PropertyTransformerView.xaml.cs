@@ -152,6 +152,17 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                     }
                 }
 
+                // Preview point time
+                if (vm.PreviewTimeMultiplier != 1 || vm.PreviewTimeOffset != 0) {
+                    if (beatmap.General.ContainsKey("PreviewTime") && beatmap.General["PreviewTime"].IntValue != -1) {
+                        var previewTime = beatmap.General["PreviewTime"].DoubleValue;
+                        if (Filter(previewTime, previewTime, doFilterMatch, doFilterRange, vm.MatchFilter, min, max)) {
+                            var newPreviewTime = Math.Round(previewTime * vm.PreviewTimeMultiplier + vm.PreviewTimeOffset);
+                            beatmap.General["PreviewTime"].SetDouble(newPreviewTime);
+                        }
+                    }
+                }
+
                 TimingPointsChange.ApplyChanges(beatmap.BeatmapTiming, timingPointsChanges);
 
                 // Save the file
