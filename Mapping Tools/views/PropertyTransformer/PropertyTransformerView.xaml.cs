@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Windows;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
@@ -12,7 +13,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
     /// <summary>
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
-    public partial class PropertyTransformerView {
+    public partial class PropertyTransformerView : ISavable<PropertyTransformerVM> {
         public static readonly string ToolName = "Property Transformer";
 
         public static readonly string ToolDescription = $@"Multiple and add to properties of all the timingpoints, hitobjects, bookmarks and storyboarded samples of the current map.{Environment.NewLine}The new value is the old value times the multiplier plus the offset. The multiplier is the left textbox and the offset is the right textbox. The multiplier gets done first.{Environment.NewLine}Resulting values get rounded if they have to be integer.";
@@ -41,7 +42,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
 
             bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
 
-            foreach (string path in vm.MapPaths) {
+            foreach (string path in vm.ExportPaths) {
                 var editor = EditorReaderStuff.GetBeatmapEditor(path, reader, editorRead);
                 Beatmap beatmap = editor.Beatmap;
 
@@ -165,10 +166,22 @@ namespace Mapping_Tools.Views.PropertyTransformer {
             string[] filesToCopy = MainWindow.AppWindow.GetCurrentMaps();
             IOHelper.SaveMapBackup(filesToCopy);
 
-            ((PropertyTransformerVM)DataContext).MapPaths = filesToCopy;
+            ((PropertyTransformerVM)DataContext).ExportPaths = filesToCopy;
             BackgroundWorker.RunWorkerAsync(DataContext);
 
             CanRun = false;
         }
+
+        public PropertyTransformerVM GetSaveData() {
+            return (PropertyTransformerVM) DataContext;
+        }
+
+        public void SetSaveData(PropertyTransformerVM saveData) {
+            DataContext = saveData;
+        }
+
+        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "propertytransformerproject.json");
+
+        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Property Transformer Projects");
     }
 }

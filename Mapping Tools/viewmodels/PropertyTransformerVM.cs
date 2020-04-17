@@ -1,4 +1,5 @@
 ﻿using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Components.Domain;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Viewmodels {
@@ -134,9 +135,24 @@ namespace Mapping_Tools.Viewmodels {
         #endregion
 
         [JsonIgnore]
+        public CommandImplementation ResetCommand { get; set; }
+
+        [JsonIgnore]
         public string[] ExportPaths { get; set; }
 
         public PropertyTransformerVM() {
+            ResetMultipliersAndOffsets();
+
+            ClipProperties = false;
+            EnableFilters = false;
+            MatchFilter = -1;
+            MinTimeFilter = -1;
+            MaxTimeFilter = -1;
+
+            ResetCommand = new CommandImplementation(_ => ResetMultipliersAndOffsets());
+        }
+
+        private void ResetMultipliersAndOffsets() {
             TimingpointOffsetMultiplier = 1;
             TimingpointOffsetOffset = 0;
             TimingpointBPMMultiplier = 1;
@@ -153,12 +169,6 @@ namespace Mapping_Tools.Viewmodels {
             BookmarkTimeOffset = 0;
             SBSampleTimeMultiplier = 1;
             SBSampleTimeOffset = 0;
-
-            ClipProperties = false;
-            EnableFilters = false;
-            MatchFilter = -1;
-            MinTimeFilter = -1;
-            MaxTimeFilter = -1;
         }
     }
 }
