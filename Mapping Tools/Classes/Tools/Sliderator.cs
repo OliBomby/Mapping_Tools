@@ -190,7 +190,8 @@ namespace Mapping_Tools.Classes.Tools {
                 var lengthError = Math.Abs(Math.Abs(wantedLength - nucleusWantedLength) - actualLength) - currentNeuron.Error;
                 if (lengthError > maxOvershot * velocity
                     || nearestLatticePoint.ErrorPerp < 0.1 && lengthError > maxOvershot * velocity * 0.1
-                    || nearestLatticePoint.ErrorPerp < 0.01) {
+                    || nearestLatticePoint.ErrorPerp < 0.01 && lengthError > maxOvershot * velocity * 0.001
+                    || nearestLatticePoint.ErrorPerp < Precision.DOUBLE_EPSILON) {
                     if (nearestLatticePoint != currentNeuron.Nucleus) {
                         var newNeuron = new Neuron(nearestLatticePoint, time);
                         currentNeuron.Terminal = newNeuron;
