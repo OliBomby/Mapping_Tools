@@ -40,8 +40,7 @@ namespace Mapping_Tools.Classes.Tools
 
             if (!SettingsManager.Settings.UseEditorReader) return false;
 
-            try
-            {
+            try {
                 /*editorReader.FetchEditor();
                 editorReader.SetHOM();
                 editorReader.ReadHOM();
@@ -62,8 +61,9 @@ namespace Mapping_Tools.Classes.Tools
 
                 return ValidateFullReader(editorReader);
             }
-            catch
-            {
+            catch (Exception ex) {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
                 return false;
             }
         }
@@ -380,7 +380,11 @@ namespace Mapping_Tools.Classes.Tools
             beatmap.BeatmapTiming.TimingPoints = reader.controlPoints.Select(o => (TimingPoint)o).ToList();
 
             List<HitObject> selected = new List<HitObject>();
-            beatmap.HitObjects = reader.hitObjects.Select(o => { var nho = (HitObject)o; if (o.IsSelected) selected.Add(nho); return nho; }).ToList();
+            beatmap.HitObjects = reader.hitObjects.Select(o => {
+                var nho = (HitObject) o;
+                if (o.IsSelected) selected.Add(nho); 
+                return nho;
+            }).ToList();
 
             beatmap.General["PreviewTime"] = new TValue(reader.PreviewTime.ToString(CultureInfo.InvariantCulture));
             beatmap.Difficulty["SliderMultiplier"] = new TValue(reader.SliderMultiplier.ToString(CultureInfo.InvariantCulture));
