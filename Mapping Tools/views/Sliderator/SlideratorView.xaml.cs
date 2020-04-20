@@ -594,7 +594,11 @@ namespace Mapping_Tools.Views.Sliderator {
             BeatmapEditor editor;
             bool editorRead = false;
             if (arg.DoEditorRead) {
-                editorRead = EditorReaderStuff.TryGetNewestVersion(arg.Path, out editor);
+                editor = EditorReaderStuff.GetNewestVersionOrNot(arg.Path, out _, out var exception);
+
+                if (exception == null)
+                    editorRead = true;
+
                 arg.DoEditorRead = false;
             } else {
                 editor = new BeatmapEditor(arg.Path);

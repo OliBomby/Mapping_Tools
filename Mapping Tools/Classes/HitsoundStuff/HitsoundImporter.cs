@@ -12,7 +12,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
     class HitsoundImporter {
         public static List<double> TimesFromStack(string path, double x, double y) {
             List<double> times = new List<double>();
-            EditorReaderStuff.TryGetNewestVersion(path, out var editor);
+            var editor = EditorReaderStuff.GetNewestVersionOrNot(path);
 
             bool xIgnore = x == -1;
             bool yIgnore = y == -1;
@@ -115,7 +115,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// <param name="includeStoryboard">Also imports storyboarded samples.</param>
         /// <returns>The hitsound layers</returns>
         public static List<HitsoundLayer> ImportHitsounds(string path, bool volumes, bool detectDuplicateSamples, bool removeDuplicates, bool includeStoryboard) {
-            EditorReaderStuff.TryGetNewestVersion(path, out var editor);
+            var editor = EditorReaderStuff.GetNewestVersionOrNot(path);
             Beatmap beatmap = editor.Beatmap;
             Timeline timeline = beatmap.GetTimeline();
 
@@ -244,7 +244,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         public static List<HitsoundLayer> ImportStoryboard(string path, bool volumes, bool removeDuplicates) {
-            EditorReaderStuff.TryGetNewestVersion(path, out var editor);
+            var editor = EditorReaderStuff.GetNewestVersionOrNot(path);
             Beatmap beatmap = editor.Beatmap;
             string mapDir = editor.GetParentFolder();
 

@@ -98,10 +98,10 @@ namespace Mapping_Tools.Views.MapCleaner {
         private string Run_Program(Arguments args, BackgroundWorker worker, DoWorkEventArgs _) {
             var result = new Classes.Tools.MapCleaner.MapCleanerResult();
 
-            bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+            var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
 
             if (args.Paths.Length == 1) {
-                var editor = EditorReaderStuff.GetBeatmapEditor(args.Paths[0], reader, editorRead);
+                var editor = EditorReaderStuff.GetNewestVersionOrNot(args.Paths[0], reader);
 
                 List<TimingPoint> orgininalTimingPoints = new List<TimingPoint>();
                 foreach (TimingPoint tp in editor.Beatmap.BeatmapTiming.TimingPoints) { orgininalTimingPoints.Add(tp.Copy()); }
@@ -120,7 +120,7 @@ namespace Mapping_Tools.Views.MapCleaner {
                 editor.SaveFile();
             } else {
                 foreach (string path in args.Paths) {
-                    var editor = EditorReaderStuff.GetBeatmapEditor(path, reader, editorRead);
+                    var editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader);
 
                     int oldTimingPointsCount = editor.Beatmap.BeatmapTiming.TimingPoints.Count;
 
@@ -137,7 +137,7 @@ namespace Mapping_Tools.Views.MapCleaner {
 
             // Do stuff
             if (args.Quick)
-                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, editorRead));
+                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, reader != null));
 
             // Make an accurate message
             string message = $"Successfully {(result.TimingPointsRemoved < 0 ? "added" : "removed")} {Math.Abs(result.TimingPointsRemoved)} {(Math.Abs(result.TimingPointsRemoved) == 1 ? "greenline" : "greenlines")}" +

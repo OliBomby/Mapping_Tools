@@ -47,11 +47,11 @@ namespace Mapping_Tools.Views.TimingCopier {
             string[] paths = arg.ExportPath.Split('|');
             int mapsDone = 0;
 
-            bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+            var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
 
             foreach (string exportPath in paths) {
-                var editorTo = EditorReaderStuff.GetBeatmapEditor(exportPath, reader, editorRead);
-                var editorFrom = EditorReaderStuff.GetBeatmapEditor(arg.ImportPath, reader, editorRead);
+                var editorTo = EditorReaderStuff.GetNewestVersionOrNot(exportPath, reader);
+                var editorFrom = EditorReaderStuff.GetNewestVersionOrNot(arg.ImportPath, reader);
 
                 Beatmap beatmapTo = editorTo.Beatmap;
                 Beatmap beatmapFrom = editorFrom.Beatmap;

@@ -1,5 +1,6 @@
 ﻿using Editor_Reader;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.Exceptions;
 using Mapping_Tools.Classes.SystemTools;
 using System;
 using System.Collections.Generic;
@@ -8,18 +9,14 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
-using System.Windows;
 using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
 
-namespace Mapping_Tools.Classes.Tools
-{
+namespace Mapping_Tools.Classes.Tools {
 
     public abstract class EditorReaderStuff
     {
         private static readonly EditorReader editorReader = new EditorReader();
         public static string DontCoolSaveWhenMD5EqualsThisString = "";
-        public static readonly string EditorReaderIsDisabledText = "You need to enable Editor Reader to use this feature.";
-        public static readonly string SelectedObjectsReadFailText = "Editor memory was not read. Could not get the selected hit objects. Try again in 1 second.";
 
         /// <summary>
         /// Don't use this unless you know what you're doing
@@ -31,40 +28,54 @@ namespace Mapping_Tools.Classes.Tools
         }
 
         /// <summary>
-        /// Gets the instance of EditorReader with FetchAll. Throws an exception if the editor is not open.
+        /// Gets the instance of EditorReader with FetchAll. Throws an exception if the editor is not open or anything is wrong.
         /// </summary>
         /// <returns></returns>
-        public static bool TryGetFullEditorReader(out EditorReader reader)
-        {
-            reader = editorReader;
-
-            if (!SettingsManager.Settings.UseEditorReader) return false;
-
-            try {
-                /*editorReader.FetchEditor();
-                editorReader.SetHOM();
-                editorReader.ReadHOM();
-                editorReader.FetchBeatmap();
-                editorReader.FetchControlPoints();
-                editorReader.SetObjects();
-                Console.WriteLine(editorReader.numObjects);
-                editorReader.ReadObjects();
-                editorReader.FetchBookmarks();*/
-
-                editorReader.FetchAll();
-
-                var removed = FixFullReader(editorReader);
-                if (removed > 1) {
-                    LogEditorReader(editorReader);
-                    return false;
-                }
-
-                return ValidateFullReader(editorReader);
+        /// <exception cref="EditorReaderDisabledException"></exception>
+        /// <exception cref="InvalidEditorReaderStateException"></exception>
+        public static EditorReader GetFullEditorReader() {
+            if (!SettingsManager.Settings.UseEditorReader) {
+                throw new EditorReaderDisabledException();
             }
-            catch (Exception ex) {
-                Console.WriteLine(ex.Message);
-                Console.WriteLine(ex.StackTrace);
-                return false;
+
+            /*editorReader.FetchEditor();
+            editorReader.SetHOM();
+            editorReader.ReadHOM();
+            editorReader.FetchBeatmap();
+            editorReader.FetchControlPoints();
+            editorReader.SetObjects();
+            Console.WriteLine(editorReader.numObjects);
+            editorReader.ReadObjects();
+            editorReader.FetchBookmarks();*/
+
+            editorReader.FetchAll();
+
+            var removed = FixFullReader(editorReader);
+            if (removed > 1) {
+                LogEditorReader(editorReader);
+                throw new InvalidEditorReaderStateException();
+            }
+
+            var valid = ValidateFullReader(editorReader);
+            if (!valid) {
+                LogEditorReader(editorReader);
+                throw new InvalidEditorReaderStateException();
+            }
+
+            return editorReader;
+        }
+
+        public static EditorReader GetFullEditorReaderOrNot() {
+            return GetFullEditorReaderOrNot(out _);
+        }
+
+        public static EditorReader GetFullEditorReaderOrNot(out Exception exception) {
+            exception = null;
+            try {
+                return GetFullEditorReader();
+            } catch (Exception ex) {
+                exception = ex;
+                return null;
             }
         }
 
@@ -144,35 +155,26 @@ namespace Mapping_Tools.Classes.Tools
         /// <summary>
         /// Saves current beatmap with the newest version from memory and rounded coordinates
         /// </summary>
-        public static void BetterSave()
-        {
-            try
-            {
-                if (!SettingsManager.Settings.UseEditorReader)
-                {
-                    MessageBox.Show(EditorReaderIsDisabledText);
-                    return;
-                }
+        /// <exception cref="EditorReaderDisabledException"></exception>
+        /// <exception cref="InvalidEditorReaderStateException"></exception>
+        public static void BetterSave() {
+            var reader = GetFullEditorReader();
 
-                var path = IOHelper.GetCurrentBeatmap();
+            var path = GetCurrentBeatmap(reader);
+            var editor = GetNewestVersion(path, reader);
 
-                if (!TryGetNewestVersion(path, out var editor)) {
-                    Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue("BetterSave failed. Could not fetch data from the editor."));
-                    return;
-                }
+            IOHelper.SaveMapBackup(path);
+            editor.SaveFile();
 
-                IOHelper.SaveMapBackup(path);
-
-                editor.SaveFile();
-
-                Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue("Succesfully saved current beatmap!"));
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show($"BetterSave encountered an exception.\n{e.Message}\n{e.StackTrace}");
-            }
+            Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue("Succesfully saved current beatmap!"));
         }
 
+
+        /// <summary>
+        /// Computes MD5 hash of file.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static string GetMD5FromPath(string path)
         {
             using (var md5 = MD5.Create())
@@ -185,186 +187,145 @@ namespace Mapping_Tools.Classes.Tools
             }
         }
 
-        public static List<HitObject> GetSelectedObjects(BeatmapEditor editor, EditorReader reader)
-        {
-            try
-            {
-                string songs = SettingsManager.GetSongsPath();
-                string folder = reader.ContainingFolder;
-                string filename = reader.Filename;
-                string memoryPath = Path.Combine(songs, folder, filename);
-
-                // Check whether the beatmap in the editor is the same as the beatmap you want
-                if (memoryPath != editor.Path)
-                    return new List<HitObject>();
-
-                reader.FetchSelected();
-                var convertedSelected = reader.selectedObjects.Select(o => (HitObject)o).ToList();
-                var selectedHitObjects = new List<HitObject>(convertedSelected.Count());
-                var comparer = new HitObjectComparer();
-
-                // Get all the hit objects that are selected according to the editor reader
-                foreach (var ho in editor.Beatmap.HitObjects)
-                {
-                    if (convertedSelected.Contains(ho, comparer))
-                    {
-                        selectedHitObjects.Add(ho);
-                    }
-                }
-                return selectedHitObjects;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Exception ({ex.Message}) while editor reading.");
-                return new List<HitObject>();
-            }
-        }
-
-        public static BeatmapEditor GetBeatmapEditor(string path, EditorReader fullReader, bool readEditor) {
-            return GetBeatmapEditor(path, fullReader, readEditor, out _, out _);
-        }
-
-        public static BeatmapEditor GetBeatmapEditor(string path, EditorReader fullReader, bool readEditor, out List<HitObject> selected) {
-            return GetBeatmapEditor(path, fullReader, readEditor, out selected, out _);
-        }
-
         /// <summary>
-        /// Tries to get the newest version if editorRead is true otherwise just makes a normal <see cref="BeatmapEditor"/>
+        /// Tries to get the newest version if a valid reader is provided. Otherwise returns default save.
+        /// Use this if you don't care about it failing.
         /// </summary>
         /// <param name="path"></param>
         /// <param name="fullReader"></param>
-        /// <param name="readEditor"></param>
-        /// <param name="selected"></param>
-        /// <param name="editorRead">Indicates true if the editor memory was actually read</param>
         /// <returns></returns>
-        public static BeatmapEditor GetBeatmapEditor(string path, EditorReader fullReader, bool readEditor, out List<HitObject> selected, out bool editorRead) {
-            BeatmapEditor editor;
-            if (readEditor) {
-                editorRead = TryGetNewestVersion(path, out editor, out selected, fullReader);
-            } else {
-                editor = new BeatmapEditor(path);
-                selected = new List<HitObject>();
-                editorRead = false;
-            }
-
-            return editor;
-        }
-
-        public static BeatmapEditor TryGetNewestVersion(EditorReader reader, out List<HitObject> selected)
-        {
-            // Get the path from the beatmap in memory
-            string songs = SettingsManager.GetSongsPath();
-            string folder = reader.ContainingFolder;
-            string filename = reader.Filename;
-            string memoryPath = Path.Combine(songs, folder, filename);
-
-            var editor = new BeatmapEditor(memoryPath);
-
-            // Update the beatmap with memory values
-            selected = SettingsManager.Settings.UseEditorReader ? UpdateBeatmap(editor.Beatmap, reader) : new List<HitObject>();
-
-            return editor;
+        public static BeatmapEditor GetNewestVersionOrNot(string path, EditorReader fullReader) {
+            return GetNewestVersionOrNot(path, fullReader, out _, out _);
         }
 
         /// <summary>
-        /// Returns an editor for the beatmap of the specified path. If said beatmap is currently open in the editor it will update the Beatmap object with the latest values.
+        /// Tries to get the newest version if a valid reader is provided. Otherwise returns default save.
+        /// Use this if you don't care about it failing.
         /// </summary>
-        /// <param name="path">Path to the beatmap</param>
-        /// <param name="editor">The editor with the newest version</param>
-        /// <param name="fullReader">Reader object that has already fetched all</param>
-        /// <returns>Boolean indicating whether it actually got the newest version</returns>
-        public static bool TryGetNewestVersion(string path, out BeatmapEditor editor, EditorReader fullReader = null)
-        {
-            return TryGetNewestVersion(path, out editor, out _, fullReader);
-        }
+        /// <param name="path"></param>
+        /// <param name="fullReader"></param>
+        /// <param name="selected"></param>
+        /// <param name="exception">Any exception that may occur, null otherwise</param>
+        /// <returns></returns>
+        public static BeatmapEditor GetNewestVersionOrNot(string path, EditorReader fullReader, out List<HitObject> selected, out Exception exception) {
+            exception = null;
 
-        /// <summary>
-        /// Returns an editor for the beatmap of the specified path. If said beatmap is currently open in the editor it will update the Beatmap object with the latest values.
-        /// </summary>
-        /// <param name="path">Path to the beatmap</param>
-        /// <param name="newestEditor">The editor with the newest version</param>
-        /// <param name="selected">List of selected hit objects</param>
-        /// <param name="fullReader">Reader object that has already fetched all</param>
-        /// <returns>Boolean indicating whether it actually got the newest version</returns>
-        public static bool TryGetNewestVersion(string path, out BeatmapEditor newestEditor, out List<HitObject> selected, EditorReader fullReader = null)
-        {
-            BeatmapEditor editor = new BeatmapEditor(path);
-            newestEditor = editor;
-            selected = new List<HitObject>();
-
-            // Check if Editor Reader is enabled
-            if (!SettingsManager.Settings.UseEditorReader) {
-                return false;
-            }
-
-            // Get a reader object that has everything fetched
-            var reader = fullReader;
-            if (reader == null)
-                if (!TryGetFullEditorReader(out reader)) {
-                    return false;
+            if (fullReader != null) {
+                try {
+                    return GetNewestVersion(path, fullReader, out selected);
+                } catch (Exception ex) {
+                    exception = ex;
                 }
-
-            // Get the path from the beatmap in memory
-            // This can only crash if the provided fullReader didn't fetch all values
-            try
-            {
-                string songs = SettingsManager.GetSongsPath();
-                string folder = reader.ContainingFolder;
-                string filename = reader.Filename;
-                string memoryPath = Path.Combine(songs, folder, filename);
-
-                // Check whether the beatmap in the editor is the same as the beatmap you want
-                if (memoryPath != path) {
-                    return true;
-                }
-
-                // Update the beatmap with memory values
-                selected = UpdateBeatmap(editor.Beatmap, reader);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Exception ({ex.Message}) while editor reading.");
-                return false;
             }
             
-            return true;
+            selected = new List<HitObject>();
+            return new BeatmapEditor(path);
+        }
+
+        /// <summary>
+        /// Tries to get the newest version. Otherwise returns default save.
+        /// Use this if you don't care about it failing.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static BeatmapEditor GetNewestVersionOrNot(string path) {
+            return GetNewestVersionOrNot(path, out _, out _);
+        }
+
+        /// <summary>
+        /// Tries to get the newest version. Otherwise returns default save.
+        /// Use this if you don't care about it failing.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="selected"></param>
+        /// <param name="exception">Any exception that may occur, null otherwise</param>
+        /// <returns></returns>
+        public static BeatmapEditor GetNewestVersionOrNot(string path, out List<HitObject> selected, out Exception exception) {
+            exception = null;
+
+            try {
+                var fullReader = GetFullEditorReader();
+                return GetNewestVersion(path, fullReader, out selected);
+            } catch (Exception ex) {
+                exception = ex;
+            }
+            
+            selected = new List<HitObject>();
+            return new BeatmapEditor(path);
+        }
+
+        /// <summary>
+        /// Returns an editor for the beatmap of the specified path. If said beatmap is currently open in the editor it will update the Beatmap object with the latest values.
+        /// </summary>
+        /// <param name="path">Path to the beatmap</param>
+        /// <param name="fullReader">Reader object that has already fetched all</param>
+        /// <returns>The editor with the newest version</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static BeatmapEditor GetNewestVersion(string path, EditorReader fullReader)
+        {
+            return GetNewestVersion(path, fullReader, out _);
+        }
+
+        /// <summary>
+        /// Returns an editor for the beatmap of the specified path. If said beatmap is currently open in the editor it will update the Beatmap object with the latest values.
+        /// </summary>
+        /// <param name="path">Path to the beatmap</param>
+        /// <param name="selected">List of selected hit objects</param>
+        /// <param name="fullReader">Reader object that has already fetched all</param>
+        /// <returns>The editor with the newest version</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static BeatmapEditor GetNewestVersion(string path, EditorReader fullReader, out List<HitObject> selected) {
+            if (fullReader == null) {
+                throw new ArgumentNullException(nameof(fullReader));
+            }
+
+            BeatmapEditor editor = new BeatmapEditor(path);
+            selected = new List<HitObject>();
+            
+            // Get the path from the beatmap in memory
+            string memoryPath = GetCurrentBeatmap(fullReader);
+
+            // Check whether the beatmap in the editor is the same as the beatmap you want
+            if (memoryPath == path) {
+                // Update the beatmap with memory values
+                selected = UpdateBeatmap(editor.Beatmap, fullReader);
+            }
+
+            return editor;
         }
 
         /// <summary>
         /// Returns an editor for the beatmap which is currently open in the editor. Returns null if there is no beatmap open in the editor.
         /// </summary>
-        /// <param name="selected">List of selected hit objects</param>
         /// <param name="fullReader">Reader object that has already fetched all</param>
+        /// <param name="selected">List of selected hit objects</param>
         /// <returns>An editor for the beatmap</returns>
-        public static BeatmapEditor GetBeatmapEditor(out List<HitObject> selected, EditorReader fullReader = null) {
-            selected = new List<HitObject>();
-            BeatmapEditor editor = null;
-
-            // Get a reader object that has everything fetched
-            var reader = fullReader;
-            if (reader == null)
-                if (!TryGetFullEditorReader(out reader))
-                    return null;
+        /// <exception cref="ArgumentNullException"></exception>
+        public static BeatmapEditor GetBeatmapEditor(EditorReader fullReader, out List<HitObject> selected) {
+            if (fullReader == null) {
+                throw new ArgumentNullException(nameof(fullReader));
+            }
 
             // Get the path from the beatmap in memory
-            // This can only crash if the provided fullReader didn't fetch all values
-            try
-            {
-                string songs = SettingsManager.GetSongsPath();
-                string folder = reader.ContainingFolder;
-                string filename = reader.Filename;
-                string memoryPath = Path.Combine(songs, folder, filename);
+            string memoryPath = GetCurrentBeatmap(fullReader);
 
-                // Update the beatmap with memory values
-                editor = new BeatmapEditor(memoryPath);
-                selected = UpdateBeatmap(editor.Beatmap, reader);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Exception ({ex.Message}) while editor reading.");
-            }
+            // Update the beatmap with memory values
+            var editor = new BeatmapEditor(memoryPath);
+            selected = UpdateBeatmap(editor.Beatmap, fullReader);
 
             return editor;
+        }
+
+        /// <summary>
+        /// Gets the path to the beatmap currently open in the <see cref="EditorReader"/> instance.
+        /// </summary>
+        /// <param name="fullReader">Reader object that has already fetched all</param>
+        /// <returns></returns>
+        public static string GetCurrentBeatmap(EditorReader fullReader) {
+            string songs = SettingsManager.GetSongsPath();
+            string folder = fullReader.ContainingFolder;
+            string filename = fullReader.Filename;
+            return Path.Combine(songs, folder, filename);
         }
 
         /// <summary>
@@ -409,8 +370,7 @@ namespace Mapping_Tools.Classes.Tools
         /// </summary>
         /// <param name="reader"></param>
         /// <returns></returns>
-        public static List<HitObject> GetHitObjects(EditorReader reader)
-        {
+        public static List<HitObject> GetHitObjects(EditorReader reader) {
             return reader.hitObjects.Select(o => (HitObject)o).ToList();
         }
     }

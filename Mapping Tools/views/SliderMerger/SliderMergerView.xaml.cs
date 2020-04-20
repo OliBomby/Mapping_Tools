@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
+using Editor_Reader;
+using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SliderPathStuff;
@@ -61,13 +63,17 @@ namespace Mapping_Tools.Views.SliderMerger {
         private string Merge_Sliders(Arguments arg, BackgroundWorker worker) {
             var slidersMerged = 0;
 
-            var editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+            EditorReader reader = EditorReaderStuff.GetFullEditorReaderOrNot(out var editorReaderException1);
+
+            if (arg.SelectionMode == 0 && editorReaderException1 != null) {
+                return editorReaderException1.MessageStackTrace();
+            }
 
             foreach (var path in arg.Paths) {
-                var editor = EditorReaderStuff.GetBeatmapEditor(path, reader, editorRead, out var selected, out var editorActuallyRead);
+                var editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader, out var selected, out var editorReaderException2);
 
-                if (arg.SelectionMode == 0 && !editorActuallyRead) {
-                    return EditorReaderStuff.SelectedObjectsReadFailText;
+                if (arg.SelectionMode == 0 && editorReaderException2 != null) {
+                    return editorReaderException2.MessageStackTrace();
                 }
 
                 var beatmap = editor.Beatmap;
@@ -229,7 +235,7 @@ namespace Mapping_Tools.Views.SliderMerger {
 
             // Do stuff
             if (arg.Quick)
-                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, editorRead));
+                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, reader != null));
 
             // Make an accurate message
             var message = "";

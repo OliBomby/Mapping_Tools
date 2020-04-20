@@ -84,12 +84,12 @@ namespace Mapping_Tools.Views.TimingHelper {
         private string Adjust_Timing(Arguments arg, BackgroundWorker worker, DoWorkEventArgs _) {
             // Count
             int RedlinesAdded = 0;
-
-            bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+            
+            var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
 
             foreach (string path in arg.Paths) {
                 // Open beatmap
-                var editor = EditorReaderStuff.GetBeatmapEditor(path, reader, editorRead);
+                var editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader);
                 Beatmap beatmap = editor.Beatmap;
                 Timing timing = beatmap.BeatmapTiming;
 
@@ -271,7 +271,7 @@ namespace Mapping_Tools.Views.TimingHelper {
 
             // Do QuickRun stuff
             if (arg.Quick)
-                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, editorRead));
+                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, reader != null));
 
             // Make an accurate message
             string message = "Successfully added ";

@@ -10,10 +10,13 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using Editor_Reader;
+using Mapping_Tools.Classes;
 using Mapping_Tools.Components.Graph;
 using Mapping_Tools.Views;
 using Mapping_Tools.Views.Sliderator;
 using Newtonsoft.Json;
+using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
 
 namespace Mapping_Tools.Viewmodels {
     public class SlideratorVm : BindableBase {
@@ -325,20 +328,21 @@ namespace Mapping_Tools.Viewmodels {
 
         public void Import(string path) {
             try {
-                bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+                EditorReader reader = EditorReaderStuff.GetFullEditorReaderOrNot(out var editorReaderException1);
+                
+                if (ImportMode == ImportMode.Selected && editorReaderException1 != null) {
+                    throw editorReaderException1;
+                }
+
                 BeatmapEditor editor = null;
                 List<HitObject> markedObjects = null;
 
                 switch (ImportMode) {
                     case ImportMode.Selected:
-                        if (!editorRead) {
-                            MessageBox.Show(EditorReaderStuff.SelectedObjectsReadFailText);
-                        };
+                        editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader, out var selected, out var editorReaderException2);
 
-                        editor = EditorReaderStuff.GetBeatmapEditor(out var selected, reader);
-
-                        if (editor == null) {
-                            MessageBox.Show(EditorReaderStuff.SelectedObjectsReadFailText);
+                        if (editorReaderException2 != null) {
+                            throw editorReaderException2;
                         }
 
                         markedObjects = selected;
@@ -366,7 +370,7 @@ namespace Mapping_Tools.Viewmodels {
 
                 DoEditorRead = true;
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message + ex.StackTrace, "Error");
+                ex.Show();
             }
         }
 

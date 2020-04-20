@@ -123,17 +123,14 @@ namespace Mapping_Tools.Classes.Tools {
         /// <param name="args"></param>
         public static void GenerateRhythmGuide(RhythmGuideGeneratorArgs args) {
             if (args.ExportPath == null) {
-                throw new ArgumentException("Export path can not be null.");
+                throw new ArgumentNullException(nameof(args.ExportPath));
             }
-            var editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+
+            var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
+
             switch (args.ExportMode) {
                 case ExportMode.NewMap:
-                    var beatmap = MergeBeatmaps(args.Paths.Select(o => {
-                            if (!editorRead) return new BeatmapEditor(o);
-
-                            EditorReaderStuff.TryGetNewestVersion(o, out var e, reader);
-                            return e;
-                        }).Select(o => o.Beatmap).ToArray(),
+                    var beatmap = MergeBeatmaps(args.Paths.Select(o => EditorReaderStuff.GetNewestVersionOrNot(o, reader).Beatmap).ToArray(),
                         args);
 
                     var editor = new Editor {TextFile = beatmap, Path = args.ExportPath};
@@ -142,14 +139,10 @@ namespace Mapping_Tools.Classes.Tools {
                                                      throw new ArgumentException("Export path must be a file."));
                     break;
                 case ExportMode.AddToMap:
-                    EditorReaderStuff.TryGetNewestVersion(args.ExportPath, out var editor2, reader);
-                    PopulateBeatmap(editor2.Beatmap,
-                        args.Paths.Select(o => {
-                            if (!editorRead) return new BeatmapEditor(o);
+                    var editor2 = EditorReaderStuff.GetNewestVersionOrNot(args.ExportPath, reader);
 
-                            EditorReaderStuff.TryGetNewestVersion(o, out var e, reader);
-                            return e;
-                        }).Select(o => o.Beatmap).ToArray(),
+                    PopulateBeatmap(editor2.Beatmap,
+                        args.Paths.Select(o => EditorReaderStuff.GetNewestVersionOrNot(o, reader).Beatmap),
                         args);
 
                     editor2.SaveFile();

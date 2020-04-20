@@ -88,11 +88,11 @@ namespace Mapping_Tools.Views.TimingStudio
             // Count
             int RedlinesAdded = 0;
 
-            bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+            var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
 
             foreach (string path in arg.Paths) {
                 // Open beatmap
-                var editor = EditorReaderStuff.GetBeatmapEditor(path, reader, editorRead);
+                var editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader);
                 Beatmap beatmap = editor.Beatmap;
                 Timing timing = beatmap.BeatmapTiming;
 

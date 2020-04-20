@@ -120,11 +120,11 @@ namespace Mapping_Tools.Views.HitsoundCopier {
             var paths = arg.PathTo.Split('|');
             var mapsDone = 0;
 
-            var editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+            var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
 
             foreach (var pathTo in paths) {
-                var editorTo = EditorReaderStuff.GetBeatmapEditor(pathTo, reader, editorRead);
-                var editorFrom = EditorReaderStuff.GetBeatmapEditor(arg.PathFrom, reader, editorRead);
+                var editorTo = EditorReaderStuff.GetNewestVersionOrNot(pathTo, reader);
+                var editorFrom = EditorReaderStuff.GetNewestVersionOrNot(arg.PathFrom, reader);
 
                 var beatmapTo = editorTo.Beatmap;
                 var beatmapFrom = editorFrom.Beatmap;

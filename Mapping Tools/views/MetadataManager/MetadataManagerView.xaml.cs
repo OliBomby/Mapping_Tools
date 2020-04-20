@@ -49,10 +49,10 @@ namespace Mapping_Tools.Views.MetadataManager {
             var paths = arg.ExportPath.Split('|');
             var mapsDone = 0;
 
-            var editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+            var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
 
             foreach (var path in paths) {
-                var editor = EditorReaderStuff.GetBeatmapEditor(path, reader, editorRead);
+                var editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader);
                 var beatmap = editor.Beatmap;
 
                 beatmap.Metadata["ArtistUnicode"].Value = arg.Artist;

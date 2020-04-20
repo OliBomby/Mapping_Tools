@@ -40,10 +40,10 @@ namespace Mapping_Tools.Views.PropertyTransformer {
             double min = vm.MinTimeFilter == -1 ? double.NegativeInfinity : vm.MinTimeFilter;
             double max = vm.MaxTimeFilter == -1 ? double.PositiveInfinity : vm.MaxTimeFilter;
 
-            bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+            var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
 
             foreach (string path in vm.ExportPaths) {
-                var editor = EditorReaderStuff.GetBeatmapEditor(path, reader, editorRead);
+                var editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader);
                 Beatmap beatmap = editor.Beatmap;
 
                 // Count all the total amount of things to loop through

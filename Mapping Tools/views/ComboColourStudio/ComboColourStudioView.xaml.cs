@@ -81,10 +81,10 @@ namespace Mapping_Tools.Views.ComboColourStudio {
             var orderedColourPoints = arg.Project.ColourPoints.OrderBy(o => o.Time).ToList();
             var orderedComboColours = arg.Project.ComboColours.OrderBy(o => o.Name).ToList();
 
-            var editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+            var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
 
             foreach (var path in paths) {
-                var editor = EditorReaderStuff.GetBeatmapEditor(path, reader, editorRead);
+                var editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader);
                 var beatmap = editor.Beatmap;
 
                 // Setting the combo colours

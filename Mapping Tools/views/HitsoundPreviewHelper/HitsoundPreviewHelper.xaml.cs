@@ -70,11 +70,11 @@ namespace Mapping_Tools.Views.HitsoundPreviewHelper
             if (args.Zones.Count == 0)
                 return "There are no zones!";
 
-            bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+            var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
 
             foreach (string path in args.Paths)
             {
-                var editor = EditorReaderStuff.GetBeatmapEditor(path, reader, editorRead);
+                var editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader);
                 Beatmap beatmap = editor.Beatmap;
                 Timeline timeline = beatmap.GetTimeline();
 
@@ -110,7 +110,7 @@ namespace Mapping_Tools.Views.HitsoundPreviewHelper
 
             // Do stuff
             if (args.Quick)
-                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, editorRead));
+                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, reader != null));
 
             return args.Quick ? "" : "Done!";
         }
