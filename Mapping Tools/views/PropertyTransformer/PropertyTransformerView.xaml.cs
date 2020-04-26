@@ -13,7 +13,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
     /// <summary>
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
-    public partial class PropertyTransformerView : ISavable<PropertyTransformerVM> {
+    public partial class PropertyTransformerView : ISavable<PropertyTransformerVm> {
         public static readonly string ToolName = "Property Transformer";
 
         public static readonly string ToolDescription = $@"Multiple and add to properties of all the timingpoints, hitobjects, bookmarks and storyboarded samples of the current map.{Environment.NewLine}The new value is the old value times the multiplier plus the offset. The multiplier is the left textbox and the offset is the right textbox. The multiplier gets done first.{Environment.NewLine}Resulting values get rounded if they have to be integer.";
@@ -22,19 +22,19 @@ namespace Mapping_Tools.Views.PropertyTransformer {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
-            DataContext = new PropertyTransformerVM();
+            DataContext = new PropertyTransformerVm();
         }
 
         protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
-            e.Result = TransformProperties((PropertyTransformerVM)e.Argument, bgw, e);
+            e.Result = TransformProperties((PropertyTransformerVm)e.Argument, bgw, e);
         }
 
         private bool Filter(double value, double time, bool doMatch, bool doRange, double match, double min, double max) {
             return (!doMatch || Precision.AlmostEquals(value, match, 0.01)) && (!doRange || (time >= min && time <= max));
         }
 
-        private string TransformProperties(PropertyTransformerVM vm, BackgroundWorker worker, DoWorkEventArgs _) {
+        private string TransformProperties(PropertyTransformerVm vm, BackgroundWorker worker, DoWorkEventArgs _) {
             bool doFilterMatch = vm.MatchFilter != -1 && vm.EnableFilters;
             bool doFilterRange = (vm.MinTimeFilter != -1 || vm.MaxTimeFilter != -1) && vm.EnableFilters;
             double min = vm.MinTimeFilter == -1 ? double.NegativeInfinity : vm.MinTimeFilter;
@@ -177,17 +177,17 @@ namespace Mapping_Tools.Views.PropertyTransformer {
             string[] filesToCopy = MainWindow.AppWindow.GetCurrentMaps();
             IOHelper.SaveMapBackup(filesToCopy);
 
-            ((PropertyTransformerVM)DataContext).ExportPaths = filesToCopy;
+            ((PropertyTransformerVm)DataContext).ExportPaths = filesToCopy;
             BackgroundWorker.RunWorkerAsync(DataContext);
 
             CanRun = false;
         }
 
-        public PropertyTransformerVM GetSaveData() {
-            return (PropertyTransformerVM) DataContext;
+        public PropertyTransformerVm GetSaveData() {
+            return (PropertyTransformerVm) DataContext;
         }
 
-        public void SetSaveData(PropertyTransformerVM saveData) {
+        public void SetSaveData(PropertyTransformerVm saveData) {
             DataContext = saveData;
         }
 

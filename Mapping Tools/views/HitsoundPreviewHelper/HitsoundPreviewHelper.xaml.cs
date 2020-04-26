@@ -17,7 +17,7 @@ namespace Mapping_Tools.Views.HitsoundPreviewHelper
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
-    public partial class HitsoundPreviewHelperView : ISavable<HitsoundPreviewHelperVM>, IQuickRun
+    public partial class HitsoundPreviewHelperView : ISavable<HitsoundPreviewHelperVm>, IQuickRun
     {
         public event EventHandler RunFinished;
 
@@ -39,7 +39,7 @@ namespace Mapping_Tools.Views.HitsoundPreviewHelper
         public HitsoundPreviewHelperView()
         {
             InitializeComponent();
-            DataContext = new HitsoundPreviewHelperVM();
+            DataContext = new HitsoundPreviewHelperVm();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
             ProjectManager.LoadProject(this, message: false);
@@ -133,17 +133,17 @@ namespace Mapping_Tools.Views.HitsoundPreviewHelper
             IOHelper.SaveMapBackup(paths);
 
             BackgroundWorker.RunWorkerAsync(new Arguments(paths, quick,
-                ((HitsoundPreviewHelperVM) DataContext).Items.ToList()));
+                ((HitsoundPreviewHelperVm) DataContext).Items.ToList()));
 
             CanRun = false;
         }
 
-        public HitsoundPreviewHelperVM GetSaveData()
+        public HitsoundPreviewHelperVm GetSaveData()
         {
-            return (HitsoundPreviewHelperVM) DataContext;
+            return (HitsoundPreviewHelperVm) DataContext;
         }
 
-        public void SetSaveData(HitsoundPreviewHelperVM saveData)
+        public void SetSaveData(HitsoundPreviewHelperVm saveData)
         {
             DataContext = saveData;
 

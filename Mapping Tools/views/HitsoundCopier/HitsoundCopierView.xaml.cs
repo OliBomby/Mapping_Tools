@@ -10,18 +10,20 @@ using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Viewmodels;
 
 namespace Mapping_Tools.Views.HitsoundCopier {
     /// <summary>
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
-    public partial class HitsoundCopierView {
+    public partial class HitsoundCopierView : ISavable<HitsoundCopierVm> {
         public static readonly string ToolName = "Hitsound Copier";
 
         /// <summary>
         /// 
         /// </summary>
-        [UsedImplicitly] public static readonly string ToolDescription =
+        [UsedImplicitly] 
+        public static readonly string ToolDescription =
             $@"Copies hitsounds from A to B.{Environment.NewLine}There are 2 modes. " +
             $@"First mode is overwrite everything. " +
             $@"This will basically first remove the hitsounds from the map you’re copying to and then copy the hitsounds." +
@@ -36,11 +38,14 @@ namespace Mapping_Tools.Views.HitsoundCopier {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
+            DataContext = new HitsoundCopierVm();
         }
+
+        public HitsoundCopierVm ViewModel => (HitsoundCopierVm) DataContext;
 
         protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
-            e.Result = Copy_Hitsounds((Arguments) e.Argument, bgw);
+            e.Result = Copy_Hitsounds((HitsoundCopierVm) e.Argument, bgw);
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
@@ -48,73 +53,11 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                 IOHelper.SaveMapBackup(fileToCopy);
             }
 
-            BackgroundWorker.RunWorkerAsync(new Arguments(BeatmapToBox.Text, BeatmapFromBox.Text,
-                CopyModeBox.SelectedIndex, LeniencyBox.GetDouble(5),
-                CopyHitsoundsBox.IsChecked.GetValueOrDefault(), CopyBodyBox.IsChecked.GetValueOrDefault(),
-                CopySamplesetBox.IsChecked.GetValueOrDefault(),
-                CopyVolumeBox.IsChecked.GetValueOrDefault(), AlwaysPreserve5VolumeBox.IsChecked.GetValueOrDefault(),
-                CopyStoryboardedSamplesBox.IsChecked.GetValueOrDefault(),
-                IgnoreHitsoundSatisfiedSamplesBox.IsChecked.GetValueOrDefault(),
-                MuteSliderendBox.IsChecked.GetValueOrDefault(),
-                int.Parse(MutedSnap1.Text.Split('/')[1]), int.Parse(MutedSnap2.Text.Split('/')[1]),
-                MutedMinLengthBox.GetDouble(0), MutedCustomIndexBox.GetInt(),
-                (SampleSet) (MutedSampleSetBox.SelectedIndex + 1)));
+            BackgroundWorker.RunWorkerAsync(ViewModel);
             CanRun = false;
         }
 
-        private struct Arguments {
-            public readonly string PathTo;
-            public readonly string PathFrom;
-            public readonly int CopyMode;
-            public readonly double TemporalLeniency;
-            public readonly bool CopyHitsounds;
-            public readonly bool CopyBodyHitsounds;
-            public readonly bool CopySamplesets;
-            public readonly bool CopyVolumes;
-            public readonly bool AlwaysPreserve5Volume;
-            public readonly bool CopyStoryboardedSamples;
-            public readonly bool IgnoreHitsoundSatisfiedSamples;
-            public readonly bool MuteSliderends;
-            public readonly int Snap1;
-            public readonly int Snap2;
-            public readonly double MinLength;
-            public readonly int MutedIndex;
-            public readonly SampleSet MutedSampleset;
-
-            public Arguments(string pathTo, string pathFrom, int copyMode, double temporalLeniency, bool copyHitsounds,
-                bool copyBodyHitsounds, bool copySamplesets, bool copyVolumes, bool alwaysPreserve5Volume,
-                bool copyStoryboardedSamples, bool ignoreHitsoundSatisfiedSamples, bool muteSliderends, int snap1,
-                int snap2, double minLength, int mutedIndex, SampleSet mutedSampleset) {
-                PathTo = pathTo;
-                PathFrom = pathFrom;
-                CopyMode = copyMode;
-                TemporalLeniency = temporalLeniency;
-                CopyHitsounds = copyHitsounds;
-                CopyBodyHitsounds = copyBodyHitsounds;
-                CopySamplesets = copySamplesets;
-                CopyVolumes = copyVolumes;
-                AlwaysPreserve5Volume = alwaysPreserve5Volume;
-                CopyStoryboardedSamples = copyStoryboardedSamples;
-                IgnoreHitsoundSatisfiedSamples = ignoreHitsoundSatisfiedSamples;
-                MuteSliderends = muteSliderends;
-                Snap1 = snap1;
-                Snap2 = snap2;
-                MinLength = minLength;
-                MutedIndex = mutedIndex;
-                MutedSampleset = mutedSampleset;
-            }
-        }
-
-        private string Copy_Hitsounds(Arguments arg, BackgroundWorker worker) {
-            var copyMode = arg.CopyMode;
-            var temporalLeniency = arg.TemporalLeniency;
-            var copyHitsounds = arg.CopyHitsounds;
-            var copySliderbodychanges = arg.CopyBodyHitsounds;
-            var copyVolumes = arg.CopyVolumes;
-            var copySbSamples = arg.CopyStoryboardedSamples;
-            var ignoreHssbSamples = arg.IgnoreHitsoundSatisfiedSamples;
-            var copySamplesets = arg.CopySamplesets;
-            var muteSliderends = arg.MuteSliderends;
+        private string Copy_Hitsounds(HitsoundCopierVm arg, BackgroundWorker worker) {
             var doMutedIndex = arg.MutedIndex >= 0;
 
             var paths = arg.PathTo.Split('|');
@@ -131,7 +74,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
 
                 Timeline processedTimeline;
 
-                if (copyMode == 0) {
+                if (arg.CopyMode == 0) {
                     // Every defined hitsound and sampleset on hitsound gets copied to their copyTo destination
                     // Timelines
                     var tlTo = beatmapTo.GetTimeline();
@@ -139,7 +82,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
 
                     var volumeMuteTimes = arg.CopyVolumes && arg.AlwaysPreserve5Volume ? new List<double>() : null;
 
-                    if (copyHitsounds) {
+                    if (arg.CopyHitsounds) {
                         ResetHitObjectHitsounds(beatmapTo);
                         CopyHitsounds(arg, tlFrom, tlTo);
                     }
@@ -153,8 +96,8 @@ namespace Mapping_Tools.Views.HitsoundCopier {
 
                     // Volumes and samplesets and customindices greenlines get copied with timingpointchanges and allafter enabled
                     var timingPointsChanges = beatmapFrom.BeatmapTiming.TimingPoints.Select(tp =>
-                        new TimingPointsChange(tp, sampleset: copySamplesets, index: copySamplesets,
-                            volume: copyVolumes)).ToList();
+                        new TimingPointsChange(tp, sampleset: arg.CopySampleSets, index: arg.CopySampleSets,
+                            volume: arg.CopyVolumes)).ToList();
 
                     // Apply the timingpoint changes
                     TimingPointsChange.ApplyChanges(beatmapTo.BeatmapTiming, timingPointsChanges, true);
@@ -197,11 +140,11 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                     var mapDir = editorTo.GetParentFolder();
                     var firstSamples = HitsoundImporter.AnalyzeSamples(mapDir);
 
-                    if (copyHitsounds) {
+                    if (arg.CopyHitsounds) {
                         CopyHitsounds(arg, tlFrom, tlTo, timingPointsChanges, mode, mapDir, firstSamples);
                     }
 
-                    if (copySliderbodychanges) {
+                    if (arg.CopyBodyHitsounds) {
                         // Remove timingpoints in beatmapTo that are in a sliderbody/spinnerbody for both beatmapTo and BeatmapFrom
                         foreach (var tp in from ho in beatmapTo.HitObjects
                             from tp in ho.BodyHitsounds
@@ -215,8 +158,8 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                         timingPointsChanges.AddRange(from ho in beatmapFrom.HitObjects
                             from tp in ho.BodyHitsounds
                             where beatmapTo.HitObjects.Any(o => o.Time < tp.Offset && o.EndTime > tp.Offset)
-                            select new TimingPointsChange(tp.Copy(), sampleset: copySamplesets, index: copySamplesets,
-                                volume: copyVolumes));
+                            select new TimingPointsChange(tp.Copy(), sampleset: arg.CopySampleSets, index: arg.CopySampleSets,
+                                volume: arg.CopyVolumes));
                     }
 
                     // Apply the timingpoint changes
@@ -225,8 +168,8 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                     processedTimeline = tlTo;
                 }
 
-                if (copySbSamples) {
-                    if (copyMode == 0) {
+                if (arg.CopyStoryboardedSamples) {
+                    if (arg.CopyMode == 0) {
                         beatmapTo.StoryboardSoundSamples.Clear();
                     }
 
@@ -240,9 +183,9 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                     var mode = (GameMode) beatmapTo.General["Mode"].IntValue;
 
                     foreach (var sampleFrom in beatmapFrom.StoryboardSoundSamples) {
-                        if (ignoreHssbSamples) {
+                        if (arg.IgnoreHitsoundSatisfiedSamples) {
                             var tloHere = processedTimeline.TimelineObjects.FindAll(o =>
-                                Math.Abs(o.Time - sampleFrom.Time) <= temporalLeniency);
+                                Math.Abs(o.Time - sampleFrom.Time) <= arg.TemporalLeniency);
                             var samplesHere = new HashSet<string>();
                             foreach (var tlo in tloHere) {
                                 foreach (var filename in tlo.GetPlayingFilenames(mode)) {
@@ -280,7 +223,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                     beatmapTo.StoryboardSoundSamples = beatmapTo.StoryboardSoundSamples.OrderBy(o => o.Time).ToList();
                 }
 
-                if (muteSliderends) {
+                if (arg.MuteSliderends) {
                     var timingPointsChanges = new List<TimingPointsChange>();
                     beatmapTo.GiveObjectsGreenlines();
                     processedTimeline.GiveTimingPoints(beatmapTo.BeatmapTiming);
@@ -288,7 +231,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                     foreach (var tloTo in processedTimeline.TimelineObjects) {
                         if (FilterMuteTlo(tloTo, beatmapTo, arg)) {
                             // Set volume to 5%, remove all hitsounds, apply customindex and sampleset
-                            tloTo.SampleSet = arg.MutedSampleset;
+                            tloTo.SampleSet = arg.MutedSampleSet;
                             tloTo.AdditionSet = 0;
                             tloTo.Normal = false;
                             tloTo.Whistle = false;
@@ -300,7 +243,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                             // Add timingpointschange to copy timingpoint hitsounds
                             var tp = tloTo.HitsoundTimingPoint.Copy();
                             tp.Offset = tloTo.Time;
-                            tp.SampleSet = arg.MutedSampleset;
+                            tp.SampleSet = arg.MutedSampleSet;
                             tp.SampleIndex = arg.MutedIndex;
                             tp.Volume = 5;
                             timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: true, index: doMutedIndex,
@@ -330,7 +273,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
             return "Done!";
         }
 
-        private static void CopyHitsounds(Arguments arg, Timeline tlFrom, Timeline tlTo) {
+        private static void CopyHitsounds(HitsoundCopierVm arg, Timeline tlFrom, Timeline tlTo) {
             foreach (var tloFrom in tlFrom.TimelineObjects) {
                 var tloTo = tlTo.GetNearestTlo(tloFrom.Time, true);
 
@@ -344,7 +287,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
             }
         }
 
-        private void CopyHitsounds(Arguments arg, Timeline tlFrom, Timeline tlTo,
+        private void CopyHitsounds(HitsoundCopierVm arg, Timeline tlFrom, Timeline tlTo,
             List<TimingPointsChange> timingPointsChanges, GameMode mode, string mapDir,
             Dictionary<string, string> firstSamples) {
             foreach (var tloFrom in tlFrom.TimelineObjects) {
@@ -358,8 +301,8 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                     // Add timingpointschange to copy timingpoint hitsounds
                     var tp = tloFrom.HitsoundTimingPoint.Copy();
                     tp.Offset = tloTo.Time;
-                    timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: arg.CopySamplesets,
-                        index: arg.CopySamplesets, volume: arg.CopyVolumes));
+                    timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: arg.CopySampleSets,
+                        index: arg.CopySampleSets, volume: arg.CopyVolumes));
                 }
 
                 tloFrom.CanCopy = false;
@@ -369,8 +312,8 @@ namespace Mapping_Tools.Views.HitsoundCopier {
             foreach (var tloTo in tlTo.TimelineObjects) {
                 if (!tloTo.CanCopy) continue;
                 var tp = tloTo.HitsoundTimingPoint.Copy();
-                var holdSampleset = arg.CopySamplesets && tloTo.SampleSet == SampleSet.Auto;
-                var holdIndex = arg.CopySamplesets && !(tloTo.CanCustoms && tloTo.CustomIndex != 0);
+                var holdSampleset = arg.CopySampleSets && tloTo.SampleSet == SampleSet.Auto;
+                var holdIndex = arg.CopySampleSets && !(tloTo.CanCustoms && tloTo.CustomIndex != 0);
 
                 // Dont hold indexes or sampleset if the sample it plays currently is the same as the sample it would play without conserving
                 if (holdSampleset || holdIndex) {
@@ -419,7 +362,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
             }
         }
 
-        private static void CopyHitsounds(Arguments arg, TimelineObject tloFrom, TimelineObject tloTo) {
+        private static void CopyHitsounds(HitsoundCopierVm arg, TimelineObject tloFrom, TimelineObject tloTo) {
             // Copy to this tlo
             tloTo.SampleSet = tloFrom.SampleSet;
             tloTo.AdditionSet = tloFrom.AdditionSet;
@@ -466,7 +409,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
             }
         }
 
-        private static bool FilterMuteTlo(TimelineObject tloTo, Beatmap beatmapTo, Arguments arg) {
+        private static bool FilterMuteTlo(TimelineObject tloTo, Beatmap beatmapTo, HitsoundCopierVm arg) {
             // Check whether it's defined
             if (!tloTo.CanCopy)
                 return false;
@@ -497,48 +440,16 @@ namespace Mapping_Tools.Views.HitsoundCopier {
             return Precision.AlmostBigger(tloTo.Origin.TemporalLength, arg.MinLength * timingPoint.MpB);
         }
 
-        private void BeatmapFromBrowse_Click(object sender, RoutedEventArgs e) {
-            try {
-                var paths = IOHelper.BeatmapFileDialog(restore: !SettingsManager.Settings.CurrentBeatmapDefaultFolder);
-                if (paths.Length != 0) {
-                    BeatmapFromBox.Text = paths[0];
-                }
-            } catch (Exception) {
-                // ignored
-            }
+        public HitsoundCopierVm GetSaveData() {
+            return ViewModel;
         }
 
-        private void BeatmapFromLoad_Click(object sender, RoutedEventArgs e) {
-            try {
-                var path = IOHelper.GetCurrentBeatmap();
-                if (path != "") {
-                    BeatmapFromBox.Text = path;
-                }
-            } catch (Exception) {
-                // ignored
-            }
+        public void SetSaveData(HitsoundCopierVm saveData) {
+            DataContext = saveData;
         }
 
-        private void BeatmapToBrowse_Click(object sender, RoutedEventArgs e) {
-            try {
-                var paths = IOHelper.BeatmapFileDialog(true, !SettingsManager.Settings.CurrentBeatmapDefaultFolder);
-                if (paths.Length != 0) {
-                    BeatmapToBox.Text = string.Join("|", paths);
-                }
-            } catch (Exception) {
-                // ignored
-            }
-        }
+        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "hitsoundcopierproject.json");
 
-        private void BeatmapToLoad_Click(object sender, RoutedEventArgs e) {
-            try {
-                var path = IOHelper.GetCurrentBeatmap();
-                if (path != "") {
-                    BeatmapToBox.Text = path;
-                }
-            } catch (Exception) {
-                // ignored
-            }
-        }
+        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Hitsound Copier Projects");
     }
 }

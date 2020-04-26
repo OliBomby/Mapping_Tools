@@ -33,7 +33,7 @@
 
     <Window.Resources>
         <domain:MapPathStringToCountStringConverter x:Key="MapPathStringToCountStringConverter"/>
-        <DataTemplate DataType="{x:Type viewmodels:StandardVM}">
+        <DataTemplate DataType="{x:Type viewmodels:StandardVm}">
             <standard:StandardView DataContext="{Binding}"/>
         </DataTemplate>
     </Window.Resources>

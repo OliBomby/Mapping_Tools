@@ -26,7 +26,7 @@ namespace Mapping_Tools.Components.Domain {
 
                 return new ValidationResult(false, "Int format error.");
             }
-            TypeConverters.TryParseInt(value.ToString(), out int result2, (int)parameter);
+            TypeConverters.TryParseInt(value.ToString(), out int result2, int.Parse(parameter.ToString()));
             return result2;
         }
     }

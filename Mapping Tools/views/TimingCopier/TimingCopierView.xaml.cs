@@ -13,7 +13,7 @@ namespace Mapping_Tools.Views.TimingCopier {
     /// <summary>
     /// Interactielogica voor TimingCopierView.xaml
     /// </summary>
-    public partial class TimingCopierView : ISavable<TimingCopierVM> {
+    public partial class TimingCopierView : ISavable<TimingCopierVm> {
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "timingcopierproject.json");
 
         public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Timing Copier Projects");
@@ -24,7 +24,7 @@ namespace Mapping_Tools.Views.TimingCopier {
 
         public TimingCopierView() {
             InitializeComponent();
-            DataContext = new TimingCopierVM();
+            DataContext = new TimingCopierVm();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
             ProjectManager.LoadProject(this, message: false);
@@ -32,18 +32,18 @@ namespace Mapping_Tools.Views.TimingCopier {
 
         protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
-            e.Result = Copy_Timing((TimingCopierVM) e.Argument, bgw, e);
+            e.Result = Copy_Timing((TimingCopierVm) e.Argument, bgw, e);
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
-            string filesToCopy = ((TimingCopierVM)DataContext).ExportPath;
+            string filesToCopy = ((TimingCopierVm)DataContext).ExportPath;
             IOHelper.SaveMapBackup(filesToCopy.Split('|'));
 
             BackgroundWorker.RunWorkerAsync(DataContext);
             CanRun = false;
         }
 
-        private string Copy_Timing(TimingCopierVM arg, BackgroundWorker worker, DoWorkEventArgs _) {
+        private string Copy_Timing(TimingCopierVm arg, BackgroundWorker worker, DoWorkEventArgs _) {
             string[] paths = arg.ExportPath.Split('|');
             int mapsDone = 0;
 
@@ -247,11 +247,11 @@ namespace Mapping_Tools.Views.TimingCopier {
             }
         }
 
-        public TimingCopierVM GetSaveData() {
-            return (TimingCopierVM)DataContext;
+        public TimingCopierVm GetSaveData() {
+            return (TimingCopierVm)DataContext;
         }
 
-        public void SetSaveData(TimingCopierVM saveData) {
+        public void SetSaveData(TimingCopierVm saveData) {
             DataContext = saveData;
         }
     }

@@ -3,7 +3,7 @@ using Mapping_Tools.Components.Domain;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Viewmodels {
-    public class PropertyTransformerVM : BindableBase{
+    public class PropertyTransformerVm : BindableBase{
         #region multipliers and offsets
 
         private double _timingpointOffsetMultiplier;
@@ -198,7 +198,7 @@ namespace Mapping_Tools.Viewmodels {
         [JsonIgnore]
         public string[] ExportPaths { get; set; }
 
-        public PropertyTransformerVM() {
+        public PropertyTransformerVm() {
             ResetMultipliersAndOffsets();
 
             SyncTimeFields = false;

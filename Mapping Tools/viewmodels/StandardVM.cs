@@ -2,6 +2,6 @@
     /// <summary>
     /// 
     /// </summary>
-    public class StandardVM {
+    public class StandardVm {
     }
 }
