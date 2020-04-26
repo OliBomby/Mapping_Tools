@@ -372,6 +372,7 @@
     <Compile Include="Classes\Tools\CircleBezierPreset.cs" />
     <Compile Include="Classes\Tools\EditorReaderStuff.cs" />
     <Compile Include="Classes\Tools\MapCleaner.cs" />
+    <Compile Include="Classes\Tools\MapCleanerArgs.cs" />
     <Compile Include="Classes\Tools\RhythmGuide.cs" />
     <Compile Include="Classes\Tools\Sliderator.cs" />
     <Compile Include="Components\Dialogs\MessageDialog.xaml.cs">
@@ -379,6 +380,7 @@
     </Compile>
     <Compile Include="Components\Domain\ColorToBrushConverter.cs" />
     <Compile Include="Components\Domain\CommandImplementation.cs" />
+    <Compile Include="Components\Domain\SnapDivisorToStringConverter.cs" />
     <Compile Include="Components\Domain\MapPathStringToCountStringConverter.cs" />
     <Compile Include="Components\Domain\FlagToBoolConverter.cs" />
     <Compile Include="Components\Domain\IntToStringConverter.cs" />
@@ -391,7 +393,6 @@
     <Compile Include="Components\Domain\NotEmptyValidationRule.cs" />
     <Compile Include="Components\Domain\StringArrayToStringConverter.cs" />
     <Compile Include="Components\Domain\IsASCIIValidationRule.cs" />
-    <Compile Include="Components\Domain\SnapDivisorToStringConverter.cs" />
     <Compile Include="Components\Domain\TimeToStringConverter.cs" />
     <Compile Include="Components\Domain\VolumeToPercentageConverter.cs" />
     <Compile Include="Components\Domain\HitsoundToStringConverter.cs" />
@@ -488,7 +489,7 @@
     </Compile>
     <Compile Include="Classes\Tools\TimingPointsChange.cs" />
     <Compile Include="Properties\Annotations.cs" />
-    <Compile Include="Viewmodels\CleanerVM.cs" />
+    <Compile Include="Viewmodels\MapCleanerVm.cs" />
     <Compile Include="Viewmodels\HitsoundPreviewHelperVM.cs" />
     <Compile Include="Viewmodels\HitsoundStudioVm.cs" />
     <Compile Include="Viewmodels\HitsoundCopierVM.cs" />

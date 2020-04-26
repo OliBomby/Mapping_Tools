@@ -5,50 +5,22 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.Tools {
     public class MapCleaner {
-        public class MapCleanerArgs {
-            public bool VolumeSliders;
-            public bool SamplesetSliders;
-            public bool VolumeSpinners;
-            public bool ResnapObjects;
-            public bool ResnapBookmarks;
-            public bool RemoveUnusedSamples;
-            public bool RemoveMuting;
-            public bool RemoveUnclickableHitsounds;
-            public int Snap1;
-            public int Snap2;
-
-            public MapCleanerArgs(bool volumeSliders, bool samplesetSliders, bool volumeSpinners, bool resnapObjects, bool resnapBookmarks, bool removeUnusedSamples, bool removeMuting, bool removeUnclickableHitsounds, int snap1, int snap2) {
-                VolumeSliders = volumeSliders;
-                SamplesetSliders = samplesetSliders;
-                VolumeSpinners = volumeSpinners;
-                ResnapObjects = resnapObjects;
-                ResnapBookmarks = resnapBookmarks;
-                RemoveUnusedSamples = removeUnusedSamples;
-                RemoveMuting = removeMuting;
-                RemoveUnclickableHitsounds = removeUnclickableHitsounds;
-                Snap1 = snap1;
-                Snap2 = snap2;
-            }
-
-            public static readonly MapCleanerArgs BasicResnap = new MapCleanerArgs(true, true, true, true, false, false, false, false, 16, 12);
-        }
-
         public class MapCleanerResult {
-            public int ObjectsResnapped = 0;
-            public int SamplesRemoved = 0;
-            public int TimingPointsRemoved = 0;
+            public int ObjectsResnapped;
+            public int SamplesRemoved;
+            public int TimingPointsRemoved;
 
             public MapCleanerResult() {
+                SamplesRemoved = 0;
             }
 
             public MapCleanerResult(int objectsResnapped, int samplesRemoved) {
                 ObjectsResnapped = objectsResnapped;
+                SamplesRemoved = 0;
                 SamplesRemoved = samplesRemoved;
             }
 
@@ -62,7 +34,7 @@ namespace Mapping_Tools.Classes.Tools {
         /// <summary>
         /// Cleans a map.
         /// </summary>
-        /// <param name="beatmap">The beatmap that is going to be cleaned.</param>
+        /// <param name="editor">The editor of the beatmap that is going to be cleaned.</param>
         /// <param name="args">The arguments for how to clean the beatmap.</param>
         /// <param name="worker">The BackgroundWorker for updating progress.</param>
         /// <returns>Number of resnapped objects.</returns>
@@ -185,8 +157,8 @@ namespace Mapping_Tools.Classes.Tools {
                 }
                 // Body hitsounds
                 bool vol = (ho.IsSlider && args.VolumeSliders) || (ho.IsSpinner && args.VolumeSpinners);
-                bool sam = (ho.IsSlider && args.SamplesetSliders && ho.SampleSet == 0);
-                bool ind = (ho.IsSlider && args.SamplesetSliders);
+                bool sam = (ho.IsSlider && args.SampleSetSliders && ho.SampleSet == 0);
+                bool ind = (ho.IsSlider && args.SampleSetSliders);
                 bool samplesetActuallyChanged = false;
                 foreach (TimingPoint tp in ho.BodyHitsounds) {
                     if (tp.Volume == 5 && args.RemoveMuting) {
@@ -195,7 +167,7 @@ namespace Mapping_Tools.Classes.Tools {
                     }
                     timingPointsChanges.Add(new TimingPointsChange(tp, volume: vol, index: ind, sampleset: sam));
                     if (tp.SampleSet != ho.HitsoundTimingPoint.SampleSet) {
-                        samplesetActuallyChanged = args.SamplesetSliders && ho.SampleSet == 0; }  // True for sampleset change in sliderbody
+                        samplesetActuallyChanged = args.SampleSetSliders && ho.SampleSet == 0; }  // True for sampleset change in sliderbody
                 }
                 if (ho.IsSlider && (!samplesetActuallyChanged) && ho.SampleSet == 0)  // Case can put sampleset on sliderbody
                 {

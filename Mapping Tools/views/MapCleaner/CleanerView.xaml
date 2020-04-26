@@ -5,9 +5,15 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Mapping_Tools.Views"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
              mc:Ignorable="d" 
              x:Name="This"
-             d:DesignHeight="450" Width="759.5">
+             d:DesignHeight="450" Width="759.5" d:DataContext="{d:DesignData MapCleanerVm}">
+    <local:SingleRunMappingTool.Resources>
+        <domain:DoubleToStringConverter x:Key="DoubleToStringConverter"/>
+        <domain:TimeToStringConverter x:Key="TimeToStringConverter"/>
+        <domain:SnapDivisorToStringConverter x:Key="SnapDivisorToStringConverter"/>
+    </local:SingleRunMappingTool.Resources>
     <Grid Name="MasterGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -40,47 +46,38 @@
                     </materialDesign:PopupBox>
                 </StackPanel>
               
-                <CheckBox FontSize="14" x:Name="ResnapObjects" Cursor="Hand" Margin="0,10,0,0">
+                <CheckBox FontSize="14" x:Name="ResnapObjects" IsChecked="{Binding MapCleanerArgs.ResnapObjects}" Cursor="Hand" Margin="0,10,0,0">
                     Resnap objects
                 </CheckBox>
-                <CheckBox FontSize="14" x:Name="ResnapBookmarks" Cursor="Hand">
+                <CheckBox FontSize="14" x:Name="ResnapBookmarks" IsChecked="{Binding MapCleanerArgs.ResnapBookmarks}" Cursor="Hand">
                     Resnap bookmarks
                 </CheckBox>
-                <CheckBox FontSize="14" x:Name="RemoveUnusedSamples" Cursor="Hand">
+                <CheckBox FontSize="14" x:Name="RemoveUnusedSamples" IsChecked="{Binding MapCleanerArgs.RemoveUnusedSamples}" Cursor="Hand">
                     Remove unused samples
                 </CheckBox>
-                <CheckBox FontSize="14" x:Name="RemoveMuting" Cursor="Hand">
+                <CheckBox FontSize="14" x:Name="RemoveMuting" IsChecked="{Binding MapCleanerArgs.RemoveMuting}" Cursor="Hand">
                     Remove muting
                 </CheckBox>
-                <CheckBox FontSize="14" x:Name="RemoveUnclickableHitsounds" Cursor="Hand">
+                <CheckBox FontSize="14" x:Name="RemoveUnclickableHitsounds" IsChecked="{Binding MapCleanerArgs.RemoveUnclickableHitsounds}" Cursor="Hand">
                     Mute unclickable hitsounds
                 </CheckBox>
 
                 <TextBlock Text="Map info" Margin="0,20,0,0" FontSize="14" FontWeight="Bold"/>
-                <CheckBox FontSize="14" x:Name="VolumeSliders" Cursor="Hand" IsChecked="True">
+                <CheckBox FontSize="14" x:Name="VolumeSliders" Cursor="Hand" IsChecked="{Binding MapCleanerArgs.VolumeSliders}">
                     Map uses volume changes in sliders
                 </CheckBox>
-                <CheckBox FontSize="14" Name="SamplesetSliders" Cursor="Hand" IsChecked="True">
+                <CheckBox FontSize="14" Name="SamplesetSliders" Cursor="Hand" IsChecked="{Binding MapCleanerArgs.SampleSetSliders}">
                     Map uses sampleset changes in sliders
                 </CheckBox>
-                <CheckBox FontSize="14" x:Name="VolumeSpinners" Cursor="Hand" IsChecked="True">
+                <CheckBox FontSize="14" x:Name="VolumeSpinners" Cursor="Hand" IsChecked="{Binding MapCleanerArgs.VolumeSpinners}">
                     Map uses volume changes in spinners
                 </CheckBox>
 
                 <TextBlock Text="Signatures" Margin="0,20,0,0" FontSize="14" FontWeight="Bold"/>
-                <ComboBox FontSize="14" x:Name="Snap1" Cursor="Hand" SelectedIndex="4" Width="60" HorizontalAlignment="Left">
-                    <ComboBoxItem Content="1/1" Cursor="Hand"/>
-                    <ComboBoxItem Content="1/2" Cursor="Hand"/>
-                    <ComboBoxItem Content="1/4" Cursor="Hand"/>
-                    <ComboBoxItem Content="1/8" Cursor="Hand"/>
-                    <ComboBoxItem Content="1/16" Cursor="Hand"/>
-                </ComboBox>
-                <ComboBox FontSize="14" x:Name="Snap2" Cursor="Hand" SelectedIndex="3" Width="60" HorizontalAlignment="Left">
-                    <ComboBoxItem Content="1/1" Cursor="Hand"/>
-                    <ComboBoxItem Content="1/3" Cursor="Hand"/>
-                    <ComboBoxItem Content="1/6" Cursor="Hand"/>
-                    <ComboBoxItem Content="1/12" Cursor="Hand"/>
-                </ComboBox>
+                <ComboBox FontSize="14" x:Name="Snap1" Cursor="Hand" Width="60" HorizontalAlignment="Left"
+                          ItemsSource="{Binding Snaps1}" SelectedItem="{Binding MapCleanerArgs.Snap1, Converter={StaticResource SnapDivisorToStringConverter}}"/>
+                <ComboBox FontSize="14" x:Name="Snap2" Cursor="Hand" Width="60" HorizontalAlignment="Left"
+                          ItemsSource="{Binding Snaps2}" SelectedItem="{Binding MapCleanerArgs.Snap2, Converter={StaticResource SnapDivisorToStringConverter}}"/>
             </StackPanel>
             <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
                 <Button

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using Mapping_Tools.Classes.BeatmapHelper;
@@ -9,15 +10,16 @@ using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Components.TimeLine;
+using Mapping_Tools.Viewmodels;
 
 namespace Mapping_Tools.Views.MapCleaner {
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
-    public partial class CleanerView : IQuickRun {
-        List<double> TimingpointsRemoved;
-        List<double> TimingpointsAdded;
-        List<double> TimingpointsChanged;
-        double EndTime_monitor;
-        TimeLine TL;
+    public partial class CleanerView : IQuickRun, ISavable<MapCleanerVm> {
+        private List<double> _timingpointsRemoved;
+        private List<double> _timingpointsAdded;
+        private List<double> _timingpointsChanged;
+        private double _endTimeMonitor;
+        private TimeLine _tl;
 
         /// <summary>
         /// 
@@ -41,7 +43,10 @@ namespace Mapping_Tools.Views.MapCleaner {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
+            DataContext = new MapCleanerVm();
         }
+
+        public MapCleanerVm ViewModel => (MapCleanerVm) DataContext;
 
         private void Start_Click(object sender, RoutedEventArgs e) {
             RunTool(MainWindow.AppWindow.GetCurrentMaps(), quick: false);
@@ -59,21 +64,16 @@ namespace Mapping_Tools.Views.MapCleaner {
 
             IOHelper.SaveMapBackup(paths);
 
-            Arguments arguments = new Arguments(paths, quick,
-                                                new Classes.Tools.MapCleaner.MapCleanerArgs((bool)VolumeSliders.IsChecked, (bool)SamplesetSliders.IsChecked, (bool)VolumeSpinners.IsChecked,
-                                                                         (bool)ResnapObjects.IsChecked, (bool)ResnapBookmarks.IsChecked,
-                                                                         (bool)RemoveUnusedSamples.IsChecked,
-                                                                         (bool)RemoveMuting.IsChecked,
-                                                                         (bool)RemoveUnclickableHitsounds.IsChecked,
-                                                                         int.Parse(Snap1.Text.Split('/')[1]), int.Parse(Snap2.Text.Split('/')[1])));
+            ViewModel.Paths = paths;
+            ViewModel.Quick = quick;
 
-            BackgroundWorker.RunWorkerAsync(arguments);
+            BackgroundWorker.RunWorkerAsync(ViewModel);
             CanRun = false;
         }
 
         protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
-            e.Result = Run_Program((Arguments) e.Argument, bgw, e);
+            e.Result = Run_Program((MapCleanerVm) e.Argument, bgw, e);
         }
 
         protected override void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
@@ -83,19 +83,7 @@ namespace Mapping_Tools.Views.MapCleaner {
             base.BackgroundWorker_RunWorkerCompleted(sender, e);
         }
 
-        private struct Arguments {
-            public string[] Paths;
-            public bool Quick;
-            public Classes.Tools.MapCleaner.MapCleanerArgs CleanerArguments;
-
-            public Arguments(string[] paths, bool quick, Classes.Tools.MapCleaner.MapCleanerArgs cleanerArguments) {
-                Paths = paths;
-                Quick = quick;
-                CleanerArguments = cleanerArguments;
-            }
-        }
-
-        private string Run_Program(Arguments args, BackgroundWorker worker, DoWorkEventArgs _) {
+        private string Run_Program(MapCleanerVm args, BackgroundWorker worker, DoWorkEventArgs _) {
             var result = new Classes.Tools.MapCleaner.MapCleanerResult();
 
             var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
@@ -103,11 +91,10 @@ namespace Mapping_Tools.Views.MapCleaner {
             if (args.Paths.Length == 1) {
                 var editor = EditorReaderStuff.GetNewestVersionOrNot(args.Paths[0], reader);
 
-                List<TimingPoint> orgininalTimingPoints = new List<TimingPoint>();
-                foreach (TimingPoint tp in editor.Beatmap.BeatmapTiming.TimingPoints) { orgininalTimingPoints.Add(tp.Copy()); }
+                List<TimingPoint> orgininalTimingPoints = editor.Beatmap.BeatmapTiming.TimingPoints.Select(tp => tp.Copy()).ToList();
                 int oldTimingPointsCount = editor.Beatmap.BeatmapTiming.TimingPoints.Count;
 
-                result.Add(Classes.Tools.MapCleaner.CleanMap(editor, args.CleanerArguments, worker));
+                result.Add(Classes.Tools.MapCleaner.CleanMap(editor, args.MapCleanerArgs, worker));
 
                 // Update result with removed count
                 int removed = oldTimingPointsCount - editor.Beatmap.BeatmapTiming.TimingPoints.Count;
@@ -124,7 +111,7 @@ namespace Mapping_Tools.Views.MapCleaner {
 
                     int oldTimingPointsCount = editor.Beatmap.BeatmapTiming.TimingPoints.Count;
 
-                    result.Add(Classes.Tools.MapCleaner.CleanMap(editor, args.CleanerArguments, worker));
+                    result.Add(Classes.Tools.MapCleaner.CleanMap(editor, args.MapCleanerArgs, worker));
 
                     // Update result with removed count
                     int removed = oldTimingPointsCount - editor.Beatmap.BeatmapTiming.TimingPoints.Count;
@@ -141,14 +128,14 @@ namespace Mapping_Tools.Views.MapCleaner {
 
             // Make an accurate message
             string message = $"Successfully {(result.TimingPointsRemoved < 0 ? "added" : "removed")} {Math.Abs(result.TimingPointsRemoved)} {(Math.Abs(result.TimingPointsRemoved) == 1 ? "greenline" : "greenlines")}" +
-                (args.CleanerArguments.ResnapObjects ? $" and resnapped {result.ObjectsResnapped} {(result.ObjectsResnapped == 1 ? "object" : "objects")}" : "") + 
-                (args.CleanerArguments.RemoveUnusedSamples ? $" and removed {result.SamplesRemoved} unused {(result.SamplesRemoved == 1 ? "sample" : "samples")}" : "") + "!";
+                (args.MapCleanerArgs.ResnapObjects ? $" and resnapped {result.ObjectsResnapped} {(result.ObjectsResnapped == 1 ? "object" : "objects")}" : "") + 
+                (args.MapCleanerArgs.RemoveUnusedSamples ? $" and removed {result.SamplesRemoved} unused {(result.SamplesRemoved == 1 ? "sample" : "samples")}" : "") + "!";
             return args.Quick ? string.Empty : message;
         }
 
         private void Monitor_Differences(List<TimingPoint> originalTimingPoints, List<TimingPoint> newTimingPoints) {
             // Take note of all the changes
-            TimingpointsChanged = new List<double>();
+            _timingpointsChanged = new List<double>();
 
             var originalInNew = (from first in originalTimingPoints
                                  join second in newTimingPoints
@@ -167,7 +154,7 @@ namespace Mapping_Tools.Views.MapCleaner {
                 foreach (TimingPoint newTp in newTPs) {
                     if (tp.Equals(newTp)) { different = false; }
                 }
-                if (different) { TimingpointsChanged.Add(tp.Offset); }
+                if (different) { _timingpointsChanged.Add(tp.Offset); }
             }
 
             List<double> originalOffsets = new List<double>();
@@ -175,31 +162,43 @@ namespace Mapping_Tools.Views.MapCleaner {
             originalTimingPoints.ForEach(o => originalOffsets.Add(o.Offset));
             newTimingPoints.ForEach(o => newOffsets.Add(o.Offset));
 
-            TimingpointsRemoved = originalOffsets.Except(newOffsets).ToList();
-            TimingpointsAdded = newOffsets.Except(originalOffsets).ToList();
+            _timingpointsRemoved = originalOffsets.Except(newOffsets).ToList();
+            _timingpointsAdded = newOffsets.Except(originalOffsets).ToList();
             double endTimeOriginal = originalTimingPoints.Count > 0 ? originalTimingPoints.Last().Offset : 0;
             double endTimeNew = newTimingPoints.Count > 0 ? newTimingPoints.Last().Offset : 0;
-            EndTime_monitor = Math.Max(endTimeOriginal, endTimeNew);
+            _endTimeMonitor = Math.Max(endTimeOriginal, endTimeNew);
         }
 
         private void FillTimeLine() {
-            TL?.mainCanvas.Children.Clear();
+            _tl?.mainCanvas.Children.Clear();
             try {
-                TL = new TimeLine(MainWindow.AppWindow.ActualWidth, 100.0, EndTime_monitor);
-                foreach (double timingS in TimingpointsAdded) {
-                    TL.AddElement(timingS, 1);
+                _tl = new TimeLine(MainWindow.AppWindow.ActualWidth, 100.0, _endTimeMonitor);
+                foreach (double timingS in _timingpointsAdded) {
+                    _tl.AddElement(timingS, 1);
                 }
-                foreach (double timingS in TimingpointsChanged) {
-                    TL.AddElement(timingS, 2);
+                foreach (double timingS in _timingpointsChanged) {
+                    _tl.AddElement(timingS, 2);
                 }
-                foreach (double timingS in TimingpointsRemoved) {
-                    TL.AddElement(timingS, 3);
+                foreach (double timingS in _timingpointsRemoved) {
+                    _tl.AddElement(timingS, 3);
                 }
                 tl_host.Children.Clear();
-                tl_host.Children.Add(TL);
+                tl_host.Children.Add(_tl);
             } catch (Exception ex) {
                 Console.WriteLine(ex.Message);
             }
         }
+
+        public MapCleanerVm GetSaveData() {
+            return ViewModel;
+        }
+
+        public void SetSaveData(MapCleanerVm saveData) {
+            DataContext = saveData;
+        }
+
+        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "mapcleanerproject.json");
+
+        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Map Cleaner Projects");
     }
 }
