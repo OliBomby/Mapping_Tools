@@ -86,6 +86,7 @@
                                   ToolTip="Import mode"/>
 
                         <TextBox Grid.Column="1" Text="{Binding TimeCode}" Visibility="{Binding TimeCodeBoxVisibility}" Margin="5 0 5 2" Width="100"
+                                 materialDesign:HintAssist.Hint="Time code"
                                  ToolTip="Input a time code here. Example time code: 00:56:823 (1,2,1,2) - "/>
 
                         <Button Grid.Column="2" Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ImportCommand}" Margin="5 0 0 0"
