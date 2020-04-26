@@ -106,7 +106,7 @@ namespace Mapping_Tools.Views.Sliderator {
                     case Vector2 newVector2:
                         if (ViewModel.GraphMode == GraphMode.Position && anchor.PreviousAnchor != null) {
                             // List of bounds. X represents the minimum Y value and Y represents the maximum Y value
-                            // I use Vector2 here because it has usefull math methods
+                            // I use Vector2 here because it has useful math methods
                             var bounds = new List<Vector2>();
 
                             if (anchor.PreviousAnchor != null) {
@@ -253,7 +253,7 @@ namespace Mapping_Tools.Views.Sliderator {
                 if (ViewModel.ShowRedAnchors) {
                     var redAnchorCompletions = SliderPathUtil.GetRedAnchorCompletions(sliderPath).ToArray();
 
-                    // Add red anhors to hit object preview
+                    // Add red anchors to hit object preview
                     foreach (var completion in redAnchorCompletions) {
                         hitObjectMarkers.Add(new HitObjectElementMarker(completion / maxCompletion, 0.2, Brushes.Red));
                     }
