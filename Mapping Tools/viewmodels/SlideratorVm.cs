@@ -31,8 +31,8 @@ namespace Mapping_Tools.Viewmodels {
         private TimeSpan _graphDuration;
         private double _svGraphMultiplier;
         private ImportMode _importModeSetting;
-        private double _exactTime;
-        private Visibility _exactTimeBoxVisibility;
+        private string _timeCode;
+        private Visibility _timeCodeBoxVisibility;
         private double _exportTime;
         private ExportMode _exportModeSetting;
         private GraphMode _graphModeSetting;
@@ -137,14 +137,14 @@ namespace Mapping_Tools.Viewmodels {
         [JsonIgnore]
         public IEnumerable<ImportMode> ImportModes => Enum.GetValues(typeof(ImportMode)).Cast<ImportMode>();
 
-        public double ExactTime {
-            get => _exactTime;
-            set => Set(ref _exactTime, value);
+        public string TimeCode {
+            get => _timeCode;
+            set => Set(ref _timeCode, value);
         }
 
-        public Visibility ExactTimeBoxVisibility {
-            get => _exactTimeBoxVisibility;
-            set => Set(ref _exactTimeBoxVisibility, value);
+        public Visibility TimeCodeBoxVisibility {
+            get => _timeCodeBoxVisibility;
+            set => Set(ref _timeCodeBoxVisibility, value);
         }
 
         public double ExportTime {
@@ -277,7 +277,7 @@ namespace Mapping_Tools.Viewmodels {
             GraphBeats = 3;
             BeatSnapDivisor = 4;
             ImportModeSetting = ImportMode.Selected;
-            ExactTimeBoxVisibility = Visibility.Collapsed;
+            TimeCodeBoxVisibility = Visibility.Collapsed;
             VelocityLimit = 10;
             GraphModeSetting = GraphMode.Position;
             ShowRedAnchors = false;
@@ -353,10 +353,7 @@ namespace Mapping_Tools.Viewmodels {
                         break;
                     case ImportMode.Time:
                         editor = new BeatmapEditor(path);
-                        markedObjects =
-                            new List<HitObject>(editor.Beatmap.GetHitObjectsWithRangeInRange(
-                                ExactTime - 5,
-                                ExactTime + 5));
+                        markedObjects = editor.Beatmap.QueryTimeCode(TimeCode).ToList();
                         break;
                 }
 
@@ -432,7 +429,7 @@ namespace Mapping_Tools.Viewmodels {
 
         private void SetImportMode(ImportMode value) {
             if (!Set(ref _importModeSetting, value, nameof(ImportMode))) return;
-            ExactTimeBoxVisibility = ImportModeSetting == ImportMode.Time ? Visibility.Visible : Visibility.Collapsed;
+            TimeCodeBoxVisibility = ImportModeSetting == ImportMode.Time ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public enum ImportMode
