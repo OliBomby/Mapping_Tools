@@ -504,6 +504,7 @@
     <Compile Include="Viewmodels\SliderMergerVm.cs" />
     <Compile Include="Viewmodels\PreferencesVM.cs" />
     <Compile Include="Viewmodels\StandardVm.cs" />
+    <Compile Include="Viewmodels\TimingHelperVm.cs" />
     <Compile Include="Viewmodels\TimingStudioVm.cs" />
     <Compile Include="Components\Dialogs\BeatmapImportDialog.xaml.cs">
       <DependentUpon>BeatmapImportDialog.xaml</DependentUpon>
