@@ -30,12 +30,12 @@ namespace Mapping_Tools.Viewmodels {
         private int _beatSnapDivisor;
         private TimeSpan _graphDuration;
         private double _svGraphMultiplier;
-        private ImportMode _importMode;
+        private ImportMode _importModeSetting;
         private double _exactTime;
         private Visibility _exactTimeBoxVisibility;
         private double _exportTime;
-        private ExportMode _exportMode;
-        private GraphMode _graphMode;
+        private ExportMode _exportModeSetting;
+        private GraphMode _graphModeSetting;
         private double _velocityLimit;
         private bool _showRedAnchors;
         private bool _showGraphAnchors;
@@ -129,8 +129,8 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
-        public ImportMode ImportMode {
-            get => _importMode;
+        public ImportMode ImportModeSetting {
+            get => _importModeSetting;
             set => SetImportMode(value);
         }
 
@@ -156,17 +156,17 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
-        public ExportMode ExportMode {
-            get => _exportMode;
-            set => Set(ref _exportMode, value);
+        public ExportMode ExportModeSetting {
+            get => _exportModeSetting;
+            set => Set(ref _exportModeSetting, value);
         }
         
         [JsonIgnore]
         public IEnumerable<ExportMode> ExportModes => Enum.GetValues(typeof(ExportMode)).Cast<ExportMode>();
 
-        public GraphMode GraphMode {
-            get => _graphMode;
-            set => Set(ref _graphMode, value);
+        public GraphMode GraphModeSetting {
+            get => _graphModeSetting;
+            set => Set(ref _graphModeSetting, value);
         }
 
         public double VelocityLimit {
@@ -276,10 +276,10 @@ namespace Mapping_Tools.Viewmodels {
             GlobalSv = 1.4;
             GraphBeats = 3;
             BeatSnapDivisor = 4;
-            ImportMode = ImportMode.Selected;
+            ImportModeSetting = ImportMode.Selected;
             ExactTimeBoxVisibility = Visibility.Collapsed;
             VelocityLimit = 10;
-            GraphMode = GraphMode.Position;
+            GraphModeSetting = GraphMode.Position;
             ShowRedAnchors = false;
             ShowGraphAnchors = false;
             ManualVelocity = false;
@@ -330,14 +330,14 @@ namespace Mapping_Tools.Viewmodels {
             try {
                 EditorReader reader = EditorReaderStuff.GetFullEditorReaderOrNot(out var editorReaderException1);
                 
-                if (ImportMode == ImportMode.Selected && editorReaderException1 != null) {
+                if (ImportModeSetting == ImportMode.Selected && editorReaderException1 != null) {
                     throw editorReaderException1;
                 }
 
                 BeatmapEditor editor = null;
                 List<HitObject> markedObjects = null;
 
-                switch (ImportMode) {
+                switch (ImportModeSetting) {
                     case ImportMode.Selected:
                         editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader, out var selected, out var editorReaderException2);
 
@@ -375,15 +375,15 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         private void ToggleGraphMode(object _) {
-            switch (GraphMode) {
+            switch (GraphModeSetting) {
                 case GraphMode.Position:
-                    GraphMode = GraphMode.Velocity;
+                    GraphModeSetting = GraphMode.Velocity;
                     break;
                 case GraphMode.Velocity:
-                    GraphMode = GraphMode.Position;
+                    GraphModeSetting = GraphMode.Position;
                     break;
                 default:
-                    GraphMode = GraphMode.Position;
+                    GraphModeSetting = GraphMode.Position;
                     break;
             }
         }
@@ -431,24 +431,27 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         private void SetImportMode(ImportMode value) {
-            if (!Set(ref _importMode, value, nameof(ImportMode))) return;
-            ExactTimeBoxVisibility = ImportMode == ImportMode.Time ? Visibility.Visible : Visibility.Collapsed;
+            if (!Set(ref _importModeSetting, value, nameof(ImportMode))) return;
+            ExactTimeBoxVisibility = ImportModeSetting == ImportMode.Time ? Visibility.Visible : Visibility.Collapsed;
         }
-    }
 
-    public enum ImportMode {
-        Selected,
-        Bookmarked,
-        Time
-    }
+        public enum ImportMode
+        {
+            Selected,
+            Bookmarked,
+            Time
+        }
 
-    public enum ExportMode {
-        Add,
-        Override
-    }
+        public enum ExportMode
+        {
+            Add,
+            Override
+        }
 
-    public enum GraphMode {
-        Position,
-        Velocity
+        public enum GraphMode
+        {
+            Position,
+            Velocity
+        }
     }
 }

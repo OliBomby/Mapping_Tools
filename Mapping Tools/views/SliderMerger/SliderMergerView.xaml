@@ -5,9 +5,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Mapping_Tools.Views"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
              mc:Ignorable="d" 
              x:Name="This"
              d:DesignHeight="450" Width="759.5" d:DataContext="{d:DesignData SliderMergerVM}">
+    <local:SingleRunMappingTool.Resources>
+        <domain:DoubleToStringConverter x:Key="DoubleToStringConverter"/>
+        <domain:TimeToStringConverter x:Key="TimeToStringConverter"/>
+    </local:SingleRunMappingTool.Resources>
     <Grid Name="MasterGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -41,16 +46,29 @@
                     </materialDesign:PopupBox>
                 </StackPanel>
 
-                <TextBox x:Name="LeniencyBox" Width="258" HorizontalAlignment="Left" Text="2" Margin="0,20,0,0"
+                <TextBox x:Name="LeniencyBox" Width="258" HorizontalAlignment="Left" Margin="0,20,0,0"
                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Merge connection leniency"
-                    ToolTip="The maximum distance in osu! pixels that an object can be from the end of previous object and still merge."/>
+                    ToolTip="The maximum distance in osu! pixels that an object can be from the end of previous object and still merge.">
+                    <TextBox.Text>
+                        <Binding Path="Leniency" Mode="TwoWay" UpdateSourceTrigger="LostFocus"  NotifyOnValidationError="True">
+                            <Binding.Converter>
+                                <domain:DoubleToStringConverter/>
+                            </Binding.Converter>
+                            <Binding.ValidationRules>
+                                <domain:IsGreaterOrEqualValidationRule>
+                                    <domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                        <domain:DoubleWrapper Value="0"/>
+                                    </domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                </domain:IsGreaterOrEqualValidationRule>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
 
-                <ComboBox x:Name="SelectionModeBox" Margin="0,26,0,0" SelectedIndex="0" Cursor="Hand" Width="258" HorizontalAlignment="Left"
+                <ComboBox x:Name="SelectionModeBox" Margin="0,26,0,0" SelectedIndex="{Binding ImportModeSetting}" Cursor="Hand" Width="258" HorizontalAlignment="Left"
+                          ItemsSource="{Binding ImportModes}"
                     Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Object selection mode"
                     ToolTip="How will Slider Merger choose hitobjects to attempt merging. Slider Merger will not always merge all the specified objects, because the distance between every pair of objects must still be within the connection distance leniency.">
-                    <ComboBoxItem Content="Selected objects" Cursor="Hand" ToolTip="Only merge selected hitobjects."/>
-                    <ComboBoxItem Content="Bookmarked objects" Cursor="Hand" ToolTip="Only merge hitobjects that have a bookmark on them."/>
-                    <ComboBoxItem Content="Everything" Cursor="Hand" ToolTip="Try merging on all hitobjects."/>
                 </ComboBox>
 
                 <ComboBox x:Name="ConnectionModeBox" Margin="0,26,0,0" Cursor="Hand" SelectedIndex="0" Width="258" HorizontalAlignment="Left" ItemsSource="{Binding ConnectionModes}"
@@ -58,10 +76,10 @@
                           ToolTip="This is how Slider Merger is going to deal with space gaps between hitobjects that it wants to merge.">
                 </ComboBox>
 
-                <CheckBox x:Name="MergeOnSliderEndBox" Margin="0 26 0 0" Content="Merge on slider end" IsChecked="True"
+                <CheckBox x:Name="MergeOnSliderEndBox" Margin="0 26 0 0" Content="Merge on slider end" IsChecked="{Binding MergeOnSliderEnd}"
                           ToolTip="Merge on the slider end instead of the last anchor of the slider."/>
 
-                <CheckBox x:Name="LinearOnLinearBox" Margin="0,5,0,0" Content="Use linear curve type on fully linear merge"
+                <CheckBox x:Name="LinearOnLinearBox" Margin="0,5,0,0" Content="Use linear curve type on fully linear merge" IsChecked="{Binding LinearOnLinear}"
                           ToolTip="This option will make Slider Merger, if possible, use linear curve type and no red anchors for the combined slider(s)."></CheckBox>
             </StackPanel>
 

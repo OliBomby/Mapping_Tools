@@ -500,7 +500,7 @@
     <Compile Include="Viewmodels\PropertyTransformerVM.cs" />
     <Compile Include="Viewmodels\SnappingToolsVm.cs" />
     <Compile Include="Viewmodels\SliderCompletionatorVM.cs" />
-    <Compile Include="Viewmodels\SliderMergerVM.cs" />
+    <Compile Include="Viewmodels\SliderMergerVm.cs" />
     <Compile Include="Viewmodels\PreferencesVM.cs" />
     <Compile Include="Viewmodels\StandardVM.cs" />
     <Compile Include="Viewmodels\TimingStudioVM.cs" />

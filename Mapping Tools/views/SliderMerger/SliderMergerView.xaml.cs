@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Windows;
-using Editor_Reader;
 using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
@@ -18,7 +18,7 @@ namespace Mapping_Tools.Views.SliderMerger {
     ///     Interaktionslogik für UserControl1.xaml
     /// </summary>
     [SmartQuickRunUsage(SmartQuickRunTargets.MultipleSelection)]
-    public partial class SliderMergerView : IQuickRun {
+    public partial class SliderMergerView : IQuickRun, ISavable<SliderMergerVm> {
         public static readonly string ToolName = "Slider Merger";
 
         public static readonly string ToolDescription =
@@ -28,8 +28,10 @@ namespace Mapping_Tools.Views.SliderMerger {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
-            DataContext = new SliderMergerVM();
+            DataContext = new SliderMergerVm();
         }
+
+        public SliderMergerVm ViewModel => (SliderMergerVm) DataContext;
 
         public event EventHandler RunFinished;
 
@@ -39,7 +41,7 @@ namespace Mapping_Tools.Views.SliderMerger {
 
         protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
-            e.Result = Merge_Sliders((Arguments) e.Argument, bgw);
+            e.Result = Merge_Sliders((SliderMergerVm) e.Argument, bgw);
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
@@ -54,31 +56,33 @@ namespace Mapping_Tools.Views.SliderMerger {
 
             IOHelper.SaveMapBackup(paths);
 
-            BackgroundWorker.RunWorkerAsync(new Arguments(paths, LeniencyBox.GetDouble(0),
-                SelectionModeBox.SelectedIndex, (ConnectionMode) ConnectionModeBox.SelectedItem,
-                LinearOnLinearBox.IsChecked.GetValueOrDefault(), MergeOnSliderEndBox.IsChecked.GetValueOrDefault(), quick));
+            ViewModel.Paths = paths;
+            ViewModel.Quick = quick;
+
+            BackgroundWorker.RunWorkerAsync(ViewModel);
             CanRun = false;
         }
 
-        private string Merge_Sliders(Arguments arg, BackgroundWorker worker) {
+        private string Merge_Sliders(SliderMergerVm arg, BackgroundWorker worker) {
             var slidersMerged = 0;
 
-            EditorReader reader = EditorReaderStuff.GetFullEditorReaderOrNot(out var editorReaderException1);
+            var reader = EditorReaderStuff.GetFullEditorReaderOrNot(out var editorReaderException1);
 
-            if (arg.SelectionMode == 0 && editorReaderException1 != null) {
+            if (arg.ImportModeSetting == 0 && editorReaderException1 != null) {
                 return editorReaderException1.MessageStackTrace();
             }
 
             foreach (var path in arg.Paths) {
                 var editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader, out var selected, out var editorReaderException2);
 
-                if (arg.SelectionMode == 0 && editorReaderException2 != null) {
+                if (arg.ImportModeSetting == SliderMergerVm.ImportMode.Selected && editorReaderException2 != null) {
                     return editorReaderException2.MessageStackTrace();
                 }
 
                 var beatmap = editor.Beatmap;
-                var markedObjects = arg.SelectionMode == 0 ? selected :
-                    arg.SelectionMode == 1 ? beatmap.GetBookmarkedObjects() :
+                var markedObjects = arg.ImportModeSetting == 0 ? selected :
+                    arg.ImportModeSetting == SliderMergerVm.ImportMode.Bookmarked ? beatmap.GetBookmarkedObjects() :
+                    //TODO time import
                     beatmap.HitObjects;
 
                 var mergeLast = false;
@@ -107,11 +111,11 @@ namespace Mapping_Tools.Views.SliderMerger {
                         var sp2 = BezierConverter.ConvertToBezier(ho2.SliderPath).ControlPoints;
 
                         double extraLength = 0;
-                        switch (arg.ConnectionMode) {
-                            case ConnectionMode.Move:
+                        switch (arg.ConnectionModeSetting) {
+                            case SliderMergerVm.ConnectionMode.Move:
                                 Move(sp2, sp1.Last() - sp2.First());
                                 break;
-                            case ConnectionMode.Linear:
+                            case SliderMergerVm.ConnectionMode.Linear:
                                 sp1.Add(sp1.Last());
                                 sp1.Add(sp2.First());
                                 extraLength = (ho1.CurvePoints.Last() - ho2.Pos).Length;
@@ -262,26 +266,16 @@ namespace Mapping_Tools.Views.SliderMerger {
                 points[i] = points[i] + delta;
             }
         }
-
-        private struct Arguments {
-            public readonly string[] Paths;
-            public readonly double Leniency;
-            public readonly int SelectionMode;
-            public ConnectionMode ConnectionMode;
-            public bool LinearOnLinear;
-            public bool MergeOnSliderEnd;
-            public readonly bool Quick;
-
-            public Arguments(string[] paths, double leniency, int selectionMode, ConnectionMode connectionMode,
-                bool linearOnLinear, bool mergeOnSliderEnd, bool quick) {
-                Paths = paths;
-                Leniency = leniency;
-                SelectionMode = selectionMode;
-                ConnectionMode = connectionMode;
-                LinearOnLinear = linearOnLinear;
-                MergeOnSliderEnd = mergeOnSliderEnd;
-                Quick = quick;
-            }
+        public SliderMergerVm GetSaveData() {
+            return ViewModel;
         }
+
+        public void SetSaveData(SliderMergerVm saveData) {
+            DataContext = saveData;
+        }
+
+        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "slidermergerproject.json");
+
+        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Slider Merger Projects");
     }
 }

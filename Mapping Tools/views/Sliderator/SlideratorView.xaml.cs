@@ -104,7 +104,7 @@ namespace Mapping_Tools.Views.Sliderator {
                             }));
                         break;
                     case Vector2 newVector2:
-                        if (ViewModel.GraphMode == GraphMode.Position && anchor.PreviousAnchor != null) {
+                        if (ViewModel.GraphModeSetting == SlideratorVm.GraphMode.Position && anchor.PreviousAnchor != null) {
                             // List of bounds. X represents the minimum Y value and Y represents the maximum Y value
                             // I use Vector2 here because it has useful math methods
                             var bounds = new List<Vector2>();
@@ -163,7 +163,7 @@ namespace Mapping_Tools.Views.Sliderator {
 
             var diff = anchor.NextAnchor.Pos - anchor.Pos;
 
-            if (ViewModel.GraphMode == GraphMode.Position)
+            if (ViewModel.GraphModeSetting == SlideratorVm.GraphMode.Position)
                 return Math.Abs(InterpolatorHelper.GetBiggestDerivative(anchor.NextAnchor.Interpolator) * diff.Y /
                                 diff.X)
                        / ViewModel.SvGraphMultiplier > ViewModel.VelocityLimit;
@@ -176,7 +176,7 @@ namespace Mapping_Tools.Views.Sliderator {
 
             var diff = anchor.Pos - anchor.PreviousAnchor.Pos;
 
-            if (ViewModel.GraphMode == GraphMode.Position)
+            if (ViewModel.GraphModeSetting == SlideratorVm.GraphMode.Position)
                 return Math.Abs(InterpolatorHelper.GetBiggestDerivative(anchor.Interpolator) * diff.Y / diff.X)
                        / ViewModel.SvGraphMultiplier > ViewModel.VelocityLimit;
             return Math.Abs(InterpolatorHelper.GetBiggestValue(anchor.Interpolator)) > ViewModel.VelocityLimit;
@@ -190,7 +190,7 @@ namespace Mapping_Tools.Views.Sliderator {
         }
 
         private void UpdateVelocity() {
-            ViewModel.DistanceTraveled = ViewModel.GraphMode == GraphMode.Position ? 
+            ViewModel.DistanceTraveled = ViewModel.GraphModeSetting == SlideratorVm.GraphMode.Position ? 
                 Graph.Anchors.GetDistanceTraveled() * ViewModel.PixelLength : 
                 Graph.Anchors.GetIntegralDistanceTraveled() * ViewModel.SvGraphMultiplier * ViewModel.PixelLength;
             if (!ViewModel.ManualVelocity) {
@@ -219,13 +219,13 @@ namespace Mapping_Tools.Views.Sliderator {
                     Graph.HorizontalMarkerGenerator = new DividedBeatMarkerGenerator(ViewModel.BeatSnapDivisor);
                     break;
                 case nameof(ViewModel.VelocityLimit):
-                    if (ViewModel.GraphMode == GraphMode.Velocity) {
+                    if (ViewModel.GraphModeSetting == SlideratorVm.GraphMode.Velocity) {
                         Graph.MinY = -ViewModel.VelocityLimit;
                         Graph.MaxY = ViewModel.VelocityLimit;
                     }
 
                     break;
-                case nameof(ViewModel.GraphMode):
+                case nameof(ViewModel.GraphModeSetting):
                     UpdateGraphModeStuff();
                     UpdatePointsOfInterest();
                     break;
@@ -259,7 +259,7 @@ namespace Mapping_Tools.Views.Sliderator {
                     }
 
                     // Add red anchors to graph
-                    if (ViewModel.GraphMode == GraphMode.Position) {
+                    if (ViewModel.GraphModeSetting == SlideratorVm.GraphMode.Position) {
                         var markers = new ObservableCollection<GraphMarker>();
 
                         foreach (var completion in redAnchorCompletions) {
@@ -275,7 +275,7 @@ namespace Mapping_Tools.Views.Sliderator {
                 }
                 if (ViewModel.ShowGraphAnchors) {
                     // Add graph anchors to hit objects preview
-                    var graphAnchorCompletions = ViewModel.GraphMode == GraphMode.Velocity
+                    var graphAnchorCompletions = ViewModel.GraphModeSetting == SlideratorVm.GraphMode.Velocity
                         ? Graph.Anchors.Select(a => Graph.Anchors.GetIntegral(0, a.Pos.X) * ViewModel.SvGraphMultiplier)
                         : Graph.Anchors.Select(a => a.Pos.Y);
 
@@ -304,7 +304,7 @@ namespace Mapping_Tools.Views.Sliderator {
             var extraDuration = graphDuration.Add(TimeSpan.FromSeconds(1));
 
             DoubleAnimationBase animation;
-            if (ViewModel.GraphMode == GraphMode.Velocity)
+            if (ViewModel.GraphModeSetting == SlideratorVm.GraphMode.Velocity)
                 animation = new GraphIntegralDoubleAnimation {
                     GraphState = Graph.GetGraphState(), From = Graph.MinX, To = Graph.MaxX,
                     Duration = graphDuration,
@@ -343,7 +343,7 @@ namespace Mapping_Tools.Views.Sliderator {
 
         private static double GetMaxCompletion(SlideratorVm viewModel, IReadOnlyList<IGraphAnchor> anchors) {
             double maxValue;
-            if (viewModel.GraphMode == GraphMode.Velocity) // Integrate the graph to get the end value
+            if (viewModel.GraphModeSetting == SlideratorVm.GraphMode.Velocity) // Integrate the graph to get the end value
                 // Here we use SvGraphMultiplier to get an accurate conversion from SV to slider completion per beat
                 // Completion = (100 * SliderMultiplier / PixelLength) * SV * Beats
                 maxValue = AnchorCollection.GetMaxIntegral(anchors) * viewModel.SvGraphMultiplier;
@@ -359,7 +359,7 @@ namespace Mapping_Tools.Views.Sliderator {
 
         private static double GetMinCompletion(SlideratorVm viewModel, IReadOnlyList<Anchor> anchors) {
             double minValue;
-            if (viewModel.GraphMode == GraphMode.Velocity) // Integrate the graph to get the end value
+            if (viewModel.GraphModeSetting == SlideratorVm.GraphMode.Velocity) // Integrate the graph to get the end value
                 // Here we use SvGraphMultiplier to get an accurate conversion from SV to slider completion per beat
                 // Completion = (100 * SliderMultiplier / PixelLength) * SV * Beats
                 minValue = AnchorCollection.GetMinIntegral(anchors) * viewModel.SvGraphMultiplier;
@@ -372,7 +372,7 @@ namespace Mapping_Tools.Views.Sliderator {
         // Gets max velocity in SV
         private static double GetMaxVelocity(SlideratorVm viewModel, IReadOnlyList<IGraphAnchor> anchors) {
             double maxValue;
-            if (viewModel.GraphMode == GraphMode.Velocity) // Integrate the graph to get the end value
+            if (viewModel.GraphModeSetting == SlideratorVm.GraphMode.Velocity) // Integrate the graph to get the end value
                 // Here we use SvGraphMultiplier to get an accurate conversion from SV to slider completion per beat
                 // Completion = (100 * SliderMultiplier / PixelLength) * SV * Beats
                 maxValue = Math.Max(AnchorCollection.GetMaxValue(anchors), -AnchorCollection.GetMinValue(anchors));
@@ -400,7 +400,7 @@ namespace Mapping_Tools.Views.Sliderator {
             if (messageBoxResult != MessageBoxResult.Yes) return;
 
             Graph.Clear();
-            if (ViewModel.GraphMode == GraphMode.Velocity) {
+            if (ViewModel.GraphModeSetting == SlideratorVm.GraphMode.Velocity) {
                 var sv = MathHelper.Clamp(ViewModel.PixelLength / ViewModel.GraphBeats / ViewModel.GlobalSv / 100,
                     -ViewModel.VelocityLimit, ViewModel.VelocityLimit);
                 Graph.Anchors.First().Pos = new Vector2(0, sv);
@@ -412,8 +412,8 @@ namespace Mapping_Tools.Views.Sliderator {
         }
 
         public void UpdateGraphModeStuff() {
-            switch (ViewModel.GraphMode) {
-                case GraphMode.Position:
+            switch (ViewModel.GraphModeSetting) {
+                case SlideratorVm.GraphMode.Position:
                     GraphToggleContentTextBlock.Text = "X";
                     Graph.HorizontalAxisVisible = false;
                     Graph.VerticalAxisVisible = false;
@@ -427,7 +427,7 @@ namespace Mapping_Tools.Views.Sliderator {
                     Graph.MaxY = 1;
                     Graph.VerticalMarkerGenerator = new DoubleMarkerGenerator(0, 1/4d);
                     break;
-                case GraphMode.Velocity:
+                case SlideratorVm.GraphMode.Velocity:
                     GraphToggleContentTextBlock.Text = "V";
                     Graph.HorizontalAxisVisible = true;
                     Graph.VerticalAxisVisible = false;
@@ -520,7 +520,7 @@ namespace Mapping_Tools.Views.Sliderator {
             bool constantVelocity;
             // We convert the graph GetValue function to a function that works like ms -> px
             // d is a value representing the number of milliseconds into the slider
-            if (arg.GraphMode == GraphMode.Velocity) {
+            if (arg.GraphModeSetting == SlideratorVm.GraphMode.Velocity) {
                 // Here we use SvGraphMultiplier to get an accurate conversion from SV to slider completion per beat
                 // Completion = (100 * SliderMultiplier / PixelLength) * SV * Beats
                 positionFunction = d =>
@@ -635,7 +635,7 @@ namespace Mapping_Tools.Views.Sliderator {
                 clone.SliderVelocity = -100 / velocity;
                 
                 // Add hit object
-                if (arg.ExportMode == ExportMode.Add) {
+                if (arg.ExportModeSetting == SlideratorVm.ExportMode.Add) {
                     beatmap.HitObjects.Add(clone);
                 } else {
                     beatmap.HitObjects.Remove(hitObjectHere);
@@ -679,7 +679,7 @@ namespace Mapping_Tools.Views.Sliderator {
                 TimingPointsChange.ApplyChanges(timing, timingPointsChanges);
             } else {
                 // Add hit objects
-                if (arg.ExportMode == ExportMode.Override) {
+                if (arg.ExportModeSetting == SlideratorVm.ExportMode.Override) {
                     beatmap.HitObjects.Remove(hitObjectHere);
                 }
 

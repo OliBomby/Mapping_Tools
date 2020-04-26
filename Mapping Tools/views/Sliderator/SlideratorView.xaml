@@ -82,7 +82,7 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <ComboBox Grid.Column="0" ItemsSource="{Binding ImportModes}" SelectedItem="{Binding ImportMode}" Margin="0 0 5 0"
+                        <ComboBox Grid.Column="0" ItemsSource="{Binding ImportModes}" SelectedItem="{Binding ImportModeSetting}" Margin="0 0 5 0"
                                   ToolTip="Import mode"/>
 
                         <TextBox Grid.Column="1" Text="{Binding ExactTime, Converter={StaticResource TimeToStringConverter}}" materialDesign:HintAssist.Hint="Time"
@@ -190,7 +190,7 @@
                              Text="{Binding ExportTime, Converter={StaticResource TimeToStringConverter}}"/>
 
                     <ComboBox Margin="0 10 0 0" ToolTip="Choose how you want to export sliders." ItemsSource="{Binding ExportModes}"
-                              SelectedItem="{Binding ExportMode}"/>
+                              SelectedItem="{Binding ExportModeSetting}"/>
 
                     <CheckBox Content="Export as stream instead" Margin="0 10 0 0"
                               ToolTip="Instead of exporting a slider, export an accelerating stream instead. This stream uses the beat snap divisor."
