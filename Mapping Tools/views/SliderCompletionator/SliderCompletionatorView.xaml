@@ -5,9 +5,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Mapping_Tools.Views"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
              mc:Ignorable="d" 
              x:Name="This"
-             d:DesignHeight="450" Width="759.5">
+             d:DesignHeight="450" Width="759.5" d:DataContext="{d:DesignData SliderCompletionatorVm}">
+    <local:SingleRunMappingTool.Resources>
+        <domain:DoubleToStringConverter x:Key="DoubleToStringConverter"/>
+        <domain:TimeToStringConverter x:Key="TimeToStringConverter"/>
+    </local:SingleRunMappingTool.Resources>
     <Grid Name="MasterGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -38,17 +43,19 @@
                 </StackPanel>
               
                 <TextBox x:Name="TemporalBox" Width="258" HorizontalAlignment="Left" Margin="0,20,0,0"
+                         Text="{Binding TemporalLength, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=-1}"
                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Temporal length (beats)"/>
-                <TextBox x:Name="SpatialBox" Width="258" HorizontalAlignment="Left" Margin="0,20,0,0" Text="1"
+                <TextBox x:Name="SpatialBox" Width="258" HorizontalAlignment="Left" Margin="0,20,0,0"
+                         Text="{Binding SpatialLength, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=-1}"
                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Spatial length (fraction of full path)"/>
-                <CheckBox x:Name="MoveAnchorsBox" HorizontalAlignment="Left" Margin="0,20,0,0" Content="Move anchors to new length"
-                          ToolTip="Checking this will move the anchors such that the last anchor is exactly on the slider end. Much like using Ctrl+G twice in the editor."/>
 
-                <ComboBox x:Name="SelectionModeBox" Margin="0,26,0,0" SelectedIndex="0" Cursor="Hand" Width="258" HorizontalAlignment="Left"
-                    Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Object selection mode">
-                    <ComboBoxItem Content="Selected objects" Cursor="Hand"/>
-                    <ComboBoxItem Content="Bookmarked objects" Cursor="Hand"/>
-                    <ComboBoxItem Content="Everything" Cursor="Hand"/>
+                <CheckBox x:Name="MoveAnchorsBox" HorizontalAlignment="Left" Margin="0,20,0,0" Content="Move anchors to new length"
+                          IsChecked="{Binding MoveAnchors}"
+                          ToolTip="Checking this will move the anchors such that the last anchor is exactly on the slider end. Much like using Ctrl+G twice in the editor, but better."/>
+
+                <ComboBox x:Name="SelectionModeBox" Margin="0,26,0,0" Cursor="Hand" Width="258" HorizontalAlignment="Left"
+                    Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Object selection mode"
+                    ItemsSource="{Binding ImportModes}" SelectedItem="{Binding ImportModeSetting}">
                 </ComboBox>
             </StackPanel>
 

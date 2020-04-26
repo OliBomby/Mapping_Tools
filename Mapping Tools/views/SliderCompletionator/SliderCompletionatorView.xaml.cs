@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Windows;
 using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.BeatmapHelper;
@@ -8,13 +9,14 @@ using Mapping_Tools.Classes.SliderPathStuff;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Viewmodels;
 
 namespace Mapping_Tools.Views.SliderCompletionator {
     /// <summary>
     /// Interaktionslogik für UserControl1.xaml
     /// </summary>
     [SmartQuickRunUsage(SmartQuickRunTargets.AnySelection)]
-    public partial class SliderCompletionatorView : IQuickRun {
+    public partial class SliderCompletionatorView : IQuickRun, ISavable<SliderCompletionatorVm> {
         public event EventHandler RunFinished;
 
         public static readonly string ToolName = "Slider Completionator";
@@ -26,11 +28,14 @@ namespace Mapping_Tools.Views.SliderCompletionator {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
+            DataContext = new SliderCompletionatorVm();
         }
+
+        public SliderCompletionatorVm ViewModel => (SliderCompletionatorVm) DataContext;
 
         protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
-            e.Result = Complete_Sliders((Arguments) e.Argument, bgw, e);
+            e.Result = Complete_Sliders((SliderCompletionatorVm) e.Argument, bgw, e);
         }
 
        
@@ -50,48 +55,34 @@ namespace Mapping_Tools.Views.SliderCompletionator {
 
             IOHelper.SaveMapBackup(paths);
 
-            BackgroundWorker.RunWorkerAsync(new Arguments(paths, TemporalBox.GetDouble(), SpatialBox.GetDouble(), MoveAnchorsBox.IsChecked.GetValueOrDefault(), SelectionModeBox.SelectedIndex, quick));
+            ViewModel.Paths = paths;
+            ViewModel.Quick = quick;
+
+            BackgroundWorker.RunWorkerAsync(ViewModel);
             CanRun = false;
         }
 
-        private struct Arguments {
-            public string[] Paths;
-            public double TemporalLength;
-            public double SpatialLength;
-            public bool MoveAnchors;
-            public int SelectionMode;
-            public bool Quick;
-            public Arguments(string[] paths, double temporal, double spatial, bool moveAnchors, int selectionMode, bool quick)
-            {
-                Paths = paths;
-                TemporalLength = temporal;
-                SpatialLength = spatial;
-                MoveAnchors = moveAnchors;
-                SelectionMode = selectionMode;
-                Quick = quick;
-            }
-        }
-
-        private string Complete_Sliders(Arguments arg, BackgroundWorker worker, DoWorkEventArgs _) {
+        private string Complete_Sliders(SliderCompletionatorVm arg, BackgroundWorker worker, DoWorkEventArgs _) {
             int slidersCompleted = 0;
 
             var reader = EditorReaderStuff.GetFullEditorReaderOrNot(out var editorReaderException1);
 
-            if (arg.SelectionMode == 0 && editorReaderException1 != null) {
+            if (arg.ImportModeSetting == SliderCompletionatorVm.ImportMode.Selected && editorReaderException1 != null) {
                 return editorReaderException1.MessageStackTrace();
             }
 
             foreach (string path in arg.Paths) {
                 var editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader, out var selected, out var editorReaderException2);
 
-                if (arg.SelectionMode == 0 && editorReaderException2 != null) {
+                if (arg.ImportModeSetting == SliderCompletionatorVm.ImportMode.Selected && editorReaderException2 != null) {
                     return editorReaderException2.MessageStackTrace();
                 }
 
                 Beatmap beatmap = editor.Beatmap;
                 Timing timing = beatmap.BeatmapTiming;
-                List<HitObject> markedObjects = arg.SelectionMode == 0 ? selected :
-                                                arg.SelectionMode == 1 ? beatmap.GetBookmarkedObjects() :
+                List<HitObject> markedObjects = arg.ImportModeSetting == SliderCompletionatorVm.ImportMode.Selected ? selected :
+                                                arg.ImportModeSetting == SliderCompletionatorVm.ImportMode.Bookmarked ? beatmap.GetBookmarkedObjects() :
+                                                // TODO time code import
                                                                          beatmap.HitObjects;
 
                 for (int i = 0; i < markedObjects.Count; i++) {
@@ -169,5 +160,16 @@ namespace Mapping_Tools.Views.SliderCompletionator {
             }
             return arg.Quick ? "" : message;
         }
+        public SliderCompletionatorVm GetSaveData() {
+            return ViewModel;
+        }
+
+        public void SetSaveData(SliderCompletionatorVm saveData) {
+            DataContext = saveData;
+        }
+
+        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "slidermergerproject.json");
+
+        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Slider Merger Projects");
     }
 }
