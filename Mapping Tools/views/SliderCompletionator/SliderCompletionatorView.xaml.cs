@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.BeatmapHelper;
@@ -82,7 +83,7 @@ namespace Mapping_Tools.Views.SliderCompletionator {
                 Timing timing = beatmap.BeatmapTiming;
                 List<HitObject> markedObjects = arg.ImportModeSetting == SliderCompletionatorVm.ImportMode.Selected ? selected :
                                                 arg.ImportModeSetting == SliderCompletionatorVm.ImportMode.Bookmarked ? beatmap.GetBookmarkedObjects() :
-                                                // TODO time code import
+                                                arg.ImportModeSetting == SliderCompletionatorVm.ImportMode.Time ? beatmap.QueryTimeCode(arg.TimeCode).ToList() :
                                                                          beatmap.HitObjects;
 
                 for (int i = 0; i < markedObjects.Count; i++) {

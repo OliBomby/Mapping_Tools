@@ -82,7 +82,7 @@ namespace Mapping_Tools.Views.SliderMerger {
                 var beatmap = editor.Beatmap;
                 var markedObjects = arg.ImportModeSetting == 0 ? selected :
                     arg.ImportModeSetting == SliderMergerVm.ImportMode.Bookmarked ? beatmap.GetBookmarkedObjects() :
-                    //TODO time import
+                    arg.ImportModeSetting == SliderMergerVm.ImportMode.Time ? beatmap.QueryTimeCode(arg.TimeCode).ToList() :
                     beatmap.HitObjects;
 
                 var mergeLast = false;

@@ -53,10 +53,15 @@
                           IsChecked="{Binding MoveAnchors}"
                           ToolTip="Checking this will move the anchors such that the last anchor is exactly on the slider end. Much like using Ctrl+G twice in the editor, but better."/>
 
-                <ComboBox x:Name="SelectionModeBox" Margin="0,26,0,0" Cursor="Hand" Width="258" HorizontalAlignment="Left"
-                    Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Object selection mode"
-                    ItemsSource="{Binding ImportModes}" SelectedItem="{Binding ImportModeSetting}">
-                </ComboBox>
+                <StackPanel Orientation="Horizontal" Margin="0,26,0,0" HorizontalAlignment="Left">
+                    <ComboBox x:Name="SelectionModeBox" Cursor="Hand" Width="258"
+                              Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Object selection mode"
+                              ItemsSource="{Binding ImportModes}" SelectedItem="{Binding ImportModeSetting}">
+                    </ComboBox>
+                    <TextBox Margin="15 0 0 0" Width="258" Text="{Binding TimeCode}" Visibility="{Binding TimeCodeBoxVisibility}"
+                             Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Time code"
+                             ToolTip="Input a time code here. Example time code: 00:56:823 (1,2,1,2) - "/>
+                </StackPanel>
             </StackPanel>
 
             <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">

@@ -65,11 +65,17 @@
                     </TextBox.Text>
                 </TextBox>
 
-                <ComboBox x:Name="SelectionModeBox" Margin="0,26,0,0" Cursor="Hand" Width="258" HorizontalAlignment="Left"
-                          ItemsSource="{Binding ImportModes}" SelectedItem="{Binding ImportModeSetting}"
-                    Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Object selection mode"
-                    ToolTip="How will Slider Merger choose hitobjects to attempt merging. Slider Merger will not always merge all the specified objects, because the distance between every pair of objects must still be within the connection distance leniency.">
-                </ComboBox>
+                <StackPanel Orientation="Horizontal" Margin="0,26,0,0" HorizontalAlignment="Left">
+                    <ComboBox x:Name="SelectionModeBox" Cursor="Hand" Width="258"
+                              ItemsSource="{Binding ImportModes}" SelectedItem="{Binding ImportModeSetting}"
+                              Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Object selection mode"
+                              ToolTip="How will Slider Merger choose hitobjects to attempt merging. Slider Merger will not always merge all the specified objects, because the distance between every pair of objects must still be within the connection distance leniency.">
+                    </ComboBox>
+                    <TextBox Margin="15 0 0 0" Width="258" Text="{Binding TimeCode}" Visibility="{Binding TimeCodeBoxVisibility}"
+                             Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Time code"
+                             ToolTip="Input a time code here. Example time code: 00:56:823 (1,2,1,2) - "/>
+                </StackPanel>
+                
 
                 <ComboBox x:Name="ConnectionModeBox" Margin="0,26,0,0" Cursor="Hand" Width="258" HorizontalAlignment="Left" 
                           ItemsSource="{Binding ConnectionModes}" SelectedItem="{Binding ConnectionModeSetting}"
