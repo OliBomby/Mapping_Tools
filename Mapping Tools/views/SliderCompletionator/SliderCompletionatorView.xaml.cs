@@ -168,8 +168,8 @@ namespace Mapping_Tools.Views.SliderCompletionator {
             DataContext = saveData;
         }
 
-        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "slidermergerproject.json");
+        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "slidercompletionatorproject.json");
 
-        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Slider Merger Projects");
+        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Slider Completionator Projects");
     }
 }
