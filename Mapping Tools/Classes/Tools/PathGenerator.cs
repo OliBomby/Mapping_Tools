@@ -103,12 +103,12 @@ namespace Mapping_Tools.Classes.Tools {
                 var angle = _angle[i];
                 var angleChange = GetSmallestAngle(angle, lastAngle);
 
-                // Check for inflection point
-                if (angleChange * lastAngleChange < 0) {
+                // Check for inflection point or super sharp angles
+                if (angleChange * lastAngleChange < 0 || Math.Abs(angleChange) > Math.PI * 1/8) {
                     subRanges.Add(new Tuple<int, int, double>(startSubRange, i, subRangeAngleChange));
 
                     startSubRange = i;
-                    subRangeAngleChange = 0;
+                    subRangeAngleChange = -angleChange;  // Negate the angle change because this point invalidates the angle
                 }
 
                 subRangeAngleChange += angleChange;
