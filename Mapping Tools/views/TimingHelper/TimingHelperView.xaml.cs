@@ -26,6 +26,7 @@ namespace Mapping_Tools.Views.TimingHelper {
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
             DataContext = new TimingHelperVm();
+            ProjectManager.LoadProject(this, message: false);
         }
 
         public TimingHelperVm ViewModel => (TimingHelperVm) DataContext;

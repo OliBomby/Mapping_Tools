@@ -29,6 +29,7 @@ namespace Mapping_Tools.Views.SliderMerger {
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
             DataContext = new SliderMergerVm();
+            ProjectManager.LoadProject(this, message: false);
         }
 
         public SliderMergerVm ViewModel => (SliderMergerVm) DataContext;

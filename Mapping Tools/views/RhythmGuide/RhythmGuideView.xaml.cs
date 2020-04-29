@@ -2,6 +2,7 @@
 using Mapping_Tools.Viewmodels;
 using System;
 using System.ComponentModel;
+using System.IO;
 using System.Windows;
 
 namespace Mapping_Tools.Views.RhythmGuide {
@@ -9,9 +10,7 @@ namespace Mapping_Tools.Views.RhythmGuide {
     /// <summary>
     /// Interactielogica voor RhythmGuideView.xaml
     /// </summary>
-    public partial class RhythmGuideView {
-        private readonly RhythmGuideVm settings;
-
+    public partial class RhythmGuideView : ISavable<RhythmGuideVm> {
         public static readonly string ToolName = "Rhythm Guide";
 
         public static readonly string ToolDescription =
@@ -26,8 +25,11 @@ namespace Mapping_Tools.Views.RhythmGuide {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
-            DataContext = settings = new RhythmGuideVm();
+            DataContext = new RhythmGuideVm();
+            ProjectManager.LoadProject(this, message: false);
         }
+
+        public RhythmGuideVm ViewModel => (RhythmGuideVm) DataContext;
 
         protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
@@ -35,11 +37,11 @@ namespace Mapping_Tools.Views.RhythmGuide {
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
-            foreach (var fileToCopy in settings.GuideGeneratorArgs.Paths) {
+            foreach (var fileToCopy in ViewModel.GuideGeneratorArgs.Paths) {
                 IOHelper.SaveMapBackup(fileToCopy);
             }
 
-            BackgroundWorker.RunWorkerAsync(settings.GuideGeneratorArgs);
+            BackgroundWorker.RunWorkerAsync(ViewModel.GuideGeneratorArgs);
             CanRun = false;
         }
 
@@ -52,5 +54,17 @@ namespace Mapping_Tools.Views.RhythmGuide {
             }
             return args.ExportMode == Classes.Tools.RhythmGuide.ExportMode.NewMap ? "" : "Done!";
         }
+
+        public RhythmGuideVm GetSaveData() {
+            return ViewModel;
+        }
+
+        public void SetSaveData(RhythmGuideVm saveData) {
+            DataContext = saveData;
+        }
+
+        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "rhythmguideproject.json");
+
+        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Rhythm Guide Projects");
     }
 }

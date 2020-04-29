@@ -30,6 +30,7 @@ namespace Mapping_Tools.Views.SliderCompletionator {
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
             DataContext = new SliderCompletionatorVm();
+            ProjectManager.LoadProject(this, message: false);
         }
 
         public SliderCompletionatorVm ViewModel => (SliderCompletionatorVm) DataContext;

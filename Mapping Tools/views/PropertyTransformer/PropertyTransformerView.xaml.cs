@@ -23,6 +23,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
             DataContext = new PropertyTransformerVm();
+            ProjectManager.LoadProject(this, message: false);
         }
 
         protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {

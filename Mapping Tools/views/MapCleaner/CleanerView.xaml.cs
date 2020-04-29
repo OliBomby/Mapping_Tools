@@ -44,6 +44,7 @@ namespace Mapping_Tools.Views.MapCleaner {
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
             DataContext = new MapCleanerVm();
+            ProjectManager.LoadProject(this, message: false);
         }
 
         public MapCleanerVm ViewModel => (MapCleanerVm) DataContext;

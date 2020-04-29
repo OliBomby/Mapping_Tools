@@ -39,6 +39,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
             DataContext = new HitsoundCopierVm();
+            ProjectManager.LoadProject(this, message: false);
         }
 
         public HitsoundCopierVm ViewModel => (HitsoundCopierVm) DataContext;

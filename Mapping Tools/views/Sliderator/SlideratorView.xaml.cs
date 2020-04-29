@@ -70,6 +70,10 @@ namespace Mapping_Tools.Views.Sliderator {
             UpdatePointsOfInterest();
         }
 
+        private void SlideratorView_OnLoaded(object sender, RoutedEventArgs e) {
+            ProjectManager.LoadProject(this, message: false);
+        }
+
         private SlideratorVm ViewModel => (SlideratorVm) DataContext;
 
         private void AnchorsOnAnchorsChanged(object sender, DependencyPropertyChangedEventArgs e) {
@@ -730,10 +734,6 @@ namespace Mapping_Tools.Views.Sliderator {
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "slideratorproject.json");
 
         public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Sliderator Projects");
-
-        private void SlideratorView_OnLoaded(object sender, RoutedEventArgs e) {
-            ProjectManager.LoadProject(this, message: false);
-        }
 
         public void RunFast() {
             var currentMap = IOHelper.GetCurrentBeatmap();
