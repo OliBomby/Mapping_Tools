@@ -146,13 +146,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// Gets the angle (direction) of the vector.
         /// </summary>
         [JsonIgnore]
-        public double Theta
-        {
-            get
-            {
-                return Math.Acos(X / Math.Sqrt(X * X + Y * Y));
-            }
-        }
+        public double Theta => Y < 0 ? -Math.Acos(X / Math.Sqrt(X * X + Y * Y)) : Math.Acos(X / Math.Sqrt(X * X + Y * Y));
 
         /// <summary>
         /// Gets the perpendicular vector on the right side of this vector.

@@ -18,6 +18,7 @@ namespace Mapping_Tools.Classes.Tools {
 
         private List<Vector2> _path; // input path
         private List<Vector2> _diff; // path segments
+        private List<double> _angle; // path segment angles
         private List<double> _diffL; // length of segments
         private List<double> _pathL; // cumulative length
         private double _totalPathL => _pathL.Last(); // total length
@@ -28,6 +29,7 @@ namespace Mapping_Tools.Classes.Tools {
         public void SetPath(List<Vector2> pathPoints) {
             _path = new List<Vector2> {pathPoints.First()};
             _diff = new List<Vector2>();
+            _angle = new List<double>();
             _diffL = new List<double>();
             double sum = 0;
             _pathL = new List<double> {sum};
@@ -37,11 +39,18 @@ namespace Mapping_Tools.Classes.Tools {
                 if (dl < Precision.DOUBLE_EPSILON) continue;
                 _path.Add(p);
                 _diff.Add(d);
+                _angle.Add(d.Theta);
                 _diffL.Add(dl);
                 sum += dl;
                 _pathL.Add(sum);
             }
+
             if (Math.Abs(sum) < Precision.DOUBLE_EPSILON) throw new InvalidOperationException("Zero length path.");
+
+            // Add last member again so these lists have the same number of elements as path
+            _diff.Add(_diff.Last());
+            _angle.Add(_angle.Last());
+            _diffL.Add(_diffL.Last());
         }
 
         private Vector2 PositionAt(double x) {

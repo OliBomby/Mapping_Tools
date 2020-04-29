@@ -373,6 +373,7 @@
     <Compile Include="Classes\Tools\EditorReaderStuff.cs" />
     <Compile Include="Classes\Tools\MapCleaner.cs" />
     <Compile Include="Classes\Tools\MapCleanerArgs.cs" />
+    <Compile Include="Classes\Tools\PathGenerator.cs" />
     <Compile Include="Classes\Tools\RhythmGuide.cs" />
     <Compile Include="Classes\Tools\Sliderator.cs" />
     <Compile Include="Components\Dialogs\MessageDialog.xaml.cs">
