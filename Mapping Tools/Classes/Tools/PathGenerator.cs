@@ -55,6 +55,34 @@ namespace Mapping_Tools.Classes.Tools {
         }
 
         /// <summary>
+        /// Generates anchors which approximate the path between the given indices
+        /// </summary>
+        /// <param name="startIndex"></param>
+        /// <param name="endIndex"></param>
+        /// <param name="maxAngle"></param>
+        /// <returns></returns>
+        public IEnumerable<Vector2> GeneratePath(int startIndex, int endIndex, double maxAngle = Math.PI * 1 / 4) {
+            var segments = GetNonInflectionSegments(startIndex, endIndex, maxAngle);
+
+            foreach (var segment in segments) {
+                var p1 = _path[segment.Item1];
+                var p2 = _path[segment.Item2];
+
+                yield return p1;
+
+                var t1 = new Line2(p1, _angle[segment.Item1]);
+                var t2 = new Line2(p2, _angle[segment.Item2]);
+
+                var middleAnchor = Line2.Intersection(t1, t2);
+                if (middleAnchor != Vector2.NaN) {
+                    yield return middleAnchor;
+                }
+
+                yield return p2;
+            }
+        }
+
+        /// <summary>
         /// Calculates the indices of sub-ranges such that the sub-ranges have no inflection points or sharp curves inside
         /// </summary>
         /// <param name="startIndex"></param>
