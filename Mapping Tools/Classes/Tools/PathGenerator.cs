@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SliderPathStuff;
 
 namespace Mapping_Tools.Classes.Tools {
     /// <summary>
@@ -53,6 +54,14 @@ namespace Mapping_Tools.Classes.Tools {
             _angle.Add(_angle.Last());
             _diffL.Add(_diffL.Last());
         }
+        /// <summary>
+        /// Generates anchors which approximate the entire path
+        /// </summary>
+        /// <param name="maxAngle"></param>
+        /// <returns></returns>
+        public IEnumerable<Vector2> GeneratePath(double maxAngle = Math.PI * 1 / 4) {
+            return GeneratePath(0, _path.Count - 1, maxAngle);
+        }
 
         /// <summary>
         /// Generates anchors which approximate the path between the given indices
@@ -70,12 +79,19 @@ namespace Mapping_Tools.Classes.Tools {
 
                 yield return p1;
 
-                var t1 = new Line2(p1, _angle[segment.Item1]);
-                var t2 = new Line2(p2, _angle[segment.Item2]);
+                var a1 = _angle[segment.Item1];
+                var a2 = _angle[Math.Max(segment.Item2 - 1, 0)];
 
-                var middleAnchor = Line2.Intersection(t1, t2);
-                if (middleAnchor != Vector2.NaN) {
-                    yield return middleAnchor;
+                if (Math.Abs(GetSmallestAngle(a1, a2)) > 0.1) {
+                    var t1 = new Line2(p1, a1);
+                    var t2 = new Line2(p2, a2);
+
+                    var middleAnchor = Line2.Intersection(t1, t2);
+                    if (middleAnchor != Vector2.NaN &&
+                        Vector2.DistanceSquared(p1, middleAnchor) > 0.5 &&
+                        Vector2.DistanceSquared(p2, middleAnchor) > 0.5) {
+                        yield return middleAnchor;
+                    }
                 }
 
                 yield return p2;
@@ -92,8 +108,8 @@ namespace Mapping_Tools.Classes.Tools {
         public List<Tuple<int, int>> GetNonInflectionSegments(int startIndex, int endIndex, double maxAngle=Math.PI * 1/4) {
             endIndex = Math.Min(endIndex, _angle.Count - 1);
 
-            double lastAngleChange = GetSmallestAngle(_angle[Math.Max(startIndex - 1, 0)], _angle[Math.Max(startIndex - 2, 0)]);
-            var lastAngle = _angle[Math.Max(startIndex - 1, 0)];
+            double lastAngleChange = GetSmallestAngle(_angle[Math.Max(startIndex - 0, 0)], _angle[Math.Max(startIndex - 0, 0)]);
+            var lastAngle = _angle[Math.Max(startIndex - 0, 0)];
 
             int startSubRange = startIndex;
             double subRangeAngleChange = 0;
@@ -104,14 +120,14 @@ namespace Mapping_Tools.Classes.Tools {
                 var angleChange = GetSmallestAngle(angle, lastAngle);
 
                 // Check for inflection point or super sharp angles
-                if (angleChange * lastAngleChange < 0 || Math.Abs(angleChange) > Math.PI * 1/8) {
+                if (angleChange * lastAngleChange < -Precision.DOUBLE_EPSILON || Math.Abs(angleChange) > Math.PI * 1 / 8) {
                     subRanges.Add(new Tuple<int, int, double>(startSubRange, i, subRangeAngleChange));
 
                     startSubRange = i;
-                    subRangeAngleChange = -angleChange;  // Negate the angle change because this point invalidates the angle
+                    subRangeAngleChange = -Math.Abs(angleChange);  // Negate the angle change because this point invalidates the angle
                 }
 
-                subRangeAngleChange += angleChange;
+                subRangeAngleChange += Math.Abs(angleChange);
 
                 if (i == endIndex) {
                     subRanges.Add(new Tuple<int, int, double>(startSubRange, i, subRangeAngleChange));
@@ -126,23 +142,25 @@ namespace Mapping_Tools.Classes.Tools {
             foreach (var subRange in subRanges) {
                 int numSegments = (int) Math.Ceiling(subRange.Item3 / maxAngle);
                 double maxSegmentAngle = subRange.Item3 / numSegments;
-                
-                lastAngle = _angle[Math.Max(subRange.Item1 - 1, 0)];
+
+                lastAngle = _angle[subRange.Item1];
 
                 int startSegment = subRange.Item1;
-                double segmentAngleChangle = 0;
+                double segmentAngleChange = 0;
+                int c = 0;
                 // Loop through the sub-range and count the angle change to make even divisions of the angle
                 for (int i = subRange.Item1; i <= subRange.Item2; i++) {
                     var angle = _angle[i];
                     var angleChange = GetSmallestAngle(angle, lastAngle);
 
-                    segmentAngleChangle += angleChange;
+                    segmentAngleChange += Math.Abs(angleChange);
 
-                    if (segmentAngleChangle >= maxSegmentAngle || i == subRange.Item2) {
+                    if (segmentAngleChange >= maxSegmentAngle || i == subRange.Item2) {
                         segments.Add(new Tuple<int, int>(startSegment, i));
+                        c++;
 
                         startSegment = i;
-                        segmentAngleChangle -= maxSegmentAngle;
+                        segmentAngleChange -= maxSegmentAngle;
                     }
 
                     lastAngle = angle;
@@ -158,6 +176,27 @@ namespace Mapping_Tools.Classes.Tools {
 
         private static double GetSmallestAngle(double a1, double a2) {
             return Modulo(a2 - a1 + Math.PI, 2 * Math.PI) - Math.PI;
+        }
+
+        public static double CalculatePathLength(List<Vector2> anchors) {
+            double length = 0;
+
+            int start = 0;
+            int end = 0;
+
+            for (int i = 0; i < anchors.Length(); ++i) {
+                end++;
+
+                if (i == anchors.Length() - 1 || anchors[i] == anchors[i + 1]) {
+                    List<Vector2> cpSpan = anchors.GetRange(start, end - start);
+
+                    length += new BezierSubdivision(cpSpan).SubdividedApproximationLength();
+
+                    start = end;
+                }
+            }
+
+            return length;
         }
     }
 }
