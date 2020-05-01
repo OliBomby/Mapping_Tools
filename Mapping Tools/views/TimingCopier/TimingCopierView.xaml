@@ -24,7 +24,7 @@
                   <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
                     <Run Text="Timing Copier"/>
                   </TextBlock>
-                  <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom">
+                    <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom" ToolTip="Click me!">
                     <materialDesign:PopupBox.ToggleContent>
                       <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
                     </materialDesign:PopupBox.ToggleContent>
