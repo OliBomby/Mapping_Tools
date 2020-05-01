@@ -45,6 +45,7 @@ namespace Mapping_Tools.Views.Sliderator {
                                                         "Check out all the options. The tooltips should help you further.";
 
         private bool _ignoreAnchorsChange;
+        private bool _initialized;
 
         public SlideratorView() {
             InitializeComponent();
@@ -71,7 +72,10 @@ namespace Mapping_Tools.Views.Sliderator {
         }
 
         private void SlideratorView_OnLoaded(object sender, RoutedEventArgs e) {
+            if (_initialized) return;
+
             ProjectManager.LoadProject(this, message: false);
+            _initialized = true;
         }
 
         private SlideratorVm ViewModel => (SlideratorVm) DataContext;
