@@ -32,14 +32,14 @@
                     Change the length and duration of marked sliders and this tool will automatically handle the SliderVelocity for you.
                     </TextBlock>
                     </materialDesign:PopupBox>
-                    <materialDesign:PopupBox Margin="0,10,10,10" VerticalAlignment="Bottom">
-                        <materialDesign:PopupBox.ToggleContent>
-                            <materialDesign:PackIcon Kind="LightningBoltCircle" Width="24" Height="24" Foreground="{DynamicResource PrimaryHueLightBrush}"/>
-                        </materialDesign:PopupBox.ToggleContent>
-                        <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
-                            This tool is compatible with QuickRun!
-                        </TextBlock>
-                    </materialDesign:PopupBox>
+                  <materialDesign:PopupBox Margin="0,10,10,10" VerticalAlignment="Bottom" ToolTip="Click me!">
+                      <materialDesign:PopupBox.ToggleContent>
+                          <materialDesign:PackIcon Kind="LightningBoltCircle" Width="24" Height="24" Foreground="{DynamicResource PrimaryHueLightBrush}"/>
+                      </materialDesign:PopupBox.ToggleContent>
+                      <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
+                          This tool is compatible with QuickRun!
+                      </TextBlock>
+                  </materialDesign:PopupBox>
                 </StackPanel>
               
                 <TextBox x:Name="TemporalBox" Width="258" HorizontalAlignment="Left" Margin="0,20,0,0"
