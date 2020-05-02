@@ -134,7 +134,8 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <TextBox Grid.Column="0" Margin="0 0 10 0" materialDesign:HintAssist.Hint="Beat length" Style="{StaticResource MaterialDesignFloatingHintTextBox}">
+                        <TextBox Grid.Column="0" Margin="0 0 10 0" materialDesign:HintAssist.Hint="Beat length" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                 ToolTip="Duration of the slider in beats.">
                             <TextBox.Text>
                                 <Binding Path="GraphBeats" Mode="TwoWay" UpdateSourceTrigger="LostFocus"  NotifyOnValidationError="True">
                                     <Binding.Converter>
@@ -155,7 +156,8 @@
                                 </Binding>
                             </TextBox.Text>
                         </TextBox>
-                        <TextBox Grid.Column="1" Margin="0 0 10 0" materialDesign:HintAssist.Hint="BPM" Style="{StaticResource MaterialDesignFloatingHintTextBox}">
+                        <TextBox Grid.Column="1" Margin="0 0 10 0" materialDesign:HintAssist.Hint="BPM" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                 ToolTip="The BPM at which this slider gets played.">
                             <TextBox.Text>
                                 <Binding Path="BeatsPerMinute" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
                                     <Binding.Converter>
@@ -171,7 +173,8 @@
                                 </Binding>
                             </TextBox.Text>
                         </TextBox>
-                        <TextBox Grid.Column="2" Margin="0" materialDesign:HintAssist.Hint="Global SV" Style="{StaticResource MaterialDesignFloatingHintTextBox}">
+                        <TextBox Grid.Column="2" Margin="0" materialDesign:HintAssist.Hint="Global SV" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                 ToolTip="The Global Slider Velocity at which this slider gets played.">
                             <TextBox.Text>
                                 <Binding Path="GlobalSv" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
                                     <Binding.Converter>
@@ -206,10 +209,10 @@
                               IsChecked="{Binding ExportAsStream}"/>
 
                     <CheckBox x:Name="ManualSvBox" Content="Manually choose new SV" Margin="0 10 0 5"
-                              ToolTip="Allows you to manually choose the SV for the sliderator algorithm. Lower SV generally reduces lag from the resulting slider."
+                              ToolTip="Allows you to manually choose the SV for the sliderator algorithm and optimise the resulting slider."
                               IsChecked="{Binding ManualVelocity}"/>
                     <TextBox materialDesign:HintAssist.Hint="New SV" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 0 5"
-                             ToolTip="The new SV for the sliderated slider. This SV inlfuences the Sliderator algorithm. Use lower SV for less lag."
+                             ToolTip="The new SV for the sliderated slider. This SV influences the Sliderator algorithm. Use lower SV for less lag."
                              IsEnabled="{Binding ManualVelocity}">
                         <TextBox.Text>
                             <Binding Path="NewVelocity" Mode="TwoWay" UpdateSourceTrigger="LostFocus"  NotifyOnValidationError="True">
@@ -227,7 +230,7 @@
                         </TextBox.Text>
                     </TextBox>
                     <TextBox materialDesign:HintAssist.Hint="Minimum tumour length" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                             ToolTip="Determines the minimum length for tumours which slow down the sliderball in the sliderated slider. Longer tumours result in less lag but a more shaky sliderball.">
+                             ToolTip="Minimum length for tumours which slow down the sliderball in the sliderated slider. Longer tumours result in less lag but a more shaky sliderball.">
                         <TextBox.Text>
                             <Binding Path="MinDendrite" Mode="TwoWay" UpdateSourceTrigger="LostFocus"  NotifyOnValidationError="True">
                                 <Binding.Converter>
@@ -251,9 +254,9 @@
 
                     <StackPanel Orientation="Horizontal" Margin="0 10 0 0">
                         <TextBlock Text="Expected segment count: "
-                                   ToolTip="This is the estimated segment count for your result. Less segments means less lag, so try to optimise this value."/>
+                                   ToolTip="This is the estimated segment count for your result. More segments means more lag, so try to optimise this value."/>
                         <TextBlock Text="{Binding ExpectedSegments}"
-                                   ToolTip="This is the estimated segment count for your result. Less segments means less lag, so try to optimise this value."/>
+                                   ToolTip="This is the estimated segment count for your result. More segments means more lag, so try to optimise this value."/>
                     </StackPanel>
 
                     <CheckBox x:Name="DelegateSvToBpmBox" Content="Delegate SV to BPM" Margin="0 15 0 0"
@@ -309,7 +312,7 @@
                             </Button.Content>
                         </Button>
                         <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" Margin="0 0 5 0"
-                                ToolTip="Clear graph." Click="ClearButton_OnClick">
+                                ToolTip="Reset graph." Click="ClearButton_OnClick">
                             <Button.Content>
                                 <materialDesign:PackIcon Kind="Rocket" Width="24" Height="24"/>
                             </Button.Content>
@@ -326,7 +329,7 @@
                 </Grid>
 
                 <Slider Grid.Row="1" Minimum="1" Maximum="16" Value="{Binding BeatSnapDivisor}" Style="{StaticResource MaterialDesignDiscreteSlider}"
-                        ToolTip="Beat snap divisor"/>
+                        ToolTip="Beat snap divisor."/>
 
                 <ToolBarOverflowPanel HorizontalAlignment="Left" Grid.Row="2" Margin="5 10 5 0">
                     <CheckBox IsChecked="{Binding ShowRedAnchors}" Content="Show red anchors" Margin="0 0 5 0"

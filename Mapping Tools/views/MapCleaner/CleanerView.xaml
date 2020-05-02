@@ -46,38 +46,49 @@
                   </materialDesign:PopupBox>
                 </StackPanel>
               
-                <CheckBox FontSize="14" x:Name="ResnapObjects" IsChecked="{Binding MapCleanerArgs.ResnapObjects}" Cursor="Hand" Margin="0,10,0,0">
+                <CheckBox FontSize="14" x:Name="ResnapObjects" IsChecked="{Binding MapCleanerArgs.ResnapObjects}" Cursor="Hand" Margin="0,10,0,0"
+                          ToolTip="Resnap hit objects and slider ends.">
                     Resnap objects
                 </CheckBox>
-                <CheckBox FontSize="14" x:Name="ResnapBookmarks" IsChecked="{Binding MapCleanerArgs.ResnapBookmarks}" Cursor="Hand">
+                <CheckBox FontSize="14" x:Name="ResnapBookmarks" IsChecked="{Binding MapCleanerArgs.ResnapBookmarks}" Cursor="Hand"
+                          ToolTip="Resnap bookmarks.">
                     Resnap bookmarks
                 </CheckBox>
-                <CheckBox FontSize="14" x:Name="RemoveUnusedSamples" IsChecked="{Binding MapCleanerArgs.RemoveUnusedSamples}" Cursor="Hand">
+                <CheckBox FontSize="14" x:Name="RemoveUnusedSamples" IsChecked="{Binding MapCleanerArgs.RemoveUnusedSamples}" Cursor="Hand"
+                          ToolTip="Remove all samples that are unused by all maps and storyboards in the set.">
                     Remove unused samples
                 </CheckBox>
-                <CheckBox FontSize="14" x:Name="RemoveMuting" IsChecked="{Binding MapCleanerArgs.RemoveMuting}" Cursor="Hand">
+                <CheckBox FontSize="14" x:Name="RemoveMuting" IsChecked="{Binding MapCleanerArgs.RemoveMuting}" Cursor="Hand"
+                          ToolTip="Remove all occurances of 5% volume on slider ends or spinner ends.">
                     Remove muting
                 </CheckBox>
-                <CheckBox FontSize="14" x:Name="RemoveUnclickableHitsounds" IsChecked="{Binding MapCleanerArgs.RemoveUnclickableHitsounds}" Cursor="Hand">
+                <CheckBox FontSize="14" x:Name="RemoveUnclickableHitsounds" IsChecked="{Binding MapCleanerArgs.RemoveUnclickableHitsounds}" Cursor="Hand"
+                          ToolTip="Mute all slider ends/repeats and spinner ends.">
                     Mute unclickable hitsounds
                 </CheckBox>
 
                 <TextBlock Text="Map info" Margin="0,20,0,0" FontSize="14" FontWeight="Bold"/>
-                <CheckBox FontSize="14" x:Name="VolumeSliders" Cursor="Hand" IsChecked="{Binding MapCleanerArgs.VolumeSliders}">
+                <CheckBox FontSize="14" x:Name="VolumeSliders" Cursor="Hand" IsChecked="{Binding MapCleanerArgs.VolumeSliders}"
+                          ToolTip="Flag volume changes in sliders as usefull, so they don't get removed.">
                     Map uses volume changes in sliders
                 </CheckBox>
-                <CheckBox FontSize="14" Name="SamplesetSliders" Cursor="Hand" IsChecked="{Binding MapCleanerArgs.SampleSetSliders}">
+                <CheckBox FontSize="14" Name="SamplesetSliders" Cursor="Hand" IsChecked="{Binding MapCleanerArgs.SampleSetSliders}"
+                          ToolTip="Flag sample set changes in sliders as usefull, so they don't get removed.">
                     Map uses sampleset changes in sliders
                 </CheckBox>
-                <CheckBox FontSize="14" x:Name="VolumeSpinners" Cursor="Hand" IsChecked="{Binding MapCleanerArgs.VolumeSpinners}">
+                <CheckBox FontSize="14" x:Name="VolumeSpinners" Cursor="Hand" IsChecked="{Binding MapCleanerArgs.VolumeSpinners}"
+                          ToolTip="Flag volume changes in spinners as usefull, so they don't get removed.">
                     Map uses volume changes in spinners
                 </CheckBox>
 
-                <TextBlock Text="Signatures" Margin="0,20,0,0" FontSize="14" FontWeight="Bold"/>
+                <TextBlock Text="Signatures" Margin="0,20,0,0" FontSize="14" FontWeight="Bold"
+                           ToolTip="Choose the snap divisors to resnap to."/>
                 <ComboBox FontSize="14" x:Name="Snap1" Cursor="Hand" Width="60" HorizontalAlignment="Left"
-                          ItemsSource="{Binding Snaps1}" SelectedItem="{Binding MapCleanerArgs.Snap1, Converter={StaticResource SnapDivisorToStringConverter}}"/>
+                          ItemsSource="{Binding Snaps1}" SelectedItem="{Binding MapCleanerArgs.Snap1, Converter={StaticResource SnapDivisorToStringConverter}}"
+                          ToolTip="Choose the snap divisors to resnap to."/>
                 <ComboBox FontSize="14" x:Name="Snap2" Cursor="Hand" Width="60" HorizontalAlignment="Left"
-                          ItemsSource="{Binding Snaps2}" SelectedItem="{Binding MapCleanerArgs.Snap2, Converter={StaticResource SnapDivisorToStringConverter}}"/>
+                          ItemsSource="{Binding Snaps2}" SelectedItem="{Binding MapCleanerArgs.Snap2, Converter={StaticResource SnapDivisorToStringConverter}}"
+                          ToolTip="Choose the snap divisors to resnap to."/>
             </StackPanel>
             <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
                 <Button
@@ -105,7 +116,8 @@
             </Grid>
         </Grid>
         <Grid Name="FourthGrid" Grid.Row="2">
-            <StackPanel x:Name="tl_host"/>
+            <StackPanel x:Name="tl_host"
+                        ToolTip="This timeline shows the changes in the control points of the map. You can double-click the lines to go to that time."/>
         </Grid>
     </Grid>
 </local:SingleRunMappingTool>

@@ -114,8 +114,10 @@
                 </GroupBox>
 
                 <StackPanel Orientation="Horizontal" Margin="0 10 0 0">
-                    <ToggleButton IsChecked="{Binding SyncTimeFields}" Margin="5 0 0 0"/>
-                    <TextBlock Text="Synchronize time fields" VerticalAlignment="Center" Margin="5 0 0 0"/>
+                    <ToggleButton IsChecked="{Binding SyncTimeFields}" Margin="5 0 0 0"
+                                  ToolTip="Enable this to synchronize the fields of all time-related elements."/>
+                    <TextBlock Text="Synchronize time fields" VerticalAlignment="Center" Margin="5 0 0 0"
+                               ToolTip="Enable this to synchronize the fields of all time-related elements."/>
                     <Button HorizontalAlignment="Left" Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" Margin="300 0 0 0"
                             ToolTip="Reset all multipliers and offsets." Command="{Binding ResetCommand}">
                         <materialDesign:PackIcon Kind="Rocket" Height="24" Width="24" />
@@ -123,10 +125,12 @@
                 </StackPanel>
 
                 <StackPanel Margin="0,10,0,0">
-                    <CheckBox x:Name="ClipBox" Content="Clip properties" ToolTip="Clips the parameters to stay within bounds. (Volume: 5-100 etc)"
+                    <CheckBox x:Name="ClipBox" Content="Clip properties" 
+                              ToolTip="Clips the parameters to stay within bounds. (Volume: 5-100 etc)"
                         IsChecked="{Binding Path=ClipProperties, Mode=TwoWay}"/>
                     <CheckBox x:Name="FiltersBox" Content="Enable filters" IsChecked="{Binding Path=EnableFilters, Mode=TwoWay}"
-                        HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+                        HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                        ToolTip="Enable filtering to control which objects get transformed."/>
                     <StackPanel Visibility="{Binding Path=EnableFilters, UpdateSourceTrigger=PropertyChanged,  
                                  Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
                         <TextBox x:Name="MatchBox" Text="{Binding Path=MatchFilter, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=-1}"

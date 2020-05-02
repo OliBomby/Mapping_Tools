@@ -50,7 +50,8 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBox Grid.Column="0" Text="{Binding ImportPath}" Margin="0,0,5,0"
-                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Copy timing from"/>
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Copy timing from"
+                        ToolTip="Path to the beatmap to copy timing from."/>
                     <Button Grid.Column="1" Cursor="Hand" Command="{Binding ImportLoadCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
                             ToolTip="Fetch the selected beatmap from your osu! client.">
                         <Viewbox Width="30" Height="30" Cursor="Hand">
@@ -71,7 +72,8 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBox Grid.Column="0" x:Name="ExportPathBox" Text="{Binding ExportPath}"
-                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Copy timing to"/>
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Copy timing to"
+                        ToolTip="Beatmap(s) to copy timing to. You can input multiple beatmap paths seperated with '|'."/>
                     <TextBlock Grid.Column="1" Margin="3 15 5 0" FontStyle="Italic"
                                ToolTip="Multiple beatmaps can be inputted in this field. Separate the paths with the '|' character."
                                Text="{Binding ElementName=ExportPathBox, Path=Text, Converter={StaticResource MapPathStringToCountStringConverter}}"/>
@@ -87,20 +89,24 @@
                     </Button >
                 </Grid>
                 <ComboBox Margin="0,20,0,0" Cursor="Hand" Text="{Binding ResnapMode}"
-                    Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Resnapping mode">
+                    Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Resnapping mode"
+                    ToolTip="Choose how to move hit objects to the new timing.">
                     <ComboBoxItem Content="Number of beats between objects stays the same" Cursor="Hand"/>
                     <ComboBoxItem Content="Just resnap" Cursor="Hand"/>
                     <ComboBoxItem Content="Don't move objects" Cursor="Hand"/>
                 </ComboBox>
-                <TextBlock Text="Signatures" Margin="0,20,0,0" FontSize="14" FontWeight="Bold"/>
-                <ComboBox FontSize="14" Text="{Binding Snap1, Converter={StaticResource SnapDivisorToStringConverter}}" Cursor="Hand" SelectedIndex="4" Width="60" HorizontalAlignment="Left">
+                <TextBlock Text="Signatures" Margin="0,20,0,0" FontSize="14" FontWeight="Bold"
+                           ToolTip="Beat snap divisors for resnapping."/>
+                <ComboBox FontSize="14" Text="{Binding Snap1, Converter={StaticResource SnapDivisorToStringConverter}}" Cursor="Hand" SelectedIndex="4" Width="60" HorizontalAlignment="Left"
+                          ToolTip="Beat snap divisors for resnapping.">
                     <ComboBoxItem Content="1/1" Cursor="Hand"/>
                     <ComboBoxItem Content="1/2" Cursor="Hand"/>
                     <ComboBoxItem Content="1/4" Cursor="Hand"/>
                     <ComboBoxItem Content="1/8" Cursor="Hand"/>
                     <ComboBoxItem Content="1/16" Cursor="Hand"/>
                 </ComboBox>
-                <ComboBox FontSize="14" Text="{Binding Snap2, Converter={StaticResource SnapDivisorToStringConverter}}" Cursor="Hand" SelectedIndex="3" Width="60" HorizontalAlignment="Left">
+                <ComboBox FontSize="14" Text="{Binding Snap2, Converter={StaticResource SnapDivisorToStringConverter}}" Cursor="Hand" SelectedIndex="3" Width="60" HorizontalAlignment="Left"
+                          ToolTip="Beat snap divisors for resnapping.">
                     <ComboBoxItem Content="1/1" Cursor="Hand"/>
                     <ComboBoxItem Content="1/3" Cursor="Hand"/>
                     <ComboBoxItem Content="1/6" Cursor="Hand"/>

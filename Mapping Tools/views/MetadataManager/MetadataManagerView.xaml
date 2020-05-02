@@ -59,7 +59,8 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBox Grid.Column="0" x:Name="BeatmapFromBox" Margin="0,0,5,0" Text="{Binding ImportPath}"
-                                Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Import metadata from"/>
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Import metadata from"
+                                ToolTip="Beatmap to import metadata from. This is optional."/>
                             <Button Grid.Column="1" Cursor="Hand" Command="{Binding ImportLoadCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
                                     ToolTip="Fetch the selected beatmap from your osu! client.">
                                 <Viewbox Width="30" Height="30" Cursor="Hand">
@@ -69,7 +70,8 @@
                                     ToolTip="Select beatmaps with File Explorer.">
                                 <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                             </Button >
-                            <Button Grid.Column="5" Cursor="Hand" Command="{Binding ImportCommand}" VerticalAlignment="Bottom">
+                            <Button Grid.Column="5" Cursor="Hand" Command="{Binding ImportCommand}" VerticalAlignment="Bottom"
+                                    ToolTip="Import metadata from the specified beatmap. This is optional.">
                                 Import metadata
                             </Button >
                         </Grid>
@@ -82,7 +84,8 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBox Grid.Column="0" x:Name="BeatmapToBox" Margin="0,0,5,0" Text="{Binding ExportPath}"
-                                Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Export metadata to"/>
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Export metadata to"
+                                ToolTip="Beatmap(s) to export the metadata to. You can input multiple map paths seperated by '|'."/>
                             <TextBlock Grid.Column="1" Margin="3 15 5 0" FontStyle="Italic"
                                        ToolTip="Multiple beatmaps can be inputted in this field. Separate the paths with the '|' character."
                                        Text="{Binding ElementName=BeatmapToBox, Path=Text, Converter={StaticResource MapPathStringToCountStringConverter}}"/>
@@ -223,7 +226,8 @@
                             <TextBox Grid.Column="2" Grid.Row="7" Text="{Binding PreviewTime, Converter={StaticResource TimeToStringConverter}, ConverterParameter=-1}" TextWrapping="Wrap" Margin="0 50 0 0"/>
 
                             <StackPanel Grid.Column="2" Grid.Row="8">
-                                <ToggleButton x:Name="ComboColourToggle" HorizontalAlignment="Left" Margin="5 10 0 10" IsChecked="{Binding UseComboColours}"/>
+                                <ToggleButton x:Name="ComboColourToggle" HorizontalAlignment="Left" Margin="5 10 0 10" IsChecked="{Binding UseComboColours}"
+                                              ToolTip="Choose to export combo colours. You can disable this to have different colours between maps."/>
                                 <StackPanel IsEnabled="{Binding Path=IsChecked, ElementName=ComboColourToggle}">
                                     <StackPanel Orientation="Horizontal">
                                         <materialDesign:Card UniformCornerRadius="5">
