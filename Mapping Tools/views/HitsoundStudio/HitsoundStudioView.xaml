@@ -151,8 +151,9 @@
                                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Source path"/>
                                 <Button Grid.Column="1" Cursor="Hand" Click="SelectedImportPathLoad_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
                                         ToolTip="Fetch the selected beatmap from your osu! client.">
-                                    <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Download" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
-                                </Button >
+                                    <Viewbox Width="30" Height="30" Cursor="Hand">
+                                        <Image Source="{StaticResource OsuBeatmapFetchIcon}" Margin="20"/>
+                                    </Viewbox>                                </Button >
                                 <Button Grid.Column="3" Cursor="Hand" Click="SelectedImportPathBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
                                         ToolTip="Select beatmaps with File Explorer.">
                                     <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
@@ -303,8 +304,9 @@
                             <TextBox Grid.Column="1" x:Name="BaseBeatmapPathBox" Text="{Binding BaseBeatmap, Mode=TwoWay}" Margin="5,0,5,0"/>
                             <Button Grid.Column="2" Cursor="Hand" Click="BaseBeatmapLoad_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
                                     ToolTip="Fetch the selected beatmap from your osu! client.">
-                                <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Download" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
-                            </Button >
+                                <Viewbox Width="30" Height="30" Cursor="Hand">
+                                    <Image Source="{StaticResource OsuBeatmapFetchIcon}" Margin="20"/>
+                                </Viewbox>                            </Button >
                             <Button Grid.Column="4" Cursor="Hand" Click="BaseBeatmapBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
                                     ToolTip="Select beatmaps with File Explorer.">
                                 <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>

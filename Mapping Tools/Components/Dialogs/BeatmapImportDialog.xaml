@@ -34,8 +34,9 @@
             </TextBox>
             <Button Grid.Column="1" Cursor="Hand" Click="BeatmapLoad_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
                     ToolTip="Fetch the selected beatmap from your osu! client.">
-                <wpf:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Download" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
-            </Button >
+                <Viewbox Width="30" Height="30" Cursor="Hand">
+                    <Image Source="{StaticResource OsuBeatmapFetchIcon}" Margin="20"/>
+                </Viewbox>            </Button >
             <Button Grid.Column="3" Cursor="Hand" Click="BeatmapBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
                     ToolTip="Select beatmaps with File Explorer.">
                 <wpf:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
