@@ -114,7 +114,8 @@
                         <materialDesign:Snackbar x:Name="MainSnackbar"/>
                     </Grid>
                     <materialDesign:ColorZone Mode="PrimaryDark" Grid.Row="3" Padding="10 10 10 0">
-                        <Grid x:Name="ForthGrid">
+                        <Grid x:Name="ForthGrid"
+                              ToolTip="This is the current beatmap. Most of the tools do their work on this beatmap.">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
