@@ -61,35 +61,55 @@
                     <Border Padding="5 10">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
-                                <TextBlock Width="100" Text="Snap key" VerticalAlignment="Bottom" Margin="0 0 0 6" ToolTip="Press and hold this key to snap your cursor to the closest virtual object."/>
-                                <components1:HotkeyEditorControl Width="150" VerticalAlignment="Bottom" Hotkey="{Binding SnapHotkey}"/>
-                                <TextBlock Width="100" Text="Select key" VerticalAlignment="Bottom" Margin="10 0 0 6" ToolTip="Press or hold this key to select virtual objects."/>
-                                <components1:HotkeyEditorControl Width="150" VerticalAlignment="Bottom" Hotkey="{Binding SelectHotkey}"/>
+                                <TextBlock Width="100" Text="Snap key" VerticalAlignment="Bottom" Margin="0 0 0 6" 
+                                           ToolTip="Press and hold this key to snap your cursor to the closest virtual object."/>
+                                <components1:HotkeyEditorControl Width="150" VerticalAlignment="Bottom" Hotkey="{Binding SnapHotkey}"
+                                                                 ToolTip="Press and hold this key to snap your cursor to the closest virtual object."/>
+                                <TextBlock Width="100" Text="Select key" VerticalAlignment="Bottom" Margin="10 0 0 6" 
+                                           ToolTip="Press or hold this key to select virtual objects."/>
+                                <components1:HotkeyEditorControl Width="150" VerticalAlignment="Bottom" Hotkey="{Binding SelectHotkey}"
+                                                                 ToolTip="Press or hold this key to select virtual objects."/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
-                                <TextBlock Width="100" Text="Lock key" VerticalAlignment="Bottom" Margin="0 0 0 6" ToolTip="Press or hold this key to lock virtual objects."/>
-                                <components1:HotkeyEditorControl Width="150" VerticalAlignment="Bottom" Hotkey="{Binding LockHotkey}"/>
-                                <TextBlock Width="100" Text="Usability key" VerticalAlignment="Bottom" Margin="10 0 0 6" ToolTip="Press or hold this key to select which virtual objects can get used by generators."/>
-                                <components1:HotkeyEditorControl Width="150" VerticalAlignment="Bottom" Hotkey="{Binding InheritHotkey}"/>
+                                <TextBlock Width="100" Text="Lock key" VerticalAlignment="Bottom" Margin="0 0 0 6" 
+                                           ToolTip="Press or hold this key to lock virtual objects."/>
+                                <components1:HotkeyEditorControl Width="150" VerticalAlignment="Bottom" Hotkey="{Binding LockHotkey}"
+                                                                 ToolTip="Press or hold this key to lock virtual objects."/>
+                                <TextBlock Width="100" Text="Usability key" VerticalAlignment="Bottom" Margin="10 0 0 6" 
+                                           ToolTip="Press or hold this key to select which virtual objects can get used by generators."/>
+                                <components1:HotkeyEditorControl Width="150" VerticalAlignment="Bottom" Hotkey="{Binding InheritHotkey}"
+                                                                 ToolTip="Press or hold this key to select which virtual objects can get used by generators."/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
-                                <TextBlock Width="100" Text="Refresh key" VerticalAlignment="Bottom" Margin="0 0 0 6" ToolTip="Press or hold this key to continuously refresh the hit objects in the root layer the object tree."/>
-                                <components1:HotkeyEditorControl Width="150" VerticalAlignment="Bottom" Hotkey="{Binding RefreshHotkey}"/>
+                                <TextBlock Width="100" Text="Refresh key" VerticalAlignment="Bottom" Margin="0 0 0 6"
+                                           ToolTip="Press or hold this key to continuously refresh the hit objects in the root layer of the object tree."/>
+                                <components1:HotkeyEditorControl Width="150" VerticalAlignment="Bottom" Hotkey="{Binding RefreshHotkey}"
+                                                                 ToolTip="Press or hold this key to continuously refresh the hit objects in the root layer of the object tree."/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
                                 <TextBlock Width="100" Margin="0 0 0 6" Text="Offset" VerticalAlignment="Bottom" ToolTip="Offsets the overlay box. Use this field when the automatic editor-to-screen coordinate conversion seems to fail. Enable Debug mode to see the overlay box."/>
-                                <TextBox Text="{Binding OffsetLeft, Converter={StaticResource DoubleToStringConverter}}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Left offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 10 0"/>
-                                <TextBox Text="{Binding OffsetTop, Converter={StaticResource DoubleToStringConverter}}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Top offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 10 0"/>
-                                <TextBox Text="{Binding OffsetRight, Converter={StaticResource DoubleToStringConverter}}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Right offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 10 0"/>
-                                <TextBox Text="{Binding OffsetBottom, Converter={StaticResource DoubleToStringConverter}}" Width="95" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Bottom offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
+                                <TextBox Text="{Binding OffsetLeft, Converter={StaticResource DoubleToStringConverter}}" Width="95" VerticalAlignment="Bottom" 
+                                         materialDesign:HintAssist.Hint="Left offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 10 0"
+                                         ToolTip="Input the offset for the left side of the overlay."/>
+                                <TextBox Text="{Binding OffsetTop, Converter={StaticResource DoubleToStringConverter}}" Width="95" VerticalAlignment="Bottom" 
+                                         materialDesign:HintAssist.Hint="Top offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 10 0"
+                                         ToolTip="Input the offset for the top side of the overlay."/>
+                                <TextBox Text="{Binding OffsetRight, Converter={StaticResource DoubleToStringConverter}}" Width="95" VerticalAlignment="Bottom" 
+                                         materialDesign:HintAssist.Hint="Right offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 10 0"
+                                         ToolTip="Input the offset for the right side of the overlay."/>
+                                <TextBox Text="{Binding OffsetBottom, Converter={StaticResource DoubleToStringConverter}}" Width="95" VerticalAlignment="Bottom" 
+                                         materialDesign:HintAssist.Hint="Bottom offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                         ToolTip="Input the offset for the bottom side of the overlay."/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
-                                <TextBlock Width="100" Margin="0 0 0 6" Text="Complexity" VerticalAlignment="Bottom" ToolTip="Specifies how many layers of virtual objects can be used. More layers means more generation of virtual objects from the previous virtual objects in the tree."/>
+                                <TextBlock Width="100" Margin="0 0 0 6" Text="Complexity" VerticalAlignment="Bottom" 
+                                           ToolTip="Specifies how many layers of virtual objects can be used. More layers means more recursion of generating virtual objects."/>
                                 <TextBox Text="{Binding InceptionLevel, Converter={StaticResource IntToStringConverter}}" Width="120" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Inception level" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                                         ToolTip="Specifies how many layers of virtual objects can be used. More layers means more generation of virtual objects from the previous virtual objects in the tree. It is recommended to use between 2 and 10 layers."/>
+                                         ToolTip="Specifies how many layers of virtual objects can be used. More layers means more recursion of generating virtual objects. It is recommended to use between 2 and 10 layers."/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
-                                <TextBlock Width="100" Margin="0 0 0 6" Text="Downkey" VerticalAlignment="Center" ToolTip="Customize what gets displayed when the Activation Key is pressed."/>
+                                <TextBlock Width="100" Margin="0 0 0 6" Text="Downkey" VerticalAlignment="Center"
+                                           ToolTip="Customize what gets displayed while the Snap Key is pressed."/>
                                 <ListBox SelectionMode="Extended" SelectionChanged="KeyDownViewModeSelector_OnSelectionChanged"
                                     Style="{StaticResource MaterialDesignToolToggleListBox}">
                                     <ListBoxItem ToolTip="Everything" Tag="{x:Static serialization:ViewMode.Everything}" IsSelected="{Binding KeyDownViewMode, Mode=OneTime, Converter={StaticResource FlagToBoolConverter}, ConverterParameter={x:Static serialization:ViewMode.Everything}}">
@@ -110,7 +130,8 @@
                                 </ListBox>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
-                                <TextBlock Width="100" Margin="0 0 0 6" Text="Upkey" VerticalAlignment="Center" ToolTip="Customize what gets displayed when the Activation Key is not pressed."/>
+                                <TextBlock Width="100" Margin="0 0 0 6" Text="Upkey" VerticalAlignment="Center" 
+                                           ToolTip="Customize what gets displayed while the Snap Key is not pressed."/>
                                 <StackPanel>
                                     <RadioButton IsChecked="{Binding KeyUpViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static serialization:ViewMode.Everything}}"
                                                  Content="Everything" ToolTip="Default behavior. Display all virtual objects even if the Activation Key is not pressed."/>
@@ -119,18 +140,20 @@
                                 </StackPanel>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
-                                <TextBlock Width="100" Margin="0 0 0 6" Text="Selection" VerticalAlignment="Center" ToolTip="Customize what hit objects get used for generating virtual objects."/>
+                                <TextBlock Width="100" Margin="0 0 0 6" Text="Selection" VerticalAlignment="Center" 
+                                           ToolTip="Customize which hit objects get used for generating virtual objects."/>
                                 <StackPanel>
                                     <RadioButton IsChecked="{Binding SelectedHitObjectMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static serialization:SelectedHitObjectMode.AllwaysAllVisible}}"
                                                  Content="All visible" ToolTip="Use the visible hit objects regardless of selection."/>
                                     <RadioButton IsChecked="{Binding SelectedHitObjectMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static serialization:SelectedHitObjectMode.VisibleOrSelected}}"
-                                                 Content="Visible or selected" ToolTip="Use the visible hit objects, but use the selected hit objects if any are selected."/>
+                                                 Content="Visible or selected" ToolTip="Use the visible hit objects, or use the selected hit objects if there are any selected."/>
                                     <RadioButton IsChecked="{Binding SelectedHitObjectMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static serialization:SelectedHitObjectMode.OnlySelected}}"
                                                  Content="Selected only" ToolTip="Exclusively use selected hit objects."/>
                                 </StackPanel>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
-                                <TextBlock Width="100" Margin="0 0 0 6" Text="Updating" VerticalAlignment="Center" ToolTip="Customize on what events the virtual objects get updated."/>
+                                <TextBlock Width="100" Margin="0 0 0 6" Text="Updating" VerticalAlignment="Center" 
+                                           ToolTip="Customize on which events the virtual objects get updated."/>
                                 <StackPanel>
                                     <RadioButton IsChecked="{Binding UpdateMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static serialization:UpdateMode.AnyChange}}"
                                                  Content="Any change" ToolTip="Update whenever used hit objects get changed."/>
@@ -139,24 +162,34 @@
                                     <RadioButton IsChecked="{Binding UpdateMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static serialization:UpdateMode.OsuActivated}}"
                                                  Content="osu! activated" ToolTip="Update whenever the osu! window goes from an inactive state to an active state."/>
                                     <RadioButton IsChecked="{Binding UpdateMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static serialization:UpdateMode.HotkeyDown}}"
-                                                 Content="Hotkey down" ToolTip="Update only when refresh hotkey is down."/>
+                                                 Content="Hotkey down" ToolTip="Update only when the refresh hotkey is down."/>
                                 </StackPanel>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
-                                <TextBlock Width="100" Margin="0 0 0 6" Text="Minimal diff" VerticalAlignment="Bottom" ToolTip="Similar virtual objects get merged together. This sets the minimal acceptable difference that two objects can have and not get merged together."></TextBlock>
-                                <TextBox Text="{Binding AcceptableDifference, Converter={StaticResource DoubleToStringConverter}}" Width="150" VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Minimal difference" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
+                                <TextBlock Width="100" Margin="0 0 0 6" Text="Minimal diff" VerticalAlignment="Bottom" 
+                                           ToolTip="Similar virtual objects get merged together to reduce clutter. This field sets the minimal difference that two objects must have to not get merged together."></TextBlock>
+                                <TextBox Text="{Binding AcceptableDifference, Converter={StaticResource DoubleToStringConverter}}" Width="150" 
+                                         VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="Minimal difference" 
+                                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                         ToolTip="Similar virtual objects get merged together to reduce clutter. This field sets the minimal difference that two objects must have to not get merged together."/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
-                                <TextBlock Width="100" Margin="0 0 0 6" Text="Keep running" VerticalAlignment="Center" ToolTip="Keeps Geometry Dashboard running in the background while other tools are open."/>
-                                <ToggleButton IsChecked="{Binding KeepRunning}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignSwitchToggleButton}"/>
+                                <TextBlock Width="100" Margin="0 0 0 6" Text="Keep running" VerticalAlignment="Center" 
+                                           ToolTip="Keeps Geometry Dashboard running in the background while other tools are open."/>
+                                <ToggleButton IsChecked="{Binding KeepRunning}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                                              ToolTip="Keeps Geometry Dashboard running in the background while other tools are open."/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
-                                <TextBlock Width="100" Margin="0 0 0 6" Text="See playfield" VerticalAlignment="Center" ToolTip="Visualize boundary of the play area on the overlay."/>
-                                <ToggleButton IsChecked="{Binding VisiblePlayfieldBoundary}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignSwitchToggleButton}"/>
+                                <TextBlock Width="100" Margin="0 0 0 6" Text="See playfield" VerticalAlignment="Center" 
+                                           ToolTip="Visualize boundary of the play area on the overlay."/>
+                                <ToggleButton IsChecked="{Binding VisiblePlayfieldBoundary}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                                              ToolTip="Visualize boundary of the play area on the overlay."/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
-                                <TextBlock Width="100" Margin="0 0 0 6" Text="Debug" VerticalAlignment="Center" ToolTip="Visualize boundaries of the overlay box for debugging purposes."/>
-                                <ToggleButton IsChecked="{Binding DebugEnabled}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignSwitchToggleButton}"/>
+                                <TextBlock Width="100" Margin="0 0 0 6" Text="Debug" VerticalAlignment="Center" 
+                                           ToolTip="Visualize boundaries of the overlay box for debugging purposes."/>
+                                <ToggleButton IsChecked="{Binding DebugEnabled}" VerticalAlignment="Center" Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                                              ToolTip="Visualize boundaries of the overlay box for debugging purposes."/>
                             </StackPanel>
                         </StackPanel>
                     </Border>

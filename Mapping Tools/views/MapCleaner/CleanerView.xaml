@@ -83,7 +83,8 @@
                 <Button
                     Style="{StaticResource MaterialDesignFloatingActionButton}"
                     IsEnabled="{Binding ElementName=This, Path=CanRun}"
-                    Click="Start_Click">
+                    Click="Start_Click"
+                    ToolTip="Run this tool.">
                     <materialDesign:PackIcon
                         Kind="Play" Height="36" Width="36" />
                 </Button>

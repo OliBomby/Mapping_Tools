@@ -302,10 +302,10 @@ namespace Mapping_Tools.Views.HitsoundStudio
         {
             try
             {
-                string[] paths = IOHelper.BeatmapFileDialog(restore: !SettingsManager.Settings.CurrentBeatmapDefaultFolder);
-                if (paths.Length != 0)
+                string path = IOHelper.FileDialog();
+                if (!string.IsNullOrEmpty(path))
                 {
-                    SelectedImportPathBox.Text = paths[0];
+                    SelectedImportPathBox.Text = path;
                 }
             }
             catch (Exception) { }

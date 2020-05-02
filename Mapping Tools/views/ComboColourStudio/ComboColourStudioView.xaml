@@ -149,7 +149,8 @@
                                         ToolTip="Import colour haxing from a beatmap and populate the colour points."/>
 
                                 <TextBox Width="120" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="10 0 10 5"
-                                         materialDesign:HintAssist.Hint="Max burst length" ToolTip="Determines the maximum combo size for burst combos. Combos longer than this cant get burst colours."
+                                         materialDesign:HintAssist.Hint="Max burst length" 
+                                         ToolTip="Determines the maximum combo size for burst combos. Combos longer than this value can't get a colour from burst colour points."
                                          Text="{Binding Project.MaxBurstLength}"/>
                             </StackPanel>
                         </materialDesign:Card>
@@ -210,7 +211,8 @@
                     <Button
                         IsEnabled="{Binding ElementName=This, Path=CanRun}"
                         Style="{StaticResource MaterialDesignFloatingActionButton}"
-                        Click="Start_Click">
+                        Click="Start_Click"
+                        ToolTip="Run this tool.">
                         <materialDesign:PackIcon
                             Kind="Play" Height="36" Width="36" />
                     </Button>
