@@ -78,7 +78,7 @@
                             <MenuItem Height="31" Header="_File" Padding="12,0,0,0" MinWidth="50">
                                 <MenuItem Header="_Open beatmap" Click="OpenBeatmap" Icon="{materialDesign:PackIcon Folder}"
                                           ToolTip="Select the current beatmap with File Explorer."/>
-                                <MenuItem Header="_Open current beatmap" Click="OpenGetCurrentBeatmap" Icon="{materialDesign:PackIcon Download}"
+                                <MenuItem Header="_Open current beatmap" Click="OpenGetCurrentBeatmap" Icon="{materialDesign:PackIcon RestoreFromTrash}"
                                           ToolTip="Set the current beatmap to the selected beatmap in your osu! client."/>
                                 <MenuItem Header="_Generate backup" Click="SaveBackup" Icon="{materialDesign:PackIcon Backup}"
                                           ToolTip="Save a backup of the current beatmap to the backups folder."/>

@@ -55,9 +55,8 @@
                                Text="{Binding ElementName=ImportPathBox, Path=Text, Converter={StaticResource MapPathStringToCountStringConverter}}"/>
                     <Button Grid.Column="2" Cursor="Hand" Command="{Binding ImportLoadCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
                             ToolTip="Fetch the selected beatmap from your osu! client.">
-                        <Viewbox Width="30" Height="30" Cursor="Hand">
-                            <Image Source="{StaticResource OsuBeatmapFetchIcon}" Margin="20"/>
-                        </Viewbox>                    </Button >
+                        <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="RestoreFromTrash" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                    </Button >
                     <Button Grid.Column="4" Cursor="Hand" Command="{Binding ImportBrowseCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
                             ToolTip="Select beatmaps with File Explorer.">
                         <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
@@ -75,9 +74,8 @@
                         ToolTip="Where to save the rhythm guide map. Can also be an existing beatmap."/>
                     <Button Grid.Column="1" Cursor="Hand" Command="{Binding ExportLoadCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
                             ToolTip="Fetch the selected beatmap from your osu! client.">
-                        <Viewbox Width="30" Height="30" Cursor="Hand">
-                            <Image Source="{StaticResource OsuBeatmapFetchIcon}" Margin="20"/>
-                        </Viewbox>                    </Button >
+                        <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="RestoreFromTrash" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                    </Button >
                     <Button Grid.Column="3" Cursor="Hand" Command="{Binding ExportBrowseCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
                             ToolTip="Select beatmaps with File Explorer.">
                         <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
