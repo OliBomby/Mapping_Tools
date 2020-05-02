@@ -109,7 +109,8 @@
                             </Grid.ColumnDefinitions>
                             <TextBox Grid.Column="0" x:Name="SelectedSamplePathBox" TextChanged="SelectedSamplePathBox_TextChanged" Margin="0,0,5,0"
                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Path"/>
-                            <Button Grid.Column="1" Cursor="Hand" Click="SelectedSamplePathBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
+                            <Button Grid.Column="1" Cursor="Hand" Click="SelectedSamplePathBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                                    ToolTip="Select files with File Explorer.">
                                 <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                             </Button >
                         </Grid>
@@ -148,10 +149,12 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBox Grid.Column="0" x:Name="SelectedImportPathBox" TextChanged="SelectedImportPathBox_TextChanged" Margin="0,0,5,0"
                                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Source path"/>
-                                <Button Grid.Column="1" Cursor="Hand" Click="SelectedImportPathLoad_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
+                                <Button Grid.Column="1" Cursor="Hand" Click="SelectedImportPathLoad_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                                        ToolTip="Fetch the selected beatmap from your osu! client.">
                                     <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Download" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                                 </Button >
-                                <Button Grid.Column="3" Cursor="Hand" Click="SelectedImportPathBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
+                                <Button Grid.Column="3" Cursor="Hand" Click="SelectedImportPathBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                                        ToolTip="Select beatmaps with File Explorer.">
                                     <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                                 </Button >
                             </Grid>
@@ -176,7 +179,8 @@
                                     </Grid.ColumnDefinitions>
                                     <TextBox Grid.Column="0" x:Name="SelectedImportSamplePathBox" TextChanged="SelectedImportSamplePathBox_TextChanged" Margin="0,0,5,0"
                                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Sample path"/>
-                                    <Button Grid.Column="1" Cursor="Hand" Click="SelectedImportSamplePathBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
+                                    <Button Grid.Column="1" Cursor="Hand" Click="SelectedImportSamplePathBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                                            ToolTip="Select files with File Explorer.">
                                         <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                                     </Button >
                                 </Grid>
@@ -198,7 +202,8 @@
                                     </Grid.ColumnDefinitions>
                                     <TextBox Grid.Column="0" x:Name="SelectedStoryboardImportSamplePathBox" TextChanged="SelectedImportSamplePathBox_TextChanged" Margin="0,0,5,0"
                                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Sample path"/>
-                                    <Button Grid.Column="1" Cursor="Hand" Click="SelectedImportSamplePathBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
+                                    <Button Grid.Column="1" Cursor="Hand" Click="SelectedImportSamplePathBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                                            ToolTip="Select beatmaps with File Explorer.">
                                         <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                                     </Button >
                                 </Grid>
@@ -296,10 +301,12 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock FontSize="14" Margin="0,8,0,0"><Run Text="Base beatmap:"/></TextBlock>
                             <TextBox Grid.Column="1" x:Name="BaseBeatmapPathBox" Text="{Binding BaseBeatmap, Mode=TwoWay}" Margin="5,0,5,0"/>
-                            <Button Grid.Column="2" Cursor="Hand" Click="BaseBeatmapLoad_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
+                            <Button Grid.Column="2" Cursor="Hand" Click="BaseBeatmapLoad_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                                    ToolTip="Fetch the selected beatmap from your osu! client.">
                                 <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Download" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                             </Button >
-                            <Button Grid.Column="4" Cursor="Hand" Click="BaseBeatmapBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
+                            <Button Grid.Column="4" Cursor="Hand" Click="BaseBeatmapBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                                    ToolTip="Select beatmaps with File Explorer.">
                                 <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                             </Button >
                         </Grid>
@@ -315,7 +322,8 @@
                             <TextBox Grid.Column="1" x:Name="DefaultSamplePathBox" Text="{Binding SampleArgs.Path, Mode=TwoWay}" Margin="5,0,5,0"/>
                             <TextBox Grid.Column="3" x:Name="DefaultSampleVolumeBox" Width="50" Text="{Binding SampleArgs.Volume, Mode=TwoWay, Converter={StaticResource V2PConverter}, ConverterParameter=100}" Margin="0,0,5,0"
                                         ToolTip="Volume %" materialDesign:HintAssist.Hint="Volume"/>
-                            <Button Grid.Column="4" Cursor="Hand" Click="DefaultSampleBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
+                            <Button Grid.Column="4" Cursor="Hand" Click="DefaultSampleBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                                    ToolTip="Select files with File Explorer.">
                                 <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                             </Button >
                             <ComboBox Grid.Column="2" x:Name="DefaultSampleSetBox" Width="70" VerticalAlignment="Stretch" Margin="0,0,5,0" SelectedValue="{Binding SampleSet, Mode=TwoWay, Converter={StaticResource SS2SConverter}}" SelectedValuePath="Content" Cursor="Hand">

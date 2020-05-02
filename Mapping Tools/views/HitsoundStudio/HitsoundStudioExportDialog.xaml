@@ -24,7 +24,8 @@
                          Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Export folder"
                          ToolTip="The folder to export the hitsound beatmap and hitsound samples to. Original items in this folder could be deleted."/>
                 <Button x:Name="ExportFolderBrowseButton" Grid.Column="1" Cursor="Hand" Click="ExportFolderBrowseButton_OnClick"
-                        Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
+                        Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                        ToolTip="Select folder with File Explorer.">
                     <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                 </Button >
             </Grid>
