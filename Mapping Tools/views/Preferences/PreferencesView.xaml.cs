@@ -64,10 +64,6 @@ namespace Mapping_Tools.Views.Preferences
             }
         }
 
-        private void Button_ReloadHotkeys_Click(object sender, RoutedEventArgs e) {
-            MainWindow.AppWindow.ListenerManager.ReloadHotkeys();
-        }
-
         private void Button_LoadConfigImport_Click(object sender, RoutedEventArgs e)
         {
             string path = IOHelper.ConfigFileDialog(SettingsManager.GetOsuPath());
