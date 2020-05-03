@@ -74,13 +74,17 @@ namespace Mapping_Tools.Classes.Tools {
             var segments = GetNonInflectionSegments(startIndex, endIndex, maxAngle);
 
             foreach (var segment in segments) {
+                int dir = Math.Sign(segment.Item2 - segment.Item1);
+
+                if (dir == 0) continue;
+
                 var p1 = _path[segment.Item1];
                 var p2 = _path[segment.Item2];
 
                 yield return p1;
 
                 var a1 = _angle[segment.Item1];
-                var a2 = _angle[Math.Max(segment.Item2 - 1, 0)];
+                var a2 = _angle[segment.Item2];
 
                 if (Math.Abs(GetSmallestAngle(a1, a2)) > 0.1) {
                     var t1 = new Line2(p1, a1);
@@ -106,10 +110,23 @@ namespace Mapping_Tools.Classes.Tools {
         /// <param name="maxAngle"></param>
         /// <returns></returns>
         public List<Tuple<int, int>> GetNonInflectionSegments(int startIndex, int endIndex, double maxAngle=Math.PI * 1/4) {
-            endIndex = Math.Min(endIndex, _angle.Count - 1);
+            int dir = Math.Sign(endIndex - startIndex);
 
-            double lastAngleChange = GetSmallestAngle(_angle[Math.Max(startIndex - 0, 0)], _angle[Math.Max(startIndex - 0, 0)]);
-            var lastAngle = _angle[Math.Max(startIndex - 0, 0)];
+            if (dir == 0) {
+                return new List<Tuple<int, int>> {new Tuple<int, int>(startIndex, endIndex)};
+            }
+
+            // If the direction is reversed, just swap the start and end index and then reverse the result at the end
+            if (dir == -1) {
+                var temp = endIndex;
+                endIndex = startIndex;
+                startIndex = temp;
+            }
+
+            endIndex = MathHelper.Clamp(endIndex, 0, _angle.Count - 1);
+
+            double lastAngleChange = 0;
+            var lastAngle = _angle[startIndex];
 
             int startSubRange = startIndex;
             double subRangeAngleChange = 0;
@@ -147,7 +164,6 @@ namespace Mapping_Tools.Classes.Tools {
 
                 int startSegment = subRange.Item1;
                 double segmentAngleChange = 0;
-                int c = 0;
                 // Loop through the sub-range and count the angle change to make even divisions of the angle
                 for (int i = subRange.Item1; i <= subRange.Item2; i++) {
                     var angle = _angle[i];
@@ -157,7 +173,6 @@ namespace Mapping_Tools.Classes.Tools {
 
                     if (segmentAngleChange >= maxSegmentAngle || i == subRange.Item2) {
                         segments.Add(new Tuple<int, int>(startSegment, i));
-                        c++;
 
                         startSegment = i;
                         segmentAngleChange -= maxSegmentAngle;
@@ -165,6 +180,18 @@ namespace Mapping_Tools.Classes.Tools {
 
                     lastAngle = angle;
                 }
+            }
+
+            // Reverse the result
+            if (dir == -1) {
+                List<Tuple<int, int>> reversedSegments = new List<Tuple<int, int>>(segments.Count);
+
+                for (int i = segments.Count - 1; i >= 0; i--) {
+                    var s = segments[i];
+                    reversedSegments.Add(new Tuple<int, int>(s.Item2, s.Item1));
+                }
+
+                return reversedSegments;
             }
 
             return segments;

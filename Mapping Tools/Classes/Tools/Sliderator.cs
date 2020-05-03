@@ -113,7 +113,7 @@ namespace Mapping_Tools.Classes.Tools {
             List<double> diffL, List<double> pathL, double tolerance = 0.35) { // tolerance >= sqrt(2)/4 may miss points
             var lattice = new List<LatticePoint>();
 
-            for (var n = 0; n < diff.Count; n++) { // iterate through path segments
+            for (int n = 0; n < diff.Count - 1; n++) { // iterate through path segments -1 because the last one is repeated
                 var l = diffL[n]; // segment length
                 if (Math.Abs(l) < Precision.DOUBLE_EPSILON) continue; // skip segment if degenerate
                 var a = path[n]; // start point
@@ -121,7 +121,7 @@ namespace Mapping_Tools.Classes.Tools {
                 var l2 = d.LengthSquared;
                 var ax = Math.Abs(d[0]) < Math.Abs(d[1]) ? 1 : 0; // axis to iterate along
                 var dr = Math.Sign(d[ax]); // direction of iteration
-                for (var i = (int) Math.Round(a[ax]); i != (int) Math.Round(a[ax] + d[ax]) + dr; i += dr) { // major axis lattice coordinate
+                for (int i = (int) Math.Round(a[ax]); i != (int) Math.Round(a[ax] + d[ax]) + dr; i += dr) { // major axis lattice coordinate
                     var s = (i - a[ax]) / d[ax]; // progress along segment in major axis
                     var r = a[1 - ax] + s * d[1 - ax]; // minor axis coordinate
                     var j = (int) Math.Round(r); // minor axis lattice coordinate
@@ -136,9 +136,9 @@ namespace Mapping_Tools.Classes.Tools {
                     if (Math.Abs(t - 1) < Precision.DOUBLE_EPSILON && n + 1 < diff.Count) continue;
                     if (lattice.Count > 0 && k == lattice.Last().Pos) { // repeated point
                         if (e <= lattice.Last().Error)
-                            lattice[lattice.Count - 1] = new LatticePoint(k, p, x, e, ep, n);
+                            lattice[lattice.Count - 1] = new LatticePoint(k, p, x, e, ep, n, t);
                     } else {
-                        lattice.Add(new LatticePoint(k, p, x, e, ep, n));
+                        lattice.Add(new LatticePoint(k, p, x, e, ep, n, t));
                     }
                 }
             }
@@ -245,8 +245,8 @@ namespace Mapping_Tools.Classes.Tools {
                 var firstPoint = neuron.Nucleus.Pos;
                 var lastPoint = neuron.Terminal.Nucleus.Pos;
 
-                var path = pathGenerator.GeneratePath(neuron.Nucleus.SegmentIndex,
-                    neuron.Terminal.Nucleus.SegmentIndex).ToList();
+                var path = pathGenerator.GeneratePath(neuron.Nucleus.NearestPathIndex,
+                    neuron.Terminal.Nucleus.NearestPathIndex).ToList();
 
                 if (path.Count < 2) {
                     path = new List<Vector2> {firstPoint, lastPoint};
@@ -445,20 +445,24 @@ namespace Mapping_Tools.Classes.Tools {
             public double Error; // error ||Pos - PathPoint||
             public double ErrorPerp; // perpendicular error (positive = right handed)
             public int SegmentIndex; // segment index
+            public double SegmentProgress; // projected progress on segment
             public double Time; // placeholder
             public double Length; // placeholder
 
             public LatticePoint(Vector2 pos, Vector2 pathPoint, double pathPosition, double error,
-                double errorPerp, int segmentIndex) {
+                double errorPerp, int segmentIndex, double segmentProgress) {
                 Pos = pos;
                 PathPoint = pathPoint;
                 PathPosition = pathPosition;
                 Error = error;
                 ErrorPerp = errorPerp;
                 SegmentIndex = segmentIndex;
+                SegmentProgress = segmentProgress;
                 Time = 0;
                 Length = 0;
             }
+
+            public int NearestPathIndex => SegmentProgress > 0.5 ? SegmentIndex + 1 : SegmentIndex;
         }
 
         internal class Neuron {
