@@ -18,6 +18,7 @@ namespace Mapping_Tools.Classes.Tools {
 
         private List<Vector2> _path; // input path
         private List<Vector2> _diff; // path segments
+        private List<double> _angle; // path segment angles
         private List<double> _diffL; // length of segments
         private List<double> _pathL; // cumulative length
         private double _totalPathL => _pathL.Last(); // total length
@@ -28,6 +29,7 @@ namespace Mapping_Tools.Classes.Tools {
         public void SetPath(List<Vector2> pathPoints) {
             _path = new List<Vector2> {pathPoints.First()};
             _diff = new List<Vector2>();
+            _angle = new List<double>();
             _diffL = new List<double>();
             double sum = 0;
             _pathL = new List<double> {sum};
@@ -37,11 +39,18 @@ namespace Mapping_Tools.Classes.Tools {
                 if (dl < Precision.DOUBLE_EPSILON) continue;
                 _path.Add(p);
                 _diff.Add(d);
+                _angle.Add(d.Theta);
                 _diffL.Add(dl);
                 sum += dl;
                 _pathL.Add(sum);
             }
+
             if (Math.Abs(sum) < Precision.DOUBLE_EPSILON) throw new InvalidOperationException("Zero length path.");
+
+            // Add last member again so these lists have the same number of elements as path
+            _diff.Add(_diff.Last());
+            _angle.Add(_angle.Last());
+            _diffL.Add(_diffL.Last());
         }
 
         private Vector2 PositionAt(double x) {
@@ -104,7 +113,7 @@ namespace Mapping_Tools.Classes.Tools {
             List<double> diffL, List<double> pathL, double tolerance = 0.35) { // tolerance >= sqrt(2)/4 may miss points
             var lattice = new List<LatticePoint>();
 
-            for (var n = 0; n < diff.Count; n++) { // iterate through path segments
+            for (int n = 0; n < diff.Count - 1; n++) { // iterate through path segments -1 because the last one is repeated
                 var l = diffL[n]; // segment length
                 if (Math.Abs(l) < Precision.DOUBLE_EPSILON) continue; // skip segment if degenerate
                 var a = path[n]; // start point
@@ -112,7 +121,7 @@ namespace Mapping_Tools.Classes.Tools {
                 var l2 = d.LengthSquared;
                 var ax = Math.Abs(d[0]) < Math.Abs(d[1]) ? 1 : 0; // axis to iterate along
                 var dr = Math.Sign(d[ax]); // direction of iteration
-                for (var i = (int) Math.Round(a[ax]); i != (int) Math.Round(a[ax] + d[ax]) + dr; i += dr) { // major axis lattice coordinate
+                for (int i = (int) Math.Round(a[ax]); i != (int) Math.Round(a[ax] + d[ax]) + dr; i += dr) { // major axis lattice coordinate
                     var s = (i - a[ax]) / d[ax]; // progress along segment in major axis
                     var r = a[1 - ax] + s * d[1 - ax]; // minor axis coordinate
                     var j = (int) Math.Round(r); // minor axis lattice coordinate
@@ -127,9 +136,9 @@ namespace Mapping_Tools.Classes.Tools {
                     if (Math.Abs(t - 1) < Precision.DOUBLE_EPSILON && n + 1 < diff.Count) continue;
                     if (lattice.Count > 0 && k == lattice.Last().Pos) { // repeated point
                         if (e <= lattice.Last().Error)
-                            lattice[lattice.Count - 1] = new LatticePoint(k, p, x, e, ep, n);
+                            lattice[lattice.Count - 1] = new LatticePoint(k, p, x, e, ep, n, t);
                     } else {
-                        lattice.Add(new LatticePoint(k, p, x, e, ep, n));
+                        lattice.Add(new LatticePoint(k, p, x, e, ep, n, t));
                     }
                 }
             }
@@ -147,7 +156,7 @@ namespace Mapping_Tools.Classes.Tools {
 
         private void GenerateNeurons() {
             // These values are placeholders. Experimentation has to be done to find better parameters
-            const double maxOvershot = 64;  // Max error in wantedLength
+            const double maxOvershot = 32;  // Max error in wantedLength
             const double epsilon = 0.01;  // Resolution for for speed differentiation
             const double deltaT = 0.02;  // Size of time step
 
@@ -188,9 +197,8 @@ namespace Mapping_Tools.Classes.Tools {
 
                 // Make a new neuron when the error in the length becomes too large
                 var lengthError = Math.Abs(Math.Abs(wantedLength - nucleusWantedLength) - actualLength) - currentNeuron.Error;
-                if (lengthError > maxOvershot * velocity
-                    || nearestLatticePoint.ErrorPerp < 0.1 && lengthError > maxOvershot * velocity * 0.1
-                    || nearestLatticePoint.ErrorPerp < 0.01) {
+                if (lengthError > Math.Max(MinDendriteLength, velocity * maxOvershot) || 
+                    nearestLatticePoint.Error < 0.05 && lengthError > Math.Max(MinDendriteLength, velocity * MinDendriteLength)) {
                     if (nearestLatticePoint != currentNeuron.Nucleus) {
                         var newNeuron = new Neuron(nearestLatticePoint, time);
                         currentNeuron.Terminal = newNeuron;
@@ -222,7 +230,7 @@ namespace Mapping_Tools.Classes.Tools {
                 neuron.WantedLength *= ratio;
             }
 
-            totalWantedLength = _slider.Sum(n => n.WantedLength);
+            //totalWantedLength = _slider.Sum(n => n.WantedLength);
             //Console.WriteLine(@"Total wanted length after scale: " + totalWantedLength);
             //Console.WriteLine(@"Expected total wanted length: " + MaxS);
 
@@ -230,23 +238,27 @@ namespace Mapping_Tools.Classes.Tools {
         }
 
         private void GenerateAxons() {
+            var pathGenerator = new PathGenerator(_path, _diff, _angle, _diffL, _pathL);
+
             // Generate bezier points that approximate the paths between neurons
             foreach (var neuron in _slider.Where(n => n.Terminal != null)) {
                 var firstPoint = neuron.Nucleus.Pos;
                 var lastPoint = neuron.Terminal.Nucleus.Pos;
-                var middlePoint = PositionAt((neuron.Nucleus.PathPosition + neuron.Terminal.Nucleus.PathPosition) / 2);
 
-                var flatness = new BezierSubdivision(new List<Vector2> {firstPoint, middlePoint, lastPoint}).Flatness();
+                var path = pathGenerator.GeneratePath(neuron.Nucleus.NearestPathIndex,
+                    neuron.Terminal.Nucleus.NearestPathIndex).ToList();
 
-                double length = Vector2.Distance(firstPoint, lastPoint);
-                if (flatness < 0.1 || length < 8) {
-                    neuron.Axon = new BezierSubdivision(new List<Vector2> {firstPoint, lastPoint});
+                if (path.Count < 2) {
+                    path = new List<Vector2> {firstPoint, lastPoint};
                 } else {
-                    neuron.Axon = DoubleMiddleApproximation(neuron, middlePoint, out length);
+                    path[0] = firstPoint;
+                    path[path.Count - 1] = lastPoint;
                 }
 
+                neuron.Axon = new BezierSubdivision(path);
+
                 // Calculate lengths
-                neuron.AxonLenth = length;
+                neuron.AxonLenth = PathGenerator.CalculatePathLength(path);
                 neuron.DendriteLength = neuron.WantedLength - neuron.AxonLenth;
             }
         }
@@ -433,20 +445,24 @@ namespace Mapping_Tools.Classes.Tools {
             public double Error; // error ||Pos - PathPoint||
             public double ErrorPerp; // perpendicular error (positive = right handed)
             public int SegmentIndex; // segment index
+            public double SegmentProgress; // projected progress on segment
             public double Time; // placeholder
             public double Length; // placeholder
 
             public LatticePoint(Vector2 pos, Vector2 pathPoint, double pathPosition, double error,
-                double errorPerp, int segmentIndex) {
+                double errorPerp, int segmentIndex, double segmentProgress) {
                 Pos = pos;
                 PathPoint = pathPoint;
                 PathPosition = pathPosition;
                 Error = error;
                 ErrorPerp = errorPerp;
                 SegmentIndex = segmentIndex;
+                SegmentProgress = segmentProgress;
                 Time = 0;
                 Length = 0;
             }
+
+            public int NearestPathIndex => SegmentProgress > 0.5 ? SegmentIndex + 1 : SegmentIndex;
         }
 
         internal class Neuron {

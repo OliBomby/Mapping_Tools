@@ -13,6 +13,7 @@ using System.Security.Principal;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Mapping_Tools.Views.Standard;
 
 namespace Mapping_Tools {
 

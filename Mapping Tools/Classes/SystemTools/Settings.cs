@@ -119,6 +119,9 @@ namespace Mapping_Tools.Classes.SystemTools {
             set => Set(ref _currentBeatmapDefaultFolder, value);
         }
 
+        /// <summary>
+        /// Makes a new Settings objects and initializes default settings.
+        /// </summary>
         public Settings() {
             RecentMaps = new List<string[]>();
             MainWindowWidth = null;
@@ -136,6 +139,7 @@ namespace Mapping_Tools.Classes.SystemTools {
             SingleQuickRunTool = "<Current Tool>";
             MultipleQuickRunTool = "<Current Tool>";
             MaxBackupFiles = 1000;
+            MakePeriodicBackups = true;
             PeriodicBackupInterval = TimeSpan.FromMinutes(10);
             CurrentBeatmapDefaultFolder = true;
         }

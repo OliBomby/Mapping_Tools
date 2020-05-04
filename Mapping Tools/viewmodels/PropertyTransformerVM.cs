@@ -1,248 +1,217 @@
-﻿using System;
-using System.ComponentModel;
+﻿using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Components.Domain;
+using Newtonsoft.Json;
 
 namespace Mapping_Tools.Viewmodels {
-    public class PropertyTransformerVM : INotifyPropertyChanged{
-        private double timingpointOffsetMultiplier;
+    public class PropertyTransformerVm : BindableBase{
+        #region multipliers and offsets
+
+        private double _timingpointOffsetMultiplier;
         public double TimingpointOffsetMultiplier {
-            get { return timingpointOffsetMultiplier; }
+            get => _timingpointOffsetMultiplier;
             set {
-                if (timingpointOffsetMultiplier != value) {
-                    timingpointOffsetMultiplier = value;
-                    NotifyPropertyChanged("TimingpointOffsetMultiplier");
+                if (Set(ref _timingpointOffsetMultiplier, value) && SyncTimeFields) {
+                    SetAllTimeMultipliers(value);
                 }
             }
         }
 
-        private double timingpointOffsetOffset;
+        private double _timingpointOffsetOffset;
         public double TimingpointOffsetOffset {
-            get { return timingpointOffsetOffset; }
+            get => _timingpointOffsetOffset;
             set {
-                if (timingpointOffsetOffset != value) {
-                    timingpointOffsetOffset = value;
-                    NotifyPropertyChanged("TimingpointOffsetOffset");
+                if (Set(ref _timingpointOffsetOffset, value) && SyncTimeFields) {
+                    SetAllTimeOffsets(value);
                 }
             }
         }
 
-        private double timingpointBPMMultiplier;
+        private double _timingpointBPMMultiplier;
         public double TimingpointBPMMultiplier {
-            get { return timingpointBPMMultiplier; }
-            set {
-                if (timingpointBPMMultiplier != value) {
-                    timingpointBPMMultiplier = value;
-                    NotifyPropertyChanged("TimingpointBPMMultiplier");
-                }
-            }
+            get => _timingpointBPMMultiplier;
+            set => Set(ref _timingpointBPMMultiplier, value);
         }
 
-        private double timingpointBPMOffset;
+        private double _timingpointBPMOffset;
         public double TimingpointBPMOffset {
-            get { return timingpointBPMOffset; }
-            set {
-                if (timingpointBPMOffset != value) {
-                    timingpointBPMOffset = value;
-                    NotifyPropertyChanged("TimingpointBPMOffset");
-                }
-            }
+            get => _timingpointBPMOffset;
+            set => Set(ref _timingpointBPMOffset, value);
         }
 
-        private double timingpointSVMultiplier;
+        private double _timingpointSVMultiplier;
         public double TimingpointSVMultiplier {
-            get { return timingpointSVMultiplier; }
-            set {
-                if (timingpointSVMultiplier != value) {
-                    timingpointSVMultiplier = value;
-                    NotifyPropertyChanged("TimingpointSVMultiplier");
-                }
-            }
+            get => _timingpointSVMultiplier;
+            set => Set(ref _timingpointSVMultiplier, value);
         }
 
-        private double timingpointSVOffset;
+        private double _timingpointSVOffset;
         public double TimingpointSVOffset {
-            get { return timingpointSVOffset; }
-            set {
-                if (timingpointSVOffset != value) {
-                    timingpointSVOffset = value;
-                    NotifyPropertyChanged("TimingpointSVOffset");
-                }
-            }
+            get => _timingpointSVOffset;
+            set => Set(ref _timingpointSVOffset, value);
         }
 
-        private double timingpointIndexMultiplier;
+        private double _timingpointIndexMultiplier;
         public double TimingpointIndexMultiplier {
-            get { return timingpointIndexMultiplier; }
-            set {
-                if (timingpointIndexMultiplier != value) {
-                    timingpointIndexMultiplier = value;
-                    NotifyPropertyChanged("TimingpointIndexMultiplier");
-                }
-            }
+            get => _timingpointIndexMultiplier;
+            set => Set(ref _timingpointIndexMultiplier, value);
         }
 
-        private double timingpointIndexOffset;
+        private double _timingpointIndexOffset;
         public double TimingpointIndexOffset {
-            get { return timingpointIndexOffset; }
-            set {
-                if (timingpointIndexOffset != value) {
-                    timingpointIndexOffset = value;
-                    NotifyPropertyChanged("TimingpointIndexOffset");
-                }
-            }
+            get => _timingpointIndexOffset;
+            set => Set(ref _timingpointIndexOffset, value);
         }
 
-        private double timingpointVolumeMultiplier;
+        private double _timingpointVolumeMultiplier;
         public double TimingpointVolumeMultiplier {
-            get { return timingpointVolumeMultiplier; }
-            set {
-                if (timingpointVolumeMultiplier != value) {
-                    timingpointVolumeMultiplier = value;
-                    NotifyPropertyChanged("TimingpointVolumeMultiplier");
-                }
-            }
+            get => _timingpointVolumeMultiplier;
+            set => Set(ref _timingpointVolumeMultiplier, value);
         }
 
-        private double timingpointVolumeOffset;
+        private double _timingpointVolumeOffset;
         public double TimingpointVolumeOffset {
-            get { return timingpointVolumeOffset; }
-            set {
-                if (timingpointVolumeOffset != value) {
-                    timingpointVolumeOffset = value;
-                    NotifyPropertyChanged("TimingpointVolumeOffset");
-                }
-            }
+            get => _timingpointVolumeOffset;
+            set => Set(ref _timingpointVolumeOffset, value);
         }
 
-        private double hitObjectTimeMultiplier;
+        private double _hitObjectTimeMultiplier;
         public double HitObjectTimeMultiplier {
-            get { return hitObjectTimeMultiplier; }
+            get => _hitObjectTimeMultiplier;
             set {
-                if (hitObjectTimeMultiplier != value) {
-                    hitObjectTimeMultiplier = value;
-                    NotifyPropertyChanged("HitObjectTimeMultiplier");
+                if (Set(ref _hitObjectTimeMultiplier, value) && SyncTimeFields) {
+                    SetAllTimeMultipliers(value);
                 }
             }
         }
 
-        private double hitObjectTimeOffset;
+        private double _hitObjectTimeOffset;
         public double HitObjectTimeOffset {
-            get { return hitObjectTimeOffset; }
+            get => _hitObjectTimeOffset;
             set {
-                if (hitObjectTimeOffset != value) {
-                    hitObjectTimeOffset = value;
-                    NotifyPropertyChanged("HitObjectTimeOffset");
+                if (Set(ref _hitObjectTimeOffset, value) && SyncTimeFields) {
+                    SetAllTimeOffsets(value);
                 }
             }
         }
 
-        private double bookmarkTimeMultiplier;
+        private double _bookmarkTimeMultiplier;
         public double BookmarkTimeMultiplier {
-            get { return bookmarkTimeMultiplier; }
+            get => _bookmarkTimeMultiplier;
             set {
-                if (bookmarkTimeMultiplier != value) {
-                    bookmarkTimeMultiplier = value;
-                    NotifyPropertyChanged("BookmarkTimeMultiplier");
+                if (Set(ref _bookmarkTimeMultiplier, value) && SyncTimeFields) {
+                    SetAllTimeMultipliers(value);
                 }
             }
         }
 
-        private double bookmarkTimeOffset;
+        private double _bookmarkTimeOffset;
         public double BookmarkTimeOffset {
-            get { return bookmarkTimeOffset; }
+            get => _bookmarkTimeOffset;
             set {
-                if (bookmarkTimeOffset != value) {
-                    bookmarkTimeOffset = value;
-                    NotifyPropertyChanged("BookmarkTimeOffset");
+                if (Set(ref _bookmarkTimeOffset, value) && SyncTimeFields) {
+                    SetAllTimeOffsets(value);
                 }
             }
         }
 
-        private double sbSampleTimeMultiplier;
+        private double _sbSampleTimeMultiplier;
         public double SBSampleTimeMultiplier {
-            get { return sbSampleTimeMultiplier; }
+            get => _sbSampleTimeMultiplier;
             set {
-                if (sbSampleTimeMultiplier != value) {
-                    sbSampleTimeMultiplier = value;
-                    NotifyPropertyChanged("SBSampleTimeMultiplier");
+                if (Set(ref _sbSampleTimeMultiplier, value) && SyncTimeFields) {
+                    SetAllTimeMultipliers(value);
                 }
             }
         }
 
-        private double sbSampleTimeOffset;
+        private double _sbSampleTimeOffset;
         public double SBSampleTimeOffset {
-            get { return sbSampleTimeOffset; }
+            get => _sbSampleTimeOffset;
             set {
-                if (sbSampleTimeOffset != value) {
-                    sbSampleTimeOffset = value;
-                    NotifyPropertyChanged("SBSampleTimeOffset");
+                if (Set(ref _sbSampleTimeOffset, value) && SyncTimeFields) {
+                    SetAllTimeOffsets(value);
                 }
             }
         }
 
-        private bool clipProperties;
+        private double _previewTimeMultiplier;
+        public double PreviewTimeMultiplier {
+            get => _previewTimeMultiplier;
+            set {
+                if (Set(ref _previewTimeMultiplier, value) && SyncTimeFields) {
+                    SetAllTimeMultipliers(value);
+                }
+            }
+        }
+
+        private double _previewTimeOffset;
+        public double PreviewTimeOffset {
+            get => _previewTimeOffset;
+            set {
+                if (Set(ref _previewTimeOffset, value) && SyncTimeFields) {
+                    SetAllTimeOffsets(value);
+                }
+            }
+        }
+
+        #endregion
+
+        private bool _clipProperties;
         public bool ClipProperties {
-            get { return clipProperties; }
-            set {
-                if (clipProperties != value) {
-                    clipProperties = value;
-                    NotifyPropertyChanged("ClipProperties");
-                }
-            }
+            get => _clipProperties;
+            set => Set(ref _clipProperties, value);
         }
 
-        private bool enableFilters;
+        private bool _enableFilters;
         public bool EnableFilters {
-            get { return enableFilters; }
-            set {
-                if (enableFilters != value) {
-                    enableFilters = value;
-                    NotifyPropertyChanged("EnableFilters");
-                }
-            }
+            get => _enableFilters;
+            set => Set(ref _enableFilters, value);
         }
 
-        private double matchFilter;
+        private double _matchFilter;
         public double MatchFilter {
-            get { return matchFilter; }
-            set {
-                if (matchFilter != value) {
-                    matchFilter = value;
-                    NotifyPropertyChanged("MatchFilter");
-                }
-            }
+            get => _matchFilter;
+            set => Set(ref _matchFilter, value);
         }
 
-        private double minTimeFilter;
+        private double _minTimeFilter;
         public double MinTimeFilter {
-            get { return minTimeFilter; }
-            set {
-                if (minTimeFilter != value) {
-                    minTimeFilter = value;
-                    NotifyPropertyChanged("MinTimeFilter");
-                }
-            }
+            get => _minTimeFilter;
+            set => Set(ref _minTimeFilter, value);
         }
 
-        private double maxTimeFilter;
+        private double _maxTimeFilter;
         public double MaxTimeFilter {
-            get { return maxTimeFilter; }
-            set {
-                if (maxTimeFilter != value) {
-                    maxTimeFilter = value;
-                    NotifyPropertyChanged("MaxTimeFilter");
-                }
-            }
+            get => _maxTimeFilter;
+            set => Set(ref _maxTimeFilter, value);
         }
 
-        public string[] MapPaths;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public void NotifyPropertyChanged(string propName) {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+        private bool _syncTimeFields;
+        public bool SyncTimeFields {
+            get => _syncTimeFields;
+            set => Set(ref _syncTimeFields, value);
         }
 
-        public PropertyTransformerVM() {
+        [JsonIgnore]
+        public CommandImplementation ResetCommand { get; set; }
+
+        [JsonIgnore]
+        public string[] ExportPaths { get; set; }
+
+        public PropertyTransformerVm() {
+            ResetMultipliersAndOffsets();
+
+            SyncTimeFields = false;
+            ClipProperties = false;
+            EnableFilters = false;
+            MatchFilter = -1;
+            MinTimeFilter = -1;
+            MaxTimeFilter = -1;
+
+            ResetCommand = new CommandImplementation(_ => ResetMultipliersAndOffsets());
+        }
+
+        private void ResetMultipliersAndOffsets() {
             TimingpointOffsetMultiplier = 1;
             TimingpointOffsetOffset = 0;
             TimingpointBPMMultiplier = 1;
@@ -259,12 +228,24 @@ namespace Mapping_Tools.Viewmodels {
             BookmarkTimeOffset = 0;
             SBSampleTimeMultiplier = 1;
             SBSampleTimeOffset = 0;
+            PreviewTimeMultiplier = 1;
+            PreviewTimeOffset = 0;
+        }
 
-            ClipProperties = false;
-            EnableFilters = false;
-            MatchFilter = -1;
-            MinTimeFilter = -1;
-            MaxTimeFilter = -1;
+        private void SetAllTimeMultipliers(double value) {
+            TimingpointOffsetMultiplier = value;
+            HitObjectTimeMultiplier = value;
+            BookmarkTimeMultiplier = value;
+            SBSampleTimeMultiplier = value;
+            PreviewTimeMultiplier = value;
+        }
+
+        private void SetAllTimeOffsets(double value) {
+            TimingpointOffsetOffset = value;
+            HitObjectTimeOffset = value;
+            BookmarkTimeOffset = value;
+            SBSampleTimeOffset = value;
+            PreviewTimeOffset = value;
         }
     }
 }

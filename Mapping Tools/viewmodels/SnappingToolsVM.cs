@@ -24,7 +24,10 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using Editor_Reader;
+using Mapping_Tools.Classes;
 using Mapping_Tools.Components.Domain;
+using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
 
 namespace Mapping_Tools.Viewmodels {
     public class SnappingToolsVm : IDisposable
@@ -208,12 +211,13 @@ namespace Mapping_Tools.Viewmodels {
                     try {
                         reader.FetchEditor();
                     }
-                    catch {
+                    catch (Exception ex) {
                         _fetchEditorFails++;
                         if (_fetchEditorFails <= 3) return;
 
-                        MessageBox.Show(
-                            "Editor Reader seems to be failing a lot. Try restarting osu! and opening Geometry Dashboard again.");
+                        MessageBox.Show("Editor Reader seems to be failing a lot. Try restarting osu! and opening Geometry Dashboard again.");
+                        ex.Show();
+
                         _updateTimer.IsEnabled = false;
                         return;
                     }
@@ -369,9 +373,11 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
         
-        private List<HitObject> GetHitObjects()
-        {
-            if (!EditorReaderStuff.TryGetFullEditorReader(out var reader)) return new List<HitObject>();
+        private List<HitObject> GetHitObjects() {
+            var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
+
+            if (reader == null)
+                return new List<HitObject>();
 
             var hitObjects = EditorReaderStuff.GetHitObjects(reader);
 

@@ -1,12 +1,10 @@
-﻿using Mapping_Tools.Classes.SystemTools;
-using MaterialDesignThemes.Wpf;
-using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
+using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
+using MaterialDesignThemes.Wpf;
 
-namespace Mapping_Tools.Views
+namespace Mapping_Tools.Views.Preferences
 {
     /// <summary>
     /// Interaktionslogik für UserControl2.xaml
@@ -64,10 +62,6 @@ namespace Mapping_Tools.Views
             if (!string.IsNullOrWhiteSpace(path)) {
                 SettingsManager.Settings.BackupsPath = path;
             }
-        }
-
-        private void Button_ReloadHotkeys_Click(object sender, RoutedEventArgs e) {
-            MainWindow.AppWindow.ListenerManager.ReloadHotkeys();
         }
 
         private void Button_LoadConfigImport_Click(object sender, RoutedEventArgs e)

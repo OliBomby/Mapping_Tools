@@ -1,26 +1,22 @@
 ﻿using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Components.Domain;
+using Mapping_Tools.Views.RhythmGuide;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using Mapping_Tools.Views.RhythmGuide;
 
-namespace Mapping_Tools.Viewmodels
-{
-    public class HitsoundPreviewHelperVM : INotifyPropertyChanged
+namespace Mapping_Tools.Viewmodels {
+    public class HitsoundPreviewHelperVm : INotifyPropertyChanged
     {
         private ObservableCollection<HitsoundZone> _items;
         private bool? _isAllItemsSelected;
         private RhythmGuideWindow _rhythmGuideWindow;
 
-        public HitsoundPreviewHelperVM() {
+        public HitsoundPreviewHelperVm() {
             _items = new ObservableCollection<HitsoundZone>();
 
             RhythmGuideCommand = new CommandImplementation(

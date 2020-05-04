@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
 
-namespace Mapping_Tools.Classes
-{
+namespace Mapping_Tools.Classes {
     public static class GenericExtensions
     {
         public static int RemoveAll<T>(this ObservableCollection<T> coll, Func<T, bool> condition) {
@@ -17,6 +14,14 @@ namespace Mapping_Tools.Classes
             }
 
             return itemsToRemove.Count;
+        }
+
+        public static void Show(this Exception exception) {
+            MessageBox.Show(exception.MessageStackTrace(), "Error");
+        }
+
+        public static string MessageStackTrace(this Exception exception) {
+            return exception.Message + "\n\n" + exception.StackTrace;
         }
     }
 }

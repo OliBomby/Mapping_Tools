@@ -28,7 +28,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
         }
 
         public static void ExportHitsounds(List<HitsoundEvent> hitsounds, string baseBeatmap, string exportFolder, string exportMapName, GameMode exportGameMode, bool useGreenlines, bool useStoryboard) {
-            EditorReaderStuff.TryGetNewestVersion(baseBeatmap, out var editor);
+            var editor = EditorReaderStuff.GetNewestVersionOrNot(baseBeatmap);
             Beatmap beatmap = editor.Beatmap;
 
             if (useStoryboard) {

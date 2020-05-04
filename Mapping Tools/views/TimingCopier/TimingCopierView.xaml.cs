@@ -1,19 +1,19 @@
-﻿using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.Tools;
-using Mapping_Tools.Viewmodels;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Viewmodels;
 
-namespace Mapping_Tools.Views {
+namespace Mapping_Tools.Views.TimingCopier {
     /// <summary>
     /// Interactielogica voor TimingCopierView.xaml
     /// </summary>
-    public partial class TimingCopierView : ISavable<TimingCopierVM> {
+    public partial class TimingCopierView : ISavable<TimingCopierVm> {
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "timingcopierproject.json");
 
         public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Timing Copier Projects");
@@ -24,7 +24,7 @@ namespace Mapping_Tools.Views {
 
         public TimingCopierView() {
             InitializeComponent();
-            DataContext = new TimingCopierVM();
+            DataContext = new TimingCopierVm();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
             ProjectManager.LoadProject(this, message: false);
@@ -32,26 +32,26 @@ namespace Mapping_Tools.Views {
 
         protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
-            e.Result = Copy_Timing((TimingCopierVM) e.Argument, bgw, e);
+            e.Result = Copy_Timing((TimingCopierVm) e.Argument, bgw, e);
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
-            string filesToCopy = ((TimingCopierVM)DataContext).ExportPath;
+            string filesToCopy = ((TimingCopierVm)DataContext).ExportPath;
             IOHelper.SaveMapBackup(filesToCopy.Split('|'));
 
             BackgroundWorker.RunWorkerAsync(DataContext);
             CanRun = false;
         }
 
-        private string Copy_Timing(TimingCopierVM arg, BackgroundWorker worker, DoWorkEventArgs _) {
+        private string Copy_Timing(TimingCopierVm arg, BackgroundWorker worker, DoWorkEventArgs _) {
             string[] paths = arg.ExportPath.Split('|');
             int mapsDone = 0;
 
-            bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+            var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
 
             foreach (string exportPath in paths) {
-                var editorTo = EditorReaderStuff.GetBeatmapEditor(exportPath, reader, editorRead);
-                var editorFrom = EditorReaderStuff.GetBeatmapEditor(arg.ImportPath, reader, editorRead);
+                var editorTo = EditorReaderStuff.GetNewestVersionOrNot(exportPath, reader);
+                var editorFrom = EditorReaderStuff.GetNewestVersionOrNot(arg.ImportPath, reader);
 
                 Beatmap beatmapTo = editorTo.Beatmap;
                 Beatmap beatmapFrom = editorFrom.Beatmap;
@@ -247,11 +247,11 @@ namespace Mapping_Tools.Views {
             }
         }
 
-        public TimingCopierVM GetSaveData() {
-            return (TimingCopierVM)DataContext;
+        public TimingCopierVm GetSaveData() {
+            return (TimingCopierVm)DataContext;
         }
 
-        public void SetSaveData(TimingCopierVM saveData) {
+        public void SetSaveData(TimingCopierVm saveData) {
             DataContext = saveData;
         }
     }

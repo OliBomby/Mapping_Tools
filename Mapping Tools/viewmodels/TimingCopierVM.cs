@@ -5,14 +5,14 @@ using System.Runtime.CompilerServices;
 
 namespace Mapping_Tools.Viewmodels {
 
-    public class TimingCopierVM :INotifyPropertyChanged {
+    public class TimingCopierVm :INotifyPropertyChanged {
         private string _importPath;
         private string _exportPath;
         private string _resnapMode;
         private int _snap1;
         private int _snap2;
 
-        public TimingCopierVM() {
+        public TimingCopierVm() {
             _importPath = "";
             _exportPath = "";
             _resnapMode = "Number of beats between objects stays the same";

@@ -10,9 +10,13 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using Editor_Reader;
+using Mapping_Tools.Classes;
 using Mapping_Tools.Components.Graph;
 using Mapping_Tools.Views;
+using Mapping_Tools.Views.Sliderator;
 using Newtonsoft.Json;
+using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
 
 namespace Mapping_Tools.Viewmodels {
     public class SlideratorVm : BindableBase {
@@ -26,12 +30,12 @@ namespace Mapping_Tools.Viewmodels {
         private int _beatSnapDivisor;
         private TimeSpan _graphDuration;
         private double _svGraphMultiplier;
-        private ImportMode _importMode;
-        private double _exactTime;
-        private Visibility _exactTimeBoxVisibility;
+        private ImportMode _importModeSetting;
+        private string _timeCode;
+        private Visibility _timeCodeBoxVisibility;
         private double _exportTime;
-        private ExportMode _exportMode;
-        private GraphMode _graphMode;
+        private ExportMode _exportModeSetting;
+        private GraphMode _graphModeSetting;
         private double _velocityLimit;
         private bool _showRedAnchors;
         private bool _showGraphAnchors;
@@ -125,22 +129,22 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
-        public ImportMode ImportMode {
-            get => _importMode;
+        public ImportMode ImportModeSetting {
+            get => _importModeSetting;
             set => SetImportMode(value);
         }
 
         [JsonIgnore]
         public IEnumerable<ImportMode> ImportModes => Enum.GetValues(typeof(ImportMode)).Cast<ImportMode>();
 
-        public double ExactTime {
-            get => _exactTime;
-            set => Set(ref _exactTime, value);
+        public string TimeCode {
+            get => _timeCode;
+            set => Set(ref _timeCode, value);
         }
 
-        public Visibility ExactTimeBoxVisibility {
-            get => _exactTimeBoxVisibility;
-            set => Set(ref _exactTimeBoxVisibility, value);
+        public Visibility TimeCodeBoxVisibility {
+            get => _timeCodeBoxVisibility;
+            set => Set(ref _timeCodeBoxVisibility, value);
         }
 
         public double ExportTime {
@@ -152,17 +156,17 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
-        public ExportMode ExportMode {
-            get => _exportMode;
-            set => Set(ref _exportMode, value);
+        public ExportMode ExportModeSetting {
+            get => _exportModeSetting;
+            set => Set(ref _exportModeSetting, value);
         }
         
         [JsonIgnore]
         public IEnumerable<ExportMode> ExportModes => Enum.GetValues(typeof(ExportMode)).Cast<ExportMode>();
 
-        public GraphMode GraphMode {
-            get => _graphMode;
-            set => Set(ref _graphMode, value);
+        public GraphMode GraphModeSetting {
+            get => _graphModeSetting;
+            set => Set(ref _graphModeSetting, value);
         }
 
         public double VelocityLimit {
@@ -272,10 +276,10 @@ namespace Mapping_Tools.Viewmodels {
             GlobalSv = 1.4;
             GraphBeats = 3;
             BeatSnapDivisor = 4;
-            ImportMode = ImportMode.Selected;
-            ExactTimeBoxVisibility = Visibility.Collapsed;
+            ImportModeSetting = ImportMode.Selected;
+            TimeCodeBoxVisibility = Visibility.Collapsed;
             VelocityLimit = 10;
-            GraphMode = GraphMode.Position;
+            GraphModeSetting = GraphMode.Position;
             ShowRedAnchors = false;
             ShowGraphAnchors = false;
             ManualVelocity = false;
@@ -324,20 +328,21 @@ namespace Mapping_Tools.Viewmodels {
 
         public void Import(string path) {
             try {
-                bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+                EditorReader reader = EditorReaderStuff.GetFullEditorReaderOrNot(out var editorReaderException1);
+                
+                if (ImportModeSetting == ImportMode.Selected && editorReaderException1 != null) {
+                    throw editorReaderException1;
+                }
+
                 BeatmapEditor editor = null;
                 List<HitObject> markedObjects = null;
 
-                switch (ImportMode) {
+                switch (ImportModeSetting) {
                     case ImportMode.Selected:
-                        if (!editorRead) {
-                            MessageBox.Show(EditorReaderStuff.SelectedObjectsReadFailText);
-                        };
+                        editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader, out var selected, out var editorReaderException2);
 
-                        editor = EditorReaderStuff.GetBeatmapEditor(out var selected, reader);
-
-                        if (editor == null) {
-                            MessageBox.Show(EditorReaderStuff.SelectedObjectsReadFailText);
+                        if (editorReaderException2 != null) {
+                            throw editorReaderException2;
                         }
 
                         markedObjects = selected;
@@ -348,10 +353,7 @@ namespace Mapping_Tools.Viewmodels {
                         break;
                     case ImportMode.Time:
                         editor = new BeatmapEditor(path);
-                        markedObjects =
-                            new List<HitObject>(editor.Beatmap.GetHitObjectsWithRangeInRange(
-                                ExactTime - 5,
-                                ExactTime + 5));
+                        markedObjects = editor.Beatmap.QueryTimeCode(TimeCode).ToList();
                         break;
                 }
 
@@ -365,20 +367,20 @@ namespace Mapping_Tools.Viewmodels {
 
                 DoEditorRead = true;
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message + ex.StackTrace, "Error");
+                ex.Show();
             }
         }
 
         private void ToggleGraphMode(object _) {
-            switch (GraphMode) {
+            switch (GraphModeSetting) {
                 case GraphMode.Position:
-                    GraphMode = GraphMode.Velocity;
+                    GraphModeSetting = GraphMode.Velocity;
                     break;
                 case GraphMode.Velocity:
-                    GraphMode = GraphMode.Position;
+                    GraphModeSetting = GraphMode.Position;
                     break;
                 default:
-                    GraphMode = GraphMode.Position;
+                    GraphModeSetting = GraphMode.Position;
                     break;
             }
         }
@@ -426,24 +428,27 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         private void SetImportMode(ImportMode value) {
-            if (!Set(ref _importMode, value, nameof(ImportMode))) return;
-            ExactTimeBoxVisibility = ImportMode == ImportMode.Time ? Visibility.Visible : Visibility.Collapsed;
+            if (!Set(ref _importModeSetting, value, nameof(ImportMode))) return;
+            TimeCodeBoxVisibility = ImportModeSetting == ImportMode.Time ? Visibility.Visible : Visibility.Collapsed;
         }
-    }
 
-    public enum ImportMode {
-        Selected,
-        Bookmarked,
-        Time
-    }
+        public enum ImportMode
+        {
+            Selected,
+            Bookmarked,
+            Time
+        }
 
-    public enum ExportMode {
-        Add,
-        Override
-    }
+        public enum ExportMode
+        {
+            Add,
+            Override
+        }
 
-    public enum GraphMode {
-        Position,
-        Velocity
+        public enum GraphMode
+        {
+            Position,
+            Velocity
+        }
     }
 }

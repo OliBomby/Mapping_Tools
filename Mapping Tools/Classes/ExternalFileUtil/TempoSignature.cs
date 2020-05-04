@@ -1,36 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Mapping_Tools.Classes.ExternalFileUtil
-{
-#pragma warning disable CS0660 // Type defines operator == or operator != but does not override Object.Equals(object o)
+namespace Mapping_Tools.Classes.ExternalFileUtil {
     public class TempoSignature : IEquatable<TempoSignature>
-#pragma warning restore CS0660 // Type defines operator == or operator != but does not override Object.Equals(object o)
     {
-        private int _tempoDenominator;
-
         /// <summary>
         /// The bottom value of the time signature.
         /// </summary>
-        public int TempoDenominator
-        {
-            get { return _tempoDenominator; }
-            set { _tempoDenominator = value; }
-        }
-
-        private int _tempoNumerator;
-
+        public int TempoDenominator { get; set; }
+        
         /// <summary>
         /// The top value of the time signature.
         /// </summary>
-        public int TempoNumerator
-        {
-            get { return _tempoNumerator; }
-            set { _tempoNumerator = value; }
-        }
+        public int TempoNumerator { get; set; }
 
         /// <summary>
         /// The constructor for a new Tempo Signature
@@ -53,32 +35,32 @@ namespace Mapping_Tools.Classes.ExternalFileUtil
             TempoDenominator = 4;
         }
 
-        private bool _partialMeasure;
-
         /// <summary>
         /// Allows a partial measure before the current marker.
         /// </summary>
         /// <remarks>
-        /// The number 5 is spesified as a partial measurea allowance.
+        /// The number 5 is spesified as a partial measure allowance.
         /// </remarks>
-        public bool PartialMeasure
-        {
-            get { return _partialMeasure; }
-            set { _partialMeasure = value; }
-        }
+        public bool PartialMeasure { get; set; }
 
         public bool Equals(TempoSignature other)
         {
-            return _tempoDenominator == other.TempoDenominator
-                && _tempoNumerator == other._tempoNumerator;
+            return other != null && 
+                   TempoDenominator == other.TempoDenominator && 
+                   TempoNumerator == other.TempoNumerator;
+        }
+        public override bool Equals(object obj) {
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj.GetType() == GetType() && Equals((TempoSignature) obj);
         }
 
         public override int GetHashCode()
         {
             var hashCode = -175245820;
-            hashCode = hashCode * -1521134295 + _tempoDenominator.GetHashCode();
-            hashCode = hashCode * -1521134295 + _tempoNumerator.GetHashCode();
-            hashCode = hashCode * -1521134295 + _partialMeasure.GetHashCode();
+            hashCode = hashCode * -1521134295 + TempoDenominator.GetHashCode();
+            hashCode = hashCode * -1521134295 + TempoNumerator.GetHashCode();
+            hashCode = hashCode * -1521134295 + PartialMeasure.GetHashCode();
             return hashCode;
         }
 

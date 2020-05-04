@@ -5,11 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Newtonsoft.Json;
 
 namespace Mapping_Tools.Viewmodels {
 
     public class RhythmGuideVm : BindableBase {
-        public RhythmGuide.RhythmGuideGeneratorArgs GuideGeneratorArgs { get; }
+        public RhythmGuide.RhythmGuideGeneratorArgs GuideGeneratorArgs { set; get; }
 
         public RhythmGuideVm() {
             GuideGeneratorArgs = new RhythmGuide.RhythmGuideGeneratorArgs();
@@ -47,13 +48,20 @@ namespace Mapping_Tools.Viewmodels {
                 });
         }
 
+        [JsonIgnore]
         public CommandImplementation ImportLoadCommand { get; }
+        [JsonIgnore]
         public CommandImplementation ImportBrowseCommand { get; }
+        [JsonIgnore]
         public CommandImplementation ExportLoadCommand { get; }
+        [JsonIgnore]
         public CommandImplementation ExportBrowseCommand { get; }
 
+        [JsonIgnore]
         public IEnumerable<RhythmGuide.ExportMode> ExportModes => Enum.GetValues(typeof(RhythmGuide.ExportMode)).Cast<RhythmGuide.ExportMode>();
+        [JsonIgnore]
         public IEnumerable<GameMode> ExportGameModes => Enum.GetValues(typeof(GameMode)).Cast<GameMode>();
+        [JsonIgnore]
         public IEnumerable<RhythmGuide.SelectionMode> SelectionModes => Enum.GetValues(typeof(RhythmGuide.SelectionMode)).Cast<RhythmGuide.SelectionMode>();
     }
 }

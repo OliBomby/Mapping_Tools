@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -244,7 +245,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
 
             // Set the timing object
-            BeatmapTiming = new Timing(timingLines, Difficulty["SliderMultiplier"].Value);
+            BeatmapTiming = new Timing(timingLines, Difficulty["SliderMultiplier"].DoubleValue);
 
             SortHitObjects();
             CalculateHitObjectComboStuff();
@@ -367,7 +368,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <returns>The list of Bookmarks.</returns>
         public List<double> GetBookmarks() {
             try {
-                return Editor["Bookmarks"].GetStringValue().Split(',').Select(double.Parse).ToList();
+                return Editor["Bookmarks"].GetDoubleList();
             }
             catch (KeyNotFoundException) {
                 return new List<double>();
@@ -486,8 +487,54 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         /// <returns>String of file name.</returns>
         public string GetFileName() {
-            return GetFileName(Metadata["Artist"].StringValue, Metadata["Title"].StringValue,
-                Metadata["Creator"].StringValue, Metadata["Version"].StringValue);
+            return GetFileName(Metadata["Artist"].Value, Metadata["Title"].Value,
+                Metadata["Creator"].Value, Metadata["Version"].Value);
+        }
+
+        /// <summary>
+        /// Finds the objects refered by specified time code.
+        /// Example time code: <example>00:56:823 (1,2,1,2) - </example>
+        /// </summary>
+        /// <param name="code">The time code</param>
+        /// <returns></returns>
+        public IEnumerable<HitObject> QueryTimeCode(string code) {
+            var startBracketIndex = code.IndexOf("(", StringComparison.Ordinal);
+            var endBracketIndex = code.IndexOf(")", StringComparison.Ordinal);
+
+            // Extract the list of combo numbers from the code
+            IEnumerable<int> comboNumbers;
+            if (startBracketIndex == -1) {
+                // If there is not start bracket, then we assume that there is no list of combo numbers in the code
+                // -1 means just get any combo number
+                comboNumbers = new[] {-1};
+            } else {
+                if (endBracketIndex == -1) {
+                    endBracketIndex = code.Length - 1;
+                }
+
+                // Get the part of the code between the brackets
+                var comboNumbersString = code.Substring(startBracketIndex + 1, endBracketIndex - startBracketIndex - 1);
+
+                comboNumbers = comboNumbersString.Split(',').Select(int.Parse);
+            }
+
+            // Parse the time span in the code
+            var time = TimeSpan.ParseExact(
+                code.Substring(0, startBracketIndex == -1 ? code.Length : startBracketIndex - 1).Trim(),
+                @"mm\:ss\:fff", CultureInfo.InvariantCulture, TimeSpanStyles.None).TotalMilliseconds;
+
+            // Enumerate through the hit objects from the first object at the time
+            int objectIndex = HitObjects.FindIndex(h => h.Time >= time);
+            foreach (var comboNumber in comboNumbers) {
+                while (comboNumber != -1 && objectIndex < HitObjects.Count && HitObjects[objectIndex].ComboIndex != comboNumber) {
+                    objectIndex++;
+                }
+
+                if (objectIndex >= HitObjects.Count)
+                    yield break;
+
+                yield return HitObjects[objectIndex++];
+            }
         }
 
         /// <summary>
@@ -506,7 +553,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         private static void AddDictionaryToLines(Dictionary<string, TValue> dict, List<string> lines) {
-            lines.AddRange(dict.Select(kvp => kvp.Key + ":" + kvp.Value.StringValue));
+            lines.AddRange(dict.Select(kvp => kvp.Key + ":" + kvp.Value.Value));
         }
 
         private static void FillDictionary(Dictionary<string, TValue> dict, List<string> lines) {

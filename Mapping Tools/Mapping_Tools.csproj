@@ -204,6 +204,8 @@
     <Compile Include="Classes\ComboColourStudio\ColourPointMode.cs" />
     <Compile Include="Classes\ComboColourStudio\ComboColourProject.cs" />
     <Compile Include="Classes\ComboColourStudio\SpecialColourDragAndDropListBox.cs" />
+    <Compile Include="Classes\Exceptions\InvalidEditorReaderStateException.cs" />
+    <Compile Include="Classes\Exceptions\EditorReaderDisabledException.cs" />
     <Compile Include="Classes\ExternalFileUtil\Reaper\EnvelopeShape.cs" />
     <Compile Include="Classes\ExternalFileUtil\Reaper\EnvelopeTempoPoint.cs" />
     <Compile Include="Classes\ExternalFileUtil\Reaper\ReaperEditor.cs" />
@@ -370,6 +372,8 @@
     <Compile Include="Classes\Tools\CircleBezierPreset.cs" />
     <Compile Include="Classes\Tools\EditorReaderStuff.cs" />
     <Compile Include="Classes\Tools\MapCleaner.cs" />
+    <Compile Include="Classes\Tools\MapCleanerArgs.cs" />
+    <Compile Include="Classes\Tools\PathGenerator.cs" />
     <Compile Include="Classes\Tools\RhythmGuide.cs" />
     <Compile Include="Classes\Tools\Sliderator.cs" />
     <Compile Include="Components\Dialogs\MessageDialog.xaml.cs">
@@ -377,6 +381,7 @@
     </Compile>
     <Compile Include="Components\Domain\ColorToBrushConverter.cs" />
     <Compile Include="Components\Domain\CommandImplementation.cs" />
+    <Compile Include="Components\Domain\SnapDivisorToStringConverter.cs" />
     <Compile Include="Components\Domain\MapPathStringToCountStringConverter.cs" />
     <Compile Include="Components\Domain\FlagToBoolConverter.cs" />
     <Compile Include="Components\Domain\IntToStringConverter.cs" />
@@ -389,7 +394,6 @@
     <Compile Include="Components\Domain\NotEmptyValidationRule.cs" />
     <Compile Include="Components\Domain\StringArrayToStringConverter.cs" />
     <Compile Include="Components\Domain\IsASCIIValidationRule.cs" />
-    <Compile Include="Components\Domain\SnapDivisorToStringConverter.cs" />
     <Compile Include="Components\Domain\TimeToStringConverter.cs" />
     <Compile Include="Components\Domain\VolumeToPercentageConverter.cs" />
     <Compile Include="Components\Domain\HitsoundToStringConverter.cs" />
@@ -486,22 +490,23 @@
     </Compile>
     <Compile Include="Classes\Tools\TimingPointsChange.cs" />
     <Compile Include="Properties\Annotations.cs" />
-    <Compile Include="Viewmodels\CleanerVM.cs" />
-    <Compile Include="Viewmodels\HitsoundPreviewHelperVM.cs" />
+    <Compile Include="Viewmodels\MapCleanerVm.cs" />
+    <Compile Include="Viewmodels\HitsoundPreviewHelperVm.cs" />
     <Compile Include="Viewmodels\HitsoundStudioVm.cs" />
-    <Compile Include="Viewmodels\HitsoundCopierVM.cs" />
+    <Compile Include="Viewmodels\HitsoundCopierVm.cs" />
     <Compile Include="Viewmodels\ComboColourStudioVm.cs" />
     <Compile Include="Viewmodels\RhythmGuideVm.cs" />
     <Compile Include="Viewmodels\SlideratorVm.cs" />
-    <Compile Include="Viewmodels\TimingCopierVM.cs" />
+    <Compile Include="Viewmodels\TimingCopierVm.cs" />
     <Compile Include="Viewmodels\MetadataManagerVm.cs" />
-    <Compile Include="Viewmodels\PropertyTransformerVM.cs" />
+    <Compile Include="Viewmodels\PropertyTransformerVm.cs" />
     <Compile Include="Viewmodels\SnappingToolsVm.cs" />
-    <Compile Include="Viewmodels\SliderCompletionatorVM.cs" />
-    <Compile Include="Viewmodels\SliderMergerVM.cs" />
+    <Compile Include="Viewmodels\SliderCompletionatorVm.cs" />
+    <Compile Include="Viewmodels\SliderMergerVm.cs" />
     <Compile Include="Viewmodels\PreferencesVM.cs" />
-    <Compile Include="Viewmodels\StandardVM.cs" />
-    <Compile Include="Viewmodels\TimingStudioVM.cs" />
+    <Compile Include="Viewmodels\StandardVm.cs" />
+    <Compile Include="Viewmodels\TimingHelperVm.cs" />
+    <Compile Include="Viewmodels\TimingStudioVm.cs" />
     <Compile Include="Components\Dialogs\BeatmapImportDialog.xaml.cs">
       <DependentUpon>BeatmapImportDialog.xaml</DependentUpon>
     </Compile>

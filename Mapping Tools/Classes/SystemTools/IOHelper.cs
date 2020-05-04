@@ -151,7 +151,7 @@ namespace Mapping_Tools.Classes.SystemTools {
         public static string[] BeatmapFileDialog(bool multiselect = false, bool restore = false) {
             string path = MainWindow.AppWindow.GetCurrentMaps()[0];
             using( OpenFileDialog openFileDialog = new OpenFileDialog {
-                InitialDirectory = restore ? "" : path != "" ? Editor.GetBeatmapFolder(path) : SettingsManager.GetSongsPath(),
+                InitialDirectory = restore ? "" : path != "" ? Editor.GetParentFolder(path) : SettingsManager.GetSongsPath(),
                 Filter = "Osu files (*.osu)|*.osu",
                 FilterIndex = 1,
                 RestoreDirectory = true,

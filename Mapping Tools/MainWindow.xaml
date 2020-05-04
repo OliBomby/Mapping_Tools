@@ -7,9 +7,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        xmlns:views="clr-namespace:Mapping_Tools.Views"
         xmlns:viewmodels="clr-namespace:Mapping_Tools.Viewmodels"
         xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
+        xmlns:standard="clr-namespace:Mapping_Tools.Views.Standard"
         mc:Ignorable="d"
         Title="Mapping Tools"  
         WindowStyle="None"
@@ -33,29 +33,8 @@
 
     <Window.Resources>
         <domain:MapPathStringToCountStringConverter x:Key="MapPathStringToCountStringConverter"/>
-        <DataTemplate DataType="{x:Type viewmodels:StandardVM}">
-            <views:StandardView DataContext="{Binding}"/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodels:CleanerVM}">
-            <views:CleanerView DataContext="{Binding}"/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodels:SliderMergerVM}">
-            <views:SliderMergerView DataContext="{Binding}"/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodels:SliderCompletionatorVM}">
-            <views:SliderCompletionatorView DataContext="{Binding}"/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodels:SnappingToolsVm}">
-            <views:SnappingToolsView DataContext="{Binding}"/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodels:HitsoundCopierVM}">
-            <views:HitsoundCopierView DataContext="{Binding}"/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodels:HitsoundStudioVm}">
-            <views:HitsoundStudioView DataContext="{Binding}"/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodels:PreferencesVM}">
-            <views:PreferencesView DataContext="{Binding}"/>
+        <DataTemplate DataType="{x:Type viewmodels:StandardVm}">
+            <standard:StandardView DataContext="{Binding}"/>
         </DataTemplate>
     </Window.Resources>
 
@@ -98,8 +77,8 @@
                         <Menu Foreground="{DynamicResource MaterialDesignBody}">
                             <MenuItem Height="31" Header="_File" Padding="12,0,0,0" MinWidth="50">
                                 <MenuItem Header="_Open beatmap" Click="OpenBeatmap" Icon="{materialDesign:PackIcon Folder}"
-                                          ToolTip="Set the current beatmap using the file explorer."/>
-                                <MenuItem Header="_Open current beatmap" Click="OpenGetCurrentBeatmap" Icon="{materialDesign:PackIcon Download}"
+                                          ToolTip="Select the current beatmap with File Explorer."/>
+                                <MenuItem Header="_Open current beatmap" Click="OpenGetCurrentBeatmap" Icon="{materialDesign:PackIcon RestoreFromTrash}"
                                           ToolTip="Set the current beatmap to the selected beatmap in your osu! client."/>
                                 <MenuItem Header="_Generate backup" Click="SaveBackup" Icon="{materialDesign:PackIcon Backup}"
                                           ToolTip="Save a backup of the current beatmap to the backups folder."/>
@@ -135,7 +114,8 @@
                         <materialDesign:Snackbar x:Name="MainSnackbar"/>
                     </Grid>
                     <materialDesign:ColorZone Mode="PrimaryDark" Grid.Row="3" Padding="10 10 10 0">
-                        <Grid x:Name="ForthGrid">
+                        <Grid x:Name="ForthGrid"
+                              ToolTip="This is the current beatmap. Most of the tools do their work on this beatmap.">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>

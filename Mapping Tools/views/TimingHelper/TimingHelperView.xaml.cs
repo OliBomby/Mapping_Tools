@@ -1,33 +1,39 @@
-﻿using Mapping_Tools.Classes.BeatmapHelper;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Windows;
+using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Classes.Tools;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Windows;
+using Mapping_Tools.Viewmodels;
 
-namespace Mapping_Tools.Views {
+namespace Mapping_Tools.Views.TimingHelper {
     /// <summary>
     /// Interactielogica voor TimingHelperView.xaml
     /// </summary>
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
-    public partial class TimingHelperView : IQuickRun {
+    public partial class TimingHelperView : IQuickRun, ISavable<TimingHelperVm> {
         public static readonly string ToolName = "Timing Helper";
 
-        public static readonly string ToolDescription = $@"Timing Helper is meant to speed up your timing job by placing the redlines for you. You only have to tell it where exactly all the sounds are.{Environment.NewLine}What you do is place 'markers' exactly on the correct timing of sounds. These markers can be hit objects, bookmarks, greenlines and redlines.{Environment.NewLine}Timing Helper will then adjust BPM and/or add redlines to make every marker be snapped.";
+        public static readonly string ToolDescription = $@"Timing Helper is meant to speed up your timing job by placing the redlines for you. You only have to tell it exactly where all the sounds are.{Environment.NewLine}What you do is place 'markers' exactly on the correct timing of sounds. These markers can be hit objects, bookmarks, greenlines and redlines.{Environment.NewLine}Timing Helper will then adjust BPM and/or add redlines to make every marker be snapped.";
 
         public TimingHelperView() {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
+            DataContext = new TimingHelperVm();
+            ProjectManager.LoadProject(this, message: false);
         }
+
+        public TimingHelperVm ViewModel => (TimingHelperVm) DataContext;
 
         protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
-            e.Result = Adjust_Timing((Arguments) e.Argument, bgw, e);
+            e.Result = Adjust_Timing((TimingHelperVm) e.Argument, bgw, e);
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
@@ -43,83 +49,41 @@ namespace Mapping_Tools.Views {
 
             IOHelper.SaveMapBackup(paths);
 
-            var args = new Arguments(quick, paths, ObjectsBox.IsChecked.GetValueOrDefault(), BookmarkBox.IsChecked.GetValueOrDefault(),
-                GreenlinesBox.IsChecked.GetValueOrDefault(),
-                RedlinesBox.IsChecked.GetValueOrDefault(), OmitBarlineBox.IsChecked.GetValueOrDefault(),
-                LeniencyBox.GetDouble(defaultValue: 3), TemporalBox.GetDouble(),
-                int.Parse(Snap1.Text.Split('/')[1]), int.Parse(Snap2.Text.Split('/')[1]));
+            ViewModel.Paths = paths;
+            ViewModel.Quick = quick;
 
-            BackgroundWorker.RunWorkerAsync(args);
+            BackgroundWorker.RunWorkerAsync(ViewModel);
 
             CanRun = false;
         }
 
-        private struct Arguments {
-            public bool Quick;
-            public string[] Paths;
-            public bool Objects;
-            public bool Bookmarks;
-            public bool Greenlines;
-            public bool Redlines;
-            public bool OmitBarline;
-            public double Leniency;
-            public double BeatsBetween;
-            public int Snap1;
-            public int Snap2;
-            public Arguments(bool quick, string[] paths, bool objects, bool bookmarks, bool greenlines, bool redlines, bool omitBarline, double leniency, double beatsBetween, int snap1, int snap2) {
-                Quick = quick;
-                Paths = paths;
-                Objects = objects;
-                Bookmarks = bookmarks;
-                Greenlines = greenlines;
-                Redlines = redlines;
-                OmitBarline = omitBarline;
-                Leniency = leniency;
-                BeatsBetween = beatsBetween;
-                Snap1 = snap1;
-                Snap2 = snap2;
-            }
-        }
-
-        private string Adjust_Timing(Arguments arg, BackgroundWorker worker, DoWorkEventArgs _) {
+        private string Adjust_Timing(TimingHelperVm arg, BackgroundWorker worker, DoWorkEventArgs _) {
             // Count
-            int RedlinesAdded = 0;
-
-            bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+            int redlinesAdded = 0;
+            
+            var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
 
             foreach (string path in arg.Paths) {
                 // Open beatmap
-                var editor = EditorReaderStuff.GetBeatmapEditor(path, reader, editorRead);
+                var editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader);
                 Beatmap beatmap = editor.Beatmap;
                 Timing timing = beatmap.BeatmapTiming;
 
                 // Get all the times to snap
                 List<Marker> markers = new List<Marker>();
                 if (arg.Objects) {
-                    foreach (HitObject ho in beatmap.HitObjects) {
-                        markers.Add(new Marker(ho.Time));
-                    }
+                    markers.AddRange(beatmap.HitObjects.Select(ho => new Marker(ho.Time)));
                 }
                 if (arg.Bookmarks) {
-                    foreach (double time in beatmap.GetBookmarks()) {
-                        markers.Add(new Marker(time));
-                    }
+                    markers.AddRange(beatmap.GetBookmarks().Select(time => new Marker(time)));
                 }
                 if (arg.Greenlines) {
                     // Get the offsets of greenlines
-                    foreach (TimingPoint tp in timing.TimingPoints) {
-                        if (!tp.Uninherited) {
-                            markers.Add(new Marker(tp.Offset));
-                        }
-                    }
+                    markers.AddRange(from tp in timing.TimingPoints where !tp.Uninherited select new Marker(tp.Offset));
                 }
                 if (arg.Redlines) {
                     // Get the offsets of redlines
-                    foreach (TimingPoint tp in timing.TimingPoints) {
-                        if (tp.Uninherited) {
-                            markers.Add(new Marker(tp.Offset));
-                        }
-                    }
+                    markers.AddRange(from tp in timing.TimingPoints where tp.Uninherited select new Marker(tp.Offset));
                 }
 
                 // Update progressbar
@@ -133,8 +97,7 @@ namespace Mapping_Tools.Views {
                 // Calculate the beats between time and the last time or redline for each time
                 // Time the same is 0
                 // Time a little after is smallest snap
-                for (int i = 0; i < markers.Count; i++) {
-                    Marker marker = markers[i];
+                foreach (var marker in markers) {
                     double time = marker.Time;
 
                     TimingPoint redline = timing.GetRedlineAtTime(time - 1);
@@ -147,7 +110,7 @@ namespace Mapping_Tools.Views {
 
                     // Avoid problems
                     if (MathHelper.ApproximatelyEquivalent(beatsFromRedline, 0, 0.0001)) {
-                        beatsFromRedline = 1 / Math.Max(arg.Snap1, arg.Snap2);
+                        beatsFromRedline = 1d / Math.Max(arg.Snap1, arg.Snap2);
                     }
                     if (time == redline.Offset) {
                         beatsFromRedline = 0;
@@ -250,7 +213,7 @@ namespace Mapping_Tools.Views {
                         newRedline.MpB = GetMpB(time - lastTime, beatsFromLastMarker, arg.Leniency);
 
                         // Update the counter
-                        RedlinesAdded++;
+                        redlinesAdded++;
                     }
 
                     // Update progressbar
@@ -271,12 +234,12 @@ namespace Mapping_Tools.Views {
 
             // Do QuickRun stuff
             if (arg.Quick)
-                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, editorRead));
+                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, reader != null));
 
             // Make an accurate message
             string message = "Successfully added ";
-            message += RedlinesAdded;
-            if (Math.Abs(RedlinesAdded) == 1) {
+            message += redlinesAdded;
+            if (Math.Abs(redlinesAdded) == 1) {
                 message += " redlines!";
             } else {
                 message += " redlines!";
@@ -285,7 +248,7 @@ namespace Mapping_Tools.Views {
             return arg.Quick ? string.Empty : message;
         }
 
-        private bool CheckMpB(double mpbNew, List<Marker> markers, TimingPoint redline, Arguments arg) {
+        private static bool CheckMpB(double mpbNew, IEnumerable<Marker> markers, TimingPoint redline, TimingHelperVm arg) {
             // For each their beatsFromRedline must stay the same AND their time must be within leniency of their resnapped time
             // If any of these times becomes incompatible, place a new anchor on the last time and not change the previous redline
             double mpbOld = redline.MpB;
@@ -297,14 +260,14 @@ namespace Mapping_Tools.Views {
 
                 // Get the beatsFromRedline after changing mpb
                 redline.MpB = mpbNew;
-                double resnappedTimeBA = redline.Offset + redline.MpB * beatsFromRedline;
-                double beatsFromRedlineBA = (resnappedTimeBA - redline.Offset) / redline.MpB;
+                double resnappedTimeBa = redline.Offset + redline.MpB * beatsFromRedline;
+                double beatsFromRedlineBa = (resnappedTimeBa - redline.Offset) / redline.MpB;
 
                 // Change MpB back so the redline doesn't get changed
                 redline.MpB = mpbOld;
 
                 // Check changes
-                if (MathHelper.ApproximatelyEquivalent(beatsFromRedlineBA, beatsFromRedline, 0.1) && IsSnapped(timeB, resnappedTimeBA, arg.Leniency)) {
+                if (MathHelper.ApproximatelyEquivalent(beatsFromRedlineBa, beatsFromRedline, 0.1) && IsSnapped(timeB, resnappedTimeBa, arg.Leniency)) {
                     continue;
                 }
                 canChangeRedline = false;
@@ -312,7 +275,7 @@ namespace Mapping_Tools.Views {
             return canChangeRedline;
         }
 
-        private double HumanRoundMpB(double mpb, List<Marker> markers, TimingPoint redline, Arguments arg) {
+        private static double HumanRoundMpB(double mpb, IReadOnlyCollection<Marker> markers, TimingPoint redline, TimingHelperVm arg) {
             double bpm = 60000 / mpb;
 
             // Round bpm
@@ -349,7 +312,7 @@ namespace Mapping_Tools.Views {
             return mpb;
         }
 
-        private double GetMpB(double timeFromRedline, double beatsFromRedline, double leniency) {
+        private static double GetMpB(double timeFromRedline, double beatsFromRedline, double leniency) {
             // Will make human-like BPM values like integers, halves and tenths
             // If that doesn't work (like the time is really far from the redline) it will try thousandths
             
@@ -406,5 +369,17 @@ namespace Mapping_Tools.Views {
         }
 
         public event EventHandler RunFinished;
+
+        public TimingHelperVm GetSaveData() {
+            return ViewModel;
+        }
+
+        public void SetSaveData(TimingHelperVm saveData) {
+            DataContext = saveData;
+        }
+
+        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "timinghelperproject.json");
+
+        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Timing Helper Projects");
     }
 }

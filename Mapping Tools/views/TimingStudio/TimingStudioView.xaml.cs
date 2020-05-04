@@ -7,19 +7,16 @@ using System.Windows;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.TimingStudio.Serialization;
-
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Viewmodels;
-using Mapping_Tools.Views.TimingStudio;
 
-namespace Mapping_Tools.Views
+namespace Mapping_Tools.Views.TimingStudio
 {
     /// <summary>
     /// TimingStudioView Tool for Mapping Tools
     /// </summary>
     [HiddenTool]
-    public partial class TimingStudioView : ISavable<TimingStudioVM> {
+    public partial class TimingStudioView : ISavable<TimingStudioVm> {
         public static readonly string ToolName = "Timing Studio";
 
         //public static readonly string ToolDescription = $@"Timing Helper is meant to speed up your timing job by placing the redlines for you. You only have to tell it where exactly all the sounds are."
@@ -34,7 +31,7 @@ namespace Mapping_Tools.Views
 
         public TimingStudioView() {
             InitializeComponent();
-            DataContext = new TimingStudioVM();
+            DataContext = new TimingStudioVm();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
         }
@@ -91,11 +88,11 @@ namespace Mapping_Tools.Views
             // Count
             int RedlinesAdded = 0;
 
-            bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+            var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
 
             foreach (string path in arg.Paths) {
                 // Open beatmap
-                var editor = EditorReaderStuff.GetBeatmapEditor(path, reader, editorRead);
+                var editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader);
                 Beatmap beatmap = editor.Beatmap;
                 Timing timing = beatmap.BeatmapTiming;
 
@@ -396,12 +393,12 @@ namespace Mapping_Tools.Views
             return Math.Abs(resnappedTime - time) <= leniency;
         }
 
-        public TimingStudioVM GetSaveData()
+        public TimingStudioVm GetSaveData()
         {
             throw new NotImplementedException();
         }
 
-        public void SetSaveData(TimingStudioVM saveData)
+        public void SetSaveData(TimingStudioVm saveData)
         {
             throw new NotImplementedException();
         }

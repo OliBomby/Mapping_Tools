@@ -1,19 +1,19 @@
-﻿using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.ComboColourStudio;
-using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.Tools;
-using Mapping_Tools.Viewmodels;
-using MaterialDesignThemes.Wpf;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.ComboColourStudio;
+using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Components.Dialogs;
+using Mapping_Tools.Viewmodels;
+using MaterialDesignThemes.Wpf;
 
-namespace Mapping_Tools.Views {
+namespace Mapping_Tools.Views.ComboColourStudio {
     /// <summary>
     /// Interactielogica voor ComboColourStudioView.xaml
     /// </summary>
@@ -81,10 +81,10 @@ namespace Mapping_Tools.Views {
             var orderedColourPoints = arg.Project.ColourPoints.OrderBy(o => o.Time).ToList();
             var orderedComboColours = arg.Project.ComboColours.OrderBy(o => o.Name).ToList();
 
-            var editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+            var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
 
             foreach (var path in paths) {
-                var editor = EditorReaderStuff.GetBeatmapEditor(path, reader, editorRead);
+                var editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader);
                 var beatmap = editor.Beatmap;
 
                 // Setting the combo colours

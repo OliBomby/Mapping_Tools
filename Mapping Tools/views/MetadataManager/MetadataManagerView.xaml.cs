@@ -1,14 +1,14 @@
-﻿using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.Tools;
-using Mapping_Tools.Viewmodels;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Windows;
+using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Viewmodels;
 
-namespace Mapping_Tools.Views {
+namespace Mapping_Tools.Views.MetadataManager {
     /// <summary>
     /// Interactielogica voor MetadataManagerView.xaml
     /// </summary>
@@ -49,19 +49,19 @@ namespace Mapping_Tools.Views {
             var paths = arg.ExportPath.Split('|');
             var mapsDone = 0;
 
-            var editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+            var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
 
             foreach (var path in paths) {
-                var editor = EditorReaderStuff.GetBeatmapEditor(path, reader, editorRead);
+                var editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader);
                 var beatmap = editor.Beatmap;
 
-                beatmap.Metadata["ArtistUnicode"].StringValue = arg.Artist;
-                beatmap.Metadata["Artist"].StringValue = arg.RomanisedArtist;
-                beatmap.Metadata["TitleUnicode"].StringValue = arg.Title;
-                beatmap.Metadata["Title"].StringValue = arg.RomanisedTitle;
-                beatmap.Metadata["Creator"].StringValue = arg.BeatmapCreator;
-                beatmap.Metadata["Source"].StringValue = arg.Source;
-                beatmap.Metadata["Tags"].StringValue = arg.Tags;
+                beatmap.Metadata["ArtistUnicode"].Value = arg.Artist;
+                beatmap.Metadata["Artist"].Value = arg.RomanisedArtist;
+                beatmap.Metadata["TitleUnicode"].Value = arg.Title;
+                beatmap.Metadata["Title"].Value = arg.RomanisedTitle;
+                beatmap.Metadata["Creator"].Value = arg.BeatmapCreator;
+                beatmap.Metadata["Source"].Value = arg.Source;
+                beatmap.Metadata["Tags"].Value = arg.Tags;
 
                 beatmap.General["PreviewTime"] = new TValue(arg.PreviewTime.ToRoundInvariant());
                 if (arg.UseComboColours) {
@@ -72,8 +72,8 @@ namespace Mapping_Tools.Views {
                     }
                 }
 
-                // Save the file
-                editor.SaveFile();
+                // Save the file with name update because we updated the metadata
+                editor.SaveFileWithNameUpdate();
 
                 // Update progressbar
                 if (worker != null && worker.WorkerReportsProgress) {

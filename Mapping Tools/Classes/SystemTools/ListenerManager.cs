@@ -11,6 +11,7 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Threading;
+using Editor_Reader;
 using ModifierKeys = NonInvasiveKeyboardHookLibrary.ModifierKeys;
 
 namespace Mapping_Tools.Classes.SystemTools {
@@ -54,7 +55,14 @@ namespace Mapping_Tools.Classes.SystemTools {
 
                 if (string.IsNullOrEmpty(path)) return;
 
-                EditorReaderStuff.TryGetNewestVersion(path, out var editor);
+                EditorReader reader = null;
+                try {
+                    reader = EditorReaderStuff.GetFullEditorReader();
+                } catch (Exception ex) {
+                    Console.WriteLine(ex.MessageStackTrace());
+                }
+
+                var editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader);
 
                 // Save temp version
                 var tempPath = Path.Combine(MainWindow.AppDataPath, "temp.osu");
@@ -217,7 +225,8 @@ namespace Mapping_Tools.Classes.SystemTools {
             {
                 if (!SettingsManager.Settings.SmartQuickRunEnabled) { QuickRunCurrentTool(); return; }
 
-                if (!EditorReaderStuff.TryGetFullEditorReader(out var reader)) return;
+                var reader = EditorReaderStuff.GetFullEditorReader();
+
                 var so = reader.hitObjects.Count(o => o.IsSelected);
                 IQuickRun tool = null;
 
@@ -253,9 +262,9 @@ namespace Mapping_Tools.Classes.SystemTools {
                     tool.QuickRun();
                 });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Ignored
+                ex.Show();
             }
         }
 
@@ -272,9 +281,9 @@ namespace Mapping_Tools.Classes.SystemTools {
                     tool.QuickRun();
                 });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Ignored
+                ex.Show();
             }
         }
 

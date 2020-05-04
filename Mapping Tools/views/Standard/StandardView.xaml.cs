@@ -1,11 +1,10 @@
-﻿using Mapping_Tools.Classes.SystemTools;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Windows.Controls;
+using Mapping_Tools.Classes.SystemTools;
+using Newtonsoft.Json;
 
-namespace Mapping_Tools.Views {
+namespace Mapping_Tools.Views.Standard {
     [DontShowTitle]
     public partial class StandardView {
         public static readonly string ToolName = "Get started";

@@ -1,23 +1,23 @@
-﻿using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.HitsoundStuff;
-using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.SystemTools.QuickRun;
-using Mapping_Tools.Classes.Tools;
-using Mapping_Tools.Viewmodels;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.HitsoundStuff;
+using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.SystemTools.QuickRun;
+using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Viewmodels;
 
-namespace Mapping_Tools.Views
+namespace Mapping_Tools.Views.HitsoundPreviewHelper
 {
     /// <summary>
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
-    public partial class HitsoundPreviewHelperView : ISavable<HitsoundPreviewHelperVM>, IQuickRun
+    public partial class HitsoundPreviewHelperView : ISavable<HitsoundPreviewHelperVm>, IQuickRun
     {
         public event EventHandler RunFinished;
 
@@ -39,7 +39,7 @@ namespace Mapping_Tools.Views
         public HitsoundPreviewHelperView()
         {
             InitializeComponent();
-            DataContext = new HitsoundPreviewHelperVM();
+            DataContext = new HitsoundPreviewHelperVm();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
             ProjectManager.LoadProject(this, message: false);
@@ -70,11 +70,11 @@ namespace Mapping_Tools.Views
             if (args.Zones.Count == 0)
                 return "There are no zones!";
 
-            bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+            var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
 
             foreach (string path in args.Paths)
             {
-                var editor = EditorReaderStuff.GetBeatmapEditor(path, reader, editorRead);
+                var editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader);
                 Beatmap beatmap = editor.Beatmap;
                 Timeline timeline = beatmap.GetTimeline();
 
@@ -110,7 +110,7 @@ namespace Mapping_Tools.Views
 
             // Do stuff
             if (args.Quick)
-                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, editorRead));
+                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, reader != null));
 
             return args.Quick ? "" : "Done!";
         }
@@ -133,17 +133,17 @@ namespace Mapping_Tools.Views
             IOHelper.SaveMapBackup(paths);
 
             BackgroundWorker.RunWorkerAsync(new Arguments(paths, quick,
-                ((HitsoundPreviewHelperVM) DataContext).Items.ToList()));
+                ((HitsoundPreviewHelperVm) DataContext).Items.ToList()));
 
             CanRun = false;
         }
 
-        public HitsoundPreviewHelperVM GetSaveData()
+        public HitsoundPreviewHelperVm GetSaveData()
         {
-            return (HitsoundPreviewHelperVM) DataContext;
+            return (HitsoundPreviewHelperVm) DataContext;
         }
 
-        public void SetSaveData(HitsoundPreviewHelperVM saveData)
+        public void SetSaveData(HitsoundPreviewHelperVm saveData)
         {
             DataContext = saveData;
 

@@ -51,7 +51,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// Saves the lines of string into the path provided.
         /// </summary>
         /// <param name="path"></param>
-        public void SaveFile(string path) {
+        public virtual void SaveFile(string path) {
             SaveFile(path, TextFile.GetLines());
         }
 
@@ -59,7 +59,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// Saves the lines of string into the path provided.
         /// </summary>
         /// <param name="lines"></param>
-        public void SaveFile(List<string> lines) {
+        public virtual void SaveFile(List<string> lines) {
             SaveFile(Path, lines);
         }
 
@@ -84,19 +84,19 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         /// <summary>
-        /// Grab the beatmap folder as absolute.
+        /// Grab the parent folder as absolute.
         /// </summary>
         /// <returns></returns>
-        public string GetBeatmapFolder() {
+        public string GetParentFolder() {
             return Directory.GetParent(Path).FullName;
         }
 
         /// <summary>
-        /// Grab the beatmap folder as absolute.
+        /// Grab the parent folder as absolute.
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static string GetBeatmapFolder(string path)
+        public static string GetParentFolder(string path)
         {
             return Directory.GetParent(path).FullName;
         }

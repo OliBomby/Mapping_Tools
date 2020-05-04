@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
+using System.IO;
 using System.Windows;
-using System.Windows.Controls;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Viewmodels;
 
-namespace Mapping_Tools.Views {
+namespace Mapping_Tools.Views.PropertyTransformer {
     /// <summary>
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
-    public partial class PropertyTransformerView {
+    public partial class PropertyTransformerView : ISavable<PropertyTransformerVm> {
         public static readonly string ToolName = "Property Transformer";
 
         public static readonly string ToolDescription = $@"Multiple and add to properties of all the timingpoints, hitobjects, bookmarks and storyboarded samples of the current map.{Environment.NewLine}The new value is the old value times the multiplier plus the offset. The multiplier is the left textbox and the offset is the right textbox. The multiplier gets done first.{Environment.NewLine}Resulting values get rounded if they have to be integer.";
@@ -23,28 +22,29 @@ namespace Mapping_Tools.Views {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
-            DataContext = new PropertyTransformerVM();
+            DataContext = new PropertyTransformerVm();
+            ProjectManager.LoadProject(this, message: false);
         }
 
         protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
-            e.Result = TransformProperties((PropertyTransformerVM)e.Argument, bgw, e);
+            e.Result = TransformProperties((PropertyTransformerVm)e.Argument, bgw, e);
         }
 
         private bool Filter(double value, double time, bool doMatch, bool doRange, double match, double min, double max) {
             return (!doMatch || Precision.AlmostEquals(value, match, 0.01)) && (!doRange || (time >= min && time <= max));
         }
 
-        private string TransformProperties(PropertyTransformerVM vm, BackgroundWorker worker, DoWorkEventArgs _) {
+        private string TransformProperties(PropertyTransformerVm vm, BackgroundWorker worker, DoWorkEventArgs _) {
             bool doFilterMatch = vm.MatchFilter != -1 && vm.EnableFilters;
             bool doFilterRange = (vm.MinTimeFilter != -1 || vm.MaxTimeFilter != -1) && vm.EnableFilters;
             double min = vm.MinTimeFilter == -1 ? double.NegativeInfinity : vm.MinTimeFilter;
             double max = vm.MaxTimeFilter == -1 ? double.PositiveInfinity : vm.MaxTimeFilter;
 
-            bool editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+            var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
 
-            foreach (string path in vm.MapPaths) {
-                var editor = EditorReaderStuff.GetBeatmapEditor(path, reader, editorRead);
+            foreach (string path in vm.ExportPaths) {
+                var editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader);
                 Beatmap beatmap = editor.Beatmap;
 
                 // Count all the total amount of things to loop through
@@ -153,6 +153,17 @@ namespace Mapping_Tools.Views {
                     }
                 }
 
+                // Preview point time
+                if (vm.PreviewTimeMultiplier != 1 || vm.PreviewTimeOffset != 0) {
+                    if (beatmap.General.ContainsKey("PreviewTime") && beatmap.General["PreviewTime"].IntValue != -1) {
+                        var previewTime = beatmap.General["PreviewTime"].DoubleValue;
+                        if (Filter(previewTime, previewTime, doFilterMatch, doFilterRange, vm.MatchFilter, min, max)) {
+                            var newPreviewTime = Math.Round(previewTime * vm.PreviewTimeMultiplier + vm.PreviewTimeOffset);
+                            beatmap.General["PreviewTime"].SetDouble(newPreviewTime);
+                        }
+                    }
+                }
+
                 TimingPointsChange.ApplyChanges(beatmap.BeatmapTiming, timingPointsChanges);
 
                 // Save the file
@@ -167,10 +178,22 @@ namespace Mapping_Tools.Views {
             string[] filesToCopy = MainWindow.AppWindow.GetCurrentMaps();
             IOHelper.SaveMapBackup(filesToCopy);
 
-            ((PropertyTransformerVM)DataContext).MapPaths = filesToCopy;
+            ((PropertyTransformerVm)DataContext).ExportPaths = filesToCopy;
             BackgroundWorker.RunWorkerAsync(DataContext);
 
             CanRun = false;
         }
+
+        public PropertyTransformerVm GetSaveData() {
+            return (PropertyTransformerVm) DataContext;
+        }
+
+        public void SetSaveData(PropertyTransformerVm saveData) {
+            DataContext = saveData;
+        }
+
+        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "propertytransformerproject.json");
+
+        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Property Transformer Projects");
     }
 }

@@ -1,49 +1,48 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
+    /// <summary>
+    /// Helper class for a single string that can represent multiple data types.
+    /// Provides methods for converting data to and from string.
+    /// </summary>
     public class TValue {
-        public string StringValue { get; set; }
-        public dynamic Value { get => GetValue(); set => SetValue(value); }
+        public string Value { get; set; }
+
+        public int IntValue {
+            get => GetInt();
+            set => SetInt(value);
+        }
+
+        public double DoubleValue {
+            get => GetDouble();
+            set => SetDouble(value);
+        }
+
+        public TValue() { }
 
         public TValue(string str) {
-            StringValue = str;
+            Value = str;
         }
 
-        public dynamic GetValue() {
-            if( double.TryParse(StringValue, NumberStyles.Any, CultureInfo.InvariantCulture, out double d) ) {
-                if( StringValue.Split('.').Count() > 1 ) {
-                    return d;
-                }
-                else {
-                    return int.Parse(StringValue, CultureInfo.InvariantCulture);
-                }
-            }
-            else {
-                return StringValue;
-            }
+        public void SetValue(object value) {
+            Value = value.ToInvariant();
         }
 
-        public void SetValue(dynamic value) {
-            StringValue = value.ToString();
-        }
+        public int GetInt() => int.Parse(Value, CultureInfo.InvariantCulture);
 
-        public string GetStringValue() {
-            return StringValue;
-        }
+        public void SetInt(int value) => Value = value.ToInvariant();
 
-        public int GetInt() => GetValue();
+        public bool IsInt() => !string.IsNullOrEmpty(Value) && Regex.IsMatch(Value, @"^\-?[0-9]$");
 
-        public bool IsInt(dynamic value) => value == typeof(int);
+        public double GetDouble() => double.Parse(Value, NumberStyles.Float, CultureInfo.InvariantCulture);
 
-        public double GetDouble() => GetValue();
+        public void SetDouble(double value) => Value = value.ToInvariant();
 
-        public bool IsDouble(dynamic value) => value == typeof(double);
+        public bool IsDouble() => !string.IsNullOrEmpty(Value) && Regex.IsMatch(Value, @"^\-?[0-9]+(\.[0-9]+)?$");
 
-
+        public List<double> GetDoubleList() => Value.Split(',').Select(v => double.Parse(v, NumberStyles.Float, CultureInfo.InvariantCulture)).ToList();
     }
 }

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Windows;
-using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SliderPathStuff;
@@ -12,12 +13,12 @@ using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Viewmodels;
 
-namespace Mapping_Tools.Views {
+namespace Mapping_Tools.Views.SliderMerger {
     /// <summary>
     ///     Interaktionslogik für UserControl1.xaml
     /// </summary>
     [SmartQuickRunUsage(SmartQuickRunTargets.MultipleSelection)]
-    public partial class SliderMergerView : IQuickRun {
+    public partial class SliderMergerView : IQuickRun, ISavable<SliderMergerVm> {
         public static readonly string ToolName = "Slider Merger";
 
         public static readonly string ToolDescription =
@@ -27,8 +28,11 @@ namespace Mapping_Tools.Views {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
-            DataContext = new SliderMergerVM();
+            DataContext = new SliderMergerVm();
+            ProjectManager.LoadProject(this, message: false);
         }
+
+        public SliderMergerVm ViewModel => (SliderMergerVm) DataContext;
 
         public event EventHandler RunFinished;
 
@@ -38,7 +42,7 @@ namespace Mapping_Tools.Views {
 
         protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
-            e.Result = Merge_Sliders((Arguments) e.Argument, bgw);
+            e.Result = Merge_Sliders((SliderMergerVm) e.Argument, bgw);
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
@@ -53,43 +57,66 @@ namespace Mapping_Tools.Views {
 
             IOHelper.SaveMapBackup(paths);
 
-            BackgroundWorker.RunWorkerAsync(new Arguments(paths, LeniencyBox.GetDouble(0),
-                SelectionModeBox.SelectedIndex, (ConnectionMode) ConnectionModeBox.SelectedItem,
-                LinearOnLinearBox.IsChecked.GetValueOrDefault(), quick));
+            ViewModel.Paths = paths;
+            ViewModel.Quick = quick;
+
+            BackgroundWorker.RunWorkerAsync(ViewModel);
             CanRun = false;
         }
 
-        private string Merge_Sliders(Arguments arg, BackgroundWorker worker) {
+        private string Merge_Sliders(SliderMergerVm arg, BackgroundWorker worker) {
             var slidersMerged = 0;
 
-            var editorRead = EditorReaderStuff.TryGetFullEditorReader(out var reader);
+            var reader = EditorReaderStuff.GetFullEditorReaderOrNot(out var editorReaderException1);
+
+            if (arg.ImportModeSetting == 0 && editorReaderException1 != null) {
+                return editorReaderException1.MessageStackTrace();
+            }
 
             foreach (var path in arg.Paths) {
-                var editor = EditorReaderStuff.GetBeatmapEditor(path, reader, editorRead, out var selected, out var editorActuallyRead);
+                var editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader, out var selected, out var editorReaderException2);
 
-                if (arg.SelectionMode == 0 && !editorActuallyRead) {
-                    return EditorReaderStuff.SelectedObjectsReadFailText;
+                if (arg.ImportModeSetting == SliderMergerVm.ImportMode.Selected && editorReaderException2 != null) {
+                    return editorReaderException2.MessageStackTrace();
                 }
 
                 var beatmap = editor.Beatmap;
-                var markedObjects = arg.SelectionMode == 0 ? selected :
-                    arg.SelectionMode == 1 ? beatmap.GetBookmarkedObjects() :
+                var markedObjects = arg.ImportModeSetting == 0 ? selected :
+                    arg.ImportModeSetting == SliderMergerVm.ImportMode.Bookmarked ? beatmap.GetBookmarkedObjects() :
+                    arg.ImportModeSetting == SliderMergerVm.ImportMode.Time ? beatmap.QueryTimeCode(arg.TimeCode).ToList() :
                     beatmap.HitObjects;
 
                 var mergeLast = false;
                 for (var i = 0; i < markedObjects.Count - 1; i++) {
                     var ho1 = markedObjects[i];
                     var ho2 = markedObjects[i + 1];
-                    if (ho1.IsSlider && ho2.IsSlider && (ho1.CurvePoints.Last() - ho2.Pos).Length <= arg.Leniency) {
+
+                    double dist;
+                    if (arg.MergeOnSliderEnd) {
+                        var sliderEnd = ho1.GetSliderPath().PositionAt(1);
+                        dist = (sliderEnd - ho2.Pos).Length;
+                    } else {
+                        dist = (ho1.CurvePoints.Last() - ho2.Pos).Length;
+                    }
+
+                    if (ho1.IsSlider && ho2.IsSlider && dist <= arg.Leniency) {
+                        if (arg.MergeOnSliderEnd) {
+                            // In order to merge on the slider end we first move the anchors such that the last anchor is exactly on the slider end
+                            // After that merge as usual
+                            ho1.SetAllCurvePoints(SliderPathUtil.MoveAnchorsToLength(
+                                ho1.GetAllCurvePoints(), ho1.SliderType, ho1.PixelLength, out var pathType));
+                            ho1.SliderType = pathType;
+                        }
+
                         var sp1 = BezierConverter.ConvertToBezier(ho1.SliderPath).ControlPoints;
                         var sp2 = BezierConverter.ConvertToBezier(ho2.SliderPath).ControlPoints;
 
                         double extraLength = 0;
-                        switch (arg.ConnectionMode) {
-                            case ConnectionMode.Move:
+                        switch (arg.ConnectionModeSetting) {
+                            case SliderMergerVm.ConnectionMode.Move:
                                 Move(sp2, sp1.Last() - sp2.First());
                                 break;
-                            case ConnectionMode.Linear:
+                            case SliderMergerVm.ConnectionMode.Linear:
                                 sp1.Add(sp1.Last());
                                 sp1.Add(sp2.First());
                                 extraLength = (ho1.CurvePoints.Last() - ho2.Pos).Length;
@@ -213,7 +240,7 @@ namespace Mapping_Tools.Views {
 
             // Do stuff
             if (arg.Quick)
-                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, editorRead));
+                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, reader != null));
 
             // Make an accurate message
             var message = "";
@@ -240,24 +267,16 @@ namespace Mapping_Tools.Views {
                 points[i] = points[i] + delta;
             }
         }
-
-        private struct Arguments {
-            public readonly string[] Paths;
-            public readonly double Leniency;
-            public readonly int SelectionMode;
-            public ConnectionMode ConnectionMode;
-            public bool LinearOnLinear;
-            public readonly bool Quick;
-
-            public Arguments(string[] paths, double leniency, int selectionMode, ConnectionMode connectionMode,
-                bool linearOnLinear, bool quick) {
-                Paths = paths;
-                Leniency = leniency;
-                SelectionMode = selectionMode;
-                ConnectionMode = connectionMode;
-                LinearOnLinear = linearOnLinear;
-                Quick = quick;
-            }
+        public SliderMergerVm GetSaveData() {
+            return ViewModel;
         }
+
+        public void SetSaveData(SliderMergerVm saveData) {
+            DataContext = saveData;
+        }
+
+        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "slidermergerproject.json");
+
+        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Slider Merger Projects");
     }
 }
