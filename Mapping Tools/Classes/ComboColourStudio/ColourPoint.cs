@@ -12,7 +12,7 @@ using MaterialDesignThemes.Wpf;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Classes.ComboColourStudio {
-    public class ColourPoint : BindableBase, IEquatable<ColourPoint>, ICloneable {
+    public class ColourPoint : BindableBase, ICloneable {
         private double _time;
         private ObservableCollection<SpecialColour> _colourSequence; 
         private ColourPointMode _mode;
@@ -97,27 +97,6 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
         public IEnumerable<ColourPointMode> ColourPointModes => Enum.GetValues(typeof(ColourPointMode)).Cast<ColourPointMode>();
         public CommandImplementation AddCommand { get; }
         public CommandImplementation RemoveCommand { get; }
-
-        public bool Equals(ColourPoint other) {
-            if (other is null) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return _time.Equals(other._time) && Equals(_colourSequence, other._colourSequence) && _mode == other._mode;
-        }
-
-        public override bool Equals(object obj) {
-            if (obj is null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            return obj.GetType() == GetType() && Equals((ColourPoint) obj);
-        }
-
-        public override int GetHashCode() {
-            unchecked {
-                var hashCode = _time.GetHashCode();
-                hashCode = (hashCode * 397) ^ (_colourSequence != null ? _colourSequence.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (int) _mode;
-                return hashCode;
-            }
-        }
 
         public object Clone() {
             var colours = new SpecialColour[ColourSequence.Count];
