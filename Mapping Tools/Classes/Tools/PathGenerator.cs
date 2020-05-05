@@ -70,21 +70,17 @@ namespace Mapping_Tools.Classes.Tools {
         /// <param name="endIndex"></param>
         /// <param name="maxAngle"></param>
         /// <returns></returns>
-        public IEnumerable<Vector2> GeneratePath(int startIndex, int endIndex, double maxAngle = Math.PI * 1 / 4) {
+        public IEnumerable<Vector2> GeneratePath(double startIndex, double endIndex, double maxAngle = Math.PI * 1 / 4) {
             var segments = GetNonInflectionSegments(startIndex, endIndex, maxAngle);
 
             foreach (var segment in segments) {
-                int dir = Math.Sign(segment.Item2 - segment.Item1);
-
-                if (dir == 0) continue;
-
-                var p1 = _path[segment.Item1];
-                var p2 = _path[segment.Item2];
+                var p1 = GetContinuousPosition(segment.Item1);
+                var p2 = GetContinuousPosition(segment.Item2);
 
                 yield return p1;
 
-                var a1 = _angle[segment.Item1];
-                var a2 = _angle[segment.Item2];
+                var a1 = GetContinuousAngle(segment.Item1);
+                var a2 = GetContinuousAngle(segment.Item2);
 
                 if (Math.Abs(GetSmallestAngle(a1, a2)) > 0.1) {
                     var t1 = new Line2(p1, a1);
@@ -109,11 +105,11 @@ namespace Mapping_Tools.Classes.Tools {
         /// <param name="endIndex"></param>
         /// <param name="maxAngle"></param>
         /// <returns></returns>
-        public List<Tuple<int, int>> GetNonInflectionSegments(int startIndex, int endIndex, double maxAngle=Math.PI * 1/4) {
+        public List<Tuple<double, double>> GetNonInflectionSegments(double startIndex, double endIndex, double maxAngle=Math.PI * 1/4) {
             int dir = Math.Sign(endIndex - startIndex);
 
             if (dir == 0) {
-                return new List<Tuple<int, int>> {new Tuple<int, int>(startIndex, endIndex)};
+                return new List<Tuple<double, double>> {new Tuple<double, double>(startIndex, endIndex)};
             }
 
             // If the direction is reversed, just swap the start and end index and then reverse the result at the end
@@ -125,20 +121,23 @@ namespace Mapping_Tools.Classes.Tools {
 
             endIndex = MathHelper.Clamp(endIndex, 0, _angle.Count - 1);
 
-            double lastAngleChange = 0;
-            var lastAngle = _angle[startIndex];
+            int startIndexInt = (int) Math.Ceiling(startIndex);
+            int endIndexInt = (int) Math.Floor(endIndex);
 
-            int startSubRange = startIndex;
+            double lastAngleChange = 0;
+            var lastAngle = GetContinuousAngle(startIndex);
+
+            double startSubRange = startIndex;
             double subRangeAngleChange = 0;
-            List<Tuple<int, int, double>> subRanges = new List<Tuple<int, int, double>>();
+            List<Tuple<double, double, double>> subRanges = new List<Tuple<double, double, double>>();
             // Loop through the whole path and divide it into sub-ranges at every inflection point
-            for (int i = startIndex; i <= endIndex; i++) {
+            for (int i = startIndexInt; i <= endIndexInt; i++) {
                 var angle = _angle[i];
                 var angleChange = GetSmallestAngle(angle, lastAngle);
 
                 // Check for inflection point or super sharp angles
                 if (angleChange * lastAngleChange < -Precision.DOUBLE_EPSILON || Math.Abs(angleChange) > Math.PI * 1 / 8) {
-                    subRanges.Add(new Tuple<int, int, double>(startSubRange, i, subRangeAngleChange));
+                    subRanges.Add(new Tuple<double, double, double>(startSubRange, i, subRangeAngleChange));
 
                     startSubRange = i;
                     subRangeAngleChange = -Math.Abs(angleChange);  // Negate the angle change because this point invalidates the angle
@@ -146,33 +145,36 @@ namespace Mapping_Tools.Classes.Tools {
 
                 subRangeAngleChange += Math.Abs(angleChange);
 
-                if (i == endIndex) {
-                    subRanges.Add(new Tuple<int, int, double>(startSubRange, i, subRangeAngleChange));
-                }
-
                 lastAngle = angle;
                 lastAngleChange = angleChange;
             }
 
-            List<Tuple<int, int>> segments = new List<Tuple<int, int>>();
+            if (Math.Abs(startSubRange - endIndex) > Precision.DOUBLE_EPSILON) {
+                subRanges.Add(new Tuple<double, double, double>(startSubRange, endIndex, subRangeAngleChange));
+            }
+
+            List<Tuple<double, double>> segments = new List<Tuple<double, double>>();
             // Divide each sub-range into evenly spaced segments which have an aggregate angle change less than the max
             foreach (var subRange in subRanges) {
                 int numSegments = (int) Math.Ceiling(subRange.Item3 / maxAngle);
                 double maxSegmentAngle = subRange.Item3 / numSegments;
 
-                lastAngle = _angle[subRange.Item1];
+                int segmentStartIndexInt = (int) Math.Ceiling(subRange.Item1);
+                int segmentEndIndexInt = (int) Math.Floor(subRange.Item2);
 
-                int startSegment = subRange.Item1;
+                lastAngle = GetContinuousAngle(subRange.Item1);
+
+                double startSegment = subRange.Item1;
                 double segmentAngleChange = 0;
                 // Loop through the sub-range and count the angle change to make even divisions of the angle
-                for (int i = subRange.Item1; i <= subRange.Item2; i++) {
+                for (int i = segmentStartIndexInt; i <= segmentEndIndexInt; i++) {
                     var angle = _angle[i];
                     var angleChange = GetSmallestAngle(angle, lastAngle);
 
                     segmentAngleChange += Math.Abs(angleChange);
 
-                    if (segmentAngleChange >= maxSegmentAngle || i == subRange.Item2) {
-                        segments.Add(new Tuple<int, int>(startSegment, i));
+                    if (segmentAngleChange >= maxSegmentAngle) {
+                        segments.Add(new Tuple<double, double>(startSegment, i));
 
                         startSegment = i;
                         segmentAngleChange -= maxSegmentAngle;
@@ -180,21 +182,42 @@ namespace Mapping_Tools.Classes.Tools {
 
                     lastAngle = angle;
                 }
+
+                if (Math.Abs(startSegment - subRange.Item2) > Precision.DOUBLE_EPSILON) {
+                    segments.Add(new Tuple<double, double>(startSegment, subRange.Item2));
+                }
             }
 
             // Reverse the result
             if (dir == -1) {
-                List<Tuple<int, int>> reversedSegments = new List<Tuple<int, int>>(segments.Count);
+                List<Tuple<double, double>> reversedSegments = new List<Tuple<double, double>>(segments.Count);
 
                 for (int i = segments.Count - 1; i >= 0; i--) {
                     var s = segments[i];
-                    reversedSegments.Add(new Tuple<int, int>(s.Item2, s.Item1));
+                    reversedSegments.Add(new Tuple<double, double>(s.Item2, s.Item1));
                 }
 
                 return reversedSegments;
             }
 
             return segments;
+        }
+
+        public Vector2 GetContinuousPosition(double index) {
+            int segmentIndex = (int) Math.Floor(index);
+            double segmentProgression = index - segmentIndex;
+
+            return Math.Abs(segmentProgression) < Precision.DOUBLE_EPSILON ? 
+                _path[segmentIndex] : 
+                Math.Abs(segmentProgression - 1) < Precision.DOUBLE_EPSILON ?
+                    _path[segmentIndex + 1] :
+                Vector2.Lerp(_path[segmentIndex], _path[segmentIndex + 1], segmentProgression);
+        }
+
+        public double GetContinuousAngle(double index) {
+            int segmentIndex = (int)Math.Floor(index + Precision.DOUBLE_EPSILON);
+
+            return _angle[segmentIndex];
         }
 
         private static double Modulo(double a, double n) {
