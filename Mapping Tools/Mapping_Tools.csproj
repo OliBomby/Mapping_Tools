@@ -505,6 +505,7 @@
     <Compile Include="Viewmodels\SliderMergerVm.cs" />
     <Compile Include="Viewmodels\PreferencesVM.cs" />
     <Compile Include="Viewmodels\StandardVm.cs" />
+    <Compile Include="Viewmodels\AspirenatorVm.cs" />
     <Compile Include="Viewmodels\TimingHelperVm.cs" />
     <Compile Include="Viewmodels\TimingStudioVm.cs" />
     <Compile Include="Components\Dialogs\BeatmapImportDialog.xaml.cs">
@@ -550,6 +551,9 @@
       <DependentUpon>MetadataManagerView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Classes\TimingStudio\Marker.cs" />
+    <Compile Include="Views\Aspirenator\AspirenatorView.xaml.cs">
+      <DependentUpon>AspirenatorView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\TimingHelper\TimingHelperView.xaml.cs">
       <DependentUpon>TimingHelperView.xaml</DependentUpon>
     </Compile>
@@ -723,6 +727,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\MetadataManager\MetadataManagerView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Aspirenator\AspirenatorView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
