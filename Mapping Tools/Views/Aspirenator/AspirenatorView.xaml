@@ -42,7 +42,11 @@
                   </materialDesign:PopupBox>
                 </StackPanel>
 
-                
+                <TextBox Text="{Binding Leniency, Converter={StaticResource DoubleToStringConverter}}" Width="300" HorizontalAlignment="Left" Margin="0 30 0 0"/>
+
+                <CheckBox Content="Zero pixellength sliders" IsChecked="{Binding DoZeroSliders}" Margin="0 20 0 0"/>
+                <CheckBox Content="Fix zero pixellength sliders" IsChecked="{Binding FixZeroSliders}" Margin="0 0 0 0"/>
+                <CheckBox Content="Bugged passthrough sliders" IsChecked="{Binding DoBugSliders}" Margin="0 0 0 0"/>
             </StackPanel>
 
             <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">

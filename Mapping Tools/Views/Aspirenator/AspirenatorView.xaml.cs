@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SliderPathStuff;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Classes.Tools;
@@ -57,6 +59,10 @@ namespace Mapping_Tools.Views.Aspirenator {
         }
 
         private string Aspirenate(AspirenatorVm arg, BackgroundWorker worker, DoWorkEventArgs _) {
+            int zeroSliders = 0;
+            int fixedZeroSliders = 0;
+            int bugSliders = 0;
+
             var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
 
             foreach (string path in arg.Paths) {
@@ -67,6 +73,28 @@ namespace Mapping_Tools.Views.Aspirenator {
                 // Update progressbar
                 if (worker != null && worker.WorkerReportsProgress) {
                     worker.ReportProgress(20);
+                }
+
+                // Change all sliders with 100% pixellength to 0 pixellength
+                // Change all nearly straight and super long bezier sliders to passthrough
+                foreach (var ho in beatmap.HitObjects.Where(h => h.IsSlider && h.CurvePoints.Count < 1000)) {
+                    var fullLength = ho.GetSliderPath(fullLength: true).Distance;
+
+                    if (arg.DoZeroSliders && !arg.FixZeroSliders && Math.Abs(ho.PixelLength - fullLength) < arg.Leniency) {
+                        ho.PixelLength = 0;
+                        zeroSliders++;
+                    }
+
+                    if (arg.DoZeroSliders && arg.FixZeroSliders && ho.PixelLength == 0) {
+                        ho.PixelLength = fullLength;
+                        fixedZeroSliders++;
+                    }
+
+                    if (arg.DoBugSliders && ho.SliderType == PathType.Bezier && ho.CurvePoints.Count == 2 &&
+                        ho.CurvePoints.Last().Length > 1000) {
+                        ho.SliderType = PathType.PerfectCurve;
+                        bugSliders++;
+                    }
                 }
 
                 // Save the file
@@ -84,7 +112,7 @@ namespace Mapping_Tools.Views.Aspirenator {
                 RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, reader != null));
 
             // Make an accurate message
-            string message = "Done!";
+            string message = $"Succesfully set 0 pixellength to {zeroSliders} sliders, fixed {fixedZeroSliders} sliders, and bugged {bugSliders} sliders!";
 
             return arg.Quick ? string.Empty : message;
         }
