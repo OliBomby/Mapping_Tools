@@ -5,6 +5,7 @@ using Mapping_Tools.Views;
 using MaterialDesignThemes.Wpf;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -34,6 +35,10 @@ namespace Mapping_Tools {
 
         public MainWindow() {
             InitializeComponent();
+
+            // Initialize exception logging
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
             try {
                 Setup();
                 SettingsManager.LoadConfig();
@@ -54,6 +59,24 @@ namespace Mapping_Tools {
             } catch (Exception ex) {
                 MessageBox.Show($"{ex.Message}{Environment.NewLine}{ex.StackTrace}", "Error");
             }
+        }
+
+        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e) {
+            // Log the exception, display it, etc
+            if (!(e.ExceptionObject is Exception exception)) return;
+            var lines = new List<string> {exception.Message, exception.StackTrace, exception.Source};
+
+            while (exception.InnerException != null) {
+                exception = exception.InnerException;
+                lines.Add("\nInner exception:");
+                lines.Add(exception.Message);
+                lines.Add(exception.StackTrace);
+                lines.Add(exception.Source);
+            }
+
+            var path = Path.Combine(AppDataPath, "crash-log.txt");
+            File.WriteAllLines(path, lines);
+            MessageBox.Show("The program encountered an unhandled exception. Look in crash-log.txt for more info.", "Error");
         }
 
         private void Setup() {
