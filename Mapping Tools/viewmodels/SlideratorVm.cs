@@ -331,7 +331,7 @@ namespace Mapping_Tools.Viewmodels {
                 EditorReader reader = EditorReaderStuff.GetFullEditorReaderOrNot(out var editorReaderException1);
                 
                 if (ImportModeSetting == ImportMode.Selected && editorReaderException1 != null) {
-                    throw editorReaderException1;
+                    throw new Exception("Could not fetch selected hit objects.", editorReaderException1);
                 }
 
                 BeatmapEditor editor = null;
@@ -342,7 +342,7 @@ namespace Mapping_Tools.Viewmodels {
                         editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader, out var selected, out var editorReaderException2);
 
                         if (editorReaderException2 != null) {
-                            throw editorReaderException2;
+                            throw new Exception("Could not fetch selected hit objects.", editorReaderException2);
                         }
 
                         markedObjects = selected;

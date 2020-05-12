@@ -1,7 +1,6 @@
-﻿using System;
+﻿using Mapping_Tools.Classes;
 using System.ComponentModel;
 using System.Windows;
-using Mapping_Tools.Classes.SystemTools.QuickRun;
 
 namespace Mapping_Tools.Views {
     [HiddenTool]
@@ -41,7 +40,7 @@ namespace Mapping_Tools.Views {
         /// <param name="e"></param>
         protected virtual void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
             if (e.Error != null) {
-                MessageBox.Show($"{e.Error.Message}{Environment.NewLine}{e.Error.StackTrace}", "Error");
+                e.Error.Show();
             } else if (!string.IsNullOrEmpty(e.Result as string)) {
                 MessageBox.Show(e.Result.ToString());
             }

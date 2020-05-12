@@ -70,14 +70,14 @@ namespace Mapping_Tools.Views.SliderCompletionator {
             var reader = EditorReaderStuff.GetFullEditorReaderOrNot(out var editorReaderException1);
 
             if (arg.ImportModeSetting == SliderCompletionatorVm.ImportMode.Selected && editorReaderException1 != null) {
-                return editorReaderException1.MessageStackTrace();
+                throw new Exception("Could not fetch selected hit objects.", editorReaderException1);
             }
 
             foreach (string path in arg.Paths) {
                 var editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader, out var selected, out var editorReaderException2);
 
                 if (arg.ImportModeSetting == SliderCompletionatorVm.ImportMode.Selected && editorReaderException2 != null) {
-                    return editorReaderException2.MessageStackTrace();
+                    throw new Exception("Could not fetch selected hit objects.", editorReaderException2);
                 }
 
                 Beatmap beatmap = editor.Beatmap;

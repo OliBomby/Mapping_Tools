@@ -70,14 +70,14 @@ namespace Mapping_Tools.Views.SliderMerger {
             var reader = EditorReaderStuff.GetFullEditorReaderOrNot(out var editorReaderException1);
 
             if (arg.ImportModeSetting == 0 && editorReaderException1 != null) {
-                return editorReaderException1.MessageStackTrace();
+                throw new Exception("Could not fetch selected hit objects.", editorReaderException1);
             }
 
             foreach (var path in arg.Paths) {
                 var editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader, out var selected, out var editorReaderException2);
 
                 if (arg.ImportModeSetting == SliderMergerVm.ImportMode.Selected && editorReaderException2 != null) {
-                    return editorReaderException2.MessageStackTrace();
+                    throw new Exception("Could not fetch selected hit objects.", editorReaderException2);
                 }
 
                 var beatmap = editor.Beatmap;
