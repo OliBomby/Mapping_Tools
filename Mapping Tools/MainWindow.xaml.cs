@@ -14,6 +14,7 @@ using System.Security.Principal;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Mapping_Tools.Classes;
 using Mapping_Tools.Views.Standard;
 
 namespace Mapping_Tools {
@@ -204,20 +205,37 @@ namespace Mapping_Tools {
         }
 
         private void OpenBeatmap(object sender, RoutedEventArgs e) {
-            string[] paths = IOHelper.BeatmapFileDialog(true);
-            if( paths.Length != 0 ) { SetCurrentMaps(paths); }
+            try {
+                string[] paths = IOHelper.BeatmapFileDialog(true);
+                if (paths.Length != 0) {
+                    SetCurrentMaps(paths);
+                }
+            }
+            catch (Exception ex) {
+                ex.Show();
+            }
         }
 
         private void OpenGetCurrentBeatmap(object sender, RoutedEventArgs e) {
-            string path = IOHelper.GetCurrentBeatmap();
-            if( path != "" ) { SetCurrentMaps(new[] { path }); }
+            try {
+                string path = IOHelper.GetCurrentBeatmap();
+                if (path != "") {
+                    SetCurrentMaps(new[] { path });
+                }
+            } catch (Exception ex) {
+                ex.Show();
+            }
         }
 
         private void SaveBackup(object sender, RoutedEventArgs e) {
-            var paths = GetCurrentMaps();
-            var result = IOHelper.SaveMapBackup(paths, true);
-            if( result )
-                MessageBox.Show($"Beatmap{( paths.Length == 1 ? "" : "s" )} successfully copied!");
+            try {
+                var paths = GetCurrentMaps();
+                var result = IOHelper.SaveMapBackup(paths, true);
+                if (result)
+                    MessageBox.Show($"Beatmap{(paths.Length == 1 ? "" : "s")} successfully copied!");
+            } catch (Exception ex) {
+                ex.Show();
+            }
         }
 
         private void ViewChanged() { 
@@ -286,7 +304,7 @@ namespace Mapping_Tools {
                 System.Diagnostics.Process.Start(SettingsManager.GetBackupsPath());
             }
             catch( Exception ex ) {
-                System.Windows.Forms.MessageBox.Show(ex.Message);
+                ex.Show();
             }
         }
 
@@ -295,7 +313,12 @@ namespace Mapping_Tools {
         }
 
         private void CoolSave(object sender, RoutedEventArgs e) {
-            EditorReaderStuff.BetterSave();
+            try {
+                EditorReaderStuff.BetterSave();
+            } 
+            catch (Exception ex) {
+                ex.Show();
+            }
         }
 
         //Open project in browser
