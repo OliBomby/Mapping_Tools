@@ -165,7 +165,7 @@ namespace Mapping_Tools.Views.ComboColourStudio {
             }
 
             // Make an accurate message
-            var message = $"Successfully exported metadata to {mapsDone} {(mapsDone == 1 ? "beatmap" : "beatmaps")}!";
+            var message = $"Successfully exported colours to {mapsDone} {(mapsDone == 1 ? "beatmap" : "beatmaps")}!";
             return message;
         }
 
