@@ -169,7 +169,7 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
                 }
             }
             catch( Exception ex ) {
-                MessageBox.Show($"{ex.Message}{Environment.NewLine}{ex.StackTrace}", "Error");
+                ex.Show();
             }
         }
 
@@ -306,7 +306,7 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
                 }
             }
             catch( Exception ex ) {
-                MessageBox.Show($"{ex.Message}{Environment.NewLine}{ex.StackTrace}", "Error");
+                ex.Show();
             }
         }
 

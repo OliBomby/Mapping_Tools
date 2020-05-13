@@ -169,8 +169,7 @@ namespace Mapping_Tools.Classes.SystemTools {
 
         public void ReloadHotkeys()
         {
-            try
-            {
+            try {
                 KeyboardHookManager.UnregisterAll();
 
                 foreach (var ah in ActiveHotkeys.Values.Where(ah =>
@@ -179,11 +178,9 @@ namespace Mapping_Tools.Classes.SystemTools {
                     RegisterHotkey(ah.Hotkey, ah.Action);
                 }
             }
-            catch (HotkeyAlreadyRegisteredException)
-            {
-                MessageBox.Show(@"Can not register duplicate hotkeys.", @"Warning");
+            catch (Exception ex) {
+                ex.Show();
             }
-            catch { MessageBox.Show(@"Could not reload hotkeys.", @"Warning"); }
         }
 
         private void RegisterHotkey(Hotkey hotkey, Action action)

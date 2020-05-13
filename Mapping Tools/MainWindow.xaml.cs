@@ -58,7 +58,7 @@ namespace Mapping_Tools {
 
                 SetCurrentMaps(SettingsManager.GetLatestCurrentMaps()); // Set currentmap to previously opened map
             } catch (Exception ex) {
-                MessageBox.Show($"{ex.Message}{Environment.NewLine}{ex.StackTrace}", "Error");
+                ex.Show();
             }
         }
 
@@ -96,7 +96,7 @@ namespace Mapping_Tools {
                 Directory.CreateDirectory(ExportPath);
             }
             catch( Exception ex ) {
-                MessageBox.Show(ex.Message);
+                ex.Show();
             }
 
             Views = new ViewCollection(); // Make a ViewCollection object
@@ -112,7 +112,7 @@ namespace Mapping_Tools {
             try {
                 SetCurrentView(Views.GetView(name));
             } catch (ArgumentException ex) {
-                MessageBox.Show(ex.Message);
+                ex.Show();
             }
         }
 
@@ -120,7 +120,7 @@ namespace Mapping_Tools {
             try {
                 SetCurrentView(Views.GetView(type));
             } catch (ArgumentException ex) {
-                MessageBox.Show(ex.Message);
+                ex.Show();
             }
         }
 

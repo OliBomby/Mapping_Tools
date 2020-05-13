@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.SystemTools;
 using MaterialDesignThemes.Wpf;
@@ -129,7 +130,7 @@ namespace Mapping_Tools.Views.HitsoundStudio {
                 Close();
             }
             catch( Exception ex ) {
-                MessageBox.Show(string.Format("{0}{1}{2}", ex.Message, Environment.NewLine, ex.StackTrace), "Error");
+                ex.Show();
             }
         }
 

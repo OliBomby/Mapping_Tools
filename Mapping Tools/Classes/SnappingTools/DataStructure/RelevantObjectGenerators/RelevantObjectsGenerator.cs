@@ -28,7 +28,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
                     try {
                         var settingsWindow = new GeneratorSettingsWindow(Settings);
                         settingsWindow.ShowDialog();
-                    } catch (Exception ex) { MessageBox.Show(ex.Message); }
+                    } catch (Exception ex) { ex.Show(); }
                 });
         }
 
@@ -41,7 +41,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenera
                     try {
                         var settingsWindow = new GeneratorSettingsWindow(Settings);
                         settingsWindow.ShowDialog();
-                    } catch (Exception ex) { MessageBox.Show(ex.Message); }
+                    } catch (Exception ex) { ex.Show(); }
                 });
         }
 

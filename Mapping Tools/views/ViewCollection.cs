@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Reflection;
 using System.Windows;
+using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Views.RhythmGuide;
@@ -68,9 +69,7 @@ namespace Mapping_Tools.Views {
                     Views.Add(type, Activator.CreateInstance(type));
                 }
             } catch (Exception ex) {
-                MessageBox.Show($"{ex.Message}{Environment.NewLine}{ex.StackTrace}", "Error");
-                if (ex.InnerException != null)
-                    MessageBox.Show($"{ex.InnerException.Message}{Environment.NewLine}{ex.InnerException.StackTrace}", "Error");
+                ex.Show();
                 return null;
             }
             return Views[type];

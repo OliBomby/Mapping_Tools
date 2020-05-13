@@ -36,6 +36,7 @@ namespace Mapping_Tools.Classes.SystemTools {
                 Console.WriteLine(ex.Message);
 
                 MessageBox.Show("User-specific configuration could not be loaded!");
+                ex.Show();
                 return false;
             }
             return true;
@@ -54,6 +55,7 @@ namespace Mapping_Tools.Classes.SystemTools {
                 Console.WriteLine(ex.Message);
 
                 MessageBox.Show("User-specific configuration could not be loaded!");
+                ex.Show();
                 return false;
             }
             return true;
@@ -72,6 +74,7 @@ namespace Mapping_Tools.Classes.SystemTools {
                 Console.WriteLine(ex.Message);
 
                 MessageBox.Show("User-specific configuration could not be saved!");
+                ex.Show();
                 return false;
             }
 
