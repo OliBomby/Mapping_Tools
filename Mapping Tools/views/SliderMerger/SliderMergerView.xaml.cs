@@ -88,18 +88,23 @@ namespace Mapping_Tools.Views.SliderMerger {
 
                 var mergeLast = false;
                 for (var i = 0; i < markedObjects.Count - 1; i++) {
+                    if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(i / markedObjects.Count);
+
                     var ho1 = markedObjects[i];
                     var ho2 = markedObjects[i + 1];
 
-                    double dist;
-                    if (arg.MergeOnSliderEnd) {
-                        var sliderEnd = ho1.GetSliderPath().PositionAt(1);
-                        dist = (sliderEnd - ho2.Pos).Length;
-                    } else {
-                        dist = (ho1.CurvePoints.Last() - ho2.Pos).Length;
+                    var lastPos1 = ho1.IsSlider
+                        ? arg.MergeOnSliderEnd ? ho1.GetSliderPath().PositionAt(1) : ho1.CurvePoints.Last()
+                        : ho1.Pos;
+
+                    double dist = Vector2.Distance(lastPos1, ho2.Pos);
+
+                    if (dist > arg.Leniency) {
+                        mergeLast = false;
+                        continue;
                     }
 
-                    if (ho1.IsSlider && ho2.IsSlider && dist <= arg.Leniency) {
+                    if (ho1.IsSlider && ho2.IsSlider) {
                         if (arg.MergeOnSliderEnd) {
                             // In order to merge on the slider end we first move the anchors such that the last anchor is exactly on the slider end
                             // After that merge as usual
@@ -146,7 +151,7 @@ namespace Mapping_Tools.Views.SliderMerger {
                         slidersMerged++;
                         if (!mergeLast) slidersMerged++;
                         mergeLast = true;
-                    } else if (ho1.IsSlider && ho2.IsCircle && (ho1.CurvePoints.Last() - ho2.Pos).Length <= arg.Leniency) {
+                    } else if (ho1.IsSlider && ho2.IsCircle) {
                         var sp1 = BezierConverter.ConvertToBezier(ho1.SliderPath).ControlPoints;
 
                         sp1.Add(sp1.Last());
@@ -175,7 +180,7 @@ namespace Mapping_Tools.Views.SliderMerger {
                         slidersMerged++;
                         if (!mergeLast) slidersMerged++;
                         mergeLast = true;
-                    } else if (ho1.IsCircle && ho2.IsSlider && (ho1.Pos - ho2.Pos).Length <= arg.Leniency) {
+                    } else if (ho1.IsCircle && ho2.IsSlider) {
                         var sp2 = BezierConverter.ConvertToBezier(ho2.SliderPath).ControlPoints;
 
                         sp2.Insert(0, sp2.First());
@@ -204,7 +209,7 @@ namespace Mapping_Tools.Views.SliderMerger {
                         slidersMerged++;
                         if (!mergeLast) slidersMerged++;
                         mergeLast = true;
-                    } else if (ho1.IsCircle && ho2.IsCircle && (ho1.Pos - ho2.Pos).Length <= arg.Leniency) {
+                    } else if (ho1.IsCircle && ho2.IsCircle) {
                         var mergedAnchors = new List<Vector2> {ho1.Pos, ho2.Pos};
 
                         var mergedPath = new SliderPath(arg.LinearOnLinear ? PathType.Linear : PathType.Bezier, mergedAnchors.ToArray(), (ho1.Pos - ho2.Pos).Length);
@@ -227,8 +232,6 @@ namespace Mapping_Tools.Views.SliderMerger {
                     else {
                         mergeLast = false;
                     }
-
-                    if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(i / markedObjects.Count);
                 }
 
                 // Save the file
