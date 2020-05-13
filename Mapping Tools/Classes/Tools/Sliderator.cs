@@ -325,7 +325,8 @@ namespace Mapping_Tools.Classes.Tools {
             foreach (var neuron in _slider.Where(n => n.Terminal != null)) {
                 // Find angles for the neuron and the terminal to point the dendrites towards
                 var dir = Math.Sign(neuron.Terminal.Nucleus.PathPosition - neuron.Nucleus.PathPosition);
-                dir = dir == 0 ? 1 : dir;
+                dir = dir == 0 ? 1 : dir;  // Let dir not be zero
+
                 var dendriteDir1 = dir * NearbyNonZeroDiff(neuron.Nucleus.SegmentIndex).Normalized();
                 var dendriteDir2 = -dir * NearbyNonZeroDiff(neuron.Terminal.Nucleus.SegmentIndex).Normalized();
 
@@ -383,13 +384,13 @@ namespace Mapping_Tools.Classes.Tools {
             while (length > minLength) {
                 var size = MathHelper.Clamp(Math.Floor(length), Math.Max(minLength, 1), Math.Min(maxLength, 12));
 
-                var dendrite = (dir * -size).Rounded();
+                var dendrite = (dir * size).Rounded();
                 var dendriteLength = dendrite.Length;
 
                 // Shorten dendrites longer than 12 pixels to keep dendrites invisible
                 while (dendriteLength > 12) {
                     size -= 0.5;
-                    dendrite = (dir * -size).Rounded();
+                    dendrite = (dir * size).Rounded();
                     dendriteLength = dendrite.Length;
                 }
 
