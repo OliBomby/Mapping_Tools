@@ -27,7 +27,7 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
 
             AddColourPointCommand = new CommandImplementation(_ => {
                 double time = ColourPoints.Count > 1 ? 
-                    ColourPoints.Count(o => o.IsSelected) > 0 ? ColourPoints.Last(o => o.IsSelected).Time :
+                    ColourPoints.Count(o => o.IsSelected) > 0 ? ColourPoints.Where(o => o.IsSelected).Max(o => o.Time) :
                     ColourPoints.Last().Time
                     : 0;
                 if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)) {
