@@ -181,7 +181,7 @@ namespace Mapping_Tools.Classes.Tools {
                 // Make a new neuron if the path turns around
                 // The position of this turn-around is not entirely accurate because the actual turn-around happens somewhere in between the time steps
                 // This is the cause behind most of the error compared to the expected total length
-                if (direction != lastDirection) {
+                if (direction * lastDirection < 0) {  // Do this to exclude 0 direction sign
                     var newNeuron = new Neuron(nearestLatticePoint, time);
                     currentNeuron.Terminal = newNeuron;
 
@@ -197,25 +197,32 @@ namespace Mapping_Tools.Classes.Tools {
 
                 // Make a new neuron when the error in the length becomes too large
                 var lengthError = Math.Abs(Math.Abs(wantedLength - nucleusWantedLength) - actualLength) - currentNeuron.Error;
+
                 if (lengthError > Math.Max(MinDendriteLength, velocity * maxOvershot) || 
                     nearestLatticePoint.Error < 0.05 && lengthError > Math.Max(MinDendriteLength, velocity * MinDendriteLength)) {
-                    if (nearestLatticePoint != currentNeuron.Nucleus) {
+                    if ((nearestLatticePoint.Pos - currentNeuron.Nucleus.Pos).LengthSquared > 0.1) {
                         var newNeuron = new Neuron(nearestLatticePoint, time);
                         currentNeuron.Terminal = newNeuron;
 
-                        currentNeuron.WantedLength = actualLength;
+                        currentNeuron.WantedLength += actualLength;
                         _slider.Add(currentNeuron);
 
                         currentNeuron = newNeuron;
                         nucleusWantedLength = wantedLength;
                         nucleusTime = time;
+                    } else {
+                        // Pretend to add a new neuron but merged with the current one
+                        currentNeuron.WantedLength += actualLength;
+
+                        nucleusWantedLength = wantedLength;
+                        nucleusTime = time;
                     }
                 }
 
-                lastDirection = direction;
+                lastDirection = direction == 0 ? lastDirection : direction;  // Not update last direction if direction is 0
             }
             // Need to add currentNeuron at the end otherwise the last neuron would get ignored
-            currentNeuron.WantedLength = actualLength;
+            currentNeuron.WantedLength += actualLength;
             var lastNeuron = new Neuron(GetNearestLatticePoint(PositionFunction(MaxT)), MaxT);
             currentNeuron.Terminal = lastNeuron;
             _slider.Add(currentNeuron);
@@ -235,6 +242,10 @@ namespace Mapping_Tools.Classes.Tools {
             //Console.WriteLine(@"Expected total wanted length: " + MaxS);
 
             //Console.WriteLine(@"Number of neurons: " + _slider.Count);
+            //foreach (var neuron in _slider) {
+            //    Console.WriteLine(neuron.Nucleus.Pos);
+            //    Console.WriteLine(neuron.WantedLength);
+            //}
         }
 
         private void GenerateAxons() {
