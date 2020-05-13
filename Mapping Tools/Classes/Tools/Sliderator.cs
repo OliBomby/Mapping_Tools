@@ -274,39 +274,6 @@ namespace Mapping_Tools.Classes.Tools {
             }
         }
 
-        private static BezierSubdivision DoubleMiddleApproximation(Neuron neuron, Vector2 middlePoint, out double length) {
-            var firstPoint = neuron.Nucleus.Pos;
-            var lastPoint = neuron.Terminal.Nucleus.Pos;
-
-            var average = (firstPoint + lastPoint) / 2;
-
-            var doubleMiddlePoint = average + (middlePoint - average) * 2;
-
-            var bs = new BezierSubdivision(new List<Vector2> {firstPoint, doubleMiddlePoint, lastPoint});
-            length = bs.SubdividedApproximationLength();
-
-            return bs;
-        }
-
-        private BezierSubdivision TangentIntersectionApproximation(Neuron neuron, out double length) {
-            var firstPoint = neuron.Nucleus.Pos;
-            var lastPoint = neuron.Terminal.Nucleus.Pos;
-            var dir = Math.Sign(neuron.Terminal.Nucleus.SegmentIndex - neuron.Nucleus.SegmentIndex);
-            var line1 = Line2.FromPoints(neuron.Nucleus.PathPoint, _path[neuron.Nucleus.SegmentIndex + dir]);
-            var line2 = Line2.FromPoints(neuron.Terminal.Nucleus.PathPoint, _path[neuron.Terminal.Nucleus.SegmentIndex - dir]);
-
-            BezierSubdivision bs;
-            if (Line2.Intersection(line1, line2, out var intersection)) {
-                bs = new BezierSubdivision(new List<Vector2> {firstPoint, intersection, lastPoint});
-                length = bs.SubdividedApproximationLength();
-            } else {
-                bs = new BezierSubdivision(new List<Vector2> {firstPoint, lastPoint});
-                length = Vector2.Distance(firstPoint, lastPoint);
-            }
-
-            return bs;
-        }
-
         private Vector2 NearbyNonZeroDiff(int index) {
             Vector2 diff = Vector2.UnitX;
             for (int i = 0; i < 10; i++) {
