@@ -181,7 +181,7 @@ namespace Mapping_Tools.Classes.Tools {
                 // Make a new neuron if the path turns around
                 // The position of this turn-around is not entirely accurate because the actual turn-around happens somewhere in between the time steps
                 // This is the cause behind most of the error compared to the expected total length
-                if (direction != lastDirection) {
+                if (direction * lastDirection < 0) {  // Do this to exclude 0 direction sign
                     var newNeuron = new Neuron(nearestLatticePoint, time);
                     currentNeuron.Terminal = newNeuron;
 
@@ -197,25 +197,32 @@ namespace Mapping_Tools.Classes.Tools {
 
                 // Make a new neuron when the error in the length becomes too large
                 var lengthError = Math.Abs(Math.Abs(wantedLength - nucleusWantedLength) - actualLength) - currentNeuron.Error;
+
                 if (lengthError > Math.Max(MinDendriteLength, velocity * maxOvershot) || 
                     nearestLatticePoint.Error < 0.05 && lengthError > Math.Max(MinDendriteLength, velocity * MinDendriteLength)) {
-                    if (nearestLatticePoint != currentNeuron.Nucleus) {
+                    if ((nearestLatticePoint.Pos - currentNeuron.Nucleus.Pos).LengthSquared > 0.1) {
                         var newNeuron = new Neuron(nearestLatticePoint, time);
                         currentNeuron.Terminal = newNeuron;
 
-                        currentNeuron.WantedLength = actualLength;
+                        currentNeuron.WantedLength += actualLength;
                         _slider.Add(currentNeuron);
 
                         currentNeuron = newNeuron;
                         nucleusWantedLength = wantedLength;
                         nucleusTime = time;
+                    } else {
+                        // Pretend to add a new neuron but merged with the current one
+                        currentNeuron.WantedLength += actualLength;
+
+                        nucleusWantedLength = wantedLength;
+                        nucleusTime = time;
                     }
                 }
 
-                lastDirection = direction;
+                lastDirection = direction == 0 ? lastDirection : direction;  // Not update last direction if direction is 0
             }
             // Need to add currentNeuron at the end otherwise the last neuron would get ignored
-            currentNeuron.WantedLength = actualLength;
+            currentNeuron.WantedLength += actualLength;
             var lastNeuron = new Neuron(GetNearestLatticePoint(PositionFunction(MaxT)), MaxT);
             currentNeuron.Terminal = lastNeuron;
             _slider.Add(currentNeuron);
@@ -235,6 +242,10 @@ namespace Mapping_Tools.Classes.Tools {
             //Console.WriteLine(@"Expected total wanted length: " + MaxS);
 
             //Console.WriteLine(@"Number of neurons: " + _slider.Count);
+            //foreach (var neuron in _slider) {
+            //    Console.WriteLine(neuron.Nucleus.Pos);
+            //    Console.WriteLine(neuron.WantedLength);
+            //}
         }
 
         private void GenerateAxons() {
@@ -263,39 +274,6 @@ namespace Mapping_Tools.Classes.Tools {
             }
         }
 
-        private static BezierSubdivision DoubleMiddleApproximation(Neuron neuron, Vector2 middlePoint, out double length) {
-            var firstPoint = neuron.Nucleus.Pos;
-            var lastPoint = neuron.Terminal.Nucleus.Pos;
-
-            var average = (firstPoint + lastPoint) / 2;
-
-            var doubleMiddlePoint = average + (middlePoint - average) * 2;
-
-            var bs = new BezierSubdivision(new List<Vector2> {firstPoint, doubleMiddlePoint, lastPoint});
-            length = bs.SubdividedApproximationLength();
-
-            return bs;
-        }
-
-        private BezierSubdivision TangentIntersectionApproximation(Neuron neuron, out double length) {
-            var firstPoint = neuron.Nucleus.Pos;
-            var lastPoint = neuron.Terminal.Nucleus.Pos;
-            var dir = Math.Sign(neuron.Terminal.Nucleus.SegmentIndex - neuron.Nucleus.SegmentIndex);
-            var line1 = Line2.FromPoints(neuron.Nucleus.PathPoint, _path[neuron.Nucleus.SegmentIndex + dir]);
-            var line2 = Line2.FromPoints(neuron.Terminal.Nucleus.PathPoint, _path[neuron.Terminal.Nucleus.SegmentIndex - dir]);
-
-            BezierSubdivision bs;
-            if (Line2.Intersection(line1, line2, out var intersection)) {
-                bs = new BezierSubdivision(new List<Vector2> {firstPoint, intersection, lastPoint});
-                length = bs.SubdividedApproximationLength();
-            } else {
-                bs = new BezierSubdivision(new List<Vector2> {firstPoint, lastPoint});
-                length = Vector2.Distance(firstPoint, lastPoint);
-            }
-
-            return bs;
-        }
-
         private Vector2 NearbyNonZeroDiff(int index) {
             Vector2 diff = Vector2.UnitX;
             for (int i = 0; i < 10; i++) {
@@ -314,7 +292,8 @@ namespace Mapping_Tools.Classes.Tools {
             foreach (var neuron in _slider.Where(n => n.Terminal != null)) {
                 // Find angles for the neuron and the terminal to point the dendrites towards
                 var dir = Math.Sign(neuron.Terminal.Nucleus.PathPosition - neuron.Nucleus.PathPosition);
-                dir = dir == 0 ? 1 : dir;
+                dir = dir == 0 ? 1 : dir;  // Let dir not be zero
+
                 var dendriteDir1 = dir * NearbyNonZeroDiff(neuron.Nucleus.SegmentIndex).Normalized();
                 var dendriteDir2 = -dir * NearbyNonZeroDiff(neuron.Terminal.Nucleus.SegmentIndex).Normalized();
 
@@ -372,13 +351,13 @@ namespace Mapping_Tools.Classes.Tools {
             while (length > minLength) {
                 var size = MathHelper.Clamp(Math.Floor(length), Math.Max(minLength, 1), Math.Min(maxLength, 12));
 
-                var dendrite = (dir * -size).Rounded();
+                var dendrite = (dir * size).Rounded();
                 var dendriteLength = dendrite.Length;
 
                 // Shorten dendrites longer than 12 pixels to keep dendrites invisible
                 while (dendriteLength > 12) {
                     size -= 0.5;
-                    dendrite = (dir * -size).Rounded();
+                    dendrite = (dir * size).Rounded();
                     dendriteLength = dendrite.Length;
                 }
 

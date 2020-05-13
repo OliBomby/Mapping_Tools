@@ -152,6 +152,13 @@ namespace Mapping_Tools.Classes.Tools {
             File.WriteAllLines(path, lines);
         }
 
+        public static int GetEditorTime() {
+            var reader = GetEditorReader();
+            if (reader.ProcessNeedsReload() || reader.EditorNeedsReload())
+                reader.FetchEditor();
+            return reader.EditorTime();
+        }
+
         /// <summary>
         /// Saves current beatmap with the newest version from memory and rounded coordinates
         /// </summary>

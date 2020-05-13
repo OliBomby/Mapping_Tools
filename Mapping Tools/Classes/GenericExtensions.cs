@@ -18,6 +18,11 @@ namespace Mapping_Tools.Classes {
 
         public static void Show(this Exception exception) {
             MessageBox.Show(exception.MessageStackTrace(), "Error");
+            var ex = exception.InnerException;
+            while (ex != null) {
+                MessageBox.Show(ex.MessageStackTrace(), "Inner exception");
+                ex = ex.InnerException;
+            }
         }
 
         public static string MessageStackTrace(this Exception exception) {

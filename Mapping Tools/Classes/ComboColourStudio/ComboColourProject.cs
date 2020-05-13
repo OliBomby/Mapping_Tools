@@ -4,10 +4,12 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Components.Domain;
 
 namespace Mapping_Tools.Classes.ComboColourStudio {
@@ -24,9 +26,19 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
             MaxBurstLength = 1;
 
             AddColourPointCommand = new CommandImplementation(_ => {
-                ColourPoints.Add(ColourPoints.Count > 0
-                    ? (ColourPoint)ColourPoints[ColourPoints.Count - 1].Clone()
-                    : GenerateNewColourPoint());
+                double time = ColourPoints.Count > 1 ? 
+                    ColourPoints.Count(o => o.IsSelected) > 0 ? ColourPoints.Where(o => o.IsSelected).Max(o => o.Time) :
+                    ColourPoints.Last().Time
+                    : 0;
+                if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)) {
+                    try {
+                        time = EditorReaderStuff.GetEditorTime();
+                    } catch (Exception ex) {
+                        ex.Show();
+                    }
+                }
+                
+                ColourPoints.Add(GenerateNewColourPoint(time));
             });
 
             RemoveColourPointCommand = new CommandImplementation(_ => {
@@ -169,7 +181,7 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
                 }
             }
             catch( Exception ex ) {
-                MessageBox.Show($"{ex.Message}{Environment.NewLine}{ex.StackTrace}", "Error");
+                ex.Show();
             }
         }
 
@@ -306,7 +318,7 @@ namespace Mapping_Tools.Classes.ComboColourStudio {
                 }
             }
             catch( Exception ex ) {
-                MessageBox.Show($"{ex.Message}{Environment.NewLine}{ex.StackTrace}", "Error");
+                ex.Show();
             }
         }
 

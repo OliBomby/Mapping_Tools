@@ -50,6 +50,7 @@ namespace Mapping_Tools.Classes.SystemTools {
                 Console.WriteLine(ex.Message);
 
                 MessageBox.Show("Project could not be saved!");
+                ex.Show();
             }
         }
 
@@ -66,8 +67,10 @@ namespace Mapping_Tools.Classes.SystemTools {
                 Console.WriteLine(ex.StackTrace);
                 Console.WriteLine(ex.Message);
 
-                if (message)
+                if (message) {
                     MessageBox.Show("Project could not be loaded!");
+                    ex.Show();
+                }
             }
         }
 

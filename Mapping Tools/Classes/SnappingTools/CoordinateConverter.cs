@@ -114,7 +114,7 @@ namespace Mapping_Tools.Classes.SnappingTools {
                 Letterboxing = FindConfigValue("Letterboxing") == "1";
                 LetterboxingPosition = new Vector2(double.Parse(FindConfigValue("LetterboxPositionX")),
                     double.Parse(FindConfigValue("LetterboxPositionY")));
-            } catch (Exception ex) { System.Windows.MessageBox.Show(ex.Message); }
+            } catch (Exception ex) { ex.Show(); }
         }
 
         private string FindConfigValue(string key) {

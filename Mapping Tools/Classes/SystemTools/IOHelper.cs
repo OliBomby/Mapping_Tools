@@ -29,7 +29,7 @@ namespace Mapping_Tools.Classes.SystemTools {
                 return true;
             }
             catch( Exception ex ) {
-                MessageBox.Show(ex.Message);
+                ex.Show();
                 return false;
             }
         }

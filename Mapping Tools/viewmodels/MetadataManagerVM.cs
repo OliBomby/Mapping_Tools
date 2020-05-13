@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Media;
 using Mapping_Tools.Annotations;
+using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Viewmodels {
@@ -135,7 +136,7 @@ namespace Mapping_Tools.Viewmodels {
                 }
             }
             catch( Exception ex ) {
-                MessageBox.Show($"{ex.Message}{Environment.NewLine}{ex.StackTrace}", "Error");
+                ex.Show();
             }
         }
 

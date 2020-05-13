@@ -69,8 +69,10 @@ namespace Mapping_Tools.Classes.Tools {
         /// <param name="startIndex"></param>
         /// <param name="endIndex"></param>
         /// <param name="maxAngle"></param>
+        /// <param name="approximationMode"></param>
         /// <returns></returns>
-        public IEnumerable<Vector2> GeneratePath(double startIndex, double endIndex, double maxAngle = Math.PI * 1 / 4) {
+        public IEnumerable<Vector2> GeneratePath(double startIndex, double endIndex, 
+            double maxAngle = Math.PI * 1 / 4, ApproximationMode approximationMode = ApproximationMode.DoubleMiddle) {
             var segments = GetNonInflectionSegments(startIndex, endIndex, maxAngle);
 
             foreach (var segment in segments) {
@@ -79,23 +81,63 @@ namespace Mapping_Tools.Classes.Tools {
 
                 yield return p1;
 
-                var a1 = GetContinuousAngle(segment.Item1);
-                var a2 = GetContinuousAngle(segment.Item2);
+                Vector2? middle;
+                switch (approximationMode) {
+                    case ApproximationMode.TangentIntersection:
+                        middle = TangentIntersectionApproximation(segment.Item1, segment.Item2);
+                        break;
+                    case ApproximationMode.DoubleMiddle:
+                        middle = DoubleMiddleApproximation(segment.Item1, segment.Item2);
+                        break;
+                    default:
+                        middle = null;
+                        break;
+                }
 
-                if (Math.Abs(GetSmallestAngle(a1, a2)) > 0.1) {
-                    var t1 = new Line2(p1, a1);
-                    var t2 = new Line2(p2, a2);
-
-                    var middleAnchor = Line2.Intersection(t1, t2);
-                    if (middleAnchor != Vector2.NaN &&
-                        Vector2.DistanceSquared(p1, middleAnchor) > 0.5 &&
-                        Vector2.DistanceSquared(p2, middleAnchor) > 0.5) {
-                        yield return middleAnchor;
-                    }
+                if (middle.HasValue) {
+                    yield return middle.Value;
                 }
 
                 yield return p2;
             }
+        }
+
+        private Vector2? TangentIntersectionApproximation(double startIndex, double endIndex) {
+            var p1 = GetContinuousPosition(startIndex);
+            var p2 = GetContinuousPosition(endIndex);
+
+            var a1 = GetContinuousAngle(startIndex);
+            var a2 = GetContinuousAngle(endIndex);
+
+            if (Math.Abs(GetSmallestAngle(a1, a2)) > 0.1) {
+                var t1 = new Line2(p1, a1);
+                var t2 = new Line2(p2, a2);
+
+                var middleAnchor = Line2.Intersection(t1, t2);
+                if (middleAnchor != Vector2.NaN &&
+                    Vector2.DistanceSquared(p1, middleAnchor) > 0.5 &&
+                    Vector2.DistanceSquared(p2, middleAnchor) > 0.5) {
+                    return middleAnchor;
+                }
+            }
+
+            return null;
+        }
+
+        private Vector2? DoubleMiddleApproximation(double startIndex, double endIndex) {
+            var p1 = GetContinuousPosition(startIndex);
+            var p2 = GetContinuousPosition(endIndex);
+
+            var averagePoint = (p1 + p2) / 2;
+            var middlePoint = GetContinuousPosition((startIndex + endIndex) / 2);
+
+            if (Vector2.DistanceSquared(averagePoint, middlePoint) < 1) {
+                return null;
+            }
+
+            var doubleMiddlePoint = averagePoint + (middlePoint - averagePoint) * 2;
+
+            return doubleMiddlePoint;
         }
 
         /// <summary>
@@ -132,15 +174,35 @@ namespace Mapping_Tools.Classes.Tools {
             List<Tuple<double, double, double>> subRanges = new List<Tuple<double, double, double>>();
             // Loop through the whole path and divide it into sub-ranges at every inflection point
             for (int i = startIndexInt; i <= endIndexInt; i++) {
+                var pos = _path[i];
                 var angle = _angle[i];
                 var angleChange = GetSmallestAngle(angle, lastAngle);
+                //Console.WriteLine("Angle change: " + angleChange);
 
-                // Check for inflection point or super sharp angles
-                if (angleChange * lastAngleChange < -Precision.DOUBLE_EPSILON || Math.Abs(angleChange) > Math.PI * 1 / 8) {
+                // Check for inflection point or red anchors
+                if ((angleChange * lastAngleChange < -Precision.DOUBLE_EPSILON && Math.Abs(startSubRange - i) > 1) ||
+                    ((pos - pos.Rounded()).LengthSquared < Precision.DOUBLE_EPSILON && Math.Abs(angleChange) > Precision.DOUBLE_EPSILON)) {
                     subRanges.Add(new Tuple<double, double, double>(startSubRange, i, subRangeAngleChange));
+
+                    //Console.WriteLine($"Found inflection point or red anchor: {angleChange}, {lastAngleChange}, {pos}, {angleChange * lastAngleChange}");
 
                     startSubRange = i;
                     subRangeAngleChange = -Math.Abs(angleChange);  // Negate the angle change because this point invalidates the angle
+                }
+                else if (angleChange == 0 && lastAngleChange != 0) {
+                    subRanges.Add(new Tuple<double, double, double>(startSubRange, i, subRangeAngleChange));
+
+                    //Console.WriteLine($"start of zero angle change: {angleChange}, {lastAngleChange}, {pos}, {angleChange * lastAngleChange}");
+
+                    startSubRange = i;
+                    subRangeAngleChange = -Math.Abs(angleChange);  // Negate the angle change because this point invalidates the angle
+                } else if (angleChange != 0 && lastAngleChange == 0) {
+                    // Place on the previous index for symmetry with the part going into the zero chain
+                    subRanges.Add(new Tuple<double, double, double>(startSubRange, i - 1, 0));
+
+                    //Console.WriteLine($"end of zero angle change: {angleChange}, {lastAngleChange}, {pos}, {angleChange * lastAngleChange}");
+
+                    startSubRange = i - 1;
                 }
 
                 subRangeAngleChange += Math.Abs(angleChange);
@@ -153,14 +215,19 @@ namespace Mapping_Tools.Classes.Tools {
                 subRanges.Add(new Tuple<double, double, double>(startSubRange, endIndex, subRangeAngleChange));
             }
 
+            // Remove all sub-ranges which start and end on the same index
+            subRanges.RemoveAll(s => s.Item1 == s.Item2);
+
             List<Tuple<double, double>> segments = new List<Tuple<double, double>>();
             // Divide each sub-range into evenly spaced segments which have an aggregate angle change less than the max
             foreach (var subRange in subRanges) {
-                int numSegments = (int) Math.Ceiling(subRange.Item3 / maxAngle);
+                int numSegments = (int) Math.Floor(subRange.Item3 / maxAngle) + 1;
+                //Console.WriteLine("Num segments: " + numSegments);
+                //Console.WriteLine("sub-range angle: " + subRange.Item3);
                 double maxSegmentAngle = subRange.Item3 / numSegments;
 
-                int segmentStartIndexInt = (int) Math.Ceiling(subRange.Item1);
-                int segmentEndIndexInt = (int) Math.Floor(subRange.Item2);
+                int segmentStartIndexInt = (int) Math.Round(subRange.Item1);
+                int segmentEndIndexInt = (int) Math.Round(subRange.Item2);
 
                 lastAngle = GetContinuousAngle(subRange.Item1);
 
@@ -173,8 +240,9 @@ namespace Mapping_Tools.Classes.Tools {
 
                     segmentAngleChange += Math.Abs(angleChange);
 
-                    if (segmentAngleChange >= maxSegmentAngle) {
+                    if (segmentAngleChange > maxSegmentAngle + Precision.DOUBLE_EPSILON) {
                         segments.Add(new Tuple<double, double>(startSegment, i));
+                        //Console.WriteLine("Adding segment: " + segmentAngleChange);
 
                         startSegment = i;
                         segmentAngleChange -= maxSegmentAngle;
@@ -185,6 +253,7 @@ namespace Mapping_Tools.Classes.Tools {
 
                 if (Math.Abs(startSegment - subRange.Item2) > Precision.DOUBLE_EPSILON) {
                     segments.Add(new Tuple<double, double>(startSegment, subRange.Item2));
+                    //Console.WriteLine($"Adding segment at the end: {startSegment}, {subRange.Item2}");
                 }
             }
 
@@ -247,6 +316,11 @@ namespace Mapping_Tools.Classes.Tools {
             }
 
             return length;
+        }
+
+        public enum ApproximationMode {
+            TangentIntersection,
+            DoubleMiddle,
         }
     }
 }

@@ -78,6 +78,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                                 if (!error) {
                                     MessageBox.Show($"Exception '{ex.Message}' while trying to analyze samples.",
                                         "Warning");
+                                    ex.Show();
                                     error = true;
                                 }
 

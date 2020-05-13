@@ -196,7 +196,7 @@
                         </StackPanel>
 
                         <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal">
-                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a new colour point." VerticalAlignment="Center" Margin="5" Command="{Binding Project.AddColourPointCommand}">
+                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a new colour point. Hold shift to add current editor time." VerticalAlignment="Center" Margin="5" Command="{Binding Project.AddColourPointCommand}">
                                 <materialDesign:PackIcon Kind="Plus" Width="24" Height="24"/>
                             </Button>
                             <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove selected colour points or last colour point." VerticalAlignment="Center" Margin="5" Command="{Binding Project.RemoveColourPointCommand}">

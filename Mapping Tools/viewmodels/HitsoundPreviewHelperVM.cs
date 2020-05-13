@@ -29,13 +29,13 @@ namespace Mapping_Tools.Viewmodels {
                         } else {
                             _rhythmGuideWindow.Focus();
                         }
-                    } catch (Exception ex) { MessageBox.Show(ex.Message); }
+                    } catch (Exception ex) { ex.Show(); }
                 });
             AddCommand = new CommandImplementation(
                 _ => {
                     try {
                         Items.Add(new HitsoundZone());
-                    } catch (Exception ex) { MessageBox.Show(ex.Message); }
+                    } catch (Exception ex) { ex.Show(); }
                 });
             CopyCommand = new CommandImplementation(
                 _ => {
@@ -46,13 +46,13 @@ namespace Mapping_Tools.Viewmodels {
                                 Items.Add(Items[i].Copy());
                             }
                         }
-                    } catch (Exception ex) { MessageBox.Show(ex.Message); }
+                    } catch (Exception ex) { ex.Show(); }
                 });
             RemoveCommand = new CommandImplementation(
                 _ => {
                     try {
                         Items.RemoveAll(o => o.IsSelected);
-                    } catch (Exception ex) { MessageBox.Show(ex.Message); }
+                    } catch (Exception ex) { ex.Show(); }
                 });
         }
 

@@ -5,6 +5,7 @@ using Mapping_Tools.Views;
 using MaterialDesignThemes.Wpf;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -13,6 +14,7 @@ using System.Security.Principal;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Mapping_Tools.Classes;
 using Mapping_Tools.Views.Standard;
 
 namespace Mapping_Tools {
@@ -34,6 +36,10 @@ namespace Mapping_Tools {
 
         public MainWindow() {
             InitializeComponent();
+
+            // Initialize exception logging
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
             try {
                 Setup();
                 SettingsManager.LoadConfig();
@@ -52,8 +58,26 @@ namespace Mapping_Tools {
 
                 SetCurrentMaps(SettingsManager.GetLatestCurrentMaps()); // Set currentmap to previously opened map
             } catch (Exception ex) {
-                MessageBox.Show($"{ex.Message}{Environment.NewLine}{ex.StackTrace}", "Error");
+                ex.Show();
             }
+        }
+
+        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e) {
+            // Log the exception, display it, etc
+            if (!(e.ExceptionObject is Exception exception)) return;
+            var lines = new List<string> {exception.Message, exception.StackTrace, exception.Source};
+
+            while (exception.InnerException != null) {
+                exception = exception.InnerException;
+                lines.Add("\nInner exception:");
+                lines.Add(exception.Message);
+                lines.Add(exception.StackTrace);
+                lines.Add(exception.Source);
+            }
+
+            var path = Path.Combine(AppDataPath, "crash-log.txt");
+            File.WriteAllLines(path, lines);
+            MessageBox.Show("The program encountered an unhandled exception. Look in crash-log.txt for more info.", "Error");
         }
 
         private void Setup() {
@@ -72,7 +96,7 @@ namespace Mapping_Tools {
                 Directory.CreateDirectory(ExportPath);
             }
             catch( Exception ex ) {
-                MessageBox.Show(ex.Message);
+                ex.Show();
             }
 
             Views = new ViewCollection(); // Make a ViewCollection object
@@ -88,7 +112,7 @@ namespace Mapping_Tools {
             try {
                 SetCurrentView(Views.GetView(name));
             } catch (ArgumentException ex) {
-                MessageBox.Show(ex.Message);
+                ex.Show();
             }
         }
 
@@ -96,7 +120,7 @@ namespace Mapping_Tools {
             try {
                 SetCurrentView(Views.GetView(type));
             } catch (ArgumentException ex) {
-                MessageBox.Show(ex.Message);
+                ex.Show();
             }
         }
 
@@ -181,20 +205,37 @@ namespace Mapping_Tools {
         }
 
         private void OpenBeatmap(object sender, RoutedEventArgs e) {
-            string[] paths = IOHelper.BeatmapFileDialog(true);
-            if( paths.Length != 0 ) { SetCurrentMaps(paths); }
+            try {
+                string[] paths = IOHelper.BeatmapFileDialog(true);
+                if (paths.Length != 0) {
+                    SetCurrentMaps(paths);
+                }
+            }
+            catch (Exception ex) {
+                ex.Show();
+            }
         }
 
         private void OpenGetCurrentBeatmap(object sender, RoutedEventArgs e) {
-            string path = IOHelper.GetCurrentBeatmap();
-            if( path != "" ) { SetCurrentMaps(new[] { path }); }
+            try {
+                string path = IOHelper.GetCurrentBeatmap();
+                if (path != "") {
+                    SetCurrentMaps(new[] { path });
+                }
+            } catch (Exception ex) {
+                ex.Show();
+            }
         }
 
         private void SaveBackup(object sender, RoutedEventArgs e) {
-            var paths = GetCurrentMaps();
-            var result = IOHelper.SaveMapBackup(paths, true);
-            if( result )
-                MessageBox.Show($"Beatmap{( paths.Length == 1 ? "" : "s" )} successfully copied!");
+            try {
+                var paths = GetCurrentMaps();
+                var result = IOHelper.SaveMapBackup(paths, true);
+                if (result)
+                    MessageBox.Show($"Beatmap{(paths.Length == 1 ? "" : "s")} successfully copied!");
+            } catch (Exception ex) {
+                ex.Show();
+            }
         }
 
         private void ViewChanged() { 
@@ -263,7 +304,7 @@ namespace Mapping_Tools {
                 System.Diagnostics.Process.Start(SettingsManager.GetBackupsPath());
             }
             catch( Exception ex ) {
-                System.Windows.Forms.MessageBox.Show(ex.Message);
+                ex.Show();
             }
         }
 
@@ -272,7 +313,12 @@ namespace Mapping_Tools {
         }
 
         private void CoolSave(object sender, RoutedEventArgs e) {
-            EditorReaderStuff.BetterSave();
+            try {
+                EditorReaderStuff.BetterSave();
+            } 
+            catch (Exception ex) {
+                ex.Show();
+            }
         }
 
         //Open project in browser

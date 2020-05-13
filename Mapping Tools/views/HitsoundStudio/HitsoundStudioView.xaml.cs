@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
@@ -477,7 +478,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
             }
             catch (FileNotFoundException) { MessageBox.Show("Could not find the specified sample."); }
             catch (DirectoryNotFoundException) { MessageBox.Show("Could not find the specified sample's directory."); }
-            catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
+            catch (Exception ex) { ex.Show(); }
         }
 
         private void PlayerStopped(object sender, StoppedEventArgs e)
@@ -524,7 +525,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                ex.Show();
             }
         }
 
@@ -1038,8 +1039,8 @@ namespace Mapping_Tools.Views.HitsoundStudio
 
                 Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue("Succesfully loaded sample schema!"));
             } catch (ArgumentException) { }
-            catch (Exception exception) {
-                MessageBox.Show(exception.Message);
+            catch (Exception ex) {
+                ex.Show();
             }
         }
 
