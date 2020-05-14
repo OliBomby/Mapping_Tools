@@ -329,42 +329,41 @@ namespace Mapping_Tools.Classes.SystemTools {
 
         private static void OnChangedFsWatcher(object sender, FileSystemEventArgs e)
         {
-            var currentPath = IOHelper.GetCurrentBeatmap();
+            try {
+                var currentPath = IOHelper.GetCurrentBeatmap();
 
-            if (e.FullPath != currentPath)
-            {
-                return;
-            }
-
-            var proc = System.Diagnostics.Process.GetProcessesByName("osu!").FirstOrDefault();
-            if (proc != null)
-            {
-                var oldHandle = GetForegroundWindow();
-                if (oldHandle != proc.MainWindowHandle)
-                {
+                if (e.FullPath != currentPath) {
                     return;
                 }
-            }
 
-            string hashString = "";
-            try
-            {
-                if (File.Exists(currentPath))
-                {
-                    hashString = EditorReaderStuff.GetMD5FromPath(currentPath);
+                var proc = System.Diagnostics.Process.GetProcessesByName("osu!").FirstOrDefault();
+                if (proc != null) {
+                    var oldHandle = GetForegroundWindow();
+                    if (oldHandle != proc.MainWindowHandle) {
+                        return;
+                    }
                 }
-            }
-            catch
-            {
-                return;
-            }
 
-            if (EditorReaderStuff.DontCoolSaveWhenMD5EqualsThisString == hashString)
-            {
-                return;
-            }
+                string hashString = "";
+                try {
+                    if (File.Exists(currentPath)) {
+                        hashString = EditorReaderStuff.GetMD5FromPath(currentPath);
+                    }
+                }
+                catch {
+                    return;
+                }
 
-            EditorReaderStuff.BetterSave();
+                if (EditorReaderStuff.DontCoolSaveWhenMD5EqualsThisString == hashString) {
+                    return;
+                }
+
+                EditorReaderStuff.BetterSave();
+            }
+            catch (Exception ex) {
+                MessageBox.Show("Failed to overwrite osu! save with BetterSave.");
+                ex.Show();
+            }
         }
     }
 }
