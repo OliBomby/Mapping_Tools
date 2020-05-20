@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="Mapping-Tools enables you to fully realize every one of your osu! mapping ideas. Use a wide variety of ever inceasing tools to transform and manipulate evey aspect of what makes your osu! map.">
+
+  <title>Mapping-Tools for osu!</title>
+
+  <link rel="shortcut icon" href="https://iptq.gitlab.io/mapping-tools/favicon.ico" />
+  <link rel="manifest" href="https://iptq.gitlab.io/mapping-tools/manifest.json" />
+  <link rel="stylesheet" href="https://iptq.gitlab.io/mapping-tools/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://iptq.gitlab.io/mapping-tools/main.css" />
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+</head>
+
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div class="App grid-container">
+    
+    <div class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="https://iptq.gitlab.io/mapping-tools">
+                <img class="header-logo" src="https://iptq.gitlab.io/mapping-tools/logo.png" alt="mapping tools - logo" /> Mapping Tools
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#basic-navbar-nav" aria-controls="basic-navbar-nav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="basic-navbar-nav">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item"><a class="nav-link" href="https://iptq.gitlab.io/mapping-tools/downloads">Downloads</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://iptq.gitlab.io/mapping-tools/docs">Documentation</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://iptq.gitlab.io/mapping-tools/faq">FAQ</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://iptq.gitlab.io/mapping-tools/changelog">Changelog</a></li>
+                </ul>
+                <!-- <div inline="true">
+                    <span class="os-content"><strong>Auto Detected:</strong> {OS_STATES[this.state.OS.currentOS]} {!this.state.OS.isSupported && "-> Currently not supported!"}</span>
+                    {this.state.OS.isSupported &&
+                        <Button variant="primary" onClick={() => this.download(this.state.OS.currentOS)}>Download now</Button>
+                    }
+                </div>
+            -->
+            </div>
+        </div>
+    </div>
+
+    <div class="container content" style="margin-top: 24px;">
+      
+    <div class="docs">
+        <div class="row">
+            <div class="col-2 tab-container">
+                
+                <div class="list docu-listgroup">
+                
+                    <a class="list-group-item list-group-item-primary list-group-item-action
+                        active"
+                        href="../general">
+                        General
+                    </a>
+                
+                    <a class="list-group-item list-group-item-primary list-group-item-action
+                        "
+                        href="../map-cleaner">
+                        Map Cleaner
+                    </a>
+                
+                    <a class="list-group-item list-group-item-primary list-group-item-action
+                        "
+                        href="../property-transformer">
+                        Property Transformer
+                    </a>
+                
+                </div>
+            </div>
+            <div class="col docu-content">
+                <h1>General</h1>
+                <p>Mapping Tools is meant to combine all the mapping tools you need into one program.</p>
+<p>It ensures reliable quality by using shared algorithms, automatic updating and backups.</p>
+<p>Mapping tools stores all it’s config files in a map inside Documents called Mapping-Tools.</p>
+<p>It stores the general configs and configs of individual tools separately.</p>
+<p>The backups and custom Hitsound Studio saves also get saved there by default.</p>
+<p>Current map is a global variable which is used by most of the tools. It’s a path to the .osu file of a beatmap. This map will be the map that most tools do their work on.</p>
+<p>You can set the current map by clicking on File and then use either Open beatmap or Open current beatmap. </p>
+<ul>
+<li>Open beatmap will open a file browsing window that defaults to your osu! songs folder.</li>
+<li>Open current beatmap will read the memory of your osu! client to get the path to the beatmap that is currently selected in the osu! client. This will not work if osu! is closed, there are multiple osu! clients open or if the path to your osu! folder is configured incorrectly.</li>
+</ul>
+<p>Generate backup will make a copy of the current map and store it in the backups folder.</p>
+<p>The backups folder is inside the folder where mapping tools stores all of it’s configuration.</p>
+<p>You can use Options &gt; Open backups folder to easily open the backups folder.</p>
+<p>Inside the Tools menu item you can find all the available mapping tools.</p>
+<p>In the About menu item you can find some info about the contributors to mapping tools and the version of mapping tools. There is also a link to the Github.</p>
+<h2 id="get-started">Get started</h2>
+<p>It shows info letting you know how to use a tool from mapping tools.</p>
+<p>It shows a list of recent maps that were selected as current map paired with the time they were last selected.</p>
+<p>If you double click on one of the items in the list, it will select that map as the current map.</p>
+<h2 id="preferences">Preferences</h2>
+<p>You can find the preferences in the Options menu item. You can:</p>
+<ul>
+<li>Toggle dark mode</li>
+<li>Set the path to your osu! folder</li>
+<li>Set the path to your songs folder</li>
+<li>Set the path to your backups folder</li>
+<li>Toggle making automatic backups</li>
+</ul>
+<h2 id="text-boxes">Text boxes</h2>
+<p>All text boxes that want you to input some kind of number have a special way of parsing the text. You can input the number in the form of an equation. For instance “1 + 1/4” will be interpreted as 1.25. Both dots and commas will be interpreted as decimal separators.</p>
+<p>If the text cannot be interpreted then it will go to a default value. Most of the time this default value will have the program completely ignore that feature, so there will be no adverse and unexpected results.</p>
+<p>All text boxes that want you to input a path have a folder button next to it that you can use to summon a file browsing dialog.</p>
+<p>All text boxes that want you to input a path to a beatmap also have a download looking button next to it that when you click it will get the current map from your osu! client and put the path in the text box just like how the get current map works. </p>
+<h2 id="backups">Backups</h2>
+<p>Every time you run a tool that changes a beatmap a backup will automatically be made and put in the backups folder. You can disable this in the preferences.</p>
+
+            </div>
+        </div>
+    </div>
+
+    </div>
+    
+    <div class="footer footer-flex-container">
+        <div class="footer-flex-container footer-description">
+            <p>made by Olibomby and Potoofu</p>
+        </div>
+        <div class="footer-flex-container footer-social">
+            <div class="footer-donate">
+                <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=Z5ZHXHWHFYRD4&source=url">
+                    <i class="fa fa-heart"></i> Donate
+                </a>
+            </div>
+            <div class="footer-github">
+                <a href="https://github.com/OliBomby/Mapping_Tools">
+                    <i class="fa fa-github"></i> GitHub
+                </a>
+            </div>
+            <div class="footer-discord">
+                <a href="https://discord.gg/JhP964H">
+                    <i class="fa fa-discord"></i> Discord
+                </a>
+            </div>
+        </div>
+    </div>
+
+  </div>
+</body>
+
+</html>
