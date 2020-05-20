@@ -13,7 +13,7 @@ jobs:
     - name: unpack zola
       run: tar -xzf zola.tar.gz
     - name: build
-      run: ./zola build -o ./build
+      run: ./zola --root ./website build -o ./build
     - name: deploy
       uses: peaceiris/actions-gh-pages@v3
       with:
