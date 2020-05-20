@@ -1,2 +1,2 @@
 User-agent: *
-Sitemap: https://iptq.gitlab.io/mapping-tools/sitemap.xml
+Sitemap: https://olibomby.github.io/Mapping_Tools/sitemap.xml
