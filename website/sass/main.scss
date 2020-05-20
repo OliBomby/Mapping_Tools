@@ -1,0 +1,37 @@
+// @import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
+
+@import "docs";
+@import "faq";
+@import "footer";
+@import "header";
+@import "home";
+
+body {
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #282c34;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.App {
+  padding: 0px;
+  color: #fff;
+  min-height: 100vh;
+  position: relative;
+}
+
+.content {
+  padding-bottom: 60px;
+}

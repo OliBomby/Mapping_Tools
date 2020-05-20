@@ -1,0 +1,32 @@
+{% import "layout.html" as layout %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="Mapping-Tools enables you to fully realize every one of your osu! mapping ideas. Use a wide variety of ever inceasing tools to transform and manipulate evey aspect of what makes your osu! map.">
+
+  <title>Mapping-Tools for osu!</title>
+
+  <link rel="shortcut icon" href="{{ config.base_url | safe }}/favicon.ico" />
+  <link rel="manifest" href="{{ config.base_url | safe }}/manifest.json" />
+  <link rel="stylesheet" href="{{ config.base_url | safe }}/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{{ config.base_url | safe }}/main.css" />
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+</head>
+
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div class="App grid-container">
+    {{ layout::header() }}
+    <div class="container content" style="margin-top: 24px;">
+      {% block content %}{% endblock %}
+    </div>
+    {{ layout::footer() }}
+  </div>
+</body>
+
+</html>

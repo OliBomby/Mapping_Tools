@@ -1,0 +1,16 @@
+{% extends "page.html" %}
+
+{% block content %}
+    {% set data = load_data(path="content/faq/data.toml") %}
+
+    {% for item in data.entry %}
+        <div class="faq-card card bg-primary text-white">
+            <div class="faq-card-header card-header">
+                <span>Q: {{ item.question }}</span>
+            </div>
+            <div class="bg-dark faq-card-body card-body">
+                <p>{{ item.answer | safe }}</p>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}
