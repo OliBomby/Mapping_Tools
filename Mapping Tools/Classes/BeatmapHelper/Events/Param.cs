@@ -13,6 +13,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         public EasingType Easing { get; set; }
         public double StartTime { get; set; }
         public double EndTime { get; set; }
+
+        /// <summary>
+        /// All other parameters
+        /// </summary>
         public double[] Params { get; set; }
 
         public override string GetLine() {
@@ -50,9 +54,15 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
                 StartTime = startTime;
             else throw new BeatmapParsingException("Failed to parse start time of event param.", line);
 
-            if (TryParseDouble(values[3], out double endTime))
-                EndTime = endTime;
-            else throw new BeatmapParsingException("Failed to parse end time of event param.", line);
+            // Set end time to start time if empty. This accounts for the shorthand
+            if (string.IsNullOrEmpty(values[3])) {
+                EndTime = StartTime;
+            }
+            else {
+                if (TryParseDouble(values[3], out double endTime))
+                    EndTime = endTime;
+                else throw new BeatmapParsingException("Failed to parse end time of event param.", line);
+            }
 
             Params = new double[values.Length - 4];
             for (int i = 4; i < values.Length; i++) {
