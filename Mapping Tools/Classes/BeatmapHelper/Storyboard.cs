@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Mapping_Tools.Classes.BeatmapHelper.Events;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     /// <summary>

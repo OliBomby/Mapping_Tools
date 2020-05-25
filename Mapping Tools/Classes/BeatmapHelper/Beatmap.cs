@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Mapping_Tools.Classes.BeatmapHelper.Events;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {

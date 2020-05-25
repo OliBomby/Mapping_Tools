@@ -189,6 +189,10 @@
     </ApplicationDefinition>
     <Compile Include="Classes\BeatmapHelper\BeatmapEditor.cs" />
     <Compile Include="Classes\BeatmapHelper\BeatmapParsingException.cs" />
+    <Compile Include="Classes\BeatmapHelper\Events\EasingType.cs" />
+    <Compile Include="Classes\BeatmapHelper\Events\Event.cs" />
+    <Compile Include="Classes\BeatmapHelper\Events\EventType.cs" />
+    <Compile Include="Classes\BeatmapHelper\Events\Param.cs" />
     <Compile Include="Classes\BeatmapHelper\FileFormatHelper.cs" />
     <Compile Include="Classes\BeatmapHelper\GameMode.cs" />
     <Compile Include="Classes\BeatmapHelper\HitObjectComparer.cs" />
@@ -198,8 +202,8 @@
     <Compile Include="Classes\BeatmapHelper\StoryboardEditor.cs" />
     <Compile Include="Classes\BeatmapHelper\ITextFile.cs" />
     <Compile Include="Classes\BeatmapHelper\Storyboard.cs" />
-    <Compile Include="Classes\BeatmapHelper\StoryboardLayer.cs" />
-    <Compile Include="Classes\BeatmapHelper\StoryboardSoundSample.cs" />
+    <Compile Include="Classes\BeatmapHelper\Events\StoryboardLayer.cs" />
+    <Compile Include="Classes\BeatmapHelper\Events\StoryboardSoundSample.cs" />
     <Compile Include="Classes\ComboColourStudio\ColourPoint.cs" />
     <Compile Include="Classes\ComboColourStudio\ColourPointMode.cs" />
     <Compile Include="Classes\ComboColourStudio\ComboColourProject.cs" />

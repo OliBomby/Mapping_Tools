@@ -1,14 +1,14 @@
 ﻿using System;
 using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
 
-namespace Mapping_Tools.Classes.BeatmapHelper {
+namespace Mapping_Tools.Classes.BeatmapHelper.Events {
     /// <summary>
     /// This represents a storyboarded sound sample for osu! storyboards. These can always be found under the [Events] -> (Storyboard Sound Samples) section.
     /// </summary>
     /// <example>
     /// Sample,56056,0,"soft-hitnormal.wav",30
     /// </example>
-    public class StoryboardSoundSample : IEquatable<StoryboardSoundSample>, ITextLine {
+    public class StoryboardSoundSample : Event, IEquatable<StoryboardSoundSample> {
         /// <summary>
         /// The time when this sound event occurs.
         /// </summary>
@@ -47,7 +47,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// Serializes this object to .osu code.
         /// </summary>
         /// <returns></returns>
-        public string GetLine() {
+        public override string GetLine() {
             return $"Sample,{Time.ToRoundInvariant()},{Layer.ToIntInvariant()},\"{FilePath}\",{Volume.ToRoundInvariant()}";
         }
 
@@ -55,7 +55,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// Deserializes a string of .osu code and populates the properties of this object.
         /// </summary>
         /// <param name="line"></param>
-        public void SetLine(string line) {
+        public override void SetLine(string line) {
             string[] values = line.Split(',');
 
             if (values[0] != "Sample" && values[0] != "5") {

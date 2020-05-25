@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Mapping_Tools.Classes.BeatmapHelper.Events;
 
 namespace Mapping_Tools.Classes.Tools {
     public class MapCleaner {
