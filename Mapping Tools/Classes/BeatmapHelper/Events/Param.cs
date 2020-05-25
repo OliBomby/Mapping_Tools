@@ -5,7 +5,8 @@ using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Classes.BeatmapHelper.Events {
     /// <summary>
-    /// Represents all the events that can be placed underneath another event except loops and triggers.
+    /// Represents all the events that can be placed underneath another event.
+    /// The exceptions being loops and triggers because these have different syntax.
     /// </summary>
     public class Param : Event {
         public int Indents { get; set; }
@@ -20,15 +21,19 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         public double[] Params { get; set; }
 
         public override string GetLine() {
-            var builder = new StringBuilder(5 + Params.Length);
+            var builder = new StringBuilder(8 + Params.Length * 2);
 
             builder.Append(new string(' ', Indents));
             builder.Append(Event.ToString());
+            builder.Append(',');
             builder.Append(((int) Easing).ToInvariant());
+            builder.Append(',');
             builder.Append(StartTime.ToRoundInvariant());
+            builder.Append(',');
             builder.Append(EndTime.ToRoundInvariant());
 
             foreach (var param in Params) {
+                builder.Append(',');
                 builder.Append(param.ToInvariant());
             }
 
