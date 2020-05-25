@@ -109,17 +109,14 @@ namespace Mapping_Tools.Classes.HitsoundStuff
             }
         }
 
-        private static bool IsFormatEncodingCompatible(WaveFormatEncoding encoding, SampleExportFormat exportFormat) {
+        private static bool IsCopyCompatible(SampleGeneratingArgs sampleGeneratingArgs, WaveFormatEncoding waveEncoding, SampleExportFormat exportFormat) {
             switch (exportFormat) {
                 case SampleExportFormat.WaveIeeeFloat:
-                    return encoding == WaveFormatEncoding.IeeeFloat;
+                    return waveEncoding == WaveFormatEncoding.IeeeFloat && sampleGeneratingArgs.GetExtension() == ".wav";
                 case SampleExportFormat.WavePcm:
-                    return encoding == WaveFormatEncoding.Pcm;
+                    return waveEncoding == WaveFormatEncoding.Pcm && sampleGeneratingArgs.GetExtension() == ".wav";
                 case SampleExportFormat.OggVorbis:
-                    return encoding == WaveFormatEncoding.Vorbis1 || encoding == WaveFormatEncoding.Vorbis2 ||
-                           encoding == WaveFormatEncoding.Vorbis3 ||
-                           encoding == WaveFormatEncoding.Vorbis1P || encoding == WaveFormatEncoding.Vorbis2P ||
-                           encoding == WaveFormatEncoding.Vorbis3P;
+                    return sampleGeneratingArgs.GetExtension() == ".ogg";
                 default:
                     return true;
             }
@@ -150,11 +147,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff
                 }
             }
 
-            var sourceEncoding = sampleSoundGenerator.Wave.WaveFormat.Encoding;
+            var sourceWaveEncoding = sampleSoundGenerator.Wave.WaveFormat.Encoding;
 
             // Either if it is the blank sample or the source file is literally what the user wants to be exported
             if (sampleSoundGenerator.BlankSample && sampleGeneratingArgs.GetExtension() == ".wav" || 
-                sampleGeneratingArgs.CanCopyPaste && IsFormatEncodingCompatible(sourceEncoding, format)) {
+                sampleGeneratingArgs.CanCopyPaste && IsCopyCompatible(sampleGeneratingArgs, sourceWaveEncoding, format)) {
 
                 var dest = Path.Combine(exportFolder, name + sampleGeneratingArgs.GetExtension());
                 return CopySample(sampleGeneratingArgs.Path, dest);
@@ -162,7 +159,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
 
             var sampleProvider = sampleSoundGenerator.GetSampleProvider();
 
-            if ((format == SampleExportFormat.WavePcm || format == SampleExportFormat.OggVorbis) && sourceEncoding == WaveFormatEncoding.IeeeFloat) {
+            if ((format == SampleExportFormat.WavePcm || format == SampleExportFormat.OggVorbis) && sourceWaveEncoding == WaveFormatEncoding.IeeeFloat) {
                 // When the source is IEEE float and the export format is PCM or Vorbis, then clipping is possible, so we add a limiter
                 sampleProvider = new SoftLimiter(sampleProvider);
             }
@@ -178,20 +175,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff
                     VorbisFileWriter.CreateVorbisFile(Path.Combine(exportFolder, name + ".ogg"), sampleProvider.ToWaveProvider());
                     break;
                 default:
-                    switch (sourceEncoding) {
+                    switch (sourceWaveEncoding) {
                         case WaveFormatEncoding.IeeeFloat:
                             CreateWaveFile(Path.Combine(exportFolder, name + ".wav"), sampleProvider.ToWaveProvider());
                             break;
                         case WaveFormatEncoding.Pcm:
-                            CreateWaveFile(Path.Combine(exportFolder, name + ".wav"), sampleProvider.ToWaveProvider16());
-                            break;
-                        case WaveFormatEncoding.Vorbis1:
-                        case WaveFormatEncoding.Vorbis2:
-                        case WaveFormatEncoding.Vorbis3:
-                        case WaveFormatEncoding.Vorbis1P:
-                        case WaveFormatEncoding.Vorbis2P:
-                        case WaveFormatEncoding.Vorbis3P:
-                            // Vorbis files default to being exported as 16-bit PCM wave files because that's lossless
                             CreateWaveFile(Path.Combine(exportFolder, name + ".wav"), sampleProvider.ToWaveProvider16());
                             break;
                         default:
