@@ -1,24 +1,19 @@
-﻿using System;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Classes.BeatmapHelper.Events {
     /// <summary>
     /// Represents trigger loop events. Although called loops, these only ever activate once.
     /// </summary>
-    public class TriggerLoop : Event {
-        public int Indents { get; set; }
-        public EventType Event => EventType.T;
-        public double StartTime { get; set; }
+    public class TriggerLoop : Command {
+        public override EventType Event => EventType.T;
         public double EndTime { get; set; }
-
         public string TriggerName { get; set; }
 
         public override string GetLine() {
             var builder = new StringBuilder(8);
 
-            builder.Append(new string(' ', Indents));
+            builder.Append(GetIndents());
             builder.Append(Event.ToString());
             builder.Append(',');
             builder.Append(TriggerName);
@@ -31,10 +26,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         }
 
         public override void SetLine(string line) {
-            int indents = line.TakeWhile(char.IsWhiteSpace).Count();
-            Indents = indents;
-
-            var subLine = line.Substring(indents);
+            var subLine = ParseIndents(line);
             var values = subLine.Split(',');
 
             TriggerName = values[1];

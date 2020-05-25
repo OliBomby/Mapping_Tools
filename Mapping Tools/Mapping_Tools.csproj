@@ -189,12 +189,13 @@
     </ApplicationDefinition>
     <Compile Include="Classes\BeatmapHelper\BeatmapEditor.cs" />
     <Compile Include="Classes\BeatmapHelper\BeatmapParsingException.cs" />
+    <Compile Include="Classes\BeatmapHelper\Events\Command.cs" />
     <Compile Include="Classes\BeatmapHelper\Events\EasingType.cs" />
     <Compile Include="Classes\BeatmapHelper\Events\Event.cs" />
     <Compile Include="Classes\BeatmapHelper\Events\EventType.cs" />
     <Compile Include="Classes\BeatmapHelper\Events\TriggerLoop.cs" />
     <Compile Include="Classes\BeatmapHelper\Events\StandardLoop.cs" />
-    <Compile Include="Classes\BeatmapHelper\Events\Param.cs" />
+    <Compile Include="Classes\BeatmapHelper\Events\OtherCommand.cs" />
     <Compile Include="Classes\BeatmapHelper\FileFormatHelper.cs" />
     <Compile Include="Classes\BeatmapHelper\GameMode.cs" />
     <Compile Include="Classes\BeatmapHelper\HitObjectComparer.cs" />

@@ -1,18 +1,14 @@
 ﻿using System;
-using System.Linq;
 using System.Text;
 using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Classes.BeatmapHelper.Events {
     /// <summary>
-    /// Represents all the events that can be placed underneath another event.
+    /// Represents all the commands
     /// The exceptions being loops and triggers because these have different syntax.
     /// </summary>
-    public class Param : Event {
-        public int Indents { get; set; }
-        public EventType Event { get; set; }
+    public class OtherCommand : Command {
         public EasingType Easing { get; set; }
-        public double StartTime { get; set; }
         public double EndTime { get; set; }
 
         /// <summary>
@@ -23,7 +19,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         public override string GetLine() {
             var builder = new StringBuilder(8 + Params.Length * 2);
 
-            builder.Append(new string(' ', Indents));
+            builder.Append(GetIndents());
             builder.Append(Event.ToString());
             builder.Append(',');
             builder.Append(((int) Easing).ToInvariant());
@@ -41,10 +37,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         }
 
         public override void SetLine(string line) {
-            int indents = line.TakeWhile(char.IsWhiteSpace).Count();
-            Indents = indents;
-
-            var subLine = line.Substring(indents);
+            var subLine = ParseIndents(line);
             var values = subLine.Split(',');
 
             if (Enum.TryParse(values[0], out EventType eventType))
