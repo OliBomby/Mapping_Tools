@@ -77,7 +77,7 @@ namespace Mapping_Tools {
 
             var path = Path.Combine(AppDataPath, "crash-log.txt");
             File.WriteAllLines(path, lines);
-            MessageBox.Show("The program encountered an unhandled exception. Look in crash-log.txt for more info.", "Error");
+            MessageBox.Show($"The program encountered an unhandled exception. Look in crash-log.txt for more info:\n{path}", "Error");
         }
 
         private void Setup() {
