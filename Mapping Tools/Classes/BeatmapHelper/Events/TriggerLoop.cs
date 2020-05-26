@@ -6,23 +6,23 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
     /// Represents trigger loop events. Although called loops, these only ever activate once.
     /// </summary>
     public class TriggerLoop : Command {
-        public override EventType Event => EventType.T;
-        public double EndTime { get; set; }
+        public override EventType EventType => EventType.T;
+        public int EndTime { get; set; }
         public string TriggerName { get; set; }
 
         public override string GetLine() {
             var builder = new StringBuilder(8);
 
             builder.Append(GetIndents());
-            builder.Append(Event.ToString());
+            builder.Append(EventType.ToString());
             builder.Append(',');
             builder.Append(TriggerName);
             builder.Append(',');
-            builder.Append(StartTime.ToRoundInvariant());
+            builder.Append(StartTime.ToInvariant());
             builder.Append(',');
-            builder.Append(EndTime.ToRoundInvariant());
+            builder.Append(EndTime.ToInvariant());
 
-            return builder.ToString();
+            return $"{GetIndents()}{EventType},{TriggerName},{StartTime.ToInvariant()},{EndTime.ToInvariant()}";
         }
 
         public override void SetLine(string line) {
@@ -31,11 +31,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
 
             TriggerName = values[1];
 
-            if (TryParseDouble(values[2], out double startTime))
+            if (TryParseInt(values[2], out int startTime))
                 StartTime = startTime;
             else throw new BeatmapParsingException("Failed to parse start time of event param.", line);
 
-            if (TryParseDouble(values[3], out double endTime))
+            if (TryParseInt(values[3], out int endTime))
                 EndTime = endTime;
             else throw new BeatmapParsingException("Failed to parse end time of event param.", line);
         }

@@ -6,28 +6,19 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
     /// Represents the standard loop event. This event has a different syntax so it can't be a <see cref="OtherCommand"/>.
     /// </summary>
     public class StandardLoop : Command {
-        public override EventType Event => EventType.L;
+        public override EventType EventType => EventType.L;
 
         public int LoopCount { get; set; }
 
         public override string GetLine() {
-            var builder = new StringBuilder(6);
-
-            builder.Append(GetIndents());
-            builder.Append(Event.ToString());
-            builder.Append(',');
-            builder.Append(StartTime.ToRoundInvariant());
-            builder.Append(',');
-            builder.Append(LoopCount.ToInvariant());
-
-            return builder.ToString();
+            return $"{GetIndents()}{EventType},{StartTime.ToInvariant()},{LoopCount.ToInvariant()}";
         }
 
         public override void SetLine(string line) {
             var subLine = ParseIndents(line);
             var values = subLine.Split(',');
 
-            if (TryParseDouble(values[1], out double startTime))
+            if (TryParseInt(values[1], out int startTime))
                 StartTime = startTime;
             else throw new BeatmapParsingException("Failed to parse start time of event param.", line);
 

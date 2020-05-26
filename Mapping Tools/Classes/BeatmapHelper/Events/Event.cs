@@ -3,6 +3,7 @@
 namespace Mapping_Tools.Classes.BeatmapHelper.Events {
     /// <summary>
     /// Abstract event type. Represents everything that can be put in the [Events] section.
+    /// TODO: When actually doing storyboard stuff some of the types should have child and parent events instead of indents, so we get a tree structure. BTW this would break ITextLine
     /// </summary>
     public abstract class Event : ITextLine {
         /// <summary>
@@ -12,7 +13,45 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         /// <param name="line"></param>
         /// <returns></returns>
         public Event MakeEvent(string line) {
-            throw new NotImplementedException();
+            string[] values = line.Split(',');
+            string eventType = values[0].Trim();
+
+            Event myEvent;
+            switch (eventType) {
+                case "0":
+                    myEvent = new Background();
+                    break;
+                case "1":
+                case "Video":
+                    myEvent = new Video();
+                    break;
+                case "2":
+                case "Break":
+                    myEvent = new Break();
+                    break;
+                case "Sprite":
+                    myEvent = new Sprite();
+                    break;
+                case "Animation":
+                    myEvent = new Animation();
+                    break;
+                case "Sample":
+                    myEvent = new StoryboardSoundSample();
+                    break;
+                case "L":
+                    myEvent = new StandardLoop();
+                    break;
+                case "T":
+                    myEvent = new TriggerLoop();
+                    break;
+                default:
+                    myEvent = new OtherCommand();
+                    break;
+            }
+
+            myEvent.SetLine(line);
+
+            return myEvent;
         }
 
         public abstract string GetLine();

@@ -30,6 +30,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         /// </summary>
         public double Volume { get; set; }
 
+        public StoryboardSoundSample() { }
+
         /// <inheritdoc />
         public StoryboardSoundSample(double time, StoryboardLayer layer, string filePath, double volume) {
             Time = time;

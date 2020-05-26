@@ -9,7 +9,7 @@
         R, // Rotate
         C, // Colour
         L, // Loop
-        T, // Event-triggered loop
+        T, // EventType-triggered loop
         P, // Parameters
     }
 }

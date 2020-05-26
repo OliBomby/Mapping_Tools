@@ -189,10 +189,17 @@
     </ApplicationDefinition>
     <Compile Include="Classes\BeatmapHelper\BeatmapEditor.cs" />
     <Compile Include="Classes\BeatmapHelper\BeatmapParsingException.cs" />
+    <Compile Include="Classes\BeatmapHelper\Events\Break.cs" />
+    <Compile Include="Classes\BeatmapHelper\Events\Video.cs" />
+    <Compile Include="Classes\BeatmapHelper\Events\Background.cs" />
     <Compile Include="Classes\BeatmapHelper\Events\Command.cs" />
     <Compile Include="Classes\BeatmapHelper\Events\EasingType.cs" />
     <Compile Include="Classes\BeatmapHelper\Events\Event.cs" />
     <Compile Include="Classes\BeatmapHelper\Events\EventType.cs" />
+    <Compile Include="Classes\BeatmapHelper\Events\LoopType.cs" />
+    <Compile Include="Classes\BeatmapHelper\Events\Origin.cs" />
+    <Compile Include="Classes\BeatmapHelper\Events\Animation.cs" />
+    <Compile Include="Classes\BeatmapHelper\Events\Sprite.cs" />
     <Compile Include="Classes\BeatmapHelper\Events\TriggerLoop.cs" />
     <Compile Include="Classes\BeatmapHelper\Events\StandardLoop.cs" />
     <Compile Include="Classes\BeatmapHelper\Events\OtherCommand.cs" />
