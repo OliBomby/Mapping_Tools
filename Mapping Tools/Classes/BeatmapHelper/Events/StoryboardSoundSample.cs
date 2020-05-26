@@ -57,7 +57,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         /// Deserializes a string of .osu code and populates the properties of this object.
         /// </summary>
         /// <param name="line"></param>
-        public override void SetLine(string line) {
+        public sealed override void SetLine(string line) {
             string[] values = line.Split(',');
 
             if (values[0] != "Sample" && values[0] != "5") {

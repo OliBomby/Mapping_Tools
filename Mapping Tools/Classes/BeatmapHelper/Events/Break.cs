@@ -6,11 +6,17 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         public int StartTime { get; set; }
         public int EndTime { get; set; }
 
+        public Break() { }
+
+        public Break(string line) {
+            SetLine(line);
+        }
+
         public override string GetLine() {
             return $"{EventType},{StartTime.ToInvariant()},{EndTime.ToInvariant()}";
         }
 
-        public override void SetLine(string line) {
+        public sealed override void SetLine(string line) {
             string[] values = line.Split(',');
 
             // Either 'Break' or '2' indicates a break. We save the value so we dont accidentally change it.

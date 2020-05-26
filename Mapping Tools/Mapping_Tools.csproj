@@ -190,6 +190,7 @@
     <Compile Include="Classes\BeatmapHelper\BeatmapEditor.cs" />
     <Compile Include="Classes\BeatmapHelper\BeatmapParsingException.cs" />
     <Compile Include="Classes\BeatmapHelper\Events\Break.cs" />
+    <Compile Include="Classes\BeatmapHelper\Events\ParameterCommand.cs" />
     <Compile Include="Classes\BeatmapHelper\Events\Video.cs" />
     <Compile Include="Classes\BeatmapHelper\Events\Background.cs" />
     <Compile Include="Classes\BeatmapHelper\Events\Command.cs" />

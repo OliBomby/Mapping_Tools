@@ -15,7 +15,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         public Vector2 Pos { get; set; }
 
         public int FrameCount { get; set; }
-        public int FrameDelay { get; set; }
+        public double FrameDelay { get; set; }
         public LoopType LoopType { get; set; }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
                 FrameCount = frameCount;
             else throw new BeatmapParsingException("Failed to parse frame count of animation.", line);
 
-            if (TryParseInt(values[7], out int frameDelay))
+            if (TryParseDouble(values[7], out double frameDelay))
                 FrameDelay = frameDelay;
             else throw new BeatmapParsingException("Failed to parse frame delay of animation.", line);
 

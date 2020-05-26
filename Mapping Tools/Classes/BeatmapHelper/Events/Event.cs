@@ -12,7 +12,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         /// </summary>
         /// <param name="line"></param>
         /// <returns></returns>
-        public Event MakeEvent(string line) {
+        public static Event MakeEvent(string line) {
             string[] values = line.Split(',');
             string eventType = values[0].Trim();
 
@@ -37,6 +37,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
                     break;
                 case "Sample":
                     myEvent = new StoryboardSoundSample();
+                    break;
+                case "P":
+                    myEvent = new ParameterCommand();
                     break;
                 case "L":
                     myEvent = new StandardLoop();

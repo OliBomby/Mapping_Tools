@@ -1,12 +1,8 @@
-﻿using System;
+﻿using Mapping_Tools.Classes.BeatmapHelper.Events;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Mapping_Tools.Classes.BeatmapHelper.Events;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     /// <summary>
@@ -14,40 +10,56 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
     /// </summary>
     public class StoryBoard : ITextFile
     {
-        /// <summary>
-        /// List of storyboard actions that are defined within the .osb or .osu file
+        // <summary>
+        /// A list of all the lines of .osu code under the [Events] section. These strings are the actual .osu code and must be deserialized before use.
+        /// Any changes to this property will not be serialized. Use <see cref="BackgroundAndVideoEvents"/> and the other sub-headers instead.
         /// </summary>
         public List<string> Events { get; set; }
+
         /// <summary>
-        /// Events that happen to the playfield background, which includes beatmap backgrounds and video.
+        /// A list of all the lines of .osu code under the [Events] -> (Background and Video events) section.
+        /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
-        public List<string> BackgroundAndVideoEvents { get; set; }
+        public List<Event> BackgroundAndVideoEvents { get; set; }
+
         /// <summary>
-        /// (For .osu only) The times where a break is placed within the beatmap.
+        /// A list of all the lines of .osu code under the [Events] -> (Break Periods) section.
+        /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
-        public List<string> BreakPeriods { get; set; }
+        public List<Break> BreakPeriods { get; set; }
+
         /// <summary>
-        /// The Layer events relating to the storyboard background.
+        /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 0 (Background)) section.
+        /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
-        public List<string> StoryboardBackgroundLayer { get; set; }
+        public List<Event> StoryboardLayerBackground { get; set; }
+
         /// <summary>
-        /// The layer events relating to the storyboard pass layer.
+        /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 1 (Fail)) section.
+        /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
-        public List<string> StoryboardPassLayer { get; set; }
+        public List<Event> StoryboardLayerFail { get; set; }
+
         /// <summary>
-        /// The layer events relating to the storyboard fail layer.
+        /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 2 (Pass)) section.
+        /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
-        public List<string> StoryboardFailLayer { get; set; }
+        public List<Event> StoryboardLayerPass { get; set; }
+
         /// <summary>
-        /// The layer events relating to the storyboard Foreground layer.
+        /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 3 (Foreground)) section.
+        /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
-        public List<string> StoryboardForegroundLayer { get; set; }
+        public List<Event> StoryboardLayerForeground { get; set; }
+
         /// <summary>
-        /// The layer events relating to the storyboard overlay layer.
+        /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 4 (Overlay)) section.
+        /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
-        public List<string> StoryboardOverlayLayer { get; set; }
+        public List<Event> StoryboardLayerOverlay { get; set; }
+
         /// <summary>
-        /// The layer events relating to the storyboard samples.
+        /// A list of all storyboarded sound sample events under the [Events] -> (Storyboard Sound Samples) section.
         /// </summary>
         public List<StoryboardSoundSample> StoryboardSoundSamples { get; set; }
 
@@ -66,46 +78,45 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             List<string> eventsLines = GetCategoryLines(lines, "[Events]");
             List<string> backgroundAndVideoEventsLines = GetCategoryLines(lines, "//Background and Video events", new[] { "[", "//" });
             List<string> breakPeriodsLines = GetCategoryLines(lines, "//Break Periods", new[] { "[", "//" });
-            List<string> storyboardLayer0Lines = GetCategoryLines(lines, "//Storyboard Layer 0 (Background)", new[] { "[", "//" });
-            List<string> storyboardLayer1Lines = GetCategoryLines(lines, "//Storyboard Layer 1 (Fail)", new[] { "[", "//" });
-            List<string> storyboardLayer2Lines = GetCategoryLines(lines, "//Storyboard Layer 2 (Pass)", new[] { "[", "//" });
-            List<string> storyboardLayer3Lines = GetCategoryLines(lines, "//Storyboard Layer 3 (Foreground)", new[] { "[", "//" });
-            List<string> storyboardLayer4Lines = GetCategoryLines(lines, "//Storyboard Layer 4 (Overlay)", new[] { "[", "//" });
+            List<string> storyboardLayerBackgroundLines = GetCategoryLines(lines, "//Storyboard Layer 0 (Background)", new[] { "[", "//" });
+            List<string> storyboardLayerFailLines = GetCategoryLines(lines, "//Storyboard Layer 1 (Fail)", new[] { "[", "//" });
+            List<string> storyboardLayerPassLines = GetCategoryLines(lines, "//Storyboard Layer 2 (Pass)", new[] { "[", "//" });
+            List<string> storyboardLayerForegroundLines = GetCategoryLines(lines, "//Storyboard Layer 3 (Foreground)", new[] { "[", "//" });
+            List<string> storyboardLayerOverlayLines = GetCategoryLines(lines, "//Storyboard Layer 4 (Overlay)", new[] { "[", "//" });
             List<string> storyboardSoundSamplesLines = GetCategoryLines(lines, "//Storyboard Sound Samples", new[] { "[", "//" });
 
             Events = new List<string>();
-            BackgroundAndVideoEvents = new List<string>();
-            BreakPeriods = new List<string>();
-            StoryboardBackgroundLayer = new List<string>();
-            StoryboardPassLayer = new List<string>();
-            StoryboardFailLayer = new List<string>();
-            StoryboardForegroundLayer = new List<string>();
-            StoryboardOverlayLayer = new List<string>();
+            BackgroundAndVideoEvents = new List<Event>();
+            BreakPeriods = new List<Break>();
+            StoryboardLayerBackground = new List<Event>();
+            StoryboardLayerPass = new List<Event>();
+            StoryboardLayerFail = new List<Event>();
+            StoryboardLayerForeground = new List<Event>();
+            StoryboardLayerOverlay = new List<Event>();
             StoryboardSoundSamples = new List<StoryboardSoundSample>();
 
-            foreach (string line in eventsLines) {
-                Events.Add(line);
-            }
+            Events.AddRange(eventsLines);
+
             foreach (string line in backgroundAndVideoEventsLines) {
-                BackgroundAndVideoEvents.Add(line);
+                BackgroundAndVideoEvents.Add(Event.MakeEvent(line));
             }
             foreach (string line in breakPeriodsLines) {
-                BreakPeriods.Add(line);
+                BreakPeriods.Add(new Break(line));
             }
-            foreach (string line in storyboardLayer0Lines) {
-                StoryboardBackgroundLayer.Add(line);
+            foreach (string line in storyboardLayerBackgroundLines) {
+                StoryboardLayerBackground.Add(Event.MakeEvent(line));
             }
-            foreach (string line in storyboardLayer1Lines) {
-                StoryboardPassLayer.Add(line);
+            foreach (string line in storyboardLayerFailLines) {
+                StoryboardLayerFail.Add(Event.MakeEvent(line));
             }
-            foreach (string line in storyboardLayer2Lines) {
-                StoryboardFailLayer.Add(line);
+            foreach (string line in storyboardLayerPassLines) {
+                StoryboardLayerPass.Add(Event.MakeEvent(line));
             }
-            foreach (string line in storyboardLayer3Lines) {
-                StoryboardForegroundLayer.Add(line);
+            foreach (string line in storyboardLayerForegroundLines) {
+                StoryboardLayerForeground.Add(Event.MakeEvent(line));
             }
-            foreach (string line in storyboardLayer4Lines) {
-                StoryboardOverlayLayer.Add(line);
+            foreach (string line in storyboardLayerOverlayLines) {
+                StoryboardLayerOverlay.Add(Event.MakeEvent(line));
             }
             foreach (string line in storyboardSoundSamplesLines) {
                 StoryboardSoundSamples.Add(new StoryboardSoundSample(line));
@@ -120,37 +131,21 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             // Getting all the Stuff
             List<string> lines = new List<string> {"[Events]", "//Background and Video events"};
 
-            foreach (string line in BackgroundAndVideoEvents) {
-                lines.Add(line);
-            }
+            lines.AddRange(BackgroundAndVideoEvents.Select(e => e.GetLine()));
             lines.Add("//Break Periods");
-            foreach (string line in BreakPeriods) {
-                lines.Add(line);
-            }
+            lines.AddRange(BreakPeriods.Select(b => b.GetLine()));
             lines.Add("//Storyboard Layer 0 (Background)");
-            foreach (string line in StoryboardBackgroundLayer) {
-                lines.Add(line);
-            }
+            lines.AddRange(StoryboardLayerBackground.Select(e => e.GetLine()));
             lines.Add("//Storyboard Layer 1 (Fail)");
-            foreach (string line in StoryboardPassLayer) {
-                lines.Add(line);
-            }
+            lines.AddRange(StoryboardLayerPass.Select(e => e.GetLine()));
             lines.Add("//Storyboard Layer 2 (Pass)");
-            foreach (string line in StoryboardFailLayer) {
-                lines.Add(line);
-            }
+            lines.AddRange(StoryboardLayerFail.Select(e => e.GetLine()));
             lines.Add("//Storyboard Layer 3 (Foreground)");
-            foreach (string line in StoryboardForegroundLayer) {
-                lines.Add(line);
-            }
+            lines.AddRange(StoryboardLayerForeground.Select(e => e.GetLine()));
             lines.Add("//Storyboard Layer 4 (Overlay)");
-            foreach (string line in StoryboardOverlayLayer) {
-                lines.Add(line);
-            }
+            lines.AddRange(StoryboardLayerOverlay.Select(e => e.GetLine()));
             lines.Add("//Storyboard Sound Samples");
-            foreach (StoryboardSoundSample sbss in StoryboardSoundSamples) {
-                lines.Add(sbss.GetLine());
-            }
+            lines.AddRange(StoryboardSoundSamples.Select(sbss => sbss.GetLine()));
             lines.Add("");
 
             return lines;

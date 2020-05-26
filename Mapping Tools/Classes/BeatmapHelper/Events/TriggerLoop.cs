@@ -11,17 +11,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         public string TriggerName { get; set; }
 
         public override string GetLine() {
-            var builder = new StringBuilder(8);
-
-            builder.Append(GetIndents());
-            builder.Append(EventType.ToString());
-            builder.Append(',');
-            builder.Append(TriggerName);
-            builder.Append(',');
-            builder.Append(StartTime.ToInvariant());
-            builder.Append(',');
-            builder.Append(EndTime.ToInvariant());
-
             return $"{GetIndents()}{EventType},{TriggerName},{StartTime.ToInvariant()},{EndTime.ToInvariant()}";
         }
 
