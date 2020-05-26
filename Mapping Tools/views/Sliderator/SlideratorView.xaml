@@ -46,6 +46,8 @@
                     Add, remove, or edit anchors with right click and move stuff by dragging with left click. While dragging, hold Shift for horizontal clipping, hold Ctrl for vertical clipping, and hold Alt to disable snapping.
                     <LineBreak/>
                     <LineBreak/>
+                    Running Sliderator with a constant velocity will give back the original slider.
+                    <LineBreak/>
                     Check out all the options. The tooltips should help you further.
                 </TextBlock>
             </materialDesign:PopupBox>
