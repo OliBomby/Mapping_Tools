@@ -42,8 +42,8 @@ namespace Mapping_Tools.Views.Sliderator {
                                                         Environment.NewLine +
                                                         "Add, remove, or edit anchors with right click and move stuff by dragging with left click. While dragging, hold Shift for horizontal clipping, hold Ctrl for vertical clipping, and hold Alt to disable snapping." +
                                                         Environment.NewLine + Environment.NewLine +
-                                                        "Running Sliderator with a constant velocity will give back the original slider." +
-                                                        Environment.NewLine +
+                                                        "Running Sliderator with a constant velocity will give back the original slider. You can manually choose a lower SV and bigger tumour length to optimise your slider." +
+                                                        Environment.NewLine + Environment.NewLine +
                                                         "Check out all the options. The tooltips should help you further.";
 
         private bool _ignoreAnchorsChange;
