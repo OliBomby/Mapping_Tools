@@ -45,7 +45,7 @@ namespace Mapping_Tools {
                 SettingsManager.LoadConfig();
                 ListenerManager = new ListenerManager();
                 AppWindow = this;
-                MessageQueue = new SnackbarMessageQueue(TimeSpan.FromSeconds(1));
+                MessageQueue = new SnackbarMessageQueue(TimeSpan.FromSeconds(2));
                 MainSnackbar.MessageQueue = MessageQueue;
                 IsMaximized = SettingsManager.Settings.MainWindowMaximized;
                 WidthWin = SettingsManager.Settings.MainWindowWidth ?? Width;

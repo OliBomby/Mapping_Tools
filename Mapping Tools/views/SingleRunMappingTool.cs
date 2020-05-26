@@ -1,5 +1,6 @@
 ﻿using Mapping_Tools.Classes;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace Mapping_Tools.Views {
@@ -17,6 +18,12 @@ namespace Mapping_Tools.Views {
         public int Progress {
             get => _progress;
             set => Set(ref _progress, value);
+        }
+
+        private bool _verbose;
+        public bool Verbose {
+            get => _verbose;
+            set => Set(ref _verbose, value);
         }
 
         public SingleRunMappingTool() {
@@ -42,7 +49,11 @@ namespace Mapping_Tools.Views {
             if (e.Error != null) {
                 e.Error.Show();
             } else if (!string.IsNullOrEmpty(e.Result as string)) {
-                MessageBox.Show(e.Result.ToString());
+                if (Verbose) {
+                    MessageBox.Show(e.Result.ToString());
+                } else {
+                    Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue(e.Result.ToString(), true));
+                }
             }
 
             Progress = 0;
