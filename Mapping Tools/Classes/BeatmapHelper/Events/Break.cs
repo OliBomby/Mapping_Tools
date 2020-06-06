@@ -1,7 +1,7 @@
 ﻿using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Classes.BeatmapHelper.Events {
-    public class Break : Event {
+    public class Break : Event, IHasStartTime, IHasEndTime {
         public string EventType { get; set; }
         public int StartTime { get; set; }
         public int EndTime { get; set; }

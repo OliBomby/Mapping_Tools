@@ -5,7 +5,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
     /// <summary>
     /// Represents trigger loop events. Although called loops, these only ever activate once.
     /// </summary>
-    public class TriggerLoop : Command {
+    public class TriggerLoop : Command, IHasEndTime {
         public override EventType EventType => EventType.T;
         public int EndTime { get; set; }
         public string TriggerName { get; set; }

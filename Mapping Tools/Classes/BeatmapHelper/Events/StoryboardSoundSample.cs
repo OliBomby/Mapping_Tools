@@ -8,11 +8,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
     /// <example>
     /// Sample,56056,0,"soft-hitnormal.wav",30
     /// </example>
-    public class StoryboardSoundSample : Event, IEquatable<StoryboardSoundSample> {
+    public class StoryboardSoundSample : Event, IEquatable<StoryboardSoundSample>, IHasStartTime {
         /// <summary>
         /// The time when this sound event occurs.
         /// </summary>
-        public double Time { get; set; }
+        public int StartTime { get; set; }
 
         /// <summary>
         /// The storyboard layer this event belongs to.
@@ -33,8 +33,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         public StoryboardSoundSample() { }
 
         /// <inheritdoc />
-        public StoryboardSoundSample(double time, StoryboardLayer layer, string filePath, double volume) {
-            Time = time;
+        public StoryboardSoundSample(int startTime, StoryboardLayer layer, string filePath, double volume) {
+            StartTime = startTime;
             Layer = layer;
             FilePath = filePath;
             Volume = volume;
@@ -50,7 +50,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         /// </summary>
         /// <returns></returns>
         public override string GetLine() {
-            return $"Sample,{Time.ToRoundInvariant()},{Layer.ToIntInvariant()},\"{FilePath}\",{Volume.ToRoundInvariant()}";
+            return $"Sample,{StartTime.ToInvariant()},{Layer.ToIntInvariant()},\"{FilePath}\",{Volume.ToRoundInvariant()}";
         }
 
         /// <summary>
@@ -64,8 +64,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
                 throw new BeatmapParsingException("This line is not a storyboarded sample.", line);
             }
 
-            if (TryParseDouble(values[1], out double t))
-                Time = t;
+            if (TryParseInt(values[1], out int t))
+                StartTime = t;
             else throw new BeatmapParsingException("Failed to parse time of storyboarded sample.", line);
 
             if (Enum.TryParse(values[2], out StoryboardLayer layer))
@@ -88,7 +88,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         /// <returns>true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.</returns>
         public bool Equals(StoryboardSoundSample other) {
             return
-                other != null && (Time == other.Time &&
+                other != null && (StartTime == other.StartTime &&
                                   Layer == other.Layer &&
                                   FilePath == other.FilePath &&
                                   Volume == other.Volume);

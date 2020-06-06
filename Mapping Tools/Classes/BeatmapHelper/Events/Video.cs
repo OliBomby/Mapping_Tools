@@ -2,7 +2,7 @@
 using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Classes.BeatmapHelper.Events {
-    public class Video : Event {
+    public class Video : Event, IHasStartTime {
         public string EventType { get; set; }
         public int StartTime { get; set; }
         public string Filename { get; set; }

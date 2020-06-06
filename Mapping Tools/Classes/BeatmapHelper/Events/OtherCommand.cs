@@ -7,7 +7,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
     /// Represents all the commands
     /// The exceptions being loops and triggers because these have different syntax.
     /// </summary>
-    public class OtherCommand : Command {
+    public class OtherCommand : Command, IHasEndTime {
         public EasingType Easing { get; set; }
         public int EndTime { get; set; }
 

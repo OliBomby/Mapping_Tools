@@ -4,7 +4,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
     /// <summary>
     /// Represents the parameter command. This event has a different syntax so it can't be a <see cref="OtherCommand"/>.
     /// </summary>
-    public class ParameterCommand : Command {
+    public class ParameterCommand : Command, IHasEndTime {
         public override EventType EventType => EventType.P;
         public EasingType Easing { get; set; }
         public int EndTime { get; set; }

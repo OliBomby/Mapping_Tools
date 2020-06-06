@@ -187,7 +187,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                     foreach (var sampleFrom in beatmapFrom.StoryboardSoundSamples) {
                         if (arg.IgnoreHitsoundSatisfiedSamples) {
                             var tloHere = processedTimeline.TimelineObjects.FindAll(o =>
-                                Math.Abs(o.Time - sampleFrom.Time) <= arg.TemporalLeniency);
+                                Math.Abs(o.Time - sampleFrom.StartTime) <= arg.TemporalLeniency);
                             var samplesHere = new HashSet<string>();
                             foreach (var tlo in tloHere) {
                                 foreach (var filename in tlo.GetPlayingFilenames(mode)) {
@@ -222,7 +222,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                     }
 
                     // Sort the storyboarded samples
-                    beatmapTo.StoryboardSoundSamples = beatmapTo.StoryboardSoundSamples.OrderBy(o => o.Time).ToList();
+                    beatmapTo.StoryboardSoundSamples = beatmapTo.StoryboardSoundSamples.OrderBy(o => o.StartTime).ToList();
                 }
 
                 if (arg.MuteSliderends) {

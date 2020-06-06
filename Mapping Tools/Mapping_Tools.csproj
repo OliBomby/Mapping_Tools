@@ -190,6 +190,8 @@
     <Compile Include="Classes\BeatmapHelper\BeatmapEditor.cs" />
     <Compile Include="Classes\BeatmapHelper\BeatmapParsingException.cs" />
     <Compile Include="Classes\BeatmapHelper\Events\Break.cs" />
+    <Compile Include="Classes\BeatmapHelper\Events\IHasDuration.cs" />
+    <Compile Include="Classes\BeatmapHelper\Events\IHasEndTime.cs" />
     <Compile Include="Classes\BeatmapHelper\Events\ParameterCommand.cs" />
     <Compile Include="Classes\BeatmapHelper\Events\Video.cs" />
     <Compile Include="Classes\BeatmapHelper\Events\Background.cs" />
@@ -208,6 +210,7 @@
     <Compile Include="Classes\BeatmapHelper\GameMode.cs" />
     <Compile Include="Classes\BeatmapHelper\HitObjectComparer.cs" />
     <Compile Include="Classes\BeatmapHelper\HitObjectType.cs" />
+    <Compile Include="Classes\BeatmapHelper\Events\IHasStartTime.cs" />
     <Compile Include="Classes\BeatmapHelper\ITextLine.cs" />
     <Compile Include="Classes\BeatmapHelper\SpecialColour.cs" />
     <Compile Include="Classes\BeatmapHelper\StoryboardEditor.cs" />

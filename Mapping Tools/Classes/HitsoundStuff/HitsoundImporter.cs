@@ -219,7 +219,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
                 if (layer != null) {
                     // Find hitsound layer with this path and add this time
-                    layer.Times.Add(sbSample.Time);
+                    layer.Times.Add(sbSample.StartTime);
                 } else {
                     // Add new hitsound layer with this path
                     HitsoundLayer newLayer = new HitsoundLayer(prefix + filename,
@@ -228,7 +228,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         new SampleGeneratingArgs(samplePath) {Volume = volume},
                         importArgs);
 
-                    newLayer.Times.Add(sbSample.Time);
+                    newLayer.Times.Add(sbSample.StartTime);
 
                     hitsoundLayers.Add(newLayer);
                 }

@@ -3,7 +3,7 @@ using Mapping_Tools.Classes.MathUtil;
 using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Classes.BeatmapHelper.Events {
-    public class Animation : Event {
+    public class Animation : Event, IHasDuration {
         public StoryboardLayer Layer { get; set; }
         public Origin Origin { get; set; }
 
@@ -66,6 +66,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
             if (Enum.TryParse(values[8], out LoopType loopType))
                 LoopType = loopType;
             else throw new BeatmapParsingException("Failed to parse loop type of animation.", line);
+        }
+
+        public double Duration { 
+            get => FrameDelay;
+            set => FrameDelay = value;
         }
     }
 }
