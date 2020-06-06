@@ -11,11 +11,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         public string Parameter { get; set; }
 
         public override string GetLine() {
-            return $"{GetIndents()}{EventType},{((int)Easing).ToInvariant()},{StartTime.ToInvariant()},{EndTime.ToInvariant()},{Parameter}";
+            return $"{EventType},{((int)Easing).ToInvariant()},{StartTime.ToInvariant()},{EndTime.ToInvariant()},{Parameter}";
         }
 
         public override void SetLine(string line) {
-            var subLine = ParseIndents(line);
+            var subLine = RemoveIndents(line);
             var values = subLine.Split(',');
 
             if (TryParseInt(values[1], out int startTime))

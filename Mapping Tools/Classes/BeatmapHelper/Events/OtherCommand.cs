@@ -19,7 +19,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         public override string GetLine() {
             var builder = new StringBuilder(8 + Params.Length * 2);
 
-            builder.Append(GetIndents());
             builder.Append(EventType.ToString());
             builder.Append(',');
             builder.Append(((int) Easing).ToInvariant());
@@ -37,7 +36,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         }
 
         public override void SetLine(string line) {
-            var subLine = ParseIndents(line);
+            var subLine = RemoveIndents(line);
             var values = subLine.Split(',');
 
             if (Enum.TryParse(values[0], out EventType eventType))
