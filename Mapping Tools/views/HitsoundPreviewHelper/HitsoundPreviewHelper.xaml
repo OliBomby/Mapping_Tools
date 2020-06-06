@@ -122,7 +122,7 @@
                     <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Generate rhythm guide." Command="{Binding RhythmGuideCommand}" Margin="5">
                         <materialDesign:PackIcon Kind="AlternatingCurrent" Height="24" Width="24" />
                     </Button>
-                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a hitsound zone." Command="{Binding AddCommand}" Margin="5">
+                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a hitsound zone. Hold shift to add current selected coordinates." Command="{Binding AddCommand}" Margin="5">
                         <materialDesign:PackIcon Kind="Plus" Height="24" Width="24" />
                     </Button>
                     <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Copy selected hitsound zones." Command="{Binding CopyCommand}" Margin="5">
