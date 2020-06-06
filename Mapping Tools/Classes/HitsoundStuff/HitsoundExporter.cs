@@ -35,7 +35,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
             if (useStoryboard) {
                 beatmap.StoryboardSoundSamples.Clear();
                 foreach (var h in hitsounds.Where(h => !string.IsNullOrEmpty(h.Filename))) {
-                    beatmap.StoryboardSoundSamples.Add(new StoryboardSoundSample(h.Time, 0, h.Filename, h.Volume * 100));
+                    beatmap.StoryboardSoundSamples.Add(new StoryboardSoundSample((int) Math.Round(h.Time), 0, h.Filename, h.Volume * 100));
                 }
             } else {
                 // Make new timing points
