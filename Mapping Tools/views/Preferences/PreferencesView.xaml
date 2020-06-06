@@ -78,7 +78,7 @@
                 <CheckBox HorizontalAlignment="Left" Content="Make automatic backups" IsChecked="{Binding MakeBackups, Mode=TwoWay}" ToolTip="Automatically make a backup whenever you run a mapping tool."/>
                 <StackPanel Orientation="Horizontal">
                     <CheckBox x:Name="PeriodicBackupsCheckBox" HorizontalAlignment="Left" Content="Make periodic backups" IsChecked="{Binding MakePeriodicBackups, Mode=TwoWay}" 
-                              ToolTip="Periodically make automatic backups when the editor is open. This is usefull if you forget to save often or accidentally delete your map. It will only make backups if there are changes in the beatmap."/>
+                              ToolTip="Periodically make automatic backups when the editor is open. This is useful if you forget to save often or accidentally delete your map. It will only make backups if there are changes in the beatmap."/>
                     <TextBox Text="{Binding PeriodicBackupInterval, Mode=TwoWay}" MaxWidth="150" Margin="20,0,0,0" HorizontalAlignment="Left"
                              Visibility="{Binding ElementName=PeriodicBackupsCheckBox, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}"
                              Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Backup interval"
