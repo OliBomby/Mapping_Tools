@@ -69,15 +69,15 @@
 
                 <TextBlock Text="Map info" Margin="0,20,0,0" FontSize="14" FontWeight="Bold"/>
                 <CheckBox FontSize="14" x:Name="VolumeSliders" Cursor="Hand" IsChecked="{Binding MapCleanerArgs.VolumeSliders}"
-                          ToolTip="Flag volume changes in sliders as usefull, so they don't get removed.">
+                          ToolTip="Flag volume changes in sliders as useful, so they don't get removed.">
                     Map uses volume changes in sliders
                 </CheckBox>
                 <CheckBox FontSize="14" Name="SamplesetSliders" Cursor="Hand" IsChecked="{Binding MapCleanerArgs.SampleSetSliders}"
-                          ToolTip="Flag sample set changes in sliders as usefull, so they don't get removed.">
+                          ToolTip="Flag sample set changes in sliders as useful, so they don't get removed.">
                     Map uses sampleset changes in sliders
                 </CheckBox>
                 <CheckBox FontSize="14" x:Name="VolumeSpinners" Cursor="Hand" IsChecked="{Binding MapCleanerArgs.VolumeSpinners}"
-                          ToolTip="Flag volume changes in spinners as usefull, so they don't get removed.">
+                          ToolTip="Flag volume changes in spinners as useful, so they don't get removed.">
                     Map uses volume changes in spinners
                 </CheckBox>
 

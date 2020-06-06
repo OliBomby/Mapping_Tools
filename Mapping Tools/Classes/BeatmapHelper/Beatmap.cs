@@ -25,7 +25,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// StackLeniency,
         /// Mode,
         /// LetterboxInBreaks,
-        /// WidescreenStoryboard
+        /// StoryFireInFront,
+        /// SkinPreference,
+        /// EpilepsyWarning,
+        /// CountdownOffset,
+        /// SpecialStyle,
+        /// WidescreenStoryboard,
+        /// SamplesMatchPlaybackRate
         /// </summary>
         public Dictionary<string, TValue> General { get; set; }
 
