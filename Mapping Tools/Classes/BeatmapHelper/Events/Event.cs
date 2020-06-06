@@ -113,9 +113,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         /// <returns></returns>
         public static IEnumerable<string> SerializeEventTree(IEnumerable<Event> events, int depth = 0) {
             foreach (var ev in events) {
-                if (ev.ChildEvents.Count == 0) {
-                    yield return GetIndents(depth) + ev.GetLine();
-                } else {
+                yield return GetIndents(depth) + ev.GetLine();
+                if (ev.ChildEvents.Count > 0) {
                     foreach (var childLine in SerializeEventTree(ev.ChildEvents, depth + 1)) {
                         yield return childLine;
                     }
