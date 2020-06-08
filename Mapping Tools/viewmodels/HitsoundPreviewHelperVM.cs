@@ -8,6 +8,8 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Input;
+using Mapping_Tools.Classes.Tools;
 
 namespace Mapping_Tools.Viewmodels {
     public class HitsoundPreviewHelperVm : INotifyPropertyChanged
@@ -34,7 +36,18 @@ namespace Mapping_Tools.Viewmodels {
             AddCommand = new CommandImplementation(
                 _ => {
                     try {
-                        Items.Add(new HitsoundZone());
+                        var newZone = new HitsoundZone();
+                        if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)) {
+                            var editor = EditorReaderStuff.GetBeatmapEditor(EditorReaderStuff.GetFullEditorReader(),
+                                out var selected);
+                            if (selected.Count > 0) {
+                                newZone.XPos = selected[0].Pos.X;
+                                newZone.YPos = editor.Beatmap.General["Mode"].IntValue == 3 ? -1 : selected[0].Pos.Y;
+                            } else {
+                                MessageBox.Show("Please select a hit object to fetch the coordinates.");
+                            }
+                        }
+                        Items.Add(newZone);
                     } catch (Exception ex) { ex.Show(); }
                 });
             CopyCommand = new CommandImplementation(

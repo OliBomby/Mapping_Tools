@@ -114,6 +114,26 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
+        private double _sbEventTimeMultiplier;
+        public double SBEventTimeMultiplier {
+            get => _sbEventTimeMultiplier;
+            set {
+                if (Set(ref _sbEventTimeMultiplier, value) && SyncTimeFields) {
+                    SetAllTimeMultipliers(value);
+                }
+            }
+        }
+
+        private double _sbEventTimeOffset;
+        public double SBEventTimeOffset {
+            get => _sbEventTimeOffset;
+            set {
+                if (Set(ref _sbEventTimeOffset, value) && SyncTimeFields) {
+                    SetAllTimeOffsets(value);
+                }
+            }
+        }
+
         private double _sbSampleTimeMultiplier;
         public double SBSampleTimeMultiplier {
             get => _sbSampleTimeMultiplier;
@@ -129,6 +149,46 @@ namespace Mapping_Tools.Viewmodels {
             get => _sbSampleTimeOffset;
             set {
                 if (Set(ref _sbSampleTimeOffset, value) && SyncTimeFields) {
+                    SetAllTimeOffsets(value);
+                }
+            }
+        }
+
+        private double _breakTimeMultiplier;
+        public double BreakTimeMultiplier {
+            get => _breakTimeMultiplier;
+            set {
+                if (Set(ref _breakTimeMultiplier, value) && SyncTimeFields) {
+                    SetAllTimeMultipliers(value);
+                }
+            }
+        }
+
+        private double _breakTimeOffset;
+        public double BreakTimeOffset {
+            get => _breakTimeOffset;
+            set {
+                if (Set(ref _breakTimeOffset, value) && SyncTimeFields) {
+                    SetAllTimeOffsets(value);
+                }
+            }
+        }
+
+        private double _videoTimeMultiplier;
+        public double VideoTimeMultiplier {
+            get => _videoTimeMultiplier;
+            set {
+                if (Set(ref _videoTimeMultiplier, value) && SyncTimeFields) {
+                    SetAllTimeMultipliers(value);
+                }
+            }
+        }
+
+        private double _videoTimeOffset;
+        public double VideoTimeOffset {
+            get => _videoTimeOffset;
+            set {
+                if (Set(ref _videoTimeOffset, value) && SyncTimeFields) {
                     SetAllTimeOffsets(value);
                 }
             }
@@ -226,8 +286,14 @@ namespace Mapping_Tools.Viewmodels {
             HitObjectTimeOffset = 0;
             BookmarkTimeMultiplier = 1;
             BookmarkTimeOffset = 0;
+            SBEventTimeMultiplier = 1;
+            SBEventTimeOffset = 0;
             SBSampleTimeMultiplier = 1;
             SBSampleTimeOffset = 0;
+            BreakTimeMultiplier = 1;
+            BreakTimeOffset = 0;
+            VideoTimeMultiplier = 1;
+            VideoTimeOffset = 0;
             PreviewTimeMultiplier = 1;
             PreviewTimeOffset = 0;
         }
@@ -236,7 +302,10 @@ namespace Mapping_Tools.Viewmodels {
             TimingpointOffsetMultiplier = value;
             HitObjectTimeMultiplier = value;
             BookmarkTimeMultiplier = value;
+            SBEventTimeMultiplier = value;
             SBSampleTimeMultiplier = value;
+            BreakTimeMultiplier = value;
+            VideoTimeMultiplier = value;
             PreviewTimeMultiplier = value;
         }
 
@@ -244,7 +313,10 @@ namespace Mapping_Tools.Viewmodels {
             TimingpointOffsetOffset = value;
             HitObjectTimeOffset = value;
             BookmarkTimeOffset = value;
+            SBEventTimeOffset = value;
             SBSampleTimeOffset = value;
+            BreakTimeOffset = value;
+            VideoTimeOffset = value;
             PreviewTimeOffset = value;
         }
     }

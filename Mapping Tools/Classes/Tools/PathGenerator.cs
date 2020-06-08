@@ -141,7 +141,7 @@ namespace Mapping_Tools.Classes.Tools {
         }
 
         /// <summary>
-        /// Calculates the indices of sub-ranges such that the sub-ranges have no inflection points or sharp curves inside
+        /// Calculates the indices of sub-ranges such that the sub-ranges have no inflection points or sharp curves inside.
         /// </summary>
         /// <param name="startIndex"></param>
         /// <param name="endIndex"></param>
@@ -173,6 +173,7 @@ namespace Mapping_Tools.Classes.Tools {
             double subRangeAngleChange = 0;
             List<Tuple<double, double, double>> subRanges = new List<Tuple<double, double, double>>();
             // Loop through the whole path and divide it into sub-ranges at every inflection point
+            //Console.WriteLine($"Iterating from {startIndexInt} to {endIndexInt}");
             for (int i = startIndexInt; i <= endIndexInt; i++) {
                 var pos = _path[i];
                 var angle = _angle[i];
@@ -184,6 +185,7 @@ namespace Mapping_Tools.Classes.Tools {
                     ((pos - pos.Rounded()).LengthSquared < Precision.DOUBLE_EPSILON && Math.Abs(angleChange) > Precision.DOUBLE_EPSILON)) {
                     subRanges.Add(new Tuple<double, double, double>(startSubRange, i, subRangeAngleChange));
 
+                    //Console.WriteLine($"Adding segment for inflection point or red: {startSubRange} to {i}");
                     //Console.WriteLine($"Found inflection point or red anchor: {angleChange}, {lastAngleChange}, {pos}, {angleChange * lastAngleChange}");
 
                     startSubRange = i;
@@ -192,14 +194,16 @@ namespace Mapping_Tools.Classes.Tools {
                 else if (angleChange == 0 && lastAngleChange != 0) {
                     subRanges.Add(new Tuple<double, double, double>(startSubRange, i, subRangeAngleChange));
 
+                    //Console.WriteLine($"Adding segment for start zero angle change: {startSubRange} to {i}");
                     //Console.WriteLine($"start of zero angle change: {angleChange}, {lastAngleChange}, {pos}, {angleChange * lastAngleChange}");
 
                     startSubRange = i;
                     subRangeAngleChange = -Math.Abs(angleChange);  // Negate the angle change because this point invalidates the angle
-                } else if (angleChange != 0 && lastAngleChange == 0) {
+                } else if (angleChange != 0 && lastAngleChange == 0 && i - 1 >= startSubRange) {  // Extra check to prevent subranges going backwards with i - 1
                     // Place on the previous index for symmetry with the part going into the zero chain
                     subRanges.Add(new Tuple<double, double, double>(startSubRange, i - 1, 0));
-
+                    
+                    //Console.WriteLine($"Adding segment for end zero angle change: {startSubRange} to {i}");
                     //Console.WriteLine($"end of zero angle change: {angleChange}, {lastAngleChange}, {pos}, {angleChange * lastAngleChange}");
 
                     startSubRange = i - 1;
@@ -215,8 +219,8 @@ namespace Mapping_Tools.Classes.Tools {
                 subRanges.Add(new Tuple<double, double, double>(startSubRange, endIndex, subRangeAngleChange));
             }
 
-            // Remove all sub-ranges which start and end on the same index
-            subRanges.RemoveAll(s => s.Item1 == s.Item2);
+            // Remove all sub-ranges which start and end on the same index or start at a later index
+            subRanges.RemoveAll(s => s.Item1 >= s.Item2);
 
             List<Tuple<double, double>> segments = new List<Tuple<double, double>>();
             // Divide each sub-range into evenly spaced segments which have an aggregate angle change less than the max
@@ -226,14 +230,15 @@ namespace Mapping_Tools.Classes.Tools {
                 //Console.WriteLine("sub-range angle: " + subRange.Item3);
                 double maxSegmentAngle = subRange.Item3 / numSegments;
 
-                int segmentStartIndexInt = (int) Math.Round(subRange.Item1);
-                int segmentEndIndexInt = (int) Math.Round(subRange.Item2);
+                int segmentStartIndexInt = (int) Math.Ceiling(subRange.Item1);
+                int segmentEndIndexInt = (int) Math.Floor(subRange.Item2);
 
                 lastAngle = GetContinuousAngle(subRange.Item1);
 
                 double startSegment = subRange.Item1;
                 double segmentAngleChange = 0;
                 // Loop through the sub-range and count the angle change to make even divisions of the angle
+                //Console.WriteLine($"Iterating subrange from {segmentStartIndexInt} to {segmentEndIndexInt}");
                 for (int i = segmentStartIndexInt; i <= segmentEndIndexInt; i++) {
                     var angle = _angle[i];
                     var angleChange = GetSmallestAngle(angle, lastAngle);
@@ -242,7 +247,7 @@ namespace Mapping_Tools.Classes.Tools {
 
                     if (segmentAngleChange > maxSegmentAngle + Precision.DOUBLE_EPSILON) {
                         segments.Add(new Tuple<double, double>(startSegment, i));
-                        //Console.WriteLine("Adding segment: " + segmentAngleChange);
+                        //Console.WriteLine($"Adding segment for angle: {startSegment} to {i}");
 
                         startSegment = i;
                         segmentAngleChange -= maxSegmentAngle;

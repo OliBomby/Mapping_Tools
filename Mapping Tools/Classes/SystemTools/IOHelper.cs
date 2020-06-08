@@ -152,7 +152,7 @@ namespace Mapping_Tools.Classes.SystemTools {
             string path = MainWindow.AppWindow.GetCurrentMaps()[0];
             using( OpenFileDialog openFileDialog = new OpenFileDialog {
                 InitialDirectory = restore ? "" : path != "" ? Editor.GetParentFolder(path) : SettingsManager.GetSongsPath(),
-                Filter = "Osu files (*.osu)|*.osu",
+                Filter = "Osu files (*.osu;*.osb)|*.osu;*.osb",
                 FilterIndex = 1,
                 RestoreDirectory = true,
                 CheckFileExists = true,

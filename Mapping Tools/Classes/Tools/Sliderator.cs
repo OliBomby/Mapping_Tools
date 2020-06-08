@@ -256,7 +256,7 @@ namespace Mapping_Tools.Classes.Tools {
                 var firstPoint = neuron.Nucleus.Pos;
                 var lastPoint = neuron.Terminal.Nucleus.Pos;
 
-                var path = pathGenerator.GeneratePath(neuron.Nucleus.SegmentIndex + neuron.Nucleus.SegmentProgress,
+               var path = pathGenerator.GeneratePath(neuron.Nucleus.SegmentIndex + neuron.Nucleus.SegmentProgress,
                     neuron.Terminal.Nucleus.SegmentIndex + neuron.Terminal.Nucleus.SegmentProgress).ToList();
 
                 if (path.Count < 2) {

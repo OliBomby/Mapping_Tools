@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows;
 using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.BeatmapHelper.Events;
 using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
@@ -186,7 +187,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                     foreach (var sampleFrom in beatmapFrom.StoryboardSoundSamples) {
                         if (arg.IgnoreHitsoundSatisfiedSamples) {
                             var tloHere = processedTimeline.TimelineObjects.FindAll(o =>
-                                Math.Abs(o.Time - sampleFrom.Time) <= arg.TemporalLeniency);
+                                Math.Abs(o.Time - sampleFrom.StartTime) <= arg.TemporalLeniency);
                             var samplesHere = new HashSet<string>();
                             foreach (var tlo in tloHere) {
                                 foreach (var filename in tlo.GetPlayingFilenames(mode)) {
@@ -221,7 +222,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                     }
 
                     // Sort the storyboarded samples
-                    beatmapTo.StoryboardSoundSamples = beatmapTo.StoryboardSoundSamples.OrderBy(o => o.Time).ToList();
+                    beatmapTo.StoryboardSoundSamples = beatmapTo.StoryboardSoundSamples.OrderBy(o => o.StartTime).ToList();
                 }
 
                 if (arg.MuteSliderends) {

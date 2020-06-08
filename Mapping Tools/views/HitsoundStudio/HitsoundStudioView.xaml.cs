@@ -51,6 +51,9 @@ namespace Mapping_Tools.Views.HitsoundStudio
             Num_Layers_Changed();
             GetSelectedLayers();
             ProjectManager.LoadProject(this, message: false);
+
+            // This tool is verbose because of the 'show results' option
+            Verbose = true;
         }
 
         protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)

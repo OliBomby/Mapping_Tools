@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Mapping_Tools.Classes.BeatmapHelper.Events;
 
 namespace Mapping_Tools.Classes.Tools {
     public class MapCleaner {
@@ -312,22 +313,22 @@ namespace Mapping_Tools.Classes.Tools {
             List<string> storyboards = Directory.GetFiles(mapDir, "*.osb", SearchOption.TopDirectoryOnly).ToList();
             foreach (string path in storyboards) {
                 StoryboardEditor editor = new StoryboardEditor(path);
-                StoryBoard beatmap = editor.StoryBoard;
+                StoryBoard storyboard = editor.StoryBoard;
 
-                foreach (StoryboardSoundSample sbss in beatmap.StoryboardSoundSamples) {
+                foreach (StoryboardSoundSample sbss in storyboard.StoryboardSoundSamples) {
                     allFilenames.Add(sbss.FilePath);
                 }
             }
 
             // Only if there are spinners in standard you may have spinnerspin and spinnerbonus
             if (anySpinners)
-                allFilenames.UnionWith(new string[] { "spinnerspin", "spinnerbonus" });
+                allFilenames.UnionWith(new[] { "spinnerspin", "spinnerbonus" });
 
             // We don't do extensions in osu!
-            HashSet<string> usedFilenames = new HashSet<string>(allFilenames.Select(o => Path.GetFileNameWithoutExtension(o)));
+            HashSet<string> usedFilenames = new HashSet<string>(allFilenames.Select(Path.GetFileNameWithoutExtension));
 
             // Get the sound files
-            var extList = new string[] { ".wav", ".ogg", ".mp3" };
+            var extList = new[] { ".wav", ".ogg", ".mp3" };
             DirectoryInfo di = new DirectoryInfo(mapDir);
             List<FileInfo> sampleFiles = di.GetFiles("*.*", SearchOption.TopDirectoryOnly)
                                             .Where(n => extList.Contains(n.Extension, StringComparer.OrdinalIgnoreCase)).ToList();
