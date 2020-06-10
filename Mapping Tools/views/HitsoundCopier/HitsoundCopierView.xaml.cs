@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.BeatmapHelper.Events;
@@ -51,6 +52,9 @@ namespace Mapping_Tools.Views.HitsoundCopier {
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
+            // Remove logical focus to trigger LostFocus on any fields that didn't yet update the ViewModel
+            FocusManager.SetFocusedElement(FocusManager.GetFocusScope(this), null);
+
             foreach (string fileToCopy in BeatmapToBox.Text.Split('|')) {
                 IOHelper.SaveMapBackup(fileToCopy);
             }

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.SystemTools;
@@ -129,6 +130,9 @@ namespace Mapping_Tools.Views.HitsoundPreviewHelper
         private void RunTool(string[] paths, bool quick = false)
         {
             if (!CanRun) return;
+
+            // Remove logical focus to trigger LostFocus on any fields that didn't yet update the ViewModel
+            FocusManager.SetFocusedElement(FocusManager.GetFocusScope(this), null);
 
             IOHelper.SaveMapBackup(paths);
 

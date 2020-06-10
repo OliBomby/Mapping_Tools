@@ -252,6 +252,9 @@ namespace Mapping_Tools.Views.HitsoundStudio
                 MessageBox.Show("Please select a base beatmap and default hitsound first.");
                 return;
             }
+            
+            // Remove logical focus to trigger LostFocus on any fields that didn't yet update the ViewModel
+            FocusManager.SetFocusedElement(FocusManager.GetFocusScope(this), null);
 
             BackgroundWorker.RunWorkerAsync(Settings);
             CanRun = false;

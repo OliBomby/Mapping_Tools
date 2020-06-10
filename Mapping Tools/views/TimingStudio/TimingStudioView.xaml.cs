@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
@@ -42,6 +43,9 @@ namespace Mapping_Tools.Views.TimingStudio
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
+            // Remove logical focus to trigger LostFocus on any fields that didn't yet update the ViewModel
+            FocusManager.SetFocusedElement(FocusManager.GetFocusScope(this), null);
+
             string[] filesToCopy = MainWindow.AppWindow.GetCurrentMaps();
             IOHelper.SaveMapBackup(filesToCopy);
 

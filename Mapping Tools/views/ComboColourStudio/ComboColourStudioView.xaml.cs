@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.ComboColourStudio;
 using Mapping_Tools.Classes.MathUtil;
@@ -62,6 +63,9 @@ namespace Mapping_Tools.Views.ComboColourStudio {
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
+            // Remove logical focus to trigger LostFocus on any fields that didn't yet update the ViewModel
+            FocusManager.SetFocusedElement(FocusManager.GetFocusScope(this), null);
+
             ViewModel.ExportPath = MainWindow.AppWindow.GetCurrentMapsString();
 
             var filesToCopy = ViewModel.ExportPath.Split('|');
