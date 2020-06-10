@@ -1,4 +1,5 @@
-﻿using Mapping_Tools.Classes.BeatmapHelper;
+﻿using Mapping_Tools.Classes;
+using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SnappingTools;
 using Mapping_Tools.Classes.SnappingTools.DataStructure;
@@ -9,6 +10,7 @@ using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators
 using Mapping_Tools.Classes.SnappingTools.Serialization;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Components.Domain;
 using Mapping_Tools.Views.SnappingTools;
 using Process.NET;
 using Process.NET.Memory;
@@ -21,13 +23,12 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-using Editor_Reader;
-using Mapping_Tools.Classes;
-using Mapping_Tools.Components.Domain;
 using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
+using MessageBox = System.Windows.MessageBox;
 
 namespace Mapping_Tools.Viewmodels {
     public class SnappingToolsVm : IDisposable
@@ -45,6 +46,9 @@ namespace Mapping_Tools.Viewmodels {
         public CommandImplementation InheritableToggleCommand { get; set; }
 
         private IRelevantObject _lastSnappedRelevantObject;
+        private HitObject _heldHitObject;
+        private HitObject[] _heldHitObjects;
+        private Vector2 _heldHitObjectMouseOffset;
         private readonly List<IRelevantDrawable> _lastSelectedRelevantDrawables;
         private readonly List<IRelevantDrawable> _lastLockedRelevantDrawables;
         private readonly List<IRelevantDrawable> _lastInheritRelevantDrawables;
@@ -297,6 +301,11 @@ namespace Mapping_Tools.Viewmodels {
 
                         // Reset last snapped relevant object to trigger an overlay update in the snap timer tick
                         _lastSnappedRelevantObject = null;
+
+                        // Find any possible held hit object
+                        GetHeldHitObject();
+                        var cursorPos = GetCursorPosition();
+                        _heldHitObjectMouseOffset = _heldHitObject != null ? _heldHitObject.Pos - cursorPos : Vector2.Zero;
                         
                         _autoSnapTimer.Start();
                     }
@@ -373,7 +382,7 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
         
-        private List<HitObject> GetHitObjects() {
+        private List<HitObject> GetHitObjects(SelectedHitObjectMode selectionMode) {
             var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
 
             if (reader == null)
@@ -384,7 +393,7 @@ namespace Mapping_Tools.Viewmodels {
             // Get the visible hitobjects using approach rate
             var approachTime = Beatmap.ApproachRateToMs(reader.ApproachRate);
 
-            switch (Preferences.SelectedHitObjectMode) {
+            switch (selectionMode) {
                 case SelectedHitObjectMode.AllwaysAllVisible:
                     return hitObjects.Where(o => _editorTime > o.Time - approachTime && _editorTime < o.EndTime + approachTime).ToList();
                 case SelectedHitObjectMode.VisibleOrSelected:
@@ -396,10 +405,43 @@ namespace Mapping_Tools.Viewmodels {
                     throw new ArgumentOutOfRangeException();
             }
         }
+
+        private void GetHeldHitObject() {
+            if (Mouse.LeftButton != MouseButtonState.Pressed && !Control.MouseButtons.HasFlag(MouseButtons.Left)) {
+                _heldHitObject = null;
+                _heldHitObjects = new HitObject[0];
+                return;
+            }
+
+            var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
+
+            if (reader == null) {
+                _heldHitObject = null;
+                _heldHitObjects = new HitObject[0];
+                return;
+            }
+
+            var selectedHitObjects = EditorReaderStuff.GetHitObjects(reader).Where(o => o.IsSelected).ToArray();
+
+            if (selectedHitObjects.Length == 0) {
+                _heldHitObject = null;
+                _heldHitObjects = new HitObject[0];
+                return;
+            }
+
+            var mousePos = GetCursorPosition();
+            var circleRadius = (109 - 9 * reader.CircleSize) / 2;
+
+            _heldHitObject = selectedHitObjects.FirstOrDefault(o => Vector2.Distance(o.Pos, mousePos) <= circleRadius);
+
+            if (_heldHitObject != null) {
+                _heldHitObjects = selectedHitObjects;
+            }
+        }
       
         private void UpdateRelevantObjects()
         {
-            var hitObjects = GetHitObjects();
+            var hitObjects = GetHitObjects(Preferences.SelectedHitObjectMode);
             
             var comparer = new HitObjectComparer(true);
             var rootLayer = LayerCollection.GetRootLayer();
@@ -424,9 +466,12 @@ namespace Mapping_Tools.Viewmodels {
         }
 
 
-        private IRelevantDrawable GetNearestDrawable(Vector2 cursorPos, bool specialPriority = false) {
+        private IRelevantDrawable GetNearestDrawable(Vector2 cursorPos, bool specialPriority = false, HitObject[] heldHitObjects = null) {
             // Get all the relevant drawables
             var drawables = LayerCollection.GetAllRelevantDrawables().ToArray();
+
+            // Hit object comparer for finding a parent held hit object
+            var comparer = new HitObjectComparer();
 
             // Get the relevant object nearest to the cursor
             IRelevantDrawable nearest = null;
@@ -440,6 +485,12 @@ namespace Mapping_Tools.Viewmodels {
                 if (specialPriority && (o.IsSelected || o.IsLocked)) {
                     // Prioritize selected and locked to be able to unselect them easily
                     dist -= SpecialBias;
+                }
+
+                // Exclude any drawables which are the direct child of the held hit object
+                if (heldHitObjects != null && o.ParentObjects.Any(p =>
+                        p is RelevantHitObject rho && heldHitObjects.Any(hho => comparer.Equals(rho.HitObject, hho)))) {
+                    continue;
                 }
 
                 if (!(dist < smallestDistance)) continue;
@@ -486,7 +537,8 @@ namespace Mapping_Tools.Viewmodels {
             
             // Get nearest drawable
             var cursorPos = GetCursorPosition();
-            var nearest = GetNearestDrawable(cursorPos);
+            // Get the offset if a hit object is being held so the center of that object gets snapped
+            var nearest = GetNearestDrawable(cursorPos + _heldHitObjectMouseOffset, heldHitObjects:_heldHitObjects);
 
             // Update overlay if the last snapped changed and parentview is on
             if (nearest != _lastSnappedRelevantObject && SnapChangeRedrawsOverlay) {
@@ -499,7 +551,8 @@ namespace Mapping_Tools.Viewmodels {
             // CONVERT THIS TO CURSOR POSITION
             if (nearest == null) return;
 
-            var nearestPoint = _coordinateConverter.EditorToScreenCoordinate(nearest.NearestPoint(cursorPos));
+            var nearestPoint = _coordinateConverter.EditorToScreenCoordinate(
+                nearest.NearestPoint(cursorPos + _heldHitObjectMouseOffset) - _heldHitObjectMouseOffset);
             System.Windows.Forms.Cursor.Position = new System.Drawing.Point((int) Math.Round(nearestPoint.X), (int) Math.Round(nearestPoint.Y));
         }
 
