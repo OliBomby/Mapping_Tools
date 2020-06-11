@@ -303,7 +303,7 @@ namespace Mapping_Tools.Viewmodels {
                         _lastSnappedRelevantObject = null;
 
                         // Find any possible held hit object
-                        GetHeldHitObject();
+                        FetchHeldHitObject();
                         var cursorPos = GetCursorPosition();
                         _heldHitObjectMouseOffset = _heldHitObject != null ? _heldHitObject.Pos - cursorPos : Vector2.Zero;
                         
@@ -406,7 +406,7 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
-        private void GetHeldHitObject() {
+        private void FetchHeldHitObject() {
             if (Mouse.LeftButton != MouseButtonState.Pressed && !Control.MouseButtons.HasFlag(MouseButtons.Left)) {
                 _heldHitObject = null;
                 _heldHitObjects = new HitObject[0];
@@ -432,9 +432,18 @@ namespace Mapping_Tools.Viewmodels {
             var mousePos = GetCursorPosition();
             var circleRadius = (109 - 9 * reader.CircleSize) / 2;
 
-            _heldHitObject = selectedHitObjects.FirstOrDefault(o => Vector2.Distance(o.Pos, mousePos) <= circleRadius);
+            HitObject closest = null;
+            double bestDist = double.PositiveInfinity;
+            foreach (var ho in selectedHitObjects) {
+                var dist = Vector2.Distance(ho.Pos, mousePos);
+                if (dist < bestDist) {
+                    bestDist = dist;
+                    closest = ho;
+                }
+            }
 
-            if (_heldHitObject != null) {
+            if (closest != null && bestDist <= circleRadius) {
+                _heldHitObject = closest;
                 _heldHitObjects = selectedHitObjects;
             }
         }
@@ -471,7 +480,7 @@ namespace Mapping_Tools.Viewmodels {
             var drawables = LayerCollection.GetAllRelevantDrawables().ToArray();
 
             // Hit object comparer for finding a parent held hit object
-            var comparer = new HitObjectComparer();
+            var comparer = new HitObjectComparer(checkPosition:false);
 
             // Get the relevant object nearest to the cursor
             IRelevantDrawable nearest = null;
@@ -487,8 +496,8 @@ namespace Mapping_Tools.Viewmodels {
                     dist -= SpecialBias;
                 }
 
-                // Exclude any drawables which are the direct child of the held hit object
-                if (heldHitObjects != null && o.ParentObjects.Any(p =>
+                // Exclude any drawables which are the direct child of the held hit objects
+                if (heldHitObjects != null && o.ParentObjects.All(p =>
                         p is RelevantHitObject rho && heldHitObjects.Any(hho => comparer.Equals(rho.HitObject, hho)))) {
                     continue;
                 }
