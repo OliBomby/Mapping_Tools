@@ -366,6 +366,7 @@
     <Compile Include="Classes\SoundFontUtil\SoundFontImporter.cs" />
     <Compile Include="Classes\SpectrumUtil\Waveform.cs" />
     <Compile Include="Classes\SystemTools\ActionHotkey.cs" />
+    <Compile Include="Classes\SystemTools\BackupManager.cs" />
     <Compile Include="Classes\SystemTools\BindableBase.cs" />
     <Compile Include="Classes\SystemTools\Hotkey.cs" />
     <Compile Include="Classes\SystemTools\IHaveExtraProjectMenuItems.cs" />
