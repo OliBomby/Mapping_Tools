@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.Tools;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public static class BackupManager {
@@ -37,6 +39,21 @@ namespace Mapping_Tools.Classes.SystemTools {
                     break;
             }
             return result;
+        }
+
+        /// <summary>
+        /// Copies a backup to replace a beatmap at the destination path.
+        /// </summary>
+        /// <param name="backupPath">Path to the backup map.</param>
+        /// <param name="destination">Path to the destination map.</param>
+        /// <param name="allowDifferentName">If false, this method throws an exception when the backup and the destination have mismatching beatmap metadata.</param>
+        public static void LoadMapBackup(string backupPath, string destination, bool allowDifferentName = false) {
+            var backupEditor = new BeatmapEditor(backupPath);
+            var destinationEditor = new BeatmapEditor(destination);
+
+            if (!allowDifferentName && !string.Equals(backupEditor.Beatmap.GetFileName(), destinationEditor.Beatmap.GetFileName())) {
+
+            }
         }
     }
 }
