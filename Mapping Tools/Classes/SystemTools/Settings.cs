@@ -119,6 +119,12 @@ namespace Mapping_Tools.Classes.SystemTools {
             set => Set(ref _currentBeatmapDefaultFolder, value);
         }
 
+        private Hotkey _quickUndoHotkey;
+        public Hotkey QuickUndoHotkey {
+            get => _quickUndoHotkey;
+            set => Set(ref _quickUndoHotkey, value);
+        }
+
         /// <summary>
         /// Makes a new Settings objects and initializes default settings.
         /// </summary>

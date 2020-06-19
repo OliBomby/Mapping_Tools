@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.Exceptions;
 
@@ -59,6 +61,34 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
 
             File.Copy(backupPath, destination, true);
+        }
+
+        public static void QuickUndo() {
+            try {
+                var path = IOHelper.GetCurrentBeatmap();
+                var backupFile = new DirectoryInfo(SettingsManager.GetBackupsPath()).GetFiles().OrderByDescending(x => x.CreationTime).FirstOrDefault();
+                if (backupFile != null) {
+                    try {
+                        LoadMapBackup(backupFile.FullName, path, false);
+                    } catch (BeatmapIncompatibleException ex) {
+                        ex.Show();
+                        var result = MessageBox.Show("Do you want to load the backup anyways?", "Load backup",
+                            MessageBoxButton.YesNo);
+                        if (result == MessageBoxResult.Yes) {
+                            LoadMapBackup(backupFile.FullName, path, true);
+                        } else {
+                            return;
+                        }
+                    }
+                    Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue("Backup successfully loaded!"));
+
+                    if (SettingsManager.Settings.AutoReload) {
+                        ListenerManager.ForceReloadEditor();
+                    }
+                }
+            } catch (Exception ex) {
+                ex.Show();
+            }
         }
     }
 }
