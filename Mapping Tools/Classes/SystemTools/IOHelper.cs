@@ -118,12 +118,27 @@ namespace Mapping_Tools.Classes.SystemTools {
             string path = MainWindow.AppWindow.GetCurrentMaps()[0];
             using( OpenFileDialog openFileDialog = new OpenFileDialog {
                 InitialDirectory = restore ? "" : path != "" ? Editor.GetParentFolder(path) : SettingsManager.GetSongsPath(),
-                Filter = "Osu files (*.osu;*.osb)|*.osu;*.osb",
+                Filter = "osu! files (*.osu;*.osb)|*.osu;*.osb",
                 FilterIndex = 1,
                 RestoreDirectory = true,
                 CheckFileExists = true,
                 Multiselect = multiselect
             } ) {
+                openFileDialog.ShowDialog();
+                return openFileDialog.FileNames;
+            }
+        }
+
+        public static string[] BeatmapFileDialog(string initialDirectory, bool multiselect = false) {
+            string path = MainWindow.AppWindow.GetCurrentMaps()[0];
+            using (OpenFileDialog openFileDialog = new OpenFileDialog {
+                InitialDirectory = initialDirectory,
+                Filter = "osu! files (*.osu;*.osb)|*.osu;*.osb",
+                FilterIndex = 1,
+                RestoreDirectory = true,
+                CheckFileExists = true,
+                Multiselect = multiselect
+            }) {
                 openFileDialog.ShowDialog();
                 return openFileDialog.FileNames;
             }

@@ -11,10 +11,12 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Security.Principal;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Mapping_Tools.Classes;
+using Mapping_Tools.Classes.Exceptions;
 using Mapping_Tools.Views.Standard;
 
 namespace Mapping_Tools {
@@ -232,7 +234,35 @@ namespace Mapping_Tools {
                 var paths = GetCurrentMaps();
                 var result = BackupManager.SaveMapBackup(paths, true, "UB");  // UB stands for User Backup
                 if (result)
-                    MessageBox.Show($"Beatmap{(paths.Length == 1 ? "" : "s")} successfully copied!");
+                    Task.Factory.StartNew(() => MessageQueue.Enqueue($"Beatmap{(paths.Length == 1 ? "" : "s")} successfully copied!"));
+            } catch (Exception ex) {
+                ex.Show();
+            }
+        }
+
+        private void LoadBackup(object sender, RoutedEventArgs e) {
+            try {
+                var paths = GetCurrentMaps();
+                if (paths.Length > 1) {
+                    throw new Exception($"Can't load backup into multiple beatmaps. You currently have {paths.Length} beatmaps selected.");
+                }
+                var backupPaths = IOHelper.BeatmapFileDialog(SettingsManager.GetBackupsPath(), false);
+                if (backupPaths.Length == 1) {
+                    try {
+                        BackupManager.LoadMapBackup(backupPaths[0], paths[0], false);
+                    }
+                    catch (BeatmapIncompatibleException ex) {
+                        ex.Show();
+                        var result = MessageBox.Show("Do you want to load the backup anyways?", "Load backup",
+                            MessageBoxButton.YesNo);
+                        if (result == MessageBoxResult.Yes) {
+                            BackupManager.LoadMapBackup(backupPaths[0], paths[0], true);
+                        } else {
+                            return;
+                        }
+                    }
+                    Task.Factory.StartNew(() => MessageQueue.Enqueue("Backup successfully loaded!"));
+                }
             } catch (Exception ex) {
                 ex.Show();
             }
