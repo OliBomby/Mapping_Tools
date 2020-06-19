@@ -82,7 +82,7 @@ namespace Mapping_Tools.Classes.SystemTools {
                 }
 
                 // Saving backup of the map
-                BackupManager.SaveMapBackup(tempPath, true, Path.GetFileName(path));
+                BackupManager.SaveMapBackup(tempPath, true, Path.GetFileName(path), "PB");  // PB stands for Periodic Backup
 
                 previousPeriodicBackupHash = currentMapHash;
             } catch (Exception ex) {

@@ -4,16 +4,18 @@ using System.Linq;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public static class BackupManager {
-        public static bool SaveMapBackup(string fileToCopy, bool forced = false, string customFileName = "") {
+        public static bool SaveMapBackup(string fileToCopy, bool forced = false, string customFileName = "", string backupCode = "") {
             if (!SettingsManager.GetMakeBackups() && !forced)
                 return false;
 
             DateTime now = DateTime.Now;
             string destinationDirectory = SettingsManager.GetBackupsPath();
             try {
+                var name = now.ToString("yyyy-MM-dd HH-mm-ss") + "_" + backupCode + "__" +
+                           (string.IsNullOrEmpty(customFileName) ? Path.GetFileName(fileToCopy) : customFileName);
+
                 File.Copy(fileToCopy,
-                    Path.Combine(destinationDirectory, now.ToString("yyyy-MM-dd HH-mm-ss") + "___" +
-                                                       (string.IsNullOrEmpty(customFileName) ? Path.GetFileName(fileToCopy) : customFileName)),
+                    Path.Combine(destinationDirectory, name),
                     true);
 
                 // Delete old files if the number of backup files are over the limit
@@ -27,10 +29,10 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
         }
 
-        public static bool SaveMapBackup(string[] filesToCopy, bool forced = false) {
+        public static bool SaveMapBackup(string[] filesToCopy, bool forced = false, string backupCode = "") {
             bool result = true;
             foreach (string fileToCopy in filesToCopy) {
-                result = SaveMapBackup(fileToCopy, forced) && result;
+                result = SaveMapBackup(fileToCopy, forced, backupCode: backupCode);
                 if (!result)
                     break;
             }

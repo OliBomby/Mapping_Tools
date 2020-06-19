@@ -230,7 +230,7 @@ namespace Mapping_Tools {
         private void SaveBackup(object sender, RoutedEventArgs e) {
             try {
                 var paths = GetCurrentMaps();
-                var result = BackupManager.SaveMapBackup(paths, true);
+                var result = BackupManager.SaveMapBackup(paths, true, "UB");  // UB stands for User Backup
                 if (result)
                     MessageBox.Show($"Beatmap{(paths.Length == 1 ? "" : "s")} successfully copied!");
             } catch (Exception ex) {
