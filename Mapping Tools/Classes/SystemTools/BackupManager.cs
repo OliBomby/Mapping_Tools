@@ -2,7 +2,7 @@
 using System.IO;
 using System.Linq;
 using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Classes.Exceptions;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public static class BackupManager {
@@ -46,14 +46,19 @@ namespace Mapping_Tools.Classes.SystemTools {
         /// </summary>
         /// <param name="backupPath">Path to the backup map.</param>
         /// <param name="destination">Path to the destination map.</param>
-        /// <param name="allowDifferentName">If false, this method throws an exception when the backup and the destination have mismatching beatmap metadata.</param>
-        public static void LoadMapBackup(string backupPath, string destination, bool allowDifferentName = false) {
+        /// <param name="allowDifferentFilename">If false, this method throws an exception when the backup and the destination have mismatching beatmap metadata.</param>
+        public static void LoadMapBackup(string backupPath, string destination, bool allowDifferentFilename = false) {
             var backupEditor = new BeatmapEditor(backupPath);
             var destinationEditor = new BeatmapEditor(destination);
 
-            if (!allowDifferentName && !string.Equals(backupEditor.Beatmap.GetFileName(), destinationEditor.Beatmap.GetFileName())) {
+            var backupFilename = backupEditor.Beatmap.GetFileName();
+            var destinationFilename = destinationEditor.Beatmap.GetFileName();
 
+            if (!allowDifferentFilename && !string.Equals(backupFilename, destinationFilename)) {
+                throw new BeatmapIncompatibleException($"The backup and the destination beatmap have mismatching metadata.\n{backupFilename}\n{destinationFilename}");
             }
+
+            File.Copy(backupPath, destination, true);
         }
     }
 }
