@@ -70,7 +70,7 @@ namespace Mapping_Tools.Views.ComboColourStudio {
 
             var filesToCopy = ViewModel.ExportPath.Split('|');
             foreach (var fileToCopy in filesToCopy) {
-                IOHelper.SaveMapBackup(fileToCopy);
+                BackupManager.SaveMapBackup(fileToCopy);
             }
 
             BackgroundWorker.RunWorkerAsync(ViewModel);

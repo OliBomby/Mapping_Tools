@@ -327,7 +327,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
 
             // Backup
             string[] filesToCopy = MainWindow.AppWindow.GetCurrentMaps();
-            IOHelper.SaveMapBackup(filesToCopy);
+            BackupManager.SaveMapBackup(filesToCopy);
 
             ((PropertyTransformerVm)DataContext).ExportPaths = filesToCopy;
             BackgroundWorker.RunWorkerAsync(DataContext);

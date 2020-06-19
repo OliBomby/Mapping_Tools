@@ -41,7 +41,7 @@ namespace Mapping_Tools.Views.MetadataManager {
 
             var filesToCopy = ((MetadataManagerVm)DataContext).ExportPath.Split('|');
             foreach (var fileToCopy in filesToCopy) {
-                IOHelper.SaveMapBackup(fileToCopy);
+                BackupManager.SaveMapBackup(fileToCopy);
             }
 
             BackgroundWorker.RunWorkerAsync((MetadataManagerVm)DataContext);

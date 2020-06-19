@@ -82,7 +82,7 @@ namespace Mapping_Tools.Classes.SystemTools {
                 }
 
                 // Saving backup of the map
-                IOHelper.SaveMapBackup(tempPath, true, Path.GetFileName(path));
+                BackupManager.SaveMapBackup(tempPath, true, Path.GetFileName(path));
 
                 previousPeriodicBackupHash = currentMapHash;
             } catch (Exception ex) {

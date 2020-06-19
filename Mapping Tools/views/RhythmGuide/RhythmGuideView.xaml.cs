@@ -42,7 +42,7 @@ namespace Mapping_Tools.Views.RhythmGuide {
             FocusManager.SetFocusedElement(FocusManager.GetFocusScope(this), null);
 
             foreach (var fileToCopy in ViewModel.GuideGeneratorArgs.Paths) {
-                IOHelper.SaveMapBackup(fileToCopy);
+                BackupManager.SaveMapBackup(fileToCopy);
             }
 
             BackgroundWorker.RunWorkerAsync(ViewModel.GuideGeneratorArgs);

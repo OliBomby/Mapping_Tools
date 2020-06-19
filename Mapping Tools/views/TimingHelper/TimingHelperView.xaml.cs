@@ -51,7 +51,7 @@ namespace Mapping_Tools.Views.TimingHelper {
             // Remove logical focus to trigger LostFocus on any fields that didn't yet update the ViewModel
             FocusManager.SetFocusedElement(FocusManager.GetFocusScope(this), null);
 
-            IOHelper.SaveMapBackup(paths);
+            BackupManager.SaveMapBackup(paths);
 
             ViewModel.Paths = paths;
             ViewModel.Quick = quick;

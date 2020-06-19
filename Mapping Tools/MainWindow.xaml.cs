@@ -230,7 +230,7 @@ namespace Mapping_Tools {
         private void SaveBackup(object sender, RoutedEventArgs e) {
             try {
                 var paths = GetCurrentMaps();
-                var result = IOHelper.SaveMapBackup(paths, true);
+                var result = BackupManager.SaveMapBackup(paths, true);
                 if (result)
                     MessageBox.Show($"Beatmap{(paths.Length == 1 ? "" : "s")} successfully copied!");
             } catch (Exception ex) {

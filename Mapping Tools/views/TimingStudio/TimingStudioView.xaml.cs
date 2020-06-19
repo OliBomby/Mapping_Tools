@@ -47,7 +47,7 @@ namespace Mapping_Tools.Views.TimingStudio
             FocusManager.SetFocusedElement(FocusManager.GetFocusScope(this), null);
 
             string[] filesToCopy = MainWindow.AppWindow.GetCurrentMaps();
-            IOHelper.SaveMapBackup(filesToCopy);
+            BackupManager.SaveMapBackup(filesToCopy);
 
             //BackgroundWorker.RunWorkerAsync(
             //    new Arguments(filesToCopy, 

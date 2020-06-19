@@ -511,7 +511,7 @@ namespace Mapping_Tools.Views.Sliderator {
                 return;
             }
 
-            IOHelper.SaveMapBackup(path);
+            BackupManager.SaveMapBackup(path);
 
             ViewModel.Path = path;
             ViewModel.Quick = quick;

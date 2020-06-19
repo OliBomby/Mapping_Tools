@@ -41,7 +41,7 @@ namespace Mapping_Tools.Views.TimingCopier {
             FocusManager.SetFocusedElement(FocusManager.GetFocusScope(this), null);
 
             string filesToCopy = ((TimingCopierVm)DataContext).ExportPath;
-            IOHelper.SaveMapBackup(filesToCopy.Split('|'));
+            BackupManager.SaveMapBackup(filesToCopy.Split('|'));
 
             BackgroundWorker.RunWorkerAsync(DataContext);
             CanRun = false;

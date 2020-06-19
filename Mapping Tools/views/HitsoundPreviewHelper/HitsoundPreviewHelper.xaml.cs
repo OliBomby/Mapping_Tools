@@ -134,7 +134,7 @@ namespace Mapping_Tools.Views.HitsoundPreviewHelper
             // Remove logical focus to trigger LostFocus on any fields that didn't yet update the ViewModel
             FocusManager.SetFocusedElement(FocusManager.GetFocusScope(this), null);
 
-            IOHelper.SaveMapBackup(paths);
+            BackupManager.SaveMapBackup(paths);
 
             BackgroundWorker.RunWorkerAsync(new Arguments(paths, quick,
                 ((HitsoundPreviewHelperVm) DataContext).Items.ToList()));

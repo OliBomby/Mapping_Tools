@@ -56,7 +56,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
             FocusManager.SetFocusedElement(FocusManager.GetFocusScope(this), null);
 
             foreach (string fileToCopy in BeatmapToBox.Text.Split('|')) {
-                IOHelper.SaveMapBackup(fileToCopy);
+                BackupManager.SaveMapBackup(fileToCopy);
             }
 
             BackgroundWorker.RunWorkerAsync(ViewModel);
