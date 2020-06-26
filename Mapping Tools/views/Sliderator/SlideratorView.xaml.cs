@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using Mapping_Tools.Classes.BeatmapHelper;
@@ -501,13 +502,16 @@ namespace Mapping_Tools.Views.Sliderator {
         private async void RunTool(string path, bool quick = false) {
             if (!CanRun) return;
 
+            // Remove logical focus to trigger LostFocus on any fields that didn't yet update the ViewModel
+            FocusManager.SetFocusedElement(FocusManager.GetFocusScope(this), null);
+
             if (!ValidateToolInput(out var message)) {
                 var dialog = new MessageDialog(message);
                 await DialogHost.Show(dialog, "RootDialog");
                 return;
             }
 
-            IOHelper.SaveMapBackup(path);
+            BackupManager.SaveMapBackup(path);
 
             ViewModel.Path = path;
             ViewModel.Quick = quick;

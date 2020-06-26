@@ -1,4 +1,5 @@
-﻿using Mapping_Tools.Classes.SystemTools.QuickRun;
+﻿using Editor_Reader;
+using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Classes.Tools;
 using NonInvasiveKeyboardHookLibrary;
 using System;
@@ -11,7 +12,6 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Threading;
-using Editor_Reader;
 using ModifierKeys = NonInvasiveKeyboardHookLibrary.ModifierKeys;
 
 namespace Mapping_Tools.Classes.SystemTools {
@@ -82,7 +82,7 @@ namespace Mapping_Tools.Classes.SystemTools {
                 }
 
                 // Saving backup of the map
-                IOHelper.SaveMapBackup(tempPath, true, Path.GetFileName(path));
+                BackupManager.SaveMapBackup(tempPath, true, Path.GetFileName(path), "PB");  // PB stands for Periodic Backup
 
                 previousPeriodicBackupHash = currentMapHash;
             } catch (Exception ex) {
@@ -111,6 +111,9 @@ namespace Mapping_Tools.Classes.SystemTools {
                 case "QuickRunHotkey":
                     ChangeActiveHotkeyHotkey("QuickRunHotkey", SettingsManager.Settings.QuickRunHotkey);
                     break;
+                case "QuickUndoHotkey":
+                    ChangeActiveHotkeyHotkey("QuickUndoHotkey", SettingsManager.Settings.QuickUndoHotkey);
+                    break;
                 case "BetterSaveHotkey":
                     ChangeActiveHotkeyHotkey("BetterSaveHotkey", SettingsManager.Settings.BetterSaveHotkey);
                     break;
@@ -131,6 +134,7 @@ namespace Mapping_Tools.Classes.SystemTools {
         {
             AddActiveHotkey("QuickRunHotkey", new ActionHotkey(SettingsManager.Settings.QuickRunHotkey, SmartQuickRun));
             AddActiveHotkey("BetterSaveHotkey", new ActionHotkey(SettingsManager.Settings.BetterSaveHotkey, QuickBetterSave));
+            AddActiveHotkey("QuickUndoHotkey", new ActionHotkey(SettingsManager.Settings.QuickUndoHotkey, QuickUndo));
         }
 
         public void AddActiveHotkey(string name, ActionHotkey actionHotkey)
@@ -211,7 +215,11 @@ namespace Mapping_Tools.Classes.SystemTools {
             return otherModifiers.ToArray();
         }
 
-        private void QuickBetterSave()
+        private static void QuickUndo() {
+            System.Windows.Application.Current.Dispatcher.Invoke(BackupManager.QuickUndo);
+        }
+
+        private static void QuickBetterSave()
         {
             EditorReaderStuff.BetterSave();
         }
@@ -284,23 +292,24 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
         }
 
+        private static void Reload(object sender, EventArgs e) {
+            if (!((RunToolCompletedEventArgs)e).NeedReload || !SettingsManager.Settings.AutoReload) return;
+
+            ForceReloadEditor();
+        }
+
         [DllImport("user32.dll")]
         private static extern IntPtr GetForegroundWindow();
 
         [DllImport("user32.dll")]
         private static extern bool SetForegroundWindow(IntPtr hWnd);
 
-        private static void Reload(object sender, EventArgs e)
-        {
-            if (!((RunToolCompletedEventArgs)e).NeedReload || !SettingsManager.Settings.AutoReload) return;
-
+        public static void ForceReloadEditor() {
             var proc = System.Diagnostics.Process.GetProcessesByName("osu!").FirstOrDefault();
 
-            if (proc != null)
-            {
+            if (proc != null) {
                 var oldHandle = GetForegroundWindow();
-                if (oldHandle != proc.MainWindowHandle)
-                {
+                if (oldHandle != proc.MainWindowHandle) {
                     SetForegroundWindow(proc.MainWindowHandle);
                     Thread.Sleep(300);
                 }

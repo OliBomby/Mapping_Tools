@@ -4,6 +4,7 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.Windows;
+using System.Windows.Input;
 
 namespace Mapping_Tools.Views.RhythmGuide {
 
@@ -37,8 +38,11 @@ namespace Mapping_Tools.Views.RhythmGuide {
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
+            // Remove logical focus to trigger LostFocus on any fields that didn't yet update the ViewModel
+            FocusManager.SetFocusedElement(FocusManager.GetFocusScope(this), null);
+
             foreach (var fileToCopy in ViewModel.GuideGeneratorArgs.Paths) {
-                IOHelper.SaveMapBackup(fileToCopy);
+                BackupManager.SaveMapBackup(fileToCopy);
             }
 
             BackgroundWorker.RunWorkerAsync(ViewModel.GuideGeneratorArgs);

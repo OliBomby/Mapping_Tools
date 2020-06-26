@@ -222,6 +222,7 @@
     <Compile Include="Classes\ComboColourStudio\ColourPointMode.cs" />
     <Compile Include="Classes\ComboColourStudio\ComboColourProject.cs" />
     <Compile Include="Classes\ComboColourStudio\SpecialColourDragAndDropListBox.cs" />
+    <Compile Include="Classes\Exceptions\BeatmapIncompatibleException.cs" />
     <Compile Include="Classes\Exceptions\InvalidEditorReaderStateException.cs" />
     <Compile Include="Classes\Exceptions\EditorReaderDisabledException.cs" />
     <Compile Include="Classes\ExternalFileUtil\Reaper\EnvelopeShape.cs" />
@@ -366,6 +367,7 @@
     <Compile Include="Classes\SoundFontUtil\SoundFontImporter.cs" />
     <Compile Include="Classes\SpectrumUtil\Waveform.cs" />
     <Compile Include="Classes\SystemTools\ActionHotkey.cs" />
+    <Compile Include="Classes\SystemTools\BackupManager.cs" />
     <Compile Include="Classes\SystemTools\BindableBase.cs" />
     <Compile Include="Classes\SystemTools\Hotkey.cs" />
     <Compile Include="Classes\SystemTools\IHaveExtraProjectMenuItems.cs" />

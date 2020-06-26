@@ -170,7 +170,7 @@ namespace Mapping_Tools.Classes.Tools {
             var path = GetCurrentBeatmap(reader);
             var editor = GetNewestVersion(path, reader);
 
-            IOHelper.SaveMapBackup(path);
+            BackupManager.SaveMapBackup(path);
             editor.SaveFile();
 
             Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue("Succesfully saved current beatmap!"));

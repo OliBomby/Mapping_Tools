@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.BeatmapHelper.Events;
 using Mapping_Tools.Classes.MathUtil;
@@ -321,9 +322,12 @@ namespace Mapping_Tools.Views.PropertyTransformer {
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
+            // Remove logical focus to trigger LostFocus on any fields that didn't yet update the ViewModel
+            FocusManager.SetFocusedElement(FocusManager.GetFocusScope(this), null);
+
             // Backup
             string[] filesToCopy = MainWindow.AppWindow.GetCurrentMaps();
-            IOHelper.SaveMapBackup(filesToCopy);
+            BackupManager.SaveMapBackup(filesToCopy);
 
             ((PropertyTransformerVm)DataContext).ExportPaths = filesToCopy;
             BackgroundWorker.RunWorkerAsync(DataContext);

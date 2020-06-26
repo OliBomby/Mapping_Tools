@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
@@ -55,7 +56,10 @@ namespace Mapping_Tools.Views.SliderMerger {
         private void RunTool(string[] paths, bool quick = false) {
             if (!CanRun) return;
 
-            IOHelper.SaveMapBackup(paths);
+            // Remove logical focus to trigger LostFocus on any fields that didn't yet update the ViewModel
+            FocusManager.SetFocusedElement(FocusManager.GetFocusScope(this), null);
+
+            BackupManager.SaveMapBackup(paths);
 
             ViewModel.Paths = paths;
             ViewModel.Quick = quick;

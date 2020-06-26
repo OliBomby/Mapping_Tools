@@ -121,6 +121,12 @@
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal">
+                    <TextBlock Width="150" VerticalAlignment="Center" Text="QuickUndo hotkey:" 
+                               ToolTip="Quickly loads the latest backup into the beatmap currently open in the editor."/>
+                    <components:HotkeyEditorControl Width="150" Hotkey="{Binding QuickUndoHotkey}"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
                     <TextBlock Width="150" VerticalAlignment="Center" Text="BetterSave™ hotkey:" 
                                ToolTip="BetterSave saves the current map with proper rounding instead of truncating values."/>
                     <components:HotkeyEditorControl Width="150" Hotkey="{Binding BetterSaveHotkey}"/>

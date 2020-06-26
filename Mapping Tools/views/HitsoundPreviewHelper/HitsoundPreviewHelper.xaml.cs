@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.SystemTools;
@@ -130,7 +131,10 @@ namespace Mapping_Tools.Views.HitsoundPreviewHelper
         {
             if (!CanRun) return;
 
-            IOHelper.SaveMapBackup(paths);
+            // Remove logical focus to trigger LostFocus on any fields that didn't yet update the ViewModel
+            FocusManager.SetFocusedElement(FocusManager.GetFocusScope(this), null);
+
+            BackupManager.SaveMapBackup(paths);
 
             BackgroundWorker.RunWorkerAsync(new Arguments(paths, quick,
                 ((HitsoundPreviewHelperVm) DataContext).Items.ToList()));
