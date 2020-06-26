@@ -26,15 +26,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
 
             EventType = values[0];
 
-            // This start time is usually 0 for backgrounds but lets parse it anyways
             if (TryParseInt(values[1], out int startTime))
                 StartTime = startTime;
             else throw new BeatmapParsingException("Failed to parse start time of break.", line);
 
-            // This start time is usually 0 for backgrounds but lets parse it anyways
-            if (TryParseInt(values[1], out int endTime))
+            if (TryParseInt(values[2], out int endTime))
                 EndTime = endTime;
-            else throw new BeatmapParsingException("Failed to parse start time of break.", line);
+            else throw new BeatmapParsingException("Failed to parse end time of break.", line);
         }
     }
 }
