@@ -20,6 +20,8 @@ namespace Mapping_Tools.Viewmodels {
         private bool _alwaysPreserve5Volume;
         private bool _copyStoryboardedSamples;
         private bool _ignoreHitsoundSatisfiedSamples;
+        private bool _copyToSliderTicks;
+        private bool _copyToSliderSlides;
         private bool _muteSliderends;
         private int _snap1;
         private int _snap2;
@@ -39,8 +41,14 @@ namespace Mapping_Tools.Viewmodels {
 
         public int CopyMode {
             get => _copyMode;
-            set => Set(ref _copyMode, value);
+            set {
+                if (Set(ref _copyMode, value)) {
+                    RaisePropertyChanged(nameof(SmartCopyModeSelected));
+                }
+            }
         }
+
+        public bool SmartCopyModeSelected => CopyMode == 1;
 
         public double TemporalLeniency {
             get => _temporalLeniency;
@@ -80,6 +88,16 @@ namespace Mapping_Tools.Viewmodels {
         public bool IgnoreHitsoundSatisfiedSamples {
             get => _ignoreHitsoundSatisfiedSamples;
             set => Set(ref _ignoreHitsoundSatisfiedSamples, value);
+        }
+
+        public bool CopyToSliderTicks {
+            get => _copyToSliderTicks;
+            set => Set(ref _copyToSliderTicks, value);
+        }
+
+        public bool CopyToSliderSlides {
+            get => _copyToSliderSlides;
+            set => Set(ref _copyToSliderSlides, value);
         }
 
         public bool MuteSliderends {
@@ -137,6 +155,8 @@ namespace Mapping_Tools.Viewmodels {
             AlwaysPreserve5Volume = true;
             CopyStoryboardedSamples = false;
             IgnoreHitsoundSatisfiedSamples = true;
+            CopyToSliderTicks = false;
+            CopyToSliderSlides = false;
             MuteSliderends = false;
             Snap1 = 4;
             Snap2 = 6;
