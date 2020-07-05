@@ -127,10 +127,10 @@
                                  Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"/>
                 <CheckBox IsChecked="{Binding CopyToSliderTicks}" Content="Copy to slider ticks"
                           IsEnabled="{Binding SmartCopyModeSelected}"
-                          ToolTip="With this option enabled, Hitsound Copier will try to assign custom samples to slider ticks when there is no other object to copy hitsounds to. New sample files will be generated which you'll have to put in your mapset folder."/>
+                          ToolTip="With this option enabled, Hitsound Copier will try to assign custom samples to slider ticks when there is no other object to copy hitsounds to. New sample files will be generated which you'll have to put in your mapset folder. Only works for 'Overwrite only defined' copy mode."/>
                 <CheckBox IsChecked="{Binding CopyToSliderSlides}" Content="Copy to slider slides"
                           IsEnabled="{Binding SmartCopyModeSelected}"
-                          ToolTip="With this option enabled, Hitsound Copier will try to assign custom samples to slider slides when there is no other object to copy hitsounds to. New sample files will be generated which you'll have to put in your mapset folder."/>
+                          ToolTip="With this option enabled, Hitsound Copier will try to assign custom samples to slider slides when there is no other object to copy hitsounds to. New sample files will be generated which you'll have to put in your mapset folder. Only works for 'Overwrite only defined' copy mode."/>
                 <CheckBox x:Name="MuteSliderendBox" IsChecked="{Binding MuteSliderends}" Content="Mute sliderends"
                     ToolTip="Automatically mute slider ends or spinner ends which have no hitsounds in the source beatmap and follow these extra criteria."/>
                 <StackPanel Visibility="{Binding Path=IsChecked, ElementName=MuteSliderendBox, UpdateSourceTrigger=PropertyChanged,  

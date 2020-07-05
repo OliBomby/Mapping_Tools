@@ -5,8 +5,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     /// <summary>
@@ -30,7 +28,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// 
         /// </summary>
         public int ObjectType { get; set; }
-        private BitArray TypeArray { get => new BitArray(new int[] { ObjectType }); }
+        private BitArray TypeArray => new BitArray(new[] { ObjectType });
+
         /// <summary>
         /// 
         /// </summary>
@@ -144,12 +143,21 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <remarks>Special for hitsound copier</remarks>
         public bool CanCopy = true;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Generates a new <see cref="TimelineObject"/>.
+        /// </summary>
+        /// <param name="origin"></param>
+        /// <param name="time"></param>
+        /// <param name="objectType"></param>
+        /// <param name="repeat"></param>
+        /// <param name="hitsounds"></param>
+        /// <param name="sampleset"></param>
+        /// <param name="additionset"></param>
         public TimelineObject(HitObject origin, double time, int objectType, int repeat, int hitsounds, SampleSet sampleset, SampleSet additionset) {
             Origin = origin;
             Time = time;
 
-            BitArray b = new BitArray(new int[] { hitsounds });
+            BitArray b = new BitArray(new[] { hitsounds });
             Normal = b[0];
             Whistle = b[1];
             Finish = b[2];
@@ -195,7 +203,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         /// <returns></returns>
         public int GetHitsounds() {
-            return MathHelper.GetIntFromBitArray(new BitArray(new bool[] { Normal, Whistle, Finish, Clap }));
+            return MathHelper.GetIntFromBitArray(new BitArray(new[] { Normal, Whistle, Finish, Clap }));
         }
 
         /// <summary>

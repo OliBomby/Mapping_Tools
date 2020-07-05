@@ -278,6 +278,14 @@ namespace Mapping_Tools.Classes.HitsoundStuff
             }
         }
 
+        public static void ExportSampleSchema(SampleSchema sampleSchema, string exportFolder,
+            Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null,
+            SampleExportFormat format = SampleExportFormat.Default, SampleExportFormat mixedFormat = SampleExportFormat.Default) {
+            foreach (var kvp in sampleSchema) {
+                ExportMixedSample(kvp.Value, kvp.Key, exportFolder, loadedSamples, format, mixedFormat);
+            }
+        }
+
         private static bool CreateWaveFile(string filename, IWaveProvider sourceProvider) {
             try {
                 using (var writer = new WaveFileWriter(filename, sourceProvider.WaveFormat)) {

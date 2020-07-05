@@ -58,7 +58,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// <returns></returns>
         public static bool CheckSupport(HashSet<SampleGeneratingArgs> s1, HashSet<SampleGeneratingArgs> s2) {
             // s2 fits in s1 or s2 is empty
-            return s2.Count > 0 ? s1.SetEquals(s2) : true;
+            return s2.Count <= 0 || s1.SetEquals(s2);
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// <returns></returns>
         public static bool CheckCanSupport(HashSet<SampleGeneratingArgs> s1, HashSet<SampleGeneratingArgs> s2) {
             // s2 fits in s1 or s1 is empty or s2 is empty
-            return s1.Count > 0 && s2.Count > 0 ? s1.SetEquals(s2) : true;
+            return s1.Count <= 0 || s2.Count <= 0 || s1.SetEquals(s2);
         }
 
         /// <summary>

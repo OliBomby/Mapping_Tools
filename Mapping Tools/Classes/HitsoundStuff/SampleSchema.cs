@@ -29,6 +29,25 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
+        public string FindFilename(List<SampleGeneratingArgs> samples) {
+            return (from kvp 
+                in this 
+                where kvp.Value.SequenceEqual(samples)
+                select kvp.Key).FirstOrDefault();
+        }
+
+        public string FindFilename(List<SampleGeneratingArgs> samples, string regexPattern) {
+            return (from kvp
+                    in this
+                where kvp.Value.SequenceEqual(samples) && Regex.IsMatch(kvp.Key, regexPattern)
+                select kvp.Key).FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Generates a dictionary which maps <see cref="SampleGeneratingArgs"/> to their corresponding filename which makes that sample sound.
+        /// Only maps the <see cref="SampleGeneratingArgs"/> which are non-mixed.
+        /// </summary>
+        /// <returns></returns>
         public Dictionary<SampleGeneratingArgs, string> GetSampleNames() {
             var sampleNames = new Dictionary<SampleGeneratingArgs, string>();
 
