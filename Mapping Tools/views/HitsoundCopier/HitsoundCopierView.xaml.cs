@@ -360,17 +360,21 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                             index++;
                         }
 
-                        filename = $"{sampleSet.ToString().ToLower()}-slidertick{index}";
+                        filename = $"{sampleSet.ToString().ToLower()}-slidertick{(index == 1 ? string.Empty : index.ToInvariant())}";
 
                         sampleSchema.Add(filename, samples);
 
                         // Add a copy of the slider slide sound to this index if necessary
-                        var oldSlideFilename = $"{tloFrom.HitsoundTimingPoint.SampleSet.ToString().ToLower()}-sliderslide{tloFrom.HitsoundTimingPoint.SampleIndex}";
+                        var oldIndex = tloFrom.HitsoundTimingPoint.SampleIndex;
+                        var oldSampleSet = tloFrom.HitsoundTimingPoint.SampleSet;
+                        var oldSlideFilename = $"{oldSampleSet.ToString().ToLower()}-sliderslide{(oldIndex == 1 ? string.Empty : oldIndex.ToInvariant())}";
                         var oldSlidePath = Path.Combine(mapDir, oldSlideFilename);
+
                         if (firstSamples.ContainsKey(oldSlidePath)) {
                             oldSlidePath = firstSamples[oldSlidePath];
-                            var newSlideFilename = $"{sampleSet.ToString().ToLower()}-sliderslide{index}";
                             var slideGeneratingArgs = new SampleGeneratingArgs(oldSlidePath);
+                            var newSlideFilename = $"{sampleSet.ToString().ToLower()}-sliderslide{index.ToInvariant()}";
+
                             sampleSchema.Add(newSlideFilename, new List<SampleGeneratingArgs> {slideGeneratingArgs});
                         }
                     }
@@ -454,7 +458,10 @@ namespace Mapping_Tools.Views.HitsoundCopier {
             var tickrate = beatmap.Difficulty.ContainsKey("SliderTickRate")
                 ? beatmap.Difficulty["SliderTickRate"].DoubleValue : 1.0;
 
-            foreach (var slider in beatmap.HitObjects.Where(o => o.IsSlider && (o.Time < endTime || o.EndTime > startTime))) {
+            // Check all sliders in range and exclude those which have NaN SV, because those dont have slider ticks
+            foreach (var slider in beatmap.HitObjects.Where(o => o.IsSlider && 
+                                                                 !double.IsNaN(o.SliderVelocity) && 
+                                                                 (o.Time < endTime || o.EndTime > startTime))) {
                 var timeBetweenTicks = slider.UnInheritedTimingPoint.MpB / tickrate;
 
                 sliderTickTime = slider.Time + timeBetweenTicks;
