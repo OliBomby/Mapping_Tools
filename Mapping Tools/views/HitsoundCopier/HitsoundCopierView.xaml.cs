@@ -334,7 +334,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                 // This slider tick gets a custom sample and timingpoints change to imitate the copied hitsound.
                 else 
                 if (arg.CopyToSliderTicks && 
-                           FindSliderTickInRange(beatmapTo, tloFrom.Time - arg.TemporalLeniency, tloFrom.Time + arg.TemporalLeniency, out var sliderTickTime) &&
+                           FindSliderTickInRange(beatmapTo, tloFrom.Time - arg.TemporalLeniency, tloFrom.Time + arg.TemporalLeniency, out var sliderTickTime, out var slider) &&
                            !CustomSampledTimes.Contains((int) sliderTickTime)) {
                     // Add a new custom sample to this slider tick to represent the hitsounds
                     List<string> sampleFilenames = tloFrom.GetFirstPlayingFilenames(mode, mapDir, firstSamples, false);
@@ -454,7 +454,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
             }
         }
 
-        private static bool FindSliderTickInRange(Beatmap beatmap, double startTime, double endTime, out double sliderTickTime) {
+        private static bool FindSliderTickInRange(Beatmap beatmap, double startTime, double endTime, out double sliderTickTime, out HitObject tickSlider) {
             var tickrate = beatmap.Difficulty.ContainsKey("SliderTickRate")
                 ? beatmap.Difficulty["SliderTickRate"].DoubleValue : 1.0;
 
@@ -467,6 +467,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                 sliderTickTime = slider.Time + timeBetweenTicks;
                 while (sliderTickTime < slider.EndTime) {
                     if (sliderTickTime >= startTime && sliderTickTime <= endTime) {
+                        tickSlider = slider;
                         return true;
                     }
                     sliderTickTime += timeBetweenTicks;
@@ -474,6 +475,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
             }
 
             sliderTickTime = -1;
+            tickSlider = null;
             return false;
         }
 
