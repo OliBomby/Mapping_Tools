@@ -126,10 +126,10 @@
                     Visibility="{Binding Path=IsChecked, ElementName=CopyStoryboardedSamplesBox, UpdateSourceTrigger=PropertyChanged,  
                                  Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"/>
                 <CheckBox IsChecked="{Binding CopyToSliderTicks}" Content="Copy to slider ticks"
-                          Visibility="{Binding SmartCopyModeSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
+                          IsEnabled="{Binding SmartCopyModeSelected}"
                           ToolTip="With this option enabled, Hitsound Copier will try to assign custom samples to slider ticks when there is no other object to copy hitsounds to. New sample files will be generated which you'll have to put in your mapset folder."/>
                 <CheckBox IsChecked="{Binding CopyToSliderSlides}" Content="Copy to slider slides"
-                          Visibility="{Binding SmartCopyModeSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
+                          IsEnabled="{Binding SmartCopyModeSelected}"
                           ToolTip="With this option enabled, Hitsound Copier will try to assign custom samples to slider slides when there is no other object to copy hitsounds to. New sample files will be generated which you'll have to put in your mapset folder."/>
                 <CheckBox x:Name="MuteSliderendBox" IsChecked="{Binding MuteSliderends}" Content="Mute sliderends"
                     ToolTip="Automatically mute slider ends or spinner ends which have no hitsounds in the source beatmap and follow these extra criteria."/>
