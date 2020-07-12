@@ -497,7 +497,8 @@ namespace Mapping_Tools.Viewmodels {
                 }
 
                 // Exclude any drawables which are the direct child of the held hit objects
-                if (heldHitObjects != null && o.ParentObjects.All(p =>
+                // Checks if any and all parents of the drawable are one of the held hit objects.
+                if (heldHitObjects != null && o.ParentObjects.Count > 0 && o.ParentObjects.All(p =>
                         p is RelevantHitObject rho && heldHitObjects.Any(hho => comparer.Equals(rho.HitObject, hho)))) {
                     continue;
                 }
