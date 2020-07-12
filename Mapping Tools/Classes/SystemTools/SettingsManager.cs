@@ -101,14 +101,12 @@ namespace Mapping_Tools.Classes.SystemTools {
 
         public static void DefaultPaths() {
             if (Settings.OsuPath == "") {
-                RegistryKey regKey;
                 try {
-                    regKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall");
-                } catch (Exception) {
-                    regKey = null;
-                }
-                if (regKey != null)
+                    var regKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall");
                     Settings.OsuPath = FindByDisplayName(regKey, "osu!");
+                } catch (Exception) {
+                    Settings.OsuPath = Path.Combine(MainWindow.AppCommon, "osu!");
+                }
             }
 
             if (Settings.SongsPath == "") {

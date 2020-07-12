@@ -32,7 +32,7 @@ namespace Mapping_Tools {
         public static SnackbarMessageQueue MessageQueue;
         public static Random MainRandom = new Random();
         public static readonly HttpClient HttpClient = new HttpClient();
-        private static readonly string AppCommon = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        public static readonly string AppCommon = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         public static readonly string AppDataPath = Path.Combine(AppCommon, "Mapping Tools");
         public static readonly string ExportPath = Path.Combine(AppDataPath, "Exports");
 
