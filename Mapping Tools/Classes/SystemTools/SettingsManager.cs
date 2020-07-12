@@ -130,7 +130,8 @@ namespace Mapping_Tools.Classes.SystemTools {
                     }
                 } catch (NullReferenceException) { }
             }
-            return "";
+
+            throw new Exception();
         }
 
         public static List<string[]> GetRecentMaps() {
