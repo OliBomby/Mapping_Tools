@@ -1,0 +1,22 @@
+on: push
+name: build website every push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: download tags
+      run: curl -L https://gitlab.com/api/v4/projects/17839219/repository/tags > tags.json
+    - name: download zola
+      run: curl -L https://github.com/getzola/zola/releases/download/v0.10.1/zola-v0.10.1-x86_64-unknown-linux-gnu.tar.gz > zola.tar.gz
+    - name: unpack zola
+      run: tar -xzf zola.tar.gz
+    - name: build
+      run: ./zola --root website build -u https://olibomby.github.io/Mapping_Tools -o build
+    - name: deploy
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./build
+

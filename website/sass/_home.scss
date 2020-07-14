@@ -1,0 +1,35 @@
+.home-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 85vh;
+}
+
+.home-content {
+    position: absolute;
+    top: calc(50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+
+    p {
+        text-align: center;
+        margin-bottom: 3rem;
+        font-size: calc(10px + 1vw);
+    }
+
+    ul > li {
+        margin-bottom: 0.8rem;
+        font-size: calc(10px + 0.5vw);
+
+        &:last-of-type {
+            list-style-type: none;
+        }
+    }
+}
+
+.home-default {
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
