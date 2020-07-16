@@ -475,7 +475,15 @@ namespace Mapping_Tools.Viewmodels {
         }
 
 
-        private IRelevantDrawable GetNearestDrawable(Vector2 cursorPos, bool specialPriority = false, HitObject[] heldHitObjects = null) {
+        [Flags]
+        private enum DrawableFetchPriority {
+            Selected = 1,
+            Locked = 2,
+            Inheritable = 4,
+        }
+
+
+        private IRelevantDrawable GetNearestDrawable(Vector2 cursorPos, DrawableFetchPriority specialPriority = 0, HitObject[] heldHitObjects = null) {
             // Get all the relevant drawables
             var drawables = LayerCollection.GetAllRelevantDrawables().ToArray();
 
@@ -491,7 +499,9 @@ namespace Mapping_Tools.Viewmodels {
                     // Prioritize points to be able to snap to intersections
                     dist -= PointsBias;
                 }
-                if (specialPriority && (o.IsSelected || o.IsLocked)) {
+                if (specialPriority.HasFlag(DrawableFetchPriority.Selected) && o.IsSelected ||
+                    specialPriority.HasFlag(DrawableFetchPriority.Locked) && o.IsLocked ||
+                    specialPriority.HasFlag(DrawableFetchPriority.Inheritable) && o.IsInheritable) {
                     // Prioritize selected and locked to be able to unselect them easily
                     dist -= SpecialBias;
                 }
@@ -576,7 +586,7 @@ namespace Mapping_Tools.Viewmodels {
 
             // Get nearest drawable
             var cursorPos = GetCursorPosition();
-            var nearest = GetNearestDrawable(cursorPos, true);
+            var nearest = GetNearestDrawable(cursorPos, DrawableFetchPriority.Selected);
 
             if (nearest == null) return;
 
@@ -608,7 +618,7 @@ namespace Mapping_Tools.Viewmodels {
 
             // Get nearest drawable
             var cursorPos = GetCursorPosition();
-            var nearest = GetNearestDrawable(cursorPos, true);
+            var nearest = GetNearestDrawable(cursorPos, DrawableFetchPriority.Locked);
 
             if (nearest == null) return;
 
