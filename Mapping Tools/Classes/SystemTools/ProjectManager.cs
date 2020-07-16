@@ -62,7 +62,13 @@ namespace Mapping_Tools.Classes.SystemTools {
             // If the file name is not an empty string open it for saving.  
             if (path == "") return;
             try {
-                view.SetSaveData(LoadJson<T>(path));
+                T project = LoadJson<T>(path);
+
+                if (project == null) {
+                    throw new Exception("Loaded project is a null reference.");
+                }
+
+                view.SetSaveData(project);
             } catch (Exception ex) {
                 Console.WriteLine(ex.StackTrace);
                 Console.WriteLine(ex.Message);
