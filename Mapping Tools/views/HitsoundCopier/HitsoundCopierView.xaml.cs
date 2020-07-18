@@ -388,6 +388,9 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                     timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: arg.CopySampleSets,
                         index: arg.CopySampleSets, volume: arg.CopyVolumes));
 
+                    // Make sure the slider with the slider ticks uses auto sampleset so the customized greenlines control the hitsounds
+                    slider.SampleSet = SampleSet.Auto;
+
                     // Add timingpointschange 5ms later to revert the stuff back to whatever it should be
                     var tp2 = tloFrom.HitsoundTimingPoint.Copy();
                     tp2.Offset = sliderTickTime + 5;
