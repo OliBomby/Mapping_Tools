@@ -173,7 +173,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff
                     CreateWaveFile(Path.Combine(exportFolder, name + ".wav"), sampleProvider.ToWaveProvider16());
                     break;
                 case SampleExportFormat.OggVorbis:
-                    VorbisFileWriter.CreateVorbisFile(Path.Combine(exportFolder, name + ".ogg"), sampleProvider.ToWaveProvider());
+                    var resampled = new WdlResamplingSampleProvider(sampleProvider,
+                        VorbisFileWriter.GetSupportedSampleRate(sampleProvider.WaveFormat.SampleRate));
+                    VorbisFileWriter.CreateVorbisFile(Path.Combine(exportFolder, name + ".ogg"), resampled.ToWaveProvider());
                     break;
                 default:
                     switch (sourceWaveEncoding) {
@@ -231,6 +233,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff
                 int maxSampleRate = validLoadedSamples.Values.Max(o => o.Wave.WaveFormat.SampleRate);
                 int maxChannels = validLoadedSamples.Values.Max(o => o.Wave.WaveFormat.Channels);
 
+                // Resample to a supported sample rate when exporting in vorbis format
+                if (mixedFormat == SampleExportFormat.OggVorbis) {
+                    maxSampleRate = VorbisFileWriter.GetSupportedSampleRate(maxSampleRate);
+                }
+
                 IEnumerable<ISampleProvider> sameFormatSamples = validLoadedSamples.Select(o =>
                     (ISampleProvider) new WdlResamplingSampleProvider(SampleImporter.SetChannels(o.Value.GetSampleProvider(), maxChannels),
                         maxSampleRate));
@@ -263,6 +270,14 @@ namespace Mapping_Tools.Classes.HitsoundStuff
             }
         }
 
+        /// <summary>
+        /// Exports all samples for a collection of custom indices.
+        /// </summary>
+        /// <param name="customIndices"></param>
+        /// <param name="exportFolder"></param>
+        /// <param name="loadedSamples"></param>
+        /// <param name="format"></param>
+        /// <param name="mixedFormat"></param>
         public static void ExportCustomIndices(List<CustomIndex> customIndices, string exportFolder, 
             Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples=null, 
             SampleExportFormat format=SampleExportFormat.Default, SampleExportFormat mixedFormat=SampleExportFormat.Default) {
