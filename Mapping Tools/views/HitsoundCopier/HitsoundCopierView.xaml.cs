@@ -468,7 +468,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                 var timeBetweenTicks = slider.UnInheritedTimingPoint.MpB / tickrate;
 
                 sliderTickTime = slider.Time + timeBetweenTicks;
-                while (sliderTickTime < slider.EndTime) {
+                while (sliderTickTime < slider.EndTime - 5) {  // This -5 is to make sure the +5 ms timingpoint that reverts the change is still inside the slider
                     if (sliderTickTime >= startTime && sliderTickTime <= endTime) {
                         tickSlider = slider;
                         return true;
