@@ -315,6 +315,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
 
             var CustomSampledTimes = new HashSet<int>();
             sampleSchema = new SampleSchema();
+            var tloToSliderSlide = new List<TimelineObject>();
 
             foreach (var tloFrom in tlFrom.TimelineObjects) {
                 var tloTo = tlTo.GetNearestTlo(tloFrom.Time, true);
@@ -341,7 +342,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                     List<SampleGeneratingArgs> samples = sampleFilenames.Select(o => new SampleGeneratingArgs(Path.Combine(mapDir, o))).ToList();
 
                     if (sampleSchema.AddHitsound(samples, "slidertick", tloFrom.FenoSampleSet, 
-                        out int index, out var sampleSet)) {
+                        out int index, out var sampleSet, arg.StartIndex)) {
                         // Add a copy of the slider slide sound to this index if necessary
                         var oldIndex = tloFrom.HitsoundTimingPoint.SampleIndex;
                         var oldSampleSet = tloFrom.HitsoundTimingPoint.SampleSet;
@@ -379,30 +380,37 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                 }
                 // If the there is no slidertick to be found, then try copying it to the slider slide
                 else 
-                if (arg.CopyToSliderSlides && 
-                         FindSliderAtTime(beatmapTo, tloFrom.Time, out var slideSlider) && 
-                         !CustomSampledTimes.Contains((int)tloFrom.Time)) {
-                    // Add a new custom sample to this slider slide to represent the hitsounds
-                    List<string> sampleFilenames = tloFrom.GetFirstPlayingFilenames(mode, mapDir, firstSamples, false);
-                    List<SampleGeneratingArgs> samples = sampleFilenames.Select(o => new SampleGeneratingArgs(Path.Combine(mapDir, o))).ToList();
-
-                    sampleSchema.AddHitsound(samples, "sliderslide", tloFrom.FenoSampleSet, 
-                        out int index, out var sampleSet);
-
-                    // Add timingpointschange
-                    var tp = tloFrom.HitsoundTimingPoint.Copy();
-                    tp.Offset = tloFrom.Time;
-                    tp.SampleIndex = index;
-                    tp.SampleSet = sampleSet;
-                    tp.Volume = tloFrom.FenoSampleVolume;
-                    timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: arg.CopySampleSets,
-                        index: arg.CopySampleSets, volume: arg.CopyVolumes));
-
-                    // Make sure the slider with the slider ticks uses auto sampleset so the customized greenlines control the hitsounds
-                    slideSlider.SampleSet = SampleSet.Auto;
+                if (arg.CopyToSliderSlides) {
+                    tloToSliderSlide.Add(tloFrom);
                 }
 
                 tloFrom.CanCopy = false;
+            }
+
+            // Do the sliderslide hitsounds after because the ticks need to add sliderslides with strict indices.
+            foreach (var tlo in tloToSliderSlide) {
+                if (!FindSliderAtTime(beatmapTo, tlo.Time, out var slideSlider) ||
+                      CustomSampledTimes.Contains((int)tlo.Time)) 
+                    continue;
+
+                // Add a new custom sample to this slider slide to represent the hitsounds
+                List<string> sampleFilenames = tlo.GetFirstPlayingFilenames(mode, mapDir, firstSamples, false);
+                List<SampleGeneratingArgs> samples = sampleFilenames.Select(o => new SampleGeneratingArgs(Path.Combine(mapDir, o))).ToList();
+
+                sampleSchema.AddHitsound(samples, "sliderslide", tlo.FenoSampleSet,
+                    out int index, out var sampleSet, arg.StartIndex);
+
+                // Add timingpointschange
+                var tp = tlo.HitsoundTimingPoint.Copy();
+                tp.Offset = tlo.Time;
+                tp.SampleIndex = index;
+                tp.SampleSet = sampleSet;
+                tp.Volume = tlo.FenoSampleVolume;
+                timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: arg.CopySampleSets,
+                    index: arg.CopySampleSets, volume: arg.CopyVolumes));
+
+                // Make sure the slider with the slider ticks uses auto sampleset so the customized greenlines control the hitsounds
+                slideSlider.SampleSet = SampleSet.Auto;
             }
 
             // Timingpointchange all the undefined tlo from copyFrom

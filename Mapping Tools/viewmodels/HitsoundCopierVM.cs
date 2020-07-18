@@ -22,6 +22,7 @@ namespace Mapping_Tools.Viewmodels {
         private bool _ignoreHitsoundSatisfiedSamples;
         private bool _copyToSliderTicks;
         private bool _copyToSliderSlides;
+        public int _startIndex;
         private bool _muteSliderends;
         private int _snap1;
         private int _snap2;
@@ -92,12 +93,27 @@ namespace Mapping_Tools.Viewmodels {
 
         public bool CopyToSliderTicks {
             get => _copyToSliderTicks;
-            set => Set(ref _copyToSliderTicks, value);
+            set { 
+                if (Set(ref _copyToSliderTicks, value)) {
+                    RaisePropertyChanged(nameof(StartIndexBoxVisible));
+                } 
+            }
         }
 
         public bool CopyToSliderSlides {
             get => _copyToSliderSlides;
-            set => Set(ref _copyToSliderSlides, value);
+            set {
+                if (Set(ref _copyToSliderSlides, value)) {
+                    RaisePropertyChanged(nameof(StartIndexBoxVisible));
+                }
+            }
+        }
+
+        public bool StartIndexBoxVisible => CopyToSliderSlides || CopyToSliderTicks;
+
+        public int StartIndex {
+            get => _startIndex;
+            set => Set(ref _startIndex, value);
         }
 
         public bool MuteSliderends {
@@ -157,6 +173,7 @@ namespace Mapping_Tools.Viewmodels {
             IgnoreHitsoundSatisfiedSamples = true;
             CopyToSliderTicks = false;
             CopyToSliderSlides = false;
+            StartIndex = 100;
             MuteSliderends = false;
             Snap1 = 4;
             Snap2 = 6;
