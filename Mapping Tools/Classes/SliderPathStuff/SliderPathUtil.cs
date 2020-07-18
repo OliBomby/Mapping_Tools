@@ -1,4 +1,5 @@
-﻿using Mapping_Tools.Classes.MathUtil;
+﻿using System;
+using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.Tools;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,11 @@ namespace Mapping_Tools.Classes.SliderPathStuff {
                     case PathType.Bezier:
                         newPathType = PathType.Bezier;
                         newAnchors.AddRange(anchors);
+
+                        if (newAnchors.Count > 1 && newAnchors[newAnchors.Count - 2] == newAnchors[newAnchors.Count - 1]) {
+                            newAnchors[newAnchors.Count - 2] = newAnchors[newAnchors.Count - 2] + Vector2.UnitX;
+                        }
+
                         newAnchors.Add(anchors.Last());
                         newAnchors.Add(sliderPath.PositionAt(1));
                         break;
@@ -140,7 +146,7 @@ namespace Mapping_Tools.Classes.SliderPathStuff {
             for (int i = 0; i < anchors.Count; i++) {
                 end++;
 
-                if (i != anchors.Count - 1 && anchors[i] != anchors[i + 1]) continue;
+                if (i != anchors.Count - 1 && anchors[i] != anchors[i + 1] || i == anchors.Count - 2) continue;
 
                 var cpSpan = anchors.GetRange(start, end - start);
                 var subdivision = new BezierSubdivision(cpSpan);

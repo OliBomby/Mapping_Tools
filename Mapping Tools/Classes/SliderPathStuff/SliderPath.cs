@@ -154,7 +154,7 @@ namespace Mapping_Tools.Classes.SliderPathStuff {
             for( int i = 0; i < ControlPoints.Length(); ++i ) {
                 end++;
 
-                if( i == ControlPoints.Length() - 1 || ControlPoints[i] == ControlPoints[i + 1] ) {
+                if( i == ControlPoints.Length() - 1 || ControlPoints[i] == ControlPoints[i + 1] && i != ControlPoints.Length() - 2) {
                     List<Vector2> cpSpan = ControlPoints.GetRange(start, end - start);
 
                     foreach( Vector2 t in CalculateSubpath(cpSpan) )
