@@ -71,6 +71,7 @@ namespace Mapping_Tools.Viewmodels {
 
         private const double PointsBias = 3;
         private const double SpecialBias = 3;
+        private const double SelectionRange = 10;
 
         private readonly CoordinateConverter _coordinateConverter;
         private readonly FileSystemWatcher _configWatcher;
@@ -483,7 +484,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
 
-        private IRelevantDrawable GetNearestDrawable(Vector2 cursorPos, DrawableFetchPriority specialPriority = 0, HitObject[] heldHitObjects = null) {
+        private IRelevantDrawable GetNearestDrawable(Vector2 cursorPos, DrawableFetchPriority specialPriority = 0, HitObject[] heldHitObjects = null, double range = double.PositiveInfinity) {
             // Get all the relevant drawables
             var drawables = LayerCollection.GetAllRelevantDrawables().ToArray();
 
@@ -495,10 +496,16 @@ namespace Mapping_Tools.Viewmodels {
             var smallestDistance = double.PositiveInfinity;
             foreach (var o in drawables) {
                 var dist = o.DistanceTo(cursorPos);
+
+                if (dist > range) {
+                    continue;
+                }
+
                 if (o is RelevantPoint) {
                     // Prioritize points to be able to snap to intersections
                     dist -= PointsBias;
                 }
+
                 if (specialPriority.HasFlag(DrawableFetchPriority.Selected) && o.IsSelected ||
                     specialPriority.HasFlag(DrawableFetchPriority.Locked) && o.IsLocked ||
                     specialPriority.HasFlag(DrawableFetchPriority.Inheritable) && o.IsInheritable) {
@@ -586,7 +593,7 @@ namespace Mapping_Tools.Viewmodels {
 
             // Get nearest drawable
             var cursorPos = GetCursorPosition();
-            var nearest = GetNearestDrawable(cursorPos, DrawableFetchPriority.Selected);
+            var nearest = GetNearestDrawable(cursorPos, DrawableFetchPriority.Selected, range: SelectionRange);
 
             if (nearest == null) return;
 
@@ -618,7 +625,7 @@ namespace Mapping_Tools.Viewmodels {
 
             // Get nearest drawable
             var cursorPos = GetCursorPosition();
-            var nearest = GetNearestDrawable(cursorPos, DrawableFetchPriority.Locked);
+            var nearest = GetNearestDrawable(cursorPos, DrawableFetchPriority.Locked, range: SelectionRange);
 
             if (nearest == null) return;
 
@@ -658,7 +665,7 @@ namespace Mapping_Tools.Viewmodels {
 
             // Get nearest drawable
             var cursorPos = GetCursorPosition();
-            var nearest = GetNearestDrawable(cursorPos);
+            var nearest = GetNearestDrawable(cursorPos, range: SelectionRange);
 
             if (nearest == null) return;
 
