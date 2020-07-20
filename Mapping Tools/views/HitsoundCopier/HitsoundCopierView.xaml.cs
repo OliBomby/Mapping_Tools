@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
 using Mapping_Tools.Annotations;
@@ -147,7 +148,21 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                     var firstSamples = HitsoundImporter.AnalyzeSamples(mapDir);
 
                     if (arg.CopyHitsounds) {
-                        CopyHitsounds(arg, tlFrom, tlTo, timingPointsChanges, mode, mapDir, firstSamples);
+                        CopyHitsounds(arg, beatmapTo, tlFrom, tlTo, timingPointsChanges, mode, mapDir, firstSamples, out var sampleSchema);
+
+                        // Export the sample schema if there are samples
+                        if (sampleSchema.Count > 0) {
+                            string exportFolder = MainWindow.ExportPath;
+
+                            DirectoryInfo di = new DirectoryInfo(exportFolder);
+                            foreach (FileInfo file in di.GetFiles()) {
+                                file.Delete();
+                            }
+
+                            HitsoundExporter.ExportSampleSchema(sampleSchema, exportFolder);
+
+                            System.Diagnostics.Process.Start(exportFolder);
+                        }
                     }
 
                     if (arg.CopyBodyHitsounds) {
@@ -293,9 +308,15 @@ namespace Mapping_Tools.Views.HitsoundCopier {
             }
         }
 
-        private void CopyHitsounds(HitsoundCopierVm arg, Timeline tlFrom, Timeline tlTo,
+        private void CopyHitsounds(HitsoundCopierVm arg, Beatmap beatmapTo, 
+            Timeline tlFrom, Timeline tlTo,
             List<TimingPointsChange> timingPointsChanges, GameMode mode, string mapDir,
-            Dictionary<string, string> firstSamples) {
+            Dictionary<string, string> firstSamples, out SampleSchema sampleSchema) {
+
+            var CustomSampledTimes = new HashSet<int>();
+            sampleSchema = new SampleSchema();
+            var tloToSliderSlide = new List<TimelineObject>();
+
             foreach (var tloFrom in tlFrom.TimelineObjects) {
                 var tloTo = tlTo.GetNearestTlo(tloFrom.Time, true);
 
@@ -310,8 +331,86 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                     timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: arg.CopySampleSets,
                         index: arg.CopySampleSets, volume: arg.CopyVolumes));
                 }
+                // Try to find a slider tick in range to copy the sample to instead.
+                // This slider tick gets a custom sample and timingpoints change to imitate the copied hitsound.
+                else 
+                if (arg.CopyToSliderTicks && 
+                           FindSliderTickInRange(beatmapTo, tloFrom.Time - arg.TemporalLeniency, tloFrom.Time + arg.TemporalLeniency, out var sliderTickTime, out var tickSlider) &&
+                           !CustomSampledTimes.Contains((int) sliderTickTime)) {
+                    // Add a new custom sample to this slider tick to represent the hitsounds
+                    List<string> sampleFilenames = tloFrom.GetFirstPlayingFilenames(mode, mapDir, firstSamples, false);
+                    List<SampleGeneratingArgs> samples = sampleFilenames.Select(o => new SampleGeneratingArgs(Path.Combine(mapDir, o))).ToList();
+
+                    if (sampleSchema.AddHitsound(samples, "slidertick", tloFrom.FenoSampleSet, 
+                        out int index, out var sampleSet, arg.StartIndex)) {
+                        // Add a copy of the slider slide sound to this index if necessary
+                        var oldIndex = tloFrom.HitsoundTimingPoint.SampleIndex;
+                        var oldSampleSet = tloFrom.HitsoundTimingPoint.SampleSet;
+                        var oldSlideFilename = $"{oldSampleSet.ToString().ToLower()}-sliderslide{(oldIndex == 1 ? string.Empty : oldIndex.ToInvariant())}";
+                        var oldSlidePath = Path.Combine(mapDir, oldSlideFilename);
+
+                        if (firstSamples.ContainsKey(oldSlidePath)) {
+                            oldSlidePath = firstSamples[oldSlidePath];
+                            var slideGeneratingArgs = new SampleGeneratingArgs(oldSlidePath);
+                            var newSlideFilename = $"{sampleSet.ToString().ToLower()}-sliderslide{index.ToInvariant()}";
+
+                            sampleSchema.Add(newSlideFilename, new List<SampleGeneratingArgs> { slideGeneratingArgs });
+                        }
+                    }
+
+                    // Make sure the slider with the slider ticks uses auto sampleset so the customized greenlines control the hitsounds
+                    tickSlider.SampleSet = SampleSet.Auto;
+
+                    // Add timingpointschange
+                    var tp = tloFrom.HitsoundTimingPoint.Copy();
+                    tp.Offset = sliderTickTime;
+                    tp.SampleIndex = index;
+                    tp.SampleSet = sampleSet;
+                    tp.Volume = tloFrom.FenoSampleVolume;
+                    timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: arg.CopySampleSets,
+                        index: arg.CopySampleSets, volume: arg.CopyVolumes));
+
+                    // Add timingpointschange 5ms later to revert the stuff back to whatever it should be
+                    var tp2 = tloFrom.HitsoundTimingPoint.Copy();
+                    tp2.Offset = sliderTickTime + 5;
+                    timingPointsChanges.Add(new TimingPointsChange(tp2, sampleset: arg.CopySampleSets,
+                        index: arg.CopySampleSets, volume: arg.CopyVolumes));
+
+                    CustomSampledTimes.Add((int)sliderTickTime);
+                }
+                // If the there is no slidertick to be found, then try copying it to the slider slide
+                else 
+                if (arg.CopyToSliderSlides) {
+                    tloToSliderSlide.Add(tloFrom);
+                }
 
                 tloFrom.CanCopy = false;
+            }
+
+            // Do the sliderslide hitsounds after because the ticks need to add sliderslides with strict indices.
+            foreach (var tlo in tloToSliderSlide) {
+                if (!FindSliderAtTime(beatmapTo, tlo.Time, out var slideSlider) ||
+                      CustomSampledTimes.Contains((int)tlo.Time)) 
+                    continue;
+
+                // Add a new custom sample to this slider slide to represent the hitsounds
+                List<string> sampleFilenames = tlo.GetFirstPlayingFilenames(mode, mapDir, firstSamples, false);
+                List<SampleGeneratingArgs> samples = sampleFilenames.Select(o => new SampleGeneratingArgs(Path.Combine(mapDir, o))).ToList();
+
+                sampleSchema.AddHitsound(samples, "sliderslide", tlo.FenoSampleSet,
+                    out int index, out var sampleSet, arg.StartIndex);
+
+                // Add timingpointschange
+                var tp = tlo.HitsoundTimingPoint.Copy();
+                tp.Offset = tlo.Time;
+                tp.SampleIndex = index;
+                tp.SampleSet = sampleSet;
+                tp.Volume = tlo.FenoSampleVolume;
+                timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: arg.CopySampleSets,
+                    index: arg.CopySampleSets, volume: arg.CopyVolumes));
+
+                // Make sure the slider with the slider ticks uses auto sampleset so the customized greenlines control the hitsounds
+                slideSlider.SampleSet = SampleSet.Auto;
             }
 
             // Timingpointchange all the undefined tlo from copyFrom
@@ -366,6 +465,36 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                 timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: holdSampleset, index: holdIndex,
                     volume: arg.CopyVolumes));
             }
+        }
+
+        private static bool FindSliderTickInRange(Beatmap beatmap, double startTime, double endTime, out double sliderTickTime, out HitObject tickSlider) {
+            var tickrate = beatmap.Difficulty.ContainsKey("SliderTickRate")
+                ? beatmap.Difficulty["SliderTickRate"].DoubleValue : 1.0;
+
+            // Check all sliders in range and exclude those which have NaN SV, because those dont have slider ticks
+            foreach (var slider in beatmap.HitObjects.Where(o => o.IsSlider && 
+                                                                 !double.IsNaN(o.SliderVelocity) && 
+                                                                 (o.Time < endTime || o.EndTime > startTime))) {
+                var timeBetweenTicks = slider.UnInheritedTimingPoint.MpB / tickrate;
+
+                sliderTickTime = slider.Time + timeBetweenTicks;
+                while (sliderTickTime < slider.EndTime - 5) {  // This -5 is to make sure the +5 ms timingpoint that reverts the change is still inside the slider
+                    if (sliderTickTime >= startTime && sliderTickTime <= endTime) {
+                        tickSlider = slider;
+                        return true;
+                    }
+                    sliderTickTime += timeBetweenTicks;
+                }
+            }
+
+            sliderTickTime = -1;
+            tickSlider = null;
+            return false;
+        }
+
+        private static bool FindSliderAtTime(Beatmap beatmap, double time, out HitObject slider) {
+            slider = beatmap.HitObjects.FirstOrDefault(ho => ho.IsSlider && ho.Time < time && ho.EndTime > time);
+            return slider != null;
         }
 
         private static void CopyHitsounds(HitsoundCopierVm arg, TimelineObject tloFrom, TimelineObject tloTo) {

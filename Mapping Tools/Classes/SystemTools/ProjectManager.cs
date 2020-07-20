@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using Mapping_Tools.Classes.JsonConverters;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public enum ErrorType
@@ -17,7 +18,8 @@ namespace Mapping_Tools.Classes.SystemTools {
             NullValueHandling = NullValueHandling.Ignore,
             TypeNameHandling = TypeNameHandling.All,
             Formatting = Formatting.Indented,
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore, 
+            Converters = { new Vector2Converter()}
         };
 
         public static void SaveJson(string path, object obj) {
@@ -62,13 +64,39 @@ namespace Mapping_Tools.Classes.SystemTools {
             // If the file name is not an empty string open it for saving.  
             if (path == "") return;
             try {
-                view.SetSaveData(LoadJson<T>(path));
+                T project = LoadJson<T>(path);
+
+                if (project == null) {
+                    throw new Exception("Loaded project is a null reference.");
+                }
+
+                view.SetSaveData(project);
             } catch (Exception ex) {
                 Console.WriteLine(ex.StackTrace);
                 Console.WriteLine(ex.Message);
 
                 if (message) {
                     MessageBox.Show("Project could not be loaded!");
+                    ex.Show();
+                }
+            }
+        }
+
+        public static void NewProject<T>(ISavable<T> view, bool dialog = false, bool message = true) {
+            if (dialog) {
+                var messageBoxResult = MessageBox.Show("Are you sure you want to start a new project? All unsaved progress will be lost.", "Confirm new project", MessageBoxButton.YesNo);
+                if (messageBoxResult != MessageBoxResult.Yes) return;
+            }
+
+            try {
+                T project = Activator.CreateInstance<T>();
+                view.SetSaveData(project);
+            } catch (Exception ex) {
+                Console.WriteLine(ex.StackTrace);
+                Console.WriteLine(ex.Message);
+
+                if (message) {
+                    MessageBox.Show("New project could not be initialized!");
                     ex.Show();
                 }
             }
@@ -88,6 +116,22 @@ namespace Mapping_Tools.Classes.SystemTools {
             string path = dialog ? IOHelper.LoadProjectDialog(view.DefaultSaveFolder) : view.AutoSavePath;
 
             return LoadJson<T>(path);
+        }
+
+        public static void SaveToolFile<T, T2>(ISavable<T> view, T2 obj, bool dialog = false) {
+            if (dialog)
+                Directory.CreateDirectory(view.DefaultSaveFolder);
+            string path = dialog ? IOHelper.SaveProjectDialog(view.DefaultSaveFolder) : view.AutoSavePath;
+
+            SaveJson(path, obj);
+        }
+
+        public static T2 LoadToolFile<T, T2>(ISavable<T> view, bool dialog = false) {
+            if (dialog)
+                Directory.CreateDirectory(view.DefaultSaveFolder);
+            string path = dialog ? IOHelper.LoadProjectDialog(view.DefaultSaveFolder) : view.AutoSavePath;
+
+            return LoadJson<T2>(path);
         }
 
         public static bool IsSavable(object obj) {

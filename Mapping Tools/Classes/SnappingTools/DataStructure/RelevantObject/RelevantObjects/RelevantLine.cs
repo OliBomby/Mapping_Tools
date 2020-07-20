@@ -1,6 +1,7 @@
 using System;
 using System.Windows;
 using System.Windows.Media;
+using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects {
@@ -8,7 +9,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.Relev
         public static string PreferencesNameStatic => "Virtual line preferences";
         public override string PreferencesName => PreferencesNameStatic;
 
-        public readonly Line2 Child;
+        public Line2 Child { get; set; }
 
         public override double DistanceTo(Vector2 point) {
             return Line2.Distance(Child, point);
@@ -42,6 +43,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.Relev
         public override Vector2 NearestPoint(Vector2 point) {
             return Line2.NearestPoint(Child, point);
         }
+
+        [UsedImplicitly]
+        public RelevantLine() { }
 
         public RelevantLine(Line2 line) {
             Child = line;

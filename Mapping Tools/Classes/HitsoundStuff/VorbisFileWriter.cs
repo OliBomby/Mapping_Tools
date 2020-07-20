@@ -11,7 +11,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         private ProcessingState processingState;
 
         // Buffer sizes for various sample rates. These values were found empirically
-        private readonly Dictionary<int, int> startBuffers = new Dictionary<int, int> {
+        private static readonly Dictionary<int, int> startBuffers = new Dictionary<int, int> {
             {48000, 1024}, {44100, 1024}, {32000, 1024}, {22050, 512}, {16000, 512}, {11025, 256}, {8000, 256}
         };
 
@@ -121,6 +121,20 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             } catch (IndexOutOfRangeException) {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Returns the best sample rate for the provided sample rate that is supported by the vorbis writer.
+        /// </summary>
+        public static int GetSupportedSampleRate(int oldSampleRate) {
+            int newSampleRate = 48000;
+            foreach (var sampleRate in startBuffers.Keys) {
+                if (sampleRate >= oldSampleRate && sampleRate <= newSampleRate) {
+                    newSampleRate = sampleRate;
+                }
+            }
+
+            return newSampleRate;
         }
 
         private static void FlushPages(OggStream oggStream, Stream Output, bool Force)

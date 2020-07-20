@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects {
     public class RelevantHitObject : RelevantObject {
-        public HitObject HitObject;
+        public HitObject HitObject { get; set; }
 
         public override double Time {
             get => HitObject.Time;
@@ -23,6 +24,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.Relev
             get => HitObject.IsSelected;
             set => HitObject.IsSelected = value;
         }
+
+        [UsedImplicitly]
+        public RelevantHitObject() { }
 
         public RelevantHitObject(HitObject hitObject) {
             HitObject = hitObject;

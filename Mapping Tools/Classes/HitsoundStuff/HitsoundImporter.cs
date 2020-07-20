@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
@@ -34,6 +35,14 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return layer;
         }
 
+        /// <summary>
+        /// Analyses all sound samples in a folder and generates a mapping from a full path without extension to the full path of the first sample which makes the same sound.
+        /// Use this to detect duplicate samples.
+        /// </summary>
+        /// <param name="dir"></param>
+        /// <param name="extended"></param>
+        /// <param name="detectDuplicateSamples"></param>
+        /// <returns></returns>
         public static Dictionary<string, string> AnalyzeSamples(string dir, bool extended=false, bool detectDuplicateSamples=true) {
             var extList = new[] { ".wav", ".ogg", ".mp3" };
             List<string> samplePaths = Directory.GetFiles(dir, "*.*", extended ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly)
@@ -47,7 +56,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 for (int i = 0; i < samplePaths.Count; i++) {
                     long thisLength = new FileInfo(samplePaths[i]).Length;
 
-                    for (int k = i; k < samplePaths.Count; k++) {
+                    for (int k = 0; k <= i; k++) {
                         if (samplePaths[i] != samplePaths[k]) {
                             long otherLength = new FileInfo(samplePaths[k]).Length;
 
@@ -287,6 +296,18 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             if (hitsound.Contains("hitclap"))
                 return Hitsound.Clap;
             return Hitsound.Normal;
+        }
+
+        public static int GetIndexFromFilename(string filename) {
+            var match = Regex.Match(filename, "^(normal|soft|drum)-(hit(normal|whistle|finish|clap)|slidertick|sliderslide)");
+
+            var remainder = filename.Substring(match.Index + match.Length);
+            int index = 0;
+            if (!string.IsNullOrEmpty(remainder)) {
+                FileFormatHelper.TryParseInt(remainder, out index);
+            }
+
+            return index;
         }
 
         public static List<HitsoundLayer> ImportMidi(string path, double offset=0, bool instruments=true, bool keysounds=true, bool lengths=true, double lengthRoughness=1, bool velocities=true, double velocityRoughness=1) {

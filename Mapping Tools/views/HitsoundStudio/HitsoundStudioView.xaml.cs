@@ -1043,7 +1043,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
                 var project = ProjectManager.GetProject(this, true);
                 Settings.PreviousSampleSchema = project.PreviousSampleSchema;
 
-                Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue("Succesfully loaded sample schema!"));
+                Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue("Successfully loaded sample schema!"));
             } catch (ArgumentException) { }
             catch (Exception ex) {
                 ex.Show();

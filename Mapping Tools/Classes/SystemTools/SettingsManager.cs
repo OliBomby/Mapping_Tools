@@ -11,7 +11,8 @@ namespace Mapping_Tools.Classes.SystemTools {
     public static class SettingsManager {
         private static readonly string JsonPath = Path.Combine(MainWindow.AppDataPath, "config.json");
         private static readonly JsonSerializer Serializer = new JsonSerializer {
-            NullValueHandling = NullValueHandling.Ignore
+            NullValueHandling = NullValueHandling.Ignore,
+            Formatting = Formatting.Indented
         };
 
         public static readonly Settings Settings = new Settings();
@@ -101,14 +102,12 @@ namespace Mapping_Tools.Classes.SystemTools {
 
         public static void DefaultPaths() {
             if (Settings.OsuPath == "") {
-                RegistryKey regKey;
                 try {
-                    regKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall");
-                } catch (Exception) {
-                    regKey = null;
-                }
-                if (regKey != null)
+                    var regKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall");
                     Settings.OsuPath = FindByDisplayName(regKey, "osu!");
+                } catch (Exception) {
+                    Settings.OsuPath = Path.Combine(MainWindow.AppCommon, "osu!");
+                }
             }
 
             if (Settings.SongsPath == "") {
@@ -132,7 +131,8 @@ namespace Mapping_Tools.Classes.SystemTools {
                     }
                 } catch (NullReferenceException) { }
             }
-            return "";
+
+            throw new Exception();
         }
 
         public static List<string[]> GetRecentMaps() {

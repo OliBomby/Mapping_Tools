@@ -29,6 +29,65 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
+        /// <summary>
+        /// Make sure a certain hitsound with a certain sound is in the <see cref="SampleSchema"/>.
+        /// If it already exists, then it simply returns the index and sampleset of that filename.
+        /// </summary>
+        /// <param name="samples">List of <see cref="SampleGeneratingArgs"/> that represents the sound that has to be made.</param>
+        /// <param name="hitsoundName">Name of the hitsound. For example "hitwhistle" or "slidertick".</param>
+        /// <param name="sampleSet">Sample set for the hitsound for if it adds a new sample to the sample schema.</param>
+        /// <param name="newIndex">Index to start searching from. It will start at this value and go up until a slot is available.</param>
+        /// <param name="newSampleSet">The sample set of the added sample.</param>
+        /// <param name="startIndex">The index of the added sample.</param>
+        /// <returns>True if it added a new entry.</returns>
+        public bool AddHitsound(List<SampleGeneratingArgs> samples, string hitsoundName, SampleSet sampleSet, out int newIndex,
+            out SampleSet newSampleSet, int startIndex = 1) {
+
+            // Check if our sample schema already has a sample for this
+            var filename = FindFilename(samples, "^(normal|soft|drum)-" + hitsoundName);
+            if (filename != null) {
+                newIndex = HitsoundImporter.GetIndexFromFilename(filename);
+                newSampleSet = HitsoundImporter.GetSamplesetFromFilename(filename);
+                return false;
+            }
+
+            // Make a new sample with the same sound as all the samples mixed and add it to the sample schema
+            int index = startIndex;
+            newSampleSet = sampleSet;
+
+            // Find an index which is not taken in the sample schema
+            while (Keys.Any(o => Regex.IsMatch(o, "^(normal|soft|drum)-" + hitsoundName) &&
+                                 HitsoundImporter.GetIndexFromFilename(o) == index &&
+                                 HitsoundImporter.GetSamplesetFromFilename(o) == sampleSet)) {
+                index++;
+            }
+
+            newIndex = index;
+            filename = $"{sampleSet.ToString().ToLower()}-{hitsoundName}{(index == 1 ? string.Empty : index.ToInvariant())}";
+
+            Add(filename, samples);
+            return true;
+        }
+
+        public string FindFilename(List<SampleGeneratingArgs> samples) {
+            return (from kvp 
+                in this 
+                where kvp.Value.SequenceEqual(samples)
+                select kvp.Key).FirstOrDefault();
+        }
+
+        public string FindFilename(List<SampleGeneratingArgs> samples, string regexPattern) {
+            return (from kvp
+                    in this
+                where kvp.Value.SequenceEqual(samples) && Regex.IsMatch(kvp.Key, regexPattern)
+                select kvp.Key).FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Generates a dictionary which maps <see cref="SampleGeneratingArgs"/> to their corresponding filename which makes that sample sound.
+        /// Only maps the <see cref="SampleGeneratingArgs"/> which are non-mixed.
+        /// </summary>
+        /// <returns></returns>
         public Dictionary<SampleGeneratingArgs, string> GetSampleNames() {
             var sampleNames = new Dictionary<SampleGeneratingArgs, string>();
 

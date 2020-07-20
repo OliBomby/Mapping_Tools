@@ -173,7 +173,7 @@ namespace Mapping_Tools.Classes.Tools {
             BackupManager.SaveMapBackup(path);
             editor.SaveFile();
 
-            Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue("Succesfully saved current beatmap!"));
+            Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue("Successfully saved current beatmap!"));
         }
 
 

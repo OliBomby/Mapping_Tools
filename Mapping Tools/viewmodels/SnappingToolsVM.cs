@@ -27,6 +27,7 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectCollection;
 using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
 using MessageBox = System.Windows.MessageBox;
 
@@ -55,6 +56,7 @@ namespace Mapping_Tools.Viewmodels {
         private bool _selectedToggle;
         private bool _lockedToggle;
         private bool _inheritableToggle;
+        private bool _unlockedSomething;
 
         private int _editorTime;
         private bool _osuActivated;
@@ -71,6 +73,7 @@ namespace Mapping_Tools.Viewmodels {
 
         private const double PointsBias = 3;
         private const double SpecialBias = 3;
+        private const double SelectionRange = 80;
 
         private readonly CoordinateConverter _coordinateConverter;
         private readonly FileSystemWatcher _configWatcher;
@@ -475,7 +478,15 @@ namespace Mapping_Tools.Viewmodels {
         }
 
 
-        private IRelevantDrawable GetNearestDrawable(Vector2 cursorPos, bool specialPriority = false, HitObject[] heldHitObjects = null) {
+        [Flags]
+        private enum DrawableFetchPriority {
+            Selected = 1,
+            Locked = 2,
+            Inheritable = 4,
+        }
+
+
+        private IRelevantDrawable GetNearestDrawable(Vector2 cursorPos, DrawableFetchPriority specialPriority = 0, HitObject[] heldHitObjects = null, double range = double.PositiveInfinity) {
             // Get all the relevant drawables
             var drawables = LayerCollection.GetAllRelevantDrawables().ToArray();
 
@@ -487,17 +498,26 @@ namespace Mapping_Tools.Viewmodels {
             var smallestDistance = double.PositiveInfinity;
             foreach (var o in drawables) {
                 var dist = o.DistanceTo(cursorPos);
+
+                if (dist > range) {
+                    continue;
+                }
+
                 if (o is RelevantPoint) {
                     // Prioritize points to be able to snap to intersections
                     dist -= PointsBias;
                 }
-                if (specialPriority && (o.IsSelected || o.IsLocked)) {
+
+                if (specialPriority.HasFlag(DrawableFetchPriority.Selected) && o.IsSelected ||
+                    specialPriority.HasFlag(DrawableFetchPriority.Locked) && o.IsLocked ||
+                    specialPriority.HasFlag(DrawableFetchPriority.Inheritable) && o.IsInheritable) {
                     // Prioritize selected and locked to be able to unselect them easily
                     dist -= SpecialBias;
                 }
 
                 // Exclude any drawables which are the direct child of the held hit objects
-                if (heldHitObjects != null && o.ParentObjects.All(p =>
+                // Checks if any and all parents of the drawable are one of the held hit objects.
+                if (heldHitObjects != null && o.ParentObjects.Count > 0 && o.ParentObjects.All(p =>
                         p is RelevantHitObject rho && heldHitObjects.Any(hho => comparer.Equals(rho.HitObject, hho)))) {
                     continue;
                 }
@@ -575,7 +595,7 @@ namespace Mapping_Tools.Viewmodels {
 
             // Get nearest drawable
             var cursorPos = GetCursorPosition();
-            var nearest = GetNearestDrawable(cursorPos, true);
+            var nearest = GetNearestDrawable(cursorPos, DrawableFetchPriority.Selected, range: SelectionRange);
 
             if (nearest == null) return;
 
@@ -602,12 +622,13 @@ namespace Mapping_Tools.Viewmodels {
             if (!IsHotkeyDown(Preferences.LockHotkey)) {
                 _lockTimer.Stop();
                 _lastLockedRelevantDrawables.Clear();
+                _unlockedSomething = false;
                 return;
             }
 
             // Get nearest drawable
             var cursorPos = GetCursorPosition();
-            var nearest = GetNearestDrawable(cursorPos, true);
+            var nearest = GetNearestDrawable(cursorPos, DrawableFetchPriority.Locked, range: SelectionRange);
 
             if (nearest == null) return;
 
@@ -626,8 +647,10 @@ namespace Mapping_Tools.Viewmodels {
                     LayerCollection.LockedLayer.NextLayer?.GenerateNewObjects(true);
                 }
             } else {
-                if (nearest.IsLocked)
+                if (nearest.IsLocked && !_unlockedSomething) {
                     nearest.Dispose();
+                    _unlockedSomething = true;
+                }
             }
 
             // Add nearest drawable to the list so it doesnt get toggled later
@@ -647,7 +670,7 @@ namespace Mapping_Tools.Viewmodels {
 
             // Get nearest drawable
             var cursorPos = GetCursorPosition();
-            var nearest = GetNearestDrawable(cursorPos);
+            var nearest = GetNearestDrawable(cursorPos, range: SelectionRange);
 
             if (nearest == null) return;
 
@@ -914,6 +937,17 @@ namespace Mapping_Tools.Viewmodels {
 
         public SnappingToolsProject GetProject() {
             return Project.GetThis();
+        }
+
+        public RelevantObjectCollection GetLockedObjects() {
+            return LayerCollection.LockedLayer.Objects;
+        }
+
+        public void SetLockedObjects(RelevantObjectCollection objects) {
+            LayerCollection.LockedLayer.Objects = objects;
+            objects.SetParentLayer(LayerCollection.LockedLayer);
+
+            _overlay.OverlayWindow.InvalidateVisual();
         }
 
         #endregion

@@ -32,21 +32,21 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public override void SaveFile() {
-            GenerateCoolSaveMD5(TextFile.GetLines());
+            GenerateBetterSaveMD5(TextFile.GetLines());
             base.SaveFile();
         }
 
         public override void SaveFile(string path) {
-            GenerateCoolSaveMD5(TextFile.GetLines());
+            GenerateBetterSaveMD5(TextFile.GetLines());
             base.SaveFile(path);
         }
 
         public override void SaveFile(List<string> lines) {
-            GenerateCoolSaveMD5(lines);
+            GenerateBetterSaveMD5(lines);
             base.SaveFile(lines);
         }
 
-        private static void GenerateCoolSaveMD5(List<string> lines) {
+        private static void GenerateBetterSaveMD5(List<string> lines) {
             var tempPath = System.IO.Path.Combine(MainWindow.AppDataPath, "temp.osu");
 
             if (!File.Exists(tempPath))

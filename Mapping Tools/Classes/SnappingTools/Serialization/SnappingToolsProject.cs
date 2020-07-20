@@ -83,14 +83,14 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
         public void SaveToSlot(SnappingToolsSaveSlot saveSlot, bool message = true) {
             saveSlot.Preferences = (SnappingToolsPreferences)GetCurrentPreferences().Clone();
             if (message) {
-                Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue($"Succesfully saved settings to {saveSlot.Name}!"));
+                Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue($"Successfully saved settings to {saveSlot.Name}!"));
             }
         }
 
         public void LoadFromSlot(SnappingToolsSaveSlot saveSlot, bool message = true) {
             SetCurrentPreferences(saveSlot.Preferences);
             if (message) {
-                Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue($"Succesfully loaded settings from {saveSlot.Name}!"));
+                Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue($"Successfully loaded settings from {saveSlot.Name}!"));
             }
         }
 

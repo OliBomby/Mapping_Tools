@@ -32,7 +32,7 @@ namespace Mapping_Tools {
         public static SnackbarMessageQueue MessageQueue;
         public static Random MainRandom = new Random();
         public static readonly HttpClient HttpClient = new HttpClient();
-        private static readonly string AppCommon = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        public static readonly string AppCommon = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         public static readonly string AppDataPath = Path.Combine(AppCommon, "Mapping Tools");
         public static readonly string ExportPath = Path.Combine(AppDataPath, "Exports");
 
@@ -283,6 +283,7 @@ namespace Mapping_Tools {
 
                 projectMenu.Items.Add(GetSaveProjectMenuItem());
                 projectMenu.Items.Add(GetLoadProjectMenuItem());
+                projectMenu.Items.Add(GetNewProjectMenuItem());
             }
 
             if (DataContext is IHaveExtraProjectMenuItems havingExtraProjectMenuItems) {
@@ -314,6 +315,16 @@ namespace Mapping_Tools {
             return menu;
         }
 
+        private MenuItem GetNewProjectMenuItem() {
+            var menu = new MenuItem {
+                Header = "_New project", Icon = new PackIcon { Kind = PackIconKind.Rocket },
+                ToolTip = "Load the default tool settings."
+            };
+            menu.Click += NewProject;
+
+            return menu;
+        }
+
         private void LoadProject(object sender, RoutedEventArgs e) {
             if( !ProjectManager.IsSavable(DataContext) )
                 return;
@@ -328,12 +339,27 @@ namespace Mapping_Tools {
             ProjectManager.SaveProject(data, true);
         }
 
+        private void NewProject(object sender, RoutedEventArgs e) {
+            if (!ProjectManager.IsSavable(DataContext))
+                return;
+            dynamic data = DataContext;
+            ProjectManager.NewProject(data, true);
+        }
+
         //Open backup folder in file explorer
         private void OpenBackups(object sender, RoutedEventArgs e) {
             try {
                 System.Diagnostics.Process.Start(SettingsManager.GetBackupsPath());
             }
             catch( Exception ex ) {
+                ex.Show();
+            }
+        }
+
+        private void OpenConfig(object sender, RoutedEventArgs e) {
+            try {
+                System.Diagnostics.Process.Start(AppDataPath);
+            } catch (Exception ex) {
                 ex.Show();
             }
         }
