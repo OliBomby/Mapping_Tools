@@ -11,7 +11,8 @@ namespace Mapping_Tools.Classes.SystemTools {
     public static class SettingsManager {
         private static readonly string JsonPath = Path.Combine(MainWindow.AppDataPath, "config.json");
         private static readonly JsonSerializer Serializer = new JsonSerializer {
-            NullValueHandling = NullValueHandling.Ignore
+            NullValueHandling = NullValueHandling.Ignore,
+            Formatting = Formatting.Indented
         };
 
         public static readonly Settings Settings = new Settings();
