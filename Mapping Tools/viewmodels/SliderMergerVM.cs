@@ -67,7 +67,7 @@ namespace Mapping_Tools.Viewmodels {
         public SliderMergerVm() {
             ImportModeSetting = ImportMode.Selected;
             ConnectionModeSetting = ConnectionMode.Move;
-            Leniency = 2;
+            Leniency = 256;
             LinearOnLinear = false;
             MergeOnSliderEnd = true;
         }
