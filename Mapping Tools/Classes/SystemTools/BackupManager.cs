@@ -5,12 +5,16 @@ using System.Threading.Tasks;
 using System.Windows;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.Exceptions;
+using Mapping_Tools.Classes.Tools;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public static class BackupManager {
         public static bool SaveMapBackup(string fileToCopy, bool forced = false, string customFileName = "", string backupCode = "") {
             if (!SettingsManager.GetMakeBackups() && !forced)
                 return false;
+
+            if (SettingsManager.Settings.UseEditorReader)
+                fileToCopy = GetNewestVersionPath(fileToCopy);
 
             DateTime now = DateTime.Now;
             string destinationDirectory = SettingsManager.GetBackupsPath();
@@ -89,6 +93,22 @@ namespace Mapping_Tools.Classes.SystemTools {
             } catch (Exception ex) {
                 ex.Show();
             }
+        }
+
+        /// <summary>
+        /// Generates a temp file with the newest version of specified map and returns the path to that temp file.
+        /// </summary>
+        /// <param name="mapPath"></param>
+        /// <returns></returns>
+        private static string GetNewestVersionPath(string mapPath) {
+            var editor = EditorReaderStuff.GetNewestVersionOrNot(mapPath);
+
+            // Save temp version
+            var tempPath = Path.Combine(MainWindow.AppDataPath, "temp.osu");
+
+            Editor.SaveFile(tempPath, editor.Beatmap.GetLines());
+
+            return tempPath;
         }
     }
 }

@@ -12,6 +12,7 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Threading;
+using Mapping_Tools.Classes.BeatmapHelper;
 using ModifierKeys = NonInvasiveKeyboardHookLibrary.ModifierKeys;
 
 namespace Mapping_Tools.Classes.SystemTools {
@@ -67,11 +68,7 @@ namespace Mapping_Tools.Classes.SystemTools {
                 // Save temp version
                 var tempPath = Path.Combine(MainWindow.AppDataPath, "temp.osu");
 
-                if (!File.Exists(tempPath)) {
-                    File.Create(tempPath).Dispose();
-                }
-
-                File.WriteAllLines(tempPath, editor.Beatmap.GetLines());
+                Editor.SaveFile(tempPath, editor.Beatmap.GetLines());
 
                 // Get MD5 from temp file
                 var currentMapHash = EditorReaderStuff.GetMD5FromPath(tempPath);
