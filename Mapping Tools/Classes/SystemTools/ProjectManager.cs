@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using Mapping_Tools.Classes.JsonConverters;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public enum ErrorType
@@ -17,7 +18,8 @@ namespace Mapping_Tools.Classes.SystemTools {
             NullValueHandling = NullValueHandling.Ignore,
             TypeNameHandling = TypeNameHandling.All,
             Formatting = Formatting.Indented,
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore, 
+            Converters = { new Vector2Converter()}
         };
 
         public static void SaveJson(string path, object obj) {
@@ -114,6 +116,22 @@ namespace Mapping_Tools.Classes.SystemTools {
             string path = dialog ? IOHelper.LoadProjectDialog(view.DefaultSaveFolder) : view.AutoSavePath;
 
             return LoadJson<T>(path);
+        }
+
+        public static void SaveToolFile<T, T2>(ISavable<T> view, T2 obj, bool dialog = false) {
+            if (dialog)
+                Directory.CreateDirectory(view.DefaultSaveFolder);
+            string path = dialog ? IOHelper.SaveProjectDialog(view.DefaultSaveFolder) : view.AutoSavePath;
+
+            SaveJson(path, obj);
+        }
+
+        public static T2 LoadToolFile<T, T2>(ISavable<T> view, bool dialog = false) {
+            if (dialog)
+                Directory.CreateDirectory(view.DefaultSaveFolder);
+            string path = dialog ? IOHelper.LoadProjectDialog(view.DefaultSaveFolder) : view.AutoSavePath;
+
+            return LoadJson<T2>(path);
         }
 
         public static bool IsSavable(object obj) {

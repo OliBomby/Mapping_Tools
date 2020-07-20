@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Media;
+using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects {
@@ -8,7 +9,7 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.Relev
         public static string PreferencesNameStatic => "Virtual circle preferences";
         public override string PreferencesName => PreferencesNameStatic;
 
-        public readonly Circle Child;
+        public Circle Child { get; set; }
 
         public override double DistanceTo(Vector2 point) {
             var dist = Vector2.Distance(point, Child.Centre);
@@ -41,6 +42,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.Relev
             var dist = diff.Length;
             return Child.Centre + diff / dist * Child.Radius;
         }
+
+        [UsedImplicitly]
+        public RelevantCircle() { }
 
         public RelevantCircle(Circle circle) {
             Child = circle;

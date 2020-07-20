@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Policy;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.Layers;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
 
@@ -134,6 +134,12 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectCollec
         public void RemoveRelevantObject(IRelevantObject relevantObject) {
             if (TryGetValue(relevantObject.GetType(), out var list)) {
                 list.Remove(relevantObject);
+            }
+        }
+
+        public void SetParentLayer(RelevantObjectLayer layer) {
+            foreach (var relevantObject in Values.SelectMany(list => list)) {
+                relevantObject.Layer = layer;
             }
         }
 

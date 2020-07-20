@@ -1,15 +1,20 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectCollection;
 using Mapping_Tools.Classes.SnappingTools.Serialization;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Viewmodels;
+using MaterialDesignThemes.Wpf;
 
 namespace Mapping_Tools.Views.SnappingTools
 {
-    public partial class SnappingToolsView : ISavable<SnappingToolsProject>
+    public partial class SnappingToolsView : ISavable<SnappingToolsProject>, IHaveExtraProjectMenuItems
     {
 
         public static readonly string ToolName = "Geometry Dashboard";
@@ -113,5 +118,46 @@ namespace Mapping_Tools.Views.SnappingTools
         {
             _resetScroll = !Equals(e.Source, GeneratorsScrollViewer);
         }
+
+        #region IHaveExtraMenuItems members
+
+        public MenuItem[] GetMenuItems() {
+            var saveObjects = new MenuItem {
+                Header = "_Save virtual objects", Icon = new PackIcon { Kind = PackIconKind.ContentSaveOutline },
+                ToolTip = "Save locked virtual objects to a file."
+            };
+            saveObjects.Click += SaveLockedRelevantObjectsFromFile;
+
+            var loadObjects = new MenuItem {
+                Header = "_Load virtual objects", Icon = new PackIcon { Kind = PackIconKind.FolderOpenOutline },
+                ToolTip = "Load locked virtual objects from a save file."
+            };
+            loadObjects.Click += LoadLockedRelevantObjectsFromFile;
+
+            return new[] { saveObjects, loadObjects };
+        }
+
+        private void SaveLockedRelevantObjectsFromFile(object sender, RoutedEventArgs e) {
+            try {
+                ProjectManager.SaveToolFile(this, ViewModel.GetLockedObjects(), true);
+
+                Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue("Successfully saved locked virtual objects!"));
+            } catch (ArgumentException) { } catch (Exception ex) {
+                ex.Show();
+            }
+        }
+
+        private void LoadLockedRelevantObjectsFromFile(object sender, RoutedEventArgs e) {
+            try {
+                var objects = ProjectManager.LoadToolFile<SnappingToolsProject, RelevantObjectCollection>(this, true);
+                ViewModel.SetLockedObjects(objects);
+
+                Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue("Successfully loaded locked virtual objects!"));
+            } catch (ArgumentException) { } catch (Exception ex) {
+                ex.Show();
+            }
+        }
+
+        #endregion
     }
 }

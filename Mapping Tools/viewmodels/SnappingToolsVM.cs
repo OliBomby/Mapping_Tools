@@ -27,6 +27,7 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectCollection;
 using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
 using MessageBox = System.Windows.MessageBox;
 
@@ -936,6 +937,17 @@ namespace Mapping_Tools.Viewmodels {
 
         public SnappingToolsProject GetProject() {
             return Project.GetThis();
+        }
+
+        public RelevantObjectCollection GetLockedObjects() {
+            return LayerCollection.LockedLayer.Objects;
+        }
+
+        public void SetLockedObjects(RelevantObjectCollection objects) {
+            LayerCollection.LockedLayer.Objects = objects;
+            objects.SetParentLayer(LayerCollection.LockedLayer);
+
+            _overlay.OverlayWindow.InvalidateVisual();
         }
 
         #endregion

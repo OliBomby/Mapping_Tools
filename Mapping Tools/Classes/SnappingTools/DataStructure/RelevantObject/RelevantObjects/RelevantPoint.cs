@@ -1,13 +1,16 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Media;
+using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.MathUtil;
+using Newtonsoft.Json;
 
 namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects {
     public class RelevantPoint : RelevantDrawable {
         public static string PreferencesNameStatic => "Virtual point preferences";
         public override string PreferencesName => PreferencesNameStatic;
 
-        public readonly Vector2 Child;
+        public Vector2 Child { get; set; }
 
         public override double DistanceTo(Vector2 point) {
             return Vector2.Distance(Child, point);
@@ -35,6 +38,9 @@ namespace Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.Relev
         public override Vector2 NearestPoint(Vector2 point) {
             return Child;
         }
+
+        [UsedImplicitly]
+        public RelevantPoint() { }
 
         public RelevantPoint(Vector2 vec) {
             Child = vec;

@@ -258,6 +258,7 @@
     <Compile Include="Classes\HitsoundStuff\SampleSoundGenerator.cs" />
     <Compile Include="Classes\HitsoundStuff\SF2Extension.cs" />
     <Compile Include="Classes\HitsoundStuff\VorbisFileWriter.cs" />
+    <Compile Include="Classes\JsonConverters\Vector2Converter.cs" />
     <Compile Include="Classes\MathUtil\BinarySearchUtil.cs" />
     <Compile Include="Classes\MathUtil\Circle.cs" />
     <Compile Include="Classes\MathUtil\Extensions.cs" />
