@@ -55,6 +55,7 @@ namespace Mapping_Tools.Viewmodels {
         private bool _selectedToggle;
         private bool _lockedToggle;
         private bool _inheritableToggle;
+        private bool _unlockedSomething;
 
         private int _editorTime;
         private bool _osuActivated;
@@ -71,7 +72,7 @@ namespace Mapping_Tools.Viewmodels {
 
         private const double PointsBias = 3;
         private const double SpecialBias = 3;
-        private const double SelectionRange = 10;
+        private const double SelectionRange = 80;
 
         private readonly CoordinateConverter _coordinateConverter;
         private readonly FileSystemWatcher _configWatcher;
@@ -620,6 +621,7 @@ namespace Mapping_Tools.Viewmodels {
             if (!IsHotkeyDown(Preferences.LockHotkey)) {
                 _lockTimer.Stop();
                 _lastLockedRelevantDrawables.Clear();
+                _unlockedSomething = false;
                 return;
             }
 
@@ -644,8 +646,10 @@ namespace Mapping_Tools.Viewmodels {
                     LayerCollection.LockedLayer.NextLayer?.GenerateNewObjects(true);
                 }
             } else {
-                if (nearest.IsLocked)
+                if (nearest.IsLocked && !_unlockedSomething) {
                     nearest.Dispose();
+                    _unlockedSomething = true;
+                }
             }
 
             // Add nearest drawable to the list so it doesnt get toggled later
