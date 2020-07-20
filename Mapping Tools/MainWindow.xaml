@@ -96,6 +96,8 @@
                                           ToolTip="Open the Preferences page."/>
                                 <MenuItem Header="_Open backups folder" Click="OpenBackups" Icon="{materialDesign:PackIcon FolderOpen}"
                                           ToolTip="Open the backups folder."/>
+                                <MenuItem Header="_Open Mapping Tools folder" Click="OpenConfig" Icon="{materialDesign:PackIcon FolderOpen}"
+                                          ToolTip="Open the Mapping Tools folder."/>
                             </MenuItem>
                             <MenuItem Height="31" Header="_About" Padding="12,0,0,0" MinWidth="67">
                                 <MenuItem Header="_Website" Click="OpenWebsite" Icon="{materialDesign:PackIcon OpenInBrowser}"

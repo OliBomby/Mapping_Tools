@@ -338,6 +338,14 @@ namespace Mapping_Tools {
             }
         }
 
+        private void OpenConfig(object sender, RoutedEventArgs e) {
+            try {
+                System.Diagnostics.Process.Start(AppDataPath);
+            } catch (Exception ex) {
+                ex.Show();
+            }
+        }
+
         private void OpenWebsite(object sender, RoutedEventArgs e) {
             System.Diagnostics.Process.Start("https://mappingtools.seira.moe/");
         }
