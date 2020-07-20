@@ -283,6 +283,7 @@ namespace Mapping_Tools {
 
                 projectMenu.Items.Add(GetSaveProjectMenuItem());
                 projectMenu.Items.Add(GetLoadProjectMenuItem());
+                projectMenu.Items.Add(GetNewProjectMenuItem());
             }
 
             if (DataContext is IHaveExtraProjectMenuItems havingExtraProjectMenuItems) {
@@ -314,6 +315,16 @@ namespace Mapping_Tools {
             return menu;
         }
 
+        private MenuItem GetNewProjectMenuItem() {
+            var menu = new MenuItem {
+                Header = "_New project", Icon = new PackIcon { Kind = PackIconKind.Rocket },
+                ToolTip = "Load the default tool settings."
+            };
+            menu.Click += NewProject;
+
+            return menu;
+        }
+
         private void LoadProject(object sender, RoutedEventArgs e) {
             if( !ProjectManager.IsSavable(DataContext) )
                 return;
@@ -326,6 +337,13 @@ namespace Mapping_Tools {
                 return;
             dynamic data = DataContext;
             ProjectManager.SaveProject(data, true);
+        }
+
+        private void NewProject(object sender, RoutedEventArgs e) {
+            if (!ProjectManager.IsSavable(DataContext))
+                return;
+            dynamic data = DataContext;
+            ProjectManager.NewProject(data, true);
         }
 
         //Open backup folder in file explorer

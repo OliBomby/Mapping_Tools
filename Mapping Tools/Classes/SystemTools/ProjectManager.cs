@@ -80,6 +80,26 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
         }
 
+        public static void NewProject<T>(ISavable<T> view, bool dialog = false, bool message = true) {
+            if (dialog) {
+                var messageBoxResult = MessageBox.Show("Are you sure you want to start a new project? All unsaved progress will be lost.", "Confirm new project", MessageBoxButton.YesNo);
+                if (messageBoxResult != MessageBoxResult.Yes) return;
+            }
+
+            try {
+                T project = Activator.CreateInstance<T>();
+                view.SetSaveData(project);
+            } catch (Exception ex) {
+                Console.WriteLine(ex.StackTrace);
+                Console.WriteLine(ex.Message);
+
+                if (message) {
+                    MessageBox.Show("New project could not be initialized!");
+                    ex.Show();
+                }
+            }
+        }
+
         /// <summary>
         /// Gets the project file for a savable tool with optional dialog.
         /// Uses default save path if no dialog is used.

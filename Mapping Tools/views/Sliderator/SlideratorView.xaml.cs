@@ -736,7 +736,11 @@ namespace Mapping_Tools.Views.Sliderator {
 
         public void SetSaveData(SlideratorVm saveData) {
             DataContext = saveData;
-            Graph.SetGraphState(saveData.GraphState);
+            if (saveData.GraphState != null) {
+                Graph.SetGraphState(saveData.GraphState);
+            } else {
+                Graph.Clear();
+            }
             UpdateEverything();
             ViewModel.PropertyChanged += ViewModelOnPropertyChanged;
         }
