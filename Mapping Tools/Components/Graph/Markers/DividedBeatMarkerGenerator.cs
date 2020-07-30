@@ -9,9 +9,11 @@ namespace Mapping_Tools.Components.Graph.Markers {
     public class DividedBeatMarkerGenerator : IMarkerGenerator {
         public int BeatDivisor { get; set; }
 
+        public bool Snappable { get; set; }
+
         public DividedBeatMarkerGenerator() : this(4) {}
 
-        public DividedBeatMarkerGenerator(int beatDivisor) {
+        public DividedBeatMarkerGenerator(int beatDivisor, bool snappable = false) {
             BeatDivisor = beatDivisor;
         }
 
