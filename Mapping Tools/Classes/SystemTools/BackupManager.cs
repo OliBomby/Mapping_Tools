@@ -9,9 +9,12 @@ using Mapping_Tools.Classes.Tools;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public static class BackupManager {
-        public static bool SaveMapBackup(string fileToCopy, bool forced = false, string customFileName = "", string backupCode = "") {
+        public static bool SaveMapBackup(string fileToCopy, bool forced = false, string filename = null, string backupCode = "") {
             if (!SettingsManager.GetMakeBackups() && !forced)
                 return false;
+
+            if (string.IsNullOrEmpty(filename))
+                filename = Path.GetFileName(fileToCopy);
 
             if (SettingsManager.Settings.UseEditorReader)
                 fileToCopy = GetNewestVersionPath(fileToCopy);
@@ -19,8 +22,7 @@ namespace Mapping_Tools.Classes.SystemTools {
             DateTime now = DateTime.Now;
             string destinationDirectory = SettingsManager.GetBackupsPath();
             try {
-                var name = now.ToString("yyyy-MM-dd HH-mm-ss") + "_" + backupCode + "__" +
-                           (string.IsNullOrEmpty(customFileName) ? Path.GetFileName(fileToCopy) : customFileName);
+                var name = now.ToString("yyyy-MM-dd HH-mm-ss") + "_" + backupCode + "__" + filename;
 
                 File.Copy(fileToCopy,
                     Path.Combine(destinationDirectory, name),
