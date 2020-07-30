@@ -257,10 +257,11 @@ namespace Mapping_Tools.Viewmodels {
                         return;
                     }
 
-                    // Get editor time
-                    var editorTime = reader.EditorTime();
                     // Get osu! state
                     var osuActivated = _osuWindow.IsActivated;
+
+                    // Get editor time
+                    var editorTime = reader.EditorTime();
 
                     // Handle updating of relevant objects
                     switch (Preferences.UpdateMode) {
@@ -296,6 +297,10 @@ namespace Mapping_Tools.Viewmodels {
 
                     _coordinateConverter.OsuWindowPosition = new Vector2(_osuWindow.X, _osuWindow.Y);
                     _overlay.Update();
+
+                    // Don't do hotkeys if osu is deactivated
+                    if (!osuActivated)
+                        break;
 
                     if (!_autoSnapTimer.IsEnabled && IsHotkeyDown(Preferences.SnapHotkey)) {
                         // Update overlay but not on parents only view mode, because that one updates on his own terms
