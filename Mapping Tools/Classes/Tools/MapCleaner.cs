@@ -113,16 +113,6 @@ namespace Mapping_Tools.Classes.Tools {
                 UpdateProgressBar(worker, 45);
             }
 
-            // Maybe mute unclickable timelineobjects
-            if (args.RemoveUnclickableHitsounds) {
-                foreach (TimelineObject tlo in timeline.TimelineObjects) {
-                    if (!(tlo.IsCircle || tlo.IsSliderHead || tlo.IsHoldnoteHead))  // Not clickable
-                    {
-                        tlo.FenoSampleVolume = 5;  // 5% volume mute
-                    }
-                }
-            }
-
             // Make new timingpoints
             List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
 
@@ -223,6 +213,9 @@ namespace Mapping_Tools.Classes.Tools {
                     TimingPoint tp = tlo.HitsoundTimingPoint.Copy();
 
                     bool doUnmute = tlo.FenoSampleVolume == 5 && args.RemoveMuting;
+                    bool doMute = args.RemoveUnclickableHitsounds && !args.RemoveMuting &&
+                                  !(tlo.IsCircle || tlo.IsSliderHead || tlo.IsHoldnoteHead);
+
                     bool ind = !tlo.UsesFilename && !doUnmute;  // Index doesnt have to change if custom is overridden by Filename
                     bool vol = !doUnmute;  // Remove volume change muted
 
@@ -255,7 +248,7 @@ namespace Mapping_Tools.Classes.Tools {
 
                     tp.Offset = tlo.Time;
                     tp.SampleIndex = tlo.FenoCustomIndex;
-                    tp.Volume = tlo.FenoSampleVolume;
+                    tp.Volume = doMute ? 5 : tlo.FenoSampleVolume;
 
                     timingPointsChanges.Add(new TimingPointsChange(tp, volume: vol, index: ind));
                 }
