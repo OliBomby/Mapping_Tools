@@ -453,6 +453,9 @@ namespace Mapping_Tools.Viewmodels {
             if (closest != null && bestDist <= circleRadius) {
                 _heldHitObject = closest;
                 _heldHitObjects = selectedHitObjects;
+            } else {
+                _heldHitObject = null;
+                _heldHitObjects = new HitObject[0];
             }
         }
       
