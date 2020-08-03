@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
-using System.Windows.Forms;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.Tools;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using OsuMemoryDataProvider;
+using System.Windows.Forms;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public class IOHelper {
@@ -145,23 +145,47 @@ namespace Mapping_Tools.Classes.SystemTools {
         }
 
         public static string GetCurrentBeatmap() {
-            string songs = SettingsManager.GetSongsPath();
+            string path;
+            try {
+                string songs = SettingsManager.GetSongsPath();
 
-            if (string.IsNullOrEmpty(songs)) {
-                throw new Exception(@"Can't fetch current in-game beatmap, because there is no Songs path specified in Preferences.");
+                if (string.IsNullOrEmpty(songs)) {
+                    throw new Exception(
+                        @"Can't fetch current in-game beatmap, because there is no Songs path specified in Preferences.");
+                }
+
+                string folder = PioReader.GetMapFolderName();
+                string filename = PioReader.GetOsuFileName();
+
+                if (string.IsNullOrEmpty(folder)) {
+                    throw new Exception(@"Can't fetch the folder name of the current in-game beatmap.");
+                }
+
+                if (string.IsNullOrEmpty(filename)) {
+                    throw new Exception(@"Can't fetch the file name of the current in-game beatmap.");
+                }
+
+                path = Path.Combine(songs, folder, filename);
+                throw new Exception("test");
             }
-
-            string folder = PioReader.GetMapFolderName();
-            string filename = PioReader.GetOsuFileName();
-            string path = Path.Combine(songs, folder, filename);
-
-            if (string.IsNullOrEmpty(folder)) {
-                throw new Exception(@"Can't fetch the folder name of the current in-game beatmap.");
+            catch (Exception ex) {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
+                try {
+                    var reader = EditorReaderStuff.GetEditorReader();
+                    reader.FetchEditor();
+                    reader.SetHOM();
+                    reader.ReadHOM();
+                    reader.FetchBeatmap();
+                    path = EditorReaderStuff.GetCurrentBeatmap(reader);
+                }
+                catch (Exception ex2) {
+                    Console.WriteLine(ex2.Message);
+                    Console.WriteLine(ex2.StackTrace);
+                    throw ex;
+                }
             }
-            if (string.IsNullOrEmpty(filename)) {
-                throw new Exception(@"Can't fetch the file name of the current in-game beatmap.");
-            }
-
+            
             return path;
         }
 
