@@ -764,12 +764,12 @@ namespace Mapping_Tools.Views.Sliderator {
         public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Sliderator Projects");
 
         public void RunFast() {
-            var currentMap = IOHelper.GetCurrentBeatmap();
+            var currentMap = MainWindow.AppWindow.GetCurrentMaps()[0];
             RunTool(currentMap, true);
         }
 
         public void QuickRun() {
-            var currentMap = IOHelper.GetCurrentBeatmap();
+            var currentMap = IOHelper.GetCurrentBeatmapOrCurrentBeatmap();
 
             ViewModel.Import(currentMap);
             RunTool(currentMap, true);

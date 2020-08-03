@@ -145,18 +145,32 @@ namespace Mapping_Tools.Classes.SystemTools {
         }
 
         public static string GetCurrentBeatmap() {
-            try {
-                string songs = SettingsManager.GetSongsPath();
+            string songs = SettingsManager.GetSongsPath();
 
-                string folder = PioReader.GetMapFolderName();
-                string filename = PioReader.GetOsuFileName();
-                string path = Path.Combine(songs, folder, filename);
-
-                if( songs == "" || folder == "" || filename == "" ) { return ""; }
-                return path;
+            if (string.IsNullOrEmpty(songs)) {
+                throw new Exception(@"Can't fetch current in-game beatmap, because there is no Songs path specified in Preferences.");
             }
-            catch( Exception ) {
-                return "";
+
+            string folder = PioReader.GetMapFolderName();
+            string filename = PioReader.GetOsuFileName();
+            string path = Path.Combine(songs, folder, filename);
+
+            if (string.IsNullOrEmpty(folder)) {
+                throw new Exception(@"Can't fetch the folder name of the current in-game beatmap.");
+            }
+            if (string.IsNullOrEmpty(filename)) {
+                throw new Exception(@"Can't fetch the file name of the current in-game beatmap.");
+            }
+
+            return path;
+        }
+
+        public static string GetCurrentBeatmapOrCurrentBeatmap() {
+            try {
+                return GetCurrentBeatmap();
+            }
+            catch {
+                return MainWindow.AppWindow.GetCurrentMaps()[0];
             }
         }
     }

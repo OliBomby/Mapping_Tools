@@ -61,7 +61,7 @@ namespace Mapping_Tools.Views.MapCleaner {
         /// 
         /// </summary>
         public void QuickRun() {
-            RunTool(new[] { IOHelper.GetCurrentBeatmap() }, quick: true);
+            RunTool(new[] { IOHelper.GetCurrentBeatmapOrCurrentBeatmap() }, quick: true);
         }
 
         private void RunTool(string[] paths, bool quick = false) {

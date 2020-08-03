@@ -1,8 +1,10 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using Mapping_Tools.Annotations;
+using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.SystemTools;
 
 namespace Mapping_Tools.Components.Dialogs {
@@ -28,14 +30,27 @@ namespace Mapping_Tools.Components.Dialogs {
         }
 
         private void BeatmapBrowse_Click(object sender, RoutedEventArgs e) {
-            string[] paths = IOHelper.BeatmapFileDialog(restore: !SettingsManager.Settings.CurrentBeatmapDefaultFolder);
-            if( paths.Length != 0 ) { Path = paths[0]; }
+            try {
+                string[] paths =
+                    IOHelper.BeatmapFileDialog(restore: !SettingsManager.Settings.CurrentBeatmapDefaultFolder);
+                if (paths.Length != 0) {
+                    Path = paths[0];
+                }
+            }
+            catch (Exception ex) {
+                ex.Show();
+            }
         }
 
         private void BeatmapLoad_Click(object sender, RoutedEventArgs e) {
-            string path = IOHelper.GetCurrentBeatmap();
-            if( path != "" ) { Path = path; }
-        }
+            try {
+                string path = IOHelper.GetCurrentBeatmap();
+                if( path != "" ) { Path = path; }
+            }
+            catch (Exception ex) {
+                ex.Show();
+            }
+}
 
         public event PropertyChangedEventHandler PropertyChanged;
 

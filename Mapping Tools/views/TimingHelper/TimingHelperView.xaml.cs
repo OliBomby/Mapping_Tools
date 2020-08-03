@@ -42,7 +42,7 @@ namespace Mapping_Tools.Views.TimingHelper {
         }
 
         public void QuickRun() {
-            RunTool(new[] {IOHelper.GetCurrentBeatmap()}, true);
+            RunTool(new[] {IOHelper.GetCurrentBeatmapOrCurrentBeatmap()}, true);
         }
 
         private void RunTool(string[] paths, bool quick = false) {

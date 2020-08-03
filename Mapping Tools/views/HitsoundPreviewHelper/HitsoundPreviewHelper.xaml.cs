@@ -123,7 +123,7 @@ namespace Mapping_Tools.Views.HitsoundPreviewHelper
 
         public void QuickRun()
         {
-            RunTool(new[] {IOHelper.GetCurrentBeatmap()}, quick: true);
+            RunTool(new[] {IOHelper.GetCurrentBeatmapOrCurrentBeatmap()}, quick: true);
         }
 
 

@@ -44,8 +44,13 @@ namespace Mapping_Tools.Views.HitsoundStudio {
         }
 
         private void BeatmapLoad_Click(object sender, RoutedEventArgs e) {
-            string path = IOHelper.GetCurrentBeatmap();
-            if( path != "" ) { BeatmapPathBox.Text = path; }
+            try {
+                string path = IOHelper.GetCurrentBeatmap();
+                if (path != "") { BeatmapPathBox.Text = path; }
+            }
+            catch (Exception ex) {
+                ex.Show();
+            }
         }
 
         private void BeatmapBrowse2_Click(object sender, RoutedEventArgs e) {
@@ -54,8 +59,13 @@ namespace Mapping_Tools.Views.HitsoundStudio {
         }
 
         private void BeatmapLoad2_Click(object sender, RoutedEventArgs e) {
-            string path = IOHelper.GetCurrentBeatmap();
-            if( path != "" ) { BeatmapPathBox2.Text = path; }
+            try {
+                string path = IOHelper.GetCurrentBeatmap();
+                if (path != "") { BeatmapPathBox2.Text = path; }
+            }
+            catch (Exception ex) {
+                ex.Show();
+            }
         }
 
         private void BeatmapBrowse4_Click(object sender, RoutedEventArgs e) {
@@ -64,8 +74,13 @@ namespace Mapping_Tools.Views.HitsoundStudio {
         }
 
         private void BeatmapLoad4_Click(object sender, RoutedEventArgs e) {
-            string path = IOHelper.GetCurrentBeatmap();
-            if( path != "" ) { BeatmapPathBox4.Text = path; }
+            try {
+                string path = IOHelper.GetCurrentBeatmap();
+                if (path != "") { BeatmapPathBox4.Text = path; }
+            }
+            catch (Exception ex) {
+                ex.Show();
+            }
         }
 
         private void MIDIBrowse3_Click(object sender, RoutedEventArgs e) {

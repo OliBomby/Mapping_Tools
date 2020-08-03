@@ -287,8 +287,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
                 {
                     SelectedSamplePathBox.Text = path;
                 }
-            }
-            catch (Exception) { }
+            } catch (Exception ex) { ex.Show(); }
         }
 
         private void SelectedImportSamplePathBrowse_Click(object sender, RoutedEventArgs e)
@@ -301,8 +300,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
                     SelectedImportSamplePathBox.Text = path;
                     SelectedStoryboardImportSamplePathBox.Text = path;
                 }
-            }
-            catch (Exception) { }
+            } catch (Exception ex) { ex.Show(); }
         }
 
         private void SelectedImportPathBrowse_Click(object sender, RoutedEventArgs e)
@@ -314,8 +312,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
                 {
                     SelectedImportPathBox.Text = path;
                 }
-            }
-            catch (Exception) { }
+            } catch (Exception ex) { ex.Show(); }
         }
 
         private void SelectedImportPathLoad_Click(object sender, RoutedEventArgs e)
@@ -328,7 +325,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
                     SelectedImportPathBox.Text = path;
                 }
             }
-            catch (Exception) { }
+            catch (Exception ex) { ex.Show(); }
         }
 
         private void DefaultSampleBrowse_Click(object sender, RoutedEventArgs e)
@@ -341,8 +338,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
                     Settings.DefaultSample.SampleArgs.Path = path;
                     DefaultSamplePathBox.Text = path;
                 }
-            }
-            catch (Exception) { }
+            } catch (Exception ex) { ex.Show(); }
         }
 
         private void BaseBeatmapBrowse_Click(object sender, RoutedEventArgs e)
@@ -354,8 +350,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
                 {
                     Settings.BaseBeatmap = paths[0];
                 }
-            }
-            catch (Exception) { }
+            } catch (Exception ex) { ex.Show(); }
         }
 
         private void BaseBeatmapLoad_Click(object sender, RoutedEventArgs e)
@@ -367,8 +362,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
                 {
                     Settings.BaseBeatmap = path;
                 }
-            }
-            catch (Exception) { }
+            } catch (Exception ex) { ex.Show(); }
         }
 
         private void ReloadFromSource_Click(object sender, RoutedEventArgs e)
@@ -400,7 +394,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
                     layers.ForEach(o => o.Reload(importedLayers));
                 }
             }
-            catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
+            catch (Exception ex) { ex.Show(); }
         }
 
         private void LayersList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -487,7 +481,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
             catch (Exception ex) { ex.Show(); }
         }
 
-        private void PlayerStopped(object sender, StoppedEventArgs e)
+        private static void PlayerStopped(object sender, StoppedEventArgs e)
         {
             ((WaveOutEvent)sender).Dispose();
             GC.Collect();
@@ -560,7 +554,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
                 RecalculatePriorities();
                 Num_Layers_Changed();
             }
-            catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
+            catch (Exception ex) { ex.Show(); }
         }
 
         private void Raise_Click(object sender, RoutedEventArgs e)
@@ -614,7 +608,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
                     GetSelectedLayers();
                 }
             }
-            catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
+            catch (Exception ex) { ex.Show(); }
         }
 
         private void Lower_Click(object sender, RoutedEventArgs e)
@@ -670,7 +664,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
                     GetSelectedLayers();
                 }
             }
-            catch (Exception ex) { Console.WriteLine(ex.Message); Console.WriteLine(ex.StackTrace); }
+            catch (Exception ex) { ex.Show(); }
         }
 
         private void RecalculatePriorities()

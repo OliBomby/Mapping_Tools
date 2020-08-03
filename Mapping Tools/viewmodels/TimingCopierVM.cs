@@ -1,7 +1,9 @@
-﻿using Mapping_Tools.Classes.SystemTools;
+﻿using System;
+using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Components.Domain;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Mapping_Tools.Classes;
 
 namespace Mapping_Tools.Viewmodels {
 
@@ -21,9 +23,13 @@ namespace Mapping_Tools.Viewmodels {
 
             ImportLoadCommand = new CommandImplementation(
                 _ => {
-                    string path = IOHelper.GetCurrentBeatmap();
-                    if( path != "" ) {
-                        ImportPath = path;
+                    try {
+                        string path = IOHelper.GetCurrentBeatmap();
+                        if (path != "") {
+                            ImportPath = path;
+                        }
+                    } catch (Exception ex) {
+                        ex.Show();
                     }
                 });
 
@@ -37,9 +43,13 @@ namespace Mapping_Tools.Viewmodels {
 
             ExportLoadCommand = new CommandImplementation(
                 _ => {
-                    string path = IOHelper.GetCurrentBeatmap();
-                    if( path != "" ) {
-                        ExportPath = path;
+                    try {
+                        string path = IOHelper.GetCurrentBeatmap();
+                        if (path != "") {
+                            ExportPath = path;
+                        }
+                    } catch (Exception ex) {
+                        ex.Show();
                     }
                 });
 
@@ -53,7 +63,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public string ImportPath {
-            get { return _importPath; }
+            get => _importPath;
             set {
                 if( _importPath == value )
                     return;
@@ -63,7 +73,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public string ExportPath {
-            get { return _exportPath; }
+            get => _exportPath;
             set {
                 if( _exportPath == value )
                     return;
@@ -73,7 +83,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public string ResnapMode {
-            get { return _resnapMode; }
+            get => _resnapMode;
             set {
                 if( _resnapMode == value )
                     return;
@@ -83,7 +93,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public int Snap1 {
-            get { return _snap1; }
+            get => _snap1;
             set {
                 if( _snap1 == value )
                     return;
@@ -93,7 +103,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public int Snap2 {
-            get { return _snap2; }
+            get => _snap2;
             set {
                 if( _snap2 == value )
                     return;

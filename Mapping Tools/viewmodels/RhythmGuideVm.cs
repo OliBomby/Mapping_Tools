@@ -4,6 +4,7 @@ using Mapping_Tools.Components.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Newtonsoft.Json;
 
@@ -17,9 +18,14 @@ namespace Mapping_Tools.Viewmodels {
 
             ImportLoadCommand = new CommandImplementation(
                 _ => {
-                    var path = IOHelper.GetCurrentBeatmap();
-                    if (path != "") {
-                        GuideGeneratorArgs.Paths = new[] {path};
+                    try {
+                        var path = IOHelper.GetCurrentBeatmap();
+                        if (path != "") {
+                            GuideGeneratorArgs.Paths = new[] { path };
+                        }
+                    }
+                    catch (Exception ex) {
+                        ex.Show();
                     }
                 });
 
@@ -33,9 +39,14 @@ namespace Mapping_Tools.Viewmodels {
 
             ExportLoadCommand = new CommandImplementation(
                 _ => {
-                    var path = IOHelper.GetCurrentBeatmap();
-                    if (path != "") {
-                        GuideGeneratorArgs.ExportPath = path;
+                    try {
+                        var path = IOHelper.GetCurrentBeatmap();
+                        if (path != "") {
+                            GuideGeneratorArgs.ExportPath = path;
+                        }
+                    }
+                    catch (Exception ex) {
+                        ex.Show();
                     }
                 });
 
