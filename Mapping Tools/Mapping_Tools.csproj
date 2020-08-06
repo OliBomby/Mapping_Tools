@@ -513,6 +513,7 @@
     </Compile>
     <Compile Include="Classes\Tools\TimingPointsChange.cs" />
     <Compile Include="Properties\Annotations.cs" />
+    <Compile Include="Viewmodels\PatternGalleryVm.cs" />
     <Compile Include="Viewmodels\MapCleanerVm.cs" />
     <Compile Include="Viewmodels\HitsoundPreviewHelperVm.cs" />
     <Compile Include="Viewmodels\HitsoundStudioVm.cs" />
@@ -538,6 +539,9 @@
     <Compile Include="Views\Extensions.cs" />
     <Compile Include="Views\ComboColourStudio\ComboColourStudioView.xaml.cs">
       <DependentUpon>ComboColourStudioView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PatternGallery\PatternGalleryView.xaml.cs">
+      <DependentUpon>PatternGalleryView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\HitsoundStudio\HitsoundStudioExportDialog.xaml.cs">
       <DependentUpon>HitsoundStudioExportDialog.xaml</DependentUpon>
@@ -706,6 +710,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Components\Dialogs\BeatmapImportDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\PatternGallery\PatternGalleryView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
