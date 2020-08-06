@@ -29,16 +29,14 @@
 
               <StackPanel Orientation="Horizontal" Grid.Row="0">
                 <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
-                  <Run Text="Hitsound Preview Helper"/>
+                  <Run Text="Pattern Gallery"/>
                 </TextBlock>
                     <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom" ToolTip="Click me!">
                   <materialDesign:PopupBox.ToggleContent>
                     <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
                   </materialDesign:PopupBox.ToggleContent>
                   <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
-                    Hitsound Preview Helper helps by placing hitsounds on all the objects of the current map based on the positions of the objects. That way you can hear the hitsounds play while you hitsound without having to assign them manually and later import them to Hitsound Studio.
-                    <LineBreak/>
-                    This tool is meant to help a very specific hitsounding workflow. If you hitsound by placing circles on different parts on the screen and treat each position as a different layer of hitsounds. For example using a mania map and have each column represent a different sound.
+                    Patterns
                   </TextBlock>
                     </materialDesign:PopupBox>
                   <materialDesign:PopupBox Margin="0,10,10,10" VerticalAlignment="Bottom" ToolTip="Click me!">
@@ -119,14 +117,8 @@
                         HorizontalAlignment="Right"
                         VerticalAlignment="Bottom"
                         Orientation="Horizontal">
-                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Generate rhythm guide." Command="{Binding RhythmGuideCommand}" Margin="5">
-                        <materialDesign:PackIcon Kind="AlternatingCurrent" Height="24" Width="24" />
-                    </Button>
                     <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a hitsound zone. Hold shift to add current selected coordinates." Command="{Binding AddCommand}" Margin="5">
                         <materialDesign:PackIcon Kind="Plus" Height="24" Width="24" />
-                    </Button>
-                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Copy selected hitsound zones." Command="{Binding CopyCommand}" Margin="5">
-                        <materialDesign:PackIcon Kind="ContentCopy" Height="24" Width="24" />
                     </Button>
                     <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove selected hitsound zones." Command="{Binding RemoveCommand}" Margin="5">
                         <materialDesign:PackIcon Kind="Trashcan" Height="24" Width="24" />

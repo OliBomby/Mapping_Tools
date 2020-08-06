@@ -1,38 +1,23 @@
 ﻿using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.HitsoundStuff;
+using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Components.Domain;
-using Mapping_Tools.Views.RhythmGuide;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
-using Mapping_Tools.Classes.Tools;
 
 namespace Mapping_Tools.Viewmodels {
-    public class PatternGalleryVm : INotifyPropertyChanged
+    public class PatternGalleryVm : BindableBase
     {
-        private ObservableCollection<HitsoundZone> _items;
+        private ObservableCollection<HitsoundZone> _patterns;
         private bool? _isAllItemsSelected;
-        private RhythmGuideWindow _rhythmGuideWindow;
 
         public PatternGalleryVm() {
-            _items = new ObservableCollection<HitsoundZone>();
+            _patterns = new ObservableCollection<HitsoundZone>();
 
-            RhythmGuideCommand = new CommandImplementation(
-                _ => {
-                    try {
-                        if (_rhythmGuideWindow == null) {
-                            _rhythmGuideWindow = new RhythmGuideWindow();
-                            _rhythmGuideWindow.Closed += RhythmGuideWindowOnClosed;
-                            _rhythmGuideWindow.Show();
-                        } else {
-                            _rhythmGuideWindow.Focus();
-                        }
-                    } catch (Exception ex) { ex.Show(); }
-                });
             AddCommand = new CommandImplementation(
                 _ => {
                     try {
@@ -47,52 +32,29 @@ namespace Mapping_Tools.Viewmodels {
                                 MessageBox.Show("Please select a hit object to fetch the coordinates.");
                             }
                         }
-                        Items.Add(newZone);
-                    } catch (Exception ex) { ex.Show(); }
-                });
-            CopyCommand = new CommandImplementation(
-                _ => {
-                    try {
-                        int initialCount = Items.Count;
-                        for (int i = 0; i < initialCount; i++) {
-                            if (Items[i].IsSelected) {
-                                Items.Add(Items[i].Copy());
-                            }
-                        }
+                        Patterns.Add(newZone);
                     } catch (Exception ex) { ex.Show(); }
                 });
             RemoveCommand = new CommandImplementation(
                 _ => {
                     try {
-                        Items.RemoveAll(o => o.IsSelected);
+                        Patterns.RemoveAll(o => o.IsSelected);
                     } catch (Exception ex) { ex.Show(); }
                 });
         }
 
-        private void RhythmGuideWindowOnClosed(object sender, EventArgs e) {
-            _rhythmGuideWindow = null;
-        }
-
-        public ObservableCollection<HitsoundZone> Items {
-            get { return _items; }
-            set {
-                if (_items == value) return;
-                _items = value;
-                OnPropertyChanged();
-            }
+        public ObservableCollection<HitsoundZone> Patterns {
+            get => _patterns;
+            set => Set(ref _patterns, value);
         }
 
         public bool? IsAllItemsSelected {
-            get { return _isAllItemsSelected; }
+            get => _isAllItemsSelected;
             set {
-                if (_isAllItemsSelected == value) return;
-
-                _isAllItemsSelected = value;
-
-                if (_isAllItemsSelected.HasValue)
-                    SelectAll(_isAllItemsSelected.Value, Items);
-
-                OnPropertyChanged();
+                if (Set(ref _isAllItemsSelected, value)) {
+                    if (_isAllItemsSelected.HasValue)
+                        SelectAll(_isAllItemsSelected.Value, Patterns);
+                }
             }
         }
 
@@ -102,19 +64,7 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
-        public CommandImplementation RhythmGuideCommand { get; }
         public CommandImplementation AddCommand { get; }
-        public CommandImplementation CopyCommand { get; }
         public CommandImplementation RemoveCommand { get; }
-
-        public IEnumerable<string> SampleSets => Enum.GetNames(typeof(SampleSet));
-
-        public IEnumerable<string> Hitsounds => Enum.GetNames(typeof(Hitsound));
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
     }
 }
