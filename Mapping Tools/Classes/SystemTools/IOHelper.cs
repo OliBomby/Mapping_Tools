@@ -166,7 +166,6 @@ namespace Mapping_Tools.Classes.SystemTools {
                 }
 
                 path = Path.Combine(songs, folder, filename);
-                throw new Exception("test");
             }
             catch (Exception ex) {
                 Console.WriteLine(ex.Message);
