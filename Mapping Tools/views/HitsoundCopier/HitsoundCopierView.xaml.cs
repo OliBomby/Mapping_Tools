@@ -69,6 +69,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
 
             var paths = arg.PathTo.Split('|');
             var mapsDone = 0;
+            var sampleSchema = new SampleSchema();
 
             var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
 
@@ -148,21 +149,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                     var firstSamples = HitsoundImporter.AnalyzeSamples(mapDir);
 
                     if (arg.CopyHitsounds) {
-                        CopyHitsounds(arg, beatmapTo, tlFrom, tlTo, timingPointsChanges, mode, mapDir, firstSamples, out var sampleSchema);
-
-                        // Export the sample schema if there are samples
-                        if (sampleSchema.Count > 0) {
-                            string exportFolder = MainWindow.ExportPath;
-
-                            DirectoryInfo di = new DirectoryInfo(exportFolder);
-                            foreach (FileInfo file in di.GetFiles()) {
-                                file.Delete();
-                            }
-
-                            HitsoundExporter.ExportSampleSchema(sampleSchema, exportFolder);
-
-                            System.Diagnostics.Process.Start(exportFolder);
-                        }
+                        CopyHitsounds(arg, beatmapTo, tlFrom, tlTo, timingPointsChanges, mode, mapDir, firstSamples, ref sampleSchema);
                     }
 
                     if (arg.CopyBodyHitsounds) {
@@ -285,6 +272,20 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                 // Save the file
                 editorTo.SaveFile();
 
+                // Export the sample schema if there are samples
+                if (sampleSchema.Count > 0) {
+                    string exportFolder = MainWindow.ExportPath;
+
+                    DirectoryInfo di = new DirectoryInfo(exportFolder);
+                    foreach (FileInfo file in di.GetFiles()) {
+                        file.Delete();
+                    }
+
+                    HitsoundExporter.ExportSampleSchema(sampleSchema, exportFolder);
+
+                    System.Diagnostics.Process.Start(exportFolder);
+                }
+
                 // Update progressbar
                 if (worker != null && worker.WorkerReportsProgress) {
                     worker.ReportProgress(++mapsDone * 100 / paths.Length);
@@ -311,10 +312,9 @@ namespace Mapping_Tools.Views.HitsoundCopier {
         private void CopyHitsounds(HitsoundCopierVm arg, Beatmap beatmapTo, 
             Timeline tlFrom, Timeline tlTo,
             List<TimingPointsChange> timingPointsChanges, GameMode mode, string mapDir,
-            Dictionary<string, string> firstSamples, out SampleSchema sampleSchema) {
+            Dictionary<string, string> firstSamples, ref SampleSchema sampleSchema) {
 
             var CustomSampledTimes = new HashSet<int>();
-            sampleSchema = new SampleSchema();
             var tloToSliderSlide = new List<TimelineObject>();
 
             foreach (var tloFrom in tlFrom.TimelineObjects) {
