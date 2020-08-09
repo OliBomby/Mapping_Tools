@@ -29,26 +29,32 @@ namespace Mapping_Tools {
         public bool SessionhasAdminRights;
 
         public static MainWindow AppWindow { get; set; }
-        public static SnackbarMessageQueue MessageQueue;
-        public static Random MainRandom = new Random();
-        public static readonly HttpClient HttpClient = new HttpClient();
-        public static readonly string AppCommon = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        public static readonly string AppDataPath = Path.Combine(AppCommon, "Mapping Tools");
-        public static readonly string ExportPath = Path.Combine(AppDataPath, "Exports");
+        public static string AppCommon { get; set; }
+        public static string AppDataPath { get; set; }
+        public static string ExportPath { get; set; }
+        public static Random MainRandom { get; set; }
+        public static HttpClient HttpClient { get; set; }
+        public static SnackbarMessageQueue MessageQueue { get; set; }
 
         public MainWindow() {
-            InitializeComponent();
-
             // Initialize exception logging
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
+            InitializeComponent();
+
             try {
+                AppWindow = this;
+                AppCommon = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                AppDataPath = Path.Combine(AppCommon, "Mapping Tools");
+                ExportPath = Path.Combine(AppDataPath, "Exports");
+                MainRandom = new Random();
+                HttpClient = new HttpClient();
+                MessageQueue = new SnackbarMessageQueue(TimeSpan.FromSeconds(2));
+                MainSnackbar.MessageQueue = MessageQueue;
+
                 Setup();
                 SettingsManager.LoadConfig();
                 ListenerManager = new ListenerManager();
-                AppWindow = this;
-                MessageQueue = new SnackbarMessageQueue(TimeSpan.FromSeconds(2));
-                MainSnackbar.MessageQueue = MessageQueue;
                 IsMaximized = SettingsManager.Settings.MainWindowMaximized;
                 WidthWin = SettingsManager.Settings.MainWindowWidth ?? Width;
                 HeightWin = SettingsManager.Settings.MainWindowHeight ?? Height;
