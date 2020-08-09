@@ -67,10 +67,16 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             set => Set(ref _timingPoints, value);
         }
 
-        private double _svMultiplier;
-        public double SvMultiplier {
-            get => _svMultiplier;
-            set => Set(ref _svMultiplier, value);
+        private TimingPoint _firstUnInheritedTimingPoint;
+        public TimingPoint FirstUnInheritedTimingPoint {
+            get => _firstUnInheritedTimingPoint;
+            set => Set(ref _firstUnInheritedTimingPoint, value);
+        }
+
+        private double _sliderMultiplier;
+        public double SliderMultiplier {
+            get => _sliderMultiplier;
+            set => Set(ref _sliderMultiplier, value);
         }
 
         private double _sliderTickRate;
