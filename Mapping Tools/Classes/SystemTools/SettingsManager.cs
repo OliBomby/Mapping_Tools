@@ -9,7 +9,7 @@ using System.Windows;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public static class SettingsManager {
-        private static readonly string JsonPath = Path.Combine(MainWindow.AppDataPath, "config.json");
+        private static string JsonPath { get; set; }
         private static readonly JsonSerializer Serializer = new JsonSerializer {
             NullValueHandling = NullValueHandling.Ignore,
             Formatting = Formatting.Indented
@@ -19,6 +19,7 @@ namespace Mapping_Tools.Classes.SystemTools {
         public static bool InstanceComplete;
 
         public static void LoadConfig() {
+            JsonPath = Path.Combine(MainWindow.AppDataPath, "config.json");
             InstanceComplete = File.Exists(JsonPath) ? LoadFromJson() : CreateJson();
             DefaultPaths();
         }

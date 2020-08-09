@@ -10,18 +10,19 @@ using Mapping_Tools.Classes.Tools;
 namespace Mapping_Tools.Classes.SystemTools {
     public static class BackupManager {
         public static bool SaveMapBackup(string fileToCopy, bool forced = false, string filename = null, string backupCode = "") {
-            if (!SettingsManager.GetMakeBackups() && !forced)
-                return false;
-
-            if (string.IsNullOrEmpty(filename))
-                filename = Path.GetFileName(fileToCopy);
-
-            if (SettingsManager.Settings.UseEditorReader)
-                fileToCopy = GetNewestVersionPath(fileToCopy);
-
-            DateTime now = DateTime.Now;
-            string destinationDirectory = SettingsManager.GetBackupsPath();
             try {
+                if (!SettingsManager.GetMakeBackups() && !forced)
+                    return false;
+
+                if (string.IsNullOrEmpty(filename))
+                    filename = Path.GetFileName(fileToCopy);
+
+                if (SettingsManager.Settings.UseEditorReader) {
+                    fileToCopy = GetNewestVersionPath(fileToCopy);
+                }
+
+                DateTime now = DateTime.Now;
+                string destinationDirectory = SettingsManager.GetBackupsPath();
                 var name = now.ToString("yyyy-MM-dd HH-mm-ss") + "_" + backupCode + "__" + filename;
 
                 File.Copy(fileToCopy,
