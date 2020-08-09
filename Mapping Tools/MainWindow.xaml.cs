@@ -40,8 +40,6 @@ namespace Mapping_Tools {
             // Initialize exception logging
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
-            InitializeComponent();
-
             try {
                 AppWindow = this;
                 AppCommon = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -49,6 +47,9 @@ namespace Mapping_Tools {
                 ExportPath = Path.Combine(AppDataPath, "Exports");
                 MainRandom = new Random();
                 HttpClient = new HttpClient();
+
+                InitializeComponent();
+
                 MessageQueue = new SnackbarMessageQueue(TimeSpan.FromSeconds(2));
                 MainSnackbar.MessageQueue = MessageQueue;
 
