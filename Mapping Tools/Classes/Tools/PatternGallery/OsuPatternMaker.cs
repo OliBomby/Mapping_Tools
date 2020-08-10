@@ -12,7 +12,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 throw new Exception("No selected hit objects found.");
 
             var startTime = hitObjects.Min(h => h.Time) - 5;
-            var endTime = hitObjects.Max(h => h.Time) + 5;
+            var endTime = hitObjects.Max(h => h.EndTime) + 5;
 
             var timingPoints = beatmap.BeatmapTiming.TimingPoints
                 .Where(tp => tp.Offset >= startTime && tp.Offset <= endTime).ToList();
