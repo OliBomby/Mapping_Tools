@@ -5,7 +5,7 @@ using Mapping_Tools.Classes.HitsoundStuff;
 
 namespace Mapping_Tools.Classes.Tools.PatternGallery {
     public class OsuPatternMaker {
-        public static OsuPattern FromSelected(Beatmap beatmap, string name="") {
+        public OsuPattern FromSelected(Beatmap beatmap, string name="") {
             var hitObjects = beatmap.HitObjects.Where(h => h.IsSelected).ToList();
 
             if (hitObjects.Count == 0)

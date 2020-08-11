@@ -7,11 +7,10 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
              x:Name="This"
-             mc:Ignorable="d" Width="900" Height="700">
+             mc:Ignorable="d" Width="900" Height="700" d:DataContext="{d:DesignData PatternGalleryVm}">
     <UserControl.Resources>
         <domain:DoubleToStringConverter x:Key="D2SConverter"/>
-        <domain:SampleSetToStringConverter x:Key="SS2SConverter"/>
-        <domain:HitsoundToStringConverter x:Key="HS2SConverter"/>
+        <domain:IntToStringConverter x:Key="I2SConverter"/>
     </UserControl.Resources>
     <Grid Name="MasterGrid">
         <Grid.RowDefinitions>
@@ -52,7 +51,7 @@
                 <DataGrid
                     Grid.Row="1"
                     Margin="0 18 0 0"
-                    ItemsSource="{Binding Items}"
+                    ItemsSource="{Binding Patterns}"
                     CanUserSortColumns="True"
                     CanUserAddRows="False"
                     AutoGenerateColumns="False"
@@ -88,26 +87,11 @@
                             Header="Name"
                             EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}" />
                         <materialDesign:MaterialDataGridTextColumn
-                            Binding="{Binding Filename, UpdateSourceTrigger=PropertyChanged}"
-                            Header="Filename"
-                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}" />
+                            Binding="{Binding UseCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                            Header="Use count"/>
                         <materialDesign:MaterialDataGridTextColumn
-                            Binding="{Binding XPos, Converter={StaticResource D2SConverter}, ConverterParameter=-1, UpdateSourceTrigger=PropertyChanged}"
-                            Header="X position"
-                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"/>
-                        <materialDesign:MaterialDataGridTextColumn
-                            Binding="{Binding YPos, Converter={StaticResource D2SConverter}, ConverterParameter=-1, UpdateSourceTrigger=PropertyChanged}"
-                            Header="Y position"
-                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"/>
-                        <!-- use custom combo box column to get better combos. Use ItemsSourceBinding as your binding template to be applied to each combo -->
-                        <materialDesign:MaterialDataGridComboBoxColumn
-                            Header="SampleSet"
-                            SelectedValueBinding="{Binding SampleSet, Converter={StaticResource SS2SConverter}, UpdateSourceTrigger=PropertyChanged}"
-                            ItemsSourceBinding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}, Path=DataContext.SampleSets}" />
-                        <materialDesign:MaterialDataGridComboBoxColumn
-                            Header="Hitsound"
-                            SelectedValueBinding="{Binding Hitsound, Converter={StaticResource HS2SConverter}, UpdateSourceTrigger=PropertyChanged}"
-                            ItemsSourceBinding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}, Path=DataContext.Hitsounds}" />
+                            Binding="{Binding HitObjects.Count, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                            Header="Object count"/>
                     </DataGrid.Columns>
                 </DataGrid>
 

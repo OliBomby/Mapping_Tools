@@ -475,7 +475,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="deltaTime"></param>
         public void MoveTime(double deltaTime) {
             Time += deltaTime;
-            EndTime += deltaTime;
 
             // Move its timelineobjects
             foreach (var tlo in TimelineObjects) tlo.Time += deltaTime;
@@ -756,6 +755,24 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        public HitObject DeepCopy() {
+            var newHitObject = (HitObject) MemberwiseClone();
+            newHitObject.BodyHitsounds = BodyHitsounds?.Select(o => o.Copy()).ToList();
+            newHitObject.TimelineObjects = TimelineObjects?.Select(o => o.Copy()).ToList();
+            newHitObject.CurvePoints = CurvePoints?.Copy();
+            if (EdgeHitsounds != null)
+                newHitObject.EdgeHitsounds = new List<int>(EdgeHitsounds);
+            if (EdgeSampleSets != null)
+                newHitObject.EdgeSampleSets = new List<SampleSet>(EdgeSampleSets);
+            if (EdgeAdditionSets != null)
+                newHitObject.EdgeAdditionSets = new List<SampleSet>(EdgeAdditionSets);
+            newHitObject.TimingPoint = TimingPoint?.Copy();
+            newHitObject.HitsoundTimingPoint = HitsoundTimingPoint?.Copy();
+            newHitObject.UnInheritedTimingPoint = UnInheritedTimingPoint?.Copy();
+            newHitObject.Colour = Colour?.Copy();
+            return newHitObject;
         }
 
         public void Debug() {

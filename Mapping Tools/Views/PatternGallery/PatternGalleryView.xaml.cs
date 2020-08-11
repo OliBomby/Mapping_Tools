@@ -10,6 +10,7 @@ using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Classes.Tools.PatternGallery;
 using Mapping_Tools.Viewmodels;
 
 namespace Mapping_Tools.Views.PatternGallery
@@ -20,8 +21,6 @@ namespace Mapping_Tools.Views.PatternGallery
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
     public partial class PatternGalleryView : ISavable<PatternGalleryVm>, IQuickRun
     {
-        public event EventHandler RunFinished;
-
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "patterngalleryproject.json");
 
         public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Pattern Gallery Projects");
@@ -42,14 +41,14 @@ namespace Mapping_Tools.Views.PatternGallery
             ProjectManager.LoadProject(this, message: false);
         }
 
+        public PatternGalleryVm ViewModel => (PatternGalleryVm)DataContext;
+
+        public event EventHandler RunFinished;
+
         protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             var bgw = sender as BackgroundWorker;
             e.Result = ExportPattern((PatternGalleryVm) e.Argument, bgw, e);
-        }
-
-        private string ExportPattern(PatternGalleryVm args, BackgroundWorker worker, DoWorkEventArgs _) {
-            return "yes";
         }
 
         private void Start_Click(object sender, RoutedEventArgs e)
@@ -62,7 +61,6 @@ namespace Mapping_Tools.Views.PatternGallery
             RunTool(new[] {IOHelper.GetCurrentBeatmapOrCurrentBeatmap()}, quick: true);
         }
 
-
         private void RunTool(string[] paths, bool quick = false)
         {
             if (!CanRun) return;
@@ -72,9 +70,39 @@ namespace Mapping_Tools.Views.PatternGallery
 
             BackupManager.SaveMapBackup(paths);
 
+            ViewModel.Paths = paths;
+            ViewModel.Quick = quick;
+
             BackgroundWorker.RunWorkerAsync(DataContext);
 
             CanRun = false;
+        }
+
+        private string ExportPattern(PatternGalleryVm args, BackgroundWorker worker, DoWorkEventArgs _) {
+            var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
+            var editor = EditorReaderStuff.GetNewestVersionOrNot(IOHelper.GetCurrentBeatmapOrCurrentBeatmap(), reader);
+
+            var pattern = args.Patterns.FirstOrDefault(o => o.IsSelected);
+            if (pattern == null)
+                throw new Exception("No pattern has been selected to export.");
+
+            var patternPlacer = new OsuPatternPlacer();
+            if (reader != null) {
+                patternPlacer.PlaceOsuPatternAtTime(pattern, editor.Beatmap, reader.EditorTime());
+            } else {
+                patternPlacer.PlaceOsuPattern(pattern, editor.Beatmap);
+            }
+
+            editor.SaveFile();
+
+            // Complete progressbar
+            if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(100);
+
+            // Do stuff
+            if (args.Quick)
+                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, reader != null));
+
+            return "Successfully exported pattern!";
         }
 
         public PatternGalleryVm GetSaveData()

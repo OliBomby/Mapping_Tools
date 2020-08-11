@@ -399,6 +399,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
+        public TimelineObject Copy() {
+            return (TimelineObject) MemberwiseClone();
+        }
+
         public override string ToString() {
             return $"{Time}, {ObjectType}, {Repeat}, {FenoSampleVolume}";
         }

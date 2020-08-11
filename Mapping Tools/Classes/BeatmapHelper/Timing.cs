@@ -24,6 +24,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public double SliderMultiplier { get; set; }
 
         /// <inheritdoc />
+        public Timing(List<TimingPoint> timingPoints, double sliderMultiplier) {
+            TimingPoints = timingPoints;
+            SliderMultiplier = sliderMultiplier;
+            Sort();
+        }
+
+        /// <inheritdoc />
         public Timing(List<string> timingLines, double sliderMultiplier) {
             TimingPoints = GetTimingPoints(timingLines);
             SliderMultiplier = sliderMultiplier;

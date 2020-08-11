@@ -1,0 +1,45 @@
+﻿<UserControl x:Class="Mapping_Tools.Components.Dialogs.OsuPatternImport.OsuPatternImportDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d"
+             Loaded="OsuPatternImportDialog_OnLoaded" 
+             d:DataContext="{d:DesignData OsuPatternImportDialogViewModel}">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <TextBox Grid.Row="0" x:Name="NameBox" Text="{Binding Name}" Margin="0 0 0 10"
+                 materialDesign:HintAssist.Hint="Name"
+                 ToolTip="Name of the pattern."/>
+
+        <ComboBox Grid.Row="1" ItemsSource="{Binding ImportModes}" SelectedItem="{Binding ImportModeSetting}" Margin="0 0 0 5"
+                  ToolTip="Import mode."/>
+
+        <TextBox Grid.Row="2" Text="{Binding TimeCode}" Visibility="{Binding TimeCodeBoxVisibility}" Margin="0 0 0 0"
+                 materialDesign:HintAssist.Hint="Time code"
+                 ToolTip="Input a time code here. Example time code: 00:56:823 (1,2,1,2) - "/>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="3"
+                    Margin="0 16 0 0">
+            <Button IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}"
+                    Click="AcceptButton_Click">
+                ACCEPT
+            </Button>
+            <Button IsCancel="True" Margin="8 0 0 0" Style="{DynamicResource MaterialDesignFlatButton}"
+                    Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}">
+                <Button.CommandParameter>
+                    <system:Boolean>False</system:Boolean>
+                </Button.CommandParameter>
+                CANCEL
+            </Button>
+        </StackPanel>
+    </Grid>
+</UserControl>
