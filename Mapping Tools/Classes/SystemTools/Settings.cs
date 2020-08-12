@@ -1,14 +1,11 @@
 ﻿using System;
-using Mapping_Tools.Annotations;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+using System.Windows;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public class Settings : BindableBase {
         public List<string[]> RecentMaps { get; set; }
-        public double? MainWindowWidth { get; set; }
-        public double? MainWindowHeight { get; set; }
+        public Rect? MainWindowRestoreBounds { get; set; }
         public bool MainWindowMaximized { get; set; }
 
         private string _osuPath;
@@ -130,8 +127,7 @@ namespace Mapping_Tools.Classes.SystemTools {
         /// </summary>
         public Settings() {
             RecentMaps = new List<string[]>();
-            MainWindowWidth = null;
-            MainWindowHeight = null;
+            MainWindowRestoreBounds = null;
             MainWindowMaximized = false;
             OsuPath = "";
             SongsPath = "";

@@ -12,7 +12,6 @@
         xmlns:standard="clr-namespace:Mapping_Tools.Views.Standard"
         mc:Ignorable="d"
         Title="Mapping Tools"  
-        WindowStyle="None"
         ResizeMode="CanResize"
         Width="1500"
         Height="800"
@@ -38,7 +37,7 @@
         </DataTemplate>
     </Window.Resources>
 
-    <Grid>
+    <Grid x:Name="MasterGrid">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="35"/>
