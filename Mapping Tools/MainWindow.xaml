@@ -16,7 +16,6 @@
         Width="1500"
         Height="800"
         AllowsTransparency="False"
-        WindowStartupLocation="CenterScreen"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Medium"
         TextElement.FontSize="14"
