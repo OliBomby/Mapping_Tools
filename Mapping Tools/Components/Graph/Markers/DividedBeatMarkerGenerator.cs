@@ -15,6 +15,7 @@ namespace Mapping_Tools.Components.Graph.Markers {
 
         public DividedBeatMarkerGenerator(int beatDivisor, bool snappable = false) {
             BeatDivisor = beatDivisor;
+            Snappable = snappable;
         }
 
         public IEnumerable<GraphMarker> GenerateMarkers(double start, double end, Orientation orientation, int maxMarkers) {
@@ -55,7 +56,7 @@ namespace Mapping_Tools.Components.Graph.Markers {
                 }
 
                 markers.Add(new GraphMarker {Orientation = orientation, Value = v, DrawMarker = true,
-                    MarkerColor = markerColor, MarkerLength = markerLength, Text = null
+                    MarkerColor = markerColor, MarkerLength = markerLength, Text = null, Snappable = Snappable
                 });
 
                 v = start + step * ++i;
