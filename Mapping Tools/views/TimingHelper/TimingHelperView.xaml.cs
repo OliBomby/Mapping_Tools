@@ -99,9 +99,9 @@ namespace Mapping_Tools.Views.TimingHelper {
                 // Sort the markers
                 markers = markers.OrderBy(o => o.Time).ToList();
 
-                // If there are no redlines add one with a default 180 BPM
+                // If there are no redlines add one with a default BPM
                 if (!timing.TimingPoints.Any(tp => tp.Uninherited)) {
-                    timing.TimingPoints.Add(new TimingPoint(0, 60000d / 180, 4, SampleSet.Soft, 0, 100, true, false, false));
+                    timing.TimingPoints.Add(new TimingPoint(0, 1000, 4, SampleSet.Soft, 0, 100, true, false, false));
                 }
 
                 // Calculate the beats between time and the last time or redline for each time
