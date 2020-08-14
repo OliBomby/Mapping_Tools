@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
@@ -97,6 +98,11 @@ namespace Mapping_Tools.Views.TimingHelper {
 
                 // Sort the markers
                 markers = markers.OrderBy(o => o.Time).ToList();
+
+                // If there are no redlines add one with a default 180 BPM
+                if (!timing.TimingPoints.Any(tp => tp.Uninherited)) {
+                    timing.TimingPoints.Add(new TimingPoint(0, 60000d / 180, 4, SampleSet.Soft, 0, 100, true, false, false));
+                }
 
                 // Calculate the beats between time and the last time or redline for each time
                 // Time the same is 0
