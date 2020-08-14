@@ -45,12 +45,12 @@ namespace Mapping_Tools.Views.SliderCompletionator {
         private void Start_Click(object sender, RoutedEventArgs e) {
             // Get the current beatmap if the selection mode is 'Selected' because otherwise the selection would always fail
             RunTool(SelectionModeBox.SelectedIndex == 0
-                ? new[] {IOHelper.GetCurrentBeatmap()}
+                ? new[] {IOHelper.GetCurrentBeatmapOrCurrentBeatmap()}
                 : MainWindow.AppWindow.GetCurrentMaps());
         }
 
         public void QuickRun() {
-            RunTool(new[] { IOHelper.GetCurrentBeatmap() }, quick: true);
+            RunTool(new[] { IOHelper.GetCurrentBeatmapOrCurrentBeatmap() }, quick: true);
         }
 
         private void RunTool(string[] paths, bool quick = false) {

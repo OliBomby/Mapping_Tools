@@ -1,7 +1,10 @@
 ﻿using AutoUpdaterDotNET;
+using Mapping_Tools.Classes;
+using Mapping_Tools.Classes.Exceptions;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Views;
+using Mapping_Tools.Views.Standard;
 using MaterialDesignThemes.Wpf;
 using Newtonsoft.Json;
 using System;
@@ -15,47 +18,48 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Mapping_Tools.Classes;
-using Mapping_Tools.Classes.Exceptions;
-using Mapping_Tools.Views.Standard;
 
 namespace Mapping_Tools {
 
     public partial class MainWindow {
-        public bool IsMaximized; //Check for window state
-        public double WidthWin, HeightWin; //Set default sizes of window
         public ViewCollection Views;
         public ListenerManager ListenerManager;
         public bool SessionhasAdminRights;
 
         public static MainWindow AppWindow { get; set; }
-        public static SnackbarMessageQueue MessageQueue;
-        public static Random MainRandom = new Random();
-        public static readonly HttpClient HttpClient = new HttpClient();
-        public static readonly string AppCommon = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        public static readonly string AppDataPath = Path.Combine(AppCommon, "Mapping Tools");
-        public static readonly string ExportPath = Path.Combine(AppDataPath, "Exports");
+        public static string AppCommon { get; set; }
+        public static string AppDataPath { get; set; }
+        public static string ExportPath { get; set; }
+        public static Random MainRandom { get; set; }
+        public static HttpClient HttpClient { get; set; }
+        public static SnackbarMessageQueue MessageQueue { get; set; }
 
         public MainWindow() {
-            InitializeComponent();
-
             // Initialize exception logging
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
             try {
+                AppWindow = this;
+                AppCommon = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                AppDataPath = Path.Combine(AppCommon, "Mapping Tools");
+                ExportPath = Path.Combine(AppDataPath, "Exports");
+                MainRandom = new Random();
+                HttpClient = new HttpClient();
+
+                InitializeComponent();
+
+                MessageQueue = new SnackbarMessageQueue(TimeSpan.FromSeconds(2));
+                MainSnackbar.MessageQueue = MessageQueue;
+
                 Setup();
                 SettingsManager.LoadConfig();
                 ListenerManager = new ListenerManager();
-                AppWindow = this;
-                MessageQueue = new SnackbarMessageQueue(TimeSpan.FromSeconds(2));
-                MainSnackbar.MessageQueue = MessageQueue;
-                IsMaximized = SettingsManager.Settings.MainWindowMaximized;
-                WidthWin = SettingsManager.Settings.MainWindowWidth ?? Width;
-                HeightWin = SettingsManager.Settings.MainWindowHeight ?? Height;
-                IsMaximized = !IsMaximized;
-                ToggleWin(this, null);
-                WidthWin = SettingsManager.Settings.MainWindowWidth ?? Width;
-                HeightWin = SettingsManager.Settings.MainWindowHeight ?? Height;
+
+                if (SettingsManager.Settings.MainWindowRestoreBounds is Rect r) {
+                    SetToRect(r);
+                }
+                SetFullscreen(SettingsManager.Settings.MainWindowMaximized);
+
                 SetCurrentView(typeof(StandardView)); // Generate Standard view model to show on startup
 
                 SetCurrentMaps(SettingsManager.GetLatestCurrentMaps()); // Set currentmap to previously opened map
@@ -390,55 +394,58 @@ namespace Mapping_Tools {
 
         //Change top right icons on changed window state and set state variable
         private void Window_StateChanged(object sender, EventArgs e) {
-            if (!(this.FindName("toggle_button") is Button bt)) return;
-
-            switch( this.WindowState ) {
+            switch( WindowState ) {
                 case WindowState.Maximized:
-                    bt.Content = new PackIcon { Kind = PackIconKind.WindowRestore };
-                    IsMaximized = true;
-                    window_border.BorderThickness = new Thickness(0);
+                    SetFullscreen(true, false);
                     break;
 
                 case WindowState.Minimized:
                     break;
 
                 case WindowState.Normal:
-                    window_border.BorderThickness = new Thickness(1);
-                    IsMaximized = false;
-                    bt.Content = new PackIcon { Kind = PackIconKind.WindowMaximize };
+                    SetFullscreen(false, false);
                     break;
             }
         }
 
         //Clickevent for top right maximize/minimize button
         private void ToggleWin(object sender, RoutedEventArgs e) {
-            if (!(this.FindName("toggle_button") is Button bt)) return;
+            SetFullscreen(WindowState != WindowState.Maximized);
+        }
 
-            if( IsMaximized ) {
-                this.WindowState = WindowState.Normal;
-                Width = WidthWin;
-                Height = HeightWin;
-                IsMaximized = false;
+        private void SetFullscreen(bool fullscreen, bool actuallyChangeFullscreen = true) {
+            if (!(FindName("toggle_button") is Button bt)) return;
+
+            if (fullscreen && WindowState != WindowState.Maximized) {
+
+                if (actuallyChangeFullscreen) {
+                    WindowState = WindowState.Maximized;
+                    MasterGrid.Margin = new Thickness(5);
+                }
+
+                window_border.BorderThickness = new Thickness(0);
+                bt.Content = new PackIcon { Kind = PackIconKind.WindowRestore };
+            } else if (!fullscreen && WindowState == WindowState.Maximized) {
+                if (actuallyChangeFullscreen) {
+                    WindowState = WindowState.Normal;
+                    MasterGrid.Margin = new Thickness(0);
+                }
+                
                 window_border.BorderThickness = new Thickness(1);
                 bt.Content = new PackIcon { Kind = PackIconKind.WindowMaximize };
             }
-            else {
-                WidthWin = ActualWidth;
-                HeightWin = ActualHeight;
-                this.Left = SystemParameters.WorkArea.Left;
-                this.Top = SystemParameters.WorkArea.Top;
-                this.Height = SystemParameters.WorkArea.Height;
-                this.Width = SystemParameters.WorkArea.Width;
-                window_border.BorderThickness = new Thickness(0);
-                //this.WindowState = WindowState.Maximized;
-                IsMaximized = true;
-                bt.Content = new PackIcon { Kind = PackIconKind.WindowRestore };
-            }
+        }
+
+        private void SetToRect(Rect rect) {
+            Left = rect.Left;
+            Top = rect.Top;
+            Width = rect.Width;
+            Height = rect.Height;
         }
 
         //Minimize window on click
         private void MinimizeWin(object sender, RoutedEventArgs e) {
-            this.WindowState = WindowState.Minimized;
+            WindowState = WindowState.Minimized;
         }
 
         //Close window
@@ -447,30 +454,27 @@ namespace Mapping_Tools {
             if (DataContext is MappingTool mt){ mt.Dispose(); }
             SettingsManager.UpdateSettings();
             SettingsManager.WriteToJson();
-            this.Close();
+            Close();
         }
 
         //Enable drag control of window and set icons when docked
         private void DragWin(object sender, MouseButtonEventArgs e) {
             if (e.ChangedButton != MouseButton.Left) return;
-            if (!(this.FindName("toggle_button") is Button bt)) return;
-
-            if( WindowState == WindowState.Maximized ) {
+            
+            if(WindowState == WindowState.Maximized) {
                 var point = PointToScreen(e.MouseDevice.GetPosition(this));
 
                 if( point.X <= RestoreBounds.Width / 2 )
                     Left = 0;
-                else if( point.X >= RestoreBounds.Width )
-                    Left = point.X - ( RestoreBounds.Width - ( this.ActualWidth - point.X ) );
+                else if( point.X >= RestoreBounds.Width)
+                    Left = point.X - (RestoreBounds.Width - ( ActualWidth - point.X ) );
                 else
-                    Left = point.X - ( RestoreBounds.Width / 2 );
+                    Left = point.X - (RestoreBounds.Width / 2 );
 
                 Top = point.Y - ( ( (FrameworkElement) sender ).ActualHeight / 2 );
-                WindowState = WindowState.Normal;
-                bt.Content = new PackIcon { Kind = PackIconKind.WindowMaximize };
             }
             if( e.LeftButton == MouseButtonState.Pressed )
-                this.DragMove();
+                DragMove();
             //bt.Content = new PackIcon { Kind = PackIconKind.WindowRestore };
         }
     }

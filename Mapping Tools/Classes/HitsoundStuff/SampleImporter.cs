@@ -11,8 +11,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
     class SampleImporter {
         // TODO: Redo importing of soundfonts to include all legacy
         //          and new versions of soundfonts (which should be included in NAudio)
-        public static readonly string[] ValidSamplePathExtensions = new string[] { 
-            ".wav", ".ogg", ".mp3", ".sf2", ".sfz", ".sf1", ".ssx", ".sfpack", ".sfark" };
+        // ".sfz", ".sf1", ".ssx", ".sfpack", ".sfark"
+        public static readonly string[] ValidSamplePathExtensions = { 
+            ".wav", ".ogg", ".mp3", ".sf2"};
 
         public static bool ValidateSampleArgs(string path) {
             return (File.Exists(path) && ValidSamplePathExtensions.Contains(Path.GetExtension(path)));

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Components.Domain;
@@ -183,9 +184,14 @@ namespace Mapping_Tools.Viewmodels {
 
             ImportLoadCommand = new CommandImplementation(
                 _ => {
-                    string path = IOHelper.GetCurrentBeatmap();
-                    if (path != "") {
-                        PathFrom = path;
+                    try {
+                        string path = IOHelper.GetCurrentBeatmap();
+                        if (path != "") {
+                            PathFrom = path;
+                        }
+                    }
+                    catch (Exception ex) {
+                        ex.Show();
                     }
                 });
 
@@ -199,9 +205,13 @@ namespace Mapping_Tools.Viewmodels {
 
             ExportLoadCommand = new CommandImplementation(
                 _ => {
-                    string path = IOHelper.GetCurrentBeatmap();
-                    if (path != "") {
-                        PathTo = path;
+                    try {
+                        string path = IOHelper.GetCurrentBeatmap();
+                        if (path != "") {
+                            PathTo = path;
+                        }
+                    } catch (Exception ex) {
+                        ex.Show();
                     }
                 });
 

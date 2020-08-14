@@ -31,6 +31,8 @@ namespace Mapping_Tools.Components.Graph.Markers {
         public bool DrawMarker { get; set; }
 
         public bool Visible { get; set; } = true;
+
+        public bool Snappable { get; set; } = false;
  
         protected override void OnRender(DrawingContext drawingContext)
         {

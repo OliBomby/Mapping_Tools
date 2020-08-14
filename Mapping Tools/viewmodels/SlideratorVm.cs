@@ -292,7 +292,10 @@ namespace Mapping_Tools.Viewmodels {
             DoEditorRead = false;
             Quick = false;
 
-            ImportCommand = new CommandImplementation(_ => Import(MainWindow.AppWindow.GetCurrentMaps()[0]));
+            ImportCommand = new CommandImplementation(_ => Import(ImportModeSetting == ImportMode.Selected ? 
+                IOHelper.GetCurrentBeatmapOrCurrentBeatmap() : 
+                MainWindow.AppWindow.GetCurrentMaps()[0])
+            );
             MoveLeftCommand = new CommandImplementation(_ => {
                 if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)) {
                     SlideratorView.RunFast();

@@ -43,9 +43,13 @@ namespace Mapping_Tools.Viewmodels {
 
             ImportLoadCommand = new CommandImplementation(
                 _ => {
-                    var path = IOHelper.GetCurrentBeatmap();
-                    if( path != "" ) {
-                        ImportPath = path;
+                    try {
+                        string path = IOHelper.GetCurrentBeatmap();
+                        if (path != "") {
+                            ImportPath = path;
+                        }
+                    } catch (Exception ex) {
+                        ex.Show();
                     }
                 });
 
@@ -64,9 +68,13 @@ namespace Mapping_Tools.Viewmodels {
 
             ExportLoadCommand = new CommandImplementation(
                 _ => {
-                    var path = IOHelper.GetCurrentBeatmap();
-                    if (path != "") {
-                        ExportPath = path;
+                    try {
+                        string path = IOHelper.GetCurrentBeatmap();
+                        if (path != "") {
+                            ExportPath = path;
+                        }
+                    } catch (Exception ex) {
+                        ex.Show();
                     }
                 });
 

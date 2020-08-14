@@ -398,5 +398,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                     return $"{taiko}{sampleSet.ToString().ToLower()}-hit{hitsound.ToString().ToLower()}{index}";
             }
         }
+
+        public override string ToString() {
+            return $"{Time}, {ObjectType}, {Repeat}, {FenoSampleVolume}";
+        }
     }
 }

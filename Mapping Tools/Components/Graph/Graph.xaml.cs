@@ -255,7 +255,7 @@ namespace Mapping_Tools.Components.Graph {
             DependencyProperty.Register(nameof(MarkerSnappingHorizontal),
                 typeof(bool), 
                 typeof(Graph), 
-                new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.None));
+                new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.None));
 
         public bool MarkerSnappingHorizontal {
             get => (bool) GetValue(MarkerSnappingHorizontalProperty);
@@ -271,6 +271,28 @@ namespace Mapping_Tools.Components.Graph {
         public bool MarkerSnappingVertical {
             get => (bool) GetValue(MarkerSnappingVerticalProperty);
             set => SetValue(MarkerSnappingVerticalProperty, value);
+        }
+
+        public static readonly DependencyProperty MarkerSnappingRangeHorizontalProperty =
+            DependencyProperty.Register(nameof(MarkerSnappingRangeHorizontal),
+                typeof(double),
+                typeof(Graph),
+                new FrameworkPropertyMetadata(double.PositiveInfinity, FrameworkPropertyMetadataOptions.None));
+
+        public double MarkerSnappingRangeHorizontal {
+            get => (double)GetValue(MarkerSnappingRangeHorizontalProperty);
+            set => SetValue(MarkerSnappingRangeHorizontalProperty, value);
+        }
+
+        public static readonly DependencyProperty MarkerSnappingRangeVerticalProperty =
+            DependencyProperty.Register(nameof(MarkerSnappingRangeVertical),
+                typeof(double),
+                typeof(Graph),
+                new FrameworkPropertyMetadata(double.PositiveInfinity, FrameworkPropertyMetadataOptions.None));
+
+        public double MarkerSnappingRangeVertical {
+            get => (double)GetValue(MarkerSnappingRangeVerticalProperty);
+            set => SetValue(MarkerSnappingRangeVerticalProperty, value);
         }
 
         public static readonly DependencyProperty ScaleOnBoundChangeHorizontalProperty =
@@ -852,7 +874,7 @@ namespace Mapping_Tools.Components.Graph {
                     // Find the nearest marker
                     GraphMarker nearestMarkerHorizontal = null;
                     double nearestDistance = double.PositiveInfinity;
-                    foreach (var marker in _markers.Where(o => o.Orientation == Orientation.Vertical)) {
+                    foreach (var marker in _markers.Concat(ExtraMarkers).Where(o => o.Orientation == Orientation.Vertical && o.Snappable)) {
                         var markerPos = GetValue(marker);
                         var dist = Math.Abs(pos.X - markerPos.X);
                         if (!(dist < nearestDistance)) continue;
@@ -860,14 +882,14 @@ namespace Mapping_Tools.Components.Graph {
                         nearestMarkerHorizontal = marker;
                     }
                     // Set X to that marker's value
-                    if (nearestMarkerHorizontal != null)
+                    if (nearestMarkerHorizontal != null && nearestDistance <= MarkerSnappingRangeHorizontal)
                         pos.X = GetValueX(nearestMarkerHorizontal.X);
                 }
                 if (MarkerSnappingVertical) {
                     // Find the nearest marker
                     GraphMarker nearestMarkerVertical = null;
                     double nearestDistance = double.PositiveInfinity;
-                    foreach (var marker in _markers.Where(o => o.Orientation == Orientation.Horizontal)) {
+                    foreach (var marker in _markers.Concat(ExtraMarkers).Where(o => o.Orientation == Orientation.Horizontal && o.Snappable)) {
                         var markerPos = GetValue(marker);
                         var dist = Math.Abs(pos.Y - markerPos.Y);
                         if (!(dist < nearestDistance)) continue;
@@ -875,7 +897,7 @@ namespace Mapping_Tools.Components.Graph {
                         nearestMarkerVertical = marker;
                     }
                     // Set Y to that marker's value
-                    if (nearestMarkerVertical != null)
+                    if (nearestMarkerVertical != null && nearestDistance <= MarkerSnappingRangeVertical)
                         pos.Y = GetValueY(nearestMarkerVertical.Y);
                 }
             }

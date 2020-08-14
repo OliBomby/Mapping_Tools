@@ -59,8 +59,12 @@ namespace Mapping_Tools.Views.Sliderator {
             ViewModel.PropertyChanged += ViewModelOnPropertyChanged;
             ViewModel.SlideratorView = this;
 
-            Graph.VerticalMarkerGenerator = new DoubleMarkerGenerator(0, 1/4d);
-            Graph.HorizontalMarkerGenerator = new DividedBeatMarkerGenerator(4);
+            Graph.VerticalMarkerGenerator = GetVerticalMarkerGenerator();
+            Graph.HorizontalMarkerGenerator = GetHorizontalMarkerGenerator();
+
+            Graph.MarkerSnappingHorizontal = true;
+            Graph.MarkerSnappingVertical = true;
+            Graph.MarkerSnappingRangeVertical = 0.01;
 
             Graph.SetBrush(new SolidColorBrush(Color.FromArgb(255, 0, 255, 255)));
 
@@ -227,7 +231,7 @@ namespace Mapping_Tools.Views.Sliderator {
                     UpdatePointsOfInterest();
                     break;
                 case nameof(ViewModel.BeatSnapDivisor):
-                    Graph.HorizontalMarkerGenerator = new DividedBeatMarkerGenerator(ViewModel.BeatSnapDivisor);
+                    Graph.HorizontalMarkerGenerator = GetHorizontalMarkerGenerator();
                     break;
                 case nameof(ViewModel.VelocityLimit):
                     if (ViewModel.GraphModeSetting == SlideratorVm.GraphMode.Velocity) {
@@ -250,7 +254,7 @@ namespace Mapping_Tools.Views.Sliderator {
                 AnimateProgress(GraphHitObjectElement);
             UpdatePointsOfInterest();
             UpdateVelocity();
-            Graph.HorizontalMarkerGenerator = new DividedBeatMarkerGenerator(ViewModel.BeatSnapDivisor);
+            Graph.HorizontalMarkerGenerator = GetHorizontalMarkerGenerator();
             Graph.Anchors.CollectionChanged += AnchorsOnCollectionChanged;
             Graph.Anchors.AnchorsChanged += AnchorsOnAnchorsChanged;
         }
@@ -275,7 +279,7 @@ namespace Mapping_Tools.Views.Sliderator {
 
                         foreach (var completion in redAnchorCompletions) {
                             markers.Add(new GraphMarker {Orientation = Orientation.Horizontal, Value = completion,
-                                CustomLineBrush = Brushes.Red, Text = null
+                                CustomLineBrush = Brushes.Red, Text = null, Snappable = true
                             });
                         }
 
@@ -302,6 +306,16 @@ namespace Mapping_Tools.Views.Sliderator {
                 GraphHitObjectElement.ExtraMarkers.Clear();
                 Graph.ExtraMarkers.Clear();
             }
+        }
+
+        private IMarkerGenerator GetVerticalMarkerGenerator() {
+            return ViewModel.GraphModeSetting == SlideratorVm.GraphMode.Velocity
+                ? new DoubleMarkerGenerator(0, 1 / 4d, "x")
+                : new DoubleMarkerGenerator(0, 1 / 4d);
+        }
+
+        private IMarkerGenerator GetHorizontalMarkerGenerator() {
+            return new DividedBeatMarkerGenerator(ViewModel.BeatSnapDivisor, true);
         }
 
         private void AnimateProgress(HitObjectElement element) {
@@ -436,7 +450,7 @@ namespace Mapping_Tools.Views.Sliderator {
 
                     Graph.MinY = 0;
                     Graph.MaxY = 1;
-                    Graph.VerticalMarkerGenerator = new DoubleMarkerGenerator(0, 1/4d);
+                    Graph.VerticalMarkerGenerator = GetVerticalMarkerGenerator();
                     break;
                 case SlideratorVm.GraphMode.Velocity:
                     GraphToggleContentTextBlock.Text = "V";
@@ -446,7 +460,7 @@ namespace Mapping_Tools.Views.Sliderator {
 
                     Graph.MinY = -ViewModel.VelocityLimit;
                     Graph.MaxY = ViewModel.VelocityLimit;
-                    Graph.VerticalMarkerGenerator = new DoubleMarkerGenerator(0, 1/4d, "x");
+                    Graph.VerticalMarkerGenerator = GetVerticalMarkerGenerator();
                     break;
                 default:
                     GraphToggleContentTextBlock.Text = "";
@@ -750,12 +764,12 @@ namespace Mapping_Tools.Views.Sliderator {
         public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Sliderator Projects");
 
         public void RunFast() {
-            var currentMap = IOHelper.GetCurrentBeatmap();
+            var currentMap = MainWindow.AppWindow.GetCurrentMaps()[0];
             RunTool(currentMap, true);
         }
 
         public void QuickRun() {
-            var currentMap = IOHelper.GetCurrentBeatmap();
+            var currentMap = IOHelper.GetCurrentBeatmapOrCurrentBeatmap();
 
             ViewModel.Import(currentMap);
             RunTool(currentMap, true);

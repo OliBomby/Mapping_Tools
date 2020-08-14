@@ -9,7 +9,7 @@ using System.Windows;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public static class SettingsManager {
-        private static readonly string JsonPath = Path.Combine(MainWindow.AppDataPath, "config.json");
+        private static string JsonPath { get; set; }
         private static readonly JsonSerializer Serializer = new JsonSerializer {
             NullValueHandling = NullValueHandling.Ignore,
             Formatting = Formatting.Indented
@@ -19,6 +19,7 @@ namespace Mapping_Tools.Classes.SystemTools {
         public static bool InstanceComplete;
 
         public static void LoadConfig() {
+            JsonPath = Path.Combine(MainWindow.AppDataPath, "config.json");
             InstanceComplete = File.Exists(JsonPath) ? LoadFromJson() : CreateJson();
             DefaultPaths();
         }
@@ -164,13 +165,16 @@ namespace Mapping_Tools.Classes.SystemTools {
         }
 
         internal static void UpdateSettings() {
-            Settings.MainWindowMaximized = MainWindow.AppWindow.IsMaximized;
-            if (MainWindow.AppWindow.IsMaximized) {
-                Settings.MainWindowWidth = MainWindow.AppWindow.WidthWin;
-                Settings.MainWindowHeight = MainWindow.AppWindow.HeightWin;
+            Settings.MainWindowMaximized = MainWindow.AppWindow.WindowState == WindowState.Maximized;
+            if (MainWindow.AppWindow.WindowState == WindowState.Maximized) {
+                Settings.MainWindowRestoreBounds = MainWindow.AppWindow.RestoreBounds;
             } else{
-                Settings.MainWindowWidth = MainWindow.AppWindow.Width;
-                Settings.MainWindowHeight = MainWindow.AppWindow.Height;
+                Settings.MainWindowRestoreBounds = new Rect(new Point(
+                    MainWindow.AppWindow.Left,
+                    MainWindow.AppWindow.Top
+                    ), new Vector(
+                    MainWindow.AppWindow.Width,
+                    MainWindow.AppWindow.Height));
             }
         }
     }
