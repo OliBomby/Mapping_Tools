@@ -94,6 +94,10 @@ namespace Mapping_Tools.Views.PatternGallery {
 
             editor.SaveFile();
 
+            // Increase pattern use count and time
+            pattern.UseCount++;
+            pattern.LastUsedTime = DateTime.Now;
+
             // Complete progressbar
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(100);
 

@@ -23,10 +23,16 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             set => Set(ref _name, value);
         }
 
-        private DateTime _saveDateTime;
-        public DateTime SaveDateTime {
-            get => _saveDateTime;
-            set => Set(ref _saveDateTime, value);
+        private DateTime _creationTime;
+        public DateTime CreationTime {
+            get => _creationTime;
+            set => Set(ref _creationTime, value);
+        }
+
+        private DateTime _lastUsedTime;
+        public DateTime LastUsedTime {
+            get => _lastUsedTime;
+            set => Set(ref _lastUsedTime, value);
         }
 
         private int _useCount;
@@ -39,6 +45,24 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
         public string FileName {
             get => _fileName;
             set => Set(ref _fileName, value);
+        }
+
+        private int _objectCount;
+        public int ObjectCount {
+            get => _objectCount;
+            set => Set(ref _objectCount, value);
+        }
+
+        private TimeSpan _duration;
+        public TimeSpan Duration {
+            get => _duration;
+            set => Set(ref _duration, value);
+        }
+
+        private double _beatLength;
+        public double BeatLength {
+            get => _beatLength;
+            set => Set(ref _beatLength, value);
         }
 
         #endregion

@@ -1,9 +1,13 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Mapping_Tools.Classes.BeatmapHelper;
 
 namespace Mapping_Tools.Classes.Tools.PatternGallery {
     public class OsuPatternMaker {
+        public double Padding { get; set; } = 5;
+
         public OsuPattern FromSelectedWithSave(Beatmap beatmap, string name, OsuPatternFileHandler fileHandler) {
             var osuPattern = FromSelected(beatmap, name, out var patternBeatmap);
 
@@ -28,8 +32,8 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             // Keep the selected subset of hit objects
             patternBeatmap.HitObjects = patternBeatmap.HitObjects.Where(h => h.IsSelected).ToList();
 
-            var startTime = patternBeatmap.GetHitObjectStartTime() - 5;
-            var endTime = patternBeatmap.GetHitObjectEndTime() + 5;
+            var startTime = patternBeatmap.GetHitObjectStartTime() - Padding;
+            var endTime = patternBeatmap.GetHitObjectEndTime() + Padding;
 
             // Keep the timing points in the range of the hitobjects
             patternBeatmap.BeatmapTiming.TimingPoints = patternBeatmap.BeatmapTiming.TimingPoints
@@ -48,24 +52,70 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             patternBeatmap.BeatmapTiming.Sort();
 
             // Generate a file name and save the pattern
-            var now = DateTime.UtcNow;
-            var fileName = GeneratePatternFileName(patternBeatmap.GetFileName(), now);
+            var now = DateTime.Now;
+            var fileName = GenerateUniquePatternFileName(name, now);
 
             return new OsuPattern {
                 Name = name,
-                SaveDateTime = now,
-                FileName = fileName
+                CreationTime = now,
+                LastUsedTime = now,
+                FileName = fileName,
+                ObjectCount = patternBeatmap.HitObjects.Count,
+                Duration = TimeSpan.FromMilliseconds(endTime - startTime - 2 * Padding),
+                BeatLength = GetBeatLength(patternBeatmap, startTime + Padding, endTime - Padding)
             };
         }
 
-        public string GeneratePatternFileName(string name, DateTime time) {
-            var filename = time.ToString("yyyy-MM-dd HH-mm-ss") + "___" + name;
+        /// <summary>
+        /// Integrates over the redlines between the start and end time of the beatmap to calculate the number of beats inside.
+        /// </summary>
+        /// <param name="beatmap"></param>
+        /// <param name="startTime"></param>
+        /// <param name="endTime"></param>
+        /// <returns></returns>
+        public static double GetBeatLength(Beatmap beatmap, double startTime, double endTime) {
+            var redlines = beatmap.BeatmapTiming.GetTimingPointsInTimeRange(startTime, endTime)
+                .Where(tp => tp.Uninherited);
 
-            if (!filename.EndsWith(".osu")) {
-                filename += ".osu";
+            double beats = 0;
+            double lastTime = startTime;
+            var lastRedline = beatmap.BeatmapTiming.GetRedlineAtTime(startTime);
+            foreach (var redline in redlines) {
+                beats += MultiSnapRound((redline.Offset - lastTime) / lastRedline.MpB, 16, 12);
+
+                lastTime = redline.Offset;
+                lastRedline = redline;
+            }
+            beats += MultiSnapRound((endTime - lastTime) / lastRedline.MpB, 16, 12);
+
+            return beats;
+        }
+
+        private static double MultiSnapRound(double value, double divisor1, double divisor2) {
+            var round1 = Math.Round(value * divisor1) / divisor1;
+            var round2 = Math.Round(value * divisor2) / divisor2;
+            return Math.Abs(round1 - value) < Math.Abs(round2 - value) ? round1 : round2;
+        }
+
+        private static string GenerateUniquePatternFileName(string name, DateTime time) {
+            var fileName = time.ToString("yyyy-MM-dd HH-mm-ss") + "_" + RandomString(8) + "__" + name;
+
+            if (!fileName.EndsWith(".osu")) {
+                fileName += ".osu";
             }
 
-            return filename;
+            // Remove invalid characters
+            string regexSearch = new string(Path.GetInvalidFileNameChars());
+            Regex r = new Regex($"[{Regex.Escape(regexSearch)}]");
+            fileName = r.Replace(fileName, "");
+
+            return fileName;
+        }
+
+        public static string RandomString(int length) {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return new string(Enumerable.Range(1, length)
+                .Select(_ => chars[MainWindow.MainRandom.Next(chars.Length)]).ToArray());
         }
     }
 }

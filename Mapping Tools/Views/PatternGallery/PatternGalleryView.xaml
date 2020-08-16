@@ -90,8 +90,20 @@
                             Binding="{Binding UseCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                             Header="Use count"/>
                         <materialDesign:MaterialDataGridTextColumn
-                            Binding="{Binding HitObjects.Count, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                            Binding="{Binding ObjectCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                             Header="Object count"/>
+                        <materialDesign:MaterialDataGridTextColumn
+                            Binding="{Binding Duration, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                            Header="Duration"/>
+                        <materialDesign:MaterialDataGridTextColumn
+                            Binding="{Binding BeatLength, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                            Header="Number of beats"/>
+                        <materialDesign:MaterialDataGridTextColumn
+                            Binding="{Binding CreationTime, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                            Header="Time of creation"/>
+                        <materialDesign:MaterialDataGridTextColumn
+                            Binding="{Binding LastUsedTime, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                            Header="Time of last use"/>
                     </DataGrid.Columns>
                 </DataGrid>
 
