@@ -11,36 +11,36 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
         public double Padding { get; set; } = 5;
         public PatternOverwriteMode OverwriteMode { get; set; } = PatternOverwriteMode.SmartOverwrite;
 
-        public void PlaceOsuPatternAtTime(OsuPattern pattern, Beatmap beatmap, double time = double.NaN) {
-            double offset = double.IsNaN(time) ? 0 : time - pattern.GetHitObjectStartTime();
-            PlaceOsuPattern(pattern, beatmap, offset);
+        public void PlaceOsuPatternAtTime(Beatmap patternBeatmap, Beatmap beatmap, double time = double.NaN) {
+            double offset = double.IsNaN(time) ? 0 : time - patternBeatmap.GetHitObjectStartTime();
+            PlaceOsuPattern(patternBeatmap, beatmap, offset);
         }
 
-        public void PlaceOsuPattern(OsuPattern pattern, Beatmap beatmap, double offset = 0) {
+        public void PlaceOsuPattern(Beatmap patternBeatmap, Beatmap beatmap, double offset = 0) {
             // Remove stuff
             switch (OverwriteMode) {
                 case PatternOverwriteMode.BasicOverwrite:
-                    MakeSpaceForOsuPatternBasic(pattern, beatmap, offset);
+                    MakeSpaceForOsuPatternBasic(patternBeatmap, beatmap, offset);
                     break;
                 case PatternOverwriteMode.SmartOverwrite:
-                    MakeSpaceForOsuPatternSmart(pattern, beatmap, offset);
+                    MakeSpaceForOsuPatternSmart(patternBeatmap, beatmap, offset);
                     break;
                 case PatternOverwriteMode.NoOverwrite:
                     break;
             }
 
-            AddOsuPattern(pattern, beatmap, offset);
+            AddOsuPattern(patternBeatmap, beatmap, offset);
         }
 
         /// <summary>
         /// Removes hitobjects and timingpoints in the beatmap between the start and the end time of the pattern
         /// </summary>
-        /// <param name="pattern"></param>
+        /// <param name="patternBeatmap"></param>
         /// <param name="beatmap"></param>
         /// <param name="offset"></param>
-        public void MakeSpaceForOsuPatternBasic(OsuPattern pattern, Beatmap beatmap, double offset = 0) {
-            var startTime = pattern.GetHitObjectStartTime() + offset - Padding;
-            var endTime = pattern.GetHitObjectEndTime() + offset + Padding;
+        public void MakeSpaceForOsuPatternBasic(Beatmap patternBeatmap, Beatmap beatmap, double offset = 0) {
+            var startTime = patternBeatmap.GetHitObjectStartTime() + offset - Padding;
+            var endTime = patternBeatmap.GetHitObjectEndTime() + offset + Padding;
 
             beatmap.HitObjects.RemoveAll(h => h.Time >= startTime && h.Time <= endTime);
             beatmap.BeatmapTiming.TimingPoints.RemoveAll(tp => tp.Offset >= startTime && tp.Offset <= endTime);
@@ -49,36 +49,38 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
         /// <summary>
         /// Removes all hitobjects and timingpoints from the beatmap where it overlaps with objects of the pattern.
         /// </summary>
-        /// <param name="pattern"></param>
+        /// <param name="patternBeatmap"></param>
         /// <param name="beatmap"></param>
         /// <param name="offset"></param>
-        public void MakeSpaceForOsuPatternSmart(OsuPattern pattern, Beatmap beatmap, double offset = 0) {
+        public void MakeSpaceForOsuPatternSmart(Beatmap patternBeatmap, Beatmap beatmap, double offset = 0) {
             beatmap.HitObjects = beatmap.HitObjects
-                .Where(ho => !pattern.HitObjects.Any(pho => pho.Time + offset - Padding <= ho.Time && pho.EndTime + offset + Padding >= ho.Time)).ToList();
+                .Where(ho => !patternBeatmap.HitObjects.Any(pho => pho.Time + offset - Padding <= ho.Time && pho.EndTime + offset + Padding >= ho.Time)).ToList();
             beatmap.BeatmapTiming.TimingPoints = beatmap.BeatmapTiming.TimingPoints
-                .Where(tp => !pattern.HitObjects.Any(pho => pho.Time + offset - Padding <= tp.Offset && pho.EndTime + offset + Padding >= tp.Offset)).ToList();
+                .Where(tp => !patternBeatmap.HitObjects.Any(pho => pho.Time + offset - Padding <= tp.Offset && pho.EndTime + offset + Padding >= tp.Offset)).ToList();
 
         }
 
-        private void AddOsuPattern(OsuPattern pattern, Beatmap beatmap, double offset = 0) {
-            var startTime = pattern.GetHitObjectStartTime() + offset - Padding;
-            var endTime = pattern.GetHitObjectEndTime() + offset + Padding;
+        private void AddOsuPattern(Beatmap patternBeatmap, Beatmap beatmap, double offset = 0, bool protectBeatmapPattern = true) {
+            if (protectBeatmapPattern) {
+                // Copy so the original pattern doesnt get changed
+                patternBeatmap = patternBeatmap.DeepCopy();
+            }
 
-            // Copy so the original pattern doesnt get changed
-            pattern = pattern.DeepCopy();
+            var startTime = patternBeatmap.GetHitObjectStartTime() + offset - Padding;
+            var endTime = patternBeatmap.GetHitObjectEndTime() + offset + Padding;
 
             if (offset != 0) {
-                pattern.Offset(offset);
+                patternBeatmap.OffsetTime(offset);
             }
 
             // Do some kind of processing to fix timing etc
 
             var timingPointsChanges = new List<TimingPointsChange>();
 
-            beatmap.HitObjects.AddRange(pattern.HitObjects);
+            beatmap.HitObjects.AddRange(patternBeatmap.HitObjects);
             beatmap.SortHitObjects();
 
-            beatmap.BeatmapTiming.TimingPoints.AddRange(pattern.TimingPoints);
+            beatmap.BeatmapTiming.TimingPoints.AddRange(patternBeatmap.BeatmapTiming.TimingPoints);
             beatmap.BeatmapTiming.Sort();
 
             if (OverwriteMode == PatternOverwriteMode.SmartOverwrite) {
@@ -88,7 +90,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             }
         }
 
-        private TimingPointsChange GetSvHitsoundChange(HitObject ho) {
+        private static TimingPointsChange GetSvHitsoundChange(HitObject ho) {
             var tp = ho.TimingPoint.Copy();
             tp.Offset = ho.Time;
             tp.Uninherited = false;

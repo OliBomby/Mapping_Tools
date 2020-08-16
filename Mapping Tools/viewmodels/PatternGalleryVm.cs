@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Mapping_Tools.Classes.Tools.PatternGallery;
+using Newtonsoft.Json;
 
 namespace Mapping_Tools.Viewmodels {
     public class PatternGalleryVm : BindableBase
@@ -28,10 +29,17 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
+        [JsonIgnore]
         public CommandImplementation AddCommand { get; }
+        [JsonIgnore]
         public CommandImplementation RemoveCommand { get; }
 
+        [JsonIgnore]
+        public OsuPatternFileHandler FileHandler { get; set; }
+
+        [JsonIgnore]
         public string[] Paths { get; set; }
+        [JsonIgnore]
         public bool Quick { get; set; }
 
         public PatternGalleryVm() {
@@ -43,7 +51,7 @@ namespace Mapping_Tools.Viewmodels {
                         var reader = EditorReaderStuff.GetFullEditorReader();
                         var editor = EditorReaderStuff.GetNewestVersion(IOHelper.GetCurrentBeatmap(), reader);
                         var patternMaker = new OsuPatternMaker();
-                        var pattern = patternMaker.FromSelected(editor.Beatmap);
+                        var pattern = patternMaker.FromSelectedWithSave(editor.Beatmap, "test", FileHandler);
                         Patterns.Add(pattern);
                     } catch (Exception ex) { ex.Show(); }
                 });

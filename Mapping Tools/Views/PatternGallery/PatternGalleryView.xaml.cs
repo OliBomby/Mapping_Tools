@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.SystemTools.QuickRun;
+using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Classes.Tools.PatternGallery;
+using Mapping_Tools.Viewmodels;
+using System;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.HitsoundStuff;
-using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.SystemTools.QuickRun;
-using Mapping_Tools.Classes.Tools;
-using Mapping_Tools.Classes.Tools.PatternGallery;
-using Mapping_Tools.Viewmodels;
 
-namespace Mapping_Tools.Views.PatternGallery
-{
+namespace Mapping_Tools.Views.PatternGallery {
     /// <summary>
     /// Interactielogica voor PatternGalleryView.xaml
     /// </summary>
@@ -39,6 +35,7 @@ namespace Mapping_Tools.Views.PatternGallery
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
             ProjectManager.LoadProject(this, message: false);
+            InitializeOsuPatternFileHandler();
         }
 
         public PatternGalleryVm ViewModel => (PatternGalleryVm)DataContext;
@@ -86,11 +83,13 @@ namespace Mapping_Tools.Views.PatternGallery
             if (pattern == null)
                 throw new Exception("No pattern has been selected to export.");
 
+            var patternBeatmap = pattern.GetPatternBeatmap(args.FileHandler);
+
             var patternPlacer = new OsuPatternPlacer();
             if (reader != null) {
-                patternPlacer.PlaceOsuPatternAtTime(pattern, editor.Beatmap, reader.EditorTime());
+                patternPlacer.PlaceOsuPatternAtTime(patternBeatmap, editor.Beatmap, reader.EditorTime());
             } else {
-                patternPlacer.PlaceOsuPattern(pattern, editor.Beatmap);
+                patternPlacer.PlaceOsuPattern(patternBeatmap, editor.Beatmap);
             }
 
             editor.SaveFile();
@@ -105,6 +104,12 @@ namespace Mapping_Tools.Views.PatternGallery
             return "Successfully exported pattern!";
         }
 
+        private void InitializeOsuPatternFileHandler() {
+            if (ViewModel.FileHandler == null) {
+                ViewModel.FileHandler = new OsuPatternFileHandler(Path.Combine(DefaultSaveFolder, @"Pattern Files"));
+            }
+        }
+
         public PatternGalleryVm GetSaveData()
         {
             return (PatternGalleryVm) DataContext;
@@ -113,8 +118,7 @@ namespace Mapping_Tools.Views.PatternGallery
         public void SetSaveData(PatternGalleryVm saveData)
         {
             DataContext = saveData;
-
+            InitializeOsuPatternFileHandler();
         }
-
     }
 }

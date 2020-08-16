@@ -445,15 +445,17 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return lines;
         }
 
-        /// <summary>
-        /// Grabs the specified file name of beatmap file.
-        /// with format of:
-        /// <c>Artist - Title (Host) [Difficulty].osu</c>
-        /// </summary>
-        /// <returns>String of file name.</returns>
-        public string GetFileName() {
-            return GetFileName(Metadata["Artist"].Value, Metadata["Title"].Value,
-                Metadata["Creator"].Value, Metadata["Version"].Value);
+        public double GetHitObjectStartTime() {
+            return HitObjects.Min(h => h.Time);
+        }
+
+        public double GetHitObjectEndTime() {
+            return HitObjects.Max(h => h.EndTime);
+        }
+
+        public void OffsetTime(double offset) {
+            BeatmapTiming.TimingPoints?.ForEach(tp => tp.Offset += offset);
+            HitObjects?.ForEach(h => h.MoveTime(offset));
         }
 
         /// <summary>
@@ -508,6 +510,17 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <c>Artist - Title (Host) [Difficulty].osu</c>
         /// </summary>
         /// <returns>String of file name.</returns>
+        public string GetFileName() {
+            return GetFileName(Metadata["Artist"].Value, Metadata["Title"].Value,
+                Metadata["Creator"].Value, Metadata["Version"].Value);
+        }
+
+        /// <summary>
+        /// Grabs the specified file name of beatmap file.
+        /// with format of:
+        /// <c>Artist - Title (Host) [Difficulty].osu</c>
+        /// </summary>
+        /// <returns>String of file name.</returns>
         public static string GetFileName(string artist, string title, string creator, string version) {
             string fileName = $"{artist} - {title} ({creator}) [{version}].osu";
 
@@ -553,6 +566,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 }
             }
             return categoryLines;
+        }
+
+        public Beatmap DeepCopy() {
+            var newBeatmap = (Beatmap)MemberwiseClone();
+            newBeatmap.HitObjects = HitObjects?.Select(h => h.DeepCopy()).ToList();
+            newBeatmap.BeatmapTiming = new Timing(BeatmapTiming.TimingPoints.Select(t => t.Copy()).ToList(), BeatmapTiming.SliderMultiplier);
+            newBeatmap.GiveObjectsGreenlines();
+            return newBeatmap;
         }
     }
 }
