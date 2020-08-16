@@ -165,13 +165,16 @@ namespace Mapping_Tools.Classes.SystemTools {
         }
 
         internal static void UpdateSettings() {
-            Settings.MainWindowMaximized = MainWindow.AppWindow.IsMaximized;
-            if (MainWindow.AppWindow.IsMaximized) {
-                Settings.MainWindowWidth = MainWindow.AppWindow.WidthWin;
-                Settings.MainWindowHeight = MainWindow.AppWindow.HeightWin;
+            Settings.MainWindowMaximized = MainWindow.AppWindow.WindowState == WindowState.Maximized;
+            if (MainWindow.AppWindow.WindowState == WindowState.Maximized) {
+                Settings.MainWindowRestoreBounds = MainWindow.AppWindow.RestoreBounds;
             } else{
-                Settings.MainWindowWidth = MainWindow.AppWindow.Width;
-                Settings.MainWindowHeight = MainWindow.AppWindow.Height;
+                Settings.MainWindowRestoreBounds = new Rect(new Point(
+                    MainWindow.AppWindow.Left,
+                    MainWindow.AppWindow.Top
+                    ), new Vector(
+                    MainWindow.AppWindow.Width,
+                    MainWindow.AppWindow.Height));
             }
         }
     }

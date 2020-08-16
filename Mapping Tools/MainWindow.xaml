@@ -12,12 +12,10 @@
         xmlns:standard="clr-namespace:Mapping_Tools.Views.Standard"
         mc:Ignorable="d"
         Title="Mapping Tools"  
-        WindowStyle="None"
         ResizeMode="CanResize"
         Width="1500"
         Height="800"
         AllowsTransparency="False"
-        WindowStartupLocation="CenterScreen"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Medium"
         TextElement.FontSize="14"
@@ -38,7 +36,7 @@
         </DataTemplate>
     </Window.Resources>
 
-    <Grid>
+    <Grid x:Name="MasterGrid">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="35"/>
