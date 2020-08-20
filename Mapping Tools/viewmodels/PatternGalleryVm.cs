@@ -1,5 +1,4 @@
 ﻿using Mapping_Tools.Classes;
-using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Classes.Tools.PatternGallery;
@@ -44,7 +43,7 @@ namespace Mapping_Tools.Viewmodels {
 
         public PatternGalleryVm() {
             _patterns = new ObservableCollection<OsuPattern>();
-            FileHandler = new OsuPatternFileHandler(RNG.RandomString(20));
+            FileHandler = new OsuPatternFileHandler();
 
             AddCommand = new CommandImplementation(
                 _ => {

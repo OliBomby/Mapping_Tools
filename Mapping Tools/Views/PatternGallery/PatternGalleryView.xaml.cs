@@ -7,16 +7,20 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using Mapping_Tools.Classes;
+using Mapping_Tools.Components.Dialogs.CustomDialog;
+using MaterialDesignThemes.Wpf;
 
 namespace Mapping_Tools.Views.PatternGallery {
     /// <summary>
     /// Interactielogica voor PatternGalleryView.xaml
     /// </summary>
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
-    public partial class PatternGalleryView : ISavable<PatternGalleryVm>, IQuickRun
-    {
+    public partial class PatternGalleryView : ISavable<PatternGalleryVm>, IQuickRun, IHaveExtraProjectMenuItems {
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "patterngalleryproject.json");
 
         public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Pattern Gallery Projects");
@@ -125,6 +129,33 @@ namespace Mapping_Tools.Views.PatternGallery {
         {
             DataContext = saveData;
             InitializeOsuPatternFileHandler();
+        }
+
+        public MenuItem[] GetMenuItems() {
+            var menu = new MenuItem {
+                Header = "_Rename collection", Icon = new PackIcon { Kind = PackIconKind.Rename },
+                ToolTip = "Rename this collection's directory in the Pattern Files directory."
+            };
+            menu.Click += DoRenameCollection;
+
+            return new[] { menu };
+        }
+
+        private async void DoRenameCollection(object sender, RoutedEventArgs e) {
+            try {
+                var viewModel = new CollectionRenameVm {NewName = ViewModel.FileHandler.CollectionFolderName};
+
+                var dialog = new CustomDialog(viewModel, 0);
+                var result = await DialogHost.Show(dialog, "RootDialog");
+
+                if (!(bool)result) return;
+
+                ViewModel.FileHandler.RenameCollection(viewModel.NewName);
+
+                await Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue("Successfully renamed this collection!"));
+            } catch (ArgumentException) { } catch (Exception ex) {
+                ex.Show();
+            }
         }
     }
 }

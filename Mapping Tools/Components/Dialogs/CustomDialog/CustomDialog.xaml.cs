@@ -1,0 +1,149 @@
+﻿using Mapping_Tools.Components.Domain;
+using MaterialDesignThemes.Wpf;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Reflection;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Data;
+using System.Windows.Input;
+
+namespace Mapping_Tools.Components.Dialogs.CustomDialog {
+    /// <summary>
+    /// Interaction logic for OsuPatternImportDialog.xaml
+    /// </summary>
+    public partial class CustomDialog {
+        private readonly int _autoSelectIndex;
+        private int _populationIndex;
+        private UIElement _autoSelectElement;
+
+        public CustomDialog(object viewModel, int autoSelectIndex = -1) {
+            if (viewModel == null) return;
+
+            InitializeComponent();
+
+            DataContext = viewModel;
+            _autoSelectIndex = autoSelectIndex;
+            PopulateSettings(DataContext);
+
+            AcceptButton.Command = new CommandImplementation(AcceptButtonCommand);
+        }
+
+        private void AcceptButtonCommand(object parameter) {
+            // Remove logical focus to trigger LostFocus on any fields that didn't yet update the ViewModel
+            FocusManager.SetFocusedElement(FocusManager.GetFocusScope(this), null);
+
+            DialogHost.CloseDialogCommand.Execute(parameter, this);
+        }
+
+        private void PopulateSettings(object settings) {
+            _populationIndex = 0;
+
+            var type = settings.GetType();
+            var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            AddPropertyControls(properties, settings);
+        }
+
+        private void AddPropertyControls(IReadOnlyCollection<PropertyInfo> props, object settings, bool useCard = false) {
+            if (props.Count == 0) return;
+
+            if (useCard) {
+                var card = new Card {Margin = new Thickness(10)};
+                var cardPanel = new StackPanel();
+                card.Content = cardPanel;
+
+                foreach (var prop in props) {
+                    var e = GetSettingControl(prop, settings);
+                    if (e != null) {
+                        cardPanel.Children.Add(e);
+                    }
+                }
+
+                Panel.Children.Add(card);
+            }
+            else {
+                foreach (var prop in props) {
+                    var e = GetSettingControl(prop, settings);
+                    if (e != null) {
+                        Panel.Children.Add(e);
+                    }
+                }
+            }
+        }
+
+        private UIElement GetSettingControl(PropertyInfo prop, object settings) {
+            if (!prop.CanWrite || !prop.CanRead) return null;
+
+            var value = prop.GetValue(settings);
+            if (value == null) return null;
+
+            string name;
+            if (prop.GetCustomAttribute(typeof(DisplayNameAttribute)) is DisplayNameAttribute n) {
+                name = n.DisplayName;
+            } else {
+                name = prop.Name;
+            }
+
+            string description = null;
+            if (prop.GetCustomAttribute(typeof(DescriptionAttribute)) is DescriptionAttribute d) {
+                description = d.Description;
+            }
+
+            UIElement content = null;
+            switch (value) {
+                case bool _:
+                    var checkBox = new CheckBox { Content = name, ToolTip = description };
+
+                    Binding toggleBinding = new Binding(prop.Name) {
+                        Source = settings
+                    };
+                    checkBox.SetBinding(ToggleButton.IsCheckedProperty, toggleBinding);
+                    content = checkBox;
+                    break;
+                case double _:
+                    var doubleTextBox = new TextBox {
+                        MinWidth = 100, ToolTip = description,
+                        Style = Application.Current.FindResource("MaterialDesignFloatingHintTextBox") as Style
+                    };
+                    HintAssist.SetHint(doubleTextBox, name);
+
+                    Binding doubleBinding = new Binding(prop.Name) {
+                        Source = settings,
+                        Converter = new DoubleToStringConverter()
+                    };
+                    doubleTextBox.SetBinding(TextBox.TextProperty, doubleBinding);
+                    content = doubleTextBox;
+                    break;
+                case string _:
+                    var stringTextBox = new TextBox {
+                        MinWidth = 100, ToolTip = description,
+                        Style = Application.Current.FindResource("MaterialDesignFloatingHintTextBox") as Style };
+                    HintAssist.SetHint(stringTextBox, name);
+
+                    Binding stringBinding = new Binding(prop.Name) {
+                        Source = settings
+                    };
+                    stringTextBox.SetBinding(TextBox.TextProperty, stringBinding);
+                    content = stringTextBox;
+                    break;
+            }
+
+            if (content != null && _autoSelectIndex == _populationIndex) {
+                _autoSelectElement = content;
+            }
+            _populationIndex++;
+
+            return content;
+        }
+
+        private void CustomDialog_OnLoaded(object sender, RoutedEventArgs e) {
+            if (_autoSelectElement != null) {
+                _autoSelectElement.Focus();
+                if (_autoSelectElement is TextBox textBox) {
+                    textBox.SelectAll();
+                }
+            }
+        }
+    }
+}

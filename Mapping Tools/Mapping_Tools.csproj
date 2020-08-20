@@ -397,6 +397,7 @@
     <Compile Include="Classes\Tools\MapCleaner.cs" />
     <Compile Include="Classes\Tools\MapCleanerArgs.cs" />
     <Compile Include="Classes\Tools\PathGenerator.cs" />
+    <Compile Include="Classes\Tools\PatternGallery\CollectionRenameVm.cs" />
     <Compile Include="Classes\Tools\PatternGallery\OsuPattern.cs" />
     <Compile Include="Classes\Tools\PatternGallery\OsuPatternFileHandler.cs" />
     <Compile Include="Classes\Tools\PatternGallery\OsuPatternMaker.cs" />
@@ -407,10 +408,9 @@
     <Compile Include="Components\Dialogs\MessageDialog.xaml.cs">
       <DependentUpon>MessageDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Components\Dialogs\OsuPatternImport\OsuPatternImportDialog.xaml.cs">
-      <DependentUpon>OsuPatternImportDialog.xaml</DependentUpon>
+    <Compile Include="Components\Dialogs\CustomDialog\CustomDialog.xaml.cs">
+      <DependentUpon>CustomDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Components\Dialogs\OsuPatternImport\OsuPatternImportDialogViewModel.cs" />
     <Compile Include="Components\Domain\ColorToBrushConverter.cs" />
     <Compile Include="Components\Domain\CommandImplementation.cs" />
     <Compile Include="Components\Domain\SnapDivisorToStringConverter.cs" />
@@ -627,7 +627,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Components\Dialogs\OsuPatternImport\OsuPatternImportDialog.xaml">
+    <Page Include="Components\Dialogs\CustomDialog\CustomDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
