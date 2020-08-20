@@ -109,8 +109,10 @@ namespace Mapping_Tools.Views.PatternGallery {
         }
 
         private void InitializeOsuPatternFileHandler() {
-            if (ViewModel.FileHandler == null) {
-                ViewModel.FileHandler = new OsuPatternFileHandler(Path.Combine(DefaultSaveFolder, @"Pattern Files"));
+            // Make sure the file handler always uses the right pattern files folder
+            if (ViewModel.FileHandler != null) {
+                ViewModel.FileHandler.PatternFolderPath = Path.Combine(DefaultSaveFolder, @"Pattern Files");
+                ViewModel.FileHandler.EnsureCollectionFolderExists();
             }
         }
 

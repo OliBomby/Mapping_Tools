@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 
 namespace Mapping_Tools.Classes.MathUtil {
     /// <summary>
@@ -116,6 +117,17 @@ namespace Mapping_Tools.Classes.MathUtil {
             byte[] bytes = new byte[length];
             NextBytes(bytes);
             return bytes;
+        }
+
+        /// <summary>
+        /// Creates a string with random letters and numbers.
+        /// </summary>
+        /// <param name="length">The length the string should have.</param>
+        /// <returns>The newly created string.</returns>
+        public static string RandomString(int length) {
+            const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return new string(Enumerable.Range(1, length)
+                .Select(_ => chars[random.Next(chars.Length)]).ToArray());
         }
     }
 }

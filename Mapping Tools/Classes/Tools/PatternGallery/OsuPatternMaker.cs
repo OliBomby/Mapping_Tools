@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.Tools.PatternGallery {
     public class OsuPatternMaker {
@@ -98,7 +99,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
         }
 
         private static string GenerateUniquePatternFileName(string name, DateTime time) {
-            var fileName = time.ToString("yyyy-MM-dd HH-mm-ss") + "_" + RandomString(8) + "__" + name;
+            var fileName = time.ToString("yyyy-MM-dd HH-mm-ss") + "_" + RNG.RandomString(8) + "__" + name;
 
             if (!fileName.EndsWith(".osu")) {
                 fileName += ".osu";
@@ -110,12 +111,6 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             fileName = r.Replace(fileName, "");
 
             return fileName;
-        }
-
-        public static string RandomString(int length) {
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            return new string(Enumerable.Range(1, length)
-                .Select(_ => chars[MainWindow.MainRandom.Next(chars.Length)]).ToArray());
         }
     }
 }

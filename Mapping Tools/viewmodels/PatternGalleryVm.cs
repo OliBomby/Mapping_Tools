@@ -1,13 +1,13 @@
 ﻿using Mapping_Tools.Classes;
-using Mapping_Tools.Classes.HitsoundStuff;
+using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Classes.Tools.PatternGallery;
 using Mapping_Tools.Components.Domain;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Mapping_Tools.Classes.Tools.PatternGallery;
-using Newtonsoft.Json;
 
 namespace Mapping_Tools.Viewmodels {
     public class PatternGalleryVm : BindableBase
@@ -17,6 +17,8 @@ namespace Mapping_Tools.Viewmodels {
             get => _patterns;
             set => Set(ref _patterns, value);
         }
+
+        public OsuPatternFileHandler FileHandler { get; set; }
 
         private bool? _isAllItemsSelected;
         public bool? IsAllItemsSelected {
@@ -34,8 +36,6 @@ namespace Mapping_Tools.Viewmodels {
         [JsonIgnore]
         public CommandImplementation RemoveCommand { get; }
 
-        [JsonIgnore]
-        public OsuPatternFileHandler FileHandler { get; set; }
 
         [JsonIgnore]
         public string[] Paths { get; set; }
@@ -44,6 +44,7 @@ namespace Mapping_Tools.Viewmodels {
 
         public PatternGalleryVm() {
             _patterns = new ObservableCollection<OsuPattern>();
+            FileHandler = new OsuPatternFileHandler(RNG.RandomString(20));
 
             AddCommand = new CommandImplementation(
                 _ => {

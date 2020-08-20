@@ -3,19 +3,32 @@ using System.IO;
 
 namespace Mapping_Tools.Classes.Tools.PatternGallery {
     public class OsuPatternFileHandler {
-        public string PatternFolderPath { get; }
+        public string PatternFolderPath { get; set; }
 
-        public OsuPatternFileHandler(string patternFolderPath) {
-            PatternFolderPath = patternFolderPath;
-            EnsurePatternFolderExists();
+        public string CollectionFolderName { get; set; }
+
+        public OsuPatternFileHandler() { }
+
+        public OsuPatternFileHandler(string collectionFolderName) {
+            CollectionFolderName = collectionFolderName;
         }
 
-        private void EnsurePatternFolderExists() {
-            Directory.CreateDirectory(PatternFolderPath);
+        public OsuPatternFileHandler(string patternFolderPath, string collectionFolderName) {
+            PatternFolderPath = patternFolderPath;
+            CollectionFolderName = collectionFolderName;
+            EnsureCollectionFolderExists();
+        }
+
+        public void EnsureCollectionFolderExists() {
+            Directory.CreateDirectory(GetCollectionFolderPath());
+        }
+
+        public string GetCollectionFolderPath() {
+            return Path.Combine(PatternFolderPath, CollectionFolderName);
         }
 
         public string GetPatternPath(string fileName) {
-            return Path.Combine(PatternFolderPath, fileName);
+            return Path.Combine(PatternFolderPath, CollectionFolderName, fileName);
         }
     }
 }
