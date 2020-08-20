@@ -93,7 +93,11 @@ namespace Mapping_Tools.Components.Dialogs.CustomDialog {
             UIElement content = null;
             switch (value) {
                 case bool _:
-                    var checkBox = new CheckBox { Content = name, ToolTip = description };
+                    var checkBox = new CheckBox {
+                        Content = name, 
+                        ToolTip = description, 
+                        Margin = new Thickness(0, 0, 0, 5)
+                    };
 
                     Binding toggleBinding = new Binding(prop.Name) {
                         Source = settings
@@ -103,7 +107,9 @@ namespace Mapping_Tools.Components.Dialogs.CustomDialog {
                     break;
                 case double _:
                     var doubleTextBox = new TextBox {
-                        MinWidth = 100, ToolTip = description,
+                        MinWidth = 100, 
+                        ToolTip = description,
+                        Margin = new Thickness(0, 0, 0, 5),
                         Style = Application.Current.FindResource("MaterialDesignFloatingHintTextBox") as Style
                     };
                     HintAssist.SetHint(doubleTextBox, name);
@@ -117,7 +123,9 @@ namespace Mapping_Tools.Components.Dialogs.CustomDialog {
                     break;
                 case string _:
                     var stringTextBox = new TextBox {
-                        MinWidth = 100, ToolTip = description,
+                        MinWidth = 100, 
+                        ToolTip = description,
+                        Margin = new Thickness(0, 0, 0, 5),
                         Style = Application.Current.FindResource("MaterialDesignFloatingHintTextBox") as Style };
                     HintAssist.SetHint(stringTextBox, name);
 

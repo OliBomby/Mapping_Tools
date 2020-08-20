@@ -134,7 +134,7 @@ namespace Mapping_Tools.Views.PatternGallery {
         public MenuItem[] GetMenuItems() {
             var menu = new MenuItem {
                 Header = "_Rename collection", Icon = new PackIcon { Kind = PackIconKind.Rename },
-                ToolTip = "Rename this collection's directory in the Pattern Files directory."
+                ToolTip = "Rename this collection and the collection's directory in the Pattern Files directory."
             };
             menu.Click += DoRenameCollection;
 
@@ -143,14 +143,18 @@ namespace Mapping_Tools.Views.PatternGallery {
 
         private async void DoRenameCollection(object sender, RoutedEventArgs e) {
             try {
-                var viewModel = new CollectionRenameVm {NewName = ViewModel.FileHandler.CollectionFolderName};
+                var viewModel = new CollectionRenameVm {
+                    NewName = ViewModel.CollectionName, 
+                    NewFolderName = ViewModel.FileHandler.CollectionFolderName
+                };
 
                 var dialog = new CustomDialog(viewModel, 0);
                 var result = await DialogHost.Show(dialog, "RootDialog");
 
                 if (!(bool)result) return;
 
-                ViewModel.FileHandler.RenameCollection(viewModel.NewName);
+                ViewModel.CollectionName = viewModel.NewName;
+                ViewModel.FileHandler.RenameCollectionFolder(viewModel.NewFolderName);
 
                 await Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue("Successfully renamed this collection!"));
             } catch (ArgumentException) { } catch (Exception ex) {

@@ -9,8 +9,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace Mapping_Tools.Viewmodels {
-    public class PatternGalleryVm : BindableBase
-    {
+    public class PatternGalleryVm : BindableBase {
+        private string _collectionName;
+        public string CollectionName {
+            get => _collectionName;
+            set => Set(ref _collectionName, value);
+        }
+
         private ObservableCollection<OsuPattern> _patterns;
         public ObservableCollection<OsuPattern> Patterns {
             get => _patterns;
@@ -42,6 +47,7 @@ namespace Mapping_Tools.Viewmodels {
         public bool Quick { get; set; }
 
         public PatternGalleryVm() {
+            CollectionName = @"My Pattern Collection";
             _patterns = new ObservableCollection<OsuPattern>();
             FileHandler = new OsuPatternFileHandler();
 

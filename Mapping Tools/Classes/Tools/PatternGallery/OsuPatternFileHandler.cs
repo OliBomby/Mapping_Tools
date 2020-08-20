@@ -45,7 +45,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             return GetCollectionFolderNames().Contains(name);
         }
 
-        public void RenameCollection(string newName) {
+        public void RenameCollectionFolder(string newName) {
             if (CollectionFolderName == newName) return;
 
             if (CollectionFolderExists(newName)) {
