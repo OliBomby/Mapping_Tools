@@ -13,7 +13,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             var osuPattern = FromSelected(beatmap, name, out var patternBeatmap);
 
             // Could possibly be saved async
-            // TODO: Do something so it saves with float precision coordinates
+            patternBeatmap.SaveWithFloatPrecision = true;
             Editor.SaveFile(fileHandler.GetPatternPath(osuPattern.FileName), patternBeatmap.GetLines());
 
             return osuPattern;

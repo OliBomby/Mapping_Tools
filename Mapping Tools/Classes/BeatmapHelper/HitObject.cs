@@ -20,6 +20,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         // Special combined with timeline
         public List<TimelineObject> TimelineObjects = new List<TimelineObject>();
 
+        /// <summary>
+        /// When true, all coordinates and times will be serialized without rounding.
+        /// </summary>
+        public bool SaveWithFloatPrecision { get; set; }
+
         public HitObject() { }
 
         public HitObject(string line) {
@@ -335,9 +340,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <inheritdoc />
         public string GetLine() {
             var values = new List<string> {
-                Pos.X.ToRoundInvariant(),
-                Pos.Y.ToRoundInvariant(),
-                Time.ToRoundInvariant(),
+                SaveWithFloatPrecision ? Pos.X.ToInvariant() : Pos.X.ToRoundInvariant(),
+                SaveWithFloatPrecision ? Pos.Y.ToInvariant() : Pos.Y.ToRoundInvariant(),
+                SaveWithFloatPrecision ? Time.ToInvariant() : Time.ToRoundInvariant(),
                 ObjectType.ToInvariant(),
                 Hitsounds.ToInvariant()
             };
@@ -345,7 +350,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             if (IsSlider) {
                 var builder = new StringBuilder();
                 builder.Append(GetPathTypeString());
-                foreach (var p in CurvePoints) builder.Append($"|{p.X.ToRoundInvariant()}:{p.Y.ToRoundInvariant()}");
+                foreach (var p in CurvePoints) builder.Append($"|{(SaveWithFloatPrecision ? p.X.ToInvariant() : p.X.ToRoundInvariant())}:{(SaveWithFloatPrecision ? p.Y.ToInvariant() : p.Y.ToRoundInvariant())}");
                 values.Add(builder.ToString());
                 values.Add(Repeat.ToInvariant());
                 values.Add(PixelLength.ToInvariant());
@@ -364,7 +369,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                     values.Add(Extras);
                 }
             } else if (IsSpinner) {
-                values.Add(EndTime.ToRoundInvariant());
+                values.Add(SaveWithFloatPrecision ? EndTime.ToInvariant() : EndTime.ToRoundInvariant());
                 values.Add(Extras);
             } else {
                 // It's a circle or a hold note
@@ -642,7 +647,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public string GetExtras() {
             if (IsHoldNote)
-                return string.Join(":", EndTime.ToRoundInvariant(), SampleSet.ToIntInvariant(),
+                return string.Join(":", SaveWithFloatPrecision ? EndTime.ToInvariant() : EndTime.ToRoundInvariant(), SampleSet.ToIntInvariant(),
                     AdditionSet.ToIntInvariant(), CustomIndex.ToInvariant(), SampleVolume.ToRoundInvariant(), Filename);
             return string.Join(":", SampleSet.ToIntInvariant(), AdditionSet.ToIntInvariant(), CustomIndex.ToInvariant(),
                 SampleVolume.ToRoundInvariant(), Filename);

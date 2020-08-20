@@ -154,6 +154,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public List<double> Bookmarks { get => GetBookmarks(); set => SetBookmarks(value); }
 
         /// <summary>
+        /// When true, all coordinates and times will be serialized without rounding.
+        /// </summary>
+        public bool SaveWithFloatPrecision { get; set; }
+
+        /// <summary>
         /// Initializes the Beatmap file format.
         /// </summary>
         /// <param name="lines">List of strings where each string is another line in the .osu file.</param>
@@ -426,7 +431,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             lines.AddRange(StoryboardSoundSamples.Select(sbss => sbss.GetLine()));
             lines.Add("");
             lines.Add("[TimingPoints]");
-            lines.AddRange(from tp in BeatmapTiming.TimingPoints where tp != null select tp.GetLine());
+            lines.AddRange(BeatmapTiming.TimingPoints.Where(tp => tp != null).Select(tp => {
+                tp.SaveWithFloatPrecision = SaveWithFloatPrecision;
+                return tp.GetLine();
+            }));
             lines.Add("");
             if (ComboColours.Any()) {
                 lines.Add("");
@@ -440,7 +448,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
             lines.Add("");
             lines.Add("[HitObjects]");
-            lines.AddRange(HitObjects.Select(ho => ho.GetLine()));
+            lines.AddRange(HitObjects.Select(ho => {
+                ho.SaveWithFloatPrecision = SaveWithFloatPrecision;
+                return ho.GetLine();
+            }));
 
             return lines;
         }
