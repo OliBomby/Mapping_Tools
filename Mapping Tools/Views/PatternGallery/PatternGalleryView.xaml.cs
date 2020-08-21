@@ -115,7 +115,7 @@ namespace Mapping_Tools.Views.PatternGallery {
         private void InitializeOsuPatternFileHandler() {
             // Make sure the file handler always uses the right pattern files folder
             if (ViewModel.FileHandler != null) {
-                ViewModel.FileHandler.PatternFolderPath = Path.Combine(DefaultSaveFolder, @"Pattern Files");
+                ViewModel.FileHandler.BasePath = DefaultSaveFolder;
                 ViewModel.FileHandler.EnsureCollectionFolderExists();
             }
         }

@@ -3,10 +3,12 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using Mapping_Tools.Classes.MathUtil;
+using Newtonsoft.Json;
 
 namespace Mapping_Tools.Classes.Tools.PatternGallery {
     public class OsuPatternFileHandler {
-        public string PatternFolderPath { get; set; }
+        [JsonIgnore]
+        public string BasePath { get; set; }
 
         public string CollectionFolderName { get; set; }
 
@@ -14,22 +16,26 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             CollectionFolderName = RNG.RandomString(20);
         }
 
-        public OsuPatternFileHandler(string patternFolderPath) {
+        public OsuPatternFileHandler(string basePath) {
             CollectionFolderName = RNG.RandomString(20);
-            PatternFolderPath = patternFolderPath;
+            BasePath = basePath;
             EnsureCollectionFolderExists();
         }
 
         public void EnsureCollectionFolderExists() {
-            Directory.CreateDirectory(GetCollectionFolderPath());
+            Directory.CreateDirectory(GetPatternFilesFolderPath());
         }
 
         public string GetCollectionFolderPath() {
-            return Path.Combine(PatternFolderPath, CollectionFolderName);
+            return Path.Combine(BasePath, CollectionFolderName);
+        }
+
+        public string GetPatternFilesFolderPath() {
+            return Path.Combine(GetCollectionFolderPath(), @"Pattern Files");
         }
 
         public string GetPatternPath(string fileName) {
-            return Path.Combine(PatternFolderPath, CollectionFolderName, fileName);
+            return Path.Combine(GetPatternFilesFolderPath(), fileName);
         }
 
         /// <summary>
@@ -37,7 +43,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
         /// </summary>
         /// <returns></returns>
         public string[] GetCollectionFolderNames() {
-            return Directory.GetDirectories(PatternFolderPath)
+            return Directory.GetDirectories(BasePath)
                 .Select(Path.GetFileName).ToArray();
         }
 
@@ -49,10 +55,10 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             if (CollectionFolderName == newName) return;
 
             if (CollectionFolderExists(newName)) {
-                throw new DuplicateNameException($"A collection with the name {newName} already exists in {PatternFolderPath}.");
+                throw new DuplicateNameException($"A collection with the name {newName} already exists in {BasePath}.");
             }
 
-            Directory.Move(GetCollectionFolderPath(), Path.Combine(PatternFolderPath, newName));
+            Directory.Move(GetCollectionFolderPath(), Path.Combine(BasePath, newName));
             CollectionFolderName = newName;
         }
     }
