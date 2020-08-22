@@ -91,9 +91,9 @@ namespace Mapping_Tools.Views.PatternGallery {
 
             var patternPlacer = new OsuPatternPlacer();
             if (reader != null) {
-                patternPlacer.PlaceOsuPatternAtTime(patternBeatmap, editor.Beatmap, reader.EditorTime());
+                patternPlacer.PlaceOsuPatternAtTime(patternBeatmap, editor.Beatmap, reader.EditorTime(), false);
             } else {
-                patternPlacer.PlaceOsuPattern(patternBeatmap, editor.Beatmap);
+                patternPlacer.PlaceOsuPattern(patternBeatmap, editor.Beatmap, protectBeatmapPattern:false);
             }
 
             editor.SaveFile();

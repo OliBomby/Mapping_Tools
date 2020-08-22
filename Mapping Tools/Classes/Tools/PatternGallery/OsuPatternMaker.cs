@@ -63,39 +63,8 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 FileName = fileName,
                 ObjectCount = patternBeatmap.HitObjects.Count,
                 Duration = TimeSpan.FromMilliseconds(endTime - startTime - 2 * Padding),
-                BeatLength = GetBeatLength(patternBeatmap, startTime + Padding, endTime - Padding)
+                BeatLength = patternBeatmap.BeatmapTiming.GetBeatLength(startTime + Padding, endTime - Padding, true)
             };
-        }
-
-        /// <summary>
-        /// Integrates over the redlines between the start and end time of the beatmap to calculate the number of beats inside.
-        /// </summary>
-        /// <param name="beatmap"></param>
-        /// <param name="startTime"></param>
-        /// <param name="endTime"></param>
-        /// <returns></returns>
-        public static double GetBeatLength(Beatmap beatmap, double startTime, double endTime) {
-            var redlines = beatmap.BeatmapTiming.GetTimingPointsInTimeRange(startTime, endTime)
-                .Where(tp => tp.Uninherited);
-
-            double beats = 0;
-            double lastTime = startTime;
-            var lastRedline = beatmap.BeatmapTiming.GetRedlineAtTime(startTime);
-            foreach (var redline in redlines) {
-                beats += MultiSnapRound((redline.Offset - lastTime) / lastRedline.MpB, 16, 12);
-
-                lastTime = redline.Offset;
-                lastRedline = redline;
-            }
-            beats += MultiSnapRound((endTime - lastTime) / lastRedline.MpB, 16, 12);
-
-            return beats;
-        }
-
-        private static double MultiSnapRound(double value, double divisor1, double divisor2) {
-            var round1 = Math.Round(value * divisor1) / divisor1;
-            var round2 = Math.Round(value * divisor2) / divisor2;
-            return Math.Abs(round1 - value) < Math.Abs(round2 - value) ? round1 : round2;
         }
 
         private static string GenerateUniquePatternFileName(string name, DateTime time) {
