@@ -2,23 +2,29 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Mapping_Tools.Classes.SystemTools;
 
 namespace Mapping_Tools.Classes.Tools.PatternGallery {
     /// <summary>
     /// Helper class for placing a <see cref="OsuPattern"/> into a <see cref="Beatmap"/>.
     /// </summary>
-    public class OsuPatternPlacer {
-        /// <summary>
-        /// Extra time in millseconds around the patterns for deleting parts of the original map.
-        /// </summary>
-        public double Padding { get; set; } = 5;
-
-        /// <summary>
-        /// Minimum time in beats necessary to separate parts of the pattern.
-        /// </summary>
-        public double PartingDistance { get; set; } = 2;
-
-        public PatternOverwriteMode OverwriteMode { get; set; } = PatternOverwriteMode.PartitionedOverwrite;
+    public class OsuPatternPlacer : BindableBase {
+        public double Padding = 5;
+        public double PartingDistance = 4;
+        public PatternOverwriteMode PatternOverwriteMode = PatternOverwriteMode.PartitionedOverwrite;
+        public TimingOverwriteMode TimingOverwriteMode = TimingOverwriteMode.InPatternRelativeTiming;
+        public bool IncludeHitsounds = true;
+        public bool ScaleToNewCircleSize = true;
+        public bool ScaleToNewTiming = true;
+        public bool SnapToNewTiming = true;
+        public int SnapDivisor1 = 16;
+        public int SnapDivisor2 = 12;
+        public bool FixGlobalSV = true;
+        public bool FixColourHax = true;
+        public bool FixStackLeniency = true;
+        public bool FixTickRate = true;
+        public double CustomScale = 1;
+        public double CustomRotate = 0;
 
         /// <summary>
         /// Places each hit object of the pattern beatmap into the other beatmap and applies timingpoint changes to copy timingpoint stuff aswell.
@@ -61,7 +67,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
 
             // Partition the pattern beatmap
             List<Tuple<double, double>> parts;
-            if (OverwriteMode == PatternOverwriteMode.PartitionedOverwrite) {
+            if (PatternOverwriteMode == PatternOverwriteMode.PartitionedOverwrite) {
                 parts = PartitionBeatmap(patternBeatmap);
             }
             else {
@@ -71,7 +77,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             }
 
             // Remove stuff
-            if (OverwriteMode != PatternOverwriteMode.NoOverwrite) {
+            if (PatternOverwriteMode != PatternOverwriteMode.NoOverwrite) {
                 foreach (var part in parts) {
                     RemovePartOfBeatmap(beatmap, part.Item1 - Padding, part.Item2 + Padding);
                 }

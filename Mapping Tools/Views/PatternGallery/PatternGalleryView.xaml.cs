@@ -89,7 +89,7 @@ namespace Mapping_Tools.Views.PatternGallery {
 
             var patternBeatmap = pattern.GetPatternBeatmap(args.FileHandler);
 
-            var patternPlacer = new OsuPatternPlacer();
+            var patternPlacer = args.OsuPatternPlacer;
             if (reader != null) {
                 patternPlacer.PlaceOsuPatternAtTime(patternBeatmap, editor.Beatmap, reader.EditorTime(), false);
             } else {

@@ -402,6 +402,7 @@
     <Compile Include="Classes\Tools\PatternGallery\OsuPatternFileHandler.cs" />
     <Compile Include="Classes\Tools\PatternGallery\OsuPatternMaker.cs" />
     <Compile Include="Classes\Tools\PatternGallery\OsuPatternPlacer.cs" />
+    <Compile Include="Classes\Tools\PatternGallery\TimingOverwriteMode.cs" />
     <Compile Include="Classes\Tools\PatternGallery\PatternOverwriteMode.cs" />
     <Compile Include="Classes\Tools\RhythmGuide.cs" />
     <Compile Include="Classes\Tools\Sliderator.cs" />
