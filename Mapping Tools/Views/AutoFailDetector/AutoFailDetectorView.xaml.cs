@@ -88,8 +88,6 @@ namespace Mapping_Tools.Views.AutoFailDetector {
         }
 
         private string Run_Program(AutoFailDetectorVm args, BackgroundWorker worker, DoWorkEventArgs _) {
-            const int physicsUpdateTime = 9;
-
             // Reset the timeline lists
             _autoFailTimes = new List<double>();
             _autoFailingObjects = new List<double>();
@@ -111,7 +109,7 @@ namespace Mapping_Tools.Views.AutoFailDetector {
                 : args.OverallDifficultyOverride;
             var window50 = (int) Math.Ceiling(200 - 10 * od);
 
-            var endTime = (int) hitObjects.Max(ho => ho.EndTime) + physicsUpdateTime;
+            var endTime = (int) hitObjects.Max(ho => ho.EndTime) + args.PhysicsUpdateLeniency;
             _endTimeMonitor = endTime;
 
             SortedSet<int> timesToCheck = new SortedSet<int>(hitObjects.Select(ho => (int)ho.EndTime + approachTime)
@@ -136,7 +134,7 @@ namespace Mapping_Tools.Views.AutoFailDetector {
 
                 var removedObjects = lastHitObjects.Except(hitObjectsMinimal);
 
-                var badUnload = removedObjects.FirstOrDefault(ho => GetTrueEndTime(ho, window50, physicsUpdateTime) > time);
+                var badUnload = removedObjects.FirstOrDefault(ho => GetTrueEndTime(ho, window50, args.PhysicsUpdateLeniency) > time);
                 if (badUnload != null) {
                     autoFail = true;
                     if (args.ShowAutoFailTimes)

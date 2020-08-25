@@ -37,6 +37,12 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _overallDifficultyOverride, value);
         }
 
+        private int _physicsUpdateLeniency = 9;
+        public int PhysicsUpdateLeniency {
+            get => _physicsUpdateLeniency;
+            set => Set(ref _physicsUpdateLeniency, value);
+        }
+
         public AutoFailDetectorVm() {
             
         }
