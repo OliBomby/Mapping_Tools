@@ -153,7 +153,7 @@ namespace Mapping_Tools.Views.AutoFailDetector {
             if (args.Quick)
                 RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, false));
 
-            return autoFail ? $"{Math.Max(_autoFailTimes.Count, _autoFailingObjects.Count)} cases of auto-fail detected!" : "No autofail detected.";
+            return autoFail ? $"{Math.Max(_autoFailTimes.Count, _autoFailingObjects.Count)} cases of auto-fail detected!" : "No auto-fail detected.";
         }
 
         private static int GetTrueEndTime(HitObject ho, int window50, int physicsUpdateTime) {
