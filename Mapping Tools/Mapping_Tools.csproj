@@ -523,6 +523,7 @@
     </Compile>
     <Compile Include="Classes\Tools\TimingPointsChange.cs" />
     <Compile Include="Properties\Annotations.cs" />
+    <Compile Include="Viewmodels\AutoFailDetectorVm.cs" />
     <Compile Include="Viewmodels\PatternGalleryVm.cs" />
     <Compile Include="Viewmodels\MapCleanerVm.cs" />
     <Compile Include="Viewmodels\HitsoundPreviewHelperVm.cs" />
@@ -549,6 +550,9 @@
     <Compile Include="Views\Extensions.cs" />
     <Compile Include="Views\ComboColourStudio\ComboColourStudioView.xaml.cs">
       <DependentUpon>ComboColourStudioView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\AutoFailDetector\AutoFailDetectorView.xaml.cs">
+      <DependentUpon>AutoFailDetectorView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\PatternGallery\PatternGalleryView.xaml.cs">
       <DependentUpon>PatternGalleryView.xaml</DependentUpon>
@@ -724,6 +728,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Components\Dialogs\BeatmapImportDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\AutoFailDetector\AutoFailDetectorView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
