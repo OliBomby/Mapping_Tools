@@ -54,15 +54,20 @@
                           ToolTip="Show the start times of unloading hit objects which cause auto-fail. Green in the timeline.">
                     Show unloading hit objects
                 </CheckBox>
-                <TextBox Width="258" HorizontalAlignment="Left" Margin="0,20,0,0"
+                <TextBox Width="258" HorizontalAlignment="Left" Margin="0,10,0,0"
                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="AR override"
                         ToolTip="Override the approach rate used for finding the loaded hit objects. Use -1 for no override."
                         Text="{Binding ApproachRateOverride, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=-1}">
                 </TextBox>
-                <TextBox Width="258" HorizontalAlignment="Left" Margin="0,20,0,0"
+                <TextBox Width="258" HorizontalAlignment="Left" Margin="0,10,0,0"
                          Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="OD override"
                          ToolTip="Override the overall difficulty used for finding which hit objects unload incorrectly. Use -1 for no override."
                          Text="{Binding OverallDifficultyOverride, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=-1}">
+                </TextBox>
+                <TextBox Width="258" HorizontalAlignment="Left" Margin="0,20,0,0"
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Physics update leniency"
+                         ToolTip="Time in milliseconds to require objects to unload later to account for the update frequency of the physics engine."
+                         Text="{Binding PhysicsUpdateLeniency}">
                 </TextBox>
             </StackPanel>
             <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
