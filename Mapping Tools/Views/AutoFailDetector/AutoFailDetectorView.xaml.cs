@@ -10,12 +10,15 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Views.AutoFailDetector {
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
     public partial class AutoFailDetectorView : IQuickRun {
         private List<double> _autoFailTimes;
-        private List<double> _autoFailingObjects;
+        private List<double> _unloadingObjects;
+        private List<double> _potentialUnloadingObjects;
+        private List<double> _potentialDisruptors;
         private double _endTimeMonitor;
         private TimeLine _tl;
 
@@ -90,13 +93,24 @@ namespace Mapping_Tools.Views.AutoFailDetector {
         private string Run_Program(AutoFailDetectorVm args, BackgroundWorker worker, DoWorkEventArgs _) {
             // Reset the timeline lists
             _autoFailTimes = new List<double>();
-            _autoFailingObjects = new List<double>();
+            _unloadingObjects = new List<double>();
+            _potentialUnloadingObjects = new List<double>();
+            _potentialDisruptors = new List<double>();
 
             var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
             var editor = EditorReaderStuff.GetNewestVersionOrNot(args.Paths[0], reader);
+            var beatmap = editor.Beatmap;
+
+            //var indices = new[] {0, 2, 6, 13, 27, 55, 111, 223};
+            /*foreach (var index in indices) {
+                beatmap.HitObjects.Insert(index, new HitObject {Pos = Vector2.Zero, Time = beatmap.HitObjects[index].Time - 1, ObjectType = 8, EndTime = 138797});
+            }
+
+            editor.SaveFile();
+            return "";*/
 
             // Hit objects sorted by start time
-            var hitObjects = editor.Beatmap.HitObjects;
+            var hitObjects = beatmap.HitObjects;
             hitObjects = hitObjects.OrderBy(ho => ho.Time).ToList();
 
             var ar = args.ApproachRateOverride == -1
@@ -112,12 +126,40 @@ namespace Mapping_Tools.Views.AutoFailDetector {
             var endTime = (int) hitObjects.Max(ho => ho.EndTime) + args.PhysicsUpdateLeniency;
             _endTimeMonitor = endTime;
 
-            SortedSet<int> timesToCheck = new SortedSet<int>(hitObjects.Select(ho => (int)ho.EndTime + approachTime)
-                .Concat(hitObjects.Select(ho => (int)ho.EndTime + approachTime + 1))
-                .Concat(hitObjects.Select(ho => (int)ho.EndTime + approachTime - 1)));
+            // Find all problematic areas which could cause auto-fail depending on the binary search
+            var problemAreas = new List<ProblemArea>();
+            for (int i = 0; i < hitObjects.Count; i++) {
+                var ho = hitObjects[i];
+                var disruptors = new List<HitObject>();
+                for (int j = i + 1; j < hitObjects.Count; j++) {
+                    var ho2 = hitObjects[j];
+                    if (ho2.EndTime < GetTrueEndTime(ho, window50, args.PhysicsUpdateLeniency) - approachTime) {
+                        disruptors.Add(ho2);
+
+                        if (args.ShowPotentialDisruptors) {
+                            _potentialDisruptors.Add(ho2.Time);
+                        }
+                    }
+                }
+
+                if (disruptors.Count > 0) {
+                    problemAreas.Add(new ProblemArea {unloadableHitObject = ho, disruptors = disruptors});
+
+                    if (args.ShowPotentialUnloadingObjects) {
+                        _potentialUnloadingObjects.Add(ho.Time);
+                    }
+                }
+            }
+
+            if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(50);
+
+            var allDisruptors = problemAreas.SelectMany(o => o.disruptors).ToArray();
+            SortedSet<int> timesToCheck = new SortedSet<int>(allDisruptors.Select(ho => (int)ho.EndTime + approachTime)
+                .Concat(allDisruptors.Select(ho => (int)ho.EndTime + approachTime + 1))
+                .Concat(allDisruptors.Select(ho => (int)ho.EndTime + approachTime - 1)));
             //var timesToCheck = Enumerable.Range(0, endTime);
 
-            bool autoFail = false;
+            int autoFails = 0;
             List<HitObject> lastHitObjects = new List<HitObject>();
 
             foreach (var time in timesToCheck) {
@@ -136,11 +178,11 @@ namespace Mapping_Tools.Views.AutoFailDetector {
 
                 var badUnload = removedObjects.FirstOrDefault(ho => GetTrueEndTime(ho, window50, args.PhysicsUpdateLeniency) > time);
                 if (badUnload != null) {
-                    autoFail = true;
+                    autoFails++;
                     if (args.ShowAutoFailTimes)
                         _autoFailTimes.Add(time);
                     if (args.ShowUnloadingObjects)
-                        _autoFailingObjects.Add(badUnload.Time);
+                        _unloadingObjects.Add(badUnload.Time);
                 }
 
                 lastHitObjects = hitObjectsMinimal;
@@ -153,7 +195,7 @@ namespace Mapping_Tools.Views.AutoFailDetector {
             if (args.Quick)
                 RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, false));
 
-            return autoFail ? $"{Math.Max(_autoFailTimes.Count, _autoFailingObjects.Count)} cases of auto-fail detected!" : "No auto-fail detected.";
+            return autoFails > 0 ? $"{autoFails} cases of auto-fail detected and {problemAreas.Count} potential unloading objects detected!" : problemAreas.Count > 0 ? $"{problemAreas.Count} potential unloading objects detected." : "No auto-fail detected.";
         }
 
         private static int GetTrueEndTime(HitObject ho, int window50, int physicsUpdateTime) {
@@ -173,6 +215,9 @@ namespace Mapping_Tools.Views.AutoFailDetector {
             var max = n - 1;
             while (min <= max) {
                 var mid = min + (max - min) / 2;
+                //Console.WriteLine($"index {mid}");
+                //Console.WriteLine($"time {hitObjects[mid].Time}");
+                //Console.WriteLine($"end time {hitObjects[mid].EndTime}");
                 var t = hitObjects[mid].EndTime;
 
                 if (time == t) {
@@ -192,8 +237,14 @@ namespace Mapping_Tools.Views.AutoFailDetector {
             _tl?.mainCanvas.Children.Clear();
             try {
                 _tl = new TimeLine(MainWindow.AppWindow.ActualWidth, 100.0, _endTimeMonitor);
-                foreach (double timingS in _autoFailingObjects) {
+                foreach (double timingS in _potentialUnloadingObjects) {
                     _tl.AddElement(timingS, 1);
+                }
+                foreach (double timingS in _potentialDisruptors) {
+                    _tl.AddElement(timingS, 4);
+                }
+                foreach (double timingS in _unloadingObjects) {
+                    _tl.AddElement(timingS, 2);
                 }
                 foreach (double timingS in _autoFailTimes) {
                     _tl.AddElement(timingS, 3);
@@ -202,6 +253,19 @@ namespace Mapping_Tools.Views.AutoFailDetector {
                 tl_host.Children.Add(_tl);
             } catch (Exception ex) {
                 Console.WriteLine(ex.Message);
+            }
+        }
+
+        private class ProblemArea {
+            public HitObject unloadableHitObject;
+            public List<HitObject> disruptors;
+
+            public int GetStartTime() {
+                return (int) unloadableHitObject.Time;
+            }
+
+            public int GetEndTime() {
+                return (int) unloadableHitObject.EndTime;
             }
         }
     }

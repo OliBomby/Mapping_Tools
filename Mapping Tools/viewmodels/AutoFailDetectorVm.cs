@@ -25,6 +25,18 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _showUnloadingObjects, value);
         }
 
+        private bool _showPotentialUnloadingObjects;
+        public bool ShowPotentialUnloadingObjects {
+            get => _showPotentialUnloadingObjects;
+            set => Set(ref _showPotentialUnloadingObjects, value);
+        }
+
+        private bool _showPotentialDisruptors;
+        public bool ShowPotentialDisruptors {
+            get => _showPotentialDisruptors;
+            set => Set(ref _showPotentialDisruptors, value);
+        }
+
         private double _approachRateOverride = -1;
         public double ApproachRateOverride {
             get => _approachRateOverride;
