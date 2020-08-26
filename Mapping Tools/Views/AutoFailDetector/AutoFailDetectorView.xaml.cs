@@ -35,7 +35,7 @@ namespace Mapping_Tools.Views.AutoFailDetector {
         /// <summary>
         /// 
         /// </summary>
-        public static readonly string ToolDescription = $"Detects cases of incorrect object loading in a beatmap which makes osu! unable to calculate scores correctly.{Environment.NewLine} Auto-fail is most often caused by placing other hit objects during sliders, so there are multiple hit objects going on at the same time also known as \"2B\" patterns.";
+        public static readonly string ToolDescription = $"Detects cases of incorrect object loading in a beatmap which makes osu! unable to calculate scores correctly.{Environment.NewLine} Auto-fail is most often caused by placing other hit objects during sliders, so there are multiple hit objects going on at the same time also known as \"2B\" patterns.{Environment.NewLine} Use the AR and OD override options to see what would happen when you use hardrock mod on the map.";
 
         /// <summary>
         /// Initializes the Map Cleaner view to <see cref="MainWindow"/>
