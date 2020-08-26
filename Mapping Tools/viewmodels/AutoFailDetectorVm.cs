@@ -49,10 +49,16 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _physicsUpdateLeniency, value);
         }
 
-        private bool _fixAutoFail;
-        public bool FixAutoFail {
-            get => _fixAutoFail;
-            set => Set(ref _fixAutoFail, value);
+        private bool _getAutoFailFix;
+        public bool GetAutoFailFix {
+            get => _getAutoFailFix;
+            set => Set(ref _getAutoFailFix, value);
+        }
+
+        private bool _autoPlaceFix;
+        public bool AutoPlaceFix {
+            get => _autoPlaceFix;
+            set => Set(ref _autoPlaceFix, value);
         }
 
         public AutoFailDetectorVm() {

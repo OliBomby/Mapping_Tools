@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Input;
 
@@ -151,8 +152,52 @@ namespace Mapping_Tools.Views.AutoFailDetector {
 
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(33);
 
-            int autoFails = 0;
+            // Make a solution
+            StringBuilder guideBuilder = new StringBuilder();
+            if (args.GetAutoFailFix) {
+                guideBuilder.AppendLine("Auto-fail fix guide. Place these extra objects to fix auto-fail:\n");
 
+                int[] solution = SolveAutoFailPadding(hitObjects, problemAreas, 1);
+
+                int lastTime = 0;
+                for (int i = 0; i < problemAreas.Count; i++) {
+                    if (solution[i] > 0) {
+                        guideBuilder.AppendLine(i == 0
+                            ? $"Extra objects before {problemAreas[i].GetStartTime()}: {solution[i]}"
+                            : $"Extra objects between {lastTime} - {problemAreas[i].GetStartTime()}: {solution[i]}");
+
+                        if (args.AutoPlaceFix) {
+                            var t = GetSafePlacementTime(hitObjects, lastTime, problemAreas[i].GetStartTime(), approachTime,
+                                window50, args.PhysicsUpdateLeniency);
+                            for (int j = 0; j < solution[i]; j++) {
+                                beatmap.HitObjects.Add(new HitObject { Pos = Vector2.Zero, Time = t, ObjectType = 8, EndTime = t - 1 });
+                            }
+                        }
+                    }
+                    lastTime = problemAreas[i].GetEndTime(approachTime, window50, args.PhysicsUpdateLeniency);
+                }
+                if (solution.Last() > 0) {
+                    guideBuilder.AppendLine($"Extra objects after {lastTime}: {solution.Last()}");
+
+                    if (args.AutoPlaceFix) {
+                        var t = GetSafePlacementTime(hitObjects, lastTime, endTime, approachTime, window50,
+                            args.PhysicsUpdateLeniency);
+                        for (int i = 0; i < solution.Last(); i++) {
+                            beatmap.HitObjects.Add(new HitObject
+                                {Pos = Vector2.Zero, Time = t, ObjectType = 8, EndTime = t - 1});
+                        }
+                    }
+                }
+
+                if (args.AutoPlaceFix) {
+                    editor.SaveFile();
+                    hitObjects = beatmap.HitObjects.OrderBy(ho => ho.Time).ToList();
+                }
+            }
+
+            if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(67);
+
+            int autoFails = 0;
             // Use osu!'s object loading algorithm to find out which objects are actually unloaded
             foreach (var problemArea in problemAreas) {
                 SortedSet<int> timesToCheck = new SortedSet<int>(problemArea.disruptors.Select(ho => (int)ho.EndTime + approachTime)
@@ -181,34 +226,6 @@ namespace Mapping_Tools.Views.AutoFailDetector {
                 }
             }
 
-            if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(67);
-
-            // Print a solution
-            if (args.FixAutoFail) {
-                int[] solution = SolveAutoFailPadding(hitObjects, problemAreas, 1);
-
-                int lastTime = 0;
-                for (int i = 0; i < problemAreas.Count; i++) {
-                    if (solution[i] > 0) {
-                        Console.WriteLine(i == 0
-                            ? $"Padding before {problemAreas[i].GetStartTime()}: {solution[i]}"
-                            : $"Padding between {lastTime} - {problemAreas[i].GetStartTime()}: {solution[i]}");
-                    }
-
-                    var t = GetSafePlacementTime(hitObjects, lastTime, problemAreas[i].GetStartTime(), approachTime, window50, args.PhysicsUpdateLeniency);
-                    for (int j = 0; j < solution[i]; j++) {
-                        beatmap.HitObjects.Add(new HitObject { Pos = Vector2.Zero, Time = t, ObjectType = 8, EndTime = t - 1 });
-                    }
-                    lastTime = problemAreas[i].GetEndTime(approachTime, window50, args.PhysicsUpdateLeniency);
-                }
-                Console.WriteLine($"Padding after {lastTime}: {solution.Last()}");
-                var t2 = GetSafePlacementTime(hitObjects, lastTime, endTime, approachTime, window50, args.PhysicsUpdateLeniency);
-                for (int i = 0; i < solution.Last(); i++) {
-                    beatmap.HitObjects.Add(new HitObject { Pos = Vector2.Zero, Time = t2, ObjectType = 8, EndTime = t2 - 1 });
-                }
-                editor.SaveFile();
-            }
-
             // Complete progressbar
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(100);
 
@@ -216,7 +233,10 @@ namespace Mapping_Tools.Views.AutoFailDetector {
             if (args.Quick)
                 RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, false));
 
-            return autoFails > 0 ? $"{autoFails} unloading objects detected and {problemAreas.Count} potential unloading objects detected!" : problemAreas.Count > 0 ? $"{problemAreas.Count} potential unloading objects detected." : "No auto-fail detected.";
+            return args.GetAutoFailFix ? guideBuilder.ToString() : 
+                autoFails > 0 ? $"{autoFails} unloading objects detected and {problemAreas.Count} potential unloading objects detected!" : 
+                problemAreas.Count > 0 ? $"{problemAreas.Count} potential unloading objects detected." : 
+                "No auto-fail detected.";
         }
 
         private static int GetSafePlacementTime(List<HitObject> hitObjects, int start, int end, int approachTime, int window50, int physicsUpdateLeniency) {
@@ -230,7 +250,7 @@ namespace Mapping_Tools.Views.AutoFailDetector {
                 }
             }
 
-            return start;
+            throw new Exception($"Can't find a safe place to place objects between {start} and {end}.");
         }
 
         private static int GetAdjustedEndTime(HitObject ho, int window50, int physicsUpdateTime) {
