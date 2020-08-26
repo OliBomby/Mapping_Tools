@@ -13,13 +13,7 @@ namespace Mapping_Tools.Viewmodels {
         [JsonIgnore]
         public bool Quick { get; set; }
 
-        private bool _showAutoFailTimes = true;
-        public bool ShowAutoFailTimes {
-            get => _showAutoFailTimes;
-            set => Set(ref _showAutoFailTimes, value);
-        }
-
-        private bool _showUnloadingObjects;
+        private bool _showUnloadingObjects = true;
         public bool ShowUnloadingObjects {
             get => _showUnloadingObjects;
             set => Set(ref _showUnloadingObjects, value);

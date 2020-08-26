@@ -15,7 +15,6 @@ using Mapping_Tools.Classes.MathUtil;
 namespace Mapping_Tools.Views.AutoFailDetector {
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
     public partial class AutoFailDetectorView : IQuickRun {
-        private List<double> _autoFailTimes;
         private List<double> _unloadingObjects;
         private List<double> _potentialUnloadingObjects;
         private List<double> _potentialDisruptors;
@@ -92,7 +91,6 @@ namespace Mapping_Tools.Views.AutoFailDetector {
 
         private string Run_Program(AutoFailDetectorVm args, BackgroundWorker worker, DoWorkEventArgs _) {
             // Reset the timeline lists
-            _autoFailTimes = new List<double>();
             _unloadingObjects = new List<double>();
             _potentialUnloadingObjects = new List<double>();
             _potentialDisruptors = new List<double>();
@@ -133,7 +131,7 @@ namespace Mapping_Tools.Views.AutoFailDetector {
                 var disruptors = new List<HitObject>();
                 for (int j = i + 1; j < hitObjects.Count; j++) {
                     var ho2 = hitObjects[j];
-                    if (ho2.EndTime < GetTrueEndTime(ho, window50, args.PhysicsUpdateLeniency) - approachTime) {
+                    if (ho2.EndTime < GetAdjustedEndTime(ho, window50, args.PhysicsUpdateLeniency) - approachTime) {
                         disruptors.Add(ho2);
 
                         if (args.ShowPotentialDisruptors) {
@@ -143,7 +141,7 @@ namespace Mapping_Tools.Views.AutoFailDetector {
                 }
 
                 if (disruptors.Count > 0) {
-                    problemAreas.Add(new ProblemArea {unloadableHitObject = ho, disruptors = disruptors});
+                    problemAreas.Add(new ProblemArea {index = i, unloadableHitObject = ho, disruptors = disruptors});
 
                     if (args.ShowPotentialUnloadingObjects) {
                         _potentialUnloadingObjects.Add(ho.Time);
@@ -151,41 +149,64 @@ namespace Mapping_Tools.Views.AutoFailDetector {
                 }
             }
 
-            if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(50);
-
-            var allDisruptors = problemAreas.SelectMany(o => o.disruptors).ToArray();
-            SortedSet<int> timesToCheck = new SortedSet<int>(allDisruptors.Select(ho => (int)ho.EndTime + approachTime)
-                .Concat(allDisruptors.Select(ho => (int)ho.EndTime + approachTime + 1))
-                .Concat(allDisruptors.Select(ho => (int)ho.EndTime + approachTime - 1)));
-            //var timesToCheck = Enumerable.Range(0, endTime);
+            if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(33);
 
             int autoFails = 0;
-            List<HitObject> lastHitObjects = new List<HitObject>();
 
-            foreach (var time in timesToCheck) {
-                var minimalLeft = time - approachTime;
-                var minimalRight = time + approachTime;
+            // Use osu!'s object loading algorithm to find out which objects are actually unloaded
+            foreach (var problemArea in problemAreas) {
+                SortedSet<int> timesToCheck = new SortedSet<int>(problemArea.disruptors.Select(ho => (int)ho.EndTime + approachTime)
+                    .Concat(problemArea.disruptors.Select(ho => (int)ho.EndTime + approachTime + 1))
+                    .Concat(problemArea.disruptors.Select(ho => (int)ho.EndTime + approachTime - 1)));
 
-                var startIndex = OsuBinarySearch(hitObjects, minimalLeft);
-                var endIndex = hitObjects.FindIndex(startIndex, ho => ho.Time > minimalRight);
-                if (endIndex < 0) {
-                    endIndex = hitObjects.Count - 1;
+                foreach (var time in timesToCheck) {
+                    var minimalLeft = time - approachTime;
+                    var minimalRight = time + approachTime;
+
+                    var startIndex = OsuBinarySearch(hitObjects, minimalLeft);
+                    var endIndex = hitObjects.FindIndex(startIndex, ho => ho.Time > minimalRight);
+                    if (endIndex < 0) {
+                        endIndex = hitObjects.Count - 1;
+                    }
+
+                    var hitObjectsMinimal = hitObjects.GetRange(startIndex, 1 + endIndex - startIndex);
+
+                    if (!hitObjectsMinimal.Contains(problemArea.unloadableHitObject) && 
+                        GetAdjustedEndTime(problemArea.unloadableHitObject, window50, args.PhysicsUpdateLeniency) > time) {
+                        if (args.ShowUnloadingObjects)
+                            _unloadingObjects.Add(problemArea.unloadableHitObject.Time);
+                        autoFails++;
+                        break;
+                    }
                 }
+            }
 
-                var hitObjectsMinimal = hitObjects.GetRange(startIndex, 1 + endIndex - startIndex);
+            if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(67);
 
-                var removedObjects = lastHitObjects.Except(hitObjectsMinimal);
+            // Print a solution
+            if (true) {
+                int[] solution = SolveAutoFailPadding(hitObjects, problemAreas, 1);
 
-                var badUnload = removedObjects.FirstOrDefault(ho => GetTrueEndTime(ho, window50, args.PhysicsUpdateLeniency) > time);
-                if (badUnload != null) {
-                    autoFails++;
-                    if (args.ShowAutoFailTimes)
-                        _autoFailTimes.Add(time);
-                    if (args.ShowUnloadingObjects)
-                        _unloadingObjects.Add(badUnload.Time);
+                int lastTime = 0;
+                for (int i = 0; i < problemAreas.Count; i++) {
+                    if (solution[i] > 0) {
+                        Console.WriteLine(i == 0
+                            ? $"Padding before {problemAreas[i].GetStartTime()}: {solution[i]}"
+                            : $"Padding between {lastTime} - {problemAreas[i].GetStartTime()}: {solution[i]}");
+                    }
+
+                    /*var t = (lastTime + problemAreas[i].GetStartTime()) / 2d;
+                    for (int j = 0; j < solution[i]; j++) {
+                        beatmap.HitObjects.Add(new HitObject { Pos = Vector2.Zero, Time = t, ObjectType = 8, EndTime = t - 1 });
+                    }*/
+                    lastTime = problemAreas[i].GetEndTime(approachTime, window50, args.PhysicsUpdateLeniency);
                 }
-
-                lastHitObjects = hitObjectsMinimal;
+                Console.WriteLine($"Padding after {lastTime}: {solution.Last()}");
+                /*var t2 = (lastTime + endTime) / 2d;
+                for (int i = 0; i < solution.Last(); i++) {
+                    beatmap.HitObjects.Add(new HitObject { Pos = Vector2.Zero, Time = t2, ObjectType = 8, EndTime = t2 - 1 });
+                }
+                editor.SaveFile();*/
             }
 
             // Complete progressbar
@@ -195,10 +216,10 @@ namespace Mapping_Tools.Views.AutoFailDetector {
             if (args.Quick)
                 RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, false));
 
-            return autoFails > 0 ? $"{autoFails} cases of auto-fail detected and {problemAreas.Count} potential unloading objects detected!" : problemAreas.Count > 0 ? $"{problemAreas.Count} potential unloading objects detected." : "No auto-fail detected.";
+            return autoFails > 0 ? $"{autoFails} unloading objects detected and {problemAreas.Count} potential unloading objects detected!" : problemAreas.Count > 0 ? $"{problemAreas.Count} potential unloading objects detected." : "No auto-fail detected.";
         }
 
-        private static int GetTrueEndTime(HitObject ho, int window50, int physicsUpdateTime) {
+        private static int GetAdjustedEndTime(HitObject ho, int window50, int physicsUpdateTime) {
             if (ho.IsCircle) {
                 return (int) ho.Time + window50 + physicsUpdateTime;
             }
@@ -218,7 +239,7 @@ namespace Mapping_Tools.Views.AutoFailDetector {
                 //Console.WriteLine($"index {mid}");
                 //Console.WriteLine($"time {hitObjects[mid].Time}");
                 //Console.WriteLine($"end time {hitObjects[mid].EndTime}");
-                var t = hitObjects[mid].EndTime;
+                var t = (int) hitObjects[mid].EndTime;
 
                 if (time == t) {
                     return mid;
@@ -244,9 +265,6 @@ namespace Mapping_Tools.Views.AutoFailDetector {
                     _tl.AddElement(timingS, 4);
                 }
                 foreach (double timingS in _unloadingObjects) {
-                    _tl.AddElement(timingS, 2);
-                }
-                foreach (double timingS in _autoFailTimes) {
                     _tl.AddElement(timingS, 3);
                 }
                 tl_host.Children.Clear();
@@ -257,6 +275,7 @@ namespace Mapping_Tools.Views.AutoFailDetector {
         }
 
         private class ProblemArea {
+            public int index;
             public HitObject unloadableHitObject;
             public List<HitObject> disruptors;
 
@@ -264,9 +283,83 @@ namespace Mapping_Tools.Views.AutoFailDetector {
                 return (int) unloadableHitObject.Time;
             }
 
-            public int GetEndTime() {
-                return (int) unloadableHitObject.EndTime;
+            public int GetEndTime(int approachTime, int window50, int physicsTime) {
+                return GetAdjustedEndTime(unloadableHitObject, window50, physicsTime) - approachTime;
             }
+        }
+
+        private static int[] SolveAutoFailPadding(IReadOnlyList<HitObject> hitObjects, IReadOnlyList<ProblemArea> problemAreas, int startPaddingCount = 0) {
+            int padding = startPaddingCount;
+            int[] solution;
+            while (!SolveAutoFailPadding(hitObjects, problemAreas, padding++, out solution)) { }
+
+            return solution;
+        }
+
+        private static bool SolveAutoFailPadding(IReadOnlyList<HitObject> hitObjects, IReadOnlyList<ProblemArea> problemAreas, int paddingCount, out int[] solution) {
+            solution = new int[problemAreas.Count + 1];
+
+            int leftPadding = 0;
+            for (var i = 0; i < problemAreas.Count; i++) {
+                var problemAreaSolution =
+                    SolveSingleProblemAreaPadding(problemAreas[i], hitObjects, paddingCount, leftPadding);
+
+                if (problemAreaSolution.Count == 0 || problemAreaSolution.Max() < leftPadding) {
+                    /*Console.WriteLine($"Padding {paddingCount} failed on area {i} at {problemAreas[i].unloadableHitObject.Time} object index {problemAreas[i].index} left padding {leftPadding}.");
+                    foreach (var sol in problemAreaSolution) {
+                        Console.WriteLine($"Solution {sol}");
+                    }*/
+                    return false;
+                }
+
+                var lowest = problemAreaSolution.First(o => o >= leftPadding);
+                solution[i] = lowest - leftPadding;
+                leftPadding = lowest;
+            }
+
+            solution[problemAreas.Count] = paddingCount - leftPadding;
+
+            return true;
+        }
+
+        private static List<int> SolveSingleProblemAreaPadding(ProblemArea problemArea, IReadOnlyList<HitObject> hitObjects, int paddingCount, int minimalLeft = 0) {
+            var solution = new List<int>(paddingCount - minimalLeft + 1);
+
+            for (int left = minimalLeft; left <= paddingCount; left++) {
+                var right = paddingCount - left;
+
+                if (ProblemAreaPaddingWorks(problemArea, hitObjects, left, right)) {
+                    solution.Add(left);
+                }
+            }
+
+            return solution;
+        }
+
+        private static bool ProblemAreaPaddingWorks(ProblemArea problemArea, IReadOnlyList<HitObject> hitObjects, int left, int right) {
+            return problemArea.disruptors.All(ho =>
+                PaddedOsuBinarySearch(hitObjects, (int) ho.EndTime, left, right) <= problemArea.index);
+        }
+
+        private static int PaddedOsuBinarySearch(IReadOnlyList<HitObject> hitObjects, int time, int left, int right) {
+            var n = hitObjects.Count;
+            var min = -left;
+            var max = n - 1 + right;
+            while (min <= max) {
+                var mid = min + (max - min) / 2;
+                var t = mid < 0 ? int.MinValue : mid > hitObjects.Count - 1 ? int.MaxValue : (int) hitObjects[mid].EndTime;
+
+                if (time == t) {
+                    return mid;
+                }
+                if (time > t) {
+                    min = mid + 1;
+                } else {
+                    max = mid - 1;
+                }
+            }
+
+            return min;
         }
     }
 }
