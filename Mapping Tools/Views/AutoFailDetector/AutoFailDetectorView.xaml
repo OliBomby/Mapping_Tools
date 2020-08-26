@@ -60,6 +60,10 @@
                           ToolTip="Show the start times of hit objects which cause the potential unloading of other hit objects. Purple in the timeline.">
                     Show disrupting hit objects
                 </CheckBox>
+                <CheckBox FontSize="14" IsChecked="{Binding FixAutoFail}" Cursor="Hand"
+                          ToolTip="Removes auto-fail from the map.">
+                    Fix auto-fail
+                </CheckBox>
                 <TextBox Width="258" HorizontalAlignment="Left" Margin="0,10,0,0"
                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="AR override"
                         ToolTip="Override the approach rate used for finding the loaded hit objects. Use -1 for no override."

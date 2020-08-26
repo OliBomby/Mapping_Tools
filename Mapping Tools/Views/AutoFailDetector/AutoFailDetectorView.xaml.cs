@@ -1,4 +1,5 @@
 ﻿using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Classes.Tools;
@@ -10,7 +11,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Views.AutoFailDetector {
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
@@ -184,7 +184,7 @@ namespace Mapping_Tools.Views.AutoFailDetector {
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(67);
 
             // Print a solution
-            if (true) {
+            if (args.FixAutoFail) {
                 int[] solution = SolveAutoFailPadding(hitObjects, problemAreas, 1);
 
                 int lastTime = 0;
@@ -195,18 +195,18 @@ namespace Mapping_Tools.Views.AutoFailDetector {
                             : $"Padding between {lastTime} - {problemAreas[i].GetStartTime()}: {solution[i]}");
                     }
 
-                    /*var t = (lastTime + problemAreas[i].GetStartTime()) / 2d;
+                    var t = GetSafePlacementTime(hitObjects, lastTime, problemAreas[i].GetStartTime(), approachTime, window50, args.PhysicsUpdateLeniency);
                     for (int j = 0; j < solution[i]; j++) {
                         beatmap.HitObjects.Add(new HitObject { Pos = Vector2.Zero, Time = t, ObjectType = 8, EndTime = t - 1 });
-                    }*/
+                    }
                     lastTime = problemAreas[i].GetEndTime(approachTime, window50, args.PhysicsUpdateLeniency);
                 }
                 Console.WriteLine($"Padding after {lastTime}: {solution.Last()}");
-                /*var t2 = (lastTime + endTime) / 2d;
+                var t2 = GetSafePlacementTime(hitObjects, lastTime, endTime, approachTime, window50, args.PhysicsUpdateLeniency);
                 for (int i = 0; i < solution.Last(); i++) {
                     beatmap.HitObjects.Add(new HitObject { Pos = Vector2.Zero, Time = t2, ObjectType = 8, EndTime = t2 - 1 });
                 }
-                editor.SaveFile();*/
+                editor.SaveFile();
             }
 
             // Complete progressbar
@@ -217,6 +217,20 @@ namespace Mapping_Tools.Views.AutoFailDetector {
                 RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, false));
 
             return autoFails > 0 ? $"{autoFails} unloading objects detected and {problemAreas.Count} potential unloading objects detected!" : problemAreas.Count > 0 ? $"{problemAreas.Count} potential unloading objects detected." : "No auto-fail detected.";
+        }
+
+        private static int GetSafePlacementTime(List<HitObject> hitObjects, int start, int end, int approachTime, int window50, int physicsUpdateLeniency) {
+            var rangeObjects = hitObjects.FindAll(o => o.EndTime >= start && o.Time <= end);
+
+            for (int i = start; i < end; i++) {
+                if (!rangeObjects.Any(ho =>
+                    i >= (int) ho.Time &&
+                    i <= GetAdjustedEndTime(ho, window50, physicsUpdateLeniency) - approachTime)) {
+                    return i;
+                }
+            }
+
+            return start;
         }
 
         private static int GetAdjustedEndTime(HitObject ho, int window50, int physicsUpdateTime) {
