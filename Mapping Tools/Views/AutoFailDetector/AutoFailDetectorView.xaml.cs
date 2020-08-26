@@ -242,7 +242,7 @@ namespace Mapping_Tools.Views.AutoFailDetector {
         private static int GetSafePlacementTime(List<HitObject> hitObjects, int start, int end, int approachTime, int window50, int physicsUpdateLeniency) {
             var rangeObjects = hitObjects.FindAll(o => o.EndTime >= start && o.Time <= end);
 
-            for (int i = start; i < end; i++) {
+            for (int i = end - 1; i >= start; i--) {
                 if (!rangeObjects.Any(ho =>
                     i >= (int) ho.Time &&
                     i <= GetAdjustedEndTime(ho, window50, physicsUpdateLeniency) - approachTime)) {
