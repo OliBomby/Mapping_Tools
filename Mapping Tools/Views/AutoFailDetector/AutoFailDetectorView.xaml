@@ -80,7 +80,7 @@
                 </TextBox>
                 <TextBox Width="258" HorizontalAlignment="Left" Margin="0,20,0,0"
                          Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Physics update leniency"
-                         ToolTip="Time in milliseconds to require objects to unload later to account for the update frequency of the physics engine."
+                         ToolTip="Time in milliseconds to require objects to unload later to account for the update frequency of the physics engine. A value of 9ms or higher is recommended, so players with 120fps (8.33ms frame time) can pass the map. Increase it further if your map is really laggy."
                          Text="{Binding PhysicsUpdateLeniency}">
                 </TextBox>
             </StackPanel>
