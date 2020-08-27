@@ -157,7 +157,7 @@ namespace Mapping_Tools.Views.AutoFailDetector {
             if (args.GetAutoFailFix) {
                 guideBuilder.AppendLine("Auto-fail fix guide. Place these extra objects to fix auto-fail:\n");
 
-                int[] solution = SolveAutoFailPadding(hitObjects, problemAreas, 1);
+                int[] solution = SolveAutoFailPadding(hitObjects, problemAreas, 0);
 
                 int lastTime = 0;
                 for (int i = 0; i < problemAreas.Count; i++) {
