@@ -91,6 +91,8 @@ namespace Mapping_Tools.Views.AutoFailDetector {
         }
 
         private string Run_Program(AutoFailDetectorVm args, BackgroundWorker worker, DoWorkEventArgs _) {
+            //TODO: negative padding option. Browsing other solutions.
+
             // Reset the timeline lists
             _unloadingObjects = new List<double>();
             _potentialUnloadingObjects = new List<double>();
