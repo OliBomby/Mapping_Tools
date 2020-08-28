@@ -100,14 +100,6 @@ namespace Mapping_Tools.Views.AutoFailDetector {
             var editor = EditorReaderStuff.GetNewestVersionOrNot(args.Paths[0], reader);
             var beatmap = editor.Beatmap;
 
-            //var indices = new[] {0, 2, 6, 13, 27, 55, 111, 223};
-            /*foreach (var index in indices) {
-                beatmap.HitObjects.Insert(index, new HitObject {Pos = Vector2.Zero, Time = beatmap.HitObjects[index].Time - 1, ObjectType = 8, EndTime = 138797});
-            }
-
-            editor.SaveFile();
-            return "";*/
-
             // Hit objects sorted by start time
             var hitObjects = beatmap.HitObjects;
             hitObjects = hitObjects.OrderBy(ho => ho.Time).ToList();
@@ -162,12 +154,9 @@ namespace Mapping_Tools.Views.AutoFailDetector {
                     continue;
 
                 var timesToCheck = new HashSet<int>(allTimesToCheck.GetViewBetween((int) ho.Time, adjEndTime));
-                /*Console.WriteLine($"object at {ho.Time}");
-                foreach (var i1 in timesToCheck) {
-                    Console.WriteLine(i1);
-                }*/
 
-                //
+                // A problem area can also be ignored if the times-to-check is a subset of the last times-to-check,
+                // because if thats the case that implies this problem is contained in the last.
                 if (!(problemAreas.Count > 0 && timesToCheck.IsSubsetOf(problemAreas.Last().timesToCheck))) {
                     problemAreas.Add(new ProblemArea {index = i, unloadableHitObject = ho, disruptors = disruptors, timesToCheck = timesToCheck});
 
@@ -242,14 +231,6 @@ namespace Mapping_Tools.Views.AutoFailDetector {
             int autoFails = 0;
             // Use osu!'s object loading algorithm to find out which objects are actually unloaded
             foreach (var problemArea in problemAreas) {
-                /*SortedSet<int> timesToCheck = new SortedSet<int>(problemArea.disruptors.Select(ho => (int)ho.EndTime + approachTime)
-                    .Concat(problemArea.disruptors.Select(ho => (int)ho.EndTime + approachTime + 1))
-                    .Concat(problemArea.disruptors.Select(ho => (int)ho.EndTime + approachTime - 1)));*/
-                //var timesToCheck = Enumerable.Range(problemArea.GetStartTime(), 
-                //    problemArea.GetTimeToCheck(window50, args.PhysicsUpdateLeniency) - problemArea.GetStartTime() + 1);
-
-                // Under the assumption that auto-fail only happens when the object is unloaded during the end time
-
                 foreach (var time in problemArea.timesToCheck) {
                     var minimalLeft = time - approachTime;
                     var minimalRight = time + approachTime;
@@ -314,9 +295,6 @@ namespace Mapping_Tools.Views.AutoFailDetector {
             var max = n - 1;
             while (min <= max) {
                 var mid = min + (max - min) / 2;
-                //Console.WriteLine($"index {mid}");
-                //Console.WriteLine($"time {hitObjects[mid].Time}");
-                //Console.WriteLine($"end time {hitObjects[mid].EndTime}");
                 var t = (int) hitObjects[mid].EndTime;
 
                 if (time == t) {
@@ -400,10 +378,6 @@ namespace Mapping_Tools.Views.AutoFailDetector {
                     SolveSingleProblemAreaPadding(problemAreas[i], hitObjects, approachTime, paddingCount, leftPadding);
 
                 if (problemAreaSolution.Count == 0 || problemAreaSolution.Max() < leftPadding) {
-                    /*Console.WriteLine($"Padding {paddingCount} failed on area {i} at {problemAreas[i].unloadableHitObject.Time} object index {problemAreas[i].index} left padding {leftPadding}.");
-                    foreach (var sol in problemAreaSolution) {
-                        Console.WriteLine($"Solution {sol}");
-                    }*/
                     return false;
                 }
 
