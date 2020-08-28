@@ -13,7 +13,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
     /// <summary>
     /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
-    public class HitObject : ITextLine {
+    public class HitObject : ITextLine, IComparable<HitObject> {
         public List<TimingPoint> BodyHitsounds = new List<TimingPoint>();
         private int _repeat;
 
@@ -799,6 +799,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 Console.WriteLine(@"feno index: " + tlo.FenoCustomIndex);
                 Console.WriteLine(@"feno volume: " + tlo.FenoSampleVolume);
             }
+        }
+
+        public int CompareTo(HitObject other) {
+            if (ReferenceEquals(this, other)) return 0;
+            if (ReferenceEquals(null, other)) return 1;
+            if (Time == other.Time) return other.NewCombo.CompareTo(NewCombo);
+            return Time.CompareTo(other.Time);
         }
     }
 }

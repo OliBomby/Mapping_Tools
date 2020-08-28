@@ -250,7 +250,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// Sorts all hitobjects in map by order of time.
         /// </summary>
         public void SortHitObjects() {
-            HitObjects = HitObjects.OrderBy(o => o.Time).ToList();
+            HitObjects.Sort();
         }
 
         /// <summary>

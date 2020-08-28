@@ -36,7 +36,7 @@ namespace Mapping_Tools.Classes.Tools {
         public List<double> PotentialUnloadingObjects;
         public List<double> Disruptors;
 
-        public AutoFailDetector(IEnumerable<HitObject> hitObjects, int approachTime, int window50, int physicsTime) {
+        public AutoFailDetector(List<HitObject> hitObjects, int approachTime, int window50, int physicsTime) {
             // Sort the hitobjects
             SetHitObjects(hitObjects);
 
@@ -46,11 +46,12 @@ namespace Mapping_Tools.Classes.Tools {
         }
 
         private void SortHitObjects() {
-            hitObjects = hitObjects.OrderBy(ho => ho.Time).ToList();
+            hitObjects.Sort();
         }
 
-        public void SetHitObjects(IEnumerable<HitObject> hitObjects2) {
-            hitObjects = hitObjects2.OrderBy(ho => ho.Time).ToList();
+        public void SetHitObjects(List<HitObject> hitObjects2) {
+            hitObjects = hitObjects2;
+            SortHitObjects();
         }
 
         public bool DetectAutoFail() {
