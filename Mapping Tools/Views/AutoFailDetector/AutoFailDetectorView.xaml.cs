@@ -113,7 +113,11 @@ namespace Mapping_Tools.Views.AutoFailDetector {
 
             // Fix auto-fail
             if (args.GetAutoFailFix) {
-                autoFailDetector.AutoFailFixDialogue(args.AutoPlaceFix);
+                var placedFix = autoFailDetector.AutoFailFixDialogue(args.AutoPlaceFix);
+
+                if (placedFix) {
+                    editor.SaveFile();
+                }
             }
 
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(67);
