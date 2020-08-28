@@ -14,16 +14,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
     /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
     public class HitObject : ITextLine, IComparable<HitObject> {
-        public List<TimingPoint> BodyHitsounds = new List<TimingPoint>();
-        private int _repeat;
-
-        // Special combined with timeline
-        public List<TimelineObject> TimelineObjects = new List<TimelineObject>();
-
-        /// <summary>
-        /// When true, all coordinates and times will be serialized without rounding.
-        /// </summary>
-        public bool SaveWithFloatPrecision { get; set; }
 
         public HitObject() { }
 
@@ -207,6 +197,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             set => SetEndTime(value);
         } // Includes all repeats
 
+        private double GetEndTime() {
+            return Math.Floor(Time + TemporalLength * Repeat + Precision.DOUBLE_EPSILON);
+        }
+
+        private void SetEndTime(double value) {
+            TemporalLength = Repeat == 0 ? 0 : (value - Time) / Repeat;
+        }
+
         // Special combined with greenline
         [JsonProperty]
         public double SliderVelocity { get; set; }
@@ -219,6 +217,17 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         
         [JsonProperty]
         public bool IsSelected { get; set; }
+
+        public List<TimingPoint> BodyHitsounds = new List<TimingPoint>();
+        private int _repeat;
+
+        // Special combined with timeline
+        public List<TimelineObject> TimelineObjects = new List<TimelineObject>();
+
+        /// <summary>
+        /// When true, all coordinates and times will be serialized without rounding.
+        /// </summary>
+        public bool SaveWithFloatPrecision { get; set; }
 
 
         /// <inheritdoc />
@@ -378,14 +387,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
 
             return string.Join(",", values);
-        }
-
-        private double GetEndTime() {
-            return Math.Floor(Time + TemporalLength * Repeat + Precision.DOUBLE_EPSILON);
-        }
-
-        private void SetEndTime(double value) {
-            TemporalLength = Repeat == 0 ? 0 : (value - Time) / Repeat;
         }
 
         /// <summary>
@@ -760,6 +761,16 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        /// <summary>
+        /// Detects a failure in the slider path algorithm causing a slider to become invisible.
+        /// </summary>
+        /// <returns></returns>
+        public bool IsInvisible() {
+            return PixelLength != 0 && PixelLength <= 0.0001 ||
+                   double.IsNaN(PixelLength) ||
+                   CurvePoints.All(o => o == Pos);
         }
 
         public HitObject DeepCopy() {
