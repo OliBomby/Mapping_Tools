@@ -14,6 +14,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Security.Principal;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -387,7 +388,22 @@ namespace Mapping_Tools {
         //Open info screen
         private void OpenInfo(object sender, RoutedEventArgs e) {
             var version = Assembly.GetEntryAssembly()?.GetName().Version;
-            MessageBox.Show($"Mapping Tools {version}\n\nMade by:\nOliBomby\nPotoofu", "Info");
+            var builder = new StringBuilder();
+            builder.AppendLine($"Mapping Tools {version}");
+            builder.AppendLine();
+            builder.AppendLine("Made by:");
+            builder.AppendLine("OliBomby");
+            builder.AppendLine();
+            builder.AppendLine("Supporters:");
+            builder.AppendLine("Mercury");
+            builder.AppendLine("Spoppyboi");
+            builder.AppendLine();
+            builder.AppendLine("Contributors:");
+            builder.AppendLine("Potoofu");
+            builder.AppendLine("Karoo13");
+            builder.AppendLine("Coppertine");
+
+            MessageBox.Show(builder.ToString(), "Info");
         }
 
         //Change top right icons on changed window state and set state variable
