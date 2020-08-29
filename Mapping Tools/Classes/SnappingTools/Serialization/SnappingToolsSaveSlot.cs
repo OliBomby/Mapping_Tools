@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Windows.Input;
 using Mapping_Tools.Annotations;
+using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Components.Domain;
 using Newtonsoft.Json;
@@ -81,9 +82,9 @@ namespace Mapping_Tools.Classes.SnappingTools.Serialization {
         }
 
         private static string GenerateActiveHotkeyHandle() {
-            var number = MainWindow.MainRandom.Next(int.MaxValue);
+            var number = RNG.Next();
             while (MainWindow.AppWindow.ListenerManager.ActiveHotkeys.ContainsKey($"SaveSlot - {number}")) {
-                number = MainWindow.MainRandom.Next(int.MaxValue);
+                number = RNG.Next();
             }
             return $"SaveSlot - {number}";
         }

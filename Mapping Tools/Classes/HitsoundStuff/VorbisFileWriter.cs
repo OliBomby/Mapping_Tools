@@ -3,6 +3,7 @@ using OggVorbisEncoder;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     public class VorbisFileWriter : IDisposable {
@@ -35,7 +36,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             var info = VorbisInfo.InitVariableBitRate(channels, sampleRate, quality);
 
             // set up our packet->stream encoder
-            var serial = MainWindow.MainRandom.Next();
+            var serial = RNG.Next();
             oggStream = new OggStream(serial);
 
             // =========================================================

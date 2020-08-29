@@ -391,16 +391,27 @@
     <Compile Include="Classes\TimingStudio\Serialization\TimingPointType.cs" />
     <Compile Include="Classes\TimingStudio\Serialization\TimingStudioPreferences.cs" />
     <Compile Include="Classes\TimingStudio\StudioTimingPoint.cs" />
+    <Compile Include="Classes\Tools\AutoFailDetector.cs" />
     <Compile Include="Classes\Tools\BezierConverter.cs" />
     <Compile Include="Classes\Tools\CircleBezierPreset.cs" />
     <Compile Include="Classes\Tools\EditorReaderStuff.cs" />
     <Compile Include="Classes\Tools\MapCleaner.cs" />
     <Compile Include="Classes\Tools\MapCleanerArgs.cs" />
     <Compile Include="Classes\Tools\PathGenerator.cs" />
+    <Compile Include="Classes\Tools\PatternGallery\CollectionRenameVm.cs" />
+    <Compile Include="Classes\Tools\PatternGallery\OsuPattern.cs" />
+    <Compile Include="Classes\Tools\PatternGallery\OsuPatternFileHandler.cs" />
+    <Compile Include="Classes\Tools\PatternGallery\OsuPatternMaker.cs" />
+    <Compile Include="Classes\Tools\PatternGallery\OsuPatternPlacer.cs" />
+    <Compile Include="Classes\Tools\PatternGallery\TimingOverwriteMode.cs" />
+    <Compile Include="Classes\Tools\PatternGallery\PatternOverwriteMode.cs" />
     <Compile Include="Classes\Tools\RhythmGuide.cs" />
     <Compile Include="Classes\Tools\Sliderator.cs" />
     <Compile Include="Components\Dialogs\MessageDialog.xaml.cs">
       <DependentUpon>MessageDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Components\Dialogs\CustomDialog\CustomDialog.xaml.cs">
+      <DependentUpon>CustomDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Components\Domain\ColorToBrushConverter.cs" />
     <Compile Include="Components\Domain\CommandImplementation.cs" />
@@ -513,6 +524,8 @@
     </Compile>
     <Compile Include="Classes\Tools\TimingPointsChange.cs" />
     <Compile Include="Properties\Annotations.cs" />
+    <Compile Include="Viewmodels\AutoFailDetectorVm.cs" />
+    <Compile Include="Viewmodels\PatternGalleryVm.cs" />
     <Compile Include="Viewmodels\MapCleanerVm.cs" />
     <Compile Include="Viewmodels\HitsoundPreviewHelperVm.cs" />
     <Compile Include="Viewmodels\HitsoundStudioVm.cs" />
@@ -538,6 +551,12 @@
     <Compile Include="Views\Extensions.cs" />
     <Compile Include="Views\ComboColourStudio\ComboColourStudioView.xaml.cs">
       <DependentUpon>ComboColourStudioView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\AutoFailDetector\AutoFailDetectorView.xaml.cs">
+      <DependentUpon>AutoFailDetectorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PatternGallery\PatternGalleryView.xaml.cs">
+      <DependentUpon>PatternGalleryView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\HitsoundStudio\HitsoundStudioExportDialog.xaml.cs">
       <DependentUpon>HitsoundStudioExportDialog.xaml</DependentUpon>
@@ -611,6 +630,10 @@
       <DependentUpon>HitsoundLayerImportWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="Components\Dialogs\MessageDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Components\Dialogs\CustomDialog\CustomDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -706,6 +729,14 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Components\Dialogs\BeatmapImportDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\AutoFailDetector\AutoFailDetectorView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\PatternGallery\PatternGalleryView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

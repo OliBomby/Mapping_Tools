@@ -92,7 +92,7 @@ namespace Mapping_Tools.Views.TimingCopier {
                 // Add redlines
                 List<TimingPoint> redlines = timingFrom.GetAllRedlines();
                 foreach (TimingPoint tp in redlines) {
-                    timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, meter: true, inherited: true, omitFirstBarLine: true));
+                    timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, meter: true, unInherited: true, omitFirstBarLine: true));
                 }
 
                 // Apply timing changes

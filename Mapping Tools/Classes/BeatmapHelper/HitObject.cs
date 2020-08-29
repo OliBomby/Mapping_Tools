@@ -13,12 +13,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
     /// <summary>
     /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
-    public class HitObject : ITextLine {
-        public List<TimingPoint> BodyHitsounds = new List<TimingPoint>();
-        private int _repeat;
-
-        // Special combined with timeline
-        public List<TimelineObject> TimelineObjects = new List<TimelineObject>();
+    public class HitObject : ITextLine, IComparable<HitObject> {
 
         public HitObject() { }
 
@@ -202,6 +197,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             set => SetEndTime(value);
         } // Includes all repeats
 
+        private double GetEndTime() {
+            return Math.Floor(Time + TemporalLength * Repeat + Precision.DOUBLE_EPSILON);
+        }
+
+        private void SetEndTime(double value) {
+            TemporalLength = Repeat == 0 ? 0 : (value - Time) / Repeat;
+        }
+
         // Special combined with greenline
         [JsonProperty]
         public double SliderVelocity { get; set; }
@@ -214,6 +217,17 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         
         [JsonProperty]
         public bool IsSelected { get; set; }
+
+        public List<TimingPoint> BodyHitsounds = new List<TimingPoint>();
+        private int _repeat;
+
+        // Special combined with timeline
+        public List<TimelineObject> TimelineObjects = new List<TimelineObject>();
+
+        /// <summary>
+        /// When true, all coordinates and times will be serialized without rounding.
+        /// </summary>
+        public bool SaveWithFloatPrecision { get; set; }
 
 
         /// <inheritdoc />
@@ -335,9 +349,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <inheritdoc />
         public string GetLine() {
             var values = new List<string> {
-                Pos.X.ToRoundInvariant(),
-                Pos.Y.ToRoundInvariant(),
-                Time.ToRoundInvariant(),
+                SaveWithFloatPrecision ? Pos.X.ToInvariant() : Pos.X.ToRoundInvariant(),
+                SaveWithFloatPrecision ? Pos.Y.ToInvariant() : Pos.Y.ToRoundInvariant(),
+                SaveWithFloatPrecision ? Time.ToInvariant() : Time.ToRoundInvariant(),
                 ObjectType.ToInvariant(),
                 Hitsounds.ToInvariant()
             };
@@ -345,7 +359,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             if (IsSlider) {
                 var builder = new StringBuilder();
                 builder.Append(GetPathTypeString());
-                foreach (var p in CurvePoints) builder.Append($"|{p.X.ToRoundInvariant()}:{p.Y.ToRoundInvariant()}");
+                foreach (var p in CurvePoints) builder.Append($"|{(SaveWithFloatPrecision ? p.X.ToInvariant() : p.X.ToRoundInvariant())}:{(SaveWithFloatPrecision ? p.Y.ToInvariant() : p.Y.ToRoundInvariant())}");
                 values.Add(builder.ToString());
                 values.Add(Repeat.ToInvariant());
                 values.Add(PixelLength.ToInvariant());
@@ -364,7 +378,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                     values.Add(Extras);
                 }
             } else if (IsSpinner) {
-                values.Add(EndTime.ToRoundInvariant());
+                values.Add(SaveWithFloatPrecision ? EndTime.ToInvariant() : EndTime.ToRoundInvariant());
                 values.Add(Extras);
             } else {
                 // It's a circle or a hold note
@@ -373,14 +387,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
 
             return string.Join(",", values);
-        }
-
-        private double GetEndTime() {
-            return Math.Floor(Time + TemporalLength * Repeat + Precision.DOUBLE_EPSILON);
-        }
-
-        private void SetEndTime(double value) {
-            TemporalLength = Repeat == 0 ? 0 : (value - Time) / Repeat;
         }
 
         /// <summary>
@@ -475,7 +481,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="deltaTime"></param>
         public void MoveTime(double deltaTime) {
             Time += deltaTime;
-            EndTime += deltaTime;
 
             // Move its timelineobjects
             foreach (var tlo in TimelineObjects) tlo.Time += deltaTime;
@@ -643,7 +648,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public string GetExtras() {
             if (IsHoldNote)
-                return string.Join(":", EndTime.ToRoundInvariant(), SampleSet.ToIntInvariant(),
+                return string.Join(":", SaveWithFloatPrecision ? EndTime.ToInvariant() : EndTime.ToRoundInvariant(), SampleSet.ToIntInvariant(),
                     AdditionSet.ToIntInvariant(), CustomIndex.ToInvariant(), SampleVolume.ToRoundInvariant(), Filename);
             return string.Join(":", SampleSet.ToIntInvariant(), AdditionSet.ToIntInvariant(), CustomIndex.ToInvariant(),
                 SampleVolume.ToRoundInvariant(), Filename);
@@ -758,6 +763,34 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
+        /// <summary>
+        /// Detects a failure in the slider path algorithm causing a slider to become invisible.
+        /// </summary>
+        /// <returns></returns>
+        public bool IsInvisible() {
+            return PixelLength != 0 && PixelLength <= 0.0001 ||
+                   double.IsNaN(PixelLength) ||
+                   CurvePoints.All(o => o == Pos);
+        }
+
+        public HitObject DeepCopy() {
+            var newHitObject = (HitObject) MemberwiseClone();
+            newHitObject.BodyHitsounds = BodyHitsounds?.Select(o => o.Copy()).ToList();
+            newHitObject.TimelineObjects = TimelineObjects?.Select(o => o.Copy()).ToList();
+            newHitObject.CurvePoints = CurvePoints?.Copy();
+            if (EdgeHitsounds != null)
+                newHitObject.EdgeHitsounds = new List<int>(EdgeHitsounds);
+            if (EdgeSampleSets != null)
+                newHitObject.EdgeSampleSets = new List<SampleSet>(EdgeSampleSets);
+            if (EdgeAdditionSets != null)
+                newHitObject.EdgeAdditionSets = new List<SampleSet>(EdgeAdditionSets);
+            newHitObject.TimingPoint = TimingPoint?.Copy();
+            newHitObject.HitsoundTimingPoint = HitsoundTimingPoint?.Copy();
+            newHitObject.UnInheritedTimingPoint = UnInheritedTimingPoint?.Copy();
+            newHitObject.Colour = Colour?.Copy();
+            return newHitObject;
+        }
+
         public void Debug() {
             Console.WriteLine(GetLine());
             foreach (var tp in BodyHitsounds) {
@@ -777,6 +810,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 Console.WriteLine(@"feno index: " + tlo.FenoCustomIndex);
                 Console.WriteLine(@"feno volume: " + tlo.FenoSampleVolume);
             }
+        }
+
+        public int CompareTo(HitObject other) {
+            if (ReferenceEquals(this, other)) return 0;
+            if (ReferenceEquals(null, other)) return 1;
+            if (Time == other.Time) return other.NewCombo.CompareTo(NewCombo);
+            return Time.CompareTo(other.Time);
         }
     }
 }

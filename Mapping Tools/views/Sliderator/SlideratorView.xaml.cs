@@ -689,8 +689,8 @@ namespace Mapping_Tools.Views.Sliderator {
                     clone.SliderVelocity = arg.RemoveSliderTicks ? double.NaN : -100;
                     
                     // Add redlines
-                    timingPointsChanges.Add(new TimingPointsChange(tpOn, mpb:true, inherited:true, omitFirstBarLine:true, fuzzyness:0));
-                    timingPointsChanges.Add(new TimingPointsChange(tpAfter, mpb:true, inherited:true, omitFirstBarLine:true, fuzzyness:0));
+                    timingPointsChanges.Add(new TimingPointsChange(tpOn, mpb:true, unInherited:true, omitFirstBarLine:true, fuzzyness:0));
+                    timingPointsChanges.Add(new TimingPointsChange(tpAfter, mpb:true, unInherited:true, omitFirstBarLine:true, fuzzyness:0));
 
                     clone.Time -= 1;
                 }
