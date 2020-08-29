@@ -104,8 +104,9 @@ namespace Mapping_Tools.Views.AutoFailDetector {
             var window50 = (int) Math.Ceiling(200 - 10 * od);
 
             // Detect auto-fail
-            var autoFailDetector = new Classes.Tools.AutoFailDetector(beatmap.HitObjects, approachTime, window50,
-                args.PhysicsUpdateLeniency);
+            var autoFailDetector = new Classes.Tools.AutoFailDetector(beatmap.HitObjects, 
+                (int) beatmap.GetMapStartTime(), (int) beatmap.GetMapEndTime(),
+                approachTime, window50, args.PhysicsUpdateLeniency);
 
             var autoFail = autoFailDetector.DetectAutoFail();
 

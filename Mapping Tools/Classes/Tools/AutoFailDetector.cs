@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.MathUtil;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.Tools {
     public class AutoFailDetector {
@@ -23,6 +23,8 @@ namespace Mapping_Tools.Classes.Tools {
             }
         }
 
+        private readonly int mapStartTime;
+        private readonly int mapEndTime;
         private readonly int approachTime;
         private readonly int window50;
         private readonly int physicsTime;
@@ -30,16 +32,17 @@ namespace Mapping_Tools.Classes.Tools {
         private List<ProblemArea> problemAreas;
 
         private SortedSet<int> timesToCheckStartIndex;
-        private SortedSet<int> timesToCheckEndIndex;
 
         public List<double> UnloadingObjects;
         public List<double> PotentialUnloadingObjects;
         public List<double> Disruptors;
 
-        public AutoFailDetector(List<HitObject> hitObjects, int approachTime, int window50, int physicsTime) {
+        public AutoFailDetector(List<HitObject> hitObjects, int mapStartTime, int mapEndTime, int approachTime, int window50, int physicsTime) {
             // Sort the hitobjects
             SetHitObjects(hitObjects);
 
+            this.mapStartTime = mapStartTime;
+            this.mapEndTime = mapEndTime;
             this.approachTime = approachTime;
             this.window50 = window50;
             this.physicsTime = physicsTime;
@@ -61,35 +64,44 @@ namespace Mapping_Tools.Classes.Tools {
             Disruptors = new List<double>();
 
             // Get times to check
+            // These are all the times at which the startIndex can change in the object loading system.
             timesToCheckStartIndex = new SortedSet<int>(hitObjects.SelectMany(ho => new[] {
                 (int)ho.EndTime + approachTime,
                 (int)ho.EndTime + approachTime + 1
-            }));
-            timesToCheckEndIndex = new SortedSet<int>(hitObjects.SelectMany(ho => new[] {
-                (int)ho.Time - approachTime,
-                (int)ho.Time - approachTime + 1
             }));
 
             // Find all problematic areas which could cause auto-fail depending on the binary search
             // A problem area consists of one object and the objects which can unload it
             // An object B can unload another object A if it has a later index than A and an end time earlier than A's end time - approach time.
+            // A loaded object has to be loaded after its end time for any period long enough for the physics update tick to count the judgement.
+            // I ignore all unloadable objects B for which at least one unloadable object A is loaded implies B is loaded. In that case I say A contains B.
             problemAreas = new List<ProblemArea>();
             for (int i = 0; i < hitObjects.Count; i++) {
                 var ho = hitObjects[i];
                 var adjEndTime = GetAdjustedEndTime(ho);
 
                 // Ignore all problem areas which are contained by another unloadable object,
-                // because fixing the outer problem area will also fix all of the problems inside
-                if (problemAreas.Count > 0 && adjEndTime <=
-                    GetAdjustedEndTime(problemAreas.Last().unloadableHitObject)) {
-                    continue;
+                // because fixing the outer problem area will also fix all of the problems inside.
+                // Added a check for the end time to prevent weird situations with the endIndex caused by negative duration.
+                if (problemAreas.Count > 0 && adjEndTime > ho.Time - approachTime) {
+                    // Lower end time means that it will be loaded alongside the previous problem area.
+                    var lastAdjEndTime = GetAdjustedEndTime(problemAreas.Last().unloadableHitObject);
+                    if (adjEndTime <= lastAdjEndTime) {
+                        continue;
+                    }
+
+                    // If the end time is greater but there has been no time to change the start index yet,
+                    // then it is still contained in the previous problem area.
+                    if (timesToCheckStartIndex.GetViewBetween(lastAdjEndTime, adjEndTime + physicsTime).Count == 0) {
+                        continue;
+                    }
                 }
 
                 // Check all later objects for any which have an early enough end time
                 var disruptors = new HashSet<HitObject>();
                 for (int j = i + 1; j < hitObjects.Count; j++) {
                     var ho2 = hitObjects[j];
-                    if (ho2.EndTime < adjEndTime - approachTime) {
+                    if (ho2.EndTime < adjEndTime + physicsTime - approachTime) {
                         disruptors.Add(ho2);
 
                         Disruptors.Add(ho2.Time);
@@ -99,19 +111,21 @@ namespace Mapping_Tools.Classes.Tools {
                 if (disruptors.Count == 0)
                     continue;
 
-                var timesToCheck = new HashSet<int>(timesToCheckStartIndex.GetViewBetween((int)ho.Time, adjEndTime));
+                // The first time after the end time where the object could be loaded
+                var firstRequiredLoadTime = Math.Max(adjEndTime, (int) hitObjects[i - 1].Time - approachTime + 1);
+                // It cant load before the map has started
+                firstRequiredLoadTime = Math.Max(firstRequiredLoadTime, mapStartTime);
 
-                // A problem area can also be ignored if the times-to-check is a subset of the last times-to-check,
-                // because if thats the case that implies this problem is contained in the last.
-                if (!(problemAreas.Count > 0 && timesToCheck.IsSubsetOf(problemAreas.Last().timesToCheck))) {
-                    problemAreas.Add(new ProblemArea { index = i, unloadableHitObject = ho, disruptors = disruptors, timesToCheck = timesToCheck });
+                // These are all the times to check. If the object is loaded at all these times, then it will not cause auto-fail. (terms and conditions apply)
+                var timesToCheck = new HashSet<int>(timesToCheckStartIndex.GetViewBetween(
+                    firstRequiredLoadTime, firstRequiredLoadTime + physicsTime)) {firstRequiredLoadTime + physicsTime};
 
-                    PotentialUnloadingObjects.Add(ho.Time);
-                }
+                problemAreas.Add(new ProblemArea { index = i, unloadableHitObject = ho, disruptors = disruptors, timesToCheck = timesToCheck });
+                PotentialUnloadingObjects.Add(ho.Time);
             }
 
             int autoFails = 0;
-            // Use osu!'s object loading algorithm to find out which objects are actually unloaded
+            // Use osu!'s object loading algorithm to find out which objects are actually loaded
             foreach (var problemArea in problemAreas) {
                 foreach (var time in problemArea.timesToCheck) {
                     var minimalLeft = time - approachTime;
@@ -142,13 +156,13 @@ namespace Mapping_Tools.Classes.Tools {
 
         private int GetAdjustedEndTime(HitObject ho) {
             if (ho.IsCircle) {
-                return (int)ho.Time + window50 + physicsTime;
+                return (int)ho.Time + window50;
             }
             if (ho.IsSlider || ho.IsSpinner) {
-                return (int)ho.EndTime + physicsTime;
+                return (int)ho.EndTime;
             }
 
-            return (int)Math.Max(ho.Time + window50 + physicsTime, ho.EndTime + physicsTime);
+            return (int)Math.Max(ho.Time + window50, ho.EndTime);
         }
 
         public bool AutoFailFixDialogue(bool autoPlaceFix) {
@@ -344,8 +358,22 @@ namespace Mapping_Tools.Classes.Tools {
         }
 
         private bool ProblemAreaPaddingWorks(ProblemArea problemArea, int left, int right) {
-            return problemArea.timesToCheck.All(t =>
-                PaddedOsuBinarySearch(t - approachTime, left, right) <= problemArea.index);
+            foreach (var time in problemArea.timesToCheck) {
+                var minimalLeft = time - approachTime;
+                var minimalRight = time + approachTime;
+
+                var startIndex = PaddedOsuBinarySearch(minimalLeft, left, right);
+                var endIndex = hitObjects.FindIndex(startIndex, ho => ho.Time > minimalRight);
+                if (endIndex < 0) {
+                    endIndex = hitObjects.Count - 1;
+                }
+
+                if (startIndex > problemArea.index || endIndex < problemArea.index) {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private int OsuBinarySearch(int time) {

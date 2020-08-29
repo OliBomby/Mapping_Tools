@@ -474,6 +474,33 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             HitObjects?.ForEach(h => h.MoveTime(offset));
         }
 
+        private IEnumerable<Event> EnumerateAllEvents() {
+            return BackgroundAndVideoEvents.Concat(BreakPeriods).Concat(StoryboardSoundSamples)
+                .Concat(StoryboardLayerFail).Concat(StoryboardLayerPass).Concat(StoryboardLayerBackground)
+                .Concat(StoryboardLayerForeground).Concat(StoryboardLayerOverlay);
+        }
+
+        public double GetLeadInTime() {
+            var leadInTime = General["AudioLeadIn"].DoubleValue;
+            leadInTime = Math.Max(-EnumerateAllEvents().OfType<IHasStartTime>().Min(o => o.StartTime), leadInTime);
+            if (HitObjects.Count > 0)
+                leadInTime = Math.Max(Difficulty["ApproachRate"].DoubleValue - HitObjects[0].Time, leadInTime);
+            return leadInTime;
+        }
+
+        public double GetMapStartTime() {
+            return -GetLeadInTime();
+        }
+
+        public double GetMapEndTime() {
+            var hitObjectEndTime = HitObjects.Count > 0
+                ? Math.Max(GetHitObjectEndTime() + 200, HitObjects.Last().EndTime + 3000)
+                : double.NegativeInfinity;
+            var lastEventTime = EnumerateAllEvents().OfType<IHasEndTime>()
+                .Max(o => o.EndTime);
+            return Math.Max(hitObjectEndTime, lastEventTime - 500);
+        }
+
         /// <summary>
         /// Finds the objects refered by specified time code.
         /// Example time code: <example>00:56:823 (1,2,1,2) - </example>
