@@ -79,11 +79,12 @@ namespace Mapping_Tools.Classes.Tools {
             for (int i = 0; i < hitObjects.Count; i++) {
                 var ho = hitObjects[i];
                 var adjEndTime = GetAdjustedEndTime(ho);
+                var negative = adjEndTime < ho.Time - approachTime;
 
                 // Ignore all problem areas which are contained by another unloadable object,
                 // because fixing the outer problem area will also fix all of the problems inside.
                 // Added a check for the end time to prevent weird situations with the endIndex caused by negative duration.
-                if (problemAreas.Count > 0 && adjEndTime > ho.Time - approachTime) {
+                if (problemAreas.Count > 0 && !negative) {
                     // Lower end time means that it will be loaded alongside the previous problem area.
                     var lastAdjEndTime = GetAdjustedEndTime(problemAreas.Last().unloadableHitObject);
                     if (adjEndTime <= lastAdjEndTime) {
@@ -108,11 +109,13 @@ namespace Mapping_Tools.Classes.Tools {
                     }
                 }
 
-                if (disruptors.Count == 0)
+                if (disruptors.Count == 0 && !negative)
                     continue;
 
                 // The first time after the end time where the object could be loaded
-                var firstRequiredLoadTime = Math.Max(adjEndTime, (int) hitObjects[i - 1].Time - approachTime + 1);
+                var firstRequiredLoadTime = adjEndTime;
+                if (i > 0)
+                    firstRequiredLoadTime = Math.Max(adjEndTime, (int)hitObjects[i - 1].Time - approachTime + 1);
                 // It cant load before the map has started
                 firstRequiredLoadTime = Math.Max(firstRequiredLoadTime, mapStartTime);
 

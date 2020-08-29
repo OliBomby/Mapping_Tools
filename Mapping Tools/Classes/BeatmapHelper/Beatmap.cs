@@ -482,10 +482,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public double GetLeadInTime() {
             var leadInTime = General["AudioLeadIn"].DoubleValue;
+            var od = Difficulty["OverallDifficulty"].DoubleValue;
+            var window50 = Math.Ceiling(200 - 10 * od);
             leadInTime = Math.Max(-EnumerateAllEvents().OfType<IHasStartTime>().Min(o => o.StartTime), leadInTime);
-            if (HitObjects.Count > 0)
-                leadInTime = Math.Max(Difficulty["ApproachRate"].DoubleValue - HitObjects[0].Time, leadInTime);
-            return leadInTime;
+            if (HitObjects.Count > 0) {
+                var approachTime = ApproachRateToMs(Difficulty["ApproachRate"].DoubleValue);
+                leadInTime = Math.Max(approachTime - HitObjects[0].Time, leadInTime);
+            }
+            return leadInTime + window50 + 1000;
         }
 
         public double GetMapStartTime() {
