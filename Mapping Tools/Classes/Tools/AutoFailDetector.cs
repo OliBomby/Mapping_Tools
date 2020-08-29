@@ -23,8 +23,11 @@ namespace Mapping_Tools.Classes.Tools {
             }
         }
 
+        private const int maxPaddingCount = 2000;
+
         private readonly int mapStartTime;
         private readonly int mapEndTime;
+        private readonly int autoFailCheckTime;
         private readonly int approachTime;
         private readonly int window50;
         private readonly int physicsTime;
@@ -37,12 +40,13 @@ namespace Mapping_Tools.Classes.Tools {
         public List<double> PotentialUnloadingObjects;
         public List<double> Disruptors;
 
-        public AutoFailDetector(List<HitObject> hitObjects, int mapStartTime, int mapEndTime, int approachTime, int window50, int physicsTime) {
+        public AutoFailDetector(List<HitObject> hitObjects, int mapStartTime, int mapEndTime, int autoFailCheckTime, int approachTime, int window50, int physicsTime) {
             // Sort the hitobjects
             SetHitObjects(hitObjects);
 
             this.mapStartTime = mapStartTime;
             this.mapEndTime = mapEndTime;
+            this.autoFailCheckTime = autoFailCheckTime;
             this.approachTime = approachTime;
             this.window50 = window50;
             this.physicsTime = physicsTime;
@@ -142,7 +146,7 @@ namespace Mapping_Tools.Classes.Tools {
 
                     var hitObjectsMinimal = hitObjects.GetRange(startIndex, 1 + endIndex - startIndex);
 
-                    if (!hitObjectsMinimal.Contains(problemArea.unloadableHitObject)) {
+                    if (!hitObjectsMinimal.Contains(problemArea.unloadableHitObject) || time > autoFailCheckTime) {
                         UnloadingObjects.Add(problemArea.unloadableHitObject.Time);
                         autoFails++;
                         break;
@@ -151,10 +155,6 @@ namespace Mapping_Tools.Classes.Tools {
             }
 
             return autoFails > 0;
-        }
-
-        public int GetEndTime() {
-            return (int) hitObjects.Max(ho => ho.EndTime);
         }
 
         private int GetAdjustedEndTime(HitObject ho) {
@@ -229,7 +229,7 @@ namespace Mapping_Tools.Classes.Tools {
             }
 
             if (paddingSolution.Last() > 0) {
-                var t = GetSafePlacementTime(lastTime, GetEndTime());
+                var t = GetSafePlacementTime(lastTime, mapEndTime);
                 for (int i = 0; i < paddingSolution.Last(); i++) {
                     hitObjects.Add(new HitObject { Pos = Vector2.Zero, Time = t, ObjectType = 8, EndTime = t - 1 });
                 }
@@ -255,7 +255,11 @@ namespace Mapping_Tools.Classes.Tools {
         private int[] SolveAutoFailPadding(int startPaddingCount = 0) {
             int padding = startPaddingCount;
             int[] solution;
-            while (!SolveAutoFailPadding(padding++, out solution)) { }
+            while (!SolveAutoFailPadding(padding++, out solution)) {
+                if (padding > maxPaddingCount) {
+                    throw new Exception("No auto-fail fix padding solution found.");
+                }
+            }
 
             return solution;
         }
@@ -371,7 +375,7 @@ namespace Mapping_Tools.Classes.Tools {
                     endIndex = hitObjects.Count - 1;
                 }
 
-                if (startIndex > problemArea.index || endIndex < problemArea.index) {
+                if (startIndex > problemArea.index || endIndex < problemArea.index || time > autoFailCheckTime) {
                     return false;
                 }
             }

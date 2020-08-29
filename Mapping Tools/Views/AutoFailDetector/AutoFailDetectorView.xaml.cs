@@ -103,9 +103,14 @@ namespace Mapping_Tools.Views.AutoFailDetector {
                 : args.OverallDifficultyOverride;
             var window50 = (int) Math.Ceiling(200 - 10 * od);
 
+            // Start time and end time
+            var mapStartTime = (int) beatmap.GetMapStartTime();
+            var mapEndTime = (int) beatmap.GetMapEndTime();
+            var autoFailTime = (int) beatmap.GetAutoFailCheckTime();
+
             // Detect auto-fail
-            var autoFailDetector = new Classes.Tools.AutoFailDetector(beatmap.HitObjects, 
-                (int) beatmap.GetMapStartTime(), (int) beatmap.GetMapEndTime(),
+            var autoFailDetector = new Classes.Tools.AutoFailDetector(beatmap.HitObjects,
+                mapStartTime, mapEndTime, autoFailTime,
                 approachTime, window50, args.PhysicsUpdateLeniency);
 
             var autoFail = autoFailDetector.DetectAutoFail();
@@ -132,7 +137,7 @@ namespace Mapping_Tools.Views.AutoFailDetector {
                 _potentialDisruptors = autoFailDetector.Disruptors;
 
             // Set end time for the timeline
-            _endTimeMonitor = autoFailDetector.GetEndTime();
+            _endTimeMonitor = mapEndTime;
 
             // Complete progressbar
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(100);
