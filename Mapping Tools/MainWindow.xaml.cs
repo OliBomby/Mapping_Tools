@@ -30,7 +30,6 @@ namespace Mapping_Tools {
         public static string AppCommon { get; set; }
         public static string AppDataPath { get; set; }
         public static string ExportPath { get; set; }
-        public static Random MainRandom { get; set; }
         public static HttpClient HttpClient { get; set; }
         public static SnackbarMessageQueue MessageQueue { get; set; }
 
@@ -43,7 +42,6 @@ namespace Mapping_Tools {
                 AppCommon = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
                 AppDataPath = Path.Combine(AppCommon, "Mapping Tools");
                 ExportPath = Path.Combine(AppDataPath, "Exports");
-                MainRandom = new Random();
                 HttpClient = new HttpClient();
 
                 InitializeComponent();

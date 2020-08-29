@@ -119,7 +119,7 @@ namespace Mapping_Tools.Classes.Tools {
             // Add redlines
             List<TimingPoint> redlines = timing.GetAllRedlines();
             foreach (TimingPoint tp in redlines) {
-                timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, meter: true, inherited: true, omitFirstBarLine: true));
+                timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, meter: true, unInherited: true, omitFirstBarLine: true));
             }
             UpdateProgressBar(worker, 55);
 

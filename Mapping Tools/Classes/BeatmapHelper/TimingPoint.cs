@@ -3,6 +3,7 @@ using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
 using System;
 using System.Collections;
+using Newtonsoft.Json;
 using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
@@ -59,6 +60,12 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// It can also be utilised for the Nightcore mod of standard by removing a finish sample at the timing point.
         /// </summary>
         public bool OmitFirstBarLine { get; set; }
+
+        /// <summary>
+        /// When true, all coordinates and times will be serialized without rounding.
+        /// </summary>
+        [JsonIgnore]
+        public bool SaveWithFloatPrecision { get; set; }
 
         /// <summary>
         /// Creates a new <see cref="TimingPoint"/>
@@ -163,7 +170,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <returns></returns>
         public string GetLine() {
             int style = MathHelper.GetIntFromBitArray(new BitArray(new[] { Kiai, false, false, OmitFirstBarLine }));
-            return $"{Offset.ToRoundInvariant()},{MpB.ToInvariant()},{Meter.TempoNumerator.ToInvariant()},{SampleSet.ToIntInvariant()},{SampleIndex.ToInvariant()},{Volume.ToRoundInvariant()},{Convert.ToInt32(Uninherited).ToInvariant()},{style.ToInvariant()}";
+            return $"{(SaveWithFloatPrecision ? Offset.ToInvariant() : Offset.ToRoundInvariant())},{MpB.ToInvariant()},{Meter.TempoNumerator.ToInvariant()},{SampleSet.ToIntInvariant()},{SampleIndex.ToInvariant()},{(SaveWithFloatPrecision ? Volume.ToInvariant() : Volume.ToRoundInvariant())},{Convert.ToInt32(Uninherited).ToInvariant()},{style.ToInvariant()}";
         }
 
         /// <summary>

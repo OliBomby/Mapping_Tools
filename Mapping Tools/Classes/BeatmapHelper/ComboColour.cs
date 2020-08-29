@@ -50,6 +50,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Color = Color.FromRgb((byte)r, (byte)g, (byte)b);
         }
 
+        public ComboColour Copy() {
+            return (ComboColour) MemberwiseClone();
+        }
 
         /// <summary>Returns a string that represents the current object.</summary>
         /// <returns>A string that represents the current object.</returns>

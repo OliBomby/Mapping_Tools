@@ -154,6 +154,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public List<double> Bookmarks { get => GetBookmarks(); set => SetBookmarks(value); }
 
         /// <summary>
+        /// When true, all coordinates and times will be serialized without rounding.
+        /// </summary>
+        public bool SaveWithFloatPrecision { get; set; }
+
+        /// <summary>
         /// Initializes the Beatmap file format.
         /// </summary>
         /// <param name="lines">List of strings where each string is another line in the .osu file.</param>
@@ -245,7 +250,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// Sorts all hitobjects in map by order of time.
         /// </summary>
         public void SortHitObjects() {
-            HitObjects = HitObjects.OrderBy(o => o.Time).ToList();
+            HitObjects.Sort();
         }
 
         /// <summary>
@@ -253,7 +258,12 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         public void CalculateSliderEndTimes() {
             foreach (var ho in HitObjects.Where(ho => ho.IsSlider)) {
-                ho.TemporalLength = BeatmapTiming.CalculateSliderTemporalLength(ho.Time, ho.PixelLength);
+                if (double.IsNaN(ho.PixelLength) || ho.PixelLength < 0 || ho.CurvePoints.All(o => o == ho.Pos)) {
+                    ho.TemporalLength = 0;
+                }
+                else {
+                    ho.TemporalLength = BeatmapTiming.CalculateSliderTemporalLength(ho.Time, ho.PixelLength);
+                }
             }
         }
         
@@ -426,7 +436,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             lines.AddRange(StoryboardSoundSamples.Select(sbss => sbss.GetLine()));
             lines.Add("");
             lines.Add("[TimingPoints]");
-            lines.AddRange(from tp in BeatmapTiming.TimingPoints where tp != null select tp.GetLine());
+            lines.AddRange(BeatmapTiming.TimingPoints.Where(tp => tp != null).Select(tp => {
+                tp.SaveWithFloatPrecision = SaveWithFloatPrecision;
+                return tp.GetLine();
+            }));
             lines.Add("");
             if (ComboColours.Any()) {
                 lines.Add("");
@@ -440,20 +453,68 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
             lines.Add("");
             lines.Add("[HitObjects]");
-            lines.AddRange(HitObjects.Select(ho => ho.GetLine()));
+            lines.AddRange(HitObjects.Select(ho => {
+                ho.SaveWithFloatPrecision = SaveWithFloatPrecision;
+                return ho.GetLine();
+            }));
 
             return lines;
         }
 
+        public double GetHitObjectStartTime() {
+            return HitObjects.Min(h => h.Time);
+        }
+
+        public double GetHitObjectEndTime() {
+            return HitObjects.Max(h => h.EndTime);
+        }
+
+        public void OffsetTime(double offset) {
+            BeatmapTiming.TimingPoints?.ForEach(tp => tp.Offset += offset);
+            HitObjects?.ForEach(h => h.MoveTime(offset));
+        }
+
+        private IEnumerable<Event> EnumerateAllEvents() {
+            return BackgroundAndVideoEvents.Concat(BreakPeriods).Concat(StoryboardSoundSamples)
+                .Concat(StoryboardLayerFail).Concat(StoryboardLayerPass).Concat(StoryboardLayerBackground)
+                .Concat(StoryboardLayerForeground).Concat(StoryboardLayerOverlay);
+        }
+
+        public double GetLeadInTime() {
+            var leadInTime = General["AudioLeadIn"].DoubleValue;
+            var od = Difficulty["OverallDifficulty"].DoubleValue;
+            var window50 = Math.Ceiling(200 - 10 * od);
+            var eventsWithStartTime = EnumerateAllEvents().OfType<IHasStartTime>().ToArray();
+            if (eventsWithStartTime.Length > 0)
+                leadInTime = Math.Max(-eventsWithStartTime.Min(o => o.StartTime), leadInTime);
+            if (HitObjects.Count > 0) {
+                var approachTime = ApproachRateToMs(Difficulty["ApproachRate"].DoubleValue);
+                leadInTime = Math.Max(approachTime - HitObjects[0].Time, leadInTime);
+            }
+            return leadInTime + window50 + 1000;
+        }
+
+        public double GetMapStartTime() {
+            return -GetLeadInTime();
+        }
+
+        public double GetMapEndTime() {
+            var endTime = HitObjects.Count > 0
+                ? Math.Max(GetHitObjectEndTime() + 200, HitObjects.Last().EndTime + 3000)
+                : double.NegativeInfinity;
+            var eventsWithEndTime = EnumerateAllEvents().OfType<IHasEndTime>().ToArray();
+            if (eventsWithEndTime.Length > 0)
+                endTime = Math.Max(endTime, eventsWithEndTime.Max(o => o.EndTime) - 500);
+            return endTime;
+        }
+
         /// <summary>
-        /// Grabs the specified file name of beatmap file.
-        /// with format of:
-        /// <c>Artist - Title (Host) [Difficulty].osu</c>
+        /// Gets the time at which auto-fail gets checked by osu!
+        /// The counted judgements must add up to the object count at this time.
         /// </summary>
-        /// <returns>String of file name.</returns>
-        public string GetFileName() {
-            return GetFileName(Metadata["Artist"].Value, Metadata["Title"].Value,
-                Metadata["Creator"].Value, Metadata["Version"].Value);
+        /// <returns></returns>
+        public double GetAutoFailCheckTime() {
+            return GetHitObjectEndTime() + 200;
         }
 
         /// <summary>
@@ -508,6 +569,17 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <c>Artist - Title (Host) [Difficulty].osu</c>
         /// </summary>
         /// <returns>String of file name.</returns>
+        public string GetFileName() {
+            return GetFileName(Metadata["Artist"].Value, Metadata["Title"].Value,
+                Metadata["Creator"].Value, Metadata["Version"].Value);
+        }
+
+        /// <summary>
+        /// Grabs the specified file name of beatmap file.
+        /// with format of:
+        /// <c>Artist - Title (Host) [Difficulty].osu</c>
+        /// </summary>
+        /// <returns>String of file name.</returns>
         public static string GetFileName(string artist, string title, string creator, string version) {
             string fileName = $"{artist} - {title} ({creator}) [{version}].osu";
 
@@ -553,6 +625,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 }
             }
             return categoryLines;
+        }
+
+        public Beatmap DeepCopy() {
+            var newBeatmap = (Beatmap)MemberwiseClone();
+            newBeatmap.HitObjects = HitObjects?.Select(h => h.DeepCopy()).ToList();
+            newBeatmap.BeatmapTiming = new Timing(BeatmapTiming.TimingPoints.Select(t => t.Copy()).ToList(), BeatmapTiming.SliderMultiplier);
+            newBeatmap.GiveObjectsGreenlines();
+            return newBeatmap;
         }
     }
 }

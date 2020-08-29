@@ -24,6 +24,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public double SliderMultiplier { get; set; }
 
         /// <inheritdoc />
+        public Timing(List<TimingPoint> timingPoints, double sliderMultiplier) {
+            TimingPoints = timingPoints;
+            SliderMultiplier = sliderMultiplier;
+            Sort();
+        }
+
+        /// <inheritdoc />
         public Timing(List<string> timingLines, double sliderMultiplier) {
             TimingPoints = GetTimingPoints(timingLines);
             SliderMultiplier = sliderMultiplier;
@@ -35,6 +42,40 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         public void Sort() {
             TimingPoints = TimingPoints.OrderBy(o => o.Offset).ThenByDescending(o => o.Uninherited).ToList();
+        }
+
+        /// <summary>
+        /// Calculates the number of beats between the start time and the end time.
+        /// The resulting number of beats will be rounded to a 1/16 or 1/12 beat divisor.
+        /// </summary>
+        /// <param name="startTime"></param>
+        /// <param name="endTime"></param>
+        /// <param name="round">To round the number of beats to a snap divisor.</param>
+        /// <returns></returns>
+        public double GetBeatLength(double startTime, double endTime, bool round = false) {
+            var redlines = GetTimingPointsInTimeRange(startTime, endTime)
+                .Where(tp => tp.Uninherited);
+
+            double beats = 0;
+            double lastTime = startTime;
+            var lastRedline = GetRedlineAtTime(startTime);
+            foreach (var redline in redlines) {
+                var inc1 = (redline.Offset - lastTime) / lastRedline.MpB;
+                beats += round ? MultiSnapRound(inc1, 16, 12) : inc1;
+
+                lastTime = redline.Offset;
+                lastRedline = redline;
+            }
+            var inc2 = (endTime - lastTime) / lastRedline.MpB;
+            beats += round ? MultiSnapRound(inc2, 16, 12) : inc2;
+
+            return beats;
+        }
+
+        private static double MultiSnapRound(double value, double divisor1, double divisor2) {
+            var round1 = Math.Round(value * divisor1) / divisor1;
+            var round2 = Math.Round(value * divisor2) / divisor2;
+            return Math.Abs(round1 - value) < Math.Abs(round2 - value) ? round1 : round2;
         }
 
         /// <summary>
