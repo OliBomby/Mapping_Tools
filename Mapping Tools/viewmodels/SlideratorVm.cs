@@ -216,13 +216,13 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
-        public int ExpectedSegments {
+        public long ExpectedSegments {
             get {
                 if (ExportAsStream) {
-                    return (int) (GraphBeats * BeatSnapDivisor) + 1;
+                    return (long) (GraphBeats * BeatSnapDivisor) + 1;
                 }
                 var newLength = NewVelocity * 100 * GlobalSv * GraphBeats;
-                return (int) ((newLength - DistanceTraveled) / MinDendrite + DistanceTraveled / 10);
+                return (long) ((newLength - DistanceTraveled) / MinDendrite + DistanceTraveled / 10);
             }
         }
 

@@ -102,8 +102,8 @@
                                           ToolTip="Open the official Mapping Tools website in your browser."/>
                                 <MenuItem Header="_Github" Click="OpenGitHub" Icon="{materialDesign:PackIcon GithubCircle}"
                                           ToolTip="Go to the Mapping Tools Github."/>
-                                <MenuItem Header="_Info" Click="OpenInfo" Icon="{materialDesign:PackIcon InfoCircle}"
-                                          ToolTip="Basic information about your Mapping Tools client."/>
+                                <MenuItem Header="_About" Click="OpenInfo" Icon="{materialDesign:PackIcon InfoCircle}"
+                                          ToolTip="Information about your Mapping Tools client and credits."/>
                             </MenuItem>
                             <MenuItem x:Name="ProjectMenu" Visibility="Collapsed" Height="31" Header="_Project" Padding="12,0,0,0" MinWidth="67">
                             </MenuItem>
