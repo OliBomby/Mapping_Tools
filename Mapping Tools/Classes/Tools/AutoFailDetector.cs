@@ -35,6 +35,7 @@ namespace Mapping_Tools.Classes.Tools {
         private List<ProblemArea> problemAreas;
 
         private SortedSet<int> timesToCheckStartIndex;
+        private int?[] placementTimes;
 
         public List<double> UnloadingObjects;
         public List<double> PotentialUnloadingObjects;
@@ -172,6 +173,8 @@ namespace Mapping_Tools.Classes.Tools {
             if (problemAreas.Count == 0)
                 return false;
 
+            placementTimes = GetAllSafePlacementTimes();
+
             int[] solution = SolveAutoFailPadding();
             int paddingCount = solution.Sum();
             bool acceptedSolution = false;
@@ -207,21 +210,33 @@ namespace Mapping_Tools.Classes.Tools {
             guideBuilder.AppendLine("Auto-fail fix guide. Place these extra objects to fix auto-fail:\n");
             int lastTime = 0;
             for (int i = 0; i < problemAreas.Count; i++) {
-                guideBuilder.AppendLine(i == 0
-                    ? $"Extra objects before {problemAreas[i].GetStartTime()}: {paddingSolution[i]}"
-                    : $"Extra objects between {lastTime} - {problemAreas[i].GetStartTime()}: {paddingSolution[i]}");
+                if (!(placementTimes != null && !placementTimes[i].HasValue)) {
+                    guideBuilder.AppendLine(i == 0
+                        ? $"Extra objects before {problemAreas[i].GetStartTime()}: {paddingSolution[i]}"
+                        : $"Extra objects between {lastTime} - {problemAreas[i].GetStartTime()}: {paddingSolution[i]}");
+                }
                 lastTime = GetAdjustedEndTime(problemAreas[i].unloadableHitObject) - approachTime;
             }
-            guideBuilder.AppendLine($"Extra objects after {lastTime}: {paddingSolution.Last()}");
+
+            if (!(placementTimes != null && !placementTimes[placementTimes.Length - 1].HasValue)) {
+                guideBuilder.AppendLine($"Extra objects after {lastTime}: {paddingSolution.Last()}");
+            }
         }
 
         private void PlaceFixGuide(IReadOnlyList<int> paddingSolution) {
-            int lastTime = 0;
+            int lastTime = mapStartTime;
             for (int i = 0; i < problemAreas.Count; i++) {
                 if (paddingSolution[i] > 0) {
-                    var t = GetSafePlacementTime(lastTime, problemAreas[i].GetStartTime());
-                    for (int j = 0; j < paddingSolution[i]; j++) {
-                        hitObjects.Add(new HitObject { Pos = Vector2.Zero, Time = t, ObjectType = 8, EndTime = t - 1 });
+                    var t = placementTimes != null ?
+                        placementTimes[i] :
+                        GetSafePlacementTime(lastTime, problemAreas[i].GetStartTime());
+                    if (t.HasValue) {
+                        for (int j = 0; j < paddingSolution[i]; j++) {
+                            hitObjects.Add(
+                                new HitObject {Pos = Vector2.Zero, Time = t.Value, ObjectType = 8, EndTime = t.Value - 1});
+                        }
+                    } else {
+                        throw new Exception($"Can't find a safe place to place objects between {lastTime} and {problemAreas[i].GetStartTime()}.");
                     }
                 }
 
@@ -229,16 +244,37 @@ namespace Mapping_Tools.Classes.Tools {
             }
 
             if (paddingSolution.Last() > 0) {
-                var t = GetSafePlacementTime(lastTime, mapEndTime);
-                for (int i = 0; i < paddingSolution.Last(); i++) {
-                    hitObjects.Add(new HitObject { Pos = Vector2.Zero, Time = t, ObjectType = 8, EndTime = t - 1 });
+                var t = placementTimes != null ?
+                    placementTimes.Last() : 
+                    GetSafePlacementTime(lastTime, autoFailCheckTime - physicsTime);
+                if (t.HasValue) {
+                    for (int i = 0; i < paddingSolution.Last(); i++) {
+                        hitObjects.Add(new HitObject {Pos = Vector2.Zero, Time = t.Value, ObjectType = 8, EndTime = t.Value - 1});
+                    }
+                } else {
+                    throw new Exception($"Can't find a safe place to place objects between {lastTime} and {mapEndTime}.");
                 }
             }
 
             SortHitObjects();
         }
 
-        private int GetSafePlacementTime(int start, int end) {
+        private int?[] GetAllSafePlacementTimes() {
+            int?[] allSafePlacementTimes = new int?[problemAreas.Count + 1];
+
+            int lastTime = mapStartTime;
+            for (int i = 0; i < problemAreas.Count; i++) {
+                var t = GetSafePlacementTime(lastTime, problemAreas[i].GetStartTime());
+                allSafePlacementTimes[i] = t;
+
+                lastTime = GetAdjustedEndTime(problemAreas[i].unloadableHitObject) - approachTime;
+            }
+            allSafePlacementTimes[allSafePlacementTimes.Length - 1] = GetSafePlacementTime(lastTime, autoFailCheckTime - physicsTime);
+
+            return allSafePlacementTimes;
+        }
+
+        private int? GetSafePlacementTime(int start, int end) {
             var rangeObjects = hitObjects.FindAll(o => o.EndTime >= start && o.Time <= end);
 
             for (int i = end - 1; i >= start; i--) {
@@ -249,7 +285,7 @@ namespace Mapping_Tools.Classes.Tools {
                 }
             }
 
-            throw new Exception($"Can't find a safe place to place objects between {start} and {end}.");
+            return null;
         }
 
         private int[] SolveAutoFailPadding(int startPaddingCount = 0) {
@@ -276,12 +312,25 @@ namespace Mapping_Tools.Classes.Tools {
                     return false;
                 }
 
-                var lowest = problemAreaSolution.First(o => o >= leftPadding);
+                // The first element is always the lowest element equal or greater than leftPadding,
+                // because the single problem solver started iterating from leftPadding.
+                var lowest = problemAreaSolution.First();
+
+                // Check if placement is possible for this area and if not, assert 0 padding
+                if (placementTimes != null && !placementTimes[i].HasValue && lowest != leftPadding) {
+                    return false;
+                }
+
                 solution[i] = lowest - leftPadding;
                 leftPadding = lowest;
             }
 
-            solution[problemAreas.Count] = paddingCount - leftPadding;
+            // Check if placement is possible for the last area and if not, assert 0 padding
+            if (placementTimes != null && !placementTimes[placementTimes.Length - 1].HasValue && paddingCount != leftPadding) {
+                return false;
+            }
+
+            solution[solution.Length - 1] = paddingCount - leftPadding;
 
             return true;
         }
@@ -309,8 +358,22 @@ namespace Mapping_Tools.Classes.Tools {
                     yield break;
                 }
 
+                // The first element is always the lowest element equal or greater than minimalLeft,
+                // because the single problem solver started iterating from minimalLeft.
+                var lowest = problemAreaSolution.First();
+
+                // Check if placement is possible for this area and if not, assert 0 padding
+                if (placementTimes != null && !placementTimes[i].HasValue && lowest != minimalLeft) {
+                    yield break;
+                }
+
                 allSolutions[i] = problemAreaSolution;
-                minimalLeft = problemAreaSolution.First();
+                minimalLeft = lowest;
+            }
+
+            // Check if placement is possible for the last area and if not, assert 0 padding
+            if (placementTimes != null && !placementTimes[placementTimes.Length - 1].HasValue && paddingCount != minimalLeft) {
+                yield break;
             }
 
             // Remove impossible max padding
@@ -328,6 +391,11 @@ namespace Mapping_Tools.Classes.Tools {
                     left = leftPadding[i];
                 }
 
+                // If there is no placement for the last area, assert 0 padding.
+                if (placementTimes != null && !placementTimes[placementTimes.Length - 1].HasValue && left != paddingCount) {
+                    continue;
+                }
+
                 pads[pads.Length - 1] = paddingCount - left;
                 yield return pads;
             }
@@ -335,14 +403,18 @@ namespace Mapping_Tools.Classes.Tools {
 
         private IEnumerable<int[]> EnumerateSolutions(IReadOnlyList<List<int>> allSolutions, int depth = 0, int minimum = 0) {
             if (depth == allSolutions.Count - 1) {
-                foreach (var i in allSolutions[depth].Where(o => o >= minimum)) {
+                // Loop through all solutions which are greater or equal to the minimum or assert equal to paddingCount if there is no placement spot.
+                foreach (var i in allSolutions[depth].Where(o => o == minimum ||
+                                                                 !(placementTimes != null && !placementTimes[depth].HasValue) && o > minimum)) {
                     var s = new int[allSolutions.Count];
                     s[depth] = i;
                     yield return s;
                 }
                 yield break;
             }
-            foreach (var i in allSolutions[depth].Where(o => o >= minimum)) {
+            // Loop through all solutions which are greater or equal to the minimum or assert equal to minimum if there is no placement spot.
+            foreach (var i in allSolutions[depth].Where(o => o == minimum || 
+                                                             !(placementTimes != null && !placementTimes[depth].HasValue) && o > minimum)) {
                 foreach (var j in EnumerateSolutions(allSolutions, depth + 1, minimum = i)) {
                     j[depth] = i;
                     yield return j;

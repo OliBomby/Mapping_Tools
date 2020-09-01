@@ -13,9 +13,9 @@ using System.Windows.Input;
 namespace Mapping_Tools.Views.AutoFailDetector {
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
     public partial class AutoFailDetectorView : IQuickRun {
-        private List<double> _unloadingObjects = new List<double>();
-        private List<double> _potentialUnloadingObjects = new List<double>();
-        private List<double> _potentialDisruptors = new List<double>();
+        private List<double> _unloadingObjects;
+        private List<double> _potentialUnloadingObjects;
+        private List<double> _potentialDisruptors;
         private double _endTimeMonitor;
         private TimeLine _tl;
 
@@ -129,12 +129,9 @@ namespace Mapping_Tools.Views.AutoFailDetector {
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(67);
 
             // Set the timeline lists
-            if (args.ShowUnloadingObjects)
-                _unloadingObjects = autoFailDetector.UnloadingObjects;
-            if (args.ShowPotentialUnloadingObjects)
-                _potentialUnloadingObjects = autoFailDetector.PotentialUnloadingObjects;
-            if (args.ShowPotentialDisruptors)
-                _potentialDisruptors = autoFailDetector.Disruptors;
+            _unloadingObjects = args.ShowUnloadingObjects ? autoFailDetector.UnloadingObjects : new List<double>();
+            _potentialUnloadingObjects = args.ShowPotentialUnloadingObjects ? autoFailDetector.PotentialUnloadingObjects : new List<double>();
+            _potentialDisruptors = args.ShowPotentialDisruptors ? autoFailDetector.Disruptors : new List<double>();
 
             // Set end time for the timeline
             _endTimeMonitor = mapEndTime;
