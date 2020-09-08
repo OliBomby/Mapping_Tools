@@ -313,8 +313,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public static List<HitsoundLayer> ImportMidi(string path, double offset=0, bool instruments=true, bool keysounds=true, bool lengths=true, double lengthRoughness=1, bool velocities=true, double velocityRoughness=1) {
             List<HitsoundLayer> hitsoundLayers = new List<HitsoundLayer>();
 
-            var strictMode = false;
-            var mf = new MidiFile(path, strictMode);
+            var mf = new MidiFile(path, false);
 
             Console.WriteLine(
                 $@"Format {mf.FileFormat}, " +
@@ -375,7 +374,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         velocity = (int)RoundVelocity(velocity, velocityRoughness);
 
                         string lengthString = Math.Round(length).ToString(CultureInfo.InvariantCulture);
-                        string filename = $"{bank}\\{patch}\\{instrument}\\{key}\\{lengthString}\\{velocity}.wav";
 
                         string instrumentName = on.Channel == 10 ? "Percussion" :
                             patch >= 0 && patch <= 127 ? PatchChangeEvent.GetPatchName(patch) : "Undefined";
@@ -390,7 +388,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                             name += "," + velocity;
 
 
-                        var sampleArgs = new SampleGeneratingArgs(filename, bank, patch, instrument, key, length, velocity);
+                        var sampleArgs = new SampleGeneratingArgs(string.Empty, bank, patch, instrument, key, length, velocity);
                         var importArgs = new LayerImportArgs(ImportType.MIDI) {
                             Path = path,
                             Bank = bank,

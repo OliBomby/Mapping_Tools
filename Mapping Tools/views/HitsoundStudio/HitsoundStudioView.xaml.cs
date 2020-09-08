@@ -446,7 +446,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
             SelectedImportVelocityRoughnessBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.VelocityRoughness, CultureInfo.InvariantCulture);
 
             // Update visibility
-            SoundFontArgsPanel.Visibility = selectedLayers.Any(o => o.SampleArgs.UsesSoundFont) ? Visibility.Visible : Visibility.Collapsed;
+            SoundFontArgsPanel.Visibility = selectedLayers.Any(o => o.SampleArgs.UsesSoundFont || string.IsNullOrEmpty(o.SampleArgs.GetExtension())) ? Visibility.Visible : Visibility.Collapsed;
             SelectedStackPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Stack) ? Visibility.Visible : Visibility.Collapsed;
             SelectedHitsoundsPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Hitsounds) ? Visibility.Visible : Visibility.Collapsed;
             SelectedStoryboardPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Storyboard) ? Visibility.Visible : Visibility.Collapsed;

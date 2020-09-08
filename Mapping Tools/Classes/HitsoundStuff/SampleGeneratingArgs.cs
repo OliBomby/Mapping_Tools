@@ -60,7 +60,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// <summary>
         /// Means you can export this sample by simply copy pasting the source file in <see cref="Path"/>.
         /// </summary>
-        public bool CanCopyPaste => !UsesSoundFont && Math.Abs(Volume - 1) < Precision.DOUBLE_EPSILON;
+        public bool CanCopyPaste => !string.IsNullOrEmpty(GetExtension()) && !UsesSoundFont && Math.Abs(Volume - 1) < Precision.DOUBLE_EPSILON;
 
         private string path;
         public string Path {
