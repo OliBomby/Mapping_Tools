@@ -342,7 +342,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                             channelBanks[co.Channel] = (co.ControllerValue * 128) + (channelBanks.ContainsKey(co.Channel) ? (byte)channelBanks[co.Channel] : 0);
                         }
                         else if (co.Controller == MidiController.BankSelectLsb) {
-                            channelBanks[co.Channel] = co.ControllerValue + (channelBanks.ContainsKey(co.Channel) ? channelBanks[co.Channel] >> 8 * 128 : 0);
+                            channelBanks[co.Channel] = co.ControllerValue + (channelBanks.ContainsKey(co.Channel) ? (channelBanks[co.Channel] >> 8) * 128 : 0);
                         }
                     }
                     else if (MidiEvent.IsNoteOn(midiEvent)) {

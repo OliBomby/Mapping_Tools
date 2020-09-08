@@ -1,37 +1,74 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using NAudio.Midi;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     public class MidiExporter {
-		public void SaveToFile(string fileName) {
+        public static void SaveToFile(string fileName, SampleGeneratingArgs[] samples) {
+            SaveToFile(fileName, 
+                samples.Select(s => s.Bank == -1 ? 0 : s.Bank).ToArray(),
+                samples.Select(s => s.Patch == -1 ? 0 : s.Patch).ToArray(),
+                samples.Select(s => s.Key).ToArray(),
+                samples.Select(s => s.Length == -1 ? 0 : s.Length).ToArray(),
+                samples.Select(s => s.Velocity == -1 ? 0 : s.Velocity).ToArray());
+        }
+
+		public static void SaveToFile(string fileName, int[] bankNumbers, int[] patchNumbers, int[] noteNumbers, double[] durations, int[] velocities) {
             const int MidiFileType = 0;
-            const int BeatsPerMinute = 60;
+            const int MicrosecondsPerQuaterNote = 1000000;
             const int TicksPerQuarterNote = 120;
 
             const int TrackNumber = 0;
-            const int ChannelNumber = 1;
-
-            long absoluteTime = 0;
+            const long Time = 0;
 
             var collection = new MidiEventCollection(MidiFileType, TicksPerQuarterNote);
 
-            collection.AddEvent(new TextEvent("Note Stream", MetaEventType.TextEvent, absoluteTime), TrackNumber);
-            ++absoluteTime;
-            collection.AddEvent(new TempoEvent(CalculateMicrosecondsPerQuaterNote(BeatsPerMinute), absoluteTime), TrackNumber);
+            collection.AddEvent(new TextEvent("Note Stream", MetaEventType.TextEvent, Time), TrackNumber);
+            collection.AddEvent(new TempoEvent(MicrosecondsPerQuaterNote, Time), TrackNumber);
 
-            collection.AddEvent(new PatchChangeEvent(0, ChannelNumber, 0), TrackNumber);
+            var channels = new List<Tuple<int, int>>();
 
-            const int NoteVelocity = 100;
-            const int NoteDuration = 3 * TicksPerQuarterNote / 4;
-            const long SpaceBetweenNotes = TicksPerQuarterNote;
+            int notesAdded = 0;
+            for (int i = 0; i < noteNumbers.Length; i++) {
+                if (noteNumbers[i] < 0) {
+                    continue;
+                }
 
-            collection.AddEvent(new NoteOnEvent(absoluteTime, ChannelNumber, 70, NoteVelocity, NoteDuration), TrackNumber);
-            collection.AddEvent(new NoteEvent(absoluteTime + NoteDuration, ChannelNumber, MidiCommandCode.NoteOff, 70, 0), TrackNumber);
+                var channelIndex = FindChannel(channels, bankNumbers[i], patchNumbers[i]);
 
-            absoluteTime += SpaceBetweenNotes;
+                if (channelIndex == -1) {
+                    channels.Add(new Tuple<int, int>(bankNumbers[i], patchNumbers[i]));
+
+                    channelIndex = channels.Count;
+                    collection.AddEvent(new ControlChangeEvent(Time, channelIndex, MidiController.BankSelect, bankNumbers[i] >> 8 << 8), TrackNumber);
+                    collection.AddEvent(new ControlChangeEvent(Time, channelIndex, MidiController.BankSelectLsb, (byte)bankNumbers[i]), TrackNumber);
+                    collection.AddEvent(new PatchChangeEvent(Time, channelIndex, patchNumbers[i]), TrackNumber);
+                }
+
+                var tickDuration = (int) (durations[i] * 1000 / MicrosecondsPerQuaterNote * TicksPerQuarterNote);
+                collection.AddEvent(new NoteOnEvent(Time, channelIndex, noteNumbers[i], velocities[i], tickDuration), TrackNumber);
+                collection.AddEvent(new NoteEvent(Time + tickDuration, channelIndex, MidiCommandCode.NoteOff, noteNumbers[i], 0), TrackNumber);
+
+                notesAdded++;
+            }
+
+            if (notesAdded == 0)
+                return;
 
             collection.PrepareForExport();
             MidiFile.Export(fileName, collection);
+        }
+
+        private static int FindChannel(List<Tuple<int, int>> channels, int bank, int patch) {
+            for (int i = 0; i < channels.Count; i++) {
+                var item = channels[i];
+                if (item.Item1 == bank && item.Item2 == patch) {
+                    return i + 1;
+                }
+            }
+
+            return -1;
         }
 
         private static int CalculateMicrosecondsPerQuaterNote(int bpm) {

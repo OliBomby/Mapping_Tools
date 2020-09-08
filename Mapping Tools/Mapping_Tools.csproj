@@ -235,6 +235,7 @@
     <Compile Include="Classes\HitsoundStuff\Effects\Effect.cs" />
     <Compile Include="Classes\HitsoundStuff\Effects\EffectParameter.cs" />
     <Compile Include="Classes\HitsoundStuff\Effects\SoftLimiter.cs" />
+    <Compile Include="Classes\HitsoundStuff\SampleGeneratingArgsComparer.cs" />
     <Compile Include="Classes\HitsoundStuff\Hitsound.cs" />
     <Compile Include="Classes\HitsoundStuff\HitsoundLayerExtension.cs" />
     <Compile Include="Classes\HitsoundStuff\HitsoundZone.cs" />

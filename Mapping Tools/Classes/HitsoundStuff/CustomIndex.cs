@@ -14,7 +14,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// 
         /// </summary>
         public int Index;
-        
+
+        private SampleGeneratingArgsComparer Comparer;
+
         /// <summary>
         /// 
         /// </summary>
@@ -31,22 +33,24 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// 
         /// </summary>
         /// <param name="index"></param>
-        public CustomIndex(int index) {
+        public CustomIndex(int index, SampleGeneratingArgsComparer comparer = null) {
             Index = index;
+            Comparer = comparer ?? new SampleGeneratingArgsComparer();
             Samples = new Dictionary<string, HashSet<SampleGeneratingArgs>>();
             foreach (string key in AllKeys) {
-                Samples[key] = new HashSet<SampleGeneratingArgs>();
+                Samples[key] = new HashSet<SampleGeneratingArgs>(Comparer);
             }
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public CustomIndex() {
+        public CustomIndex(SampleGeneratingArgsComparer comparer = null) {
             Index = -1;
+            Comparer = comparer ?? new SampleGeneratingArgsComparer();
             Samples = new Dictionary<string, HashSet<SampleGeneratingArgs>>();
             foreach (string key in AllKeys) {
-                Samples[key] = new HashSet<SampleGeneratingArgs>();
+                Samples[key] = new HashSet<SampleGeneratingArgs>(Comparer);
             }
         }
 
@@ -135,7 +139,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// </summary>
         /// <returns></returns>
         public CustomIndex Copy() {
-            CustomIndex ci = new CustomIndex(Index);
+            CustomIndex ci = new CustomIndex(Index, Comparer);
             ci.MergeWith(this);
             return ci;
         }
@@ -144,11 +148,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// 
         /// </summary>
         /// <param name="loadedSamples"></param>
-        public void CleanInvalids(Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null) {
+        public void CleanInvalids(Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null, bool validateSampleFile = true) {
             // Replace all invalid paths with "" and remove the invalid path if another valid path is also in the hashset
             foreach (HashSet<SampleGeneratingArgs> paths in Samples.Values) {
                 int initialCount = paths.Count;
-                int removed = paths.RemoveWhere(o => !SampleImporter.ValidateSampleArgs(o, loadedSamples));
+                int removed = paths.RemoveWhere(o => !SampleImporter.ValidateSampleArgs(o, loadedSamples, validateSampleFile));
 
                 if (paths.Count == 0 && initialCount != 0) {
                     // All the paths where invalid and it didn't just start out empty

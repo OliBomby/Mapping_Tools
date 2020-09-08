@@ -341,7 +341,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                     List<string> sampleFilenames = tloFrom.GetFirstPlayingFilenames(mode, mapDir, firstSamples, false);
                     List<SampleGeneratingArgs> samples = sampleFilenames
                         .Select(o => new SampleGeneratingArgs(Path.Combine(mapDir, o)))
-                        .Where(s => SampleImporter.ValidateSampleArgs(s.Path))
+                        .Where(o => SampleImporter.ValidateSampleArgs(o, true))
                         .ToList();
 
                     if (samples.Count > 0) {
@@ -405,7 +405,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                 List<string> sampleFilenames = tlo.GetFirstPlayingFilenames(mode, mapDir, firstSamples, false);
                 List<SampleGeneratingArgs> samples = sampleFilenames
                     .Select(o => new SampleGeneratingArgs(Path.Combine(mapDir, o)))
-                    .Where(s => SampleImporter.ValidateSampleArgs(s.Path))
+                    .Where(o => SampleImporter.ValidateSampleArgs(o))
                     .ToList();
 
                 if (samples.Count > 0) {
