@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Mapping_Tools.Classes.BeatmapHelper.Events;
 using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SystemTools;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
 
@@ -545,9 +546,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
 
             // Parse the time span in the code
-            var time = TimeSpan.ParseExact(
-                code.Substring(0, startBracketIndex == -1 ? code.Length : startBracketIndex - 1).Trim(),
-                @"mm\:ss\:fff", CultureInfo.InvariantCulture, TimeSpanStyles.None).TotalMilliseconds;
+            var time = TypeConverters.ParseOsuTimestamp(code).TotalMilliseconds;
 
             // Enumerate through the hit objects from the first object at the time
             int objectIndex = HitObjects.FindIndex(h => h.Time >= time);
