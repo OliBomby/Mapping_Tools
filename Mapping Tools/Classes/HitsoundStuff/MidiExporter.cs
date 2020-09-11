@@ -6,12 +6,13 @@ using NAudio.Midi;
 namespace Mapping_Tools.Classes.HitsoundStuff {
     public class MidiExporter {
         public static void SaveToFile(string fileName, SampleGeneratingArgs[] samples) {
-            SaveToFile(fileName, 
-                samples.Select(s => s.Bank == -1 ? 0 : s.Bank).ToArray(),
-                samples.Select(s => s.Patch == -1 ? 0 : s.Patch).ToArray(),
-                samples.Select(s => s.Key).ToArray(),
-                samples.Select(s => s.Length == -1 ? 0 : s.Length).ToArray(),
-                samples.Select(s => s.Velocity == -1 ? 0 : s.Velocity).ToArray());
+            var validSamples = samples.Where(o => o.Key >= 0).ToArray();
+            SaveToFile(fileName,
+                validSamples.Select(s => s.Bank < 0 ? 0 : s.Bank).ToArray(),
+                validSamples.Select(s => s.Patch < 0 ? 0 : s.Patch).ToArray(),
+                validSamples.Select(s => s.Key).ToArray(),
+                validSamples.Select(s => s.Length < 0 ? 0 : s.Length).ToArray(),
+                validSamples.Select(s => s.Velocity < 0 ? 0 : s.Velocity).ToArray());
         }
 
 		public static void SaveToFile(string fileName, int[] bankNumbers, int[] patchNumbers, int[] noteNumbers, double[] durations, int[] velocities) {
@@ -31,10 +32,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
             int notesAdded = 0;
             for (int i = 0; i < noteNumbers.Length; i++) {
-                if (noteNumbers[i] < 0) {
-                    continue;
-                }
-
                 var channelIndex = FindChannel(channels, bankNumbers[i], patchNumbers[i]);
 
                 if (channelIndex == -1) {

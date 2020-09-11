@@ -73,7 +73,8 @@ namespace Mapping_Tools.Views.HitsoundStudio
 
             if (arg.HitsoundExportModeSetting == HitsoundStudioVm.HitsoundExportMode.Standard) {
                 // Convert the multiple layers into packages that have the samples from all the layers at one specific time
-                List<SamplePackage> samplePackages = HitsoundConverter.ZipLayers(arg.HitsoundLayers, arg.DefaultSample, arg.ZipLayersLeniency);
+                // Don't add default sample when exporting midi files because that's not a final export.
+                List<SamplePackage> samplePackages = HitsoundConverter.ZipLayers(arg.HitsoundLayers, arg.DefaultSample, arg.ZipLayersLeniency, validateSampleFile);
                 UpdateProgressBar(worker, 10);
 
                 // Balance the volume between greenlines and samples
