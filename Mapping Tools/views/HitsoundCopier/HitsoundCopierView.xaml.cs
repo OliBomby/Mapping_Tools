@@ -571,6 +571,12 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                 return false;
             }
 
+            // Check if this tlo has hitsounds
+            if (tloTo.Whistle || tloTo.Finish || tloTo.Clap || 
+                (arg.MutedSampleSet != SampleSet.Auto && tloTo.FenoSampleSet != arg.MutedSampleSet)) {
+                return false;
+            }
+
             // Check filter snap
             // It's at least snap x or worse if the time is not a multiple of snap x / 2
             var timingPoint = beatmapTo.BeatmapTiming.GetRedlineAtTime(tloTo.Time - 1);
