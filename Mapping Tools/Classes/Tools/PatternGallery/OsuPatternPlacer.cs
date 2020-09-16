@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 
 namespace Mapping_Tools.Classes.Tools.PatternGallery {
@@ -53,17 +54,14 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 patternBeatmap = patternBeatmap.DeepCopy();
             }
 
-            if (offset != 0) {
+            if (Math.Abs(offset) > Precision.DOUBLE_EPSILON) {
                 patternBeatmap.OffsetTime(offset);
             }
 
-            // Do some kind of processing to fix timing etc
-            // Set the global SV and BPM in the pattern beatmap so the object end times can be calculated for the partitioning
-            patternBeatmap.BeatmapTiming.SliderMultiplier = beatmap.BeatmapTiming.SliderMultiplier;
-            patternBeatmap.BeatmapTiming.TimingPoints.RemoveAll(tp => tp.Uninherited);
-            patternBeatmap.BeatmapTiming.TimingPoints.AddRange(beatmap.BeatmapTiming.GetAllRedlines());
-            patternBeatmap.BeatmapTiming.Sort();
-            patternBeatmap.CalculateSliderEndTimes();
+            // We adjust the pattern first so it alligns with the beatmap.
+            // The right timing is applied and optional pre-processing is applied.
+            // Sliderends and object timingpoints get recalculated.
+            AdjustPatternToBeatmap(patternBeatmap, beatmap);
 
             // Partition the pattern beatmap
             List<Tuple<double, double>> parts;
@@ -157,6 +155,173 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             tp.MpB = tp.Uninherited ? -100 : tp.MpB;
             tp.Uninherited = false;
             return new TimingPointsChange(tp, sv, false, hs, hs, hs);
+        }
+
+        /// <summary>
+        /// Does a procedure similar to <see cref="MapCleaner"/> which adjusts the pattern so it fits in the beatmap.
+        /// It does so according to the options selected in this.
+        /// </summary>
+        /// <param name="patternBeatmap"></param>
+        /// <param name="beatmap"></param>
+        private void AdjustPatternToBeatmap(Beatmap patternBeatmap, Beatmap beatmap) {
+            Timing timing = patternBeatmap.BeatmapTiming;
+            Timeline timeline = patternBeatmap.GetTimeline();
+
+            GameMode mode = (GameMode)patternBeatmap.General["Mode"].IntValue;
+            GameMode targetMode = (GameMode)beatmap.General["Mode"].IntValue;
+
+            double circleSize = patternBeatmap.Difficulty["CircleSize"].DoubleValue;
+
+            // Collect Kiai toggles and SliderVelocity changes for mania/taiko
+            List<TimingPoint> kiaiToggles = new List<TimingPoint>();
+            List<TimingPoint> svChanges = new List<TimingPoint>();
+            bool lastKiai = false;
+            double lastSV = -100;
+            foreach (TimingPoint tp in timing.TimingPoints) {
+                if (tp.Kiai != lastKiai) {
+                    kiaiToggles.Add(tp.Copy());
+                    lastKiai = tp.Kiai;
+                }
+                if (tp.Uninherited) {
+                    lastSV = -100;
+                } else {
+                    if (Math.Abs(tp.MpB - lastSV) > Precision.DOUBLE_EPSILON) {
+                        svChanges.Add(tp.Copy());
+                        lastSV = tp.MpB;
+                    }
+                }
+            }
+
+            // Resnap shit
+            // TODO: move this to after changing timing
+            if (SnapToNewTiming) {
+                // Resnap all objects
+                foreach (HitObject ho in patternBeatmap.HitObjects) {
+                    ho.ResnapSelf(timing, SnapDivisor1, SnapDivisor2);
+                    ho.ResnapEnd(timing, SnapDivisor1, SnapDivisor2);
+                    ho.ResnapPosition(mode, circleSize);
+                }
+
+                // Resnap Kiai toggles
+                foreach (TimingPoint tp in kiaiToggles) {
+                    tp.ResnapSelf(timing, SnapDivisor1, SnapDivisor2);
+                }
+
+                // Resnap SliderVelocity changes
+                foreach (TimingPoint tp in svChanges) {
+                    tp.ResnapSelf(timing, SnapDivisor1, SnapDivisor2);
+                }
+            }
+
+            // Make new timingpoints
+            List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
+
+            // Add redlines
+            List<TimingPoint> redlines = timing.GetAllRedlines();
+            foreach (TimingPoint tp in redlines) {
+                timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, meter: true, unInherited: true, omitFirstBarLine: true));
+            }
+
+            // Add SliderVelocity changes for taiko and mania
+            if (mode == GameMode.Taiko || mode == GameMode.Mania) {
+                foreach (TimingPoint tp in svChanges) {
+                    timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true));
+                }
+            }
+
+            // Add Kiai toggles
+            foreach (TimingPoint tp in kiaiToggles) {
+                timingPointsChanges.Add(new TimingPointsChange(tp, kiai: true));
+            }
+
+            // Add Hitobject stuff
+            foreach (HitObject ho in patternBeatmap.HitObjects) {
+                if (ho.IsSlider) // SliderVelocity changes
+                {
+                    TimingPoint tp = ho.TimingPoint.Copy();
+                    tp.Offset = ho.Time;
+                    tp.MpB = ho.SliderVelocity;
+                    timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true));
+                }
+
+                // Body hitsounds
+                bool vol = ho.IsSlider || (ho.IsSpinner);
+                bool sam = ho.IsSlider && ho.SampleSet == 0;
+                bool ind = ho.IsSlider;
+                bool samplesetActuallyChanged = false;
+                foreach (TimingPoint tp in ho.BodyHitsounds) {
+                    timingPointsChanges.Add(new TimingPointsChange(tp, volume: vol, index: ind, sampleset: sam));
+                    if (tp.SampleSet != ho.HitsoundTimingPoint.SampleSet) {
+                        samplesetActuallyChanged = ho.SampleSet == 0; }  // True for sampleset change in sliderbody
+                }
+                if (ho.IsSlider && (!samplesetActuallyChanged) && ho.SampleSet == 0)  // Case can put sampleset on sliderbody
+                {
+                    ho.SampleSet = ho.HitsoundTimingPoint.SampleSet;
+                }
+                if (ho.IsSlider && samplesetActuallyChanged) // Make it start out with the right sampleset
+                {
+                    TimingPoint tp = ho.HitsoundTimingPoint.Copy();
+                    tp.Offset = ho.Time;
+                    timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: true));
+                }
+            }
+
+            // Add timeline hitsounds
+            foreach (TimelineObject tlo in timeline.TimelineObjects) {
+                // Change the samplesets in the hitobjects
+                if (tlo.Origin.IsCircle) {
+                    tlo.Origin.SampleSet = tlo.FenoSampleSet;
+                    tlo.Origin.AdditionSet = tlo.FenoAdditionSet;
+                    if (mode == GameMode.Mania) {
+                        tlo.Origin.CustomIndex = tlo.FenoCustomIndex;
+                        tlo.Origin.SampleVolume = tlo.FenoSampleVolume;
+                    }
+                } else if (tlo.Origin.IsSlider) {
+                    tlo.Origin.EdgeHitsounds[tlo.Repeat] = tlo.GetHitsounds();
+                    tlo.Origin.EdgeSampleSets[tlo.Repeat] = tlo.FenoSampleSet;
+                    tlo.Origin.EdgeAdditionSets[tlo.Repeat] = tlo.FenoAdditionSet;
+                    if (tlo.Origin.EdgeAdditionSets[tlo.Repeat] == tlo.Origin.EdgeSampleSets[tlo.Repeat])  // Simplify additions to auto
+                    {
+                        tlo.Origin.EdgeAdditionSets[tlo.Repeat] = 0;
+                    }
+                } else if (tlo.Origin.IsSpinner) {
+                    if (tlo.Repeat == 1) {
+                        tlo.Origin.SampleSet = tlo.FenoSampleSet;
+                        tlo.Origin.AdditionSet = tlo.FenoAdditionSet;
+                    }
+                } else if (tlo.Origin.IsHoldNote) {
+                    if (tlo.Repeat == 0) {
+                        tlo.Origin.SampleSet = tlo.FenoSampleSet;
+                        tlo.Origin.AdditionSet = tlo.FenoAdditionSet;
+                        tlo.Origin.CustomIndex = tlo.FenoCustomIndex;
+                        tlo.Origin.SampleVolume = tlo.FenoSampleVolume;
+                    }
+                }
+                if (tlo.Origin.AdditionSet == tlo.Origin.SampleSet)  // Simplify additions to auto
+                {
+                    tlo.Origin.AdditionSet = 0;
+                }
+                if (tlo.HasHitsound) // Add greenlines for custom indexes and volumes
+                {
+                    TimingPoint tp = tlo.HitsoundTimingPoint.Copy();
+
+                    bool ind = !tlo.UsesFilename;  // Index doesnt have to change if custom is overridden by Filename
+                    const bool vol = true;
+
+                    tp.Offset = tlo.Time;
+                    tp.SampleIndex = tlo.FenoCustomIndex;
+                    tp.Volume = tlo.FenoSampleVolume;
+
+                    timingPointsChanges.Add(new TimingPointsChange(tp, volume: vol, index: ind));
+                }
+            }
+            
+            // Replace the old timingpoints
+            timing.TimingPoints.Clear();
+            TimingPointsChange.ApplyChanges(timing, timingPointsChanges);
+
+            patternBeatmap.GiveObjectsGreenlines();
+            patternBeatmap.CalculateSliderEndTimes();
         }
     }
 }
