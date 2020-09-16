@@ -74,11 +74,19 @@ namespace Mapping_Tools.Views.HitsoundCopier {
             var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
 
             foreach (var pathTo in paths) {
-                var editorTo = EditorReaderStuff.GetNewestVersionOrNot(pathTo, reader);
-                var editorFrom = EditorReaderStuff.GetNewestVersionOrNot(arg.PathFrom, reader);
+                BeatmapEditor editorTo = EditorReaderStuff.GetNewestVersionOrNot(pathTo, reader);;
+                Beatmap beatmapTo = editorTo.Beatmap;
+                Beatmap beatmapFrom;
 
-                var beatmapTo = editorTo.Beatmap;
-                var beatmapFrom = editorFrom.Beatmap;
+                if (!string.IsNullOrEmpty(arg.PathFrom)) {
+                    var editorFrom = EditorReaderStuff.GetNewestVersionOrNot(arg.PathFrom, reader);
+                    beatmapFrom = editorFrom.Beatmap;
+                } else {
+                    // Copy from an empty beatmap similar to the map to copy to
+                    beatmapFrom = beatmapTo.DeepCopy();
+                    beatmapFrom.HitObjects.Clear();
+                    beatmapFrom.BeatmapTiming.TimingPoints.Clear();
+                }
 
                 Timeline processedTimeline;
 
