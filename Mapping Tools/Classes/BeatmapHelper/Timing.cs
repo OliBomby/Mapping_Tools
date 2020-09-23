@@ -58,7 +58,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="round">To round the number of beats to a snap divisor.</param>
         /// <returns></returns>
         public double GetBeatLength(double startTime, double endTime, bool round = false) {
-            var redlines = GetTimingPointsInTimeRange(startTime, endTime)
+            var redlines = GetTimingPointsInTimeRange(startTime, endTime, false)
                 .Where(tp => tp.Uninherited);
 
             double beats = 0;
@@ -140,7 +140,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
             double newTime = snapDistance3 < snapDistance2 ? newTime3 : newTime2;
 
-            if( afterTp != null && newTime >= afterTp.Offset - 10 ) {
+            if( afterTp != null && newTime > beforeTp.Offset + 10 && newTime >= afterTp.Offset - 10 ) {
                 newTime = afterTp.Offset;
             }
             return floor ? Math.Floor(newTime) : newTime;
@@ -229,9 +229,12 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         /// <param name="startTime"></param>
         /// <param name="endTime"></param>
+        /// <param name="inclusive"></param>
         /// <returns></returns>
-        public List<TimingPoint> GetTimingPointsInTimeRange(double startTime, double endTime) {
-            return TimingPoints.Where(tp => Precision.DefinitelyBigger(tp.Offset, startTime) && Precision.DefinitelyBigger(endTime, tp.Offset)).ToList();
+        public List<TimingPoint> GetTimingPointsInTimeRange(double startTime, double endTime, bool inclusive = true) {
+            return inclusive ? 
+                TimingPoints.Where(tp => tp.Offset >= startTime - Precision.DOUBLE_EPSILON && tp.Offset <= endTime + Precision.DOUBLE_EPSILON).ToList() : 
+                TimingPoints.Where(tp => Precision.DefinitelyBigger(tp.Offset, startTime) && Precision.DefinitelyBigger(endTime, tp.Offset)).ToList();
         }
 
         /// <summary>
@@ -239,9 +242,12 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         /// <param name="startTime"></param>
         /// <param name="endTime"></param>
+        /// <param name="inclusive"></param>
         /// <returns></returns>
-        public List<TimingPoint> GetRedlinesInTimeRange(double startTime, double endTime) {
-            return TimingPoints.Where(tp => tp.Uninherited && Precision.DefinitelyBigger(tp.Offset, startTime) && Precision.DefinitelyBigger(endTime, tp.Offset)).ToList();
+        public List<TimingPoint> GetRedlinesInTimeRange(double startTime, double endTime, bool inclusive = true) {
+            return inclusive ? 
+                TimingPoints.Where(tp => tp.Uninherited && tp.Offset >= startTime - Precision.DOUBLE_EPSILON && tp.Offset <= endTime + Precision.DOUBLE_EPSILON).ToList() : 
+                TimingPoints.Where(tp => tp.Uninherited && Precision.DefinitelyBigger(tp.Offset, startTime) && Precision.DefinitelyBigger(endTime, tp.Offset)).ToList();
         }
 
         /// <summary>
@@ -349,7 +355,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <returns>The duration of the slider in milliseconds.</returns>
         public double CalculateSliderTemporalLength(double time, double length) {
             var sv = GetSvAtTime(time);
-            return ( length * GetMpBAtTime(time) * (double.IsNaN(sv) ? -100 : sv) ) / ( -10000 * SliderMultiplier );
+            return CalculateSliderTemporalLength(time, length, sv);
+        }
+
+        public double CalculateSliderTemporalLength(double time, double length, double sv) {
+            return (length * GetMpBAtTime(time) * (double.IsNaN(sv) ? -100 : sv)) / (-10000 * SliderMultiplier);
         }
 
         /// <summary>

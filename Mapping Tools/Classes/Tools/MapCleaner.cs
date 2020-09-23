@@ -44,7 +44,6 @@ namespace Mapping_Tools.Classes.Tools {
 
             Beatmap beatmap = editor.Beatmap;
             Timing timing = beatmap.BeatmapTiming;
-            Timeline timeline = beatmap.GetTimeline();
 
             GameMode mode = (GameMode)beatmap.General["Mode"].IntValue;
             double circleSize = beatmap.Difficulty["CircleSize"].DoubleValue;
@@ -112,6 +111,9 @@ namespace Mapping_Tools.Classes.Tools {
 
                 UpdateProgressBar(worker, 45);
             }
+
+            // Collect timeline objects after resnapping
+            Timeline timeline = beatmap.GetTimeline();
 
             // Make new timingpoints
             List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
