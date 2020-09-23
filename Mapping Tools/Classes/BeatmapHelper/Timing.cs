@@ -23,6 +23,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         public double SliderMultiplier { get; set; }
 
+        public Timing(double sliderMultiplier) {
+            TimingPoints = new List<TimingPoint>();
+            SliderMultiplier = sliderMultiplier;
+        }
+
         /// <inheritdoc />
         public Timing(List<TimingPoint> timingPoints, double sliderMultiplier) {
             TimingPoints = timingPoints;
@@ -227,6 +232,16 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <returns></returns>
         public List<TimingPoint> GetTimingPointsInTimeRange(double startTime, double endTime) {
             return TimingPoints.Where(tp => Precision.DefinitelyBigger(tp.Offset, startTime) && Precision.DefinitelyBigger(endTime, tp.Offset)).ToList();
+        }
+
+        /// <summary>
+        /// Finds all the uninherited timing points in a specified time range.
+        /// </summary>
+        /// <param name="startTime"></param>
+        /// <param name="endTime"></param>
+        /// <returns></returns>
+        public List<TimingPoint> GetRedlinesInTimeRange(double startTime, double endTime) {
+            return TimingPoints.Where(tp => tp.Uninherited && Precision.DefinitelyBigger(tp.Offset, startTime) && Precision.DefinitelyBigger(endTime, tp.Offset)).ToList();
         }
 
         /// <summary>
