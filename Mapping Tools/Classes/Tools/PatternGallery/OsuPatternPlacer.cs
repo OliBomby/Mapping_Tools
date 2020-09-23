@@ -79,23 +79,12 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             // We adjust the pattern first so it alligns with the beatmap.
             // The right timing is applied and optional pre-processing is applied.
             // Sliderends and object timingpoints get recalculated.
-            AdjustPatternToBeatmap(patternBeatmap, beatmap);
-
-            // Partition the pattern beatmap
-            List<Tuple<double, double>> parts;
-            if (PatternOverwriteMode == PatternOverwriteMode.PartitionedOverwrite) {
-                parts = PartitionBeatmap(patternBeatmap);
-            }
-            else {
-                parts = new List<Tuple<double, double>> {
-                    new Tuple<double, double>(patternBeatmap.GetHitObjectStartTime(), patternBeatmap.GetHitObjectEndTime())
-                };
-            }
+            AdjustPatternToBeatmap(patternBeatmap, beatmap, out var parts);
 
             // Remove stuff
             if (PatternOverwriteMode != PatternOverwriteMode.NoOverwrite) {
                 foreach (var part in parts) {
-                    RemovePartOfBeatmap(beatmap, part.Item1 - Padding, part.Item2 + Padding);
+                    RemovePartOfBeatmap(beatmap, part.StartTime - Padding, part.EndTime + Padding);
                 }
             }
 
@@ -106,8 +95,8 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             var timingPointsChanges = new List<TimingPointsChange>();
             foreach (var part in parts) {
                 timingPointsChanges.AddRange(
-                    patternBeatmap.BeatmapTiming.TimingPoints.Where(tp => tp.Offset >= part.Item1 - Padding &&
-                                                                          tp.Offset <= part.Item2 + Padding)
+                    patternBeatmap.BeatmapTiming.TimingPoints.Where(tp => tp.Offset >= part.StartTime - Padding &&
+                                                                          tp.Offset <= part.EndTime + Padding)
                     .Select(tp => GetTimingPointsChange(tp, true, true)));
             }
 
@@ -222,7 +211,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 tp.Offset = customOffset.Value;
             }
             
-            return new TimingPointsChange(tp, mpb: true, meter: true, omitFirstBarLine: true);
+            return new TimingPointsChange(tp, mpb: true, meter: true, unInherited: true, omitFirstBarLine: true);
         }
 
         /// <summary>
@@ -231,7 +220,8 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
         /// </summary>
         /// <param name="patternBeatmap"></param>
         /// <param name="beatmap"></param>
-        private void AdjustPatternToBeatmap(Beatmap patternBeatmap, Beatmap beatmap) {
+        /// <param name="parts"></param>
+        private void AdjustPatternToBeatmap(Beatmap patternBeatmap, Beatmap beatmap, out List<Part> parts) {
             double patternStartTime = patternBeatmap.GetHitObjectStartTime();
             double patternEndTime = patternBeatmap.GetHitObjectEndTime();
 
@@ -246,7 +236,6 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             double patternCircleSize = patternBeatmap.Difficulty["CircleSize"].DoubleValue;
 
             // Partition the pattern based on the timing in the pattern
-            List<Part> parts;
             if (PatternOverwriteMode == PatternOverwriteMode.PartitionedOverwrite) {
                 parts = PartitionBeatmap(patternBeatmap);
             } else {
@@ -379,7 +368,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 }
             }
 
-            // Scale everything to the new timing starting from the first object in the pattern and keeping the number of beats the same.
+            // TODO Scale everything to the new timing starting from the first object in the pattern and keeping the number of beats the same.
             if (ScaleToNewTiming) {
 
             }
@@ -403,14 +392,8 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 }
             }
 
-            // Make new timingpoints
+            // Make new timingpoints changes for the hitsounds and other stuff
             List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
-
-            // Add redlines
-            List<TimingPoint> redlines = newTiming.GetAllRedlines();
-            foreach (TimingPoint tp in redlines) {
-                timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, meter: true, unInherited: true, omitFirstBarLine: true));
-            }
 
             // Add SliderVelocity changes for taiko and mania
             if (patternMode == GameMode.Taiko || patternMode == GameMode.Mania) {
