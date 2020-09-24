@@ -15,18 +15,18 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public static readonly string[] ValidSamplePathExtensions = { 
             ".wav", ".ogg", ".mp3", ".sf2"};
 
-        public static bool ValidateSampleArgs(string path) {
+        public static bool ValidateSamplePath(string path) {
             return (File.Exists(path) && ValidSamplePathExtensions.Contains(Path.GetExtension(path)));
         }
 
-        public static bool ValidateSampleArgs(SampleGeneratingArgs args) {
-            return ValidateSampleArgs(args.Path);
+        public static bool ValidateSampleArgs(SampleGeneratingArgs args, bool validateSampleFile = true) {
+            return !validateSampleFile || ValidateSamplePath(args.Path);
         }
 
-        public static bool ValidateSampleArgs(SampleGeneratingArgs args, Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples) {
+        public static bool ValidateSampleArgs(SampleGeneratingArgs args, Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples, bool validateSampleFile = true) {
             if (loadedSamples == null)
-                return ValidateSampleArgs(args);
-            return loadedSamples.ContainsKey(args) && loadedSamples[args] != null;
+                return ValidateSampleArgs(args, validateSampleFile);
+            return !validateSampleFile || loadedSamples.ContainsKey(args) && loadedSamples[args] != null;
         }
   
         public static WaveStream OpenSample(string path) {
@@ -39,21 +39,24 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// </summary>
         /// <param name="argsList"></param>
         /// <returns></returns>
-        public static Dictionary<SampleGeneratingArgs, SampleSoundGenerator> ImportSamples(IEnumerable<SampleGeneratingArgs> argsList) {
-            var samples = new Dictionary<SampleGeneratingArgs, SampleSoundGenerator>();
+        public static Dictionary<SampleGeneratingArgs, SampleSoundGenerator> ImportSamples(IEnumerable<SampleGeneratingArgs> argsList, SampleGeneratingArgsComparer comparer = null) {
+            if (comparer == null)
+                comparer = new SampleGeneratingArgsComparer();
+
+            var samples = new Dictionary<SampleGeneratingArgs, SampleSoundGenerator>(comparer);
             var separatedByPath = new Dictionary<string, HashSet<SampleGeneratingArgs>>();
 
             foreach (var args in argsList) {
                 if (separatedByPath.TryGetValue(args.Path, out HashSet<SampleGeneratingArgs> value)) {
                     value.Add(args);
                 } else {
-                    separatedByPath.Add(args.Path, new HashSet<SampleGeneratingArgs> { args });
+                    separatedByPath.Add(args.Path, new HashSet<SampleGeneratingArgs>(comparer) { args });
                 }
             }
 
             foreach (var pair in separatedByPath) {
                 var path = pair.Key;
-                if (!ValidateSampleArgs(path)) {
+                if (!ValidateSamplePath(path)) {
                     foreach (var args in pair.Value) {
                         samples.Add(args, null);
                     }

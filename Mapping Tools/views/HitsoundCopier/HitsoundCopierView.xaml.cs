@@ -74,11 +74,19 @@ namespace Mapping_Tools.Views.HitsoundCopier {
             var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
 
             foreach (var pathTo in paths) {
-                var editorTo = EditorReaderStuff.GetNewestVersionOrNot(pathTo, reader);
-                var editorFrom = EditorReaderStuff.GetNewestVersionOrNot(arg.PathFrom, reader);
+                BeatmapEditor editorTo = EditorReaderStuff.GetNewestVersionOrNot(pathTo, reader);;
+                Beatmap beatmapTo = editorTo.Beatmap;
+                Beatmap beatmapFrom;
 
-                var beatmapTo = editorTo.Beatmap;
-                var beatmapFrom = editorFrom.Beatmap;
+                if (!string.IsNullOrEmpty(arg.PathFrom)) {
+                    var editorFrom = EditorReaderStuff.GetNewestVersionOrNot(arg.PathFrom, reader);
+                    beatmapFrom = editorFrom.Beatmap;
+                } else {
+                    // Copy from an empty beatmap similar to the map to copy to
+                    beatmapFrom = beatmapTo.DeepCopy();
+                    beatmapFrom.HitObjects.Clear();
+                    beatmapFrom.BeatmapTiming.TimingPoints.Clear();
+                }
 
                 Timeline processedTimeline;
 
@@ -341,7 +349,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                     List<string> sampleFilenames = tloFrom.GetFirstPlayingFilenames(mode, mapDir, firstSamples, false);
                     List<SampleGeneratingArgs> samples = sampleFilenames
                         .Select(o => new SampleGeneratingArgs(Path.Combine(mapDir, o)))
-                        .Where(s => SampleImporter.ValidateSampleArgs(s.Path))
+                        .Where(o => SampleImporter.ValidateSampleArgs(o, true))
                         .ToList();
 
                     if (samples.Count > 0) {
@@ -405,7 +413,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                 List<string> sampleFilenames = tlo.GetFirstPlayingFilenames(mode, mapDir, firstSamples, false);
                 List<SampleGeneratingArgs> samples = sampleFilenames
                     .Select(o => new SampleGeneratingArgs(Path.Combine(mapDir, o)))
-                    .Where(s => SampleImporter.ValidateSampleArgs(s.Path))
+                    .Where(o => SampleImporter.ValidateSampleArgs(o))
                     .ToList();
 
                 if (samples.Count > 0) {
@@ -568,6 +576,12 @@ namespace Mapping_Tools.Views.HitsoundCopier {
 
             // Check repeats
             if (tloTo.Repeat != 1) {
+                return false;
+            }
+
+            // Check if this tlo has hitsounds
+            if (tloTo.Whistle || tloTo.Finish || tloTo.Clap || 
+                (arg.MutedSampleSet != SampleSet.Auto && tloTo.FenoSampleSet != arg.MutedSampleSet)) {
                 return false;
             }
 

@@ -58,16 +58,19 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return additions;
         }
 
-        public CustomIndex GetCustomIndex() {
+        public CustomIndex GetCustomIndex(SampleGeneratingArgsComparer comparer = null) {
+            if (comparer == null)
+                comparer = new SampleGeneratingArgsComparer();
+
             SampleSet sampleSet = GetSampleSet();
             SampleSet additions = GetAdditions();
 
-            HashSet<SampleGeneratingArgs> normals = new HashSet<SampleGeneratingArgs>(Samples.Where(o => o.Hitsound == Hitsound.Normal).Select(o => o.SampleArgs));
-            HashSet<SampleGeneratingArgs> whistles = new HashSet<SampleGeneratingArgs>(Samples.Where(o => o.Hitsound == Hitsound.Whistle).Select(o => o.SampleArgs));
-            HashSet<SampleGeneratingArgs> finishes = new HashSet<SampleGeneratingArgs>(Samples.Where(o => o.Hitsound == Hitsound.Finish).Select(o => o.SampleArgs));
-            HashSet<SampleGeneratingArgs> claps = new HashSet<SampleGeneratingArgs>(Samples.Where(o => o.Hitsound == Hitsound.Clap).Select(o => o.SampleArgs));
+            HashSet<SampleGeneratingArgs> normals = new HashSet<SampleGeneratingArgs>(Samples.Where(o => o.Hitsound == Hitsound.Normal).Select(o => o.SampleArgs), comparer);
+            HashSet<SampleGeneratingArgs> whistles = new HashSet<SampleGeneratingArgs>(Samples.Where(o => o.Hitsound == Hitsound.Whistle).Select(o => o.SampleArgs), comparer);
+            HashSet<SampleGeneratingArgs> finishes = new HashSet<SampleGeneratingArgs>(Samples.Where(o => o.Hitsound == Hitsound.Finish).Select(o => o.SampleArgs), comparer);
+            HashSet<SampleGeneratingArgs> claps = new HashSet<SampleGeneratingArgs>(Samples.Where(o => o.Hitsound == Hitsound.Clap).Select(o => o.SampleArgs), comparer);
             
-            CustomIndex ci = new CustomIndex();
+            CustomIndex ci = new CustomIndex(comparer);
 
             if (sampleSet == SampleSet.Normal) {
                 ci.Samples["normal-hitnormal"] = normals;

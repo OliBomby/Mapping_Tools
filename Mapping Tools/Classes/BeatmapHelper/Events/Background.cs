@@ -14,11 +14,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         }
 
         public override string GetLine() {
-            // Dont write the offset if its 0,0
-            if (XOffset == 0 && YOffset == 0) {
-                return $"{EventType},{StartTime.ToInvariant()},\"{Filename}\"";
-            }
-
+            // Writing the offset is optional if its 0,0 but we add it anyways because that is what osu! does.
             return $"{EventType},{StartTime.ToInvariant()},\"{Filename}\",{XOffset.ToInvariant()},{YOffset.ToInvariant()}";
         }
 

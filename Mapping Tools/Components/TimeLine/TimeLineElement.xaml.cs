@@ -64,6 +64,17 @@ namespace Mapping_Tools.Components.TimeLine {
                         Color = Color.FromRgb(252, 66, 20)
                     };
                     break;
+                case 4:
+                    // Create a Brush  
+                    Inner = new SolidColorBrush {
+                        Color = Color.FromRgb(145, 37, 175)
+                    };
+
+                    // Create a Brush  
+                    Outer = new SolidColorBrush {
+                        Color = Color.FromRgb(172, 56, 190)
+                    };
+                    break;
                 default:
                     // Create a Brush  
                     Inner = new SolidColorBrush {

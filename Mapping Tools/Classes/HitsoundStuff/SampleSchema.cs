@@ -88,8 +88,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// Only maps the <see cref="SampleGeneratingArgs"/> which are non-mixed.
         /// </summary>
         /// <returns></returns>
-        public Dictionary<SampleGeneratingArgs, string> GetSampleNames() {
-            var sampleNames = new Dictionary<SampleGeneratingArgs, string>();
+        public Dictionary<SampleGeneratingArgs, string> GetSampleNames(SampleGeneratingArgsComparer comparer = null) {
+            var sampleNames = new Dictionary<SampleGeneratingArgs, string>(comparer ?? new SampleGeneratingArgsComparer());
 
             foreach (var kvp in this.Where(kvp => kvp.Value.Count == 1)) {
                 if (!sampleNames.ContainsKey(kvp.Value[0])) {
@@ -100,7 +100,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return sampleNames;
         }
 
-        public List<CustomIndex> GetCustomIndices() {
+        public List<CustomIndex> GetCustomIndices(SampleGeneratingArgsComparer comparer = null) {
+            if (comparer == null)
+                comparer = new SampleGeneratingArgsComparer();
+
             var customIndices = new Dictionary<int, CustomIndex>();
 
             foreach (var kvp in this) {
@@ -123,9 +126,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 if (customIndices.ContainsKey(index)) {
                     customIndices[index].Samples[hitsound] = new HashSet<SampleGeneratingArgs>(kvp.Value);
                 } else {
-                    var ci = new CustomIndex(index);
+                    var ci = new CustomIndex(index, comparer);
                     customIndices.Add(index, ci);
-                    ci.Samples[hitsound] = new HashSet<SampleGeneratingArgs>(kvp.Value);
+                    ci.Samples[hitsound] = new HashSet<SampleGeneratingArgs>(kvp.Value, comparer);
                 }
             }
 

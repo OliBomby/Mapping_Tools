@@ -123,20 +123,40 @@ namespace Mapping_Tools.Viewmodels {
         private HitsoundExporter.SampleExportFormat _singleSampleExportFormat;
         public HitsoundExporter.SampleExportFormat SingleSampleExportFormat {
             get => _singleSampleExportFormat;
-            set => Set(ref _singleSampleExportFormat, value);
+            set {
+                if (Set(ref _singleSampleExportFormat, value)) {
+                    RaisePropertyChanged(nameof(SingleSampleExportFormatDisplay));
+                    if (value == HitsoundExporter.SampleExportFormat.MidiChords) {
+                        MixedSampleExportFormat = value;
+                    } else if (MixedSampleExportFormat == HitsoundExporter.SampleExportFormat.MidiChords) {
+                        MixedSampleExportFormat = value;
+                    }
+                }
+            }
         }
 
         private HitsoundExporter.SampleExportFormat _mixedSampleExportFormat;
         public HitsoundExporter.SampleExportFormat MixedSampleExportFormat {
             get => _mixedSampleExportFormat;
-            set => Set(ref _mixedSampleExportFormat, value);
+            set {
+                if (Set(ref _mixedSampleExportFormat, value)) {
+                    RaisePropertyChanged(nameof(MixedSampleExportFormatDisplay));
+                    if (value == HitsoundExporter.SampleExportFormat.MidiChords) {
+                        SingleSampleExportFormat = value;
+                    } else if (SingleSampleExportFormat == HitsoundExporter.SampleExportFormat.MidiChords) {
+                        SingleSampleExportFormat = value;
+                    }
+                }
+            }
         }
 
         public readonly Dictionary<HitsoundExporter.SampleExportFormat, string> SampleExportFormatDisplayNameMapping = 
             new Dictionary<HitsoundExporter.SampleExportFormat, string> {{HitsoundExporter.SampleExportFormat.Default, "Default"}, 
                 {HitsoundExporter.SampleExportFormat.WaveIeeeFloat, "IEEE Float (.wav)"},
                 {HitsoundExporter.SampleExportFormat.WavePcm, "PCM 16-bit (.wav)"},
-                {HitsoundExporter.SampleExportFormat.OggVorbis, "Vorbis (.ogg)"}};
+                {HitsoundExporter.SampleExportFormat.OggVorbis, "Vorbis (.ogg)"},
+                {HitsoundExporter.SampleExportFormat.MidiChords, "Single-chord Midi (.mid)"}
+            };
 
         public IEnumerable<string> SampleExportFormatDisplayNames => SampleExportFormatDisplayNameMapping.Values;
 

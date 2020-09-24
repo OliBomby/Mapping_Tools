@@ -235,6 +235,7 @@
     <Compile Include="Classes\HitsoundStuff\Effects\Effect.cs" />
     <Compile Include="Classes\HitsoundStuff\Effects\EffectParameter.cs" />
     <Compile Include="Classes\HitsoundStuff\Effects\SoftLimiter.cs" />
+    <Compile Include="Classes\HitsoundStuff\SampleGeneratingArgsComparer.cs" />
     <Compile Include="Classes\HitsoundStuff\Hitsound.cs" />
     <Compile Include="Classes\HitsoundStuff\HitsoundLayerExtension.cs" />
     <Compile Include="Classes\HitsoundStuff\HitsoundZone.cs" />
@@ -242,6 +243,7 @@
     <Compile Include="Classes\HitsoundStuff\ImportReloadingArgsComparer.cs" />
     <Compile Include="Classes\HitsoundStuff\ImportType.cs" />
     <Compile Include="Classes\HitsoundStuff\LayerImportArgs.cs" />
+    <Compile Include="Classes\HitsoundStuff\MidiExporter.cs" />
     <Compile Include="Classes\HitsoundStuff\SampleGeneratingArgs.cs" />
     <Compile Include="Classes\HitsoundStuff\SampleImporter.cs" />
     <Compile Include="Classes\HitsoundStuff\CompleteHitsounds.cs" />
@@ -391,6 +393,7 @@
     <Compile Include="Classes\TimingStudio\Serialization\TimingPointType.cs" />
     <Compile Include="Classes\TimingStudio\Serialization\TimingStudioPreferences.cs" />
     <Compile Include="Classes\TimingStudio\StudioTimingPoint.cs" />
+    <Compile Include="Classes\Tools\AutoFailDetector.cs" />
     <Compile Include="Classes\Tools\BezierConverter.cs" />
     <Compile Include="Classes\Tools\CircleBezierPreset.cs" />
     <Compile Include="Classes\Tools\EditorReaderStuff.cs" />
@@ -523,6 +526,7 @@
     </Compile>
     <Compile Include="Classes\Tools\TimingPointsChange.cs" />
     <Compile Include="Properties\Annotations.cs" />
+    <Compile Include="Viewmodels\AutoFailDetectorVm.cs" />
     <Compile Include="Viewmodels\PatternGalleryVm.cs" />
     <Compile Include="Viewmodels\MapCleanerVm.cs" />
     <Compile Include="Viewmodels\HitsoundPreviewHelperVm.cs" />
@@ -549,6 +553,9 @@
     <Compile Include="Views\Extensions.cs" />
     <Compile Include="Views\ComboColourStudio\ComboColourStudioView.xaml.cs">
       <DependentUpon>ComboColourStudioView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\AutoFailDetector\AutoFailDetectorView.xaml.cs">
+      <DependentUpon>AutoFailDetectorView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\PatternGallery\PatternGalleryView.xaml.cs">
       <DependentUpon>PatternGalleryView.xaml</DependentUpon>
@@ -724,6 +731,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Components\Dialogs\BeatmapImportDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\AutoFailDetector\AutoFailDetectorView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

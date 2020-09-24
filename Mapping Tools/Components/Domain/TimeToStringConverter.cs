@@ -12,10 +12,14 @@ namespace Mapping_Tools.Components.Domain {
                 return "";
             }
 
+            var timeSpan = TimeSpan.FromMilliseconds(timeValue);
+
             try {
                 return parameter != null
                     ? value.ToInvariant()
-                    : $"{TimeSpan.FromMilliseconds(timeValue):mm\\:ss\\:fff}";
+                    : $"{(timeSpan.Days > 0 ? $"{timeSpan.Days:####}:" : string.Empty)}" +
+                      $"{(timeSpan.Hours > 0 ? $"{timeSpan.Hours:00}:" : string.Empty)}" +
+                      $"{timeSpan.Minutes:00}:{timeSpan.Seconds:00}:{timeSpan.Milliseconds:000}";
             } catch (OverflowException) {
                 return value.ToInvariant();
             }
@@ -26,10 +30,11 @@ namespace Mapping_Tools.Components.Domain {
                 return null;
             }
 
-            var bracketIndex = str.IndexOf("(", StringComparison.Ordinal);
-            if (TimeSpan.TryParseExact(str.Substring(0, bracketIndex == -1 ? str.Length : bracketIndex - 1).Trim(),
-                @"mm\:ss\:fff", culture, TimeSpanStyles.None, out var result)) {
-                return result.TotalMilliseconds;
+            try {
+                return TypeConverters.ParseOsuTimestamp(str).TotalMilliseconds;
+            }
+            catch (Exception e) {
+                Console.WriteLine(e);
             }
 
             if (parameter is string s) {

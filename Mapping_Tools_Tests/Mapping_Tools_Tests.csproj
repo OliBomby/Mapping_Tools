@@ -63,6 +63,7 @@
     <Compile Include="Classes\MathUtil\GradientDescentUtilTests.cs" />
     <Compile Include="Classes\SliderPathStuff\BezierSubdivisionTests.cs" />
     <Compile Include="Classes\SystemTools\ListenerManagerTests.cs" />
+    <Compile Include="Classes\SystemTools\TypeConvertersTests.cs" />
     <Compile Include="SerializationTests.cs" />
     <Compile Include="MathUtilTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

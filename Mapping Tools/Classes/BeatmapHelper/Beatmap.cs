@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Mapping_Tools.Classes.BeatmapHelper.Events;
 using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SystemTools;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
 
@@ -250,7 +251,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// Sorts all hitobjects in map by order of time.
         /// </summary>
         public void SortHitObjects() {
-            HitObjects = HitObjects.OrderBy(o => o.Time).ToList();
+            HitObjects.Sort();
         }
 
         /// <summary>
@@ -258,7 +259,12 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         public void CalculateSliderEndTimes() {
             foreach (var ho in HitObjects.Where(ho => ho.IsSlider)) {
-                ho.TemporalLength = BeatmapTiming.CalculateSliderTemporalLength(ho.Time, ho.PixelLength);
+                if (double.IsNaN(ho.PixelLength) || ho.PixelLength < 0 || ho.CurvePoints.All(o => o == ho.Pos)) {
+                    ho.TemporalLength = 0;
+                }
+                else {
+                    ho.TemporalLength = BeatmapTiming.CalculateSliderTemporalLength(ho.Time, ho.PixelLength);
+                }
             }
         }
         
@@ -469,6 +475,49 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             HitObjects?.ForEach(h => h.MoveTime(offset));
         }
 
+        private IEnumerable<Event> EnumerateAllEvents() {
+            return BackgroundAndVideoEvents.Concat(BreakPeriods).Concat(StoryboardSoundSamples)
+                .Concat(StoryboardLayerFail).Concat(StoryboardLayerPass).Concat(StoryboardLayerBackground)
+                .Concat(StoryboardLayerForeground).Concat(StoryboardLayerOverlay);
+        }
+
+        public double GetLeadInTime() {
+            var leadInTime = General["AudioLeadIn"].DoubleValue;
+            var od = Difficulty["OverallDifficulty"].DoubleValue;
+            var window50 = Math.Ceiling(200 - 10 * od);
+            var eventsWithStartTime = EnumerateAllEvents().OfType<IHasStartTime>().ToArray();
+            if (eventsWithStartTime.Length > 0)
+                leadInTime = Math.Max(-eventsWithStartTime.Min(o => o.StartTime), leadInTime);
+            if (HitObjects.Count > 0) {
+                var approachTime = ApproachRateToMs(Difficulty["ApproachRate"].DoubleValue);
+                leadInTime = Math.Max(approachTime - HitObjects[0].Time, leadInTime);
+            }
+            return leadInTime + window50 + 1000;
+        }
+
+        public double GetMapStartTime() {
+            return -GetLeadInTime();
+        }
+
+        public double GetMapEndTime() {
+            var endTime = HitObjects.Count > 0
+                ? Math.Max(GetHitObjectEndTime() + 200, HitObjects.Last().EndTime + 3000)
+                : double.NegativeInfinity;
+            var eventsWithEndTime = EnumerateAllEvents().OfType<IHasEndTime>().ToArray();
+            if (eventsWithEndTime.Length > 0)
+                endTime = Math.Max(endTime, eventsWithEndTime.Max(o => o.EndTime) - 500);
+            return endTime;
+        }
+
+        /// <summary>
+        /// Gets the time at which auto-fail gets checked by osu!
+        /// The counted judgements must add up to the object count at this time.
+        /// </summary>
+        /// <returns></returns>
+        public double GetAutoFailCheckTime() {
+            return GetHitObjectEndTime() + 200;
+        }
+
         /// <summary>
         /// Finds the objects refered by specified time code.
         /// Example time code: <example>00:56:823 (1,2,1,2) - </example>
@@ -497,9 +546,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
 
             // Parse the time span in the code
-            var time = TimeSpan.ParseExact(
-                code.Substring(0, startBracketIndex == -1 ? code.Length : startBracketIndex - 1).Trim(),
-                @"mm\:ss\:fff", CultureInfo.InvariantCulture, TimeSpanStyles.None).TotalMilliseconds;
+            var time = TypeConverters.ParseOsuTimestamp(code).TotalMilliseconds;
 
             // Enumerate through the hit objects from the first object at the time
             int objectIndex = HitObjects.FindIndex(h => h.Time >= time);
