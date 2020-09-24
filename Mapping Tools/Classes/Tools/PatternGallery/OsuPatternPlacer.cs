@@ -156,6 +156,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             public double EndTime;
             public double BeatGap;
             public double BeatLength;
+            public List<HitObject> HitObjects;
 
             public Part(double startTime, double endTime, double beatGap, double beatLength) {
                 StartTime = startTime;
@@ -189,13 +190,6 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             tp.Offset = ho.Time;
             tp.Uninherited = false;
             return new TimingPointsChange(tp, sampleset: true, index: true, volume: true);
-        }
-
-        private static TimingPointsChange GetTimingPointsChange(TimingPoint tp, bool sv, bool hs) {
-            tp = tp.Copy();
-            tp.MpB = tp.Uninherited ? -100 : tp.MpB;
-            tp.Uninherited = false;
-            return new TimingPointsChange(tp, sv, false, hs, hs, hs);
         }
 
         private static TimingPointsChange GetBpmChange(TimingPoint tp, double? customOffset = null) {
