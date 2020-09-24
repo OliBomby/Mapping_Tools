@@ -40,8 +40,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff
             } else {
                 // Make new timing points
                 // Add red lines
-                List<TimingPoint> timingPoints = beatmap.BeatmapTiming.GetAllRedlines();
-                List<TimingPointsChange> timingPointsChanges = timingPoints.Select(tp =>
+                var redlines = beatmap.BeatmapTiming.Redlines;
+                List<TimingPointsChange> timingPointsChanges = redlines.Select(tp =>
                         new TimingPointsChange(tp, mpb: true, meter: true, unInherited: true, omitFirstBarLine: true))
                     .ToList();
 
@@ -64,7 +64,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
                 }
 
                 // Replace the old timingpoints
-                beatmap.BeatmapTiming.TimingPoints.Clear();
+                beatmap.BeatmapTiming.Clear();
                 TimingPointsChange.ApplyChanges(beatmap.BeatmapTiming, timingPointsChanges);
             }
 

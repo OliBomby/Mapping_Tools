@@ -159,7 +159,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                             where beatmapFrom.HitObjects.Any(o => o.Time < tp.Offset && o.EndTime > tp.Offset)
                             where !tp.Uninherited
                             select tp) {
-                            beatmapTo.BeatmapTiming.TimingPoints.Remove(tp);
+                            beatmapTo.BeatmapTiming.Remove(tp);
                         }
 
                         // Get timingpointschanges for every timingpoint from beatmapFrom that is in a sliderbody/spinnerbody for both beatmapTo and BeatmapFrom

@@ -73,24 +73,28 @@ namespace Mapping_Tools.Views.TimingCopier {
                 // If a greenline exists at the same time as a redline then the redline ceizes to exist
                 // Else convert the redline to a greenline: Inherited = false & MpB = -100
                 List<TimingPoint> removeList = new List<TimingPoint>();
-                foreach (TimingPoint redline in timingTo.GetAllRedlines()) {
+                foreach (TimingPoint redline in timingTo.Redlines) {
                     TimingPoint greenlineHere = timingTo.GetGreenlineAtTime(redline.Offset);
-                    if (greenlineHere.Offset == redline.Offset) {
-                        removeList.Add(redline);
-                    } else {
-                        redline.Uninherited = false;
-                        redline.MpB = -100;
+
+                    if (greenlineHere.Offset != redline.Offset) {
+                        var newGreenline = redline.Copy();
+                        newGreenline.Uninherited = false;
+                        newGreenline.MpB = -100;
+
+                        timingTo.Add(newGreenline);
                     }
+
+                    removeList.Add(redline);
                 }
                 foreach (TimingPoint tp in removeList) {
-                    timingTo.TimingPoints.Remove(tp);
+                    timingTo.Remove(tp);
                 }
 
                 // Make new timing points changes
                 List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
 
                 // Add redlines
-                List<TimingPoint> redlines = timingFrom.GetAllRedlines();
+                var redlines = timingFrom.Redlines;
                 foreach (TimingPoint tp in redlines) {
                     timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, meter: true, unInherited: true, omitFirstBarLine: true));
                 }
@@ -99,7 +103,7 @@ namespace Mapping_Tools.Views.TimingCopier {
                 TimingPointsChange.ApplyChanges(timingTo, timingPointsChanges);
 
                 if (arg.ResnapMode == "Number of beats between objects stays the same") {
-                    redlines = timingTo.GetAllRedlines();
+                    redlines = timingTo.Redlines;
                     List<double> newBookmarks = new List<double>();
                     double lastTime = redlines.FirstOrDefault().Offset;
                     foreach (Marker marker in markers) {
@@ -147,10 +151,11 @@ namespace Mapping_Tools.Views.TimingCopier {
                     }
 
                     // Resnap greenlines
-                    foreach (TimingPoint tp in timingTo.GetAllGreenlines())
+                    foreach (TimingPoint tp in timingTo.Greenlines)
                     {
                         tp.ResnapSelf(timingTo, arg.Snap1, arg.Snap2, firstTP: redlines.FirstOrDefault());
                     }
+                    timingTo.Sort();
                 } else {
                     // Don't move objects
                 }
@@ -171,7 +176,7 @@ namespace Mapping_Tools.Views.TimingCopier {
 
         private List<Marker> GetMarkers(Beatmap beatmap, Timing timing) {
             List<Marker> markers = new List<Marker>();
-            List<TimingPoint> redlines = timing.GetAllRedlines();
+            var redlines = timing.Redlines;
 
             foreach (HitObject ho in beatmap.HitObjects) {
                 markers.Add(new Marker(ho));

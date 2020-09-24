@@ -312,7 +312,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 ho.TimingPoint = BeatmapTiming.GetTimingPointAtTime(ho.Time);
                 ho.HitsoundTimingPoint = BeatmapTiming.GetTimingPointAtTime(ho.Time + 5);
                 ho.UnInheritedTimingPoint = BeatmapTiming.GetRedlineAtTime(ho.Time);
-                ho.BodyHitsounds = BeatmapTiming.GetTimingPointsInTimeRange(ho.Time, ho.EndTime, false);
+                ho.BodyHitsounds = BeatmapTiming.GetTimingPointsInRange(ho.Time, ho.EndTime, false);
                 foreach (var time in ho.GetAllTloTimes(BeatmapTiming)) {
                     ho.BodyHitsounds.RemoveAll(o => Math.Abs(time - o.Offset) <= 5);
                 }
@@ -465,7 +465,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public void OffsetTime(double offset) {
-            BeatmapTiming.TimingPoints?.ForEach(tp => tp.Offset += offset);
+            BeatmapTiming.Offset(offset);
             HitObjects?.ForEach(h => h.MoveTime(offset));
         }
 

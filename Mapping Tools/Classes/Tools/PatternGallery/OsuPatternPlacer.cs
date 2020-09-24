@@ -174,7 +174,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
         /// <param name="endTime"></param>
         private static void RemovePartOfBeatmap(Beatmap beatmap, double startTime, double endTime) {
             beatmap.HitObjects.RemoveAll(h => h.Time >= startTime && h.Time <= endTime);
-            beatmap.BeatmapTiming.TimingPoints.RemoveAll(tp => tp.Offset >= startTime && tp.Offset <= endTime);
+            beatmap.BeatmapTiming.RemoveAll(tp => tp.Offset >= startTime && tp.Offset <= endTime);
         }
 
         private static TimingPointsChange GetSvChange(HitObject ho) {
@@ -249,7 +249,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 var endTime = part.EndTime;  // Subtract one to omit BPM changes right on the end of the part.
 
                 // Add the original timing between the last part and this part
-                timingChanges.AddRange(originalTiming.GetRedlinesInTimeRange(lastEndTime, startTime - 1).Select(o => GetBpmChange(o)));
+                timingChanges.AddRange(originalTiming.GetRedlinesInRange(lastEndTime, startTime - 1).Select(o => GetBpmChange(o)));
 
                 var startOriginalRedline = originalTiming.GetRedlineAtTime(startTime);
 
@@ -262,11 +262,11 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 switch (TimingOverwriteMode) {
                     case TimingOverwriteMode.PatternTimingOnly:
                         // Subtract one from the end time to omit BPM changes right on the end of the part.
-                        inPartRedlines = patternTiming.GetRedlinesInTimeRange(startTime, endTime - 1).ToArray();
+                        inPartRedlines = patternTiming.GetRedlinesInRange(startTime, endTime - 1).ToArray();
                         startPartRedline = patternTiming.GetRedlineAtTime(startTime);
                         break;
                     case TimingOverwriteMode.InPatternAbsoluteTiming:
-                        var tempInPartRedlines = patternTiming.GetRedlinesInTimeRange(startTime, endTime - 1);
+                        var tempInPartRedlines = patternTiming.GetRedlinesInRange(startTime, endTime - 1);
 
                         // Replace all parts in the pattern which have the default BPM to timing from the target beatmap.
                         inPartRedlines = tempInPartRedlines.Select(tp => {
@@ -284,8 +284,8 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                     case TimingOverwriteMode.InPatternRelativeTiming:
                         // Multiply mix the pattern timing and the original timing together.
                         // The pattern timing divided by the default BPM will be used as a scalar for the original timing.
-                        var tempInPartRedlines2 = patternTiming.GetRedlinesInTimeRange(startTime, endTime - 1);
-                        var tempInOriginalRedlines = originalTiming.GetRedlinesInTimeRange(startTime, endTime - 1);
+                        var tempInPartRedlines2 = patternTiming.GetRedlinesInRange(startTime, endTime - 1);
+                        var tempInOriginalRedlines = originalTiming.GetRedlinesInRange(startTime, endTime - 1);
 
                         // Replace all parts in the pattern which have the default BPM to timing from the target beatmap.
                         inPartRedlines = tempInPartRedlines2.Select(tp => {
@@ -304,7 +304,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                     case TimingOverwriteMode.OriginalTimingOnly:
                     default:
                         // Subtract one from the end time to omit BPM changes right on the end of the part.
-                        inPartRedlines = originalTiming.GetRedlinesInTimeRange(startTime, endTime - 1).ToArray();
+                        inPartRedlines = originalTiming.GetRedlinesInRange(startTime, endTime - 1).ToArray();
                         startPartRedline = originalTiming.GetRedlineAtTime(startTime);
                         break;
                 }
@@ -325,7 +325,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
 
                 // Do the same thing at the end of the pattern to make sure the BPM goes back to normal after the pattern.
                 var endOriginalRedline = originalTiming.GetRedlineAtTime(endTime);
-                var endPartRedline = inPartRedlines.Last();
+                var endPartRedline = inPartRedlines.LastOrDefault() ?? startPartRedline;
                 if (Math.Abs(endPartRedline.MpB - endOriginalRedline.MpB) > Precision.DOUBLE_EPSILON) {
                     // We dont have to add the redline again if its already during the parts in between parts.
                     if (Math.Abs(endOriginalRedline.Offset - endTime) > Precision.DOUBLE_EPSILON) {
@@ -337,7 +337,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             }
 
             // Add the original timing between the last part and the rest of the map
-            timingChanges.AddRange(originalTiming.GetRedlinesInTimeRange(lastEndTime, double.PositiveInfinity).Select(o => GetBpmChange(o)));
+            timingChanges.AddRange(originalTiming.GetRedlinesInRange(lastEndTime, double.PositiveInfinity).Select(o => GetBpmChange(o)));
 
             // Make the new timing from the timing changes
             Timing newTiming = new Timing(beatmap.BeatmapTiming.SliderMultiplier);
@@ -415,7 +415,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             timingPointsChanges = new List<TimingPointsChange>();
 
             // Add redlines
-            List<TimingPoint> redlines = newTiming.GetAllRedlines();
+            var redlines = newTiming.Redlines;
             foreach (TimingPoint tp in redlines) {
                 timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, meter: true, unInherited: true, omitFirstBarLine: true));
             }
@@ -465,7 +465,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             }
             
             // Replace the old timingpoints
-            patternTiming.TimingPoints.Clear();
+            patternTiming.Clear();
             TimingPointsChange.ApplyChanges(newTiming, timingPointsChanges);
 
             patternBeatmap.GiveObjectsGreenlines();

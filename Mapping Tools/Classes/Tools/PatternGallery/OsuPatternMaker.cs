@@ -37,20 +37,18 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             var endTime = patternBeatmap.GetHitObjectEndTime() + Padding;
 
             // Keep the timing points in the range of the hitobjects
-            patternBeatmap.BeatmapTiming.TimingPoints = patternBeatmap.BeatmapTiming.TimingPoints
-                .Where(tp => tp.Offset >= startTime && tp.Offset <= endTime).ToList();
+            patternBeatmap.BeatmapTiming.RemoveAll(tp => !(tp.Offset >= startTime && tp.Offset <= endTime));
 
             // Add some earlier timing points if necessary
             var firstUnInheritedTimingPoint = patternBeatmap.HitObjects.First().UnInheritedTimingPoint;
             var firstNormalTimingPoint = patternBeatmap.HitObjects.First().TimingPoint;
 
-            if (!patternBeatmap.BeatmapTiming.TimingPoints.Contains(firstUnInheritedTimingPoint)) {
-                patternBeatmap.BeatmapTiming.TimingPoints.Add(firstUnInheritedTimingPoint);
+            if (!patternBeatmap.BeatmapTiming.Contains(firstUnInheritedTimingPoint)) {
+                patternBeatmap.BeatmapTiming.Add(firstUnInheritedTimingPoint);
             }
-            if (!patternBeatmap.BeatmapTiming.TimingPoints.Contains(firstNormalTimingPoint)) {
-                patternBeatmap.BeatmapTiming.TimingPoints.Add(firstNormalTimingPoint);
+            if (!patternBeatmap.BeatmapTiming.Contains(firstNormalTimingPoint)) {
+                patternBeatmap.BeatmapTiming.Add(firstNormalTimingPoint);
             }
-            patternBeatmap.BeatmapTiming.Sort();
 
             // Generate a file name and save the pattern
             var now = DateTime.Now;

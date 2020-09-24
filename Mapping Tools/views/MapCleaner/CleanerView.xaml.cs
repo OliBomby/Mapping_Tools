@@ -108,7 +108,7 @@ namespace Mapping_Tools.Views.MapCleaner {
                 int removed = oldTimingPointsCount - editor.Beatmap.BeatmapTiming.TimingPoints.Count;
                 result.TimingPointsRemoved += removed;
 
-                List<TimingPoint> newTimingPoints = editor.Beatmap.BeatmapTiming.TimingPoints;
+                var newTimingPoints = editor.Beatmap.BeatmapTiming.TimingPoints;
                 Monitor_Differences(orgininalTimingPoints, newTimingPoints);
 
                 // Save the file
@@ -141,7 +141,7 @@ namespace Mapping_Tools.Views.MapCleaner {
             return args.Quick ? string.Empty : message;
         }
 
-        private void Monitor_Differences(List<TimingPoint> originalTimingPoints, List<TimingPoint> newTimingPoints) {
+        private void Monitor_Differences(IReadOnlyList<TimingPoint> originalTimingPoints, IReadOnlyList<TimingPoint> newTimingPoints) {
             // Take note of all the changes
             _timingpointsChanged = new List<double>();
 
@@ -167,8 +167,12 @@ namespace Mapping_Tools.Views.MapCleaner {
 
             List<double> originalOffsets = new List<double>();
             List<double> newOffsets = new List<double>();
-            originalTimingPoints.ForEach(o => originalOffsets.Add(o.Offset));
-            newTimingPoints.ForEach(o => newOffsets.Add(o.Offset));
+            foreach (var originalTimingPoint in originalTimingPoints) {
+                originalOffsets.Add(originalTimingPoint.Offset);
+            }
+            foreach (var newTimingPoint in newTimingPoints) {
+                newOffsets.Add(newTimingPoint.Offset);
+            }
 
             _timingpointsRemoved = originalOffsets.Except(newOffsets).ToList();
             _timingpointsAdded = newOffsets.Except(originalOffsets).ToList();
