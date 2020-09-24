@@ -85,7 +85,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                     // Copy from an empty beatmap similar to the map to copy to
                     beatmapFrom = beatmapTo.DeepCopy();
                     beatmapFrom.HitObjects.Clear();
-                    beatmapFrom.BeatmapTiming.TimingPoints.Clear();
+                    beatmapFrom.BeatmapTiming.Clear();
                 }
 
                 Timeline processedTimeline;
