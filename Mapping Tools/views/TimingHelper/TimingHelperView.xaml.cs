@@ -101,7 +101,7 @@ namespace Mapping_Tools.Views.TimingHelper {
 
                 // If there are no redlines add one with a default BPM
                 if (!timing.TimingPoints.Any(tp => tp.Uninherited)) {
-                    timing.TimingPoints.Add(new TimingPoint(0, 1000, 4, SampleSet.Soft, 0, 100, true, false, false));
+                    timing.Add(new TimingPoint(0, 1000, 4, SampleSet.Soft, 0, 100, true, false, false));
                 }
 
                 // Calculate the beats between time and the last time or redline for each time
@@ -156,7 +156,7 @@ namespace Mapping_Tools.Views.TimingHelper {
                 // Remove redlines except the first redline
                 if (!arg.Redlines) {
                     var first = timing.TimingPoints.FirstOrDefault(o => o.Uninherited);
-                    timing.TimingPoints.RemoveAll(o => o.Uninherited && o != first);
+                    timing.RemoveAll(o => o.Uninherited && o != first);
                 }
 
                 // Update progressbar
@@ -216,8 +216,7 @@ namespace Mapping_Tools.Views.TimingHelper {
                         newRedline.SampleIndex = lastHitsounds.SampleIndex;
                         newRedline.SampleSet = lastHitsounds.SampleSet;
                         newRedline.Volume = lastHitsounds.Volume;
-                        timing.TimingPoints.Add(newRedline);
-                        timing.Sort();
+                        timing.Add(newRedline);
 
                         // Set the MpB
                         newRedline.MpB = GetMpB(time - lastTime, beatsFromLastMarker, arg.Leniency);

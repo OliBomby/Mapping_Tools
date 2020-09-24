@@ -44,7 +44,6 @@ namespace Mapping_Tools.Classes.Tools {
 
             Beatmap beatmap = editor.Beatmap;
             Timing timing = beatmap.BeatmapTiming;
-            Timeline timeline = beatmap.GetTimeline();
 
             GameMode mode = (GameMode)beatmap.General["Mode"].IntValue;
             double circleSize = beatmap.Difficulty["CircleSize"].DoubleValue;
@@ -113,11 +112,14 @@ namespace Mapping_Tools.Classes.Tools {
                 UpdateProgressBar(worker, 45);
             }
 
+            // Collect timeline objects after resnapping
+            Timeline timeline = beatmap.GetTimeline();
+
             // Make new timingpoints
             List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
 
             // Add redlines
-            List<TimingPoint> redlines = timing.GetAllRedlines();
+            var redlines = timing.Redlines;
             foreach (TimingPoint tp in redlines) {
                 timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, meter: true, unInherited: true, omitFirstBarLine: true));
             }
@@ -256,7 +258,7 @@ namespace Mapping_Tools.Classes.Tools {
             UpdateProgressBar(worker, 85);
             
             // Replace the old timingpoints
-            timing.TimingPoints.Clear();
+            timing.Clear();
             TimingPointsChange.ApplyChanges(timing, timingPointsChanges);
             beatmap.GiveObjectsGreenlines();
 

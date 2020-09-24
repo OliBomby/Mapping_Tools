@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
-    public class TimingPoint : ITextLine {
+    public class TimingPoint : ITextLine, IComparable<TimingPoint> {
         // Offset, Milliseconds per Beat, Meter, Sample Set, Sample Index, Volume, Inherited, Kiai Mode
         /// <summary>
         /// The millisecond value of the timing point.
@@ -287,6 +287,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             } else {
                 MpB = -100 / bpm;
             }
+        }
+
+        public int CompareTo(TimingPoint other) {
+            if (ReferenceEquals(this, other)) return 0;
+            if (ReferenceEquals(null, other)) return 1;
+            var offsetComparison = Offset.CompareTo(other.Offset);
+            if (offsetComparison != 0) return offsetComparison;
+            return -Uninherited.CompareTo(other.Uninherited);
         }
     }
 }

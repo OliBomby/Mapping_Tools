@@ -345,7 +345,7 @@ namespace Mapping_Tools.Classes.Tools {
         {
             beatmap.SetBookmarks(reader.bookmarks.Select<int, double>(o => o).ToList());
 
-            beatmap.BeatmapTiming.TimingPoints = reader.controlPoints.Select(o => (TimingPoint)o).ToList();
+            beatmap.BeatmapTiming.SetTimingPoints(reader.controlPoints.Select(o => (TimingPoint)o).ToList());
 
             List<HitObject> selected = new List<HitObject>();
             beatmap.HitObjects = reader.hitObjects.Select(o => {
@@ -363,7 +363,6 @@ namespace Mapping_Tools.Classes.Tools {
 
             // Sort the stuff
             beatmap.HitObjects = beatmap.HitObjects.OrderBy(o => o.Time).ToList();
-            beatmap.BeatmapTiming.Sort();
 
             beatmap.CalculateHitObjectComboStuff();
             beatmap.CalculateSliderEndTimes();

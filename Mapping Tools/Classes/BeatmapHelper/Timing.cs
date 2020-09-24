@@ -1,5 +1,6 @@
 ﻿using Mapping_Tools.Classes.MathUtil;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Mapping_Tools.Classes.HitsoundStuff;
@@ -11,38 +12,175 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
     /// With this object you can always calculate the slider velocity at any time.
     /// <see cref="Beatmap"/> objects use this object to store all timing data.
     /// </summary>
-    public class Timing {
+    public class Timing : IList<TimingPoint> {
         /// <summary>
         /// List of all timing points. This included uninherited timing points and inherited timing points.
         /// This list should be sorted at all times.
         /// </summary>
-        public List<TimingPoint> TimingPoints { get; set; }
+        private List<TimingPoint> _timingPoints { get; set; }
+        private List<TimingPoint> _redlines { get; set; }
+        private List<TimingPoint> _greenlines { get; set; }
+
+        public IReadOnlyList<TimingPoint> TimingPoints => _timingPoints;
+        public IReadOnlyList<TimingPoint> Redlines => _redlines;
+        public IReadOnlyList<TimingPoint> Greenlines => _greenlines;
 
         /// <summary>
         /// The global slider multiplier of a <see cref="Beatmap"/>. This is here for convenience sake to calculate absolute slider velocities.
         /// </summary>
         public double SliderMultiplier { get; set; }
 
-        /// <inheritdoc />
-        public Timing(List<TimingPoint> timingPoints, double sliderMultiplier) {
-            TimingPoints = timingPoints;
+        public Timing(double sliderMultiplier) {
+            SetTimingPoints(null);
             SliderMultiplier = sliderMultiplier;
-            Sort();
         }
 
         /// <inheritdoc />
-        public Timing(List<string> timingLines, double sliderMultiplier) {
-            TimingPoints = GetTimingPoints(timingLines);
+        public Timing(List<TimingPoint> timingPoints, double sliderMultiplier) {
+            SetTimingPoints(timingPoints);
             SliderMultiplier = sliderMultiplier;
-            Sort();
+        }
+
+        /// <inheritdoc />
+        public Timing(IEnumerable<string> timingLines, double sliderMultiplier) {
+            SetTimingPoints(GetTimingPoints(timingLines).ToList());
+            SliderMultiplier = sliderMultiplier;
+        }
+
+        /// <summary>
+        /// Replaces all the timingpoints and sorts again.
+        /// </summary>
+        /// <param name="timingPoints"></param>
+        public void SetTimingPoints(List<TimingPoint> timingPoints) {
+            _timingPoints = timingPoints ?? new List<TimingPoint>();
+            _timingPoints.Sort();
+            _redlines = _timingPoints.Where(tp => tp.Uninherited).ToList();
+            _greenlines = _timingPoints.Where(tp => !tp.Uninherited).ToList();
         }
 
         /// <summary>
         /// Sorts all <see cref="TimingPoint"/> in order of time.
         /// </summary>
         public void Sort() {
-            TimingPoints = TimingPoints.OrderBy(o => o.Offset).ThenByDescending(o => o.Uninherited).ToList();
+            _timingPoints.Sort();
+            _redlines.Sort();
+            _greenlines.Sort();
         }
+
+        #region BasicOperations
+
+        public void Add(TimingPoint tp) {
+            if (tp == null) return;
+
+            var index = _timingPoints.BinarySearch(tp);
+            if (index < 0)
+                index = ~index;
+
+            _timingPoints.Insert(index, tp);
+
+            if (tp.Uninherited) {
+                index = _redlines.BinarySearch(tp);
+                if (index < 0)
+                    index = ~index;
+
+                _redlines.Insert(index, tp);
+            } else {
+                index = _greenlines.BinarySearch(tp);
+                if (index < 0)
+                    index = ~index;
+
+                _greenlines.Insert(index, tp);
+            }
+        }
+
+        public bool Remove(TimingPoint tp) {
+            var index = _timingPoints.BinarySearch(tp);
+            if (index >= 0) {
+                _timingPoints.RemoveAt(index);
+            }
+
+            if (tp.Uninherited) {
+                index = _redlines.BinarySearch(tp);
+                if (index >= 0) {
+                    _redlines.RemoveAt(index);
+                    return true;
+                }
+            } else {
+                index = _greenlines.BinarySearch(tp);
+                if (index >= 0) {
+                    _greenlines.RemoveAt(index);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public void CopyTo(TimingPoint[] array, int arrayIndex) {
+            _timingPoints.CopyTo(array, arrayIndex);
+        }
+
+        bool ICollection<TimingPoint>.Remove(TimingPoint tp) {
+            return tp != null && Remove(tp);
+        }
+
+        public int Count => _timingPoints.Count;
+        public bool IsReadOnly => false;
+
+        public void Clear() {
+            _timingPoints.Clear();
+            _redlines.Clear();
+            _greenlines.Clear();
+        }
+
+        public bool Contains(TimingPoint item) {
+            return _timingPoints.Contains(item);
+        }
+
+        public void Offset(double offset) {
+            _timingPoints.ForEach(tp => tp.Offset += offset);
+        }
+
+        public int RemoveAll(Func<TimingPoint, bool> match) {
+            var itemsToRemove = _timingPoints.Where(match).ToList();
+
+            foreach (var itemToRemove in itemsToRemove) {
+                Remove(itemToRemove);
+            }
+
+            return itemsToRemove.Count;
+        }
+
+        public IEnumerator<TimingPoint> GetEnumerator() {
+            return _timingPoints.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() {
+            return GetEnumerator();
+        }
+
+        public int IndexOf(TimingPoint item) {
+            return _timingPoints.IndexOf(item);
+        }
+
+        /// <summary>
+        /// Ignores index so it remains sorted.
+        /// </summary>
+        public void Insert(int index, TimingPoint item) {
+            Add(item);
+        }
+
+        public void RemoveAt(int index) {
+            var itemToRemove = _timingPoints[index];
+            Remove(itemToRemove);
+        }
+
+        public TimingPoint this[int index] {
+            get => _timingPoints[index];
+            set => _timingPoints[index] = value;
+        }
+
+        #endregion
 
         /// <summary>
         /// Calculates the number of beats between the start time and the end time.
@@ -53,8 +191,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="round">To round the number of beats to a snap divisor.</param>
         /// <returns></returns>
         public double GetBeatLength(double startTime, double endTime, bool round = false) {
-            var redlines = GetTimingPointsInTimeRange(startTime, endTime)
-                .Where(tp => tp.Uninherited);
+            var redlines = GetRedlinesInRange(startTime, endTime, false);
 
             double beats = 0;
             double lastTime = startTime;
@@ -135,7 +272,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
             double newTime = snapDistance3 < snapDistance2 ? newTime3 : newTime2;
 
-            if( afterTp != null && newTime >= afterTp.Offset - 10 ) {
+            if( afterTp != null && newTime > beforeTp.Offset + 10 && newTime >= afterTp.Offset - 10 ) {
                 newTime = afterTp.Offset;
             }
             return floor ? Math.Floor(newTime) : newTime;
@@ -179,17 +316,58 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         /// <summary>
-        /// Calculates the size of the effective time range of a given timing point.
-        /// This range stops at the next timing point, so it just returns the offset of the next timing point.
+        /// Finds the timing point which is in effect at a given time with a custom set of timing points.
         /// </summary>
-        /// <param name="timingPoint"></param>
-        /// <returns>The timing point after specified timing point.</returns>
-        public double GetTimingPointEffectiveRange(TimingPoint timingPoint) {
-            foreach (var tp in TimingPoints.Where(tp => Precision.DefinitelyBigger(tp.Offset, timingPoint.Offset))) {
-                return tp.Offset;
+        /// <param name="time"></param>
+        /// <param name="timingPoints">All the timing points.</param>
+        /// <param name="firstTimingpoint">The first timing point to start searching from.</param>
+        /// <returns></returns>
+        public static TimingPoint GetTimingPointAtTime(double time, IReadOnlyList<TimingPoint> timingPoints, TimingPoint firstTimingpoint) {
+            var index = BinarySearchUtil.BinarySearch(timingPoints, time, tp => tp.Offset, BinarySearchUtil.EqualitySelection.Rightmost);
+            if (index < 0) {
+                index = ~index;
+                return index == 0 ? firstTimingpoint : timingPoints[index - 1];
             }
 
-            return double.PositiveInfinity; // Being the last timingpoint, the effective range is infinite (very big)
+            return timingPoints[index];
+        }
+
+        /// <summary>
+        /// Gets the first timing point after specified time.
+        /// </summary>
+        /// <param name="time"></param>
+        /// <param name="timingPoints"></param>
+        /// <returns></returns>
+        public static TimingPoint GetTimingPointAfterTime(double time, IReadOnlyList<TimingPoint> timingPoints) {
+            var index = BinarySearchUtil.BinarySearch(timingPoints, time, tp => tp.Offset, BinarySearchUtil.EqualitySelection.Rightmost);
+            if (index < 0) {
+                index = ~index;
+
+                return index < timingPoints.Count ? timingPoints[index] : null;
+            }
+
+            return index + 1 < timingPoints.Count ? timingPoints[index + 1] : null;
+        }
+
+        public static List<TimingPoint> GetTimingPointsInRange(double startTime, double endTime,
+            List<TimingPoint> timingPoints, bool inclusive = true) {
+            if (!inclusive) {
+                startTime += Precision.DOUBLE_EPSILON;
+                endTime -= Precision.DOUBLE_EPSILON;
+            } else {
+                startTime -= Precision.DOUBLE_EPSILON;
+                endTime += Precision.DOUBLE_EPSILON;
+            }
+
+            var startIndex = BinarySearchUtil.BinarySearch(timingPoints, startTime, tp => tp.Offset, BinarySearchUtil.EqualitySelection.Leftmost);
+            if (startIndex < 0)
+                startIndex = ~startIndex;
+
+            var endIndex = BinarySearchUtil.BinarySearch(timingPoints, endTime, tp => tp.Offset, BinarySearchUtil.EqualitySelection.Rightmost);
+            if (endIndex < 0)
+                endIndex = ~endIndex - 1;
+
+            return timingPoints.GetRange(startIndex, Math.Max(endIndex - startIndex + 1, 0));
         }
 
         /// <summary>
@@ -198,25 +376,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="time"></param>
         /// <returns></returns>
         public TimingPoint GetTimingPointAtTime(double time) {
-            return GetTimingPointAtTime(time, TimingPoints, GetFirstTimingPointExtended());
-        }
-
-        /// <summary>
-        /// Finds the timing point which is in effect at a given time with a custom set of timing points.
-        /// </summary>
-        /// <param name="time"></param>
-        /// <param name="timingPoints">All the timing points.</param>
-        /// <param name="firstTimingpoint">The first timing point to start searching from.</param>
-        /// <returns></returns>
-        public static TimingPoint GetTimingPointAtTime(double time, List<TimingPoint> timingPoints, TimingPoint firstTimingpoint) {
-            TimingPoint lastTp = firstTimingpoint;
-            foreach (TimingPoint tp in timingPoints) {
-                if (Precision.DefinitelyBigger(tp.Offset, time)) {
-                    return lastTp;
-                }
-                lastTp = tp;
-            }
-            return lastTp;
+            return GetTimingPointAtTime(time, _timingPoints, GetFirstTimingPointExtended());
         }
 
         /// <summary>
@@ -224,9 +384,21 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         /// <param name="startTime"></param>
         /// <param name="endTime"></param>
+        /// <param name="inclusive"></param>
         /// <returns></returns>
-        public List<TimingPoint> GetTimingPointsInTimeRange(double startTime, double endTime) {
-            return TimingPoints.Where(tp => Precision.DefinitelyBigger(tp.Offset, startTime) && Precision.DefinitelyBigger(endTime, tp.Offset)).ToList();
+        public List<TimingPoint> GetTimingPointsInRange(double startTime, double endTime, bool inclusive = true) {
+            return GetTimingPointsInRange(startTime, endTime, _timingPoints, inclusive);
+        }
+
+        /// <summary>
+        /// Finds all the uninherited timing points in a specified time range.
+        /// </summary>
+        /// <param name="startTime"></param>
+        /// <param name="endTime"></param>
+        /// <param name="inclusive"></param>
+        /// <returns></returns>
+        public List<TimingPoint> GetRedlinesInRange(double startTime, double endTime, bool inclusive = true) {
+            return GetTimingPointsInRange(startTime, endTime, _redlines, inclusive);
         }
 
         /// <summary>
@@ -253,16 +425,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="time"></param>
         /// <returns></returns>
         public TimingPoint GetGreenlineAtTime(double time) {
-            TimingPoint lastTp = GetFirstTimingPointExtended();
-            foreach (TimingPoint tp in TimingPoints) {
-                if (Precision.DefinitelyBigger(tp.Offset, time)) {
-                    return lastTp;
-                }
-                if (!tp.Uninherited) {
-                    lastTp = tp;
-                }
-            }
-            return lastTp;
+            return GetTimingPointAtTime(time, _greenlines, GetFirstTimingPointExtended());
         }
 
         /// <summary>
@@ -272,16 +435,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="firstTimingPoint"></param>
         /// <returns></returns>
         public TimingPoint GetRedlineAtTime(double time, TimingPoint firstTimingPoint=null) {
-            TimingPoint lastTp = firstTimingPoint ?? GetFirstTimingPointExtended();
-            foreach( TimingPoint tp in TimingPoints ) {
-                if( Precision.DefinitelyBigger(tp.Offset, time) ) {
-                    return lastTp;
-                }
-                if( tp.Uninherited ) {
-                    lastTp = tp;
-                }
-            }
-            return lastTp;
+            return GetTimingPointAtTime(time, _redlines, firstTimingPoint ?? GetFirstTimingPointExtended());
         }
 
         /// <summary>
@@ -290,7 +444,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="time"></param>
         /// <returns></returns>
         public TimingPoint GetRedlineAfterTime(double time) {
-            return TimingPoints.FirstOrDefault(tp => Precision.DefinitelyBigger(tp.Offset, time) && tp.Uninherited);
+            return GetTimingPointAfterTime(time, _redlines);
         }
 
         /// <summary>
@@ -311,19 +465,23 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="time"></param>
         /// <returns></returns>
         public double GetSvAtTime(double time) {
-            double lastSv = -100;
-            foreach( TimingPoint tp in TimingPoints ) {
-                if( Precision.DefinitelyBigger(tp.Offset, time) ) {
-                    return MathHelper.Clamp(lastSv, -1000, -10);
-                }
-                if( !tp.Uninherited ) {
-                    lastSv = tp.MpB;
-                }
-                else {
-                    lastSv = -100;
-                }
+            var lastTp = GetTimingPointAtTime(time, _timingPoints, null);
+            if (lastTp == null || lastTp.Uninherited) {
+                return -100;
             }
-            return MathHelper.Clamp(lastSv, -1000, -10);
+
+            return MathHelper.Clamp(lastTp.MpB, -1000, -10);
+        }
+
+        /// <summary>
+        /// Calculates the size of the effective time range of a given timing point.
+        /// This range stops at the next timing point, so it just returns the offset of the next timing point.
+        /// </summary>
+        /// <param name="timingPoint"></param>
+        /// <returns>The timing point after specified timing point.</returns>
+        public double GetTimingPointEffectiveRange(TimingPoint timingPoint) {
+            var afterTp = GetTimingPointAfterTime(timingPoint.Offset, _timingPoints);
+            return afterTp?.Offset ?? double.PositiveInfinity;
         }
 
         /// <summary>
@@ -334,7 +492,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <returns>The duration of the slider in milliseconds.</returns>
         public double CalculateSliderTemporalLength(double time, double length) {
             var sv = GetSvAtTime(time);
-            return ( length * GetMpBAtTime(time) * (double.IsNaN(sv) ? -100 : sv) ) / ( -10000 * SliderMultiplier );
+            return CalculateSliderTemporalLength(time, length, sv);
+        }
+
+        public double CalculateSliderTemporalLength(double time, double length, double sv) {
+            return (length * GetMpBAtTime(time) * (double.IsNaN(sv) ? -100 : sv)) / (-10000 * SliderMultiplier);
         }
 
         /// <summary>
@@ -352,16 +514,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return ( -10000 * temporalLength * SliderMultiplier ) / ( GetMpBAtTime(time) * (double.IsNaN(sv) ? -100 : sv) );
         }
 
-        public List<TimingPoint> GetAllRedlines() {
-            return TimingPoints.Where(tp => tp.Uninherited).ToList();
-        }
-
-        public List<TimingPoint> GetAllGreenlines() {
-            return TimingPoints.Where(tp => !tp.Uninherited).ToList();
-        }
-
-        private static List<TimingPoint> GetTimingPoints(List<string> timingLines) {
-            return timingLines.Select(line => new TimingPoint(line)).ToList();
+        private static IEnumerable<TimingPoint> GetTimingPoints(IEnumerable<string> timingLines) {
+            return timingLines.Select(line => new TimingPoint(line));
         }
 
         public TimingPoint GetFirstTimingPointExtended() {
@@ -371,7 +525,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             // The value in the greenline will be used as the milliseconds per beat, so for example a 1x SliderVelocity slider will be 600 bpm.
             // The timeline will work like a redline on 0 offset and 1000 milliseconds per beat
 
-            TimingPoint firstTp = TimingPoints.FirstOrDefault();
+            TimingPoint firstTp = _timingPoints.FirstOrDefault();
             if( firstTp != null && firstTp.Uninherited ) {
                 return new TimingPoint(firstTp.Offset - firstTp.MpB * firstTp.Meter.TempoDenominator * 10, firstTp.MpB,
                                         firstTp.Meter, firstTp.SampleSet, firstTp.SampleIndex, firstTp.Volume, firstTp.Uninherited, false, false);
