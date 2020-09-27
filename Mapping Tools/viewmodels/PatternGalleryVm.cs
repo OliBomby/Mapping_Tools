@@ -7,6 +7,8 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Mapping_Tools.Components.Dialogs.CustomDialog;
+using MaterialDesignThemes.Wpf;
 
 namespace Mapping_Tools.Viewmodels {
     public class PatternGalleryVm : BindableBase {
@@ -34,6 +36,9 @@ namespace Mapping_Tools.Viewmodels {
                 }
             }
         }
+
+        [JsonIgnore]
+        public OsuPatternMaker OsuPatternMaker { get; set; }
 
         #region Export Options
 
@@ -129,6 +134,8 @@ namespace Mapping_Tools.Viewmodels {
         #endregion
 
         [JsonIgnore]
+        public CommandImplementation AddFileCommand { get; }
+        [JsonIgnore]
         public CommandImplementation AddCommand { get; }
         [JsonIgnore]
         public CommandImplementation RemoveCommand { get; }
@@ -143,15 +150,34 @@ namespace Mapping_Tools.Viewmodels {
             CollectionName = @"My Pattern Collection";
             _patterns = new ObservableCollection<OsuPattern>();
             FileHandler = new OsuPatternFileHandler();
+            OsuPatternMaker = new OsuPatternMaker();
             OsuPatternPlacer = new OsuPatternPlacer();
 
+            AddFileCommand = new CommandImplementation(
+                async _ => {
+                    try {
+                        var viewModel = new PatternFileImportVm {
+                            Name = $"Pattern {_patterns.Count + 1}",
+                            FilePath = string.Empty
+                        };
+
+                        var dialog = new CustomDialog(viewModel, 0);
+                        var result = await DialogHost.Show(dialog, "RootDialog");
+
+                        if (!(bool)result) return;
+
+                        var pattern = OsuPatternMaker.FromFile(viewModel.FilePath, viewModel.Name, FileHandler);
+                        Patterns.Add(pattern);
+                    } catch (Exception ex) {
+                        ex.Show();
+                    }
+                });
             AddCommand = new CommandImplementation(
                 _ => {
                     try {
                         var reader = EditorReaderStuff.GetFullEditorReader();
                         var editor = EditorReaderStuff.GetNewestVersion(IOHelper.GetCurrentBeatmap(), reader);
-                        var patternMaker = new OsuPatternMaker();
-                        var pattern = patternMaker.FromSelectedWithSave(editor.Beatmap, "test", FileHandler);
+                        var pattern = OsuPatternMaker.FromSelectedWithSave(editor.Beatmap, "test", FileHandler);
                         Patterns.Add(pattern);
                     } catch (Exception ex) { ex.Show(); }
                 });

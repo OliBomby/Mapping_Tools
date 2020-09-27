@@ -79,5 +79,30 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
 
             return fileName;
         }
+
+        public OsuPattern FromFile(string filePath, string name, OsuPatternFileHandler fileHandler) {
+            // Generate a file name and save the pattern
+            var now = DateTime.Now;
+            var fileName = GenerateUniquePatternFileName(name, now);
+
+            // Read some stuff from the pattern
+            var patternBeatmap = new BeatmapEditor(filePath).Beatmap;
+            var startTime = patternBeatmap.GetHitObjectStartTime();
+            var endTime = patternBeatmap.GetHitObjectEndTime();
+
+            // Save the pattern in the collection folder
+            var newFilePath = fileHandler.GetPatternPath(fileName);
+            File.Copy(filePath, newFilePath, false);
+
+            return new OsuPattern {
+                Name = name,
+                CreationTime = now,
+                LastUsedTime = now,
+                FileName = fileName,
+                ObjectCount = patternBeatmap.HitObjects.Count,
+                Duration = TimeSpan.FromMilliseconds(endTime - startTime - 2 * Padding),
+                BeatLength = patternBeatmap.BeatmapTiming.GetBeatLength(startTime + Padding, endTime - Padding, true)
+            };
+        }
     }
 }

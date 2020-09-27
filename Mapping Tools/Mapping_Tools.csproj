@@ -400,6 +400,7 @@
     <Compile Include="Classes\Tools\MapCleaner.cs" />
     <Compile Include="Classes\Tools\MapCleanerArgs.cs" />
     <Compile Include="Classes\Tools\PathGenerator.cs" />
+    <Compile Include="Classes\Tools\PatternGallery\PatternFileImportVm.cs" />
     <Compile Include="Classes\Tools\PatternGallery\CollectionRenameVm.cs" />
     <Compile Include="Classes\Tools\PatternGallery\OsuPattern.cs" />
     <Compile Include="Classes\Tools\PatternGallery\OsuPatternFileHandler.cs" />
@@ -409,6 +410,8 @@
     <Compile Include="Classes\Tools\PatternGallery\PatternOverwriteMode.cs" />
     <Compile Include="Classes\Tools\RhythmGuide.cs" />
     <Compile Include="Classes\Tools\Sliderator.cs" />
+    <Compile Include="Components\Dialogs\CustomDialog\BeatmapBrowseAttribute.cs" />
+    <Compile Include="Components\Dialogs\CustomDialog\FileBrowseAttribute.cs" />
     <Compile Include="Components\Dialogs\MessageDialog.xaml.cs">
       <DependentUpon>MessageDialog.xaml</DependentUpon>
     </Compile>
