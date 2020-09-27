@@ -7,6 +7,8 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
 using Mapping_Tools.Components.Dialogs.CustomDialog;
 using MaterialDesignThemes.Wpf;
 
@@ -184,6 +186,10 @@ namespace Mapping_Tools.Viewmodels {
             RemoveCommand = new CommandImplementation(
                 _ => {
                     try {
+                        // Remove all selected patterns and their files
+                        foreach (var pattern in Patterns.Where(o => o.IsSelected)) {
+                            File.Delete(FileHandler.GetPatternPath(pattern.FileName));
+                        }
                         Patterns.RemoveAll(o => o.IsSelected);
                     } catch (Exception ex) { ex.Show(); }
                 });

@@ -91,7 +91,7 @@ namespace Mapping_Tools.Views.PatternGallery {
             var patternBeatmap = pattern.GetPatternBeatmap(args.FileHandler);
 
             var patternPlacer = args.OsuPatternPlacer;
-            if (reader != null) {
+            if (reader != null && false) {
                 patternPlacer.PlaceOsuPatternAtTime(patternBeatmap, editor.Beatmap, reader.EditorTime(), false);
             } else {
                 patternPlacer.PlaceOsuPattern(patternBeatmap, editor.Beatmap, protectBeatmapPattern:false);
