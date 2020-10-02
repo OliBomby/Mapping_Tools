@@ -13,7 +13,6 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
         public OsuPattern FromSelectedWithSave(Beatmap beatmap, string name, OsuPatternFileHandler fileHandler) {
             var osuPattern = FromSelected(beatmap, name, out var patternBeatmap);
 
-            // Could possibly be saved async
             patternBeatmap.SaveWithFloatPrecision = true;
             Editor.SaveFile(fileHandler.GetPatternPath(osuPattern.FileName), patternBeatmap.GetLines());
 
@@ -82,7 +81,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             return FromBeatmap(patternBeatmap, name);
         }
 
-        private static OsuPattern FromBeatmap(Beatmap beatmap, string name) {
+        public OsuPattern FromBeatmap(Beatmap beatmap, string name) {
             // Generate a file name and save the pattern
             var now = DateTime.Now;
             var fileName = GenerateUniquePatternFileName(name, now);
@@ -99,6 +98,26 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 Duration = TimeSpan.FromMilliseconds(endTime - startTime),
                 BeatLength = beatmap.BeatmapTiming.GetBeatLength(startTime, endTime, true)
             };
+        }
+
+        public OsuPattern FromObjectsWithSave(List<HitObject> hitObjects, List<TimingPoint> timingPoints, OsuPatternFileHandler fileHandler,
+            string name, TimingPoint firstUnInheritedTimingPoint = null, double globalSv = 1.4) {
+            var osuPattern = FromObjects(hitObjects, timingPoints, out var patternBeatmap, name,
+                firstUnInheritedTimingPoint, globalSv);
+
+            patternBeatmap.SaveWithFloatPrecision = true;
+            Editor.SaveFile(fileHandler.GetPatternPath(osuPattern.FileName), patternBeatmap.GetLines());
+
+            return osuPattern;
+        }
+
+        public OsuPattern FromObjects(List<HitObject> hitObjects, List<TimingPoint> timingPoints, out Beatmap patternBeatmap, 
+            string name, TimingPoint firstUnInheritedTimingPoint = null, double globalSv = 1.4) {
+            patternBeatmap = new Beatmap(hitObjects, timingPoints, firstUnInheritedTimingPoint, globalSv) {
+                    Metadata = {["Version"] = new TValue(name)}
+                };
+
+            return FromBeatmap(patternBeatmap, name);
         }
 
         #region Helpers
