@@ -187,7 +187,7 @@ namespace Mapping_Tools.Viewmodels {
 
                         var reader = EditorReaderStuff.GetFullEditorReader();
                         var editor = EditorReaderStuff.GetNewestVersion(IOHelper.GetCurrentBeatmap(), reader);
-                        var pattern = OsuPatternMaker.FromSelectedWithSave(editor.Beatmap, viewModel.Name, FileHandler);
+                        var pattern = OsuPatternMaker.FromSelectedWithSave(editor.Beatmap, FileHandler, viewModel.Name);
                         Patterns.Add(pattern);
                     } catch (Exception ex) { ex.Show(); }
                 });

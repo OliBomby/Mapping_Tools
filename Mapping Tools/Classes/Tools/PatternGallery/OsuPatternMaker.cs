@@ -10,8 +10,8 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
     public class OsuPatternMaker {
         public double Padding { get; set; } = 5;
 
-        public OsuPattern FromSelectedWithSave(Beatmap beatmap, string name, OsuPatternFileHandler fileHandler) {
-            var osuPattern = FromSelected(beatmap, name, out var patternBeatmap);
+        public OsuPattern FromSelectedWithSave(Beatmap beatmap, OsuPatternFileHandler fileHandler, string name) {
+            var osuPattern = FromSelected(beatmap, out var patternBeatmap, name);
 
             patternBeatmap.SaveWithFloatPrecision = true;
             Editor.SaveFile(fileHandler.GetPatternPath(osuPattern.FileName), patternBeatmap.GetLines());
@@ -19,7 +19,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             return osuPattern;
         }
 
-        public OsuPattern FromSelected(Beatmap beatmap, string name, out Beatmap patternBeatmap) {
+        public OsuPattern FromSelected(Beatmap beatmap, out Beatmap patternBeatmap, string name) {
             // Copy it so the changes dont affect the given beatmap object
             patternBeatmap = beatmap.DeepCopy();
 
