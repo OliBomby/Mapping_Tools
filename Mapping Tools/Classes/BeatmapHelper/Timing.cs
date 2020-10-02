@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Mapping_Tools.Classes.HitsoundStuff;
+using Mapping_Tools.Classes.Tools;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     /// <summary>
@@ -114,6 +115,12 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
 
             return false;
+        }
+
+        public void AddRange(IEnumerable<TimingPoint> timingPoints) {
+            foreach (var timingPoint in timingPoints) {
+                Add(timingPoint);
+            }
         }
 
         public void CopyTo(TimingPoint[] array, int arrayIndex) {

@@ -160,6 +160,46 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public bool SaveWithFloatPrecision { get; set; }
 
         /// <summary>
+        /// Initializes a new Beatmap.
+        /// </summary>
+        public Beatmap() {
+            Initialize();
+        }
+
+        /// <summary>
+        /// Initializes a beatmap with the provided hit objects and timing points.
+        /// </summary>
+        /// <param name="hitObjects"></param>
+        /// <param name="timingPoints"></param>
+        /// <param name="firstUnInheritedTimingPoint"></param>
+        /// <param name="globalSv"></param>
+        /// <param name="gameMode"></param>
+        public Beatmap(List<HitObject> hitObjects, List<TimingPoint> timingPoints,
+            TimingPoint firstUnInheritedTimingPoint = null, double globalSv = 1.4, GameMode gameMode = GameMode.Standard) {
+            Initialize();
+
+            // Set the hit objects
+            HitObjects = hitObjects;
+
+            // Set the timing stuff
+            BeatmapTiming.SetTimingPoints(timingPoints);
+            BeatmapTiming.SliderMultiplier = globalSv;
+
+            if (!BeatmapTiming.Contains(firstUnInheritedTimingPoint)) {
+                BeatmapTiming.Add(firstUnInheritedTimingPoint);
+            }
+
+            // Set the global SV here too because thats absolutely necessary
+            Difficulty["SliderMultiplier"] = new TValue(globalSv.ToInvariant());
+            General["Mode"] = new TValue(((int) gameMode).ToInvariant());
+
+            SortHitObjects();
+            CalculateSliderEndTimes();
+            GiveObjectsGreenlines();
+            CalculateHitObjectComboStuff();
+        }
+
+        /// <summary>
         /// Initializes the Beatmap file format.
         /// </summary>
         /// <param name="lines">List of strings where each string is another line in the .osu file.</param>
@@ -167,11 +207,64 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             SetLines(lines);
         }
 
+        private void Initialize() {
+            General = new Dictionary<string, TValue>();
+            Editor = new Dictionary<string, TValue>();
+            Metadata = new Dictionary<string, TValue>();
+            Difficulty = new Dictionary<string, TValue>();
+            ComboColours = new List<ComboColour>();
+            SpecialColours = new Dictionary<string, ComboColour>();
+            BackgroundAndVideoEvents = new List<Event>();
+            BreakPeriods = new List<Break>();
+            StoryboardLayerBackground = new List<Event>();
+            StoryboardLayerPass = new List<Event>();
+            StoryboardLayerFail = new List<Event>();
+            StoryboardLayerForeground = new List<Event>();
+            StoryboardLayerOverlay = new List<Event>();
+            StoryboardSoundSamples = new List<StoryboardSoundSample>();
+            HitObjects = new List<HitObject>();
+            BeatmapTiming = new Timing(1.4);
+
+            FillBasicMetadata();
+        }
+
+        public void FillBasicMetadata() {
+            General["AudioFilename"] = new TValue(string.Empty);
+            General["AudioLeadIn"] = new TValue("0");
+            General["PreviewTime"] = new TValue("-1");
+            General["Countdown"] = new TValue("0");
+            General["SampleSet"] = new TValue("Soft");
+            General["StackLeniency"] = new TValue("0.2");
+            General["Mode"] = new TValue("0");
+            General["LetterboxInBreaks"] = new TValue("0");
+            General["WidescreenStoryboard"] = new TValue("0");
+
+            Metadata["Title"] = new TValue(string.Empty);
+            Metadata["TitleUnicode"] = new TValue(string.Empty);
+            Metadata["Artist"] = new TValue(string.Empty);
+            Metadata["ArtistUnicode"] = new TValue(string.Empty);
+            Metadata["Creator"] = new TValue(string.Empty);
+            Metadata["Version"] = new TValue(string.Empty);
+            Metadata["Source"] = new TValue(string.Empty);
+            Metadata["Tags"] = new TValue(string.Empty);
+            Metadata["BeatmapID"] = new TValue("0");
+            Metadata["BeatmapSetID"] = new TValue("-1");
+
+            Difficulty["HPDrainRate"] = new TValue("5");
+            Difficulty["CircleSize"] = new TValue("5");
+            Difficulty["OverallDifficulty"] = new TValue("5");
+            Difficulty["ApproachRate"] = new TValue("5");
+            Difficulty["SliderMultiplier"] = new TValue("1.4");
+            Difficulty["SliderTickRate"] = new TValue("1");
+        }
+
         /// <summary>
         /// Deserializes an entire .osu file and stores the data to this object.
         /// </summary>
         /// <param name="lines">List of strings where each string is another line in the .osu file.</param>
         public void SetLines(List<string> lines) {
+            Initialize();
+
             // Load up all the shit
             List<string> generalLines = GetCategoryLines(lines, "[General]");
             List<string> editorLines = GetCategoryLines(lines, "[Editor]");
@@ -188,22 +281,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             List<string> timingLines = GetCategoryLines(lines, "[TimingPoints]");
             List<string> colourLines = GetCategoryLines(lines, "[Colours]");
             List<string> hitobjectLines = GetCategoryLines(lines, "[HitObjects]");
-
-            General = new Dictionary<string, TValue>();
-            Editor = new Dictionary<string, TValue>();
-            Metadata = new Dictionary<string, TValue>();
-            Difficulty = new Dictionary<string, TValue>();
-            ComboColours = new List<ComboColour>();
-            SpecialColours = new Dictionary<string, ComboColour>();
-            BackgroundAndVideoEvents = new List<Event>();
-            BreakPeriods = new List<Break>();
-            StoryboardLayerBackground = new List<Event>();
-            StoryboardLayerPass = new List<Event>();
-            StoryboardLayerFail = new List<Event>();
-            StoryboardLayerForeground = new List<Event>();
-            StoryboardLayerOverlay = new List<Event>();
-            StoryboardSoundSamples = new List<StoryboardSoundSample>();
-            HitObjects = new List<HitObject>();
 
             FillDictionary(General, generalLines);
             FillDictionary(Editor, editorLines);

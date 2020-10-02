@@ -1,4 +1,5 @@
-﻿using Mapping_Tools.Components.Domain;
+﻿using System;
+using Mapping_Tools.Components.Domain;
 using MaterialDesignThemes.Wpf;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,6 +9,9 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media;
+using Mapping_Tools.Classes;
+using Mapping_Tools.Classes.SystemTools;
 
 namespace Mapping_Tools.Components.Dialogs.CustomDialog {
     /// <summary>
@@ -118,6 +122,15 @@ namespace Mapping_Tools.Components.Dialogs.CustomDialog {
                         Source = settings,
                         Converter = new DoubleToStringConverter()
                     };
+
+                    if (prop.GetCustomAttribute(typeof(TimeInputAttribute)) != null) {
+                        doubleBinding.Converter = new TimeToStringConverter();
+                    }
+
+                    if (prop.GetCustomAttribute(typeof(ConverterParameterAttribute)) is ConverterParameterAttribute doubleConverterParameterAttribute) {
+                        doubleBinding.ConverterParameter = doubleConverterParameterAttribute.Parameter;
+                    }
+
                     doubleTextBox.SetBinding(TextBox.TextProperty, doubleBinding);
                     content = doubleTextBox;
                     break;
@@ -129,11 +142,30 @@ namespace Mapping_Tools.Components.Dialogs.CustomDialog {
                         Style = Application.Current.FindResource("MaterialDesignFloatingHintTextBox") as Style };
                     HintAssist.SetHint(stringTextBox, name);
 
+                    if (prop.GetCustomAttribute(typeof(TextWrappingAttribute)) is TextWrappingAttribute stringTextWrappingAttribute) {
+                        stringTextBox.TextWrapping = stringTextWrappingAttribute.TextWrapping;
+                    }
+                    if (prop.GetCustomAttribute(typeof(MultiLineInputAttribute)) != null) {
+                        stringTextBox.AcceptsReturn = true;
+                    }
+
                     Binding stringBinding = new Binding(prop.Name) {
                         Source = settings
                     };
                     stringTextBox.SetBinding(TextBox.TextProperty, stringBinding);
+
                     content = stringTextBox;
+
+                    // Attach a file browser button
+                    if (prop.GetCustomAttribute(typeof(FileBrowseAttribute)) != null) {
+                        content = AttachFileBrowseButton(stringTextBox, prop, settings);
+                    }
+
+                    // Attach a beatmap browser button
+                    if (prop.GetCustomAttribute(typeof(BeatmapBrowseAttribute)) != null) {
+                        content = AttachBeatmapBrowseHelp(stringTextBox, prop, settings);
+                    }
+
                     break;
             }
 
@@ -152,6 +184,105 @@ namespace Mapping_Tools.Components.Dialogs.CustomDialog {
                     textBox.SelectAll();
                 }
             }
+        }
+
+        private static Grid AttachFileBrowseButton(TextBox textBox, PropertyInfo prop, object settings) {
+            var grid = new Grid();
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(5, GridUnitType.Pixel) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
+
+            textBox.MaxWidth = 200;
+
+            Grid.SetColumn(textBox, 0);
+            grid.Children.Add(textBox);
+
+            var browseButton = new Button {
+                Cursor = Cursors.Hand,
+                Style = Application.Current.FindResource("IconButton") as Style,
+                VerticalAlignment = VerticalAlignment.Bottom,
+                ToolTip = @"Select files with File Explorer.",
+                Content = new PackIcon {
+                    Kind = PackIconKind.Folder, Width = 30, Height = 30, Cursor = Cursors.Hand,
+                    Foreground = Application.Current.FindResource("PrimaryHueMidBrush") as Brush
+                },
+                Command = new CommandImplementation(_ => {
+                    try {
+                        string path = IOHelper.FileDialog();
+                        if (!string.IsNullOrEmpty(path)) {
+                            textBox.Text = path;
+                            prop.SetValue(settings, path);
+                        }
+                    } catch (Exception ex) { ex.Show(); }
+                })
+            };
+
+            Grid.SetColumn(browseButton, 2);
+            grid.Children.Add(browseButton);
+
+            return grid;
+        }
+
+        private static Grid AttachBeatmapBrowseHelp(TextBox textBox, PropertyInfo prop, object settings) {
+            var grid = new Grid();
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(5, GridUnitType.Pixel) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(5, GridUnitType.Pixel) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
+
+            textBox.MaxWidth = 200;
+
+            Grid.SetColumn(textBox, 0);
+            grid.Children.Add(textBox);
+
+            var getButton = new Button {
+                Cursor = Cursors.Hand,
+                Style = Application.Current.FindResource("IconButton") as Style,
+                VerticalAlignment = VerticalAlignment.Bottom,
+                ToolTip = @"Fetch the selected beatmap from your osu! client.",
+                Content = new PackIcon {
+                    Kind = PackIconKind.RestoreFromTrash, Width = 30, Height = 30, Cursor = Cursors.Hand,
+                    Foreground = Application.Current.FindResource("PrimaryHueMidBrush") as Brush
+                },
+                Command = new CommandImplementation(_ => {
+                    try {
+                        string path = IOHelper.GetCurrentBeatmap();
+                        if (!string.IsNullOrEmpty(path)) {
+                            textBox.Text = path;
+                            prop.SetValue(settings, path);
+                        }
+                    } catch (Exception ex) { ex.Show(); }
+                })
+            };
+
+            Grid.SetColumn(getButton, 2);
+            grid.Children.Add(getButton);
+
+            var browseButton = new Button {
+                Cursor = Cursors.Hand,
+                Style = Application.Current.FindResource("IconButton") as Style,
+                VerticalAlignment = VerticalAlignment.Bottom,
+                ToolTip = @"Select beatmaps with File Explorer.",
+                Content = new PackIcon {
+                    Kind = PackIconKind.Folder, Width = 30, Height = 30, Cursor = Cursors.Hand,
+                    Foreground = Application.Current.FindResource("PrimaryHueMidBrush") as Brush
+                },
+                Command = new CommandImplementation(_ => {
+                    try {
+                        string[] paths = IOHelper.BeatmapFileDialog(restore: !SettingsManager.Settings.CurrentBeatmapDefaultFolder);
+                        if (paths.Length > 0) {
+                            textBox.Text = paths[0];
+                            prop.SetValue(settings, paths[0]);
+                        }
+                    } catch (Exception ex) { ex.Show(); }
+                })
+            };
+
+            Grid.SetColumn(browseButton, 4);
+            grid.Children.Add(browseButton);
+
+            return grid;
         }
     }
 }

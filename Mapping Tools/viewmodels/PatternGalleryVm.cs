@@ -7,6 +7,12 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Components.Dialogs.CustomDialog;
+using MaterialDesignThemes.Wpf;
 
 namespace Mapping_Tools.Viewmodels {
     public class PatternGalleryVm : BindableBase {
@@ -34,6 +40,9 @@ namespace Mapping_Tools.Viewmodels {
                 }
             }
         }
+
+        [JsonIgnore]
+        public OsuPatternMaker OsuPatternMaker { get; set; }
 
         #region Export Options
 
@@ -129,7 +138,11 @@ namespace Mapping_Tools.Viewmodels {
         #endregion
 
         [JsonIgnore]
-        public CommandImplementation AddCommand { get; }
+        public CommandImplementation AddCodeCommand { get; }
+        [JsonIgnore]
+        public CommandImplementation AddFileCommand { get; }
+        [JsonIgnore]
+        public CommandImplementation AddSelectedCommand { get; }
         [JsonIgnore]
         public CommandImplementation RemoveCommand { get; }
 
@@ -143,21 +156,77 @@ namespace Mapping_Tools.Viewmodels {
             CollectionName = @"My Pattern Collection";
             _patterns = new ObservableCollection<OsuPattern>();
             FileHandler = new OsuPatternFileHandler();
+            OsuPatternMaker = new OsuPatternMaker();
             OsuPatternPlacer = new OsuPatternPlacer();
 
-            AddCommand = new CommandImplementation(
-                _ => {
+            AddCodeCommand = new CommandImplementation(
+                async _ => {
                     try {
+                        var viewModel = new PatternCodeImportVm {
+                            Name = $"Pattern {_patterns.Count + 1}"
+                        };
+
+                        var dialog = new CustomDialog(viewModel, 0);
+                        var result = await DialogHost.Show(dialog, "RootDialog");
+
+                        if (!(bool)result) return;
+
+                        var hitObjects = Regex.Split(viewModel.HitObjects, Environment.NewLine)
+                            .Select(o => new HitObject(o.Trim())).ToList();
+                        var timingPoints = Regex.Split(viewModel.TimingPoints, Environment.NewLine)
+                            .Select(o => new TimingPoint(o.Trim())).ToList();
+
+                        var pattern = OsuPatternMaker.FromObjectsWithSave(
+                            hitObjects, timingPoints, FileHandler, viewModel.Name, null, viewModel.GlobalSv, viewModel.GameMode);
+                        Patterns.Add(pattern);
+                    } catch (Exception ex) {
+                        ex.Show();
+                    }
+                });
+            AddFileCommand = new CommandImplementation(
+                async _ => {
+                    try {
+                        var viewModel = new PatternFileImportVm {
+                            Name = $"Pattern {_patterns.Count + 1}"
+                        };
+
+                        var dialog = new CustomDialog(viewModel, 0);
+                        var result = await DialogHost.Show(dialog, "RootDialog");
+
+                        if (!(bool)result) return;
+
+                        var pattern = OsuPatternMaker.FromFileWithSave(
+                            viewModel.FilePath, FileHandler, viewModel.Name, viewModel.Filter, viewModel.StartTime, viewModel.EndTime);
+                        Patterns.Add(pattern);
+                    } catch (Exception ex) {
+                        ex.Show();
+                    }
+                });
+            AddSelectedCommand = new CommandImplementation(
+                async _ => {
+                    try {
+                        var viewModel = new SelectedPatternImportVm() {
+                            Name = $"Pattern {_patterns.Count + 1}"
+                        };
+
+                        var dialog = new CustomDialog(viewModel, 0);
+                        var result = await DialogHost.Show(dialog, "RootDialog");
+
+                        if (!(bool)result) return;
+
                         var reader = EditorReaderStuff.GetFullEditorReader();
                         var editor = EditorReaderStuff.GetNewestVersion(IOHelper.GetCurrentBeatmap(), reader);
-                        var patternMaker = new OsuPatternMaker();
-                        var pattern = patternMaker.FromSelectedWithSave(editor.Beatmap, "test", FileHandler);
+                        var pattern = OsuPatternMaker.FromSelectedWithSave(editor.Beatmap, FileHandler, viewModel.Name);
                         Patterns.Add(pattern);
                     } catch (Exception ex) { ex.Show(); }
                 });
             RemoveCommand = new CommandImplementation(
                 _ => {
                     try {
+                        // Remove all selected patterns and their files
+                        foreach (var pattern in Patterns.Where(o => o.IsSelected)) {
+                            File.Delete(FileHandler.GetPatternPath(pattern.FileName));
+                        }
                         Patterns.RemoveAll(o => o.IsSelected);
                     } catch (Exception ex) { ex.Show(); }
                 });

@@ -20,7 +20,7 @@ namespace Mapping_Tools.Views.PatternGallery {
     /// Interactielogica voor PatternGalleryView.xaml
     /// </summary>
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
-    [HiddenTool]
+    //[HiddenTool]
     public partial class PatternGalleryView : ISavable<PatternGalleryVm>, IQuickRun, IHaveExtraProjectMenuItems {
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "patterngalleryproject.json");
 
@@ -84,24 +84,27 @@ namespace Mapping_Tools.Views.PatternGallery {
             var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
             var editor = EditorReaderStuff.GetNewestVersionOrNot(IOHelper.GetCurrentBeatmapOrCurrentBeatmap(), reader);
 
-            var pattern = args.Patterns.FirstOrDefault(o => o.IsSelected);
-            if (pattern == null)
+            var patternCount = args.Patterns.Count(o => o.IsSelected);
+
+            if (patternCount == 0)
                 throw new Exception("No pattern has been selected to export.");
 
-            var patternBeatmap = pattern.GetPatternBeatmap(args.FileHandler);
+            foreach (var pattern in args.Patterns.Where(o => o.IsSelected)) {
+                var patternBeatmap = pattern.GetPatternBeatmap(args.FileHandler);
 
-            var patternPlacer = args.OsuPatternPlacer;
-            if (reader != null) {
-                patternPlacer.PlaceOsuPatternAtTime(patternBeatmap, editor.Beatmap, reader.EditorTime(), false);
-            } else {
-                patternPlacer.PlaceOsuPattern(patternBeatmap, editor.Beatmap, protectBeatmapPattern:false);
+                var patternPlacer = args.OsuPatternPlacer;
+                if (reader != null && false) {
+                    patternPlacer.PlaceOsuPatternAtTime(patternBeatmap, editor.Beatmap, reader.EditorTime(), false);
+                } else {
+                    patternPlacer.PlaceOsuPattern(patternBeatmap, editor.Beatmap, protectBeatmapPattern:false);
+                }
+
+                // Increase pattern use count and time
+                pattern.UseCount++;
+                pattern.LastUsedTime = DateTime.Now;
             }
 
             editor.SaveFile();
-
-            // Increase pattern use count and time
-            pattern.UseCount++;
-            pattern.LastUsedTime = DateTime.Now;
 
             // Complete progressbar
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(100);
