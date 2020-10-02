@@ -142,6 +142,13 @@ namespace Mapping_Tools.Components.Dialogs.CustomDialog {
                         Style = Application.Current.FindResource("MaterialDesignFloatingHintTextBox") as Style };
                     HintAssist.SetHint(stringTextBox, name);
 
+                    if (prop.GetCustomAttribute(typeof(TextWrappingAttribute)) is TextWrappingAttribute stringTextWrappingAttribute) {
+                        stringTextBox.TextWrapping = stringTextWrappingAttribute.TextWrapping;
+                    }
+                    if (prop.GetCustomAttribute(typeof(MultiLineInputAttribute)) != null) {
+                        stringTextBox.AcceptsReturn = true;
+                    }
+
                     Binding stringBinding = new Binding(prop.Name) {
                         Source = settings
                     };

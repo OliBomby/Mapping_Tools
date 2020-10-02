@@ -101,9 +101,9 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
         }
 
         public OsuPattern FromObjectsWithSave(List<HitObject> hitObjects, List<TimingPoint> timingPoints, OsuPatternFileHandler fileHandler,
-            string name, TimingPoint firstUnInheritedTimingPoint = null, double globalSv = 1.4) {
+            string name, TimingPoint firstUnInheritedTimingPoint = null, double globalSv = 1.4, GameMode gameMode = GameMode.Standard) {
             var osuPattern = FromObjects(hitObjects, timingPoints, out var patternBeatmap, name,
-                firstUnInheritedTimingPoint, globalSv);
+                firstUnInheritedTimingPoint, globalSv, gameMode);
 
             patternBeatmap.SaveWithFloatPrecision = true;
             Editor.SaveFile(fileHandler.GetPatternPath(osuPattern.FileName), patternBeatmap.GetLines());
@@ -112,8 +112,8 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
         }
 
         public OsuPattern FromObjects(List<HitObject> hitObjects, List<TimingPoint> timingPoints, out Beatmap patternBeatmap, 
-            string name, TimingPoint firstUnInheritedTimingPoint = null, double globalSv = 1.4) {
-            patternBeatmap = new Beatmap(hitObjects, timingPoints, firstUnInheritedTimingPoint, globalSv) {
+            string name, TimingPoint firstUnInheritedTimingPoint = null, double globalSv = 1.4, GameMode gameMode = GameMode.Standard) {
+            patternBeatmap = new Beatmap(hitObjects, timingPoints, firstUnInheritedTimingPoint, globalSv, gameMode) {
                     Metadata = {["Version"] = new TValue(name)}
                 };
 

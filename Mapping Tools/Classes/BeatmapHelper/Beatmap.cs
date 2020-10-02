@@ -173,8 +173,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="timingPoints"></param>
         /// <param name="firstUnInheritedTimingPoint"></param>
         /// <param name="globalSv"></param>
+        /// <param name="gameMode"></param>
         public Beatmap(List<HitObject> hitObjects, List<TimingPoint> timingPoints,
-            TimingPoint firstUnInheritedTimingPoint = null, double globalSv = 1.4) {
+            TimingPoint firstUnInheritedTimingPoint = null, double globalSv = 1.4, GameMode gameMode = GameMode.Standard) {
             Initialize();
 
             // Set the hit objects
@@ -190,6 +191,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
             // Set the global SV here too because thats absolutely necessary
             Difficulty["SliderMultiplier"] = new TValue(globalSv.ToInvariant());
+            General["Mode"] = new TValue(((int) gameMode).ToInvariant());
 
             SortHitObjects();
             CalculateSliderEndTimes();

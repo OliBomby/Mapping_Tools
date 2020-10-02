@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
+using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Components.Dialogs.CustomDialog;
 using MaterialDesignThemes.Wpf;
 
@@ -136,6 +138,8 @@ namespace Mapping_Tools.Viewmodels {
         #endregion
 
         [JsonIgnore]
+        public CommandImplementation AddCodeCommand { get; }
+        [JsonIgnore]
         public CommandImplementation AddFileCommand { get; }
         [JsonIgnore]
         public CommandImplementation AddSelectedCommand { get; }
@@ -155,6 +159,30 @@ namespace Mapping_Tools.Viewmodels {
             OsuPatternMaker = new OsuPatternMaker();
             OsuPatternPlacer = new OsuPatternPlacer();
 
+            AddCodeCommand = new CommandImplementation(
+                async _ => {
+                    try {
+                        var viewModel = new PatternCodeImportVm {
+                            Name = $"Pattern {_patterns.Count + 1}"
+                        };
+
+                        var dialog = new CustomDialog(viewModel, 0);
+                        var result = await DialogHost.Show(dialog, "RootDialog");
+
+                        if (!(bool)result) return;
+
+                        var hitObjects = Regex.Split(viewModel.HitObjects, Environment.NewLine)
+                            .Select(o => new HitObject(o.Trim())).ToList();
+                        var timingPoints = Regex.Split(viewModel.TimingPoints, Environment.NewLine)
+                            .Select(o => new TimingPoint(o.Trim())).ToList();
+
+                        var pattern = OsuPatternMaker.FromObjectsWithSave(
+                            hitObjects, timingPoints, FileHandler, viewModel.Name, null, viewModel.GlobalSv, viewModel.GameMode);
+                        Patterns.Add(pattern);
+                    } catch (Exception ex) {
+                        ex.Show();
+                    }
+                });
             AddFileCommand = new CommandImplementation(
                 async _ => {
                     try {
