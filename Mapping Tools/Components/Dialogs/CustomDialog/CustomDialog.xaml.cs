@@ -122,6 +122,15 @@ namespace Mapping_Tools.Components.Dialogs.CustomDialog {
                         Source = settings,
                         Converter = new DoubleToStringConverter()
                     };
+
+                    if (prop.GetCustomAttribute(typeof(TimeInputAttribute)) != null) {
+                        doubleBinding.Converter = new TimeToStringConverter();
+                    }
+
+                    if (prop.GetCustomAttribute(typeof(ConverterParameterAttribute)) is ConverterParameterAttribute doubleConverterParameterAttribute) {
+                        doubleBinding.ConverterParameter = doubleConverterParameterAttribute.Parameter;
+                    }
+
                     doubleTextBox.SetBinding(TextBox.TextProperty, doubleBinding);
                     content = doubleTextBox;
                     break;

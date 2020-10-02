@@ -167,7 +167,8 @@ namespace Mapping_Tools.Viewmodels {
 
                         if (!(bool)result) return;
 
-                        var pattern = OsuPatternMaker.FromFileWithSave(viewModel.FilePath, FileHandler, viewModel.Name);
+                        var pattern = OsuPatternMaker.FromFileWithSave(
+                            viewModel.FilePath, FileHandler, viewModel.Name, viewModel.Filter, viewModel.StartTime, viewModel.EndTime);
                         Patterns.Add(pattern);
                     } catch (Exception ex) {
                         ex.Show();

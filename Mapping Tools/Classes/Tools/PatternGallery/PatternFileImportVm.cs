@@ -32,6 +32,8 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             set => Set(ref _filter, value);
         }
 
+        [TimeInput]
+        [ConverterParameter(-1)]
         [DisplayName("Start time")]
         [Description("Optional lower bound time. All objects before this time will be ignored.")]
         public double StartTime {
@@ -39,6 +41,8 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             set => Set(ref _startTime, value);
         }
 
+        [TimeInput]
+        [ConverterParameter(-1)]
         [DisplayName("End time")]
         [Description("Optional upper bound time. All objects after this time will be ignored.")]
         public double EndTime {

@@ -412,6 +412,8 @@
     <Compile Include="Classes\Tools\RhythmGuide.cs" />
     <Compile Include="Classes\Tools\Sliderator.cs" />
     <Compile Include="Components\Dialogs\CustomDialog\BeatmapBrowseAttribute.cs" />
+    <Compile Include="Components\Dialogs\CustomDialog\ConverterParameterAttribute.cs" />
+    <Compile Include="Components\Dialogs\CustomDialog\TimeInputAttribute.cs" />
     <Compile Include="Components\Dialogs\CustomDialog\FileBrowseAttribute.cs" />
     <Compile Include="Components\Dialogs\MessageDialog.xaml.cs">
       <DependentUpon>MessageDialog.xaml</DependentUpon>
