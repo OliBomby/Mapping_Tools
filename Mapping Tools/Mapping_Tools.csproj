@@ -400,6 +400,7 @@
     <Compile Include="Classes\Tools\MapCleaner.cs" />
     <Compile Include="Classes\Tools\MapCleanerArgs.cs" />
     <Compile Include="Classes\Tools\PathGenerator.cs" />
+    <Compile Include="Classes\Tools\PatternGallery\SelectedPatternImportVm.cs" />
     <Compile Include="Classes\Tools\PatternGallery\PatternFileImportVm.cs" />
     <Compile Include="Classes\Tools\PatternGallery\CollectionRenameVm.cs" />
     <Compile Include="Classes\Tools\PatternGallery\OsuPattern.cs" />

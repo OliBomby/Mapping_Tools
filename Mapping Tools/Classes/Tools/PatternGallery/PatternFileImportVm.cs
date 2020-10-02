@@ -4,8 +4,11 @@ using Mapping_Tools.Components.Dialogs.CustomDialog;
 
 namespace Mapping_Tools.Classes.Tools.PatternGallery {
     public class PatternFileImportVm : BindableBase {
-        private string _name;
-        private string _filePath;
+        private string _name = string.Empty;
+        private string _filePath = string.Empty;
+        private string _filter = string.Empty;
+        private double _startTime = -1;
+        private double _endTime = -1;
 
         [DisplayName("Name")]
         [Description("The name for the pattern.")]
@@ -20,6 +23,27 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
         public string FilePath {
             get => _filePath;
             set => Set(ref _filePath, value);
+        }
+
+        [DisplayName("Filter")]
+        [Description("Input an optional time code here. Example time code: 00:56:823 (1,2,1,2) - ")]
+        public string Filter {
+            get => _filter;
+            set => Set(ref _filter, value);
+        }
+
+        [DisplayName("Start time")]
+        [Description("Optional lower bound time. All objects before this time will be ignored.")]
+        public double StartTime {
+            get => _startTime;
+            set => Set(ref _startTime, value);
+        }
+
+        [DisplayName("End time")]
+        [Description("Optional upper bound time. All objects after this time will be ignored.")]
+        public double EndTime {
+            get => _endTime;
+            set => Set(ref _endTime, value);
         }
     }
 }

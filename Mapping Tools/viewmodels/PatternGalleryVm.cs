@@ -138,7 +138,7 @@ namespace Mapping_Tools.Viewmodels {
         [JsonIgnore]
         public CommandImplementation AddFileCommand { get; }
         [JsonIgnore]
-        public CommandImplementation AddCommand { get; }
+        public CommandImplementation AddSelectedCommand { get; }
         [JsonIgnore]
         public CommandImplementation RemoveCommand { get; }
 
@@ -159,8 +159,7 @@ namespace Mapping_Tools.Viewmodels {
                 async _ => {
                     try {
                         var viewModel = new PatternFileImportVm {
-                            Name = $"Pattern {_patterns.Count + 1}",
-                            FilePath = string.Empty
+                            Name = $"Pattern {_patterns.Count + 1}"
                         };
 
                         var dialog = new CustomDialog(viewModel, 0);
@@ -168,18 +167,27 @@ namespace Mapping_Tools.Viewmodels {
 
                         if (!(bool)result) return;
 
-                        var pattern = OsuPatternMaker.FromFile(viewModel.FilePath, viewModel.Name, FileHandler);
+                        var pattern = OsuPatternMaker.FromFileWithSave(viewModel.FilePath, FileHandler, viewModel.Name);
                         Patterns.Add(pattern);
                     } catch (Exception ex) {
                         ex.Show();
                     }
                 });
-            AddCommand = new CommandImplementation(
-                _ => {
+            AddSelectedCommand = new CommandImplementation(
+                async _ => {
                     try {
+                        var viewModel = new SelectedPatternImportVm() {
+                            Name = $"Pattern {_patterns.Count + 1}"
+                        };
+
+                        var dialog = new CustomDialog(viewModel, 0);
+                        var result = await DialogHost.Show(dialog, "RootDialog");
+
+                        if (!(bool)result) return;
+
                         var reader = EditorReaderStuff.GetFullEditorReader();
                         var editor = EditorReaderStuff.GetNewestVersion(IOHelper.GetCurrentBeatmap(), reader);
-                        var pattern = OsuPatternMaker.FromSelectedWithSave(editor.Beatmap, "test", FileHandler);
+                        var pattern = OsuPatternMaker.FromSelectedWithSave(editor.Beatmap, viewModel.Name, FileHandler);
                         Patterns.Add(pattern);
                     } catch (Exception ex) { ex.Show(); }
                 });
