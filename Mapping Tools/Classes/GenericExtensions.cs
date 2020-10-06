@@ -17,11 +17,11 @@ namespace Mapping_Tools.Classes {
         }
 
         public static void Show(this Exception exception) {
-            MessageBox.Show(exception.MessageStackTrace(), "Error");
-            var ex = exception.InnerException;
+            var result = MessageBox.Show(exception.MessageStackTrace(), "Error", MessageBoxButton.OKCancel);
+            var ex = result == MessageBoxResult.OK ? exception.InnerException : null;
             while (ex != null) {
-                MessageBox.Show(ex.MessageStackTrace(), "Inner exception");
-                ex = ex.InnerException;
+                result = MessageBox.Show(ex.MessageStackTrace(), "Inner exception", MessageBoxButton.OKCancel);
+                ex = result == MessageBoxResult.OK ? ex.InnerException : null;
             }
         }
 
