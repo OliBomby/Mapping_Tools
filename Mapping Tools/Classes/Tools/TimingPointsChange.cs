@@ -58,7 +58,8 @@ namespace Mapping_Tools.Classes.Tools {
             if (UnInherited && !onHasRed) {
                 // Make new redline
                 if (prevTimingPoint == null) {
-                    addingTimingPoint = MyTP;
+                    addingTimingPoint = MyTP.Copy();
+                    addingTimingPoint.Uninherited = true;
                 } else {
                     addingTimingPoint = prevTimingPoint.Copy();
                     addingTimingPoint.Offset = MyTP.Offset;
@@ -69,7 +70,8 @@ namespace Mapping_Tools.Classes.Tools {
             if (!UnInherited && (onTimingPoints.Count == 0 || (MpB && !onHasGreen))) {
                 // Make new greenline (based on prev)
                 if (prevTimingPoint == null) {
-                    addingTimingPoint = MyTP;
+                    addingTimingPoint = MyTP.Copy();
+                    addingTimingPoint.Uninherited = false;
                 } else {
                     addingTimingPoint = prevTimingPoint.Copy();
                     addingTimingPoint.Offset = MyTP.Offset;
