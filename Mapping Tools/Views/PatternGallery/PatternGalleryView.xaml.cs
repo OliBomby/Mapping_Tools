@@ -1,8 +1,11 @@
-﻿using Mapping_Tools.Classes.SystemTools;
+﻿using Mapping_Tools.Classes;
+using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Classes.Tools.PatternGallery;
+using Mapping_Tools.Components.Dialogs.CustomDialog;
 using Mapping_Tools.Viewmodels;
+using MaterialDesignThemes.Wpf;
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -11,9 +14,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Mapping_Tools.Classes;
-using Mapping_Tools.Components.Dialogs.CustomDialog;
-using MaterialDesignThemes.Wpf;
 
 namespace Mapping_Tools.Views.PatternGallery {
     /// <summary>
@@ -82,7 +82,7 @@ namespace Mapping_Tools.Views.PatternGallery {
 
         private string ExportPattern(PatternGalleryVm args, BackgroundWorker worker, DoWorkEventArgs _) {
             var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
-            var editor = EditorReaderStuff.GetNewestVersionOrNot(IOHelper.GetCurrentBeatmapOrCurrentBeatmap(), reader);
+            var editor = EditorReaderStuff.GetNewestVersionOrNot(args.Paths[0], reader);
 
             var patternCount = args.Patterns.Count(o => o.IsSelected);
 
