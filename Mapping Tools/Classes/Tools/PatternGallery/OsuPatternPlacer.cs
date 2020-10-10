@@ -25,7 +25,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
         /// <summary>
         /// Determines which timing stuff to keep from the pattern.
         /// </summary>
-        public TimingOverwriteMode TimingOverwriteMode = TimingOverwriteMode.OriginalTimingOnly;
+        public TimingOverwriteMode TimingOverwriteMode = TimingOverwriteMode.PatternTimingOnly;
         public bool IncludeHitsounds = true;
         public bool ScaleToNewCircleSize = false;
         public bool ScaleToNewTiming = false;
