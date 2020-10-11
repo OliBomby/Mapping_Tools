@@ -113,7 +113,7 @@ namespace Mapping_Tools.Views.TimingHelper {
                     TimingPoint redline = timing.GetRedlineAtTime(time - 1);
 
                     // Resnap to that redline only
-                    double resnappedTime = timing.Resnap(time, arg.Snap1, arg.Snap2, false, redline);
+                    double resnappedTime = timing.Resnap(time, TODO, false, tp: redline);
 
                     // Calculate beats from the redline
                     double beatsFromRedline = (resnappedTime - redline.Offset) / redline.MpB;
@@ -135,7 +135,7 @@ namespace Mapping_Tools.Views.TimingHelper {
                     if (timesBefore.Count > 0) {
                         // Get the last time info
                         double lastTime = timesBefore.Last().Time;
-                        double resnappedTimeL = timing.Resnap(lastTime, arg.Snap1, arg.Snap2, false);
+                        double resnappedTimeL = timing.Resnap(lastTime, TODO, false);
 
                         // Change the beats from last marker
                         beatsFromLastMarker = (resnappedTime - resnappedTimeL) / redline.MpB;

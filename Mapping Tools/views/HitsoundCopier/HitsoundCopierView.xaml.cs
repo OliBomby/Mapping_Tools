@@ -588,7 +588,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
             // Check filter snap
             // It's at least snap x or worse if the time is not a multiple of snap x / 2
             var timingPoint = beatmapTo.BeatmapTiming.GetRedlineAtTime(tloTo.Time - 1);
-            var resnappedTime = beatmapTo.BeatmapTiming.Resnap(tloTo.Time, arg.Snap1, arg.Snap2, false, timingPoint);
+            var resnappedTime = beatmapTo.BeatmapTiming.Resnap(tloTo.Time, TODO, false, tp: timingPoint);
             var beatsFromRedline = (resnappedTime - timingPoint.Offset) / timingPoint.MpB;
             var dist1 = beatsFromRedline * arg.Snap1 / (arg.Snap1 == 1 ? 4 : 2);
             var dist2 = beatsFromRedline * arg.Snap2 / (arg.Snap2 == 1 ? 4 : arg.Snap2 == 3 ? 3 : 2);

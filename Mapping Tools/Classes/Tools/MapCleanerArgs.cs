@@ -1,4 +1,7 @@
-﻿using Mapping_Tools.Classes.SystemTools;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.SystemTools;
 
 namespace Mapping_Tools.Classes.Tools {
     public class MapCleanerArgs : BindableBase {
@@ -10,8 +13,7 @@ namespace Mapping_Tools.Classes.Tools {
         private bool _removeUnusedSamples;
         private bool _removeMuting;
         private bool _removeUnclickableHitsounds;
-        private int _snap1;
-        private int _snap2;
+        private ObservableCollection<IBeatDivisor> _beatDivisors;
 
         public bool VolumeSliders {
             get => _volumeSliders;
@@ -53,17 +55,12 @@ namespace Mapping_Tools.Classes.Tools {
             set => Set(ref _removeUnclickableHitsounds, value);
         }
 
-        public int Snap1 {
-            get => _snap1;
-            set => Set(ref _snap1, value);
+        public ObservableCollection<IBeatDivisor> BeatDivisors {
+            get => _beatDivisors;
+            set => Set(ref _beatDivisors, value);
         }
 
-        public int Snap2 {
-            get => _snap2;
-            set => Set(ref _snap2, value);
-        }
-
-        public MapCleanerArgs(bool volumeSliders, bool sampleSetSliders, bool volumeSpinners, bool resnapObjects, bool resnapBookmarks, bool removeUnusedSamples, bool removeMuting, bool removeUnclickableHitsounds, int snap1, int snap2) {
+        public MapCleanerArgs(bool volumeSliders, bool sampleSetSliders, bool volumeSpinners, bool resnapObjects, bool resnapBookmarks, bool removeUnusedSamples, bool removeMuting, bool removeUnclickableHitsounds, IEnumerable<IBeatDivisor> beatDivisors) {
             _volumeSliders = volumeSliders;
             _sampleSetSliders = sampleSetSliders;
             _volumeSpinners = volumeSpinners;
@@ -72,12 +69,11 @@ namespace Mapping_Tools.Classes.Tools {
             _removeUnusedSamples = removeUnusedSamples;
             _removeMuting = removeMuting;
             _removeUnclickableHitsounds = removeUnclickableHitsounds;
-            _snap1 = snap1;
-            _snap2 = snap2;
+            _beatDivisors = new ObservableCollection<IBeatDivisor>(beatDivisors);
         }
 
-        public static readonly MapCleanerArgs BasicClean = new MapCleanerArgs(true, true, true, false, false, false, false, false, 16, 12);
+        public static readonly MapCleanerArgs BasicClean = new MapCleanerArgs(true, true, true, false, false, false, false, false, new RationalBeatDivisor[] { 16, 12 });
 
-        public static readonly MapCleanerArgs BasicResnap = new MapCleanerArgs(true, true, true, true, false, false, false, false, 16, 12);
+        public static readonly MapCleanerArgs BasicResnap = new MapCleanerArgs(true, true, true, true, false, false, false, false, new RationalBeatDivisor[] { 16, 12 });
     }
 }

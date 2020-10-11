@@ -21,6 +21,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Denominator = denominator;
         }
 
+        public static implicit operator RationalBeatDivisor(int denominator) {
+            return new RationalBeatDivisor(denominator);
+        }
+
         public double GetValue() {
             return (double) Numerator / Denominator;
         }

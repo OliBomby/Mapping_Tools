@@ -187,12 +187,12 @@ namespace Mapping_Tools.Classes.Tools {
                     // Handle different selection modes
                     switch (args.SelectionMode) {
                         case SelectionMode.AllEvents:
-                            times.Add(b.BeatmapTiming.Resnap(timelineObject.Time, 16, 12));
+                            times.Add(b.BeatmapTiming.Resnap(timelineObject.Time, TODO));
 
                             break;
                         case SelectionMode.HitsoundEvents:
                             if (timelineObject.HasHitsound) {
-                                times.Add(b.BeatmapTiming.Resnap(timelineObject.Time, 16, 12));
+                                times.Add(b.BeatmapTiming.Resnap(timelineObject.Time, TODO));
                             }
 
                             break;

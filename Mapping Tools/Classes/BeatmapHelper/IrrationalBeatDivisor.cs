@@ -6,6 +6,10 @@
             Value = value;
         }
 
+        public static implicit operator IrrationalBeatDivisor(double value) {
+            return new IrrationalBeatDivisor(value);
+        }
+
         public double GetValue() {
             return Value;
         }

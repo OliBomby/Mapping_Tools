@@ -126,7 +126,7 @@ namespace Mapping_Tools.Views.TimingCopier {
 
                         // Last time is the time of the last redline in between
                         double newTime = lastTime + redline.MpB * beatsFromLastTime;
-                        newTime = timingTo.Resnap(newTime, arg.Snap1, arg.Snap2, firstTp: redlines.FirstOrDefault());
+                        newTime = timingTo.Resnap(newTime, TODO, firstTp: redlines.FirstOrDefault());
                         marker.Time = newTime;
 
                         lastTime = marker.Time;

@@ -521,25 +521,25 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             for (var i = 0; i < CurvePoints.Count; i++) CurvePoints[i] = CurvePoints[i] + delta;
         }
 
-        public bool ResnapSelf(Timing timing, int snap1, int snap2, bool floor = true, TimingPoint tp = null,
+        public bool ResnapSelf(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint tp = null,
             TimingPoint firstTp = null) {
-            var newTime = GetResnappedTime(timing, snap1, snap2, floor, tp, firstTp);
+            var newTime = GetResnappedTime(timing, beatDivisors, floor, tp, firstTp);
             var deltaTime = newTime - Time;
             MoveTime(deltaTime);
             return Math.Abs(deltaTime) > Precision.DOUBLE_EPSILON;
         }
 
-        public bool ResnapEnd(Timing timing, int snap1, int snap2, bool floor = true, TimingPoint tp = null,
+        public bool ResnapEnd(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint tp = null,
             TimingPoint firstTp = null) {
             // If there is a redline in the sliderbody then the sliderend gets snapped to a tick of the latest redline
             if (!IsSlider || timing.TimingPoints.Any(o => o.Uninherited && o.Offset <= EndTime + 20 && o.Offset > Time))
-                return ResnapEndTime(timing, snap1, snap2, floor, tp, firstTp);
-            return ResnapEndClassic(timing, snap1, snap2, firstTp);
+                return ResnapEndTime(timing, beatDivisors, floor, tp, firstTp);
+            return ResnapEndClassic(timing, beatDivisors, firstTp);
         }
 
-        public bool ResnapEndTime(Timing timing, int snap1, int snap2, bool floor = true, TimingPoint tp = null,
+        public bool ResnapEndTime(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint tp = null,
             TimingPoint firstTp = null) {
-            var newTime = timing.Resnap(EndTime, snap1, snap2, floor, tp, firstTp);
+            var newTime = timing.Resnap(EndTime, beatDivisors, floor, tp: tp, firstTp: firstTp);
             var deltaTime = newTime - EndTime;
             MoveEndTime(timing, deltaTime);
 
@@ -559,17 +559,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return Math.Abs(dX) > Precision.DOUBLE_EPSILON || Math.Abs(dY) > Precision.DOUBLE_EPSILON;
         }
 
-        public bool ResnapEndClassic(Timing timing, int snap1, int snap2, TimingPoint firstTp = null) {
-            // Temporal length is n times a snap divisor length
-            var tp = timing.GetRedlineAtTime(Time, firstTp);
-
-            var newTemporalLength1 = Timing.GetNearestMultiple(TemporalLength, tp.MpB / snap1);
-            var snapDistance1 = Math.Abs(TemporalLength - newTemporalLength1);
-
-            var newTemporalLength2 = Timing.GetNearestMultiple(TemporalLength, tp.MpB / snap2);
-            var snapDistance2 = Math.Abs(TemporalLength - newTemporalLength2);
-
-            var newTemporalLength = snapDistance1 < snapDistance2 ? newTemporalLength1 : newTemporalLength2;
+        public bool ResnapEndClassic(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, TimingPoint firstTp = null) {
+            var newTemporalLength = timing.ResnapDuration(Time, TemporalLength, beatDivisors, false, firstTp: firstTp);
 
             var deltaTime = newTemporalLength - TemporalLength;
             ChangeTemporalTime(timing, deltaTime);
@@ -577,9 +568,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return Math.Abs(deltaTime) > Precision.DOUBLE_EPSILON;
         }
 
-        public double GetResnappedTime(Timing timing, int snap1, int snap2, bool floor = true, TimingPoint tp = null,
+        public double GetResnappedTime(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint tp = null,
             TimingPoint firstTp = null) {
-            return timing.Resnap(Time, snap1, snap2, floor, tp, firstTp);
+            return timing.Resnap(Time, beatDivisors, floor, tp: tp, firstTp: firstTp);
         }
 
         private bool GetSliderExtras() {
