@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.SystemTools;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Mapping_Tools.Classes.Tools {
     public class MapCleanerArgs : BindableBase {
@@ -13,7 +14,7 @@ namespace Mapping_Tools.Classes.Tools {
         private bool _removeUnusedSamples;
         private bool _removeMuting;
         private bool _removeUnclickableHitsounds;
-        private ObservableCollection<IBeatDivisor> _beatDivisors;
+        private IBeatDivisor[] _beatDivisors;
 
         public bool VolumeSliders {
             get => _volumeSliders;
@@ -55,7 +56,7 @@ namespace Mapping_Tools.Classes.Tools {
             set => Set(ref _removeUnclickableHitsounds, value);
         }
 
-        public ObservableCollection<IBeatDivisor> BeatDivisors {
+        public IBeatDivisor[] BeatDivisors {
             get => _beatDivisors;
             set => Set(ref _beatDivisors, value);
         }
@@ -69,11 +70,11 @@ namespace Mapping_Tools.Classes.Tools {
             _removeUnusedSamples = removeUnusedSamples;
             _removeMuting = removeMuting;
             _removeUnclickableHitsounds = removeUnclickableHitsounds;
-            _beatDivisors = new ObservableCollection<IBeatDivisor>(beatDivisors);
+            _beatDivisors = beatDivisors.ToArray();
         }
 
-        public static readonly MapCleanerArgs BasicClean = new MapCleanerArgs(true, true, true, false, false, false, false, false, new RationalBeatDivisor[] { 16, 12 });
+        public static readonly MapCleanerArgs BasicClean = new MapCleanerArgs(true, true, true, false, false, false, false, false, RationalBeatDivisor.GetDefaultBeatDivisors());
 
-        public static readonly MapCleanerArgs BasicResnap = new MapCleanerArgs(true, true, true, true, false, false, false, false, new RationalBeatDivisor[] { 16, 12 });
+        public static readonly MapCleanerArgs BasicResnap = new MapCleanerArgs(true, true, true, true, false, false, false, false, RationalBeatDivisor.GetDefaultBeatDivisors());
     }
 }

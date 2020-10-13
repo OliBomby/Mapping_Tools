@@ -71,9 +71,8 @@ namespace Mapping_Tools.Views.TimingStudio
             public bool OmitBarline;
             public double Leniency;
             public double BeatsBetween;
-            public int Snap1;
-            public int Snap2;
-            public Arguments(string[] paths, bool objects, bool bookmarks, bool greenlines, bool redlines, bool omitBarline, double leniency, double beatsBetween, int snap1, int snap2)
+            public IBeatDivisor[] BeatDivisors;
+            public Arguments(string[] paths, bool objects, bool bookmarks, bool greenlines, bool redlines, bool omitBarline, double leniency, double beatsBetween, IBeatDivisor[] beatDivisors)
             {
                 Paths = paths;
                 Objects = objects;
@@ -83,8 +82,7 @@ namespace Mapping_Tools.Views.TimingStudio
                 OmitBarline = omitBarline;
                 Leniency = leniency;
                 BeatsBetween = beatsBetween;
-                Snap1 = snap1;
-                Snap2 = snap2;
+                BeatDivisors = beatDivisors;
             }
         }
 
@@ -147,14 +145,14 @@ namespace Mapping_Tools.Views.TimingStudio
                     TimingPoint redline = timing.GetRedlineAtTime(time - 1);
 
                     // Resnap to that redline only
-                    double resnappedTime = timing.Resnap(time, TODO, false, tp: redline);
+                    double resnappedTime = timing.Resnap(time, arg.BeatDivisors, false, tp: redline);
 
                     // Calculate beats from the redline
                     double beatsFromRedline = (resnappedTime - redline.Offset) / redline.MpB;
 
                     // Avoid problems
                     if (MathHelper.ApproximatelyEquivalent(beatsFromRedline, 0, 0.0001)) {
-                        beatsFromRedline = 1 / Math.Max(arg.Snap1, arg.Snap2);
+                        beatsFromRedline = arg.BeatDivisors.Max(o => o.GetValue());
                     }
                     if (time == redline.Offset) {
                         beatsFromRedline = 0;
@@ -169,14 +167,14 @@ namespace Mapping_Tools.Views.TimingStudio
                     if (timesBefore.Count > 0) {
                         // Get the last time info
                         double lastTime = timesBefore.Last().Time;
-                        double resnappedTimeL = timing.Resnap(lastTime, beatDivisors, false);
+                        double resnappedTimeL = timing.Resnap(lastTime, arg.BeatDivisors, false);
 
                         // Change the beats from last marker
                         beatsFromLastMarker = (resnappedTime - resnappedTimeL) / redline.MpB;
 
                         // Avoid problems
                         if (MathHelper.ApproximatelyEquivalent(beatsFromLastMarker, 0, 0.0001)) {
-                            beatsFromLastMarker = 1f / Math.Max(arg.Snap1, arg.Snap2);
+                            beatsFromLastMarker = arg.BeatDivisors.Max(o => o.GetValue());
                         }
                         if (lastTime == time) {
                             beatsFromLastMarker = 0;

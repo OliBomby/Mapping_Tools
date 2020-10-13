@@ -3,7 +3,9 @@ using System;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Windows.Controls;
 using System.Windows.Data;
+using Mapping_Tools.Classes.SystemTools;
 
 namespace Mapping_Tools.Components.Domain {
     internal class BeatDivisorArrayToStringConverter : IValueConverter {
@@ -14,7 +16,7 @@ namespace Mapping_Tools.Components.Domain {
             bool first = true;
             foreach (var beatDivisor in beatDivisors) {
                 if (!first) {
-                    builder.Append(',');
+                    builder.Append(", ");
                 }
 
                 switch (beatDivisor) {
@@ -47,7 +49,15 @@ namespace Mapping_Tools.Components.Domain {
                     beatDivisors[i] = new RationalBeatDivisor(int.Parse(ndSplit[0], CultureInfo.InvariantCulture),
                                                             int.Parse(ndSplit[1], CultureInfo.InvariantCulture));
                 } else {
-                    beatDivisors[i] = new IrrationalBeatDivisor(double.Parse(val, CultureInfo.InvariantCulture));
+                    var valid = TypeConverters.TryParseDouble(val, out double doubleValue);
+                    if (valid) {
+                        if (doubleValue <= 0)
+                            return new ValidationResult(false, "Beat divisor must be greater than zero.");
+
+                        beatDivisors[i] = new IrrationalBeatDivisor(doubleValue);
+                    } else {
+                        return new ValidationResult(false, "Double format error.");
+                    }
                 }
             }
 

@@ -1,4 +1,6 @@
 ﻿
+using Newtonsoft.Json;
+
 namespace Mapping_Tools.Classes.BeatmapHelper {
     public class RationalBeatDivisor : IBeatDivisor {
         /// <summary>
@@ -16,6 +18,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Denominator = denominator;
         }
 
+        [JsonConstructor]
         public RationalBeatDivisor(int numerator, int denominator) {
             Numerator = numerator;
             Denominator = denominator;
@@ -50,6 +53,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             unchecked {
                 return (Numerator * 397) ^ Denominator;
             }
+        }
+
+        public static IBeatDivisor[] GetDefaultBeatDivisors() {
+            return new IBeatDivisor[] {new RationalBeatDivisor(16), new RationalBeatDivisor(12)};
         }
     }
 }

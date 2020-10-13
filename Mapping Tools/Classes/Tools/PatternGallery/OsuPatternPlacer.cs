@@ -30,7 +30,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
         public bool ScaleToNewCircleSize = false;
         public bool ScaleToNewTiming = false;
         public bool SnapToNewTiming = false;
-        public List<IBeatDivisor> BeatDivisors = new List<IBeatDivisor>();
+        public IBeatDivisor[] BeatDivisors = RationalBeatDivisor.GetDefaultBeatDivisors();
         public bool FixGlobalSV = false;
         public bool FixColourHax = false;
         public bool FixStackLeniency = false;

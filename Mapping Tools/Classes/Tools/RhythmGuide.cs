@@ -25,6 +25,9 @@ namespace Mapping_Tools.Classes.Tools {
             private string _outputName = "Hitsounds";
             private bool _ncEverything;
             private SelectionMode _selectionMode = SelectionMode.HitsoundEvents;
+            // ReSharper disable once CoVariantArrayConversion
+            // ReSharper disable once RedundantArrayCreationExpression
+            private IBeatDivisor[] _beatDivisors = new RationalBeatDivisor[] {16, 12};
 
             private ExportMode _exportMode = ExportMode.NewMap;
             private string _exportPath = Path.Combine(MainWindow.ExportPath, @"rhythm_guide.osu");
@@ -85,6 +88,11 @@ namespace Mapping_Tools.Classes.Tools {
             public string ExportPath {
                 get => _exportPath;
                 set => Set(ref _exportPath, value);
+            }
+
+            public IBeatDivisor[] BeatDivisors {
+                get => _beatDivisors;
+                set => Set(ref _beatDivisors, value);
             }
 
 
@@ -187,12 +195,12 @@ namespace Mapping_Tools.Classes.Tools {
                     // Handle different selection modes
                     switch (args.SelectionMode) {
                         case SelectionMode.AllEvents:
-                            times.Add(b.BeatmapTiming.Resnap(timelineObject.Time, TODO));
+                            times.Add(b.BeatmapTiming.Resnap(timelineObject.Time, args.BeatDivisors));
 
                             break;
                         case SelectionMode.HitsoundEvents:
                             if (timelineObject.HasHitsound) {
-                                times.Add(b.BeatmapTiming.Resnap(timelineObject.Time, TODO));
+                                times.Add(b.BeatmapTiming.Resnap(timelineObject.Time, args.BeatDivisors));
                             }
 
                             break;

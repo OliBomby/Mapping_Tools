@@ -126,7 +126,7 @@ namespace Mapping_Tools.Views.TimingCopier {
 
                         // Last time is the time of the last redline in between
                         double newTime = lastTime + redline.MpB * beatsFromLastTime;
-                        newTime = timingTo.Resnap(newTime, TODO, firstTp: redlines.FirstOrDefault());
+                        newTime = timingTo.Resnap(newTime, arg.BeatDivisors, firstTp: redlines.FirstOrDefault());
                         marker.Time = newTime;
 
                         lastTime = marker.Time;
@@ -146,14 +146,14 @@ namespace Mapping_Tools.Views.TimingCopier {
                     // Resnap hitobjects
                     foreach (HitObject ho in beatmapTo.HitObjects)
                     {
-                        ho.ResnapSelf(timingTo, arg.Snap1, arg.Snap2, firstTp: redlines.FirstOrDefault());
-                        ho.ResnapEnd(timingTo, arg.Snap1, arg.Snap2, firstTp: redlines.FirstOrDefault());
+                        ho.ResnapSelf(timingTo, arg.BeatDivisors, firstTp: redlines.FirstOrDefault());
+                        ho.ResnapEnd(timingTo, arg.BeatDivisors, firstTp: redlines.FirstOrDefault());
                     }
 
                     // Resnap greenlines
                     foreach (TimingPoint tp in timingTo.Greenlines)
                     {
-                        tp.ResnapSelf(timingTo, arg.Snap1, arg.Snap2, firstTP: redlines.FirstOrDefault());
+                        tp.ResnapSelf(timingTo, arg.BeatDivisors, firstTP: redlines.FirstOrDefault());
                     }
                     timingTo.Sort();
                 } else {
