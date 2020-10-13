@@ -173,11 +173,20 @@ namespace Mapping_Tools.Viewmodels {
             CopyToSliderSlides = false;
             StartIndex = 100;
             MuteSliderends = false;
-            BeatDivisors = RationalBeatDivisor.GetDefaultBeatDivisors();
-            MutedDivisors = new IBeatDivisor[] {new RationalBeatDivisor(4), new RationalBeatDivisor(6)};
+            BeatDivisors = new IBeatDivisor[] {
+                new RationalBeatDivisor(1),
+                new RationalBeatDivisor(4), new RationalBeatDivisor(3),
+                new RationalBeatDivisor(8), new RationalBeatDivisor(6),
+                new RationalBeatDivisor(16), new RationalBeatDivisor(12)
+            };
+            MutedDivisors = new IBeatDivisor[] {
+                new RationalBeatDivisor(4), new RationalBeatDivisor(3),
+                new RationalBeatDivisor(8), new RationalBeatDivisor(6),
+                new RationalBeatDivisor(16), new RationalBeatDivisor(12)
+            };
             MinLength = 0.5;
             MutedIndex = -1;
-            MutedSampleSet = SampleSet.Soft;
+            MutedSampleSet = SampleSet.Auto;
 
             ImportLoadCommand = new CommandImplementation(
                 _ => {
