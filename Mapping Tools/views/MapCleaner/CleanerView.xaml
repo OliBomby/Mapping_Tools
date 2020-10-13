@@ -12,7 +12,6 @@
     <local:SingleRunMappingTool.Resources>
         <domain:DoubleToStringConverter x:Key="DoubleToStringConverter"/>
         <domain:TimeToStringConverter x:Key="TimeToStringConverter"/>
-        <domain:SnapDivisorToStringConverter x:Key="SnapDivisorToStringConverter"/>
         <domain:BeatDivisorArrayToStringConverter x:Key="BeatDivisorArrayToStringConverter"/>
     </local:SingleRunMappingTool.Resources>
     <Grid Name="MasterGrid">

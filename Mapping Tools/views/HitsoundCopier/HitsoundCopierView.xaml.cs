@@ -586,7 +586,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
             }
 
             // Check filter snap
-            var allBeatDivisors = arg.BeatDivisors.Concat(arg.MutedDivisors).ToArray();
+            var allBeatDivisors = arg.BeatDivisors;
 
             var timingPoint = beatmapTo.BeatmapTiming.GetRedlineAtTime(tloTo.Time - 1);
             var resnappedTime = beatmapTo.BeatmapTiming.Resnap(tloTo.Time, allBeatDivisors, false, tp: timingPoint);
@@ -596,8 +596,8 @@ namespace Mapping_Tools.Views.HitsoundCopier {
             var possibleDivisors =
                 allBeatDivisors.Where(d => Precision.AlmostEquals(beatsFromRedline % d.GetValue(), 0));
 
-            // Make sure all the possible beat divisors are in the muted category
-            if (possibleDivisors.Any(d => !arg.MutedDivisors.Contains(d))) {
+            // Make sure all the possible beat divisors of lower priority are in the muted category
+            if (possibleDivisors.TakeWhile(d => !arg.MutedDivisors.Contains(d)).Any()) {
                 return false;
             }
 

@@ -11,7 +11,7 @@
              d:DesignHeight="450" Width="759.5" d:DataContext="{d:DesignData TimingHelperVm}">
     <local:SingleRunMappingTool.Resources>
         <domain:DoubleToStringConverter x:Key="DoubleToStringConverter"/>
-        <domain:SnapDivisorToStringConverter x:Key="SnapDivisorToStringConverter"/>
+        <domain:BeatDivisorArrayToStringConverter x:Key="BeatDivisorArrayToStringConverter"/>
     </local:SingleRunMappingTool.Resources>
     <Grid Name="MasterGrid">
         <Grid.RowDefinitions>
@@ -83,12 +83,11 @@
 
                 <TextBlock Text="Signatures" Margin="0,20,0,0" FontSize="14" FontWeight="Bold"
                            ToolTip="Beat snap divisors for resnapping."/>
-                <ComboBox FontSize="14" x:Name="Snap1" Cursor="Hand" SelectedItem="{Binding Snap1, Converter={StaticResource SnapDivisorToStringConverter}}"
-                          Width="60" HorizontalAlignment="Left" ItemsSource="{Binding Snaps1}"
-                          ToolTip="Beat snap divisors for resnapping."/>
-                <ComboBox FontSize="14" x:Name="Snap2" Cursor="Hand" SelectedItem="{Binding Snap2, Converter={StaticResource SnapDivisorToStringConverter}}"
-                          Width="60" HorizontalAlignment="Left" ItemsSource="{Binding Snaps2}"
-                          ToolTip="Beat snap divisors for resnapping."/>
+                <TextBox Text="{Binding BeatDivisors, Converter={StaticResource BeatDivisorArrayToStringConverter}}" 
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                         HorizontalAlignment="Left" MinWidth="100" FontSize="14" Cursor="Hand"
+                         materialDesign:HintAssist.Hint="Beat divisors"
+                         ToolTip="Input any number of beat divisors here separated with commas. Example: 1/4, 1/12, 1/7, 4/5, 0.13435622499"/>
             </StackPanel>
 
             <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">

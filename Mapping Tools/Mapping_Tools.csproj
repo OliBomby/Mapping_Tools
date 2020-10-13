@@ -430,7 +430,6 @@
     <Compile Include="Components\Domain\ColorToBrushConverter.cs" />
     <Compile Include="Components\Domain\CommandImplementation.cs" />
     <Compile Include="Components\Domain\BeatDivisorArrayToStringConverter.cs" />
-    <Compile Include="Components\Domain\SnapDivisorToStringConverter.cs" />
     <Compile Include="Components\Domain\MapPathStringToCountStringConverter.cs" />
     <Compile Include="Components\Domain\FlagToBoolConverter.cs" />
     <Compile Include="Components\Domain\IntToStringConverter.cs" />
