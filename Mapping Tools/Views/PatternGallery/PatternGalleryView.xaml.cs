@@ -20,7 +20,7 @@ namespace Mapping_Tools.Views.PatternGallery {
     /// Interactielogica voor PatternGalleryView.xaml
     /// </summary>
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
-    //[HiddenTool]
+    [HiddenTool]
     public partial class PatternGalleryView : ISavable<PatternGalleryVm>, IQuickRun, IHaveExtraProjectMenuItems {
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "patterngalleryproject.json");
 
