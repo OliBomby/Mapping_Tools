@@ -95,14 +95,9 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref OsuPatternPlacer.SnapToNewTiming, value);
         }
 
-        public int SnapDivisor1 {
-            get => OsuPatternPlacer.SnapDivisor1;
-            set => Set(ref OsuPatternPlacer.SnapDivisor1, value);
-        }
-
-        public int SnapDivisor2 {
-            get => OsuPatternPlacer.SnapDivisor2;
-            set => Set(ref OsuPatternPlacer.SnapDivisor2, value);
+        public IBeatDivisor[] BeatDivisors {
+            get => OsuPatternPlacer.BeatDivisors;
+            set => Set(ref OsuPatternPlacer.BeatDivisors, value);
         }
 
         public bool FixGlobalSV {

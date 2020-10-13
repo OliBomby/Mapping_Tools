@@ -11,6 +11,7 @@
     <UserControl.Resources>
         <domain:DoubleToStringConverter x:Key="D2SConverter"/>
         <domain:IntToStringConverter x:Key="I2SConverter"/>
+        <domain:BeatDivisorArrayToStringConverter x:Key="BeatDivisorArrayToStringConverter"/>
     </UserControl.Resources>
     <Grid Name="MasterGrid">
         <Grid.RowDefinitions>

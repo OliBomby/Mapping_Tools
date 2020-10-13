@@ -4,6 +4,7 @@ using Mapping_Tools.Components.Domain;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Mapping_Tools.Classes;
+using Mapping_Tools.Classes.BeatmapHelper;
 
 namespace Mapping_Tools.Viewmodels {
 
@@ -11,15 +12,13 @@ namespace Mapping_Tools.Viewmodels {
         private string _importPath;
         private string _exportPath;
         private string _resnapMode;
-        private int _snap1;
-        private int _snap2;
+        private IBeatDivisor[] _beatDivisors;
 
         public TimingCopierVm() {
             _importPath = "";
             _exportPath = "";
             _resnapMode = "Number of beats between objects stays the same";
-            _snap1 = 16;
-            _snap2 = 12;
+            _beatDivisors = RationalBeatDivisor.GetDefaultBeatDivisors();
 
             ImportLoadCommand = new CommandImplementation(
                 _ => {
@@ -92,22 +91,12 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
-        public int Snap1 {
-            get => _snap1;
+        public IBeatDivisor[] BeatDivisors {
+            get => _beatDivisors;
             set {
-                if( _snap1 == value )
+                if( _beatDivisors == value )
                     return;
-                _snap1 = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public int Snap2 {
-            get => _snap2;
-            set {
-                if( _snap2 == value )
-                    return;
-                _snap2 = value;
+                _beatDivisors = value;
                 OnPropertyChanged();
             }
         }

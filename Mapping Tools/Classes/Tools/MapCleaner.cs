@@ -78,24 +78,24 @@ namespace Mapping_Tools.Classes.Tools {
             if (args.ResnapObjects) {
                 // Resnap all objects
                 foreach (HitObject ho in beatmap.HitObjects) {
-                    bool resnapped = ho.ResnapSelf(timing, args.Snap1, args.Snap2);
+                    bool resnapped = ho.ResnapSelf(timing, args.BeatDivisors);
                     if (resnapped) {
                         objectsResnapped += 1;
                     }
-                    ho.ResnapEnd(timing, args.Snap1, args.Snap2);
+                    ho.ResnapEnd(timing, args.BeatDivisors);
                     ho.ResnapPosition(mode, circleSize);
                 }
                 UpdateProgressBar(worker, 18);
 
                 // Resnap Kiai toggles
                 foreach (TimingPoint tp in kiaiToggles) {
-                    tp.ResnapSelf(timing, args.Snap1, args.Snap2);
+                    tp.ResnapSelf(timing, args.BeatDivisors);
                 }
                 UpdateProgressBar(worker, 27);
 
                 // Resnap SliderVelocity changes
                 foreach (TimingPoint tp in svChanges) {
-                    tp.ResnapSelf(timing, args.Snap1, args.Snap2);
+                    tp.ResnapSelf(timing, args.BeatDivisors);
                 }
                 UpdateProgressBar(worker, 36);
             }
@@ -103,7 +103,7 @@ namespace Mapping_Tools.Classes.Tools {
             if (args.ResnapBookmarks) {
                 // Resnap the bookmarks
                 List<double> bookmarks = beatmap.GetBookmarks();
-                List<double> newBookmarks = bookmarks.Select(o => timing.Resnap(o, args.Snap1, args.Snap2)).ToList();
+                List<double> newBookmarks = bookmarks.Select(o => timing.Resnap(o, args.BeatDivisors)).ToList();
 
                 // Remove duplicate bookmarks
                 newBookmarks = newBookmarks.Distinct().ToList();

@@ -30,8 +30,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
         public bool ScaleToNewCircleSize = false;
         public bool ScaleToNewTiming = false;
         public bool SnapToNewTiming = false;
-        public int SnapDivisor1 = 16;
-        public int SnapDivisor2 = 12;
+        public IBeatDivisor[] BeatDivisors = RationalBeatDivisor.GetDefaultBeatDivisors();
         public bool FixGlobalSV = false;
         public bool FixColourHax = false;
         public bool FixStackLeniency = false;
@@ -387,19 +386,19 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             if (SnapToNewTiming) {
                 // Resnap all objects
                 foreach (HitObject ho in patternBeatmap.HitObjects) {
-                    ho.ResnapSelf(newTiming, SnapDivisor1, SnapDivisor2);
-                    ho.ResnapEnd(newTiming, SnapDivisor1, SnapDivisor2);
+                    ho.ResnapSelf(newTiming, BeatDivisors);
+                    ho.ResnapEnd(newTiming, BeatDivisors);
                     ho.ResnapPosition(patternMode, patternCircleSize);  // Resnap to column X positions for mania only
                 }
 
                 // Resnap Kiai toggles
                 foreach (TimingPoint tp in kiaiToggles) {
-                    tp.ResnapSelf(newTiming, SnapDivisor1, SnapDivisor2);
+                    tp.ResnapSelf(newTiming, BeatDivisors);
                 }
 
                 // Resnap SliderVelocity changes
                 foreach (TimingPoint tp in svChanges) {
-                    tp.ResnapSelf(newTiming, SnapDivisor1, SnapDivisor2);
+                    tp.ResnapSelf(newTiming, BeatDivisors);
                 }
             }
 

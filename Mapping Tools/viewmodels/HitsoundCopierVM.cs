@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Mapping_Tools.Classes;
+using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Components.Domain;
@@ -25,8 +26,8 @@ namespace Mapping_Tools.Viewmodels {
         private bool _copyToSliderSlides;
         public int _startIndex;
         private bool _muteSliderends;
-        private int _snap1;
-        private int _snap2;
+        private IBeatDivisor[] _beatDivisors;
+        private IBeatDivisor[] _mutedDivisors;
         private double _minLength;
         private int _mutedIndex;
         private SampleSet _mutedSampleSet;
@@ -122,19 +123,15 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _muteSliderends, value);
         }
 
-        public int Snap1 {
-            get => _snap1;
-            set => Set(ref _snap1, value);
+        public IBeatDivisor[] BeatDivisors {
+            get => _beatDivisors;
+            set => Set(ref _beatDivisors, value);
         }
 
-        public int Snap2 {
-            get => _snap2;
-            set => Set(ref _snap2, value);
+        public IBeatDivisor[] MutedDivisors {
+            get => _mutedDivisors;
+            set => Set(ref _mutedDivisors, value);
         }
-
-        public string[] Snaps1 => new[] { "1/1", "1/2", "1/4", "1/8", "1/16" };
-
-        public string[] Snaps2 => new[] { "1/1", "1/3", "1/6", "1/12" };
 
         public double MinLength {
             get => _minLength;
@@ -176,11 +173,20 @@ namespace Mapping_Tools.Viewmodels {
             CopyToSliderSlides = false;
             StartIndex = 100;
             MuteSliderends = false;
-            Snap1 = 4;
-            Snap2 = 6;
+            BeatDivisors = new IBeatDivisor[] {
+                new RationalBeatDivisor(1),
+                new RationalBeatDivisor(4), new RationalBeatDivisor(3),
+                new RationalBeatDivisor(8), new RationalBeatDivisor(6),
+                new RationalBeatDivisor(16), new RationalBeatDivisor(12)
+            };
+            MutedDivisors = new IBeatDivisor[] {
+                new RationalBeatDivisor(4), new RationalBeatDivisor(3),
+                new RationalBeatDivisor(8), new RationalBeatDivisor(6),
+                new RationalBeatDivisor(16), new RationalBeatDivisor(12)
+            };
             MinLength = 0.5;
             MutedIndex = -1;
-            MutedSampleSet = SampleSet.Soft;
+            MutedSampleSet = SampleSet.Auto;
 
             ImportLoadCommand = new CommandImplementation(
                 _ => {

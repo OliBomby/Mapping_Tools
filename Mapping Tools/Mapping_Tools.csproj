@@ -187,6 +187,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Classes\BeatmapHelper\IBeatDivisor.cs" />
+    <Compile Include="Classes\BeatmapHelper\IrrationalBeatDivisor.cs" />
+    <Compile Include="Classes\BeatmapHelper\RationalBeatDivisor.cs" />
     <Compile Include="Classes\BeatmapHelper\BeatmapEditor.cs" />
     <Compile Include="Classes\BeatmapHelper\BeatmapParsingException.cs" />
     <Compile Include="Classes\BeatmapHelper\Events\Break.cs" />
@@ -426,7 +429,7 @@
     </Compile>
     <Compile Include="Components\Domain\ColorToBrushConverter.cs" />
     <Compile Include="Components\Domain\CommandImplementation.cs" />
-    <Compile Include="Components\Domain\SnapDivisorToStringConverter.cs" />
+    <Compile Include="Components\Domain\BeatDivisorArrayToStringConverter.cs" />
     <Compile Include="Components\Domain\MapPathStringToCountStringConverter.cs" />
     <Compile Include="Components\Domain\FlagToBoolConverter.cs" />
     <Compile Include="Components\Domain\IntToStringConverter.cs" />
