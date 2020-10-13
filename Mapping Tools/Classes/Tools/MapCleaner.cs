@@ -44,7 +44,6 @@ namespace Mapping_Tools.Classes.Tools {
 
             Beatmap beatmap = editor.Beatmap;
             Timing timing = beatmap.BeatmapTiming;
-            Timeline timeline = beatmap.GetTimeline();
 
             GameMode mode = (GameMode)beatmap.General["Mode"].IntValue;
             double circleSize = beatmap.Difficulty["CircleSize"].DoubleValue;
@@ -79,24 +78,24 @@ namespace Mapping_Tools.Classes.Tools {
             if (args.ResnapObjects) {
                 // Resnap all objects
                 foreach (HitObject ho in beatmap.HitObjects) {
-                    bool resnapped = ho.ResnapSelf(timing, args.Snap1, args.Snap2);
+                    bool resnapped = ho.ResnapSelf(timing, args.BeatDivisors);
                     if (resnapped) {
                         objectsResnapped += 1;
                     }
-                    ho.ResnapEnd(timing, args.Snap1, args.Snap2);
+                    ho.ResnapEnd(timing, args.BeatDivisors);
                     ho.ResnapPosition(mode, circleSize);
                 }
                 UpdateProgressBar(worker, 18);
 
                 // Resnap Kiai toggles
                 foreach (TimingPoint tp in kiaiToggles) {
-                    tp.ResnapSelf(timing, args.Snap1, args.Snap2);
+                    tp.ResnapSelf(timing, args.BeatDivisors);
                 }
                 UpdateProgressBar(worker, 27);
 
                 // Resnap SliderVelocity changes
                 foreach (TimingPoint tp in svChanges) {
-                    tp.ResnapSelf(timing, args.Snap1, args.Snap2);
+                    tp.ResnapSelf(timing, args.BeatDivisors);
                 }
                 UpdateProgressBar(worker, 36);
             }
@@ -104,7 +103,7 @@ namespace Mapping_Tools.Classes.Tools {
             if (args.ResnapBookmarks) {
                 // Resnap the bookmarks
                 List<double> bookmarks = beatmap.GetBookmarks();
-                List<double> newBookmarks = bookmarks.Select(o => timing.Resnap(o, args.Snap1, args.Snap2)).ToList();
+                List<double> newBookmarks = bookmarks.Select(o => timing.Resnap(o, args.BeatDivisors)).ToList();
 
                 // Remove duplicate bookmarks
                 newBookmarks = newBookmarks.Distinct().ToList();
@@ -113,11 +112,14 @@ namespace Mapping_Tools.Classes.Tools {
                 UpdateProgressBar(worker, 45);
             }
 
+            // Collect timeline objects after resnapping
+            Timeline timeline = beatmap.GetTimeline();
+
             // Make new timingpoints
             List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
 
             // Add redlines
-            List<TimingPoint> redlines = timing.GetAllRedlines();
+            var redlines = timing.Redlines;
             foreach (TimingPoint tp in redlines) {
                 timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, meter: true, unInherited: true, omitFirstBarLine: true));
             }
@@ -256,7 +258,7 @@ namespace Mapping_Tools.Classes.Tools {
             UpdateProgressBar(worker, 85);
             
             // Replace the old timingpoints
-            timing.TimingPoints.Clear();
+            timing.Clear();
             TimingPointsChange.ApplyChanges(timing, timingPointsChanges);
             beatmap.GiveObjectsGreenlines();
 

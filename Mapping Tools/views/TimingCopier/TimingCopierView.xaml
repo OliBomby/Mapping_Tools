@@ -10,8 +10,8 @@
              x:Name="This"
              d:DesignHeight="650" Width="759.5">
     <UserControl.Resources>
-        <domain:SnapDivisorToStringConverter x:Key="SnapDivisorToStringConverter"/>
         <domain:MapPathStringToCountStringConverter x:Key="MapPathStringToCountStringConverter"/>
+        <domain:BeatDivisorArrayToStringConverter x:Key="BeatDivisorArrayToStringConverter"/>
     </UserControl.Resources>
     <Grid Name="MasterGrid">
         <Grid.RowDefinitions>
@@ -93,21 +93,11 @@
                 </ComboBox>
                 <TextBlock Text="Signatures" Margin="0,20,0,0" FontSize="14" FontWeight="Bold"
                            ToolTip="Beat snap divisors for resnapping."/>
-                <ComboBox FontSize="14" Text="{Binding Snap1, Converter={StaticResource SnapDivisorToStringConverter}}" Cursor="Hand" SelectedIndex="4" Width="60" HorizontalAlignment="Left"
-                          ToolTip="Beat snap divisors for resnapping.">
-                    <ComboBoxItem Content="1/1" Cursor="Hand"/>
-                    <ComboBoxItem Content="1/2" Cursor="Hand"/>
-                    <ComboBoxItem Content="1/4" Cursor="Hand"/>
-                    <ComboBoxItem Content="1/8" Cursor="Hand"/>
-                    <ComboBoxItem Content="1/16" Cursor="Hand"/>
-                </ComboBox>
-                <ComboBox FontSize="14" Text="{Binding Snap2, Converter={StaticResource SnapDivisorToStringConverter}}" Cursor="Hand" SelectedIndex="3" Width="60" HorizontalAlignment="Left"
-                          ToolTip="Beat snap divisors for resnapping.">
-                    <ComboBoxItem Content="1/1" Cursor="Hand"/>
-                    <ComboBoxItem Content="1/3" Cursor="Hand"/>
-                    <ComboBoxItem Content="1/6" Cursor="Hand"/>
-                    <ComboBoxItem Content="1/12" Cursor="Hand"/>
-                </ComboBox>
+                <TextBox Text="{Binding BeatDivisors, Converter={StaticResource BeatDivisorArrayToStringConverter}}" 
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                         HorizontalAlignment="Left" MinWidth="100" FontSize="14" Cursor="Hand"
+                         materialDesign:HintAssist.Hint="Beat divisors"
+                         ToolTip="Input any number of beat divisors here separated with commas. Example: 1/4, 1/12, 1/7, 4/5, 0.13435622499"/>
             </StackPanel>
             <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
                 <Button

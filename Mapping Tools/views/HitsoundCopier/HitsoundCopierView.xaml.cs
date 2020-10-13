@@ -74,11 +74,19 @@ namespace Mapping_Tools.Views.HitsoundCopier {
             var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
 
             foreach (var pathTo in paths) {
-                var editorTo = EditorReaderStuff.GetNewestVersionOrNot(pathTo, reader);
-                var editorFrom = EditorReaderStuff.GetNewestVersionOrNot(arg.PathFrom, reader);
+                BeatmapEditor editorTo = EditorReaderStuff.GetNewestVersionOrNot(pathTo, reader);;
+                Beatmap beatmapTo = editorTo.Beatmap;
+                Beatmap beatmapFrom;
 
-                var beatmapTo = editorTo.Beatmap;
-                var beatmapFrom = editorFrom.Beatmap;
+                if (!string.IsNullOrEmpty(arg.PathFrom)) {
+                    var editorFrom = EditorReaderStuff.GetNewestVersionOrNot(arg.PathFrom, reader);
+                    beatmapFrom = editorFrom.Beatmap;
+                } else {
+                    // Copy from an empty beatmap similar to the map to copy to
+                    beatmapFrom = beatmapTo.DeepCopy();
+                    beatmapFrom.HitObjects.Clear();
+                    beatmapFrom.BeatmapTiming.Clear();
+                }
 
                 Timeline processedTimeline;
 
@@ -159,7 +167,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                             where beatmapFrom.HitObjects.Any(o => o.Time < tp.Offset && o.EndTime > tp.Offset)
                             where !tp.Uninherited
                             select tp) {
-                            beatmapTo.BeatmapTiming.TimingPoints.Remove(tp);
+                            beatmapTo.BeatmapTiming.Remove(tp);
                         }
 
                         // Get timingpointschanges for every timingpoint from beatmapFrom that is in a sliderbody/spinnerbody for both beatmapTo and BeatmapFrom
@@ -341,7 +349,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                     List<string> sampleFilenames = tloFrom.GetFirstPlayingFilenames(mode, mapDir, firstSamples, false);
                     List<SampleGeneratingArgs> samples = sampleFilenames
                         .Select(o => new SampleGeneratingArgs(Path.Combine(mapDir, o)))
-                        .Where(s => SampleImporter.ValidateSampleArgs(s.Path))
+                        .Where(o => SampleImporter.ValidateSampleArgs(o, true))
                         .ToList();
 
                     if (samples.Count > 0) {
@@ -405,7 +413,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                 List<string> sampleFilenames = tlo.GetFirstPlayingFilenames(mode, mapDir, firstSamples, false);
                 List<SampleGeneratingArgs> samples = sampleFilenames
                     .Select(o => new SampleGeneratingArgs(Path.Combine(mapDir, o)))
-                    .Where(s => SampleImporter.ValidateSampleArgs(s.Path))
+                    .Where(o => SampleImporter.ValidateSampleArgs(o))
                     .ToList();
 
                 if (samples.Count > 0) {
@@ -571,18 +579,27 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                 return false;
             }
 
-            // Check filter snap
-            // It's at least snap x or worse if the time is not a multiple of snap x / 2
-            var timingPoint = beatmapTo.BeatmapTiming.GetRedlineAtTime(tloTo.Time - 1);
-            var resnappedTime = beatmapTo.BeatmapTiming.Resnap(tloTo.Time, arg.Snap1, arg.Snap2, false, timingPoint);
-            var beatsFromRedline = (resnappedTime - timingPoint.Offset) / timingPoint.MpB;
-            var dist1 = beatsFromRedline * arg.Snap1 / (arg.Snap1 == 1 ? 4 : 2);
-            var dist2 = beatsFromRedline * arg.Snap2 / (arg.Snap2 == 1 ? 4 : arg.Snap2 == 3 ? 3 : 2);
-            dist1 %= 1;
-            dist2 %= 1;
-            if (Precision.AlmostEquals(dist1, 0) || Precision.AlmostEquals(dist1, 1) ||
-                Precision.AlmostEquals(dist2, 0) || Precision.AlmostEquals(dist2, 1))
+            // Check if this tlo has hitsounds
+            if (tloTo.Whistle || tloTo.Finish || tloTo.Clap || 
+                (arg.MutedSampleSet != SampleSet.Auto && tloTo.FenoSampleSet != arg.MutedSampleSet)) {
                 return false;
+            }
+
+            // Check filter snap
+            var allBeatDivisors = arg.BeatDivisors;
+
+            var timingPoint = beatmapTo.BeatmapTiming.GetRedlineAtTime(tloTo.Time - 1);
+            var resnappedTime = beatmapTo.BeatmapTiming.Resnap(tloTo.Time, allBeatDivisors, false, tp: timingPoint);
+            var beatsFromRedline = (resnappedTime - timingPoint.Offset) / timingPoint.MpB;
+
+            // Get all the divisors which the sliderend could possibly be snapped to
+            var possibleDivisors =
+                allBeatDivisors.Where(d => Precision.AlmostEquals(beatsFromRedline % d.GetValue(), 0));
+
+            // Make sure all the possible beat divisors of lower priority are in the muted category
+            if (possibleDivisors.TakeWhile(d => !arg.MutedDivisors.Contains(d)).Any()) {
+                return false;
+            }
 
             // Check filter temporal length
             return Precision.AlmostBigger(tloTo.Origin.TemporalLength, arg.MinLength * timingPoint.MpB);

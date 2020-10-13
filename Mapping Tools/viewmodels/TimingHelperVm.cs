@@ -1,4 +1,5 @@
-﻿using Mapping_Tools.Classes.SystemTools;
+﻿using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.SystemTools;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Viewmodels {
@@ -12,8 +13,7 @@ namespace Mapping_Tools.Viewmodels {
         private bool _omitBarline;
         private double _leniency;
         private double _beatsBetween;
-        private int _snap1;
-        private int _snap2;
+        private IBeatDivisor[] _beatDivisors;
 
         [JsonIgnore]
         public string[] Paths;
@@ -56,19 +56,10 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _beatsBetween, value);
         }
 
-        public int Snap1 {
-            get => _snap1;
-            set => Set(ref _snap1, value);
+        public IBeatDivisor[] BeatDivisors {
+            get => _beatDivisors;
+            set => Set(ref _beatDivisors, value);
         }
-
-        public int Snap2 {
-            get => _snap2;
-            set => Set(ref _snap2, value);
-        }
-
-        public string[] Snaps1 => new[] { "1/1", "1/2", "1/4", "1/8", "1/16" };
-
-        public string[] Snaps2 => new[] { "1/1", "1/3", "1/6", "1/12" };
 
         #endregion
 
@@ -80,8 +71,7 @@ namespace Mapping_Tools.Viewmodels {
             OmitBarline = false;
             Leniency = 3;
             BeatsBetween = -1;
-            Snap1 = 4;
-            Snap2 = 3;
+            BeatDivisors = RationalBeatDivisor.GetDefaultBeatDivisors();
         }
     }
 }

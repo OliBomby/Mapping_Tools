@@ -2,48 +2,45 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SystemTools;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     /// <summary>
     /// 
     /// </summary>
-    public class SampleGeneratingArgs : INotifyPropertyChanged, IEquatable<SampleGeneratingArgs> {
-        /// <summary>
-        /// 
-        /// </summary>
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="propName"></param>
-        public void NotifyPropertyChanged(string propName) {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
-        }
-
+    public class SampleGeneratingArgs : BindableBase, IEquatable<SampleGeneratingArgs> {
         public SampleGeneratingArgs() {
             Path = "";
-            volume = 1;
+            Volume = 1;
+            Bank = -1;
+            Patch = -1;
+            Instrument = -1;
+            Key = -1;
+            Length = -1;
         }
 
         public SampleGeneratingArgs(string path) {
             Path = path;
-            volume = 1;
+            Volume = 1;
+            Bank = -1;
+            Patch = -1;
+            Instrument = -1;
+            Key = -1;
+            Length = -1;
         }
 
         public SampleGeneratingArgs(string path, double volume, int bank, int patch, int instrument, int key, double length) {
-            this.path = path;
-            this.volume = volume;
-            this.bank = bank;
-            this.patch = patch;
-            this.instrument = instrument;
-            this.key = key;
-            this.length = length;
+            Path = path;
+            Volume = volume;
+            Bank = bank;
+            Patch = patch;
+            Instrument = instrument;
+            Key = key;
+            Length = length;
         }
 
         public SampleGeneratingArgs(string path, int bank, int patch, int instrument, int key, double length, int velocity) {
             Path = path;
-            volume = 1;
             Bank = bank;
             Patch = patch;
             Instrument = instrument;
@@ -60,27 +57,20 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// <summary>
         /// Means you can export this sample by simply copy pasting the source file in <see cref="Path"/>.
         /// </summary>
-        public bool CanCopyPaste => !UsesSoundFont && Math.Abs(Volume - 1) < Precision.DOUBLE_EPSILON;
+        public bool CanCopyPaste => !string.IsNullOrEmpty(GetExtension()) && !UsesSoundFont && Math.Abs(Volume - 1) < Precision.DOUBLE_EPSILON;
 
         private string path;
         public string Path {
             get => path;
-            set {
-                if (path != value) {
-                    path = value;
-                    NotifyPropertyChanged("Path");
-                }
-            }
+            set => Set(ref path, value);
         }
 
         private double volume;
         public double Volume {
             get => volume;
             set {
-                if (volume != value) {
-                    volume = value;
-                    NotifyPropertyChanged("Volume");
-                    NotifyPropertyChanged("Velocity");
+                if (Set(ref volume, value)) {
+                    RaisePropertyChanged(nameof(Velocity));
                 }
             }
         }
@@ -88,66 +78,36 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         private int bank;
         public int Bank {
             get => bank;
-            set {
-                if (bank != value) {
-                    bank = value;
-                    NotifyPropertyChanged("Bank");
-                }
-            }
+            set => Set(ref bank, value);
         }
 
         private int patch;
         public int Patch {
             get => patch;
-            set {
-                if (patch != value) {
-                    patch = value;
-                    NotifyPropertyChanged("Patch");
-                }
-            }
+            set => Set(ref patch, value);
         }
 
         private int instrument;
         public int Instrument {
             get => instrument;
-            set {
-                if (instrument != value) {
-                    instrument = value;
-                    NotifyPropertyChanged("Instrument");
-                }
-            }
+            set => Set(ref instrument, value);
         }
 
         private int key;
         public int Key {
             get => key;
-            set {
-                if (key != value) {
-                    key = value;
-                    NotifyPropertyChanged("Key");
-                }
-            }
+            set => Set(ref key, value);
         }
 
         private double length;
         public double Length {
             get => length;
-            set {
-                if (length != value) {
-                    length = value;
-                    NotifyPropertyChanged("Length");
-                }
-            }
+            set => Set(ref length, value);
         }
 
         public int Velocity {
-            get => (int)Math.Round(Volume * 127);
-            set {
-                if (Velocity != value) {
-                    Volume = value / 127d;
-                    NotifyPropertyChanged("Velocity");
-                }
-            }
+            get => (int) Math.Round(Volume * 127);
+            set => Volume = value / 127d;
         }
 
         /// <summary>Returns a string that represents the current object and can be used as a filename.</summary>
@@ -181,18 +141,15 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         public bool Equals(SampleGeneratingArgs other) {
-            // Equality method can ignore bank, patch etc when path is not a soundfont because then those variables have no effect on how a sample gets generated
-            if (GetExtension() == ".sf2" && other.GetExtension() == ".sf2") {
-                return Path == other.Path &&
-                Bank == other.Bank &&
-                Patch == other.Patch &&
-                Instrument == other.Instrument &&
-                Key == other.Key &&
-                Length == other.Length;
-            } else {
-                return Path == other.Path &&
-                Volume == other.Volume;
-            }
+            if (other is null) return false;
+
+            return Path == other.Path &&
+                   Volume == other.Volume &&
+                   Bank == other.Bank &&
+                   Patch == other.Patch &&
+                   Instrument == other.Instrument &&
+                   Key == other.Key &&
+                   Length == other.Length;
         }
 
         public override bool Equals(object obj) {
@@ -203,43 +160,26 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return Equals((SampleGeneratingArgs)obj);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="other"></param>
-        /// <returns></returns>
-        public bool ExactlyEquals(SampleGeneratingArgs other) {
-            return Path == other.Path &&
-            Volume == other.Volume &&
-            Bank == other.Bank &&
-            Patch == other.Patch &&
-            Instrument == other.Instrument &&
-            Key == other.Key &&
-            Length == other.Length;
-        }
-
         /// <summary>Serves as the default hash function. </summary>
         /// <returns>A hash code for the current object.</returns>
         public override int GetHashCode() {
             var hashCode = 0x34894079;
             hashCode = hashCode * -0x5AAAAAD7 + EqualityComparer<string>.Default.GetHashCode(Path);
             hashCode = hashCode * -0x5AAAAAD7 + Volume.GetHashCode();
-            if (GetExtension() == ".sf2") {
-                hashCode = hashCode * -0x5AAAAAD7 + Bank.GetHashCode();
-                hashCode = hashCode * -0x5AAAAAD7 + Patch.GetHashCode();
-                hashCode = hashCode * -0x5AAAAAD7 + Instrument.GetHashCode();
-                hashCode = hashCode * -0x5AAAAAD7 + Key.GetHashCode();
-                hashCode = hashCode * -0x5AAAAAD7 + Length.GetHashCode();
-            }
+            hashCode = hashCode * -0x5AAAAAD7 + Bank.GetHashCode();
+            hashCode = hashCode * -0x5AAAAAD7 + Patch.GetHashCode();
+            hashCode = hashCode * -0x5AAAAAD7 + Instrument.GetHashCode();
+            hashCode = hashCode * -0x5AAAAAD7 + Key.GetHashCode();
+            hashCode = hashCode * -0x5AAAAAD7 + Length.GetHashCode();
             return hashCode;
         }
 
         public static bool operator ==(SampleGeneratingArgs left, object right) {
-            return left.Equals(right);
+            return !(left is null) && left.Equals(right);
         }
 
         public static bool operator !=(SampleGeneratingArgs left, object right) {
-            return !left.Equals(right);
+            return left is null || !left.Equals(right);
         }
     }
 }

@@ -11,6 +11,7 @@
     <UserControl.Resources>
         <domain:DoubleToStringConverter x:Key="D2SConverter"/>
         <domain:IntToStringConverter x:Key="I2SConverter"/>
+        <domain:BeatDivisorArrayToStringConverter x:Key="BeatDivisorArrayToStringConverter"/>
     </UserControl.Resources>
     <Grid Name="MasterGrid">
         <Grid.RowDefinitions>
@@ -113,10 +114,16 @@
                         HorizontalAlignment="Right"
                         VerticalAlignment="Bottom"
                         Orientation="Horizontal">
-                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a hitsound zone. Hold shift to add current selected coordinates." Command="{Binding AddCommand}" Margin="5">
-                        <materialDesign:PackIcon Kind="Plus" Height="24" Width="24" />
+                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a pattern from .osu code." Command="{Binding AddCodeCommand}" Margin="5">
+                        <materialDesign:PackIcon Kind="CodeBraces" Height="24" Width="24" />
                     </Button>
-                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove selected hitsound zones." Command="{Binding RemoveCommand}" Margin="5">
+                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a pattern from a file." Command="{Binding AddFileCommand}" Margin="5">
+                        <materialDesign:PackIcon Kind="FilePlus" Height="24" Width="24" />
+                    </Button>
+                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a pattern from selected hit objects." Command="{Binding AddSelectedCommand}" Margin="5">
+                        <materialDesign:PackIcon Kind="PlusBox" Height="24" Width="24" />
+                    </Button>
+                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove selected pattern." Command="{Binding RemoveCommand}" Margin="5">
                         <materialDesign:PackIcon Kind="Trashcan" Height="24" Width="24" />
                     </Button>
                 </StackPanel>

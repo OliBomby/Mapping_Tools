@@ -90,9 +90,13 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
-        public static List<CustomIndex> GetCustomIndices(List<SamplePackage> packages, Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null) {
-            var indices = packages.Select(o => o.GetCustomIndex()).ToList();
-            indices.ForEach(o => o.CleanInvalids(loadedSamples));
+        public static List<CustomIndex> GetCustomIndices(List<SamplePackage> packages, 
+            Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null,
+            bool validateSampleFile = true, 
+            SampleGeneratingArgsComparer comparer = null) {
+
+            var indices = packages.Select(o => o.GetCustomIndex(comparer)).ToList();
+            indices.ForEach(o => o.CleanInvalids(loadedSamples, validateSampleFile));
             return indices;
         }
 
@@ -154,24 +158,28 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             ref Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples,
             ref Dictionary<SampleGeneratingArgs, string> names,
             ref Dictionary<SampleGeneratingArgs, Vector2> positions,
-            bool maniaPositions=false, bool includeRegularHitsounds=true, bool allowNamingGrowth=false) {
+            bool maniaPositions=false, bool includeRegularHitsounds=true, bool allowNamingGrowth=false,
+            bool validateSampleFile = true, SampleGeneratingArgsComparer comparer = null) {
 
-            HashSet<SampleGeneratingArgs> allSampleArgs = new HashSet<SampleGeneratingArgs>();
+            if (comparer == null)
+                comparer = new SampleGeneratingArgsComparer();
+
+            HashSet<SampleGeneratingArgs> allSampleArgs = new HashSet<SampleGeneratingArgs>(comparer);
             foreach (SamplePackage sp in samplePackages) {
                 allSampleArgs.UnionWith(sp.Samples.Select(o => o.SampleArgs));
             }
 
             if (loadedSamples == null) {
-                loadedSamples = SampleImporter.ImportSamples(allSampleArgs);
+                loadedSamples = SampleImporter.ImportSamples(allSampleArgs, comparer);
             }
 
             if (names == null) {
-                names = HitsoundExporter.GenerateSampleNames(allSampleArgs, loadedSamples);
+                names = HitsoundExporter.GenerateSampleNames(allSampleArgs, loadedSamples, validateSampleFile, comparer);
             }
 
             if (positions == null) {
-                positions = maniaPositions ? HitsoundExporter.GenerateManiaHitsoundPositions(allSampleArgs) :
-                    HitsoundExporter.GenerateHitsoundPositions(allSampleArgs);
+                positions = maniaPositions ? HitsoundExporter.GenerateManiaHitsoundPositions(allSampleArgs, comparer) :
+                    HitsoundExporter.GenerateHitsoundPositions(allSampleArgs, comparer);
             }
 
             var hitsounds = new List<HitsoundEvent>();
@@ -183,7 +191,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         filename = names[s.SampleArgs];
                     } else {
                         // Validate the sample because we expect only valid samples to be present in the sample schema
-                        if (SampleImporter.ValidateSampleArgs(s.SampleArgs, loadedSamples)) {
+                        if (SampleImporter.ValidateSampleArgs(s.SampleArgs, loadedSamples, validateSampleFile)) {
                             if (allowNamingGrowth) {
                                 HitsoundExporter.AddNewSampleName(names, s.SampleArgs, loadedSamples);
                                 filename = names[s.SampleArgs];
@@ -215,10 +223,16 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// </summary>
         /// <param name="samplePackages">The SamplePackages to get hitsounds out of</param>
         /// <param name="customIndices">The CustomIndices that fit all the packages</param>
+        /// <param name="loadedSamples">Loaded samples for the validation of samples files from the sample packages.</param>
+        /// <param name="validateSampleFile">Whether to validate sample files from the sample packages.</param>
+        /// <param name="comparer">Comparer for <see cref="SampleGeneratingArgs"/></param>
         /// <returns></returns>
-        public static List<HitsoundEvent> GetHitsounds(List<SamplePackage> samplePackages, List<CustomIndex> customIndices) {
+        public static List<HitsoundEvent> GetHitsounds(List<SamplePackage> samplePackages, 
+            List<CustomIndex> customIndices,
+            Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null,
+            bool validateSampleFile = true, SampleGeneratingArgsComparer comparer = null) {
             List<HitsoundEvent> hitsounds = new List<HitsoundEvent>(samplePackages.Count);
-            List<CustomIndex> packageCustomIndices = GetCustomIndices(samplePackages);
+            List<CustomIndex> packageCustomIndices = GetCustomIndices(samplePackages, loadedSamples, validateSampleFile, comparer);
 
             int index = 0;
             while (index < packageCustomIndices.Count) {
@@ -264,17 +278,19 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         public static CompleteHitsounds GetCompleteHitsounds(List<SamplePackage> packages, 
-            Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null, 
-            List<CustomIndex> customIndices = null, bool allowGrowth=false, int firstCustomIndex=1) {
+            Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null,
+            List<CustomIndex> customIndices = null, bool allowGrowth=false, int firstCustomIndex=1,
+            bool validateSampleFile = true, SampleGeneratingArgsComparer comparer = null) {
+
             if (customIndices == null) {
-                customIndices = OptimizeCustomIndices(GetCustomIndices(packages, loadedSamples));
+                customIndices = OptimizeCustomIndices(GetCustomIndices(packages, loadedSamples, validateSampleFile, comparer));
                 GiveCustomIndicesIndices(customIndices, false, firstCustomIndex);
             } else if (allowGrowth) {
-                customIndices = OptimizeCustomIndices(customIndices.Concat(GetCustomIndices(packages, loadedSamples)).ToList());
+                customIndices = OptimizeCustomIndices(customIndices.Concat(GetCustomIndices(packages, loadedSamples, validateSampleFile, comparer)).ToList());
                 GiveCustomIndicesIndices(customIndices, true, firstCustomIndex);
             }
 
-            var hitsounds = GetHitsounds(packages, customIndices);
+            var hitsounds = GetHitsounds(packages, customIndices, loadedSamples, validateSampleFile, comparer);
 
             return new CompleteHitsounds(hitsounds, customIndices);
         }

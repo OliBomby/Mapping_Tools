@@ -32,14 +32,14 @@ namespace Mapping_Tools.Classes.Tools {
             Fuzzyness = fuzzyness;
         }
 
-        public void AddChange(List<TimingPoint> list, bool allAfter = false) {
+        public void AddChange(Timing timing, bool allAfter = false) {
             TimingPoint addingTimingPoint = null;
             TimingPoint prevTimingPoint = null;
             List<TimingPoint> onTimingPoints = new List<TimingPoint>();
             bool onHasRed = false;
             bool onHasGreen = false;
 
-            foreach (TimingPoint tp in list) {
+            foreach (TimingPoint tp in timing) {
                 if (tp == null) { continue; }  // Continue nulls to avoid exceptions
                 if (tp.Offset < MyTP.Offset && (prevTimingPoint == null || tp.Offset >= prevTimingPoint.Offset)) {
                     prevTimingPoint = tp;
@@ -58,7 +58,8 @@ namespace Mapping_Tools.Classes.Tools {
             if (UnInherited && !onHasRed) {
                 // Make new redline
                 if (prevTimingPoint == null) {
-                    addingTimingPoint = MyTP;
+                    addingTimingPoint = MyTP.Copy();
+                    addingTimingPoint.Uninherited = true;
                 } else {
                     addingTimingPoint = prevTimingPoint.Copy();
                     addingTimingPoint.Offset = MyTP.Offset;
@@ -69,7 +70,8 @@ namespace Mapping_Tools.Classes.Tools {
             if (!UnInherited && (onTimingPoints.Count == 0 || (MpB && !onHasGreen))) {
                 // Make new greenline (based on prev)
                 if (prevTimingPoint == null) {
-                    addingTimingPoint = MyTP;
+                    addingTimingPoint = MyTP.Copy();
+                    addingTimingPoint.Uninherited = false;
                 } else {
                     addingTimingPoint = prevTimingPoint.Copy();
                     addingTimingPoint.Offset = MyTP.Offset;
@@ -90,12 +92,12 @@ namespace Mapping_Tools.Classes.Tools {
             }
 
             if (addingTimingPoint != null && (prevTimingPoint == null || !addingTimingPoint.SameEffect(prevTimingPoint) || UnInherited)) {
-                list.Add(addingTimingPoint);
+                timing.Add(addingTimingPoint);
             }
 
             if (allAfter) // Change every timingpoint after
             {
-                foreach (TimingPoint tp in list) {
+                foreach (TimingPoint tp in timing) {
                     if (tp.Offset > MyTP.Offset) {
                         if (Sampleset) { tp.SampleSet = MyTP.SampleSet; }
                         if (Index) { tp.SampleIndex = MyTP.SampleIndex; }
@@ -109,84 +111,13 @@ namespace Mapping_Tools.Classes.Tools {
         public static void ApplyChanges(Timing timing, IEnumerable<TimingPointsChange> timingPointsChanges, bool allAfter = false) {
             timingPointsChanges = timingPointsChanges.OrderBy(o => o.MyTP.Offset);
             foreach (TimingPointsChange c in timingPointsChanges) {
-                c.AddChange(timing.TimingPoints, allAfter);
+                c.AddChange(timing, allAfter);
             }
-            timing.Sort();
         }
 
         public void Debug() {
             Console.WriteLine(MyTP.GetLine());
             Console.WriteLine($"{MpB}, {Meter}, {Sampleset}, {Index}, {Volume}, {UnInherited}, {Kiai}, {OmitFirstBarLine}");
-        }
-
-        public void AddChangeOld(List<TimingPoint> list, bool allAfter=false) {
-            TimingPoint prev = null;
-            TimingPoint on = null;
-            foreach (TimingPoint tp in list) {
-                if (tp == null) {
-                    continue;
-                }
-                if (prev == null) {
-                    if (tp.Offset < MyTP.Offset) {
-                        prev = tp;
-                    }
-                } else if (tp.Offset >= prev.Offset && tp.Offset < MyTP.Offset) {
-                    prev = tp;
-                }
-                if (tp.Offset == MyTP.Offset) {
-                    if (tp.Uninherited && MpB) {
-                        prev = tp;
-                    } else {
-                        on = tp;
-                    }
-                }
-            }
-
-            if (on != null) {
-                if (MpB) { on.MpB = MyTP.MpB; }
-                if (Meter) { on.Meter = MyTP.Meter; }
-                if (Sampleset) { on.SampleSet = MyTP.SampleSet; }
-                if (Index) { on.SampleIndex = MyTP.SampleIndex; }
-                if (Volume) { on.Volume = MyTP.Volume; }
-                if (UnInherited) { on.Uninherited = MyTP.Uninherited; }
-                if (Kiai) { on.Kiai = MyTP.Kiai; }
-                if (OmitFirstBarLine) { on.OmitFirstBarLine = MyTP.OmitFirstBarLine; }
-            } else {
-                if (prev != null) {
-                    // Make new timingpoint
-                    if (prev.Uninherited) {
-                        on = new TimingPoint(MyTP.Offset, -100, prev.Meter, prev.SampleSet, prev.SampleIndex, prev.Volume, false, prev.Kiai, prev.OmitFirstBarLine);
-                    } else {
-                        on = new TimingPoint(MyTP.Offset, prev.MpB, prev.Meter, prev.SampleSet, prev.SampleIndex, prev.Volume, false, prev.Kiai, prev.OmitFirstBarLine);
-                    }
-                    if (MpB) { on.MpB = MyTP.MpB; }
-                    if (Meter) { on.Meter = MyTP.Meter; }
-                    if (Sampleset) { on.SampleSet = MyTP.SampleSet; }
-                    if (Index) { on.SampleIndex = MyTP.SampleIndex; }
-                    if (Volume) { on.Volume = MyTP.Volume; }
-                    if (UnInherited) { on.Uninherited = MyTP.Uninherited; }
-                    if (Kiai) { on.Kiai = MyTP.Kiai; }
-                    if (OmitFirstBarLine) { on.OmitFirstBarLine = MyTP.OmitFirstBarLine; }
-
-                    if (!on.SameEffect(prev) || UnInherited) {
-                        list.Add(on);
-                    }
-                } else {
-                    list.Add(MyTP);
-                }
-            }
-
-            if (allAfter) // Change every timingpoint after
-            {
-                foreach (TimingPoint tp in list) {
-                    if (tp.Offset > MyTP.Offset) {
-                        if (Sampleset) { tp.SampleSet = MyTP.SampleSet; }
-                        if (Index) { tp.SampleIndex = MyTP.SampleIndex; }
-                        if (Volume) { tp.Volume = MyTP.Volume; }
-                        if (Kiai) { tp.Kiai = MyTP.Kiai; }
-                    }
-                }
-            }
         }
     }
 }

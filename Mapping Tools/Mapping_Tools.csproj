@@ -187,6 +187,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Classes\BeatmapHelper\IBeatDivisor.cs" />
+    <Compile Include="Classes\BeatmapHelper\IrrationalBeatDivisor.cs" />
+    <Compile Include="Classes\BeatmapHelper\RationalBeatDivisor.cs" />
     <Compile Include="Classes\BeatmapHelper\BeatmapEditor.cs" />
     <Compile Include="Classes\BeatmapHelper\BeatmapParsingException.cs" />
     <Compile Include="Classes\BeatmapHelper\Events\Break.cs" />
@@ -235,6 +238,7 @@
     <Compile Include="Classes\HitsoundStuff\Effects\Effect.cs" />
     <Compile Include="Classes\HitsoundStuff\Effects\EffectParameter.cs" />
     <Compile Include="Classes\HitsoundStuff\Effects\SoftLimiter.cs" />
+    <Compile Include="Classes\HitsoundStuff\SampleGeneratingArgsComparer.cs" />
     <Compile Include="Classes\HitsoundStuff\Hitsound.cs" />
     <Compile Include="Classes\HitsoundStuff\HitsoundLayerExtension.cs" />
     <Compile Include="Classes\HitsoundStuff\HitsoundZone.cs" />
@@ -242,6 +246,7 @@
     <Compile Include="Classes\HitsoundStuff\ImportReloadingArgsComparer.cs" />
     <Compile Include="Classes\HitsoundStuff\ImportType.cs" />
     <Compile Include="Classes\HitsoundStuff\LayerImportArgs.cs" />
+    <Compile Include="Classes\HitsoundStuff\MidiExporter.cs" />
     <Compile Include="Classes\HitsoundStuff\SampleGeneratingArgs.cs" />
     <Compile Include="Classes\HitsoundStuff\SampleImporter.cs" />
     <Compile Include="Classes\HitsoundStuff\CompleteHitsounds.cs" />
@@ -398,6 +403,9 @@
     <Compile Include="Classes\Tools\MapCleaner.cs" />
     <Compile Include="Classes\Tools\MapCleanerArgs.cs" />
     <Compile Include="Classes\Tools\PathGenerator.cs" />
+    <Compile Include="Classes\Tools\PatternGallery\PatternCodeImportVm.cs" />
+    <Compile Include="Classes\Tools\PatternGallery\SelectedPatternImportVm.cs" />
+    <Compile Include="Classes\Tools\PatternGallery\PatternFileImportVm.cs" />
     <Compile Include="Classes\Tools\PatternGallery\CollectionRenameVm.cs" />
     <Compile Include="Classes\Tools\PatternGallery\OsuPattern.cs" />
     <Compile Include="Classes\Tools\PatternGallery\OsuPatternFileHandler.cs" />
@@ -407,6 +415,12 @@
     <Compile Include="Classes\Tools\PatternGallery\PatternOverwriteMode.cs" />
     <Compile Include="Classes\Tools\RhythmGuide.cs" />
     <Compile Include="Classes\Tools\Sliderator.cs" />
+    <Compile Include="Components\Dialogs\CustomDialog\BeatmapBrowseAttribute.cs" />
+    <Compile Include="Components\Dialogs\CustomDialog\ConverterParameterAttribute.cs" />
+    <Compile Include="Components\Dialogs\CustomDialog\MultiLineInputAttribute.cs" />
+    <Compile Include="Components\Dialogs\CustomDialog\TextWrappingAttribute.cs" />
+    <Compile Include="Components\Dialogs\CustomDialog\TimeInputAttribute.cs" />
+    <Compile Include="Components\Dialogs\CustomDialog\FileBrowseAttribute.cs" />
     <Compile Include="Components\Dialogs\MessageDialog.xaml.cs">
       <DependentUpon>MessageDialog.xaml</DependentUpon>
     </Compile>
@@ -415,7 +429,7 @@
     </Compile>
     <Compile Include="Components\Domain\ColorToBrushConverter.cs" />
     <Compile Include="Components\Domain\CommandImplementation.cs" />
-    <Compile Include="Components\Domain\SnapDivisorToStringConverter.cs" />
+    <Compile Include="Components\Domain\BeatDivisorArrayToStringConverter.cs" />
     <Compile Include="Components\Domain\MapPathStringToCountStringConverter.cs" />
     <Compile Include="Components\Domain\FlagToBoolConverter.cs" />
     <Compile Include="Components\Domain\IntToStringConverter.cs" />
