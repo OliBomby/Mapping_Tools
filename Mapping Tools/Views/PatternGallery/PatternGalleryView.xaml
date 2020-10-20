@@ -6,8 +6,9 @@
              xmlns:local="clr-namespace:Mapping_Tools.Views"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
+             xmlns:viewmodels="clr-namespace:Mapping_Tools.Viewmodels"
              x:Name="This"
-             mc:Ignorable="d" Width="900" Height="700" d:DataContext="{d:DesignData PatternGalleryVm}">
+             mc:Ignorable="d" Width="900" Height="700" d:DataContext="{d:DesignInstance viewmodels:PatternGalleryVm}">
     <UserControl.Resources>
         <domain:DoubleToStringConverter x:Key="D2SConverter"/>
         <domain:IntToStringConverter x:Key="I2SConverter"/>
@@ -19,7 +20,13 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid Name="FirstGrid" Grid.Row="0">
-            <Grid Margin="0,0,120,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Margin="0,0,0,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
@@ -27,7 +34,7 @@
                 </Grid.RowDefinitions>
 
 
-              <StackPanel Orientation="Horizontal" Grid.Row="0">
+                <StackPanel Orientation="Horizontal" Grid.Row="0">
                 <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
                   <Run Text="Pattern Gallery"/>
                 </TextBlock>
@@ -129,7 +136,100 @@
                 </StackPanel>
             </Grid>
 
-            <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
+            <GridSplitter Grid.Column="1" Width="2" Margin="0,72,0,10" HorizontalAlignment="Center"/>
+
+            <Grid Grid.Column="2" Margin="0 72 0 0">
+                <StackPanel>
+                    <TextBox Margin="0 7 0 0" materialDesign:HintAssist.Hint="Deletion margin" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                             ToolTip="Extra time in milliseconds around the patterns for deleting parts of the original map.">
+                        <TextBox.Text>
+                            <Binding Path="Padding" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
+                                <Binding.Converter>
+                                    <domain:DoubleToStringConverter/>
+                                </Binding.Converter>
+                                <Binding.ValidationRules>
+                                    <domain:IsGreaterOrEqualValidationRule>
+                                        <domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                            <domain:DoubleWrapper Value="0"/>
+                                        </domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                    </domain:IsGreaterOrEqualValidationRule>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
+                    <TextBox Margin="0 5 0 0" materialDesign:HintAssist.Hint="Parting distance" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                             ToolTip="Minimum number of beats required in a gap to split a pattern into smaller parts.">
+                        <TextBox.Text>
+                            <Binding Path="PartingDistance" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
+                                <Binding.Converter>
+                                    <domain:DoubleToStringConverter/>
+                                </Binding.Converter>
+                                <Binding.ValidationRules>
+                                    <domain:IsGreaterOrEqualValidationRule>
+                                        <domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                            <domain:DoubleWrapper Value="0"/>
+                                        </domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                    </domain:IsGreaterOrEqualValidationRule>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
+                    <TextBox Text="{Binding BeatDivisors, Converter={StaticResource BeatDivisorArrayToStringConverter}}" 
+                             Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                             materialDesign:HintAssist.Hint="Beat divisors" Margin="0 5 0 0"
+                             ToolTip="Input any number of beat divisors here separated with commas. Example: 1/4, 1/12, 1/7, 4/5, 0.13435622499"/>
+                    <Grid Margin="0 5 0 0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="5"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Text="{Binding CustomScale, Converter={StaticResource D2SConverter}}" 
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                 materialDesign:HintAssist.Hint="Custom scale" Grid.Column="0"
+                                 ToolTip="Scalar to change the size of the pattern."/>
+                        <TextBox Text="{Binding CustomRotate, Converter={StaticResource D2SConverter}}" 
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                 materialDesign:HintAssist.Hint="Custom rotate" Grid.Column="2"
+                                 ToolTip="Degrees to rotate the pattern."/>
+                    </Grid>
+                    <ComboBox SelectedItem="{Binding PatternOverwriteMode}" ItemsSource="{Binding PatternOverwriteModes}"
+                              Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                              materialDesign:HintAssist.Hint="Pattern overwrite mode" Margin="0 5 0 0"
+                              ToolTip="Determines how to overwrite the objects in the original beatmap when a pattern gets placed on them."/>
+                    <ComboBox SelectedItem="{Binding TimingOverwriteMode}" ItemsSource="{Binding TimingOverwriteModes}"
+                              Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                              materialDesign:HintAssist.Hint="Timing overwrite mode" Margin="0 5 0 0"
+                              ToolTip="Determines how to combine the timing of the orignal beatmap and the timing of the pattern."/>
+                    
+                    <CheckBox Content="Include hitsounds" Margin="0 5 0 0"
+                              ToolTip="Export the pattern with hitsounds and hitsound effects from timing points."
+                              IsChecked="{Binding IncludeHitsounds}"/>
+                    <CheckBox Content="Scale to new circle size"
+                              ToolTip="Scale the pattern such that the spacing relative to the circle size stays the same."
+                              IsChecked="{Binding ScaleToNewCircleSize}"/>
+                    <CheckBox Content="Scale to new Timing"
+                              ToolTip="Scale the pattern in time such that the relative number of beats between objects stays the same in the new timing."
+                              IsChecked="{Binding ScaleToNewTiming}"/>
+                    <CheckBox Content="Snap to new Timing"
+                              ToolTip="Snap the objects of the pattern to the new timing using the specified beat divisors."
+                              IsChecked="{Binding SnapToNewTiming}"/>
+                    <CheckBox Content="Fix global SV"
+                              ToolTip="Adjust greenline SV in the pattern to the new global SV so sliders have the same SV in the new beatmap."
+                              IsChecked="{Binding FixGlobalSV}"/>
+                    <CheckBox Content="Fix colourhax"
+                              ToolTip="Adjust colour skip such that the colour indices of objects stay the same for the pattern and the original beatmap."
+                              IsChecked="{Binding FixColourHax}"/>
+                    <CheckBox Content="Fix stack leniency"
+                              ToolTip="Manually stack objects of the pattern which should be stacked but don't have enough stack leniency in the new beatmap."
+                              IsChecked="{Binding FixStackLeniency}"/>
+                    <CheckBox Content="Fix slider tick rate"
+                              ToolTip="Multiply BPM in the pattern so the slider tick rate in the pattern stays the same."
+                              IsChecked="{Binding FixTickRate}"/>
+                </StackPanel>
+            </Grid>
+
+            <Viewbox Grid.Column="2" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
                 <Button
                     IsEnabled="{Binding ElementName=This, Path=CanRun}"
                     Style="{StaticResource MaterialDesignFloatingActionButton}"

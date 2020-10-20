@@ -50,7 +50,7 @@ namespace Mapping_Tools.Viewmodels {
         public OsuPatternPlacer OsuPatternPlacer { get; set; }
 
         /// <summary>
-        /// Extra time in millseconds around the patterns for deleting parts of the original map.
+        /// Extra time in milliseconds around the patterns for deleting parts of the original map.
         /// </summary>
         public double Padding {
             get => OsuPatternPlacer.Padding;
@@ -70,10 +70,18 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref OsuPatternPlacer.PatternOverwriteMode, value);
         }
 
+        [JsonIgnore]
+        public IEnumerable<PatternOverwriteMode> PatternOverwriteModes =>
+            Enum.GetValues(typeof(PatternOverwriteMode)).Cast<PatternOverwriteMode>();
+
         public TimingOverwriteMode TimingOverwriteMode {
             get => OsuPatternPlacer.TimingOverwriteMode;
             set => Set(ref OsuPatternPlacer.TimingOverwriteMode, value);
         }
+
+        [JsonIgnore]
+        public IEnumerable<TimingOverwriteMode> TimingOverwriteModes =>
+            Enum.GetValues(typeof(TimingOverwriteMode)).Cast<TimingOverwriteMode>();
 
         public bool IncludeHitsounds {
             get => OsuPatternPlacer.IncludeHitsounds;
