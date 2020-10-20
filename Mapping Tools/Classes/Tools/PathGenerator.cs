@@ -107,7 +107,7 @@ namespace Mapping_Tools.Classes.Tools {
             var p2 = GetContinuousPosition(endIndex);
 
             var a1 = GetContinuousAngle(startIndex);
-            var a2 = GetContinuousAngle(endIndex);
+            var a2 = GetContinuousAngle(endIndex - 2 * Precision.DOUBLE_EPSILON);
 
             if (Math.Abs(GetSmallestAngle(a1, a2)) > 0.1) {
                 var t1 = new Line2(p1, a1);
@@ -128,10 +128,14 @@ namespace Mapping_Tools.Classes.Tools {
             var p1 = GetContinuousPosition(startIndex);
             var p2 = GetContinuousPosition(endIndex);
 
-            var averagePoint = (p1 + p2) / 2;
-            var middlePoint = GetContinuousPosition((startIndex + endIndex) / 2);
+            var d1 = GetContinuousDistance(startIndex);
+            var d2 = GetContinuousDistance(endIndex);
+            var middleIndex = GetIndexAtDistance((d1 + d2) / 2);
 
-            if (Vector2.DistanceSquared(averagePoint, middlePoint) < 1) {
+            var averagePoint = (p1 + p2) / 2;
+            var middlePoint = GetContinuousPosition(middleIndex);
+
+            if (Vector2.DistanceSquared(averagePoint, middlePoint) < 0.1) {
                 return null;
             }
 
@@ -292,6 +296,31 @@ namespace Mapping_Tools.Classes.Tools {
             int segmentIndex = (int)Math.Floor(index + Precision.DOUBLE_EPSILON);
 
             return _angle[segmentIndex];
+        }
+
+        public double GetContinuousDistance(double index) {
+            int segmentIndex = (int)Math.Floor(index);
+            double segmentProgression = index - segmentIndex;
+
+            return Math.Abs(segmentProgression) < Precision.DOUBLE_EPSILON ?
+                _pathL[segmentIndex] :
+                Math.Abs(segmentProgression - 1) < Precision.DOUBLE_EPSILON ?
+                    _pathL[segmentIndex + 1] :
+                    (1 - segmentProgression) * _pathL[segmentIndex] + segmentProgression * _pathL[segmentIndex + 1];
+        }
+
+        public double GetIndexAtDistance(double distance) {
+            var index = _pathL.BinarySearch(distance);
+            if (index >= 0) {
+                return index;
+            }
+
+            var i2 = ~index;
+            var i1 = i2 - 1;
+            var d1 = _pathL[i1];
+            var d2 = _pathL[i2];
+
+            return (distance - d1) / (d2 - d1) + i1;
         }
 
         private static double Modulo(double a, double n) {
