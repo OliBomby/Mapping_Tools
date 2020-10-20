@@ -72,7 +72,7 @@ namespace Mapping_Tools.Classes.Tools {
         /// <param name="approximationMode"></param>
         /// <returns></returns>
         public IEnumerable<Vector2> GeneratePath(double startIndex, double endIndex, 
-            double maxAngle = Math.PI * 1 / 4, ApproximationMode approximationMode = ApproximationMode.DoubleMiddle) {
+            double maxAngle = Math.PI * 1 / 4, ApproximationMode approximationMode = ApproximationMode.Best) {
             var segments = GetNonInflectionSegments(startIndex, endIndex, maxAngle);
 
             foreach (var segment in segments) {
@@ -89,6 +89,9 @@ namespace Mapping_Tools.Classes.Tools {
                     case ApproximationMode.DoubleMiddle:
                         middle = DoubleMiddleApproximation(segment.Item1, segment.Item2);
                         break;
+                    case ApproximationMode.Best:
+                        middle = BestApproximation(segment.Item1, segment.Item2);
+                        break;
                     default:
                         middle = null;
                         break;
@@ -100,6 +103,49 @@ namespace Mapping_Tools.Classes.Tools {
 
                 yield return p2;
             }
+        }
+
+        private Vector2? BestApproximation(double startIndex, double endIndex) {
+            // Make sure start index is before end index
+            // The results will be the same for flipped indices
+            if (startIndex > endIndex) {
+                var tempEndIndex = endIndex;
+                endIndex = startIndex;
+                startIndex = tempEndIndex;
+            }
+
+            var p1 = GetContinuousPosition(startIndex);
+            var p2 = GetContinuousPosition(endIndex);
+
+            const int numTestPoints = 100;
+            var labels = _path.GetRange((int) startIndex, (int) Math.Ceiling(endIndex) - (int) startIndex + 1);
+
+            Vector2?[] middles = {
+                TangentIntersectionApproximation(startIndex, endIndex), 
+                DoubleMiddleApproximation(startIndex, endIndex)
+            };
+
+            Vector2? bestMiddle = null;
+            double bestLoss = double.PositiveInfinity;
+
+            foreach (var middle in middles) {
+                var bezier = new BezierCurveQuadric(p1, p2, middle ?? (p2 - p1) / 2);
+
+                var interpolatedPoints = new Vector2[numTestPoints];
+                for (int i = 0; i < numTestPoints; i++) {
+                    double t = (double) i / (numTestPoints - 1);
+                    interpolatedPoints[i] = bezier.CalculatePoint(t);
+                }
+
+                var loss = SliderPathUtil.CalculateLoss(interpolatedPoints, labels);
+
+                if (loss < bestLoss) {
+                    bestLoss = loss;
+                    bestMiddle = middle;
+                }
+            }
+
+            return bestMiddle;
         }
 
         private Vector2? TangentIntersectionApproximation(double startIndex, double endIndex) {
@@ -355,6 +401,7 @@ namespace Mapping_Tools.Classes.Tools {
         public enum ApproximationMode {
             TangentIntersection,
             DoubleMiddle,
+            Best
         }
     }
 }
