@@ -163,5 +163,42 @@ namespace Mapping_Tools.Classes.SliderPathStuff {
                 yield return subdivision;
             }
         }
+        
+        public static double CalculateLoss(IReadOnlyCollection<Vector2> points, IReadOnlyList<Vector2> labels) {
+            int n = points.Count;
+            double totalLoss = 0;
+
+            foreach (var point in points) {
+                var minLoss = Double.PositiveInfinity;
+
+                for (int i = 0; i < labels.Count - 1; i++) {
+                    var p1 = labels[i];
+                    var p2 = labels[i + 1];
+
+                    var loss = MinimumDistance(p1, p2, point);
+
+                    if (loss < minLoss) {
+                        minLoss = loss;
+                    }
+                }
+
+                totalLoss += minLoss;
+            }
+
+            return totalLoss / n;
+        }
+
+        private static double MinimumDistance(Vector2 v, Vector2 w, Vector2 p) {
+            // Return minimum distance between line segment vw and point p
+            double l2 = Vector2.DistanceSquared(v, w);  // i.e. |w-v|^2 -  avoid a sqrt
+            if (l2 == 0.0) return Vector2.Distance(p, v);   // v == w case
+            // Consider the line extending the segment, parameterized as v + t (w - v).
+            // We find projection of point p onto the line. 
+            // It falls where t = [(p-v) . (w-v)] / |w-v|^2
+            // We clamp t from [0,1] to handle points outside the segment vw.
+            double t = Math.Max(0, Math.Min(1, Vector2.Dot(p - v, w - v) / l2));
+            Vector2 projection = v + t * (w - v);  // Projection falls on the segment
+            return Vector2.Distance(p, projection);
+        }
     }
 }
