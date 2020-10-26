@@ -21,9 +21,9 @@
         </Grid.RowDefinitions>
         <Grid Name="FirstGrid" Grid.Row="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="3*"/>
-                <ColumnDefinition Width="20"/>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="240"/>
             </Grid.ColumnDefinitions>
 
             <Grid Margin="0,0,0,0">
