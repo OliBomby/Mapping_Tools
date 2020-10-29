@@ -44,17 +44,21 @@ namespace Mapping_Tools.Viewmodels {
         [JsonIgnore]
         public OsuPatternMaker OsuPatternMaker { get; set; }
 
-        #region Export Options
-
         [JsonIgnore]
         public OsuPatternPlacer OsuPatternPlacer { get; set; }
+
+        #region Options
 
         /// <summary>
         /// Extra time in millseconds around the patterns for deleting parts of the original map.
         /// </summary>
         public double Padding {
             get => OsuPatternPlacer.Padding;
-            set => Set(ref OsuPatternPlacer.Padding, value);
+            set {
+                if (Set(ref OsuPatternPlacer.Padding, value)) {
+                    OsuPatternMaker.Padding = value;
+                }
+            }
         }
 
         /// <summary>

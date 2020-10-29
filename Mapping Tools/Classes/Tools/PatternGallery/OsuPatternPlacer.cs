@@ -72,6 +72,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 patternBeatmap = patternBeatmap.DeepCopy();
             }
 
+            // Do the offset
             if (Math.Abs(offset) > Precision.DOUBLE_EPSILON) {
                 patternBeatmap.OffsetTime(offset);
             }
@@ -79,7 +80,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             // We adjust the pattern first so it alligns with the beatmap.
             // The right timing is applied and optional pre-processing is applied.
             // Sliderends and object timingpoints get recalculated.
-            AdjustPatternToBeatmap(patternBeatmap, beatmap, out var parts, out var timingPointsChanges);
+            PreparePattern(patternBeatmap, beatmap, out var parts, out var timingPointsChanges);
 
             // Keep just the timing point changes which are inside the parts.
             // These timing point changes have everything that is necessary for inside the parts of the pattern. (even timing)
@@ -220,7 +221,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
         /// <param name="beatmap"></param>
         /// <param name="parts"></param>
         /// <param name="timingPointsChanges"></param>
-        private void AdjustPatternToBeatmap(Beatmap patternBeatmap, Beatmap beatmap, out List<Part> parts, out List<TimingPointsChange> timingPointsChanges) {
+        private void PreparePattern(Beatmap patternBeatmap, Beatmap beatmap, out List<Part> parts, out List<TimingPointsChange> timingPointsChanges) {
             double patternStartTime = patternBeatmap.GetHitObjectStartTime();
             double patternEndTime = patternBeatmap.GetHitObjectEndTime();
 
