@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Editor_Reader;
 
 namespace Mapping_Tools.Views.PatternGallery {
     /// <summary>
@@ -81,7 +82,26 @@ namespace Mapping_Tools.Views.PatternGallery {
         }
 
         private string ExportPattern(PatternGalleryVm args, BackgroundWorker worker, DoWorkEventArgs _) {
-            var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
+            EditorReader reader;
+            double exportTime = 0;
+            bool usePatternOffset = false;
+            switch (args.ExportTimeMode) {
+                case ExportTimeMode.Current:
+                    reader = EditorReaderStuff.GetFullEditorReader();
+                    exportTime = reader.EditorTime();
+                    break;
+                case ExportTimeMode.Pattern:
+                    reader = EditorReaderStuff.GetFullEditorReaderOrNot();
+                    usePatternOffset = true;
+                    break;
+                case ExportTimeMode.Custom:
+                    reader = EditorReaderStuff.GetFullEditorReaderOrNot();
+                    exportTime = args.CustomExportTime;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(ExportTimeMode), "Invalid value encountered");
+            }
+           
             var editor = EditorReaderStuff.GetNewestVersionOrNot(args.Paths[0], reader);
 
             var patternCount = args.Patterns.Count(o => o.IsSelected);
@@ -89,14 +109,14 @@ namespace Mapping_Tools.Views.PatternGallery {
             if (patternCount == 0)
                 throw new Exception("No pattern has been selected to export.");
 
+            var patternPlacer = args.OsuPatternPlacer;
             foreach (var pattern in args.Patterns.Where(o => o.IsSelected)) {
                 var patternBeatmap = pattern.GetPatternBeatmap(args.FileHandler);
 
-                var patternPlacer = args.OsuPatternPlacer;
-                if (reader != null && false) {
-                    patternPlacer.PlaceOsuPatternAtTime(patternBeatmap, editor.Beatmap, reader.EditorTime(), false);
-                } else {
+                if (usePatternOffset) {
                     patternPlacer.PlaceOsuPattern(patternBeatmap, editor.Beatmap, protectBeatmapPattern:false);
+                } else {
+                    patternPlacer.PlaceOsuPatternAtTime(patternBeatmap, editor.Beatmap, exportTime, false);
                 }
 
                 // Increase pattern use count and time

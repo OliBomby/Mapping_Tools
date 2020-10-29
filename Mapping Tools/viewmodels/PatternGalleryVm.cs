@@ -49,6 +49,29 @@ namespace Mapping_Tools.Viewmodels {
 
         #region Options
 
+        private ExportTimeMode _exportTimeMode;
+        public ExportTimeMode ExportTimeMode {
+            get => _exportTimeMode;
+            set {
+                if (Set(ref _exportTimeMode, value)) {
+                    RaisePropertyChanged(nameof(CustomExportTimeVisible));
+                }
+            }
+        }
+
+        [JsonIgnore]
+        public IEnumerable<ExportTimeMode> ExportTimeModes =>
+            Enum.GetValues(typeof(ExportTimeMode)).Cast<ExportTimeMode>();
+
+        private double _customExportTime;
+        public double CustomExportTime {
+            get => _customExportTime;
+            set => Set(ref _customExportTime, value);
+        }
+
+        [JsonIgnore]
+        public bool CustomExportTimeVisible => ExportTimeMode == ExportTimeMode.Custom;
+
         /// <summary>
         /// Extra time in milliseconds around the patterns for deleting parts of the original map.
         /// </summary>
@@ -165,6 +188,9 @@ namespace Mapping_Tools.Viewmodels {
             FileHandler = new OsuPatternFileHandler();
             OsuPatternMaker = new OsuPatternMaker();
             OsuPatternPlacer = new OsuPatternPlacer();
+
+            ExportTimeMode = ExportTimeMode.Current;
+            CustomExportTime = 0;
 
             AddCodeCommand = new CommandImplementation(
                 async _ => {

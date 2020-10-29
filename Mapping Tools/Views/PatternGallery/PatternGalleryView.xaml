@@ -140,7 +140,22 @@
 
             <Grid Grid.Column="2" Margin="0 72 0 0">
                 <StackPanel>
-                    <TextBox Margin="0 7 0 0" materialDesign:HintAssist.Hint="Deletion margin" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                    <ComboBox SelectedItem="{Binding ExportTimeMode}" ItemsSource="{Binding ExportTimeModes}"
+                              Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                              materialDesign:HintAssist.Hint="Export offset" Margin="0 7 0 0"
+                              ToolTip="Determines at what time to put the pattern."/>
+                    <TextBox Margin="0 5 0 0" materialDesign:HintAssist.Hint="Custom export offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                             ToolTip="Determines at what time to put the pattern for the custom offset mode." 
+                             Visibility="{Binding CustomExportTimeVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <TextBox.Text>
+                            <Binding Path="CustomExportTime" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
+                                <Binding.Converter>
+                                    <domain:TimeToStringConverter/>
+                                </Binding.Converter>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
+                    <TextBox Margin="0 5 0 0" materialDesign:HintAssist.Hint="Deletion margin" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                              ToolTip="Extra time in milliseconds around the patterns for deleting parts of the original map.">
                         <TextBox.Text>
                             <Binding Path="Padding" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">

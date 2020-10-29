@@ -93,7 +93,6 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 }
             }
 
-            Console.WriteLine(beatmap.HitObjects.Count);
             // Add timingpoint changes for each hitobject to make sure they still have the wanted SV and hitsounds (especially near the edges of parts)
             // It is possible for the timingpoint of a hitobject at the start of a part to be outside of the part, so this fixes issues related to that
             timingPointsChanges.AddRange(
