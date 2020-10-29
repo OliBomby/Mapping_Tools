@@ -50,7 +50,7 @@ namespace Mapping_Tools.Viewmodels {
         #region Options
 
         /// <summary>
-        /// Extra time in millseconds around the patterns for deleting parts of the original map.
+        /// Extra time in milliseconds around the patterns for deleting parts of the original map.
         /// </summary>
         public double Padding {
             get => OsuPatternPlacer.Padding;
@@ -74,10 +74,18 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref OsuPatternPlacer.PatternOverwriteMode, value);
         }
 
+        [JsonIgnore]
+        public IEnumerable<PatternOverwriteMode> PatternOverwriteModes =>
+            Enum.GetValues(typeof(PatternOverwriteMode)).Cast<PatternOverwriteMode>();
+
         public TimingOverwriteMode TimingOverwriteMode {
             get => OsuPatternPlacer.TimingOverwriteMode;
             set => Set(ref OsuPatternPlacer.TimingOverwriteMode, value);
         }
+
+        [JsonIgnore]
+        public IEnumerable<TimingOverwriteMode> TimingOverwriteModes =>
+            Enum.GetValues(typeof(TimingOverwriteMode)).Cast<TimingOverwriteMode>();
 
         public bool IncludeHitsounds {
             get => OsuPatternPlacer.IncludeHitsounds;
@@ -99,14 +107,9 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref OsuPatternPlacer.SnapToNewTiming, value);
         }
 
-        public int SnapDivisor1 {
-            get => OsuPatternPlacer.SnapDivisor1;
-            set => Set(ref OsuPatternPlacer.SnapDivisor1, value);
-        }
-
-        public int SnapDivisor2 {
-            get => OsuPatternPlacer.SnapDivisor2;
-            set => Set(ref OsuPatternPlacer.SnapDivisor2, value);
+        public IBeatDivisor[] BeatDivisors {
+            get => OsuPatternPlacer.BeatDivisors;
+            set => Set(ref OsuPatternPlacer.BeatDivisors, value);
         }
 
         public bool FixGlobalSV {

@@ -104,7 +104,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                                 int newIndex =
                                     (int) Math.Round(tp.SampleIndex * vm.TimingpointIndexMultiplier +
                                                      vm.TimingpointIndexOffset);
-                                tp.SampleIndex = vm.ClipProperties ? MathHelper.Clamp(newIndex, 0, 100) : newIndex;
+                                tp.SampleIndex = vm.ClipProperties ? MathHelper.Clamp(newIndex, 0, int.MaxValue) : newIndex;
                             }
                         }
 

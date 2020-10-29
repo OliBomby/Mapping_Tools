@@ -14,10 +14,6 @@ namespace Mapping_Tools.Viewmodels {
 
         public MapCleanerArgs MapCleanerArgs { get; set; }
 
-        public string[] Snaps1 => new[] {"1/1", "1/2", "1/4", "1/8", "1/16"};
-
-        public string[] Snaps2 => new[] {"1/1", "1/3", "1/6", "1/12"};
-
         public MapCleanerVm() {
             MapCleanerArgs = MapCleanerArgs.BasicResnap;
         }
