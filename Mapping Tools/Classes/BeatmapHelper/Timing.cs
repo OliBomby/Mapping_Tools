@@ -305,7 +305,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
             foreach (var beatDivisor in beatDivisors) {
                 var nd = GetNearestMultiple(duration, beforeTp.MpB * beatDivisor.GetValue());
-                var d = Math.Abs(duration - newDuration);
+                var d = Math.Abs(duration - nd);
 
                 if (d < lowestDistance) {
                     lowestDistance = d;
