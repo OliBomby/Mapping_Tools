@@ -8,7 +8,10 @@ using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.Tools.PatternGallery {
     public class OsuPatternMaker {
-        public double Padding { get; set; } = 5;
+        /// <summary>
+        /// Extra time in milliseconds around patterns for including a wider range of objects in the target beatmap.
+        /// </summary>
+        public double Padding = 5;
 
         public OsuPattern FromSelectedWithSave(Beatmap beatmap, OsuPatternFileHandler fileHandler, string name) {
             var osuPattern = FromSelected(beatmap, out var patternBeatmap, name);
@@ -81,25 +84,6 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             return FromBeatmap(patternBeatmap, name);
         }
 
-        public OsuPattern FromBeatmap(Beatmap beatmap, string name) {
-            // Generate a file name and save the pattern
-            var now = DateTime.Now;
-            var fileName = GenerateUniquePatternFileName(name, now);
-
-            var startTime = beatmap.GetHitObjectStartTime();
-            var endTime = beatmap.GetHitObjectEndTime();
-
-            return new OsuPattern {
-                Name = name,
-                CreationTime = now,
-                LastUsedTime = now,
-                FileName = fileName,
-                ObjectCount = beatmap.HitObjects.Count,
-                Duration = TimeSpan.FromMilliseconds(endTime - startTime),
-                BeatLength = beatmap.BeatmapTiming.GetBeatLength(startTime, endTime, true)
-            };
-        }
-
         public OsuPattern FromObjectsWithSave(List<HitObject> hitObjects, List<TimingPoint> timingPoints, OsuPatternFileHandler fileHandler,
             string name, TimingPoint firstUnInheritedTimingPoint = null, double globalSv = 1.4, GameMode gameMode = GameMode.Standard) {
             var osuPattern = FromObjects(hitObjects, timingPoints, out var patternBeatmap, name,
@@ -118,6 +102,25 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 };
 
             return FromBeatmap(patternBeatmap, name);
+        }
+
+        public OsuPattern FromBeatmap(Beatmap beatmap, string name) {
+            // Generate a file name and save the pattern
+            var now = DateTime.Now;
+            var fileName = GenerateUniquePatternFileName(name, now);
+
+            var startTime = beatmap.GetHitObjectStartTime();
+            var endTime = beatmap.GetHitObjectEndTime();
+
+            return new OsuPattern {
+                Name = name,
+                CreationTime = now,
+                LastUsedTime = now,
+                FileName = fileName,
+                ObjectCount = beatmap.HitObjects.Count,
+                Duration = TimeSpan.FromMilliseconds(endTime - startTime),
+                BeatLength = beatmap.BeatmapTiming.GetBeatLength(startTime, endTime, true)
+            };
         }
 
         #region Helpers

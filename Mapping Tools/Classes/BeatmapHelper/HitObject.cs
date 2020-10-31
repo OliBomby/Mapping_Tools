@@ -197,8 +197,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             set => SetEndTime(value);
         } // Includes all repeats
 
-        private double GetEndTime() {
-            return Math.Floor(Time + TemporalLength * Repeat + Precision.DOUBLE_EPSILON);
+        public double GetEndTime(bool floor = true) {
+            var endTime = Time + TemporalLength * Repeat;
+            return floor ? Math.Floor(endTime + Precision.DOUBLE_EPSILON) : endTime;
         }
 
         private void SetEndTime(double value) {
@@ -507,8 +508,12 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             // Change
             TemporalLength += deltaTemporalTime;
 
-            // Clean up body objects
-            if (TimelineObjects.Count > 0) TimelineObjects.Last().Time = EndTime;
+            // Move body objects
+            for (int i = 0; i <= Math.Min(Repeat, TimelineObjects.Count - 1); i++) {
+                double time = Math.Floor(Time + TemporalLength * i);
+                TimelineObjects[i].Time = time;
+            }
+
             BodyHitsounds.RemoveAll(s => s.Offset >= EndTime);
         }
 

@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Components.Dialogs.CustomDialog;
 using MaterialDesignThemes.Wpf;
 
@@ -44,17 +45,44 @@ namespace Mapping_Tools.Viewmodels {
         [JsonIgnore]
         public OsuPatternMaker OsuPatternMaker { get; set; }
 
-        #region Export Options
-
         [JsonIgnore]
         public OsuPatternPlacer OsuPatternPlacer { get; set; }
 
+        #region Options
+
+        private ExportTimeMode _exportTimeMode;
+        public ExportTimeMode ExportTimeMode {
+            get => _exportTimeMode;
+            set {
+                if (Set(ref _exportTimeMode, value)) {
+                    RaisePropertyChanged(nameof(CustomExportTimeVisible));
+                }
+            }
+        }
+
+        [JsonIgnore]
+        public IEnumerable<ExportTimeMode> ExportTimeModes =>
+            Enum.GetValues(typeof(ExportTimeMode)).Cast<ExportTimeMode>();
+
+        private double _customExportTime;
+        public double CustomExportTime {
+            get => _customExportTime;
+            set => Set(ref _customExportTime, value);
+        }
+
+        [JsonIgnore]
+        public bool CustomExportTimeVisible => ExportTimeMode == ExportTimeMode.Custom;
+
         /// <summary>
-        /// Extra time in millseconds around the patterns for deleting parts of the original map.
+        /// Extra time in milliseconds around the patterns for deleting parts of the original map.
         /// </summary>
         public double Padding {
             get => OsuPatternPlacer.Padding;
-            set => Set(ref OsuPatternPlacer.Padding, value);
+            set {
+                if (Set(ref OsuPatternPlacer.Padding, value)) {
+                    OsuPatternMaker.Padding = value;
+                }
+            }
         }
 
         /// <summary>
@@ -70,10 +98,18 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref OsuPatternPlacer.PatternOverwriteMode, value);
         }
 
+        [JsonIgnore]
+        public IEnumerable<PatternOverwriteMode> PatternOverwriteModes =>
+            Enum.GetValues(typeof(PatternOverwriteMode)).Cast<PatternOverwriteMode>();
+
         public TimingOverwriteMode TimingOverwriteMode {
             get => OsuPatternPlacer.TimingOverwriteMode;
             set => Set(ref OsuPatternPlacer.TimingOverwriteMode, value);
         }
+
+        [JsonIgnore]
+        public IEnumerable<TimingOverwriteMode> TimingOverwriteModes =>
+            Enum.GetValues(typeof(TimingOverwriteMode)).Cast<TimingOverwriteMode>();
 
         public bool IncludeHitsounds {
             get => OsuPatternPlacer.IncludeHitsounds;
@@ -100,9 +136,14 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref OsuPatternPlacer.BeatDivisors, value);
         }
 
-        public bool FixGlobalSV {
-            get => OsuPatternPlacer.FixGlobalSV;
-            set => Set(ref OsuPatternPlacer.FixGlobalSV, value);
+        public bool FixGlobalSv {
+            get => OsuPatternPlacer.FixGlobalSv;
+            set => Set(ref OsuPatternPlacer.FixGlobalSv, value);
+        }
+
+        public bool FixBpmSv {
+            get => OsuPatternPlacer.FixBpmSv;
+            set => Set(ref OsuPatternPlacer.FixBpmSv, value);
         }
 
         public bool FixColourHax {
@@ -126,8 +167,8 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public double CustomRotate {
-            get => OsuPatternPlacer.CustomRotate;
-            set => Set(ref OsuPatternPlacer.CustomRotate, value);
+            get => MathHelper.RadiansToDegrees(OsuPatternPlacer.CustomRotate);
+            set => Set(ref OsuPatternPlacer.CustomRotate, MathHelper.DegreesToRadians(value));
         }
 
         #endregion
@@ -153,6 +194,9 @@ namespace Mapping_Tools.Viewmodels {
             FileHandler = new OsuPatternFileHandler();
             OsuPatternMaker = new OsuPatternMaker();
             OsuPatternPlacer = new OsuPatternPlacer();
+
+            ExportTimeMode = ExportTimeMode.Current;
+            CustomExportTime = 0;
 
             AddCodeCommand = new CommandImplementation(
                 async _ => {
