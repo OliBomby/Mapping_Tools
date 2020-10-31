@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Components.Dialogs.CustomDialog;
 using MaterialDesignThemes.Wpf;
 
@@ -135,9 +136,14 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref OsuPatternPlacer.BeatDivisors, value);
         }
 
-        public bool FixGlobalSV {
-            get => OsuPatternPlacer.FixGlobalSV;
-            set => Set(ref OsuPatternPlacer.FixGlobalSV, value);
+        public bool FixGlobalSv {
+            get => OsuPatternPlacer.FixGlobalSv;
+            set => Set(ref OsuPatternPlacer.FixGlobalSv, value);
+        }
+
+        public bool FixBpmSv {
+            get => OsuPatternPlacer.FixBpmSv;
+            set => Set(ref OsuPatternPlacer.FixBpmSv, value);
         }
 
         public bool FixColourHax {
@@ -161,8 +167,8 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public double CustomRotate {
-            get => OsuPatternPlacer.CustomRotate;
-            set => Set(ref OsuPatternPlacer.CustomRotate, value);
+            get => MathHelper.RadiansToDegrees(OsuPatternPlacer.CustomRotate);
+            set => Set(ref OsuPatternPlacer.CustomRotate, MathHelper.DegreesToRadians(value));
         }
 
         #endregion

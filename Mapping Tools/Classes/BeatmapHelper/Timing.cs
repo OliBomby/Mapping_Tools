@@ -538,7 +538,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public double CalculateSliderTemporalLength(double time, double length, double sv) {
-            return (length * GetMpBAtTime(time) * (double.IsNaN(sv) ? -100 : sv)) / (-10000 * SliderMultiplier);
+            return (length * GetMpBAtTime(time) * (double.IsNaN(sv) ? -100 : MathHelper.Clamp(sv, -1000, -10))) / 
+                   (-10000 * SliderMultiplier);
         }
 
         /// <summary>
