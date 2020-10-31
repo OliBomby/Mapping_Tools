@@ -1,8 +1,11 @@
-﻿using Mapping_Tools.Classes.SystemTools;
+﻿using Mapping_Tools.Classes;
+using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Classes.Tools.PatternGallery;
+using Mapping_Tools.Components.Dialogs.CustomDialog;
 using Mapping_Tools.Viewmodels;
+using MaterialDesignThemes.Wpf;
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -11,9 +14,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Mapping_Tools.Classes;
-using Mapping_Tools.Components.Dialogs.CustomDialog;
-using MaterialDesignThemes.Wpf;
+using Editor_Reader;
 
 namespace Mapping_Tools.Views.PatternGallery {
     /// <summary>
@@ -55,7 +56,9 @@ namespace Mapping_Tools.Views.PatternGallery {
 
         private void Start_Click(object sender, RoutedEventArgs e)
         {
-            RunTool(MainWindow.AppWindow.GetCurrentMaps(), quick: false);
+            RunTool(ViewModel.ExportTimeMode == ExportTimeMode.Current
+                ? new[] { IOHelper.GetCurrentBeatmapOrCurrentBeatmap() }
+                : MainWindow.AppWindow.GetCurrentMaps(), quick: false);
         }
 
         public void QuickRun()
@@ -81,22 +84,41 @@ namespace Mapping_Tools.Views.PatternGallery {
         }
 
         private string ExportPattern(PatternGalleryVm args, BackgroundWorker worker, DoWorkEventArgs _) {
-            var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
-            var editor = EditorReaderStuff.GetNewestVersionOrNot(IOHelper.GetCurrentBeatmapOrCurrentBeatmap(), reader);
+            EditorReader reader;
+            double exportTime = 0;
+            bool usePatternOffset = false;
+            switch (args.ExportTimeMode) {
+                case ExportTimeMode.Current:
+                    reader = EditorReaderStuff.GetFullEditorReader();
+                    exportTime = reader.EditorTime();
+                    break;
+                case ExportTimeMode.Pattern:
+                    reader = EditorReaderStuff.GetFullEditorReaderOrNot();
+                    usePatternOffset = true;
+                    break;
+                case ExportTimeMode.Custom:
+                    reader = EditorReaderStuff.GetFullEditorReaderOrNot();
+                    exportTime = args.CustomExportTime;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(ExportTimeMode), "Invalid value encountered");
+            }
+           
+            var editor = EditorReaderStuff.GetNewestVersionOrNot(args.Paths[0], reader);
 
             var patternCount = args.Patterns.Count(o => o.IsSelected);
 
             if (patternCount == 0)
                 throw new Exception("No pattern has been selected to export.");
 
+            var patternPlacer = args.OsuPatternPlacer;
             foreach (var pattern in args.Patterns.Where(o => o.IsSelected)) {
                 var patternBeatmap = pattern.GetPatternBeatmap(args.FileHandler);
 
-                var patternPlacer = args.OsuPatternPlacer;
-                if (reader != null && false) {
-                    patternPlacer.PlaceOsuPatternAtTime(patternBeatmap, editor.Beatmap, reader.EditorTime(), false);
-                } else {
+                if (usePatternOffset) {
                     patternPlacer.PlaceOsuPattern(patternBeatmap, editor.Beatmap, protectBeatmapPattern:false);
+                } else {
+                    patternPlacer.PlaceOsuPatternAtTime(patternBeatmap, editor.Beatmap, exportTime, false);
                 }
 
                 // Increase pattern use count and time
