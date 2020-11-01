@@ -213,13 +213,19 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             double patternEndTime = patternBeatmap.GetHitObjectEndTime();
 
             Timing originalTiming = beatmap.BeatmapTiming;
-
             Timing patternTiming = patternBeatmap.BeatmapTiming;
 
             GameMode patternMode = (GameMode)patternBeatmap.General["Mode"].IntValue;
             GameMode targetMode = (GameMode)beatmap.General["Mode"].IntValue;
 
             double patternCircleSize = patternBeatmap.Difficulty["CircleSize"].DoubleValue;
+
+            // Avoid including hitsounds if there are no timingpoints to get hitsounds from
+            bool includeHitsounds = IncludeHitsounds && patternTiming.Count > 0;
+            // Avoid overwriting timing if the pattern has no redlines
+            TimingOverwriteMode timingOverwriteMode = patternTiming.Redlines.Count > 0
+                ? TimingOverwriteMode
+                : TimingOverwriteMode.OriginalTimingOnly;
 
             // Get the timeline before moving all objects so it has the correct hitsounds
             // Make sure that moving the objects in the pattern moves the timeline objects aswell
@@ -286,7 +292,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
 
                 TimingPoint[] inPartRedlines;
                 TimingPoint startPartRedline;
-                switch (TimingOverwriteMode) {
+                switch (timingOverwriteMode) {
                     case TimingOverwriteMode.PatternTimingOnly:
                         // Subtract one from the end time to omit BPM changes right on the end of the part.
                         inPartRedlines = patternTiming.GetRedlinesInRange(startTime, endTime - 1).ToArray();
@@ -402,13 +408,6 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
 
             // Resnap everything to the new timing.
             if (SnapToNewTiming) {
-                // Resnap all objects
-                foreach (HitObject ho in patternBeatmap.HitObjects) {
-                    ho.ResnapSelf(newTiming, BeatDivisors);
-                    ho.ResnapEnd(newTiming, BeatDivisors);
-                    ho.ResnapPosition(patternMode, patternCircleSize);  // Resnap to column X positions for mania only
-                }
-
                 // Resnap Kiai toggles
                 foreach (TimingPoint tp in kiaiToggles) {
                     tp.ResnapSelf(newTiming, BeatDivisors);
@@ -448,7 +447,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                     timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true));
                 }
 
-                if (!IncludeHitsounds)
+                if (!includeHitsounds)
                     continue;
 
                 // Body hitsounds
@@ -462,7 +461,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
 
             // Add timeline hitsounds
             foreach (TimelineObject tlo in patternTimeline.TimelineObjects) {
-                if (tlo.HasHitsound && IncludeHitsounds) {
+                if (tlo.HasHitsound && includeHitsounds) {
                     // Add greenlines for hitsounds
                     TimingPoint tp = tlo.HitsoundTimingPoint.Copy();
                     tp.Offset = tlo.Time;

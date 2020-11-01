@@ -212,10 +212,24 @@ namespace Mapping_Tools.Viewmodels {
 
                         if (!(bool)result) return;
 
-                        var hitObjects = Regex.Split(viewModel.HitObjects, Environment.NewLine)
-                            .Select(o => new HitObject(o.Trim())).ToList();
-                        var timingPoints = Regex.Split(viewModel.TimingPoints, Environment.NewLine)
-                            .Select(o => new TimingPoint(o.Trim())).ToList();
+                        var hitObjects = new List<HitObject>();
+                        foreach (string o in Regex.Split(viewModel.HitObjects, Environment.NewLine)) {
+                            try {
+                                hitObjects.Add(new HitObject(o.Trim()));
+                            } catch (Exception ex) { Console.WriteLine(ex);}
+                        }
+                        var timingPoints = new List<TimingPoint>();
+                        foreach (string o in Regex.Split(viewModel.TimingPoints, Environment.NewLine)) {
+                            try {
+                                timingPoints.Add(new TimingPoint(o.Trim()));
+                            } catch (Exception ex) { Console.WriteLine(ex);}
+                        }
+
+                        // The pattern needs at least one hitobject
+                        if (hitObjects.Count == 0) {
+                            MessageBox.Show("At least one valid hit object is required.");
+                            return;
+                        }
 
                         var pattern = OsuPatternMaker.FromObjectsWithSave(
                             hitObjects, timingPoints, FileHandler, viewModel.Name, null, viewModel.GlobalSv, viewModel.GameMode);
@@ -256,6 +270,11 @@ namespace Mapping_Tools.Viewmodels {
                         if (!(bool)result) return;
 
                         var reader = EditorReaderStuff.GetFullEditorReader();
+                        if (reader.numSelected == 0) {
+                            MessageBox.Show("No selected hit objects found.");
+                            return;
+                        }
+
                         var editor = EditorReaderStuff.GetNewestVersion(IOHelper.GetCurrentBeatmap(), reader);
                         var pattern = OsuPatternMaker.FromSelectedWithSave(editor.Beatmap, FileHandler, viewModel.Name);
                         Patterns.Add(pattern);
