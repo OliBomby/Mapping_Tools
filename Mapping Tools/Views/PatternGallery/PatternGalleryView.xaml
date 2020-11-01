@@ -70,6 +70,22 @@
                     materialDesign:DataGridAssist.CellPadding="13 8 8 8"
                     materialDesign:DataGridAssist.ColumnHeaderPadding="8"
                     VerticalScrollBarVisibility="Auto">
+                    <DataGrid.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Delete" Command="{Binding RemoveCommand}" Tag="Delete"
+                                      ToolTip="Delete selected patterns. Hold shift to skip dialog.">
+                                <MenuItem.Icon>
+                                    <materialDesign:PackIcon Kind="TrashCan"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="Open in File Explorer" Command="{Binding OpenExplorerSelectedCommand}"
+                                      ToolTip="Open the source files of the selected patterns in the File Explorer.">
+                                <MenuItem.Icon>
+                                    <materialDesign:PackIcon Kind="ArrowTopRightThick"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
                     <DataGrid.Resources>
                         <Style TargetType="DataGridRow" BasedOn="{StaticResource MaterialDesignDataGridRow}">
                             <Setter Property="IsSelected"
@@ -134,7 +150,7 @@
                     <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a pattern from selected hit objects." Command="{Binding AddSelectedCommand}" Margin="5">
                         <materialDesign:PackIcon Kind="PlusBox" Height="24" Width="24" />
                     </Button>
-                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove selected patterns. Hold shift to skip dialog." Command="{Binding RemoveCommand}" Margin="5">
+                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Delete selected patterns. Hold shift to skip dialog." Command="{Binding RemoveCommand}" Margin="5">
                         <materialDesign:PackIcon Kind="Trashcan" Height="24" Width="24" />
                     </Button>
                 </StackPanel>

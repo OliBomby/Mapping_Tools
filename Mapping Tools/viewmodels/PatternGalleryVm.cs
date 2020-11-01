@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
@@ -183,6 +184,8 @@ namespace Mapping_Tools.Viewmodels {
         public CommandImplementation AddSelectedCommand { get; }
         [JsonIgnore]
         public CommandImplementation RemoveCommand { get; }
+        [JsonIgnore]
+        public CommandImplementation OpenExplorerSelectedCommand { get; }
 
 
         [JsonIgnore]
@@ -270,11 +273,6 @@ namespace Mapping_Tools.Viewmodels {
                         if (!(bool)result) return;
 
                         var reader = EditorReaderStuff.GetFullEditorReader();
-                        if (reader.numSelected == 0) {
-                            MessageBox.Show("No selected hit objects found.");
-                            return;
-                        }
-
                         var editor = EditorReaderStuff.GetNewestVersion(IOHelper.GetCurrentBeatmap(), reader);
                         var pattern = OsuPatternMaker.FromSelectedWithSave(editor.Beatmap, FileHandler, viewModel.Name);
                         Patterns.Add(pattern);
@@ -299,6 +297,13 @@ namespace Mapping_Tools.Viewmodels {
                             File.Delete(FileHandler.GetPatternPath(pattern.FileName));
                         }
                         Patterns.RemoveAll(o => o.IsSelected);
+                    } catch (Exception ex) { ex.Show(); }
+                });
+            OpenExplorerSelectedCommand = new CommandImplementation(
+                _ => {
+                    try {
+                        ShowSelectedInExplorer.FilesOrFolders(
+                            Patterns.Where(o => o.IsSelected).Select(o => FileHandler.GetPatternPath(o.FileName)));
                     } catch (Exception ex) { ex.Show(); }
                 });
         }

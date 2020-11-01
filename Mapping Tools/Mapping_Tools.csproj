@@ -389,6 +389,7 @@
     <Compile Include="Classes\SystemTools\RunToolCompletedEventArgs.cs" />
     <Compile Include="Classes\SystemTools\Settings.cs" />
     <Compile Include="Classes\SystemTools\SettingsManager.cs" />
+    <Compile Include="Classes\SystemTools\ShowSelectedInFileExplorer.cs" />
     <Compile Include="Classes\SystemTools\TypeConverters.cs" />
     <Compile Include="Classes\TimingStudio\BeatTime.cs" />
     <Compile Include="Classes\ExternalFileUtil\Reaper\ReaperProject.cs" />

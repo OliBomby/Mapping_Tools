@@ -23,6 +23,9 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
         }
 
         public OsuPattern FromSelected(Beatmap beatmap, out Beatmap patternBeatmap, string name) {
+            // Check if it has selected objects
+            if (!beatmap.HitObjects.Any(h => h.IsSelected)) throw new Exception("No selected hit objects found.");
+
             // Copy it so the changes dont affect the given beatmap object
             patternBeatmap = beatmap.DeepCopy();
 
