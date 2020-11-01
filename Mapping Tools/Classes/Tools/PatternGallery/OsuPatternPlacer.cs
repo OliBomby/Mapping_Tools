@@ -427,7 +427,8 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
 
             // Add redlines
             var redlines = newTiming.Redlines;
-            timingPointsChanges = redlines.Select(tp => new TimingPointsChange(tp, mpb: true, meter: true, unInherited: true, omitFirstBarLine: true)).ToList();
+            timingPointsChanges = redlines.Select(tp => 
+                new TimingPointsChange(tp, mpb: true, meter: true, unInherited: true, omitFirstBarLine: true, fuzzyness:Precision.DOUBLE_EPSILON)).ToList();
 
             // Add SliderVelocity changes for taiko and mania
             if (patternMode == GameMode.Taiko || patternMode == GameMode.Mania) {

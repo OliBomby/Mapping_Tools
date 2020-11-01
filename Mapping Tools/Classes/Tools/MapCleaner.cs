@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Mapping_Tools.Classes.BeatmapHelper.Events;
+using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.Tools {
     public class MapCleaner {
@@ -121,7 +122,7 @@ namespace Mapping_Tools.Classes.Tools {
             // Add redlines
             var redlines = timing.Redlines;
             foreach (TimingPoint tp in redlines) {
-                timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, meter: true, unInherited: true, omitFirstBarLine: true));
+                timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, meter: true, unInherited: true, omitFirstBarLine: true, fuzzyness:Precision.DOUBLE_EPSILON));
             }
             UpdateProgressBar(worker, 55);
 
