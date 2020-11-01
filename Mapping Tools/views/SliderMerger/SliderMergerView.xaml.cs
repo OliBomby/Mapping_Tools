@@ -246,8 +246,7 @@ namespace Mapping_Tools.Views.SliderMerger {
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(100);
 
             // Do stuff
-            if (arg.Quick)
-                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, reader != null));
+            RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, reader != null, arg.Quick));
 
             // Make an accurate message
             var message = "";

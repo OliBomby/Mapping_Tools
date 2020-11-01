@@ -110,8 +110,7 @@ namespace Mapping_Tools.Views.HitsoundPreviewHelper
             }
 
             // Do stuff
-            if (args.Quick)
-                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, reader != null));
+            RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, reader != null, args.Quick));
 
             return args.Quick ? "" : "Done!";
         }

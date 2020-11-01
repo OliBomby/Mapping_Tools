@@ -90,6 +90,7 @@
                         <Style TargetType="DataGridRow" BasedOn="{StaticResource MaterialDesignDataGridRow}">
                             <Setter Property="IsSelected"
                                 Value="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <EventSetter Event="MouseDoubleClick" Handler="PatternRow_MouseDoubleClick"/>
                         </Style>
                     </DataGrid.Resources>
                     <DataGrid.Columns>

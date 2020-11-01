@@ -151,8 +151,7 @@ namespace Mapping_Tools.Views.SliderCompletionator {
             }
 
             // Do stuff
-            if (arg.Quick)
-                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, reader != null));
+            RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, reader != null, arg.Quick));
 
             // Make an accurate message
             string message = "";

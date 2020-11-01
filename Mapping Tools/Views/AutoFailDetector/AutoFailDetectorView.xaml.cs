@@ -140,8 +140,7 @@ namespace Mapping_Tools.Views.AutoFailDetector {
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(100);
 
             // Do stuff
-            if (args.Quick)
-                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, false));
+            RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, false, args.Quick));
 
             return autoFail ? $"{autoFailDetector.UnloadingObjects.Count} unloading objects detected and {autoFailDetector.PotentialUnloadingObjects.Count} potential unloading objects detected!" :
                 autoFailDetector.PotentialUnloadingObjects.Count > 0 ? $"No auto-fail, but {autoFailDetector.PotentialUnloadingObjects.Count} potential unloading objects detected." : 

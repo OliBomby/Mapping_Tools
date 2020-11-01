@@ -131,8 +131,7 @@ namespace Mapping_Tools.Views.MapCleaner {
             }
 
             // Do stuff
-            if (args.Quick)
-                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, reader != null));
+            RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, reader != null, args.Quick));
 
             // Make an accurate message
             string message = $"Successfully {(result.TimingPointsRemoved < 0 ? "added" : "removed")} {Math.Abs(result.TimingPointsRemoved)} {(Math.Abs(result.TimingPointsRemoved) == 1 ? "greenline" : "greenlines")}" +

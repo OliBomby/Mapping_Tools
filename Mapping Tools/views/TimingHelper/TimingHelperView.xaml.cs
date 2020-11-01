@@ -242,8 +242,7 @@ namespace Mapping_Tools.Views.TimingHelper {
             }
 
             // Do QuickRun stuff
-            if (arg.Quick)
-                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, reader != null));
+            RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, reader != null, arg.Quick));
 
             // Make an accurate message
             string message = "Successfully added ";

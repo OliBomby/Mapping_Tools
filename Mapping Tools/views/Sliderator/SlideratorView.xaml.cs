@@ -513,7 +513,7 @@ namespace Mapping_Tools.Views.Sliderator {
             RunTool(MainWindow.AppWindow.GetCurrentMaps()[0]);
         }
 
-        private async void RunTool(string path, bool quick = false) {
+        private async void RunTool(string path, bool quick = false, bool reload = false) {
             if (!CanRun) return;
 
             // Remove logical focus to trigger LostFocus on any fields that didn't yet update the ViewModel
@@ -529,6 +529,7 @@ namespace Mapping_Tools.Views.Sliderator {
 
             ViewModel.Path = path;
             ViewModel.Quick = quick;
+            ViewModel.Reload = reload;
             ViewModel.GraphState = Graph.GetGraphState();
             if (ViewModel.GraphState.CanFreeze) ViewModel.GraphState.Freeze();
 
@@ -735,8 +736,7 @@ namespace Mapping_Tools.Views.Sliderator {
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(100);
             
             // Do stuff
-            if (arg.Quick)
-                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, editorRead));
+            RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true,  arg.Reload && editorRead, arg.Quick));
 
             return arg.Quick ? string.Empty : "Done!";
         }
@@ -772,7 +772,7 @@ namespace Mapping_Tools.Views.Sliderator {
             var currentMap = IOHelper.GetCurrentBeatmapOrCurrentBeatmap();
 
             ViewModel.Import(currentMap);
-            RunTool(currentMap, true);
+            RunTool(currentMap, true, true);
         }
 
         public event EventHandler RunFinished;

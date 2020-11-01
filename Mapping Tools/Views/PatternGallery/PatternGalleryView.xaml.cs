@@ -136,8 +136,7 @@ namespace Mapping_Tools.Views.PatternGallery {
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(100);
 
             // Do stuff
-            if (args.Quick)
-                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, reader != null));
+            RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, reader != null, args.Quick));
 
             return "Successfully exported pattern!";
         }
@@ -190,6 +189,12 @@ namespace Mapping_Tools.Views.PatternGallery {
             } catch (ArgumentException) { } catch (Exception ex) {
                 ex.Show();
             }
+        }
+
+        private void PatternRow_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
+            try {
+                QuickRun();
+            } catch (Exception ex) { ex.Show(); }
         }
     }
 }

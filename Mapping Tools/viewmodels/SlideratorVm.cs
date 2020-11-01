@@ -267,6 +267,9 @@ namespace Mapping_Tools.Viewmodels {
         [JsonIgnore]
         public bool Quick { get; set; }
 
+        [JsonIgnore]
+        public bool Reload { get; set; }
+
         #endregion
 
         public SlideratorVm() {
