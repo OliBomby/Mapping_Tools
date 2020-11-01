@@ -21,7 +21,7 @@ namespace Mapping_Tools.Views.PatternGallery {
     /// Interactielogica voor PatternGalleryView.xaml
     /// </summary>
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
-    [HiddenTool]
+    //[HiddenTool]
     public partial class PatternGalleryView : ISavable<PatternGalleryVm>, IQuickRun, IHaveExtraProjectMenuItems {
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "patterngalleryproject.json");
 
@@ -29,7 +29,11 @@ namespace Mapping_Tools.Views.PatternGallery {
 
         public static readonly string ToolName = "Pattern Gallery";
         public static readonly string ToolDescription =
-            $@"Save and load patterns from osu! beatmaps.";
+            $@"Import and export patterns from osu! beatmaps and create pattern collections which you can share with your friends."+Environment.NewLine+ 
+            @"You can add or remove patterns by using the buttons at the bottom."+Environment.NewLine+ 
+            @"To export a pattern to the current beatmap simply select one or more patterns and click the run button. You can also double-click a pattern to instantly export it."+Environment.NewLine+ 
+            @"On the right there are export options which allow for additional processing on the pattern during export."+Environment.NewLine+
+            @"With the 'Project' menu you can save/load/rename your pattern collections.";
 
         /// <summary>
         /// 
