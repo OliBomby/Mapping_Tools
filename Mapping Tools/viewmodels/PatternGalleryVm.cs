@@ -10,6 +10,8 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Windows;
+using System.Windows.Input;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Components.Dialogs.CustomDialog;
@@ -262,6 +264,17 @@ namespace Mapping_Tools.Viewmodels {
             RemoveCommand = new CommandImplementation(
                 _ => {
                     try {
+                        var selected = Patterns.Where(o => o.IsSelected).ToList();
+                        if (selected.Count == 0) return;
+
+                        if (!(Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))){
+                            string message = selected.Count == 1 ? $"Are you sure you want to delete \"{selected.First().Name}\"?" :
+                                selected.Count == 2 ? $"Are you sure you want to delete \"{selected[0].Name}\" and \"{selected[1].Name}\"?" :
+                                $"Are you sure you want to delete \"{selected[0].Name}\" and {selected.Count-1} others?";
+                            var messageBoxResult = MessageBox.Show(message, "Confirm deletion", MessageBoxButton.YesNo);
+                            if (messageBoxResult != MessageBoxResult.Yes) return;
+                        }
+
                         // Remove all selected patterns and their files
                         foreach (var pattern in Patterns.Where(o => o.IsSelected)) {
                             File.Delete(FileHandler.GetPatternPath(pattern.FileName));
