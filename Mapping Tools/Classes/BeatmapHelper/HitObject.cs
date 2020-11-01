@@ -501,7 +501,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             if (IsSlider) {
                 var deltaLength = -10000 * timing.SliderMultiplier * deltaTemporalTime /
                                   (UnInheritedTimingPoint.MpB *
-                                   SliderVelocity); // Divide by repeats because the endtime is multiplied by repeats
+                                   (double.IsNaN(SliderVelocity) ? -100 : SliderVelocity)); // Divide by repeats because the endtime is multiplied by repeats
                 PixelLength += deltaLength; // Change the pixel length to match the new time
             }
 
