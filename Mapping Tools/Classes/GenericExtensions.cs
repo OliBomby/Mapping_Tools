@@ -16,13 +16,16 @@ namespace Mapping_Tools.Classes {
             return itemsToRemove.Count;
         }
 
-        public static void Show(this Exception exception) {
+        public static MessageBoxResult Show(this Exception exception) {
             var result = MessageBox.Show(exception.MessageStackTrace(), "Error", MessageBoxButton.OKCancel);
-            var ex = result == MessageBoxResult.OK ? exception.InnerException : null;
+            if (result == MessageBoxResult.Cancel) return result;
+            var ex = exception.InnerException;
             while (ex != null) {
                 result = MessageBox.Show(ex.MessageStackTrace(), "Inner exception", MessageBoxButton.OKCancel);
                 ex = result == MessageBoxResult.OK ? ex.InnerException : null;
             }
+
+            return MessageBoxResult.OK;
         }
 
         public static string MessageStackTrace(this Exception exception) {
