@@ -509,12 +509,16 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             TemporalLength += deltaTemporalTime;
 
             // Move body objects
+            UpdateTimelineObjectTimes();
+
+            BodyHitsounds.RemoveAll(s => s.Offset >= EndTime);
+        }
+
+        public void UpdateTimelineObjectTimes() {
             for (int i = 0; i <= Math.Min(Repeat, TimelineObjects.Count - 1); i++) {
                 double time = Math.Floor(Time + TemporalLength * i);
                 TimelineObjects[i].Time = time;
             }
-
-            BodyHitsounds.RemoveAll(s => s.Offset >= EndTime);
         }
 
         /// <summary>
