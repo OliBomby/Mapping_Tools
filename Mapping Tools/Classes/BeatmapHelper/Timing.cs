@@ -251,29 +251,41 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="originTime"></param>
         /// <param name="beatTime"></param>
         /// <returns></returns>
-        public double GetMilliseconds(double beatTime, double originTime = 0) {
+        public double GetMilliseconds(double beatTime, double originTime = 0, bool round = false, IBeatDivisor[] divisors = null) {
             double ms = originTime;
 
             if (beatTime >= 0) {
                 var redlines = GetRedlinesInRange(0, beatTime, false);
                 TimingPoint lastRedline = GetRedlineAtTime(0);
-                ms += lastRedline.Offset * lastRedline.MpB;
+                ms += round
+                    ? MultiSnapRound(lastRedline.Offset, divisors) * lastRedline.MpB
+                    : lastRedline.Offset * lastRedline.MpB;
                 foreach (var redline in redlines) {
-                    ms += (redline.Offset - lastRedline.Offset) * lastRedline.MpB;
+                    ms += round 
+                        ? MultiSnapRound(redline.Offset - lastRedline.Offset, divisors) * lastRedline.MpB
+                        : (redline.Offset - lastRedline.Offset) * lastRedline.MpB;
 
                     lastRedline = redline;
                 }
-                ms += (beatTime - lastRedline.Offset) * lastRedline.MpB;
+                ms += round
+                    ? MultiSnapRound(beatTime - lastRedline.Offset, divisors) * lastRedline.MpB
+                    : (beatTime - lastRedline.Offset) * lastRedline.MpB;
             } else {
                 var redlines = GetRedlinesInRange(beatTime, 0, false);
                 TimingPoint lastRedline = GetRedlineAtTime(beatTime);
-                ms += (beatTime - lastRedline.Offset) * lastRedline.MpB;
+                ms += round
+                    ? MultiSnapRound(beatTime - lastRedline.Offset, divisors) * lastRedline.MpB
+                    : (beatTime - lastRedline.Offset) * lastRedline.MpB;
                 foreach (var redline in redlines) {
-                    ms -= (redline.Offset - lastRedline.Offset) * lastRedline.MpB;
+                    ms -= round
+                        ? MultiSnapRound(redline.Offset - lastRedline.Offset, divisors) * lastRedline.MpB
+                        : (redline.Offset - lastRedline.Offset) * lastRedline.MpB;
 
                     lastRedline = redline;
                 }
-                ms += lastRedline.Offset * lastRedline.MpB;
+                ms += round
+                    ? MultiSnapRound(lastRedline.Offset, divisors) * lastRedline.MpB
+                    : lastRedline.Offset * lastRedline.MpB;
             }
 
             return ms;
@@ -297,7 +309,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                         redline.Offset - startBeatTime:
                         redline.Offset - lastRedline.Offset;
 
-                    if (beatDiff * lastRedline.MpB > milliseconds) {
+                    if (beatDiff * lastRedline.MpB > milliseconds + Precision.DOUBLE_EPSILON) {
                         break;
                     }
 
@@ -315,7 +327,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                     redline = _redlines[index];
                     double beatDiff = redline.Offset - lastBeatTime;
 
-                    if (beatDiff * redline.MpB < milliseconds) {
+                    if (beatDiff * redline.MpB < milliseconds - Precision.DOUBLE_EPSILON) {
                         break;
                     }
 
@@ -328,6 +340,61 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
 
             return beatTime;
+        }
+
+        /// <summary>
+        /// Assumes all the redlines are in beat timing and calculates the millisecond time for a beat time.
+        /// 0 beatTime returns originTime.
+        /// </summary>
+        /// <param name="originTime"></param>
+        /// <param name="beatTime"></param>
+        /// <returns></returns>
+        public double WalkBeatsInMillisecondTime(double beatTime, double originTime = 0, bool round = false, IBeatDivisor[] divisors = null) {
+            double ms = originTime;
+
+            if (beatTime >= 0) {
+                TimingPoint firstRedline = GetRedlineAtTime(originTime);
+                TimingPoint lastRedline = firstRedline;
+                int index = GetTimingPointIndexAfterTime(originTime, _redlines);
+                for (int i = index; i < _redlines.Count && i != -1; i++) {
+                    var redline = _redlines[index];
+                    var msDiff = lastRedline == firstRedline ?
+                        redline.Offset - originTime :
+                        redline.Offset - lastRedline.Offset;
+                    var beatDiff = round ? MultiSnapRound(msDiff / lastRedline.MpB, divisors) : msDiff / lastRedline.MpB;
+
+                    if (beatDiff > beatTime + Precision.DOUBLE_EPSILON) {
+                        break;
+                    }
+
+                    beatTime -= beatDiff;
+                    ms += msDiff;
+
+                    lastRedline = redline;
+                }
+                ms += beatTime * lastRedline.MpB;
+            } else {
+                int index = GetTimingPointIndexAtTime(originTime, _redlines);
+                double lastBeatTime = originTime;
+                TimingPoint redline = index == -1 ? GetFirstTimingPointExtended() : _redlines[index];
+                for (int i = index; i >= 0; i--) {
+                    redline = _redlines[index];
+                    double msDiff = redline.Offset - lastBeatTime;
+                    var beatDiff = round ? MultiSnapRound(msDiff / redline.MpB, divisors) : msDiff / redline.MpB;
+
+                    if (beatDiff < beatTime - Precision.DOUBLE_EPSILON) {
+                        break;
+                    }
+
+                    beatTime -= beatDiff;
+                    ms += msDiff;
+
+                    lastBeatTime = redline.Offset;
+                }
+                ms += beatTime * redline.MpB;
+            }
+
+            return ms;
         }
 
         /// <summary>
