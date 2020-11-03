@@ -253,7 +253,10 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             if (ScaleToNewTiming) {
                 // Transform everything to beat time relative to pattern start time
                 foreach (var ho in patternBeatmap.HitObjects) {
+                    double oldEndTime = ho.EndTime;
+
                     ho.Time = patternTiming.GetBeatLength(patternStartTime, ho.Time);
+                    ho.EndTime = patternTiming.GetBeatLength(patternStartTime, oldEndTime);
 
                     foreach (var tp in ho.BodyHitsounds) {
                         tp.Offset = patternTiming.GetBeatLength(patternStartTime, tp.Offset);
@@ -294,13 +297,18 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             }
 
             // Fix SV for the new global SV
+            var globalSvFactor =  transformOriginalTiming.SliderMultiplier / patternTiming.SliderMultiplier;
             if (FixGlobalSv) {
-                var globalSvFactor =  transformOriginalTiming.SliderMultiplier / patternTiming.SliderMultiplier;
-                foreach (HitObject ho in patternBeatmap.HitObjects) {
+                foreach (HitObject ho in patternBeatmap.HitObjects.Where(o => o.IsSlider)) {
                     ho.SliderVelocity *= globalSvFactor;
                 }
                 foreach (TimingPoint tp in svChanges) {
                     tp.MpB *= globalSvFactor;
+                }
+            }
+            else if (ScaleToNewTiming) {
+                foreach (HitObject ho in patternBeatmap.HitObjects.Where(o => o.IsSlider)) {
+                    ho.TemporalLength /= globalSvFactor;
                 }
             }
 
@@ -393,9 +401,20 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
 
                 // Fix SV for the new BPM
                 if (FixBpmSv) {
-                    foreach (HitObject ho in patternBeatmap.HitObjects) {
-                        var bpmSvFactor = patternTiming.GetMpBAtTime(ho.Time) / newTiming.GetMpBAtTime(ho.Time);
-                        ho.SliderVelocity *= bpmSvFactor;
+                    if (ScaleToNewTiming) {
+                        foreach (HitObject ho in patternBeatmap.HitObjects.Where(o => o.IsSlider)) {
+                            var bpmSvFactor = patternTiming.GetMpBAtTime(
+                                                  newTiming.GetMilliseconds(ho.Time, patternStartTime)) / 
+                                              newTiming.GetMpBAtTime(ho.Time);
+                            ho.SliderVelocity *= bpmSvFactor;
+                            ho.TemporalLength /= bpmSvFactor;
+                        }
+                    }
+                    else {
+                        foreach (HitObject ho in patternBeatmap.HitObjects.Where(o => o.IsSlider)) {
+                            var bpmSvFactor = patternTiming.GetMpBAtTime(ho.Time) / newTiming.GetMpBAtTime(ho.Time);
+                            ho.SliderVelocity *= bpmSvFactor;
+                        }
                     }
                 }
 
@@ -403,9 +422,18 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 foreach (var ho in part.HitObjects) {
                     ho.UnInheritedTimingPoint = newTiming.GetRedlineAtTime(ho.Time);
                     if (ho.IsSlider) {
-                        ho.TemporalLength = ScaleToNewTiming ?
-                            newTiming.CalculateSliderBeatLength(ho.PixelLength, ho.SliderVelocity) :
-                            newTiming.CalculateSliderTemporalLength(ho.Time, ho.PixelLength, ho.SliderVelocity);
+                        // If ScaleToNewTiming then the end time is already at the correct beat time
+                        // The SV has to be adjusted so the sliderend is really on the end time
+                        if (ScaleToNewTiming) {
+                            var wantedMsDuration = newTiming.GetMilliseconds(ho.GetEndTime(false), patternStartTime) -
+                                                 newTiming.GetMilliseconds(ho.Time, patternStartTime);
+                            var trueMsDuration = newTiming.CalculateSliderTemporalLength(ho.Time, ho.PixelLength, ho.SliderVelocity);
+                            ho.SliderVelocity /= trueMsDuration / wantedMsDuration;
+                            // TODO Add option for kiai toggles. Intermediate snapping.
+                        }
+                        else {
+                            ho.TemporalLength = newTiming.CalculateSliderTemporalLength(ho.Time, ho.PixelLength, ho.SliderVelocity);
+                        }
                     }
                 }
 
@@ -431,26 +459,6 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             // Transform the beat time back to millisecond time
             Timing transformNewTiming = newTiming;
             if (ScaleToNewTiming) {
-                // Transform everything to millisecond time relative to pattern start time
-                foreach (var ho in patternBeatmap.HitObjects) {
-                    if (ho.IsSlider) {
-                        var redline = newTiming.GetRedlineAtTime(ho.Time);
-                        ho.TemporalLength = ho.TemporalLength * redline.MpB;
-                    }
-
-                    ho.Time = newTiming.GetMilliseconds(ho.Time, patternStartTime);
-                    
-                    foreach (var tp in ho.BodyHitsounds) {
-                        tp.Offset = newTiming.GetMilliseconds(tp.Offset, patternStartTime);
-                    }
-
-                    ho.UpdateTimelineObjectTimes();
-                }
-
-                foreach (var tp in kiaiToggles.Concat(svChanges)) {
-                    tp.Offset = newTiming.GetMilliseconds(tp.Offset, patternStartTime);
-                }
-
                 // Transform back the timing
                 transformNewTiming = newTiming.Copy();
                 foreach (var tp in transformNewTiming.TimingPoints) {
@@ -461,6 +469,28 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 foreach (Part part in parts) {
                     part.StartTime = newTiming.GetMilliseconds(part.StartTime, patternStartTime);
                     part.EndTime = newTiming.GetMilliseconds(part.EndTime, patternStartTime);
+                }
+
+                // Transform everything to millisecond time relative to pattern start time
+                foreach (var ho in patternBeatmap.HitObjects) {
+                    // Calculate the millisecond end time before changing the start time because the end time getter uses the beat time start time
+                    var msEndTime = newTiming.GetMilliseconds(ho.GetEndTime(false), patternStartTime);
+
+                    ho.Time = newTiming.GetMilliseconds(ho.Time, patternStartTime);
+
+                    // End time has to be set after the time because the end time setter uses the millisecond start time
+                    ho.EndTime = msEndTime;
+
+                    foreach (var tp in ho.BodyHitsounds) {
+                        tp.Offset = newTiming.GetMilliseconds(tp.Offset, patternStartTime);
+                    }
+
+                    ho.UnInheritedTimingPoint = transformNewTiming.GetRedlineAtTime(ho.Time);
+                    ho.UpdateTimelineObjectTimes();
+                }
+
+                foreach (var tp in kiaiToggles.Concat(svChanges)) {
+                    tp.Offset = newTiming.GetMilliseconds(tp.Offset, patternStartTime);
                 }
             }
 

@@ -551,6 +551,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             var newTime = timing.Resnap(EndTime, beatDivisors, floor, tp: tp, firstTp: firstTp);
             var deltaTime = newTime - EndTime;
             MoveEndTime(timing, deltaTime);
+            return Math.Abs(deltaTime) > Precision.DOUBLE_EPSILON;
+        }
+
+        public bool ResnapEndClassic(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, TimingPoint firstTp = null) {
+            var newTemporalLength = timing.ResnapDuration(Time, TemporalLength, beatDivisors, false, firstTp: firstTp);
+
+            var deltaTime = newTemporalLength - TemporalLength;
+            ChangeTemporalTime(timing, deltaTime);
 
             return Math.Abs(deltaTime) > Precision.DOUBLE_EPSILON;
         }
@@ -566,15 +574,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Move(new Vector2(dX, dY));
 
             return Math.Abs(dX) > Precision.DOUBLE_EPSILON || Math.Abs(dY) > Precision.DOUBLE_EPSILON;
-        }
-
-        public bool ResnapEndClassic(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, TimingPoint firstTp = null) {
-            var newTemporalLength = timing.ResnapDuration(Time, TemporalLength, beatDivisors, false, firstTp: firstTp);
-
-            var deltaTime = newTemporalLength - TemporalLength;
-            ChangeTemporalTime(timing, deltaTime);
-
-            return Math.Abs(deltaTime) > Precision.DOUBLE_EPSILON;
         }
 
         public double GetResnappedTime(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint tp = null,

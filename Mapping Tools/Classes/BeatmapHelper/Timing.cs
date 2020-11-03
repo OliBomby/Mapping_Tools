@@ -280,6 +280,57 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         /// <summary>
+        /// Assumes all the redlines are in beat timing and calculates the beat time which is X milliseconds offset for a beat time.
+        /// 0 beatTime returns originTime.
+        /// </summary>
+        /// <returns></returns>
+        public double WalkMillisecondsInBeatTime(double startBeatTime, double milliseconds) {
+            double beatTime = startBeatTime;
+
+            if (milliseconds >= 0) {
+                TimingPoint firstRedline = GetRedlineAtTime(startBeatTime);
+                TimingPoint lastRedline = firstRedline;
+                int index = GetTimingPointIndexAfterTime(startBeatTime, _redlines);
+                for (int i = index; i < _redlines.Count && i != -1; i++) {
+                    var redline = _redlines[index];
+                    var beatDiff = lastRedline == firstRedline ? 
+                        redline.Offset - startBeatTime:
+                        redline.Offset - lastRedline.Offset;
+
+                    if (beatDiff * lastRedline.MpB > milliseconds) {
+                        break;
+                    }
+
+                    milliseconds -= beatDiff * lastRedline.MpB;
+                    beatTime += beatDiff;
+
+                    lastRedline = redline;
+                }
+                beatTime += milliseconds / lastRedline.MpB;
+            } else {
+                int index = GetTimingPointIndexAtTime(startBeatTime, _redlines);
+                double lastBeatTime = startBeatTime;
+                TimingPoint redline = index == -1 ? GetFirstTimingPointExtended() : _redlines[index];
+                for (int i = index; i >= 0; i--) {
+                    redline = _redlines[index];
+                    double beatDiff = redline.Offset - lastBeatTime;
+
+                    if (beatDiff * redline.MpB < milliseconds) {
+                        break;
+                    }
+
+                    milliseconds -= beatDiff * redline.MpB;
+                    beatTime += beatDiff;
+
+                    lastBeatTime = redline.Offset;
+                }
+                beatTime += milliseconds / redline.MpB;
+            }
+
+            return beatTime;
+        }
+
+        /// <summary>
         /// This method calculates time of the tick on the timeline which is nearest to specified time.
         /// This method is mostly used to snap objects to timing.
         /// </summary>
@@ -429,13 +480,24 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="firstTimingpoint">The first timing point to start searching from.</param>
         /// <returns></returns>
         public static TimingPoint GetTimingPointAtTime(double time, IReadOnlyList<TimingPoint> timingPoints, TimingPoint firstTimingpoint) {
+            var index = GetTimingPointIndexAtTime(time, timingPoints);
+            return index != -1 ? timingPoints[index] : firstTimingpoint;
+        }
+
+        /// <summary>
+        /// Finds the index of the timing point which is in effect at a given time with a custom set of timing points.
+        /// </summary>
+        /// <param name="time"></param>
+        /// <param name="timingPoints">All the timing points.</param>
+        /// <returns></returns>
+        public static int GetTimingPointIndexAtTime(double time, IReadOnlyList<TimingPoint> timingPoints) {
             var index = BinarySearchUtil.BinarySearch(timingPoints, time, tp => tp.Offset, BinarySearchUtil.EqualitySelection.Rightmost);
             if (index < 0) {
                 index = ~index;
-                return index == 0 ? firstTimingpoint : timingPoints[index - 1];
+                return index == 0 ? -1 : index - 1;
             }
 
-            return timingPoints[index];
+            return index;
         }
 
         /// <summary>
@@ -445,14 +507,25 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="timingPoints"></param>
         /// <returns></returns>
         public static TimingPoint GetTimingPointAfterTime(double time, IReadOnlyList<TimingPoint> timingPoints) {
+            var index = GetTimingPointIndexAfterTime(time, timingPoints);
+            return index != -1 ? timingPoints[index] : null;
+        }
+
+        /// <summary>
+        /// Gets the index of the first timing point after specified time.
+        /// </summary>
+        /// <param name="time"></param>
+        /// <param name="timingPoints"></param>
+        /// <returns></returns>
+        public static int GetTimingPointIndexAfterTime(double time, IReadOnlyList<TimingPoint> timingPoints) {
             var index = BinarySearchUtil.BinarySearch(timingPoints, time, tp => tp.Offset, BinarySearchUtil.EqualitySelection.Rightmost);
             if (index < 0) {
                 index = ~index;
 
-                return index < timingPoints.Count ? timingPoints[index] : null;
+                return index < timingPoints.Count ? index : -1;
             }
 
-            return index + 1 < timingPoints.Count ? timingPoints[index + 1] : null;
+            return index + 1 < timingPoints.Count ? index + 1 : -1;
         }
 
         public static List<TimingPoint> GetTimingPointsInRange(double startTime, double endTime,
