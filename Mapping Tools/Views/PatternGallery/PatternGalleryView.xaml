@@ -245,7 +245,7 @@
                               ToolTip="Scale the pattern such that the spacing relative to the circle size stays the same."
                               IsChecked="{Binding ScaleToNewCircleSize}"/>
                     <CheckBox Content="Scale to new timing"
-                              ToolTip="Scale the pattern in time such that the relative number of beats between objects stays the same in the new timing."
+                              ToolTip="Scale the pattern in time such that the number of beats between objects stays the same in the new timing. Incorrect snaps can occur if your timing has unsnapped redlines. Do not use this if you have 0 or infinite BPM redlines."
                               IsChecked="{Binding ScaleToNewTiming}"/>
                     <CheckBox Content="Snap to new timing"
                               ToolTip="Snap the objects of the pattern to the new timing using the specified beat divisors."
