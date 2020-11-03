@@ -416,6 +416,24 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         /// <summary>
+        /// This method calculates time of the tick on the timeline which is nearest to specified time in beat time.
+        /// This method is mostly used to snap objects to timing.
+        /// </summary>
+        /// <param name="time">Specified time.</param>
+        /// <param name="tp">Uninherited timing point to get the timing from.</param>
+        /// <param name="beatDivisor">How many beats to have per timeline tick.</param>
+        /// <returns></returns>
+        public static double GetNearestTickBeatTime(double time, TimingPoint tp, IBeatDivisor beatDivisor) {
+            double d = beatDivisor.GetValue();
+            double remainder = (time - tp.Offset) % d;
+            if (remainder < 0.5 * d) {
+                return time - remainder;
+            }
+
+            return time - remainder + d;
+        }
+
+        /// <summary>
         /// Calculates the nearest value to <see cref="duration"/> which is also a multiple of <see cref="divisor"/>.
         /// </summary>
         /// <param name="duration">The target value.</param>
@@ -464,6 +482,40 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 newTime = afterTp.Offset;
             }
             return floor && !exactMode ? Math.Floor(newTime) : newTime;
+        }
+
+        /// <summary>
+        /// Calculates the snapped beat time for a given beat time and multiple different options.
+        /// </summary>
+        /// <param name="time"></param>
+        /// <param name="beatDivisors"></param>
+        /// <param name="tp">The uninherited timing point to snap to. Leave null for automatic selection.</param>
+        /// <param name="firstTp">Overwrites the timing for anything that happens before the first timing point.
+        ///     You can set this to avoid bad timing when there could be an inherited timing point before the first red line.</param>
+        /// <param name="exactMode">If true, interprets time not as milliseconds and prevents big rounding operations.</param>
+        /// <returns>The snapped time.</returns>
+        public double ResnapBeatTime(double time, IEnumerable<IBeatDivisor> beatDivisors,
+            TimingPoint tp = null, TimingPoint firstTp = null, bool exactMode = false) {
+            TimingPoint beforeTp = tp ?? GetRedlineAtTime(time, firstTp);
+            TimingPoint afterTp = tp == null ? GetRedlineAfterTime(time) : null;
+
+            double newTime = 0;
+            double lowestDistance = double.PositiveInfinity;
+
+            foreach (var beatDivisor in beatDivisors) {
+                var t = GetNearestTickBeatTime(time, beforeTp, beatDivisor);
+                var d = Math.Abs(time - t);
+
+                if (d < lowestDistance) {
+                    lowestDistance = d;
+                    newTime = t;
+                }
+            }
+
+            if (!exactMode && afterTp != null && newTime > beforeTp.Offset + 10 / beforeTp.MpB && newTime >= afterTp.Offset - 10 / beforeTp.MpB) {
+                newTime = afterTp.Offset;
+            }
+            return newTime;
         }
 
         /// <summary>

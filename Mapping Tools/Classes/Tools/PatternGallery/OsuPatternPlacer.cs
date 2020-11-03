@@ -281,6 +281,22 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 }
             }
 
+            // Fix SV for the new global SV
+            var globalSvFactor =  transformOriginalTiming.SliderMultiplier / patternTiming.SliderMultiplier;
+            if (FixGlobalSv) {
+                foreach (HitObject ho in patternBeatmap.HitObjects.Where(o => o.IsSlider)) {
+                    ho.SliderVelocity *= globalSvFactor;
+                }
+                foreach (TimingPoint tp in svChanges) {
+                    tp.MpB *= globalSvFactor;
+                }
+            }
+            else {
+                foreach (HitObject ho in patternBeatmap.HitObjects.Where(o => o.IsSlider)) {
+                    ho.TemporalLength /= globalSvFactor;
+                }
+            }
+
             // Get the timeline before moving all objects so it has the correct hitsounds
             // Make sure that moving the objects in the pattern moves the timeline objects aswell
             Timeline patternTimeline = patternBeatmap.GetTimeline();
@@ -294,22 +310,6 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                         patternBeatmap.HitObjects[patternBeatmap.HitObjects.Count-1].Time, 
                         patternBeatmap.HitObjects)
                 };
-            }
-
-            // Fix SV for the new global SV
-            var globalSvFactor =  transformOriginalTiming.SliderMultiplier / patternTiming.SliderMultiplier;
-            if (FixGlobalSv) {
-                foreach (HitObject ho in patternBeatmap.HitObjects.Where(o => o.IsSlider)) {
-                    ho.SliderVelocity *= globalSvFactor;
-                }
-                foreach (TimingPoint tp in svChanges) {
-                    tp.MpB *= globalSvFactor;
-                }
-            }
-            else if (ScaleToNewTiming) {
-                foreach (HitObject ho in patternBeatmap.HitObjects.Where(o => o.IsSlider)) {
-                    ho.TemporalLength /= globalSvFactor;
-                }
             }
 
             // Construct a new timing which is a mix of the beatmap and the pattern.
@@ -403,16 +403,20 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 if (FixBpmSv) {
                     if (ScaleToNewTiming) {
                         foreach (HitObject ho in patternBeatmap.HitObjects.Where(o => o.IsSlider)) {
-                            var bpmSvFactor = patternTiming.GetMpBAtTime(
-                                                  newTiming.GetMilliseconds(ho.Time, patternStartTime)) / 
-                                              newTiming.GetMpBAtTime(ho.Time);
+                            var bpmSvFactor = SnapToNewTiming ? 
+                                patternTiming.GetMpBAtTime(newTiming.GetMilliseconds(ho.Time, patternStartTime)) /
+                                newTiming.GetMpBAtTime(newTiming.ResnapBeatTime(ho.Time, BeatDivisors)) : 
+                                patternTiming.GetMpBAtTime(newTiming.GetMilliseconds(ho.Time, patternStartTime)) / 
+                                newTiming.GetMpBAtTime(ho.Time);
                             ho.SliderVelocity *= bpmSvFactor;
                             ho.TemporalLength /= bpmSvFactor;
                         }
                     }
                     else {
                         foreach (HitObject ho in patternBeatmap.HitObjects.Where(o => o.IsSlider)) {
-                            var bpmSvFactor = patternTiming.GetMpBAtTime(ho.Time) / newTiming.GetMpBAtTime(ho.Time);
+                            var bpmSvFactor = SnapToNewTiming ?
+                                patternTiming.GetMpBAtTime(ho.Time) / newTiming.GetMpBAtTime(newTiming.Resnap(ho.Time, BeatDivisors)) :
+                                patternTiming.GetMpBAtTime(ho.Time) / newTiming.GetMpBAtTime(ho.Time);
                             ho.SliderVelocity *= bpmSvFactor;
                         }
                     }
@@ -427,12 +431,12 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                         if (ScaleToNewTiming) {
                             var wantedMsDuration = newTiming.GetMilliseconds(ho.GetEndTime(false), patternStartTime) -
                                                  newTiming.GetMilliseconds(ho.Time, patternStartTime);
-                            var trueMsDuration = newTiming.CalculateSliderTemporalLength(ho.Time, ho.PixelLength, ho.SliderVelocity);
+                            var trueMsDuration = newTiming.CalculateSliderTemporalLength(SnapToNewTiming ? newTiming.ResnapBeatTime(ho.Time, BeatDivisors) : ho.Time, ho.PixelLength, ho.SliderVelocity);
                             ho.SliderVelocity /= trueMsDuration / wantedMsDuration;
-                            // TODO Add option for kiai toggles. Intermediate snapping.
+                            // TODO Add option for kiai toggles
                         }
                         else {
-                            ho.TemporalLength = newTiming.CalculateSliderTemporalLength(ho.Time, ho.PixelLength, ho.SliderVelocity);
+                            ho.TemporalLength = newTiming.CalculateSliderTemporalLength(SnapToNewTiming ? newTiming.Resnap(ho.Time, BeatDivisors) : ho.Time, ho.PixelLength, ho.SliderVelocity);
                         }
                     }
                 }

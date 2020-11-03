@@ -543,14 +543,17 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             // If there is a redline in the sliderbody then the sliderend gets snapped to a tick of the latest redline
             if (!IsSlider || timing.TimingPoints.Any(o => o.Uninherited && o.Offset <= EndTime + 20 && o.Offset > Time))
                 return ResnapEndTime(timing, beatDivisors, floor, tp, firstTp);
+
             return ResnapEndClassic(timing, beatDivisors, firstTp);
         }
 
         public bool ResnapEndTime(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint tp = null,
             TimingPoint firstTp = null) {
             var newTime = timing.Resnap(EndTime, beatDivisors, floor, tp: tp, firstTp: firstTp);
+
             var deltaTime = newTime - EndTime;
             MoveEndTime(timing, deltaTime);
+
             return Math.Abs(deltaTime) > Precision.DOUBLE_EPSILON;
         }
 
