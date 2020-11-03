@@ -119,6 +119,11 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref OsuPatternPlacer.IncludeHitsounds, value);
         }
 
+        public bool IncludeKiai {
+            get => OsuPatternPlacer.IncludeKiai;
+            set => Set(ref OsuPatternPlacer.IncludeKiai, value);
+        }
+
         public bool ScaleToNewCircleSize {
             get => OsuPatternPlacer.ScaleToNewCircleSize;
             set => Set(ref OsuPatternPlacer.ScaleToNewCircleSize, value);

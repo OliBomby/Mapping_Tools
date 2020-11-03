@@ -27,6 +27,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
         /// </summary>
         public TimingOverwriteMode TimingOverwriteMode = TimingOverwriteMode.PatternTimingOnly;
         public bool IncludeHitsounds = true;
+        public bool IncludeKiai = true;
         public bool ScaleToNewCircleSize = false;
         public bool ScaleToNewTiming = false;
         public bool SnapToNewTiming = true;
@@ -230,13 +231,13 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 : TimingOverwriteMode.OriginalTimingOnly;
 
             // Collect Kiai toggles and SliderVelocity changes for mania/taiko
-            List<TimingPoint> kiaiToggles = new List<TimingPoint>();
+            List<TimingPoint> patternKiaiToggles = new List<TimingPoint>();
             List<TimingPoint> svChanges = new List<TimingPoint>();
             bool lastKiai = false;
             double lastSV = -100;
             foreach (TimingPoint tp in patternTiming.TimingPoints) {
-                if (tp.Kiai != lastKiai) {
-                    kiaiToggles.Add(tp.Copy());
+                if (tp.Kiai != lastKiai || patternKiaiToggles.Count == 0) {
+                    patternKiaiToggles.Add(tp.Copy());
                     lastKiai = tp.Kiai;
                 }
                 if (tp.Uninherited) {
@@ -263,7 +264,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                     }
                 }
 
-                foreach (var tp in kiaiToggles.Concat(svChanges)) {
+                foreach (var tp in patternKiaiToggles.Concat(svChanges)) {
                     tp.Offset = patternTiming.GetBeatLength(patternStartTime, tp.Offset);
                 }
 
@@ -493,7 +494,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                     ho.UpdateTimelineObjectTimes();
                 }
 
-                foreach (var tp in kiaiToggles.Concat(svChanges)) {
+                foreach (var tp in patternKiaiToggles.Concat(svChanges)) {
                     tp.Offset = newTiming.GetMilliseconds(tp.Offset, patternStartTime);
                 }
             }
@@ -507,7 +508,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                     ho.ResnapPosition(patternMode, patternCircleSize);  // Resnap to column X positions for mania only
                 }
                 // Resnap Kiai toggles
-                foreach (TimingPoint tp in kiaiToggles) {
+                foreach (TimingPoint tp in patternKiaiToggles) {
                     tp.ResnapSelf(transformNewTiming, BeatDivisors);
                 }
 
@@ -530,7 +531,18 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             }
 
             // Add Kiai toggles
-            timingPointsChanges.AddRange(kiaiToggles.Select(tp => new TimingPointsChange(tp, kiai: true)));
+            if (IncludeKiai) {
+                timingPointsChanges.AddRange(patternKiaiToggles.Select(tp => new TimingPointsChange(tp, kiai: true)));
+            }
+            else {
+                lastKiai = false;
+                foreach (TimingPoint tp in originalTiming.TimingPoints) {
+                    if (tp.Kiai != lastKiai) {
+                        timingPointsChanges.Add(new TimingPointsChange(tp.Copy(), kiai: true));
+                        lastKiai = tp.Kiai;
+                    }
+                }
+            }
 
             // Add Hitobject stuff
             foreach (HitObject ho in patternBeatmap.HitObjects) {

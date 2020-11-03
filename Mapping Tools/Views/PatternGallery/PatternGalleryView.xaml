@@ -239,8 +239,11 @@
                               ToolTip="Determines how to combine the timing of the orignal beatmap and the timing of the pattern."/>
                     
                     <CheckBox Content="Include hitsounds" Margin="0 5 0 0"
-                              ToolTip="Export the pattern with hitsounds and hitsound effects from timing points."
+                              ToolTip="Export the pattern with the hitsound effects of the pattern timing points."
                               IsChecked="{Binding IncludeHitsounds}"/>
+                    <CheckBox Content="Include kiai"
+                              ToolTip="Export the pattern with the kiai of the pattern."
+                              IsChecked="{Binding IncludeKiai}"/>
                     <CheckBox Content="Scale to new circle size"
                               ToolTip="Scale the pattern such that the spacing relative to the circle size stays the same."
                               IsChecked="{Binding ScaleToNewCircleSize}"/>
