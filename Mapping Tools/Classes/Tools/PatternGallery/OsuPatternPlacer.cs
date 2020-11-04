@@ -254,7 +254,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             if (ScaleToNewTiming) {
                 // Transform everything to beat time relative to pattern start time
                 foreach (var ho in patternBeatmap.HitObjects) {
-                    double oldEndTime = ho.EndTime;
+                    double oldEndTime = ho.GetEndTime(false);
 
                     ho.Time = patternTiming.GetBeatLength(patternStartTime, ho.Time);
                     ho.EndTime = patternTiming.GetBeatLength(patternStartTime, oldEndTime);
@@ -430,8 +430,8 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                         // If ScaleToNewTiming then the end time is already at the correct beat time
                         // The SV has to be adjusted so the sliderend is really on the end time
                         if (ScaleToNewTiming) {
-                            var wantedMsDuration = newTiming.GetMilliseconds(ho.GetEndTime(false), patternStartTime) -
-                                                 newTiming.GetMilliseconds(ho.Time, patternStartTime);
+                            var wantedMsDuration = (newTiming.GetMilliseconds(ho.GetEndTime(false), patternStartTime) -
+                                                    newTiming.GetMilliseconds(ho.Time, patternStartTime)) / ho.Repeat;
                             var trueMsDuration = newTiming.CalculateSliderTemporalLength(SnapToNewTiming ? newTiming.ResnapBeatTime(ho.Time, BeatDivisors) : ho.Time, ho.PixelLength, ho.SliderVelocity);
                             ho.SliderVelocity /= trueMsDuration / wantedMsDuration;
                         }

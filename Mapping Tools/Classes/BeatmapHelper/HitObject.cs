@@ -526,7 +526,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public void UpdateTimelineObjectTimes() {
-            for (int i = 0; i <= Math.Min(Repeat, TimelineObjects.Count - 1); i++) {
+            for (int i = 0; i < Math.Min(Repeat + 1, TimelineObjects.Count); i++) {
                 double time = Math.Floor(Time + TemporalLength * i);
                 TimelineObjects[i].Time = time;
             }
