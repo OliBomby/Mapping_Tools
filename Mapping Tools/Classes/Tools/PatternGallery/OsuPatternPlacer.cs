@@ -434,7 +434,6 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                                                  newTiming.GetMilliseconds(ho.Time, patternStartTime);
                             var trueMsDuration = newTiming.CalculateSliderTemporalLength(SnapToNewTiming ? newTiming.ResnapBeatTime(ho.Time, BeatDivisors) : ho.Time, ho.PixelLength, ho.SliderVelocity);
                             ho.SliderVelocity /= trueMsDuration / wantedMsDuration;
-                            // TODO Add option for kiai toggles
                         }
                         else {
                             ho.TemporalLength = newTiming.CalculateSliderTemporalLength(SnapToNewTiming ? newTiming.Resnap(ho.Time, BeatDivisors) : ho.Time, ho.PixelLength, ho.SliderVelocity);
@@ -467,13 +466,13 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 // Transform back the timing
                 transformNewTiming = newTiming.Copy();
                 foreach (var tp in transformNewTiming.TimingPoints) {
-                    tp.Offset = newTiming.GetMilliseconds(tp.Offset, patternStartTime);
+                    tp.Offset = Math.Floor(newTiming.GetMilliseconds(tp.Offset, patternStartTime) + Precision.DOUBLE_EPSILON);
                 }
 
                 // Transform back the parts
                 foreach (Part part in parts) {
-                    part.StartTime = newTiming.GetMilliseconds(part.StartTime, patternStartTime);
-                    part.EndTime = newTiming.GetMilliseconds(part.EndTime, patternStartTime);
+                    part.StartTime = Math.Floor(newTiming.GetMilliseconds(part.StartTime, patternStartTime));
+                    part.EndTime = Math.Floor(newTiming.GetMilliseconds(part.EndTime, patternStartTime));
                 }
 
                 // Transform everything to millisecond time relative to pattern start time
@@ -490,12 +489,19 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                         tp.Offset = newTiming.GetMilliseconds(tp.Offset, patternStartTime);
                     }
 
+                    // It is necessary to resnap early so it can recalculate the duration using the right offset
+                    if (SnapToNewTiming)
+                        ho.ResnapSelf(transformNewTiming, BeatDivisors);
+
+                    if (ho.IsSlider)
+                        ho.CalculateSliderTemporalLength(transformNewTiming, true);
+
                     ho.UnInheritedTimingPoint = transformNewTiming.GetRedlineAtTime(ho.Time);
                     ho.UpdateTimelineObjectTimes();
                 }
 
                 foreach (var tp in patternKiaiToggles.Concat(svChanges)) {
-                    tp.Offset = newTiming.GetMilliseconds(tp.Offset, patternStartTime);
+                    tp.Offset = Math.Floor(newTiming.GetMilliseconds(tp.Offset, patternStartTime));
                 }
             }
 

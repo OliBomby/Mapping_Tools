@@ -495,6 +495,17 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             ChangeTemporalTime(timing, deltaTime / Repeat);
         }
 
+        public void CalculateSliderTemporalLength(Timing timing, bool useOwnSv) {
+            if (!IsSlider) return;
+            if (double.IsNaN(PixelLength) || PixelLength < 0 || CurvePoints.All(o => o == Pos)) {
+                TemporalLength = 0;
+            } else {
+                TemporalLength = useOwnSv
+                    ? timing.CalculateSliderTemporalLength(Time, PixelLength, SliderVelocity)
+                    : timing.CalculateSliderTemporalLength(Time, PixelLength);
+            }
+        }
+
         public void ChangeTemporalTime(Timing timing, double deltaTemporalTime) {
             if (Repeat == 0) return;
 

@@ -336,12 +336,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         public void CalculateSliderEndTimes() {
             foreach (var ho in HitObjects.Where(ho => ho.IsSlider)) {
-                if (double.IsNaN(ho.PixelLength) || ho.PixelLength < 0 || ho.CurvePoints.All(o => o == ho.Pos)) {
-                    ho.TemporalLength = 0;
-                }
-                else {
-                    ho.TemporalLength = BeatmapTiming.CalculateSliderTemporalLength(ho.Time, ho.PixelLength);
-                }
+                ho.CalculateSliderTemporalLength(BeatmapTiming, false);
             }
         }
         

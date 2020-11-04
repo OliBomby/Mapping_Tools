@@ -481,7 +481,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             if (!exactMode && afterTp != null && newTime > beforeTp.Offset + 10 && newTime >= afterTp.Offset - 10) {
                 newTime = afterTp.Offset;
             }
-            return floor && !exactMode ? Math.Floor(newTime) : newTime;
+            return floor && !exactMode ? Math.Floor(newTime + Precision.DOUBLE_EPSILON) : newTime;
         }
 
         /// <summary>
@@ -545,7 +545,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 }
             }
 
-            return floor ? Math.Floor(newDuration) : newDuration;
+            return floor ? Math.Floor(newDuration + Precision.DOUBLE_EPSILON) : newDuration;
         }
 
         /// <summary>
@@ -586,7 +586,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 newTime = time;
             }
 
-            return floor ? Math.Floor(newTime) : newTime;
+            return floor ? Math.Floor(newTime + Precision.DOUBLE_EPSILON) : newTime;
         }
 
         #region TimingPointGetters
