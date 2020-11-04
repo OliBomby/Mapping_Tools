@@ -250,6 +250,11 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 }
             }
 
+            // Get the timeline before moving all objects so it has the correct hitsounds
+            // Make sure that moving the objects in the pattern moves the timeline objects aswell
+            // This method is NOT safe to use in beat time
+            Timeline patternTimeline = patternBeatmap.GetTimeline();
+
             Timing transformOriginalTiming = originalTiming;
             if (ScaleToNewTiming) {
                 // Transform everything to beat time relative to pattern start time
@@ -297,10 +302,6 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                     ho.TemporalLength /= globalSvFactor;
                 }
             }
-
-            // Get the timeline before moving all objects so it has the correct hitsounds
-            // Make sure that moving the objects in the pattern moves the timeline objects aswell
-            Timeline patternTimeline = patternBeatmap.GetTimeline();
 
             // Partition the pattern based on the timing in the pattern
             if (PatternOverwriteMode == PatternOverwriteMode.PartitionedOverwrite) {
