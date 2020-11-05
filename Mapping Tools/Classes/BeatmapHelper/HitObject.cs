@@ -478,6 +478,36 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         /// <summary>
+        /// Removes all hitounds and sets samplesets to auto.
+        /// Also clears hitsounds from timeline objects and clears body hitsounds.
+        /// </summary>
+        public void ResetHitsounds() {
+            SetHitsounds(1);
+            SampleSet = SampleSet.Auto;
+            AdditionSet = SampleSet.Auto;
+            SampleVolume = 0;
+            CustomIndex = 0;
+            Filename = string.Empty;
+            if (IsSlider) {
+                for (int i = 0; i < EdgeHitsounds.Count; i++) {
+                    EdgeHitsounds[i] = 0;
+                }
+                for (int i = 0; i < EdgeSampleSets.Count; i++) {
+                    EdgeSampleSets[i] = SampleSet.Auto;
+                }
+                for (int i = 0; i < EdgeAdditionSets.Count; i++) {
+                    EdgeAdditionSets[i] = SampleSet.Auto;
+                }
+            }
+
+            foreach (var tlo in TimelineObjects) {
+                tlo.ResetHitsounds();
+            }
+
+            BodyHitsounds.Clear();
+        }
+
+        /// <summary>
         /// </summary>
         /// <param name="deltaTime"></param>
         public void MoveTime(double deltaTime) {

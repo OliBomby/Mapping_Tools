@@ -233,6 +233,15 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
+        public void ResetHitsounds() {
+            Normal = false;
+            Whistle = false;
+            Finish = false;
+            Clap = false;
+            SampleSet = SampleSet.Auto;
+            AdditionSet = SampleSet.Auto;
+        }
+
         /// <summary>
         /// Checks if the selected timeline object does play a normal
         /// (Only in modes other than Mania)

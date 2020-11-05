@@ -1,9 +1,9 @@
 ﻿using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.ExternalFileUtil;
 using Mapping_Tools.Classes.MathUtil;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Mapping_Tools.Classes.ExternalFileUtil;
 
 namespace Mapping_Tools.Classes.Tools.PatternGallery {
     /// <summary>
@@ -151,7 +151,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
         private class Part {
             public double StartTime;
             public double EndTime;
-            public List<HitObject> HitObjects;
+            public readonly List<HitObject> HitObjects;
 
             public Part(double startTime, double endTime, List<HitObject> hitObjects) {
                 StartTime = startTime;
@@ -561,25 +561,28 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                     timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true));
                 }
 
-                if (!includeHitsounds)
+                if (!includeHitsounds) {
+                    // Remove hitsounds and skip adding body hitsounds
+                    ho.ResetHitsounds();
                     continue;
+                }
 
                 // Body hitsounds
                 bool vol = ho.IsSlider || ho.IsSpinner;
                 bool sam = ho.IsSlider && ho.SampleSet == 0;
                 bool ind = ho.IsSlider;
-                foreach (TimingPoint tp in ho.BodyHitsounds) {
-                    timingPointsChanges.Add(new TimingPointsChange(tp, volume: vol, index: ind, sampleset: sam));
-                }
+                timingPointsChanges.AddRange(ho.BodyHitsounds.Select(tp => new TimingPointsChange(tp, volume: vol, index: ind, sampleset: sam)));
             }
 
             // Add timeline hitsounds
-            foreach (TimelineObject tlo in patternTimeline.TimelineObjects) {
-                if (tlo.HasHitsound && includeHitsounds) {
-                    // Add greenlines for hitsounds
-                    TimingPoint tp = tlo.HitsoundTimingPoint.Copy();
-                    tp.Offset = tlo.Time;
-                    timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: true, volume: true, index: true));
+            if (includeHitsounds) {
+                foreach (TimelineObject tlo in patternTimeline.TimelineObjects) {
+                    if (tlo.HasHitsound) {
+                        // Add greenlines for hitsounds
+                        TimingPoint tp = tlo.HitsoundTimingPoint.Copy();
+                        tp.Offset = tlo.Time;
+                        timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: true, volume: true, index: true));
+                    }
                 }
             }
             
