@@ -123,6 +123,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
         /// Creates parts that have at least PartingDistance number of beats of a gap between the parts.
         /// </summary>
         /// <param name="beatmap">The beatmap to partition.</param>
+        /// <param name="beatMode">Set to true if the beatmap uses beat time.</param>
         /// <returns>List of tuples with start time, end time.</returns>
         private List<Part> PartitionBeatmap(Beatmap beatmap, bool beatMode) {
             var parts = new List<Part>();
@@ -246,7 +247,6 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                     double oldEndTime = ho.GetEndTime(false);
 
                     ho.Time = patternTiming.GetBeatLength(patternStartTime, ho.Time);
-                    Console.WriteLine($"beat time: {ho.Time}");
                     ho.EndTime = patternTiming.GetBeatLength(patternStartTime, oldEndTime);
 
                     // The body hitsounds are not copies of timingpoints in patternTiming so they should be copied before changing offset
@@ -366,8 +366,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                         startPartRedline = transformPatternTiming.GetRedlineAtTime(startTime).Copy();
                         startPartRedline.MpB *= transformOriginalTiming.GetMpBAtTime(startTime) / patternDefaultMpb;
                         break;
-                    case TimingOverwriteMode.OriginalTimingOnly:
-                    default:
+                    default:  // Original timing only
                         // Subtract one from the end time to omit BPM changes right on the end of the part.
                         inPartRedlines = transformOriginalTiming.GetRedlinesInRange(startTime, endTime - 2 * Precision.DOUBLE_EPSILON).ToArray();
                         startPartRedline = transformOriginalTiming.GetRedlineAtTime(startTime);
