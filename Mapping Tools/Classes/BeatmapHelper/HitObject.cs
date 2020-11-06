@@ -571,6 +571,16 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             for (var i = 0; i < CurvePoints.Count; i++) CurvePoints[i] = CurvePoints[i] + delta;
         }
 
+        /// <summary>
+        /// Apply a 2x2 transformation matrix to the positions and curve points.
+        /// </summary>
+        /// <param name="mat"></param>
+        public void Transform(Matrix2 mat) {
+            Pos = Matrix2.Mult(mat, Pos);
+            if (!IsSlider) return;
+            for (var i = 0; i < CurvePoints.Count; i++) CurvePoints[i] = Matrix2.Mult(mat, CurvePoints[i]);;
+        }
+
         public bool ResnapSelf(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint tp = null,
             TimingPoint firstTp = null) {
             var newTime = GetResnappedTime(timing, beatDivisors, floor, tp, firstTp);

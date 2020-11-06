@@ -227,7 +227,7 @@
                         <TextBox Text="{Binding CustomRotate, Converter={StaticResource D2SConverter}}" 
                                  Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                                  materialDesign:HintAssist.Hint="Custom rotate" Grid.Column="2"
-                                 ToolTip="Degrees to rotate the pattern."/>
+                                 ToolTip="Degrees to rotate the pattern clockwise."/>
                     </Grid>
                     <ComboBox SelectedItem="{Binding PatternOverwriteMode}" ItemsSource="{Binding PatternOverwriteModes}"
                               Style="{StaticResource MaterialDesignFloatingHintComboBox}"
