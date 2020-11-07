@@ -438,7 +438,7 @@ namespace Mapping_Tools.Viewmodels {
             }
 
             var mousePos = GetCursorPosition();
-            var circleRadius = (109 - 9 * reader.CircleSize) / 2;
+            var circleRadius = Beatmap.GetHitObjectRadius(reader.CircleSize);
 
             HitObject closest = null;
             double bestDist = double.PositiveInfinity;

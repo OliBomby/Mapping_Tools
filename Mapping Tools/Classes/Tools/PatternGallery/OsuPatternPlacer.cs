@@ -204,6 +204,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             GameMode patternMode = (GameMode)patternBeatmap.General["Mode"].IntValue;
             GameMode targetMode = (GameMode)beatmap.General["Mode"].IntValue;
 
+            double originalCircleSize = beatmap.Difficulty["CircleSize"].DoubleValue;
             double patternCircleSize = patternBeatmap.Difficulty["CircleSize"].DoubleValue;
 
             // Avoid including hitsounds if there are no timingpoints to get hitsounds from
@@ -214,6 +215,10 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             TimingOverwriteMode timingOverwriteMode = patternTiming.Redlines.Count > 0
                 ? TimingOverwriteMode
                 : TimingOverwriteMode.OriginalTimingOnly;
+            // Get the scale for custom scale x CS scale
+            double csScale = Beatmap.GetHitObjectRadius(originalCircleSize) /
+                             Beatmap.GetHitObjectRadius(patternCircleSize);
+            double spatialScale = ScaleToNewCircleSize && !double.IsNaN(csScale) ? CustomScale * csScale : CustomScale;
 
             // Collect Kiai toggles and SliderVelocity changes for mania/taiko
             List<TimingPoint> patternKiaiToggles = new List<TimingPoint>();
@@ -496,11 +501,11 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             }
 
             // Apply custom scale and rotate
-            if (Math.Abs(CustomScale - 1) > Precision.DOUBLE_EPSILON ||
+            if (Math.Abs(spatialScale - 1) > Precision.DOUBLE_EPSILON ||
                 Math.Abs(CustomRotate) > Precision.DOUBLE_EPSILON) {
                 // Create a transformation matrix for the custom scale and rotate
                 // The rotation is inverted because the default osu! rotation goes clockwise
-                Matrix2 transform = Matrix2.Mult(Matrix2.CreateScale(CustomScale), Matrix2.CreateRotation(-CustomRotate));
+                Matrix2 transform = Matrix2.Mult(Matrix2.CreateScale(spatialScale), Matrix2.CreateRotation(-CustomRotate));
                 Vector2 centre = new Vector2(256, 192);
                 foreach (var ho in patternBeatmap.HitObjects) {
                     ho.Move(-centre);
@@ -509,8 +514,8 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
 
                     // Scale pixel length and SV for sliders aswell
                     if (ho.IsSlider) {
-                        ho.PixelLength *= CustomScale;
-                        ho.SliderVelocity /= CustomScale;
+                        ho.PixelLength *= spatialScale;
+                        ho.SliderVelocity /= spatialScale;
                     }
                 }
                 

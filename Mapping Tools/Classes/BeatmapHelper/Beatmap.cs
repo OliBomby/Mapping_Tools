@@ -411,6 +411,15 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         /// <summary>
+        /// Calculates the radius of a hit circle from a given Circle Size difficulty.
+        /// </summary>
+        /// <param name="circleSize"></param>
+        /// <returns></returns>
+        public static double GetHitObjectRadius(double circleSize) {
+            return (109 - 9 * circleSize) / 2;
+        }
+
+        /// <summary>
         /// Finds all hit objects from this beatmap which are within a specified range.
         /// Just any part of the hit object has to overlap with the time range in order to be included.
         /// </summary>
