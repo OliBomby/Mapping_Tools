@@ -112,8 +112,13 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             // Add the hitobjects of the pattern
             beatmap.HitObjects.AddRange(patternBeatmap.HitObjects);
 
-            // Sort hitobjects later so the timingpoints changes from the new hitobjects have priority
+            // Sort hitobjects
             beatmap.SortHitObjects();
+
+            if (FixColourHax) {
+                beatmap.FixComboSkip();
+            }
+
             beatmap.GiveObjectsGreenlines();
             beatmap.CalculateSliderEndTimes();
         }

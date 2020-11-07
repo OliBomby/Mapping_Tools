@@ -357,10 +357,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 hitObject.ActualNewCombo = IsNewCombo(hitObject, previousHitObject);
 
                 if (hitObject.ActualNewCombo) {
-                    var colourIncrement = hitObject.ComboSkip;
-                    if (!hitObject.IsSpinner) {
-                        colourIncrement++;
-                    }
+                    var colourIncrement = hitObject.IsSpinner ? hitObject.ComboSkip : hitObject.ComboSkip + 1;
 
                     colourIndex = MathHelper.Mod(colourIndex + colourIncrement, actingComboColours.Length);
                     comboIndex = 1;
@@ -371,6 +368,39 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 hitObject.ComboIndex = comboIndex;
                 hitObject.ColourIndex = colourIndex;
                 hitObject.Colour = actingComboColours[colourIndex];
+
+                previousHitObject = hitObject;
+            }
+        }
+
+        /// <summary>
+        /// Adjusts combo skip for all the hitobjects so colour index is correct.
+        /// </summary>
+        public void FixComboSkip() {
+            HitObject previousHitObject = null;
+            int colourIndex = 0;
+
+            // If there are no combo colours use the default combo colours so the hitobjects still have something
+            var actingComboColours = ComboColours.Count == 0 ? ComboColour.GetDefaultComboColours() : ComboColours.ToArray();
+
+            foreach (var hitObject in HitObjects) {
+                bool newCombo = IsNewCombo(hitObject, previousHitObject);
+
+                if (newCombo) {
+                    int colourIncrement = hitObject.IsSpinner ? 0 : 1;
+                    var newColourIndex = MathHelper.Mod(colourIndex + colourIncrement, actingComboColours.Length);
+                    var wantedColourIndex = hitObject.ColourIndex;
+                    var diff = wantedColourIndex - newColourIndex;
+
+                    if (diff > 0) {
+                        hitObject.ComboSkip = diff;
+                    } else if (diff < 0) {
+                        hitObject.ComboSkip = (actingComboColours.Length + diff);
+                    }
+
+                    int newColourIncrement = hitObject.IsSpinner ? hitObject.ComboSkip : hitObject.ComboSkip + 1;
+                    colourIndex = MathHelper.Mod(colourIndex + newColourIncrement, actingComboColours.Length);
+                }
 
                 previousHitObject = hitObject;
             }
