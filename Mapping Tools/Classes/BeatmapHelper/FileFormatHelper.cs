@@ -1,6 +1,6 @@
-﻿using Mapping_Tools.Classes.HitsoundStuff;
-using System;
+﻿using System;
 using System.Globalization;
+using Mapping_Tools.Classes.BeatmapHelper.Enums;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     /// <summary>

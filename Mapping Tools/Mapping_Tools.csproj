@@ -210,7 +210,7 @@
     <Compile Include="Classes\BeatmapHelper\Events\StandardLoop.cs" />
     <Compile Include="Classes\BeatmapHelper\Events\OtherCommand.cs" />
     <Compile Include="Classes\BeatmapHelper\FileFormatHelper.cs" />
-    <Compile Include="Classes\BeatmapHelper\GameMode.cs" />
+    <Compile Include="Classes\BeatmapHelper\Enums\GameMode.cs" />
     <Compile Include="Classes\BeatmapHelper\HitObjectComparer.cs" />
     <Compile Include="Classes\BeatmapHelper\HitObjectType.cs" />
     <Compile Include="Classes\BeatmapHelper\Events\IHasStartTime.cs" />
@@ -239,7 +239,7 @@
     <Compile Include="Classes\HitsoundStuff\Effects\EffectParameter.cs" />
     <Compile Include="Classes\HitsoundStuff\Effects\SoftLimiter.cs" />
     <Compile Include="Classes\HitsoundStuff\SampleGeneratingArgsComparer.cs" />
-    <Compile Include="Classes\BeatmapHelper\Hitsound.cs" />
+    <Compile Include="Classes\BeatmapHelper\Enums\Hitsound.cs" />
     <Compile Include="Classes\HitsoundStuff\HitsoundLayerExtension.cs" />
     <Compile Include="Classes\HitsoundStuff\HitsoundZone.cs" />
     <Compile Include="Classes\HitsoundStuff\ImportReloadingArgs.cs" />
@@ -259,7 +259,7 @@
     <Compile Include="Classes\HitsoundStuff\Sample.cs" />
     <Compile Include="Classes\HitsoundStuff\SamplePackage.cs" />
     <Compile Include="Classes\HitsoundStuff\SampleSchema.cs" />
-    <Compile Include="Classes\BeatmapHelper\SampleSet.cs" />
+    <Compile Include="Classes\BeatmapHelper\Enums\SampleSet.cs" />
     <Compile Include="Classes\HitsoundStuff\SampleSoundGenerator.cs" />
     <Compile Include="Classes\HitsoundStuff\SF2Extension.cs" />
     <Compile Include="Classes\HitsoundStuff\VorbisFileWriter.cs" />
@@ -307,7 +307,7 @@
     <Compile Include="Classes\Tools\SlideratorStuff\GraphStateValueGetter.cs" />
     <Compile Include="Classes\ToolHelpers\BezierSubdivision.cs" />
     <Compile Include="Classes\SliderPathStuff\PathApproximator.cs" />
-    <Compile Include="Classes\SliderPathStuff\PathType.cs" />
+    <Compile Include="Classes\BeatmapHelper\Enums\PathType.cs" />
     <Compile Include="Classes\MathUtil\Precision.cs" />
     <Compile Include="Classes\MathUtil\RNG.cs" />
     <Compile Include="Classes\SliderPathStuff\SliderPath.cs" />

@@ -1,5 +1,6 @@
 ﻿using Editor_Reader;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.BeatmapHelper.Enums;
 
 namespace Mapping_Tools.Classes.Tools.TimingStudio
 {

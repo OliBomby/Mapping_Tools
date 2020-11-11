@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Viewmodels {
