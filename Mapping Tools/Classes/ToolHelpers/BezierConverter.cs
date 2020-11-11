@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Mapping_Tools.Classes.SliderPathStuff;
 using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SliderPathStuff;
 
-namespace Mapping_Tools.Classes.Tools
+namespace Mapping_Tools.Classes.ToolHelpers
 {
     /// <summary>
     /// Converts a slider between differnet types of curves.

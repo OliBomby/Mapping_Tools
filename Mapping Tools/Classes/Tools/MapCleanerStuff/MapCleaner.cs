@@ -1,38 +1,17 @@
-﻿using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.HitsoundStuff;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.BeatmapHelper.Events;
+using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.ToolHelpers;
 
-namespace Mapping_Tools.Classes.Tools {
-    public class MapCleaner {
-        public class MapCleanerResult {
-            public int ObjectsResnapped;
-            public int SamplesRemoved;
-            public int TimingPointsRemoved;
-
-            public MapCleanerResult() {
-                SamplesRemoved = 0;
-            }
-
-            public MapCleanerResult(int objectsResnapped, int samplesRemoved) {
-                ObjectsResnapped = objectsResnapped;
-                SamplesRemoved = 0;
-                SamplesRemoved = samplesRemoved;
-            }
-
-            public void Add(MapCleanerResult other) {
-                ObjectsResnapped += other.ObjectsResnapped;
-                SamplesRemoved += other.SamplesRemoved;
-                TimingPointsRemoved += other.TimingPointsRemoved;
-            }
-        }
-
+namespace Mapping_Tools.Classes.Tools.MapCleanerStuff {
+    public partial class MapCleaner {
         /// <summary>
         /// Cleans a map.
         /// </summary>

@@ -20,6 +20,7 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Classes.Tools.SnappingTools;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject;

@@ -15,6 +15,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Editor_Reader;
+using Mapping_Tools.Classes.ToolHelpers;
 
 namespace Mapping_Tools.Views.PatternGallery {
     /// <summary>

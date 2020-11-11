@@ -303,6 +303,7 @@
     <Compile Include="Classes\MathUtil\Vector3d.cs" />
     <Compile Include="Classes\MathUtil\Vector4.cs" />
     <Compile Include="Classes\MathUtil\Vector4d.cs" />
+    <Compile Include="Classes\Tools\MapCleanerStuff\MapCleanerResult.cs" />
     <Compile Include="Classes\Tools\SlideratorStuff\GraphStateValueGetter.cs" />
     <Compile Include="Classes\SliderPathStuff\BezierSubdivision.cs" />
     <Compile Include="Classes\SliderPathStuff\PathApproximator.cs" />
@@ -398,12 +399,12 @@
     <Compile Include="Classes\Tools\TimingStudio\Serialization\TimingStudioPreferences.cs" />
     <Compile Include="Classes\Tools\TimingStudio\StudioTimingPoint.cs" />
     <Compile Include="Classes\Tools\AutoFailDetector.cs" />
-    <Compile Include="Classes\Tools\BezierConverter.cs" />
-    <Compile Include="Classes\Tools\CircleBezierPreset.cs" />
-    <Compile Include="Classes\Tools\EditorReaderStuff.cs" />
-    <Compile Include="Classes\Tools\MapCleaner.cs" />
-    <Compile Include="Classes\Tools\MapCleanerArgs.cs" />
-    <Compile Include="Classes\Tools\PathGenerator.cs" />
+    <Compile Include="Classes\ToolHelpers\BezierConverter.cs" />
+    <Compile Include="Classes\ToolHelpers\CircleBezierPreset.cs" />
+    <Compile Include="Classes\ToolHelpers\EditorReaderStuff.cs" />
+    <Compile Include="Classes\Tools\MapCleanerStuff\MapCleaner.cs" />
+    <Compile Include="Classes\Tools\MapCleanerStuff\MapCleanerArgs.cs" />
+    <Compile Include="Classes\ToolHelpers\PathGenerator.cs" />
     <Compile Include="Classes\Tools\PatternGallery\ExportTimeMode.cs" />
     <Compile Include="Classes\Tools\PatternGallery\PatternCodeImportVm.cs" />
     <Compile Include="Classes\Tools\PatternGallery\SelectedPatternImportVm.cs" />
@@ -539,7 +540,7 @@
     <Compile Include="Components\TimeLine\TimeLineMark.xaml.cs">
       <DependentUpon>TimeLineMark.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Classes\Tools\TimingPointsChange.cs" />
+    <Compile Include="Classes\ToolHelpers\TimingPointsChange.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Viewmodels\AutoFailDetectorVm.cs" />
     <Compile Include="Viewmodels\PatternGalleryVm.cs" />

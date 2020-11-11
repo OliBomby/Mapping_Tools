@@ -13,6 +13,7 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.ToolHelpers;
 using ModifierKeys = NonInvasiveKeyboardHookLibrary.ModifierKeys;
 
 namespace Mapping_Tools.Classes.SystemTools {

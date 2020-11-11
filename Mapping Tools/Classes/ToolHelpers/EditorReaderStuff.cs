@@ -1,17 +1,17 @@
-﻿using Editor_Reader;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.Exceptions;
-using Mapping_Tools.Classes.SystemTools;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using Editor_Reader;
+using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.Exceptions;
+using Mapping_Tools.Classes.SystemTools;
 using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
 
-namespace Mapping_Tools.Classes.Tools {
+namespace Mapping_Tools.Classes.ToolHelpers {
 
     public abstract class EditorReaderStuff
     {

@@ -1,6 +1,7 @@
 ﻿using Mapping_Tools.Classes.Tools;
 using System.Collections.Generic;
 using System.IO;
+using Mapping_Tools.Classes.ToolHelpers;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     public class BeatmapEditor : Editor

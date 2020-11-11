@@ -1,10 +1,9 @@
-﻿using Mapping_Tools.Annotations;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.SystemTools;
-using System.Collections.Generic;
-using System.Linq;
 
-namespace Mapping_Tools.Classes.Tools {
+namespace Mapping_Tools.Classes.Tools.MapCleanerStuff {
     public class MapCleanerArgs : BindableBase {
         private bool _volumeSliders;
         private bool _sampleSetSliders;

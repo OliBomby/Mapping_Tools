@@ -5,6 +5,7 @@ using System.Linq;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.ToolHelpers;
 
 namespace Mapping_Tools.Classes.Tools {
 

@@ -1,7 +1,7 @@
-﻿using Mapping_Tools.Classes.MathUtil;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Mapping_Tools.Classes.MathUtil;
 
-namespace Mapping_Tools.Classes.Tools
+namespace Mapping_Tools.Classes.ToolHelpers
 {
     struct CircleBezierPreset
     {

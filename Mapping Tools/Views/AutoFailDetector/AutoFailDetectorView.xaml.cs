@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
+using Mapping_Tools.Classes.ToolHelpers;
 
 namespace Mapping_Tools.Views.AutoFailDetector {
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
