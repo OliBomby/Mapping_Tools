@@ -13,7 +13,7 @@ using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
 
 namespace Mapping_Tools.Classes.ToolHelpers {
 
-    public abstract class EditorReaderStuff
+    public static class EditorReaderStuff
     {
         private static readonly EditorReader editorReader = new EditorReader();
         public static string DontCoolSaveWhenMD5EqualsThisString = "";
