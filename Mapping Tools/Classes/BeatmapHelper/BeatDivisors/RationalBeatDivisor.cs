@@ -1,7 +1,7 @@
 ﻿
 using Newtonsoft.Json;
 
-namespace Mapping_Tools.Classes.BeatmapHelper {
+namespace Mapping_Tools.Classes.BeatmapHelper.BeatDivisors {
     public class RationalBeatDivisor : IBeatDivisor {
         /// <summary>
         /// The number above the line in a vulgar fraction showing how many of the parts indicated by the denominator are taken, for example, 2 in 2/3.

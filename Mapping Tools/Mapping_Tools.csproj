@@ -187,9 +187,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Classes\BeatmapHelper\IBeatDivisor.cs" />
-    <Compile Include="Classes\BeatmapHelper\IrrationalBeatDivisor.cs" />
-    <Compile Include="Classes\BeatmapHelper\RationalBeatDivisor.cs" />
+    <Compile Include="Classes\BeatmapHelper\BeatDivisors\IBeatDivisor.cs" />
+    <Compile Include="Classes\BeatmapHelper\BeatDivisors\IrrationalBeatDivisor.cs" />
+    <Compile Include="Classes\BeatmapHelper\BeatDivisors\RationalBeatDivisor.cs" />
     <Compile Include="Classes\BeatmapHelper\BeatmapEditor.cs" />
     <Compile Include="Classes\BeatmapHelper\BeatmapParsingException.cs" />
     <Compile Include="Classes\BeatmapHelper\Events\Break.cs" />
@@ -212,7 +212,7 @@
     <Compile Include="Classes\BeatmapHelper\FileFormatHelper.cs" />
     <Compile Include="Classes\BeatmapHelper\Enums\GameMode.cs" />
     <Compile Include="Classes\BeatmapHelper\HitObjectComparer.cs" />
-    <Compile Include="Classes\BeatmapHelper\HitObjectType.cs" />
+    <Compile Include="Classes\BeatmapHelper\Enums\HitObjectType.cs" />
     <Compile Include="Classes\BeatmapHelper\Events\IHasStartTime.cs" />
     <Compile Include="Classes\BeatmapHelper\ITextLine.cs" />
     <Compile Include="Classes\BeatmapHelper\SpecialColour.cs" />

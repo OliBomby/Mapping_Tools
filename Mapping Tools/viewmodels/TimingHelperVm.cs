@@ -1,4 +1,5 @@
 ﻿using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Classes.SystemTools;
 using Newtonsoft.Json;
 

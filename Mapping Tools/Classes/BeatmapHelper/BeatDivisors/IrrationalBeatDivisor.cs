@@ -1,4 +1,4 @@
-﻿namespace Mapping_Tools.Classes.BeatmapHelper {
+﻿namespace Mapping_Tools.Classes.BeatmapHelper.BeatDivisors {
     public class IrrationalBeatDivisor : IBeatDivisor {
         public readonly double Value;
 

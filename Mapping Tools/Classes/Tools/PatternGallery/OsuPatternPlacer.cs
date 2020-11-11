@@ -3,6 +3,7 @@ using Mapping_Tools.Classes.MathUtil;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Mapping_Tools.Classes.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Classes.Tools.MapCleanerStuff;

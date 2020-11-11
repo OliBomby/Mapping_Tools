@@ -4,6 +4,7 @@ using Mapping_Tools.Classes.MathUtil;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Mapping_Tools.Classes.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Newtonsoft.Json;
 using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;

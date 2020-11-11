@@ -1,4 +1,4 @@
-﻿namespace Mapping_Tools.Classes.BeatmapHelper {
+﻿namespace Mapping_Tools.Classes.BeatmapHelper.Enums {
     public enum HitObjectType {
         Circle,
         Slider,
