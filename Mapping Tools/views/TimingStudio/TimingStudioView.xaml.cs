@@ -9,6 +9,7 @@ using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Classes.Tools.TimingStudio.TimingStudio;
 using Mapping_Tools.Viewmodels;
 
 namespace Mapping_Tools.Views.TimingStudio

@@ -1,8 +1,7 @@
 ﻿using Editor_Reader;
 using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.HitsoundStuff;
 
-namespace Mapping_Tools.Classes.TimingStudio
+namespace Mapping_Tools.Classes.Tools.TimingStudio
 {
 
     public class StudioTimingPoint : TimingPoint

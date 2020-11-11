@@ -1,11 +1,7 @@
-﻿using Mapping_Tools.Classes.SystemTools;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using Mapping_Tools.Classes.SystemTools;
 
-namespace Mapping_Tools.Classes.TimingStudio.Serialization
+namespace Mapping_Tools.Classes.Tools.TimingStudio.Serialization
 {
     /// <summary>
     /// 

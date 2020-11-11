@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Mapping_Tools.Classes.TimingStudio
+namespace Mapping_Tools.Classes.Tools.TimingStudio
 {
     public class BeatTime : IEquatable<BeatTime>
     {

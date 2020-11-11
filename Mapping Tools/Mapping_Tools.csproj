@@ -391,12 +391,12 @@
     <Compile Include="Classes\SystemTools\SettingsManager.cs" />
     <Compile Include="Classes\SystemTools\ShowSelectedInFileExplorer.cs" />
     <Compile Include="Classes\SystemTools\TypeConverters.cs" />
-    <Compile Include="Classes\TimingStudio\BeatTime.cs" />
+    <Compile Include="Classes\Tools\TimingStudio\BeatTime.cs" />
     <Compile Include="Classes\ExternalFileUtil\Reaper\ReaperProject.cs" />
-    <Compile Include="Classes\TimingStudio\Serialization\TimingHelperProject.cs" />
-    <Compile Include="Classes\TimingStudio\Serialization\TimingPointType.cs" />
-    <Compile Include="Classes\TimingStudio\Serialization\TimingStudioPreferences.cs" />
-    <Compile Include="Classes\TimingStudio\StudioTimingPoint.cs" />
+    <Compile Include="Classes\Tools\TimingStudio\Serialization\TimingHelperProject.cs" />
+    <Compile Include="Classes\Tools\TimingStudio\Serialization\TimingPointType.cs" />
+    <Compile Include="Classes\Tools\TimingStudio\Serialization\TimingStudioPreferences.cs" />
+    <Compile Include="Classes\Tools\TimingStudio\StudioTimingPoint.cs" />
     <Compile Include="Classes\Tools\AutoFailDetector.cs" />
     <Compile Include="Classes\Tools\BezierConverter.cs" />
     <Compile Include="Classes\Tools\CircleBezierPreset.cs" />
@@ -608,7 +608,7 @@
     <Compile Include="Views\MetadataManager\MetadataManagerView.xaml.cs">
       <DependentUpon>MetadataManagerView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Classes\TimingStudio\Marker.cs" />
+    <Compile Include="Classes\Tools\TimingStudio\Marker.cs" />
     <Compile Include="Views\TimingHelper\TimingHelperView.xaml.cs">
       <DependentUpon>TimingHelperView.xaml</DependentUpon>
     </Compile>

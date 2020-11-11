@@ -1,4 +1,4 @@
-﻿namespace Mapping_Tools.Views
+﻿namespace Mapping_Tools.Classes.Tools.TimingStudio
 {
     namespace TimingStudio
     {

@@ -1,4 +1,4 @@
-﻿namespace Mapping_Tools.Classes.TimingStudio.Serialization
+﻿namespace Mapping_Tools.Classes.Tools.TimingStudio.Serialization
 {
     /// <summary>
     /// The types of timing points used in osu!
