@@ -372,7 +372,6 @@
     <Compile Include="Classes\Tools\SnappingTools\Serialization\SnappingToolsSaveSlot.cs" />
     <Compile Include="Classes\Tools\SnappingTools\Serialization\SnappingToolsPreferences.cs" />
     <Compile Include="Classes\Tools\SnappingTools\Serialization\SnappingToolsProject.cs" />
-    <Compile Include="Classes\SoundFontUtil\SoundFontImporter.cs" />
     <Compile Include="Classes\SpectrumUtil\Waveform.cs" />
     <Compile Include="Classes\SystemTools\ActionHotkey.cs" />
     <Compile Include="Classes\SystemTools\BackupManager.cs" />
@@ -892,9 +891,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Classes\SliderPathStuff\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="BeforeBuild" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
