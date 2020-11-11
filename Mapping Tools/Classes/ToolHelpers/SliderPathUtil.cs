@@ -1,11 +1,10 @@
 ﻿using System;
-using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.Tools;
 using System.Collections.Generic;
 using System.Linq;
-using Mapping_Tools.Classes.ToolHelpers;
+using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SliderPathStuff;
 
-namespace Mapping_Tools.Classes.SliderPathStuff {
+namespace Mapping_Tools.Classes.ToolHelpers {
     public class SliderPathUtil {
         public static List<Vector2> MoveAnchorsToLength(List<Vector2> anchors, PathType pathType, double newLength, out PathType newPathType) {
             var newAnchors = new List<Vector2>();
