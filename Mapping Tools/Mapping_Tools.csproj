@@ -310,7 +310,6 @@
     <Compile Include="Classes\SliderPathStuff\PathType.cs" />
     <Compile Include="Classes\MathUtil\Precision.cs" />
     <Compile Include="Classes\MathUtil\RNG.cs" />
-    <Compile Include="Classes\SliderPathStuff\SliderInterpreter.cs" />
     <Compile Include="Classes\SliderPathStuff\SliderPath.cs" />
     <Compile Include="Classes\BeatmapHelper\TValue.cs" />
     <Compile Include="Classes\SliderPathStuff\SliderPathUtil.cs" />
