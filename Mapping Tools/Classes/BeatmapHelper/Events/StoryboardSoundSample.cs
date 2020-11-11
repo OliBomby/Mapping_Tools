@@ -8,7 +8,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
     /// <example>
     /// Sample,56056,0,"soft-hitnormal.wav",30
     /// </example>
-    public class StoryboardSoundSample : Event, IEquatable<StoryboardSoundSample>, IHasStartTime, IHasEndTime {
+    public class StoryboardSoundSample : Event, IEquatable<StoryboardSoundSample>, IHasStartTime, IHasEndTime, IComparable<StoryboardSoundSample> {
         /// <summary>
         /// The time when this sound event occurs.
         /// </summary>
@@ -97,6 +97,12 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         public int EndTime { 
             get => StartTime;
             set => StartTime = value;
+        }
+
+        public int CompareTo(StoryboardSoundSample other) {
+            if (ReferenceEquals(this, other)) return 0;
+            if (ReferenceEquals(null, other)) return 1;
+            return StartTime.CompareTo(other.StartTime);
         }
     }
 }

@@ -2,7 +2,7 @@
 using System.Linq;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
-    class HitObjectComparer : IEqualityComparer<HitObject> {
+    public class HitObjectComparer : IEqualityComparer<HitObject> {
         public bool CheckIsSelected { get; set; }
         public bool CheckPosition { get; set; }
         public bool CheckTime { get; set; }

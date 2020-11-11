@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Windows;
-using System.Windows.Input;
-using Mapping_Tools.Annotations;
+﻿using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.BeatmapHelper.Events;
@@ -14,8 +6,14 @@ using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.ToolHelpers;
-using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Viewmodels;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Windows;
+using System.Windows.Input;
 
 namespace Mapping_Tools.Views.HitsoundCopier {
     /// <summary>
@@ -238,7 +236,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                     }
 
                     // Sort the storyboarded samples
-                    beatmapTo.StoryboardSoundSamples = beatmapTo.StoryboardSoundSamples.OrderBy(o => o.StartTime).ToList();
+                    beatmapTo.StoryboardSoundSamples.Sort();
                 }
 
                 if (arg.MuteSliderends) {

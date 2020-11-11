@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
-using Mapping_Tools.Classes.BeatmapHelper.Enums;
+﻿using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.BeatmapHelper.Events;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
 
@@ -98,51 +97,56 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public Timing BeatmapTiming { get; set; }
 
         /// <summary>
+        /// The storyboard of the Beatmap. Stores everything under the [Events] section.
+        /// </summary>
+        public StoryBoard StoryBoard { get; set; }
+
+        /// <summary>
         /// A list of all the lines of .osu code under the [Events] -> (Background and Video events) section.
         /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
-        public List<Event> BackgroundAndVideoEvents { get; set; }
+        public List<Event> BackgroundAndVideoEvents => StoryBoard.BackgroundAndVideoEvents;
 
         /// <summary>
         /// A list of all the lines of .osu code under the [Events] -> (Break Periods) section.
         /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
-        public List<Break> BreakPeriods { get; set; }
+        public List<Break> BreakPeriods => StoryBoard.BreakPeriods;
 
         /// <summary>
         /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 0 (Background)) section.
         /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
-        public List<Event> StoryboardLayerBackground { get; set; }
+        public List<Event> StoryboardLayerBackground => StoryBoard.StoryboardLayerBackground;
 
         /// <summary>
         /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 1 (Fail)) section.
         /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
-        public List<Event> StoryboardLayerFail { get; set; }
+        public List<Event> StoryboardLayerFail => StoryBoard.StoryboardLayerFail;
 
         /// <summary>
         /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 2 (Pass)) section.
         /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
-        public List<Event> StoryboardLayerPass { get; set; }
+        public List<Event> StoryboardLayerPass => StoryBoard.StoryboardLayerPass;
 
         /// <summary>
         /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 3 (Foreground)) section.
         /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
-        public List<Event> StoryboardLayerForeground { get; set; }
+        public List<Event> StoryboardLayerForeground => StoryBoard.StoryboardLayerForeground;
 
         /// <summary>
         /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 4 (Overlay)) section.
         /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
-        public List<Event> StoryboardLayerOverlay { get; set; }
-        
+        public List<Event> StoryboardLayerOverlay => StoryBoard.StoryboardLayerOverlay;
+
         /// <summary>
         /// A list of all storyboarded sound sample events under the [Events] -> (Storyboard Sound Samples) section.
         /// </summary>
-        public List<StoryboardSoundSample> StoryboardSoundSamples { get; set; }
+        public List<StoryboardSoundSample> StoryboardSoundSamples => StoryBoard.StoryboardSoundSamples;
 
         /// <summary>
         /// List of all the hit objects in this beatmap.
@@ -205,6 +209,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         /// <param name="lines">List of strings where each string is another line in the .osu file.</param>
         public Beatmap(List<string> lines) {
+            Initialize();
             SetLines(lines);
         }
 
@@ -215,14 +220,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Difficulty = new Dictionary<string, TValue>();
             ComboColours = new List<ComboColour>();
             SpecialColours = new Dictionary<string, ComboColour>();
-            BackgroundAndVideoEvents = new List<Event>();
-            BreakPeriods = new List<Break>();
-            StoryboardLayerBackground = new List<Event>();
-            StoryboardLayerPass = new List<Event>();
-            StoryboardLayerFail = new List<Event>();
-            StoryboardLayerForeground = new List<Event>();
-            StoryboardLayerOverlay = new List<Event>();
-            StoryboardSoundSamples = new List<StoryboardSoundSample>();
+            StoryBoard = new StoryBoard();
             HitObjects = new List<HitObject>();
             BeatmapTiming = new Timing(1.4);
 
@@ -264,57 +262,34 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         /// <param name="lines">List of strings where each string is another line in the .osu file.</param>
         public void SetLines(List<string> lines) {
-            Initialize();
-
             // Load up all the shit
-            List<string> generalLines = GetCategoryLines(lines, "[General]");
-            List<string> editorLines = GetCategoryLines(lines, "[Editor]");
-            List<string> metadataLines = GetCategoryLines(lines, "[Metadata]");
-            List<string> difficultyLines = GetCategoryLines(lines, "[Difficulty]");
-            List<string> backgroundAndVideoEventsLines = GetCategoryLines(lines, "//Background and Video events", new[] { "[", "//" });
-            List<string> breakPeriodsLines = GetCategoryLines(lines, "//Break Periods", new[] { "[", "//" });
-            List<string> storyboardLayerBackgroundLines = GetCategoryLines(lines, "//Storyboard Layer 0 (Background)", new[] { "[", "//" });
-            List<string> storyboardLayerFailLines = GetCategoryLines(lines, "//Storyboard Layer 1 (Fail)", new[] { "[", "//" });
-            List<string> storyboardLayerPassLines = GetCategoryLines(lines, "//Storyboard Layer 2 (Pass)", new[] { "[", "//" });
-            List<string> storyboardLayerForegroundLines = GetCategoryLines(lines, "//Storyboard Layer 3 (Foreground)", new[] { "[", "//" });
-            List<string> storyboardLayerOverlayLines = GetCategoryLines(lines, "//Storyboard Layer 4 (Overlay)", new[] { "[", "//" });
-            List<string> storyboardSoundSamplesLines = GetCategoryLines(lines, "//Storyboard Sound Samples", new[] { "[", "//" });
-            List<string> timingLines = GetCategoryLines(lines, "[TimingPoints]");
-            List<string> colourLines = GetCategoryLines(lines, "[Colours]");
-            List<string> hitobjectLines = GetCategoryLines(lines, "[HitObjects]");
+            IEnumerable<string> generalLines = FileFormatHelper.GetCategoryLines(lines, "[General]");
+            IEnumerable<string> editorLines = FileFormatHelper.GetCategoryLines(lines, "[Editor]");
+            IEnumerable<string> metadataLines = FileFormatHelper.GetCategoryLines(lines, "[Metadata]");
+            IEnumerable<string> difficultyLines = FileFormatHelper.GetCategoryLines(lines, "[Difficulty]");
+            IEnumerable<string> timingLines = FileFormatHelper.GetCategoryLines(lines, "[TimingPoints]");
+            IEnumerable<string> colourLines = FileFormatHelper.GetCategoryLines(lines, "[Colours]");
+            IEnumerable<string> hitobjectLines = FileFormatHelper.GetCategoryLines(lines, "[HitObjects]");
 
-            FillDictionary(General, generalLines);
-            FillDictionary(Editor, editorLines);
-            FillDictionary(Metadata, metadataLines);
-            FillDictionary(Difficulty, difficultyLines);
+            FileFormatHelper.FillDictionary(General, generalLines);
+            FileFormatHelper.FillDictionary(Editor, editorLines);
+            FileFormatHelper.FillDictionary(Metadata, metadataLines);
+            FileFormatHelper.FillDictionary(Difficulty, difficultyLines);
 
             foreach (string line in colourLines) {
                 if (line.Substring(0, 5) == "Combo") {
                     ComboColours.Add(new ComboColour(line));
                 } else {
-                    SpecialColours[SplitKeyValue(line)[0].Trim()] = new ComboColour(line);
+                    SpecialColours[FileFormatHelper.SplitKeyValue(line)[0].Trim()] = new ComboColour(line);
                 }
             }
 
-            foreach (string line in backgroundAndVideoEventsLines) {
-                BackgroundAndVideoEvents.Add(Event.MakeEvent(line));
-            }
-            foreach (string line in breakPeriodsLines) {
-                BreakPeriods.Add(new Break(line));
-            }
-
-            StoryboardLayerBackground.AddRange(Event.ParseEventTree(storyboardLayerBackgroundLines));
-            StoryboardLayerFail.AddRange(Event.ParseEventTree(storyboardLayerFailLines));
-            StoryboardLayerPass.AddRange(Event.ParseEventTree(storyboardLayerPassLines));
-            StoryboardLayerForeground.AddRange(Event.ParseEventTree(storyboardLayerForegroundLines));
-            StoryboardLayerOverlay.AddRange(Event.ParseEventTree(storyboardLayerOverlayLines));
-
-            foreach (string line in storyboardSoundSamplesLines) {
-                StoryboardSoundSamples.Add(new StoryboardSoundSample(line));
-            }
             foreach (string line in hitobjectLines) {
                 HitObjects.Add(new HitObject(line));
             }
+
+            // Give the lines to the storyboard
+            StoryBoard.SetLines(lines);
 
             // Set the timing object
             BeatmapTiming = new Timing(timingLines, Difficulty["SliderMultiplier"].DoubleValue);
@@ -519,16 +494,16 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 "",
                 "[General]"
             };
-            AddDictionaryToLines(General, lines);
+            FileFormatHelper.AddDictionaryToLines(General, lines);
             lines.Add("");
             lines.Add("[Editor]");
-            AddDictionaryToLines(Editor, lines);
+            FileFormatHelper.AddDictionaryToLines(Editor, lines);
             lines.Add("");
             lines.Add("[Metadata]");
-            AddDictionaryToLines(Metadata, lines);
+            FileFormatHelper.AddDictionaryToLines(Metadata, lines);
             lines.Add("");
             lines.Add("[Difficulty]");
-            AddDictionaryToLines(Difficulty, lines);
+            FileFormatHelper.AddDictionaryToLines(Difficulty, lines);
             lines.Add("");
             lines.Add("[Events]");
             lines.Add("//Background and Video events");
@@ -557,12 +532,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             if (ComboColours.Any()) {
                 lines.Add("");
                 lines.Add("[Colours]");
-                for (int i = 0; i < ComboColours.Count; i++) {
-                    lines.Add("Combo" + (i + 1) + " : " + ComboColours[i]);
-                }
-                foreach (KeyValuePair<string, ComboColour> specialColour in SpecialColours) {
-                    lines.Add(specialColour.Key + " : " + specialColour.Value);
-                }
+                lines.AddRange(ComboColours.Select((t, i) => "Combo" + (i + 1) + " : " + t));
+                lines.AddRange(SpecialColours.Select(specialColour => specialColour.Key + " : " + specialColour.Value));
             }
             lines.Add("");
             lines.Add("[HitObjects]");
@@ -698,44 +669,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Regex r = new Regex($"[{Regex.Escape(regexSearch)}]");
             fileName = r.Replace(fileName, "");
             return fileName;
-        }
-
-        private static void AddDictionaryToLines(Dictionary<string, TValue> dict, List<string> lines) {
-            lines.AddRange(dict.Select(kvp => kvp.Key + ":" + kvp.Value.Value));
-        }
-
-        private static void FillDictionary(Dictionary<string, TValue> dict, List<string> lines) {
-            foreach (var split in lines.Select(SplitKeyValue)) {
-                dict[split[0]] = new TValue(split[1]);
-            }
-        }
-
-        private static string[] SplitKeyValue(string line) {
-            return line.Split(new[] { ':' }, 2);
-        }
-
-        private static List<string> GetCategoryLines(List<string> lines, string category, string[] categoryIdentifiers=null) {
-            if (categoryIdentifiers == null)
-                categoryIdentifiers = new[] { "[" };
-
-            List<string> categoryLines = new List<string>();
-            bool atCategory = false;
-
-            foreach (string line in lines) {
-                if (atCategory && line != "") {
-                    if (categoryIdentifiers.Any(o => line.StartsWith(o))) // Reached another category
-                    {
-                        break;
-                    }
-                    categoryLines.Add(line);
-                }
-                else {
-                    if (line == category) {
-                        atCategory = true;
-                    }
-                }
-            }
-            return categoryLines;
         }
 
         public Beatmap DeepCopy() {
