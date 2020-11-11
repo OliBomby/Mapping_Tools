@@ -109,6 +109,11 @@ namespace Mapping_Tools.Classes.SliderPathStuff {
             return newAnchors;
         }
 
+        /// <summary>
+        /// Calculates the completion values of all the red anchors along the path.
+        /// </summary>
+        /// <param name="sliderPath"></param>
+        /// <returns></returns>
         public static IEnumerable<double> GetRedAnchorCompletions(SliderPath sliderPath) {
             int start = 0;
             int end = 0;
