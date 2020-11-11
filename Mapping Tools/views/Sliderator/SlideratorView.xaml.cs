@@ -12,12 +12,12 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SliderPathStuff;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Classes.Tools.SlideratorStuff;
 using Mapping_Tools.Components.Dialogs;
 using Mapping_Tools.Components.Graph;
 using Mapping_Tools.Components.Graph.Interpolation;
@@ -544,7 +544,7 @@ namespace Mapping_Tools.Views.Sliderator {
 
         private string Sliderate(SlideratorVm arg, BackgroundWorker worker) {
             // Make a position function for Sliderator
-            Classes.Tools.Sliderator.PositionFunctionDelegate positionFunction;
+            PositionFunctionDelegate positionFunction;
             // Test if the function is a constant velocity
             bool constantVelocity;
             // We convert the graph GetValue function to a function that works like ms -> px
@@ -585,7 +585,7 @@ namespace Mapping_Tools.Views.Sliderator {
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(10);
 
             List<Vector2> slideration = new List<Vector2>();
-            var sliderator = new Classes.Tools.Sliderator {
+            var sliderator = new Classes.Tools.SlideratorStuff.Sliderator {
                 PositionFunction = positionFunction, MaxT = arg.GraphBeats / arg.BeatsPerMinute * 60000,
                 Velocity = otherVelocity,
                 MinDendriteLength = arg.MinDendrite

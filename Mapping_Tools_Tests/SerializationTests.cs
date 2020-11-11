@@ -2,12 +2,12 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Input;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses;
-using Mapping_Tools.Classes.SnappingTools.Serialization;
 using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
+using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
+using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators;
+using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses;
+using Mapping_Tools.Classes.Tools.SnappingTools.Serialization;
 using Mapping_Tools.Views;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
