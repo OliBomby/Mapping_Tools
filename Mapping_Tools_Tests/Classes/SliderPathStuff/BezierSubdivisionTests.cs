@@ -1,8 +1,8 @@
 ﻿using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.SliderPathStuff;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using Mapping_Tools.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Classes.ToolHelpers;
 
 namespace Mapping_Tools_Tests.Classes.SliderPathStuff {

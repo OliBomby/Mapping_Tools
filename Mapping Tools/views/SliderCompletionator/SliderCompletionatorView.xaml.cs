@@ -7,7 +7,6 @@ using System.Windows;
 using System.Windows.Input;
 using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.SliderPathStuff;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Classes.ToolHelpers;

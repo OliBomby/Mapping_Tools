@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using Mapping_Tools.Classes.MathUtil;
 
-namespace Mapping_Tools.Classes.SliderPathStuff {
+namespace Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff {
     /// <summary>
     /// Helper methods to approximate a path by interpolating a sequence of control points.
     /// </summary>

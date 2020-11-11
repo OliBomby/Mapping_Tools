@@ -306,11 +306,11 @@
     <Compile Include="Classes\Tools\MapCleanerStuff\MapCleanerResult.cs" />
     <Compile Include="Classes\Tools\SlideratorStuff\GraphStateValueGetter.cs" />
     <Compile Include="Classes\ToolHelpers\BezierSubdivision.cs" />
-    <Compile Include="Classes\SliderPathStuff\PathApproximator.cs" />
+    <Compile Include="Classes\BeatmapHelper\SliderPathStuff\PathApproximator.cs" />
     <Compile Include="Classes\BeatmapHelper\Enums\PathType.cs" />
     <Compile Include="Classes\MathUtil\Precision.cs" />
     <Compile Include="Classes\MathUtil\RNG.cs" />
-    <Compile Include="Classes\SliderPathStuff\SliderPath.cs" />
+    <Compile Include="Classes\BeatmapHelper\SliderPathStuff\SliderPath.cs" />
     <Compile Include="Classes\BeatmapHelper\TValue.cs" />
     <Compile Include="Classes\ToolHelpers\SliderPathUtil.cs" />
     <Compile Include="Classes\Tools\SnappingTools\DashStylesEnum.cs" />
@@ -892,7 +892,9 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Classes\SliderPathStuff\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="BeforeBuild" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
