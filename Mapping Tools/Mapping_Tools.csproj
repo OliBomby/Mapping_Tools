@@ -239,7 +239,7 @@
     <Compile Include="Classes\HitsoundStuff\Effects\EffectParameter.cs" />
     <Compile Include="Classes\HitsoundStuff\Effects\SoftLimiter.cs" />
     <Compile Include="Classes\HitsoundStuff\SampleGeneratingArgsComparer.cs" />
-    <Compile Include="Classes\HitsoundStuff\Hitsound.cs" />
+    <Compile Include="Classes\BeatmapHelper\Hitsound.cs" />
     <Compile Include="Classes\HitsoundStuff\HitsoundLayerExtension.cs" />
     <Compile Include="Classes\HitsoundStuff\HitsoundZone.cs" />
     <Compile Include="Classes\HitsoundStuff\ImportReloadingArgs.cs" />
@@ -259,7 +259,7 @@
     <Compile Include="Classes\HitsoundStuff\Sample.cs" />
     <Compile Include="Classes\HitsoundStuff\SamplePackage.cs" />
     <Compile Include="Classes\HitsoundStuff\SampleSchema.cs" />
-    <Compile Include="Classes\HitsoundStuff\SampleSet.cs" />
+    <Compile Include="Classes\BeatmapHelper\SampleSet.cs" />
     <Compile Include="Classes\HitsoundStuff\SampleSoundGenerator.cs" />
     <Compile Include="Classes\HitsoundStuff\SF2Extension.cs" />
     <Compile Include="Classes\HitsoundStuff\VorbisFileWriter.cs" />

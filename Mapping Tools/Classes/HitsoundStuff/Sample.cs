@@ -1,4 +1,5 @@
-﻿using Mapping_Tools.Classes.SystemTools;
+﻿using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.SystemTools;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     /// <summary>

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Mapping_Tools.Classes.BeatmapHelper;
 
 namespace Mapping_Tools.Classes.HitsoundStuff
 {

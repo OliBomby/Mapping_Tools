@@ -1,4 +1,4 @@
-﻿namespace Mapping_Tools.Classes.HitsoundStuff {
+﻿namespace Mapping_Tools.Classes.BeatmapHelper {
     /// <summary>
     /// The types of samples used for inherited timing points and hitobjects themselves.
     /// </summary>

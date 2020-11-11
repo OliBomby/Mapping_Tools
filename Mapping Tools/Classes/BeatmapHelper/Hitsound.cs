@@ -1,4 +1,4 @@
-﻿namespace Mapping_Tools.Classes.HitsoundStuff {
+﻿namespace Mapping_Tools.Classes.BeatmapHelper {
     /// <summary>
     /// The hitsound placed into the hitobject.
     /// </summary>

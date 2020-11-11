@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Mapping_Tools.Classes.BeatmapHelper;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     class HitsoundConverter {
