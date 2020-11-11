@@ -221,10 +221,10 @@
     <Compile Include="Classes\BeatmapHelper\Storyboard.cs" />
     <Compile Include="Classes\BeatmapHelper\Events\StoryboardLayer.cs" />
     <Compile Include="Classes\BeatmapHelper\Events\StoryboardSoundSample.cs" />
-    <Compile Include="Classes\ComboColourStudio\ColourPoint.cs" />
-    <Compile Include="Classes\ComboColourStudio\ColourPointMode.cs" />
-    <Compile Include="Classes\ComboColourStudio\ComboColourProject.cs" />
-    <Compile Include="Classes\ComboColourStudio\SpecialColourDragAndDropListBox.cs" />
+    <Compile Include="Classes\Tools\ComboColourStudio\ColourPoint.cs" />
+    <Compile Include="Classes\Tools\ComboColourStudio\ColourPointMode.cs" />
+    <Compile Include="Classes\Tools\ComboColourStudio\ComboColourProject.cs" />
+    <Compile Include="Classes\Tools\ComboColourStudio\SpecialColourDragAndDropListBox.cs" />
     <Compile Include="Classes\Exceptions\BeatmapIncompatibleException.cs" />
     <Compile Include="Classes\Exceptions\InvalidEditorReaderStateException.cs" />
     <Compile Include="Classes\Exceptions\EditorReaderDisabledException.cs" />
@@ -892,7 +892,9 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Classes\ComboColourStudio\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="BeforeBuild" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

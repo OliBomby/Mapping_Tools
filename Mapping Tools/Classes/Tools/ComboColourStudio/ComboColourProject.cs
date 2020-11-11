@@ -3,16 +3,14 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Components.Domain;
 
-namespace Mapping_Tools.Classes.ComboColourStudio {
+namespace Mapping_Tools.Classes.Tools.ComboColourStudio {
     public class ComboColourProject : BindableBase {
         private ObservableCollection<ColourPoint> _colourPoints;
         private ObservableCollection<SpecialColour> _comboColours;

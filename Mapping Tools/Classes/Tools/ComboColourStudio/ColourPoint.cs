@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.SystemTools;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Mapping_Tools.Annotations;
+using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Components.Domain;
 using MaterialDesignThemes.Wpf;
 using Newtonsoft.Json;
 
-namespace Mapping_Tools.Classes.ComboColourStudio {
+namespace Mapping_Tools.Classes.Tools.ComboColourStudio {
     public class ColourPoint : BindableBase, ICloneable {
         private double _time;
         private ObservableCollection<SpecialColour> _colourSequence; 
