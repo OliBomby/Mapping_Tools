@@ -232,7 +232,7 @@
     <Compile Include="Classes\ExternalFileUtil\Reaper\EnvelopeTempoPoint.cs" />
     <Compile Include="Classes\ExternalFileUtil\Reaper\ReaperEditor.cs" />
     <Compile Include="Classes\ExternalFileUtil\Reaper\TrackItem.cs" />
-    <Compile Include="Classes\ExternalFileUtil\TempoSignature.cs" />
+    <Compile Include="Classes\BeatmapHelper\TempoSignature.cs" />
     <Compile Include="Classes\GenericExtensions.cs" />
     <Compile Include="Classes\HitsoundStuff\Effects\DelayFadeOutSampleProvider.cs" />
     <Compile Include="Classes\HitsoundStuff\Effects\Effect.cs" />

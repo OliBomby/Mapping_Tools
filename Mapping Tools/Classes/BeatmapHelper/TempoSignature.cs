@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Mapping_Tools.Classes.ExternalFileUtil {
+namespace Mapping_Tools.Classes.BeatmapHelper {
     public class TempoSignature : IEquatable<TempoSignature>
     {
         /// <summary>
@@ -39,7 +39,7 @@ namespace Mapping_Tools.Classes.ExternalFileUtil {
         /// Allows a partial measure before the current marker.
         /// </summary>
         /// <remarks>
-        /// The number 5 is spesified as a partial measure allowance.
+        /// The number 5 is specified as a partial measure allowance.
         /// </remarks>
         public bool PartialMeasure { get; set; }
 
