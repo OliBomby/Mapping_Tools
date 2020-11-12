@@ -400,7 +400,7 @@ namespace Mapping_Tools.Viewmodels {
             var hitObjects = EditorReaderStuff.GetHitObjects(reader);
 
             // Get the visible hitobjects using approach rate
-            var approachTime = Beatmap.ApproachRateToMs(reader.ApproachRate);
+            var approachTime = Beatmap.GetApproachTime(reader.ApproachRate);
 
             switch (selectionMode) {
                 case SelectedHitObjectMode.AllwaysAllVisible:

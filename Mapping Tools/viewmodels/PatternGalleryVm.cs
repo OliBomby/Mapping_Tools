@@ -1,24 +1,22 @@
 ﻿using Mapping_Tools.Classes;
+using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.BeatmapHelper.BeatDivisors;
+using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Classes.Tools.PatternGallery;
+using Mapping_Tools.Components.Dialogs.CustomDialog;
 using Mapping_Tools.Components.Domain;
+using MaterialDesignThemes.Wpf;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.BeatmapHelper.BeatDivisors;
-using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.ToolHelpers;
-using Mapping_Tools.Components.Dialogs.CustomDialog;
-using MaterialDesignThemes.Wpf;
 
 namespace Mapping_Tools.Viewmodels {
     public class PatternGalleryVm : BindableBase {

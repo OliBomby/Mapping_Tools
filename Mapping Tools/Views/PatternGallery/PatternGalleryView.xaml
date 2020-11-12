@@ -253,6 +253,9 @@
                     <CheckBox Content="Snap to new timing"
                               ToolTip="Snap the objects of the pattern to the new timing using the specified beat divisors."
                               IsChecked="{Binding SnapToNewTiming}"/>
+                    <CheckBox Content="Manualify stacks"
+                              ToolTip="Manually stack objects of the pattern."
+                              IsChecked="{Binding FixStackLeniency}"/>
                     <CheckBox Content="Fix global SV"
                               ToolTip="Adjust greenline SV in the pattern to the new global SV so sliders have the same SV in the new beatmap."
                               IsChecked="{Binding FixGlobalSv}"/>
@@ -262,9 +265,6 @@
                     <CheckBox Content="Fix colourhax"
                               ToolTip="Adjust colour skip such that the colour indices of objects stay the same for the pattern and the original beatmap."
                               IsChecked="{Binding FixColourHax}"/>
-                    <CheckBox Content="Fix stack leniency"
-                              ToolTip="Manually stack objects of the pattern which should be stacked but don't have enough stack leniency in the new beatmap."
-                              IsChecked="{Binding FixStackLeniency}"/>
                     <CheckBox Content="Fix slider tick rate"
                               ToolTip="Multiply BPM in the pattern so the slider tick rate in the pattern stays the same."
                               IsChecked="{Binding FixTickRate}"/>

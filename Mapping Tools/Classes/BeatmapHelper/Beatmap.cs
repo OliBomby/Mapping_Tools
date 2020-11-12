@@ -315,7 +315,169 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 ho.CalculateSliderTemporalLength(BeatmapTiming, false);
             }
         }
-        
+
+        /// <summary>
+        /// Calculates the end position for all hit objects.
+        /// </summary>
+        public void CalculateEndPositions() {
+            foreach (var ho in HitObjects) {
+                ho.CalculateEndPosition();
+            }
+        }
+
+        /// <summary>
+        /// Actual osu! stable code for calculating stacked positions of all hit objects.
+        /// Make sure slider end positions are calculated before using this procedure.
+        /// </summary>
+        /// <param name="startIndex"></param>
+        /// <param name="endIndex"></param>
+        internal void UpdateStacking(int startIndex = 0, int endIndex = -1, bool rounded = false) {
+            if (endIndex == -1)
+                endIndex = HitObjects.Count - 1;
+
+            // Getting some variables for use later
+            double stackOffset = GetStackOffset(Difficulty["CircleSize"].DoubleValue);
+            double stackLeniency = General["StackLeniency"].DoubleValue;
+            double preEmpt = GetApproachTime(Difficulty["ApproachRate"].DoubleValue);
+
+            // Round the stack offset so objects only get offset by integer values
+            if (rounded) {
+                stackOffset = Math.Round(stackOffset);
+            }
+
+            const int STACK_LENIENCE = 3;
+
+            Vector2 stackVector = new Vector2(stackOffset, stackOffset);
+            float stackThresold = (float) (preEmpt * stackLeniency);
+
+            // Reset stacking inside the update range
+            for (int i = startIndex; i <= endIndex; i++)
+                HitObjects[i].StackCount = 0;
+
+            // Extend the end index to include objects they are stacked on
+            int extendedEndIndex = endIndex;
+            for (int i = endIndex; i >= startIndex; i--) {
+                int stackBaseIndex = i;
+                for (int n = stackBaseIndex + 1; n < HitObjects.Count; n++) {
+                    HitObject stackBaseObject = HitObjects[stackBaseIndex];
+                    if (stackBaseObject.IsSpinner) break;
+
+                    HitObject objectN = HitObjects[n];
+                    if (objectN.IsSpinner) continue;
+
+                    if (objectN.Time - stackBaseObject.EndTime > stackThresold)
+                        //We are no longer within stacking range of the next object.
+                        break;
+
+                    if (Vector2.Distance(stackBaseObject.Pos, objectN.Pos) < STACK_LENIENCE ||
+                        (stackBaseObject.IsSlider && Vector2.Distance(stackBaseObject.EndPos, objectN.Pos) < STACK_LENIENCE)) {
+                        stackBaseIndex = n;
+
+                        // HitObjects after the specified update range haven't been reset yet
+                        objectN.StackCount = 0;
+                    }
+                }
+
+                if (stackBaseIndex > extendedEndIndex) {
+                    extendedEndIndex = stackBaseIndex;
+                    if (extendedEndIndex == HitObjects.Count - 1)
+                        break;
+                }
+            }
+
+            //Reverse pass for stack calculation.
+            int extendedStartIndex = startIndex;
+            for (int i = extendedEndIndex; i > startIndex; i--) {
+                int n = i;
+                /* We should check every note which has not yet got a stack.
+                    * Consider the case we have two interwound stacks and this will make sense.
+                    *
+                    * o <-1      o <-2
+                    *  o <-3      o <-4
+                    *
+                    * We first process starting from 4 and handle 2,
+                    * then we come backwards on the i loop iteration until we reach 3 and handle 1.
+                    * 2 and 1 will be ignored in the i loop because they already have a stack value.
+                    */
+
+                HitObject objectI = HitObjects[i];
+
+                if (objectI.StackCount != 0 || objectI.IsSpinner) continue;
+
+                /* If this object is a hitcircle, then we enter this "special" case.
+                    * It either ends with a stack of hitcircles only, or a stack of hitcircles that are underneath a slider.
+                    * Any other case is handled by the "is Slider" code below this.
+                    */
+                if (objectI.IsCircle) {
+                    while (--n >= 0) {
+                        HitObject objectN = HitObjects[n];
+
+                        if (objectN.IsSpinner) continue;
+
+                        if (objectI.Time - objectN.EndTime > stackThresold)
+                            //We are no longer within stacking range of the previous object.
+                            break;
+
+                        // HitObjects before the specified update range haven't been reset yet
+                        if (n < extendedStartIndex) {
+                            objectN.StackCount = 0;
+                            extendedStartIndex = n;
+                        }
+
+                        /* This is a special case where hticircles are moved DOWN and RIGHT (negative stacking) if they are under the *last* slider in a stacked pattern.
+                            *    o==o <- slider is at original location
+                            *        o <- hitCircle has stack of -1
+                            *         o <- hitCircle has stack of -2
+                            */
+                        if (objectN.IsSlider && Vector2.Distance(objectN.EndPos, objectI.Pos) < STACK_LENIENCE) {
+                            int offset = objectI.StackCount - objectN.StackCount + 1;
+                            for (int j = n + 1; j <= i; j++) {
+                                //For each object which was declared under this slider, we will offset it to appear *below* the slider end (rather than above).
+                                if (Vector2.Distance(objectN.EndPos, HitObjects[j].Pos) < STACK_LENIENCE)
+                                    HitObjects[j].StackCount -= offset;
+                            }
+
+                            //We have hit a slider.  We should restart calculation using this as the new base.
+                            //Breaking here will mean that the slider still has StackCount of 0, so will be handled in the i-outer-loop.
+                            break;
+                        }
+
+                        if (Vector2.Distance(objectN.Pos, objectI.Pos) < STACK_LENIENCE) {
+                            //Keep processing as if there are no sliders.  If we come across a slider, this gets cancelled out.
+                            //NOTE: Sliders with start positions stacking are a special case that is also handled here.
+
+                            objectN.StackCount = objectI.StackCount + 1;
+                            objectI = objectN;
+                        }
+                    }
+                } else if (objectI.IsSlider) {
+                    /* We have hit the first slider in a possible stack.
+                        * From this point on, we ALWAYS stack positive regardless.
+                        */
+                    while (--n >= startIndex) {
+                        HitObject objectN = HitObjects[n];
+
+                        if (objectN.IsSpinner) continue;
+
+                        if (objectI.Time - objectN.Time > stackThresold)
+                            //We are no longer within stacking range of the previous object.
+                            break;
+
+                        if (Vector2.Distance(objectN.EndPos, objectI.Pos) < STACK_LENIENCE) {
+                            objectN.StackCount = objectI.StackCount + 1;
+                            objectI = objectN;
+                        }
+                    }
+                }
+            }
+
+            for (int i = startIndex; i <= endIndex; i++) {
+                HitObject currHitObject = HitObjects[i];
+                currHitObject.StackedPos = currHitObject.Pos - currHitObject.StackCount * stackVector;
+                currHitObject.StackedEndPos = currHitObject.EndPos - currHitObject.StackCount * stackVector;
+            }
+        }
+
         /// <summary>
         /// Calculates the which hit objects actually have a new combo.
         /// Calculates the combo index and combo colours for each hit object.
@@ -408,7 +570,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         /// <param name="approachRate">The approach rate difficulty setting.</param>
         /// <returns>The time in milliseconds between a hit object appearing on screen and getting perfectly hit.</returns>
-        public static double ApproachRateToMs(double approachRate) {
+        public static double GetApproachTime(double approachRate) {
             if (approachRate < 5) {
                 return 1800 - 120 * approachRate;
             }
@@ -423,6 +585,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <returns></returns>
         public static double GetHitObjectRadius(double circleSize) {
             return (109 - 9 * circleSize) / 2;
+        }
+
+        public static double GetStackOffset(double circleSize) {
+            return GetHitObjectRadius(circleSize) / 10;
         }
 
         /// <summary>
@@ -572,7 +738,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             if (eventsWithStartTime.Length > 0)
                 leadInTime = Math.Max(-eventsWithStartTime.Min(o => o.StartTime), leadInTime);
             if (HitObjects.Count > 0) {
-                var approachTime = ApproachRateToMs(Difficulty["ApproachRate"].DoubleValue);
+                var approachTime = GetApproachTime(Difficulty["ApproachRate"].DoubleValue);
                 leadInTime = Math.Max(approachTime - HitObjects[0].Time, leadInTime);
             }
             return leadInTime + window50 + 1000;

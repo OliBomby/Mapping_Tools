@@ -97,7 +97,7 @@ namespace Mapping_Tools.Views.AutoFailDetector {
             var ar = args.ApproachRateOverride == -1
                 ? editor.Beatmap.Difficulty["ApproachRate"].DoubleValue
                 : args.ApproachRateOverride;
-            var approachTime = (int) Beatmap.ApproachRateToMs(ar);
+            var approachTime = (int) Beatmap.GetApproachTime(ar);
 
             var od = args.OverallDifficultyOverride == -1
                 ? editor.Beatmap.Difficulty["OverallDifficulty"].DoubleValue

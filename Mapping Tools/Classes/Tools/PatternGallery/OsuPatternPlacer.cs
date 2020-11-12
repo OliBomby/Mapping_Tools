@@ -540,6 +540,24 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 }
             }
 
+            // Manualify stacks
+            if (FixStackLeniency) {
+                // If scale to new timing was used update the circle size of the pattern,
+                // so it calculates stacks at the new size of the pattern.
+                if (ScaleToNewCircleSize) {
+                    patternBeatmap.Difficulty["CircleSize"].DoubleValue = originalCircleSize;
+                }
+
+                patternBeatmap.CalculateEndPositions();
+                patternBeatmap.UpdateStacking(rounded: true);
+
+                // Manualify by setting the base position to the stacked position
+                foreach (var ho in patternBeatmap.HitObjects) {
+                    var offset = ho.StackedPos - ho.Pos;
+                    ho.Move(offset);
+                }
+            }
+
             // Resnap everything to the new timing.
             if (SnapToNewTiming) {
                 // Resnap all objects

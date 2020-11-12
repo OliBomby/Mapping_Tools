@@ -6,7 +6,6 @@ using System.Text;
 using Mapping_Tools.Classes.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
-using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
 using Newtonsoft.Json;
 using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
@@ -34,6 +33,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             bool normal, bool whistle, bool finish, bool clap, SampleSet sampleSet, SampleSet additionSet,
             int index, double volume, string filename) {
             Pos = pos;
+            // Let the end position be the same as the start position before changed later for sliders
+            EndPos = Pos;
             Time = time;
             SetObjectType(type);
             NewCombo = newCombo;
@@ -52,6 +53,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public HitObject(Vector2 pos, double time, int type, int hitsounds, SampleSet sampleSet, SampleSet additionSet,
             int index, double volume, string filename) {
             Pos = pos;
+            // Let the end position be the same as the start position before changed later for sliders
+            EndPos = Pos;
             Time = time;
             SetObjectType(type);
             SetHitsounds(hitsounds);
@@ -65,6 +68,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public HitObject(double time, int hitsounds, SampleSet sampleSet, SampleSet additions) {
             // Basic hitsoundind circle
             Pos = new Vector2(256, 192);
+            // Let the end position be the same as the start position before changed later for sliders
+            EndPos = Pos;
             Time = time;
             SetObjectType(5);
             SetHitsounds(hitsounds);
@@ -111,6 +116,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
 
             Pos = new Vector2(ob.X, ob.Y);
+            // Let the end position be the same as the start position before changed later for sliders
+            EndPos = Pos;
+
             Filename = ob.SampleFile;
             SampleVolume = ob.SampleVolume;
             SampleSet = (SampleSet) ob.SampleSet;
@@ -125,7 +133,25 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             set => SetLine(value);
         }
 
+        /// <summary>
+        /// Base position of hit object.
+        /// </summary>
         public Vector2 Pos { get; set; }
+
+        /// <summary>
+        /// Position of slider end. By default is equal to the start position.
+        /// </summary>
+        public Vector2 EndPos { get; set; }
+
+        /// <summary>
+        /// Stacked position of hit object. Must be computed by beatmap.
+        /// </summary>
+        public Vector2 StackedPos { get; set; }
+
+        /// <summary>
+        /// Stacked slider end position of hit object. Must be computed by beatmap.
+        /// </summary>
+        public Vector2 StackedEndPos { get; set; }
 
         public double Time { get; set; }
 
@@ -208,6 +234,12 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             TemporalLength = Repeat == 0 ? 0 : (value - Time) / Repeat;
         }
 
+        /// <summary>
+        /// The stack count indicates the number of hit objects that this object is stacked upon.
+        /// Used for calculating stack offset.
+        /// </summary>
+        public int StackCount { get; set; }
+
         // Special combined with greenline
         [JsonProperty]
         public double SliderVelocity { get; set; }
@@ -243,6 +275,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             if (TryParseDouble(values[0], out var x) && TryParseDouble(values[1], out var y))
                 Pos = new Vector2(x, y);
             else throw new BeatmapParsingException("Failed to parse coordinate of hit object.", line);
+
+            // Let the end position be the same as the start position before changed later for sliders
+            EndPos = Pos;
 
             if (TryParseDouble(values[2], out var t))
                 Time = t;
@@ -562,6 +597,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 double time = Math.Floor(Time + TemporalLength * i);
                 TimelineObjects[i].Time = time;
             }
+        }
+
+        /// <summary>
+        /// Calculates the <see cref="EndPos"/> for sliders.
+        /// </summary>
+        public void CalculateEndPosition() {
+            EndPos = IsSlider ? GetSliderPath().PositionAt(1) : Pos;
         }
 
         /// <summary>
