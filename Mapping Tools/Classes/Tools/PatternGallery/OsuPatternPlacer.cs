@@ -28,16 +28,16 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
         /// <summary>
         /// Determines which timing stuff to keep from the pattern.
         /// </summary>
-        public TimingOverwriteMode TimingOverwriteMode = TimingOverwriteMode.PatternTimingOnly;
-        public bool IncludeHitsounds = true;
-        public bool IncludeKiai = true;
+        public TimingOverwriteMode TimingOverwriteMode = TimingOverwriteMode.OriginalTimingOnly;
+        public bool IncludeHitsounds = false;
+        public bool IncludeKiai = false;
         public bool ScaleToNewCircleSize = false;
-        public bool ScaleToNewTiming = false;
+        public bool ScaleToNewTiming = true;
         public bool SnapToNewTiming = true;
         public IBeatDivisor[] BeatDivisors = RationalBeatDivisor.GetDefaultBeatDivisors();
         public bool FixGlobalSv = true;
         public bool FixBpmSv = true;
-        public bool FixColourHax = false;
+        public bool FixColourHax = true;
         public bool FixStackLeniency = false;
         public bool FixTickRate = false;
         /// <summary>
