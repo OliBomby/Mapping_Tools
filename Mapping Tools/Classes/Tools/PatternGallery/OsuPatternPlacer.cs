@@ -205,12 +205,10 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
         /// <param name="timingPointsChanges"></param>
         private void PreparePattern(Beatmap patternBeatmap, Beatmap beatmap, out List<Part> parts, out List<TimingPointsChange> timingPointsChanges) {
             double patternStartTime = patternBeatmap.GetHitObjectStartTime();
-            double patternEndTime = patternBeatmap.GetHitObjectEndTime();
 
             Timing originalTiming = beatmap.BeatmapTiming;
             Timing patternTiming = patternBeatmap.BeatmapTiming;
 
-            GameMode patternMode = (GameMode)patternBeatmap.General["Mode"].IntValue;
             GameMode targetMode = (GameMode)beatmap.General["Mode"].IntValue;
 
             double originalCircleSize = beatmap.Difficulty["CircleSize"].DoubleValue;
@@ -570,7 +568,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 foreach (HitObject ho in patternBeatmap.HitObjects) {
                     ho.ResnapSelf(transformNewTiming, BeatDivisors);
                     ho.ResnapEnd(transformNewTiming, BeatDivisors);
-                    ho.ResnapPosition(patternMode, patternCircleSize);  // Resnap to column X positions for mania only
+                    ho.ResnapPosition(targetMode, patternCircleSize);  // Resnap to column X positions for mania only
                 }
                 // Resnap Kiai toggles
                 foreach (TimingPoint tp in patternKiaiToggles) {
@@ -590,7 +588,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 new TimingPointsChange(tp, mpb: true, meter: true, unInherited: true, omitFirstBarLine: true, fuzzyness:Precision.DOUBLE_EPSILON)).ToList();
 
             // Add SliderVelocity changes for taiko and mania
-            if (patternMode == GameMode.Taiko || patternMode == GameMode.Mania) {
+            if (targetMode == GameMode.Taiko || targetMode == GameMode.Mania) {
                 timingPointsChanges.AddRange(svChanges.Select(tp => new TimingPointsChange(tp, mpb: true)));
             }
 
