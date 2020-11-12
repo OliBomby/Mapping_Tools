@@ -214,6 +214,8 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             double originalCircleSize = beatmap.Difficulty["CircleSize"].DoubleValue;
             double patternCircleSize = patternBeatmap.Difficulty["CircleSize"].DoubleValue;
 
+            // Don't include SV changes if it is based on nothing
+            bool includeSliderVelocity = patternTiming.Count > 0;
             // Avoid including hitsounds if there are no timingpoints to get hitsounds from
             bool includeTimingPointHitsounds = IncludeHitsounds && patternTiming.Count > 0;
             // Don't scale to new timing if the pattern has no timing to speak of
@@ -588,7 +590,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 new TimingPointsChange(tp, mpb: true, meter: true, unInherited: true, omitFirstBarLine: true, fuzzyness:Precision.DOUBLE_EPSILON)).ToList();
 
             // Add SliderVelocity changes for taiko and mania
-            if (targetMode == GameMode.Taiko || targetMode == GameMode.Mania) {
+            if (includeSliderVelocity && (targetMode == GameMode.Taiko || targetMode == GameMode.Mania)) {
                 timingPointsChanges.AddRange(svChanges.Select(tp => new TimingPointsChange(tp, mpb: true)));
             }
 
@@ -608,7 +610,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
 
             // Add Hitobject stuff
             foreach (HitObject ho in patternBeatmap.HitObjects) {
-                if (ho.IsSlider) // SliderVelocity changes
+                if (ho.IsSlider && includeSliderVelocity) // SliderVelocity changes
                 {
                     TimingPoint tp = ho.TimingPoint.Copy();
                     tp.Offset = ho.Time;
