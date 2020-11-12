@@ -229,6 +229,12 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                              Beatmap.GetHitObjectRadius(patternCircleSize);
             double spatialScale = ScaleToNewCircleSize && !double.IsNaN(csScale) ? CustomScale * csScale : CustomScale;
 
+            // Give new combo to all hit objects which were actually new combo in the pattern
+            // This code can be put anywhere really
+            foreach (var ho in patternBeatmap.HitObjects) {
+                ho.NewCombo = ho.ActualNewCombo && !ho.IsSpinner;
+            }
+
             // Collect Kiai toggles and SliderVelocity changes for mania/taiko
             List<TimingPoint> patternKiaiToggles = new List<TimingPoint>();
             List<TimingPoint> svChanges = new List<TimingPoint>();
@@ -576,7 +582,6 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                     tp.ResnapSelf(transformNewTiming, BeatDivisors);
                 }
             }
-            
 
             // Make new timingpoints changes for the hitsounds and other stuff
 
