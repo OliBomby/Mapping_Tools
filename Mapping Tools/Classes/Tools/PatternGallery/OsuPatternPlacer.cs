@@ -209,9 +209,6 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             Timing originalTiming = beatmap.BeatmapTiming;
             Timing patternTiming = patternBeatmap.BeatmapTiming;
 
-            Timing transformOriginalTiming = originalTiming.Copy();
-            Timing transformPatternTiming = patternTiming.Copy();
-
             GameMode targetMode = (GameMode)beatmap.General["Mode"].IntValue;
 
             double originalCircleSize = beatmap.Difficulty["CircleSize"].DoubleValue;
@@ -242,13 +239,6 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             // Get a BPM multiplier to fix the tick rate
             // This multiplier is not meant to change SV so this is subtracted from the greenline SV later
             double bpmMultiplier = FixTickRate ? patternTickRate / originalTickRate : 1;
-            // Multiply BPM of the pattern and divide the slider SV
-            foreach (var tp in transformPatternTiming.Redlines.Concat(transformOriginalTiming.Redlines)) {
-                tp.MpB /= bpmMultiplier;  // MpB is the inverse of BPM
-            }
-            foreach (var ho in patternBeatmap.HitObjects) {
-                ho.SliderVelocity *= bpmMultiplier;  // SV is the inverse aswell
-            }
 
             // Give new combo to all hit objects which were actually new combo in the pattern
             // This code can be put anywhere really
@@ -261,7 +251,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             List<TimingPoint> svChanges = new List<TimingPoint>();
             bool lastKiai = false;
             double lastSV = -100;
-            foreach (TimingPoint tp in transformPatternTiming.TimingPoints) {
+            foreach (TimingPoint tp in patternTiming.TimingPoints) {
                 if (tp.Kiai != lastKiai || patternKiaiToggles.Count == 0) {
                     patternKiaiToggles.Add(tp.Copy());
                     lastKiai = tp.Kiai;
@@ -280,6 +270,8 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             // Make sure that moving the objects in the pattern moves the timeline objects aswell
             // This method is NOT safe to use in beat time
             Timeline patternTimeline = patternBeatmap.GetTimeline();
+            Timing transformOriginalTiming = originalTiming;
+            Timing transformPatternTiming = patternTiming;
             if (scaleToNewTiming) {
                 // Transform everything to beat time relative to pattern start time
                 foreach (var ho in patternBeatmap.HitObjects) {
@@ -302,12 +294,14 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
 
                 // Transform the pattern redlines to beat time
                 // This will not change the order of redlines (unless negative BPM exists)
+                transformPatternTiming = patternTiming.Copy();
                 foreach (var tp in transformPatternTiming.Redlines) {
                     tp.Offset = transformPatternTiming.GetBeatLength(patternStartTime, tp.Offset);
                 }
 
                 // Transform the original timingpoints to beat time
                 // This will not change the order of timingpoints (unless negative BPM exists)
+                transformOriginalTiming = originalTiming.Copy();
                 foreach (var tp in transformOriginalTiming.TimingPoints) {
                     tp.Offset = transformOriginalTiming.GetBeatLength(patternStartTime, tp.Offset);
                 }
@@ -418,7 +412,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 // and the redline may be way before that.
                 // This will probably only do something on the PatternTimingOnly mode as the other modes make sure
                 // the BPM at the start of the pattern will be the same as the original beatmap anyways.
-                if (Math.Abs(startPartRedline.MpB - startOriginalRedline.MpB) > Precision.DOUBLE_EPSILON) {
+                if (Math.Abs(startPartRedline.MpB * bpmMultiplier - startOriginalRedline.MpB) > Precision.DOUBLE_EPSILON) {
                     // We dont have to add the redline again if its already during the pattern.
                     if (Math.Abs(startPartRedline.Offset - startTime) > Precision.DOUBLE_EPSILON) {
                         var copy = startPartRedline.Copy();
@@ -474,7 +468,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 // Add a redline at the end of the pattern to make sure the BPM goes back to normal after the pattern.
                 var endOriginalRedline = transformOriginalTiming.GetRedlineAtTime(endTime);
                 var endPartRedline = inPartRedlines.LastOrDefault() ?? startPartRedline;
-                if (Math.Abs(endPartRedline.MpB - endOriginalRedline.MpB) > Precision.DOUBLE_EPSILON) {
+                if (Math.Abs(endPartRedline.MpB * bpmMultiplier - endOriginalRedline.MpB) > Precision.DOUBLE_EPSILON) {
                     // We dont have to add the redline again if its already during the parts in between parts.
                     if (Math.Abs(endOriginalRedline.Offset - endTime) > Precision.DOUBLE_EPSILON) {
                         var copy = endOriginalRedline.Copy();
@@ -596,6 +590,17 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 // Resnap SliderVelocity changes
                 foreach (TimingPoint tp in svChanges) {
                     tp.ResnapSelf(transformNewTiming, BeatDivisors);
+                }
+            }
+
+            // Multiply BPM and divide SV
+            foreach (var part in parts) {
+                foreach (var tp in transformNewTiming.GetRedlinesInRange(part.StartTime - 2 * Precision.DOUBLE_EPSILON, part.EndTime, false)) {
+                    tp.MpB /= bpmMultiplier;  // MpB is the inverse of the BPM
+                }
+
+                foreach (var ho in part.HitObjects) {
+                    ho.SliderVelocity *= bpmMultiplier;  // SliderVelocity is the inverse of the multiplier
                 }
             }
 
