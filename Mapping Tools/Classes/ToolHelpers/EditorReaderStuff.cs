@@ -9,6 +9,8 @@ using Editor_Reader;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.Exceptions;
 using Mapping_Tools.Classes.SystemTools;
+using Process.NET;
+using Process.NET.Memory;
 using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
 
 namespace Mapping_Tools.Classes.ToolHelpers {
@@ -28,6 +30,17 @@ namespace Mapping_Tools.Classes.ToolHelpers {
         }
 
         /// <summary>
+        /// Determines whether the editor is open in the osu! client by checking if the window title ends with ".osu".
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsEditorOpen() {
+            var process = System.Diagnostics.Process.GetProcessesByName("osu!").FirstOrDefault();
+            var processSharp = new ProcessSharp(process, MemoryType.Remote);
+            var osuWindow = processSharp.WindowFactory.MainWindow;
+            return osuWindow.Title.EndsWith(@".osu");
+        }
+
+        /// <summary>
         /// Gets the instance of EditorReader with FetchAll. Throws an exception if the editor is not open or anything is wrong.
         /// </summary>
         /// <returns></returns>
@@ -36,6 +49,10 @@ namespace Mapping_Tools.Classes.ToolHelpers {
         public static EditorReader GetFullEditorReader() {
             if (!SettingsManager.Settings.UseEditorReader) {
                 throw new EditorReaderDisabledException();
+            }
+
+            if (!IsEditorOpen()) {
+                throw new Exception("No active editor detected.");
             }
 
             /*editorReader.FetchEditor();
