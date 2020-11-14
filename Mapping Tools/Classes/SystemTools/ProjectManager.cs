@@ -22,11 +22,15 @@ namespace Mapping_Tools.Classes.SystemTools {
             Converters = { new Vector2Converter()}
         };
 
+        public static void WriteJson(StreamWriter streamWriter, object obj) {
+            using (JsonTextWriter reader = new JsonTextWriter(streamWriter)) {
+                Serializer.Serialize(reader, obj);
+            }
+        }
+
         public static void SaveJson(string path, object obj) {
             using (StreamWriter fs = new StreamWriter(path)) {
-                using (JsonTextWriter reader = new JsonTextWriter(fs)) {
-                    Serializer.Serialize(reader, obj);
-                }
+                WriteJson(fs, obj);
             }
         }
         

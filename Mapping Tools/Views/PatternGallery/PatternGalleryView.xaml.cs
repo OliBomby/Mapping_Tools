@@ -1,7 +1,8 @@
-﻿using Mapping_Tools.Classes;
+﻿using Editor_Reader;
+using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
-using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Classes.Tools.PatternGallery;
 using Mapping_Tools.Components.Dialogs.CustomDialog;
 using Mapping_Tools.Viewmodels;
@@ -9,13 +10,12 @@ using MaterialDesignThemes.Wpf;
 using System;
 using System.ComponentModel;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Editor_Reader;
-using Mapping_Tools.Classes.ToolHelpers;
 
 namespace Mapping_Tools.Views.PatternGallery {
     /// <summary>
@@ -162,13 +162,19 @@ namespace Mapping_Tools.Views.PatternGallery {
         }
 
         public MenuItem[] GetMenuItems() {
-            var menu = new MenuItem {
+            var renameMenu = new MenuItem {
                 Header = "_Rename collection", Icon = new PackIcon { Kind = PackIconKind.Rename },
                 ToolTip = "Rename this collection and the collection's directory in the Pattern Files directory."
             };
-            menu.Click += DoRenameCollection;
+            renameMenu.Click += DoRenameCollection;
 
-            return new[] { menu };
+            var exportMenu = new MenuItem {
+                Header = "_Export collection", Icon = new PackIcon { Kind = PackIconKind.Export },
+                ToolTip = "Export this collection to the Exports folder. The exported file can later be imported with the import menu."
+            };
+            exportMenu.Click += DoExportCollection;
+
+            return new[] { renameMenu, exportMenu };
         }
 
         private async void DoRenameCollection(object sender, RoutedEventArgs e) {
@@ -187,6 +193,37 @@ namespace Mapping_Tools.Views.PatternGallery {
                 ViewModel.FileHandler.RenameCollectionFolder(viewModel.NewFolderName);
 
                 await Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue("Successfully renamed this collection!"));
+            } catch (ArgumentException) { } catch (Exception ex) {
+                ex.Show();
+            }
+        }
+
+        private async void DoExportCollection(object sender, RoutedEventArgs e) {
+            try {
+                string exportFolder = MainWindow.ExportPath;
+                string saveName = ViewModel.CollectionName;
+                string savePath = Path.Combine(exportFolder, saveName + ".zip");
+
+                using (FileStream zipToOpen = new FileStream(savePath, FileMode.OpenOrCreate)) {
+                    using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Create)) {
+                        // Write the save json in the archive
+                        var saveEntryName = Path.Combine(ViewModel.FileHandler.CollectionFolderName, saveName + ".json");
+                        ZipArchiveEntry saveEntry = archive.CreateEntry(saveEntryName);
+                        using (StreamWriter writer = new StreamWriter(saveEntry.Open())) {
+                            ProjectManager.WriteJson(writer, GetSaveData());
+                        }
+
+                        // Add the folder of pattern files
+                        foreach (var pattern in ViewModel.Patterns) {
+                            var patternFilePath = ViewModel.FileHandler.GetPatternPath(pattern.FileName);
+                            var entryName = ViewModel.FileHandler.GetPatternRelativePath(pattern.FileName);
+                            archive.CreateEntryFromFile(patternFilePath, entryName);
+                        }
+                    }
+                }
+
+                await Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue("Successfully exported this collection!"));
+                ShowSelectedInExplorer.FilesOrFolders(savePath);
             } catch (ArgumentException) { } catch (Exception ex) {
                 ex.Show();
             }
