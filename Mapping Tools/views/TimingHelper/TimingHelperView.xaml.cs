@@ -6,10 +6,12 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
+using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Viewmodels;
 
@@ -242,8 +244,7 @@ namespace Mapping_Tools.Views.TimingHelper {
             }
 
             // Do QuickRun stuff
-            if (arg.Quick)
-                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, reader != null));
+            RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, reader != null, arg.Quick));
 
             // Make an accurate message
             string message = "Successfully added ";

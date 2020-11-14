@@ -13,6 +13,7 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.ToolHelpers;
 using ModifierKeys = NonInvasiveKeyboardHookLibrary.ModifierKeys;
 
 namespace Mapping_Tools.Classes.SystemTools {
@@ -55,6 +56,9 @@ namespace Mapping_Tools.Classes.SystemTools {
                 var path = IOHelper.GetCurrentBeatmap();
 
                 if (string.IsNullOrEmpty(path)) return;
+
+                // Don't make period backup if the editor is not open
+                if (!EditorReaderStuff.IsEditorOpen()) return;
 
                 EditorReader reader = null;
                 try {
@@ -259,8 +263,6 @@ namespace Mapping_Tools.Classes.SystemTools {
 
                     if (tool == null) return;
 
-                    tool.RunFinished -= Reload;
-                    tool.RunFinished += Reload;
                     tool.QuickRun();
                 });
             }
@@ -278,8 +280,6 @@ namespace Mapping_Tools.Classes.SystemTools {
 
                 System.Windows.Application.Current.Dispatcher.Invoke(() => {
                     if (!(MainWindow.AppWindow.GetCurrentView() is IQuickRun tool)) return;
-                    tool.RunFinished -= Reload;
-                    tool.RunFinished += Reload;
                     tool.QuickRun();
                 });
             }
@@ -289,8 +289,11 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
         }
 
-        private static void Reload(object sender, EventArgs e) {
-            if (!((RunToolCompletedEventArgs)e).NeedReload || !SettingsManager.Settings.AutoReload) return;
+        public static void RunFinishedEventHandler(object sender, EventArgs e) {
+            if (!((RunToolCompletedEventArgs)e).Quick ||
+                !((RunToolCompletedEventArgs)e).Success || 
+                !((RunToolCompletedEventArgs)e).NeedReload || 
+                !SettingsManager.Settings.AutoReload) return;
 
             ForceReloadEditor();
         }

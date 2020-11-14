@@ -1,8 +1,13 @@
 ﻿using Mapping_Tools.Classes;
+using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.BeatmapHelper.BeatDivisors;
+using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Classes.Tools.PatternGallery;
+using Mapping_Tools.Components.Dialogs.CustomDialog;
 using Mapping_Tools.Components.Domain;
+using MaterialDesignThemes.Wpf;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -10,10 +15,8 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Components.Dialogs.CustomDialog;
-using MaterialDesignThemes.Wpf;
+using System.Windows;
+using System.Windows.Input;
 
 namespace Mapping_Tools.Viewmodels {
     public class PatternGalleryVm : BindableBase {
@@ -116,6 +119,11 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref OsuPatternPlacer.IncludeHitsounds, value);
         }
 
+        public bool IncludeKiai {
+            get => OsuPatternPlacer.IncludeKiai;
+            set => Set(ref OsuPatternPlacer.IncludeKiai, value);
+        }
+
         public bool ScaleToNewCircleSize {
             get => OsuPatternPlacer.ScaleToNewCircleSize;
             set => Set(ref OsuPatternPlacer.ScaleToNewCircleSize, value);
@@ -181,6 +189,8 @@ namespace Mapping_Tools.Viewmodels {
         public CommandImplementation AddSelectedCommand { get; }
         [JsonIgnore]
         public CommandImplementation RemoveCommand { get; }
+        [JsonIgnore]
+        public CommandImplementation OpenExplorerSelectedCommand { get; }
 
 
         [JsonIgnore]
@@ -210,10 +220,24 @@ namespace Mapping_Tools.Viewmodels {
 
                         if (!(bool)result) return;
 
-                        var hitObjects = Regex.Split(viewModel.HitObjects, Environment.NewLine)
-                            .Select(o => new HitObject(o.Trim())).ToList();
-                        var timingPoints = Regex.Split(viewModel.TimingPoints, Environment.NewLine)
-                            .Select(o => new TimingPoint(o.Trim())).ToList();
+                        var hitObjects = new List<HitObject>();
+                        foreach (string o in Regex.Split(viewModel.HitObjects, Environment.NewLine)) {
+                            try {
+                                hitObjects.Add(new HitObject(o.Trim()));
+                            } catch (Exception ex) { Console.WriteLine(ex);}
+                        }
+                        var timingPoints = new List<TimingPoint>();
+                        foreach (string o in Regex.Split(viewModel.TimingPoints, Environment.NewLine)) {
+                            try {
+                                timingPoints.Add(new TimingPoint(o.Trim()));
+                            } catch (Exception ex) { Console.WriteLine(ex);}
+                        }
+
+                        // The pattern needs at least one hitobject
+                        if (hitObjects.Count == 0) {
+                            MessageBox.Show("At least one valid hit object is required.");
+                            return;
+                        }
 
                         var pattern = OsuPatternMaker.FromObjectsWithSave(
                             hitObjects, timingPoints, FileHandler, viewModel.Name, null, viewModel.GlobalSv, viewModel.GameMode);
@@ -262,11 +286,29 @@ namespace Mapping_Tools.Viewmodels {
             RemoveCommand = new CommandImplementation(
                 _ => {
                     try {
+                        var selected = Patterns.Where(o => o.IsSelected).ToList();
+                        if (selected.Count == 0) return;
+
+                        if (!(Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))){
+                            string message = selected.Count == 1 ? $"Are you sure you want to delete \"{selected.First().Name}\"?" :
+                                selected.Count == 2 ? $"Are you sure you want to delete \"{selected[0].Name}\" and \"{selected[1].Name}\"?" :
+                                $"Are you sure you want to delete \"{selected[0].Name}\" and {selected.Count-1} others?";
+                            var messageBoxResult = MessageBox.Show(message, "Confirm deletion", MessageBoxButton.YesNo);
+                            if (messageBoxResult != MessageBoxResult.Yes) return;
+                        }
+
                         // Remove all selected patterns and their files
                         foreach (var pattern in Patterns.Where(o => o.IsSelected)) {
                             File.Delete(FileHandler.GetPatternPath(pattern.FileName));
                         }
                         Patterns.RemoveAll(o => o.IsSelected);
+                    } catch (Exception ex) { ex.Show(); }
+                });
+            OpenExplorerSelectedCommand = new CommandImplementation(
+                _ => {
+                    try {
+                        ShowSelectedInExplorer.FilesOrFolders(
+                            Patterns.Where(o => o.IsSelected).Select(o => FileHandler.GetPatternPath(o.FileName)));
                     } catch (Exception ex) { ex.Show(); }
                 });
         }

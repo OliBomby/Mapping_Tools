@@ -1,5 +1,5 @@
-﻿using Mapping_Tools.Classes.ComboColourStudio;
-using Mapping_Tools.Classes.SystemTools;
+﻿using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.Tools.ComboColourStudio;
 
 namespace Mapping_Tools.Viewmodels {
 

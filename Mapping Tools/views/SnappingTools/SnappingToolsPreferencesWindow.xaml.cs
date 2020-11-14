@@ -1,7 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using Mapping_Tools.Classes.SnappingTools;
-using Mapping_Tools.Classes.SnappingTools.Serialization;
+using Mapping_Tools.Classes.Tools.SnappingTools.Serialization;
 
 namespace Mapping_Tools.Views.SnappingTools {
     /// <summary>

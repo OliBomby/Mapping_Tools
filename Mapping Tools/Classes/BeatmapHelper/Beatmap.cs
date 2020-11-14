@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
+﻿using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.BeatmapHelper.Events;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
 
@@ -97,51 +97,56 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public Timing BeatmapTiming { get; set; }
 
         /// <summary>
+        /// The storyboard of the Beatmap. Stores everything under the [Events] section.
+        /// </summary>
+        public StoryBoard StoryBoard { get; set; }
+
+        /// <summary>
         /// A list of all the lines of .osu code under the [Events] -> (Background and Video events) section.
         /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
-        public List<Event> BackgroundAndVideoEvents { get; set; }
+        public List<Event> BackgroundAndVideoEvents => StoryBoard.BackgroundAndVideoEvents;
 
         /// <summary>
         /// A list of all the lines of .osu code under the [Events] -> (Break Periods) section.
         /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
-        public List<Break> BreakPeriods { get; set; }
+        public List<Break> BreakPeriods => StoryBoard.BreakPeriods;
 
         /// <summary>
         /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 0 (Background)) section.
         /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
-        public List<Event> StoryboardLayerBackground { get; set; }
+        public List<Event> StoryboardLayerBackground => StoryBoard.StoryboardLayerBackground;
 
         /// <summary>
         /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 1 (Fail)) section.
         /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
-        public List<Event> StoryboardLayerFail { get; set; }
+        public List<Event> StoryboardLayerFail => StoryBoard.StoryboardLayerFail;
 
         /// <summary>
         /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 2 (Pass)) section.
         /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
-        public List<Event> StoryboardLayerPass { get; set; }
+        public List<Event> StoryboardLayerPass => StoryBoard.StoryboardLayerPass;
 
         /// <summary>
         /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 3 (Foreground)) section.
         /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
-        public List<Event> StoryboardLayerForeground { get; set; }
+        public List<Event> StoryboardLayerForeground => StoryBoard.StoryboardLayerForeground;
 
         /// <summary>
         /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 4 (Overlay)) section.
         /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
-        public List<Event> StoryboardLayerOverlay { get; set; }
-        
+        public List<Event> StoryboardLayerOverlay => StoryBoard.StoryboardLayerOverlay;
+
         /// <summary>
         /// A list of all storyboarded sound sample events under the [Events] -> (Storyboard Sound Samples) section.
         /// </summary>
-        public List<StoryboardSoundSample> StoryboardSoundSamples { get; set; }
+        public List<StoryboardSoundSample> StoryboardSoundSamples => StoryBoard.StoryboardSoundSamples;
 
         /// <summary>
         /// List of all the hit objects in this beatmap.
@@ -204,6 +209,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         /// <param name="lines">List of strings where each string is another line in the .osu file.</param>
         public Beatmap(List<string> lines) {
+            Initialize();
             SetLines(lines);
         }
 
@@ -214,14 +220,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Difficulty = new Dictionary<string, TValue>();
             ComboColours = new List<ComboColour>();
             SpecialColours = new Dictionary<string, ComboColour>();
-            BackgroundAndVideoEvents = new List<Event>();
-            BreakPeriods = new List<Break>();
-            StoryboardLayerBackground = new List<Event>();
-            StoryboardLayerPass = new List<Event>();
-            StoryboardLayerFail = new List<Event>();
-            StoryboardLayerForeground = new List<Event>();
-            StoryboardLayerOverlay = new List<Event>();
-            StoryboardSoundSamples = new List<StoryboardSoundSample>();
+            StoryBoard = new StoryBoard();
             HitObjects = new List<HitObject>();
             BeatmapTiming = new Timing(1.4);
 
@@ -263,57 +262,34 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         /// <param name="lines">List of strings where each string is another line in the .osu file.</param>
         public void SetLines(List<string> lines) {
-            Initialize();
-
             // Load up all the shit
-            List<string> generalLines = GetCategoryLines(lines, "[General]");
-            List<string> editorLines = GetCategoryLines(lines, "[Editor]");
-            List<string> metadataLines = GetCategoryLines(lines, "[Metadata]");
-            List<string> difficultyLines = GetCategoryLines(lines, "[Difficulty]");
-            List<string> backgroundAndVideoEventsLines = GetCategoryLines(lines, "//Background and Video events", new[] { "[", "//" });
-            List<string> breakPeriodsLines = GetCategoryLines(lines, "//Break Periods", new[] { "[", "//" });
-            List<string> storyboardLayerBackgroundLines = GetCategoryLines(lines, "//Storyboard Layer 0 (Background)", new[] { "[", "//" });
-            List<string> storyboardLayerFailLines = GetCategoryLines(lines, "//Storyboard Layer 1 (Fail)", new[] { "[", "//" });
-            List<string> storyboardLayerPassLines = GetCategoryLines(lines, "//Storyboard Layer 2 (Pass)", new[] { "[", "//" });
-            List<string> storyboardLayerForegroundLines = GetCategoryLines(lines, "//Storyboard Layer 3 (Foreground)", new[] { "[", "//" });
-            List<string> storyboardLayerOverlayLines = GetCategoryLines(lines, "//Storyboard Layer 4 (Overlay)", new[] { "[", "//" });
-            List<string> storyboardSoundSamplesLines = GetCategoryLines(lines, "//Storyboard Sound Samples", new[] { "[", "//" });
-            List<string> timingLines = GetCategoryLines(lines, "[TimingPoints]");
-            List<string> colourLines = GetCategoryLines(lines, "[Colours]");
-            List<string> hitobjectLines = GetCategoryLines(lines, "[HitObjects]");
+            IEnumerable<string> generalLines = FileFormatHelper.GetCategoryLines(lines, "[General]");
+            IEnumerable<string> editorLines = FileFormatHelper.GetCategoryLines(lines, "[Editor]");
+            IEnumerable<string> metadataLines = FileFormatHelper.GetCategoryLines(lines, "[Metadata]");
+            IEnumerable<string> difficultyLines = FileFormatHelper.GetCategoryLines(lines, "[Difficulty]");
+            IEnumerable<string> timingLines = FileFormatHelper.GetCategoryLines(lines, "[TimingPoints]");
+            IEnumerable<string> colourLines = FileFormatHelper.GetCategoryLines(lines, "[Colours]");
+            IEnumerable<string> hitobjectLines = FileFormatHelper.GetCategoryLines(lines, "[HitObjects]");
 
-            FillDictionary(General, generalLines);
-            FillDictionary(Editor, editorLines);
-            FillDictionary(Metadata, metadataLines);
-            FillDictionary(Difficulty, difficultyLines);
+            FileFormatHelper.FillDictionary(General, generalLines);
+            FileFormatHelper.FillDictionary(Editor, editorLines);
+            FileFormatHelper.FillDictionary(Metadata, metadataLines);
+            FileFormatHelper.FillDictionary(Difficulty, difficultyLines);
 
             foreach (string line in colourLines) {
                 if (line.Substring(0, 5) == "Combo") {
                     ComboColours.Add(new ComboColour(line));
                 } else {
-                    SpecialColours[SplitKeyValue(line)[0].Trim()] = new ComboColour(line);
+                    SpecialColours[FileFormatHelper.SplitKeyValue(line)[0].Trim()] = new ComboColour(line);
                 }
             }
 
-            foreach (string line in backgroundAndVideoEventsLines) {
-                BackgroundAndVideoEvents.Add(Event.MakeEvent(line));
-            }
-            foreach (string line in breakPeriodsLines) {
-                BreakPeriods.Add(new Break(line));
-            }
-
-            StoryboardLayerBackground.AddRange(Event.ParseEventTree(storyboardLayerBackgroundLines));
-            StoryboardLayerFail.AddRange(Event.ParseEventTree(storyboardLayerFailLines));
-            StoryboardLayerPass.AddRange(Event.ParseEventTree(storyboardLayerPassLines));
-            StoryboardLayerForeground.AddRange(Event.ParseEventTree(storyboardLayerForegroundLines));
-            StoryboardLayerOverlay.AddRange(Event.ParseEventTree(storyboardLayerOverlayLines));
-
-            foreach (string line in storyboardSoundSamplesLines) {
-                StoryboardSoundSamples.Add(new StoryboardSoundSample(line));
-            }
             foreach (string line in hitobjectLines) {
                 HitObjects.Add(new HitObject(line));
             }
+
+            // Give the lines to the storyboard
+            StoryBoard.SetLines(lines);
 
             // Set the timing object
             BeatmapTiming = new Timing(timingLines, Difficulty["SliderMultiplier"].DoubleValue);
@@ -336,15 +312,172 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         public void CalculateSliderEndTimes() {
             foreach (var ho in HitObjects.Where(ho => ho.IsSlider)) {
-                if (double.IsNaN(ho.PixelLength) || ho.PixelLength < 0 || ho.CurvePoints.All(o => o == ho.Pos)) {
-                    ho.TemporalLength = 0;
-                }
-                else {
-                    ho.TemporalLength = BeatmapTiming.CalculateSliderTemporalLength(ho.Time, ho.PixelLength);
-                }
+                ho.CalculateSliderTemporalLength(BeatmapTiming, false);
             }
         }
-        
+
+        /// <summary>
+        /// Calculates the end position for all hit objects.
+        /// </summary>
+        public void CalculateEndPositions() {
+            foreach (var ho in HitObjects) {
+                ho.CalculateEndPosition();
+            }
+        }
+
+        /// <summary>
+        /// Actual osu! stable code for calculating stacked positions of all hit objects.
+        /// Make sure slider end positions are calculated before using this procedure.
+        /// </summary>
+        /// <param name="startIndex"></param>
+        /// <param name="endIndex"></param>
+        internal void UpdateStacking(int startIndex = 0, int endIndex = -1, bool rounded = false) {
+            if (endIndex == -1)
+                endIndex = HitObjects.Count - 1;
+
+            // Getting some variables for use later
+            double stackOffset = GetStackOffset(Difficulty["CircleSize"].DoubleValue);
+            double stackLeniency = General["StackLeniency"].DoubleValue;
+            double preEmpt = GetApproachTime(Difficulty["ApproachRate"].DoubleValue);
+
+            // Round the stack offset so objects only get offset by integer values
+            if (rounded) {
+                stackOffset = Math.Round(stackOffset);
+            }
+
+            const int STACK_LENIENCE = 3;
+
+            Vector2 stackVector = new Vector2(stackOffset, stackOffset);
+            float stackThresold = (float) (preEmpt * stackLeniency);
+
+            // Reset stacking inside the update range
+            for (int i = startIndex; i <= endIndex; i++)
+                HitObjects[i].StackCount = 0;
+
+            // Extend the end index to include objects they are stacked on
+            int extendedEndIndex = endIndex;
+            for (int i = endIndex; i >= startIndex; i--) {
+                int stackBaseIndex = i;
+                for (int n = stackBaseIndex + 1; n < HitObjects.Count; n++) {
+                    HitObject stackBaseObject = HitObjects[stackBaseIndex];
+                    if (stackBaseObject.IsSpinner) break;
+
+                    HitObject objectN = HitObjects[n];
+                    if (objectN.IsSpinner) continue;
+
+                    if (objectN.Time - stackBaseObject.EndTime > stackThresold)
+                        //We are no longer within stacking range of the next object.
+                        break;
+
+                    if (Vector2.Distance(stackBaseObject.Pos, objectN.Pos) < STACK_LENIENCE ||
+                        (stackBaseObject.IsSlider && Vector2.Distance(stackBaseObject.EndPos, objectN.Pos) < STACK_LENIENCE)) {
+                        stackBaseIndex = n;
+
+                        // HitObjects after the specified update range haven't been reset yet
+                        objectN.StackCount = 0;
+                    }
+                }
+
+                if (stackBaseIndex > extendedEndIndex) {
+                    extendedEndIndex = stackBaseIndex;
+                    if (extendedEndIndex == HitObjects.Count - 1)
+                        break;
+                }
+            }
+
+            //Reverse pass for stack calculation.
+            int extendedStartIndex = startIndex;
+            for (int i = extendedEndIndex; i > startIndex; i--) {
+                int n = i;
+                /* We should check every note which has not yet got a stack.
+                    * Consider the case we have two interwound stacks and this will make sense.
+                    *
+                    * o <-1      o <-2
+                    *  o <-3      o <-4
+                    *
+                    * We first process starting from 4 and handle 2,
+                    * then we come backwards on the i loop iteration until we reach 3 and handle 1.
+                    * 2 and 1 will be ignored in the i loop because they already have a stack value.
+                    */
+
+                HitObject objectI = HitObjects[i];
+
+                if (objectI.StackCount != 0 || objectI.IsSpinner) continue;
+
+                /* If this object is a hitcircle, then we enter this "special" case.
+                    * It either ends with a stack of hitcircles only, or a stack of hitcircles that are underneath a slider.
+                    * Any other case is handled by the "is Slider" code below this.
+                    */
+                if (objectI.IsCircle) {
+                    while (--n >= 0) {
+                        HitObject objectN = HitObjects[n];
+
+                        if (objectN.IsSpinner) continue;
+
+                        if (objectI.Time - objectN.EndTime > stackThresold)
+                            //We are no longer within stacking range of the previous object.
+                            break;
+
+                        // HitObjects before the specified update range haven't been reset yet
+                        if (n < extendedStartIndex) {
+                            objectN.StackCount = 0;
+                            extendedStartIndex = n;
+                        }
+
+                        /* This is a special case where hticircles are moved DOWN and RIGHT (negative stacking) if they are under the *last* slider in a stacked pattern.
+                            *    o==o <- slider is at original location
+                            *        o <- hitCircle has stack of -1
+                            *         o <- hitCircle has stack of -2
+                            */
+                        if (objectN.IsSlider && Vector2.Distance(objectN.EndPos, objectI.Pos) < STACK_LENIENCE) {
+                            int offset = objectI.StackCount - objectN.StackCount + 1;
+                            for (int j = n + 1; j <= i; j++) {
+                                //For each object which was declared under this slider, we will offset it to appear *below* the slider end (rather than above).
+                                if (Vector2.Distance(objectN.EndPos, HitObjects[j].Pos) < STACK_LENIENCE)
+                                    HitObjects[j].StackCount -= offset;
+                            }
+
+                            //We have hit a slider.  We should restart calculation using this as the new base.
+                            //Breaking here will mean that the slider still has StackCount of 0, so will be handled in the i-outer-loop.
+                            break;
+                        }
+
+                        if (Vector2.Distance(objectN.Pos, objectI.Pos) < STACK_LENIENCE) {
+                            //Keep processing as if there are no sliders.  If we come across a slider, this gets cancelled out.
+                            //NOTE: Sliders with start positions stacking are a special case that is also handled here.
+
+                            objectN.StackCount = objectI.StackCount + 1;
+                            objectI = objectN;
+                        }
+                    }
+                } else if (objectI.IsSlider) {
+                    /* We have hit the first slider in a possible stack.
+                        * From this point on, we ALWAYS stack positive regardless.
+                        */
+                    while (--n >= startIndex) {
+                        HitObject objectN = HitObjects[n];
+
+                        if (objectN.IsSpinner) continue;
+
+                        if (objectI.Time - objectN.Time > stackThresold)
+                            //We are no longer within stacking range of the previous object.
+                            break;
+
+                        if (Vector2.Distance(objectN.EndPos, objectI.Pos) < STACK_LENIENCE) {
+                            objectN.StackCount = objectI.StackCount + 1;
+                            objectI = objectN;
+                        }
+                    }
+                }
+            }
+
+            for (int i = startIndex; i <= endIndex; i++) {
+                HitObject currHitObject = HitObjects[i];
+                currHitObject.StackedPos = currHitObject.Pos - currHitObject.StackCount * stackVector;
+                currHitObject.StackedEndPos = currHitObject.EndPos - currHitObject.StackCount * stackVector;
+            }
+        }
+
         /// <summary>
         /// Calculates the which hit objects actually have a new combo.
         /// Calculates the combo index and combo colours for each hit object.
@@ -362,10 +495,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 hitObject.ActualNewCombo = IsNewCombo(hitObject, previousHitObject);
 
                 if (hitObject.ActualNewCombo) {
-                    var colourIncrement = hitObject.ComboSkip;
-                    if (!hitObject.IsSpinner) {
-                        colourIncrement++;
-                    }
+                    var colourIncrement = hitObject.IsSpinner ? hitObject.ComboSkip : hitObject.ComboSkip + 1;
 
                     colourIndex = MathHelper.Mod(colourIndex + colourIncrement, actingComboColours.Length);
                     comboIndex = 1;
@@ -376,6 +506,39 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 hitObject.ComboIndex = comboIndex;
                 hitObject.ColourIndex = colourIndex;
                 hitObject.Colour = actingComboColours[colourIndex];
+
+                previousHitObject = hitObject;
+            }
+        }
+
+        /// <summary>
+        /// Adjusts combo skip for all the hitobjects so colour index is correct.
+        /// </summary>
+        public void FixComboSkip() {
+            HitObject previousHitObject = null;
+            int colourIndex = 0;
+
+            // If there are no combo colours use the default combo colours so the hitobjects still have something
+            var actingComboColours = ComboColours.Count == 0 ? ComboColour.GetDefaultComboColours() : ComboColours.ToArray();
+
+            foreach (var hitObject in HitObjects) {
+                bool newCombo = IsNewCombo(hitObject, previousHitObject);
+
+                if (newCombo) {
+                    int colourIncrement = hitObject.IsSpinner ? 0 : 1;
+                    var newColourIndex = MathHelper.Mod(colourIndex + colourIncrement, actingComboColours.Length);
+                    var wantedColourIndex = hitObject.ColourIndex;
+                    var diff = wantedColourIndex - newColourIndex;
+
+                    if (diff > 0) {
+                        hitObject.ComboSkip = diff;
+                    } else if (diff < 0) {
+                        hitObject.ComboSkip = (actingComboColours.Length + diff);
+                    }
+
+                    int newColourIncrement = hitObject.IsSpinner ? hitObject.ComboSkip : hitObject.ComboSkip + 1;
+                    colourIndex = MathHelper.Mod(colourIndex + newColourIncrement, actingComboColours.Length);
+                }
 
                 previousHitObject = hitObject;
             }
@@ -407,12 +570,25 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         /// <param name="approachRate">The approach rate difficulty setting.</param>
         /// <returns>The time in milliseconds between a hit object appearing on screen and getting perfectly hit.</returns>
-        public static double ApproachRateToMs(double approachRate) {
+        public static double GetApproachTime(double approachRate) {
             if (approachRate < 5) {
                 return 1800 - 120 * approachRate;
             }
 
             return 1200 - 150 * (approachRate - 5);
+        }
+
+        /// <summary>
+        /// Calculates the radius of a hit circle from a given Circle Size difficulty.
+        /// </summary>
+        /// <param name="circleSize"></param>
+        /// <returns></returns>
+        public static double GetHitObjectRadius(double circleSize) {
+            return (109 - 9 * circleSize) / 2;
+        }
+
+        public static double GetStackOffset(double circleSize) {
+            return GetHitObjectRadius(circleSize) / 10;
         }
 
         /// <summary>
@@ -484,16 +660,16 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 "",
                 "[General]"
             };
-            AddDictionaryToLines(General, lines);
+            FileFormatHelper.AddDictionaryToLines(General, lines);
             lines.Add("");
             lines.Add("[Editor]");
-            AddDictionaryToLines(Editor, lines);
+            FileFormatHelper.AddDictionaryToLines(Editor, lines);
             lines.Add("");
             lines.Add("[Metadata]");
-            AddDictionaryToLines(Metadata, lines);
+            FileFormatHelper.AddDictionaryToLines(Metadata, lines);
             lines.Add("");
             lines.Add("[Difficulty]");
-            AddDictionaryToLines(Difficulty, lines);
+            FileFormatHelper.AddDictionaryToLines(Difficulty, lines);
             lines.Add("");
             lines.Add("[Events]");
             lines.Add("//Background and Video events");
@@ -522,12 +698,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             if (ComboColours.Any()) {
                 lines.Add("");
                 lines.Add("[Colours]");
-                for (int i = 0; i < ComboColours.Count; i++) {
-                    lines.Add("Combo" + (i + 1) + " : " + ComboColours[i]);
-                }
-                foreach (KeyValuePair<string, ComboColour> specialColour in SpecialColours) {
-                    lines.Add(specialColour.Key + " : " + specialColour.Value);
-                }
+                lines.AddRange(ComboColours.Select((t, i) => "Combo" + (i + 1) + " : " + t));
+                lines.AddRange(SpecialColours.Select(specialColour => specialColour.Key + " : " + specialColour.Value));
             }
             lines.Add("");
             lines.Add("[HitObjects]");
@@ -566,7 +738,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             if (eventsWithStartTime.Length > 0)
                 leadInTime = Math.Max(-eventsWithStartTime.Min(o => o.StartTime), leadInTime);
             if (HitObjects.Count > 0) {
-                var approachTime = ApproachRateToMs(Difficulty["ApproachRate"].DoubleValue);
+                var approachTime = GetApproachTime(Difficulty["ApproachRate"].DoubleValue);
                 leadInTime = Math.Max(approachTime - HitObjects[0].Time, leadInTime);
             }
             return leadInTime + window50 + 1000;
@@ -663,44 +835,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Regex r = new Regex($"[{Regex.Escape(regexSearch)}]");
             fileName = r.Replace(fileName, "");
             return fileName;
-        }
-
-        private static void AddDictionaryToLines(Dictionary<string, TValue> dict, List<string> lines) {
-            lines.AddRange(dict.Select(kvp => kvp.Key + ":" + kvp.Value.Value));
-        }
-
-        private static void FillDictionary(Dictionary<string, TValue> dict, List<string> lines) {
-            foreach (var split in lines.Select(SplitKeyValue)) {
-                dict[split[0]] = new TValue(split[1]);
-            }
-        }
-
-        private static string[] SplitKeyValue(string line) {
-            return line.Split(new[] { ':' }, 2);
-        }
-
-        private static List<string> GetCategoryLines(List<string> lines, string category, string[] categoryIdentifiers=null) {
-            if (categoryIdentifiers == null)
-                categoryIdentifiers = new[] { "[" };
-
-            List<string> categoryLines = new List<string>();
-            bool atCategory = false;
-
-            foreach (string line in lines) {
-                if (atCategory && line != "") {
-                    if (categoryIdentifiers.Any(o => line.StartsWith(o))) // Reached another category
-                    {
-                        break;
-                    }
-                    categoryLines.Add(line);
-                }
-                else {
-                    if (line == category) {
-                        atCategory = true;
-                    }
-                }
-            }
-            return categoryLines;
         }
 
         public Beatmap DeepCopy() {

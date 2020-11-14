@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Windows;
 using Mapping_Tools.Classes;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.Generators;
-using Mapping_Tools.Classes.SnappingTools.Serialization;
+using Mapping_Tools.Classes.Tools.SnappingTools.Serialization;
 using Mapping_Tools.Components.Domain;
 
 namespace Mapping_Tools.Views.SnappingTools {

@@ -1,6 +1,4 @@
 ﻿using Mapping_Tools.Classes;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
 using Mapping_Tools.Components.Domain;
 using MaterialDesignThemes.Wpf;
 using System;
@@ -13,6 +11,8 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
+using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
+using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
 
 namespace Mapping_Tools.Views.SnappingTools {
     /// <summary>

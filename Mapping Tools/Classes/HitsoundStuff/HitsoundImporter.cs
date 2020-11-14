@@ -8,6 +8,8 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
+using Mapping_Tools.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Classes.ToolHelpers;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     class HitsoundImporter {

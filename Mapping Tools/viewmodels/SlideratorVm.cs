@@ -12,6 +12,7 @@ using System.Windows;
 using System.Windows.Input;
 using Editor_Reader;
 using Mapping_Tools.Classes;
+using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Components.Graph;
 using Mapping_Tools.Views;
 using Mapping_Tools.Views.Sliderator;
@@ -266,6 +267,9 @@ namespace Mapping_Tools.Viewmodels {
 
         [JsonIgnore]
         public bool Quick { get; set; }
+
+        [JsonIgnore]
+        public bool Reload { get; set; }
 
         #endregion
 

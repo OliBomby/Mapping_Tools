@@ -1,13 +1,6 @@
 ﻿using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.SnappingTools;
-using Mapping_Tools.Classes.SnappingTools.DataStructure;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorCollection;
-using Mapping_Tools.Classes.SnappingTools.Serialization;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Components.Domain;
@@ -27,7 +20,15 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-using Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectCollection;
+using Mapping_Tools.Classes.ToolHelpers;
+using Mapping_Tools.Classes.Tools.SnappingTools;
+using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure;
+using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject;
+using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
+using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectCollection;
+using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
+using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorCollection;
+using Mapping_Tools.Classes.Tools.SnappingTools.Serialization;
 using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
 using MessageBox = System.Windows.MessageBox;
 
@@ -399,7 +400,7 @@ namespace Mapping_Tools.Viewmodels {
             var hitObjects = EditorReaderStuff.GetHitObjects(reader);
 
             // Get the visible hitobjects using approach rate
-            var approachTime = Beatmap.ApproachRateToMs(reader.ApproachRate);
+            var approachTime = Beatmap.GetApproachTime(reader.ApproachRate);
 
             switch (selectionMode) {
                 case SelectedHitObjectMode.AllwaysAllVisible:
@@ -438,7 +439,7 @@ namespace Mapping_Tools.Viewmodels {
             }
 
             var mousePos = GetCursorPosition();
-            var circleRadius = (109 - 9 * reader.CircleSize) / 2;
+            var circleRadius = Beatmap.GetHitObjectRadius(reader.CircleSize);
 
             HitObject closest = null;
             double bestDist = double.PositiveInfinity;

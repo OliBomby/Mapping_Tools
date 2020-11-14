@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
+using Mapping_Tools.Classes.ToolHelpers;
 
 namespace Mapping_Tools.Views.AutoFailDetector {
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
@@ -96,7 +97,7 @@ namespace Mapping_Tools.Views.AutoFailDetector {
             var ar = args.ApproachRateOverride == -1
                 ? editor.Beatmap.Difficulty["ApproachRate"].DoubleValue
                 : args.ApproachRateOverride;
-            var approachTime = (int) Beatmap.ApproachRateToMs(ar);
+            var approachTime = (int) Beatmap.GetApproachTime(ar);
 
             var od = args.OverallDifficultyOverride == -1
                 ? editor.Beatmap.Difficulty["OverallDifficulty"].DoubleValue
@@ -140,8 +141,7 @@ namespace Mapping_Tools.Views.AutoFailDetector {
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(100);
 
             // Do stuff
-            if (args.Quick)
-                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, false));
+            RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, false, args.Quick));
 
             return autoFail ? $"{autoFailDetector.UnloadingObjects.Count} unloading objects detected and {autoFailDetector.PotentialUnloadingObjects.Count} potential unloading objects detected!" :
                 autoFailDetector.PotentialUnloadingObjects.Count > 0 ? $"No auto-fail, but {autoFailDetector.PotentialUnloadingObjects.Count} potential unloading objects detected." : 

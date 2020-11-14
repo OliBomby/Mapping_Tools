@@ -1,11 +1,11 @@
 ﻿using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.SnappingTools;
 using Overlay.NET.Common;
 using Overlay.NET.Wpf;
 using Process.NET.Windows;
 using System;
 using System.Windows;
 using System.Windows.Media;
+using Mapping_Tools.Classes.Tools.SnappingTools;
 using OverlayWindow = Overlay.NET.Wpf.OverlayWindow;
 
 namespace Mapping_Tools.Views.SnappingTools {

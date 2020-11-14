@@ -1,6 +1,6 @@
-﻿using Mapping_Tools.Classes.TimingStudio;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using Mapping_Tools.Classes.Tools.TimingStudio;
 
 
 namespace Mapping_Tools.Viewmodels {

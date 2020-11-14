@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.BeatmapHelper.Enums;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     class HitsoundConverter {
@@ -250,7 +252,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
 
                 if (bestFits == 0) {
-                    throw new Exception("Custom indices can't fit the sample packages.");
+                    throw new Exception("Custom indices can't fit the sample packages.\n" +
+                                        "Maybe you are using an incompatible previous sample schema and growth is disabled.");
                 }
 
                 // Add all the fitted packages as hitsounds

@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.BeatmapHelper.Enums;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     /// <summary>

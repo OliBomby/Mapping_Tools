@@ -1,4 +1,4 @@
-﻿using Mapping_Tools.Classes.ComboColourStudio;
+﻿using Mapping_Tools.Classes.Tools.ComboColourStudio;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools_Tests.Classes.ComboColourStudio {

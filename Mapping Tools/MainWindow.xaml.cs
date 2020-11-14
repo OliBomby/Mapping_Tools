@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Mapping_Tools.Classes.ToolHelpers;
 
 namespace Mapping_Tools {
 
@@ -255,7 +256,8 @@ namespace Mapping_Tools {
                         BackupManager.LoadMapBackup(backupPaths[0], paths[0], false);
                     }
                     catch (BeatmapIncompatibleException ex) {
-                        ex.Show();
+                        var exResult = ex.Show();
+                        if (exResult == MessageBoxResult.Cancel) return;
                         var result = MessageBox.Show("Do you want to load the backup anyways?", "Load backup",
                             MessageBoxButton.YesNo);
                         if (result == MessageBoxResult.Yes) {

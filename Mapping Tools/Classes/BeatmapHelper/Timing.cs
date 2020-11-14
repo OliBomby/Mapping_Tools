@@ -1,4 +1,5 @@
-﻿using Mapping_Tools.Classes.HitsoundStuff;
+﻿using Mapping_Tools.Classes.BeatmapHelper.BeatDivisors;
+using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.MathUtil;
 using System;
 using System.Collections;
@@ -184,39 +185,217 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             set => _timingPoints[index] = value;
         }
 
+        public Timing Copy() {
+            return new Timing(_timingPoints.Select(o => o.Copy()).ToList(), SliderMultiplier);
+        }
+
         #endregion
 
         /// <summary>
         /// Calculates the number of beats between the start time and the end time.
-        /// The resulting number of beats will be rounded to a 1/16 or 1/12 beat divisor.
+        /// Optionally the resulting number of beats will be rounded to a set of beat divisors.
         /// </summary>
         /// <param name="startTime"></param>
         /// <param name="endTime"></param>
         /// <param name="round">To round the number of beats to a snap divisor.</param>
+        /// <param name="divisors">The beat divisors to round to. If null, the default beat divisors will be used.</param>
         /// <returns></returns>
-        public double GetBeatLength(double startTime, double endTime, bool round = false) {
+        public double GetBeatLength(double startTime, double endTime, bool round = false, IBeatDivisor[] divisors = null) {
+            bool reverse = false;
+            if (startTime > endTime) {
+                var endTimeTemp = endTime;
+                endTime = startTime;
+                startTime = endTimeTemp;
+                reverse = true;
+            }
+
             var redlines = GetRedlinesInRange(startTime, endTime, false);
+            divisors = divisors ?? RationalBeatDivisor.GetDefaultBeatDivisors();
 
             double beats = 0;
             double lastTime = startTime;
             var lastRedline = GetRedlineAtTime(startTime);
             foreach (var redline in redlines) {
                 var inc1 = (redline.Offset - lastTime) / lastRedline.MpB;
-                beats += round ? MultiSnapRound(inc1, 16, 12) : inc1;
+                beats += round ? MultiSnapRound(inc1, divisors) : inc1;
 
                 lastTime = redline.Offset;
                 lastRedline = redline;
             }
             var inc2 = (endTime - lastTime) / lastRedline.MpB;
-            beats += round ? MultiSnapRound(inc2, 16, 12) : inc2;
+            beats += round ? MultiSnapRound(inc2, divisors) : inc2;
 
-            return beats;
+            return reverse ? -beats : beats;
         }
 
-        private static double MultiSnapRound(double value, double divisor1, double divisor2) {
-            var round1 = Math.Round(value * divisor1) / divisor1;
-            var round2 = Math.Round(value * divisor2) / divisor2;
-            return Math.Abs(round1 - value) < Math.Abs(round2 - value) ? round1 : round2;
+        private static double MultiSnapRound(double value, IBeatDivisor[] beatDivisors) {
+            double minDiff = double.PositiveInfinity;
+            double bestRound = value;
+
+            foreach (var beatDivisor in beatDivisors) {
+                var round = Math.Round(value / beatDivisor.GetValue()) * beatDivisor.GetValue();
+                var diff = Math.Abs(round - value);
+
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    bestRound = round;
+                }
+            }
+
+            return bestRound;
+        }
+
+        /// <summary>
+        /// Assumes all the redlines are in beat timing and calculates the millisecond time for a beat time.
+        /// 0 beatTime returns originTime.
+        /// </summary>
+        /// <param name="originTime"></param>
+        /// <param name="beatTime"></param>
+        /// <returns></returns>
+        public double GetMilliseconds(double beatTime, double originTime = 0, bool round = false, IBeatDivisor[] divisors = null) {
+            double ms = originTime;
+
+            if (beatTime >= 0) {
+                var redlines = GetRedlinesInRange(0, beatTime, false);
+                TimingPoint lastRedline = GetRedlineAtTime(0);
+                ms += round
+                    ? MultiSnapRound(lastRedline.Offset, divisors) * lastRedline.MpB
+                    : lastRedline.Offset * lastRedline.MpB;
+                foreach (var redline in redlines) {
+                    ms += round 
+                        ? MultiSnapRound(redline.Offset - lastRedline.Offset, divisors) * lastRedline.MpB
+                        : (redline.Offset - lastRedline.Offset) * lastRedline.MpB;
+
+                    lastRedline = redline;
+                }
+                ms += round
+                    ? MultiSnapRound(beatTime - lastRedline.Offset, divisors) * lastRedline.MpB
+                    : (beatTime - lastRedline.Offset) * lastRedline.MpB;
+            } else {
+                var redlines = GetRedlinesInRange(beatTime, 0, false);
+                TimingPoint lastRedline = GetRedlineAtTime(beatTime);
+                ms += round
+                    ? MultiSnapRound(beatTime - lastRedline.Offset, divisors) * lastRedline.MpB
+                    : (beatTime - lastRedline.Offset) * lastRedline.MpB;
+                foreach (var redline in redlines) {
+                    ms -= round
+                        ? MultiSnapRound(redline.Offset - lastRedline.Offset, divisors) * lastRedline.MpB
+                        : (redline.Offset - lastRedline.Offset) * lastRedline.MpB;
+
+                    lastRedline = redline;
+                }
+                ms += round
+                    ? MultiSnapRound(lastRedline.Offset, divisors) * lastRedline.MpB
+                    : lastRedline.Offset * lastRedline.MpB;
+            }
+
+            return ms;
+        }
+
+        /// <summary>
+        /// Assumes all the redlines are in beat timing and calculates the beat time which is X milliseconds offset for a beat time.
+        /// 0 beatTime returns originTime.
+        /// </summary>
+        /// <returns></returns>
+        public double WalkMillisecondsInBeatTime(double startBeatTime, double milliseconds) {
+            double beatTime = startBeatTime;
+
+            if (milliseconds >= 0) {
+                TimingPoint firstRedline = GetRedlineAtTime(startBeatTime);
+                TimingPoint lastRedline = firstRedline;
+                int index = GetTimingPointIndexAfterTime(startBeatTime, _redlines);
+                for (int i = index; i < _redlines.Count && i != -1; i++) {
+                    var redline = _redlines[index];
+                    var beatDiff = lastRedline == firstRedline ? 
+                        redline.Offset - startBeatTime:
+                        redline.Offset - lastRedline.Offset;
+
+                    if (beatDiff * lastRedline.MpB > milliseconds + Precision.DOUBLE_EPSILON) {
+                        break;
+                    }
+
+                    milliseconds -= beatDiff * lastRedline.MpB;
+                    beatTime += beatDiff;
+
+                    lastRedline = redline;
+                }
+                beatTime += milliseconds / lastRedline.MpB;
+            } else {
+                int index = GetTimingPointIndexAtTime(startBeatTime, _redlines);
+                double lastBeatTime = startBeatTime;
+                TimingPoint redline = index == -1 ? GetFirstTimingPointExtended() : _redlines[index];
+                for (int i = index; i >= 0; i--) {
+                    redline = _redlines[index];
+                    double beatDiff = redline.Offset - lastBeatTime;
+
+                    if (beatDiff * redline.MpB < milliseconds - Precision.DOUBLE_EPSILON) {
+                        break;
+                    }
+
+                    milliseconds -= beatDiff * redline.MpB;
+                    beatTime += beatDiff;
+
+                    lastBeatTime = redline.Offset;
+                }
+                beatTime += milliseconds / redline.MpB;
+            }
+
+            return beatTime;
+        }
+
+        /// <summary>
+        /// Assumes all the redlines are in beat timing and calculates the millisecond time for a beat time.
+        /// 0 beatTime returns originTime.
+        /// </summary>
+        /// <param name="originTime"></param>
+        /// <param name="beatTime"></param>
+        /// <returns></returns>
+        public double WalkBeatsInMillisecondTime(double beatTime, double originTime = 0, bool round = false, IBeatDivisor[] divisors = null) {
+            double ms = originTime;
+
+            if (beatTime >= 0) {
+                TimingPoint firstRedline = GetRedlineAtTime(originTime);
+                TimingPoint lastRedline = firstRedline;
+                int index = GetTimingPointIndexAfterTime(originTime, _redlines);
+                for (int i = index; i < _redlines.Count && i != -1; i++) {
+                    var redline = _redlines[index];
+                    var msDiff = lastRedline == firstRedline ?
+                        redline.Offset - originTime :
+                        redline.Offset - lastRedline.Offset;
+                    var beatDiff = round ? MultiSnapRound(msDiff / lastRedline.MpB, divisors) : msDiff / lastRedline.MpB;
+
+                    if (beatDiff > beatTime + Precision.DOUBLE_EPSILON) {
+                        break;
+                    }
+
+                    beatTime -= beatDiff;
+                    ms += msDiff;
+
+                    lastRedline = redline;
+                }
+                ms += beatTime * lastRedline.MpB;
+            } else {
+                int index = GetTimingPointIndexAtTime(originTime, _redlines);
+                double lastBeatTime = originTime;
+                TimingPoint redline = index == -1 ? GetFirstTimingPointExtended() : _redlines[index];
+                for (int i = index; i >= 0; i--) {
+                    redline = _redlines[index];
+                    double msDiff = redline.Offset - lastBeatTime;
+                    var beatDiff = round ? MultiSnapRound(msDiff / redline.MpB, divisors) : msDiff / redline.MpB;
+
+                    if (beatDiff < beatTime - Precision.DOUBLE_EPSILON) {
+                        break;
+                    }
+
+                    beatTime -= beatDiff;
+                    ms += msDiff;
+
+                    lastBeatTime = redline.Offset;
+                }
+                ms += beatTime * redline.MpB;
+            }
+
+            return ms;
         }
 
         /// <summary>
@@ -231,6 +410,24 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             double d = tp.MpB * beatDivisor.GetValue();
             double remainder = ( time - tp.Offset ) % d;
             if( remainder < 0.5 * d ) {
+                return time - remainder;
+            }
+
+            return time - remainder + d;
+        }
+
+        /// <summary>
+        /// This method calculates time of the tick on the timeline which is nearest to specified time in beat time.
+        /// This method is mostly used to snap objects to timing.
+        /// </summary>
+        /// <param name="time">Specified time.</param>
+        /// <param name="tp">Uninherited timing point to get the timing from.</param>
+        /// <param name="beatDivisor">How many beats to have per timeline tick.</param>
+        /// <returns></returns>
+        public static double GetNearestTickBeatTime(double time, TimingPoint tp, IBeatDivisor beatDivisor) {
+            double d = beatDivisor.GetValue();
+            double remainder = (time - tp.Offset) % d;
+            if (remainder < 0.5 * d) {
                 return time - remainder;
             }
 
@@ -262,8 +459,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="tp">The uninherited timing point to snap to. Leave null for automatic selection.</param>
         /// <param name="firstTp">Overwrites the timing for anything that happens before the first timing point.
         ///     You can set this to avoid bad timing when there could be an inherited timing point before the first red line.</param>
+        /// <param name="exactMode">If true, interprets time not as milliseconds and prevents big rounding operations.</param>
         /// <returns>The snapped time.</returns>
-        public double Resnap(double time, IEnumerable<IBeatDivisor> beatDivisors, bool floor=true, TimingPoint tp=null, TimingPoint firstTp=null) {
+        public double Resnap(double time, IEnumerable<IBeatDivisor> beatDivisors, bool floor=true, 
+            TimingPoint tp=null, TimingPoint firstTp=null, bool exactMode=false) {
             TimingPoint beforeTp = tp ?? GetRedlineAtTime(time, firstTp);
             TimingPoint afterTp = tp == null ? GetRedlineAfterTime(time) : null;
 
@@ -280,10 +479,44 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 }
             }
 
-            if (afterTp != null && newTime > beforeTp.Offset + 10 && newTime >= afterTp.Offset - 10) {
+            if (!exactMode && afterTp != null && newTime > beforeTp.Offset + 10 && newTime >= afterTp.Offset - 10) {
                 newTime = afterTp.Offset;
             }
-            return floor ? Math.Floor(newTime) : newTime;
+            return floor && !exactMode ? Math.Floor(newTime + Precision.DOUBLE_EPSILON) : newTime;
+        }
+
+        /// <summary>
+        /// Calculates the snapped beat time for a given beat time and multiple different options.
+        /// </summary>
+        /// <param name="time"></param>
+        /// <param name="beatDivisors"></param>
+        /// <param name="tp">The uninherited timing point to snap to. Leave null for automatic selection.</param>
+        /// <param name="firstTp">Overwrites the timing for anything that happens before the first timing point.
+        ///     You can set this to avoid bad timing when there could be an inherited timing point before the first red line.</param>
+        /// <param name="exactMode">If true, interprets time not as milliseconds and prevents big rounding operations.</param>
+        /// <returns>The snapped time.</returns>
+        public double ResnapBeatTime(double time, IEnumerable<IBeatDivisor> beatDivisors,
+            TimingPoint tp = null, TimingPoint firstTp = null, bool exactMode = false) {
+            TimingPoint beforeTp = tp ?? GetRedlineAtTime(time, firstTp);
+            TimingPoint afterTp = tp == null ? GetRedlineAfterTime(time) : null;
+
+            double newTime = 0;
+            double lowestDistance = double.PositiveInfinity;
+
+            foreach (var beatDivisor in beatDivisors) {
+                var t = GetNearestTickBeatTime(time, beforeTp, beatDivisor);
+                var d = Math.Abs(time - t);
+
+                if (d < lowestDistance) {
+                    lowestDistance = d;
+                    newTime = t;
+                }
+            }
+
+            if (!exactMode && afterTp != null && newTime > beforeTp.Offset + 10 / beforeTp.MpB && newTime >= afterTp.Offset - 10 / beforeTp.MpB) {
+                newTime = afterTp.Offset;
+            }
+            return newTime;
         }
 
         /// <summary>
@@ -313,7 +546,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 }
             }
 
-            return floor ? Math.Floor(newDuration) : newDuration;
+            return floor ? Math.Floor(newDuration + Precision.DOUBLE_EPSILON) : newDuration;
         }
 
         /// <summary>
@@ -354,8 +587,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 newTime = time;
             }
 
-            return floor ? Math.Floor(newTime) : newTime;
+            return floor ? Math.Floor(newTime + Precision.DOUBLE_EPSILON) : newTime;
         }
+
+        #region TimingPointGetters
 
         /// <summary>
         /// Finds the timing point which is in effect at a given time with a custom set of timing points.
@@ -365,13 +600,24 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="firstTimingpoint">The first timing point to start searching from.</param>
         /// <returns></returns>
         public static TimingPoint GetTimingPointAtTime(double time, IReadOnlyList<TimingPoint> timingPoints, TimingPoint firstTimingpoint) {
+            var index = GetTimingPointIndexAtTime(time, timingPoints);
+            return index != -1 ? timingPoints[index] : firstTimingpoint;
+        }
+
+        /// <summary>
+        /// Finds the index of the timing point which is in effect at a given time with a custom set of timing points.
+        /// </summary>
+        /// <param name="time"></param>
+        /// <param name="timingPoints">All the timing points.</param>
+        /// <returns></returns>
+        public static int GetTimingPointIndexAtTime(double time, IReadOnlyList<TimingPoint> timingPoints) {
             var index = BinarySearchUtil.BinarySearch(timingPoints, time, tp => tp.Offset, BinarySearchUtil.EqualitySelection.Rightmost);
             if (index < 0) {
                 index = ~index;
-                return index == 0 ? firstTimingpoint : timingPoints[index - 1];
+                return index == 0 ? -1 : index - 1;
             }
 
-            return timingPoints[index];
+            return index;
         }
 
         /// <summary>
@@ -381,14 +627,25 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="timingPoints"></param>
         /// <returns></returns>
         public static TimingPoint GetTimingPointAfterTime(double time, IReadOnlyList<TimingPoint> timingPoints) {
+            var index = GetTimingPointIndexAfterTime(time, timingPoints);
+            return index != -1 ? timingPoints[index] : null;
+        }
+
+        /// <summary>
+        /// Gets the index of the first timing point after specified time.
+        /// </summary>
+        /// <param name="time"></param>
+        /// <param name="timingPoints"></param>
+        /// <returns></returns>
+        public static int GetTimingPointIndexAfterTime(double time, IReadOnlyList<TimingPoint> timingPoints) {
             var index = BinarySearchUtil.BinarySearch(timingPoints, time, tp => tp.Offset, BinarySearchUtil.EqualitySelection.Rightmost);
             if (index < 0) {
                 index = ~index;
 
-                return index < timingPoints.Count ? timingPoints[index] : null;
+                return index < timingPoints.Count ? index : -1;
             }
 
-            return index + 1 < timingPoints.Count ? timingPoints[index + 1] : null;
+            return index + 1 < timingPoints.Count ? index + 1 : -1;
         }
 
         public static List<TimingPoint> GetTimingPointsInRange(double startTime, double endTime,
@@ -525,6 +782,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             var afterTp = GetTimingPointAfterTime(timingPoint.Offset, _timingPoints);
             return afterTp?.Offset ?? double.PositiveInfinity;
         }
+        
+        #endregion
 
         /// <summary>
         /// Calculates the duration of a slider using the slider velocity and milliseconds per beat at a given time, global multiplier and the pixel length.
@@ -539,6 +798,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public double CalculateSliderTemporalLength(double time, double length, double sv) {
             return (length * GetMpBAtTime(time) * (double.IsNaN(sv) ? -100 : MathHelper.Clamp(sv, -1000, -10))) / 
+                   (-10000 * SliderMultiplier);
+        }
+
+        public double CalculateSliderBeatLength(double length, double sv) {
+            return (length * (double.IsNaN(sv) ? -100 : MathHelper.Clamp(sv, -1000, -10))) / 
                    (-10000 * SliderMultiplier);
         }
 

@@ -3,9 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Mapping_Tools.Classes.HitsoundStuff;
+using Mapping_Tools.Classes.BeatmapHelper.BeatDivisors;
+using Mapping_Tools.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.SliderPathStuff;
 using Newtonsoft.Json;
 using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
 
@@ -32,6 +33,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             bool normal, bool whistle, bool finish, bool clap, SampleSet sampleSet, SampleSet additionSet,
             int index, double volume, string filename) {
             Pos = pos;
+            // Let the end position be the same as the start position before changed later for sliders
+            EndPos = Pos;
             Time = time;
             SetObjectType(type);
             NewCombo = newCombo;
@@ -50,6 +53,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public HitObject(Vector2 pos, double time, int type, int hitsounds, SampleSet sampleSet, SampleSet additionSet,
             int index, double volume, string filename) {
             Pos = pos;
+            // Let the end position be the same as the start position before changed later for sliders
+            EndPos = Pos;
             Time = time;
             SetObjectType(type);
             SetHitsounds(hitsounds);
@@ -63,6 +68,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public HitObject(double time, int hitsounds, SampleSet sampleSet, SampleSet additions) {
             // Basic hitsoundind circle
             Pos = new Vector2(256, 192);
+            // Let the end position be the same as the start position before changed later for sliders
+            EndPos = Pos;
             Time = time;
             SetObjectType(5);
             SetHitsounds(hitsounds);
@@ -109,6 +116,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
 
             Pos = new Vector2(ob.X, ob.Y);
+            // Let the end position be the same as the start position before changed later for sliders
+            EndPos = Pos;
+
             Filename = ob.SampleFile;
             SampleVolume = ob.SampleVolume;
             SampleSet = (SampleSet) ob.SampleSet;
@@ -123,7 +133,25 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             set => SetLine(value);
         }
 
+        /// <summary>
+        /// Base position of hit object.
+        /// </summary>
         public Vector2 Pos { get; set; }
+
+        /// <summary>
+        /// Position of slider end. By default is equal to the start position.
+        /// </summary>
+        public Vector2 EndPos { get; set; }
+
+        /// <summary>
+        /// Stacked position of hit object. Must be computed by beatmap.
+        /// </summary>
+        public Vector2 StackedPos { get; set; }
+
+        /// <summary>
+        /// Stacked slider end position of hit object. Must be computed by beatmap.
+        /// </summary>
+        public Vector2 StackedEndPos { get; set; }
 
         public double Time { get; set; }
 
@@ -206,6 +234,12 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             TemporalLength = Repeat == 0 ? 0 : (value - Time) / Repeat;
         }
 
+        /// <summary>
+        /// The stack count indicates the number of hit objects that this object is stacked upon.
+        /// Used for calculating stack offset.
+        /// </summary>
+        public int StackCount { get; set; }
+
         // Special combined with greenline
         [JsonProperty]
         public double SliderVelocity { get; set; }
@@ -241,6 +275,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             if (TryParseDouble(values[0], out var x) && TryParseDouble(values[1], out var y))
                 Pos = new Vector2(x, y);
             else throw new BeatmapParsingException("Failed to parse coordinate of hit object.", line);
+
+            // Let the end position be the same as the start position before changed later for sliders
+            EndPos = Pos;
 
             if (TryParseDouble(values[2], out var t))
                 Time = t;
@@ -478,6 +515,36 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         /// <summary>
+        /// Removes all hitounds and sets samplesets to auto.
+        /// Also clears hitsounds from timeline objects and clears body hitsounds.
+        /// </summary>
+        public void ResetHitsounds() {
+            SetHitsounds(1);
+            SampleSet = SampleSet.Auto;
+            AdditionSet = SampleSet.Auto;
+            SampleVolume = 0;
+            CustomIndex = 0;
+            Filename = string.Empty;
+            if (IsSlider) {
+                for (int i = 0; i < EdgeHitsounds.Count; i++) {
+                    EdgeHitsounds[i] = 0;
+                }
+                for (int i = 0; i < EdgeSampleSets.Count; i++) {
+                    EdgeSampleSets[i] = SampleSet.Auto;
+                }
+                for (int i = 0; i < EdgeAdditionSets.Count; i++) {
+                    EdgeAdditionSets[i] = SampleSet.Auto;
+                }
+            }
+
+            foreach (var tlo in TimelineObjects) {
+                tlo.ResetHitsounds();
+            }
+
+            BodyHitsounds.Clear();
+        }
+
+        /// <summary>
         /// </summary>
         /// <param name="deltaTime"></param>
         public void MoveTime(double deltaTime) {
@@ -495,13 +562,24 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             ChangeTemporalTime(timing, deltaTime / Repeat);
         }
 
+        public void CalculateSliderTemporalLength(Timing timing, bool useOwnSv) {
+            if (!IsSlider) return;
+            if (double.IsNaN(PixelLength) || PixelLength < 0 || CurvePoints.All(o => o == Pos)) {
+                TemporalLength = 0;
+            } else {
+                TemporalLength = useOwnSv
+                    ? timing.CalculateSliderTemporalLength(Time, PixelLength, SliderVelocity)
+                    : timing.CalculateSliderTemporalLength(Time, PixelLength);
+            }
+        }
+
         public void ChangeTemporalTime(Timing timing, double deltaTemporalTime) {
             if (Repeat == 0) return;
 
             if (IsSlider) {
                 var deltaLength = -10000 * timing.SliderMultiplier * deltaTemporalTime /
                                   (UnInheritedTimingPoint.MpB *
-                                   SliderVelocity); // Divide by repeats because the endtime is multiplied by repeats
+                                   (double.IsNaN(SliderVelocity) ? -100 : SliderVelocity)); // Divide by repeats because the endtime is multiplied by repeats
                 PixelLength += deltaLength; // Change the pixel length to match the new time
             }
 
@@ -509,12 +587,23 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             TemporalLength += deltaTemporalTime;
 
             // Move body objects
-            for (int i = 0; i <= Math.Min(Repeat, TimelineObjects.Count - 1); i++) {
+            UpdateTimelineObjectTimes();
+
+            BodyHitsounds.RemoveAll(s => s.Offset >= EndTime);
+        }
+
+        public void UpdateTimelineObjectTimes() {
+            for (int i = 0; i < Math.Min(Repeat + 1, TimelineObjects.Count); i++) {
                 double time = Math.Floor(Time + TemporalLength * i);
                 TimelineObjects[i].Time = time;
             }
+        }
 
-            BodyHitsounds.RemoveAll(s => s.Offset >= EndTime);
+        /// <summary>
+        /// Calculates the <see cref="EndPos"/> for sliders.
+        /// </summary>
+        public void CalculateEndPosition() {
+            EndPos = IsSlider ? GetSliderPath().PositionAt(1) : Pos;
         }
 
         /// <summary>
@@ -524,6 +613,16 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Pos += delta;
             if (!IsSlider) return;
             for (var i = 0; i < CurvePoints.Count; i++) CurvePoints[i] = CurvePoints[i] + delta;
+        }
+
+        /// <summary>
+        /// Apply a 2x2 transformation matrix to the positions and curve points.
+        /// </summary>
+        /// <param name="mat"></param>
+        public void Transform(Matrix2 mat) {
+            Pos = Matrix2.Mult(mat, Pos);
+            if (!IsSlider) return;
+            for (var i = 0; i < CurvePoints.Count; i++) CurvePoints[i] = Matrix2.Mult(mat, CurvePoints[i]);;
         }
 
         public bool ResnapSelf(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint tp = null,
@@ -539,14 +638,25 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             // If there is a redline in the sliderbody then the sliderend gets snapped to a tick of the latest redline
             if (!IsSlider || timing.TimingPoints.Any(o => o.Uninherited && o.Offset <= EndTime + 20 && o.Offset > Time))
                 return ResnapEndTime(timing, beatDivisors, floor, tp, firstTp);
+
             return ResnapEndClassic(timing, beatDivisors, firstTp);
         }
 
         public bool ResnapEndTime(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint tp = null,
             TimingPoint firstTp = null) {
             var newTime = timing.Resnap(EndTime, beatDivisors, floor, tp: tp, firstTp: firstTp);
+
             var deltaTime = newTime - EndTime;
             MoveEndTime(timing, deltaTime);
+
+            return Math.Abs(deltaTime) > Precision.DOUBLE_EPSILON;
+        }
+
+        public bool ResnapEndClassic(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, TimingPoint firstTp = null) {
+            var newTemporalLength = timing.ResnapDuration(Time, TemporalLength, beatDivisors, false, firstTp: firstTp);
+
+            var deltaTime = newTemporalLength - TemporalLength;
+            ChangeTemporalTime(timing, deltaTime);
 
             return Math.Abs(deltaTime) > Precision.DOUBLE_EPSILON;
         }
@@ -562,15 +672,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Move(new Vector2(dX, dY));
 
             return Math.Abs(dX) > Precision.DOUBLE_EPSILON || Math.Abs(dY) > Precision.DOUBLE_EPSILON;
-        }
-
-        public bool ResnapEndClassic(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, TimingPoint firstTp = null) {
-            var newTemporalLength = timing.ResnapDuration(Time, TemporalLength, beatDivisors, false, firstTp: firstTp);
-
-            var deltaTime = newTemporalLength - TemporalLength;
-            ChangeTemporalTime(timing, deltaTime);
-
-            return Math.Abs(deltaTime) > Precision.DOUBLE_EPSILON;
         }
 
         public double GetResnappedTime(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint tp = null,

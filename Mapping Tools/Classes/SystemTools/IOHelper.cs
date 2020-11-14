@@ -5,6 +5,7 @@ using Mapping_Tools.Classes.Tools;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using OsuMemoryDataProvider;
 using System.Windows.Forms;
+using Mapping_Tools.Classes.ToolHelpers;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public class IOHelper {
@@ -48,6 +49,18 @@ namespace Mapping_Tools.Classes.SystemTools {
                 InitialDirectory = initialDirectory,
                 RestoreDirectory = restore
             } ) {
+                saveFileDialog1.ShowDialog();
+                return saveFileDialog1.FileName;
+            }
+        }
+
+        public static string ZipFileDialog() {
+            using (OpenFileDialog saveFileDialog1 = new OpenFileDialog {
+                Filter = "ZIP File|*.zip",
+                FilterIndex = 1,
+                RestoreDirectory = true,
+                CheckFileExists = true
+            }) {
                 saveFileDialog1.ShowDialog();
                 return saveFileDialog1.FileName;
             }

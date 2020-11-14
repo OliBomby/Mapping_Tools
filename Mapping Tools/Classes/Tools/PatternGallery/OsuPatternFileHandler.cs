@@ -7,6 +7,8 @@ using Newtonsoft.Json;
 
 namespace Mapping_Tools.Classes.Tools.PatternGallery {
     public class OsuPatternFileHandler {
+        public string PatternFilesFolderName => @"Pattern Files";
+
         [JsonIgnore]
         public string BasePath { get; set; }
 
@@ -31,11 +33,19 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
         }
 
         public string GetPatternFilesFolderPath() {
-            return Path.Combine(GetCollectionFolderPath(), @"Pattern Files");
+            return Path.Combine(BasePath, GetPatternFilesFolderRelativePath());
+        }
+
+        public string GetPatternFilesFolderRelativePath() {
+            return Path.Combine(CollectionFolderName, PatternFilesFolderName);
         }
 
         public string GetPatternPath(string fileName) {
             return Path.Combine(GetPatternFilesFolderPath(), fileName);
+        }
+
+        public string GetPatternRelativePath(string fileName) {
+            return Path.Combine(GetPatternFilesFolderRelativePath(), fileName);
         }
 
         /// <summary>
@@ -55,7 +65,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             if (CollectionFolderName == newName) return;
 
             if (CollectionFolderExists(newName)) {
-                throw new DuplicateNameException($"A collection with the name {newName} already exists in {BasePath}.");
+                throw new DuplicateNameException($"A collection with the name \"{newName}\" already exists in {BasePath}.");
             }
 
             Directory.Move(GetCollectionFolderPath(), Path.Combine(BasePath, newName));

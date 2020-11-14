@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Mapping_Tools.Classes.BeatmapHelper.Enums;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     /// <summary>
@@ -231,6 +232,15 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 default:
                     throw new ArgumentOutOfRangeException(nameof(hitsound), hitsound, null);
             }
+        }
+
+        public void ResetHitsounds() {
+            Normal = false;
+            Whistle = false;
+            Finish = false;
+            Clap = false;
+            SampleSet = SampleSet.Auto;
+            AdditionSet = SampleSet.Auto;
         }
 
         /// <summary>

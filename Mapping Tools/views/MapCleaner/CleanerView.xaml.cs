@@ -9,7 +9,9 @@ using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
+using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Classes.Tools.MapCleanerStuff;
 using Mapping_Tools.Components.TimeLine;
 using Mapping_Tools.Viewmodels;
 
@@ -92,7 +94,7 @@ namespace Mapping_Tools.Views.MapCleaner {
         }
 
         private string Run_Program(MapCleanerVm args, BackgroundWorker worker, DoWorkEventArgs _) {
-            var result = new Classes.Tools.MapCleaner.MapCleanerResult();
+            var result = new MapCleanerResult();
 
             var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
 
@@ -102,7 +104,7 @@ namespace Mapping_Tools.Views.MapCleaner {
                 List<TimingPoint> orgininalTimingPoints = editor.Beatmap.BeatmapTiming.TimingPoints.Select(tp => tp.Copy()).ToList();
                 int oldTimingPointsCount = editor.Beatmap.BeatmapTiming.TimingPoints.Count;
 
-                result.Add(Classes.Tools.MapCleaner.CleanMap(editor, args.MapCleanerArgs, worker));
+                result.Add(Classes.Tools.MapCleanerStuff.MapCleaner.CleanMap(editor, args.MapCleanerArgs, worker));
 
                 // Update result with removed count
                 int removed = oldTimingPointsCount - editor.Beatmap.BeatmapTiming.TimingPoints.Count;
@@ -119,7 +121,7 @@ namespace Mapping_Tools.Views.MapCleaner {
 
                     int oldTimingPointsCount = editor.Beatmap.BeatmapTiming.TimingPoints.Count;
 
-                    result.Add(Classes.Tools.MapCleaner.CleanMap(editor, args.MapCleanerArgs, worker));
+                    result.Add(Classes.Tools.MapCleanerStuff.MapCleaner.CleanMap(editor, args.MapCleanerArgs, worker));
 
                     // Update result with removed count
                     int removed = oldTimingPointsCount - editor.Beatmap.BeatmapTiming.TimingPoints.Count;
@@ -131,8 +133,7 @@ namespace Mapping_Tools.Views.MapCleaner {
             }
 
             // Do stuff
-            if (args.Quick)
-                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, reader != null));
+            RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, reader != null, args.Quick));
 
             // Make an accurate message
             string message = $"Successfully {(result.TimingPointsRemoved < 0 ? "added" : "removed")} {Math.Abs(result.TimingPointsRemoved)} {(Math.Abs(result.TimingPointsRemoved) == 1 ? "greenline" : "greenlines")}" +

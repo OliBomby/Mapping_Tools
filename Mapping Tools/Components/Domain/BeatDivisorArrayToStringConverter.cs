@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Controls;
 using System.Windows.Data;
+using Mapping_Tools.Classes.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Classes.SystemTools;
 
 namespace Mapping_Tools.Components.Domain {

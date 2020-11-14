@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Reflection;
-using System.Windows;
-using Mapping_Tools.Classes;
+﻿using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
-using Mapping_Tools.Views.RhythmGuide;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Windows.Controls;
 
 namespace Mapping_Tools.Views {
     public class ViewCollection {
@@ -66,7 +62,13 @@ namespace Mapping_Tools.Views {
         public object GetView(Type type) {
             try {
                 if (!Views.ContainsKey(type)) {
-                    Views.Add(type, Activator.CreateInstance(type));
+                    object newView = Activator.CreateInstance(type);
+                    Views.Add(type, newView);
+
+                    // Attach event handler for QuickRun tools
+                    if (newView is IQuickRun qr) {
+                        qr.RunFinished += ListenerManager.RunFinishedEventHandler;
+                    }
                 }
             } catch (Exception ex) {
                 ex.Show();
