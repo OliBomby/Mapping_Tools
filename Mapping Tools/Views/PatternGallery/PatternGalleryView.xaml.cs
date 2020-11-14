@@ -278,5 +278,11 @@ namespace Mapping_Tools.Views.PatternGallery {
                 QuickRun();
             } catch (Exception ex) { ex.Show(); }
         }
+
+        private void CollectionName_MouseDown(object sender, MouseButtonEventArgs e) {
+            if (e.ClickCount == 2) {
+                DoRenameCollection(sender, null);
+            }
+        }
     }
 }

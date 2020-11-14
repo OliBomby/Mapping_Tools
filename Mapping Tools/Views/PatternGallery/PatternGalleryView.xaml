@@ -20,19 +20,11 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid Name="FirstGrid" Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="20"/>
-                <ColumnDefinition Width="240"/>
-            </Grid.ColumnDefinitions>
-
             <Grid Margin="0,0,0,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-
 
                 <StackPanel Orientation="Horizontal" Grid.Row="0">
                 <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
@@ -59,216 +51,243 @@
                       </TextBlock>
                   </materialDesign:PopupBox>
                 </StackPanel>
-              
-                <DataGrid
-                    Grid.Row="1"
-                    Margin="0 18 0 0"
-                    ItemsSource="{Binding Patterns}"
-                    CanUserSortColumns="True"
-                    CanUserAddRows="False"
-                    AutoGenerateColumns="False"
-                    materialDesign:DataGridAssist.CellPadding="13 8 8 8"
-                    materialDesign:DataGridAssist.ColumnHeaderPadding="8"
-                    VerticalScrollBarVisibility="Auto">
-                    <DataGrid.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Header="Delete" Command="{Binding RemoveCommand}" Tag="Delete"
+
+                <TextBlock 
+                    Grid.Row="0"
+                    FontSize="35"
+                    FontWeight="Thin"
+                    Foreground="{DynamicResource PrimaryHueLightBrush}"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Text="{Binding CollectionName}"
+                    MouseDown="CollectionName_MouseDown">
+                </TextBlock>
+
+                <Grid Grid.Row="1" Margin="0 18 0 0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="240"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid Grid.Column="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <DataGrid
+                            Grid.Row="0"
+                            Margin="0 0 0 0"
+                            ItemsSource="{Binding Patterns}"
+                            CanUserSortColumns="True"
+                            CanUserAddRows="False"
+                            AutoGenerateColumns="False"
+                            materialDesign:DataGridAssist.CellPadding="13 8 8 8"
+                            materialDesign:DataGridAssist.ColumnHeaderPadding="8"
+                            VerticalScrollBarVisibility="Auto"
+                            VerticalAlignment="Stretch">
+                            <DataGrid.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Delete" Command="{Binding RemoveCommand}" Tag="Delete"
                                       ToolTip="Delete selected patterns. Hold shift to skip dialog.">
-                                <MenuItem.Icon>
-                                    <materialDesign:PackIcon Kind="TrashCan"/>
-                                </MenuItem.Icon>
-                            </MenuItem>
-                            <MenuItem Header="Open in File Explorer" Command="{Binding OpenExplorerSelectedCommand}"
+                                        <MenuItem.Icon>
+                                            <materialDesign:PackIcon Kind="TrashCan"/>
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <MenuItem Header="Open in File Explorer" Command="{Binding OpenExplorerSelectedCommand}"
                                       ToolTip="Open the source files of the selected patterns in the File Explorer.">
-                                <MenuItem.Icon>
-                                    <materialDesign:PackIcon Kind="ArrowTopRightThick"/>
-                                </MenuItem.Icon>
-                            </MenuItem>
-                        </ContextMenu>
-                    </DataGrid.ContextMenu>
-                    <DataGrid.Resources>
-                        <Style TargetType="DataGridRow" BasedOn="{StaticResource MaterialDesignDataGridRow}">
-                            <Setter Property="IsSelected"
+                                        <MenuItem.Icon>
+                                            <materialDesign:PackIcon Kind="ArrowTopRightThick"/>
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                </ContextMenu>
+                            </DataGrid.ContextMenu>
+                            <DataGrid.Resources>
+                                <Style TargetType="DataGridRow" BasedOn="{StaticResource MaterialDesignDataGridRow}">
+                                    <Setter Property="IsSelected"
                                 Value="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                            <EventSetter Event="MouseDoubleClick" Handler="PatternRow_MouseDoubleClick"/>
-                        </Style>
-                    </DataGrid.Resources>
-                    <DataGrid.Columns>
-                        <DataGridCheckBoxColumn
+                                    <EventSetter Event="MouseDoubleClick" Handler="PatternRow_MouseDoubleClick"/>
+                                </Style>
+                            </DataGrid.Resources>
+                            <DataGrid.Columns>
+                                <DataGridCheckBoxColumn
                             Binding="{Binding IsSelected}"
                             ElementStyle="{StaticResource MaterialDesignDataGridCheckBoxColumnStyle}"
                             EditingElementStyle="{StaticResource MaterialDesignDataGridCheckBoxColumnEditingStyle}">
-                            <DataGridCheckBoxColumn.Header>
-                                <!--padding to allow hit test to pass thru for sorting -->
-                                <Border
+                                    <DataGridCheckBoxColumn.Header>
+                                        <!--padding to allow hit test to pass thru for sorting -->
+                                        <Border
                                     Background="Transparent"
                                     Padding="6 0 6 0"
                                     HorizontalAlignment="Center">
-                                    <CheckBox
+                                            <CheckBox
                                         HorizontalAlignment="Center"
                                         DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext}"
                                         IsChecked="{Binding IsAllItemsSelected}" />
-                                </Border>
-                            </DataGridCheckBoxColumn.Header>
-                        </DataGridCheckBoxColumn>
-                        <materialDesign:MaterialDataGridTextColumn
+                                        </Border>
+                                    </DataGridCheckBoxColumn.Header>
+                                </DataGridCheckBoxColumn>
+                                <materialDesign:MaterialDataGridTextColumn
                             Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
                             Header="Name"
                             EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}" />
-                        <materialDesign:MaterialDataGridTextColumn
+                                <materialDesign:MaterialDataGridTextColumn
                             Binding="{Binding UseCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                             Header="Use count"/>
-                        <materialDesign:MaterialDataGridTextColumn
+                                <materialDesign:MaterialDataGridTextColumn
                             Binding="{Binding ObjectCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                             Header="Object count"/>
-                        <materialDesign:MaterialDataGridTextColumn
+                                <materialDesign:MaterialDataGridTextColumn
                             Binding="{Binding Duration, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                             Header="Duration"/>
-                        <materialDesign:MaterialDataGridTextColumn
+                                <materialDesign:MaterialDataGridTextColumn
                             Binding="{Binding BeatLength, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                             Header="Number of beats"/>
-                        <materialDesign:MaterialDataGridTextColumn
+                                <materialDesign:MaterialDataGridTextColumn
                             Binding="{Binding CreationTime, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                             Header="Time of creation"/>
-                        <materialDesign:MaterialDataGridTextColumn
+                                <materialDesign:MaterialDataGridTextColumn
                             Binding="{Binding LastUsedTime, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                             Header="Time of last use"/>
-                    </DataGrid.Columns>
-                </DataGrid>
+                            </DataGrid.Columns>
+                        </DataGrid>
 
-                <StackPanel
-                        Grid.Row="2"
-                        Margin="5"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Bottom"
-                        Orientation="Horizontal">
-                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a pattern from .osu code." Command="{Binding AddCodeCommand}" Margin="5">
-                        <materialDesign:PackIcon Kind="CodeBraces" Height="24" Width="24" />
-                    </Button>
-                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a pattern from a file." Command="{Binding AddFileCommand}" Margin="5">
-                        <materialDesign:PackIcon Kind="FilePlus" Height="24" Width="24" />
-                    </Button>
-                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a pattern from selected hit objects." Command="{Binding AddSelectedCommand}" Margin="5">
-                        <materialDesign:PackIcon Kind="PlusBox" Height="24" Width="24" />
-                    </Button>
-                    <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Delete selected patterns. Hold shift to skip dialog." Command="{Binding RemoveCommand}" Margin="5">
-                        <materialDesign:PackIcon Kind="Trashcan" Height="24" Width="24" />
-                    </Button>
-                </StackPanel>
-            </Grid>
+                        <StackPanel
+                            Grid.Row="1"
+                            Margin="5"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Bottom"
+                            Orientation="Horizontal">
+                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a pattern from .osu code." Command="{Binding AddCodeCommand}" Margin="5">
+                                <materialDesign:PackIcon Kind="CodeBraces" Height="24" Width="24" />
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a pattern from a file." Command="{Binding AddFileCommand}" Margin="5">
+                                <materialDesign:PackIcon Kind="FilePlus" Height="24" Width="24" />
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a pattern from selected hit objects." Command="{Binding AddSelectedCommand}" Margin="5">
+                                <materialDesign:PackIcon Kind="PlusBox" Height="24" Width="24" />
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Delete selected patterns. Hold shift to skip dialog." Command="{Binding RemoveCommand}" Margin="5">
+                                <materialDesign:PackIcon Kind="Trashcan" Height="24" Width="24" />
+                            </Button>
+                        </StackPanel>
+                    </Grid>
 
-            <GridSplitter Grid.Column="1" Width="2" Margin="0,72,0,10" HorizontalAlignment="Center"/>
+                    <GridSplitter Grid.Column="1" Width="2" Margin="0,0,0,10" HorizontalAlignment="Center"/>
 
-            <Grid Grid.Column="2" Margin="0 72 0 0">
-                <StackPanel>
-                    <ComboBox SelectedItem="{Binding ExportTimeMode}" ItemsSource="{Binding ExportTimeModes}"
+                    <Grid Grid.Column="2" Margin="0 0 0 0">
+                        <StackPanel>
+                            <ComboBox SelectedItem="{Binding ExportTimeMode}" ItemsSource="{Binding ExportTimeModes}"
                               Style="{StaticResource MaterialDesignFloatingHintComboBox}"
                               materialDesign:HintAssist.Hint="Export offset" Margin="0 7 0 0"
                               ToolTip="Determines at what time to put the pattern."/>
-                    <TextBox Margin="0 5 0 0" materialDesign:HintAssist.Hint="Custom export offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                            <TextBox Margin="0 5 0 0" materialDesign:HintAssist.Hint="Custom export offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                              ToolTip="Determines at what time to put the pattern for the custom offset mode." 
                              Visibility="{Binding CustomExportTimeVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
-                        <TextBox.Text>
-                            <Binding Path="CustomExportTime" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
-                                <Binding.Converter>
-                                    <domain:TimeToStringConverter/>
-                                </Binding.Converter>
-                            </Binding>
-                        </TextBox.Text>
-                    </TextBox>
-                    <TextBox Margin="0 5 0 0" materialDesign:HintAssist.Hint="Deletion margin" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                <TextBox.Text>
+                                    <Binding Path="CustomExportTime" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
+                                        <Binding.Converter>
+                                            <domain:TimeToStringConverter/>
+                                        </Binding.Converter>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
+                            <TextBox Margin="0 5 0 0" materialDesign:HintAssist.Hint="Deletion margin" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                              ToolTip="Extra time in milliseconds around the patterns for deleting parts of the original map.">
-                        <TextBox.Text>
-                            <Binding Path="Padding" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
-                                <Binding.Converter>
-                                    <domain:DoubleToStringConverter/>
-                                </Binding.Converter>
-                                <Binding.ValidationRules>
-                                    <domain:IsGreaterOrEqualValidationRule>
-                                        <domain:IsGreaterOrEqualValidationRule.ValueWrapper>
-                                            <domain:DoubleWrapper Value="0"/>
-                                        </domain:IsGreaterOrEqualValidationRule.ValueWrapper>
-                                    </domain:IsGreaterOrEqualValidationRule>
-                                </Binding.ValidationRules>
-                            </Binding>
-                        </TextBox.Text>
-                    </TextBox>
-                    <TextBox Margin="0 5 0 0" materialDesign:HintAssist.Hint="Parting distance" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                <TextBox.Text>
+                                    <Binding Path="Padding" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
+                                        <Binding.Converter>
+                                            <domain:DoubleToStringConverter/>
+                                        </Binding.Converter>
+                                        <Binding.ValidationRules>
+                                            <domain:IsGreaterOrEqualValidationRule>
+                                                <domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                                    <domain:DoubleWrapper Value="0"/>
+                                                </domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                            </domain:IsGreaterOrEqualValidationRule>
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
+                            <TextBox Margin="0 5 0 0" materialDesign:HintAssist.Hint="Parting distance" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                              ToolTip="Minimum number of beats required in a gap to split a pattern into smaller parts.">
-                        <TextBox.Text>
-                            <Binding Path="PartingDistance" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
-                                <Binding.Converter>
-                                    <domain:DoubleToStringConverter/>
-                                </Binding.Converter>
-                                <Binding.ValidationRules>
-                                    <domain:IsGreaterOrEqualValidationRule>
-                                        <domain:IsGreaterOrEqualValidationRule.ValueWrapper>
-                                            <domain:DoubleWrapper Value="0"/>
-                                        </domain:IsGreaterOrEqualValidationRule.ValueWrapper>
-                                    </domain:IsGreaterOrEqualValidationRule>
-                                </Binding.ValidationRules>
-                            </Binding>
-                        </TextBox.Text>
-                    </TextBox>
-                    <TextBox Text="{Binding BeatDivisors, Converter={StaticResource BeatDivisorArrayToStringConverter}}" 
+                                <TextBox.Text>
+                                    <Binding Path="PartingDistance" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
+                                        <Binding.Converter>
+                                            <domain:DoubleToStringConverter/>
+                                        </Binding.Converter>
+                                        <Binding.ValidationRules>
+                                            <domain:IsGreaterOrEqualValidationRule>
+                                                <domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                                    <domain:DoubleWrapper Value="0"/>
+                                                </domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                            </domain:IsGreaterOrEqualValidationRule>
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
+                            <TextBox Text="{Binding BeatDivisors, Converter={StaticResource BeatDivisorArrayToStringConverter}}" 
                              Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                              materialDesign:HintAssist.Hint="Beat divisors" Margin="0 5 0 0"
                              ToolTip="Input any number of beat divisors here separated with commas. Example: 1/4, 1/12, 1/7, 4/5, 0.13435622499"/>
-                    <Grid Margin="0 5 0 0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="5"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox Text="{Binding CustomScale, Converter={StaticResource D2SConverter}}" 
+                            <Grid Margin="0 5 0 0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="5"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding CustomScale, Converter={StaticResource D2SConverter}}" 
                                  Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                                  materialDesign:HintAssist.Hint="Custom scale" Grid.Column="0"
                                  ToolTip="Scalar to change the size of the pattern."/>
-                        <TextBox Text="{Binding CustomRotate, Converter={StaticResource D2SConverter}}" 
+                                <TextBox Text="{Binding CustomRotate, Converter={StaticResource D2SConverter}}" 
                                  Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                                  materialDesign:HintAssist.Hint="Custom rotate" Grid.Column="2"
                                  ToolTip="Degrees to rotate the pattern clockwise."/>
-                    </Grid>
-                    <ComboBox SelectedItem="{Binding PatternOverwriteMode}" ItemsSource="{Binding PatternOverwriteModes}"
+                            </Grid>
+                            <ComboBox SelectedItem="{Binding PatternOverwriteMode}" ItemsSource="{Binding PatternOverwriteModes}"
                               Style="{StaticResource MaterialDesignFloatingHintComboBox}"
                               materialDesign:HintAssist.Hint="Pattern overwrite mode" Margin="0 5 0 0"
                               ToolTip="Determines how to overwrite the objects in the original beatmap when a pattern gets placed on them."/>
-                    <ComboBox SelectedItem="{Binding TimingOverwriteMode}" ItemsSource="{Binding TimingOverwriteModes}"
+                            <ComboBox SelectedItem="{Binding TimingOverwriteMode}" ItemsSource="{Binding TimingOverwriteModes}"
                               Style="{StaticResource MaterialDesignFloatingHintComboBox}"
                               materialDesign:HintAssist.Hint="Timing overwrite mode" Margin="0 5 0 0"
                               ToolTip="Determines how to combine the timing of the orignal beatmap and the timing of the pattern."/>
-                    
-                    <CheckBox Content="Include hitsounds" Margin="0 5 0 0"
+
+                            <CheckBox Content="Include hitsounds" Margin="0 5 0 0"
                               ToolTip="Export the pattern with the hitsound effects of the pattern timing points."
                               IsChecked="{Binding IncludeHitsounds}"/>
-                    <CheckBox Content="Include kiai"
+                            <CheckBox Content="Include kiai"
                               ToolTip="Export the pattern with the kiai of the pattern."
                               IsChecked="{Binding IncludeKiai}"/>
-                    <CheckBox Content="Scale to new circle size"
+                            <CheckBox Content="Scale to new circle size"
                               ToolTip="Scale the pattern such that the spacing relative to the circle size stays the same."
                               IsChecked="{Binding ScaleToNewCircleSize}"/>
-                    <CheckBox Content="Scale to new timing"
+                            <CheckBox Content="Scale to new timing"
                               ToolTip="Scale the pattern in time such that the number of beats between objects stays the same in the new timing. Incorrect snaps can occur if your timing has unsnapped redlines. Do not use this if you have 0 or infinite BPM redlines."
                               IsChecked="{Binding ScaleToNewTiming}"/>
-                    <CheckBox Content="Snap to new timing"
+                            <CheckBox Content="Snap to new timing"
                               ToolTip="Snap the objects of the pattern to the new timing using the specified beat divisors."
                               IsChecked="{Binding SnapToNewTiming}"/>
-                    <CheckBox Content="Manualify stacks"
+                            <CheckBox Content="Manualify stacks"
                               ToolTip="Manually stack objects of the pattern."
                               IsChecked="{Binding FixStackLeniency}"/>
-                    <CheckBox Content="Fix global SV"
+                            <CheckBox Content="Fix global SV"
                               ToolTip="Adjust greenline SV in the pattern to the new global SV so sliders have the same SV in the new beatmap."
                               IsChecked="{Binding FixGlobalSv}"/>
-                    <CheckBox Content="Fix BPM SV"
+                            <CheckBox Content="Fix BPM SV"
                               ToolTip="Adjust greenline SV in the pattern to the new BPM so sliders have the same SV in the new beatmap. It is recommended to disable this feature if you are using the 'Scale to new timing' feature."
                               IsChecked="{Binding FixBpmSv}"/>
-                    <CheckBox Content="Fix colourhax"
+                            <CheckBox Content="Fix colourhax"
                               ToolTip="Adjust colour skip such that the colour indices of objects stay the same for the pattern and the original beatmap."
                               IsChecked="{Binding FixColourHax}"/>
-                    <CheckBox Content="Fix slider tick rate"
+                            <CheckBox Content="Fix slider tick rate"
                               ToolTip="Multiply BPM in the pattern so the slider tick rate in the pattern stays the same."
                               IsChecked="{Binding FixTickRate}"/>
-                </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
             </Grid>
 
             <Viewbox Grid.Column="2" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
