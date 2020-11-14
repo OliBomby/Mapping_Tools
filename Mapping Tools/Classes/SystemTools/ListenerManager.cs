@@ -57,6 +57,9 @@ namespace Mapping_Tools.Classes.SystemTools {
 
                 if (string.IsNullOrEmpty(path)) return;
 
+                // Don't make period backup if the editor is not open
+                if (!EditorReaderStuff.IsEditorOpen()) return;
+
                 EditorReader reader = null;
                 try {
                     reader = EditorReaderStuff.GetFullEditorReader();
