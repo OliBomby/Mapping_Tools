@@ -280,6 +280,7 @@ namespace Mapping_Tools.Views.PatternGallery {
         }
 
         private void CollectionName_MouseDown(object sender, MouseButtonEventArgs e) {
+            // Check for double-click, because there is no MouseDoubleClick event
             if (e.ClickCount == 2) {
                 DoRenameCollection(sender, e);
             }
