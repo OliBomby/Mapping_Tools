@@ -9,6 +9,7 @@ using Mapping_Tools.Viewmodels;
 using MaterialDesignThemes.Wpf;
 using System;
 using System.ComponentModel;
+using System.Data;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -168,13 +169,19 @@ namespace Mapping_Tools.Views.PatternGallery {
             };
             renameMenu.Click += DoRenameCollection;
 
+            var importMenu = new MenuItem {
+                Header = "_Import collection", Icon = new PackIcon { Kind = PackIconKind.Import },
+                ToolTip = "Import a collection zip file to the projects folder."
+            };
+            importMenu.Click += DoImportCollection;
+
             var exportMenu = new MenuItem {
                 Header = "_Export collection", Icon = new PackIcon { Kind = PackIconKind.Export },
                 ToolTip = "Export this collection to the Exports folder. The exported file can later be imported with the import menu."
             };
             exportMenu.Click += DoExportCollection;
 
-            return new[] { renameMenu, exportMenu };
+            return new[] { renameMenu, importMenu, exportMenu };
         }
 
         private async void DoRenameCollection(object sender, RoutedEventArgs e) {
@@ -193,6 +200,43 @@ namespace Mapping_Tools.Views.PatternGallery {
                 ViewModel.FileHandler.RenameCollectionFolder(viewModel.NewFolderName);
 
                 await Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue("Successfully renamed this collection!"));
+            } catch (ArgumentException) { } catch (Exception ex) {
+                ex.Show();
+            }
+        }
+
+        private async void DoImportCollection(object sender, RoutedEventArgs e) {
+            try {
+                var path = IOHelper.ZipFileDialog();
+                if (string.IsNullOrEmpty(path)) return;
+
+                string archiveFolderName;
+                using (ZipArchive archive = ZipFile.Open(path, ZipArchiveMode.Read)) {
+                    // Assuming the first folder in the zip file is the collection folder
+                    archiveFolderName = archive.Entries[0].FullName.Split('\\')[0];
+
+                    if (ViewModel.FileHandler.CollectionFolderExists(archiveFolderName)) {
+                        throw new DuplicateNameException($"A collection with the name \"{archiveFolderName}\" already exists in {ViewModel.FileHandler.BasePath}.");
+                    }
+
+                    archive.ExtractToDirectory(ViewModel.FileHandler.BasePath);
+                }
+
+                await Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue("Successfully imported the collection!"));
+
+                var result = MessageBox.Show(
+                        "Do you want to load the newly imported collection right now?\n Warning: Unsaved changes will be lost.",
+                        "Load new collection",
+                        MessageBoxButton.YesNo);
+
+                if (result == MessageBoxResult.Yes) {
+                    string collectionFolderPath = Path.Combine(ViewModel.FileHandler.BasePath, archiveFolderName);
+                    // Get the first .json file in the imported collection folder
+                    string savePath = Directory.GetFiles(collectionFolderPath).First(o => Path.GetExtension(o) == ".json");
+                    var project = ProjectManager.LoadJson<PatternGalleryVm>(savePath);
+
+                    SetSaveData(project);
+                }
             } catch (ArgumentException) { } catch (Exception ex) {
                 ex.Show();
             }

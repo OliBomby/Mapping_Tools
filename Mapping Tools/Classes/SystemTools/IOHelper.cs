@@ -54,6 +54,18 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
         }
 
+        public static string ZipFileDialog() {
+            using (OpenFileDialog saveFileDialog1 = new OpenFileDialog {
+                Filter = "ZIP File|*.zip",
+                FilterIndex = 1,
+                RestoreDirectory = true,
+                CheckFileExists = true
+            }) {
+                saveFileDialog1.ShowDialog();
+                return saveFileDialog1.FileName;
+            }
+        }
+
         public static string FileDialog() {
             using( OpenFileDialog openFileDialog = new OpenFileDialog {
                 RestoreDirectory = true,
