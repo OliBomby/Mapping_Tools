@@ -338,7 +338,7 @@ namespace Mapping_Tools.Classes.ToolHelpers {
         }
 
         public double GetContinuousAngle(double index) {
-            int segmentIndex = (int)Math.Floor(index + Precision.DOUBLE_EPSILON);
+            int segmentIndex = MathHelper.Clamp((int)Math.Floor(index + Precision.DOUBLE_EPSILON), 0, _angle.Count - 1);
 
             return _angle[segmentIndex];
         }
