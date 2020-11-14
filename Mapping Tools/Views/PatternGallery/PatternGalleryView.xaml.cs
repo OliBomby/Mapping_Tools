@@ -95,8 +95,13 @@ namespace Mapping_Tools.Views.PatternGallery {
             bool usePatternOffset = false;
             switch (args.ExportTimeMode) {
                 case ExportTimeMode.Current:
-                    reader = EditorReaderStuff.GetFullEditorReader();
-                    exportTime = reader.EditorTime();
+                    try {
+                        reader = EditorReaderStuff.GetFullEditorReader();
+                        exportTime = reader.EditorTime();
+                    }
+                    catch (Exception e) {
+                        throw new Exception("Could not fetch the current editor time.", e);
+                    }
                     break;
                 case ExportTimeMode.Pattern:
                     reader = EditorReaderStuff.GetFullEditorReaderOrNot();
