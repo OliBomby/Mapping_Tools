@@ -47,7 +47,7 @@
                       You can add or remove patterns by using the buttons at the bottom.<LineBreak/>
                       To export a pattern to the current beatmap simply select one or more patterns and click the run button. You can also double-click a pattern to instantly export it.<LineBreak/>
                       On the right there are export options which allow for additional processing on the pattern during export.<LineBreak/>
-                      With the 'Project' menu you can save/load/rename your pattern collections.
+                      With the 'Project' menu you can save/load/rename/import/export your pattern collections.
                   </TextBlock>
                     </materialDesign:PopupBox>
                   <materialDesign:PopupBox Margin="0,10,10,10" VerticalAlignment="Bottom" ToolTip="Click me!">
