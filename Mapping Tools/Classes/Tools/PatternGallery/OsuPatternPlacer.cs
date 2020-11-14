@@ -277,33 +277,33 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 foreach (var ho in patternBeatmap.HitObjects) {
                     double oldEndTime = ho.GetEndTime(false);
 
-                    ho.Time = transformPatternTiming.GetBeatLength(patternStartTime, ho.Time);
-                    ho.EndTime = transformPatternTiming.GetBeatLength(patternStartTime, oldEndTime);
+                    ho.Time = patternTiming.GetBeatLength(patternStartTime, ho.Time);
+                    ho.EndTime = patternTiming.GetBeatLength(patternStartTime, oldEndTime);
 
                     // The body hitsounds are not copies of timingpoints in patternTiming so they should be copied before changing offset
                     for (int i = 0; i < ho.BodyHitsounds.Count; i++) {
                         TimingPoint tp = ho.BodyHitsounds[i].Copy();
-                        tp.Offset = transformPatternTiming.GetBeatLength(patternStartTime, tp.Offset);
+                        tp.Offset = patternTiming.GetBeatLength(patternStartTime, tp.Offset);
                         ho.BodyHitsounds[i] = tp;
                     }
                 }
 
                 foreach (var tp in patternKiaiToggles.Concat(svChanges)) {
-                    tp.Offset = transformPatternTiming.GetBeatLength(patternStartTime, tp.Offset);
+                    tp.Offset = patternTiming.GetBeatLength(patternStartTime, tp.Offset);
                 }
 
                 // Transform the pattern redlines to beat time
                 // This will not change the order of redlines (unless negative BPM exists)
                 transformPatternTiming = patternTiming.Copy();
                 foreach (var tp in transformPatternTiming.Redlines) {
-                    tp.Offset = transformPatternTiming.GetBeatLength(patternStartTime, tp.Offset);
+                    tp.Offset = patternTiming.GetBeatLength(patternStartTime, tp.Offset);
                 }
 
                 // Transform the original timingpoints to beat time
                 // This will not change the order of timingpoints (unless negative BPM exists)
                 transformOriginalTiming = originalTiming.Copy();
                 foreach (var tp in transformOriginalTiming.TimingPoints) {
-                    tp.Offset = transformOriginalTiming.GetBeatLength(patternStartTime, tp.Offset);
+                    tp.Offset = originalTiming.GetBeatLength(patternStartTime, tp.Offset);
                 }
             }
 
