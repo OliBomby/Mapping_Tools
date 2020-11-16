@@ -106,6 +106,11 @@ namespace Mapping_Tools.Views.TimingHelper {
                     timing.Add(new TimingPoint(0, 1000, 4, SampleSet.Soft, 0, 100, true, false, false));
                 }
 
+                // Remove multiple markers on the same tick
+                var newMarkers = new List<Marker>(markers.Count);
+                newMarkers.AddRange(markers.Where((t, i) => i == 0 || Math.Abs(t.Time - markers[i - 1].Time) >= arg.Leniency + Precision.DOUBLE_EPSILON));
+                markers = newMarkers;
+
                 // Calculate the beats between time and the last time or redline for each time
                 // Time the same is 0
                 // Time a little after is smallest snap
@@ -153,6 +158,10 @@ namespace Mapping_Tools.Views.TimingHelper {
 
                     // Set the variable
                     marker.BeatsFromLastMarker = beatsFromLastMarker;
+
+                    if (arg.BeatsBetween != -1) {
+                        marker.BeatsFromLastMarker = arg.BeatsBetween;
+                    }
                 }
 
                 // Remove redlines except the first redline
@@ -173,7 +182,7 @@ namespace Mapping_Tools.Views.TimingHelper {
 
                     TimingPoint redline = timing.GetRedlineAtTime(time - 1);
 
-                    double beatsFromLastMarker = arg.BeatsBetween != -1 ? arg.BeatsBetween : marker.BeatsFromLastMarker;
+                    double beatsFromLastMarker = marker.BeatsFromLastMarker;
 
                     // Skip if 0 beats from last marker
                     if (beatsFromLastMarker == 0) {
