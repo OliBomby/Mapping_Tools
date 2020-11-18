@@ -26,9 +26,10 @@ Collection of tools for manipulating osu! beatmaps
 - [Geometry Dashboard]() by [OliBomby](https://github.com/OliBomby) | [CrazyRabbitKGe](https://github.com/CrazyRabbitKGe)
 - [Combo Colour Studio]() by [OliBomby](https://github.com/OliBomby)
 - [Sliderator]() by [OliBomby](https://github.com/OliBomby) | [Karoo](https://github.com/Karoo13)
+- [Pattern Gallery]() by [OliBomby](https://github.com/OliBomby)
 
 ## Future implementations
-- Timing Studio (Tool for creating perfect timing from odd-time signatures and smart timing points)
+See the [Trello board](https://trello.com/b/iTmmw3eP/mapping-tools).
 
 ## Used libraries
 - [MaterialDesignInXamlToolkit](https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit)
