@@ -34,7 +34,9 @@ namespace Mapping_Tools.Classes.Tools.MapCleanerStuff {
             int objectsResnapped = 0;
             int samplesRemoved = 0;
 
-            // Collect timeline objects before resnapping
+            // Collect timeline objects before resnapping, so the timingpoints
+            // are still valid and the tlo's get the correct hitsounds and offsets.
+            // Resnapping of the hit objects will move the tlo's aswell
             Timeline timeline = beatmap.GetTimeline();
 
             // Collect Kiai toggles and SliderVelocity changes for mania/taiko
