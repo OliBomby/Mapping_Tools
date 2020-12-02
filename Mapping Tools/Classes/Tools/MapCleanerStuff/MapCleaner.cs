@@ -34,6 +34,9 @@ namespace Mapping_Tools.Classes.Tools.MapCleanerStuff {
             int objectsResnapped = 0;
             int samplesRemoved = 0;
 
+            // Collect timeline objects before resnapping
+            Timeline timeline = beatmap.GetTimeline();
+
             // Collect Kiai toggles and SliderVelocity changes for mania/taiko
             List<TimingPoint> kiaiToggles = new List<TimingPoint>();
             List<TimingPoint> svChanges = new List<TimingPoint>();
@@ -92,9 +95,6 @@ namespace Mapping_Tools.Classes.Tools.MapCleanerStuff {
 
                 UpdateProgressBar(worker, 45);
             }
-
-            // Collect timeline objects after resnapping
-            Timeline timeline = beatmap.GetTimeline();
 
             // Make new timingpoints
             List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
