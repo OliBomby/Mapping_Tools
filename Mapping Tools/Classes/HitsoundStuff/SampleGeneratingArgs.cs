@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
+using Newtonsoft.Json;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     /// <summary>
@@ -105,6 +106,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             set => Set(ref length, value);
         }
 
+        [JsonIgnore]
         public int Velocity {
             get => (int) Math.Round(Volume * 127);
             set => Volume = value / 127d;
