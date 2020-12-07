@@ -371,7 +371,8 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 switch (timingOverwriteMode) {
                     case TimingOverwriteMode.PatternTimingOnly:
                         // Subtract one from the end time to omit BPM changes right on the end of the part.
-                        inPartRedlines = transformPatternTiming.GetRedlinesInRange(startTime, endTime - 2 * Precision.DOUBLE_EPSILON).ToArray();
+                        inPartRedlines = transformPatternTiming.GetRedlinesInRange(startTime,
+                            Math.Max(startTime, endTime - 2 * Precision.DOUBLE_EPSILON)).ToArray();
                         startPartRedline = transformPatternTiming.GetRedlineAtTime(startTime);
                         break;
                     case TimingOverwriteMode.InPatternAbsoluteTiming:
@@ -412,7 +413,8 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                         break;
                     default:  // Original timing only
                         // Subtract one from the end time to omit BPM changes right on the end of the part.
-                        inPartRedlines = transformOriginalTiming.GetRedlinesInRange(startTime, endTime - 2 * Precision.DOUBLE_EPSILON).ToArray();
+                        inPartRedlines = transformOriginalTiming.GetRedlinesInRange(startTime,
+                            Math.Max(startTime, endTime - 2 * Precision.DOUBLE_EPSILON)).ToArray();
                         startPartRedline = transformOriginalTiming.GetRedlineAtTime(startTime);
                         break;
                 }
