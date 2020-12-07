@@ -240,11 +240,8 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             // This multiplier is not meant to change SV so this is subtracted from the greenline SV later
             double bpmMultiplier = FixTickRate ? patternTickRate / originalTickRate : 1;
 
-            // Give new combo to all hit objects which were actually new combo in the pattern
-            // This code can be put anywhere really
-            foreach (var ho in patternBeatmap.HitObjects) {
-                ho.NewCombo = ho.ActualNewCombo && !ho.IsSpinner;
-            }
+            // Dont give new combo to all hit objects which were actually new combo in the pattern,
+            // because it leads to unexpected NC's at the start of patterns.
 
             // Collect Kiai toggles and SliderVelocity changes for mania/taiko
             List<TimingPoint> patternKiaiToggles = new List<TimingPoint>();
