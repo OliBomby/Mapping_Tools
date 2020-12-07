@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.Windows.Controls;
 using System.Windows.Data;
-using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.SystemTools;
 
 namespace Mapping_Tools.Components.Domain {
@@ -31,16 +30,16 @@ namespace Mapping_Tools.Components.Domain {
             }
 
             try {
-                return TypeConverters.ParseOsuTimestamp(str).TotalMilliseconds;
+                return InputParsers.ParseOsuTimestamp(str).TotalMilliseconds;
             }
             catch (Exception e) {
                 Console.WriteLine(e);
             }
 
             if (parameter is string s) {
-                return TypeConverters.TryParseDouble(str, out double result2) ? result2 : double.Parse(s, CultureInfo.InvariantCulture);
+                return InputParsers.TryParseDouble(str, out double result2) ? result2 : double.Parse(s, CultureInfo.InvariantCulture);
             }
-            if (TypeConverters.TryParseDouble(str, out double result3)) {
+            if (InputParsers.TryParseDouble(str, out double result3)) {
                 return result3;
             }
 

@@ -194,194 +194,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Classes\BeatmapHelper\BeatDivisors\IBeatDivisor.cs" />
-    <Compile Include="Classes\BeatmapHelper\BeatDivisors\IrrationalBeatDivisor.cs" />
-    <Compile Include="Classes\BeatmapHelper\BeatDivisors\RationalBeatDivisor.cs" />
-    <Compile Include="Classes\BeatmapHelper\BeatmapEditor.cs" />
-    <Compile Include="Classes\BeatmapHelper\BeatmapParsingException.cs" />
-    <Compile Include="Classes\BeatmapHelper\Events\Break.cs" />
-    <Compile Include="Classes\BeatmapHelper\Events\IHasDuration.cs" />
-    <Compile Include="Classes\BeatmapHelper\Events\IHasEndTime.cs" />
-    <Compile Include="Classes\BeatmapHelper\Events\ParameterCommand.cs" />
-    <Compile Include="Classes\BeatmapHelper\Events\Video.cs" />
-    <Compile Include="Classes\BeatmapHelper\Events\Background.cs" />
-    <Compile Include="Classes\BeatmapHelper\Events\Command.cs" />
-    <Compile Include="Classes\BeatmapHelper\Events\EasingType.cs" />
-    <Compile Include="Classes\BeatmapHelper\Events\Event.cs" />
-    <Compile Include="Classes\BeatmapHelper\Events\EventType.cs" />
-    <Compile Include="Classes\BeatmapHelper\Events\LoopType.cs" />
-    <Compile Include="Classes\BeatmapHelper\Events\Origin.cs" />
-    <Compile Include="Classes\BeatmapHelper\Events\Animation.cs" />
-    <Compile Include="Classes\BeatmapHelper\Events\Sprite.cs" />
-    <Compile Include="Classes\BeatmapHelper\Events\TriggerLoop.cs" />
-    <Compile Include="Classes\BeatmapHelper\Events\StandardLoop.cs" />
-    <Compile Include="Classes\BeatmapHelper\Events\OtherCommand.cs" />
-    <Compile Include="Classes\BeatmapHelper\FileFormatHelper.cs" />
-    <Compile Include="Classes\BeatmapHelper\Enums\GameMode.cs" />
-    <Compile Include="Classes\BeatmapHelper\HitObjectComparer.cs" />
-    <Compile Include="Classes\BeatmapHelper\Enums\HitObjectType.cs" />
-    <Compile Include="Classes\BeatmapHelper\Events\IHasStartTime.cs" />
-    <Compile Include="Classes\BeatmapHelper\ITextLine.cs" />
-    <Compile Include="Classes\BeatmapHelper\SpecialColour.cs" />
-    <Compile Include="Classes\BeatmapHelper\StoryboardEditor.cs" />
-    <Compile Include="Classes\BeatmapHelper\ITextFile.cs" />
-    <Compile Include="Classes\BeatmapHelper\Storyboard.cs" />
-    <Compile Include="Classes\BeatmapHelper\Events\StoryboardLayer.cs" />
-    <Compile Include="Classes\BeatmapHelper\Events\StoryboardSoundSample.cs" />
-    <Compile Include="Classes\Tools\ComboColourStudio\ColourPoint.cs" />
-    <Compile Include="Classes\Tools\ComboColourStudio\ColourPointMode.cs" />
-    <Compile Include="Classes\Tools\ComboColourStudio\ComboColourProject.cs" />
-    <Compile Include="Classes\Tools\ComboColourStudio\SpecialColourDragAndDropListBox.cs" />
-    <Compile Include="Classes\Exceptions\BeatmapIncompatibleException.cs" />
-    <Compile Include="Classes\Exceptions\InvalidEditorReaderStateException.cs" />
-    <Compile Include="Classes\Exceptions\EditorReaderDisabledException.cs" />
-    <Compile Include="Classes\ExternalFileUtil\Reaper\EnvelopeShape.cs" />
-    <Compile Include="Classes\ExternalFileUtil\Reaper\EnvelopeTempoPoint.cs" />
-    <Compile Include="Classes\ExternalFileUtil\Reaper\ReaperEditor.cs" />
-    <Compile Include="Classes\ExternalFileUtil\Reaper\TrackItem.cs" />
-    <Compile Include="Classes\BeatmapHelper\TempoSignature.cs" />
-    <Compile Include="Classes\GenericExtensions.cs" />
-    <Compile Include="Classes\HitsoundStuff\Effects\DelayFadeOutSampleProvider.cs" />
-    <Compile Include="Classes\HitsoundStuff\Effects\Effect.cs" />
-    <Compile Include="Classes\HitsoundStuff\Effects\EffectParameter.cs" />
-    <Compile Include="Classes\HitsoundStuff\Effects\SoftLimiter.cs" />
-    <Compile Include="Classes\HitsoundStuff\SampleGeneratingArgsComparer.cs" />
-    <Compile Include="Classes\BeatmapHelper\Enums\Hitsound.cs" />
-    <Compile Include="Classes\HitsoundStuff\HitsoundLayerExtension.cs" />
-    <Compile Include="Classes\HitsoundStuff\HitsoundZone.cs" />
-    <Compile Include="Classes\HitsoundStuff\ImportReloadingArgs.cs" />
-    <Compile Include="Classes\HitsoundStuff\ImportReloadingArgsComparer.cs" />
-    <Compile Include="Classes\HitsoundStuff\ImportType.cs" />
-    <Compile Include="Classes\HitsoundStuff\LayerImportArgs.cs" />
-    <Compile Include="Classes\HitsoundStuff\MidiExporter.cs" />
-    <Compile Include="Classes\HitsoundStuff\SampleGeneratingArgs.cs" />
-    <Compile Include="Classes\HitsoundStuff\SampleImporter.cs" />
-    <Compile Include="Classes\HitsoundStuff\CompleteHitsounds.cs" />
-    <Compile Include="Classes\HitsoundStuff\CustomIndex.cs" />
-    <Compile Include="Classes\HitsoundStuff\HitsoundEvent.cs" />
-    <Compile Include="Classes\HitsoundStuff\HitsoundConverter.cs" />
-    <Compile Include="Classes\HitsoundStuff\HitsoundExporter.cs" />
-    <Compile Include="Classes\HitsoundStuff\HitsoundImporter.cs" />
-    <Compile Include="Classes\HitsoundStuff\HitsoundLayer.cs" />
-    <Compile Include="Classes\HitsoundStuff\Sample.cs" />
-    <Compile Include="Classes\HitsoundStuff\SamplePackage.cs" />
-    <Compile Include="Classes\HitsoundStuff\SampleSchema.cs" />
-    <Compile Include="Classes\BeatmapHelper\Enums\SampleSet.cs" />
-    <Compile Include="Classes\HitsoundStuff\SampleSoundGenerator.cs" />
-    <Compile Include="Classes\HitsoundStuff\SF2Extension.cs" />
-    <Compile Include="Classes\HitsoundStuff\VorbisFileWriter.cs" />
-    <Compile Include="Classes\JsonConverters\Vector2Converter.cs" />
-    <Compile Include="Classes\MathUtil\BinarySearchUtil.cs" />
-    <Compile Include="Classes\MathUtil\Circle.cs" />
-    <Compile Include="Classes\MathUtil\Extensions.cs" />
-    <Compile Include="Classes\MathUtil\BezierCurve.cs" />
-    <Compile Include="Classes\MathUtil\BezierCurveCubic.cs" />
-    <Compile Include="Classes\MathUtil\BezierCurveQuadric.cs" />
-    <Compile Include="Classes\MathUtil\Box2.cs" />
-    <Compile Include="Classes\MathUtil\Box2d.cs" />
-    <Compile Include="Classes\MathUtil\CircleArc.cs" />
-    <Compile Include="Classes\MathUtil\GradientDescentUtil.cs" />
-    <Compile Include="Classes\MathUtil\LineSegment.cs" />
-    <Compile Include="Classes\MathUtil\MathHelper.cs" />
-    <Compile Include="Classes\MathUtil\Matrix2.cs" />
-    <Compile Include="Classes\MathUtil\Matrix2d.cs" />
-    <Compile Include="Classes\MathUtil\Matrix2x3.cs" />
-    <Compile Include="Classes\MathUtil\Matrix2x3d.cs" />
-    <Compile Include="Classes\MathUtil\Matrix2x4.cs" />
-    <Compile Include="Classes\MathUtil\Matrix2x4d.cs" />
-    <Compile Include="Classes\MathUtil\Matrix3.cs" />
-    <Compile Include="Classes\MathUtil\Matrix3d.cs" />
-    <Compile Include="Classes\MathUtil\Matrix3x2.cs" />
-    <Compile Include="Classes\MathUtil\Matrix3x2d.cs" />
-    <Compile Include="Classes\MathUtil\Matrix3x4.cs" />
-    <Compile Include="Classes\MathUtil\Matrix3x4d.cs" />
-    <Compile Include="Classes\MathUtil\Matrix4.cs" />
-    <Compile Include="Classes\MathUtil\Matrix4d.cs" />
-    <Compile Include="Classes\MathUtil\Matrix4x2.cs" />
-    <Compile Include="Classes\MathUtil\Matrix4x2d.cs" />
-    <Compile Include="Classes\MathUtil\Matrix4x3.cs" />
-    <Compile Include="Classes\MathUtil\Matrix4x3d.cs" />
-    <Compile Include="Classes\MathUtil\Quaternion.cs" />
-    <Compile Include="Classes\MathUtil\Quaterniond.cs" />
-    <Compile Include="Classes\MathUtil\Line2.cs" />
-    <Compile Include="Classes\MathUtil\Vector2.cs" />
-    <Compile Include="Classes\MathUtil\Vector2d.cs" />
-    <Compile Include="Classes\MathUtil\Vector3.cs" />
-    <Compile Include="Classes\MathUtil\Vector3d.cs" />
-    <Compile Include="Classes\MathUtil\Vector4.cs" />
-    <Compile Include="Classes\MathUtil\Vector4d.cs" />
-    <Compile Include="Classes\Tools\MapCleanerStuff\MapCleanerResult.cs" />
-    <Compile Include="Classes\Tools\SlideratorStuff\GraphStateValueGetter.cs" />
-    <Compile Include="Classes\ToolHelpers\BezierSubdivision.cs" />
-    <Compile Include="Classes\BeatmapHelper\SliderPathStuff\PathApproximator.cs" />
-    <Compile Include="Classes\BeatmapHelper\Enums\PathType.cs" />
-    <Compile Include="Classes\MathUtil\Precision.cs" />
-    <Compile Include="Classes\MathUtil\RNG.cs" />
-    <Compile Include="Classes\BeatmapHelper\SliderPathStuff\SliderPath.cs" />
-    <Compile Include="Classes\BeatmapHelper\TValue.cs" />
-    <Compile Include="Classes\ToolHelpers\SliderPathUtil.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DashStylesEnum.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\CoordinateConverter.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorCollection\RelevantObjectsGeneratorCollection.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Allocation\RelevantObjectsGeneratorMethodAttribute.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Allocation\RelevantObjectPairGenerator.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorGroupComparer.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorInputSelection\SelectionPredicate.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorInputSelection\SelectionPredicateCollection.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorSettingses\ScaleRotateGeneratorSettings.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorSettingses\SinglePointCircleGeneratorSettings.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorSettingses\SymmetryGeneratorSettings.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorSettingses\SliderPathGeneratorSettings.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\AveragePointGenerator3.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\AveragePointGenerator2.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\AngleBisectorGenerator.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\PointBisectorGenerator.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SameTransformGenerator2.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\ScaleRotateGenerator.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SinglePointCircleGenerator.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SymmetryGenerator.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SameTransformGenerator4.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SameTransformGenerator3Reversed.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorSettings.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SameTransformGenerator3.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SliderPathGenerator.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SquareGenerator.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SquareGenerator2.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorTypes\GeneratorTemporalPositioning.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObject\IRelevantDrawable.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObject\IRelevantObject.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\LayerCollection.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\Layers\RelevantObjectLayer.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObject\RelevantObjects\RelevantCircle.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObject\RelevantDrawable.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObject\RelevantObjects\RelevantHitObject.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObject\RelevantObjects\RelevantLine.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObject\RelevantObject.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectCollection\RelevantObjectCollection.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\AnchorPointGenerator.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SliderEndGenerator.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\PerpendicularGenerator.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\ParallelismGenerator.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\LastAnchorGenerator.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorTypes\GeneratorType.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\RelevantObjectsGenerator.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\IntersectionGenerator.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\PerfectCircleBlanketGenerator.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\LinearLineGenerator.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\PerfectCircleGenerator.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\StartPointGenerator.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\EqualSpacingGenerator.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\LineGenerator.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\TriangleGenerator.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\TriangleGenerator2.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObject\RelevantObjectPreferences.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\DataStructure\RelevantObject\RelevantObjects\RelevantPoint.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\Serialization\SnappingToolsSaveSlot.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\Serialization\SnappingToolsPreferences.cs" />
-    <Compile Include="Classes\Tools\SnappingTools\Serialization\SnappingToolsProject.cs" />
     <Compile Include="Classes\SystemTools\ActionHotkey.cs" />
     <Compile Include="Classes\SystemTools\BackupManager.cs" />
-    <Compile Include="Classes\SystemTools\BindableBase.cs" />
     <Compile Include="Classes\SystemTools\Hotkey.cs" />
     <Compile Include="Classes\SystemTools\IHaveExtraProjectMenuItems.cs" />
     <Compile Include="Classes\SystemTools\IOHelper.cs" />
@@ -395,34 +209,6 @@
     <Compile Include="Classes\SystemTools\Settings.cs" />
     <Compile Include="Classes\SystemTools\SettingsManager.cs" />
     <Compile Include="Classes\SystemTools\ShowSelectedInFileExplorer.cs" />
-    <Compile Include="Classes\SystemTools\TypeConverters.cs" />
-    <Compile Include="Classes\Tools\TimingStudio\BeatTime.cs" />
-    <Compile Include="Classes\ExternalFileUtil\Reaper\ReaperProject.cs" />
-    <Compile Include="Classes\Tools\TimingStudio\Serialization\TimingHelperProject.cs" />
-    <Compile Include="Classes\Tools\TimingStudio\Serialization\TimingPointType.cs" />
-    <Compile Include="Classes\Tools\TimingStudio\Serialization\TimingStudioPreferences.cs" />
-    <Compile Include="Classes\Tools\TimingStudio\StudioTimingPoint.cs" />
-    <Compile Include="Classes\Tools\AutoFailDetector.cs" />
-    <Compile Include="Classes\ToolHelpers\BezierConverter.cs" />
-    <Compile Include="Classes\ToolHelpers\CircleBezierPreset.cs" />
-    <Compile Include="Classes\ToolHelpers\EditorReaderStuff.cs" />
-    <Compile Include="Classes\Tools\MapCleanerStuff\MapCleaner.cs" />
-    <Compile Include="Classes\Tools\MapCleanerStuff\MapCleanerArgs.cs" />
-    <Compile Include="Classes\ToolHelpers\PathGenerator.cs" />
-    <Compile Include="Classes\Tools\PatternGallery\ExportTimeMode.cs" />
-    <Compile Include="Classes\Tools\PatternGallery\PatternCodeImportVm.cs" />
-    <Compile Include="Classes\Tools\PatternGallery\SelectedPatternImportVm.cs" />
-    <Compile Include="Classes\Tools\PatternGallery\PatternFileImportVm.cs" />
-    <Compile Include="Classes\Tools\PatternGallery\CollectionRenameVm.cs" />
-    <Compile Include="Classes\Tools\PatternGallery\OsuPattern.cs" />
-    <Compile Include="Classes\Tools\PatternGallery\OsuPatternFileHandler.cs" />
-    <Compile Include="Classes\Tools\PatternGallery\OsuPatternMaker.cs" />
-    <Compile Include="Classes\Tools\PatternGallery\OsuPatternPlacer.cs" />
-    <Compile Include="Classes\Tools\PatternGallery\TimingOverwriteMode.cs" />
-    <Compile Include="Classes\Tools\PatternGallery\PatternOverwriteMode.cs" />
-    <Compile Include="Classes\Tools\RhythmGuide.cs" />
-    <Compile Include="Classes\Tools\SlideratorStuff\PositionFunctionDelegate.cs" />
-    <Compile Include="Classes\Tools\SlideratorStuff\Sliderator.cs" />
     <Compile Include="Components\Dialogs\CustomDialog\BeatmapBrowseAttribute.cs" />
     <Compile Include="Components\Dialogs\CustomDialog\ConverterParameterAttribute.cs" />
     <Compile Include="Components\Dialogs\CustomDialog\MultiLineInputAttribute.cs" />
@@ -544,7 +330,6 @@
     <Compile Include="Components\TimeLine\TimeLineMark.xaml.cs">
       <DependentUpon>TimeLineMark.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Classes\ToolHelpers\TimingPointsChange.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Viewmodels\AutoFailDetectorVm.cs" />
     <Compile Include="Viewmodels\PatternGalleryVm.cs" />
@@ -613,7 +398,6 @@
     <Compile Include="Views\MetadataManager\MetadataManagerView.xaml.cs">
       <DependentUpon>MetadataManagerView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Classes\Tools\TimingStudio\Marker.cs" />
     <Compile Include="Views\TimingHelper\TimingHelperView.xaml.cs">
       <DependentUpon>TimingHelperView.xaml</DependentUpon>
     </Compile>
@@ -734,14 +518,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Classes\BeatmapHelper\Beatmap.cs" />
-    <Compile Include="Classes\BeatmapHelper\ComboColour.cs" />
-    <Compile Include="Classes\BeatmapHelper\Editor.cs" />
-    <Compile Include="Classes\BeatmapHelper\HitObject.cs" />
-    <Compile Include="Classes\BeatmapHelper\Timeline.cs" />
-    <Compile Include="Classes\BeatmapHelper\TimelineObject.cs" />
-    <Compile Include="Classes\BeatmapHelper\Timing.cs" />
-    <Compile Include="Classes\BeatmapHelper\TimingPoint.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -897,7 +673,12 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Mapping_Tools_Core\Mapping_Tools_Core.csproj">
+      <Project>{c3f2d574-37a6-4e03-b18b-c36aa238740e}</Project>
+      <Name>Mapping_Tools_Core</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="BeforeBuild" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

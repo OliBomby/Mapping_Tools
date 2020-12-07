@@ -20,13 +20,13 @@ namespace Mapping_Tools.Components.Domain {
             }
 
             if (parameter == null) {
-                if (TypeConverters.TryParseDouble(value.ToString(), out double result1)) {
+                if (InputParsers.TryParseDouble(value.ToString(), out double result1)) {
                     return result1;
                 }
 
                 return new ValidationResult(false, "Double format error.");
             }
-            TypeConverters.TryParseDouble(value.ToString(), out double result2, double.Parse(parameter.ToString()));
+            InputParsers.TryParseDouble(value.ToString(), out double result2, double.Parse(parameter.ToString()));
             return result2;
         }
     }

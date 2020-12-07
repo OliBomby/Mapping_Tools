@@ -1,11 +1,9 @@
-﻿using Mapping_Tools.Classes.BeatmapHelper;
-using System;
+﻿using System;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Controls;
 using System.Windows.Data;
-using Mapping_Tools.Classes.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Classes.SystemTools;
 
 namespace Mapping_Tools.Components.Domain {
@@ -50,7 +48,7 @@ namespace Mapping_Tools.Components.Domain {
                     beatDivisors[i] = new RationalBeatDivisor(int.Parse(ndSplit[0], CultureInfo.InvariantCulture),
                                                             int.Parse(ndSplit[1], CultureInfo.InvariantCulture));
                 } else {
-                    var valid = TypeConverters.TryParseDouble(val, out double doubleValue);
+                    var valid = InputParsers.TryParseDouble(val, out double doubleValue);
                     if (valid) {
                         if (doubleValue <= 0)
                             return new ValidationResult(false, "Beat divisor must be greater than zero.");

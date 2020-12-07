@@ -5,13 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.BeatmapHelper.BeatDivisors;
-using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.ToolHelpers;
-using Mapping_Tools.Classes.Tools;
-using Mapping_Tools.Classes.Tools.TimingStudio.TimingStudio;
 using Mapping_Tools.Viewmodels;
 
 namespace Mapping_Tools.Views.TimingStudio

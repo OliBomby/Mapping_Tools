@@ -1,7 +1,4 @@
-﻿using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.Tools;
+﻿using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Components.Domain;
 using System;
 using System.Collections.Generic;
@@ -12,7 +9,6 @@ using System.Windows;
 using System.Windows.Input;
 using Editor_Reader;
 using Mapping_Tools.Classes;
-using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Components.Graph;
 using Mapping_Tools.Views;
 using Mapping_Tools.Views.Sliderator;

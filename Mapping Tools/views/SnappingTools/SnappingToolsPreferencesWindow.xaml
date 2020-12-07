@@ -6,7 +6,25 @@
         xmlns:components="clr-namespace:Mapping_Tools.Components.Domain"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:components1="clr-namespace:Mapping_Tools.Components"
-        xmlns:serialization="clr-namespace:Mapping_Tools.Classes.Tools.SnappingTools.Serialization"
+        xmlns:serialization="clr-namespace:Mapping_Tools_Core.Tools.SnappingTools.Serialization;assembly=Mapping_Tools_Core"
+        xmlns:serialization1="clr-namespace:Mapping_Tools_Core.Tools.SnappingTools.Serialization;assembly=Mapping_Tools_Core"
+        xmlns:serialization2="clr-namespace:Mapping_Tools_Core.Tools.SnappingTools.Serialization;assembly=Mapping_Tools_Core"
+        xmlns:serialization3="clr-namespace:Mapping_Tools_Core.Tools.SnappingTools.Serialization;assembly=Mapping_Tools_Core"
+        xmlns:serialization4="clr-namespace:Mapping_Tools_Core.Tools.SnappingTools.Serialization;assembly=Mapping_Tools_Core"
+        xmlns:serialization5="clr-namespace:Mapping_Tools_Core.Tools.SnappingTools.Serialization;assembly=Mapping_Tools_Core"
+        xmlns:serialization6="clr-namespace:Mapping_Tools_Core.Tools.SnappingTools.Serialization;assembly=Mapping_Tools_Core"
+        xmlns:serialization7="clr-namespace:Mapping_Tools_Core.Tools.SnappingTools.Serialization;assembly=Mapping_Tools_Core"
+        xmlns:serialization8="clr-namespace:Mapping_Tools_Core.Tools.SnappingTools.Serialization;assembly=Mapping_Tools_Core"
+        xmlns:serialization9="clr-namespace:Mapping_Tools_Core.Tools.SnappingTools.Serialization;assembly=Mapping_Tools_Core"
+        xmlns:serialization10="clr-namespace:Mapping_Tools_Core.Tools.SnappingTools.Serialization;assembly=Mapping_Tools_Core"
+        xmlns:serialization11="clr-namespace:Mapping_Tools_Core.Tools.SnappingTools.Serialization;assembly=Mapping_Tools_Core"
+        xmlns:serialization12="clr-namespace:Mapping_Tools_Core.Tools.SnappingTools.Serialization;assembly=Mapping_Tools_Core"
+        xmlns:serialization13="clr-namespace:Mapping_Tools_Core.Tools.SnappingTools.Serialization;assembly=Mapping_Tools_Core"
+        xmlns:serialization14="clr-namespace:Mapping_Tools_Core.Tools.SnappingTools.Serialization;assembly=Mapping_Tools_Core"
+        xmlns:serialization15="clr-namespace:Mapping_Tools_Core.Tools.SnappingTools.Serialization;assembly=Mapping_Tools_Core"
+        xmlns:serialization16="clr-namespace:Mapping_Tools_Core.Tools.SnappingTools.Serialization;assembly=Mapping_Tools_Core"
+        xmlns:serialization17="clr-namespace:Mapping_Tools_Core.Tools.SnappingTools.Serialization;assembly=Mapping_Tools_Core"
+        xmlns:serialization18="clr-namespace:Mapping_Tools_Core.Tools.SnappingTools.Serialization;assembly=Mapping_Tools_Core"
         mc:Ignorable="d"
         Title="Snapping Tools Preferences" Height="500" Width="570" MinWidth="575" MinHeight="360"
         WindowStyle="None"
@@ -111,19 +129,19 @@
                                            ToolTip="Customize what gets displayed while the Snap Key is pressed."/>
                                 <ListBox SelectionMode="Extended" SelectionChanged="KeyDownViewModeSelector_OnSelectionChanged"
                                     Style="{StaticResource MaterialDesignToolToggleListBox}">
-                                    <ListBoxItem ToolTip="Everything" Tag="{x:Static serialization:ViewMode.Everything}" IsSelected="{Binding KeyDownViewMode, Mode=OneTime, Converter={StaticResource FlagToBoolConverter}, ConverterParameter={x:Static serialization:ViewMode.Everything}}">
+                                    <ListBoxItem ToolTip="Everything" Tag="{x:Static serialization:ViewMode.Everything}" IsSelected="{Binding KeyDownViewMode, Mode=OneTime, Converter={StaticResource FlagToBoolConverter}, ConverterParameter={x:Static serialization1:ViewMode.Everything}}">
                                         <materialDesign:PackIcon Kind="AllInclusive"/>
                                     </ListBoxItem>
-                                    <ListBoxItem ToolTip="Parents and parents of parents" Tag="{x:Static serialization:ViewMode.Parents}" IsSelected="{Binding KeyDownViewMode, Mode=OneTime, Converter={StaticResource FlagToBoolConverter}, ConverterParameter={x:Static serialization:ViewMode.Parents}}">
+                                    <ListBoxItem ToolTip="Parents and parents of parents" Tag="{x:Static serialization2:ViewMode.Parents}" IsSelected="{Binding KeyDownViewMode, Mode=OneTime, Converter={StaticResource FlagToBoolConverter}, ConverterParameter={x:Static serialization3:ViewMode.Parents}}">
                                         P
                                     </ListBoxItem>
-                                    <ListBoxItem ToolTip="Direct parents" Tag="{x:Static serialization:ViewMode.DirectParents}" IsSelected="{Binding KeyDownViewMode, Mode=OneTime, Converter={StaticResource FlagToBoolConverter}, ConverterParameter={x:Static serialization:ViewMode.DirectParents}}">
+                                    <ListBoxItem ToolTip="Direct parents" Tag="{x:Static serialization4:ViewMode.DirectParents}" IsSelected="{Binding KeyDownViewMode, Mode=OneTime, Converter={StaticResource FlagToBoolConverter}, ConverterParameter={x:Static serialization5:ViewMode.DirectParents}}">
                                         DP
                                     </ListBoxItem>
-                                    <ListBoxItem ToolTip="Children and children of children"  Tag="{x:Static serialization:ViewMode.Children}" IsSelected="{Binding KeyDownViewMode, Mode=OneTime, Converter={StaticResource FlagToBoolConverter}, ConverterParameter={x:Static serialization:ViewMode.Children}}">
+                                    <ListBoxItem ToolTip="Children and children of children"  Tag="{x:Static serialization6:ViewMode.Children}" IsSelected="{Binding KeyDownViewMode, Mode=OneTime, Converter={StaticResource FlagToBoolConverter}, ConverterParameter={x:Static serialization7:ViewMode.Children}}">
                                         C
                                     </ListBoxItem>
-                                    <ListBoxItem ToolTip="Direct children"  Tag="{x:Static serialization:ViewMode.DirectChildren}" IsSelected="{Binding KeyDownViewMode, Mode=OneTime, Converter={StaticResource FlagToBoolConverter}, ConverterParameter={x:Static serialization:ViewMode.DirectChildren}}">
+                                    <ListBoxItem ToolTip="Direct children"  Tag="{x:Static serialization8:ViewMode.DirectChildren}" IsSelected="{Binding KeyDownViewMode, Mode=OneTime, Converter={StaticResource FlagToBoolConverter}, ConverterParameter={x:Static serialization9:ViewMode.DirectChildren}}">
                                         DC
                                     </ListBoxItem>
                                 </ListBox>
@@ -132,9 +150,9 @@
                                 <TextBlock Width="100" Margin="0 0 0 6" Text="Upkey" VerticalAlignment="Center" 
                                            ToolTip="Customize what gets displayed while the Snap Key is not pressed."/>
                                 <StackPanel>
-                                    <RadioButton IsChecked="{Binding KeyUpViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static serialization:ViewMode.Everything}}"
+                                    <RadioButton IsChecked="{Binding KeyUpViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static serialization10:ViewMode.Everything}}"
                                                  Content="Everything" ToolTip="Default behavior. Display all virtual objects even if the Activation Key is not pressed."/>
-                                    <RadioButton IsChecked="{Binding KeyUpViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static serialization:ViewMode.Nothing}}"
+                                    <RadioButton IsChecked="{Binding KeyUpViewMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static serialization11:ViewMode.Nothing}}"
                                                  Content="Nothing" ToolTip="Do not display anything if the Activation Key is not pressed."/>
                                 </StackPanel>
                             </StackPanel>
@@ -142,11 +160,11 @@
                                 <TextBlock Width="100" Margin="0 0 0 6" Text="Selection" VerticalAlignment="Center" 
                                            ToolTip="Customize which hit objects get used for generating virtual objects."/>
                                 <StackPanel>
-                                    <RadioButton IsChecked="{Binding SelectedHitObjectMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static serialization:SelectedHitObjectMode.AllwaysAllVisible}}"
+                                    <RadioButton IsChecked="{Binding SelectedHitObjectMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static serialization12:SelectedHitObjectMode.AllwaysAllVisible}}"
                                                  Content="All visible" ToolTip="Use the visible hit objects regardless of selection."/>
-                                    <RadioButton IsChecked="{Binding SelectedHitObjectMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static serialization:SelectedHitObjectMode.VisibleOrSelected}}"
+                                    <RadioButton IsChecked="{Binding SelectedHitObjectMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static serialization13:SelectedHitObjectMode.VisibleOrSelected}}"
                                                  Content="Visible or selected" ToolTip="Use the visible hit objects, or use the selected hit objects if there are any selected."/>
-                                    <RadioButton IsChecked="{Binding SelectedHitObjectMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static serialization:SelectedHitObjectMode.OnlySelected}}"
+                                    <RadioButton IsChecked="{Binding SelectedHitObjectMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static serialization14:SelectedHitObjectMode.OnlySelected}}"
                                                  Content="Selected only" ToolTip="Exclusively use selected hit objects."/>
                                 </StackPanel>
                             </StackPanel>
@@ -154,13 +172,13 @@
                                 <TextBlock Width="100" Margin="0 0 0 6" Text="Updating" VerticalAlignment="Center" 
                                            ToolTip="Customize on which events the virtual objects get updated."/>
                                 <StackPanel>
-                                    <RadioButton IsChecked="{Binding UpdateMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static serialization:UpdateMode.AnyChange}}"
+                                    <RadioButton IsChecked="{Binding UpdateMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static serialization15:UpdateMode.AnyChange}}"
                                                  Content="Any change" ToolTip="Update whenever used hit objects get changed."/>
-                                    <RadioButton IsChecked="{Binding UpdateMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static serialization:UpdateMode.TimeChange}}"
+                                    <RadioButton IsChecked="{Binding UpdateMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static serialization16:UpdateMode.TimeChange}}"
                                                  Content="Time change" ToolTip="Update whenever the editor changes time."/>
-                                    <RadioButton IsChecked="{Binding UpdateMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static serialization:UpdateMode.OsuActivated}}"
+                                    <RadioButton IsChecked="{Binding UpdateMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static serialization17:UpdateMode.OsuActivated}}"
                                                  Content="osu! activated" ToolTip="Update whenever the osu! window goes from an inactive state to an active state."/>
-                                    <RadioButton IsChecked="{Binding UpdateMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static serialization:UpdateMode.HotkeyDown}}"
+                                    <RadioButton IsChecked="{Binding UpdateMode, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static serialization18:UpdateMode.HotkeyDown}}"
                                                  Content="Hotkey down" ToolTip="Update only when the refresh hotkey is down."/>
                                 </StackPanel>
                             </StackPanel>

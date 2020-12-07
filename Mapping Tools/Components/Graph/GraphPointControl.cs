@@ -1,5 +1,4 @@
-﻿using Mapping_Tools.Classes.MathUtil;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;

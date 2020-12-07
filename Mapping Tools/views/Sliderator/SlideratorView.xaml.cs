@@ -11,15 +11,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
-using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
-using Mapping_Tools.Classes.ToolHelpers;
-using Mapping_Tools.Classes.Tools;
-using Mapping_Tools.Classes.Tools.SlideratorStuff;
 using Mapping_Tools.Components.Dialogs;
 using Mapping_Tools.Components.Graph;
 using Mapping_Tools.Components.Graph.Interpolation;
@@ -415,7 +408,7 @@ namespace Mapping_Tools.Views.Sliderator {
             var result = await DialogHost.Show(dialog, "RootDialog");
 
             if (!(bool) result) return;
-            if (!TypeConverters.TryParseDouble(dialog.ValueBox.Text, out var value)) return;
+            if (!InputParsers.TryParseDouble(dialog.ValueBox.Text, out var value)) return;
 
             var maxValue = GetMaxCompletion();
             if (Math.Abs(maxValue) < Precision.DOUBLE_EPSILON) return;

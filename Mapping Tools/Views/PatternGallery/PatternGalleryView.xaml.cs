@@ -2,8 +2,6 @@
 using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
-using Mapping_Tools.Classes.ToolHelpers;
-using Mapping_Tools.Classes.Tools.PatternGallery;
 using Mapping_Tools.Components.Dialogs.CustomDialog;
 using Mapping_Tools.Viewmodels;
 using MaterialDesignThemes.Wpf;

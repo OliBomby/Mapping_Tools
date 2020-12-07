@@ -1,8 +1,6 @@
 ﻿using AutoUpdaterDotNET;
 using Mapping_Tools.Classes;
-using Mapping_Tools.Classes.Exceptions;
 using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Views;
 using Mapping_Tools.Views.Standard;
 using MaterialDesignThemes.Wpf;
@@ -19,7 +17,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Mapping_Tools.Classes.ToolHelpers;
 
 namespace Mapping_Tools {
 

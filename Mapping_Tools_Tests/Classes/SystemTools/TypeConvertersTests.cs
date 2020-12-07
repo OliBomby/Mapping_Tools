@@ -6,16 +6,16 @@ namespace Mapping_Tools_Tests.Classes.SystemTools {
     public class TypeConvertersTests {
         [TestMethod]
         public void TimestampParserTest() {
-            var test1 = TypeConverters.ParseOsuTimestamp("00:00:891 (1) - ");
+            var test1 = InputParsers.ParseOsuTimestamp("00:00:891 (1) - ");
             Assert.AreEqual(891, test1.TotalMilliseconds);
 
-            var test2 = TypeConverters.ParseOsuTimestamp("60:00:074 (2,4) - ");
+            var test2 = InputParsers.ParseOsuTimestamp("60:00:074 (2,4) - ");
             Assert.AreEqual(3600074, test2.TotalMilliseconds);
 
-            var test3 = TypeConverters.ParseOsuTimestamp("60:00:074 - ");
+            var test3 = InputParsers.ParseOsuTimestamp("60:00:074 - ");
             Assert.AreEqual(3600074, test3.TotalMilliseconds);
 
-            var test4 = TypeConverters.ParseOsuTimestamp("00:-01:-230 (1) - ");
+            var test4 = InputParsers.ParseOsuTimestamp("00:-01:-230 (1) - ");
             Assert.AreEqual(-1230, test4.TotalMilliseconds);
         }
     }

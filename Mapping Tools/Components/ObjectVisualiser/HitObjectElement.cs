@@ -1,11 +1,9 @@
-﻿using Mapping_Tools.Classes.MathUtil;
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
-using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
 
 namespace Mapping_Tools.Components.ObjectVisualiser {
     public class HitObjectElement : FrameworkElement {

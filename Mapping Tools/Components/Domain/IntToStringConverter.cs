@@ -20,13 +20,13 @@ namespace Mapping_Tools.Components.Domain {
             }
 
             if (parameter == null) {
-                if (TypeConverters.TryParseInt(value.ToString(), out int result1)) {
+                if (InputParsers.TryParseInt(value.ToString(), out int result1)) {
                     return result1;
                 }
 
                 return new ValidationResult(false, "Int format error.");
             }
-            TypeConverters.TryParseInt(value.ToString(), out int result2, int.Parse(parameter.ToString()));
+            InputParsers.TryParseInt(value.ToString(), out int result2, int.Parse(parameter.ToString()));
             return result2;
         }
     }

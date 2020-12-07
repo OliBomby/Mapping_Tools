@@ -5,7 +5,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
-        xmlns:generatorInputSelection="clr-namespace:Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection"
         mc:Ignorable="d"
         Title="Generator Settings" Height="500" Width="570" MinWidth="575" MinHeight="360"
         WindowStyle="None"

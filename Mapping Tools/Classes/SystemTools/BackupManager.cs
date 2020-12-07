@@ -3,10 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.Exceptions;
-using Mapping_Tools.Classes.ToolHelpers;
-using Mapping_Tools.Classes.Tools;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public static class BackupManager {

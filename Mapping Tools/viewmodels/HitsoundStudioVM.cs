@@ -1,12 +1,9 @@
-﻿using Mapping_Tools.Classes.HitsoundStuff;
-using Mapping_Tools.Classes.SystemTools;
+﻿using Mapping_Tools.Classes.SystemTools;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.BeatmapHelper.Enums;
 
 namespace Mapping_Tools.Viewmodels {
     public class HitsoundStudioVm : BindableBase {

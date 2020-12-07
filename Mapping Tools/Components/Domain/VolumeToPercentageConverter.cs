@@ -10,7 +10,7 @@ namespace Mapping_Tools.Components.Domain {
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
-            TypeConverters.TryParseDouble(value.ToString(), out double result, double.Parse(parameter.ToString()));
+            InputParsers.TryParseDouble(value.ToString(), out double result, double.Parse(parameter.ToString()));
             return result / 100;
         }
     }

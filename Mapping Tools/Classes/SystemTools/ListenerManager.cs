@@ -1,6 +1,5 @@
 ﻿using Editor_Reader;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
-using Mapping_Tools.Classes.Tools;
 using NonInvasiveKeyboardHookLibrary;
 using System;
 using System.Collections.Generic;
@@ -12,8 +11,6 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Threading;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.ToolHelpers;
 using ModifierKeys = NonInvasiveKeyboardHookLibrary.ModifierKeys;
 
 namespace Mapping_Tools.Classes.SystemTools {

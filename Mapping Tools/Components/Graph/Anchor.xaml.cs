@@ -1,6 +1,6 @@
 ﻿using Mapping_Tools.Annotations;
-using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools_Core;
 using Mapping_Tools.Components.Graph.Interpolation;
 using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
 using MaterialDesignThemes.Wpf;
@@ -315,7 +315,7 @@ namespace Mapping_Tools.Components.Graph {
 
             if (!(bool) result) return;
         
-            if (TypeConverters.TryParseDouble(dialog.ValueBox.Text, out double value)) {
+            if (InputParsers.TryParseDouble(dialog.ValueBox.Text, out double value)) {
                 Pos = new Vector2(Pos.X, value);
             }
             Graph.UpdateVisual();

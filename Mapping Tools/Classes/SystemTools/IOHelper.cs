@@ -1,11 +1,8 @@
 ﻿using System;
 using System.IO;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.Tools;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using OsuMemoryDataProvider;
 using System.Windows.Forms;
-using Mapping_Tools.Classes.ToolHelpers;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public class IOHelper {

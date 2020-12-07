@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Windows.Controls;
 using Mapping_Tools.Annotations;
-using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Components.Graph.Markers {
     public class DoubleMarkerGenerator : IMarkerGenerator {

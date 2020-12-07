@@ -1,8 +1,5 @@
 ﻿using Mapping_Tools.Classes;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Components.Domain;
 using Mapping_Tools.Views.SnappingTools;
 using Process.NET;
@@ -20,15 +17,6 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-using Mapping_Tools.Classes.ToolHelpers;
-using Mapping_Tools.Classes.Tools.SnappingTools;
-using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure;
-using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject;
-using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
-using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectCollection;
-using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
-using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorCollection;
-using Mapping_Tools.Classes.Tools.SnappingTools.Serialization;
 using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
 using MessageBox = System.Windows.MessageBox;
 

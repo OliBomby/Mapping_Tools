@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Linq;
-using Mapping_Tools.Classes.BeatmapHelper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools_Tests.Classes.BeatmapHelper {

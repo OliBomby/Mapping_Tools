@@ -6,7 +6,6 @@
              xmlns:local="clr-namespace:Mapping_Tools.Views"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
-             xmlns:beatmapHelper="clr-namespace:Mapping_Tools.Classes.BeatmapHelper"
              mc:Ignorable="d" 
              x:Name="This"
              d:DesignHeight="650" Width="759.5" d:DataContext="{d:DesignData MetadataManagerVm}">

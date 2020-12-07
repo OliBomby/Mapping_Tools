@@ -6,7 +6,6 @@
         xmlns:components="clr-namespace:Mapping_Tools.Components.Domain"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:components1="clr-namespace:Mapping_Tools.Components"
-        xmlns:serialization="clr-namespace:Mapping_Tools.Classes.Tools.SnappingTools.Serialization"
         mc:Ignorable="d"
         Title="Geometry Dashboard Projects" Height="500" Width="570" MinWidth="575" MinHeight="360"
         WindowStyle="None"

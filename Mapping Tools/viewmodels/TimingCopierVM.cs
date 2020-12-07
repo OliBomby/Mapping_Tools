@@ -4,8 +4,6 @@ using Mapping_Tools.Components.Domain;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Mapping_Tools.Classes;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.BeatmapHelper.BeatDivisors;
 
 namespace Mapping_Tools.Viewmodels {
 

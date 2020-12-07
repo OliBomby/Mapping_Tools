@@ -5,10 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Mapping_Tools.Classes;
-using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectCollection;
-using Mapping_Tools.Classes.Tools.SnappingTools.Serialization;
 using Mapping_Tools.Viewmodels;
 using MaterialDesignThemes.Wpf;
 

@@ -1,7 +1,5 @@
-﻿using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.SystemTools;
+﻿using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
-using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Components.TimeLine;
 using Mapping_Tools.Viewmodels;
 using System;
@@ -9,7 +7,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
-using Mapping_Tools.Classes.ToolHelpers;
 
 namespace Mapping_Tools.Views.AutoFailDetector {
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]

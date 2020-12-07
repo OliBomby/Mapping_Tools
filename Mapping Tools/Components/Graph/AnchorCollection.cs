@@ -1,5 +1,4 @@
-﻿using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Components.Graph.Interpolation;
+﻿using Mapping_Tools.Components.Graph.Interpolation;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
