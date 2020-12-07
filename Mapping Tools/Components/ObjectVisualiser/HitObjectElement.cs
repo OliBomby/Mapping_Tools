@@ -4,6 +4,9 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
+using Mapping_Tools_Core.BeatmapHelper.SliderPathStuff;
+using Mapping_Tools_Core.MathUtil;
+using Mapping_Tools_Core.BeatmapHelper;
 
 namespace Mapping_Tools.Components.ObjectVisualiser {
     public class HitObjectElement : FrameworkElement {
@@ -19,15 +22,15 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
 
         public static readonly DependencyProperty HitObjectProperty =
             DependencyProperty.Register("HitObject",
-                typeof(Classes.BeatmapHelper.HitObject), 
+                typeof(Mapping_Tools_Core.BeatmapHelper.HitObject), 
                 typeof(HitObjectElement), 
                 new FrameworkPropertyMetadata(null,
                     FrameworkPropertyMetadataOptions.AffectsRender,
                     OnHitObjectChanged
                 ));
 
-        public Classes.BeatmapHelper.HitObject HitObject {
-            get => (Classes.BeatmapHelper.HitObject) GetValue(HitObjectProperty);
+        public Mapping_Tools_Core.BeatmapHelper.HitObject HitObject {
+            get => (Mapping_Tools_Core.BeatmapHelper.HitObject) GetValue(HitObjectProperty);
             set => SetValue(HitObjectProperty, value);
         }
 
@@ -235,7 +238,7 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
         private static void OnHitObjectChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             var me = (HitObjectElement) d; 
 
-            var hitObject = (Classes.BeatmapHelper.HitObject) e.NewValue;
+            var hitObject = (Mapping_Tools_Core.BeatmapHelper.HitObject) e.NewValue;
             me.SetHitObject(hitObject);
         }
 
@@ -251,7 +254,7 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
             me.ExtraMarkers.CollectionChanged += me.ExtraMarkersOnCollectionChanged;
         }
 
-        private void SetHitObject(Classes.BeatmapHelper.HitObject hitObject) {
+        private void SetHitObject(Mapping_Tools_Core.BeatmapHelper.HitObject hitObject) {
             if (hitObject == null) return;
 
             if (hitObject.IsSlider && hitObject.PixelLength < MaxPixelLength) {

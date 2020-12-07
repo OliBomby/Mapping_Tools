@@ -4,6 +4,9 @@ using System.Linq;
 using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Components.Domain;
+using Mapping_Tools_Core;
+using Mapping_Tools_Core.BeatmapHelper.BeatDivisors;
+using Mapping_Tools_Core.BeatmapHelper.Enums;
 
 namespace Mapping_Tools.Viewmodels {
     public class HitsoundCopierVm : BindableBase {

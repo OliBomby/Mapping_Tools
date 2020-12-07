@@ -5,7 +5,6 @@ using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Media;
 using JetBrains.Annotations;
-using Mapping_Tools.Components.Domain;
 using Mapping_Tools_Core.BeatmapHelper;
 using MaterialDesignThemes.Wpf;
 using Newtonsoft.Json;

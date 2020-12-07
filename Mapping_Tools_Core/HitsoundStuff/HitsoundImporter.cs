@@ -11,7 +11,7 @@ using Mapping_Tools_Core.ToolHelpers;
 using NAudio.Midi;
 
 namespace Mapping_Tools_Core.HitsoundStuff {
-    class HitsoundImporter {
+    public class HitsoundImporter {
         public static List<double> TimesFromStack(string path, double x, double y) {
             List<double> times = new List<double>();
             var editor = EditorReaderStuff.GetNewestVersionOrNot(path);
