@@ -218,7 +218,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             double patternTickRate = patternBeatmap.Difficulty["SliderTickRate"].DoubleValue;
 
             // Don't include SV changes if it is based on nothing
-            bool includeSliderVelocity = patternTiming.Count > 0;
+            bool includePatternSliderVelocity = patternTiming.Count > 0;
 
             // Avoid including hitsounds if there are no timingpoints to get hitsounds from
             bool includeTimingPointHitsounds = IncludeHitsounds && patternTiming.Count > 0;
@@ -243,16 +243,24 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             // Dont give new combo to all hit objects which were actually new combo in the pattern,
             // because it leads to unexpected NC's at the start of patterns.
 
-            // Collect Kiai toggles and SliderVelocity changes for mania/taiko
-            List<TimingPoint> patternKiaiToggles = new List<TimingPoint>();
-            List<TimingPoint> svChanges = new List<TimingPoint>();
+            // Collect Kiai toggles
+            List<TimingPoint> kiaiToggles = new List<TimingPoint>();
             bool lastKiai = false;
-            double lastSV = -100;
-            foreach (TimingPoint tp in patternTiming.TimingPoints) {
-                if (tp.Kiai != lastKiai || patternKiaiToggles.Count == 0) {
-                    patternKiaiToggles.Add(tp.Copy());
+            // If not including the kiai of the pattern, add the kiai of the original map.
+            // This has to be done because this part of the original map might get deleted.
+            foreach (TimingPoint tp in IncludeKiai ? patternTiming.TimingPoints : originalTiming.TimingPoints) {
+                if (tp.Kiai != lastKiai || kiaiToggles.Count == 0) {
+                    kiaiToggles.Add(tp.Copy());
                     lastKiai = tp.Kiai;
                 }
+            }
+
+            // Collect SliderVelocity changes for mania/taiko
+            List<TimingPoint> svChanges = new List<TimingPoint>();
+            double lastSV = -100;
+            // If not including the SV of the pattern, add the SV of the original map.
+            // This has to be done because this part of the original map might get deleted.
+            foreach (TimingPoint tp in includePatternSliderVelocity ? patternTiming.TimingPoints : originalTiming.TimingPoints) {
                 if (tp.Uninherited) {
                     lastSV = -100;
                 } else {
@@ -260,6 +268,14 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                         svChanges.Add(tp.Copy());
                         lastSV = tp.MpB;
                     }
+                }
+            }
+
+            // If not including the SV of the pattern, set the SV of sliders to that of the original beatmap,
+            // so the pattern will take over the SV of the original beatmap.
+            if (!includePatternSliderVelocity) {
+                foreach (var ho in patternBeatmap.HitObjects.Where(ho => ho.IsSlider)) {
+                    ho.SliderVelocity = originalTiming.GetSvAtTime(ho.Time);
                 }
             }
 
@@ -285,7 +301,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                     }
                 }
 
-                foreach (var tp in patternKiaiToggles.Concat(svChanges)) {
+                foreach (var tp in kiaiToggles.Concat(svChanges)) {
                     tp.Offset = patternTiming.GetBeatLength(patternStartTime, tp.Offset);
                 }
 
@@ -517,7 +533,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                     ho.UpdateTimelineObjectTimes();
                 }
 
-                foreach (var tp in patternKiaiToggles.Concat(svChanges)) {
+                foreach (var tp in kiaiToggles.Concat(svChanges)) {
                     tp.Offset = Math.Floor(newTiming.GetMilliseconds(tp.Offset, patternStartTime));
                 }
             }
@@ -580,7 +596,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                     ho.ResnapPosition(targetMode, patternCircleSize);  // Resnap to column X positions for mania only
                 }
                 // Resnap Kiai toggles
-                foreach (TimingPoint tp in patternKiaiToggles) {
+                foreach (TimingPoint tp in kiaiToggles) {
                     tp.ResnapSelf(transformNewTiming, BeatDivisors);
                 }
 
@@ -608,27 +624,16 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 new TimingPointsChange(tp, mpb: true, meter: true, unInherited: true, omitFirstBarLine: true, fuzzyness:Precision.DOUBLE_EPSILON)).ToList();
 
             // Add SliderVelocity changes for taiko and mania
-            if (includeSliderVelocity && (targetMode == GameMode.Taiko || targetMode == GameMode.Mania)) {
+            if (includePatternSliderVelocity && (targetMode == GameMode.Taiko || targetMode == GameMode.Mania)) {
                 timingPointsChanges.AddRange(svChanges.Select(tp => new TimingPointsChange(tp, mpb: true)));
             }
 
             // Add Kiai toggles
-            if (IncludeKiai) {
-                timingPointsChanges.AddRange(patternKiaiToggles.Select(tp => new TimingPointsChange(tp, kiai: true)));
-            }
-            else {
-                lastKiai = false;
-                foreach (TimingPoint tp in originalTiming.TimingPoints) {
-                    if (tp.Kiai != lastKiai) {
-                        timingPointsChanges.Add(new TimingPointsChange(tp.Copy(), kiai: true));
-                        lastKiai = tp.Kiai;
-                    }
-                }
-            }
+            timingPointsChanges.AddRange(kiaiToggles.Select(tp => new TimingPointsChange(tp, kiai: true)));
 
             // Add Hitobject stuff
             foreach (HitObject ho in patternBeatmap.HitObjects) {
-                if (ho.IsSlider && includeSliderVelocity) // SliderVelocity changes
+                if (ho.IsSlider) // SliderVelocity changes
                 {
                     TimingPoint tp = ho.TimingPoint.Copy();
                     tp.Offset = ho.Time;
