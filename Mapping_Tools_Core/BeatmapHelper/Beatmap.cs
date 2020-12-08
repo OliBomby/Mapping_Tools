@@ -12,7 +12,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
     /// <summary>
     /// Class containing all the data from a .osu beatmap file. It also supports serialization to .osu format and helper methods to get data in specific ways.
     /// </summary>
-    public class Beatmap : ITextFile {
+    public class Beatmap : ITextFile, IComboColourCollection {
 
         /// <summary>
         /// Contains all the values in the [General] section of a .osu file. The key is the variable name and the value is the value.
@@ -79,13 +79,18 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// There can not be more than 8 combo colours.
         /// <c>Combo1 : 245,222,139</c>
         /// </summary>
-        public List<ComboColour> ComboColours { get; set; }
+        public List<IComboColour> ComboColoursList { get; set; }
+
+        /// <summary>
+        /// Read-only version of <see cref="ComboColoursList"/> for the <see cref="IComboColourCollection"/> interface.
+        /// </summary>
+        public IReadOnlyList<IComboColour> ComboColours => ComboColoursList;
 
         /// <summary>
         /// Contains all the special colours. These include the colours of slider bodies or slider outlines.
         /// The key is the name of the special colour and the value is the actual colour.
         /// </summary>
-        public Dictionary<string, ComboColour> SpecialColours { get; set; }
+        public Dictionary<string, IComboColour> SpecialColours { get; set; }
 
         /// <summary>
         /// The timing of this beatmap. This objects contains all the timing points (data from the [TimingPoints] section) plus the global slider multiplier.
@@ -217,8 +222,8 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             Editor = new Dictionary<string, TValue>();
             Metadata = new Dictionary<string, TValue>();
             Difficulty = new Dictionary<string, TValue>();
-            ComboColours = new List<ComboColour>();
-            SpecialColours = new Dictionary<string, ComboColour>();
+            ComboColoursList = new List<IComboColour>();
+            SpecialColours = new Dictionary<string, IComboColour>();
             StoryBoard = new StoryBoard();
             HitObjects = new List<HitObject>();
             BeatmapTiming = new Timing(1.4);
@@ -277,7 +282,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
 
             foreach (string line in colourLines) {
                 if (line.Substring(0, 5) == "Combo") {
-                    ComboColours.Add(new ComboColour(line));
+                    ComboColoursList.Add(new ComboColour(line));
                 } else {
                     SpecialColours[FileFormatHelper.SplitKeyValue(line)[0].Trim()] = new ComboColour(line);
                 }
@@ -330,6 +335,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// </summary>
         /// <param name="startIndex"></param>
         /// <param name="endIndex"></param>
+        /// <param name="rounded">Whether to use a rounded stackOffset</param>
         internal void UpdateStacking(int startIndex = 0, int endIndex = -1, bool rounded = false) {
             if (endIndex == -1)
                 endIndex = HitObjects.Count - 1;
@@ -488,7 +494,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             int comboIndex = 0;
 
             // If there are no combo colours use the default combo colours so the hitobjects still have something
-            var actingComboColours = ComboColours.Count == 0 ? ComboColour.GetDefaultComboColours() : ComboColours.ToArray();
+            var actingComboColours = ComboColoursList.Count == 0 ? ComboColour.GetDefaultComboColours() : ComboColoursList.ToArray();
 
             foreach (var hitObject in HitObjects) {
                 hitObject.ActualNewCombo = IsNewCombo(hitObject, previousHitObject);
@@ -518,7 +524,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             int colourIndex = 0;
 
             // If there are no combo colours use the default combo colours so the hitobjects still have something
-            var actingComboColours = ComboColours.Count == 0 ? ComboColour.GetDefaultComboColours() : ComboColours.ToArray();
+            var actingComboColours = ComboColoursList.Count == 0 ? ComboColour.GetDefaultComboColours() : ComboColoursList.ToArray();
 
             foreach (var hitObject in HitObjects) {
                 bool newCombo = IsNewCombo(hitObject, previousHitObject);
@@ -694,11 +700,13 @@ namespace Mapping_Tools_Core.BeatmapHelper {
                 return tp.GetLine();
             }));
             lines.Add("");
-            if (ComboColours.Any()) {
+            if (ComboColoursList.Any()) {
                 lines.Add("");
                 lines.Add("[Colours]");
-                lines.AddRange(ComboColours.Select((t, i) => "Combo" + (i + 1) + " : " + t));
-                lines.AddRange(SpecialColours.Select(specialColour => specialColour.Key + " : " + specialColour.Value));
+                lines.AddRange(ComboColoursList.Select((comboColour, i) => "Combo" + (i + 1) + " : " +
+                                                                       ComboColour.SerializeComboColour(comboColour)));
+                lines.AddRange(SpecialColours.Select(specialColour => specialColour.Key + " : " +
+                                                                      ComboColour.SerializeComboColour(specialColour.Value)));
             }
             lines.Add("");
             lines.Add("[HitObjects]");

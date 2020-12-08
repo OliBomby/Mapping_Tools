@@ -146,11 +146,12 @@
     <Compile Include="BeatmapHelper\FileFormatHelper.cs" />
     <Compile Include="BeatmapHelper\HitObject.cs" />
     <Compile Include="BeatmapHelper\HitObjectComparer.cs" />
+    <Compile Include="BeatmapHelper\IComboColour.cs" />
+    <Compile Include="BeatmapHelper\IComboColourCollection.cs" />
     <Compile Include="BeatmapHelper\ITextFile.cs" />
     <Compile Include="BeatmapHelper\ITextLine.cs" />
     <Compile Include="BeatmapHelper\SliderPathStuff\PathApproximator.cs" />
     <Compile Include="BeatmapHelper\SliderPathStuff\SliderPath.cs" />
-    <Compile Include="BeatmapHelper\SpecialColour.cs" />
     <Compile Include="BeatmapHelper\Storyboard.cs" />
     <Compile Include="BeatmapHelper\StoryboardEditor.cs" />
     <Compile Include="BeatmapHelper\TempoSignature.cs" />
@@ -159,7 +160,6 @@
     <Compile Include="BeatmapHelper\Timing.cs" />
     <Compile Include="BeatmapHelper\TimingPoint.cs" />
     <Compile Include="BeatmapHelper\TValue.cs" />
-    <Compile Include="BindableBase.cs" />
     <Compile Include="Exceptions\BeatmapIncompatibleException.cs" />
     <Compile Include="Exceptions\EditorReaderDisabledException.cs" />
     <Compile Include="Exceptions\InvalidEditorReaderStateException.cs" />
@@ -168,7 +168,6 @@
     <Compile Include="ExternalFileUtil\Reaper\ReaperEditor.cs" />
     <Compile Include="ExternalFileUtil\Reaper\ReaperProject.cs" />
     <Compile Include="ExternalFileUtil\Reaper\TrackItem.cs" />
-    <Compile Include="GenericExtensions.cs" />
     <Compile Include="HitsoundStuff\CompleteHitsounds.cs" />
     <Compile Include="HitsoundStuff\CustomIndex.cs" />
     <Compile Include="HitsoundStuff\Effects\DelayFadeOutSampleProvider.cs" />
@@ -248,10 +247,14 @@
     <Compile Include="ToolHelpers\SliderPathUtil.cs" />
     <Compile Include="ToolHelpers\TimingPointsChange.cs" />
     <Compile Include="Tools\AutoFailDetector.cs" />
+    <Compile Include="Tools\ComboColourStudio\ColourHaxImporter.cs" />
     <Compile Include="Tools\ComboColourStudio\ColourPoint.cs" />
     <Compile Include="Tools\ComboColourStudio\ColourPointMode.cs" />
+    <Compile Include="Tools\ComboColourStudio\ColourHaxExporter.cs" />
     <Compile Include="Tools\ComboColourStudio\ComboColourProject.cs" />
-    <Compile Include="Tools\ComboColourStudio\SpecialColourDragAndDropListBox.cs" />
+    <Compile Include="Tools\ComboColourStudio\IColourPoint.cs" />
+    <Compile Include="Tools\ComboColourStudio\IColourPointCollection.cs" />
+    <Compile Include="Tools\ComboColourStudio\IComboColourProject.cs" />
     <Compile Include="Tools\MapCleanerStuff\MapCleaner.cs" />
     <Compile Include="Tools\MapCleanerStuff\MapCleanerArgs.cs" />
     <Compile Include="Tools\MapCleanerStuff\MapCleanerResult.cs" />

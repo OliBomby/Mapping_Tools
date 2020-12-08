@@ -194,6 +194,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Classes\BindableBase.cs" />
+    <Compile Include="Classes\GenericExtensions.cs" />
     <Compile Include="Classes\SystemTools\ActionHotkey.cs" />
     <Compile Include="Classes\SystemTools\BackupManager.cs" />
     <Compile Include="Classes\SystemTools\Hotkey.cs" />
@@ -209,6 +211,8 @@
     <Compile Include="Classes\SystemTools\Settings.cs" />
     <Compile Include="Classes\SystemTools\SettingsManager.cs" />
     <Compile Include="Classes\SystemTools\ShowSelectedInFileExplorer.cs" />
+    <Compile Include="Classes\Tools\ComboColourStudio\ColourPointBindable.cs" />
+    <Compile Include="Classes\Tools\ComboColourStudio\NamedColour.cs" />
     <Compile Include="Components\Dialogs\CustomDialog\BeatmapBrowseAttribute.cs" />
     <Compile Include="Components\Dialogs\CustomDialog\ConverterParameterAttribute.cs" />
     <Compile Include="Components\Dialogs\CustomDialog\MultiLineInputAttribute.cs" />
@@ -679,6 +683,7 @@
       <Name>Mapping_Tools_Core</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="BeforeBuild" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

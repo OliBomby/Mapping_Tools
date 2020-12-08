@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:Mapping_Tools.Views"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
+             xmlns:comboColourStudio="clr-namespace:Mapping_Tools.Classes.Tools.ComboColourStudio"
              mc:Ignorable="d" 
              x:Name="This"
              d:DesignHeight="650" Width="759.5" d:DataContext="{d:DesignData ComboColourStudioVm}">
@@ -79,8 +80,8 @@
                             ItemsSourceBinding="{Binding ColourPointModes}" />
                         <DataGridTemplateColumn Header="Colour Sequence" Width="{Binding Width, ElementName=SmallColourSequence}">
                             <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate DataType="comboColourStudio:ColourPoint">
-                                    <ItemsControl ItemsSource="{Binding ColourSequence}">
+                                <DataTemplate DataType="comboColourStudio:ColourPointBindable">
+                                    <ItemsControl ItemsSource="{Binding ColourSequenceColours}">
                                         <ItemsControl.ItemsPanel>
                                             <ItemsPanelTemplate>
                                                 <StackPanel Orientation="Horizontal"/>
@@ -88,14 +89,14 @@
                                         </ItemsControl.ItemsPanel>
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <materialDesign:PackIcon Kind="Circle" Width="24" Height="24" ToolTip="{Binding Name}" Foreground="{Binding Color, Converter={StaticResource ColorToBrushConverter}}"/>
+                                                <materialDesign:PackIcon Kind="Circle" Width="24" Height="24" ToolTip="{Binding Name}" Foreground="{Binding Colour, Converter={StaticResource ColorToBrushConverter}}"/>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                             <DataGridTemplateColumn.CellEditingTemplate>
-                                <DataTemplate DataType="comboColourStudio:ColourPoint">
+                                <DataTemplate DataType="comboColourStudio:ColourPointBindable">
                                     <StackPanel Orientation="Horizontal">
                                         <ListBox ItemsSource="{Binding ColourSequence}">
                                             <ListBox.ItemsPanel>
@@ -104,18 +105,18 @@
                                                 </ItemsPanelTemplate>
                                             </ListBox.ItemsPanel>
                                             <ListBox.ItemTemplate>
-                                                <DataTemplate DataType="beatmapHelper:SpecialColour">
+                                                <DataTemplate DataType="comboColourStudio:NamedColour">
                                                     <StackPanel Orientation="Horizontal">
-                                                        <materialDesign:Chip Content="{Binding Name}" ToolTip="{Binding Name}" IconBackground="{Binding Color, Converter={StaticResource ColorToBrushConverter}}" Icon="" 
-                                                                             IsDeletable="True" DeleteCommand="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}, Path=DataContext.RemoveCommand}" DeleteCommandParameter="{Binding}"/>
+                                                        <materialDesign:Chip Content="{Binding Name}" ToolTip="{Binding Name}" IconBackground="{Binding Colour, Converter={StaticResource ColorToBrushConverter}}" Icon="" 
+                                                                             IsDeletable="True" DeleteCommand="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}, Path=DataContext.RemoveColourCommand}" DeleteCommandParameter="{Binding}"/>
                                                     </StackPanel>
                                                 </DataTemplate>
                                             </ListBox.ItemTemplate>
                                         </ListBox>
-                                        <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a new colour." VerticalAlignment="Center" Margin="5 0 5 0" Command="{Binding AddCommand}" CommandParameter="{Binding ElementName=This}">
+                                        <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a new colour." VerticalAlignment="Center" Margin="5 0 5 0" Command="{Binding AddColourCommand}" CommandParameter="{Binding ElementName=This}">
                                             <materialDesign:PackIcon Kind="Plus" Width="24" Height="24"/>
                                         </Button>
-                                        <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove last colour." VerticalAlignment="Center" Margin="5 0 5 0" Command="{Binding RemoveCommand}">
+                                        <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove last colour." VerticalAlignment="Center" Margin="5 0 5 0" Command="{Binding RemoveColourCommand}">
                                             <materialDesign:PackIcon Kind="Minus" Width="24" Height="24"/>
                                         </Button>
                                     </StackPanel>
@@ -141,9 +142,9 @@
                     <Grid Grid.Row="1">
                         <materialDesign:Card VerticalAlignment="Bottom" HorizontalAlignment="Stretch" UniformCornerRadius="5" Padding="2" Margin="0 10 5 5">
                             <StackPanel Orientation="Horizontal">
-                                <Button Content="Import colours" Click="ImportColoursButton_OnClick" Margin="5 0 5 0"
+                                <Button Content="Import colours" Command="{Binding ImportColoursCommand}" Margin="5 0 5 0"
                                         ToolTip="Import combo colours from a beatmap."/>
-                                <Button Content="Import colorhax" Click="ImportColourHaxButton_OnClick" Margin="5 0 20 0"
+                                <Button Content="Import colorhax" Command="{Binding ImportColourHaxCommand}" Margin="5 0 20 0"
                                         ToolTip="Import colour haxing from a beatmap and populate the colour points."/>
 
                                 <TextBox Width="120" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="10 0 10 5"
@@ -169,16 +170,16 @@
                                         </ItemsPanelTemplate>
                                     </ListBox.ItemsPanel>
                                     <ListBox.ItemTemplate>
-                                        <DataTemplate DataType="beatmapHelper:SpecialColour">
+                                        <DataTemplate DataType="comboColourStudio:NamedColour">
                                             <materialDesign:PopupBox StaysOpen="True" ToolTip="{Binding Name}">
                                                 <materialDesign:PopupBox.ToggleContent>
-                                                    <materialDesign:PackIcon Kind="Circle" Foreground="{Binding Color, Converter={StaticResource ColorToBrushConverter}}" Width="35" Height="35"/>
+                                                    <materialDesign:PackIcon Kind="Circle" Foreground="{Binding Colour, Converter={StaticResource ColorToBrushConverter}}" Width="35" Height="35"/>
                                                 </materialDesign:PopupBox.ToggleContent>
                                                 <StackPanel Orientation="Horizontal" Margin="20">
                                                     <TextBox Text="{Binding Color, ElementName=ColorPicker}"
                                                              Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" materialDesign:HintAssist.Hint="Color HEX value"
                                                              Width="120" Margin="2,0,10,2"/>
-                                                    <materialDesign:ColorPicker Color="{Binding Color}" x:Name="ColorPicker" Width="300"/>
+                                                    <materialDesign:ColorPicker Color="{Binding Colour}" x:Name="ColorPicker" Width="300"/>
                                                 </StackPanel>
                                             </materialDesign:PopupBox>
                                         </DataTemplate>

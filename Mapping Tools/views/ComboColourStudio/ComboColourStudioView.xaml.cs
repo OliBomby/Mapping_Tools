@@ -1,20 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Windows;
-using System.Windows.Input;
-using Mapping_Tools.Classes.SystemTools;
+﻿using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Components.Dialogs;
 using Mapping_Tools.Viewmodels;
+using Mapping_Tools_Core.ToolHelpers;
+using Mapping_Tools_Core.Tools.ComboColourStudio;
 using MaterialDesignThemes.Wpf;
+using System;
+using System.ComponentModel;
+using System.IO;
+using System.Windows;
+using System.Windows.Input;
 
 namespace Mapping_Tools.Views.ComboColourStudio {
     /// <summary>
     /// Interactielogica voor ComboColourStudioView.xaml
     /// </summary>
-    public partial class ComboColourStudioView : ISavable<ComboColourProject> {
+    public partial class ComboColourStudioView : ISavable<ComboColourStudioVm> {
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "combocolourproject.json");
 
         public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Combo Colour Studio Projects");
@@ -31,26 +31,6 @@ namespace Mapping_Tools.Views.ComboColourStudio {
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
             ProjectManager.LoadProject(this, message: false);
-        }
-
-        private async void ImportColoursButton_OnClick(object sender, RoutedEventArgs e) {
-            var sampleDialog = new BeatmapImportDialog();
-
-            var result = await DialogHost.Show(sampleDialog, "RootDialog");
-
-            if ((bool) result) {
-                ViewModel.Project.ImportComboColoursFromBeatmap(sampleDialog.Path);
-            }
-        }
-
-        private async void ImportColourHaxButton_OnClick(object sender, RoutedEventArgs e) {
-            var sampleDialog = new BeatmapImportDialog();
-
-            var result = await DialogHost.Show(sampleDialog, "RootDialog");
-
-            if ((bool) result) {
-                ViewModel.Project.ImportColourHaxFromBeatmap(sampleDialog.Path);
-            }
         }
 
         protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
@@ -78,82 +58,13 @@ namespace Mapping_Tools.Views.ComboColourStudio {
             var paths = arg.ExportPath.Split('|');
             var mapsDone = 0;
 
-            var orderedColourPoints = arg.Project.ColourPoints.OrderBy(o => o.Time).ToList();
-            var orderedComboColours = arg.Project.ComboColours.OrderBy(o => o.Name).ToList();
-
             var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
 
             foreach (var path in paths) {
                 var editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader);
                 var beatmap = editor.Beatmap;
 
-                // Setting the combo colours
-                beatmap.ComboColours = new List<ComboColour>(arg.Project.ComboColours);
-
-                // Setting the combo skips
-                if (beatmap.HitObjects.Count > 0 && orderedColourPoints.Count > 0) {
-                    int lastColourPointColourIndex = -1;
-                    var lastColourPoint = orderedColourPoints[0];
-                    int lastColourIndex = 0;
-                    var exceptions = new List<ColourPoint>();
-                    foreach (var newCombo in beatmap.HitObjects.Where(o => o.ActualNewCombo && !o.IsSpinner)) {
-                        int comboLength = GetComboLength(newCombo, beatmap.HitObjects);
-                        //Console.WriteLine(comboLength);
-
-                        // Get the colour point for this new combo
-                        var colourPoint = GetColourPoint(orderedColourPoints, newCombo.Time, exceptions, comboLength <= arg.Project.MaxBurstLength);
-                        var colourSequence = colourPoint.ColourSequence.ToList();
-
-                        // Add the colour point to the exceptions so it doesnt get used again
-                        if (colourPoint.Mode == ColourPointMode.Burst) {
-                            exceptions.Add(colourPoint);
-                        }
-
-                        // Get the last colour index on the sequence of this colour point
-                        lastColourPointColourIndex = lastColourPointColourIndex == -1 || lastColourPoint.Equals(colourPoint) ? 
-                            lastColourPointColourIndex : 
-                            colourSequence.FindIndex(o => o.Name == orderedComboColours[lastColourIndex].Name);
-
-                        // Get the next colour index on this colour point
-                        // Check if colourSequence count is 0 to prevent division by 0
-                        var colourPointColourIndex = lastColourPointColourIndex == -1 || colourSequence.Count == 0
-                            ? 0
-                            : lastColourPoint.Equals(colourPoint) ? 
-                            MathHelper.Mod(lastColourPointColourIndex + 1, colourSequence.Count) :
-                            // If the colour point changed try going back to index 0
-                            lastColourPointColourIndex == 0 && colourSequence.Count > 1 ? 1 : 0;
-
-                        //Console.WriteLine("colourPointColourIndex: " + colourPointColourIndex);
-                        //Console.WriteLine("colourPointColour: " + colourPoint.ColourSequence[colourPointColourIndex].Name);
-
-                        // Find the combo index of the chosen colour in the sequence
-                        // Check if the colourSequence count is 0 to prevent an out-of-range exception
-                        var colourIndex = colourSequence.Count == 0 ? MathHelper.Mod(lastColourIndex + 1, orderedComboColours.Count) :
-                            orderedComboColours.FindIndex(o => o.Name == colourSequence[colourPointColourIndex].Name);
-
-                        if (colourIndex == -1) {
-                            throw new ArgumentException($"Can not use colour {colourSequence[colourPointColourIndex].Name} of colour point at offset {colourPoint.Time} because it does not exist in the combo colours.");
-                        }
-
-                        //Console.WriteLine("colourIndex: " + colourIndex);
-
-                        var comboIncrease = MathHelper.Mod(colourIndex - lastColourIndex, arg.Project.ComboColours.Count);
-
-                        // Do -1 combo skip since it always does +1 combo colour for each new combo which is not on a spinner
-                        newCombo.ComboSkip = MathHelper.Mod(comboIncrease - 1, arg.Project.ComboColours.Count);
-
-                        // Set new combo to true for the case this is the first object and new combo is false
-                        if (!newCombo.NewCombo && newCombo.ComboSkip != 0) {
-                            newCombo.NewCombo = true;
-                        }
-
-                        //Console.WriteLine("comboSkip: " + newCombo.ComboSkip);
-
-                        lastColourPointColourIndex = colourPointColourIndex;
-                        lastColourPoint = colourPoint;
-                        lastColourIndex = colourIndex;
-                    }
-                }
+                ColourHaxExporter.ExportColourHax(arg, beatmap);
 
                 // Save the file
                 editor.SaveFile();
@@ -169,38 +80,12 @@ namespace Mapping_Tools.Views.ComboColourStudio {
             return message;
         }
 
-        private static int GetComboLength(HitObject newCombo, List<HitObject> hitObjects) {
-            int count = 1;
-            var index = hitObjects.IndexOf(newCombo);
-
-            if (index == -1) {
-                return 0;
-            }
-
-            while (++index < hitObjects.Count) {
-                var hitObject = hitObjects[index];
-                if (hitObject.NewCombo) {
-                    return count;
-                }
-
-                count++;
-            }
-
-            return count;
+        public ComboColourStudioVm GetSaveData() {
+            return ViewModel;
         }
 
-        private static ColourPoint GetColourPoint(IReadOnlyList<ColourPoint> colourPoints, double time, IReadOnlyCollection<ColourPoint> exceptions, bool includeBurst) {
-            return colourPoints.Except(exceptions).LastOrDefault(o => o.Time <= time + 5 && (o.Mode != ColourPointMode.Burst || o.Time >= time - 5 && includeBurst)) ?? 
-                                                                      colourPoints.Except(exceptions).FirstOrDefault(o => o.Mode != ColourPointMode.Burst) ?? 
-                                                                      colourPoints[0];
-        }
-
-        public ComboColourProject GetSaveData() {
-            return ViewModel.Project;
-        }
-
-        public void SetSaveData(ComboColourProject saveData) {
-            ViewModel.Project = saveData;
+        public void SetSaveData(ComboColourStudioVm saveData) {
+            DataContext = saveData;
         }
     }
 }

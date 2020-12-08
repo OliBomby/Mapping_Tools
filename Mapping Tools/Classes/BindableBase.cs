@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Mapping_Tools_Core {
+namespace Mapping_Tools.Classes {
     
     /// <summary>
     /// 

@@ -215,7 +215,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         [JsonProperty]
         public int ColourIndex { get; set; }
         [JsonProperty]
-        public ComboColour Colour { get; set; }
+        public IComboColour Colour { get; set; }
         
         [JsonProperty]
         public double TemporalLength { get; set; } // Duration of one repeat
@@ -884,7 +884,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             newHitObject.TimingPoint = TimingPoint?.Copy();
             newHitObject.HitsoundTimingPoint = HitsoundTimingPoint?.Copy();
             newHitObject.UnInheritedTimingPoint = UnInheritedTimingPoint?.Copy();
-            newHitObject.Colour = Colour?.Copy();
+            newHitObject.Colour = (IComboColour) Colour?.Clone();
             return newHitObject;
         }
 
