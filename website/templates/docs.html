@@ -9,7 +9,7 @@
                 {% for docpage in section.pages %}
                     <a class="list-group-item list-group-item-primary list-group-item-action
                         {% if page.slug == docpage.slug %}active{% endif %}"
-                        href="../{{ docpage.slug | safe }}">
+                        href="../{{ docpage.slug | safe }}/">
                         {{ docpage.title }}
                     </a>
                 {% endfor %}

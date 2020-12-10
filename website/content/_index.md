@@ -2,11 +2,11 @@
 template = "home.html"
 +++
 
-Enhance Your Mapping with Mapping Tools, a program that has a bunch of cool mapping tools all in one place!
+# Get started with Mapping Tools for osu!
+
 ---
 
 - **Map Cleaner** cleans greenline usage, resnaps greenlines, hitobjects, bookmarks and more
-- **Property Transformer** transforms various properties of objects in a way the editor doesn't let you
 - **Slider Merger** merges multiple sliders into one big slider regardless of path type
 - **Slider Completionator** changes duration and pixel length of one or more sliders
 - **Timing Helper** helps you fix timing on off-beat sounds
