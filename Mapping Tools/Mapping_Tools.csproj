@@ -379,7 +379,6 @@
     <Compile Include="Classes\Tools\SnappingTools\Serialization\SnappingToolsSaveSlot.cs" />
     <Compile Include="Classes\Tools\SnappingTools\Serialization\SnappingToolsPreferences.cs" />
     <Compile Include="Classes\Tools\SnappingTools\Serialization\SnappingToolsProject.cs" />
-    <Compile Include="Classes\SpectrumUtil\Waveform.cs" />
     <Compile Include="Classes\SystemTools\ActionHotkey.cs" />
     <Compile Include="Classes\SystemTools\BackupManager.cs" />
     <Compile Include="Classes\SystemTools\BindableBase.cs" />

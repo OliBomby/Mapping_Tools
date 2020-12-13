@@ -125,15 +125,17 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                     // Hitobject time
                     if (vm.HitObjectTimeMultiplier != 1 || vm.HitObjectTimeOffset != 0) {
                         foreach (HitObject ho in beatmap.HitObjects) {
+                            // Get the end time early because the start time gets modified
+                            double oldEndTime = ho.GetEndTime(false);
+
                             if (Filter(ho.Time, ho.Time, doFilterMatch, doFilterRange, vm.MatchFilter, min, max)) {
                                 ho.Time = Math.Round(ho.Time * vm.HitObjectTimeMultiplier + vm.HitObjectTimeOffset);
                             }
 
                             // Transform end time of hold notes and spinner
                             if ((ho.IsHoldNote || ho.IsSpinner) &&
-                                Filter(ho.EndTime, ho.EndTime, doFilterMatch, doFilterRange, vm.MatchFilter, min,
-                                    max)) {
-                                ho.EndTime = Math.Round(ho.Time * vm.HitObjectTimeMultiplier + vm.HitObjectTimeOffset);
+                                Filter(oldEndTime, oldEndTime, doFilterMatch, doFilterRange, vm.MatchFilter, min, max)) {
+                                ho.EndTime = Math.Round(oldEndTime * vm.HitObjectTimeMultiplier + vm.HitObjectTimeOffset);
                             }
                         }
                     }
