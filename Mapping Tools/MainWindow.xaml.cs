@@ -400,6 +400,8 @@ namespace Mapping_Tools {
             builder.AppendLine("Mercury");
             builder.AppendLine("Spoppyboi");
             builder.AppendLine("Pon -");
+            builder.AppendLine("Ryuusei Aika");
+            builder.AppendLine("Joshua Saku");
             builder.AppendLine();
             builder.AppendLine("Contributors:");
             builder.AppendLine("Potoofu");
