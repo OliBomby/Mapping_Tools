@@ -12,7 +12,7 @@ using Process.NET;
 using Process.NET.Memory;
 using HitObject = Mapping_Tools_Core.BeatmapHelper.HitObject;
 
-namespace Mapping_Tools_Core.ToolHelpers {
+namespace Mapping_Tools.Classes.SystemTools {
 
     public static class EditorReaderStuff
     {

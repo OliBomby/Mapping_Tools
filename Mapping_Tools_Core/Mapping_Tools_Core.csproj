@@ -242,7 +242,6 @@
     <Compile Include="ToolHelpers\BezierConverter.cs" />
     <Compile Include="ToolHelpers\BezierSubdivision.cs" />
     <Compile Include="ToolHelpers\CircleBezierPreset.cs" />
-    <Compile Include="ToolHelpers\EditorReaderStuff.cs" />
     <Compile Include="ToolHelpers\PathGenerator.cs" />
     <Compile Include="ToolHelpers\SliderPathUtil.cs" />
     <Compile Include="ToolHelpers\TimingPointsChange.cs" />
@@ -269,7 +268,11 @@
     <Compile Include="Tools\PatternGallery\PatternOverwriteMode.cs" />
     <Compile Include="Tools\PatternGallery\SelectedPatternImportVm.cs" />
     <Compile Include="Tools\PatternGallery\TimingOverwriteMode.cs" />
-    <Compile Include="Tools\RhythmGuide.cs" />
+    <Compile Include="Tools\RhythmGuide\ExportMode.cs" />
+    <Compile Include="Tools\RhythmGuide\IRhythmGuideArgs.cs" />
+    <Compile Include="Tools\RhythmGuide\RhythmGuideArgs.cs" />
+    <Compile Include="Tools\RhythmGuide\RhythmGuideGenerator.cs" />
+    <Compile Include="Tools\RhythmGuide\SelectionMode.cs" />
     <Compile Include="Tools\SlideratorStuff\GraphStateValueGetter.cs" />
     <Compile Include="Tools\SlideratorStuff\PositionFunctionDelegate.cs" />
     <Compile Include="Tools\SlideratorStuff\Sliderator.cs" />
@@ -342,5 +345,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

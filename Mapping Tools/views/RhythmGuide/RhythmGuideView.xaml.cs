@@ -1,8 +1,11 @@
 ﻿using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Viewmodels;
+using Mapping_Tools_Core.BeatmapHelper;
+using Mapping_Tools_Core.Tools.RhythmGuide;
 using System;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
@@ -34,29 +37,61 @@ namespace Mapping_Tools.Views.RhythmGuide {
 
         protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
-            e.Result = GenerateRhythmGuide((Classes.Tools.RhythmGuide.RhythmGuideGeneratorArgs) e.Argument, bgw, e);
+            e.Result = GenerateRhythmGuide((RhythmGuideVm) e.Argument, bgw, e);
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
             // Remove logical focus to trigger LostFocus on any fields that didn't yet update the ViewModel
             FocusManager.SetFocusedElement(FocusManager.GetFocusScope(this), null);
 
-            foreach (var fileToCopy in ViewModel.GuideGeneratorArgs.Paths) {
-                BackupManager.SaveMapBackup(fileToCopy);
+            if (ViewModel.ExportMode == ExportMode.AddToMap) {
+                BackupManager.SaveMapBackup(ViewModel.ExportPath);
             }
 
-            BackgroundWorker.RunWorkerAsync(ViewModel.GuideGeneratorArgs);
+            BackgroundWorker.RunWorkerAsync(ViewModel);
             CanRun = false;
         }
 
-        private static string GenerateRhythmGuide(Classes.Tools.RhythmGuide.RhythmGuideGeneratorArgs args, BackgroundWorker worker, DoWorkEventArgs _) {
-            Classes.Tools.RhythmGuide.GenerateRhythmGuide(args);
+        private static string GenerateRhythmGuide(RhythmGuideVm args, BackgroundWorker worker, DoWorkEventArgs _) {
+            if (args.ExportPath == null) {
+                throw new ArgumentNullException(nameof(args.ExportPath));
+            }
+
+            var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
+            var rhythmGuideArgs = new RhythmGuideArgs {
+                BeatDivisors = args.BeatDivisors,
+                InputBeatmaps = args.Paths.Select(o => EditorReaderStuff.GetNewestVersionOrNot(o, reader).Beatmap),
+                NcEverything = args.NcEverything,
+                SelectionMode = args.SelectionMode
+            };
+
+            switch (args.ExportMode) {
+                case ExportMode.NewMap:
+                    var templateBeatmap = EditorReaderStuff.GetNewestVersionOrNot(args.Paths[0], reader).Beatmap;
+                    var beatmap = RhythmGuideGenerator.NewRhythmGuide(rhythmGuideArgs, templateBeatmap, args.OutputGameMode, args.OutputName);
+
+                    var editor = new Editor { TextFile = beatmap, Path = args.ExportPath };
+                    editor.SaveFile();
+
+                    ShowSelectedInExplorer.FileOrFolder(args.ExportPath);
+                    break;
+                case ExportMode.AddToMap:
+                    var editor2 = EditorReaderStuff.GetNewestVersionOrNot(args.ExportPath, reader);
+
+                    RhythmGuideGenerator.AddRhythmGuideToBeatmap(editor2.Beatmap, rhythmGuideArgs);
+
+                    editor2.SaveFile();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
 
             // Complete progress bar
             if (worker != null && worker.WorkerReportsProgress) {
                 worker.ReportProgress(100);
             }
-            return args.ExportMode == Classes.Tools.RhythmGuide.ExportMode.NewMap ? "" : "Done!";
+
+            return args.ExportMode == ExportMode.NewMap ? "" : "Done!";
         }
 
         public RhythmGuideVm GetSaveData() {

@@ -198,6 +198,7 @@
     <Compile Include="Classes\GenericExtensions.cs" />
     <Compile Include="Classes\SystemTools\ActionHotkey.cs" />
     <Compile Include="Classes\SystemTools\BackupManager.cs" />
+    <Compile Include="Classes\SystemTools\EditorReaderStuff.cs" />
     <Compile Include="Classes\SystemTools\Hotkey.cs" />
     <Compile Include="Classes\SystemTools\IHaveExtraProjectMenuItems.cs" />
     <Compile Include="Classes\SystemTools\IOHelper.cs" />
