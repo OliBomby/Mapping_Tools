@@ -37,7 +37,7 @@ namespace Mapping_Tools_Core.Tools.RhythmGuide {
                 }
             }
 
-            // Generate hitcircles at those times
+            // Import hitcircles at those times
             foreach (var ho in times.Select(time => new HitObject(time, 0, SampleSet.Auto, SampleSet.Auto))) {
                 ho.NewCombo = args.NcEverything;
                 beatmap.HitObjects.Add(ho);

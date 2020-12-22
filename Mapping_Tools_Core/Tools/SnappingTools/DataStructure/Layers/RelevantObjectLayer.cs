@@ -143,9 +143,9 @@ namespace Mapping_Tools_Core.Tools.SnappingTools.DataStructure.Layers {
                         RelevantObjectPairGenerator.GetParametersList(dependencies, objects,
                             generator.Settings.IsSequential);
 
-                    // Generate all the new relevant objects
+                    // Import all the new relevant objects
                     foreach (var parameters in parametersList) {
-                        // Generate the new relevant object(s)
+                        // Import the new relevant object(s)
                         var result = method.Invoke(generator, parameters);
 
                         // Cast parameters to relevant objects

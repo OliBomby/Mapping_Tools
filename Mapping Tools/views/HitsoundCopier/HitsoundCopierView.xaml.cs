@@ -8,12 +8,14 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using Mapping_Tools_Core.Audio;
 using Mapping_Tools_Core.BeatmapHelper;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.BeatmapHelper.Events;
-using Mapping_Tools_Core.HitsoundStuff;
 using Mapping_Tools_Core.MathUtil;
 using Mapping_Tools_Core.ToolHelpers;
+using Mapping_Tools_Core.Tools.HitsoundStudio;
+using Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes;
 
 namespace Mapping_Tools.Views.HitsoundCopier {
     /// <summary>

@@ -7,9 +7,9 @@ using System.Text.RegularExpressions;
 using Mapping_Tools_Core.BeatmapHelper;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.BeatmapHelper.Events;
-using Mapping_Tools_Core.HitsoundStuff;
 using Mapping_Tools_Core.MathUtil;
 using Mapping_Tools_Core.ToolHelpers;
+using Mapping_Tools_Core.Tools.HitsoundStudio;
 
 namespace Mapping_Tools_Core.Tools.MapCleanerStuff {
     public partial class MapCleaner {

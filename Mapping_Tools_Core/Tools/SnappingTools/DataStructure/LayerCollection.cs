@@ -27,7 +27,7 @@ namespace Mapping_Tools_Core.Tools.SnappingTools.DataStructure {
             AcceptableDifference = acceptableDifference;
             LockedLayer = new RelevantObjectLayer(this, null);
 
-            // Generate 1 layer
+            // Import 1 layer
             ObjectLayers.Add(new RelevantObjectLayer(this, AllGenerators));
 
             // Set the previous layer of the rootlayer to the locked layer so every layer has the locked layer

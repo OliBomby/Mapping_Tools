@@ -109,7 +109,7 @@ namespace Mapping_Tools_Core.Tools.PatternGallery {
         }
 
         public OsuPattern FromBeatmap(Beatmap beatmap, string name) {
-            // Generate a file name and save the pattern
+            // Import a file name and save the pattern
             var now = DateTime.Now;
             var fileName = GenerateUniquePatternFileName(name, now);
 

@@ -250,7 +250,7 @@ namespace Mapping_Tools_Core.Tools.SlideratorStuff {
         private void GenerateAxons() {
             var pathGenerator = new PathGenerator(_path, _diff, _angle, _diffL, _pathL);
 
-            // Generate bezier points that approximate the paths between neurons
+            // Import bezier points that approximate the paths between neurons
             foreach (var neuron in _slider.Where(n => n.Terminal != null)) {
                 var firstPoint = neuron.Nucleus.Pos;
                 var lastPoint = neuron.Terminal.Nucleus.Pos;

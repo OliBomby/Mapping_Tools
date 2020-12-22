@@ -60,7 +60,7 @@ namespace Mapping_Tools {
                 }
                 SetFullscreen(SettingsManager.Settings.MainWindowMaximized);
 
-                SetCurrentView(typeof(StandardView)); // Generate Standard view model to show on startup
+                SetCurrentView(typeof(StandardView)); // Import Standard view model to show on startup
 
                 SetCurrentMaps(SettingsManager.GetLatestCurrentMaps()); // Set currentmap to previously opened map
             } catch (Exception ex) {

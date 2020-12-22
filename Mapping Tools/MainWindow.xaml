@@ -78,7 +78,7 @@
                                           ToolTip="Select the current beatmap with File Explorer."/>
                                 <MenuItem Header="_Open current beatmap" Click="OpenGetCurrentBeatmap" Icon="{materialDesign:PackIcon RestoreFromTrash}"
                                           ToolTip="Set the current beatmap to the selected beatmap in your osu! client."/>
-                                <MenuItem Header="_Generate backup" Click="SaveBackup" Icon="{materialDesign:PackIcon Backup}"
+                                <MenuItem Header="_Import backup" Click="SaveBackup" Icon="{materialDesign:PackIcon Backup}"
                                           ToolTip="Save a backup of the current beatmap to the backups folder."/>
                                 <MenuItem Header="_Load backup" Click="LoadBackup" Icon="{materialDesign:PackIcon BackupRestore}"
                                           ToolTip="Load a backup from the backups folder into the current beatmap."/>
