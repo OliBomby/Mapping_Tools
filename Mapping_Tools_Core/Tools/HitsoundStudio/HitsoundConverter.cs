@@ -7,7 +7,7 @@ using Mapping_Tools_Core.MathUtil;
 using Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio {
-    class HitsoundConverter {
+    public class HitsoundConverter {
         public static List<SamplePackage> ZipLayers(IEnumerable<HitsoundLayer> layers, Sample defaultSample, double leniency=15, bool needNormalSample=true) {
             List<SamplePackage> packages = new List<SamplePackage>();
             foreach (HitsoundLayer hl in layers) {

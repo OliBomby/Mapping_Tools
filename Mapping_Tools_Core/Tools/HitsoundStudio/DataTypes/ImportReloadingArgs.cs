@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
     /// <summary>
-    /// 
+    /// All arguments for the importing of <see cref="HitsoundLayer"/> using <see cref="HitsoundImporter"/>.
     /// </summary>
     public class ImportReloadingArgs : IEquatable<ImportReloadingArgs> {
         /// <summary>

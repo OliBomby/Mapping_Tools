@@ -1,4 +1,4 @@
-﻿namespace Mapping_Tools_Core.Tools.HitsoundStudio {
+﻿namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
     /// <summary>
     /// Enumerator of import types of hitsounds.
     /// </summary>

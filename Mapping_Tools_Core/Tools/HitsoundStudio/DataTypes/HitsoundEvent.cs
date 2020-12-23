@@ -6,17 +6,17 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
     /// <summary>
     /// Represents a hitsound by a single circle in the editor.
     /// </summary>
-    public class HitsoundEvent {
-        public double Time;
-        public Vector2 Pos;
-        public double Volume;
-        public string Filename;
-        public SampleSet SampleSet;
-        public SampleSet Additions;
-        public int CustomIndex;
-        public bool Whistle;
-        public bool Finish;
-        public bool Clap;
+    public class HitsoundEvent : IHitsoundEvent {
+        public double Time { get; }
+        public Vector2 Pos { get; }
+        public double Volume { get; }
+        public string Filename { get; }
+        public SampleSet SampleSet { get; }
+        public SampleSet Additions { get; }
+        public int CustomIndex { get; }
+        public bool Whistle { get; }
+        public bool Finish { get; }
+        public bool Clap { get; }
 
         public HitsoundEvent(double time, double volume, SampleSet sampleSet, SampleSet additions, int customIndex, bool whistle, bool finish, bool clap) : this(
             time, new Vector2(256, 192), volume, string.Empty, sampleSet, additions, customIndex, whistle, finish, clap) { }
@@ -39,7 +39,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
         /// </summary>
         /// <returns></returns>
         public int GetHitsounds() {
-            return MathHelper.GetIntFromBitArray(new BitArray(new bool[] { false, Whistle, Finish, Clap }));
+            return MathHelper.GetIntFromBitArray(new BitArray(new[] { false, Whistle, Finish, Clap }));
         }
     }
 }

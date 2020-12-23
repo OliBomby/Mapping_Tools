@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-namespace Mapping_Tools_Core.Tools.HitsoundStudio {
+namespace Mapping_Tools.Classes.Tools.HitsoundStudio {
     static class HitsoundLayerExtension {
         public static string AllToStringOrDefault<TObj, TResult>(this List<TObj> list, Func<TObj, TResult> func, CultureInfo culture=null) {
             if (list.Count == 0)

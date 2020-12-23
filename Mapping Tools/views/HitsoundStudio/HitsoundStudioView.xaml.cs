@@ -10,7 +10,14 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.Tools.HitsoundStudio;
 using Mapping_Tools.Viewmodels;
+using Mapping_Tools_Core;
+using Mapping_Tools_Core.Audio;
+using Mapping_Tools_Core.BeatmapHelper.Enums;
+using Mapping_Tools_Core.MathUtil;
+using Mapping_Tools_Core.Tools.HitsoundStudio;
+using Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes;
 using MaterialDesignThemes.Wpf;
 using NAudio.Wave;
 
@@ -110,7 +117,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
                     // Count the number of changes of custom index
                     int greenlines = 0;
                     int lastIndex = -1;
-                    foreach (var hit in completeHitsounds.Hitsounds.Where(hit => hit.CustomIndex != lastIndex)) {
+                    foreach (var hit in completeHitsounds.HitsoundEvents.Where(hit => hit.CustomIndex != lastIndex)) {
                         lastIndex = hit.CustomIndex;
                         greenlines++;
                     }
@@ -131,7 +138,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
 
                 // Export the hitsound map and sound samples
                 if (arg.ExportMap) {
-                    HitsoundExporter.ExportHitsounds(completeHitsounds.Hitsounds, 
+                    HitsoundExporter.ExportHitsounds(completeHitsounds.HitsoundEvents, 
                         arg.BaseBeatmap, arg.ExportFolder, arg.HitsoundDiffName, arg.HitsoundExportGameMode, true, false);
                 }
 

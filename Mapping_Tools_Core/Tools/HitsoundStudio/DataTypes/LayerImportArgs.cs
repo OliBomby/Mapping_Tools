@@ -5,7 +5,8 @@ using Mapping_Tools_Core.MathUtil;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
     /// <summary>
-    /// 
+    /// Specific to a single <see cref="HitsoundLayer"/>.
+    /// Describes the relation between the <see cref="HitsoundLayer"/> and its source material.
     /// </summary>
     public class LayerImportArgs : INotifyPropertyChanged, IEquatable<LayerImportArgs> {
         /// <inheritdoc />

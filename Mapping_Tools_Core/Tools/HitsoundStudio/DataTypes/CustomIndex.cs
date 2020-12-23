@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Mapping_Tools_Core.Audio;
+using Mapping_Tools_Core.Audio.SampleSoundGeneration;
 using Mapping_Tools_Core.BeatmapHelper;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
@@ -9,24 +11,22 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
     /// <summary>
     /// 
     /// </summary>
-    public class CustomIndex {
+    public class CustomIndex : ICustomIndex {
+        /// <summary>
+        /// The index.
+        /// The default value is -1 which means the index is undefined.
+        /// </summary>
+        public int Index { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public int Index;
-
-        private SampleGeneratingArgsComparer Comparer;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public Dictionary<string, HashSet<SampleGeneratingArgs>> Samples;
+        public Dictionary<string, HashSet<ISampleGeneratingArgs>> Samples { get; }
         
         /// <summary>
         /// 
         /// </summary>
-        public static readonly List<string> AllKeys = new List<string> { "normal-hitnormal", "normal-hitwhistle", "normal-hitfinish", "normal-hitclap",
+        private static IEnumerable<string> AllKeys => new[] { "normal-hitnormal", "normal-hitwhistle", "normal-hitfinish", "normal-hitclap",
                                                                          "soft-hitnormal", "soft-hitwhistle", "soft-hitfinish", "soft-hitclap",
                                                                          "drum-hitnormal", "drum-hitwhistle", "drum-hitfinish", "drum-hitclap" };
 
@@ -34,26 +34,18 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
         /// 
         /// </summary>
         /// <param name="index"></param>
-        public CustomIndex(int index, SampleGeneratingArgsComparer comparer = null) {
+        public CustomIndex(int index) {
             Index = index;
-            Comparer = comparer ?? new SampleGeneratingArgsComparer();
-            Samples = new Dictionary<string, HashSet<SampleGeneratingArgs>>();
+            Samples = new Dictionary<string, HashSet<ISampleGeneratingArgs>>();
             foreach (string key in AllKeys) {
-                Samples[key] = new HashSet<SampleGeneratingArgs>(Comparer);
+                Samples[key] = new HashSet<ISampleGeneratingArgs>();
             }
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public CustomIndex(SampleGeneratingArgsComparer comparer = null) {
-            Index = -1;
-            Comparer = comparer ?? new SampleGeneratingArgsComparer();
-            Samples = new Dictionary<string, HashSet<SampleGeneratingArgs>>();
-            foreach (string key in AllKeys) {
-                Samples[key] = new HashSet<SampleGeneratingArgs>(Comparer);
-            }
-        }
+        public CustomIndex() : this(-1) { }
 
         /// <summary>
         /// 
@@ -61,7 +53,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
         /// <param name="s1"></param>
         /// <param name="s2"></param>
         /// <returns></returns>
-        public static bool CheckSupport(HashSet<SampleGeneratingArgs> s1, HashSet<SampleGeneratingArgs> s2) {
+        public static bool CheckSupport(HashSet<ISampleGeneratingArgs> s1, HashSet<ISampleGeneratingArgs> s2) {
             // s2 fits in s1 or s2 is empty
             return s2.Count <= 0 || s1.SetEquals(s2);
         }
@@ -72,7 +64,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
         /// <param name="s1"></param>
         /// <param name="s2"></param>
         /// <returns></returns>
-        public static bool CheckCanSupport(HashSet<SampleGeneratingArgs> s1, HashSet<SampleGeneratingArgs> s2) {
+        public static bool CheckCanSupport(HashSet<ISampleGeneratingArgs> s1, HashSet<ISampleGeneratingArgs> s2) {
             // s2 fits in s1 or s1 is empty or s2 is empty
             return s1.Count <= 0 || s2.Count <= 0 || s1.SetEquals(s2);
         }
@@ -82,14 +74,9 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public bool Fits(CustomIndex other) {
+        public bool Fits(ICustomIndex other) {
             // Every non-empty set from other == set from self
-            // True until false
-            bool support = true;
-            foreach (KeyValuePair<string, HashSet<SampleGeneratingArgs>> kvp in Samples) {
-                support = CheckSupport(kvp.Value, other.Samples[kvp.Key]) && support; 
-            }
-            return support;
+            return Samples.All(kvp => CheckSupport(kvp.Value, other.Samples[kvp.Key]));
         }
 
         /// <summary>
@@ -97,26 +84,22 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public bool CanMerge(CustomIndex other) {
+        public bool CanMerge(ICustomIndex other) {
             // Every non-empty set from other == non-empty set from self
-            // True until false
-            bool support = true;
-            foreach (KeyValuePair<string, HashSet<SampleGeneratingArgs>> kvp in Samples) {
-                support = CheckCanSupport(kvp.Value, other.Samples[kvp.Key]) && support;
-            }
-            return support;
+            return Samples.All(kvp => CheckCanSupport(kvp.Value, other.Samples[kvp.Key]));
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="other"></param>
-        public void MergeWith(CustomIndex other) {
+        public void MergeWith(ICustomIndex other) {
             foreach (string key in AllKeys) {
                 Samples[key].UnionWith(other.Samples[key]);
             }
 
-            // If the other custom index has an assigned index and this one doesnt. Get the index, so optimised custom indices retain their indices.
+            // If the other custom index has an assigned index and this one doesnt,
+            // get the index, so optimised custom indices retain their indices.
             if (Index == -1 && other.Index != -1) {
                 Index = other.Index;
             }
@@ -125,22 +108,9 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="other"></param>
         /// <returns></returns>
-        public CustomIndex Merge(CustomIndex other) {
-            CustomIndex ci = new CustomIndex(Math.Max(Index, other.Index));
-            foreach (string key in AllKeys) {
-                ci.Samples[key].UnionWith(other.Samples[key]);
-            }
-            return ci;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public CustomIndex Copy() {
-            CustomIndex ci = new CustomIndex(Index, Comparer);
+        public object Clone() {
+            ICustomIndex ci = new CustomIndex(Index);
             ci.MergeWith(this);
             return ci;
         }
@@ -149,14 +119,14 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
         /// 
         /// </summary>
         /// <param name="loadedSamples"></param>
-        public void CleanInvalids(Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null, bool validateSampleFile = true) {
+        public void CleanInvalids(Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator> loadedSamples = null) {
             // Replace all invalid paths with "" and remove the invalid path if another valid path is also in the hashset
-            foreach (HashSet<SampleGeneratingArgs> paths in Samples.Values) {
+            foreach (HashSet<ISampleGeneratingArgs> paths in Samples.Values) {
                 int initialCount = paths.Count;
-                int removed = paths.RemoveWhere(o => !SampleImporter.ValidateSampleArgs(o, loadedSamples, validateSampleFile));
+                int removed = paths.RemoveWhere(o => !SampleImporter.ValidateSampleArgs(o, loadedSamples));
 
                 if (paths.Count == 0 && initialCount != 0) {
-                    // All the paths where invalid and it didn't just start out empty
+                    // All the paths were invalid and it didn't just start out empty
                     paths.Add(new SampleGeneratingArgs());  // This "" is here to prevent this hashset from getting new paths
                 }
             }
@@ -168,7 +138,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
         /// <returns></returns>
         public override string ToString() {
             var accumulator = new StringBuilder();
-            foreach (KeyValuePair<string, HashSet<SampleGeneratingArgs>> kvp in Samples) {
+            foreach (KeyValuePair<string, HashSet<ISampleGeneratingArgs>> kvp in Samples) {
                 var sampleList = new StringBuilder();
                 foreach (var sga in kvp.Value) {
                     sampleList.Append($"{sga}|");

@@ -1,56 +1,29 @@
 ﻿using System.Collections.Generic;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
-
     /// <summary>
-    /// 
+    /// Complete representation of custom hitsounds for osu! standard without sliderbody samples.
     /// </summary>
-    public class CompleteHitsounds {
+    public class CompleteHitsounds : ICompleteHitsounds {
 
         /// <summary>
         /// 
         /// </summary>
-        public List<HitsoundEvent> Hitsounds;
+        public List<IHitsoundEvent> HitsoundEvents { get; }
 
         /// <summary>
         /// 
         /// </summary>
-        public List<CustomIndex> CustomIndices;
+        public List<ICustomIndex> CustomIndices { get; }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="hitsounds"></param>
+        /// <param name="hitsoundEvents"></param>
         /// <param name="customIndices"></param>
-        public CompleteHitsounds(List<HitsoundEvent> hitsounds, List<CustomIndex> customIndices) {
-            Hitsounds = hitsounds;
+        public CompleteHitsounds(List<IHitsoundEvent> hitsoundEvents, List<ICustomIndex> customIndices) {
+            HitsoundEvents = hitsoundEvents;
             CustomIndices = customIndices;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="hitsounds"></param>
-        public CompleteHitsounds(List<HitsoundEvent> hitsounds) {
-            Hitsounds = hitsounds;
-            CustomIndices = new List<CustomIndex>();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="customIndices"></param>
-        public CompleteHitsounds(List<CustomIndex> customIndices) {
-            Hitsounds = new List<HitsoundEvent>();
-            CustomIndices = customIndices;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public CompleteHitsounds() {
-            Hitsounds = new List<HitsoundEvent>();
-            CustomIndices = new List<CustomIndex>();
         }
     }
 }
