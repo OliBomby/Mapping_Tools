@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Mapping_Tools_Core.Audio.SampleImportArgs;
+using NAudio.Midi;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes;
-using NAudio.Midi;
 
 namespace Mapping_Tools_Core.Audio {
     public class MidiExporter {
-        public static void SaveToFile(string fileName, SampleGeneratingArgs[] samples) {
+        public static void SaveToFile(string fileName, ISoundFontSampleImportArgs[] samples) {
             var validSamples = samples.Where(o => o.Key >= 0).ToArray();
             SaveToFile(fileName,
                 validSamples.Select(s => s.Bank < 0 ? 0 : s.Bank).ToArray(),
