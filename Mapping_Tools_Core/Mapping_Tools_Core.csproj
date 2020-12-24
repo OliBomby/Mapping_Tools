@@ -154,6 +154,7 @@
     <Compile Include="Tools\HitsoundStudio\DataTypes\IHitsoundLayer.cs" />
     <Compile Include="Tools\HitsoundStudio\DataTypes\ISample.cs" />
     <Compile Include="Tools\HitsoundStudio\DataTypes\ISamplePackage.cs" />
+    <Compile Include="Tools\HitsoundStudio\DataTypes\ISampleSchema.cs" />
     <Compile Include="Tools\HitsoundStudio\DataTypes\LayerImportArgs\IFileLayerImportArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\DataTypes\LayerImportArgs\IHitsoundsLayerImportArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\DataTypes\LayerImportArgs\ILayerImportArgs.cs" />

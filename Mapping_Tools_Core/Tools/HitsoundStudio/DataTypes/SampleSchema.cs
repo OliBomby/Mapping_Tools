@@ -12,21 +12,21 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
     /// Stores a dictionary with pairs (filename without ext., list of sample args which are satisfied by that file)
     /// Represents a schema on how to exports sample packages.
     /// </summary>
-    public class SampleSchema : Dictionary<string, IList<ISampleGeneratingArgs>> {
+    public class SampleSchema : Dictionary<string, ISet<ISampleGeneratingArgs>>, ISampleSchema {
         [UsedImplicitly]
         public SampleSchema() { }
 
         public SampleSchema(IEnumerable<CustomIndex> customIndices) {
             foreach (var customIndex in customIndices) {
                 foreach (var customIndexSample in customIndex.Samples) {
-                    Add(customIndexSample.Key + customIndex.GetNumberExtension(), customIndexSample.Value.ToList());
+                    Add(customIndexSample.Key + customIndex.GetNumberExtension(), customIndexSample.Value);
                 }
             }
         }
 
-        public SampleSchema(Dictionary<ISampleGeneratingArgs, string> sampleNames) {
+        public SampleSchema(IDictionary<ISampleGeneratingArgs, string> sampleNames) {
             foreach (var sample in sampleNames) {
-                Add(sample.Value, new List<ISampleGeneratingArgs> {sample.Key});
+                Add(sample.Value, new HashSet<ISampleGeneratingArgs> {sample.Key});
             }
         }
 
@@ -34,14 +34,14 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
         /// Make sure a certain hitsound with a certain sound is in the <see cref="SampleSchema"/>.
         /// If it already exists, then it simply returns the index and sampleset of that filename.
         /// </summary>
-        /// <param name="samples">List of <see cref="SampleGeneratingArgs"/> that represents the sound that has to be made.</param>
+        /// <param name="samples">List of <see cref="ISampleGeneratingArgs"/> that represents the sound that has to be made.</param>
         /// <param name="hitsoundName">Name of the hitsound. For example "hitwhistle" or "slidertick".</param>
         /// <param name="sampleSet">Sample set for the hitsound for if it adds a new sample to the sample schema.</param>
         /// <param name="newIndex">Index to start searching from. It will start at this value and go up until a slot is available.</param>
         /// <param name="newSampleSet">The sample set of the added sample.</param>
         /// <param name="startIndex">The index of the added sample.</param>
         /// <returns>True if it added a new entry.</returns>
-        public bool AddHitsound(IList<ISampleGeneratingArgs> samples, string hitsoundName, SampleSet sampleSet, out int newIndex,
+        public bool AddHitsound(ISet<ISampleGeneratingArgs> samples, string hitsoundName, SampleSet sampleSet, out int newIndex,
             out SampleSet newSampleSet, int startIndex = 1) {
 
             // Check if our sample schema already has a sample for this
@@ -70,14 +70,14 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
             return true;
         }
 
-        public string FindFilename(IList<ISampleGeneratingArgs> samples) {
+        public string FindFilename(ISet<ISampleGeneratingArgs> samples) {
             return (from kvp 
                 in this 
                 where kvp.Value.SequenceEqual(samples)
                 select kvp.Key).FirstOrDefault();
         }
 
-        public string FindFilename(IList<ISampleGeneratingArgs> samples, string regexPattern) {
+        public string FindFilename(ISet<ISampleGeneratingArgs> samples, string regexPattern) {
             return (from kvp
                     in this
                 where kvp.Value.SequenceEqual(samples) && Regex.IsMatch(kvp.Key, regexPattern)
@@ -85,24 +85,24 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
         }
 
         /// <summary>
-        /// Generates a dictionary which maps <see cref="SampleGeneratingArgs"/> to their corresponding filename which makes that sample sound.
-        /// Only maps the <see cref="SampleGeneratingArgs"/> which are non-mixed.
+        /// Generates a dictionary which maps <see cref="ISampleGeneratingArgs"/> to their corresponding filename which makes that sample sound.
+        /// Only maps the <see cref="ISampleGeneratingArgs"/> which are non-mixed.
         /// </summary>
         /// <returns></returns>
-        public Dictionary<ISampleGeneratingArgs, string> GetSampleNames() {
+        public IDictionary<ISampleGeneratingArgs, string> GetSampleNames() {
             var sampleNames = new Dictionary<ISampleGeneratingArgs, string>();
 
             foreach (var kvp in this.Where(kvp => kvp.Value.Count == 1)) {
-                if (!sampleNames.ContainsKey(kvp.Value[0])) {
-                    sampleNames.Add(kvp.Value[0], kvp.Key);
+                if (!sampleNames.ContainsKey(kvp.Value.First())) {
+                    sampleNames.Add(kvp.Value.First(), kvp.Key);
                 }
             }
 
             return sampleNames;
         }
 
-        public List<CustomIndex> GetCustomIndices() {
-            var customIndices = new Dictionary<int, CustomIndex>();
+        public IList<ICustomIndex> GetCustomIndices() {
+            var customIndices = new Dictionary<int, ICustomIndex>();
 
             foreach (var kvp in this) {
                 var name = Path.GetFileNameWithoutExtension(kvp.Key);
@@ -133,7 +133,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
             return customIndices.Values.ToList();
         }
 
-        public void MergeWith(SampleSchema other) {
+        public void MergeWith(ISampleSchema other) {
             foreach (var kvp in other) {
                 if (!ContainsKey(kvp.Key)) {
                     Add(kvp.Key, kvp.Value);
