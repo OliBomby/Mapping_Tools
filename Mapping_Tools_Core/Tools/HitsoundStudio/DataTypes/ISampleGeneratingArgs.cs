@@ -28,6 +28,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
         /// <summary>
         /// Factory method for the <see cref="ISampleSoundGenerator"/>.
         /// Uses the <see cref="ImportArgs"/> and applies the additional effects.
+        /// Returns null if import failed.
         /// </summary>
         /// <returns></returns>
         ISampleSoundGenerator Import();

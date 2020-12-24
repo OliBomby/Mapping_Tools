@@ -216,6 +216,9 @@
     <Compile Include="Classes\Tools\ComboColourStudio\NamedColour.cs" />
     <Compile Include="Classes\Tools\HitsoundStudio\HitsoundLayer.cs" />
     <Compile Include="Classes\Tools\HitsoundStudio\HitsoundLayerExtension.cs" />
+    <Compile Include="Classes\Tools\HitsoundStudio\ImportReloadingArgs.cs" />
+    <Compile Include="Classes\Tools\HitsoundStudio\ImportType.cs" />
+    <Compile Include="Classes\Tools\HitsoundStudio\LayerImportArgs.cs" />
     <Compile Include="Classes\Tools\HitsoundStudio\UISampleGeneratingArgs.cs" />
     <Compile Include="Components\Dialogs\CustomDialog\BeatmapBrowseAttribute.cs" />
     <Compile Include="Components\Dialogs\CustomDialog\ConverterParameterAttribute.cs" />

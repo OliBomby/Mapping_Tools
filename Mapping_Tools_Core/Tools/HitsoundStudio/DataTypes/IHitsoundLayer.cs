@@ -1,11 +1,14 @@
 ﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
+using Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes.LayerSourceRef;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
     public interface IHitsoundLayer {
         /// <summary>
         /// Contains all the times that this hitsound should play.
         /// </summary>
+        [NotNull]
         SortedSet<double> Times { get; set; }
 
         SampleSet SampleSet { get; set; }
@@ -14,8 +17,10 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
 
         int Priority { get; set; }
 
+        [CanBeNull]
         ILayerSourceRef LayerSourceRef { get; set; }
 
+        [NotNull]
         ISampleGeneratingArgs SampleGeneratingArgs { get; set; }
 
         /// <summary>

@@ -25,11 +25,10 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
         }
 
         public ISampleSoundGenerator Import() {
-            if (ImportArgs == null)
-                return null;
+            var baseGenerator = ImportArgs?.Import();
 
-            var baseGenerator = ImportArgs.Import();
-            return new VolumeSampleSoundDecorator(baseGenerator, Volume);
+            return baseGenerator == null ? null : 
+                new VolumeSampleSoundDecorator(baseGenerator, Volume);
         }
 
         public bool Equals(ISampleGeneratingArgs other) {
