@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.MathUtil;
+using Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes;
 
-namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
+namespace Mapping_Tools.Classes.Tools.HitsoundStudio {
     /// <summary>
     /// Represents a single hitsound and every time that hitsound has to be played.
     /// It is also directly connected to the source of the data.

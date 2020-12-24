@@ -24,6 +24,12 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
         
         bool IsValid();
         bool IsValid(Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator> loadedSamples);
+
+        /// <summary>
+        /// Factory method for the <see cref="ISampleSoundGenerator"/>.
+        /// Uses the <see cref="ImportArgs"/> and applies the additional effects.
+        /// </summary>
+        /// <returns></returns>
         ISampleSoundGenerator Import();
     }
 }

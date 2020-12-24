@@ -1,4 +1,7 @@
-﻿using Mapping_Tools_Core.Audio.SampleImportArgs;
+﻿using System.Collections.Generic;
+using Mapping_Tools_Core.Audio.SampleImportArgs;
+using Mapping_Tools_Core.Audio.SampleSoundGeneration;
+using Mapping_Tools_Core.Audio.SampleSoundGeneration.Decorators;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
     public class SampleGeneratingArgs : ISampleGeneratingArgs {
@@ -11,6 +14,22 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
         public SampleGeneratingArgs(ISampleImportArgs importArgs, double volume) {
             ImportArgs = importArgs;
             Volume = volume;
+        }
+
+        public bool IsValid() {
+            return ImportArgs != null && ImportArgs.IsValid();
+        }
+
+        public bool IsValid(Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator> loadedSamples) {
+            return loadedSamples.ContainsKey(this) && loadedSamples[this] != null;
+        }
+
+        public ISampleSoundGenerator Import() {
+            if (ImportArgs == null)
+                return null;
+
+            var baseGenerator = ImportArgs.Import();
+            return new VolumeSampleSoundDecorator(baseGenerator, Volume);
         }
 
         public bool Equals(ISampleGeneratingArgs other) {

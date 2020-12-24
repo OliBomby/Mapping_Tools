@@ -8,14 +8,14 @@ using System.IO;
 
 namespace Mapping_Tools_Core.Audio {
     public class SampleImporter {
-        public static bool ValidateSampleArgs(ISampleImportArgs args, bool validateSampleFile = true) {
-            return !validateSampleFile || args.IsValid();
+        public static bool ValidateSampleArgs(ISampleImportArgs args) {
+            return args.IsValid();
         }
 
-        public static bool ValidateSampleArgs(ISampleImportArgs args, Dictionary<ISampleImportArgs, ISampleSoundGenerator> loadedSamples, bool validateSampleFile = true) {
+        public static bool ValidateSampleArgs(ISampleImportArgs args, Dictionary<ISampleImportArgs, ISampleSoundGenerator> loadedSamples) {
             if (loadedSamples == null)
-                return ValidateSampleArgs(args, validateSampleFile);
-            return !validateSampleFile || loadedSamples.ContainsKey(args) && loadedSamples[args] != null;
+                return ValidateSampleArgs(args);
+            return loadedSamples.ContainsKey(args) && loadedSamples[args] != null;
         }
         
         public static WaveStream OpenSample(string path) {

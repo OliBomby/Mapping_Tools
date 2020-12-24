@@ -1,10 +1,8 @@
-﻿using System;
+﻿using Mapping_Tools_Core.Audio.SampleSoundGeneration;
+using Mapping_Tools_Core.BeatmapHelper;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Mapping_Tools_Core.Audio;
-using Mapping_Tools_Core.Audio.SampleSoundGeneration;
-using Mapping_Tools_Core.BeatmapHelper;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
 
@@ -12,15 +10,8 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
     /// 
     /// </summary>
     public class CustomIndex : ICustomIndex {
-        /// <summary>
-        /// The index.
-        /// The default value is -1 which means the index is undefined.
-        /// </summary>
         public int Index { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public Dictionary<string, HashSet<ISampleGeneratingArgs>> Samples { get; }
         
         /// <summary>
@@ -120,14 +111,14 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
         /// </summary>
         /// <param name="loadedSamples"></param>
         public void CleanInvalids(Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator> loadedSamples = null) {
-            // Replace all invalid paths with "" and remove the invalid path if another valid path is also in the hashset
+            // Remove all invalid paths but leave one invalid path in to mark the sample as occupied
             foreach (HashSet<ISampleGeneratingArgs> paths in Samples.Values) {
                 int initialCount = paths.Count;
-                int removed = paths.RemoveWhere(o => !SampleImporter.ValidateSampleArgs(o, loadedSamples));
+                paths.RemoveWhere(o => !o.IsValid(loadedSamples));
 
                 if (paths.Count == 0 && initialCount != 0) {
                     // All the paths were invalid and it didn't just start out empty
-                    paths.Add(new SampleGeneratingArgs());  // This "" is here to prevent this hashset from getting new paths
+                    paths.Add(new SampleGeneratingArgs());  // This invalid path is here to prevent this hashset from getting new paths
                 }
             }
         }

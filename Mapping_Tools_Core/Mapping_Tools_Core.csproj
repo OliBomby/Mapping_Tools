@@ -151,13 +151,15 @@
     <Compile Include="Tools\HitsoundStudio\DataTypes\ICompleteHitsounds.cs" />
     <Compile Include="Tools\HitsoundStudio\DataTypes\ICustomIndex.cs" />
     <Compile Include="Tools\HitsoundStudio\DataTypes\IHitsoundEvent.cs" />
+    <Compile Include="Tools\HitsoundStudio\DataTypes\IHitsoundLayer.cs" />
+    <Compile Include="Tools\HitsoundStudio\DataTypes\ILayerImportArgs.cs" />
+    <Compile Include="Tools\HitsoundStudio\DataTypes\ILayerSourceRef.cs" />
     <Compile Include="Tools\HitsoundStudio\DataTypes\ISampleGeneratingArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\DataTypes\SampleGeneratingArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\HitsoundConverter.cs" />
     <Compile Include="Tools\HitsoundStudio\DataTypes\HitsoundEvent.cs" />
     <Compile Include="Tools\HitsoundStudio\HitsoundExporter.cs" />
     <Compile Include="Tools\HitsoundStudio\HitsoundImporter.cs" />
-    <Compile Include="Tools\HitsoundStudio\DataTypes\HitsoundLayer.cs" />
     <Compile Include="Tools\HitsoundPreviewHelper\HitsoundZone.cs" />
     <Compile Include="Tools\HitsoundStudio\DataTypes\ImportReloadingArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\DataTypes\ImportReloadingArgsComparer.cs" />
