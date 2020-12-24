@@ -6,20 +6,18 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
     /// <summary>
     /// 
     /// </summary>
-    public class SamplePackage {
-        public double Time;
-        public HashSet<Sample> Samples;
+    public class SamplePackage : ISamplePackage {
+        public double Time { get; }
+        public ISet<ISample> Samples { get; }
 
-        public double MaxOutsideVolume => Samples.Max(s => s.OutsideVolume);
-
-        public SamplePackage(double time, HashSet<Sample> samples) {
+        public SamplePackage(double time, ISet<ISample> samples) {
             Time = time;
             Samples = samples;
         }
 
         public SamplePackage(double time) {
             Time = time;
-            Samples = new HashSet<Sample>();
+            Samples = new HashSet<ISample>();
         }
 
         public void SetAllOutsideVolume(double outsideVolume) {
@@ -28,10 +26,8 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
             }
         }
 
-        /// <summary>
-        /// Grabs the <see cref="SampleSet"/> relying on priority with both itself and other layers of the same sample.
-        /// </summary>
-        /// <returns></returns>
+        public double GetMaxOutsideVolume() => Samples.Max(s => s.OutsideVolume);
+
         public SampleSet GetSampleSet() {
             SampleSet sampleSet = SampleSet.Auto;
             int bestPriority = int.MaxValue;
@@ -50,7 +46,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
         public SampleSet GetAdditions() {
             SampleSet additions = SampleSet.Auto;
             int bestPriority = int.MaxValue;
-            foreach (Sample sample in Samples) {
+            foreach (ISample sample in Samples) {
                 if (sample.Hitsound != 0 && sample.Priority < bestPriority) {
                     additions = sample.SampleSet;
                     bestPriority = sample.Priority;
@@ -59,50 +55,56 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
             return additions;
         }
 
-        public CustomIndex GetCustomIndex(SampleGeneratingArgsComparer comparer = null) {
-            if (comparer == null)
-                comparer = new SampleGeneratingArgsComparer();
-
+        public ICustomIndex GetCustomIndex() {
             SampleSet sampleSet = GetSampleSet();
             SampleSet additions = GetAdditions();
 
-            HashSet<SampleGeneratingArgs> normals = new HashSet<SampleGeneratingArgs>(Samples.Where(o => o.Hitsound == Hitsound.Normal).Select(o => o.SampleArgs), comparer);
-            HashSet<SampleGeneratingArgs> whistles = new HashSet<SampleGeneratingArgs>(Samples.Where(o => o.Hitsound == Hitsound.Whistle).Select(o => o.SampleArgs), comparer);
-            HashSet<SampleGeneratingArgs> finishes = new HashSet<SampleGeneratingArgs>(Samples.Where(o => o.Hitsound == Hitsound.Finish).Select(o => o.SampleArgs), comparer);
-            HashSet<SampleGeneratingArgs> claps = new HashSet<SampleGeneratingArgs>(Samples.Where(o => o.Hitsound == Hitsound.Clap).Select(o => o.SampleArgs), comparer);
+            HashSet<ISampleGeneratingArgs> normals = new HashSet<ISampleGeneratingArgs>(
+                Samples.Where(o => o.Hitsound == Hitsound.Normal).Select(o => o.SampleGeneratingArgs));
+            HashSet<ISampleGeneratingArgs> whistles = new HashSet<ISampleGeneratingArgs>(
+                Samples.Where(o => o.Hitsound == Hitsound.Whistle).Select(o => o.SampleGeneratingArgs));
+            HashSet<ISampleGeneratingArgs> finishes = new HashSet<ISampleGeneratingArgs>(
+                Samples.Where(o => o.Hitsound == Hitsound.Finish).Select(o => o.SampleGeneratingArgs));
+            HashSet<ISampleGeneratingArgs> claps = new HashSet<ISampleGeneratingArgs>(
+                Samples.Where(o => o.Hitsound == Hitsound.Clap).Select(o => o.SampleGeneratingArgs));
             
-            CustomIndex ci = new CustomIndex(comparer);
+            CustomIndex ci = new CustomIndex();
 
-            if (sampleSet == SampleSet.Normal) {
-                ci.Samples["normal-hitnormal"] = normals;
-            } else if (sampleSet == SampleSet.Drum) {
-                ci.Samples["drum-hitnormal"] = normals;
-            } else {
-                ci.Samples["soft-hitnormal"] = normals;
+            switch (sampleSet) {
+                case SampleSet.Normal:
+                    ci.Samples["normal-hitnormal"] = normals;
+                    break;
+                case SampleSet.Drum:
+                    ci.Samples["drum-hitnormal"] = normals;
+                    break;
+                default:
+                    // Soft
+                    ci.Samples["soft-hitnormal"] = normals;
+                    break;
             }
 
-            if (additions == SampleSet.Normal) {
-                ci.Samples["normal-hitwhistle"] = whistles;
-                ci.Samples["normal-hitfinish"] = finishes;
-                ci.Samples["normal-hitclap"] = claps;
-            } else if (additions == SampleSet.Drum) {
-                ci.Samples["drum-hitwhistle"] = whistles;
-                ci.Samples["drum-hitfinish"] = finishes;
-                ci.Samples["drum-hitclap"] = claps;
-            } else {
-                ci.Samples["soft-hitwhistle"] = whistles;
-                ci.Samples["soft-hitfinish"] = finishes;
-                ci.Samples["soft-hitclap"] = claps;
+            switch (additions) {
+                case SampleSet.Normal:
+                    ci.Samples["normal-hitwhistle"] = whistles;
+                    ci.Samples["normal-hitfinish"] = finishes;
+                    ci.Samples["normal-hitclap"] = claps;
+                    break;
+                case SampleSet.Drum:
+                    ci.Samples["drum-hitwhistle"] = whistles;
+                    ci.Samples["drum-hitfinish"] = finishes;
+                    ci.Samples["drum-hitclap"] = claps;
+                    break;
+                default:
+                    // Soft
+                    ci.Samples["soft-hitwhistle"] = whistles;
+                    ci.Samples["soft-hitfinish"] = finishes;
+                    ci.Samples["soft-hitclap"] = claps;
+                    break;
             }
             return ci;
         }
 
-        /// <summary>
-        /// Grabs the <see cref="HitsoundEvent"/> that is created into the specified sample custom index.
-        /// </summary>
-        /// <param name="index">The Custom Sample Index</param>
-        /// <returns>The current custom index sample list.</returns>
-        public HitsoundEvent GetHitsound(int index) {
+        public IHitsoundEvent GetHitsound(int index) {
             SampleSet sampleSet = GetSampleSet();
             SampleSet additions = GetAdditions();
 
@@ -110,7 +112,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
             bool finish = Samples.Any(o => o.Hitsound == Hitsound.Finish);
             bool clap = Samples.Any(o => o.Hitsound == Hitsound.Clap);
 
-            return new HitsoundEvent(Time, MaxOutsideVolume, sampleSet, additions, index, whistle, finish, clap);
+            return new HitsoundEvent(Time, GetMaxOutsideVolume(), sampleSet, additions, index, whistle, finish, clap);
         }
     }
 }

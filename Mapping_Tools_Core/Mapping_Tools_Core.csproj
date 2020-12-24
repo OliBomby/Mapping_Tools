@@ -152,6 +152,8 @@
     <Compile Include="Tools\HitsoundStudio\DataTypes\ICustomIndex.cs" />
     <Compile Include="Tools\HitsoundStudio\DataTypes\IHitsoundEvent.cs" />
     <Compile Include="Tools\HitsoundStudio\DataTypes\IHitsoundLayer.cs" />
+    <Compile Include="Tools\HitsoundStudio\DataTypes\ISample.cs" />
+    <Compile Include="Tools\HitsoundStudio\DataTypes\ISamplePackage.cs" />
     <Compile Include="Tools\HitsoundStudio\DataTypes\LayerImportArgs\IFileLayerImportArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\DataTypes\LayerImportArgs\IHitsoundsLayerImportArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\DataTypes\LayerImportArgs\ILayerImportArgs.cs" />
@@ -174,7 +176,6 @@
     <Compile Include="Tools\HitsoundStudio\HitsoundImporter.cs" />
     <Compile Include="Tools\HitsoundPreviewHelper\HitsoundZone.cs" />
     <Compile Include="Audio\MidiExporter.cs" />
-    <Compile Include="Tools\HitsoundStudio\DataTypes\Sample.cs" />
     <Compile Include="Audio\SampleImporter.cs" />
     <Compile Include="Tools\HitsoundStudio\DataTypes\SamplePackage.cs" />
     <Compile Include="Tools\HitsoundStudio\DataTypes\SampleSchema.cs" />

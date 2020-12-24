@@ -47,7 +47,7 @@ namespace Mapping_Tools.Classes.Tools.HitsoundStudio {
 
         private int _priority;
         /// <summary>
-        /// The priority of this hitsound layer. When mixing multiple <see cref="Sample"/>,
+        /// The priority of this hitsound layer. When mixing multiple <see cref="BindableSample"/>,
         /// the sampleset of the one with the lowest priority will be taken.
         /// This priority value is equal to the index in the hitsound layers list.
         /// </summary>
@@ -65,11 +65,11 @@ namespace Mapping_Tools.Classes.Tools.HitsoundStudio {
             set => Set(ref _importArgs, value);
         }
 
-        private SampleGeneratingArgs _sampleArgs;
+        private UISampleGeneratingArgs _sampleArgs;
         /// <summary>
         /// Contains all the information about how the sound of this hitsound should be generated.
         /// </summary>
-        public SampleGeneratingArgs SampleArgs {
+        public UISampleGeneratingArgs SampleArgs {
             get => _sampleArgs;
             set => Set(ref _sampleArgs, value);
         }

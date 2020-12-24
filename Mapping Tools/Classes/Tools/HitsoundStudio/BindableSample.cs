@@ -1,11 +1,12 @@
 ﻿using Mapping_Tools_Core.BeatmapHelper.Enums;
+using Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes;
 
-namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
+namespace Mapping_Tools.Classes.Tools.HitsoundStudio {
     /// <summary>
     /// 
     /// </summary>
-    public class Sample : BindableBase {
-        private SampleGeneratingArgs _sampleArgs;
+    public class BindableSample : BindableBase {
+        private UISampleGeneratingArgs _sampleArgs;
         private int _priority;
         private double _outsideVolume;
         private SampleSet _sampleSet;
@@ -14,7 +15,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
         /// <summary>
         /// 
         /// </summary>
-        public SampleGeneratingArgs SampleArgs {
+        public UISampleGeneratingArgs SampleGeneratingArgs {
             get => _sampleArgs;
             set => Set(ref _sampleArgs, value);
         }
@@ -44,15 +45,15 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
         public bool Finish => Hitsound == Hitsound.Finish;
         public bool Clap => Hitsound == Hitsound.Clap;
 
-        public Sample() {
-            _sampleArgs = new SampleGeneratingArgs();
+        public BindableSample() {
+            _sampleArgs = new UISampleGeneratingArgs();
             _outsideVolume = 1;
             _priority = 0;
             _sampleSet = SampleSet.Normal;
             _hitsound = Hitsound.Normal;
         }
 
-        public Sample(SampleSet sampleSet, Hitsound hitsound, SampleGeneratingArgs sampleArgs, int priority, double outsideVolume) {
+        public BindableSample(SampleSet sampleSet, Hitsound hitsound, UISampleGeneratingArgs sampleArgs, int priority, double outsideVolume) {
             _sampleArgs = sampleArgs;
             _outsideVolume = outsideVolume;
             _priority = priority;
@@ -60,7 +61,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
             _hitsound = hitsound;
         }
 
-        public Sample(HitsoundLayer hl) {
+        public BindableSample(HitsoundLayer hl) {
             _sampleArgs = hl.SampleArgs.Copy();  // Copy so any changes made to these sample args do not carry over to the layers
             _outsideVolume = 1;
             _priority = hl.Priority;
@@ -72,14 +73,14 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
         /// 
         /// </summary>
         /// <returns></returns>
-        public Sample Copy() {
-            return new Sample(SampleSet, Hitsound, SampleArgs.Copy(), Priority, OutsideVolume);
+        public object Clone() {
+            return new BindableSample(SampleSet, Hitsound, SampleGeneratingArgs.Copy(), Priority, OutsideVolume);
         }
 
         /// <summary>Returns a string that represents the current object.</summary>
         /// <returns>A string that represents the current object.</returns>
         public override string ToString() {
-            return $"{SampleArgs}, outside volume: {OutsideVolume}, priority: {Priority}, sampleset: {SampleSet}, hitsound: {Hitsound}";
+            return $"{SampleGeneratingArgs}, outside volume: {OutsideVolume}, priority: {Priority}, sampleset: {SampleSet}, hitsound: {Hitsound}";
         }
     }
 }

@@ -10,7 +10,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
     public class HitsoundConverter {
         public static List<SamplePackage> ZipLayers(IEnumerable<HitsoundLayer> layers, Sample defaultSample, double leniency=15, bool needNormalSample=true) {
             List<SamplePackage> packages = new List<SamplePackage>();
-            foreach (HitsoundLayer hl in layers) {
+            foreach (IHitsoundLayer hl in layers) {
                 foreach (double t in hl.Times) {
                     SamplePackage packageOnTime = packages.Find(o => Math.Abs(o.Time - t) <= leniency);
                     if (packageOnTime != null) {

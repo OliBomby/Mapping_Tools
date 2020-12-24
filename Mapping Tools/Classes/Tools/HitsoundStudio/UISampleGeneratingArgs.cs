@@ -66,11 +66,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
         private double volume;
         public double Volume {
             get => volume;
-            set {
-                if (Set(ref volume, value)) {
-                    RaisePropertyChanged(nameof(Velocity));
-                }
-            }
+            set => Set(ref volume, value);
         }
 
         private int bank;
@@ -133,6 +129,10 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
             return GetExtension() == ".sf2" ? 
                 $"{Path} {Bank},{Patch},{Instrument},{Key},{Length},{Velocity}" : 
                 $"{Path} {Volume * 100}%";
+        }
+
+        public UISampleGeneratingArgs Copy() {
+            return (UISampleGeneratingArgs) MemberwiseClone();
         }
     }
 }
