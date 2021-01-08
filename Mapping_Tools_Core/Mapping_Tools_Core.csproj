@@ -245,6 +245,7 @@
     <Compile Include="Tools\ComboColourStudio\IColourPoint.cs" />
     <Compile Include="Tools\ComboColourStudio\IColourPointCollection.cs" />
     <Compile Include="Tools\ComboColourStudio\IComboColourProject.cs" />
+    <Compile Include="Tools\HitsoundStudio\LayerImporters\IBeatmapLayerImporter.cs" />
     <Compile Include="Tools\MapCleanerStuff\MapCleaner.cs" />
     <Compile Include="Tools\MapCleanerStuff\MapCleanerArgs.cs" />
     <Compile Include="Tools\MapCleanerStuff\MapCleanerResult.cs" />
