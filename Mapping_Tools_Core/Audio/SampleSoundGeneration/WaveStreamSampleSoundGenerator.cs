@@ -9,11 +9,6 @@ namespace Mapping_Tools_Core.Audio.SampleSoundGeneration {
         /// </summary>
         public WaveStream Wave { get; set; }
 
-        /// <summary>
-        /// This means that this is the blank sample. There is some special logic for this.
-        /// </summary>
-        public bool BlankSample => Wave.TotalTime.Equals(TimeSpan.Zero);
-
         /// <inheritdoc />
         public WaveStreamSampleSoundGenerator(WaveStream wave) {
             Wave = wave;
@@ -24,6 +19,10 @@ namespace Mapping_Tools_Core.Audio.SampleSoundGeneration {
             ISampleProvider output = WaveToSampleProvider(Wave);
 
             return output;
+        }
+
+        public bool IsBlank() {
+            return Wave.TotalTime.Equals(TimeSpan.Zero);
         }
 
         private static ISampleProvider WaveToSampleProvider(IWaveProvider wave) {

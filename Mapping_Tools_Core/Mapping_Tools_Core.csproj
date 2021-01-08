@@ -67,12 +67,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Audio\OsuVolumeConverter.cs" />
+    <Compile Include="Audio\SampleImportArgs\AudioFileImportArgs.cs" />
     <Compile Include="Audio\SampleImportArgs\IAudioFileImportArgs.cs" />
     <Compile Include="Audio\SampleImportArgs\ISampleImportArgs.cs" />
     <Compile Include="Audio\SampleImportArgs\IPathSampleImportArgs.cs" />
     <Compile Include="Audio\SampleImportArgs\IMidiSampleImportArgs.cs" />
     <Compile Include="Audio\SampleImportArgs\ISoundFontSampleImportArgs.cs" />
     <Compile Include="Audio\SampleImportArgs\IVorbisFileImportArgs.cs" />
+    <Compile Include="Audio\SampleImportArgs\MidiSampleImportArgs.cs" />
+    <Compile Include="Audio\SampleImportArgs\SoundFontSampleImportArgs.cs" />
+    <Compile Include="Audio\SampleImportArgs\VorbisFileImportArgs.cs" />
     <Compile Include="Audio\SampleImporters\AudioFileImporter.cs" />
     <Compile Include="Audio\SampleImporters\ISampleImporter.cs" />
     <Compile Include="Audio\SampleImporters\SoundFontSampleImporter.cs" />

@@ -15,5 +15,11 @@ namespace Mapping_Tools_Core.Audio.SampleSoundGeneration {
         /// </summary>
         /// <returns></returns>
         ISampleProvider GetSampleProvider();
+
+        /// <summary>
+        /// Whether this generator makes any sound at all.
+        /// </summary>
+        /// <returns></returns>
+        bool IsBlank();
     }
 }

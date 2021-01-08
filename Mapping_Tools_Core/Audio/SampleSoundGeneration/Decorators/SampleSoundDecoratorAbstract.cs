@@ -16,6 +16,10 @@ namespace Mapping_Tools_Core.Audio.SampleSoundGeneration.Decorators {
             return Decorate(baseGenerator.GetSampleProvider());
         }
 
+        public virtual bool IsBlank() {
+            return baseGenerator.IsBlank();
+        }
+
         protected abstract ISampleProvider Decorate(ISampleProvider baseSampleProvider);
     }
 }

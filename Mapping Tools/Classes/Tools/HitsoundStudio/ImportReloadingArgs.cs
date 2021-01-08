@@ -4,7 +4,7 @@ using Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes;
 
 namespace Mapping_Tools.Classes.Tools.HitsoundStudio {
     /// <summary>
-    /// All arguments for the importing of <see cref="Mapping_Tools.Classes.Tools.HitsoundStudio.HitsoundLayer"/> using <see cref="HitsoundImporter"/>.
+    /// All arguments for the importing of <see cref="HitsoundLayer"/>.
     /// </summary>
     public class ImportReloadingArgs : IEquatable<ImportReloadingArgs> {
         /// <summary>
