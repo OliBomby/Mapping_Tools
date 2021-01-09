@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using JetBrains.Annotations;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.BeatmapHelper.Events;
 using Mapping_Tools_Core.MathUtil;
@@ -12,7 +13,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
     /// <summary>
     /// Class containing all the data from a .osu beatmap file. It also supports serialization to .osu format and helper methods to get data in specific ways.
     /// </summary>
-    public class Beatmap : ITextFile, IComboColourCollection {
+    public class Beatmap : IComboColourCollection {
 
         /// <summary>
         /// Contains all the values in the [General] section of a .osu file. The key is the variable name and the value is the value.
@@ -33,6 +34,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// WidescreenStoryboard,
         /// SamplesMatchPlaybackRate
         /// </summary>
+        [NotNull]
         public Dictionary<string, TValue> General { get; set; }
 
         /// <summary>
@@ -44,6 +46,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// GridSize,
         /// TimelineZoom
         /// </summary>
+        [NotNull]
         public Dictionary<string, TValue> Editor { get; set; }
 
         /// <summary>
@@ -60,6 +63,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// BeatmapID,
         /// BeatmapSetID
         /// </summary>
+        [NotNull]
         public Dictionary<string, TValue> Metadata { get; set; }
 
         /// <summary>
@@ -72,6 +76,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// SliderMultiplier,
         /// SliderTickRate
         /// </summary>
+        [NotNull]
         public Dictionary<string, TValue> Difficulty { get; set; }
 
         /// <summary>
@@ -79,17 +84,20 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// There can not be more than 8 combo colours.
         /// <c>Combo1 : 245,222,139</c>
         /// </summary>
+        [NotNull]
         public List<IComboColour> ComboColoursList { get; set; }
 
         /// <summary>
         /// Read-only version of <see cref="ComboColoursList"/> for the <see cref="IComboColourCollection"/> interface.
         /// </summary>
+        [NotNull]
         public IReadOnlyList<IComboColour> ComboColours => ComboColoursList;
 
         /// <summary>
         /// Contains all the special colours. These include the colours of slider bodies or slider outlines.
         /// The key is the name of the special colour and the value is the actual colour.
         /// </summary>
+        [NotNull]
         public Dictionary<string, IComboColour> SpecialColours { get; set; }
 
         /// <summary>
@@ -98,81 +106,98 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// With this object you can always calculate the slider velocity at any time.
         /// Any changes to the slider multiplier property in this object will not be serialized. Change the value in <see cref="Difficulty"/> instead.
         /// </summary>
+        [NotNull]
         public Timing BeatmapTiming { get; set; }
 
         /// <summary>
         /// The storyboard of the Beatmap. Stores everything under the [Events] section.
         /// </summary>
+        [NotNull]
         public StoryBoard StoryBoard { get; set; }
 
         /// <summary>
         /// A list of all the lines of .osu code under the [Events] -> (Background and Video events) section.
         /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
+        [NotNull]
         public List<Event> BackgroundAndVideoEvents => StoryBoard.BackgroundAndVideoEvents;
 
         /// <summary>
         /// A list of all the lines of .osu code under the [Events] -> (Break Periods) section.
         /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
+        [NotNull]
         public List<Break> BreakPeriods => StoryBoard.BreakPeriods;
 
         /// <summary>
         /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 0 (Background)) section.
         /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
+        [NotNull]
         public List<Event> StoryboardLayerBackground => StoryBoard.StoryboardLayerBackground;
 
         /// <summary>
         /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 1 (Fail)) section.
         /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
+        [NotNull]
         public List<Event> StoryboardLayerFail => StoryBoard.StoryboardLayerFail;
 
         /// <summary>
         /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 2 (Pass)) section.
         /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
+        [NotNull]
         public List<Event> StoryboardLayerPass => StoryBoard.StoryboardLayerPass;
 
         /// <summary>
         /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 3 (Foreground)) section.
         /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
+        [NotNull]
         public List<Event> StoryboardLayerForeground => StoryBoard.StoryboardLayerForeground;
 
         /// <summary>
         /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 4 (Overlay)) section.
         /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
+        [NotNull]
         public List<Event> StoryboardLayerOverlay => StoryBoard.StoryboardLayerOverlay;
 
         /// <summary>
         /// A list of all storyboarded sound sample events under the [Events] -> (Storyboard Sound Samples) section.
         /// </summary>
+        [NotNull]
         public List<StoryboardSoundSample> StoryboardSoundSamples => StoryBoard.StoryboardSoundSamples;
 
         /// <summary>
         /// List of all the hit objects in this beatmap.
         /// </summary>
+        [NotNull]
         public List<HitObject> HitObjects { get; set; }
 
         /// <summary>
         /// Gets or sets the bookmarks of this beatmap. This returns a clone of the real bookmarks which are stored in the <see cref="Editor"/> property.
         /// The bookmarks are represented with just a double which is the time of the bookmark.
         /// </summary>
+        [NotNull]
         public List<double> Bookmarks { get => GetBookmarks(); set => SetBookmarks(value); }
-
-        /// <summary>
-        /// When true, all coordinates and times will be serialized without rounding.
-        /// </summary>
-        public bool SaveWithFloatPrecision { get; set; }
 
         /// <summary>
         /// Initializes a new Beatmap.
         /// </summary>
         public Beatmap() {
-            Initialize();
+            General = new Dictionary<string, TValue>();
+            Editor = new Dictionary<string, TValue>();
+            Metadata = new Dictionary<string, TValue>();
+            Difficulty = new Dictionary<string, TValue>();
+            ComboColoursList = new List<IComboColour>();
+            SpecialColours = new Dictionary<string, IComboColour>();
+            StoryBoard = new StoryBoard();
+            HitObjects = new List<HitObject>();
+            BeatmapTiming = new Timing(1.4);
+
+            FillBasicMetadata();
         }
 
         /// <summary>
@@ -184,9 +209,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// <param name="globalSv"></param>
         /// <param name="gameMode"></param>
         public Beatmap(List<HitObject> hitObjects, List<TimingPoint> timingPoints,
-            TimingPoint firstUnInheritedTimingPoint = null, double globalSv = 1.4, GameMode gameMode = GameMode.Standard) {
-            Initialize();
-
+            TimingPoint firstUnInheritedTimingPoint = null, double globalSv = 1.4, GameMode gameMode = GameMode.Standard) : this() {
             // Set the hit objects
             HitObjects = hitObjects;
 
@@ -206,29 +229,6 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             CalculateSliderEndTimes();
             GiveObjectsGreenlines();
             CalculateHitObjectComboStuff();
-        }
-
-        /// <summary>
-        /// Initializes the Beatmap file format.
-        /// </summary>
-        /// <param name="lines">List of strings where each string is another line in the .osu file.</param>
-        public Beatmap(List<string> lines) {
-            Initialize();
-            SetLines(lines);
-        }
-
-        private void Initialize() {
-            General = new Dictionary<string, TValue>();
-            Editor = new Dictionary<string, TValue>();
-            Metadata = new Dictionary<string, TValue>();
-            Difficulty = new Dictionary<string, TValue>();
-            ComboColoursList = new List<IComboColour>();
-            SpecialColours = new Dictionary<string, IComboColour>();
-            StoryBoard = new StoryBoard();
-            HitObjects = new List<HitObject>();
-            BeatmapTiming = new Timing(1.4);
-
-            FillBasicMetadata();
         }
 
         public void FillBasicMetadata() {
@@ -259,49 +259,6 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             Difficulty["ApproachRate"] = new TValue("5");
             Difficulty["SliderMultiplier"] = new TValue("1.4");
             Difficulty["SliderTickRate"] = new TValue("1");
-        }
-
-        /// <summary>
-        /// Deserializes an entire .osu file and stores the data to this object.
-        /// </summary>
-        /// <param name="lines">List of strings where each string is another line in the .osu file.</param>
-        public void SetLines(List<string> lines) {
-            // Load up all the shit
-            IEnumerable<string> generalLines = FileFormatHelper.GetCategoryLines(lines, "[General]");
-            IEnumerable<string> editorLines = FileFormatHelper.GetCategoryLines(lines, "[Editor]");
-            IEnumerable<string> metadataLines = FileFormatHelper.GetCategoryLines(lines, "[Metadata]");
-            IEnumerable<string> difficultyLines = FileFormatHelper.GetCategoryLines(lines, "[Difficulty]");
-            IEnumerable<string> timingLines = FileFormatHelper.GetCategoryLines(lines, "[TimingPoints]");
-            IEnumerable<string> colourLines = FileFormatHelper.GetCategoryLines(lines, "[Colours]");
-            IEnumerable<string> hitobjectLines = FileFormatHelper.GetCategoryLines(lines, "[HitObjects]");
-
-            FileFormatHelper.FillDictionary(General, generalLines);
-            FileFormatHelper.FillDictionary(Editor, editorLines);
-            FileFormatHelper.FillDictionary(Metadata, metadataLines);
-            FileFormatHelper.FillDictionary(Difficulty, difficultyLines);
-
-            foreach (string line in colourLines) {
-                if (line.Substring(0, 5) == "Combo") {
-                    ComboColoursList.Add(new ComboColour(line));
-                } else {
-                    SpecialColours[FileFormatHelper.SplitKeyValue(line)[0].Trim()] = new ComboColour(line);
-                }
-            }
-
-            foreach (string line in hitobjectLines) {
-                HitObjects.Add(new HitObject(line));
-            }
-
-            // Give the lines to the storyboard
-            StoryBoard.SetLines(lines);
-
-            // Set the timing object
-            BeatmapTiming = new Timing(timingLines, Difficulty["SliderMultiplier"].DoubleValue);
-
-            SortHitObjects();
-            CalculateHitObjectComboStuff();
-            CalculateSliderEndTimes();
-            GiveObjectsGreenlines();
         }
 
         /// <summary>
@@ -651,71 +608,6 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             List<double> bookmarks = GetBookmarks();
             List<HitObject> markedObjects = HitObjects.FindAll(ho => bookmarks.Exists(o => (ho.Time <= o && o <= ho.EndTime)));
             return markedObjects;
-        }
-
-        /// <summary>
-        /// Serializes all data of this beatmap to .osu format.
-        /// </summary>
-        /// <returns>List of lines of .osu code.</returns>
-        public List<string> GetLines() {
-            // Getting all the stuff
-            List<string> lines = new List<string>
-            {
-                "osu file format v14",
-                "",
-                "[General]"
-            };
-            FileFormatHelper.AddDictionaryToLines(General, lines);
-            lines.Add("");
-            lines.Add("[Editor]");
-            FileFormatHelper.AddDictionaryToLines(Editor, lines);
-            lines.Add("");
-            lines.Add("[Metadata]");
-            FileFormatHelper.AddDictionaryToLines(Metadata, lines);
-            lines.Add("");
-            lines.Add("[Difficulty]");
-            FileFormatHelper.AddDictionaryToLines(Difficulty, lines);
-            lines.Add("");
-            lines.Add("[Events]");
-            lines.Add("//Background and Video events");
-            lines.AddRange(BackgroundAndVideoEvents.Select(e => e.GetLine()));
-            lines.Add("//Break Periods");
-            lines.AddRange(BreakPeriods.Select(b => b.GetLine()));
-            lines.Add("//Storyboard Layer 0 (Background)");
-            lines.AddRange(Event.SerializeEventTree(StoryboardLayerBackground));
-            lines.Add("//Storyboard Layer 1 (Fail)");
-            lines.AddRange(Event.SerializeEventTree(StoryboardLayerFail));
-            lines.Add("//Storyboard Layer 2 (Pass)");
-            lines.AddRange(Event.SerializeEventTree(StoryboardLayerPass));
-            lines.Add("//Storyboard Layer 3 (Foreground)");
-            lines.AddRange(Event.SerializeEventTree(StoryboardLayerForeground));
-            lines.Add("//Storyboard Layer 4 (Overlay)");
-            lines.AddRange(Event.SerializeEventTree(StoryboardLayerOverlay));
-            lines.Add("//Storyboard Sound Samples");
-            lines.AddRange(StoryboardSoundSamples.Select(sbss => sbss.GetLine()));
-            lines.Add("");
-            lines.Add("[TimingPoints]");
-            lines.AddRange(BeatmapTiming.TimingPoints.Where(tp => tp != null).Select(tp => {
-                tp.SaveWithFloatPrecision = SaveWithFloatPrecision;
-                return tp.GetLine();
-            }));
-            lines.Add("");
-            if (ComboColoursList.Any()) {
-                lines.Add("");
-                lines.Add("[Colours]");
-                lines.AddRange(ComboColoursList.Select((comboColour, i) => "Combo" + (i + 1) + " : " +
-                                                                       ComboColour.SerializeComboColour(comboColour)));
-                lines.AddRange(SpecialColours.Select(specialColour => specialColour.Key + " : " +
-                                                                      ComboColour.SerializeComboColour(specialColour.Value)));
-            }
-            lines.Add("");
-            lines.Add("[HitObjects]");
-            lines.AddRange(HitObjects.Select(ho => {
-                ho.SaveWithFloatPrecision = SaveWithFloatPrecision;
-                return ho.GetLine();
-            }));
-
-            return lines;
         }
 
         public double GetHitObjectStartTime() {

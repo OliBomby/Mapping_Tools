@@ -94,6 +94,9 @@
     <Compile Include="BeatmapHelper\Beatmap.cs" />
     <Compile Include="BeatmapHelper\BeatmapEditor.cs" />
     <Compile Include="BeatmapHelper\BeatmapParsingException.cs" />
+    <Compile Include="BeatmapHelper\Parsing\IParser.cs" />
+    <Compile Include="BeatmapHelper\Parsing\OsuBeatmapParser.cs" />
+    <Compile Include="BeatmapHelper\Parsing\OsuStoryboardParser.cs" />
     <Compile Include="BeatmapHelper\ComboColour.cs" />
     <Compile Include="BeatmapHelper\Editor.cs" />
     <Compile Include="BeatmapHelper\Enums\Gamemode.cs" />
@@ -126,7 +129,6 @@
     <Compile Include="BeatmapHelper\HitObjectComparer.cs" />
     <Compile Include="BeatmapHelper\IComboColour.cs" />
     <Compile Include="BeatmapHelper\IComboColourCollection.cs" />
-    <Compile Include="BeatmapHelper\ITextFile.cs" />
     <Compile Include="BeatmapHelper\ITextLine.cs" />
     <Compile Include="BeatmapHelper\SliderPathStuff\PathApproximator.cs" />
     <Compile Include="BeatmapHelper\SliderPathStuff\SliderPath.cs" />

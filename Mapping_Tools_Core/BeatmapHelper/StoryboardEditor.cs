@@ -1,26 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using Mapping_Tools_Core.BeatmapHelper.Parsing;
 
-namespace Mapping_Tools_Core.BeatmapHelper
-{
+namespace Mapping_Tools_Core.BeatmapHelper {
     /// <summary>
-    /// 
+    /// Editor specifically for storyboards
     /// </summary>
-    public class StoryboardEditor : Editor
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        public StoryBoard StoryBoard => (StoryBoard)TextFile;
+    public class StoryboardEditor : Editor<StoryBoard> {
+        public StoryBoard StoryBoard => Instance;
 
-        /// <inheritdoc />
-        public StoryboardEditor(List<string> lines) {
-            TextFile = new StoryBoard(lines);
-        }
+        public StoryboardEditor() : base(new OsuStoryboardParser()) {}
 
-        /// <inheritdoc />
-        public StoryboardEditor(string path) {
-            Path = path;
-            TextFile = new StoryBoard(ReadFile(Path));
-        }
+        public StoryboardEditor(string path) : base(new OsuStoryboardParser(), path) {}
     }
 }

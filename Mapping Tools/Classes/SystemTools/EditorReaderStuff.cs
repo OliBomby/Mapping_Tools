@@ -10,6 +10,7 @@ using Mapping_Tools_Core.BeatmapHelper;
 using Mapping_Tools_Core.Exceptions;
 using Process.NET;
 using Process.NET.Memory;
+using ConnectedBeatmapEditor = Mapping_Tools.Classes.BeatmapHelper.ConnectedBeatmapEditor;
 using HitObject = Mapping_Tools_Core.BeatmapHelper.HitObject;
 
 namespace Mapping_Tools.Classes.SystemTools {
@@ -217,7 +218,7 @@ namespace Mapping_Tools.Classes.SystemTools {
         /// <param name="path"></param>
         /// <param name="fullReader"></param>
         /// <returns></returns>
-        public static BeatmapEditor GetNewestVersionOrNot(string path, EditorReader fullReader) {
+        public static ConnectedBeatmapEditor GetNewestVersionOrNot(string path, EditorReader fullReader) {
             return GetNewestVersionOrNot(path, fullReader, out _, out _);
         }
 
@@ -230,7 +231,7 @@ namespace Mapping_Tools.Classes.SystemTools {
         /// <param name="selected"></param>
         /// <param name="exception">Any exception that may occur, null otherwise</param>
         /// <returns></returns>
-        public static BeatmapEditor GetNewestVersionOrNot(string path, EditorReader fullReader, out List<HitObject> selected, out Exception exception) {
+        public static ConnectedBeatmapEditor GetNewestVersionOrNot(string path, EditorReader fullReader, out List<HitObject> selected, out Exception exception) {
             exception = null;
 
             if (fullReader != null) {
@@ -242,7 +243,7 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
             
             selected = new List<HitObject>();
-            return new BeatmapEditor(path);
+            return new ConnectedBeatmapEditor(path);
         }
 
         /// <summary>
@@ -251,7 +252,7 @@ namespace Mapping_Tools.Classes.SystemTools {
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static BeatmapEditor GetNewestVersionOrNot(string path) {
+        public static ConnectedBeatmapEditor GetNewestVersionOrNot(string path) {
             return GetNewestVersionOrNot(path, out _, out _);
         }
 
@@ -263,7 +264,7 @@ namespace Mapping_Tools.Classes.SystemTools {
         /// <param name="selected"></param>
         /// <param name="exception">Any exception that may occur, null otherwise</param>
         /// <returns></returns>
-        public static BeatmapEditor GetNewestVersionOrNot(string path, out List<HitObject> selected, out Exception exception) {
+        public static ConnectedBeatmapEditor GetNewestVersionOrNot(string path, out List<HitObject> selected, out Exception exception) {
             exception = null;
 
             try {
@@ -274,7 +275,7 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
             
             selected = new List<HitObject>();
-            return new BeatmapEditor(path);
+            return new ConnectedBeatmapEditor(path);
         }
 
         /// <summary>
@@ -284,7 +285,7 @@ namespace Mapping_Tools.Classes.SystemTools {
         /// <param name="fullReader">Reader object that has already fetched all</param>
         /// <returns>The editor with the newest version</returns>
         /// <exception cref="System.ArgumentNullException"></exception>
-        public static BeatmapEditor GetNewestVersion(string path, EditorReader fullReader)
+        public static ConnectedBeatmapEditor GetNewestVersion(string path, EditorReader fullReader)
         {
             return GetNewestVersion(path, fullReader, out _);
         }
@@ -297,12 +298,12 @@ namespace Mapping_Tools.Classes.SystemTools {
         /// <param name="fullReader">Reader object that has already fetched all</param>
         /// <returns>The editor with the newest version</returns>
         /// <exception cref="System.ArgumentNullException"></exception>
-        public static BeatmapEditor GetNewestVersion(string path, EditorReader fullReader, out List<HitObject> selected) {
+        public static ConnectedBeatmapEditor GetNewestVersion(string path, EditorReader fullReader, out List<HitObject> selected) {
             if (fullReader == null) {
                 throw new ArgumentNullException(nameof(fullReader));
             }
 
-            BeatmapEditor editor = new BeatmapEditor(path);
+            ConnectedBeatmapEditor editor = new ConnectedBeatmapEditor(path);
             selected = new List<HitObject>();
             
             // Get the path from the beatmap in memory
@@ -324,7 +325,7 @@ namespace Mapping_Tools.Classes.SystemTools {
         /// <param name="selected">List of selected hit objects</param>
         /// <returns>An editor for the beatmap</returns>
         /// <exception cref="System.ArgumentNullException"></exception>
-        public static BeatmapEditor GetBeatmapEditor(EditorReader fullReader, out List<HitObject> selected) {
+        public static ConnectedBeatmapEditor GetBeatmapEditor(EditorReader fullReader, out List<HitObject> selected) {
             if (fullReader == null) {
                 throw new ArgumentNullException(nameof(fullReader));
             }
@@ -333,7 +334,7 @@ namespace Mapping_Tools.Classes.SystemTools {
             string memoryPath = GetCurrentBeatmap(fullReader);
 
             // Update the beatmap with memory values
-            var editor = new BeatmapEditor(memoryPath);
+            var editor = new ConnectedBeatmapEditor(memoryPath);
             selected = UpdateBeatmap(editor.Beatmap, fullReader);
 
             return editor;

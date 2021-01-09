@@ -194,6 +194,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Classes\BeatmapHelper\ConnectedBeatmapEditor.cs" />
     <Compile Include="Classes\BindableBase.cs" />
     <Compile Include="Classes\GenericExtensions.cs" />
     <Compile Include="Classes\SystemTools\ActionHotkey.cs" />

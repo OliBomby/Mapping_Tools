@@ -1,73 +1,74 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using Mapping_Tools_Core.BeatmapHelper.Parsing;
 
 namespace Mapping_Tools_Core.BeatmapHelper {
     /// <summary>
-    /// This is a class that sits around a <see cref="ITextFile"/> and gives it IO helper methods. This makes the <see cref="ITextFile"/> more like an actual file.
+    /// This is a class that gives it IO helper methods for an object that is parseable with a <see cref="IParser{T}"/>
     /// </summary>
-    public class Editor {
+    public class Editor<T> {
+        protected readonly IParser<T> parser;
+
         /// <summary>
-        /// The file path to the beatmap or storyboard file.
+        /// The file path to the serialized file.
         /// </summary>
         public string Path { get; set; }
 
         /// <summary>
-        /// The text file interface used as an object.
+        /// The parsed object.
         /// </summary>
-        public ITextFile TextFile { get; set; }
+        public T Instance { get; set; }
 
-        /// <inheritdoc />
-        public Editor() {
-
+        /// <summary>
+        /// Initializes a new editor.
+        /// </summary>
+        /// <param name="parser">The parser for the file type</param>
+        public Editor(IParser<T> parser) {
+            this.parser = parser;
         }
 
-        /// <inheritdoc />
-        public Editor(List<string> lines) {
-            TextFile = new Beatmap(lines);
-        }
-
-        /// <inheritdoc />
-        public Editor(string path) {
+        /// <summary>
+        /// Initializes a new editor with provided path.
+        /// Optionally loads the instance from the path aswell.
+        /// </summary>
+        /// <param name="parser">The parser for the file type</param>
+        /// <param name="path">The path of the physical file</param>
+        /// <param name="load">Whether to load the instance from the path</param>
+        public Editor(IParser<T> parser, string path, bool load = true) : this(parser) {
             Path = path;
-            if (System.IO.Path.GetExtension(path) == ".osb") {
-                TextFile = new StoryBoard(ReadFile(path));
-            } else {
-                TextFile = new Beatmap(ReadFile(path));
-            }
+            if (load)
+                Instance = parser.ParseNew(ReadFile());
+        }
+
+        /// <inheritdoc />
+        public Editor(IParser<T> parser, string path, T instance) : this(parser) {
+            Path = path;
+            Instance = instance;
         }
 
         /// <summary>
-        /// Reads the text file into string formats. with the 
+        /// Reads the file at <see cref="Path"/> and reads the lines of text.
         /// </summary>
-        /// <param name="path"></param>
         /// <returns></returns>
-        public List<string> ReadFile(string path) {
+        public string[] ReadFile() {
             // Get contents of the file
-            var lines = File.ReadAllLines(path);
-            return new List<string>(lines);
+            var lines = File.ReadAllLines(Path);
+            return lines;
         }
 
         /// <summary>
-        /// Saves the lines of string into the path provided.
+        /// Saves <see cref="Instance"/> to the path provided.
         /// </summary>
         /// <param name="path"></param>
         public virtual void SaveFile(string path) {
-            SaveFile(path, TextFile.GetLines());
+            SaveFile(path, parser.Serialize(Instance));
         }
 
         /// <summary>
-        /// Saves the lines of string into the path provided.
-        /// </summary>
-        /// <param name="lines"></param>
-        public virtual void SaveFile(List<string> lines) {
-            SaveFile(Path, lines);
-        }
-
-        /// <summary>
-        /// Saves the beatmap files.
+        /// Saves <see cref="Instance"/> to <see cref="Path"/>.
         /// </summary>
         public virtual void SaveFile() {
-            SaveFile(Path, TextFile.GetLines());
+            SaveFile(Path, parser.Serialize(Instance));
         }
 
         /// <summary>
@@ -75,7 +76,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// </summary>
         /// <param name="path"></param>
         /// <param name="lines"></param>
-        public static void SaveFile(string path, List<string> lines) {
+        public static void SaveFile(string path, IEnumerable<string> lines) {
             if (!File.Exists(path)) {
                 File.Create(path).Dispose();
             }
@@ -84,21 +85,11 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         }
 
         /// <summary>
-        /// Grab the parent folder as absolute.
+        /// Grabs the parent folder as absolute.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The parent folder of <see cref="Path"/></returns>
         public string GetParentFolder() {
             return Directory.GetParent(Path).FullName;
-        }
-
-        /// <summary>
-        /// Grab the parent folder as absolute.
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static string GetParentFolder(string path)
-        {
-            return Directory.GetParent(path).FullName;
         }
     }
 }

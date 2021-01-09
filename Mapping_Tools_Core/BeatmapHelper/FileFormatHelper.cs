@@ -50,7 +50,11 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         }
 
         public static void AddDictionaryToLines(Dictionary<string, TValue> dict, List<string> lines) {
-            lines.AddRange(dict.Select(kvp => kvp.Key + ":" + kvp.Value.Value));
+            lines.AddRange(EnumerateDictionary(dict));
+        }
+
+        public static IEnumerable<string> EnumerateDictionary(Dictionary<string, TValue> dict) {
+            return dict.Select(kvp => kvp.Key + ":" + kvp.Value.Value);
         }
 
         public static void FillDictionary(Dictionary<string, TValue> dict, IEnumerable<string> lines) {
