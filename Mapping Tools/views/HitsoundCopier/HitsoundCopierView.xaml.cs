@@ -16,7 +16,7 @@ using Mapping_Tools_Core.MathUtil;
 using Mapping_Tools_Core.ToolHelpers;
 using Mapping_Tools_Core.Tools.HitsoundStudio;
 using Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes;
-using ConnectedBeatmapEditor = Mapping_Tools.Classes.BeatmapHelper.ConnectedBeatmapEditor;
+using HashingBeatmapEditor = Mapping_Tools.Classes.BeatmapHelper.HashingBeatmapEditor;
 
 namespace Mapping_Tools.Views.HitsoundCopier {
     /// <summary>
@@ -77,7 +77,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
             var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
 
             foreach (var pathTo in paths) {
-                ConnectedBeatmapEditor editorTo = EditorReaderStuff.GetNewestVersionOrNot(pathTo, reader);;
+                HashingBeatmapEditor editorTo = EditorReaderStuff.GetNewestVersionOrNot(pathTo, reader);;
                 Beatmap beatmapTo = editorTo.Beatmap;
                 Beatmap beatmapFrom;
 

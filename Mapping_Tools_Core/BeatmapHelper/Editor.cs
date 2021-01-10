@@ -34,10 +34,8 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// <param name="parser">The parser for the file type</param>
         /// <param name="path">The path of the physical file</param>
         /// <param name="load">Whether to load the instance from the path</param>
-        public Editor(IParser<T> parser, string path, bool load = true) : this(parser) {
+        public Editor(IParser<T> parser, string path) : this(parser) {
             Path = path;
-            if (load)
-                Instance = parser.ParseNew(ReadFile());
         }
 
         /// <inheritdoc />
@@ -47,28 +45,26 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         }
 
         /// <summary>
-        /// Reads the file at <see cref="Path"/> and reads the lines of text.
+        /// Reads the file at <see cref="Path"/> and creates <see cref="Instance"/>.
         /// </summary>
-        /// <returns></returns>
-        public string[] ReadFile() {
+        public virtual void ReadFile() {
             // Get contents of the file
             var lines = File.ReadAllLines(Path);
-            return lines;
-        }
-
-        /// <summary>
-        /// Saves <see cref="Instance"/> to the path provided.
-        /// </summary>
-        /// <param name="path"></param>
-        public virtual void SaveFile(string path) {
-            SaveFile(path, parser.Serialize(Instance));
+            Instance = parser.ParseNew(lines);
         }
 
         /// <summary>
         /// Saves <see cref="Instance"/> to <see cref="Path"/>.
         /// </summary>
         public virtual void SaveFile() {
-            SaveFile(Path, parser.Serialize(Instance));
+            SaveFile(parser.Serialize(Instance));
+        }
+
+        /// <summary>
+        /// Saves given lines to <see cref="Path"/>.
+        /// </summary>
+        protected virtual void SaveFile(IEnumerable<string> lines) {
+            SaveFile(Path, lines);
         }
 
         /// <summary>

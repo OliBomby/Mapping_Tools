@@ -1,39 +1,29 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using Editor_Reader;
 using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools_Core.BeatmapHelper;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     /// <summary>
-    /// Beatmap editor for use with Editor Reader.
+    /// Beatmap editor that tries to get the newest data from osu! memory.
     /// </summary>
-    public class ConnectedBeatmapEditor : BeatmapEditor {
-        public ConnectedBeatmapEditor() {}
+    public class ConnectedBeatmapEditor : HashingBeatmapEditor {
+        private readonly EditorReader reader;
 
-        public ConnectedBeatmapEditor(string path) : base(path) {
-            // TODO: Get newest version here
+        public ConnectedBeatmapEditor() { }
+
+        public ConnectedBeatmapEditor(string path) : base(path) { }
+
+        public ConnectedBeatmapEditor(string path, EditorReader reader) : base(path) {
+            this.reader = reader;
         }
 
-        public override void SaveFile() {
-            GenerateBetterSaveMD5(parser.Serialize(Instance));
-            base.SaveFile();
-        }
+        public override void ReadFile() {
+            base.ReadFile();
 
-        public override void SaveFile(string path) {
-            GenerateBetterSaveMD5(parser.Serialize(Instance));
-            base.SaveFile(path);
-        }
-
-        private static void GenerateBetterSaveMD5(IEnumerable<string> lines) {
-            var tempPath = System.IO.Path.Combine(MainWindow.AppDataPath, "temp.osu");
-
-            if (!File.Exists(tempPath))
-            {
-                File.Create(tempPath).Dispose();
+            if (reader != null) {
+                EditorReaderStuff.UpdateEditorOrNot(this, reader, out _, out _);
+            } else {
+                EditorReaderStuff.UpdateEditorOrNot(this, out _, out _);
             }
-            File.WriteAllLines(tempPath, lines);
-
-            EditorReaderStuff.DontCoolSaveWhenMD5EqualsThisString = EditorReaderStuff.GetMD5FromPath(tempPath);
         }
     }
 }

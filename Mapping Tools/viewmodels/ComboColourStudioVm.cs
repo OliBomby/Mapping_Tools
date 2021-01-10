@@ -16,7 +16,7 @@ using Mapping_Tools_Core.ToolHelpers;
 using Mapping_Tools_Core.Tools.ComboColourStudio;
 using MaterialDesignThemes.Wpf;
 using Newtonsoft.Json;
-using ConnectedBeatmapEditor = Mapping_Tools.Classes.BeatmapHelper.ConnectedBeatmapEditor;
+using HashingBeatmapEditor = Mapping_Tools.Classes.BeatmapHelper.HashingBeatmapEditor;
 
 namespace Mapping_Tools.Viewmodels {
 
@@ -153,7 +153,7 @@ namespace Mapping_Tools.Viewmodels {
         /// </summary>
         /// <param name="importPath"></param>
         public void ImportColourHaxFromBeatmap(string importPath) {
-            var editor = new ConnectedBeatmapEditor(importPath);
+            var editor = new HashingBeatmapEditor(importPath);
             var beatmap = editor.Beatmap;
 
             // Add default colours if there are no colours
@@ -173,7 +173,7 @@ namespace Mapping_Tools.Viewmodels {
         /// </summary>
         /// <param name="importPath"></param>
         public void ImportComboColoursFromBeatmap(string importPath) {
-            var editor = new ConnectedBeatmapEditor(importPath);
+            var editor = new HashingBeatmapEditor(importPath);
             var beatmap = editor.Beatmap;
 
             ImportComboColours(beatmap);
