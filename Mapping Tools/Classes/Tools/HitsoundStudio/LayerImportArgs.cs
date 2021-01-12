@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Windows;
 using Mapping_Tools_Core.MathUtil;
 using Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes;
-using Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes.LayerSourceRef;
+using Mapping_Tools_Core.Tools.HitsoundStudio.Model.LayerSourceRef;
 
 namespace Mapping_Tools.Classes.Tools.HitsoundStudio {
     /// <summary>

@@ -9,7 +9,7 @@ using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.BeatmapHelper.Events;
 using Mapping_Tools_Core.MathUtil;
 using Mapping_Tools_Core.ToolHelpers;
-using Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes;
+using Mapping_Tools_Core.Tools.HitsoundStudio.Model;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 

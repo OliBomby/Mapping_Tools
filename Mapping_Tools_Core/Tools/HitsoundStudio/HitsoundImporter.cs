@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using Mapping_Tools_Core.Audio;
 using Mapping_Tools_Core.BeatmapHelper;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
-using Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes;
+using Mapping_Tools_Core.Tools.HitsoundStudio.Model;
 using NAudio.Midi;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio {
