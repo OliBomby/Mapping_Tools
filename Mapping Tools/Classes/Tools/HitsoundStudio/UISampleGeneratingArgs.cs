@@ -1,9 +1,7 @@
-﻿using Mapping_Tools.Classes;
+﻿using System;
 using Mapping_Tools_Core.MathUtil;
-using Newtonsoft.Json;
-using System;
 
-namespace Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes {
+namespace Mapping_Tools.Classes.Tools.HitsoundStudio {
     /// <summary>
     /// 
     /// </summary>

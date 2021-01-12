@@ -2,5 +2,6 @@
     public interface IStackLayerSourceRef {
         double X { get; }
         double Y { get; }
+        double Leniency { get; }
     }
 }

@@ -148,12 +148,14 @@
     <Compile Include="ExternalFileUtil\Reaper\ReaperEditor.cs" />
     <Compile Include="ExternalFileUtil\Reaper\ReaperProject.cs" />
     <Compile Include="ExternalFileUtil\Reaper\TrackItem.cs" />
+    <Compile Include="Tools\HitsoundStudio\LayerImporters\StackLayerImporter.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\CompleteHitsounds.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\CustomIndex.cs" />
     <Compile Include="Audio\Effects\DelayFadeOutSampleProvider.cs" />
     <Compile Include="Audio\Effects\Effect.cs" />
     <Compile Include="Audio\Effects\EffectParameter.cs" />
     <Compile Include="Audio\Effects\SoftLimiter.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\HitsoundLayer.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\ICompleteHitsounds.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\ICustomIndex.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\IHitsoundEvent.cs" />

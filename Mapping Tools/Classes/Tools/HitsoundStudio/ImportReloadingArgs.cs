@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes;
 
 namespace Mapping_Tools.Classes.Tools.HitsoundStudio {
     /// <summary>

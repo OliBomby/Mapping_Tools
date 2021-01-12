@@ -1,5 +1,4 @@
 ﻿using Mapping_Tools_Core.BeatmapHelper.Enums;
-using Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes;
 
 namespace Mapping_Tools.Classes.Tools.HitsoundStudio {
     /// <summary>

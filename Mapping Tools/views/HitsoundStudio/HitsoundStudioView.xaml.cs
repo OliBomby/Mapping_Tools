@@ -17,7 +17,6 @@ using Mapping_Tools_Core.Audio;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.MathUtil;
 using Mapping_Tools_Core.Tools.HitsoundStudio;
-using Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes;
 using Mapping_Tools_Core.Tools.HitsoundStudio.Model;
 using MaterialDesignThemes.Wpf;
 using NAudio.Wave;

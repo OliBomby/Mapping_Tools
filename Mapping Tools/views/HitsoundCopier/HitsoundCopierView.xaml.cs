@@ -15,7 +15,6 @@ using Mapping_Tools_Core.BeatmapHelper.Events;
 using Mapping_Tools_Core.MathUtil;
 using Mapping_Tools_Core.ToolHelpers;
 using Mapping_Tools_Core.Tools.HitsoundStudio;
-using Mapping_Tools_Core.Tools.HitsoundStudio.DataTypes;
 using Mapping_Tools_Core.Tools.HitsoundStudio.Model;
 using HashingBeatmapEditor = Mapping_Tools.Classes.BeatmapHelper.HashingBeatmapEditor;
 

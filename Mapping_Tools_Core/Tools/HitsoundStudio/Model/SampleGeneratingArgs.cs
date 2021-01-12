@@ -9,7 +9,9 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
 
         public double Volume { get; }
 
-        public SampleGeneratingArgs() { }
+        public SampleGeneratingArgs() {
+            Volume = 1;
+        }
 
         public SampleGeneratingArgs(ISampleImportArgs importArgs, double volume) {
             ImportArgs = importArgs;

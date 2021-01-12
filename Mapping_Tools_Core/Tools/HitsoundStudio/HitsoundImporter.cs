@@ -28,7 +28,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
         }
 
         public static HitsoundLayer ImportStack(string path, double x, double y) {
-            HitsoundLayer layer = new HitsoundLayer
+            HitsoundLayer layer = new HitsoundLayer()
             {
                 ImportArgs = {ImportType = ImportType.Stack, Path = path, X = x, Y = y},
                 Times = TimesFromStack(path, x, y)
