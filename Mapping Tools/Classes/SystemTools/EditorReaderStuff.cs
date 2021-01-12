@@ -115,7 +115,8 @@ namespace Mapping_Tools.Classes.SystemTools {
         /// <returns>A boolean whether the reader is valid</returns>
         private static bool ValidateFullReader(EditorReader reader)
         {
-            bool result = !reader.hitObjects.Any(readerHitObject => readerHitObject.SegmentCount > 9000 || 
+            bool result = !reader.hitObjects.Any(readerHitObject => readerHitObject.SegmentCount > 9000 ||
+                                                                    readerHitObject.SegmentCount < 0 ||
                                                                     readerHitObject.Type == 0 || 
                                                                     readerHitObject.SampleSet > 1000 || 
                                                                     readerHitObject.SampleSetAdditions > 1000 || 
