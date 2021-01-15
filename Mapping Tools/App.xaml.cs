@@ -12,9 +12,9 @@ namespace Mapping_Tools {
     public partial class App : Application {
         public App() {
             // Change culture under which this application runs
-            CultureInfo ci = new CultureInfo("nl-NL");
+            /*CultureInfo ci = new CultureInfo("nl-NL");
             Thread.CurrentThread.CurrentCulture = ci;
-            Thread.CurrentThread.CurrentUICulture = ci;
+            Thread.CurrentThread.CurrentUICulture = ci;*/
         }
 
         void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e) {
