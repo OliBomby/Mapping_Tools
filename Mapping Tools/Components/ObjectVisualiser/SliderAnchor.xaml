@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Mapping_Tools.Components.ObjectVisualiser.SliderAnchor"
+﻿<UserControl x:Uid="UserControl_1" x:Class="Mapping_Tools.Components.ObjectVisualiser.SliderAnchor"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:Mapping_Tools.Components.ObjectVisualiser"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+    <Grid x:Uid="Grid_1">
             
     </Grid>
 </UserControl>

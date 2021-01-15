@@ -1,4 +1,4 @@
-﻿<local:SingleRunMappingTool x:Class="Mapping_Tools.Views.MetadataManager.MetadataManagerView"
+﻿<local:SingleRunMappingTool x:Uid="This" x:Class="Mapping_Tools.Views.MetadataManager.MetadataManagerView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -11,209 +11,209 @@
              x:Name="This"
              d:DesignHeight="650" Width="759.5" d:DataContext="{d:DesignData MetadataManagerVm}">
     <UserControl.Resources>
-        <domain:DoubleToStringConverter x:Key="DoubleToStringConverter"/>
-        <domain:TimeToStringConverter x:Key="TimeToStringConverter"/>
-        <domain:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
-        <domain:MapPathStringToCountStringConverter x:Key="MapPathStringToCountStringConverter"/>
+        <domain:DoubleToStringConverter x:Uid="domain:DoubleToStringConverter_1" x:Key="DoubleToStringConverter"/>
+        <domain:TimeToStringConverter x:Uid="domain:TimeToStringConverter_1" x:Key="TimeToStringConverter"/>
+        <domain:ColorToBrushConverter x:Uid="domain:ColorToBrushConverter_1" x:Key="ColorToBrushConverter"/>
+        <domain:MapPathStringToCountStringConverter x:Uid="domain:MapPathStringToCountStringConverter_1" x:Key="MapPathStringToCountStringConverter"/>
     </UserControl.Resources>
-    <Grid Name="MasterGrid">
+    <Grid x:Uid="MasterGrid" Name="MasterGrid">
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition x:Uid="RowDefinition_1" Height="*"/>
+            <RowDefinition x:Uid="RowDefinition_2" Height="Auto"/>
         </Grid.RowDefinitions>
-        <Grid Name="FirstGrid" Grid.Row="0">
-            <Grid>
+        <Grid x:Uid="FirstGrid" Name="FirstGrid" Grid.Row="0">
+            <Grid x:Uid="Grid_1">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition x:Uid="RowDefinition_3" Height="Auto"/>
+                    <RowDefinition x:Uid="RowDefinition_4" Height="*"/>
+                    <RowDefinition x:Uid="RowDefinition_5" Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <StackPanel Grid.Row="0" Orientation="Horizontal">
-                    <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
-                    <Run Text="Metadata Manager"/>
+                <StackPanel x:Uid="StackPanel_1" Grid.Row="0" Orientation="Horizontal">
+                    <TextBlock x:Uid="TextBlock_1" FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
+                    <Run x:Uid="Run_1" Text="Metadata Manager"/>
                     </TextBlock>
-                    <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom" ToolTip="Click me!">
+                    <materialDesign:PopupBox x:Uid="materialDesign:PopupBox_1" Margin="10" VerticalAlignment="Bottom" ToolTip="Click me!">
                         <materialDesign:PopupBox.ToggleContent>
-                            <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
+                            <materialDesign:PackIcon x:Uid="materialDesign:PackIcon_1" Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
                         </materialDesign:PopupBox.ToggleContent>
-                        <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
+                        <TextBlock x:Uid="TextBlock_2" TextWrapping="Wrap" MaxWidth="600" Padding="5">
                       To save you the time of editing metadata on every individual difficulty, edit metadata in this tool and copy it to multiple diffs anytime.
-                      <LineBreak/>
+                      <LineBreak x:Uid="LineBreak_1"/>
                       You can also import metadata from beatmaps, so you can copy metadata from A to B.
-                      <LineBreak/>
+                      <LineBreak x:Uid="LineBreak_2"/>
                       Save and load metadata configurations, so you can work on multiple mapsets without hassle.
                         </TextBlock>
                     </materialDesign:PopupBox>
                 </StackPanel>
 
-                <ScrollViewer Grid.Row="1" Margin="0,0,100,0" VerticalScrollBarVisibility="Visible">
-                    <StackPanel Margin="0 0 20 0">
-                        <Grid Margin="0,20,0,0">
+                <ScrollViewer x:Uid="ScrollViewer_1" Grid.Row="1" Margin="0,0,100,0" VerticalScrollBarVisibility="Visible">
+                    <StackPanel x:Uid="StackPanel_2" Margin="0 0 20 0">
+                        <Grid x:Uid="Grid_2" Margin="0,20,0,0">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="5"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="5"/>
-                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition x:Uid="ColumnDefinition_1" Width="*"/>
+                                <ColumnDefinition x:Uid="ColumnDefinition_2" Width="Auto"/>
+                                <ColumnDefinition x:Uid="ColumnDefinition_3" Width="5"/>
+                                <ColumnDefinition x:Uid="ColumnDefinition_4" Width="Auto"/>
+                                <ColumnDefinition x:Uid="ColumnDefinition_5" Width="5"/>
+                                <ColumnDefinition x:Uid="ColumnDefinition_6" Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" x:Name="BeatmapFromBox" Margin="0,0,5,0" Text="{Binding ImportPath}"
+                            <TextBox x:Uid="BeatmapFromBox" Grid.Column="0" x:Name="BeatmapFromBox" Margin="0,0,5,0" Text="{Binding ImportPath}"
                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Import metadata from"
                                 ToolTip="Beatmap to import metadata from. This is optional."/>
-                            <Button Grid.Column="1" Cursor="Hand" Command="{Binding ImportLoadCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                            <Button x:Uid="Button_1" Grid.Column="1" Cursor="Hand" Command="{Binding ImportLoadCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
                                     ToolTip="Fetch the selected beatmap from your osu! client.">
-                                <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="RestoreFromTrash" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                                <materialDesign:PackIcon x:Uid="materialDesign:PackIcon_2" Width="30" Height="30" Cursor="Hand" Kind="RestoreFromTrash" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                             </Button >
-                            <Button Grid.Column="3" Cursor="Hand" Command="{Binding ImportBrowseCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                            <Button x:Uid="Button_2" Grid.Column="3" Cursor="Hand" Command="{Binding ImportBrowseCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
                                     ToolTip="Select beatmaps with File Explorer.">
-                                <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                                <materialDesign:PackIcon x:Uid="materialDesign:PackIcon_3" Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                             </Button >
-                            <Button Grid.Column="5" Cursor="Hand" Command="{Binding ImportCommand}" VerticalAlignment="Bottom"
+                            <Button x:Uid="Button_3" Grid.Column="5" Cursor="Hand" Command="{Binding ImportCommand}" VerticalAlignment="Bottom"
                                     ToolTip="Import metadata from the specified beatmap. This is optional.">
                                 Import metadata
                             </Button >
                         </Grid>
-                        <Grid Margin="0,10,0,0">
+                        <Grid x:Uid="Grid_3" Margin="0,10,0,0">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="5"/>
-                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition x:Uid="ColumnDefinition_7" Width="*"/>
+                                <ColumnDefinition x:Uid="ColumnDefinition_8" Width="Auto"/>
+                                <ColumnDefinition x:Uid="ColumnDefinition_9" Width="Auto"/>
+                                <ColumnDefinition x:Uid="ColumnDefinition_10" Width="5"/>
+                                <ColumnDefinition x:Uid="ColumnDefinition_11" Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" x:Name="BeatmapToBox" Margin="0,0,5,0" Text="{Binding ExportPath}"
+                            <TextBox x:Uid="BeatmapToBox" Grid.Column="0" x:Name="BeatmapToBox" Margin="0,0,5,0" Text="{Binding ExportPath}"
                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Export metadata to"
                                 ToolTip="Beatmap(s) to export the metadata to. You can input multiple map paths seperated by '|'."/>
-                            <TextBlock Grid.Column="1" Margin="3 15 5 0" FontStyle="Italic"
+                            <TextBlock x:Uid="TextBlock_3" Grid.Column="1" Margin="3 15 5 0" FontStyle="Italic"
                                        ToolTip="Multiple beatmaps can be inputted in this field. Separate the paths with the '|' character."
                                        Text="{Binding ElementName=BeatmapToBox, Path=Text, Converter={StaticResource MapPathStringToCountStringConverter}}"/>
-                            <Button Grid.Column="2" Cursor="Hand" Command="{Binding ExportLoadCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                            <Button x:Uid="Button_4" Grid.Column="2" Cursor="Hand" Command="{Binding ExportLoadCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
                                     ToolTip="Fetch the selected beatmap from your osu! client.">
-                                <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="RestoreFromTrash" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                                <materialDesign:PackIcon x:Uid="materialDesign:PackIcon_4" Width="30" Height="30" Cursor="Hand" Kind="RestoreFromTrash" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                             </Button >
-                            <Button Grid.Column="4" Cursor="Hand" Command="{Binding ExportBrowseCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                            <Button x:Uid="Button_5" Grid.Column="4" Cursor="Hand" Command="{Binding ExportBrowseCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
                                     ToolTip="Select beatmaps with File Explorer.">
-                                <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                                <materialDesign:PackIcon x:Uid="materialDesign:PackIcon_5" Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                             </Button >
                         </Grid>
 
-                        <Separator Style="{StaticResource MaterialDesignLightSeparator}" Background="{DynamicResource MaterialDesignDivider}" Margin="0,10,0,10"/>
+                        <Separator x:Uid="Separator_1" Style="{StaticResource MaterialDesignLightSeparator}" Background="{DynamicResource MaterialDesignDivider}" Margin="0,10,0,10"/>
 
-                        <Grid>
+                        <Grid x:Uid="Grid_4">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="150"/>
-                                <ColumnDefinition Width="10"/>
-                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition x:Uid="ColumnDefinition_12" Width="150"/>
+                                <ColumnDefinition x:Uid="ColumnDefinition_13" Width="10"/>
+                                <ColumnDefinition x:Uid="ColumnDefinition_14" Width="*"/>
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
+                                <RowDefinition x:Uid="RowDefinition_6" Height="Auto"/>
+                                <RowDefinition x:Uid="RowDefinition_7" Height="Auto"/>
+                                <RowDefinition x:Uid="RowDefinition_8" Height="Auto"/>
+                                <RowDefinition x:Uid="RowDefinition_9" Height="Auto"/>
+                                <RowDefinition x:Uid="RowDefinition_10" Height="Auto"/>
+                                <RowDefinition x:Uid="RowDefinition_11" Height="Auto"/>
+                                <RowDefinition x:Uid="RowDefinition_12" Height="Auto"/>
+                                <RowDefinition x:Uid="RowDefinition_13" Height="Auto"/>
+                                <RowDefinition x:Uid="RowDefinition_14" Height="Auto"/>
                             </Grid.RowDefinitions>
-                            <TextBlock Grid.Column="0" Grid.Row="0" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Artist"/>
-                            <TextBlock Grid.Column="0" Grid.Row="1" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Romanised Artist"/>
-                            <TextBlock Grid.Column="0" Grid.Row="2" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Title"/>
-                            <TextBlock Grid.Column="0" Grid.Row="3" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Romanised Title"/>
-                            <TextBlock Grid.Column="0" Grid.Row="4" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Beatmap Creator"/>
-                            <TextBlock Grid.Column="0" Grid.Row="5" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Source"/>
-                            <TextBlock Grid.Column="0" Grid.Row="6" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Tags"/>
-                            <TextBlock Grid.Column="0" Grid.Row="7" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Preview Time" Margin="0 50 0 0"/>
-                            <TextBlock Grid.Column="0" Grid.Row="8" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Top" Text="Colours" Margin="0 10 0 0"/>
+                            <TextBlock x:Uid="TextBlock_4" Grid.Column="0" Grid.Row="0" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Artist"/>
+                            <TextBlock x:Uid="TextBlock_5" Grid.Column="0" Grid.Row="1" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Romanised Artist"/>
+                            <TextBlock x:Uid="TextBlock_6" Grid.Column="0" Grid.Row="2" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Title"/>
+                            <TextBlock x:Uid="TextBlock_7" Grid.Column="0" Grid.Row="3" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Romanised Title"/>
+                            <TextBlock x:Uid="TextBlock_8" Grid.Column="0" Grid.Row="4" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Beatmap Creator"/>
+                            <TextBlock x:Uid="TextBlock_9" Grid.Column="0" Grid.Row="5" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Source"/>
+                            <TextBlock x:Uid="TextBlock_10" Grid.Column="0" Grid.Row="6" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Tags"/>
+                            <TextBlock x:Uid="TextBlock_11" Grid.Column="0" Grid.Row="7" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Preview Time" Margin="0 50 0 0"/>
+                            <TextBlock x:Uid="TextBlock_12" Grid.Column="0" Grid.Row="8" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Top" Text="Colours" Margin="0 10 0 0"/>
 
-                            <TextBox Grid.Column="2" Grid.Row="0">
+                            <TextBox x:Uid="TextBox_1" Grid.Column="2" Grid.Row="0">
                                 <TextBox.Text>
-                                    <Binding Path="Artist" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
+                                    <Binding x:Uid="Binding_1" Path="Artist" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
                                         <Binding.ValidationRules>
-                                            <domain:CharacterLimitValidationRule>
+                                            <domain:CharacterLimitValidationRule x:Uid="domain:CharacterLimitValidationRule_1">
                                                 <domain:CharacterLimitValidationRule.LimitWrapper>
-                                                    <domain:IntWrapper Value="81"/>
+                                                    <domain:IntWrapper x:Uid="domain:IntWrapper_1" Value="81"/>
                                                 </domain:CharacterLimitValidationRule.LimitWrapper>
                                             </domain:CharacterLimitValidationRule>
                                         </Binding.ValidationRules>
                                     </Binding>
                                 </TextBox.Text>
                             </TextBox>
-                            <TextBox Grid.Column="2" Grid.Row="1">
+                            <TextBox x:Uid="TextBox_2" Grid.Column="2" Grid.Row="1">
                                 <TextBox.Text>
-                                    <Binding Path="RomanisedArtist" UpdateSourceTrigger="LostFocus">
+                                    <Binding x:Uid="Binding_2" Path="RomanisedArtist" UpdateSourceTrigger="LostFocus">
                                         <Binding.ValidationRules>
-                                            <domain:IsASCIIValidationRule ValidatesOnTargetUpdated="True"/>
-                                            <domain:CharacterLimitValidationRule>
+                                            <domain:IsASCIIValidationRule x:Uid="domain:IsASCIIValidationRule_1" ValidatesOnTargetUpdated="True"/>
+                                            <domain:CharacterLimitValidationRule x:Uid="domain:CharacterLimitValidationRule_2">
                                                 <domain:CharacterLimitValidationRule.LimitWrapper>
-                                                    <domain:IntWrapper Value="81"/>
+                                                    <domain:IntWrapper x:Uid="domain:IntWrapper_2" Value="81"/>
                                                 </domain:CharacterLimitValidationRule.LimitWrapper>
                                             </domain:CharacterLimitValidationRule>
                                         </Binding.ValidationRules>
                                     </Binding>
                                 </TextBox.Text>
                             </TextBox>
-                            <TextBox Grid.Column="2" Grid.Row="2">
+                            <TextBox x:Uid="TextBox_3" Grid.Column="2" Grid.Row="2">
                                 <TextBox.Text>
-                                    <Binding Path="Title" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
+                                    <Binding x:Uid="Binding_3" Path="Title" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
                                         <Binding.ValidationRules>
-                                            <domain:CharacterLimitValidationRule>
+                                            <domain:CharacterLimitValidationRule x:Uid="domain:CharacterLimitValidationRule_3">
                                                 <domain:CharacterLimitValidationRule.LimitWrapper>
-                                                    <domain:IntWrapper Value="81"/>
+                                                    <domain:IntWrapper x:Uid="domain:IntWrapper_3" Value="81"/>
                                                 </domain:CharacterLimitValidationRule.LimitWrapper>
                                             </domain:CharacterLimitValidationRule>
                                         </Binding.ValidationRules>
                                     </Binding>
                                 </TextBox.Text>
                             </TextBox>
-                            <TextBox Grid.Column="2" Grid.Row="3">
+                            <TextBox x:Uid="TextBox_4" Grid.Column="2" Grid.Row="3">
                                 <TextBox.Text>
-                                    <Binding Path="RomanisedTitle" UpdateSourceTrigger="LostFocus">
+                                    <Binding x:Uid="Binding_4" Path="RomanisedTitle" UpdateSourceTrigger="LostFocus">
                                         <Binding.ValidationRules>
-                                            <domain:IsASCIIValidationRule ValidatesOnTargetUpdated="True"/>
-                                            <domain:CharacterLimitValidationRule>
+                                            <domain:IsASCIIValidationRule x:Uid="domain:IsASCIIValidationRule_2" ValidatesOnTargetUpdated="True"/>
+                                            <domain:CharacterLimitValidationRule x:Uid="domain:CharacterLimitValidationRule_4">
                                                 <domain:CharacterLimitValidationRule.LimitWrapper>
-                                                    <domain:IntWrapper Value="81"/>
+                                                    <domain:IntWrapper x:Uid="domain:IntWrapper_4" Value="81"/>
                                                 </domain:CharacterLimitValidationRule.LimitWrapper>
                                             </domain:CharacterLimitValidationRule>
                                         </Binding.ValidationRules>
                                     </Binding>
                                 </TextBox.Text>
                             </TextBox>
-                            <TextBox Grid.Column="2" Grid.Row="4">
+                            <TextBox x:Uid="TextBox_5" Grid.Column="2" Grid.Row="4">
                                 <TextBox.Text>
-                                    <Binding Path="BeatmapCreator" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
+                                    <Binding x:Uid="Binding_5" Path="BeatmapCreator" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
                                         <Binding.ValidationRules>
-                                            <domain:CharacterLimitValidationRule>
+                                            <domain:CharacterLimitValidationRule x:Uid="domain:CharacterLimitValidationRule_5">
                                                 <domain:CharacterLimitValidationRule.LimitWrapper>
-                                                    <domain:IntWrapper Value="81"/>
+                                                    <domain:IntWrapper x:Uid="domain:IntWrapper_5" Value="81"/>
                                                 </domain:CharacterLimitValidationRule.LimitWrapper>
                                             </domain:CharacterLimitValidationRule>
                                         </Binding.ValidationRules>
                                     </Binding>
                                 </TextBox.Text>
                             </TextBox>
-                            <TextBox Grid.Column="2" Grid.Row="5">
+                            <TextBox x:Uid="TextBox_6" Grid.Column="2" Grid.Row="5">
                                 <TextBox.Text>
-                                    <Binding Path="Source" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
+                                    <Binding x:Uid="Binding_6" Path="Source" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
                                         <Binding.ValidationRules>
-                                            <domain:CharacterLimitValidationRule>
+                                            <domain:CharacterLimitValidationRule x:Uid="domain:CharacterLimitValidationRule_6">
                                                 <domain:CharacterLimitValidationRule.LimitWrapper>
-                                                    <domain:IntWrapper Value="81"/>
+                                                    <domain:IntWrapper x:Uid="domain:IntWrapper_6" Value="81"/>
                                                 </domain:CharacterLimitValidationRule.LimitWrapper>
                                             </domain:CharacterLimitValidationRule>
                                         </Binding.ValidationRules>
                                     </Binding>
                                 </TextBox.Text>
                             </TextBox>
-                            <TextBox Grid.Column="2" Grid.Row="6" TextWrapping="Wrap">
+                            <TextBox x:Uid="TextBox_7" Grid.Column="2" Grid.Row="6" TextWrapping="Wrap">
                                 <TextBox.Text>
-                                    <Binding Path="Tags" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
+                                    <Binding x:Uid="Binding_7" Path="Tags" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
                                         <Binding.ValidationRules>
-                                            <domain:CharacterLimitValidationRule>
+                                            <domain:CharacterLimitValidationRule x:Uid="domain:CharacterLimitValidationRule_7">
                                                 <domain:CharacterLimitValidationRule.LimitWrapper>
-                                                    <domain:IntWrapper Value="1000"/>
+                                                    <domain:IntWrapper x:Uid="domain:IntWrapper_7" Value="1000"/>
                                                 </domain:CharacterLimitValidationRule.LimitWrapper>
                                             </domain:CharacterLimitValidationRule>
                                         </Binding.ValidationRules>
@@ -221,60 +221,60 @@
                                 </TextBox.Text>
                             </TextBox>
 
-                            <TextBox Grid.Column="2" Grid.Row="7" Text="{Binding PreviewTime, Converter={StaticResource TimeToStringConverter}, ConverterParameter=-1}" TextWrapping="Wrap" Margin="0 50 0 0"/>
+                            <TextBox x:Uid="TextBox_8" Grid.Column="2" Grid.Row="7" Text="{Binding PreviewTime, Converter={StaticResource TimeToStringConverter}, ConverterParameter=-1}" TextWrapping="Wrap" Margin="0 50 0 0"/>
 
-                            <StackPanel Grid.Column="2" Grid.Row="8">
-                                <ToggleButton x:Name="ComboColourToggle" HorizontalAlignment="Left" Margin="5 10 0 10" IsChecked="{Binding UseComboColours}"
+                            <StackPanel x:Uid="StackPanel_3" Grid.Column="2" Grid.Row="8">
+                                <ToggleButton x:Uid="ComboColourToggle" x:Name="ComboColourToggle" HorizontalAlignment="Left" Margin="5 10 0 10" IsChecked="{Binding UseComboColours}"
                                               ToolTip="Choose to export combo colours. You can disable this to have different colours between maps."/>
-                                <StackPanel IsEnabled="{Binding Path=IsChecked, ElementName=ComboColourToggle}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <materialDesign:Card UniformCornerRadius="5">
-                                            <ListBox ItemsSource="{Binding ComboColours}">
+                                <StackPanel x:Uid="StackPanel_4" IsEnabled="{Binding Path=IsChecked, ElementName=ComboColourToggle}">
+                                    <StackPanel x:Uid="StackPanel_5" Orientation="Horizontal">
+                                        <materialDesign:Card x:Uid="materialDesign:Card_1" UniformCornerRadius="5">
+                                            <ListBox x:Uid="ListBox_1" ItemsSource="{Binding ComboColours}">
                                                 <ListBox.ItemsPanel>
-                                                    <ItemsPanelTemplate>
-                                                        <StackPanel Orientation="Horizontal"/>
+                                                    <ItemsPanelTemplate x:Uid="ItemsPanelTemplate_1">
+                                                        <StackPanel x:Uid="StackPanel_6" Orientation="Horizontal"/>
                                                     </ItemsPanelTemplate>
                                                 </ListBox.ItemsPanel>
                                                 <ListBox.ItemTemplate>
-                                                    <DataTemplate DataType="beatmapHelper:ComboColour">
-                                                        <materialDesign:PopupBox StaysOpen="True">
+                                                    <DataTemplate x:Uid="DataTemplate_1" DataType="beatmapHelper:ComboColour">
+                                                        <materialDesign:PopupBox x:Uid="materialDesign:PopupBox_2" StaysOpen="True">
                                                             <materialDesign:PopupBox.ToggleContent>
-                                                                <materialDesign:PackIcon Kind="Circle" Foreground="{Binding Color, Converter={StaticResource ColorToBrushConverter}}" Width="35" Height="35"/>
+                                                                <materialDesign:PackIcon x:Uid="materialDesign:PackIcon_6" Kind="Circle" Foreground="{Binding Color, Converter={StaticResource ColorToBrushConverter}}" Width="35" Height="35"/>
                                                             </materialDesign:PopupBox.ToggleContent>
-                                                            <StackPanel Orientation="Horizontal" Margin="20">
-                                                                <TextBox Text="{Binding Color, ElementName=ColorPicker}"
+                                                            <StackPanel x:Uid="StackPanel_7" Orientation="Horizontal" Margin="20">
+                                                                <TextBox x:Uid="TextBox_9" Text="{Binding Color, ElementName=ColorPicker}"
                                                                          Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" materialDesign:HintAssist.Hint="Color HEX value"
                                                                          Width="120" Margin="2,0,10,2"/>
-                                                                <materialDesign:ColorPicker Color="{Binding Color}" x:Name="ColorPicker" Width="300"/>
+                                                                <materialDesign:ColorPicker x:Uid="ColorPicker" Color="{Binding Color}" x:Name="ColorPicker" Width="300"/>
                                                             </StackPanel>
                                                         </materialDesign:PopupBox>
                                                     </DataTemplate>
                                                 </ListBox.ItemTemplate>
                                             </ListBox>
                                         </materialDesign:Card>
-                                        <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a new combo colour." VerticalAlignment="Bottom" Margin="5" Command="{Binding AddCommand}">
-                                            <materialDesign:PackIcon Kind="Plus" Width="24" Height="24"/>
+                                        <Button x:Uid="Button_6" Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a new combo colour." VerticalAlignment="Bottom" Margin="5" Command="{Binding AddCommand}">
+                                            <materialDesign:PackIcon x:Uid="materialDesign:PackIcon_7" Kind="Plus" Width="24" Height="24"/>
                                         </Button>
-                                        <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove last combo colour." VerticalAlignment="Bottom" Margin="5" Command="{Binding RemoveCommand}">
-                                            <materialDesign:PackIcon Kind="Minus" Width="24" Height="24"/>
+                                        <Button x:Uid="Button_7" Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove last combo colour." VerticalAlignment="Bottom" Margin="5" Command="{Binding RemoveCommand}">
+                                            <materialDesign:PackIcon x:Uid="materialDesign:PackIcon_8" Kind="Minus" Width="24" Height="24"/>
                                         </Button>
                                     </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Margin="0 10 0 0">
-                                        <materialDesign:Card UniformCornerRadius="5">
-                                            <ListBox ItemsSource="{Binding SpecialColours}">
+                                    <StackPanel x:Uid="StackPanel_8" Orientation="Horizontal" Margin="0 10 0 0">
+                                        <materialDesign:Card x:Uid="materialDesign:Card_2" UniformCornerRadius="5">
+                                            <ListBox x:Uid="ListBox_2" ItemsSource="{Binding SpecialColours}">
                                                 <ListBox.ItemTemplate>
-                                                    <DataTemplate DataType="beatmapHelper:SpecialColour">
-                                                        <StackPanel Orientation="Horizontal">
-                                                            <TextBox Text="{Binding Name}" Width="202" Margin="0 0 10 0" ToolTip="Special colour name. Some example keywords are 'SliderTrackOverride' and 'SliderBorder'."/>
-                                                            <materialDesign:PopupBox StaysOpen="True">
+                                                    <DataTemplate x:Uid="DataTemplate_2" DataType="beatmapHelper:SpecialColour">
+                                                        <StackPanel x:Uid="StackPanel_9" Orientation="Horizontal">
+                                                            <TextBox x:Uid="TextBox_10" Text="{Binding Name}" Width="202" Margin="0 0 10 0" ToolTip="Special colour name. Some example keywords are 'SliderTrackOverride' and 'SliderBorder'."/>
+                                                            <materialDesign:PopupBox x:Uid="materialDesign:PopupBox_3" StaysOpen="True">
                                                                 <materialDesign:PopupBox.ToggleContent>
-                                                                    <materialDesign:PackIcon Kind="Circle" Foreground="{Binding Color, Converter={StaticResource ColorToBrushConverter}}" Width="35" Height="35"/>
+                                                                    <materialDesign:PackIcon x:Uid="materialDesign:PackIcon_9" Kind="Circle" Foreground="{Binding Color, Converter={StaticResource ColorToBrushConverter}}" Width="35" Height="35"/>
                                                                 </materialDesign:PopupBox.ToggleContent>
-                                                                <StackPanel Orientation="Horizontal" Margin="20">
-                                                                    <TextBox Text="{Binding Color, ElementName=ColorPicker}"
+                                                                <StackPanel x:Uid="StackPanel_10" Orientation="Horizontal" Margin="20">
+                                                                    <TextBox x:Uid="TextBox_11" Text="{Binding Color, ElementName=ColorPicker}"
                                                                              Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" materialDesign:HintAssist.Hint="Color HEX value"
                                                                              Width="120" Margin="2,0,10,2"/>
-                                                                    <materialDesign:ColorPicker Color="{Binding Color}" x:Name="ColorPicker" Width="300"/>
+                                                                    <materialDesign:ColorPicker x:Uid="materialDesign:ColorPicker_1" Color="{Binding Color}" x:Name="ColorPicker" Width="300"/>
                                                                 </StackPanel>
                                                             </materialDesign:PopupBox>
                                                         </StackPanel>
@@ -282,11 +282,11 @@
                                                 </ListBox.ItemTemplate>
                                             </ListBox>
                                         </materialDesign:Card>
-                                        <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a new special colour." VerticalAlignment="Bottom" Margin="5" Command="{Binding AddSpecialCommand}">
-                                            <materialDesign:PackIcon Kind="Plus" Width="24" Height="24"/>
+                                        <Button x:Uid="Button_8" Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a new special colour." VerticalAlignment="Bottom" Margin="5" Command="{Binding AddSpecialCommand}">
+                                            <materialDesign:PackIcon x:Uid="materialDesign:PackIcon_10" Kind="Plus" Width="24" Height="24"/>
                                         </Button>
-                                        <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove last special colour." VerticalAlignment="Bottom" Margin="5" Command="{Binding RemoveSpecialCommand}">
-                                            <materialDesign:PackIcon Kind="Minus" Width="24" Height="24"/>
+                                        <Button x:Uid="Button_9" Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove last special colour." VerticalAlignment="Bottom" Margin="5" Command="{Binding RemoveSpecialCommand}">
+                                            <materialDesign:PackIcon x:Uid="materialDesign:PackIcon_11" Kind="Minus" Width="24" Height="24"/>
                                         </Button>
                                     </StackPanel>
                                 </StackPanel>
@@ -295,32 +295,32 @@
                     </StackPanel>
                 </ScrollViewer>
 
-                <TextBlock Grid.Row="2" Text="Beatmap file name can not be over 255 characters long." Foreground="Red" Margin="10" Visibility="{Binding BeatmapFileNameOverflowErrorVisibility, FallbackValue=Collapsed}"/>
+                <TextBlock x:Uid="TextBlock_13" Grid.Row="2" Text="Beatmap file name can not be over 255 characters long." Foreground="Red" Margin="10" Visibility="{Binding BeatmapFileNameOverflowErrorVisibility, FallbackValue=Collapsed}"/>
             </Grid>
             
-            <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
+            <Viewbox x:Uid="Viewbox_1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
                 <Button
-                    IsEnabled="{Binding ElementName=This, Path=CanRun}"
+                    x:Uid="Button_10" IsEnabled="{Binding ElementName=This, Path=CanRun}"
                     Style="{StaticResource MaterialDesignFloatingActionButton}"
                     Click="Start_Click"
                     ToolTip="Run this tool.">
                     <materialDesign:PackIcon
-                        Kind="Play" Height="36" Width="36" />
+                        x:Uid="materialDesign:PackIcon_12" Kind="Play" Height="36" Width="36" />
                 </Button>
             </Viewbox>
         </Grid>
-        <Grid Name="SecondGrid" Grid.Row="1">
+        <Grid x:Uid="SecondGrid" Name="SecondGrid" Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition/>
+                <ColumnDefinition x:Uid="ColumnDefinition_15" Width="Auto"/>
+                <ColumnDefinition x:Uid="ColumnDefinition_16"/>
             </Grid.ColumnDefinitions>
-            <Grid Grid.Column="0">
-                <WrapPanel VerticalAlignment="Bottom">
-                    <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Opacity="0.58"/>
+            <Grid x:Uid="Grid_5" Grid.Column="0">
+                <WrapPanel x:Uid="WrapPanel_1" VerticalAlignment="Bottom">
+                    <TextBlock x:Uid="TextBlock_14" TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Opacity="0.58"/>
                 </WrapPanel>
             </Grid>
-            <Grid Grid.Column="1">
-                <ProgressBar Value="{Binding ElementName=This, Path=Progress}" Margin="20,0,20,0" Height="20" Background="{x:Null}" BorderBrush="{x:Null}"/>
+            <Grid x:Uid="Grid_6" Grid.Column="1">
+                <ProgressBar x:Uid="ProgressBar_1" Value="{Binding ElementName=This, Path=Progress}" Margin="20,0,20,0" Height="20" Background="{x:Null}" BorderBrush="{x:Null}"/>
             </Grid>
         </Grid>
     </Grid>

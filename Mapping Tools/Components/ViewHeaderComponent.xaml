@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Mapping_Tools.Components.ViewHeaderComponent"
+﻿<UserControl x:Uid="UserControl_1" x:Class="Mapping_Tools.Components.ViewHeaderComponent"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -7,19 +7,19 @@
              d:DesignHeight="300"
              d:DesignWidth="300"
              mc:Ignorable="d">
-    <StackPanel x:Name="MainPanel" Orientation="Horizontal">
-        <TextBlock x:Name="HeaderTextBlock" Text="Test" FontSize="40" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,5,0" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
-        <materialDesign:PopupBox x:Name="DescriptionIcon" Margin="5">
+    <StackPanel x:Uid="MainPanel" x:Name="MainPanel" Orientation="Horizontal">
+        <TextBlock x:Uid="HeaderTextBlock" x:Name="HeaderTextBlock" Text="Test" FontSize="40" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,5,0" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+        <materialDesign:PopupBox x:Uid="DescriptionIcon" x:Name="DescriptionIcon" Margin="5">
             <materialDesign:PopupBox.ToggleContent>
-                <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
+                <materialDesign:PackIcon x:Uid="materialDesign:PackIcon_1" Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
             </materialDesign:PopupBox.ToggleContent>
-            <TextBlock x:Name="DescriptionTextBlock" TextWrapping="Wrap" MaxWidth="600" Padding="5"/>
+            <TextBlock x:Uid="DescriptionTextBlock" x:Name="DescriptionTextBlock" TextWrapping="Wrap" MaxWidth="600" Padding="5"/>
         </materialDesign:PopupBox>
-        <materialDesign:PopupBox x:Name="QuickRunIcon" Margin="5">
+        <materialDesign:PopupBox x:Uid="QuickRunIcon" x:Name="QuickRunIcon" Margin="5">
             <materialDesign:PopupBox.ToggleContent>
-                <materialDesign:PackIcon Kind="LightningBoltCircle" Width="24" Height="24" Foreground="{DynamicResource PrimaryHueLightBrush}"/>
+                <materialDesign:PackIcon x:Uid="materialDesign:PackIcon_2" Kind="LightningBoltCircle" Width="24" Height="24" Foreground="{DynamicResource PrimaryHueLightBrush}"/>
             </materialDesign:PopupBox.ToggleContent>
-            <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
+            <TextBlock x:Uid="TextBlock_1" TextWrapping="Wrap" MaxWidth="600" Padding="5">
                 This tool is compatible with QuickRun!
             </TextBlock>
         </materialDesign:PopupBox>

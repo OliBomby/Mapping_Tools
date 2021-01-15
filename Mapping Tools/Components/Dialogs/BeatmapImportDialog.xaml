@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Mapping_Tools.Components.Dialogs.BeatmapImportDialog"
+﻿<UserControl x:Uid="UserControl_1" x:Class="Mapping_Tools.Components.Dialogs.BeatmapImportDialog"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -9,51 +9,51 @@
              xmlns:wpf="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" d:DataContext="{d:DesignData BeatmapImportDialog}">
-    <Grid Margin="16">
+    <Grid x:Uid="Grid_1" Margin="16">
         <Grid.RowDefinitions>
-            <RowDefinition />
-            <RowDefinition />
-            <RowDefinition />
+            <RowDefinition x:Uid="RowDefinition_1" />
+            <RowDefinition x:Uid="RowDefinition_2" />
+            <RowDefinition x:Uid="RowDefinition_3" />
         </Grid.RowDefinitions>
-        <TextBlock>Import from beatmap:</TextBlock>
-        <Grid Grid.Row="1" Margin="0 6 0 0">
+        <TextBlock x:Uid="TextBlock_1">Import from beatmap:</TextBlock>
+        <Grid x:Uid="Grid_2" Grid.Row="1" Margin="0 6 0 0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="5"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition x:Uid="ColumnDefinition_1" Width="*"/>
+                <ColumnDefinition x:Uid="ColumnDefinition_2" Width="Auto"/>
+                <ColumnDefinition x:Uid="ColumnDefinition_3" Width="5"/>
+                <ColumnDefinition x:Uid="ColumnDefinition_4" Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <TextBox wpf:HintAssist.Hint="Path" Style="{DynamicResource MaterialDesignFloatingHintTextBox}" Grid.Column="0" MaxWidth="200" Width="200">
+            <TextBox x:Uid="TextBox_1" wpf:HintAssist.Hint="Path" Style="{DynamicResource MaterialDesignFloatingHintTextBox}" Grid.Column="0" MaxWidth="200" Width="200">
                 <TextBox.Text>
-                    <Binding Path="Path" UpdateSourceTrigger="PropertyChanged">
+                    <Binding x:Uid="Binding_1" Path="Path" UpdateSourceTrigger="PropertyChanged">
                         <Binding.ValidationRules>
-                            <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                            <domain:NotEmptyValidationRule x:Uid="domain:NotEmptyValidationRule_1" ValidatesOnTargetUpdated="True"/>
                         </Binding.ValidationRules>
                     </Binding>
                 </TextBox.Text>
             </TextBox>
-            <Button Grid.Column="1" Cursor="Hand" Click="BeatmapLoad_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+            <Button x:Uid="Button_1" Grid.Column="1" Cursor="Hand" Click="BeatmapLoad_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
                     ToolTip="Fetch the selected beatmap from your osu! client.">
-                <wpf:PackIcon Width="30" Height="30" Cursor="Hand" Kind="RestoreFromTrash" Foreground="{DynamicResource PrimaryHueMidBrush}"/>            
+                <wpf:PackIcon x:Uid="wpf:PackIcon_1" Width="30" Height="30" Cursor="Hand" Kind="RestoreFromTrash" Foreground="{DynamicResource PrimaryHueMidBrush}"/>            
             </Button >
-            <Button Grid.Column="3" Cursor="Hand" Click="BeatmapBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+            <Button x:Uid="Button_2" Grid.Column="3" Cursor="Hand" Click="BeatmapBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
                     ToolTip="Select beatmaps with File Explorer.">
-                <wpf:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                <wpf:PackIcon x:Uid="wpf:PackIcon_2" Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
             </Button >
         </Grid>
-        <StackPanel Orientation="Horizontal" Grid.Row="2"
+        <StackPanel x:Uid="StackPanel_1" Orientation="Horizontal" Grid.Row="2"
                     Margin="0 16 0 0" HorizontalAlignment="Center">
-            <Button IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}"
+            <Button x:Uid="Button_3" IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}"
                     Command="{x:Static wpf:DialogHost.CloseDialogCommand}">
                 <Button.CommandParameter>
-                    <system:Boolean>True</system:Boolean>
+                    <system:Boolean x:Uid="system:Boolean_1">True</system:Boolean>
                 </Button.CommandParameter>
                 ACCEPT
             </Button>
-            <Button IsCancel="True" Margin="8 0 0 0" Style="{DynamicResource MaterialDesignFlatButton}"
+            <Button x:Uid="Button_4" IsCancel="True" Margin="8 0 0 0" Style="{DynamicResource MaterialDesignFlatButton}"
                     Command="{x:Static wpf:DialogHost.CloseDialogCommand}">
                 <Button.CommandParameter>
-                    <system:Boolean>False</system:Boolean>
+                    <system:Boolean x:Uid="system:Boolean_2">False</system:Boolean>
                 </Button.CommandParameter>
                 CANCEL
             </Button>

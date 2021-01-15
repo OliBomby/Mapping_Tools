@@ -1,5 +1,5 @@
 ﻿<Window 
-        StateChanged="Window_StateChanged"
+        x:Uid="Window_1" StateChanged="Window_StateChanged"
         MouseDown="DragWin" 
         x:Class="Mapping_Tools.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -25,117 +25,117 @@
         >
     <WindowChrome.WindowChrome>
         <WindowChrome 
-            CaptionHeight="35"
+            x:Uid="WindowChrome_1" CaptionHeight="35"
             ResizeBorderThickness="5" />
     </WindowChrome.WindowChrome>
 
     <Window.Resources>
-        <domain:MapPathStringToCountStringConverter x:Key="MapPathStringToCountStringConverter"/>
-        <DataTemplate DataType="{x:Type viewmodels:StandardVm}">
-            <standard:StandardView DataContext="{Binding}"/>
+        <domain:MapPathStringToCountStringConverter x:Uid="domain:MapPathStringToCountStringConverter_1" x:Key="MapPathStringToCountStringConverter"/>
+        <DataTemplate x:Uid="DataTemplate_1" DataType="{x:Type viewmodels:StandardVm}">
+            <standard:StandardView x:Uid="standard:StandardView_1" DataContext="{Binding}"/>
         </DataTemplate>
     </Window.Resources>
 
-    <Grid x:Name="MasterGrid">
-        <Grid>
+    <Grid x:Uid="MasterGrid" x:Name="MasterGrid">
+        <Grid x:Uid="Grid_1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="35"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition x:Uid="RowDefinition_1" Height="35"/>
+                <RowDefinition x:Uid="RowDefinition_2" Height="*"/>
             </Grid.RowDefinitions>
 
-            <Grid x:Name="FirstGrid" Grid.Row="0">
-                <StackPanel WindowChrome.IsHitTestVisibleInChrome="true" HorizontalAlignment="Left" Orientation="Horizontal">
-                    <materialDesign:ColorZone Width="24" Height="24" Margin="9,6,0,0" Mode="Inverted">
+            <Grid x:Uid="FirstGrid" x:Name="FirstGrid" Grid.Row="0">
+                <StackPanel x:Uid="StackPanel_1" WindowChrome.IsHitTestVisibleInChrome="true" HorizontalAlignment="Left" Orientation="Horizontal">
+                    <materialDesign:ColorZone x:Uid="materialDesign:ColorZone_1" Width="24" Height="24" Margin="9,6,0,0" Mode="Inverted">
                         <materialDesign:ColorZone.OpacityMask>
-                            <ImageBrush ImageSource="data/mt_logo_white_24.png"/>
+                            <ImageBrush x:Uid="ImageBrush_1" ImageSource="data/mt_logo_white_24.png"/>
                         </materialDesign:ColorZone.OpacityMask>
                     </materialDesign:ColorZone>
-                    <TextBlock Name="header" Text="Mapping Tools" Foreground="{DynamicResource MaterialDesignBody}" Margin="8,11,0,0" FontWeight="Normal"/>
+                    <TextBlock x:Uid="header" Name="header" Text="Mapping Tools" Foreground="{DynamicResource MaterialDesignBody}" Margin="8,11,0,0" FontWeight="Normal"/>
                 </StackPanel>
-                <StackPanel WindowChrome.IsHitTestVisibleInChrome="true" HorizontalAlignment="Right" Orientation="Horizontal">
-                    <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowMinimize}" Click="MinimizeWin" Panel.ZIndex="1" Foreground="{DynamicResource MaterialDesignBody}"/>
-                    <Button x:Name="toggle_button" Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowMaximize}" Click="ToggleWin" Foreground="{DynamicResource MaterialDesignBody}"/>
-                    <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowCLose}" Click="CloseWin" Foreground="{DynamicResource MaterialDesignBody}"/>
+                <StackPanel x:Uid="StackPanel_2" WindowChrome.IsHitTestVisibleInChrome="true" HorizontalAlignment="Right" Orientation="Horizontal">
+                    <Button x:Uid="Button_1" Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowMinimize}" Click="MinimizeWin" Panel.ZIndex="1" Foreground="{DynamicResource MaterialDesignBody}"/>
+                    <Button x:Uid="toggle_button" x:Name="toggle_button" Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowMaximize}" Click="ToggleWin" Foreground="{DynamicResource MaterialDesignBody}"/>
+                    <Button x:Uid="Button_2" Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowCLose}" Click="CloseWin" Foreground="{DynamicResource MaterialDesignBody}"/>
                 </StackPanel>
             </Grid>
 
-            <materialDesign:DialogHost Grid.Row="1" Identifier="RootDialog" 
+            <materialDesign:DialogHost x:Uid="materialDesign:DialogHost_1" Grid.Row="1" Identifier="RootDialog" 
                                        SnackbarMessageQueue="{Binding ElementName=MainSnackbar, Path=MessageQueue}" 
                                        Style="{StaticResource MaterialDesignEmbeddedDialogHost}">
 
-                <Grid>
+                <Grid x:Uid="Grid_2">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="1*"/>
-                        <RowDefinition Height="35"/>
+                        <RowDefinition x:Uid="RowDefinition_3" Height="Auto"/>
+                        <RowDefinition x:Uid="RowDefinition_4" Height="Auto"/>
+                        <RowDefinition x:Uid="RowDefinition_5" Height="1*"/>
+                        <RowDefinition x:Uid="RowDefinition_6" Height="35"/>
                     </Grid.RowDefinitions>
 
-                    <Grid x:Name="SecondGrid" Grid.Row="0">
-                        <Menu Foreground="{DynamicResource MaterialDesignBody}">
-                            <MenuItem Height="31" Header="_File" Padding="12,0,0,0" MinWidth="50">
-                                <MenuItem Header="_Open beatmap" Click="OpenBeatmap" Icon="{materialDesign:PackIcon Folder}"
+                    <Grid x:Uid="SecondGrid" x:Name="SecondGrid" Grid.Row="0">
+                        <Menu x:Uid="Menu_1" Foreground="{DynamicResource MaterialDesignBody}">
+                            <MenuItem x:Uid="MenuItem_1" Height="31" Header="_File" Padding="12,0,0,0" MinWidth="50">
+                                <MenuItem x:Uid="MenuItem_2" Header="_Open beatmap" Click="OpenBeatmap" Icon="{materialDesign:PackIcon Folder}"
                                           ToolTip="Select the current beatmap with File Explorer."/>
-                                <MenuItem Header="_Open current beatmap" Click="OpenGetCurrentBeatmap" Icon="{materialDesign:PackIcon RestoreFromTrash}"
+                                <MenuItem x:Uid="MenuItem_3" Header="_Open current beatmap" Click="OpenGetCurrentBeatmap" Icon="{materialDesign:PackIcon RestoreFromTrash}"
                                           ToolTip="Set the current beatmap to the selected beatmap in your osu! client."/>
-                                <MenuItem Header="_Generate backup" Click="SaveBackup" Icon="{materialDesign:PackIcon Backup}"
+                                <MenuItem x:Uid="MenuItem_4" Header="_Generate backup" Click="SaveBackup" Icon="{materialDesign:PackIcon Backup}"
                                           ToolTip="Save a backup of the current beatmap to the backups folder."/>
-                                <MenuItem Header="_Load backup" Click="LoadBackup" Icon="{materialDesign:PackIcon BackupRestore}"
+                                <MenuItem x:Uid="MenuItem_5" Header="_Load backup" Click="LoadBackup" Icon="{materialDesign:PackIcon BackupRestore}"
                                           ToolTip="Load a backup from the backups folder into the current beatmap."/>
-                                <MenuItem Header="_BetterSave™ current beatmap" Click="CoolSave" Icon="{materialDesign:PackIcon ContentSave}"
+                                <MenuItem x:Uid="MenuItem_6" Header="_BetterSave™ current beatmap" Click="CoolSave" Icon="{materialDesign:PackIcon ContentSave}"
                                           ToolTip="Save the beatmap which is currently open in your osu! editor. BetterSave™ saves the beatmap just like the vanilla editor, but decimal values get rounded instead of truncated."/>
                             </MenuItem>
-                            <MenuItem x:Name="ToolsMenu" Height="31" Header="_Tools" Padding="12,0,0,0" MinWidth="65">
+                            <MenuItem x:Uid="ToolsMenu" x:Name="ToolsMenu" Height="31" Header="_Tools" Padding="12,0,0,0" MinWidth="65">
                             </MenuItem>
-                            <MenuItem Height="31" Header="_Options" Padding="12,0,0,0" MinWidth="80">
-                                <MenuItem Header="_Get started" Click="ViewSelectMenuItemOnClick" Icon="{materialDesign:PackIcon ArrowRight}"
+                            <MenuItem x:Uid="MenuItem_7" Height="31" Header="_Options" Padding="12,0,0,0" MinWidth="80">
+                                <MenuItem x:Uid="MenuItem_8" Header="_Get started" Click="ViewSelectMenuItemOnClick" Icon="{materialDesign:PackIcon ArrowRight}"
                                           ToolTip="Open the Get Started page."/>
-                                <MenuItem Header="_Preferences" Click="ViewSelectMenuItemOnClick" Icon="{materialDesign:PackIcon Settings}"
+                                <MenuItem x:Uid="MenuItem_9" Header="_Preferences" Click="ViewSelectMenuItemOnClick" Icon="{materialDesign:PackIcon Settings}"
                                           ToolTip="Open the Preferences page."/>
-                                <MenuItem Header="_Open backups folder" Click="OpenBackups" Icon="{materialDesign:PackIcon FolderOpen}"
+                                <MenuItem x:Uid="MenuItem_10" Header="_Open backups folder" Click="OpenBackups" Icon="{materialDesign:PackIcon FolderOpen}"
                                           ToolTip="Open the backups folder."/>
-                                <MenuItem Header="_Open Mapping Tools folder" Click="OpenConfig" Icon="{materialDesign:PackIcon FolderOpen}"
+                                <MenuItem x:Uid="MenuItem_11" Header="_Open Mapping Tools folder" Click="OpenConfig" Icon="{materialDesign:PackIcon FolderOpen}"
                                           ToolTip="Open the Mapping Tools folder."/>
                             </MenuItem>
-                            <MenuItem Height="31" Header="_About" Padding="12,0,0,0" MinWidth="67">
-                                <MenuItem Header="_Website" Click="OpenWebsite" Icon="{materialDesign:PackIcon OpenInBrowser}"
+                            <MenuItem x:Uid="MenuItem_12" Height="31" Header="_About" Padding="12,0,0,0" MinWidth="67">
+                                <MenuItem x:Uid="MenuItem_13" Header="_Website" Click="OpenWebsite" Icon="{materialDesign:PackIcon OpenInBrowser}"
                                           ToolTip="Open the official Mapping Tools website in your browser."/>
-                                <MenuItem Header="_Github" Click="OpenGitHub" Icon="{materialDesign:PackIcon GithubCircle}"
+                                <MenuItem x:Uid="MenuItem_14" Header="_Github" Click="OpenGitHub" Icon="{materialDesign:PackIcon GithubCircle}"
                                           ToolTip="Go to the Mapping Tools Github."/>
-                                <MenuItem Header="_About" Click="OpenInfo" Icon="{materialDesign:PackIcon InfoCircle}"
+                                <MenuItem x:Uid="MenuItem_15" Header="_About" Click="OpenInfo" Icon="{materialDesign:PackIcon InfoCircle}"
                                           ToolTip="Information about your Mapping Tools client and credits."/>
                             </MenuItem>
-                            <MenuItem x:Name="ProjectMenu" Visibility="Collapsed" Height="31" Header="_Project" Padding="12,0,0,0" MinWidth="67">
+                            <MenuItem x:Uid="ProjectMenu" x:Name="ProjectMenu" Visibility="Collapsed" Height="31" Header="_Project" Padding="12,0,0,0" MinWidth="67">
                             </MenuItem>
                         </Menu>
                     </Grid>
-                    <Separator Background="{DynamicResource MaterialDesignDivider}" Grid.Row="1"/>
-                    <Grid x:Name="ThirdGrid" Grid.Row="2">
-                        <ContentControl Margin="20" Name="content_views" Content="{Binding}"></ContentControl>
+                    <Separator x:Uid="Separator_1" Background="{DynamicResource MaterialDesignDivider}" Grid.Row="1"/>
+                    <Grid x:Uid="ThirdGrid" x:Name="ThirdGrid" Grid.Row="2">
+                        <ContentControl x:Uid="content_views" Margin="20" Name="content_views" Content="{Binding}"></ContentControl>
 
-                        <materialDesign:Snackbar x:Name="MainSnackbar"/>
+                        <materialDesign:Snackbar x:Uid="MainSnackbar" x:Name="MainSnackbar"/>
                     </Grid>
-                    <materialDesign:ColorZone Mode="PrimaryDark" Grid.Row="3" Padding="10 10 10 0">
-                        <Grid x:Name="ForthGrid"
+                    <materialDesign:ColorZone x:Uid="materialDesign:ColorZone_2" Mode="PrimaryDark" Grid.Row="3" Padding="10 10 10 0">
+                        <Grid x:Uid="ForthGrid" x:Name="ForthGrid"
                               ToolTip="This is the current beatmap. Most of the tools do their work on this beatmap.">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition x:Uid="ColumnDefinition_1" Width="Auto"/>
+                                <ColumnDefinition x:Uid="ColumnDefinition_2" Width="*"/>
+                                <ColumnDefinition x:Uid="ColumnDefinition_3" Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <Grid Grid.Column="0">
-                                <TextBlock Text="Current Map: " Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontWeight="Normal"/>
+                            <Grid x:Uid="Grid_3" Grid.Column="0">
+                                <TextBlock x:Uid="TextBlock_1" Text="Current Map: " Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontWeight="Normal"/>
                             </Grid>
-                            <Grid Grid.Column="1">
-                                <TextBlock x:FieldModifier="public" Name="currentMap" Height="35" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontWeight="Normal"/>
+                            <Grid x:Uid="Grid_4" Grid.Column="1">
+                                <TextBlock x:Uid="currentMap" x:FieldModifier="public" Name="currentMap" Height="35" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontWeight="Normal"/>
                             </Grid>
-                            <TextBlock Grid.Column="2" Margin="2 0 0 0" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" Height="35" FontStyle="Italic"
+                            <TextBlock x:Uid="TextBlock_2" Grid.Column="2" Margin="2 0 0 0" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" Height="35" FontStyle="Italic"
                                        Text="{Binding ElementName=currentMap, Path=Text, Converter={StaticResource MapPathStringToCountStringConverter}}"/>
                         </Grid>
                     </materialDesign:ColorZone>
                 </Grid>
             </materialDesign:DialogHost>
         </Grid>
-        <Border Name="window_border" BorderThickness="1" Background="{x:Null}" BorderBrush="{DynamicResource PrimaryHueDarkBrush}"/>
+        <Border x:Uid="window_border" Name="window_border" BorderThickness="1" Background="{x:Null}" BorderBrush="{DynamicResource PrimaryHueDarkBrush}"/>
     </Grid>
 </Window>

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Mapping_Tools.Components.HotkeyEditorControl"
+﻿<UserControl x:Uid="UserControl" x:Class="Mapping_Tools.Components.HotkeyEditorControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -7,7 +7,7 @@
              d:DesignHeight="300"
              d:DesignWidth="300"
              mc:Ignorable="d">
-    <TextBox x:Name="HotkeyTextBox"
+    <TextBox x:Uid="HotkeyTextBox" x:Name="HotkeyTextBox"
              HorizontalContentAlignment="Center"
              VerticalContentAlignment="Center"
              IsReadOnly="True"
@@ -16,7 +16,7 @@
              PreviewKeyDown="HotkeyTextBox_PreviewKeyDown"
              Text="{Binding Hotkey, ElementName=UserControl, Mode=OneWay, TargetNullValue=&lt; not set &gt;}">
         <TextBox.ContextMenu>
-            <ContextMenu Visibility="Collapsed" />
+            <ContextMenu x:Uid="ContextMenu_1" Visibility="Collapsed" />
         </TextBox.ContextMenu>
     </TextBox>
 </UserControl>

@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -7,8 +9,14 @@ namespace Mapping_Tools {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application
-    {
+    public partial class App : Application {
+        public App() {
+            // Change culture under which this application runs
+            CultureInfo ci = new CultureInfo("nl-NL");
+            Thread.CurrentThread.CurrentCulture = ci;
+            Thread.CurrentThread.CurrentUICulture = ci;
+        }
+
         void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e) {
             // Process unhandled exception
             var exception = e.Exception;
