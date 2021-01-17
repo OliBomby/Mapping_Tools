@@ -66,6 +66,8 @@
     <Reference Include="System.Data.DataSetExtensions" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Audio\DuplicateDetection\IDuplicateSampleDetector.cs" />
+    <Compile Include="Audio\DuplicateDetection\MonolithicDuplicateSampleDetector.cs" />
     <Compile Include="Audio\OsuVolumeConverter.cs" />
     <Compile Include="Audio\SampleImportArgs\AudioFileImportArgs.cs" />
     <Compile Include="Audio\SampleImportArgs\IAudioFileImportArgs.cs" />
@@ -141,13 +143,12 @@
     <Compile Include="BeatmapHelper\TimingPoint.cs" />
     <Compile Include="BeatmapHelper\TValue.cs" />
     <Compile Include="Exceptions\BeatmapIncompatibleException.cs" />
-    <Compile Include="Exceptions\EditorReaderDisabledException.cs" />
-    <Compile Include="Exceptions\InvalidEditorReaderStateException.cs" />
     <Compile Include="ExternalFileUtil\Reaper\EnvelopeShape.cs" />
     <Compile Include="ExternalFileUtil\Reaper\EnvelopeTempoPoint.cs" />
     <Compile Include="ExternalFileUtil\Reaper\ReaperEditor.cs" />
     <Compile Include="ExternalFileUtil\Reaper\ReaperProject.cs" />
     <Compile Include="ExternalFileUtil\Reaper\TrackItem.cs" />
+    <Compile Include="Tools\HitsoundStudio\LayerImporters\HitsoundsLayerImporter.cs" />
     <Compile Include="Tools\HitsoundStudio\LayerImporters\StackLayerImporter.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\CompleteHitsounds.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\CustomIndex.cs" />

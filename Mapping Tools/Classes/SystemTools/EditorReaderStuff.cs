@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Editor_Reader;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.Exceptions;
 using Mapping_Tools_Core.BeatmapHelper;
 using Mapping_Tools_Core.Exceptions;
 using Process.NET;

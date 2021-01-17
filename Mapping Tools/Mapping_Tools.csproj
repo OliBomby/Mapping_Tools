@@ -198,6 +198,8 @@
     <Compile Include="Classes\BeatmapHelper\HashingBeatmapEditor.cs" />
     <Compile Include="Classes\BeatmapHelper\Extensions.cs" />
     <Compile Include="Classes\BindableBase.cs" />
+    <Compile Include="Classes\Exceptions\EditorReaderDisabledException.cs" />
+    <Compile Include="Classes\Exceptions\InvalidEditorReaderStateException.cs" />
     <Compile Include="Classes\GenericExtensions.cs" />
     <Compile Include="Classes\SystemTools\ActionHotkey.cs" />
     <Compile Include="Classes\SystemTools\BackupManager.cs" />

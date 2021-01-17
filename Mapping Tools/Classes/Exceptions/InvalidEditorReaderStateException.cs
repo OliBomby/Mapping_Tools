@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Mapping_Tools_Core.Exceptions {
+namespace Mapping_Tools.Classes.Exceptions {
     public class InvalidEditorReaderStateException : Exception {
         public static readonly string InvalidEditorReaderStateText = "Failed to validate Editor Reader state.";
 
