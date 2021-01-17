@@ -167,6 +167,7 @@
     <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\IHitsoundsLayerImportArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\ILayerImportArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\IStoryboardLayerImportArgs.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\StackLayerImportArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\IFileLayerSourceRef.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\IHitsoundsLayerSourceRef.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\ILayerSourceRef.cs" />
@@ -254,6 +255,7 @@
     <Compile Include="Tools\HitsoundStudio\LayerImporters\IMidiLayerImporter.cs" />
     <Compile Include="Tools\HitsoundStudio\LayerImporters\IStackLayerImporter.cs" />
     <Compile Include="Tools\HitsoundStudio\LayerImporters\IStoryboardLayerImporter.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\StackLayerSourceRef.cs" />
     <Compile Include="Tools\MapCleanerStuff\MapCleaner.cs" />
     <Compile Include="Tools\MapCleanerStuff\MapCleanerArgs.cs" />
     <Compile Include="Tools\MapCleanerStuff\MapCleanerResult.cs" />

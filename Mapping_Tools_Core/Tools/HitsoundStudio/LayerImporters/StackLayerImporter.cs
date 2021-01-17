@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Mapping_Tools_Core.BeatmapHelper;
+using Mapping_Tools_Core.MathUtil;
 using Mapping_Tools_Core.Tools.HitsoundStudio.Model;
 using Mapping_Tools_Core.Tools.HitsoundStudio.Model.LayerImportArgs;
+using Mapping_Tools_Core.Tools.HitsoundStudio.Model.LayerSourceRef;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio.LayerImporters {
     public class StackLayerImporter : IStackLayerImporter {
@@ -16,8 +18,8 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.LayerImporters {
         }
 
         public IEnumerable<IHitsoundLayer> Import(IStackLayerImportArgs args) {
-            // TODO: Add concrete layer source reference
-            HitsoundLayer layer = new HitsoundLayer(TimesFromStack(args.Path, args.X, args.Y, args.Leniency), null);
+            HitsoundLayer layer = new HitsoundLayer(TimesFromStack(args.Path, args.X, args.Y, args.Leniency), 
+                new StackLayerSourceRef(args.Path, args.X, args.Y, args.Leniency));
             yield return layer;
         }
 
@@ -28,8 +30,8 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.LayerImporters {
             bool xIgnore = double.IsNaN(x);
             bool yIgnore = double.IsNaN(y);
 
-            foreach (var ho in editor.Instance.HitObjects.Where(ho => (Math.Abs(ho.Pos.X - x) < leniency || xIgnore) && 
-                                                                      (Math.Abs(ho.Pos.Y - y) < leniency || yIgnore))) {
+            foreach (var ho in editor.Instance.HitObjects.Where(ho => (Math.Abs(ho.Pos.X - x) <= leniency + Precision.DOUBLE_EPSILON || xIgnore) && 
+                                                                      (Math.Abs(ho.Pos.Y - y) <= leniency + Precision.DOUBLE_EPSILON || yIgnore))) {
                 yield return ho.Time;
             }
         }
