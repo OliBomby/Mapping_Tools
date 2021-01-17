@@ -13,7 +13,7 @@ namespace Mapping_Tools_Core.Audio.DuplicateDetection {
         /// <param name="includeSubdirectories">Whether to also look in sub-drectories of the directory</param>
         /// <param name="exception">Any exception that may have happened while comparing samples</param>
         /// <returns></returns>
-        Dictionary<string, string> AnalyzeSamples(string dir, out Exception exception, bool includeSubdirectories = false);
+        Dictionary<string, string> AnalyzeSamples(string dir, out Exception exception, bool includeSubdirectories);
 
         /// <summary>
         /// Gets all the supported file extensions for the sample duplicate search.

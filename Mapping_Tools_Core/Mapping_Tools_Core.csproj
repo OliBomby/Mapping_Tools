@@ -68,6 +68,7 @@
   <ItemGroup>
     <Compile Include="Audio\DuplicateDetection\IDuplicateSampleDetector.cs" />
     <Compile Include="Audio\DuplicateDetection\MonolithicDuplicateSampleDetector.cs" />
+    <Compile Include="Audio\DuplicateDetection\UselessDuplicateSampleDetector.cs" />
     <Compile Include="Audio\OsuVolumeConverter.cs" />
     <Compile Include="Audio\SampleImportArgs\AudioFileImportArgs.cs" />
     <Compile Include="Audio\SampleImportArgs\IAudioFileImportArgs.cs" />
@@ -148,6 +149,7 @@
     <Compile Include="ExternalFileUtil\Reaper\ReaperEditor.cs" />
     <Compile Include="ExternalFileUtil\Reaper\ReaperProject.cs" />
     <Compile Include="ExternalFileUtil\Reaper\TrackItem.cs" />
+    <Compile Include="Tools\HitsoundStudio\Helpers.cs" />
     <Compile Include="Tools\HitsoundStudio\LayerImporters\HitsoundsLayerImporter.cs" />
     <Compile Include="Tools\HitsoundStudio\LayerImporters\StackLayerImporter.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\CompleteHitsounds.cs" />
@@ -164,11 +166,13 @@
     <Compile Include="Tools\HitsoundStudio\Model\ISample.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\ISamplePackage.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\ISampleSchema.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\HitsoundsLayerImportArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\IFileLayerImportArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\IHitsoundsLayerImportArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\ILayerImportArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\IStoryboardLayerImportArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\StackLayerImportArgs.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\HitsoundsLayerSourceRef.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\IFileLayerSourceRef.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\IHitsoundsLayerSourceRef.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\ILayerSourceRef.cs" />

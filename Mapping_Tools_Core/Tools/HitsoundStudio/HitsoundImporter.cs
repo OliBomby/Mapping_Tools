@@ -1,108 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
-using Mapping_Tools_Core.Audio;
+﻿using Mapping_Tools_Core.Audio;
 using Mapping_Tools_Core.BeatmapHelper;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.Tools.HitsoundStudio.Model;
 using NAudio.Midi;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio {
     public class HitsoundImporter {
-        /// <summary>
-        /// Extract every used sample in a beatmap and return them as hitsound layers.
-        /// </summary>
-        /// <param name="path">The path to the beatmap.</param>
-        /// <param name="volumes">Taking the volumes from the map and making different layers for different volumes.</param>
-        /// <param name="detectDuplicateSamples">Detect duplicate samples and optimise hitsound layer count with that.</param>
-        /// <param name="removeDuplicates">Removes duplicate sounds at the same millisecond.</param>
-        /// <param name="includeStoryboard">Also imports storyboarded samples.</param>
-        /// <returns>The hitsound layers</returns>
-        public static List<HitsoundLayer> ImportHitsounds(string path, bool volumes, bool detectDuplicateSamples, bool removeDuplicates, bool includeStoryboard) {
-            var editor = EditorReaderStuff.GetNewestVersionOrNot(path);
-            Beatmap beatmap = editor.Beatmap;
-            Timeline timeline = beatmap.GetTimeline();
-
-            GameMode mode = (GameMode)beatmap.General["Mode"].IntValue;
-            string mapDir = editor.GetParentFolder();
-            Dictionary<string, string> firstSamples = AnalyzeSamples(mapDir, false, detectDuplicateSamples);
-
-            List<HitsoundLayer> hitsoundLayers = new List<HitsoundLayer>();
-
-            foreach (TimelineObject tlo in timeline.TimelineObjects) {
-                if (!tlo.HasHitsound) { continue; }
-
-                double volume = volumes ? tlo.FenoSampleVolume / 100 : 1;
-
-                List<string> samples = tlo.GetPlayingFilenames(mode);
-
-                foreach (string filename in samples) {
-                    bool isFilename = tlo.UsesFilename;
-
-                    SampleSet sampleSet = isFilename ? tlo.FenoSampleSet : GetSamplesetFromFilename(filename);
-                    Hitsound hitsound = isFilename ? tlo.GetHitsound() : GetHitsoundFromFilename(filename);
-
-                    string samplePath = Path.Combine(mapDir, filename);
-                    string fullPathExtLess = Path.Combine(
-                        Path.GetDirectoryName(samplePath) ?? throw new InvalidOperationException(),
-                        Path.GetFileNameWithoutExtension(samplePath));
-
-                    // Get the first occurence of this sound to not get duplicated
-                    if (firstSamples.Keys.Contains(fullPathExtLess)) {
-                        samplePath = firstSamples[fullPathExtLess];
-                    } else {
-                        // Sample doesn't exist
-                        if (!isFilename) {
-                            samplePath = Path.Combine(
-                                Path.GetDirectoryName(samplePath) ?? throw new InvalidOperationException(),
-                                $"{sampleSet.ToString().ToLower()}-hit{hitsound.ToString().ToLower()}-1.wav");
-                        }
-                    }
-                    
-                    string extLessFilename = Path.GetFileNameWithoutExtension(samplePath);
-                    var importArgs = new LayerImportArgs(ImportType.Hitsounds) { Path = path, SamplePath = samplePath,
-                        Volume = volume, DetectDuplicateSamples = detectDuplicateSamples, DiscriminateVolumes = volumes, RemoveDuplicates = removeDuplicates};
-
-                    // Find the hitsoundlayer with this path
-                    HitsoundLayer layer = hitsoundLayers.Find(o => o.ImportArgs == importArgs);
-
-                    if (layer != null) {
-                        // Find hitsound layer with this path and add this time
-                        layer.Times.Add(tlo.Time);
-                    } else {
-                        // Add new hitsound layer with this path
-                        HitsoundLayer newLayer = new HitsoundLayer(extLessFilename,
-                            sampleSet,
-                            hitsound,
-                            new SampleGeneratingArgs(samplePath) {Volume = volume},
-                            importArgs);
-                        newLayer.Times.Add(tlo.Time);
-
-                        hitsoundLayers.Add(newLayer);
-                    }
-                }
-            }
-
-            if (includeStoryboard) {
-                hitsoundLayers.AddRange(ImportStoryboard(path, volumes, removeDuplicates, beatmap, mapDir, "SB: "));
-            }
-
-            // Sort layers by name
-            hitsoundLayers = hitsoundLayers.OrderBy(o => o.Name).ToList();
-
-            if (removeDuplicates) {
-                foreach (var hitsoundLayer in hitsoundLayers) {
-                    hitsoundLayer.Times.Sort();
-                    hitsoundLayer.RemoveDuplicates();
-                }
-            }
-
-            return hitsoundLayers;
-        }
-
         private static List<HitsoundLayer> ImportStoryboard(string path, bool volumes, bool removeDuplicates, Beatmap beatmap, string mapDir, string prefix=null) {
             var hitsoundLayers = new List<HitsoundLayer>();
             prefix = prefix ?? string.Empty;
@@ -160,52 +68,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
             return hitsoundLayers;
         }
 
-        public static SampleSet GetSamplesetFromFilename(string filename) {
-            string[] split = filename.Split('-');
-            if (split.Length < 1)
-                return SampleSet.Soft;
-            string sampleset = split[0];
-            switch (sampleset) {
-                case "auto":
-                    return SampleSet.Auto;
-                case "normal":
-                    return SampleSet.Normal;
-                case "soft":
-                    return SampleSet.Soft;
-                case "drum":
-                    return SampleSet.Drum;
-                default:
-                    return SampleSet.Soft;
-            }
-        }
-
-        public static Hitsound GetHitsoundFromFilename(string filename) {
-            string[] split = filename.Split('-');
-            if (split.Length < 2)
-                return Hitsound.Normal;
-            string hitsound = split[1];
-            if (hitsound.Contains("hitnormal"))
-                return Hitsound.Normal;
-            if (hitsound.Contains("hitwhistle"))
-                return Hitsound.Whistle;
-            if (hitsound.Contains("hitfinish"))
-                return Hitsound.Finish;
-            if (hitsound.Contains("hitclap"))
-                return Hitsound.Clap;
-            return Hitsound.Normal;
-        }
-
-        public static int GetIndexFromFilename(string filename) {
-            var match = Regex.Match(filename, "^(normal|soft|drum)-(hit(normal|whistle|finish|clap)|slidertick|sliderslide)");
-
-            var remainder = filename.Substring(match.Index + match.Length);
-            int index = 0;
-            if (!string.IsNullOrEmpty(remainder)) {
-                FileFormatHelper.TryParseInt(remainder, out index);
-            }
-
-            return index;
-        }
+        
 
         public static List<HitsoundLayer> ImportMidi(string path, double offset=0, bool instruments=true, bool keysounds=true, bool lengths=true, double lengthRoughness=1, bool velocities=true, double velocityRoughness=1) {
             List<HitsoundLayer> hitsoundLayers = new List<HitsoundLayer>();

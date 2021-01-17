@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Mapping_Tools_Core.Audio.DuplicateDetection {
     public class MonolithicDuplicateSampleDetector : IDuplicateSampleDetector {
-        public Dictionary<string, string> AnalyzeSamples(string dir, out Exception exception, bool includeSubdirectories = false) {
+        public Dictionary<string, string> AnalyzeSamples(string dir, out Exception exception, bool includeSubdirectories) {
             var extList = GetSupportedExtensions();
             exception = null;
 
@@ -52,6 +52,8 @@ namespace Mapping_Tools_Core.Audio.DuplicateDetection {
                                 exception = ex;
                                 errorHappened = true;
                             }
+
+                            Console.WriteLine(ex);
                             continue;
                         }
                     }

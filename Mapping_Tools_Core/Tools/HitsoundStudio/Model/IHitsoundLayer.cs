@@ -5,6 +5,8 @@ using Mapping_Tools_Core.Tools.HitsoundStudio.Model.LayerSourceRef;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
     public interface IHitsoundLayer {
+        string Name { get; set; }
+
         /// <summary>
         /// Contains all the times that this hitsound should play.
         /// </summary>

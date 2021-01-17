@@ -18,8 +18,9 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.LayerImporters {
         }
 
         public IEnumerable<IHitsoundLayer> Import(IStackLayerImportArgs args) {
-            HitsoundLayer layer = new HitsoundLayer(TimesFromStack(args.Path, args.X, args.Y, args.Leniency), 
-                new StackLayerSourceRef(args.Path, args.X, args.Y, args.Leniency));
+            HitsoundLayer layer = new HitsoundLayer(TimesFromStack(args.Path, args.X, args.Y, args.Leniency)) {
+                LayerSourceRef = new StackLayerSourceRef(args.Path, args.X, args.Y, args.Leniency)
+            };
             yield return layer;
         }
 

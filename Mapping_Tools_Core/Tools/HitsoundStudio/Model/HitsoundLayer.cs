@@ -5,6 +5,7 @@ using Mapping_Tools_Core.Tools.HitsoundStudio.Model.LayerSourceRef;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
     public class HitsoundLayer : IHitsoundLayer {
+        public string Name { get; set; }
         public SortedSet<double> Times { get; set; }
         public SampleSet SampleSet { get; set; }
         public Hitsound Hitsound { get; set; }
@@ -12,15 +13,15 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
         public ILayerSourceRef LayerSourceRef { get; set; }
         public ISampleGeneratingArgs SampleGeneratingArgs { get; set; }
 
-        public HitsoundLayer() {
-            Times = new SortedSet<double>();
-            SampleGeneratingArgs = new SampleGeneratingArgs();
-        }
+        public HitsoundLayer() : this(new double[0], new SampleGeneratingArgs()) {}
 
-        public HitsoundLayer(IEnumerable<double> times, ILayerSourceRef layerSourceRef) {
+        public HitsoundLayer(IEnumerable<double> times) : this(times, new SampleGeneratingArgs()) {}
+
+        public HitsoundLayer(ISampleGeneratingArgs sampleGeneratingArgs) : this(new double[0], sampleGeneratingArgs) {}
+
+        public HitsoundLayer(IEnumerable<double> times, ISampleGeneratingArgs sampleGeneratingArgs) {
             Times = new SortedSet<double>(times);
-            LayerSourceRef = layerSourceRef;
-            SampleGeneratingArgs = new SampleGeneratingArgs();
+            SampleGeneratingArgs = sampleGeneratingArgs;
         }
 
         public void Reload(IEnumerable<IHitsoundLayer> layers) {
