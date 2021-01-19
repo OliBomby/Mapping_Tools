@@ -13,7 +13,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
     /// <summary>
     /// Class containing all the data from a .osu beatmap file. It also supports serialization to .osu format and helper methods to get data in specific ways.
     /// </summary>
-    public class Beatmap : IComboColourCollection {
+    public class Beatmap : IComboColourCollection, IStoryboard {
 
         /// <summary>
         /// Contains all the values in the [General] section of a .osu file. The key is the variable name and the value is the value.
@@ -119,55 +119,47 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// A list of all the lines of .osu code under the [Events] -> (Background and Video events) section.
         /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
-        [NotNull]
         public List<Event> BackgroundAndVideoEvents => StoryBoard.BackgroundAndVideoEvents;
 
         /// <summary>
         /// A list of all the lines of .osu code under the [Events] -> (Break Periods) section.
         /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
-        [NotNull]
         public List<Break> BreakPeriods => StoryBoard.BreakPeriods;
 
         /// <summary>
         /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 0 (Background)) section.
         /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
-        [NotNull]
         public List<Event> StoryboardLayerBackground => StoryBoard.StoryboardLayerBackground;
 
         /// <summary>
         /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 1 (Fail)) section.
         /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
-        [NotNull]
         public List<Event> StoryboardLayerFail => StoryBoard.StoryboardLayerFail;
 
         /// <summary>
         /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 2 (Pass)) section.
         /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
-        [NotNull]
         public List<Event> StoryboardLayerPass => StoryBoard.StoryboardLayerPass;
 
         /// <summary>
         /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 3 (Foreground)) section.
         /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
-        [NotNull]
         public List<Event> StoryboardLayerForeground => StoryBoard.StoryboardLayerForeground;
 
         /// <summary>
         /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 4 (Overlay)) section.
         /// These strings are the actual .osu code and must be deserialized before use.
         /// </summary>
-        [NotNull]
         public List<Event> StoryboardLayerOverlay => StoryBoard.StoryboardLayerOverlay;
 
         /// <summary>
         /// A list of all storyboarded sound sample events under the [Events] -> (Storyboard Sound Samples) section.
         /// </summary>
-        [NotNull]
         public List<StoryboardSoundSample> StoryboardSoundSamples => StoryBoard.StoryboardSoundSamples;
 
         /// <summary>
