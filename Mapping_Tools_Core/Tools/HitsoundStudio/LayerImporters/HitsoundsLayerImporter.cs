@@ -54,8 +54,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.LayerImporters {
                     Hitsound hitsound = isFilename ? tlo.GetHitsound() : Helpers.GetHitsoundFromFilename(filename);
 
                     string samplePath = Path.Combine(mapDir, filename);
-                    string fullPathExtLess = Path.Combine(
-                        Path.GetDirectoryName(samplePath) ?? throw new InvalidOperationException(),
+                    string fullPathExtLess = Path.Combine(mapDir,
                         Path.GetFileNameWithoutExtension(samplePath));
 
                     // Get the first occurence of this sound to not get duplicated

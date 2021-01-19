@@ -97,6 +97,7 @@
     <Compile Include="BeatmapHelper\Beatmap.cs" />
     <Compile Include="BeatmapHelper\BeatmapEditor.cs" />
     <Compile Include="BeatmapHelper\BeatmapParsingException.cs" />
+    <Compile Include="BeatmapHelper\IStoryboard.cs" />
     <Compile Include="BeatmapHelper\Parsing\IParser.cs" />
     <Compile Include="BeatmapHelper\Parsing\OsuBeatmapParser.cs" />
     <Compile Include="BeatmapHelper\Parsing\OsuStoryboardParser.cs" />
@@ -152,6 +153,7 @@
     <Compile Include="Tools\HitsoundStudio\Helpers.cs" />
     <Compile Include="Tools\HitsoundStudio\LayerImporters\HitsoundsLayerImporter.cs" />
     <Compile Include="Tools\HitsoundStudio\LayerImporters\StackLayerImporter.cs" />
+    <Compile Include="Tools\HitsoundStudio\LayerImporters\StoryboardLayerImporter.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\CompleteHitsounds.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\CustomIndex.cs" />
     <Compile Include="Audio\Effects\DelayFadeOutSampleProvider.cs" />
@@ -172,6 +174,7 @@
     <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\ILayerImportArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\IStoryboardLayerImportArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\StackLayerImportArgs.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\StoryboardLayerImportArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\HitsoundsLayerSourceRef.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\IFileLayerSourceRef.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\IHitsoundsLayerSourceRef.cs" />
@@ -184,6 +187,7 @@
     <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\ISampleMapLayerSourceRef.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\IStackLayerSourceRef.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\IStoryboardLayerSourceRef.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\StoryboardLayerSourceRef.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\SampleGeneratingArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\HitsoundConverter.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\HitsoundEvent.cs" />

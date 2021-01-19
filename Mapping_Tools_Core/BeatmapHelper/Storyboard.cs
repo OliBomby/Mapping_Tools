@@ -8,54 +8,46 @@ namespace Mapping_Tools_Core.BeatmapHelper {
     /// <summary>
     /// Stores everything under the [Events] section of an osu beatmap or storyboard.
     /// </summary>
-    public class StoryBoard
+    public class StoryBoard : IStoryboard
     {
         /// <summary>
         /// A list of all Events under the [Events] -> (Background and Video events) section.
         /// </summary>
-        [NotNull]
         public List<Event> BackgroundAndVideoEvents { get; set; }
 
         /// <summary>
         /// A list of all Breaks under the [Events] -> (Break Periods) section.
         /// </summary>
-        [NotNull]
         public List<Break> BreakPeriods { get; set; }
 
         /// <summary>
         /// A list of all Events under the [Events] -> (Storyboard Layer 0 (Background)) section.
         /// </summary>
-        [NotNull]
         public List<Event> StoryboardLayerBackground { get; set; }
 
         /// <summary>
         /// A list of all Events under the [Events] -> (Storyboard Layer 1 (Fail)) section.
         /// </summary>
-        [NotNull]
         public List<Event> StoryboardLayerFail { get; set; }
 
         /// <summary>
         /// A list of all Events under the [Events] -> (Storyboard Layer 2 (Pass)) section.
         /// </summary>
-        [NotNull]
         public List<Event> StoryboardLayerPass { get; set; }
 
         /// <summary>
         /// A list of all Events under the [Events] -> (Storyboard Layer 3 (Foreground)) section.
         /// </summary>
-        [NotNull]
         public List<Event> StoryboardLayerForeground { get; set; }
 
         /// <summary>
         /// A list of all Events under the [Events] -> (Storyboard Layer 4 (Overlay)) section.
         /// </summary>
-        [NotNull]
         public List<Event> StoryboardLayerOverlay { get; set; }
 
         /// <summary>
         /// A list of all storyboarded sound sample events under the [Events] -> (Storyboard Sound Samples) section.
         /// </summary>
-        [NotNull]
         public List<StoryboardSoundSample> StoryboardSoundSamples { get; set; }
 
         /// <summary>
