@@ -2,7 +2,7 @@
 using System.IO;
 using Mapping_Tools_Core.BeatmapHelper.Parsing;
 
-namespace Mapping_Tools_Core.BeatmapHelper {
+namespace Mapping_Tools_Core.BeatmapHelper.Editor {
     /// <summary>
     /// This is a class that gives it IO helper methods for an object that is parseable with a <see cref="IParser{T}"/>
     /// </summary>

@@ -1,5 +1,6 @@
 ﻿using System;
 using Mapping_Tools_Core.BeatmapHelper;
+using Mapping_Tools_Core.BeatmapHelper.Editor;
 
 namespace Mapping_Tools_Core.Tools.PatternGallery {
     /// <summary>

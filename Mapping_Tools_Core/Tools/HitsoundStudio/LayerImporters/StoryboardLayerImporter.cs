@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using Mapping_Tools_Core.Audio.DuplicateDetection;
 using Mapping_Tools_Core.Audio.SampleImportArgs;
+using Mapping_Tools_Core.BeatmapHelper.Editor;
 using Mapping_Tools_Core.Tools.HitsoundStudio.Model.LayerSourceRef;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio.LayerImporters {

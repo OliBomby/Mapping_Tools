@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Mapping_Tools_Core.BeatmapHelper;
+using Mapping_Tools_Core.BeatmapHelper.Editor;
 using Mapping_Tools_Core.MathUtil;
 using Mapping_Tools_Core.Tools.HitsoundStudio.Model;
 using Mapping_Tools_Core.Tools.HitsoundStudio.Model.LayerImportArgs;

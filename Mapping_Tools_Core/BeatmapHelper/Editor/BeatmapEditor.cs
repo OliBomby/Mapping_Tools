@@ -1,7 +1,7 @@
-﻿using Mapping_Tools_Core.BeatmapHelper.Parsing;
-using System.IO;
+﻿using System.IO;
+using Mapping_Tools_Core.BeatmapHelper.Parsing;
 
-namespace Mapping_Tools_Core.BeatmapHelper {
+namespace Mapping_Tools_Core.BeatmapHelper.Editor {
     public class BeatmapEditor : Editor<Beatmap> {
         public Beatmap Beatmap => Instance;
 

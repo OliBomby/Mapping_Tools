@@ -9,6 +9,7 @@ using Editor_Reader;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.Exceptions;
 using Mapping_Tools_Core.BeatmapHelper;
+using Mapping_Tools_Core.BeatmapHelper.Editor;
 using Mapping_Tools_Core.Exceptions;
 using Process.NET;
 using Process.NET.Memory;
