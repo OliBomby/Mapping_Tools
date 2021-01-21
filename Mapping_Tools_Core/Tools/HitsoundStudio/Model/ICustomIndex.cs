@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Mapping_Tools_Core.Audio.SampleSoundGeneration;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
     public interface ICustomIndex : ICloneable {
@@ -45,5 +46,11 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
         /// </summary>
         /// <returns></returns>
         string GetNumberExtension();
+
+        /// <summary>
+        /// Cleans invalid samples.
+        /// </summary>
+        /// <param name="loadedSamples">The pre-loaded samples</param>
+        void CleanInvalids(Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator> loadedSamples = null);
     }
 }

@@ -106,15 +106,11 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
             return ci;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="loadedSamples"></param>
         public void CleanInvalids(Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator> loadedSamples = null) {
             // Remove all invalid paths but leave one invalid path in to mark the sample as occupied
             foreach (HashSet<ISampleGeneratingArgs> paths in Samples.Values) {
                 int initialCount = paths.Count;
-                paths.RemoveWhere(o => !o.IsValid(loadedSamples));
+                paths.RemoveWhere(o => loadedSamples == null ? !o.IsValid() : !o.IsValid(loadedSamples));
 
                 if (paths.Count == 0 && initialCount != 0) {
                     // All the paths were invalid and it didn't just start out empty
