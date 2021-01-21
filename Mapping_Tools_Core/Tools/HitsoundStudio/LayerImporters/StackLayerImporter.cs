@@ -27,13 +27,13 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.LayerImporters {
 
         private IEnumerable<double> TimesFromStack(string path, double x, double y, double leniency) {
             editor.Path = path;
-            editor.ReadFile();
+            var beatmap = editor.ReadFile();
 
             bool xIgnore = double.IsNaN(x);
             bool yIgnore = double.IsNaN(y);
 
-            foreach (var ho in editor.Instance.HitObjects.Where(ho => (Math.Abs(ho.Pos.X - x) <= leniency + Precision.DOUBLE_EPSILON || xIgnore) && 
-                                                                      (Math.Abs(ho.Pos.Y - y) <= leniency + Precision.DOUBLE_EPSILON || yIgnore))) {
+            foreach (var ho in beatmap.HitObjects.Where(ho => (Math.Abs(ho.Pos.X - x) <= leniency + Precision.DOUBLE_EPSILON || xIgnore) && 
+                                                              (Math.Abs(ho.Pos.Y - y) <= leniency + Precision.DOUBLE_EPSILON || yIgnore))) {
                 yield return ho.Time;
             }
         }
