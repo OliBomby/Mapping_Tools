@@ -75,7 +75,7 @@ namespace Mapping_Tools.Views.MetadataManager {
                 }
 
                 // Save the file with name update because we updated the metadata
-                editor.SaveFileWithNameUpdate();
+                editor.WriteFileWithNameUpdate();
 
                 // Update progressbar
                 if (worker != null && worker.WorkerReportsProgress) {

@@ -1,5 +1,7 @@
-﻿using Editor_Reader;
+﻿using System;
+using Editor_Reader;
 using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools_Core.BeatmapHelper;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     /// <summary>
@@ -16,14 +18,33 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             this.reader = reader;
         }
 
-        public override void ReadFile() {
-            base.ReadFile();
-
-            if (reader != null) {
-                EditorReaderStuff.UpdateEditorOrNot(this, reader, out _, out _);
-            } else {
-                EditorReaderStuff.UpdateEditorOrNot(this, out _, out _);
+        /// <summary>
+        /// Doesn't garantee actual newest version.
+        /// If you want an exception thrown when it fails to read the editor use <see cref="ReadFileUnsafe"/>.
+        /// </summary>
+        /// <returns></returns>
+        public override Beatmap ReadFile() {
+            Beatmap beatmap;
+            try {
+                beatmap = ReadFileUnsafe();
+            } catch (Exception e) {
+                Console.WriteLine(e);
+                beatmap = base.ReadFile();
             }
+
+            return beatmap;
+        }
+
+        /// <summary>
+        /// Version of ReadFile with exception if newest version couldn't not be fetched.
+        /// </summary>
+        /// <returns>The parsed beatmap</returns>
+        public Beatmap ReadFileUnsafe() {
+            var beatmap = base.ReadFile();
+
+            EditorReaderStuff.UpdateBeatmap(beatmap, Path, reader ?? EditorReaderStuff.GetFullEditorReader());
+
+            return beatmap;
         }
     }
 }

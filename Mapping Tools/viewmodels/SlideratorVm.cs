@@ -1,5 +1,14 @@
-﻿using Mapping_Tools.Classes.SystemTools;
+﻿using Editor_Reader;
+using Mapping_Tools.Classes;
+using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Components.Domain;
+using Mapping_Tools.Components.Graph;
+using Mapping_Tools.Views.Sliderator;
+using Mapping_Tools_Core;
+using Mapping_Tools_Core.BeatmapHelper;
+using Mapping_Tools_Core.MathUtil;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -7,13 +16,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using Editor_Reader;
-using Mapping_Tools.Classes;
-using Mapping_Tools.Components.Graph;
-using Mapping_Tools.Views;
-using Mapping_Tools.Views.Sliderator;
-using Newtonsoft.Json;
-using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
+using HitObject = Mapping_Tools_Core.BeatmapHelper.HitObject;
 
 namespace Mapping_Tools.Viewmodels {
     public class SlideratorVm : BindableBase {
@@ -337,37 +340,32 @@ namespace Mapping_Tools.Viewmodels {
                     throw new Exception("Could not fetch selected hit objects.", editorReaderException1);
                 }
 
-                BeatmapEditor editor = null;
+                ConnectedBeatmapEditor editor;
+                Beatmap beatmap = null;
                 List<HitObject> markedObjects = null;
 
                 switch (ImportModeSetting) {
                     case ImportMode.Selected:
-                        editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader, out var selected, out var editorReaderException2);
-
-                        if (editorReaderException2 != null) {
-                            throw new Exception("Could not fetch selected hit objects.", editorReaderException2);
-                        }
-
-                        markedObjects = selected;
+                        editor = EditorReaderStuff.GetBeatmapEditor(reader);
+                        beatmap = editor.ReadFileUnsafe();  // Using other method so exception gets thrown if fail
+                        markedObjects = beatmap.HitObjects.Where(o => o.IsSelected).ToList();
                         break;
                     case ImportMode.Bookmarked:
-                        editor = new BeatmapEditor(path);
-                        markedObjects = editor.Beatmap.GetBookmarkedObjects();
+                        editor = new ConnectedBeatmapEditor(path);
+                        beatmap = editor.ReadFile();
+                        markedObjects = beatmap.GetBookmarkedObjects();
                         break;
                     case ImportMode.Time:
-                        editor = new BeatmapEditor(path);
-                        markedObjects = editor.Beatmap.QueryTimeCode(TimeCode).ToList();
+                        editor = new ConnectedBeatmapEditor(path);
+                        beatmap = editor.ReadFile();
+                        markedObjects = beatmap.QueryTimeCode(TimeCode).ToList();
                         break;
                 }
 
                 if (markedObjects == null || markedObjects.Count(o => o.IsSlider) == 0) return;
 
                 LoadedHitObjects = new ObservableCollection<HitObject>(markedObjects.Where(s => s.IsSlider));
-
-                if (editor != null) {
-                    GlobalSv = editor.Beatmap.Difficulty["SliderMultiplier"].GetDouble();
-                }
-
+                GlobalSv = beatmap.Difficulty["SliderMultiplier"].GetDouble();
                 DoEditorRead = true;
             } catch (Exception ex) {
                 ex.Show();

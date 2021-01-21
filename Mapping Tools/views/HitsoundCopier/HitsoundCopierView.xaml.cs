@@ -281,7 +281,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                 }
 
                 // Save the file
-                editorTo.SaveFile();
+                editorTo.WriteFile();
 
                 // Export the sample schema if there are samples
                 if (sampleSchema.Count > 0) {

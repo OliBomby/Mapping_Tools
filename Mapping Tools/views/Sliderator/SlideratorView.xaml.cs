@@ -19,6 +19,14 @@ using Mapping_Tools.Components.Graph.Interpolation;
 using Mapping_Tools.Components.Graph.Markers;
 using Mapping_Tools.Components.ObjectVisualiser;
 using Mapping_Tools.Viewmodels;
+using Mapping_Tools_Core;
+using Mapping_Tools_Core.BeatmapHelper;
+using Mapping_Tools_Core.BeatmapHelper.Editor;
+using Mapping_Tools_Core.BeatmapHelper.Enums;
+using Mapping_Tools_Core.BeatmapHelper.SliderPathStuff;
+using Mapping_Tools_Core.MathUtil;
+using Mapping_Tools_Core.ToolHelpers;
+using Mapping_Tools_Core.Tools.SlideratorStuff;
 using MaterialDesignThemes.Wpf;
 using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
 

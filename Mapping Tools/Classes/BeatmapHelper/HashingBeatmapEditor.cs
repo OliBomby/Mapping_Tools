@@ -14,8 +14,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public HashingBeatmapEditor(string path) : base(path) {}
 
-        public override void SaveFile() {
-            var lines = parser.Serialize(Instance).ToList();
+        public override void WriteFile(Beatmap beatmap) {
+            var lines = parser.Serialize(beatmap).ToList();
             GenerateBetterSaveMD5(lines);
             base.SaveFile(lines);
         }

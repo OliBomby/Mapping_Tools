@@ -97,7 +97,10 @@
     <Compile Include="BeatmapHelper\Beatmap.cs" />
     <Compile Include="BeatmapHelper\Editor\BeatmapEditor.cs" />
     <Compile Include="BeatmapHelper\BeatmapParsingException.cs" />
+    <Compile Include="BeatmapHelper\Editor\IEditor.cs" />
     <Compile Include="BeatmapHelper\Editor\IReadEditor.cs" />
+    <Compile Include="BeatmapHelper\Editor\IReadWriteEditor.cs" />
+    <Compile Include="BeatmapHelper\Editor\IWriteEditor.cs" />
     <Compile Include="BeatmapHelper\IStoryboard.cs" />
     <Compile Include="BeatmapHelper\Parsing\IParser.cs" />
     <Compile Include="BeatmapHelper\Parsing\OsuBeatmapParser.cs" />
