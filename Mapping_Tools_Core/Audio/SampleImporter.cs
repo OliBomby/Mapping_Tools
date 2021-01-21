@@ -52,7 +52,7 @@ namespace Mapping_Tools_Core.Audio {
                     } else {
                         separatedByPath.Add(pathArgs.Path, new HashSet<ISampleImportArgs>(comparer) {args});
                     }
-                } else {
+                } else if (args != null) {
                     otherArgs.Add(args);
                 }
             }

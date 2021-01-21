@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Mapping_Tools_Core.Audio;
 using Mapping_Tools_Core.Audio.Effects;
+using Mapping_Tools_Core.Audio.SampleSoundGeneration;
 using Mapping_Tools_Core.BeatmapHelper;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.BeatmapHelper.Events;
@@ -347,14 +348,13 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio
             }
         }
 
-        public static Dictionary<SampleGeneratingArgs, string> GenerateSampleNames(IEnumerable<SampleGeneratingArgs> samples, 
-            Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples,
-            bool validateSampleFile = true, SampleGeneratingArgsComparer comparer = null) {
+        public static Dictionary<ISampleGeneratingArgs, string> GenerateSampleNames(IEnumerable<ISampleGeneratingArgs> samples, 
+            Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator> loadedSamples) {
             var usedNames = new HashSet<string>();
-            var sampleNames = new Dictionary<SampleGeneratingArgs, string>(comparer ?? new SampleGeneratingArgsComparer());
+            var sampleNames = new Dictionary<ISampleGeneratingArgs, string>();
             foreach (var sample in samples) {
-                if (!SampleImporter.ValidateSampleArgs(sample, loadedSamples, validateSampleFile)) {
-                    sampleNames[sample] = String.Empty;
+                if (!sample.IsValid(loadedSamples)) {
+                    sampleNames[sample] = string.Empty;
                     continue;
                 }
                 

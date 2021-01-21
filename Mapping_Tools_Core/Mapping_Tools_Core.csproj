@@ -195,6 +195,7 @@
     <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\IStoryboardLayerSourceRef.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\MidiLayerSourceRef.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\StoryboardLayerSourceRef.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\Sample.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\SampleGeneratingArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\HitsoundConverter.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\HitsoundEvent.cs" />

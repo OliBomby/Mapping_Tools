@@ -32,5 +32,12 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
         /// </summary>
         /// <returns></returns>
         ISampleSoundGenerator Import();
+
+        /// <summary>
+        /// Applies the additional effects to given generator.
+        /// </summary>
+        /// <param name="baseGenerator"></param>
+        /// <returns></returns>
+        ISampleSoundGenerator ApplyEffects(ISampleSoundGenerator baseGenerator);
     }
 }

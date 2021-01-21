@@ -29,7 +29,11 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
         public ISampleSoundGenerator Import() {
             var baseGenerator = ImportArgs?.Import();
 
-            return baseGenerator == null ? null : 
+            return ApplyEffects(baseGenerator);
+        }
+
+        public ISampleSoundGenerator ApplyEffects(ISampleSoundGenerator baseGenerator) {
+            return baseGenerator == null ? null :
                 new VolumeSampleSoundDecorator(baseGenerator, Volume);
         }
 
