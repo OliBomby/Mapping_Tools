@@ -5,6 +5,7 @@
         int Key { get; }
         int Velocity { get; }
         double Length { get; }
+        double Offset { get; }
         double VelocityRoughness { get; }
         double LengthRoughness { get; }
     }

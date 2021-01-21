@@ -156,6 +156,7 @@
     <Compile Include="ExternalFileUtil\Reaper\TrackItem.cs" />
     <Compile Include="Tools\HitsoundStudio\Helpers.cs" />
     <Compile Include="Tools\HitsoundStudio\LayerImporters\HitsoundsLayerImporter.cs" />
+    <Compile Include="Tools\HitsoundStudio\LayerImporters\MidiLayerImporter.cs" />
     <Compile Include="Tools\HitsoundStudio\LayerImporters\StackLayerImporter.cs" />
     <Compile Include="Tools\HitsoundStudio\LayerImporters\StoryboardLayerImporter.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\CompleteHitsounds.cs" />
@@ -177,6 +178,7 @@
     <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\IHitsoundsLayerImportArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\ILayerImportArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\IStoryboardLayerImportArgs.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\MidiLayerImportArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\StackLayerImportArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\StoryboardLayerImportArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\HitsoundsLayerSourceRef.cs" />
@@ -191,12 +193,12 @@
     <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\ISampleMapLayerSourceRef.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\IStackLayerSourceRef.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\IStoryboardLayerSourceRef.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\MidiLayerSourceRef.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\StoryboardLayerSourceRef.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\SampleGeneratingArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\HitsoundConverter.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\HitsoundEvent.cs" />
     <Compile Include="Tools\HitsoundStudio\HitsoundExporter.cs" />
-    <Compile Include="Tools\HitsoundStudio\HitsoundImporter.cs" />
     <Compile Include="Tools\HitsoundPreviewHelper\HitsoundZone.cs" />
     <Compile Include="Audio\MidiExporter.cs" />
     <Compile Include="Audio\SampleImporter.cs" />

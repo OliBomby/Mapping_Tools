@@ -1,4 +1,7 @@
-﻿namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model.LayerImportArgs {
+﻿using System.Collections.Generic;
+using Mapping_Tools_Core.Tools.HitsoundStudio.LayerImporters;
+
+namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model.LayerImportArgs {
     public class HitsoundsLayerImportArgs : IHitsoundsLayerImportArgs {
         public HitsoundsLayerImportArgs(string path, bool discriminateVolumes, bool detectDuplicateSamples) {
             Path = path;
