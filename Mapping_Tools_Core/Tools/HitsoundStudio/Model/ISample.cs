@@ -7,10 +7,10 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
     /// with the addition of an outside volume parameter.
     /// </summary>
     public interface ISample : ICloneable {
-        ISampleGeneratingArgs SampleGeneratingArgs { get; }
-        int Priority { get; }
+        ISampleGeneratingArgs SampleGeneratingArgs { get; set; }
+        int Priority { get; set; }
         double OutsideVolume { get; set; }
-        SampleSet SampleSet { get; }
-        Hitsound Hitsound { get; }
+        SampleSet SampleSet { get; set; }
+        Hitsound Hitsound { get; set; }
     }
 }
