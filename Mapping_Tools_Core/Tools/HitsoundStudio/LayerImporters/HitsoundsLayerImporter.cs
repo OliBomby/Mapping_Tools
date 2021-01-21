@@ -23,9 +23,8 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.LayerImporters {
 
         public IEnumerable<IHitsoundLayer> Import(IHitsoundsLayerImportArgs args) {
             editor.Path = args.Path;
-            editor.ReadFile();
 
-            Beatmap beatmap = editor.Instance;
+            Beatmap beatmap = editor.ReadFile();
             Timeline timeline = beatmap.GetTimeline();
             GameMode mode = (GameMode)beatmap.General["Mode"].IntValue;
 
