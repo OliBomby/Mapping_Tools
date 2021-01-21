@@ -12,19 +12,18 @@ using Mapping_Tools_Core.BeatmapHelper.Editor;
 using Mapping_Tools_Core.Tools.HitsoundStudio.Model.LayerSourceRef;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio.LayerImporters {
-    public class StoryboardLayerImporter<T> : IStoryboardLayerImporter where T : IStoryboard {
-        private readonly Editor<T> editor;
+    public class StoryboardLayerImporter : IStoryboardLayerImporter {
+        private readonly IReadEditor<IStoryboard> editor;
 
-        // TODO: requires covariant Editor
-        //public StoryboardLayerImporter() : this(new StoryboardEditor()) {}
+        public StoryboardLayerImporter() : this(new StoryboardEditor()) {}
 
-        public StoryboardLayerImporter(Editor<T> editor) {
+        public StoryboardLayerImporter(IReadEditor<IStoryboard> editor) {
             this.editor = editor;
         }
 
         public IEnumerable<IHitsoundLayer> Import(IStoryboardLayerImportArgs args) {
             editor.Path = args.Path;
-            editor.ReadFile();
+            var storyboard = editor.ReadFile();
             
             // Detect duplicate samples
             string mapDir = editor.GetParentFolder();
@@ -38,7 +37,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.LayerImporters {
             Dictionary<string, string> firstSamples = duplicateDetector.AnalyzeSamples(mapDir, out Exception _, false);
 
             var hitsoundLayers = new List<HitsoundLayer>();
-            foreach (var sbSample in editor.Instance.StoryboardSoundSamples) {
+            foreach (var sbSample in storyboard.StoryboardSoundSamples) {
                 var filepath = sbSample.FilePath;
                 string samplePath = Path.Combine(mapDir, filepath);
                 var filename = Path.GetFileNameWithoutExtension(filepath);
