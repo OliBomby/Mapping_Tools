@@ -373,11 +373,10 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio
             return sampleNames;
         }
 
-        public static void AddNewSampleName(Dictionary<SampleGeneratingArgs, string> sampleNames, SampleGeneratingArgs sample,
-            Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples,
-            bool validateSampleFile = true) {
-            if (!SampleImporter.ValidateSampleArgs(sample, loadedSamples, validateSampleFile)) {
-                sampleNames[sample] = String.Empty;
+        public static void AddNewSampleName(Dictionary<ISampleGeneratingArgs, string> sampleNames, ISampleGeneratingArgs sample,
+            Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator> loadedSamples) {
+            if (!SampleImporter.ValidateSampleArgs(sample, loadedSamples)) {
+                sampleNames[sample] = string.Empty;
                 return;
             }
             
@@ -392,8 +391,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio
             sampleNames[sample] = name;
         }
 
-        public static Dictionary<SampleGeneratingArgs, Vector2> GenerateHitsoundPositions(IEnumerable<SampleGeneratingArgs> samples, 
-            SampleGeneratingArgsComparer comparer = null) {
+        public static Dictionary<ISampleGeneratingArgs, Vector2> GenerateHitsoundPositions(IEnumerable<ISampleGeneratingArgs> samples) {
             var sampleArray = samples.ToArray();
             var sampleCount = sampleArray.Length;
 
@@ -409,7 +407,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio
                     spacingY /= 2;
             }
 
-            var positions = new Dictionary<SampleGeneratingArgs, Vector2>(comparer ?? new SampleGeneratingArgsComparer());
+            var positions = new Dictionary<ISampleGeneratingArgs, Vector2>();
             int x = 0;
             int y = 0;
             foreach (var sample in sampleArray) {
@@ -429,15 +427,14 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio
             return positions;
         }
 
-        public static Dictionary<SampleGeneratingArgs, Vector2> GenerateManiaHitsoundPositions(IEnumerable<SampleGeneratingArgs> samples, 
-            SampleGeneratingArgsComparer comparer = null) {
+        public static Dictionary<ISampleGeneratingArgs, Vector2> GenerateManiaHitsoundPositions(IEnumerable<ISampleGeneratingArgs> samples) {
             var sampleArray = samples.ToArray();
             var sampleCount = sampleArray.Length;
 
             // One key per unique sample but clamped between 1 and 18
             int numKeys = MathHelper.Clamp(sampleCount, 1, 18);
 
-            var positions = new Dictionary<SampleGeneratingArgs, Vector2>(comparer ?? new SampleGeneratingArgsComparer());
+            var positions = new Dictionary<ISampleGeneratingArgs, Vector2>();
             double x = 256d / numKeys;
             foreach (var sample in sampleArray) {
                 positions.Add(sample, new Vector2(Math.Round(x), 192));
