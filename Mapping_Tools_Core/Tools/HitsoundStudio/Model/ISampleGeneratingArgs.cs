@@ -21,9 +21,16 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
         /// </summary>
         double Volume { get; }
 
-        
         bool IsValid();
+
         bool IsValid(Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator> loadedSamples);
+
+        /// <summary>
+        /// Whether any post-processing will be applied to the sample
+        /// which will change the sample.
+        /// </summary>
+        /// <returns></returns>
+        bool HasEffects();
 
         /// <summary>
         /// Factory method for the <see cref="ISampleSoundGenerator"/>.
@@ -39,5 +46,12 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
         /// <param name="baseGenerator"></param>
         /// <returns></returns>
         ISampleSoundGenerator ApplyEffects(ISampleSoundGenerator baseGenerator);
+
+        /// <summary>
+        /// Gets a string that describes this sample.
+        /// Should be usable as a filename.
+        /// </summary>
+        /// <returns></returns>
+        string GetName();
     }
 }

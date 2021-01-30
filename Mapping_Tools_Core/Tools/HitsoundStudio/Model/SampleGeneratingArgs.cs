@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Mapping_Tools_Core.Audio.SampleImportArgs;
 using Mapping_Tools_Core.Audio.SampleSoundGeneration;
 using Mapping_Tools_Core.Audio.SampleSoundGeneration.Decorators;
+using Mapping_Tools_Core.BeatmapHelper;
+using Mapping_Tools_Core.MathUtil;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
     public class SampleGeneratingArgs : ISampleGeneratingArgs {
@@ -26,6 +29,10 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
             return loadedSamples.ContainsKey(this) && loadedSamples[this] != null;
         }
 
+        public bool HasEffects() {
+            return Math.Abs(Volume - 1) > Precision.DOUBLE_EPSILON;
+        }
+
         public ISampleSoundGenerator Import() {
             var baseGenerator = ImportArgs?.Import();
 
@@ -35,6 +42,16 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
         public ISampleSoundGenerator ApplyEffects(ISampleSoundGenerator baseGenerator) {
             return baseGenerator == null ? null :
                 new VolumeSampleSoundDecorator(baseGenerator, Volume);
+        }
+
+        public string GetName() {
+            if (ImportArgs == null) {
+                return (Volume * 100).ToRoundInvariant();
+            }
+
+            return Math.Abs(Volume - 1) < Precision.DOUBLE_EPSILON
+                ? ImportArgs.GetName()
+                : $"{ImportArgs.GetName()}-{(Volume * 100).ToRoundInvariant()}";
         }
 
         public bool Equals(ISampleGeneratingArgs other) {

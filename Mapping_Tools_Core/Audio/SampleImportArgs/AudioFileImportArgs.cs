@@ -39,6 +39,12 @@ namespace Mapping_Tools_Core.Audio.SampleImportArgs {
             return new AudioFileImporter().Import(this);
         }
 
+        public string GetName() {
+            return System.IO.Path.GetFileNameWithoutExtension(Path);
+        }
+
+        public bool IsDirectSource() => true;
+
         public string Path { get; }
     }
 }

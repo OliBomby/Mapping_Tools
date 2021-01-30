@@ -8,16 +8,6 @@ using System.IO;
 
 namespace Mapping_Tools_Core.Audio {
     public class SampleImporter {
-        public static bool ValidateSampleArgs(ISampleImportArgs args) {
-            return args.IsValid();
-        }
-
-        public static bool ValidateSampleArgs(ISampleImportArgs args, Dictionary<ISampleImportArgs, ISampleSoundGenerator> loadedSamples) {
-            if (loadedSamples == null)
-                return ValidateSampleArgs(args);
-            return loadedSamples.ContainsKey(args) && loadedSamples[args] != null;
-        }
-        
         public static WaveStream OpenSample(string path) {
             return Path.GetExtension(path) == ".ogg" ? (WaveStream)new VorbisWaveReader(path) : new MediaFoundationReader(path);
         }

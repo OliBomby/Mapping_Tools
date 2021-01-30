@@ -45,6 +45,13 @@ namespace Mapping_Tools_Core.Audio.SampleImportArgs {
             return SoundFontSampleImporter.GetInstance().Import(this);
         }
 
+        public string GetName() {
+            var filename = System.IO.Path.GetFileNameWithoutExtension(Path);
+            return $"{filename}-{Bank}-{Patch}-{Instrument}-{Key}-{Velocity}-{(int)Length}";
+        }
+
+        public bool IsDirectSource() => false;
+
         public string Path { get; }
         public int Bank { get; }
         public int Patch { get; }

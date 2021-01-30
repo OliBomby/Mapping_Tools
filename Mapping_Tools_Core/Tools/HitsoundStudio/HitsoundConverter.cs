@@ -139,7 +139,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
             return supportedCustomIndices.Any(ci => subject.Fits(ci) && !otherCustomIndices.Any(o => o.Fits(ci)));
         }
 
-        public static void GiveCustomIndicesIndices(List<CustomIndex> customIndices, bool keepExistingIndices, int startOffset=1) {
+        public static void GiveCustomIndicesIndices(List<ICustomIndex> customIndices, bool keepExistingIndices, int startOffset=1) {
             if (!keepExistingIndices) {
                 int i = startOffset;
                 foreach (var customIndex in customIndices) {
@@ -192,7 +192,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
                         filename = names[s.SampleGeneratingArgs];
                     } else {
                         // Validate the sample because we expect only valid samples to be present in the sample schema
-                        if (SampleImporter.ValidateSampleArgs(s.SampleGeneratingArgs, loadedSamples)) {
+                        if (s.SampleGeneratingArgs.IsValid(loadedSamples)) {
                             if (allowNamingGrowth) {
                                 HitsoundExporter.AddNewSampleName(names, s.SampleGeneratingArgs, loadedSamples);
                                 filename = names[s.SampleGeneratingArgs];
@@ -207,10 +207,10 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
                     if (includeRegularHitsounds) {
                         hitsounds.Add(new HitsoundEvent(p.Time,
                             positions[s.SampleGeneratingArgs], s.OutsideVolume, filename, s.SampleSet, s.SampleSet,
-                            0, s.Whistle, s.Finish, s.Clap));
+                            0, s.Hitsound == Hitsound.Whistle, s.Hitsound == Hitsound.Finish, s.Hitsound == Hitsound.Clap));
                     } else {
                         hitsounds.Add(new HitsoundEvent(p.Time,
-                            positions[s.SampleArgs], s.OutsideVolume, filename, SampleSet.Auto, SampleSet.Auto,
+                            positions[s.SampleGeneratingArgs], s.OutsideVolume, filename, SampleSet.Auto, SampleSet.Auto,
                             0, false, false, false));
                     }
                 }
@@ -220,28 +220,26 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
         }
 
         /// <summary>
-        /// Generates 1-to-1 <see cref="HitsoundEvent"/> of out <see cref="SamplePackage"/> using provided custom indices.
+        /// Generates 1-to-1 <see cref="IHitsoundEvent"/> of out <see cref="ISamplePackage"/> using provided custom indices.
         /// </summary>
         /// <param name="samplePackages">The SamplePackages to get hitsounds out of</param>
         /// <param name="customIndices">The CustomIndices that fit all the packages</param>
         /// <param name="loadedSamples">Loaded samples for the validation of samples files from the sample packages.</param>
-        /// <param name="validateSampleFile">Whether to validate sample files from the sample packages.</param>
-        /// <param name="comparer">Comparer for <see cref="SampleGeneratingArgs"/></param>
         /// <returns></returns>
-        public static List<HitsoundEvent> GetHitsounds(List<SamplePackage> samplePackages, 
-            List<CustomIndex> customIndices,
-            Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null,
-            bool validateSampleFile = true, SampleGeneratingArgsComparer comparer = null) {
-            List<HitsoundEvent> hitsounds = new List<HitsoundEvent>(samplePackages.Count);
-            List<CustomIndex> packageCustomIndices = GetCustomIndices(samplePackages, loadedSamples, validateSampleFile, comparer);
+        public static List<IHitsoundEvent> GetHitsounds(List<ISamplePackage> samplePackages, 
+            List<ICustomIndex> customIndices,
+            Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator> loadedSamples = null) {
+
+            List<IHitsoundEvent> hitsounds = new List<IHitsoundEvent>(samplePackages.Count);
+            List<ICustomIndex> packageCustomIndices = GetCustomIndices(samplePackages, loadedSamples);
 
             int index = 0;
             while (index < packageCustomIndices.Count) {
                 // Find CustomIndex that fits the most packages from here
-                CustomIndex bestCustomIndex = null;
+                ICustomIndex bestCustomIndex = null;
                 int bestFits = 0;
 
-                foreach (CustomIndex ci in customIndices) {
+                foreach (ICustomIndex ci in customIndices) {
                     int fits = NumSupportedPackages(packageCustomIndices, index, ci);
 
                     if (fits <= bestFits) continue;
@@ -266,7 +264,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
             return hitsounds;
         }
 
-        private static int NumSupportedPackages(List<CustomIndex> packageCustomIndices, int i, CustomIndex ci) {
+        private static int NumSupportedPackages(IReadOnlyList<ICustomIndex> packageCustomIndices, int i, ICustomIndex ci) {
             int supported = 0;
             int index = i;
             while (index < packageCustomIndices.Count) {
@@ -279,20 +277,19 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
             return supported;
         }
 
-        public static CompleteHitsounds GetCompleteHitsounds(List<SamplePackage> packages, 
-            Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null,
-            List<CustomIndex> customIndices = null, bool allowGrowth=false, int firstCustomIndex=1,
-            bool validateSampleFile = true, SampleGeneratingArgsComparer comparer = null) {
+        public static ICompleteHitsounds GetCompleteHitsounds(List<ISamplePackage> packages, 
+            Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator> loadedSamples = null,
+            List<ICustomIndex> customIndices = null, bool allowGrowth=false, int firstCustomIndex=1) {
 
             if (customIndices == null) {
-                customIndices = OptimizeCustomIndices(GetCustomIndices(packages, loadedSamples, validateSampleFile, comparer));
+                customIndices = OptimizeCustomIndices(GetCustomIndices(packages, loadedSamples));
                 GiveCustomIndicesIndices(customIndices, false, firstCustomIndex);
             } else if (allowGrowth) {
-                customIndices = OptimizeCustomIndices(customIndices.Concat(GetCustomIndices(packages, loadedSamples, validateSampleFile, comparer)).ToList());
+                customIndices = OptimizeCustomIndices(customIndices.Concat(GetCustomIndices(packages, loadedSamples)).ToList());
                 GiveCustomIndicesIndices(customIndices, true, firstCustomIndex);
             }
 
-            var hitsounds = GetHitsounds(packages, customIndices, loadedSamples, validateSampleFile, comparer);
+            var hitsounds = GetHitsounds(packages, customIndices, loadedSamples);
 
             return new CompleteHitsounds(hitsounds, customIndices);
         }

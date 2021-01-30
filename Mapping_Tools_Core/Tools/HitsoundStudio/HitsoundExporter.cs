@@ -4,8 +4,10 @@ using System.IO;
 using System.Linq;
 using Mapping_Tools_Core.Audio;
 using Mapping_Tools_Core.Audio.Effects;
+using Mapping_Tools_Core.Audio.SampleImportArgs;
 using Mapping_Tools_Core.Audio.SampleSoundGeneration;
 using Mapping_Tools_Core.BeatmapHelper;
+using Mapping_Tools_Core.BeatmapHelper.Editor;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.BeatmapHelper.Events;
 using Mapping_Tools_Core.MathUtil;
@@ -25,9 +27,18 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio
             MidiChords
         }
 
-        public static void ExportHitsounds(List<HitsoundEvent> hitsounds, string baseBeatmap, string exportFolder, string exportMapName, GameMode exportGameMode, bool useGreenlines, bool useStoryboard) {
-            var editor = EditorReaderStuff.GetNewestVersionOrNot(baseBeatmap);
-            Beatmap beatmap = editor.Beatmap;
+        public static void ExportHitsounds(ICollection<IHitsoundEvent> hitsounds, 
+            string baseBeatmap, 
+            string exportFolder, 
+            string exportMapName, 
+            GameMode exportGameMode, 
+            bool useGreenlines, 
+            bool useStoryboard,
+            IReadWriteEditor<Beatmap> editor = null) {
+
+            editor = editor ?? new BeatmapEditor();
+            editor.Path = baseBeatmap;
+            Beatmap beatmap = editor.ReadFile();
 
             if (useStoryboard) {
                 beatmap.StoryboardSoundSamples.Clear();
@@ -45,19 +56,22 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio
                 // Add hitsound stuff
                 // Replace all hitobjects with the hitsounds
                 beatmap.HitObjects.Clear();
-                foreach (HitsoundEvent h in hitsounds) {
+                foreach (IHitsoundEvent h in hitsounds) {
+                    var index = h.CustomIndex;
+                    var volume = h.Volume;
+
                     if (useGreenlines) {
                         TimingPoint tp = beatmap.BeatmapTiming.GetTimingPointAtTime(h.Time + 5).Copy();
                         tp.Offset = h.Time;
                         tp.SampleIndex = h.CustomIndex;
-                        h.CustomIndex = 0; // Set it to default value because it gets handled by greenlines now
+                        index = 0; // Set it to default value because it gets handled by greenlines now
                         tp.Volume = Math.Round(tp.Volume * h.Volume);
-                        h.Volume = 0; // Set it to default value because it gets handled by greenlines now
+                        volume = 0; // Set it to default value because it gets handled by greenlines now
                         timingPointsChanges.Add(new TimingPointsChange(tp, index: true, volume: true));
                     }
 
                     beatmap.HitObjects.Add(new HitObject(h.Pos, h.Time, 5, h.GetHitsounds(), h.SampleSet, h.Additions,
-                        h.CustomIndex, h.Volume * 100, h.Filename));
+                        index, volume * 100, h.Filename));
                 }
 
                 // Replace the old timingpoints
@@ -81,17 +95,18 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio
             }
 
             // Save the file to the export folder
-            editor.SaveFile(Path.Combine(exportFolder, beatmap.GetFileName()));
+            editor.Path = Path.Combine(exportFolder, beatmap.GetFileName());
+            editor.WriteFile(beatmap);
         }
 
-        public static void ExportLoadedSamples(Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples,
-            string exportFolder, Dictionary<SampleGeneratingArgs, string> names = null, 
-            SampleExportFormat format=SampleExportFormat.Default, SampleGeneratingArgsComparer comparer = null) {
+        public static void ExportLoadedSamples(Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator> loadedSamples,
+            string exportFolder, Dictionary<ISampleGeneratingArgs, string> names = null, 
+            SampleExportFormat format=SampleExportFormat.Default) {
             if (names == null) {
-                names = GenerateSampleNames(loadedSamples.Keys, loadedSamples, format != SampleExportFormat.MidiChords, comparer);
+                names = GenerateSampleNames(loadedSamples.Keys, loadedSamples);
             }
 
-            foreach (var sample in loadedSamples.Keys.Where(sample => SampleImporter.ValidateSampleArgs(sample, loadedSamples, format != SampleExportFormat.MidiChords))) {
+            foreach (var sample in loadedSamples.Keys.Where(sample => sample.IsValid(loadedSamples))) {
                 ExportSample(sample, names[sample], exportFolder, loadedSamples, format);
             }
         }
@@ -107,58 +122,65 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio
             }
         }
 
-        private static bool IsCopyCompatible(SampleGeneratingArgs sampleGeneratingArgs, WaveFormatEncoding waveEncoding, SampleExportFormat exportFormat) {
+        private static bool IsCopyCompatible(IPathSampleImportArgs pathSample, WaveFormatEncoding waveEncoding, SampleExportFormat exportFormat) {
             switch (exportFormat) {
                 case SampleExportFormat.WaveIeeeFloat:
-                    return waveEncoding == WaveFormatEncoding.IeeeFloat && sampleGeneratingArgs.GetExtension() == ".wav";
+                    return waveEncoding == WaveFormatEncoding.IeeeFloat && Path.GetExtension(pathSample.Path) == ".wav";
                 case SampleExportFormat.WavePcm:
-                    return waveEncoding == WaveFormatEncoding.Pcm && sampleGeneratingArgs.GetExtension() == ".wav";
+                    return waveEncoding == WaveFormatEncoding.Pcm && Path.GetExtension(pathSample.Path) == ".wav";
                 case SampleExportFormat.OggVorbis:
-                    return sampleGeneratingArgs.GetExtension() == ".ogg";
+                    return Path.GetExtension(pathSample.Path) == ".ogg";
                 default:
                     return true;
             }
         }
 
-        public static bool ExportSample(SampleGeneratingArgs sampleGeneratingArgs, string name,
-            string exportFolder, Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples=null, 
+        public static bool ExportSample(ISampleGeneratingArgs sampleGeneratingArgs, string name,
+            string exportFolder, Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator> loadedSamples=null, 
             SampleExportFormat format=SampleExportFormat.Default) {
 
             // Export as midi file with single note
             if (format == SampleExportFormat.MidiChords) {
-                MidiExporter.SaveToFile(Path.Combine(exportFolder, name + ".mid"), new[] {sampleGeneratingArgs});
+                MidiExporter.SaveToFile(Path.Combine(exportFolder, name + ".mid"), new[] {sampleGeneratingArgs.ImportArgs as IMidiSampleImportArgs});
                 return true;
             }
 
-            if (sampleGeneratingArgs.CanCopyPaste && format == SampleExportFormat.Default) {
-                var dest = Path.Combine(exportFolder, name + sampleGeneratingArgs.GetExtension());
-                return CopySample(sampleGeneratingArgs.Path, dest);
+            if (sampleGeneratingArgs.ImportArgs is IPathSampleImportArgs p && p.IsDirectSource() &&
+                !sampleGeneratingArgs.HasEffects() && format == SampleExportFormat.Default) {
+
+                var dest = Path.Combine(exportFolder, name + Path.GetExtension(p.Path));
+                return CopySample(p.Path, dest);
             }
 
-            SampleSoundGenerator sampleSoundGenerator;
+            ISampleSoundGenerator sampleSoundGenerator;
             if (loadedSamples != null) {
-                if (SampleImporter.ValidateSampleArgs(sampleGeneratingArgs, loadedSamples)) {
+                if (sampleGeneratingArgs.IsValid(loadedSamples)) {
                     sampleSoundGenerator = loadedSamples[sampleGeneratingArgs];
                 } else {
                     return false;
                 }
             } else {
                 try {
-                    sampleSoundGenerator = SampleImporter.ImportSample(sampleGeneratingArgs);
+                    sampleSoundGenerator = sampleGeneratingArgs.Import();
                 } catch (Exception ex) {
                     Console.WriteLine($@"{ex.Message} while importing sample {sampleGeneratingArgs}.");
                     return false;
                 }
             }
 
-            var sourceWaveEncoding = sampleSoundGenerator.Wave.WaveFormat.Encoding;
+            if (sampleSoundGenerator == null) {
+                return false;
+            }
+
+            var sourceWaveEncoding = sampleSoundGenerator.GetSourceWaveFormat().Encoding;
 
             // Either if it is the blank sample or the source file is literally what the user wants to be exported
-            if (sampleSoundGenerator.BlankSample && sampleGeneratingArgs.GetExtension() == ".wav" || 
-                sampleGeneratingArgs.CanCopyPaste && IsCopyCompatible(sampleGeneratingArgs, sourceWaveEncoding, format)) {
+            if (sampleGeneratingArgs.ImportArgs is IPathSampleImportArgs p2 && p2.IsDirectSource() && 
+                (sampleSoundGenerator.IsBlank() ||
+                 !sampleGeneratingArgs.HasEffects() && IsCopyCompatible(p2, sourceWaveEncoding, format))) {
 
-                var dest = Path.Combine(exportFolder, name + sampleGeneratingArgs.GetExtension());
-                return CopySample(sampleGeneratingArgs.Path, dest);
+                var dest = Path.Combine(exportFolder, name + Path.GetExtension(p2.Path));
+                return CopySample(p2.Path, dest);
             }
 
             var sampleProvider = sampleSoundGenerator.GetSampleProvider();
@@ -199,32 +221,42 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio
             return true;
         }
 
-        public static void ExportMixedSample(IEnumerable<SampleGeneratingArgs> sampleGeneratingArgses, string name,
-            string exportFolder, Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples=null, 
-            SampleExportFormat format=SampleExportFormat.Default, SampleExportFormat mixedFormat=SampleExportFormat.Default, 
-            SampleGeneratingArgsComparer comparer = null) {
+        public static void ExportMixedSample(IEnumerable<ISampleGeneratingArgs> sampleGeneratingArgses, string name,
+            string exportFolder, Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator> loadedSamples=null, 
+            SampleExportFormat format=SampleExportFormat.Default, SampleExportFormat mixedFormat=SampleExportFormat.Default) {
 
             // Export as midi file with single chord
             if (format == SampleExportFormat.MidiChords) {
-                MidiExporter.SaveToFile(Path.Combine(exportFolder, name + ".mid"), sampleGeneratingArgses.ToArray());
+                var notes = sampleGeneratingArgses.Where(o => o.ImportArgs is IMidiSampleImportArgs)
+                    .Select(o => (IMidiSampleImportArgs) o.ImportArgs);
+                MidiExporter.SaveToFile(Path.Combine(exportFolder, name + ".mid"), notes);
                 return;
             }
 
             // Try loading all the valid samples
-            var validLoadedSamples = new Dictionary<SampleGeneratingArgs, SampleSoundGenerator>(comparer ?? new SampleGeneratingArgsComparer());
+            // All Values are not null
+            var validLoadedSamples = new Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator>();
             
             if (loadedSamples != null) {
                 foreach (var args in sampleGeneratingArgses) {
-                    if (!SampleImporter.ValidateSampleArgs(args, loadedSamples)) continue;
+                    if (!args.IsValid(loadedSamples)) continue;
 
                     var sample = loadedSamples[args];
+
+                    // Make sure the sample generator is not null
+                    if (sample == null) continue;
+
                     validLoadedSamples.Add(args, sample);
                 }
             } else {
                 // Import each sample individually
-                foreach (SampleGeneratingArgs args in sampleGeneratingArgses) {
+                foreach (ISampleGeneratingArgs args in sampleGeneratingArgses) {
                     try {
-                        var sample = SampleImporter.ImportSample(args);
+                        var sample = args.Import();
+
+                        // Make sure the sample generator is not null
+                        if (sample == null) continue;
+
                         validLoadedSamples.Add(args, sample);
                     } catch (Exception ex) {
                         Console.WriteLine($@"{ex.Message} while importing sample {args}.");
@@ -234,23 +266,24 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio
 
             if (validLoadedSamples.Count == 0) return;
 
+            // If it has only one valid sample, we can just export it with the single sample export
             // If all the valid samples are blank samples, then also export only a single blank sample
-            if (validLoadedSamples.Count == 1 || validLoadedSamples.All(o => o.Value.BlankSample)) {
-                // It has only one valid sample, so we can just export it with the single sample export
+            if (validLoadedSamples.Count == 1 || validLoadedSamples.All(o => o.Value.IsBlank())) {
                 ExportSample(validLoadedSamples.Keys.First(), name, exportFolder, loadedSamples, format);
             } else if (validLoadedSamples.Count > 1) {
+                var sampleProviders = validLoadedSamples.Values.Select(o => o.GetSampleProvider()).ToList();
+
                 // Synchronize the sample rate and channels for all samples and get the sample providers
-                int maxSampleRate = validLoadedSamples.Values.Max(o => o.Wave.WaveFormat.SampleRate);
-                int maxChannels = validLoadedSamples.Values.Max(o => o.Wave.WaveFormat.Channels);
+                int maxSampleRate = sampleProviders.Max(o => o.WaveFormat.SampleRate);
+                int maxChannels = sampleProviders.Max(o => o.WaveFormat.Channels);
 
                 // Resample to a supported sample rate when exporting in vorbis format
                 if (mixedFormat == SampleExportFormat.OggVorbis) {
                     maxSampleRate = VorbisFileWriter.GetSupportedSampleRate(maxSampleRate);
                 }
 
-                IEnumerable<ISampleProvider> sameFormatSamples = validLoadedSamples.Select(o =>
-                    (ISampleProvider) new WdlResamplingSampleProvider(SetChannels(o.Value.GetSampleProvider(), maxChannels),
-                        maxSampleRate));
+                IEnumerable<ISampleProvider> sameFormatSamples = sampleProviders.Select(o =>
+                    (ISampleProvider) new WdlResamplingSampleProvider(SetChannels(o, maxChannels), maxSampleRate));
 
                 ISampleProvider sampleProvider = new MixingSampleProvider(sameFormatSamples);
 
@@ -300,29 +333,26 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio
         /// <param name="loadedSamples"></param>
         /// <param name="format"></param>
         /// <param name="mixedFormat"></param>
-        /// <param name="comparer"></param>
-        public static void ExportCustomIndices(List<CustomIndex> customIndices, string exportFolder, 
-            Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples=null, 
-            SampleExportFormat format=SampleExportFormat.Default, SampleExportFormat mixedFormat=SampleExportFormat.Default, 
-            SampleGeneratingArgsComparer comparer = null) {
-            foreach (CustomIndex ci in customIndices) {
-                foreach (KeyValuePair<string, HashSet<SampleGeneratingArgs>> kvp in ci.Samples) {
+        public static void ExportCustomIndices(List<ICustomIndex> customIndices, string exportFolder, 
+            Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator> loadedSamples=null, 
+            SampleExportFormat format=SampleExportFormat.Default, SampleExportFormat mixedFormat=SampleExportFormat.Default) {
+            foreach (ICustomIndex ci in customIndices) {
+                foreach (KeyValuePair<string, HashSet<ISampleGeneratingArgs>> kvp in ci.Samples) {
                     if (kvp.Value.Count == 0) {
                         continue;
                     }
                     
                     string filename = ci.Index == 1 ? kvp.Key : kvp.Key + ci.Index;
-                    ExportMixedSample(kvp.Value, filename, exportFolder, loadedSamples, format, mixedFormat, comparer);
+                    ExportMixedSample(kvp.Value, filename, exportFolder, loadedSamples, format, mixedFormat);
                 }
             }
         }
 
-        public static void ExportSampleSchema(SampleSchema sampleSchema, string exportFolder,
-            Dictionary<SampleGeneratingArgs, SampleSoundGenerator> loadedSamples = null,
-            SampleExportFormat format = SampleExportFormat.Default, SampleExportFormat mixedFormat = SampleExportFormat.Default, 
-            SampleGeneratingArgsComparer comparer = null) {
+        public static void ExportSampleSchema(ISampleSchema sampleSchema, string exportFolder,
+            Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator> loadedSamples = null,
+            SampleExportFormat format = SampleExportFormat.Default, SampleExportFormat mixedFormat = SampleExportFormat.Default) {
             foreach (var kvp in sampleSchema) {
-                ExportMixedSample(kvp.Value, kvp.Key, exportFolder, loadedSamples, format, mixedFormat, comparer);
+                ExportMixedSample(kvp.Value, kvp.Key, exportFolder, loadedSamples, format, mixedFormat);
             }
         }
 
@@ -358,7 +388,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio
                     continue;
                 }
                 
-                var baseName = sample.GetFilename();
+                var baseName = sample.GetName();
                 var name = baseName;
                 int i = 1;
 
@@ -375,12 +405,12 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio
 
         public static void AddNewSampleName(Dictionary<ISampleGeneratingArgs, string> sampleNames, ISampleGeneratingArgs sample,
             Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator> loadedSamples) {
-            if (!SampleImporter.ValidateSampleArgs(sample, loadedSamples)) {
+            if (!sample.IsValid(loadedSamples)) {
                 sampleNames[sample] = string.Empty;
                 return;
             }
             
-            var baseName = sample.GetFilename();
+            var baseName = sample.GetName();
             var name = baseName;
             int i = 1;
 

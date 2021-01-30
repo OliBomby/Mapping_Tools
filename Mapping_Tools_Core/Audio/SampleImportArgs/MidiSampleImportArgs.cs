@@ -41,6 +41,10 @@ namespace Mapping_Tools_Core.Audio.SampleImportArgs {
             return null;
         }
 
+        public string GetName() {
+            return $"{Bank}-{Patch}-{Instrument}-{Key}-{Velocity}-{(int)Length}";
+        }
+
         public int Bank { get; }
         public int Patch { get; }
         public int Instrument { get; }

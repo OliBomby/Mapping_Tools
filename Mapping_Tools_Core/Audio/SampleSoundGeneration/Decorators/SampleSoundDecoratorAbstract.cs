@@ -20,6 +20,10 @@ namespace Mapping_Tools_Core.Audio.SampleSoundGeneration.Decorators {
             return baseGenerator.IsBlank();
         }
 
+        public WaveFormat GetSourceWaveFormat() {
+            return baseGenerator.GetSourceWaveFormat();
+        }
+
         protected abstract ISampleProvider Decorate(ISampleProvider baseSampleProvider);
     }
 }

@@ -21,5 +21,11 @@ namespace Mapping_Tools_Core.Audio.SampleSoundGeneration {
         /// </summary>
         /// <returns></returns>
         bool IsBlank();
+
+        /// <summary>
+        /// Gets the <see cref="WaveFormat"/> of the audio source.
+        /// </summary>
+        /// <returns></returns>
+        WaveFormat GetSourceWaveFormat();
     }
 }

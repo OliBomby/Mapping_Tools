@@ -31,6 +31,10 @@ namespace Mapping_Tools_Core.Audio.SampleImportArgs {
             return new VorbisFileImporter().Import(this);
         }
 
+        public string GetName() {
+            return System.IO.Path.GetFileNameWithoutExtension(Path);
+        }
+
         public string Path { get; }
     }
 }

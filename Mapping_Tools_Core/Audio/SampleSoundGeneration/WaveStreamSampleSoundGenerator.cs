@@ -7,9 +7,8 @@ namespace Mapping_Tools_Core.Audio.SampleSoundGeneration {
         /// <summary>
         /// The <see cref="WaveStream"/> to generate sound from.
         /// </summary>
-        public WaveStream Wave { get; set; }
+        protected WaveStream Wave;
 
-        /// <inheritdoc />
         public WaveStreamSampleSoundGenerator(WaveStream wave) {
             Wave = wave;
         }
@@ -23,6 +22,10 @@ namespace Mapping_Tools_Core.Audio.SampleSoundGeneration {
 
         public bool IsBlank() {
             return Wave.TotalTime.Equals(TimeSpan.Zero);
+        }
+
+        public WaveFormat GetSourceWaveFormat() {
+            return Wave.WaveFormat;
         }
 
         private static ISampleProvider WaveToSampleProvider(IWaveProvider wave) {
