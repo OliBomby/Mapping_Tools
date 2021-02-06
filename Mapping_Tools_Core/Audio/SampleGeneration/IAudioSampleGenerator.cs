@@ -1,7 +1,7 @@
 ﻿using NAudio.Wave;
 
 namespace Mapping_Tools_Core.Audio.SampleGeneration {
-    public interface IAudioSampleGenerator {
+    public interface IAudioSampleGenerator : ISampleGenerator {
         /// <summary>
         /// Generates a new <see cref="ISampleProvider"/> with the sound of this generator.
         /// 
@@ -12,5 +12,10 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration {
         /// </summary>
         /// <returns></returns>
         ISampleProvider GetSampleProvider();
+
+        /// <summary>
+        /// Do the necessary pre-loading or caching to make <see cref="GetSampleProvider"/> fast.
+        /// </summary>
+        void PreLoadSample();
     }
 }
