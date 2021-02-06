@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio {
-    public class Helpers {
+    public static class Helpers {
         public static SampleSet GetSamplesetFromFilename(string filename) {
             string[] split = filename.Split('-');
             if (split.Length < 1)
