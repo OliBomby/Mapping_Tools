@@ -3,7 +3,7 @@ using System.IO;
 using Mapping_Tools_Core.Audio.SampleImporters;
 using Mapping_Tools_Core.Audio.SampleSoundGeneration;
 
-namespace Mapping_Tools_Core.Audio.SampleImportArgs {
+namespace Mapping_Tools_Core.Audio.SampleGeneration {
     public class VorbisFileImportArgs : IVorbisFileImportArgs {
         private string Extension => System.IO.Path.GetExtension(Path);
 
@@ -11,7 +11,7 @@ namespace Mapping_Tools_Core.Audio.SampleImportArgs {
             Path = path;
         }
 
-        public bool Equals(ISampleImportArgs other) {
+        public bool Equals(ISampleGenerator other) {
             return other is IVorbisFileImportArgs o && Path.Equals(o.Path);
         }
 
@@ -23,7 +23,7 @@ namespace Mapping_Tools_Core.Audio.SampleImportArgs {
             return File.Exists(Path) && Extension == ".ogg";
         }
 
-        public bool IsValid(Dictionary<ISampleImportArgs, ISampleSoundGenerator> loadedSamples) {
+        public bool IsValid(Dictionary<ISampleGenerator, ISampleSoundGenerator> loadedSamples) {
             return loadedSamples.ContainsKey(this) && loadedSamples[this] != null;
         }
 

@@ -1,4 +1,4 @@
-﻿using Mapping_Tools_Core.Audio.SampleImportArgs;
+﻿using Mapping_Tools_Core.Audio.SampleGeneration;
 using Mapping_Tools_Core.Audio.SampleSoundGeneration;
 using NAudio.Wave;
 

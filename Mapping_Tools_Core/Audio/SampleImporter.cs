@@ -1,10 +1,10 @@
-﻿using Mapping_Tools_Core.Audio.SampleImportArgs;
-using Mapping_Tools_Core.Audio.SampleSoundGeneration;
+﻿using Mapping_Tools_Core.Audio.SampleSoundGeneration;
 using NAudio.Vorbis;
 using NAudio.Wave;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Mapping_Tools_Core.Audio.SampleGeneration;
 
 namespace Mapping_Tools_Core.Audio {
     public class SampleImporter {
@@ -20,27 +20,27 @@ namespace Mapping_Tools_Core.Audio {
         /// <param name="argsList">The samples to import</param>
         /// <param name="comparer">The equality comparer for the import args. If null, Default will be used</param>
         /// <returns></returns>
-        public static Dictionary<ISampleImportArgs, ISampleSoundGenerator> ImportSamples(
-            IEnumerable<ISampleImportArgs> argsList,
-            IEqualityComparer<ISampleImportArgs> comparer = null) {
+        public static Dictionary<ISampleGenerator, ISampleSoundGenerator> ImportSamples(
+            IEnumerable<ISampleGenerator> argsList,
+            IEqualityComparer<ISampleGenerator> comparer = null) {
 
             if (comparer == null) {
                 // Get the default comparer so it uses IEquatable
-                comparer = EqualityComparer<ISampleImportArgs>.Default;
+                comparer = EqualityComparer<ISampleGenerator>.Default;
             }
 
-            var samples = new Dictionary<ISampleImportArgs, ISampleSoundGenerator>(comparer);
+            var samples = new Dictionary<ISampleGenerator, ISampleSoundGenerator>(comparer);
 
             // Group the args by path so the SoundFont importer can benefit of caching
-            var separatedByPath = new Dictionary<string, HashSet<ISampleImportArgs>>();
-            var otherArgs = new HashSet<ISampleImportArgs>();
+            var separatedByPath = new Dictionary<string, HashSet<ISampleGenerator>>();
+            var otherArgs = new HashSet<ISampleGenerator>();
 
             foreach (var args in argsList) {
-                if (args is IPathSampleImportArgs pathArgs) {
-                    if (separatedByPath.TryGetValue(pathArgs.Path, out HashSet<ISampleImportArgs> value)) {
+                if (args is IPathSampleGenerator pathArgs) {
+                    if (separatedByPath.TryGetValue(pathArgs.Path, out HashSet<ISampleGenerator> value)) {
                         value.Add(args);
                     } else {
-                        separatedByPath.Add(pathArgs.Path, new HashSet<ISampleImportArgs>(comparer) {args});
+                        separatedByPath.Add(pathArgs.Path, new HashSet<ISampleGenerator>(comparer) {args});
                     }
                 } else if (args != null) {
                     otherArgs.Add(args);

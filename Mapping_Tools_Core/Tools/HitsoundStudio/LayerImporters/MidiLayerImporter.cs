@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Mapping_Tools_Core.Audio.SampleImportArgs;
+using Mapping_Tools_Core.Audio.SampleGeneration;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.Tools.HitsoundStudio.Model;
 using Mapping_Tools_Core.Tools.HitsoundStudio.Model.LayerImportArgs;

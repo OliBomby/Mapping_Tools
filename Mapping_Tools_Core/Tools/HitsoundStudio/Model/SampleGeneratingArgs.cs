@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Mapping_Tools_Core.Audio.SampleImportArgs;
+using Mapping_Tools_Core.Audio.SampleGeneration;
 using Mapping_Tools_Core.Audio.SampleSoundGeneration;
 using Mapping_Tools_Core.Audio.SampleSoundGeneration.Decorators;
 using Mapping_Tools_Core.BeatmapHelper;
@@ -8,7 +8,7 @@ using Mapping_Tools_Core.MathUtil;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
     public class SampleGeneratingArgs : ISampleGeneratingArgs {
-        public ISampleImportArgs ImportArgs { get; }
+        public ISampleGenerator ImportArgs { get; }
 
         public double Volume { get; }
 
@@ -16,7 +16,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
             Volume = 1;
         }
 
-        public SampleGeneratingArgs(ISampleImportArgs importArgs, double volume) {
+        public SampleGeneratingArgs(ISampleGenerator importArgs, double volume) {
             ImportArgs = importArgs;
             Volume = volume;
         }
@@ -65,7 +65,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
         }
 
         public object Clone() {
-            return new SampleGeneratingArgs(ImportArgs?.Clone() as ISampleImportArgs, Volume);
+            return new SampleGeneratingArgs(ImportArgs?.Clone() as ISampleGenerator, Volume);
         }
     }
 }

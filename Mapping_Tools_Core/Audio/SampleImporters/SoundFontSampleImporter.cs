@@ -1,11 +1,11 @@
-﻿using Mapping_Tools_Core.Audio.SampleImportArgs;
-using Mapping_Tools_Core.Audio.SampleSoundGeneration;
+﻿using Mapping_Tools_Core.Audio.SampleSoundGeneration;
 using Mapping_Tools_Core.Audio.SampleSoundGeneration.Decorators;
 using NAudio.SoundFont;
 using NAudio.Wave;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Mapping_Tools_Core.Audio.SampleGeneration;
 
 namespace Mapping_Tools_Core.Audio.SampleImporters {
     public class SoundFontSampleImporter : ISampleImporter<ISoundFontSampleImportArgs> {

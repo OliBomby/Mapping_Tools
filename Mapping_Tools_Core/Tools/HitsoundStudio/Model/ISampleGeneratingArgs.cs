@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using Mapping_Tools_Core.Audio.SampleImportArgs;
+using Mapping_Tools_Core.Audio.SampleGeneration;
 using Mapping_Tools_Core.Audio.SampleSoundGeneration;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
@@ -14,7 +14,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
         /// If null, no sample will be generated.
         /// </summary>
         [CanBeNull]
-        ISampleImportArgs ImportArgs { get; }
+        ISampleGenerator ImportArgs { get; }
 
         /// <summary>
         /// Volume post-processing argument.

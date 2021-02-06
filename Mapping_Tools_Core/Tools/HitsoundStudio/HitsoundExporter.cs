@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Mapping_Tools_Core.Audio;
 using Mapping_Tools_Core.Audio.Effects;
-using Mapping_Tools_Core.Audio.SampleImportArgs;
+using Mapping_Tools_Core.Audio.SampleGeneration;
 using Mapping_Tools_Core.Audio.SampleSoundGeneration;
 using Mapping_Tools_Core.BeatmapHelper;
 using Mapping_Tools_Core.BeatmapHelper.Editor;
@@ -86,7 +86,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio
 
             if (exportGameMode == GameMode.Mania) {
                 // Count the number of distinct X positions
-                int numXPositions = new HashSet<double>(hitsounds.Select(h => h.Pos.X)).Count;
+                int numXPositions =hitsounds.Select(h => h.Pos.X).Distinct().Count();
                 int numKeys = MathHelper.Clamp(numXPositions, 1, 18);
 
                 beatmap.Difficulty["CircleSize"] = new TValue(numKeys.ToInvariant());
@@ -122,7 +122,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio
             }
         }
 
-        private static bool IsCopyCompatible(IPathSampleImportArgs pathSample, WaveFormatEncoding waveEncoding, SampleExportFormat exportFormat) {
+        private static bool IsCopyCompatible(IPathSampleGenerator pathSample, WaveFormatEncoding waveEncoding, SampleExportFormat exportFormat) {
             switch (exportFormat) {
                 case SampleExportFormat.WaveIeeeFloat:
                     return waveEncoding == WaveFormatEncoding.IeeeFloat && Path.GetExtension(pathSample.Path) == ".wav";
@@ -145,7 +145,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio
                 return true;
             }
 
-            if (sampleGeneratingArgs.ImportArgs is IPathSampleImportArgs p && p.IsDirectSource() &&
+            if (sampleGeneratingArgs.ImportArgs is IPathSampleGenerator p && p.IsDirectSource() &&
                 !sampleGeneratingArgs.HasEffects() && format == SampleExportFormat.Default) {
 
                 var dest = Path.Combine(exportFolder, name + Path.GetExtension(p.Path));
@@ -175,7 +175,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio
             var sourceWaveEncoding = sampleSoundGenerator.GetSourceWaveFormat().Encoding;
 
             // Either if it is the blank sample or the source file is literally what the user wants to be exported
-            if (sampleGeneratingArgs.ImportArgs is IPathSampleImportArgs p2 && p2.IsDirectSource() && 
+            if (sampleGeneratingArgs.ImportArgs is IPathSampleGenerator p2 && p2.IsDirectSource() && 
                 (sampleSoundGenerator.IsBlank() ||
                  !sampleGeneratingArgs.HasEffects() && IsCopyCompatible(p2, sourceWaveEncoding, format))) {
 

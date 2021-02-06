@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Mapping_Tools_Core.Audio.SampleSoundGeneration;
 using Mapping_Tools_Core.MathUtil;
 
-namespace Mapping_Tools_Core.Audio.SampleImportArgs {
+namespace Mapping_Tools_Core.Audio.SampleGeneration {
     public class MidiSampleImportArgs : IMidiSampleImportArgs {
         public MidiSampleImportArgs(int bank, int patch, int instrument, int key, int velocity, double length) {
             Bank = bank;
@@ -14,7 +13,7 @@ namespace Mapping_Tools_Core.Audio.SampleImportArgs {
             Length = length;
         }
 
-        public bool Equals(ISampleImportArgs other) {
+        public bool Equals(ISampleGenerator other) {
             return other is IMidiSampleImportArgs o &&
                    Bank == o.Bank &&
                    Patch == o.Patch &&
@@ -32,7 +31,7 @@ namespace Mapping_Tools_Core.Audio.SampleImportArgs {
             return true;
         }
 
-        public bool IsValid(Dictionary<ISampleImportArgs, ISampleSoundGenerator> loadedSamples) {
+        public bool IsValid(Dictionary<ISampleGenerator, ISampleSoundGenerator> loadedSamples) {
             return true;
         }
 

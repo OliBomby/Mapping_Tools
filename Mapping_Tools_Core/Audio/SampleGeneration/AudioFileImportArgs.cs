@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Mapping_Tools_Core.Audio.SampleImporters;
 using Mapping_Tools_Core.Audio.SampleSoundGeneration;
 
-namespace Mapping_Tools_Core.Audio.SampleImportArgs {
+namespace Mapping_Tools_Core.Audio.SampleGeneration {
     public class AudioFileImportArgs : IAudioFileImportArgs {
         private static readonly string[] ValidExtensions = {".wav", ".mp3", ".aiff", ".ogg"};
 
@@ -15,7 +14,7 @@ namespace Mapping_Tools_Core.Audio.SampleImportArgs {
             Path = path;
         }
 
-        public bool Equals(ISampleImportArgs other) {
+        public bool Equals(ISampleGenerator other) {
             return other is IAudioFileImportArgs o && Path.Equals(o.Path);
         }
 
@@ -27,7 +26,7 @@ namespace Mapping_Tools_Core.Audio.SampleImportArgs {
             return File.Exists(Path) && ValidExtensions.Contains(Extension);
         }
 
-        public bool IsValid(Dictionary<ISampleImportArgs, ISampleSoundGenerator> loadedSamples) {
+        public bool IsValid(Dictionary<ISampleGenerator, ISampleSoundGenerator> loadedSamples) {
             return loadedSamples.ContainsKey(this) && loadedSamples[this] != null;
         }
 

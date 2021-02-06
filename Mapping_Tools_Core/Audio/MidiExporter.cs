@@ -1,8 +1,8 @@
-﻿using Mapping_Tools_Core.Audio.SampleImportArgs;
-using NAudio.Midi;
+﻿using NAudio.Midi;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Mapping_Tools_Core.Audio.SampleGeneration;
 
 namespace Mapping_Tools_Core.Audio {
     public class MidiExporter {

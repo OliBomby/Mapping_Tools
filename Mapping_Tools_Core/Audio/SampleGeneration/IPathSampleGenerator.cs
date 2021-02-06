@@ -1,5 +1,5 @@
-﻿namespace Mapping_Tools_Core.Audio.SampleImportArgs {
-    public interface IPathSampleImportArgs : ISampleImportArgs{
+﻿namespace Mapping_Tools_Core.Audio.SampleGeneration {
+    public interface IPathSampleGenerator : ISampleGenerator{
         string Path { get; }
 
         /// <summary>

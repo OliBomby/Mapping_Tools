@@ -1,8 +1,8 @@
-﻿namespace Mapping_Tools_Core.Audio.SampleImportArgs {
+﻿namespace Mapping_Tools_Core.Audio.SampleGeneration {
     /// <summary>
     /// Represents the arguments for a single MIDI note.
     /// </summary>
-    public interface IMidiSampleImportArgs : ISampleImportArgs {
+    public interface IMidiSampleImportArgs : ISampleGenerator {
         int Bank { get; }
         int Patch { get; }
         int Instrument { get; }
