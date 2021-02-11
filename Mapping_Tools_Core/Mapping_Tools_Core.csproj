@@ -159,7 +159,6 @@
     <Compile Include="ExternalFileUtil\Reaper\ReaperProject.cs" />
     <Compile Include="ExternalFileUtil\Reaper\TrackItem.cs" />
     <Compile Include="InvariantHelper.cs" />
-    <Compile Include="Tools\HitsoundStudio\Exporting\IExtendedSampleExporter.cs" />
     <Compile Include="Tools\HitsoundStudio\Exporting\IHitsoundExporter.cs" />
     <Compile Include="Tools\HitsoundStudio\Exporting\ISampleExporter.cs" />
     <Compile Include="Tools\HitsoundStudio\Helpers.cs" />

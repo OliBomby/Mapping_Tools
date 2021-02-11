@@ -1,4 +1,5 @@
 ﻿using System;
+using Mapping_Tools_Core.Tools.HitsoundStudio.Exporting;
 
 namespace Mapping_Tools_Core.Audio.SampleGeneration {
     public interface ISampleGenerator : IEquatable<ISampleGenerator>, ICloneable {
@@ -15,5 +16,11 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration {
         /// </summary>
         /// <returns></returns>
         string GetName();
+
+        /// <summary>
+        /// Writes the data of this sample to the exporter.
+        /// </summary>
+        /// <param name="exporter">The exporter to write the sample to.</param>
+        void ToExporter(ISampleExporter exporter);
     }
 }
