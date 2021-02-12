@@ -66,7 +66,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.LayerImporters {
                     layer.Times.Add(sbSample.StartTime);
                 } else {
                     // Add new hitsound layer with this path
-                    var newLayer = new HitsoundLayer(new SampleGeneratingArgs(new AudioFileImportArgs(samplePath), volume)) {
+                    var newLayer = new HitsoundLayer(new SampleGeneratingArgs(new PathAudioSampleGenerator(samplePath), volume)) {
                         Name = extLessFilename,
                         SampleSet = sampleSet,
                         Hitsound = hitsound,

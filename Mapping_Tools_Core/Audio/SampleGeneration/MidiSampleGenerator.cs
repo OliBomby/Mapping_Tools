@@ -3,8 +3,8 @@ using Mapping_Tools_Core.Audio.SampleSoundGeneration;
 using Mapping_Tools_Core.MathUtil;
 
 namespace Mapping_Tools_Core.Audio.SampleGeneration {
-    public class MidiSampleImportArgs : IMidiSampleImportArgs {
-        public MidiSampleImportArgs(int bank, int patch, int instrument, int key, int velocity, double length) {
+    public class MidiSampleGenerator : IMidiSampleGenerator {
+        public MidiSampleGenerator(int bank, int patch, int instrument, int key, int velocity, double length) {
             Bank = bank;
             Patch = patch;
             Instrument = instrument;
@@ -14,7 +14,7 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration {
         }
 
         public bool Equals(ISampleGenerator other) {
-            return other is IMidiSampleImportArgs o &&
+            return other is IMidiSampleGenerator o &&
                    Bank == o.Bank &&
                    Patch == o.Patch &&
                    Instrument == o.Instrument &&

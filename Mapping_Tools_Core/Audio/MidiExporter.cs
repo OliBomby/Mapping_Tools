@@ -6,7 +6,7 @@ using Mapping_Tools_Core.Audio.SampleGeneration;
 
 namespace Mapping_Tools_Core.Audio {
     public class MidiExporter {
-        public static void SaveToFile(string fileName, IEnumerable<IMidiSampleImportArgs> samples) {
+        public static void SaveToFile(string fileName, IEnumerable<IMidiSampleGenerator> samples) {
             var validSamples = samples.Where(o => o != null && o.Key >= 0).ToArray();
             SaveToFile(fileName,
                 validSamples.Select(s => s.Bank < 0 ? 0 : s.Bank).ToArray(),

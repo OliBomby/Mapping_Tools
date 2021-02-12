@@ -14,7 +14,7 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration {
         ISampleProvider GetSampleProvider();
 
         /// <summary>
-        /// Do the necessary pre-loading or caching to make <see cref="GetSampleProvider"/> fast.
+        /// Do the necessary pre-loading and caching to make <see cref="GetSampleProvider"/> fast.
         /// </summary>
         void PreLoadSample();
     }

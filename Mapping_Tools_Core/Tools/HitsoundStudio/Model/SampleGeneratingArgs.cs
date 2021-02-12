@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Mapping_Tools_Core.Audio.SampleGeneration;
+using Mapping_Tools_Core.Audio.SampleGeneration.Decorators;
 using Mapping_Tools_Core.Audio.SampleSoundGeneration;
-using Mapping_Tools_Core.Audio.SampleSoundGeneration.Decorators;
 using Mapping_Tools_Core.BeatmapHelper;
 using Mapping_Tools_Core.MathUtil;
 

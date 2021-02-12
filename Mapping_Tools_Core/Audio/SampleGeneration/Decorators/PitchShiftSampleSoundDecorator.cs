@@ -1,8 +1,9 @@
-﻿using NAudio.Wave;
+﻿using System;
+using Mapping_Tools_Core.Audio.SampleSoundGeneration;
+using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
-using System;
 
-namespace Mapping_Tools_Core.Audio.SampleSoundGeneration.Decorators {
+namespace Mapping_Tools_Core.Audio.SampleGeneration.Decorators {
     /// <summary>
     /// Decorator for <see cref="ISampleSoundGenerator"/> to add a pitch-shift.
     /// </summary>

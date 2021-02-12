@@ -1,11 +1,16 @@
-﻿using Mapping_Tools_Core.Audio.SampleGeneration;
-using Mapping_Tools_Core.Audio.SampleSoundGeneration;
-using NAudio.Vorbis;
+﻿using NAudio.Vorbis;
+using NAudio.Wave;
 
 namespace Mapping_Tools_Core.Audio.SampleImporters {
-    public class VorbisFileImporter : ISampleImporter<IVorbisFileImportArgs> {
-        public ISampleSoundGenerator Import(IVorbisFileImportArgs args) {
-            return new WaveStreamSampleSoundGenerator(new VorbisWaveReader(args.Path));
+    public class VorbisFileImporter {
+        private readonly string path;
+
+        public VorbisFileImporter(string path) {
+            this.path = path;
+        }
+
+        public WaveStream Import() {
+            return new VorbisWaveReader(path);
         }
     }
 }

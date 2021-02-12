@@ -1,7 +1,8 @@
 ﻿using Mapping_Tools_Core.Audio.Effects;
+using Mapping_Tools_Core.Audio.SampleSoundGeneration;
 using NAudio.Wave;
 
-namespace Mapping_Tools_Core.Audio.SampleSoundGeneration.Decorators {
+namespace Mapping_Tools_Core.Audio.SampleGeneration.Decorators {
     /// <summary>
     /// Decorator for <see cref="ISampleSoundGenerator"/> to add a fade-out.
     /// </summary>

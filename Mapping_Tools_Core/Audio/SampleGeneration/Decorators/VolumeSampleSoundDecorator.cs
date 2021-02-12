@@ -1,6 +1,7 @@
-﻿using NAudio.Wave;
+﻿using Mapping_Tools_Core.Audio.SampleSoundGeneration;
+using NAudio.Wave;
 
-namespace Mapping_Tools_Core.Audio.SampleSoundGeneration.Decorators {
+namespace Mapping_Tools_Core.Audio.SampleGeneration.Decorators {
     /// <summary>
     /// Decorator for <see cref="ISampleSoundGenerator"/> to change the volume.
     /// The volume scaling in this class is roughly equal to how osu! volume works.

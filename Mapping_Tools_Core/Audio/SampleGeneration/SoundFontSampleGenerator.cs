@@ -1,14 +1,24 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using Mapping_Tools_Core.Audio.Exporting;
 using Mapping_Tools_Core.Audio.SampleImporters;
 using Mapping_Tools_Core.Audio.SampleSoundGeneration;
 using Mapping_Tools_Core.MathUtil;
+using NAudio.Wave;
 
 namespace Mapping_Tools_Core.Audio.SampleGeneration {
-    public class SoundFontSampleImportArgs : ISoundFontSampleImportArgs {
-        private string Extension => System.IO.Path.GetExtension(Path);
+    public class SoundFontSampleGenerator : ISoundFontSampleGenerator {
+        private string Extension() => System.IO.Path.GetExtension(Path);
 
-        public SoundFontSampleImportArgs(string path, int bank, int patch, int instrument, int key, int velocity, double length) {
+        public string Path { get; }
+        public int Bank { get; }
+        public int Patch { get; }
+        public int Instrument { get; }
+        public int Key { get; }
+        public int Velocity { get; }
+        public double Length { get; }
+
+        public SoundFontSampleGenerator(string path, int bank, int patch, int instrument, int key, int velocity, double length) {
             Path = path;
             Bank = bank;
             Patch = patch;
@@ -19,7 +29,7 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration {
         }
 
         public bool Equals(ISampleGenerator other) {
-            return other is ISoundFontSampleImportArgs o &&
+            return other is SoundFontSampleGenerator o &&
                    Path == o.Path &&
                    Bank == o.Bank &&
                    Patch == o.Patch &&
@@ -37,10 +47,6 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration {
             return File.Exists(Path) && Extension == ".sf2";
         }
 
-        public bool IsValid(Dictionary<ISampleGenerator, ISampleSoundGenerator> loadedSamples) {
-            return loadedSamples.ContainsKey(this) && loadedSamples[this] != null;
-        }
-
         public ISampleSoundGenerator Import() {
             return SoundFontSampleImporter.GetInstance().Import(this);
         }
@@ -50,14 +56,16 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration {
             return $"{filename}-{Bank}-{Patch}-{Instrument}-{Key}-{Velocity}-{(int)Length}";
         }
 
-        public bool IsDirectSource() => false;
+        public void ToExporter(ISampleExporter exporter) {
+            throw new System.NotImplementedException();
+        }
 
-        public string Path { get; }
-        public int Bank { get; }
-        public int Patch { get; }
-        public int Instrument { get; }
-        public int Key { get; }
-        public int Velocity { get; }
-        public double Length { get; }
+        public IWaveProvider GetAudio() {
+            throw new System.NotImplementedException();
+        }
+
+        public void PreLoadSample() {
+            throw new System.NotImplementedException();
+        }
     }
 }

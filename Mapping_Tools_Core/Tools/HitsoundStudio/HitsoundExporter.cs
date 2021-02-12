@@ -141,7 +141,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio
 
             // Export as midi file with single note
             if (format == SampleExportFormat.MidiChords) {
-                MidiExporter.SaveToFile(Path.Combine(exportFolder, name + ".mid"), new[] {sampleGeneratingArgs.ImportArgs as IMidiSampleImportArgs});
+                MidiExporter.SaveToFile(Path.Combine(exportFolder, name + ".mid"), new[] {sampleGeneratingArgs.ImportArgs as IMidiSampleGenerator});
                 return true;
             }
 
@@ -227,8 +227,8 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio
 
             // Export as midi file with single chord
             if (format == SampleExportFormat.MidiChords) {
-                var notes = sampleGeneratingArgses.Where(o => o.ImportArgs is IMidiSampleImportArgs)
-                    .Select(o => (IMidiSampleImportArgs) o.ImportArgs);
+                var notes = sampleGeneratingArgses.Where(o => o.ImportArgs is IMidiSampleGenerator)
+                    .Select(o => (IMidiSampleGenerator) o.ImportArgs);
                 MidiExporter.SaveToFile(Path.Combine(exportFolder, name + ".mid"), notes);
                 return;
             }

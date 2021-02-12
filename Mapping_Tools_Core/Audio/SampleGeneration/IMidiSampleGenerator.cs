@@ -2,7 +2,7 @@
     /// <summary>
     /// Represents the arguments for a single MIDI note.
     /// </summary>
-    public interface IMidiSampleImportArgs : ISampleGenerator {
+    public interface IMidiSampleGenerator : ISampleGenerator {
         int Bank { get; }
         int Patch { get; }
         int Instrument { get; }

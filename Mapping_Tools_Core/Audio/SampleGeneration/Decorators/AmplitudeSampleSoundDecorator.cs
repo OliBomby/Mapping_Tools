@@ -1,7 +1,8 @@
-﻿using NAudio.Wave;
+﻿using Mapping_Tools_Core.Audio.SampleSoundGeneration;
+using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 
-namespace Mapping_Tools_Core.Audio.SampleSoundGeneration.Decorators {
+namespace Mapping_Tools_Core.Audio.SampleGeneration.Decorators {
     /// <summary>
     /// Decorator for <see cref="ISampleSoundGenerator"/> to change the amplitude.
     /// The amplitude scaling in this class uses <see cref="VolumeSampleProvider"/>.
