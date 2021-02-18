@@ -26,11 +26,11 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
 
             EventType = values[0];
 
-            if (TryParseInt(values[1], out int startTime))
+            if (FileFormatHelper.TryParseInt(values[1], out int startTime))
                 StartTime = startTime;
             else throw new BeatmapParsingException("Failed to parse start time of break.", line);
 
-            if (TryParseInt(values[2], out int endTime))
+            if (FileFormatHelper.TryParseInt(values[2], out int endTime))
                 EndTime = endTime;
             else throw new BeatmapParsingException("Failed to parse end time of break.", line);
         }

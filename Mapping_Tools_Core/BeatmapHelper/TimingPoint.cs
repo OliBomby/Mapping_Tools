@@ -182,15 +182,15 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         public void SetLine(string line) {
             string[] values = line.Split(',');
 
-            if (TryParseDouble(values[0], out double offset))
+            if (FileFormatHelper.TryParseDouble(values[0], out double offset))
                 Offset = offset;
             else throw new BeatmapParsingException("Failed to parse offset of timing point", line);
 
-            if (TryParseDouble(values[1], out double mpb))
+            if (FileFormatHelper.TryParseDouble(values[1], out double mpb))
                 MpB = mpb;
             else throw new BeatmapParsingException("Failed to parse milliseconds per beat of timing point", line);
 
-            if (TryParseInt(values[2], out int meter))
+            if (FileFormatHelper.TryParseInt(values[2], out int meter))
                 Meter = new TempoSignature(meter);
             else throw new BeatmapParsingException("Failed to parse meter of timing point", line);
 
@@ -198,18 +198,18 @@ namespace Mapping_Tools_Core.BeatmapHelper {
                 SampleSet = ss;
             else throw new BeatmapParsingException("Failed to parse sampleset of timing point", line);
 
-            if (TryParseInt(values[4], out int ind))
+            if (FileFormatHelper.TryParseInt(values[4], out int ind))
                 SampleIndex = ind;
             else throw new BeatmapParsingException("Failed to parse sample index of timing point", line);
 
-            if (TryParseDouble(values[5], out double vol))
+            if (FileFormatHelper.TryParseDouble(values[5], out double vol))
                 Volume = vol;
             else throw new BeatmapParsingException("Failed to parse volume of timing point", line);
 
             Uninherited = values[6] == "1";
 
             if (values.Length <= 7) return;
-            if (TryParseInt(values[7], out int style)) {
+            if (FileFormatHelper.TryParseInt(values[7], out int style)) {
                 BitArray b = new BitArray(new int[] { style });
                 Kiai = b[0];
                 OmitFirstBarLine = b[3];

@@ -18,11 +18,11 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
             var subLine = RemoveIndents(line);
             var values = subLine.Split(',');
 
-            if (TryParseInt(values[1], out int startTime))
+            if (FileFormatHelper.TryParseInt(values[1], out int startTime))
                 StartTime = startTime;
             else throw new BeatmapParsingException("Failed to parse start time of param command.", line);
 
-            if (TryParseInt(values[2], out int endTime))
+            if (FileFormatHelper.TryParseInt(values[2], out int endTime))
                 EndTime = endTime;
             else throw new BeatmapParsingException("Failed to parse end time of param command.", line);
 

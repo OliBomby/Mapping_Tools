@@ -116,7 +116,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
                 var remainder = name.Substring(match.Index + match.Length);
                 int index = 1;
                 if (!string.IsNullOrEmpty(remainder)) {
-                    if (!FileFormatHelper.TryParseInt(remainder, out index)) {
+                    if (!InvariantHelper.TryParseInt(remainder, out index)) {
                         continue;
                     }
                 }

@@ -225,22 +225,22 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             if (values.Length <= 4)
                 throw new BeatmapParsingException("Hit object is missing values.", line);
 
-            if (TryParseDouble(values[0], out var x) && TryParseDouble(values[1], out var y))
+            if (FileFormatHelper.TryParseDouble(values[0], out var x) && FileFormatHelper.TryParseDouble(values[1], out var y))
                 Pos = new Vector2(x, y);
             else throw new BeatmapParsingException("Failed to parse coordinate of hit object.", line);
 
             // Let the end position be the same as the start position before changed later for sliders
             EndPos = Pos;
 
-            if (TryParseDouble(values[2], out var t))
+            if (FileFormatHelper.TryParseDouble(values[2], out var t))
                 Time = t;
             else throw new BeatmapParsingException("Failed to parse time of hit object.", line);
 
-            if (TryParseInt(values[3], out var type))
+            if (FileFormatHelper.TryParseInt(values[3], out var type))
                 ObjectType = type;
             else throw new BeatmapParsingException("Failed to parse type of hit object.", line);
 
-            if (TryParseInt(values[4], out var hitsounds))
+            if (FileFormatHelper.TryParseInt(values[4], out var hitsounds))
                 Hitsounds = hitsounds;
             else throw new BeatmapParsingException("Failed to parse hitsound of hit object.", line);
 
@@ -258,7 +258,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
                     var spl = sliderData[i].Split(':');
                     if (spl.Length == 2) // It has to have 2 coordinates inside
                     {
-                        if (TryParseDouble(spl[0], out var ax) && TryParseDouble(spl[1], out var ay))
+                        if (FileFormatHelper.TryParseDouble(spl[0], out var ax) && FileFormatHelper.TryParseDouble(spl[1], out var ay))
                             points.Add(new Vector2(ax, ay));
                         else throw new BeatmapParsingException("Failed to parse coordinate of slider anchor.", line);
                     }
@@ -266,11 +266,11 @@ namespace Mapping_Tools_Core.BeatmapHelper {
 
                 CurvePoints = points;
 
-                if (TryParseInt(values[6], out var repeat))
+                if (FileFormatHelper.TryParseInt(values[6], out var repeat))
                     Repeat = repeat;
                 else throw new BeatmapParsingException("Failed to parse repeat number of slider.", line);
 
-                if (TryParseDouble(values[7], out var pixelLength))
+                if (FileFormatHelper.TryParseDouble(values[7], out var pixelLength))
                     PixelLength = pixelLength;
                 else throw new BeatmapParsingException("Failed to parse pixel length of slider.", line);
 
@@ -279,7 +279,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
                 if (values.Length > 8) {
                     var split = values[8].Split('|');
                     for (var i = 0; i < Math.Min(split.Length, Repeat + 1); i++)
-                        EdgeHitsounds.Add(TryParseInt(split[i], out var ehs) ? ehs : hitsounds);
+                        EdgeHitsounds.Add(FileFormatHelper.TryParseInt(split[i], out var ehs) ? ehs : hitsounds);
                 }
 
                 for (var i = EdgeHitsounds.Count; i < Repeat + 1; i++) EdgeHitsounds.Add(hitsounds);
@@ -290,10 +290,10 @@ namespace Mapping_Tools_Core.BeatmapHelper {
                 if (values.Length > 9) {
                     var split = values[9].Split('|');
                     for (var i = 0; i < Math.Min(split.Length, Repeat + 1); i++) {
-                        EdgeSampleSets.Add(TryParseInt(split[i].Split(':')[0], out var ess)
+                        EdgeSampleSets.Add(FileFormatHelper.TryParseInt(split[i].Split(':')[0], out var ess)
                             ? (SampleSet) ess
                             : SampleSet.Auto);
-                        EdgeAdditionSets.Add(TryParseInt(split[i].Split(':')[1], out var eas)
+                        EdgeAdditionSets.Add(FileFormatHelper.TryParseInt(split[i].Split(':')[1], out var eas)
                             ? (SampleSet) eas
                             : SampleSet.Auto);
                     }
@@ -311,7 +311,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
                 if (values.Length <= 5)
                     throw new BeatmapParsingException("Spinner object is missing values.", line);
 
-                if (TryParseDouble(values[5], out var et))
+                if (FileFormatHelper.TryParseDouble(values[5], out var et))
                     EndTime = et;
                 else throw new BeatmapParsingException("Failed to parse end time of spinner.", line);
 
@@ -709,7 +709,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             var split = extras.Split(':');
             var i = 0;
             if (IsHoldNote) {
-                if (TryParseDouble(split[i], out var et))
+                if (FileFormatHelper.TryParseDouble(split[i], out var et))
                     EndTime = et;
                 else throw new BeatmapParsingException("Failed to parse end time of hold note.", extras);
                 TemporalLength = EndTime - Time;
@@ -717,19 +717,19 @@ namespace Mapping_Tools_Core.BeatmapHelper {
                 i += 1;
             }
 
-            if (TryParseInt(split[i], out var ss))
+            if (FileFormatHelper.TryParseInt(split[i], out var ss))
                 SampleSet = (SampleSet) ss;
             else throw new BeatmapParsingException("Failed to parse sample set of hit object.", extras);
 
-            if (TryParseInt(split[i + 1], out var ass))
+            if (FileFormatHelper.TryParseInt(split[i + 1], out var ass))
                 AdditionSet = (SampleSet) ass;
             else throw new BeatmapParsingException("Failed to parse additional sample set of hit object.", extras);
 
-            if (TryParseInt(split[i + 2], out var ci))
+            if (FileFormatHelper.TryParseInt(split[i + 2], out var ci))
                 CustomIndex = ci;
             else throw new BeatmapParsingException("Failed to parse custom index of hit object.", extras);
 
-            if (TryParseDouble(split[i + 3], out var vol))
+            if (FileFormatHelper.TryParseDouble(split[i + 3], out var vol))
                 SampleVolume = vol;
             else throw new BeatmapParsingException("Failed to parse volume of hit object.", extras);
 

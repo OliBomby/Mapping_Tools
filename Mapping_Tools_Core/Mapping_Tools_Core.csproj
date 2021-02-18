@@ -73,6 +73,7 @@
     <Compile Include="Audio\DuplicateDetection\MonolithicDuplicateSampleDetector.cs" />
     <Compile Include="Audio\DuplicateDetection\UselessDuplicateSampleDetector.cs" />
     <Compile Include="Audio\OsuVolumeConverter.cs" />
+    <Compile Include="Audio\SampleGeneration\Decorators\AudioSampleDecoratorAbstract.cs" />
     <Compile Include="Audio\SampleGeneration\RawAudioSampleGenerator.cs" />
     <Compile Include="Audio\SampleGeneration\PathAudioSampleGenerator.cs" />
     <Compile Include="Audio\SampleGeneration\IAudioSampleGenerator.cs" />
@@ -86,9 +87,9 @@
     <Compile Include="Audio\SampleImporters\VorbisFileImporter.cs" />
     <Compile Include="Audio\SampleGeneration\Decorators\PitchShiftSampleSoundDecorator.cs" />
     <Compile Include="Audio\SampleGeneration\Decorators\FadingSampleSoundDecorator.cs" />
-    <Compile Include="Audio\SampleGeneration\Decorators\SampleSoundDecoratorAbstract.cs" />
+    <Compile Include="Audio\SampleGeneration\Decorators\ISampleDecorator.cs" />
     <Compile Include="Audio\SampleSoundGeneration\ISampleSoundGenerator.cs" />
-    <Compile Include="Audio\SampleGeneration\Decorators\AmplitudeSampleSoundDecorator.cs" />
+    <Compile Include="Audio\SampleGeneration\Decorators\AmplitudeSampleDecorator.cs" />
     <Compile Include="Audio\SampleGeneration\Decorators\VolumeSampleSoundDecorator.cs" />
     <Compile Include="Audio\SampleSoundGeneration\WaveStreamSampleSoundGenerator.cs" />
     <Compile Include="BeatmapHelper\BeatDivisors\IBeatDivisor.cs" />
@@ -101,6 +102,7 @@
     <Compile Include="BeatmapHelper\Editor\IReadEditor.cs" />
     <Compile Include="BeatmapHelper\Editor\IReadWriteEditor.cs" />
     <Compile Include="BeatmapHelper\Editor\IWriteEditor.cs" />
+    <Compile Include="InvariantHelper.cs" />
     <Compile Include="BeatmapHelper\IStoryboard.cs" />
     <Compile Include="BeatmapHelper\Parsing\IParser.cs" />
     <Compile Include="BeatmapHelper\Parsing\OsuBeatmapParser.cs" />
@@ -154,7 +156,6 @@
     <Compile Include="ExternalFileUtil\Reaper\ReaperEditor.cs" />
     <Compile Include="ExternalFileUtil\Reaper\ReaperProject.cs" />
     <Compile Include="ExternalFileUtil\Reaper\TrackItem.cs" />
-    <Compile Include="InvariantHelper.cs" />
     <Compile Include="Audio\Exporting\IAudioSampleExporter.cs" />
     <Compile Include="Tools\HitsoundStudio\Exporting\IHitsoundExporter.cs" />
     <Compile Include="Audio\Exporting\IMidiSampleExporter.cs" />

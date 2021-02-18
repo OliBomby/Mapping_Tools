@@ -7,5 +7,12 @@ namespace Mapping_Tools_Core.Audio.Exporting {
         /// </summary>
         /// <param name="sample">The audio to export.</param>
         void AddAudio(ISampleProvider sample);
+
+        /// <summary>
+        /// Returns the last added audio and removes it from the exporter.
+        /// Returns null if there was never anything added.
+        /// </summary>
+        /// <returns></returns>
+        ISampleProvider PopAudio();
     }
 }

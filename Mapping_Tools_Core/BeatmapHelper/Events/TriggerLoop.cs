@@ -19,11 +19,11 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
 
             TriggerName = values[1];
 
-            if (TryParseInt(values[2], out int startTime))
+            if (FileFormatHelper.TryParseInt(values[2], out int startTime))
                 StartTime = startTime;
             else throw new BeatmapParsingException("Failed to parse start time of event param.", line);
 
-            if (TryParseInt(values[3], out int endTime))
+            if (FileFormatHelper.TryParseInt(values[3], out int endTime))
                 EndTime = endTime;
             else throw new BeatmapParsingException("Failed to parse end time of event param.", line);
         }

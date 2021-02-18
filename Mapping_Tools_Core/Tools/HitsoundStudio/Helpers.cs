@@ -50,7 +50,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
             var remainder = filename.Substring(match.Index + match.Length);
             int index = 0;
             if (!string.IsNullOrEmpty(remainder)) {
-                FileFormatHelper.TryParseInt(remainder, out index);
+                InvariantHelper.TryParseInt(remainder, out index);
             }
 
             return index;

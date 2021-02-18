@@ -51,13 +51,13 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             string[] split = line.Split(':');
             string[] commaSplit = split[1].Split(',');
 
-            if (!TryParseInt(commaSplit[0], out int r))
+            if (!FileFormatHelper.TryParseInt(commaSplit[0], out int r))
                 throw new BeatmapParsingException("Failed to parse red component of colour.", line);
 
-            if (!TryParseInt(commaSplit[1], out int g))
+            if (!FileFormatHelper.TryParseInt(commaSplit[1], out int g))
                 throw new BeatmapParsingException("Failed to parse green component of colour.", line);
 
-            if (!TryParseInt(commaSplit[2], out int b))
+            if (!FileFormatHelper.TryParseInt(commaSplit[2], out int b))
                 throw new BeatmapParsingException("Failed to parse blue component of colour.", line);
 
             R = (byte)r;

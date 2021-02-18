@@ -47,19 +47,19 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
 
             FilePath = values[3].Trim('"');
 
-            if (!TryParseDouble(values[4], out double x))
+            if (!FileFormatHelper.TryParseDouble(values[4], out double x))
                 throw new BeatmapParsingException("Failed to parse X position of animation.", line);
 
-            if (!TryParseDouble(values[5], out double y))
+            if (!FileFormatHelper.TryParseDouble(values[5], out double y))
                 throw new BeatmapParsingException("Failed to parse Y position of animation.", line);
 
             Pos = new Vector2(x, y);
 
-            if (TryParseInt(values[6], out int frameCount))
+            if (FileFormatHelper.TryParseInt(values[6], out int frameCount))
                 FrameCount = frameCount;
             else throw new BeatmapParsingException("Failed to parse frame count of animation.", line);
 
-            if (TryParseDouble(values[7], out double frameDelay))
+            if (FileFormatHelper.TryParseDouble(values[7], out double frameDelay))
                 FrameDelay = frameDelay;
             else throw new BeatmapParsingException("Failed to parse frame delay of animation.", line);
 

@@ -37,10 +37,13 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration {
             return File.Exists(Path) && ValidExtensions.Contains(Extension());
         }
 
-        public ISampleProvider GetSampleProvider() {
-            var wave = GetWaveStream();
+        private static ISampleProvider GetSampleProvider(WaveStream wave) {
             wave.Position = 0;
             return new WaveToSampleProvider(wave);
+        }
+
+        public ISampleProvider GetSampleProvider() {
+            return GetSampleProvider(GetWaveStream());
         }
 
         private WaveStream GetWaveStream() {
@@ -56,12 +59,15 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration {
         }
 
         public void ToExporter(ISampleExporter exporter) {
+            var wave = GetWaveStream();
+
             if (exporter is IAudioSampleExporter audioSampleExporter) {
-                audioSampleExporter.AddAudio(GetSampleProvider());
+                audioSampleExporter.AddAudio(GetSampleProvider(wave));
             }
 
             if (exporter is IPathAudioSampleExporter pathAudioSampleExporter) {
                 pathAudioSampleExporter.CopyPath = Path;
+                pathAudioSampleExporter.BlankSample = wave.TotalTime.Equals(TimeSpan.Zero);
             }
         }
 
