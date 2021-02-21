@@ -1,14 +1,17 @@
-﻿using Mapping_Tools_Core.Tools.HitsoundStudio.Model.LayerImportArgs;
+﻿using Mapping_Tools_Core.Audio.Midi;
+using Mapping_Tools_Core.Tools.HitsoundStudio.Model.LayerImportArgs;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model.LayerSourceRef {
     public class MidiLayerSourceRef : IMidiLayerSourceRef {
-        public MidiLayerSourceRef(string path, int bank, int patch, int key, int velocity, double length, double offset, double velocityRoughness, double lengthRoughness) {
+        public string Path { get; }
+        public IMidiNote Note { get; }
+        public double Offset { get; }
+        public double VelocityRoughness { get; }
+        public double LengthRoughness { get; }
+
+        public MidiLayerSourceRef(string path, IMidiNote note, double offset, double velocityRoughness, double lengthRoughness) {
             Path = path;
-            Bank = bank;
-            Patch = patch;
-            Key = key;
-            Velocity = velocity;
-            Length = length;
+            Note = note;
             Offset = offset;
             VelocityRoughness = velocityRoughness;
             LengthRoughness = lengthRoughness;
@@ -17,11 +20,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model.LayerSourceRef {
         public bool Equals(ILayerSourceRef other) {
             return other is IMidiLayerSourceRef o &&
                    Path == o.Path &&
-                   Bank == o.Bank &&
-                   Patch == o.Patch &&
-                   Key == o.Key &&
-                   Velocity == o.Velocity &&
-                   Length == o.Length &&
+                   Note.Equals(o.Note) &&
                    Offset == o.Offset &&
                    VelocityRoughness == o.VelocityRoughness &&
                    LengthRoughness == o.LengthRoughness;
@@ -43,21 +42,11 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model.LayerSourceRef {
             return other is MidiLayerSourceRef o &&
                    Path == o.Path &&
                    Offset == o.Offset &&
-                   (Bank == -1 || Bank == o.Bank) && 
-                   (Patch == -1 || Patch == o.Patch) && 
-                   (Key == -1 || Key == o.Key) && 
-                   (Length == -1 || Length == o.Length) && 
-                   (Velocity == -1 || Velocity == o.Velocity);
+                   (Note.Bank == -1 || Note.Bank == o.Note.Bank) && 
+                   (Note.Patch == -1 || Note.Patch == o.Note.Patch) && 
+                   (Note.Key == -1 || Note.Key == o.Note.Key) && 
+                   (Note.Length == -1 || Note.Length == o.Note.Length) && 
+                   (Note.Velocity == -1 || Note.Velocity == o.Note.Velocity);
         }
-
-        public string Path { get; }
-        public int Bank { get; }
-        public int Patch { get; }
-        public int Key { get; }
-        public int Velocity { get; }
-        public double Length { get; }
-        public double Offset { get; }
-        public double VelocityRoughness { get; }
-        public double LengthRoughness { get; }
     }
 }

@@ -1,71 +1,81 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using Mapping_Tools_Core.Audio.Exporting;
-using Mapping_Tools_Core.Audio.SampleImporters;
-using Mapping_Tools_Core.Audio.SampleSoundGeneration;
-using Mapping_Tools_Core.MathUtil;
+﻿using Mapping_Tools_Core.Audio.Exporting;
+using Mapping_Tools_Core.Audio.Midi;
 using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
+using System;
+using System.IO;
 
 namespace Mapping_Tools_Core.Audio.SampleGeneration {
     public class SoundFontSampleGenerator : ISoundFontSampleGenerator {
         private string Extension() => System.IO.Path.GetExtension(Path);
 
-        public string Path { get; }
-        public int Bank { get; }
-        public int Patch { get; }
-        public int Instrument { get; }
-        public int Key { get; }
-        public int Velocity { get; }
-        public double Length { get; }
+        private WaveStream cachedWaveStream;
+        private bool preloaded;
 
-        public SoundFontSampleGenerator(string path, int bank, int patch, int instrument, int key, int velocity, double length) {
+        public string Path { get; }
+        public IMidiNote Note { get; }
+
+        public SoundFontSampleGenerator(string path, IMidiNote note) {
             Path = path;
-            Bank = bank;
-            Patch = patch;
-            Instrument = instrument;
-            Key = key;
-            Velocity = velocity;
-            Length = length;
+            Note = note;
         }
 
         public bool Equals(ISampleGenerator other) {
             return other is SoundFontSampleGenerator o &&
-                   Path == o.Path &&
-                   Bank == o.Bank &&
-                   Patch == o.Patch &&
-                   Instrument == o.Instrument &&
-                   Key == o.Key &&
-                   Velocity == o.Velocity &&
-                   Precision.AlmostEquals(Length, o.Length);
+                   Path.Equals(o.Path) &&
+                   Note.Equals(o.Note);
         }
 
         public object Clone() {
-            return MemberwiseClone();
+            return new SoundFontSampleGenerator(Path, Note);
         }
 
         public bool IsValid() {
-            return File.Exists(Path) && Extension == ".sf2";
+            if (preloaded) {
+                return cachedWaveStream != null;
+            }
+
+            return File.Exists(Path) && Extension() == ".sf2";
         }
 
-        public ISampleSoundGenerator Import() {
-            return SoundFontSampleImporter.GetInstance().Import(this);
+        public ISampleProvider GetSampleProvider() {
+            return GetSampleProvider(GetWaveStream());
         }
 
         public string GetName() {
             var filename = System.IO.Path.GetFileNameWithoutExtension(Path);
-            return $"{filename}-{Bank}-{Patch}-{Instrument}-{Key}-{Velocity}-{(int)Length}";
+            return $"{filename}-{Note}";
         }
 
         public void ToExporter(ISampleExporter exporter) {
-            throw new System.NotImplementedException();
-        }
-
-        public IWaveProvider GetAudio() {
-            throw new System.NotImplementedException();
+            if (exporter is IAudioSampleExporter audioSampleExporter) {
+                audioSampleExporter.AddAudio(GetSampleProvider());
+            }
         }
 
         public void PreLoadSample() {
-            throw new System.NotImplementedException();
+            if (!preloaded) {
+                preloaded = true;
+
+                try {
+                    cachedWaveStream = GetWaveStream();
+                } catch (Exception e) {
+                    Console.WriteLine(e);
+                }
+            }
+        }
+
+        private static ISampleProvider GetSampleProvider(WaveStream wave) {
+            wave.Position = 0;
+            return new WaveToSampleProvider(wave);
+        }
+
+        private WaveStream GetWaveStream() {
+            if (preloaded) {
+                return cachedWaveStream;
+            }
+
+            throw new NotImplementedException();
         }
     }
 }

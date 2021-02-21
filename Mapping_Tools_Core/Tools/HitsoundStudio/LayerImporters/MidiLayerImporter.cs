@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Mapping_Tools_Core.Audio.Midi;
 using Mapping_Tools_Core.Audio.SampleGeneration;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.Tools.HitsoundStudio.Model;
@@ -68,7 +69,6 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.LayerImporters {
                         int patch = args.DiscriminateInstruments && channelPatches.ContainsKey(on.Channel)
                             ? channelPatches[on.Channel]
                             : -1;
-                        int instrument = -1;
                         int key = keys ? on.NoteNumber : -1;
                         length = args.DiscriminateLength ? length : -1;
                         int velocity = args.DiscriminateVelocities ? on.Velocity : -1;
@@ -90,17 +90,14 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.LayerImporters {
                             name += "," + velocity;
 
                         // Make sample generating args
-                        var sampleArgs = new SampleGeneratingArgs(
-                            new MidiSampleGenerator(bank, patch, instrument, key, velocity, length), 1.0);
+                        var note = new MidiNote(bank, patch, key, velocity, length);
+
+                        var sampleArgs = new SampleGeneratingArgs(new MidiSampleGenerator(note), 1.0);
 
                         // Make source ref
                         var sourceRef = new MidiLayerSourceRef(
                             args.Path,
-                            bank,
-                            patch,
-                            key,
-                            velocity,
-                            length,
+                            note,
                             args.Offset,
                             args.LengthRoughness,
                             args.VelocityRoughness

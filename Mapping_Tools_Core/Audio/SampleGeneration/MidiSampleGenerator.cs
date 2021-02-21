@@ -1,54 +1,39 @@
-﻿using System.Collections.Generic;
-using Mapping_Tools_Core.Audio.SampleSoundGeneration;
-using Mapping_Tools_Core.MathUtil;
+﻿using Mapping_Tools_Core.Audio.Exporting;
+using Mapping_Tools_Core.Audio.Midi;
 
 namespace Mapping_Tools_Core.Audio.SampleGeneration {
     public class MidiSampleGenerator : IMidiSampleGenerator {
-        public MidiSampleGenerator(int bank, int patch, int instrument, int key, int velocity, double length) {
-            Bank = bank;
-            Patch = patch;
-            Instrument = instrument;
-            Key = key;
-            Velocity = velocity;
-            Length = length;
+        public IMidiNote Note { get; }
+
+        /// <summary>
+        /// Initializes a new <see cref="MidiSampleGenerator"/>.
+        /// </summary>
+        /// <param name="note">The MIDI note to represent.</param>
+        public MidiSampleGenerator(IMidiNote note) {
+            Note = note;
         }
 
         public bool Equals(ISampleGenerator other) {
             return other is IMidiSampleGenerator o &&
-                   Bank == o.Bank &&
-                   Patch == o.Patch &&
-                   Instrument == o.Instrument &&
-                   Key == o.Key &&
-                   Velocity == o.Velocity &&
-                   Precision.AlmostEquals(Length, o.Length);
+                   Note.Equals(o.Note);
         }
 
         public object Clone() {
-            return MemberwiseClone();
+            return new MidiSampleGenerator(Note);
         }
 
         public bool IsValid() {
             return true;
         }
 
-        public bool IsValid(Dictionary<ISampleGenerator, ISampleSoundGenerator> loadedSamples) {
-            return true;
-        }
-
-        public ISampleSoundGenerator Import() {
-            // This type doesnt generate sound directly, because its meant to be exported as arguments
-            return null;
-        }
-
         public string GetName() {
-            return $"{Bank}-{Patch}-{Instrument}-{Key}-{Velocity}-{(int)Length}";
+            return "MidiNote-" + Note.ToString();
         }
 
-        public int Bank { get; }
-        public int Patch { get; }
-        public int Instrument { get; }
-        public int Key { get; }
-        public int Velocity { get; }
-        public double Length { get; }
+        public void ToExporter(ISampleExporter exporter) {
+            if (exporter is IMidiSampleExporter midiSampleExporter) {
+                midiSampleExporter.AddMidiNote(Note);
+            }
+        }
     }
 }
