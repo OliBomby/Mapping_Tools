@@ -4,7 +4,7 @@ using NAudio.Wave.SampleProviders;
 
 namespace Mapping_Tools_Core.Audio.SampleGeneration.Decorators {
     /// <summary>
-    /// Decorator for <see cref="ISampleGenerator"/> to change the amplitude.
+    /// Decorator for <see cref="IAudioSampleGenerator"/> to change the amplitude.
     /// </summary>
     public class AmplitudeSampleDecorator : AudioSampleDecoratorAbstract {
         public float Volume { get; }
@@ -31,7 +31,7 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration.Decorators {
         }
 
         protected override string GetNameExtension() {
-            return $"-{(Volume * 100).ToRoundInvariant()}amp";
+            return $"-amp({(Volume * 100).ToRoundInvariant()})";
         }
 
         public override bool HasEffect() => !Precision.AlmostEquals(Volume, 1);
