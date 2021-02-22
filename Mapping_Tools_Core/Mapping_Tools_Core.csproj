@@ -87,11 +87,11 @@
     <Compile Include="Audio\SampleImporters\AudioFileImporter.cs" />
     <Compile Include="Audio\SampleImporters\SoundFontSampleImporter.cs" />
     <Compile Include="Audio\SampleImporters\VorbisFileImporter.cs" />
-    <Compile Include="Audio\SampleGeneration\Decorators\PitchShiftSampleSoundDecorator.cs" />
-    <Compile Include="Audio\SampleGeneration\Decorators\FadingSampleSoundDecorator.cs" />
+    <Compile Include="Audio\SampleGeneration\Decorators\PitchShiftSampleDecorator.cs" />
+    <Compile Include="Audio\SampleGeneration\Decorators\FadingSampleDecorator.cs" />
     <Compile Include="Audio\SampleGeneration\Decorators\ISampleDecorator.cs" />
     <Compile Include="Audio\SampleGeneration\Decorators\AmplitudeSampleDecorator.cs" />
-    <Compile Include="Audio\SampleGeneration\Decorators\VolumeSampleSoundDecorator.cs" />
+    <Compile Include="Audio\SampleGeneration\Decorators\VolumeSampleDecorator.cs" />
     <Compile Include="BeatmapHelper\BeatDivisors\IBeatDivisor.cs" />
     <Compile Include="BeatmapHelper\BeatDivisors\IrrationalBeatDivisor.cs" />
     <Compile Include="BeatmapHelper\BeatDivisors\RationalBeatDivisor.cs" />

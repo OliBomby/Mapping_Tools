@@ -46,7 +46,10 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration.Decorators {
             }
 
             if (exporter is IPathAudioSampleExporter pathAudioSampleExporter) {
-                pathAudioSampleExporter.CanCopyPaste = pathAudioSampleExporter.CanCopyPaste && !HasEffect();
+                // Either this decorator didn't have any effect on the audio
+                // or the audio is blank so the decorator couldn't have any effect regardless.
+                pathAudioSampleExporter.CanCopyPaste = pathAudioSampleExporter.CanCopyPaste && 
+                                                       (!HasEffect() || pathAudioSampleExporter.BlankSample);
             }
         }
 

@@ -1,8 +1,8 @@
-﻿using Mapping_Tools_Core.Audio.Effects;
+﻿using Mapping_Tools_Core.Audio.Midi;
 using Mapping_Tools_Core.Audio.SampleGeneration;
+using Mapping_Tools_Core.Audio.SampleGeneration.Decorators;
 using NAudio.SoundFont;
 using NAudio.Wave;
-using NAudio.Wave.SampleProviders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,21 +13,21 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
         private static WeakReference<SoundFont> lastSoundFont;
         private static string lastPath;
 
-        private readonly IMidiSampleGenerator args;
+        private readonly IMidiNote args;
         private readonly string path;
         private readonly SoundFont soundFontArg;
 
-        public SoundFontSampleImporter(string path, IMidiSampleGenerator args) {
+        public SoundFontSampleImporter(string path, IMidiNote args) {
             this.args = args;
             this.path = path;
         }
 
-        public SoundFontSampleImporter(SoundFont soundFont, IMidiSampleGenerator args) {
+        public SoundFontSampleImporter(SoundFont soundFont, IMidiNote args) {
             this.args = args;
             soundFontArg = soundFont;
         }
 
-        public ISampleProvider Import() {
+        public IAudioSampleGenerator Import() {
             SoundFont soundFont = null;
             if (soundFontArg == null) {
                 if (lastPath == path) {
@@ -45,13 +45,13 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
                 soundFont = soundFontArg;
             }
 
-            return ImportFromSoundFont(args, soundFont);
+            return ImportFromSoundFont(soundFont);
         }
 
         
         // TODO: format soundfont import to detect file versions and types of files. 
-        public static ISampleProvider ImportFromSoundFont(IMidiSampleGenerator args, SoundFont sf2) {
-            ISampleProvider wave = null;
+        public IAudioSampleGenerator ImportFromSoundFont(SoundFont sf2) {
+            IAudioSampleGenerator wave = null;
 
             foreach (var preset in sf2.Presets) {
                 if (preset.PatchNumber != args.Patch && args.Patch != -1) {
@@ -61,22 +61,22 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
                     continue;
                 }
 
-                wave = ImportPreset(sf2, preset, args);
+                wave = ImportPreset(sf2, preset);
                 if (wave != null)
                     break;
             }
 
-            return wave ?? ImportInstruments(sf2, args);
+            return wave ?? ImportInstruments(sf2);
         }
 
-        private static void SoundFontDebug(SoundFont sf) {
+        private void SoundFontDebug(SoundFont sf) {
             Console.WriteLine(sf);
             Console.WriteLine(@"Number of presets: " + sf.Presets.Length);
             Console.WriteLine(@"Number of instruments: " + sf.Instruments.Length);
             Console.WriteLine(@"Number of instruments: " + sf.SampleHeaders.Length);
         }
 
-        private static ISampleProvider ImportPreset(SoundFont sf2, Preset preset, IMidiSampleGenerator args) {
+        private IAudioSampleGenerator ImportPreset(SoundFont sf2, Preset preset) {
             /*
                 == Aproximate Pesdo Code of importing a preset from sf2 ==
                 -    Get all preset zones from soundfont (sf2)
@@ -95,27 +95,22 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
                     -   Is there a zone found from above?
                         - If so, create a wave from zone information using the SampleData.
             */
-            return ImportInstruments(sf2, preset.Zones.Select(z => z.Instrument()), args);
+            return ImportInstruments(sf2, preset.Zones.Select(z => z.Instrument()));
         }
 
-        private static ISampleProvider ImportInstruments(SoundFont sf2, IMidiSampleGenerator args) {
-            return ImportInstruments(sf2, sf2.Instruments, args);
+        private IAudioSampleGenerator ImportInstruments(SoundFont sf2) {
+            return ImportInstruments(sf2, sf2.Instruments);
         }
 
-        private static ISampleProvider ImportInstruments(SoundFont sf2, IEnumerable<Instrument> instruments, IMidiSampleGenerator args) {
+        private IAudioSampleGenerator ImportInstruments(SoundFont sf2, IEnumerable<Instrument> instruments) {
             Zone closest = null;
-            int i = 0;
             int bdist = int.MaxValue;
             
             foreach (var instrument in instruments) { // perccusion bank likely has more than one instrument here.
                 if (instrument == null)
                     continue;
 
-                if (i++ != args.Instrument && args.Instrument != -1) {
-                    continue;
-                }
-
-                var iZone = ImportInstrument(instrument, args);
+                var iZone = ImportInstrument(instrument);
 
                 if (iZone == null) continue;
 
@@ -131,11 +126,11 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
             if (closest == null) return null;
 
             //Console.WriteLine("closest: " + closest.Key());
-            var wave = GenerateSample(closest, sf2.SampleData, args);
+            var wave = GenerateSample(closest, sf2.SampleData);
             return wave;
         }
 
-        private static Zone ImportInstrument(Instrument i, IMidiSampleGenerator args) {
+        private Zone ImportInstrument(Instrument i) {
             Zone closest = null;
             int bdist = int.MaxValue;
 
@@ -171,7 +166,7 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
             return closest;
         }
 
-        private static ISampleProvider GenerateSample(Zone izone, byte[] sample, IMidiSampleGenerator args) {
+        private IAudioSampleGenerator GenerateSample(Zone izone, byte[] sample) {
             // Read the sample mode to apply the correct lengthening algorithm
             // Add volume sample provider for the velocity argument
 
@@ -182,29 +177,29 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
             byte velocity = izone.Velocity();
             float volumeCorrection = args.Velocity != -1 ? (float) args.Velocity / velocity : 1f;
 
-            ISampleProvider output = GetSampleWithLength(sh, izone, sampleMode, sample, args);
+            IAudioSampleGenerator output = GetSampleWithLength(sh, izone, sampleMode, sample);
 
-            output = new VolumeSampleProvider(output) { Volume = volumeCorrection };
+            output = new AmplitudeSampleDecorator(output, volumeCorrection);
 
         return output;
         }
 
-        private static ISampleProvider GetSampleWithLength(SampleHeader sh, Zone izone, int sampleMode, byte[] sample, IMidiSampleGenerator args) {
+        private IAudioSampleGenerator GetSampleWithLength(SampleHeader sh, Zone izone, int sampleMode, byte[] sample) {
             switch (sampleMode) {
                 case 0:
                 case 2:
                     // Don't loop
-                    return GetSampleWithoutLoop(sh, izone, sample, args);
+                    return GetSampleWithoutLoop(sh, izone, sample);
                 case 1:
                     // Loop continuously
-                    return GetSampleContinuous(sh, izone, sample, args);
+                    return GetSampleContinuous(sh, izone, sample);
                 default:
                     // Loops for the duration of key depression then proceed to play the remainder of the sample
-                    return GetSampleRemainder(sh, izone, sample, args);
+                    return GetSampleRemainder(sh, izone, sample);
             }
         }
 
-        private static ISampleProvider GetSampleWithoutLoop(SampleHeader sh, Zone izone, byte[] sample, IMidiSampleGenerator args) {
+        private IAudioSampleGenerator GetSampleWithoutLoop(SampleHeader sh, Zone izone, byte[] sample) {
             // Indices in sf2 are numbers of samples, not byte length. So double them
             int start = (int)sh.Start + izone.FullStartAddressOffset();
             int end = (int)sh.End + izone.FullEndAddressOffset();
@@ -226,7 +221,8 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
             byte[] buffer = new byte[numberOfBytes];
             Array.Copy(sample, start * 2, buffer, 0, numberOfBytes);
 
-            var sampleProvider = new WaveToSampleProvider(BufferToWaveStream(buffer, (uint)(sh.SampleRate * factor)));
+            var wave = BufferToWaveStream(buffer, (uint) (sh.SampleRate * factor));
+            var sampleGenerator = new RawAudioSampleGenerator(wave);
 
             double fadeStart;
             double fadeLength;
@@ -238,13 +234,12 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
                 fadeLength = 0.3;
             }
 
-            var output = new DelayFadeOutSampleProvider(sampleProvider);
-            output.BeginFadeOut(fadeStart * 1000, fadeLength * 1000);
+            var output = new FadingSampleDecorator(sampleGenerator, fadeStart * 1000, fadeLength * 1000);
 
             return output;
         }
 
-        private static ISampleProvider GetSampleContinuous(SampleHeader sh, Zone izone, byte[] sample, IMidiSampleGenerator args) {
+        private IAudioSampleGenerator GetSampleContinuous(SampleHeader sh, Zone izone, byte[] sample) {
             // Indices in sf2 are numbers of samples, not byte length. So double them
             int start = (int)sh.Start + izone.FullStartAddressOffset();
             int end = (int)sh.End + izone.FullEndAddressOffset();
@@ -267,7 +262,7 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
             int numberOfLoopSamples = numberOfSamples - length;
 
             if (numberOfLoopSamples < 0) {
-                return GetSampleWithoutLoop(sh, izone, sample, args);
+                return GetSampleWithoutLoop(sh, izone, sample);
             }
 
             int numberOfBytes = numberOfSamples * 2;
@@ -279,15 +274,14 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
                 Array.Copy(sample, startLoop * 2, buffer, lengthBytes + i * loopLengthBytes, Math.Min(loopLengthBytes, numberOfBytes - (lengthBytes + i * loopLengthBytes)));
             }
 
-            var sampleProvider = new WaveToSampleProvider(BufferToWaveStream(buffer, (uint)(sh.SampleRate * factor)));
-
-            var output = new DelayFadeOutSampleProvider(sampleProvider);
-            output.BeginFadeOut((lengthInSeconds - 0.4) * 1000, 0.3 * 1000);
+            var wave = BufferToWaveStream(buffer, (uint) (sh.SampleRate * factor));
+            var sampleGenerator = new RawAudioSampleGenerator(wave);
+            var output = new FadingSampleDecorator(sampleGenerator, (lengthInSeconds - 0.4) * 1000, 0.3 * 1000);
 
             return output;
         }
 
-        private static ISampleProvider GetSampleRemainder(SampleHeader sh, Zone izone, byte[] sample, IMidiSampleGenerator args) {
+        private IAudioSampleGenerator GetSampleRemainder(SampleHeader sh, Zone izone, byte[] sample) {
             // Indices in sf2 are numbers of samples, not byte length. So double them
             int start = (int)sh.Start + izone.FullStartAddressOffset();
             int end = (int)sh.End + izone.FullEndAddressOffset();
@@ -316,7 +310,7 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
             int numberOfLoopSamples = numberOfSamples - lengthFirstHalf - lengthSecondHalf;
 
             if (numberOfLoopSamples < loopLength) {
-                return GetSampleWithoutLoop(sh, izone, sample, args);
+                return GetSampleWithoutLoop(sh, izone, sample);
             }
 
             int numberOfBytes = numberOfSamples * 2;
@@ -332,9 +326,10 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
             bufferLoop.CopyTo(buffer, lengthFirstHalfBytes);
             Array.Copy(sample, start * 2, buffer, lengthFirstHalfBytes + numberOfLoopBytes, lengthSecondHalfBytes);
 
-            var sampleProvider = new WaveToSampleProvider(BufferToWaveStream(buffer, (uint)(sh.SampleRate * factor)));
+            var wave = BufferToWaveStream(buffer, (uint) (sh.SampleRate * factor));
+            var sampleGenerator = new RawAudioSampleGenerator(wave);
 
-            return sampleProvider;
+            return sampleGenerator;
         }
 
         private static WaveStream BufferToWaveStream(byte[] buffer, uint sampleRate) {

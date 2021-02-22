@@ -7,6 +7,10 @@ using Mapping_Tools_Core.Audio.Exporting;
 using NAudio.Wave.SampleProviders;
 
 namespace Mapping_Tools_Core.Audio.SampleGeneration {
+    /// <summary>
+    /// Generates audio from a file in the file system.
+    /// Works with <see cref="IPathAudioSampleExporter"/>.
+    /// </summary>
     public class PathAudioSampleGenerator : IAudioSampleGenerator {
         private static readonly string[] ValidExtensions = {".wav", ".mp3", ".aiff", ".ogg"};
 

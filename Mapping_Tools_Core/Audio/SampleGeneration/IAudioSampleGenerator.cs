@@ -1,6 +1,11 @@
-﻿using NAudio.Wave;
+﻿using Mapping_Tools_Core.Audio.Exporting;
+using NAudio.Wave;
 
 namespace Mapping_Tools_Core.Audio.SampleGeneration {
+    /// <summary>
+    /// Sample generator that generates wave audio.
+    /// Expected to work with <see cref="IAudioSampleExporter"/>.
+    /// </summary>
     public interface IAudioSampleGenerator : ISampleGenerator {
         /// <summary>
         /// Generates a new <see cref="ISampleProvider"/> with the sound of this generator.

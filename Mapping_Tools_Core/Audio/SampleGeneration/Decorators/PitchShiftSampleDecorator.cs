@@ -7,19 +7,19 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration.Decorators {
     /// <summary>
     /// Decorator for <see cref="IAudioSampleGenerator"/> to add a pitch-shift.
     /// </summary>
-    public class PitchShiftSampleSoundDecorator : AudioSampleDecoratorAbstract {
+    public class PitchShiftSampleDecorator : AudioSampleDecoratorAbstract {
         public int Octaves { get; }
         public int Semitones { get; }
         public int Cents { get; }
 
         /// <summary>
-        /// Constructs a new <see cref="PitchShiftSampleSoundDecorator"/> with pitch-shift.
+        /// Constructs a new <see cref="PitchShiftSampleDecorator"/> with pitch-shift.
         /// </summary>
         /// <param name="baseGenerator">The generator to decorate</param>
         /// <param name="octaves">The Octaves to pitch-shift</param>
         /// <param name="semitones">The Semitones to pitch-shift</param>
         /// <param name="cents">The Cents to pitch-shift</param>
-        public PitchShiftSampleSoundDecorator(IAudioSampleGenerator baseGenerator, int octaves = 0, int semitones = 0,
+        public PitchShiftSampleDecorator(IAudioSampleGenerator baseGenerator, int octaves = 0, int semitones = 0,
             int cents = 0) : base(baseGenerator) {
             Octaves = octaves;
             Semitones = semitones;
@@ -27,7 +27,7 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration.Decorators {
         }
 
         public override bool Equals(ISampleGenerator other) {
-            if (other is PitchShiftSampleSoundDecorator psssd)
+            if (other is PitchShiftSampleDecorator psssd)
                 return Precision.AlmostEquals((Octaves * 12 + Semitones) * 100 + Cents,
                            (psssd.Octaves * 12 + psssd.Semitones) * 100 + psssd.Cents) &&
                        BaseGenerator.Equals(psssd.BaseGenerator);
@@ -36,7 +36,7 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration.Decorators {
         }
 
         public override object Clone() {
-            return new PitchShiftSampleSoundDecorator((IAudioSampleGenerator)BaseAudioGenerator.Clone(), Octaves, Semitones, Cents);
+            return new PitchShiftSampleDecorator((IAudioSampleGenerator)BaseAudioGenerator.Clone(), Octaves, Semitones, Cents);
         }
 
         protected override string GetNameExtension() {
