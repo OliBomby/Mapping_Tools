@@ -75,7 +75,7 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
 
         private IAudioSampleGenerator ImportPreset(SoundFont sf2, Preset preset, IMidiNote args) {
             /*
-                == Aproximate Pesdo Code of importing a preset from sf2 ==
+                == Aproximate Pseudo Code of importing a preset from sf2 ==
                 -    Get all preset zones from soundfont (sf2)
                 -    get the instrument and double check if it's not null (if it is, "continue" the method)
                 -    is the instrument grabbed the same as what args is asking for? (if not, "continue" method)
