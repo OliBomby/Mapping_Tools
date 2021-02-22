@@ -13,21 +13,18 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
         private static WeakReference<SoundFont> lastSoundFont;
         private static string lastPath;
 
-        private readonly IMidiNote args;
         private readonly string path;
         private readonly SoundFont soundFontArg;
 
-        public SoundFontSampleImporter(string path, IMidiNote args) {
-            this.args = args;
+        public SoundFontSampleImporter(string path) {
             this.path = path;
         }
 
-        public SoundFontSampleImporter(SoundFont soundFont, IMidiNote args) {
-            this.args = args;
+        public SoundFontSampleImporter(SoundFont soundFont) {
             soundFontArg = soundFont;
         }
 
-        public IAudioSampleGenerator Import() {
+        public IAudioSampleGenerator Import(IMidiNote args) {
             SoundFont soundFont = null;
             if (soundFontArg == null) {
                 if (lastPath == path) {
@@ -45,12 +42,12 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
                 soundFont = soundFontArg;
             }
 
-            return ImportFromSoundFont(soundFont);
+            return ImportFromSoundFont(soundFont, args);
         }
 
         
         // TODO: format soundfont import to detect file versions and types of files. 
-        public IAudioSampleGenerator ImportFromSoundFont(SoundFont sf2) {
+        public IAudioSampleGenerator ImportFromSoundFont(SoundFont sf2, IMidiNote args) {
             IAudioSampleGenerator wave = null;
 
             foreach (var preset in sf2.Presets) {
@@ -61,12 +58,12 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
                     continue;
                 }
 
-                wave = ImportPreset(sf2, preset);
+                wave = ImportPreset(sf2, preset, args);
                 if (wave != null)
                     break;
             }
 
-            return wave ?? ImportInstruments(sf2);
+            return wave ?? ImportInstruments(sf2, args);
         }
 
         private void SoundFontDebug(SoundFont sf) {
@@ -76,7 +73,7 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
             Console.WriteLine(@"Number of instruments: " + sf.SampleHeaders.Length);
         }
 
-        private IAudioSampleGenerator ImportPreset(SoundFont sf2, Preset preset) {
+        private IAudioSampleGenerator ImportPreset(SoundFont sf2, Preset preset, IMidiNote args) {
             /*
                 == Aproximate Pesdo Code of importing a preset from sf2 ==
                 -    Get all preset zones from soundfont (sf2)
@@ -95,14 +92,14 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
                     -   Is there a zone found from above?
                         - If so, create a wave from zone information using the SampleData.
             */
-            return ImportInstruments(sf2, preset.Zones.Select(z => z.Instrument()));
+            return ImportInstruments(sf2, preset.Zones.Select(z => z.Instrument()), args);
         }
 
-        private IAudioSampleGenerator ImportInstruments(SoundFont sf2) {
-            return ImportInstruments(sf2, sf2.Instruments);
+        private IAudioSampleGenerator ImportInstruments(SoundFont sf2, IMidiNote args) {
+            return ImportInstruments(sf2, sf2.Instruments, args);
         }
 
-        private IAudioSampleGenerator ImportInstruments(SoundFont sf2, IEnumerable<Instrument> instruments) {
+        private IAudioSampleGenerator ImportInstruments(SoundFont sf2, IEnumerable<Instrument> instruments, IMidiNote args) {
             Zone closest = null;
             int bdist = int.MaxValue;
             
@@ -110,7 +107,7 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
                 if (instrument == null)
                     continue;
 
-                var iZone = ImportInstrument(instrument);
+                var iZone = ImportInstrument(instrument, args);
 
                 if (iZone == null) continue;
 
@@ -126,11 +123,11 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
             if (closest == null) return null;
 
             //Console.WriteLine("closest: " + closest.Key());
-            var wave = GenerateSample(closest, sf2.SampleData);
+            var wave = GenerateSample(closest, sf2.SampleData, args);
             return wave;
         }
 
-        private Zone ImportInstrument(Instrument i) {
+        private Zone ImportInstrument(Instrument i, IMidiNote args) {
             Zone closest = null;
             int bdist = int.MaxValue;
 
@@ -166,7 +163,7 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
             return closest;
         }
 
-        private IAudioSampleGenerator GenerateSample(Zone izone, byte[] sample) {
+        private IAudioSampleGenerator GenerateSample(Zone izone, byte[] sample, IMidiNote args) {
             // Read the sample mode to apply the correct lengthening algorithm
             // Add volume sample provider for the velocity argument
 
@@ -177,29 +174,29 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
             byte velocity = izone.Velocity();
             float volumeCorrection = args.Velocity != -1 ? (float) args.Velocity / velocity : 1f;
 
-            IAudioSampleGenerator output = GetSampleWithLength(sh, izone, sampleMode, sample);
+            IAudioSampleGenerator output = GetSampleWithLength(sh, izone, sampleMode, sample, args);
 
             output = new AmplitudeSampleDecorator(output, volumeCorrection);
 
         return output;
         }
 
-        private IAudioSampleGenerator GetSampleWithLength(SampleHeader sh, Zone izone, int sampleMode, byte[] sample) {
+        private IAudioSampleGenerator GetSampleWithLength(SampleHeader sh, Zone izone, int sampleMode, byte[] sample, IMidiNote args) {
             switch (sampleMode) {
                 case 0:
                 case 2:
                     // Don't loop
-                    return GetSampleWithoutLoop(sh, izone, sample);
+                    return GetSampleWithoutLoop(sh, izone, sample, args);
                 case 1:
                     // Loop continuously
-                    return GetSampleContinuous(sh, izone, sample);
+                    return GetSampleContinuous(sh, izone, sample, args);
                 default:
                     // Loops for the duration of key depression then proceed to play the remainder of the sample
-                    return GetSampleRemainder(sh, izone, sample);
+                    return GetSampleRemainder(sh, izone, sample, args);
             }
         }
 
-        private IAudioSampleGenerator GetSampleWithoutLoop(SampleHeader sh, Zone izone, byte[] sample) {
+        private IAudioSampleGenerator GetSampleWithoutLoop(SampleHeader sh, Zone izone, byte[] sample, IMidiNote args) {
             // Indices in sf2 are numbers of samples, not byte length. So double them
             int start = (int)sh.Start + izone.FullStartAddressOffset();
             int end = (int)sh.End + izone.FullEndAddressOffset();
@@ -239,7 +236,7 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
             return output;
         }
 
-        private IAudioSampleGenerator GetSampleContinuous(SampleHeader sh, Zone izone, byte[] sample) {
+        private IAudioSampleGenerator GetSampleContinuous(SampleHeader sh, Zone izone, byte[] sample, IMidiNote args) {
             // Indices in sf2 are numbers of samples, not byte length. So double them
             int start = (int)sh.Start + izone.FullStartAddressOffset();
             int end = (int)sh.End + izone.FullEndAddressOffset();
@@ -262,7 +259,7 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
             int numberOfLoopSamples = numberOfSamples - length;
 
             if (numberOfLoopSamples < 0) {
-                return GetSampleWithoutLoop(sh, izone, sample);
+                return GetSampleWithoutLoop(sh, izone, sample, args);
             }
 
             int numberOfBytes = numberOfSamples * 2;
@@ -281,7 +278,7 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
             return output;
         }
 
-        private IAudioSampleGenerator GetSampleRemainder(SampleHeader sh, Zone izone, byte[] sample) {
+        private IAudioSampleGenerator GetSampleRemainder(SampleHeader sh, Zone izone, byte[] sample, IMidiNote args) {
             // Indices in sf2 are numbers of samples, not byte length. So double them
             int start = (int)sh.Start + izone.FullStartAddressOffset();
             int end = (int)sh.End + izone.FullEndAddressOffset();
@@ -310,7 +307,7 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
             int numberOfLoopSamples = numberOfSamples - lengthFirstHalf - lengthSecondHalf;
 
             if (numberOfLoopSamples < loopLength) {
-                return GetSampleWithoutLoop(sh, izone, sample);
+                return GetSampleWithoutLoop(sh, izone, sample, args);
             }
 
             int numberOfBytes = numberOfSamples * 2;
