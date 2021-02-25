@@ -73,140 +73,124 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
             Console.WriteLine(@"Number of instruments: " + sf.SampleHeaders.Length);
         }
 
+        private static bool InRange(int val, ushort range) {
+            byte velLow = (byte)range;
+            byte velHigh = (byte)(range >> 8);
+            return (val >= velLow && val <= velHigh) || val != -1 || range != 0;
+        }
+
         private IAudioSampleGenerator ImportPreset(SoundFont sf2, Preset preset, IMidiNote args) {
             /*
                 == Aproximate Pseudo Code of importing a preset from sf2 ==
-                -    Get all preset zones from soundfont (sf2)
-                -    get the instrument and double check if it's not null (if it is, "continue" the method)
-                -    is the instrument grabbed the same as what args is asking for? (if not, "continue" method)
-                -    get each zone within instrument and create wav file from information
-                    -   get Sample Header of instrument zone and double check if null (if so, "continue")
-                    -   get the Key range of spesified zone and create high and low keys 8 bit's in difference.
-                        -   is the key not the same as what the args asked for? (yes, then "continue")
-                    -   Get the velocity range of spesified zone and create high and low keys 8 bits' in difference.
-                        -   is the velocity not the same as what the args asked for? (yes, then "continue")
-                    -   Find the closest key from instrument zone to the key spesified from args.
-                        - is the closest key lower than the maximum integer value or, is the key of args just not spesified?
-                            - if so, set the closest zone (initial = null) to the current zone, 
-                            - if so, set the bdist (initial = maximum integer value) to the closest key.
-                    -   Is there a zone found from above?
-                        - If so, create a wave from zone information using the SampleData.
+                -  Find the first instrument in the preset that has a compatible key range and velocity range.
+                -    Find the first sample in the instrument that has a compatible key range and velocity range.
+                -      Generate the sample with the right key and velocity.
+                -    Apply any modulators from the sample zone in the instrument. (currently none compatible)
+                -  Apply any modulators from the instrument zone in the preset. (currently none compatible)
             */
-            return ImportInstruments(sf2, preset.Zones.Select(z => z.Instrument()), args);
-        }
 
-        private IAudioSampleGenerator ImportInstruments(SoundFont sf2, IMidiNote args) {
-            return ImportInstruments(sf2, sf2.Instruments, args);
-        }
+            foreach (var instrumentZone in preset.Zones) {
+                if (!(InRange(args.Key, instrumentZone.KeyRange()) && 
+                      InRange(args.Velocity, instrumentZone.VelocityRange()))) {
+                    continue;
+                }
 
-        private IAudioSampleGenerator ImportInstruments(SoundFont sf2, IEnumerable<Instrument> instruments, IMidiNote args) {
-            Zone closest = null;
-            int bdist = int.MaxValue;
-            
-            foreach (var instrument in instruments) { // perccusion bank likely has more than one instrument here.
+                var instrument = instrumentZone.Instrument();
+
                 if (instrument == null)
                     continue;
 
-                var iZone = ImportInstrument(instrument, args);
+                var sampleGenerator = ImportInstrument(sf2, instrument, args);
 
-                if (iZone == null) continue;
-
-                // Get closest instrument from the zones in the preset
-                int dist = Math.Abs(args.Key - iZone.Key());
-
-                if (dist < bdist || args.Key == -1) {
-                    closest = iZone;
-                    bdist = dist;
+                if (sampleGenerator != null) {
+                    return sampleGenerator;
                 }
             }
 
-            if (closest == null) return null;
-
-            //Console.WriteLine("closest: " + closest.Key());
-            var wave = GenerateSample(closest, sf2.SampleData, args);
-            return wave;
+            return null;
         }
 
-        private Zone ImportInstrument(Instrument i, IMidiNote args) {
-            Zone closest = null;
-            int bdist = int.MaxValue;
+        private IAudioSampleGenerator ImportInstruments(SoundFont sf2, IMidiNote args) {
+            foreach (var instrument in sf2.Instruments) { // perccusion bank likely has more than one instrument here.
+                if (instrument == null)
+                    continue;
 
-            // an Instrument contains a set of zones that contain sample headers.
-            foreach (var instrumentZone in i.Zones) {
-                var sh = instrumentZone.SampleHeader();
+                var sampleGenerator = ImportInstrument(sf2, instrument, args);
+
+                if (sampleGenerator != null) {
+                    return sampleGenerator;
+                };
+            }
+
+            return null;
+        }
+
+        private IAudioSampleGenerator ImportInstrument(SoundFont sf2, Instrument i, IMidiNote args) {
+            // An Instrument contains a set of zones that contain sample headers.
+            foreach (var sampleZone in i.Zones) {
+                var sh = sampleZone.SampleHeader();
                 if (sh == null)
                     continue;
 
                 // Requested key/velocity must also fit in the key/velocity range of the sample
-                ushort keyRange = instrumentZone.KeyRange();
-                byte keyLow = (byte)keyRange;
-                byte keyHigh = (byte)(keyRange >> 8);
-                if (!(args.Key >= keyLow && args.Key <= keyHigh) && args.Key != -1 && keyRange != 0) {
-                    continue;
-                }
-                ushort velRange = instrumentZone.VelocityRange();
-                byte velLow = (byte)keyRange;
-                byte velHigh = (byte)(keyRange >> 8);
-                if (!(args.Velocity >= velLow && args.Velocity <= velHigh) && args.Velocity != -1 && velRange != 0) {
+                ushort keyRange = sampleZone.KeyRange();
+                if (InRange(args.Key, keyRange)) {
                     continue;
                 }
 
-                // Get the closest key possible
-                int dist = Math.Abs(args.Key - instrumentZone.Key());
-
-                if (dist < bdist || args.Key == -1) {
-                    closest = instrumentZone;
-                    bdist = dist;
+                ushort velRange = sampleZone.VelocityRange();
+                if (InRange(args.Velocity, velRange)) {
+                    continue;
                 }
+
+                var wave = GenerateSample(sampleZone, sf2.SampleData, args);
+                return wave;
             }
 
-            return closest;
+            return null;
         }
 
-        private IAudioSampleGenerator GenerateSample(Zone izone, byte[] sample, IMidiNote args) {
+        private IAudioSampleGenerator GenerateSample(Zone sampleZone, byte[] sample, IMidiNote args) {
             // Read the sample mode to apply the correct lengthening algorithm
             // Add volume sample provider for the velocity argument
+            IAudioSampleGenerator output = GetSampleWithLength(sampleZone, sample, args);
 
-            var sh = izone.SampleHeader();
-            int sampleMode = izone.SampleModes();
-
-            byte key = izone.Key();
-            byte velocity = izone.Velocity();
+            byte velocity = sampleZone.Velocity();
             float volumeCorrection = args.Velocity != -1 ? (float) args.Velocity / velocity : 1f;
-
-            IAudioSampleGenerator output = GetSampleWithLength(sh, izone, sampleMode, sample, args);
-
             output = new AmplitudeSampleDecorator(output, volumeCorrection);
 
         return output;
         }
 
-        private IAudioSampleGenerator GetSampleWithLength(SampleHeader sh, Zone izone, int sampleMode, byte[] sample, IMidiNote args) {
+        private IAudioSampleGenerator GetSampleWithLength(Zone sampleZone, byte[] sample, IMidiNote args) {
+            int sampleMode = sampleZone.SampleModes();
             switch (sampleMode) {
                 case 0:
                 case 2:
                     // Don't loop
-                    return GetSampleWithoutLoop(sh, izone, sample, args);
+                    return GetSampleWithoutLoop(sampleZone, sample, args);
                 case 1:
                     // Loop continuously
-                    return GetSampleContinuous(sh, izone, sample, args);
+                    return GetSampleContinuous(sampleZone, sample, args);
                 default:
                     // Loops for the duration of key depression then proceed to play the remainder of the sample
-                    return GetSampleRemainder(sh, izone, sample, args);
+                    return GetSampleRemainder(sampleZone, sample, args);
             }
         }
 
-        private IAudioSampleGenerator GetSampleWithoutLoop(SampleHeader sh, Zone izone, byte[] sample, IMidiNote args) {
+        private IAudioSampleGenerator GetSampleWithoutLoop(Zone sampleZone, byte[] sample, IMidiNote args) {
+            var sh = sampleZone.SampleHeader();
+
             // Indices in sf2 are numbers of samples, not byte length. So double them
-            int start = (int)sh.Start + izone.FullStartAddressOffset();
-            int end = (int)sh.End + izone.FullEndAddressOffset();
+            int start = (int)sh.Start + sampleZone.FullStartAddressOffset();
+            int end = (int)sh.End + sampleZone.FullEndAddressOffset();
 
             int length = end - start;
 
             double lengthInSeconds = args.Length != -1 ? (args.Length / 1000) + 0.4 : length / (double)sh.SampleRate;
 
             // Sample rate key correction
-            int keyCorrection = args.Key != -1 ? args.Key - izone.Key() : 0;
+            int keyCorrection = args.Key != -1 ? args.Key - sampleZone.Key() : 0;
             double factor = Math.Pow(2, keyCorrection / 12d);
             lengthInSeconds *= factor;
 
@@ -236,12 +220,14 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
             return output;
         }
 
-        private IAudioSampleGenerator GetSampleContinuous(SampleHeader sh, Zone izone, byte[] sample, IMidiNote args) {
+        private IAudioSampleGenerator GetSampleContinuous(Zone sampleZone, byte[] sample, IMidiNote args) {
+            var sh = sampleZone.SampleHeader();
+
             // Indices in sf2 are numbers of samples, not byte length. So double them
-            int start = (int)sh.Start + izone.FullStartAddressOffset();
-            int end = (int)sh.End + izone.FullEndAddressOffset();
-            int startLoop = (int)sh.StartLoop + izone.FullStartLoopAddressOffset();
-            int endLoop = (int)sh.EndLoop + izone.FullEndLoopAddressOffset();
+            int start = (int)sh.Start + sampleZone.FullStartAddressOffset();
+            int end = (int)sh.End + sampleZone.FullEndAddressOffset();
+            int startLoop = (int)sh.StartLoop + sampleZone.FullStartLoopAddressOffset();
+            int endLoop = (int)sh.EndLoop + sampleZone.FullEndLoopAddressOffset();
 
             int length = end - start;
             int lengthBytes = length * 2;
@@ -251,7 +237,7 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
             double lengthInSeconds = args.Length != -1 ? (args.Length / 1000) + 0.4 : length / (double)sh.SampleRate + 0.4;
 
             // Sample rate key correction
-            int keyCorrection = args.Key != -1 ? args.Key - izone.Key() : 0;
+            int keyCorrection = args.Key != -1 ? args.Key - sampleZone.Key() : 0;
             double factor = Math.Pow(2, keyCorrection / 12d);
             lengthInSeconds *= factor;
 
@@ -259,7 +245,7 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
             int numberOfLoopSamples = numberOfSamples - length;
 
             if (numberOfLoopSamples < 0) {
-                return GetSampleWithoutLoop(sh, izone, sample, args);
+                return GetSampleWithoutLoop(sampleZone, sample, args);
             }
 
             int numberOfBytes = numberOfSamples * 2;
@@ -278,12 +264,14 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
             return output;
         }
 
-        private IAudioSampleGenerator GetSampleRemainder(SampleHeader sh, Zone izone, byte[] sample, IMidiNote args) {
+        private IAudioSampleGenerator GetSampleRemainder(Zone sampleZone, byte[] sample, IMidiNote args) {
+            var sh = sampleZone.SampleHeader();
+
             // Indices in sf2 are numbers of samples, not byte length. So double them
-            int start = (int)sh.Start + izone.FullStartAddressOffset();
-            int end = (int)sh.End + izone.FullEndAddressOffset();
-            int startLoop = (int)sh.StartLoop + izone.FullStartLoopAddressOffset();
-            int endLoop = (int)sh.EndLoop + izone.FullEndLoopAddressOffset();
+            int start = (int)sh.Start + sampleZone.FullStartAddressOffset();
+            int end = (int)sh.End + sampleZone.FullEndAddressOffset();
+            int startLoop = (int)sh.StartLoop + sampleZone.FullStartLoopAddressOffset();
+            int endLoop = (int)sh.EndLoop + sampleZone.FullEndLoopAddressOffset();
 
             int length = end - start;
             int loopLength = endLoop - startLoop;
@@ -298,7 +286,7 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
             double lengthInSeconds = args.Length != -1 ? (args.Length / 1000) : length / (double)sh.SampleRate;
 
             // Sample rate key correction
-            int keyCorrection = args.Key != -1 ? args.Key - izone.Key() : 0;
+            int keyCorrection = args.Key != -1 ? args.Key - sampleZone.Key() : 0;
             double factor = Math.Pow(2, keyCorrection / 12d);
             lengthInSeconds *= factor;
 
@@ -307,7 +295,7 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
             int numberOfLoopSamples = numberOfSamples - lengthFirstHalf - lengthSecondHalf;
 
             if (numberOfLoopSamples < loopLength) {
-                return GetSampleWithoutLoop(sh, izone, sample, args);
+                return GetSampleWithoutLoop(sampleZone, sample, args);
             }
 
             int numberOfBytes = numberOfSamples * 2;
