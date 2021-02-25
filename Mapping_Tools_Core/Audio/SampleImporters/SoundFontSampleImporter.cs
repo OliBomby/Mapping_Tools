@@ -190,8 +190,8 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
             double lengthInSeconds = args.Length != -1 ? (args.Length / 1000) + 0.4 : length / (double)sh.SampleRate;
 
             // Sample rate key correction
-            int keyCorrection = args.Key != -1 ? args.Key - sampleZone.Key() : 0;
-            double factor = Math.Pow(2, keyCorrection / 12d);
+            int keyCorrectionCents = args.Key != -1 ? (args.Key - sampleZone.Key()) * 100 + sampleZone.TotalTuningCents() : 0;
+            double factor = Math.Pow(2, keyCorrectionCents / 12000d);
             lengthInSeconds *= factor;
 
             lengthInSeconds = Math.Min(lengthInSeconds, length / (double)sh.SampleRate);
@@ -237,8 +237,8 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
             double lengthInSeconds = args.Length != -1 ? (args.Length / 1000) + 0.4 : length / (double)sh.SampleRate + 0.4;
 
             // Sample rate key correction
-            int keyCorrection = args.Key != -1 ? args.Key - sampleZone.Key() : 0;
-            double factor = Math.Pow(2, keyCorrection / 12d);
+            int keyCorrectionCents = args.Key != -1 ? (args.Key - sampleZone.Key()) * 100 + sampleZone.TotalTuningCents() : 0;
+            double factor = Math.Pow(2, keyCorrectionCents / 12000d);
             lengthInSeconds *= factor;
 
             int numberOfSamples = (int)Math.Ceiling(lengthInSeconds * sh.SampleRate);
@@ -286,8 +286,8 @@ namespace Mapping_Tools_Core.Audio.SampleImporters {
             double lengthInSeconds = args.Length != -1 ? (args.Length / 1000) : length / (double)sh.SampleRate;
 
             // Sample rate key correction
-            int keyCorrection = args.Key != -1 ? args.Key - sampleZone.Key() : 0;
-            double factor = Math.Pow(2, keyCorrection / 12d);
+            int keyCorrectionCents = args.Key != -1 ? (args.Key - sampleZone.Key()) * 100 + sampleZone.TotalTuningCents() : 0;
+            double factor = Math.Pow(2, keyCorrectionCents / 12000d);
             lengthInSeconds *= factor;
 
             int numberOfSamples = (int)Math.Ceiling(lengthInSeconds * sh.SampleRate);

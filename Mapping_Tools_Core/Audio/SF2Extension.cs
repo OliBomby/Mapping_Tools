@@ -91,6 +91,16 @@ namespace Mapping_Tools_Core.Audio {
             return g?.LowByteAmount ?? (byte)0;
         }
 
+        public static byte FineTune(this Zone zone) {
+            var g = SelectByGenerator(zone, GeneratorEnum.FineTune);
+            return g?.LowByteAmount ?? (byte)0;
+        }
+
+        public static byte CoarseTune(this Zone zone) {
+            var g = SelectByGenerator(zone, GeneratorEnum.CoarseTune);
+            return g?.LowByteAmount ?? (byte)0;
+        }
+
         public static byte Key(this Zone zone) {
             var sh = zone.SampleHeader();
             if (sh == null)
@@ -98,6 +108,17 @@ namespace Mapping_Tools_Core.Audio {
 
             byte over = zone.OverridingRootKey();
             return over != 0 ? over : sh.OriginalPitch;
+        }
+
+        public static int TotalTuningCents(this Zone zone) {
+            var cents = CoarseTune(zone) * 100 + FineTune(zone);
+
+            var sh = zone.SampleHeader();
+            if (sh != null) {
+                cents += sh.PitchCorrection;
+            }
+
+            return cents;
         }
 
         public static int SampleModes(this Zone zone) {
