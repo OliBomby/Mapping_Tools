@@ -4,8 +4,6 @@ using Mapping_Tools_Core.Audio.SampleGeneration.Decorators;
 using NAudio.SoundFont;
 using NAudio.Wave;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Mapping_Tools_Core.Audio.SampleImporters {
     public class SoundFontSampleImporter {

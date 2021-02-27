@@ -4,12 +4,13 @@ using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using System;
 using System.IO;
+using Mapping_Tools_Core.Audio.SampleImporters;
 
 namespace Mapping_Tools_Core.Audio.SampleGeneration {
     public class SoundFontSampleGenerator : ISoundFontSampleGenerator {
         private string Extension() => System.IO.Path.GetExtension(Path);
 
-        private WaveStream cachedWaveStream;
+        private IAudioSampleGenerator cachedGenerator;
         private bool preloaded;
 
         public string Path { get; }
@@ -32,14 +33,14 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration {
 
         public bool IsValid() {
             if (preloaded) {
-                return cachedWaveStream != null;
+                return cachedGenerator != null;
             }
 
             return File.Exists(Path) && Extension() == ".sf2";
         }
 
         public ISampleProvider GetSampleProvider() {
-            return GetSampleProvider(GetWaveStream());
+            return GetSampleGenerator().GetSampleProvider();
         }
 
         public string GetName() {
@@ -55,27 +56,22 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration {
 
         public void PreLoadSample() {
             if (!preloaded) {
-                preloaded = true;
-
                 try {
-                    cachedWaveStream = GetWaveStream();
+                    cachedGenerator = GetSampleGenerator();
                 } catch (Exception e) {
                     Console.WriteLine(e);
                 }
+
+                preloaded = true;
             }
         }
 
-        private static ISampleProvider GetSampleProvider(WaveStream wave) {
-            wave.Position = 0;
-            return new WaveToSampleProvider(wave);
-        }
-
-        private WaveStream GetWaveStream() {
+        private IAudioSampleGenerator GetSampleGenerator() {
             if (preloaded) {
-                return cachedWaveStream;
+                return cachedGenerator;
             }
 
-            throw new NotImplementedException();
+            return new SoundFontSampleImporter(Path).Import(Note);
         }
     }
 }

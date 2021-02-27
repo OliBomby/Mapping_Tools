@@ -77,14 +77,14 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration {
 
         public void PreLoadSample() {
             if (!preloaded) {
-                preloaded = true;
-
                 try {
                     cachedWaveStream = GetWaveStream();
                 }
                 catch (Exception e) {
                     Console.WriteLine(e);
                 }
+
+                preloaded = true;
             }
         }
     }
