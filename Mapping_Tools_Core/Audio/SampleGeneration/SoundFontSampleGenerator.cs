@@ -52,6 +52,10 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration {
             if (exporter is IAudioSampleExporter audioSampleExporter) {
                 audioSampleExporter.AddAudio(GetSampleProvider());
             }
+
+            if (exporter is IMidiSampleExporter midiSampleExporter) {
+                midiSampleExporter.AddMidiNote(Note);
+            }
         }
 
         public void PreLoadSample() {
