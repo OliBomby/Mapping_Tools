@@ -14,5 +14,14 @@ namespace Mapping_Tools_Core.Audio.Exporting {
         /// </summary>
         /// <returns></returns>
         ISampleProvider PopAudio();
+
+        /// <summary>
+        /// Returns the file extension that fits with the type of the exporter.
+        /// Returns null if not applicable.
+        /// </summary>
+        /// <returns></returns>
+        string GetDesiredExtension();
+
+        WaveFormat GetDesiredWaveFormat();
     }
 }

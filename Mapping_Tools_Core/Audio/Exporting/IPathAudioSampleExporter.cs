@@ -20,5 +20,15 @@
         /// Default to false.
         /// </summary>
         bool BlankSample { get; set; }
+
+        /// <summary>
+        /// The path to the folder to export to.
+        /// </summary>
+        string ExportFolder { get; set; }
+
+        /// <summary>
+        /// The filename of the exported sample without extension.
+        /// </summary>
+        string ExportName { get; set; }
     }
 }
