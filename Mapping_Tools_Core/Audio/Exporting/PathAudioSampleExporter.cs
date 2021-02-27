@@ -50,9 +50,10 @@ namespace Mapping_Tools_Core.Audio.Exporting {
                     // Check if the audio format of the file at CopyPath matches that of what the exporter wants to generate
                     if (Path.GetExtension(CopyPath) == exporter.GetDesiredExtension()) {
                         // Do a special check for .wav files. The encoding has to match
-                        if (Path.GetExtension(CopyPath) == ".wav") {
+                        if (Path.GetExtension(CopyPath) == ".wav" && exporter.GetDesiredWaveEncoding().HasValue) {
                             var waveFormat = GetWaveFormat(CopyPath);
-                            if (waveFormat != null && waveFormat.Encoding == exporter.GetDesiredWaveFormat().Encoding) {
+                            // ReSharper disable once PossibleInvalidOperationException
+                            if (waveFormat != null && waveFormat.Encoding == exporter.GetDesiredWaveEncoding().Value) {
                                 return CopySample(CopyPath, dest);
                             }
                         } else {
@@ -108,8 +109,8 @@ namespace Mapping_Tools_Core.Audio.Exporting {
             return exporter.GetDesiredExtension();
         }
 
-        public WaveFormat GetDesiredWaveFormat() {
-            return exporter.GetDesiredWaveFormat();
+        public WaveFormatEncoding? GetDesiredWaveEncoding() {
+            return exporter.GetDesiredWaveEncoding();
         }
     }
 }

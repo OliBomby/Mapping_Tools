@@ -22,6 +22,11 @@ namespace Mapping_Tools_Core.Audio.Exporting {
         /// <returns></returns>
         string GetDesiredExtension();
 
-        WaveFormat GetDesiredWaveFormat();
+        /// <summary>
+        /// Returns the wave encoding that fits with the export of the exporter.
+        /// Returns null if not applicable.
+        /// </summary>
+        /// <returns></returns>
+        WaveFormatEncoding? GetDesiredWaveEncoding();
     }
 }
