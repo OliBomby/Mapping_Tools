@@ -185,9 +185,7 @@ namespace Mapping_Tools.Classes.SystemTools {
                 Console.WriteLine(ex.StackTrace);
                 try {
                     var reader = EditorReaderStuff.GetEditorReader();
-                    reader.FetchEditor();
-                    reader.SetHOM();
-                    reader.ReadHOM();
+                    reader.FetchHOM();
                     reader.FetchBeatmap();
                     path = EditorReaderStuff.GetCurrentBeatmap(reader);
                 }
