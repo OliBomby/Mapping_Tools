@@ -116,6 +116,8 @@
     <Compile Include="Audio\DuplicateDetection\UselessDuplicateSampleDetector.cs" />
     <Compile Include="Audio\Exporting\IStreamAudioSampleExporter.cs" />
     <Compile Include="Audio\Exporting\PathAudioSampleExporter.cs" />
+    <Compile Include="Audio\Exporting\StreamAudioSampleExporter.cs" />
+    <Compile Include="Audio\Helpers.cs" />
     <Compile Include="Audio\Midi\IMidiNote.cs" />
     <Compile Include="Audio\Midi\MidiNote.cs" />
     <Compile Include="Audio\OsuVolumeConverter.cs" />

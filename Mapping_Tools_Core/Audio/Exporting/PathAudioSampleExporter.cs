@@ -6,8 +6,8 @@ using System.IO;
 namespace Mapping_Tools_Core.Audio.Exporting {
     public class PathAudioSampleExporter : IPathAudioSampleExporter {
         public string CopyPath { get; set; }
-        public bool CanCopyPaste { get; set; } = true;
-        public bool BlankSample { get; set; } = false;
+        public bool CanCopyPaste { get; set; }
+        public bool BlankSample { get; set; }
 
         public string ExportFolder { get; set; }
         public string ExportName { get; set; }
@@ -37,6 +37,13 @@ namespace Mapping_Tools_Core.Audio.Exporting {
             ExportName = exportName;
             this.exporter = exporter;
             this.forceSpecificFormat = forceSpecificFormat;
+            Reset();
+        }
+
+        private void Reset() {
+            CopyPath = null;
+            CanCopyPaste = true;
+            BlankSample = false;
         }
 
         public virtual bool Flush() {
@@ -54,21 +61,29 @@ namespace Mapping_Tools_Core.Audio.Exporting {
                             var waveFormat = GetWaveFormat(CopyPath);
                             // ReSharper disable once PossibleInvalidOperationException
                             if (waveFormat != null && waveFormat.Encoding == exporter.GetDesiredWaveEncoding().Value) {
-                                return CopySample(CopyPath, dest);
+                                var result = CopySample(CopyPath, dest);
+                                Reset();
+                                return result;
                             }
                         } else {
-                            return CopySample(CopyPath, dest);
+                            var result = CopySample(CopyPath, dest);
+                            Reset();
+                            return result;
                         }
                     }
                 } else {
-                    return CopySample(CopyPath, dest);
+                    var result = CopySample(CopyPath, dest);
+                    Reset();
+                    return result;
                 }
             }
 
             dest = Path.Combine(ExportFolder, ExportName + Path.GetExtension(CopyPath));
             using (var outStream = new FileStream(dest, FileMode.Create, FileAccess.Write, FileShare.Read)) {
-                exporter.ExportStream = outStream;
-                return exporter.Flush();
+                exporter.OutStream = outStream;
+                var result = exporter.Flush();
+                Reset();
+                return result;
             }
         }
 
