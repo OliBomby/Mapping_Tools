@@ -7,6 +7,8 @@ using System.Linq;
 namespace Mapping_Tools_Core.Audio.Exporting {
     public abstract class StreamAudioSampleExporter : IStreamAudioSampleExporter {
         public Stream OutStream { get; set; }
+        public bool BlankSample { get; set; }
+        public bool ClippingPossible { get; set; }
 
         protected Stack<ISampleProvider> sampleProviders;
 
@@ -18,26 +20,35 @@ namespace Mapping_Tools_Core.Audio.Exporting {
             OutStream = outStream;
         }
 
+        public void Reset() {
+            BlankSample = true;
+            ClippingPossible = false;
+            sampleProviders.Clear();
+        }
+
         public bool Flush() {
             var numTracks = sampleProviders.Count;
 
             if (numTracks == 0) return false;
 
             // If it has only one valid sample, we can skip the mixing part
-            if (numTracks == 1) { 
-                return ExportSampleProvider(sampleProviders.Pop(), numTracks);
+            ISampleProvider sampleProvider;
+            if (numTracks == 1) {
+                sampleProvider = sampleProviders.Pop();
+            } else { 
+                // Synchronize the sample rate and channels for all samples and get the sample providers
+                int maxSampleRate = sampleProviders.Max(o => o.WaveFormat.SampleRate);
+                int maxChannels = sampleProviders.Max(o => o.WaveFormat.Channels);
+
+                IEnumerable<ISampleProvider> sameFormatSamples = sampleProviders.Select(o =>
+                    (ISampleProvider)new WdlResamplingSampleProvider(Helpers.SetChannels(o, maxChannels), maxSampleRate));
+
+                sampleProvider = new MixingSampleProvider(sameFormatSamples);  
             }
 
-            // Synchronize the sample rate and channels for all samples and get the sample providers
-            int maxSampleRate = sampleProviders.Max(o => o.WaveFormat.SampleRate);
-            int maxChannels = sampleProviders.Max(o => o.WaveFormat.Channels);
-
-            IEnumerable<ISampleProvider> sameFormatSamples = sampleProviders.Select(o =>
-                (ISampleProvider)new WdlResamplingSampleProvider(Helpers.SetChannels(o, maxChannels), maxSampleRate));
-
-            ISampleProvider sampleProvider = new MixingSampleProvider(sameFormatSamples);
-
-            return ExportSampleProvider(sampleProvider, numTracks);
+            var result = ExportSampleProvider(sampleProvider, numTracks);
+            Reset();
+            return result;
         }
 
         /// <summary>

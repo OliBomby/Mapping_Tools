@@ -1,7 +1,6 @@
 ﻿using Mapping_Tools_Core.Audio.Exporting;
 using Mapping_Tools_Core.Audio.Midi;
 using NAudio.Wave;
-using NAudio.Wave.SampleProviders;
 using System;
 using System.IO;
 using Mapping_Tools_Core.Audio.SampleImporters;
@@ -50,7 +49,7 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration {
 
         public void ToExporter(ISampleExporter exporter) {
             if (exporter is IAudioSampleExporter audioSampleExporter) {
-                audioSampleExporter.AddAudio(GetSampleProvider());
+                GetSampleGenerator()?.ToExporter(audioSampleExporter);
             }
 
             if (exporter is IMidiSampleExporter midiSampleExporter) {

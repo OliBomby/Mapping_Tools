@@ -35,6 +35,9 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration.Decorators {
         }
 
         public override bool HasEffect() => !Precision.AlmostEquals(Volume, 1);
+        public override bool HasClippingPossible() {
+            return Volume > 1;
+        }
 
         protected override ISampleProvider Decorate(ISampleProvider sampleProvider) {
             return new VolumeSampleProvider(sampleProvider) { Volume = Volume };

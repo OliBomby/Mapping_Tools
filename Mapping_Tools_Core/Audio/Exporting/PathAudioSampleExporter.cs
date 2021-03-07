@@ -8,6 +8,7 @@ namespace Mapping_Tools_Core.Audio.Exporting {
         public string CopyPath { get; set; }
         public bool CanCopyPaste { get; set; }
         public bool BlankSample { get; set; }
+        public bool ClippingPossible { get; set; }
 
         public string ExportFolder { get; set; }
         public string ExportName { get; set; }
@@ -40,10 +41,13 @@ namespace Mapping_Tools_Core.Audio.Exporting {
             Reset();
         }
 
-        private void Reset() {
+        public void Reset() {
             CopyPath = null;
             CanCopyPaste = true;
-            BlankSample = false;
+            BlankSample = true;
+            ClippingPossible = false;
+            audioTracks = 0;
+            exporter.Reset();
         }
 
         public virtual bool Flush() {
@@ -53,7 +57,7 @@ namespace Mapping_Tools_Core.Audio.Exporting {
                 dest = Path.Combine(ExportFolder, ExportName + Path.GetExtension(CopyPath));
 
                 // Try to filter the copying if the exporter has some specific format we want to export with
-                if (forceSpecificFormat && exporter.GetDesiredExtension() != null) {
+                if (forceSpecificFormat && !exporter.BlankSample && exporter.GetDesiredExtension() != null) {
                     // Check if the audio format of the file at CopyPath matches that of what the exporter wants to generate
                     if (Path.GetExtension(CopyPath) == exporter.GetDesiredExtension()) {
                         // Do a special check for .wav files. The encoding has to match

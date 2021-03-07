@@ -67,11 +67,16 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration {
 
             if (exporter is IAudioSampleExporter audioSampleExporter) {
                 audioSampleExporter.AddAudio(GetSampleProvider(wave));
+
+                audioSampleExporter.BlankSample = audioSampleExporter.BlankSample && 
+                                                  wave.TotalTime.Equals(TimeSpan.Zero);
+                // If the encoding of the source is float then clipping is possible
+                audioSampleExporter.ClippingPossible = audioSampleExporter.ClippingPossible ||
+                                                       wave.WaveFormat.Encoding == WaveFormatEncoding.IeeeFloat;
             }
 
             if (exporter is IPathAudioSampleExporter pathAudioSampleExporter) {
                 pathAudioSampleExporter.CopyPath = Path;
-                pathAudioSampleExporter.BlankSample = wave.TotalTime.Equals(TimeSpan.Zero);
             }
         }
 

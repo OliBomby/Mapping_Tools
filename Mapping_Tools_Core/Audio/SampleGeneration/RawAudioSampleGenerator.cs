@@ -1,4 +1,5 @@
-﻿using Mapping_Tools_Core.Audio.Exporting;
+﻿using System;
+using Mapping_Tools_Core.Audio.Exporting;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 
@@ -34,6 +35,12 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration {
         public void ToExporter(ISampleExporter exporter) {
             if (exporter is IAudioSampleExporter audioSampleExporter) {
                 audioSampleExporter.AddAudio(GetSampleProvider());
+
+                audioSampleExporter.BlankSample = audioSampleExporter.BlankSample &&
+                                                  WaveStream.TotalTime.Equals(TimeSpan.Zero);
+                // If the encoding of the source is float then clipping is possible
+                audioSampleExporter.ClippingPossible = audioSampleExporter.ClippingPossible ||
+                                                       WaveStream.WaveFormat.Encoding == WaveFormatEncoding.IeeeFloat;
             }
         }
 

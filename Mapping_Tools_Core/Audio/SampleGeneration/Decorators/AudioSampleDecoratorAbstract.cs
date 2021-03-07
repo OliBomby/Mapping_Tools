@@ -43,6 +43,12 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration.Decorators {
                 var sampleProvider = audioSampleExporter.PopAudio();
 
                 audioSampleExporter.AddAudio(Decorate(sampleProvider));
+
+                audioSampleExporter.ClippingPossible = audioSampleExporter.ClippingPossible ||
+                                                       HasClippingPossible();
+
+                audioSampleExporter.BlankSample = audioSampleExporter.BlankSample &&
+                                                       !HasAddedAudio();
             }
 
             if (exporter is IPathAudioSampleExporter pathAudioSampleExporter) {
@@ -62,6 +68,24 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration.Decorators {
         }
 
         public abstract bool HasEffect();
+
+        /// <summary>
+        /// Determines whether the decorator amplifies the audio signal or adds samples
+        /// in a way such that clipping becomes possible.
+        /// </summary>
+        /// <returns></returns>
+        protected virtual bool HasClippingPossible() {
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether the decorator concatenates additional audio samples
+        /// to the original audio.
+        /// </summary>
+        /// <returns></returns>
+        protected virtual bool HasAddedAudio() {
+            return false;
+        }
 
         protected abstract ISampleProvider Decorate(ISampleProvider sampleProvider);
     }

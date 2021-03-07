@@ -17,7 +17,7 @@ namespace Mapping_Tools_Core.Audio.Exporting {
         protected override bool ExportSampleProvider(ISampleProvider sampleProvider, int numTracks) {
             // I really want to check the entire audio sample here to see if it has any clipping,
             // but that is too memory intensive.
-            if (useLimiter && numTracks > 1) {
+            if (useLimiter && (ClippingPossible || numTracks > 1)) {
                 sampleProvider = new SoftLimiter(sampleProvider);
             }
 

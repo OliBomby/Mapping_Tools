@@ -16,17 +16,22 @@ namespace Mapping_Tools_Core.Audio.Exporting {
         ISampleProvider PopAudio();
 
         /// <summary>
-        /// Returns the file extension that fits with the type of the exporter.
-        /// Returns null if not applicable.
-        /// </summary>
-        /// <returns></returns>
-        string GetDesiredExtension();
-
-        /// <summary>
         /// Returns the wave encoding that fits with the export of the exporter.
         /// Returns null if not applicable.
         /// </summary>
         /// <returns></returns>
         WaveFormatEncoding? GetDesiredWaveEncoding();
+
+        /// <summary>
+        /// Whether the sample is blank.
+        /// Default to true.
+        /// </summary>
+        bool BlankSample { get; set; }
+
+        /// <summary>
+        /// Whether clipping is possible in the sample.
+        /// Default to false.
+        /// </summary>
+        bool ClippingPossible { get; set; }
     }
 }

@@ -16,12 +16,6 @@
         bool CanCopyPaste { get; set; }
 
         /// <summary>
-        /// Whether the sample is blank.
-        /// Default to false.
-        /// </summary>
-        bool BlankSample { get; set; }
-
-        /// <summary>
         /// The path to the folder to export to.
         /// </summary>
         string ExportFolder { get; set; }
