@@ -46,13 +46,11 @@ namespace Mapping_Tools_Core.Audio {
             // most of the codec setup parameters) which is mandated by the Ogg
             // bitstream spec.  The second header holds any comment fields.  The
             // third header holds the bitstream codebook.
-            var headerBuilder = new HeaderPacketBuilder();
-            
             var comments = new Comments();
 
-            var infoPacket = headerBuilder.BuildInfoPacket(info);
-            var commentsPacket = headerBuilder.BuildCommentsPacket(comments);
-            var booksPacket = headerBuilder.BuildBooksPacket(info);
+            var infoPacket = HeaderPacketBuilder.BuildInfoPacket(info);
+            var commentsPacket = HeaderPacketBuilder.BuildCommentsPacket(comments);
+            var booksPacket = HeaderPacketBuilder.BuildBooksPacket(info);
 
             oggStream.PacketIn(infoPacket);
             oggStream.PacketIn(commentsPacket);
@@ -106,6 +104,27 @@ namespace Mapping_Tools_Core.Audio {
         public static bool CreateVorbisFile(string filename, IWaveProvider sourceProvider, float quality=0.5f) {
             try {
                 using (var writer = new VorbisFileWriter(filename, sourceProvider.WaveFormat.SampleRate, sourceProvider.WaveFormat.Channels, quality)) {
+                    var buffer = new byte[sourceProvider.WaveFormat.AverageBytesPerSecond * 4];
+                    while (true) {
+                        int bytesRead = sourceProvider.Read(buffer, 0, buffer.Length);
+                        if (bytesRead == 0) {
+                            // end of source provider
+                            break;
+                        }
+
+                        writer.WriteWaveData(buffer, bytesRead, sourceProvider.WaveFormat);
+                    }
+                }
+
+                return true;
+            } catch (IndexOutOfRangeException) {
+                return false;
+            }
+        }
+
+        public static bool CreateVorbisFile(Stream outStream, IWaveProvider sourceProvider, float quality = 0.5f) {
+            try {
+                using (var writer = new VorbisFileWriter(outStream, sourceProvider.WaveFormat.SampleRate, sourceProvider.WaveFormat.Channels, quality)) {
                     var buffer = new byte[sourceProvider.WaveFormat.AverageBytesPerSecond * 4];
                     while (true) {
                         int bytesRead = sourceProvider.Read(buffer, 0, buffer.Length);

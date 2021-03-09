@@ -116,6 +116,8 @@
     <Compile Include="Audio\DuplicateDetection\UselessDuplicateSampleDetector.cs" />
     <Compile Include="Audio\Exporting\IStreamAudioSampleExporter.cs" />
     <Compile Include="Audio\Exporting\PathAudioSampleExporter.cs" />
+    <Compile Include="Audio\Exporting\Float32StreamAudioSampleExporter.cs" />
+    <Compile Include="Audio\Exporting\VorbisStreamAudioSampleExporter.cs" />
     <Compile Include="Audio\Exporting\Pcm16StreamAudioSampleExporter.cs" />
     <Compile Include="Audio\Exporting\StreamAudioSampleExporter.cs" />
     <Compile Include="Audio\Helpers.cs" />
