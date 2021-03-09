@@ -1,10 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using Mapping_Tools_Core.Audio.SampleGeneration;
+using Mapping_Tools_Core.Audio.SampleGeneration.Decorators;
+using NAudio.Vorbis;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 
 namespace Mapping_Tools_Core.Audio {
     public static class Helpers {
+        public static WaveStream OpenSample(string path) {
+            return Path.GetExtension(path) == ".ogg" ? (WaveStream)new VorbisWaveReader(path) : new MediaFoundationReader(path);
+        }
+
         public static ISampleProvider SetChannels(ISampleProvider sampleProvider, int channels) {
             return channels == 1 ? ToMono(sampleProvider) : ToStereo(sampleProvider);
         }
@@ -70,6 +78,52 @@ namespace Mapping_Tools_Core.Audio {
                 return true;
             } catch (IndexOutOfRangeException) {
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Preloads all sample generators efficiently.
+        /// </summary>
+        /// <param name="sampleGenerators">The samples to import</param>
+        public static void PreloadSampleGenerators(IEnumerable<ISampleGenerator> sampleGenerators) {
+            // Group the args by path so the SoundFont importer can benefit of caching
+            var separatedByPath = new Dictionary<string, HashSet<ISampleGenerator>>();
+            var otherGenerators = new HashSet<ISampleGenerator>();
+
+            foreach (var generator in sampleGenerators) {
+                if (generator is IFromPathGenerator pathGenerator) {
+                    if (separatedByPath.TryGetValue(pathGenerator.Path, out HashSet<ISampleGenerator> value)) {
+                        value.Add(generator);
+                    } else {
+                        separatedByPath.Add(pathGenerator.Path, new HashSet<ISampleGenerator> { generator });
+                    }
+                } else if (generator != null) {
+                    otherGenerators.Add(generator);
+                }
+            }
+
+            // Import all samples
+            foreach (var pair in separatedByPath) {
+                PreloadFast(pair.Value);
+
+                if (Path.GetExtension(pair.Key) == ".sf2") {
+                    // Collect garbage to clean up big SoundFont object
+                    GC.Collect();
+                }
+            }
+
+            PreloadFast(otherGenerators);
+        }
+
+        private static void PreloadFast(IEnumerable<ISampleGenerator> sampleGenerators) {
+            foreach (var generator in sampleGenerators) {
+                try {
+                    if (generator is IPreloadableGenerator preloadableGenerator) {
+                        preloadableGenerator.PreloadSample();
+                    }
+                } catch (Exception e) {
+                    Console.WriteLine(e);
+                }
             }
         }
     }

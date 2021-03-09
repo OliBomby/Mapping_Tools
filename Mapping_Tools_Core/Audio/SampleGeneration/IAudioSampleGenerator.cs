@@ -1,4 +1,5 @@
 ﻿using Mapping_Tools_Core.Audio.Exporting;
+using Mapping_Tools_Core.Audio.SampleGeneration.Decorators;
 using NAudio.Wave;
 
 namespace Mapping_Tools_Core.Audio.SampleGeneration {
@@ -6,7 +7,7 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration {
     /// Sample generator that generates wave audio.
     /// Expected to work with <see cref="IAudioSampleExporter"/>.
     /// </summary>
-    public interface IAudioSampleGenerator : ISampleGenerator {
+    public interface IAudioSampleGenerator : ISampleGenerator, IPreloadableGenerator {
         /// <summary>
         /// Generates a new <see cref="ISampleProvider"/> with the sound of this generator.
         /// 
@@ -17,10 +18,5 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration {
         /// </summary>
         /// <returns></returns>
         ISampleProvider GetSampleProvider();
-
-        /// <summary>
-        /// Do the necessary pre-loading and caching to make <see cref="GetSampleProvider"/> fast.
-        /// </summary>
-        void PreLoadSample();
     }
 }

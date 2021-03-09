@@ -126,6 +126,8 @@
     <Compile Include="Audio\Midi\MidiNote.cs" />
     <Compile Include="Audio\OsuVolumeConverter.cs" />
     <Compile Include="Audio\SampleGeneration\Decorators\AudioSampleDecoratorAbstract.cs" />
+    <Compile Include="Audio\SampleGeneration\Decorators\IPreloadableGenerator.cs" />
+    <Compile Include="Audio\SampleGeneration\IFromPathGenerator.cs" />
     <Compile Include="Audio\SampleGeneration\RawAudioSampleGenerator.cs" />
     <Compile Include="Audio\SampleGeneration\PathAudioSampleGenerator.cs" />
     <Compile Include="Audio\SampleGeneration\IAudioSampleGenerator.cs" />
@@ -258,8 +260,6 @@
     <Compile Include="Tools\HitsoundStudio\Model\HitsoundEvent.cs" />
     <Compile Include="Tools\HitsoundStudio\HitsoundExporter.cs" />
     <Compile Include="Tools\HitsoundPreviewHelper\HitsoundZone.cs" />
-    <Compile Include="Audio\MidiExporter.cs" />
-    <Compile Include="Audio\SampleImporter.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\SamplePackage.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\SampleSchema.cs" />
     <Compile Include="Audio\SF2Extension.cs" />

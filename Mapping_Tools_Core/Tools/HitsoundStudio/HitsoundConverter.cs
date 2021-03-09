@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Mapping_Tools_Core.Audio;
-using Mapping_Tools_Core.Audio.SampleSoundGeneration;
+﻿using Mapping_Tools_Core.Audio;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.MathUtil;
 using Mapping_Tools_Core.Tools.HitsoundStudio.Model;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio {
     public class HitsoundConverter {

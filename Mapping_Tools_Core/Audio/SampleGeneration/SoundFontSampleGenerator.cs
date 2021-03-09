@@ -6,7 +6,7 @@ using System.IO;
 using Mapping_Tools_Core.Audio.SampleImporters;
 
 namespace Mapping_Tools_Core.Audio.SampleGeneration {
-    public class SoundFontSampleGenerator : ISoundFontSampleGenerator {
+    public class SoundFontSampleGenerator : ISoundFontSampleGenerator, IFromPathGenerator {
         private string Extension() => System.IO.Path.GetExtension(Path);
 
         private IAudioSampleGenerator cachedGenerator;

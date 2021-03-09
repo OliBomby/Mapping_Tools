@@ -11,7 +11,7 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration {
     /// Generates audio from a file in the file system.
     /// Works with <see cref="IPathAudioSampleExporter"/>.
     /// </summary>
-    public class PathAudioSampleGenerator : IAudioSampleGenerator {
+    public class PathAudioSampleGenerator : IAudioSampleGenerator, IFromPathGenerator {
         private static readonly string[] ValidExtensions = {".wav", ".mp3", ".aiff", ".ogg"};
 
         private string Extension() => System.IO.Path.GetExtension(Path);
