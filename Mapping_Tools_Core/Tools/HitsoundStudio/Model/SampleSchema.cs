@@ -1,18 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using JetBrains.Annotations;
+using Mapping_Tools_Core.Audio.SampleGeneration;
+using Mapping_Tools_Core.BeatmapHelper.Enums;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using JetBrains.Annotations;
-using Mapping_Tools_Core.BeatmapHelper;
-using Mapping_Tools_Core.BeatmapHelper.Enums;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
     /// <summary>
     /// Stores a dictionary with pairs (filename without ext., list of sample args which are satisfied by that file)
     /// Represents a schema on how to exports sample packages.
     /// </summary>
-    public class SampleSchema : Dictionary<string, ISet<ISampleGeneratingArgs>>, ISampleSchema {
+    public class SampleSchema : Dictionary<string, ISet<ISampleGenerator>>, ISampleSchema {
         [UsedImplicitly]
         public SampleSchema() { }
 
@@ -24,9 +24,9 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
             }
         }
 
-        public SampleSchema(IDictionary<ISampleGeneratingArgs, string> sampleNames) {
+        public SampleSchema(IDictionary<ISampleGenerator, string> sampleNames) {
             foreach (var sample in sampleNames) {
-                Add(sample.Value, new HashSet<ISampleGeneratingArgs> {sample.Key});
+                Add(sample.Value, new HashSet<ISampleGenerator> {sample.Key});
             }
         }
 
@@ -34,21 +34,21 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
         /// Make sure a certain hitsound with a certain sound is in the <see cref="SampleSchema"/>.
         /// If it already exists, then it simply returns the index and sampleset of that filename.
         /// </summary>
-        /// <param name="samples">List of <see cref="ISampleGeneratingArgs"/> that represents the sound that has to be made.</param>
+        /// <param name="samples">List of <see cref="ISampleGenerator"/> that represents the sound that has to be made.</param>
         /// <param name="hitsoundName">Name of the hitsound. For example "hitwhistle" or "slidertick".</param>
         /// <param name="sampleSet">Sample set for the hitsound for if it adds a new sample to the sample schema.</param>
         /// <param name="newIndex">Index to start searching from. It will start at this value and go up until a slot is available.</param>
         /// <param name="newSampleSet">The sample set of the added sample.</param>
         /// <param name="startIndex">The index of the added sample.</param>
         /// <returns>True if it added a new entry.</returns>
-        public bool AddHitsound(ISet<ISampleGeneratingArgs> samples, string hitsoundName, SampleSet sampleSet, out int newIndex,
+        public bool AddHitsound(ISet<ISampleGenerator> samples, string hitsoundName, SampleSet sampleSet, out int newIndex,
             out SampleSet newSampleSet, int startIndex = 1) {
 
             // Check if our sample schema already has a sample for this
             var filename = FindFilename(samples, "^(normal|soft|drum)-" + hitsoundName);
             if (filename != null) {
-                newIndex = HitsoundImporter.GetIndexFromFilename(filename);
-                newSampleSet = HitsoundImporter.GetSamplesetFromFilename(filename);
+                newIndex = Helpers.GetIndexFromFilename(filename);
+                newSampleSet = Helpers.GetSamplesetFromFilename(filename);
                 return false;
             }
 
@@ -58,8 +58,8 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
 
             // Find an index which is not taken in the sample schema
             while (Keys.Any(o => Regex.IsMatch(o, "^(normal|soft|drum)-" + hitsoundName) &&
-                                 HitsoundImporter.GetIndexFromFilename(o) == index &&
-                                 HitsoundImporter.GetSamplesetFromFilename(o) == sampleSet)) {
+                                 Helpers.GetIndexFromFilename(o) == index &&
+                                 Helpers.GetSamplesetFromFilename(o) == sampleSet)) {
                 index++;
             }
 
@@ -70,14 +70,14 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
             return true;
         }
 
-        public string FindFilename(ISet<ISampleGeneratingArgs> samples) {
+        public string FindFilename(ISet<ISampleGenerator> samples) {
             return (from kvp 
                 in this 
                 where kvp.Value.SequenceEqual(samples)
                 select kvp.Key).FirstOrDefault();
         }
 
-        public string FindFilename(ISet<ISampleGeneratingArgs> samples, string regexPattern) {
+        public string FindFilename(ISet<ISampleGenerator> samples, string regexPattern) {
             return (from kvp
                     in this
                 where kvp.Value.SequenceEqual(samples) && Regex.IsMatch(kvp.Key, regexPattern)
@@ -85,12 +85,12 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
         }
 
         /// <summary>
-        /// Generates a dictionary which maps <see cref="ISampleGeneratingArgs"/> to their corresponding filename which makes that sample sound.
-        /// Only maps the <see cref="ISampleGeneratingArgs"/> which are non-mixed.
+        /// Generates a dictionary which maps <see cref="ISampleGenerator"/> to their corresponding filename which makes that sample sound.
+        /// Only maps the <see cref="ISampleGenerator"/> which are non-mixed.
         /// </summary>
         /// <returns></returns>
-        public IDictionary<ISampleGeneratingArgs, string> GetSampleNames() {
-            var sampleNames = new Dictionary<ISampleGeneratingArgs, string>();
+        public IDictionary<ISampleGenerator, string> GetSampleNames() {
+            var sampleNames = new Dictionary<ISampleGenerator, string>();
 
             foreach (var kvp in this.Where(kvp => kvp.Value.Count == 1)) {
                 if (!sampleNames.ContainsKey(kvp.Value.First())) {
@@ -122,11 +122,11 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
                 }
 
                 if (customIndices.ContainsKey(index)) {
-                    customIndices[index].Samples[hitsound] = new HashSet<ISampleGeneratingArgs>(kvp.Value);
+                    customIndices[index].Samples[hitsound] = new HashSet<ISampleGenerator>(kvp.Value);
                 } else {
                     var ci = new CustomIndex(index);
                     customIndices.Add(index, ci);
-                    ci.Samples[hitsound] = new HashSet<ISampleGeneratingArgs>(kvp.Value);
+                    ci.Samples[hitsound] = new HashSet<ISampleGenerator>(kvp.Value);
                 }
             }
 

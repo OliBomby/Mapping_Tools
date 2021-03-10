@@ -1,89 +1,48 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Mapping_Tools_Core.Audio.SampleSoundGeneration;
-using Mapping_Tools_Core.BeatmapHelper;
+using Mapping_Tools_Core.Audio.SampleGeneration;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
-
-    /// <summary>
-    /// 
-    /// </summary>
     public class CustomIndex : ICustomIndex {
         public int Index { get; set; }
 
-        public Dictionary<string, HashSet<ISampleGeneratingArgs>> Samples { get; }
+        public Dictionary<string, HashSet<ISampleGenerator>> Samples { get; }
         
-        /// <summary>
-        /// 
-        /// </summary>
         private static IEnumerable<string> AllKeys => new[] { "normal-hitnormal", "normal-hitwhistle", "normal-hitfinish", "normal-hitclap",
                                                                          "soft-hitnormal", "soft-hitwhistle", "soft-hitfinish", "soft-hitclap",
                                                                          "drum-hitnormal", "drum-hitwhistle", "drum-hitfinish", "drum-hitclap" };
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="index"></param>
         public CustomIndex(int index) {
             Index = index;
-            Samples = new Dictionary<string, HashSet<ISampleGeneratingArgs>>();
+            Samples = new Dictionary<string, HashSet<ISampleGenerator>>();
             foreach (string key in AllKeys) {
-                Samples[key] = new HashSet<ISampleGeneratingArgs>();
+                Samples[key] = new HashSet<ISampleGenerator>();
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public CustomIndex() : this(-1) { }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="s1"></param>
-        /// <param name="s2"></param>
-        /// <returns></returns>
-        public static bool CheckSupport(HashSet<ISampleGeneratingArgs> s1, HashSet<ISampleGeneratingArgs> s2) {
+        public static bool CheckSupport(HashSet<ISampleGenerator> s1, HashSet<ISampleGenerator> s2) {
             // s2 fits in s1 or s2 is empty
             return s2.Count <= 0 || s1.SetEquals(s2);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="s1"></param>
-        /// <param name="s2"></param>
-        /// <returns></returns>
-        public static bool CheckCanSupport(HashSet<ISampleGeneratingArgs> s1, HashSet<ISampleGeneratingArgs> s2) {
+        public static bool CheckCanSupport(HashSet<ISampleGenerator> s1, HashSet<ISampleGenerator> s2) {
             // s2 fits in s1 or s1 is empty or s2 is empty
             return s1.Count <= 0 || s2.Count <= 0 || s1.SetEquals(s2);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="other"></param>
-        /// <returns></returns>
         public bool Fits(ICustomIndex other) {
             // Every non-empty set from other == set from self
             return Samples.All(kvp => CheckSupport(kvp.Value, other.Samples[kvp.Key]));
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="other"></param>
-        /// <returns></returns>
         public bool CanMerge(ICustomIndex other) {
             // Every non-empty set from other == non-empty set from self
             return Samples.All(kvp => CheckCanSupport(kvp.Value, other.Samples[kvp.Key]));
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="other"></param>
         public void MergeWith(ICustomIndex other) {
             foreach (string key in AllKeys) {
                 Samples[key].UnionWith(other.Samples[key]);
@@ -96,36 +55,28 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public object Clone() {
             ICustomIndex ci = new CustomIndex(Index);
             ci.MergeWith(this);
             return ci;
         }
 
-        public void CleanInvalids(Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator> loadedSamples = null) {
-            // Remove all invalid paths but leave one invalid path in to mark the sample as occupied
-            foreach (HashSet<ISampleGeneratingArgs> paths in Samples.Values) {
+        public void CleanInvalids() {
+            // Remove all invalid generators but leave one invalid path in to mark the sample as occupied
+            foreach (HashSet<ISampleGenerator> paths in Samples.Values) {
                 int initialCount = paths.Count;
-                paths.RemoveWhere(o => loadedSamples == null ? !o.IsValid() : !o.IsValid(loadedSamples));
+                paths.RemoveWhere(o => o == null || !o.IsValid());
 
                 if (paths.Count == 0 && initialCount != 0) {
-                    // All the paths were invalid and it didn't just start out empty
-                    paths.Add(new SampleGeneratingArgs());  // This invalid path is here to prevent this hashset from getting new paths
+                    // All the generators were invalid and it didn't just start out empty
+                    paths.Add(new DummySampleGenerator());  // Put this dummy here to prevent this hashset from getting new generators
                 }
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public override string ToString() {
             var accumulator = new StringBuilder();
-            foreach (KeyValuePair<string, HashSet<ISampleGeneratingArgs>> kvp in Samples) {
+            foreach (KeyValuePair<string, HashSet<ISampleGenerator>> kvp in Samples) {
                 var sampleList = new StringBuilder();
                 foreach (var sga in kvp.Value) {
                     sampleList.Append($"{sga}|");

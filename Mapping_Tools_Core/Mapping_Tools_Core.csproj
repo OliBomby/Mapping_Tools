@@ -127,6 +127,7 @@
     <Compile Include="Audio\OsuVolumeConverter.cs" />
     <Compile Include="Audio\SampleGeneration\Decorators\AudioSampleDecoratorAbstract.cs" />
     <Compile Include="Audio\SampleGeneration\Decorators\IPreloadableGenerator.cs" />
+    <Compile Include="Audio\SampleGeneration\DummySampleGenerator.cs" />
     <Compile Include="Audio\SampleGeneration\IFromPathGenerator.cs" />
     <Compile Include="Audio\SampleGeneration\RawAudioSampleGenerator.cs" />
     <Compile Include="Audio\SampleGeneration\PathAudioSampleGenerator.cs" />
@@ -244,7 +245,6 @@
     <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\IFileLayerSourceRef.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\IHitsoundsLayerSourceRef.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\ILayerSourceRef.cs" />
-    <Compile Include="Tools\HitsoundStudio\Model\ISampleGeneratingArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\IMidiLayerImportArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\ISampleMapLayerImportArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\IStackLayerImportArgs.cs" />
@@ -255,7 +255,6 @@
     <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\MidiLayerSourceRef.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\StoryboardLayerSourceRef.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\Sample.cs" />
-    <Compile Include="Tools\HitsoundStudio\Model\SampleGeneratingArgs.cs" />
     <Compile Include="Tools\HitsoundStudio\HitsoundConverter.cs" />
     <Compile Include="Tools\HitsoundStudio\Model\HitsoundEvent.cs" />
     <Compile Include="Tools\HitsoundStudio\HitsoundExporter.cs" />

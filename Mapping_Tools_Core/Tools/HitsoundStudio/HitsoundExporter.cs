@@ -10,6 +10,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Mapping_Tools_Core.Audio.Exporting;
+using Mapping_Tools_Core.Audio.SampleGeneration;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio {
     public class HitsoundExporter {
@@ -93,15 +95,34 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
             editor.WriteFile(beatmap);
         }
 
-        public static void ExportLoadedSamples(Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator> loadedSamples,
-            string exportFolder, Dictionary<ISampleGeneratingArgs, string> names = null, 
-            SampleExportFormat format=SampleExportFormat.Default) {
-            if (names == null) {
-                names = GenerateSampleNames(loadedSamples.Keys, loadedSamples);
+        public static void ExportSample(ISampleGenerator sample, ISampleExporter exporter, string name = null) {
+            if (exporter is IPathAudioSampleExporter pathAudioSampleExporter) {
+                pathAudioSampleExporter.ExportName = name ?? sample.GetName();
             }
 
-            foreach (var sample in loadedSamples.Keys.Where(sample => sample.IsValid(loadedSamples))) {
-                ExportSample(sample, names[sample], exportFolder, loadedSamples, format);
+            sample.ToExporter(exporter);
+            exporter.Flush();
+        }
+
+        public static void ExportMixedSample(IEnumerable<ISampleGenerator> samples, ISampleExporter exporter, string name) {
+            if (exporter is IPathAudioSampleExporter pathAudioSampleExporter) {
+                pathAudioSampleExporter.ExportName = name;
+            }
+
+            foreach (var sample in samples) {
+                sample.ToExporter(exporter);
+            }
+
+            exporter.Flush();
+        }
+
+        public static void ExportSamples(ICollection<ISampleGenerator> samples, ISampleExporter exporter, Dictionary<ISampleGenerator, string> names = null) {
+            if (names == null) {
+                names = GenerateSampleNames(samples);
+            }
+
+            foreach (var sample in samples.Where(sample => sample.IsValid())) {
+                ExportSample(sample, exporter, names[sample]);
             }
         }
 
@@ -109,61 +130,31 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
         /// Exports all samples for a collection of custom indices.
         /// </summary>
         /// <param name="customIndices"></param>
-        /// <param name="exportFolder"></param>
-        /// <param name="loadedSamples"></param>
-        /// <param name="format"></param>
-        /// <param name="mixedFormat"></param>
-        public static void ExportCustomIndices(List<ICustomIndex> customIndices, string exportFolder, 
-            Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator> loadedSamples=null, 
-            SampleExportFormat format=SampleExportFormat.Default, SampleExportFormat mixedFormat=SampleExportFormat.Default) {
+        /// <param name="exporter"></param>
+        public static void ExportCustomIndices(List<ICustomIndex> customIndices, ISampleExporter exporter) {
             foreach (ICustomIndex ci in customIndices) {
-                foreach (KeyValuePair<string, HashSet<ISampleGeneratingArgs>> kvp in ci.Samples) {
+                foreach (KeyValuePair<string, HashSet<ISampleGenerator>> kvp in ci.Samples) {
                     if (kvp.Value.Count == 0) {
                         continue;
                     }
                     
                     string filename = ci.Index == 1 ? kvp.Key : kvp.Key + ci.Index;
-                    ExportMixedSample(kvp.Value, filename, exportFolder, loadedSamples, format, mixedFormat);
+                    ExportMixedSample(kvp.Value, exporter, filename);
                 }
             }
         }
 
-        public static void ExportSampleSchema(ISampleSchema sampleSchema, string exportFolder,
-            Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator> loadedSamples = null,
-            SampleExportFormat format = SampleExportFormat.Default, SampleExportFormat mixedFormat = SampleExportFormat.Default) {
+        public static void ExportSampleSchema(ISampleSchema sampleSchema, ISampleExporter exporter) {
             foreach (var kvp in sampleSchema) {
-                ExportMixedSample(kvp.Value, kvp.Key, exportFolder, loadedSamples, format, mixedFormat);
+                ExportMixedSample(kvp.Value, exporter, kvp.Key);
             }
         }
 
-        private static bool CreateWaveFile(string filename, IWaveProvider sourceProvider) {
-            try {
-                using (var writer = new WaveFileWriter(filename, sourceProvider.WaveFormat)) {
-                    var buffer = new byte[sourceProvider.WaveFormat.AverageBytesPerSecond * 4];
-                    while (true) {
-                        int bytesRead = sourceProvider.Read(buffer, 0, buffer.Length);
-                        if (bytesRead == 0) {
-                            // end of source provider
-                            break;
-                        }
-
-                        // Write will throw exception if WAV file becomes too large
-                        writer.Write(buffer, 0, bytesRead);
-                    }
-                }
-
-                return true;
-            } catch (IndexOutOfRangeException) {
-                return false;
-            }
-        }
-
-        public static Dictionary<ISampleGeneratingArgs, string> GenerateSampleNames(IEnumerable<ISampleGeneratingArgs> samples, 
-            Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator> loadedSamples) {
+        public static Dictionary<ISampleGenerator, string> GenerateSampleNames(IEnumerable<ISampleGenerator> samples) {
             var usedNames = new HashSet<string>();
-            var sampleNames = new Dictionary<ISampleGeneratingArgs, string>();
+            var sampleNames = new Dictionary<ISampleGenerator, string>();
             foreach (var sample in samples) {
-                if (!sample.IsValid(loadedSamples)) {
+                if (!sample.IsValid()) {
                     sampleNames[sample] = string.Empty;
                     continue;
                 }
@@ -183,9 +174,8 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
             return sampleNames;
         }
 
-        public static void AddNewSampleName(Dictionary<ISampleGeneratingArgs, string> sampleNames, ISampleGeneratingArgs sample,
-            Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator> loadedSamples) {
-            if (!sample.IsValid(loadedSamples)) {
+        public static void AddNewSampleName(Dictionary<ISampleGenerator, string> sampleNames, ISampleGenerator sample) {
+            if (!sample.IsValid()) {
                 sampleNames[sample] = string.Empty;
                 return;
             }
@@ -201,7 +191,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
             sampleNames[sample] = name;
         }
 
-        public static Dictionary<ISampleGeneratingArgs, Vector2> GenerateHitsoundPositions(IEnumerable<ISampleGeneratingArgs> samples) {
+        public static Dictionary<ISampleGenerator, Vector2> GenerateHitsoundPositions(IEnumerable<ISampleGenerator> samples) {
             var sampleArray = samples.ToArray();
             var sampleCount = sampleArray.Length;
 
@@ -217,7 +207,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
                     spacingY /= 2;
             }
 
-            var positions = new Dictionary<ISampleGeneratingArgs, Vector2>();
+            var positions = new Dictionary<ISampleGenerator, Vector2>();
             int x = 0;
             int y = 0;
             foreach (var sample in sampleArray) {
@@ -237,14 +227,14 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
             return positions;
         }
 
-        public static Dictionary<ISampleGeneratingArgs, Vector2> GenerateManiaHitsoundPositions(IEnumerable<ISampleGeneratingArgs> samples) {
+        public static Dictionary<ISampleGenerator, Vector2> GenerateManiaHitsoundPositions(IEnumerable<ISampleGenerator> samples) {
             var sampleArray = samples.ToArray();
             var sampleCount = sampleArray.Length;
 
             // One key per unique sample but clamped between 1 and 18
             int numKeys = MathHelper.Clamp(sampleCount, 1, 18);
 
-            var positions = new Dictionary<ISampleGeneratingArgs, Vector2>();
+            var positions = new Dictionary<ISampleGenerator, Vector2>();
             double x = 256d / numKeys;
             foreach (var sample in sampleArray) {
                 positions.Add(sample, new Vector2(Math.Round(x), 192));

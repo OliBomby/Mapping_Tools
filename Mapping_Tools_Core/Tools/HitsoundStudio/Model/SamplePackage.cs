@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Mapping_Tools_Core.Audio.SampleGeneration;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
@@ -59,16 +60,16 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
             SampleSet sampleSet = GetSampleSet();
             SampleSet additions = GetAdditions();
 
-            HashSet<ISampleGeneratingArgs> normals = new HashSet<ISampleGeneratingArgs>(
-                Samples.Where(o => o.Hitsound == Hitsound.Normal).Select(o => o.SampleGeneratingArgs));
-            HashSet<ISampleGeneratingArgs> whistles = new HashSet<ISampleGeneratingArgs>(
-                Samples.Where(o => o.Hitsound == Hitsound.Whistle).Select(o => o.SampleGeneratingArgs));
-            HashSet<ISampleGeneratingArgs> finishes = new HashSet<ISampleGeneratingArgs>(
-                Samples.Where(o => o.Hitsound == Hitsound.Finish).Select(o => o.SampleGeneratingArgs));
-            HashSet<ISampleGeneratingArgs> claps = new HashSet<ISampleGeneratingArgs>(
-                Samples.Where(o => o.Hitsound == Hitsound.Clap).Select(o => o.SampleGeneratingArgs));
+            HashSet<ISampleGenerator> normals = new HashSet<ISampleGenerator>(
+                Samples.Where(o => o.Hitsound == Hitsound.Normal).Select(o => o.SampleGenerator));
+            HashSet<ISampleGenerator> whistles = new HashSet<ISampleGenerator>(
+                Samples.Where(o => o.Hitsound == Hitsound.Whistle).Select(o => o.SampleGenerator));
+            HashSet<ISampleGenerator> finishes = new HashSet<ISampleGenerator>(
+                Samples.Where(o => o.Hitsound == Hitsound.Finish).Select(o => o.SampleGenerator));
+            HashSet<ISampleGenerator> claps = new HashSet<ISampleGenerator>(
+                Samples.Where(o => o.Hitsound == Hitsound.Clap).Select(o => o.SampleGenerator));
             
-            CustomIndex ci = new CustomIndex();
+            ICustomIndex ci = new CustomIndex();
 
             switch (sampleSet) {
                 case SampleSet.Normal:

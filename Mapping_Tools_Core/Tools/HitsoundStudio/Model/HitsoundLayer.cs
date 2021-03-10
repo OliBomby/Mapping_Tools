@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Mapping_Tools_Core.Audio.SampleGeneration;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.Tools.HitsoundStudio.Model.LayerSourceRef;
 
@@ -11,17 +12,17 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
         public Hitsound Hitsound { get; set; }
         public int Priority { get; set; }
         public ILayerSourceRef LayerSourceRef { get; set; }
-        public ISampleGeneratingArgs SampleGeneratingArgs { get; set; }
+        public ISampleGenerator SampleGenerator { get; set; }
 
-        public HitsoundLayer() : this(new double[0], new SampleGeneratingArgs()) {}
+        public HitsoundLayer() : this(new double[0], null) {}
 
-        public HitsoundLayer(IEnumerable<double> times) : this(times, new SampleGeneratingArgs()) {}
+        public HitsoundLayer(IEnumerable<double> times) : this(times, null) {}
 
-        public HitsoundLayer(ISampleGeneratingArgs sampleGeneratingArgs) : this(new double[0], sampleGeneratingArgs) {}
+        public HitsoundLayer(ISampleGenerator sampleGenerator) : this(new double[0], sampleGenerator) {}
 
-        public HitsoundLayer(IEnumerable<double> times, ISampleGeneratingArgs sampleGeneratingArgs) {
+        public HitsoundLayer(IEnumerable<double> times, ISampleGenerator sampleGeneratingArgs) {
             Times = new SortedSet<double>(times);
-            SampleGeneratingArgs = sampleGeneratingArgs;
+            SampleGenerator = sampleGeneratingArgs;
         }
 
         public void Reload(IEnumerable<IHitsoundLayer> layers) {

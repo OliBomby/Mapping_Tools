@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Mapping_Tools_Core.Audio.SampleSoundGeneration;
+using Mapping_Tools_Core.Audio.SampleGeneration;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
     public interface ICustomIndex : ICloneable {
@@ -12,10 +12,10 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
 
         /// <summary>
         /// The samples in this custom index.
-        /// Maps a sample name to a set of <see cref="ISampleGeneratingArgs"/>
+        /// Maps a sample name to a set of <see cref="ISampleGenerator"/>
         /// to allow multiple samples mixed in a single sample name.
         /// </summary>
-        Dictionary<string, HashSet<ISampleGeneratingArgs>> Samples { get; }
+        Dictionary<string, HashSet<ISampleGenerator>> Samples { get; }
 
         /// <summary>
         /// Checks if this custom index fits all the needs of the other
@@ -50,7 +50,6 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
         /// <summary>
         /// Cleans invalid samples.
         /// </summary>
-        /// <param name="loadedSamples">The pre-loaded samples</param>
-        void CleanInvalids(Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator> loadedSamples = null);
+        void CleanInvalids();
     }
 }

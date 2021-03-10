@@ -1,10 +1,4 @@
-﻿using Mapping_Tools_Core.Audio;
-using Mapping_Tools_Core.Audio.SampleSoundGeneration;
-using Mapping_Tools_Core.BeatmapHelper;
-using Mapping_Tools_Core.BeatmapHelper.Enums;
-using Mapping_Tools_Core.Tools.HitsoundStudio.Model;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Mapping_Tools_Core.BeatmapHelper.Enums;
 using System.Text.RegularExpressions;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio {
@@ -54,26 +48,6 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
             }
 
             return index;
-        }
-
-        public static Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator> LoadSampleSoundGenerators(ICollection<ISampleGeneratingArgs> argsList) {
-            // Import all the samples
-            var importedSamples = SampleImporter.ImportSamples(argsList.Select(o => o.ImportArgs));
-
-            // Apply effects
-            var samples = new Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator>();
-            foreach (var args in argsList) {
-                if (args.ImportArgs == null) {
-                    samples[args] = null;
-                    continue;
-                }
-
-                if (importedSamples.ContainsKey(args.ImportArgs)) {
-                    samples[args] = args.ApplyEffects(importedSamples[args.ImportArgs]);
-                }
-            }
-
-            return samples;
         }
     }
 }

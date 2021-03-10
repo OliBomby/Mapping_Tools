@@ -5,6 +5,7 @@ using Mapping_Tools_Core.Tools.HitsoundStudio.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Mapping_Tools_Core.Audio.SampleGeneration;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio {
     public class HitsoundConverter {
@@ -35,6 +36,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
         /// <summary>
         /// Balances the volume of <see cref="ISamplePackage"/> such that volume is mostly handled by osu!'s volume controllers rather than
         /// in-sample amplitude changes.
+        /// TODO: Maybe move this to the hitsound layers or before the hitsound layers are made.
         /// </summary>
         /// <param name="packages"></param>
         /// <param name="roughness">Quantizing level in the new volumes of samples. Can be used to decrease the number of distinct volume levels.</param>
@@ -47,20 +49,20 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
                     foreach (ISample sample in package.Samples) {
                         sample.OutsideVolume = OsuVolumeConverter.AmplitudeToVolume(
                             OsuVolumeConverter.VolumeToAmplitude(sample.OutsideVolume) *
-                            OsuVolumeConverter.VolumeToAmplitude(sample.SampleGeneratingArgs.Volume));
+                            OsuVolumeConverter.VolumeToAmplitude(sample.SampleGenerator.Volume));
 
-                        sample.SampleGeneratingArgs = new SampleGeneratingArgs(sample.SampleGeneratingArgs.ImportArgs, 1);
+                        sample.SampleGenerator = new SampleGeneratingArgs(sample.SampleGenerator.ImportArgs, 1);
                     }
                     continue;
                 }
 
-                double maxVolume = package.Samples.Max(o => o.SampleGeneratingArgs.Volume);
+                double maxVolume = package.Samples.Max(o => o.SampleGenerator.Volume);
                 if (Math.Abs(maxVolume - -0.01) < Precision.DOUBLE_EPSILON) {
                     maxVolume = 1;
                 }
 
                 foreach (ISample sample in package.Samples) {
-                    var sampleVolume = sample.SampleGeneratingArgs.Volume;
+                    var sampleVolume = sample.SampleGenerator.Volume;
 
                     if (Math.Abs(sampleVolume - -0.01) < Precision.DOUBLE_EPSILON) {
                         sampleVolume = 1;
@@ -83,7 +85,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
                         sampleVolume = 1;
                     }
 
-                    sample.SampleGeneratingArgs = new SampleGeneratingArgs(sample.SampleGeneratingArgs.ImportArgs, sampleVolume);
+                    sample.SampleGenerator = new SampleGeneratingArgs(sample.SampleGenerator.ImportArgs, sampleVolume);
                 }
 
                 if (alwaysFullVolume) {
@@ -98,11 +100,10 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
             }
         }
 
-        public static List<ICustomIndex> GetCustomIndices(List<ISamplePackage> packages, 
-            Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator> loadedSamples = null) {
+        public static List<ICustomIndex> GetCustomIndices(List<ISamplePackage> packages) {
 
             var indices = packages.Select(o => o.GetCustomIndex()).ToList();
-            indices.ForEach(o => o.CleanInvalids(loadedSamples));
+            indices.ForEach(o => o.CleanInvalids());
             return indices;
         }
 
@@ -158,23 +159,29 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
             }
         }
 
-        public static List<IHitsoundEvent> GetHitsounds(List<ISamplePackage> samplePackages,
-            ref Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator> loadedSamples,
-            ref Dictionary<ISampleGeneratingArgs, string> names,
-            ref Dictionary<ISampleGeneratingArgs, Vector2> positions,
+        /// <summary>
+        /// Generates <see cref="IHitsoundEvent"/> from <see cref="ISamplePackage"/> with one hitsound event
+        /// for each sample in the packages, thus possibly creating simultaneous hitsound events.
+        /// </summary>
+        /// <param name="samplePackages"></param>
+        /// <param name="names"></param>
+        /// <param name="positions"></param>
+        /// <param name="maniaPositions"></param>
+        /// <param name="includeRegularHitsounds"></param>
+        /// <param name="allowNamingGrowth"></param>
+        /// <returns></returns>
+        public static List<IHitsoundEvent> GetHitsounds(ICollection<ISamplePackage> samplePackages,
+            ref Dictionary<ISampleGenerator, string> names,
+            ref Dictionary<ISampleGenerator, Vector2> positions,
             bool maniaPositions=false, bool includeRegularHitsounds=true, bool allowNamingGrowth=false) {
 
-            HashSet<ISampleGeneratingArgs> allSampleArgs = new HashSet<ISampleGeneratingArgs>();
+            HashSet<ISampleGenerator> allSampleArgs = new HashSet<ISampleGenerator>();
             foreach (ISamplePackage sp in samplePackages) {
-                allSampleArgs.UnionWith(sp.Samples.Select(o => o.SampleGeneratingArgs));
-            }
-
-            if (loadedSamples == null) {
-                loadedSamples = Helpers.LoadSampleSoundGenerators(allSampleArgs);
+                allSampleArgs.UnionWith(sp.Samples.Select(o => o.SampleGenerator));
             }
 
             if (names == null) {
-                names = HitsoundExporter.GenerateSampleNames(allSampleArgs, loadedSamples);
+                names = HitsoundExporter.GenerateSampleNames(allSampleArgs);
             }
 
             if (positions == null) {
@@ -186,30 +193,33 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
             foreach (var p in samplePackages) {
                 foreach (var s in p.Samples) {
                     string filename;
+                    //TODO: Fix this so it can choose position based on the Sample
+                    Vector2 position;
 
-                    if (names.ContainsKey(s.SampleGeneratingArgs)) {
-                        filename = names[s.SampleGeneratingArgs];
+                    if (s.SampleGenerator == null || !s.SampleGenerator.IsValid()) {
+                        filename = string.Empty;
+                    } else if (names.ContainsKey(s.SampleGenerator)) {
+                        filename = names[s.SampleGenerator];
                     } else {
-                        // Validate the sample because we expect only valid samples to be present in the sample schema
-                        if (s.SampleGeneratingArgs.IsValid(loadedSamples)) {
-                            if (allowNamingGrowth) {
-                                HitsoundExporter.AddNewSampleName(names, s.SampleGeneratingArgs, loadedSamples);
-                                filename = names[s.SampleGeneratingArgs];
-                            } else {
-                                throw new Exception($"Given sample schema doesn't support sample ({s.SampleGeneratingArgs}) and growth is disabled.");
-                            }
+                        if (allowNamingGrowth) {
+                            HitsoundExporter.AddNewSampleName(names, s.SampleGenerator);
+                            filename = names[s.SampleGenerator];
                         } else {
-                            filename = string.Empty;
+                            throw new Exception($"Given sample naming schema doesn't support sample ({s.SampleGenerator}) and growth is disabled.");
                         }
+                    }
+
+                    if (s.SampleGenerator == null) {
+
                     }
 
                     if (includeRegularHitsounds) {
                         hitsounds.Add(new HitsoundEvent(p.Time,
-                            positions[s.SampleGeneratingArgs], s.OutsideVolume, filename, s.SampleSet, s.SampleSet,
+                            positions[s.SampleGenerator], s.OutsideVolume, filename, s.SampleSet, s.SampleSet,
                             0, s.Hitsound == Hitsound.Whistle, s.Hitsound == Hitsound.Finish, s.Hitsound == Hitsound.Clap));
                     } else {
                         hitsounds.Add(new HitsoundEvent(p.Time,
-                            positions[s.SampleGeneratingArgs], s.OutsideVolume, filename, SampleSet.Auto, SampleSet.Auto,
+                            positions[s.SampleGenerator], s.OutsideVolume, filename, SampleSet.Auto, SampleSet.Auto,
                             0, false, false, false));
                     }
                 }
@@ -223,14 +233,12 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
         /// </summary>
         /// <param name="samplePackages">The SamplePackages to get hitsounds out of</param>
         /// <param name="customIndices">The CustomIndices that fit all the packages</param>
-        /// <param name="loadedSamples">Loaded samples for the validation of samples files from the sample packages.</param>
         /// <returns></returns>
         public static List<IHitsoundEvent> GetHitsounds(List<ISamplePackage> samplePackages, 
-            List<ICustomIndex> customIndices,
-            Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator> loadedSamples = null) {
+            List<ICustomIndex> customIndices) {
 
             List<IHitsoundEvent> hitsounds = new List<IHitsoundEvent>(samplePackages.Count);
-            List<ICustomIndex> packageCustomIndices = GetCustomIndices(samplePackages, loadedSamples);
+            List<ICustomIndex> packageCustomIndices = GetCustomIndices(samplePackages);
 
             int index = 0;
             while (index < packageCustomIndices.Count) {
@@ -276,19 +284,18 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
             return supported;
         }
 
-        public static ICompleteHitsounds GetCompleteHitsounds(List<ISamplePackage> packages, 
-            Dictionary<ISampleGeneratingArgs, ISampleSoundGenerator> loadedSamples = null,
+        public static ICompleteHitsounds GetCompleteHitsounds(List<ISamplePackage> packages,
             List<ICustomIndex> customIndices = null, bool allowGrowth=false, int firstCustomIndex=1) {
 
             if (customIndices == null) {
-                customIndices = OptimizeCustomIndices(GetCustomIndices(packages, loadedSamples));
+                customIndices = OptimizeCustomIndices(GetCustomIndices(packages));
                 GiveCustomIndicesIndices(customIndices, false, firstCustomIndex);
             } else if (allowGrowth) {
-                customIndices = OptimizeCustomIndices(customIndices.Concat(GetCustomIndices(packages, loadedSamples)).ToList());
+                customIndices = OptimizeCustomIndices(customIndices.Concat(GetCustomIndices(packages)).ToList());
                 GiveCustomIndicesIndices(customIndices, true, firstCustomIndex);
             }
 
-            var hitsounds = GetHitsounds(packages, customIndices, loadedSamples);
+            var hitsounds = GetHitsounds(packages, customIndices);
 
             return new CompleteHitsounds(hitsounds, customIndices);
         }

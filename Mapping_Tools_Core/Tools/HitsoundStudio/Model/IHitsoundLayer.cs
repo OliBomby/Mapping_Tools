@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
+using Mapping_Tools_Core.Audio.SampleGeneration;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.Tools.HitsoundStudio.Model.LayerSourceRef;
 
@@ -22,8 +23,9 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
         [CanBeNull]
         ILayerSourceRef LayerSourceRef { get; set; }
 
-        [NotNull]
-        ISampleGeneratingArgs SampleGeneratingArgs { get; set; }
+        //TODO: This can just use a ISample
+        [CanBeNull]
+        ISampleGenerator SampleGenerator { get; set; }
 
         /// <summary>
         /// Replaces <see cref="Times"/> with the times of all

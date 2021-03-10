@@ -1,4 +1,6 @@
 ﻿using System;
+using JetBrains.Annotations;
+using Mapping_Tools_Core.Audio.SampleGeneration;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
@@ -7,7 +9,8 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
     /// with the addition of an outside volume parameter.
     /// </summary>
     public interface ISample : ICloneable {
-        ISampleGeneratingArgs SampleGeneratingArgs { get; set; }
+        [CanBeNull]
+        ISampleGenerator SampleGenerator { get; set; }
         int Priority { get; set; }
         double OutsideVolume { get; set; }
         SampleSet SampleSet { get; set; }

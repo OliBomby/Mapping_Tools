@@ -194,7 +194,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
                 UpdateProgressBar(worker, 70);
 
                 if (arg.ExportSamples) {
-                    HitsoundExporter.ExportLoadedSamples(loadedSamples, arg.ExportFolder, sampleNames, arg.SingleSampleExportFormat, comparer);
+                    HitsoundExporter.ExportSamples(loadedSamples, arg.ExportFolder, sampleNames, arg.SingleSampleExportFormat, comparer);
                 }
             } else if (arg.HitsoundExportModeSetting == HitsoundStudioVm.HitsoundExportMode.Storyboard) {
                 List<SamplePackage> samplePackages = HitsoundConverter.ZipLayers(arg.HitsoundLayers, arg.DefaultSample, 0, false);
@@ -239,7 +239,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
                 UpdateProgressBar(worker, 70);
 
                 if (arg.ExportSamples) {
-                    HitsoundExporter.ExportLoadedSamples(loadedSamples, arg.ExportFolder, sampleNames, arg.SingleSampleExportFormat, comparer);
+                    HitsoundExporter.ExportSamples(loadedSamples, arg.ExportFolder, sampleNames, arg.SingleSampleExportFormat, comparer);
                 }
             }
 
