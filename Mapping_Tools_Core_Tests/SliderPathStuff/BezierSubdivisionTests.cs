@@ -1,7 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace Mapping_Tools_Tests.Classes.SliderPathStuff {
+namespace Mapping_Tools_Core_Tests.SliderPathStuff {
     [TestClass]
     public class BezierSubdivisionTests {
         [TestMethod]

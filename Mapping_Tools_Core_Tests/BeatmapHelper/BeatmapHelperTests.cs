@@ -1,8 +1,9 @@
-﻿using System.IO;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Mapping_Tools_Core.BeatmapHelper;
+using System.IO;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools_Tests.Classes.BeatmapHelper {
+namespace Mapping_Tools_Core_Tests.BeatmapHelper {
     [TestClass]
     public class BeatmapHelperTests {
         [TestMethod]

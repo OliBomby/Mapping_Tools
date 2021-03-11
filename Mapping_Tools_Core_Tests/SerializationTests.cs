@@ -1,12 +1,6 @@
 ﻿using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Windows.Input;
-using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Views;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools_Tests {
+namespace Mapping_Tools_Core_Tests {
     [TestClass]
     public class SerializationTests {
         private static T LoadJsonDynamic<T>(string path, T _) {

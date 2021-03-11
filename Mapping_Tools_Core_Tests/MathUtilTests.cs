@@ -1,6 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Numerics;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools_Tests {
+namespace Mapping_Tools_Core_Tests {
     [TestClass]
     public class MathUtilTests {
         [TestMethod]

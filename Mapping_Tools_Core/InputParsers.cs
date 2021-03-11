@@ -1,4 +1,9 @@
-﻿namespace Mapping_Tools_Core {
+﻿using System;
+using System.Data;
+using System.Globalization;
+using System.Text.RegularExpressions;
+
+namespace Mapping_Tools_Core {
     public class InputParsers {
         public static double ParseDouble(string str) {
             using (DataTable dt = new DataTable()) {

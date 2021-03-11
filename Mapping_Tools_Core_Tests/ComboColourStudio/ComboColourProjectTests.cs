@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace Mapping_Tools_Tests.Classes.ComboColourStudio {
+﻿namespace Mapping_Tools_Core_Tests.ComboColourStudio {
     [TestClass]
     public class ComboColourProjectTests {
         [TestMethod]

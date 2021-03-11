@@ -1,7 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Windows.Input;
-
-namespace Mapping_Tools.Classes.SystemTools.Tests {
+﻿namespace Mapping_Tools_Core_Tests.SystemTools {
     [TestClass]
     public class ListenerManagerTests {
         [TestMethod]
