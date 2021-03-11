@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Mapping_Tools_Core.Audio.SampleGeneration;
+using Mapping_Tools_Core.Audio.SampleGeneration.Decorators;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio {
     public class HitsoundConverter {
@@ -36,7 +37,6 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
         /// <summary>
         /// Balances the volume of <see cref="ISamplePackage"/> such that volume is mostly handled by osu!'s volume controllers rather than
         /// in-sample amplitude changes.
-        /// TODO: Maybe move this to the hitsound layers or before the hitsound layers are made.
         /// </summary>
         /// <param name="packages"></param>
         /// <param name="roughness">Quantizing level in the new volumes of samples. Can be used to decrease the number of distinct volume levels.</param>
@@ -47,55 +47,64 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
                 if (individualVolume) {
                     // Simply mix the volume in the sample to the outside volume
                     foreach (ISample sample in package.Samples) {
-                        sample.OutsideVolume = OsuVolumeConverter.AmplitudeToVolume(
-                            OsuVolumeConverter.VolumeToAmplitude(sample.OutsideVolume) *
-                            OsuVolumeConverter.VolumeToAmplitude(sample.SampleGenerator.Volume));
+                        if (!(sample.SampleGenerator is IAudioSampleGenerator audioSampleGenerator))
+                            continue;
 
-                        sample.SampleGenerator = new SampleGeneratingArgs(sample.SampleGenerator.ImportArgs, 1);
+                        var amplitudeFactor = audioSampleGenerator.GetAmplitudeFactor();
+
+                        sample.OutsideVolume = OsuVolumeConverter.AmplitudeToVolume(
+                            OsuVolumeConverter.VolumeToAmplitude(sample.OutsideVolume) * amplitudeFactor);
+
+                        sample.SampleGenerator = new AmplitudeSampleDecorator(audioSampleGenerator, (float)(1 / amplitudeFactor));
                     }
                     continue;
                 }
 
-                double maxVolume = package.Samples.Max(o => o.SampleGenerator.Volume);
-                if (Math.Abs(maxVolume - -0.01) < Precision.DOUBLE_EPSILON) {
-                    maxVolume = 1;
+                var audioSamples = package.Samples.Where(s => s.SampleGenerator is IAudioSampleGenerator).ToArray();
+
+                if (audioSamples.Length == 0) {
+                    continue;
                 }
 
-                foreach (ISample sample in package.Samples) {
-                    var sampleVolume = sample.SampleGenerator.Volume;
+                // ReSharper disable once PossibleNullReferenceException
+                double maxAmplitude = audioSamples.Max(o => ((IAudioSampleGenerator)o.SampleGenerator).GetAmplitudeFactor());
 
-                    if (Math.Abs(sampleVolume - -0.01) < Precision.DOUBLE_EPSILON) {
-                        sampleVolume = 1;
+                if (maxAmplitude < Precision.DOUBLE_EPSILON) {
+                    maxAmplitude = 1;
+                }
+
+                foreach (ISample sample in audioSamples) {
+                    var audioSampleGenerator = (IAudioSampleGenerator)sample.SampleGenerator;
+                    // ReSharper disable once PossibleNullReferenceException
+                    var sampleAmplitude = audioSampleGenerator.GetAmplitudeFactor();
+
+                    if (sampleAmplitude < Precision.DOUBLE_EPSILON) {
+                        sampleAmplitude = 1;
                     }
 
                     // Pick the new volume such that the samples have a volume as high as possible and the greenline brings the volume down.
                     // With this equation the final amplitude stays the same while the greenline has the volume of the loudest sample at this time.
-                    double newVolume = OsuVolumeConverter.AmplitudeToVolume(
-                        OsuVolumeConverter.VolumeToAmplitude(sample.OutsideVolume) *
-                        OsuVolumeConverter.VolumeToAmplitude(sampleVolume) /
-                        OsuVolumeConverter.VolumeToAmplitude(maxVolume));
+                    double newAmplitude = OsuVolumeConverter.VolumeToAmplitude(sample.OutsideVolume) * sampleAmplitude / maxAmplitude;
 
-
-                    if (Math.Abs(newVolume - 1) > roughness && !alwaysFullVolume) {
+                    if (Math.Abs(newAmplitude - 1) > roughness && !alwaysFullVolume) {
                         // If roughness is not 0 it will quantize the new volume in order to reduce the number of different volumes
-                        sampleVolume = Math.Abs(roughness) > Precision.DOUBLE_EPSILON ? 
-                            roughness * Math.Round(newVolume / roughness) : 
-                            newVolume;
+                        newAmplitude = Math.Abs(roughness) > Precision.DOUBLE_EPSILON ? 
+                            roughness * Math.Round(newAmplitude / roughness) : 
+                            newAmplitude;
                     } else {
-                        sampleVolume = 1;
+                        newAmplitude = 1;
                     }
 
-                    sample.SampleGenerator = new SampleGeneratingArgs(sample.SampleGenerator.ImportArgs, sampleVolume);
+                    sample.SampleGenerator = new AmplitudeSampleDecorator(audioSampleGenerator, (float)(newAmplitude / sampleAmplitude));
                 }
 
                 if (alwaysFullVolume) {
                     // Assuming the volume of the sample is always maximum, this equation makes sure that 
                     // the loudest sample at this time has the wanted amplitude using the volume change from the greenline.
                     package.SetAllOutsideVolume(OsuVolumeConverter.AmplitudeToVolume(
-                        OsuVolumeConverter.VolumeToAmplitude(package.GetMaxOutsideVolume()) *
-                        OsuVolumeConverter.VolumeToAmplitude(maxVolume)));
+                        OsuVolumeConverter.VolumeToAmplitude(package.GetMaxOutsideVolume()) * maxAmplitude));
                 } else {
-                    package.SetAllOutsideVolume(maxVolume);
+                    package.SetAllOutsideVolume(OsuVolumeConverter.AmplitudeToVolume(maxAmplitude));
                 }
             }
         }

@@ -11,9 +11,16 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
     public interface ISample : ICloneable {
         [CanBeNull]
         ISampleGenerator SampleGenerator { get; set; }
+
         int Priority { get; set; }
+
+        /// <summary>
+        /// osu! volume to be aplied using greenlines or property.
+        /// </summary>
         double OutsideVolume { get; set; }
+
         SampleSet SampleSet { get; set; }
+
         Hitsound Hitsound { get; set; }
     }
 }
