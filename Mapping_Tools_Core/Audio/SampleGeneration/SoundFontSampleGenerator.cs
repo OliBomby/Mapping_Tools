@@ -57,7 +57,7 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration {
             }
         }
 
-        public void PreLoadSample() {
+        public void PreloadSample() {
             if (!preloaded) {
                 try {
                     cachedGenerator = GetSampleGenerator();

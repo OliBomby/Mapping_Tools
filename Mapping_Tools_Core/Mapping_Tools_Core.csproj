@@ -126,7 +126,7 @@
     <Compile Include="Audio\Midi\MidiNote.cs" />
     <Compile Include="Audio\OsuVolumeConverter.cs" />
     <Compile Include="Audio\SampleGeneration\Decorators\AudioSampleDecoratorAbstract.cs" />
-    <Compile Include="Audio\SampleGeneration\Decorators\IPreloadableGenerator.cs" />
+    <Compile Include="Audio\SampleGeneration\IPreloadableGenerator.cs" />
     <Compile Include="Audio\SampleGeneration\DummySampleGenerator.cs" />
     <Compile Include="Audio\SampleGeneration\IFromPathGenerator.cs" />
     <Compile Include="Audio\SampleGeneration\RawAudioSampleGenerator.cs" />
