@@ -14,10 +14,10 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration {
     public class PathAudioSampleGenerator : IAudioSampleGenerator, IFromPathGenerator {
         private static readonly string[] ValidExtensions = {".wav", ".mp3", ".aiff", ".ogg"};
 
-        private string Extension() => System.IO.Path.GetExtension(Path);
+        protected string Extension() => System.IO.Path.GetExtension(Path);
 
-        private WaveStream cachedWaveStream;
-        private bool preloaded;
+        protected WaveStream cachedWaveStream;
+        protected bool preloaded;
 
         public string Path { get; }
 
@@ -50,6 +50,10 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration {
             return GetSampleProvider(GetWaveStream());
         }
 
+        public double GetAmplitudeFactor() {
+            return 1;
+        }
+
         private WaveStream GetWaveStream() {
             if (preloaded) {
                 return cachedWaveStream;
@@ -62,7 +66,7 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration {
             return System.IO.Path.GetFileNameWithoutExtension(Path);
         }
 
-        public void ToExporter(ISampleExporter exporter) {
+        public virtual void ToExporter(ISampleExporter exporter) {
             var wave = GetWaveStream();
 
             if (exporter is IAudioSampleExporter audioSampleExporter) {

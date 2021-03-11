@@ -18,5 +18,12 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration {
         /// </summary>
         /// <returns></returns>
         ISampleProvider GetSampleProvider();
+
+        /// <summary>
+        /// Gets the factor of changes to the amplitude of the audio.
+        /// 1.0 is default, 0.5 is half amplitude, etc.
+        /// </summary>
+        /// <returns></returns>
+        double GetAmplitudeFactor();
     }
 }

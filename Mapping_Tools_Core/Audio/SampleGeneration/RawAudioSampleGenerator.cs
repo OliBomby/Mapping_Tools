@@ -5,7 +5,7 @@ using NAudio.Wave.SampleProviders;
 
 namespace Mapping_Tools_Core.Audio.SampleGeneration {
     public class RawAudioSampleGenerator : IAudioSampleGenerator {
-        public WaveStream WaveStream { get; }
+        protected WaveStream WaveStream { get; }
 
         public RawAudioSampleGenerator(WaveStream waveStream) {
             WaveStream = waveStream;
@@ -28,11 +28,15 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration {
             return new WaveToSampleProvider(WaveStream);
         }
 
+        public double GetAmplitudeFactor() {
+            return 1;
+        }
+
         public string GetName() {
             return WaveStream.ToString();
         }
 
-        public void ToExporter(ISampleExporter exporter) {
+        public virtual void ToExporter(ISampleExporter exporter) {
             if (exporter is IAudioSampleExporter audioSampleExporter) {
                 audioSampleExporter.AddAudio(GetSampleProvider());
 

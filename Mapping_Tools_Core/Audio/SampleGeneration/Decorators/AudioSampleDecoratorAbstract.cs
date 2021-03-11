@@ -63,6 +63,10 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration.Decorators {
             return Decorate(BaseAudioGenerator.GetSampleProvider());
         }
 
+        public virtual double GetAmplitudeFactor() {
+            return BaseAudioGenerator.GetAmplitudeFactor();
+        }
+
         public virtual void PreloadSample() {
             BaseAudioGenerator.PreloadSample();
         }

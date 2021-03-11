@@ -7,10 +7,10 @@ using Mapping_Tools_Core.Audio.SampleImporters;
 
 namespace Mapping_Tools_Core.Audio.SampleGeneration {
     public class SoundFontSampleGenerator : ISoundFontSampleGenerator, IFromPathGenerator {
-        private string Extension() => System.IO.Path.GetExtension(Path);
+        protected string Extension() => System.IO.Path.GetExtension(Path);
 
-        private IAudioSampleGenerator cachedGenerator;
-        private bool preloaded;
+        protected IAudioSampleGenerator cachedGenerator;
+        protected bool preloaded;
 
         public string Path { get; }
         public IMidiNote Note { get; }
@@ -42,12 +42,16 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration {
             return GetSampleGenerator().GetSampleProvider();
         }
 
+        public double GetAmplitudeFactor() {
+            return GetSampleGenerator().GetAmplitudeFactor();
+        }
+
         public string GetName() {
             var filename = System.IO.Path.GetFileNameWithoutExtension(Path);
             return $"{filename}-{Note}";
         }
 
-        public void ToExporter(ISampleExporter exporter) {
+        public virtual void ToExporter(ISampleExporter exporter) {
             if (exporter is IAudioSampleExporter audioSampleExporter) {
                 GetSampleGenerator()?.ToExporter(audioSampleExporter);
             }

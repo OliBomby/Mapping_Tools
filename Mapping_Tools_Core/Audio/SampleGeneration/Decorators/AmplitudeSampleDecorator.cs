@@ -42,5 +42,9 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration.Decorators {
         protected override ISampleProvider Decorate(ISampleProvider sampleProvider) {
             return new VolumeSampleProvider(sampleProvider) { Volume = Volume };
         }
+
+        public override double GetAmplitudeFactor() {
+            return BaseAudioGenerator.GetAmplitudeFactor() * Volume;
+        }
     }
 }

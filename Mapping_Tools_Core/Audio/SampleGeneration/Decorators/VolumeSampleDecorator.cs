@@ -1,5 +1,6 @@
 ﻿using Mapping_Tools_Core.MathUtil;
 using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 
 namespace Mapping_Tools_Core.Audio.SampleGeneration.Decorators {
     /// <summary>
@@ -9,6 +10,8 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration.Decorators {
     public class VolumeSampleSoundDecorator : AudioSampleDecoratorAbstract {
         public double Volume { get; }
 
+        protected double amplitudeFactor;
+
         /// <summary>
         /// Constructs a new <see cref="VolumeSampleSoundDecorator"/> with specified volume.
         /// </summary>
@@ -16,6 +19,7 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration.Decorators {
         /// <param name="volume">The volume factor (0-1)</param>
         public VolumeSampleSoundDecorator(IAudioSampleGenerator baseGenerator, double volume = 1) : base(baseGenerator) {
             Volume = volume;
+            amplitudeFactor = OsuVolumeConverter.VolumeToAmplitude(volume);
         }
 
         public override bool Equals(ISampleGenerator other) {
@@ -40,8 +44,12 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration.Decorators {
             return Volume > 1;
         }
 
-        protected override ISampleProvider Decorate(ISampleProvider baseSampleProvider) {
-            return OsuVolumeConverter.VolumeChange(baseSampleProvider, Volume);
+        protected override ISampleProvider Decorate(ISampleProvider sampleProvider) {
+            return new VolumeSampleProvider(sampleProvider) { Volume = (float) amplitudeFactor };
+        }
+
+        public override double GetAmplitudeFactor() {
+            return BaseAudioGenerator.GetAmplitudeFactor() * amplitudeFactor;
         }
     }
 }
