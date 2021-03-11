@@ -798,18 +798,13 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         }
 
         private string GetPathTypeString() {
-            switch (SliderType) {
-                case PathType.Linear:
-                    return "L";
-                case PathType.PerfectCurve:
-                    return "P";
-                case PathType.Catmull:
-                    return "C";
-                case PathType.Bezier:
-                    return "B";
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            return SliderType switch {
+                PathType.Linear => "L",
+                PathType.PerfectCurve => "P",
+                PathType.Catmull => "C",
+                PathType.Bezier => "B",
+                _ => throw new ArgumentOutOfRangeException(),
+            };
         }
 
         /// <summary>
