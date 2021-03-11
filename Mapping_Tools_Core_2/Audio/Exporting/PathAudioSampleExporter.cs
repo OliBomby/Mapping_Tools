@@ -1,4 +1,9 @@
-﻿namespace Mapping_Tools_Core.Audio.Exporting {
+﻿using System;
+using System.IO;
+using NAudio.FileFormats.Wav;
+using NAudio.Wave;
+
+namespace Mapping_Tools_Core.Audio.Exporting {
     public class PathAudioSampleExporter : IPathAudioSampleExporter {
         public string CopyPath { get; set; }
         public bool CanCopyPaste { get; set; }

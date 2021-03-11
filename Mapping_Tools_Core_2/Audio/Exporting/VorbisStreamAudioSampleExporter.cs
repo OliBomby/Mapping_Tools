@@ -1,4 +1,7 @@
-﻿using Mapping_Tools_Core.Audio.Effects;
+﻿using System.IO;
+using Mapping_Tools_Core.Audio.Effects;
+using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 
 namespace Mapping_Tools_Core.Audio.Exporting {
     public class VorbisStreamAudioSampleExporter : StreamAudioSampleExporter {

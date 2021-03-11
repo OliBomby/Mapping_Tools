@@ -1,4 +1,6 @@
-﻿using Mapping_Tools_Core.Audio.Effects;
+﻿using System.IO;
+using Mapping_Tools_Core.Audio.Effects;
+using NAudio.Wave;
 
 namespace Mapping_Tools_Core.Audio.Exporting {
     public class Pcm16StreamAudioSampleExporter : StreamAudioSampleExporter {

@@ -1,4 +1,10 @@
-﻿using Mapping_Tools_Core.BeatmapHelper.Enums;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using JetBrains.Annotations;
+using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.BeatmapHelper.Events;
 using Mapping_Tools_Core.MathUtil;
 

@@ -1,4 +1,10 @@
-﻿namespace Mapping_Tools_Core.Audio.Exporting {
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
+
+namespace Mapping_Tools_Core.Audio.Exporting {
     public abstract class StreamAudioSampleExporter : IStreamAudioSampleExporter {
         public Stream OutStream { get; set; }
         public bool BlankSample { get; set; }

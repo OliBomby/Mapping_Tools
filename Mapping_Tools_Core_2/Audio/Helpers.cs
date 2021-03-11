@@ -1,4 +1,9 @@
-﻿using Mapping_Tools_Core.Audio.SampleGeneration;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using Mapping_Tools_Core.Audio.SampleGeneration;
+using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 
 namespace Mapping_Tools_Core.Audio {
     public static class Helpers {

@@ -1,4 +1,5 @@
-﻿using Mapping_Tools_Core.Audio.Exporting;
+﻿using System;
+using Mapping_Tools_Core.Audio.Exporting;
 
 namespace Mapping_Tools_Core.Audio.SampleGeneration {
     public interface ISampleGenerator : IEquatable<ISampleGenerator>, ICloneable {

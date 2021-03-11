@@ -1,4 +1,6 @@
-﻿using Mapping_Tools_Core.Audio.SampleGeneration;
+﻿using System;
+using JetBrains.Annotations;
+using Mapping_Tools_Core.Audio.SampleGeneration;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
 
 namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {

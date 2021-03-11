@@ -1,4 +1,7 @@
-﻿namespace Mapping_Tools_Core.Audio.SampleImporters {
+﻿using NAudio.Vorbis;
+using NAudio.Wave;
+
+namespace Mapping_Tools_Core.Audio.SampleImporters {
     public class VorbisFileImporter {
         private readonly string path;
 

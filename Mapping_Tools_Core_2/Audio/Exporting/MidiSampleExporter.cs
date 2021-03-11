@@ -1,4 +1,8 @@
-﻿using Mapping_Tools_Core.Audio.Midi;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using Mapping_Tools_Core.Audio.Midi;
+using NAudio.Midi;
 
 namespace Mapping_Tools_Core.Audio.Exporting {
     public class MidiSampleExporter : IMidiSampleExporter {

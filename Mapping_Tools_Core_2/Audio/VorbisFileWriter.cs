@@ -1,4 +1,9 @@
-﻿using Mapping_Tools_Core.MathUtil;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using Mapping_Tools_Core.MathUtil;
+using NAudio.Wave;
+using OggVorbisEncoder;
 
 namespace Mapping_Tools_Core.Audio {
     public class VorbisFileWriter : IDisposable {
