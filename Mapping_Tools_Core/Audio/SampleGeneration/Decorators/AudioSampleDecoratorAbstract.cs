@@ -63,8 +63,8 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration.Decorators {
             return Decorate(BaseAudioGenerator.GetSampleProvider());
         }
 
-        public virtual void PreLoadSample() {
-            BaseAudioGenerator.PreLoadSample();
+        public virtual void PreloadSample() {
+            BaseAudioGenerator.PreloadSample();
         }
 
         public abstract bool HasEffect();

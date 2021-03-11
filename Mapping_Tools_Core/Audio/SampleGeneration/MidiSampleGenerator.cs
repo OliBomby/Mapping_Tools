@@ -27,7 +27,7 @@ namespace Mapping_Tools_Core.Audio.SampleGeneration {
         }
 
         public string GetName() {
-            return "MidiNote-" + Note.ToString();
+            return "MidiNote-" + Note;
         }
 
         public void ToExporter(ISampleExporter exporter) {
