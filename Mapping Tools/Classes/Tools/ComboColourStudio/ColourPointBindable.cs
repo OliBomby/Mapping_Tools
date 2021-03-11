@@ -7,7 +7,6 @@ using System.Windows.Media;
 using Mapping_Tools.Annotations;
 using Mapping_Tools.Components.Domain;
 using Mapping_Tools.Viewmodels;
-using Mapping_Tools_Core.Tools.ComboColourStudio;
 using MaterialDesignThemes.Wpf;
 using Newtonsoft.Json;
 

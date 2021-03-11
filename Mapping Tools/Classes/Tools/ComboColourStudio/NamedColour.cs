@@ -1,5 +1,4 @@
 ﻿using Mapping_Tools.Annotations;
-using Mapping_Tools_Core.BeatmapHelper;
 using Newtonsoft.Json;
 using System.Windows.Media;
 

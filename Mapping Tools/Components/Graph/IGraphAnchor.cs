@@ -1,5 +1,4 @@
 ﻿using Mapping_Tools.Components.Graph.Interpolation;
-using Mapping_Tools_Core.MathUtil;
 
 namespace Mapping_Tools.Components.Graph {
     public interface IGraphAnchor {

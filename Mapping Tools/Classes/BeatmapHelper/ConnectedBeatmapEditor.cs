@@ -1,7 +1,6 @@
 ﻿using System;
 using Editor_Reader;
 using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools_Core.BeatmapHelper;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     /// <summary>

@@ -1,6 +1,5 @@
 ﻿using Mapping_Tools.Components.Graph.Interpolation;
 using System.Windows;
-using Mapping_Tools_Core.MathUtil;
 
 namespace Mapping_Tools.Components.Graph {
     public class AnchorState : Freezable, IGraphAnchor {

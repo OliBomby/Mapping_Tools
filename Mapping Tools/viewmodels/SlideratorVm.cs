@@ -6,8 +6,6 @@ using Mapping_Tools.Components.Domain;
 using Mapping_Tools.Components.Graph;
 using Mapping_Tools.Views.Sliderator;
 using Mapping_Tools_Core;
-using Mapping_Tools_Core.BeatmapHelper;
-using Mapping_Tools_Core.MathUtil;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

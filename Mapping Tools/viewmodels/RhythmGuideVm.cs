@@ -2,9 +2,6 @@
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Components.Domain;
 using Mapping_Tools_Core;
-using Mapping_Tools_Core.BeatmapHelper.BeatDivisors;
-using Mapping_Tools_Core.BeatmapHelper.Enums;
-using Mapping_Tools_Core.Tools.RhythmGuide;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

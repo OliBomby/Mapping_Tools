@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Mapping_Tools_Core.BeatmapHelper;
-using Mapping_Tools_Core.BeatmapHelper.Enums;
-using Mapping_Tools_Core.MathUtil;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     public static class Extensions {

@@ -1,7 +1,5 @@
 ﻿using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Viewmodels;
-using Mapping_Tools_Core.BeatmapHelper;
-using Mapping_Tools_Core.Tools.RhythmGuide;
 using System;
 using System.ComponentModel;
 using System.IO;

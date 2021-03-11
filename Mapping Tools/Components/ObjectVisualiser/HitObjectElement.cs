@@ -4,9 +4,6 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
-using Mapping_Tools_Core.BeatmapHelper.SliderPathStuff;
-using Mapping_Tools_Core.MathUtil;
-using Mapping_Tools_Core.BeatmapHelper;
 
 namespace Mapping_Tools.Components.ObjectVisualiser {
     public class HitObjectElement : FrameworkElement {

@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Mapping_Tools_Core.BeatmapHelper.Enums;
-using Mapping_Tools_Core.MathUtil;
-using Mapping_Tools_Core.Tools.HitsoundStudio.Model;
 
 namespace Mapping_Tools.Classes.Tools.HitsoundStudio {
     /// <summary>

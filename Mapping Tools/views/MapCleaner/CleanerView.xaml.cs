@@ -9,9 +9,6 @@ using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Components.TimeLine;
 using Mapping_Tools.Viewmodels;
-using Mapping_Tools_Core.BeatmapHelper;
-using Mapping_Tools_Core.MathUtil;
-using Mapping_Tools_Core.Tools.MapCleanerStuff;
 
 namespace Mapping_Tools.Views.MapCleaner {
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]

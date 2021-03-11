@@ -1,8 +1,6 @@
 ﻿using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Components.Dialogs;
 using Mapping_Tools.Viewmodels;
-using Mapping_Tools_Core.ToolHelpers;
-using Mapping_Tools_Core.Tools.ComboColourStudio;
 using MaterialDesignThemes.Wpf;
 using System;
 using System.ComponentModel;

@@ -18,8 +18,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Mapping_Tools_Core;
-using Mapping_Tools_Core.Exceptions;
-using Mapping_Tools_Core.ToolHelpers;
 
 namespace Mapping_Tools {
 

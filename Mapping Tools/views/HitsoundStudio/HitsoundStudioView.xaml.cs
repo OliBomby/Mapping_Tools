@@ -13,11 +13,6 @@ using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools.HitsoundStudio;
 using Mapping_Tools.Viewmodels;
 using Mapping_Tools_Core;
-using Mapping_Tools_Core.Audio;
-using Mapping_Tools_Core.BeatmapHelper.Enums;
-using Mapping_Tools_Core.MathUtil;
-using Mapping_Tools_Core.Tools.HitsoundStudio;
-using Mapping_Tools_Core.Tools.HitsoundStudio.Model;
 using MaterialDesignThemes.Wpf;
 using NAudio.Wave;
 

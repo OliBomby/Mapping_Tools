@@ -687,12 +687,6 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Mapping_Tools_Core\Mapping_Tools_Core.csproj">
-      <Project>{c3f2d574-37a6-4e03-b18b-c36aa238740e}</Project>
-      <Name>Mapping_Tools_Core</Name>
-    </ProjectReference>
-  </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="BeforeBuild" />

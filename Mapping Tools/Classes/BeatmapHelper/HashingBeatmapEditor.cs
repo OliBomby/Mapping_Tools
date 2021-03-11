@@ -2,8 +2,6 @@
 using System.IO;
 using System.Linq;
 using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools_Core.BeatmapHelper;
-using Mapping_Tools_Core.BeatmapHelper.Editor;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     /// <summary>

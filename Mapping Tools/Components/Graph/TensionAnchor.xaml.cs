@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using Mapping_Tools_Core.MathUtil;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Components.Graph {

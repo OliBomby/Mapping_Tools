@@ -10,7 +10,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Mapping_Tools.Components.Dialogs;
-using Mapping_Tools_Core.MathUtil;
 using Newtonsoft.Json;
 using ContextMenu = System.Windows.Controls.ContextMenu;
 using Cursors = System.Windows.Input.Cursors;

@@ -1,6 +1,4 @@
-﻿using Mapping_Tools_Core.BeatmapHelper.Enums;
-
-namespace Mapping_Tools.Classes.Tools.HitsoundStudio {
+﻿namespace Mapping_Tools.Classes.Tools.HitsoundStudio {
     /// <summary>
     /// 
     /// </summary>
