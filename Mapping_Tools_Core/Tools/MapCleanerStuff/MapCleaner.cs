@@ -1,17 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
-using Mapping_Tools_Core.Audio.DuplicateDetection;
+﻿using Mapping_Tools_Core.Audio.DuplicateDetection;
 using Mapping_Tools_Core.BeatmapHelper;
 using Mapping_Tools_Core.BeatmapHelper.Editor;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.BeatmapHelper.Events;
 using Mapping_Tools_Core.MathUtil;
 using Mapping_Tools_Core.ToolHelpers;
-using Mapping_Tools_Core.Tools.HitsoundStudio;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Mapping_Tools_Core.Tools.MapCleanerStuff {
     public partial class MapCleaner {
@@ -22,7 +21,7 @@ namespace Mapping_Tools_Core.Tools.MapCleanerStuff {
         /// <param name="args">The arguments for how to clean the beatmap.</param>
         /// <param name="worker">The BackgroundWorker for updating progress.</param>
         /// <returns>Number of resnapped objects.</returns>
-        public static MapCleanerResult CleanMap(BeatmapEditor editor, MapCleanerArgs args, BackgroundWorker worker = null) {
+        public static IMapCleanerResult CleanMap(BeatmapEditor editor, IMapCleanerArgs args, BackgroundWorker worker = null) {
             UpdateProgressBar(worker, 0);
 
             Beatmap beatmap = editor.ReadFile();
