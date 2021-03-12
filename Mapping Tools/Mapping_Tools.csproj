@@ -204,6 +204,7 @@
     <Compile Include="Classes\Tools\PatternGallery\PatternCodeImportVm.cs" />
     <Compile Include="Classes\Tools\PatternGallery\PatternFileImportVm.cs" />
     <Compile Include="Classes\Tools\PatternGallery\SelectedPatternImportVm.cs" />
+    <Compile Include="Classes\Tools\Sliderator\GraphStateValueGetter.cs" />
     <Compile Include="Components\Dialogs\CustomDialog\BeatmapBrowseAttribute.cs" />
     <Compile Include="Components\Dialogs\CustomDialog\ConverterParameterAttribute.cs" />
     <Compile Include="Components\Dialogs\CustomDialog\MultiLineInputAttribute.cs" />
