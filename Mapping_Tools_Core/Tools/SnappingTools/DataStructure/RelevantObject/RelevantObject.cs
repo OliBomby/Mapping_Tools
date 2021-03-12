@@ -42,7 +42,6 @@ namespace Mapping_Tools_Core.Tools.SnappingTools.DataStructure.RelevantObject {
                 foreach (var relevantObject in ChildObjects) {
                     relevantObject.UpdateTime();
                 }
-                Layer?.SortTimes();
             }
         }
 
@@ -60,8 +59,6 @@ namespace Mapping_Tools_Core.Tools.SnappingTools.DataStructure.RelevantObject {
         public bool Disposed { get; set; }
 
         public bool DoNotDispose { get; set; }
-
-        public bool DefinitelyDispose { get; set; }
 
         public bool AutoPropagate { get; set; } = true;
 

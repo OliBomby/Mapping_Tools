@@ -16,7 +16,6 @@ namespace Mapping_Tools_Core.Tools.SnappingTools.DataStructure.RelevantObject.Re
                 foreach (var relevantObject in ChildObjects) {
                     relevantObject.UpdateTime();
                 }
-                Layer?.SortTimes();
             }
         }
 
