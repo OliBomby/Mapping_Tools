@@ -92,15 +92,12 @@ namespace Mapping_Tools_Core.Audio.Exporting {
         }
 
         private static WaveFormat GetWaveFormat(string path) {
-            using (var inputStream = File.OpenRead(path)) {
-                var chunkReader = new WaveFileChunkReader();
-                try {
-                    chunkReader.ReadWaveHeader(inputStream);
-                    return chunkReader.WaveFormat;
-                }
-                catch {
-                    return null;
-                }
+            try {
+                using var wave = new WaveFileReader(path);
+                return wave.WaveFormat;
+            }
+            catch {
+                return null;
             }
         }
 

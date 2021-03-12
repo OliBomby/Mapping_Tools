@@ -29,22 +29,21 @@ namespace Mapping_Tools_Core.Audio.DuplicateDetection {
                         }
 
                         try {
-                            using (var thisWave = SampleImporter.OpenSample(samplePaths[i])) {
-                                using (var otherWave = SampleImporter.OpenSample(samplePaths[k])) {
-                                    if (thisWave.Length != otherWave.Length) {
-                                        continue;
-                                    }
+                            using var thisWave = Helpers.OpenSample(samplePaths[i]);
+                            using var otherWave = Helpers.OpenSample(samplePaths[k]);
 
-                                    byte[] thisBuffer = new byte[thisWave.Length];
-                                    thisWave.Read(thisBuffer, 0, (int) thisWave.Length);
+                            if (thisWave.Length != otherWave.Length) {
+                                continue;
+                            }
 
-                                    byte[] otherBuffer = new byte[otherWave.Length];
-                                    otherWave.Read(otherBuffer, 0, (int) otherWave.Length);
+                            byte[] thisBuffer = new byte[thisWave.Length];
+                            thisWave.Read(thisBuffer, 0, (int) thisWave.Length);
 
-                                    if (!thisBuffer.SequenceEqual(otherBuffer)) {
-                                        continue;
-                                    }
-                                }
+                            byte[] otherBuffer = new byte[otherWave.Length];
+                            otherWave.Read(otherBuffer, 0, (int) otherWave.Length);
+
+                            if (!thisBuffer.SequenceEqual(otherBuffer)) {
+                                continue;
                             }
                         } catch (Exception ex) {
                             // Something went wrong reading the samples. I'll just assume they weren't the same
@@ -61,7 +60,7 @@ namespace Mapping_Tools_Core.Audio.DuplicateDetection {
                     string samplePath = samplePaths[i];
                     string fullPathExtLess =
                         Path.Combine(Path.GetDirectoryName(samplePath) ?? throw new InvalidOperationException(),
-                            Path.GetFileNameWithoutExtension(samplePath));
+                            Path.GetFileNameWithoutExtension(samplePath) ?? throw new InvalidOperationException());
                     dict[fullPathExtLess] = samplePaths[k];
                     break;
                 }

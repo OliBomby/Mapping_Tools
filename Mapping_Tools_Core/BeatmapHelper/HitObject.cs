@@ -380,14 +380,6 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             return string.Join(",", values);
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="ob"></param>
-        /// <returns></returns>
-        public static explicit operator HitObject(Editor_Reader.HitObject ob) {
-            return new HitObject(ob);
-        }
-
         public List<string> GetPlayingBodyFilenames(double sliderTickRate, bool includeDefaults = true) {
             var samples = new List<string>();
             if (IsSlider) {
