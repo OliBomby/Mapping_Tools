@@ -200,6 +200,10 @@
     <Compile Include="Classes\Tools\HitsoundStudio\BindableSample.cs" />
     <Compile Include="Classes\Tools\HitsoundStudio\UISampleGeneratingArgs.cs" />
     <Compile Include="Classes\Tools\MapCleaner\MapCleanerArgs.cs" />
+    <Compile Include="Classes\Tools\PatternGallery\CollectionRenameVm.cs" />
+    <Compile Include="Classes\Tools\PatternGallery\PatternCodeImportVm.cs" />
+    <Compile Include="Classes\Tools\PatternGallery\PatternFileImportVm.cs" />
+    <Compile Include="Classes\Tools\PatternGallery\SelectedPatternImportVm.cs" />
     <Compile Include="Components\Dialogs\CustomDialog\BeatmapBrowseAttribute.cs" />
     <Compile Include="Components\Dialogs\CustomDialog\ConverterParameterAttribute.cs" />
     <Compile Include="Components\Dialogs\CustomDialog\MultiLineInputAttribute.cs" />

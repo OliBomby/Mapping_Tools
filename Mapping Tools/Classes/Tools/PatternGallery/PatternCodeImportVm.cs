@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel;
 using System.Windows;
 using Mapping_Tools.Components.Dialogs.CustomDialog;
-using Mapping_Tools_Core.BeatmapHelper.Enums;
 
-namespace Mapping_Tools_Core.Tools.PatternGallery {
+namespace Mapping_Tools.Classes.Tools.PatternGallery {
     public class PatternCodeImportVm : BindableBase {
         private string _name = string.Empty;
         private string _hitObjects = string.Empty;

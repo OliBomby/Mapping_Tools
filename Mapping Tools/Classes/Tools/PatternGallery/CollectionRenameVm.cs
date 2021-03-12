@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Mapping_Tools_Core.Tools.PatternGallery {
+namespace Mapping_Tools.Classes.Tools.PatternGallery {
     public class CollectionRenameVm {
         [DisplayName("New name")]
         [Description("The new name for the collection.")]

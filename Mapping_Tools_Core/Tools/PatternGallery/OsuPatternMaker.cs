@@ -15,11 +15,10 @@ namespace Mapping_Tools_Core.Tools.PatternGallery {
         /// </summary>
         public double Padding = 5;
 
-        public OsuPattern FromSelectedWithSave(Beatmap beatmap, OsuPatternFileHandler fileHandler, string name) {
+        public OsuPattern FromSelectedWithSave(Beatmap beatmap, IOsuPatternFileHandler fileHandler, string name) {
             var osuPattern = FromSelected(beatmap, out var patternBeatmap, name);
 
-            patternBeatmap.SaveWithFloatPrecision = true;
-            Editor.SaveFile(fileHandler.GetPatternPath(osuPattern.FileName), patternBeatmap.GetLines());
+            fileHandler.SavePatternBeatmap(patternBeatmap, osuPattern.Filename);
 
             return osuPattern;
         }
@@ -44,16 +43,14 @@ namespace Mapping_Tools_Core.Tools.PatternGallery {
             if (!string.IsNullOrEmpty(filter) || filterStartTime != -1 || filterEndTime != -1) {
                 osuPattern = FromFileFilter(filePath, out var patternBeatmap, name, filter, filterStartTime, filterEndTime);
 
-                // Save the modified pattern beatmap in the colleciton folder
-                var newFilePath = fileHandler.GetPatternPath(osuPattern.FileName);
-                patternBeatmap.SaveWithFloatPrecision = true;
-                Editor.SaveFile(newFilePath, patternBeatmap.GetLines());
+                // Save the modified pattern beatmap in the collection folder
+                fileHandler.SavePatternBeatmap(patternBeatmap, osuPattern.Filename);
             }
             else {
                 osuPattern = FromFile(filePath, name);
 
                 // Save the pattern in the collection folder by copying
-                var newFilePath = fileHandler.GetPatternPath(osuPattern.FileName);
+                var newFilePath = fileHandler.GetPatternPath(osuPattern.Filename);
                 File.Copy(filePath, newFilePath, false);
             }
 
@@ -63,7 +60,7 @@ namespace Mapping_Tools_Core.Tools.PatternGallery {
         public OsuPattern FromFileFilter(string filePath, out Beatmap patternBeatmap, string name, 
             string filter = null, double filterStartTime = -1, double filterEndTime = -1) {
             // Read some stuff from the pattern
-            patternBeatmap = new BeatmapEditor(filePath).Beatmap;
+            patternBeatmap = new BeatmapEditor(filePath).ReadFile();
 
             RemoveStoryboard(patternBeatmap);
 
@@ -84,18 +81,18 @@ namespace Mapping_Tools_Core.Tools.PatternGallery {
 
         public OsuPattern FromFile(string filePath, string name) {
             // Read some stuff from the pattern
-            var patternBeatmap = new BeatmapEditor(filePath).Beatmap;
+            var patternBeatmap = new BeatmapEditor(filePath).ReadFile();
 
             return FromBeatmap(patternBeatmap, name);
         }
 
         public OsuPattern FromObjectsWithSave(List<HitObject> hitObjects, List<TimingPoint> timingPoints, OsuPatternFileHandler fileHandler,
             string name, TimingPoint firstUnInheritedTimingPoint = null, double globalSv = 1.4, GameMode gameMode = GameMode.Standard) {
+
             var osuPattern = FromObjects(hitObjects, timingPoints, out var patternBeatmap, name,
                 firstUnInheritedTimingPoint, globalSv, gameMode);
 
-            patternBeatmap.SaveWithFloatPrecision = true;
-            Editor.SaveFile(fileHandler.GetPatternPath(osuPattern.FileName), patternBeatmap.GetLines());
+            fileHandler.SavePatternBeatmap(patternBeatmap, osuPattern.Filename);
 
             return osuPattern;
         }
@@ -121,7 +118,7 @@ namespace Mapping_Tools_Core.Tools.PatternGallery {
                 Name = name,
                 CreationTime = now,
                 LastUsedTime = now,
-                FileName = fileName,
+                Filename = fileName,
                 ObjectCount = beatmap.HitObjects.Count,
                 Duration = TimeSpan.FromMilliseconds(endTime - startTime),
                 BeatLength = beatmap.BeatmapTiming.GetBeatLength(startTime, endTime, true)

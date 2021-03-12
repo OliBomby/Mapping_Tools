@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Mapping_Tools_Core.Tools.PatternGallery {
+namespace Mapping_Tools.Classes.Tools.PatternGallery {
     public class SelectedPatternImportVm : BindableBase {
         private string _name;
 

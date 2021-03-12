@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using Mapping_Tools.Components.Dialogs.CustomDialog;
 
-namespace Mapping_Tools_Core.Tools.PatternGallery {
+namespace Mapping_Tools.Classes.Tools.PatternGallery {
     public class PatternFileImportVm : BindableBase {
         private string _name = string.Empty;
         private string _filePath = string.Empty;

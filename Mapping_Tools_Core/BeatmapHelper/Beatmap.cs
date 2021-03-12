@@ -13,7 +13,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
     /// <summary>
     /// Class containing all the data from a .osu beatmap file. It also supports serialization to .osu format and helper methods to get data in specific ways.
     /// </summary>
-    public class Beatmap : IComboColourCollection, IStoryboard {
+    public class Beatmap : IBeatmap, IComboColourCollection, IStoryboard {
 
         /// <summary>
         /// Contains all the values in the [General] section of a .osu file. The key is the variable name and the value is the value.
