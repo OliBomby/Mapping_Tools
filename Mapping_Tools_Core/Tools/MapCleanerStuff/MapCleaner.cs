@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Mapping_Tools_Core.Audio.DuplicateDetection;
 using Mapping_Tools_Core.BeatmapHelper;
 using Mapping_Tools_Core.BeatmapHelper.Editor;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
@@ -24,13 +25,14 @@ namespace Mapping_Tools_Core.Tools.MapCleanerStuff {
         public static MapCleanerResult CleanMap(BeatmapEditor editor, MapCleanerArgs args, BackgroundWorker worker = null) {
             UpdateProgressBar(worker, 0);
 
-            Beatmap beatmap = editor.Beatmap;
+            Beatmap beatmap = editor.ReadFile();
             Timing timing = beatmap.BeatmapTiming;
 
             GameMode mode = (GameMode)beatmap.General["Mode"].IntValue;
             double circleSize = beatmap.Difficulty["CircleSize"].DoubleValue;
             string mapDir = editor.GetParentFolder();
-            Dictionary<string, string> firstSamples = HitsoundImporter.AnalyzeSamples(mapDir);
+            Dictionary<string, string> firstSamples =
+                new MonolithicDuplicateSampleDetector().AnalyzeSamples(mapDir, out _, true);
 
             int objectsResnapped = 0;
             int samplesRemoved = 0;
@@ -250,7 +252,7 @@ namespace Mapping_Tools_Core.Tools.MapCleanerStuff {
 
             // Remove unused samples
             if (args.RemoveUnusedSamples)
-                RemoveUnusedSamples(mapDir);
+                samplesRemoved = RemoveUnusedSamples(mapDir);
 
             // Complete progressbar
             UpdateProgressBar(worker, 100);
@@ -266,7 +268,7 @@ namespace Mapping_Tools_Core.Tools.MapCleanerStuff {
             List<string> beatmaps = Directory.GetFiles(mapDir, "*.osu", SearchOption.TopDirectoryOnly).ToList();
             foreach (string path in beatmaps) {
                 BeatmapEditor editor = new BeatmapEditor(path);
-                Beatmap beatmap = editor.Beatmap;
+                Beatmap beatmap = editor.ReadFile();
 
                 GameMode mode = (GameMode)beatmap.General["Mode"].IntValue;
                 double sliderTickRate = beatmap.Difficulty["SliderTickRate"].DoubleValue;
