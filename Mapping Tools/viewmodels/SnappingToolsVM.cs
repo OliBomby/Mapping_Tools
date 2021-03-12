@@ -17,8 +17,12 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using Mapping_Tools.Classes.Tools.GeometryDashboard;
+using Mapping_Tools_Core;
+using SharpDX;
 using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
 using MessageBox = System.Windows.MessageBox;
+using Point = System.Windows.Point;
 
 namespace Mapping_Tools.Viewmodels {
     public class SnappingToolsVm : IDisposable

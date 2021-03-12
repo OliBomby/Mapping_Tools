@@ -192,6 +192,8 @@
     <Compile Include="Classes\SystemTools\ShowSelectedInFileExplorer.cs" />
     <Compile Include="Classes\Tools\ComboColourStudio\ColourPointBindable.cs" />
     <Compile Include="Classes\Tools\ComboColourStudio\NamedColour.cs" />
+    <Compile Include="Classes\Tools\GeometryDashboard\CoordinateConverter.cs" />
+    <Compile Include="Classes\Tools\GeometryDashboard\DashStylesEnum.cs" />
     <Compile Include="Classes\Tools\HitsoundStudio\HitsoundLayer.cs" />
     <Compile Include="Classes\Tools\HitsoundStudio\HitsoundLayerExtension.cs" />
     <Compile Include="Classes\Tools\HitsoundStudio\ImportReloadingArgs.cs" />

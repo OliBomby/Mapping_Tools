@@ -2,9 +2,9 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Forms;
-using Mapping_Tools_Core.MathUtil;
+using Mapping_Tools_Core;
 
-namespace Mapping_Tools_Core.Tools.SnappingTools {
+namespace Mapping_Tools.Classes.Tools.GeometryDashboard {
 
     /// <summary>
     /// Converts the coordinates of both the mouse, window and editor.

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Mapping_Tools_Core.Tools.SnappingTools {
+﻿namespace Mapping_Tools.Classes.Tools.GeometryDashboard {
     /// <summary>
     /// The <see cref="System.Enum"/> of the styles of dashes shown on the SnappingTools overlay.
     /// </summary>

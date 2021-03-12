@@ -213,15 +213,19 @@ namespace Mapping_Tools_Core.Tools.SnappingTools.DataStructure.Layers {
 
             // Add objects to this layer
             // This sets DoNotDispose for all the relevant objects that already exist in this layer and are consuming the objects to add.
+            // In this case the objectsToAdd are all the objects that this layer should have, so any object with DoNotDispose after this
+            // is unchanged and should therefore not be disposed.
             Add(objectsToAdd, false);
 
-            // Dispose all relevant objects in this layer that were generated from a generator, but not generated now.
+            // Dispose all relevant objects that shouldn't be in this layer,
+            // so those are objects which are generated from a generator (not locked) and not generated in this iteration.
             foreach (var objectLayerObject in Objects.Values) {
                 for (var i = 0; i < objectLayerObject.Count; i++) {
                     var obj = objectLayerObject[i];
                     // Continue for relevant objects with no generator or DoNotDispose
                     if (!obj.DefinitelyDispose && (obj.Generator == null || obj.DoNotDispose)) continue;
-                    obj.Dispose();
+
+                    obj.Dispose();  // This will also remove it from this layer, assuming the Layer property hasn't been tampered with
                     i--;
                 }
             }
