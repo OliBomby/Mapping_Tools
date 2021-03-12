@@ -26,7 +26,6 @@ using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools_Core.MathUtil;
 using Mapping_Tools_Core.ToolHelpers;
-using Mapping_Tools_Core.Tools.SlideratorStuff;
 using MaterialDesignThemes.Wpf;
 using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
 

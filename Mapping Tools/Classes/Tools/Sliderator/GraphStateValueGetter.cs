@@ -1,6 +1,6 @@
 ﻿using Mapping_Tools.Components.Graph;
 
-namespace Mapping_Tools_Core.Tools.SlideratorStuff {
+namespace Mapping_Tools.Classes.Tools.Sliderator {
     public class GraphStateValueGetter {
         private readonly GraphState _graphState;
         private readonly double _multiplier;
