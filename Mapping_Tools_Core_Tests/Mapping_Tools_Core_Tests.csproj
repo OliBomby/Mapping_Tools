@@ -17,4 +17,13 @@
     <ProjectReference Include="..\Mapping_Tools_Core\Mapping_Tools_Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Resources\ComplicatedTestMap.osu">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\EmptyTestMap.osu">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

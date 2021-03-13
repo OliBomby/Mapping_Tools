@@ -57,15 +57,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classes\BeatmapHelper\BeatmapHelperTests.cs" />
-    <Compile Include="Classes\ExternalFileUtil\Reaper\SerializationTests.cs" />
-    <Compile Include="Classes\ComboColourStudio\ComboColourProjectTests.cs" />
-    <Compile Include="Classes\MathUtil\GradientDescentUtilTests.cs" />
-    <Compile Include="Classes\SliderPathStuff\BezierSubdivisionTests.cs" />
     <Compile Include="Classes\SystemTools\ListenerManagerTests.cs" />
     <Compile Include="Classes\SystemTools\TypeConvertersTests.cs" />
     <Compile Include="SerializationTests.cs" />
-    <Compile Include="MathUtilTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

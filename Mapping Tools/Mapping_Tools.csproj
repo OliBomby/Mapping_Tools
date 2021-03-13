@@ -194,6 +194,10 @@
     <Compile Include="Classes\Tools\ComboColourStudio\NamedColour.cs" />
     <Compile Include="Classes\Tools\GeometryDashboard\CoordinateConverter.cs" />
     <Compile Include="Classes\Tools\GeometryDashboard\DashStylesEnum.cs" />
+    <Compile Include="Classes\Tools\GeometryDashboard\GeneratorGroupComparer.cs" />
+    <Compile Include="Classes\Tools\GeometryDashboard\SnappingToolsPreferences.cs" />
+    <Compile Include="Classes\Tools\GeometryDashboard\SnappingToolsProject.cs" />
+    <Compile Include="Classes\Tools\GeometryDashboard\SnappingToolsSaveSlot.cs" />
     <Compile Include="Classes\Tools\HitsoundStudio\HitsoundLayer.cs" />
     <Compile Include="Classes\Tools\HitsoundStudio\HitsoundLayerExtension.cs" />
     <Compile Include="Classes\Tools\HitsoundStudio\ImportReloadingArgs.cs" />
