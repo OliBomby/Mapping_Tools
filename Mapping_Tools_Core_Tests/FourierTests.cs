@@ -27,14 +27,19 @@ namespace Mapping_Tools_Core_Tests {
                 int bpm2 = bpm;
                 tasks.Add(Task.Run(() => {
                     double hz = bpm2 / 60d;
-                    Vector2 result = Vector2.Zero;
+                    double x = 0;
+                    double y = 0;
                     int i = 0;
+                    double amp;
+                    double rot;
                     foreach (var sample in allSamples) {
-                        Vector2 unit = Vector2.Rotate(Vector2.One, 2 * Math.PI * hz / sampleRate * i++);
-                        result += unit * Math.Abs(sample);
+                        rot = 2 * Math.PI * hz / sampleRate * i++;
+                        amp = Math.Abs(sample);
+                        x += amp * Math.Cos(rot);
+                        y += amp * Math.Sin(rot);
                     }
 
-                    return new Tuple<int, double>(bpm2, result.Length);
+                    return new Tuple<int, double>(bpm2, Math.Sqrt(x * x + y * y));
                 }));
             }
 
