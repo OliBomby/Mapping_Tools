@@ -293,7 +293,7 @@ namespace Mapping_Tools_Core.Tools.MapCleanerStuff {
             List<string> storyboards = Directory.GetFiles(mapDir, "*.osb", SearchOption.TopDirectoryOnly).ToList();
             foreach (string path in storyboards) {
                 StoryboardEditor editor = new StoryboardEditor(path);
-                StoryBoard storyboard = editor.StoryBoard;
+                StoryBoard storyboard = editor.ReadFile();
 
                 foreach (StoryboardSoundSample sbss in storyboard.StoryboardSoundSamples) {
                     allFilenames.Add(sbss.FilePath);
