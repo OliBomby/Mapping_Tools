@@ -14,10 +14,11 @@ namespace Mapping_Tools_Core_Tests {
             var sampleProvider = reader.ToSampleProvider().ToMono();
             var sampleRate = sampleProvider.WaveFormat.SampleRate;
 
-            // Just take one minute
-            var allSamples = new float[sampleRate * 30];
+            // Just take a part of the song
+            int numSamples = sampleRate * 30;
+            var allSamples = new float[numSamples];
             sampleProvider.Skip(TimeSpan.FromSeconds(79));
-            int samplesRead = sampleProvider.Read(allSamples, 0, allSamples.Length);
+            sampleProvider.Read(allSamples, 0, allSamples.Length);
 
             // Now you have the entire wav audio stored in the list
 
@@ -35,19 +36,24 @@ namespace Mapping_Tools_Core_Tests {
                         x += amp * Math.Cos(rot);
                         y += amp * Math.Sin(rot);
                     }
-                    Console.WriteLine($"{bpm2};{Math.Sqrt(x * x + y * y)}");
-                    return new Tuple<int, double>(bpm2, Math.Sqrt(x * x + y * y));
+
+                    double magnitude = Math.Sqrt(x * x + y * y) / numSamples;
+
+                    Console.WriteLine($"{bpm2};{magnitude}");
+                    return new Tuple<int, double>(bpm2, magnitude);
                 }));
             }
 
+            // Wait for all the tasks to finish
             Task t = Task.WhenAll(tasks);
             t.Wait();
 
+            // Get the BPM with the highest magnitude
             int bestBPM = 0;
-            double bestResonance = 0;
+            double bestMagnitude = 0;
             foreach (var task in tasks) {
-                if (task.Result.Item2 > bestResonance) {
-                    bestResonance = task.Result.Item2;
+                if (task.Result.Item2 > bestMagnitude) {
+                    bestMagnitude = task.Result.Item2;
                     bestBPM = task.Result.Item1;
                 }
             }
