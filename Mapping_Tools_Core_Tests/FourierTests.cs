@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Mapping_Tools_Core.MathUtil;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NAudio.Wave;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Mapping_Tools_Core_Tests {
     [TestClass]
@@ -17,28 +15,27 @@ namespace Mapping_Tools_Core_Tests {
             var sampleRate = sampleProvider.WaveFormat.SampleRate;
 
             // Just take one minute
-            var allSamples = new float[sampleRate * 60];
+            var allSamples = new float[sampleRate * 30];
+            sampleProvider.Skip(TimeSpan.FromSeconds(79));
             int samplesRead = sampleProvider.Read(allSamples, 0, allSamples.Length);
 
             // Now you have the entire wav audio stored in the list
 
             var tasks = new List<Task<Tuple<int, double>>>();
-            for (int bpm = 30; bpm < 300; bpm++) {
+            for (int bpm = 60; bpm < 300; bpm++) {
                 int bpm2 = bpm;
                 tasks.Add(Task.Run(() => {
                     double hz = bpm2 / 60d;
                     double x = 0;
                     double y = 0;
                     int i = 0;
-                    double amp;
-                    double rot;
                     foreach (var sample in allSamples) {
-                        rot = 2 * Math.PI * hz / sampleRate * i++;
-                        amp = Math.Abs(sample);
+                        var rot = 2 * Math.PI * hz / sampleRate * i++;
+                        var amp = Math.Abs(sample);
                         x += amp * Math.Cos(rot);
                         y += amp * Math.Sin(rot);
                     }
-
+                    Console.WriteLine($"{bpm2};{Math.Sqrt(x * x + y * y)}");
                     return new Tuple<int, double>(bpm2, Math.Sqrt(x * x + y * y));
                 }));
             }
