@@ -1,5 +1,4 @@
-﻿using static Mapping_Tools_Core.BeatmapHelper.FileFormatHelper;
-
+﻿
 namespace Mapping_Tools_Core.BeatmapHelper.Events {
     public class Break : Event, IHasStartTime, IHasEndTime {
         public string EventType { get; set; }
@@ -26,11 +25,11 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
 
             EventType = values[0];
 
-            if (FileFormatHelper.TryParseInt(values[1], out int startTime))
+            if (InputParsers.TryParseInt(values[1], out int startTime))
                 StartTime = startTime;
             else throw new BeatmapParsingException("Failed to parse start time of break.", line);
 
-            if (FileFormatHelper.TryParseInt(values[2], out int endTime))
+            if (InputParsers.TryParseInt(values[2], out int endTime))
                 EndTime = endTime;
             else throw new BeatmapParsingException("Failed to parse end time of break.", line);
         }

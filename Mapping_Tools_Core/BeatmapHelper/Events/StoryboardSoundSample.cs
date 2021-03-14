@@ -1,5 +1,4 @@
 ﻿using System;
-using static Mapping_Tools_Core.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Events {
     /// <summary>
@@ -64,7 +63,7 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
                 throw new BeatmapParsingException("This line is not a storyboarded sample.", line);
             }
 
-            if (FileFormatHelper.TryParseInt(values[1], out int t))
+            if (InputParsers.TryParseInt(values[1], out int t))
                 StartTime = t;
             else throw new BeatmapParsingException("Failed to parse time of storyboarded sample.", line);
 
@@ -75,7 +74,7 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
             FilePath = values[3].Trim('"');
 
             if (values.Length > 4) {
-                if (FileFormatHelper.TryParseDouble(values[4], out double vol))
+                if (InputParsers.TryParseDouble(values[4], out double vol))
                     Volume = vol;
                 else throw new BeatmapParsingException("Failed to parse volume of storyboarded sample.", line);
             }

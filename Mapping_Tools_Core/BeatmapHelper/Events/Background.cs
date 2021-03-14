@@ -1,5 +1,4 @@
 ﻿using Mapping_Tools_Core.MathUtil;
-using static Mapping_Tools_Core.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Events {
     public class Background : Event {
@@ -28,7 +27,7 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
             EventType = values[0];
 
             // This start time is usually 0 for backgrounds but lets parse it anyways
-            if (FileFormatHelper.TryParseInt(values[1], out int startTime))
+            if (InputParsers.TryParseInt(values[1], out int startTime))
                 StartTime = startTime;
             else throw new BeatmapParsingException("Failed to parse start time of background.", line);
 
@@ -36,11 +35,11 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
 
             // Writing offset is optional
             if (values.Length > 3) {
-                if (FileFormatHelper.TryParseInt(values[3], out int xOffset))
+                if (InputParsers.TryParseInt(values[3], out int xOffset))
                     XOffset = xOffset;
                 else throw new BeatmapParsingException("Failed to parse X offset of background.", line);
 
-                if (FileFormatHelper.TryParseInt(values[4], out int yOffset))
+                if (InputParsers.TryParseInt(values[4], out int yOffset))
                     YOffset = yOffset;
                 else throw new BeatmapParsingException("Failed to parse Y offset of background.", line);
             } else {

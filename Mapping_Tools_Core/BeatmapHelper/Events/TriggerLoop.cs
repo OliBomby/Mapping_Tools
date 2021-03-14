@@ -1,5 +1,4 @@
-﻿using static Mapping_Tools_Core.BeatmapHelper.FileFormatHelper;
-
+﻿
 namespace Mapping_Tools_Core.BeatmapHelper.Events {
     /// <summary>
     /// Represents trigger loop events. Although called loops, these only ever activate once.
@@ -19,11 +18,11 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
 
             TriggerName = values[1];
 
-            if (FileFormatHelper.TryParseInt(values[2], out int startTime))
+            if (InputParsers.TryParseInt(values[2], out int startTime))
                 StartTime = startTime;
             else throw new BeatmapParsingException("Failed to parse start time of event param.", line);
 
-            if (FileFormatHelper.TryParseInt(values[3], out int endTime))
+            if (InputParsers.TryParseInt(values[3], out int endTime))
                 EndTime = endTime;
             else throw new BeatmapParsingException("Failed to parse end time of event param.", line);
         }

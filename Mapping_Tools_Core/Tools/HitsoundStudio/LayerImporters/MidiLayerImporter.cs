@@ -92,7 +92,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.LayerImporters {
                         // Make sample generating args
                         var note = new MidiNote(bank, patch, key, velocity, length);
 
-                        var sampleArgs = new SampleGeneratingArgs(new MidiSampleGenerator(note), 1.0);
+                        var sampleArgs = new MidiSampleGenerator(note);
 
                         // Make source ref
                         var sourceRef = new MidiLayerSourceRef(

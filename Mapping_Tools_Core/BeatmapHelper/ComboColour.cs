@@ -1,5 +1,4 @@
 ﻿using System;
-using static Mapping_Tools_Core.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools_Core.BeatmapHelper {
     /// <summary>
@@ -51,13 +50,13 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             string[] split = line.Split(':');
             string[] commaSplit = split[1].Split(',');
 
-            if (!FileFormatHelper.TryParseInt(commaSplit[0], out int r))
+            if (!InputParsers.TryParseInt(commaSplit[0], out int r))
                 throw new BeatmapParsingException("Failed to parse red component of colour.", line);
 
-            if (!FileFormatHelper.TryParseInt(commaSplit[1], out int g))
+            if (!InputParsers.TryParseInt(commaSplit[1], out int g))
                 throw new BeatmapParsingException("Failed to parse green component of colour.", line);
 
-            if (!FileFormatHelper.TryParseInt(commaSplit[2], out int b))
+            if (!InputParsers.TryParseInt(commaSplit[2], out int b))
                 throw new BeatmapParsingException("Failed to parse blue component of colour.", line);
 
             R = (byte)r;
