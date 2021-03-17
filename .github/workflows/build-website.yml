@@ -6,14 +6,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: download tags
-      run: curl -L https://gitlab.com/api/v4/projects/17839219/repository/tags > tags.json
+
+    - uses: octokit/request-action@v2.x
+      id: get_latest_release
+      with:
+        route: GET /repos/{owner}/{repo}/releases/latest
+        owner: OliBomby
+        repo: Mapping_Tools
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: "echo ${{ steps.get_latest_release.outputs.data }} > latest_release.json"
+
     - name: download zola
       run: curl -L https://github.com/getzola/zola/releases/download/v0.10.1/zola-v0.10.1-x86_64-unknown-linux-gnu.tar.gz > zola.tar.gz
+
     - name: unpack zola
       run: tar -xzf zola.tar.gz
+
     - name: build
       run: ./zola --root website build -u https://olibomby.github.io/Mapping_Tools -o build
+
+    - name: copy-release-info
+      run: cp latest_release.json build
+
     - name: deploy
       uses: peaceiris/actions-gh-pages@v3
       with:
