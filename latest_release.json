@@ -1,3 +1,4 @@
+{
   "url": "https://api.github.com/repos/OliBomby/Mapping_Tools/releases/35204262",
   "assets_url": "https://api.github.com/repos/OliBomby/Mapping_Tools/releases/35204262/assets",
   "upload_url": "https://uploads.github.com/repos/OliBomby/Mapping_Tools/releases/35204262/assets{?name,label}",
@@ -104,4 +105,4 @@
   "tarball_url": "https://api.github.com/repos/OliBomby/Mapping_Tools/tarball/v1.8.0.2",
   "zipball_url": "https://api.github.com/repos/OliBomby/Mapping_Tools/zipball/v1.8.0.2",
   "body": "- Fixed 'Beats between every marker' feature in Timing Helper.\r\n- Fixed Property Transformer messing up object end time.\r\n- Fixed serialization of volume fields in Hitsound Studio.\r\n- Fixed unexpected behaviour while exporting patterns without timing in Pattern Gallery.\r\n- Fixed unexpected NCs in Pattern Gallery exports."
-}EOF
+}
