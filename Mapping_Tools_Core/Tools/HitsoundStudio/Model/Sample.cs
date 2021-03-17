@@ -22,5 +22,16 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
         public double OutsideVolume { get; set; }
         public SampleSet SampleSet { get; set; }
         public Hitsound Hitsound { get; set; }
+
+        public bool Equals(ISample other) {
+            if (!(other is Sample sample)) return false;
+            if (SampleGenerator == null && sample.SampleGenerator != null ||
+                SampleGenerator != null && sample.SampleGenerator == null) return false;
+            return (SampleGenerator == null || SampleGenerator.Equals(sample.SampleGenerator)) && 
+                   Priority == sample.Priority && 
+                   OutsideVolume.Equals(sample.OutsideVolume) && 
+                   SampleSet == sample.SampleSet && 
+                   Hitsound == sample.Hitsound;
+        }
     }
 }
