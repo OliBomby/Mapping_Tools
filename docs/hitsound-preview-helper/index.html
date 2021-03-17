@@ -67,7 +67,7 @@
                     </a>
                 
                     <a class="list-group-item list-group-item-primary list-group-item-action
-                        active"
+                        "
                         href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/property-transformer">
                         Property Transformer
                     </a>
@@ -103,7 +103,7 @@
                     </a>
                 
                     <a class="list-group-item list-group-item-primary list-group-item-action
-                        "
+                        active"
                         href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/hitsound-preview-helper">
                         Hitsound Preview Helper
                     </a>
@@ -111,42 +111,28 @@
                 </div>
             </div>
             <div class="col docu-content">
-                <h1>Property Transformer</h1>
-                <p>Multiple and add to properties of all the timingpoints, hitobjects, bookmarks
-and storyboarded samples of the current map.</p>
-<p>The new value is the old value times the multiplier plus the offset. The
-multiplier is the left textbox and the offset is the right textbox. The
-multiplier gets done first.</p>
-<p>Resulting values get rounded if they have to be integer.</p>
-<p>If the multiplier can’t be parsed then it will default to 1.</p>
-<p>If the offset can’t be parsed then it will default to 0.</p>
-<h2 id="clipping-properties">Clipping properties</h2>
-<p>Clip properties will make the properties not go outside of bounds. Properties
-that have 1x multiplier and 0 offset will not get clipped. The clipping works
-with the following boundaries:</p>
-<ul>
-<li>Timingpoints offset: None</li>
-<li>Timingpoints BPM: 15 - 10000</li>
-<li>Timingpoints SV: 0.1 - 10</li>
-<li>Timingpoints custom index: 0 - 100</li>
-<li>Timingpoints volume: 5 - 100</li>
-<li>Hitobject time: None</li>
-<li>Bookmark time: None </li>
-<li>SB sample time: None </li>
-</ul>
-<h2 id="filters">Filters</h2>
-<p>Filters let you direct the things that get targeted by Property Transformer. </p>
-<p>The first text box is for matching. All parameters that match that value are
-able to get transformed. This filter will only be active if the enable filters
-checkbox is checked and the textbox can be parsed to a number.</p>
-<p>The next filter is a time range. To get targeted by Property Transformer, the
-object that holds the parameter must have a time greater than or equal to the
-first value and less than or equal to the second value. The times specified are
-in milliseconds.</p>
-<p>If one of the textboxes can’t be parsed it will default to negative infinity
-for the minimum time and positive infinity for the maximum time.</p>
-<p>The filter is only active if one of the two textboxes can be parsed and the
-enable filters checkbox is checked.</p>
+                <h1>Hitsound Preview Helper</h1>
+                <p>Hitsound Preview Helper helps by placing hitsounds on all the objects of the
+current map based on the positions of the objects. That way you can hear the
+hitsounds play while you hitsound without having to assign them manually and
+later import them to Hitsound Studio.</p>
+<p>This tool is meant to help a very specific hitsounding workflow. If you
+hitsound by placing circles on different parts on the screen and treat each
+position as a different layer of hitsounds. For example using a mania map and
+have each column represent a different sound.</p>
+<p>You define a list of positions and their hitsounds (hitsound zones) using the
+tool's GUI.</p>
+<p>For each object the tool finds the nearest hitsound zone and applies the
+hitsounds from that hitsound zone to the object.</p>
+<p>Inputting -1 for a coordinate of the hitsound zone will make it act like that
+coordinate could be any value. For example -1 in the X coordinate will make it
+effectively a horizontal line and each object will calculate the distance from
+it using only the Y coordinate.</p>
+<h2 id="saving-projects">Saving projects</h2>
+<p>You can save and load your configuration of hitsound zones and it will also
+automatically save your current configuration for when you close Mapping Tools.
+That way you don't lose your possibly large configurations and it enables you
+to work on multiple hitsound projects at the same time.</p>
 
             </div>
         </div>

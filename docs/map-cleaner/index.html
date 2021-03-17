@@ -17,7 +17,6 @@
 </head>
 
 <body>
-  <noscript>You need to enable JavaScript to run this app.</noscript>
   <div class="App grid-container">
     
     <div class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -57,58 +56,125 @@
                 
                     <a class="list-group-item list-group-item-primary list-group-item-action
                         "
-                        href="../general">
+                        href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/general">
                         General
                     </a>
                 
                     <a class="list-group-item list-group-item-primary list-group-item-action
                         active"
-                        href="../map-cleaner">
+                        href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/map-cleaner">
                         Map Cleaner
                     </a>
                 
                     <a class="list-group-item list-group-item-primary list-group-item-action
                         "
-                        href="../property-transformer">
+                        href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/property-transformer">
                         Property Transformer
+                    </a>
+                
+                    <a class="list-group-item list-group-item-primary list-group-item-action
+                        "
+                        href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/slider-merger">
+                        Slider Merger
+                    </a>
+                
+                    <a class="list-group-item list-group-item-primary list-group-item-action
+                        "
+                        href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/slider-completionator">
+                        Slider Completionator
+                    </a>
+                
+                    <a class="list-group-item list-group-item-primary list-group-item-action
+                        "
+                        href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/timing-helper">
+                        Timing Helper
+                    </a>
+                
+                    <a class="list-group-item list-group-item-primary list-group-item-action
+                        "
+                        href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/hitsound-copier">
+                        Hitsound Copier
+                    </a>
+                
+                    <a class="list-group-item list-group-item-primary list-group-item-action
+                        "
+                        href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/hitsound-studio">
+                        Hitsound Studio
+                    </a>
+                
+                    <a class="list-group-item list-group-item-primary list-group-item-action
+                        "
+                        href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/hitsound-preview-helper">
+                        Hitsound Preview Helper
                     </a>
                 
                 </div>
             </div>
             <div class="col docu-content">
                 <h1>Map Cleaner</h1>
-                <p>It cleans the current map of useless greenlines and it also lets you do some other stuff regarding the whole map.</p>
-<p>Map cleaner cleans useless greenline stuff by storing all the influences of the timingpoints and then removing all the timingpoints and then rebuilding all the timingpoints in a good way. This means the greenlines automatically get resnapped to the objects that use them.</p>
-<p>In this process the map or hitsounds must not change in an unexpected way. If that happens please let me know, so I can fix it.</p>
-<p>Map has sliderbody volume changes: By checking this you tell map cleaner that any volume changes inside the body of a slider are <em>intentional</em> and as such will not be removed by map cleaner.</p>
+                <p>It cleans the current map of useless greenlines and it also lets you do some
+other stuff regarding the whole map.</p>
+<p>Map cleaner cleans useless greenline stuff by storing all the influences of the
+timingpoints and then removing all the timingpoints and then rebuilding all the
+timingpoints in a good way. This means the greenlines automatically get
+resnapped to the objects that use them.</p>
+<p>In this process the map or hitsounds must not change in an unexpected way. If
+that happens please let me know, so I can fix it.</p>
+<p>Map has sliderbody volume changes: By checking this you tell map cleaner that
+any volume changes inside the body of a slider are <em>intentional</em> and as such
+will not be removed by map cleaner.</p>
 <p>The same works for the other general options:</p>
 <ul>
 <li>
-<p>Resnap objects: This will resnap all the hitobjects and resnap sliderends during the map cleaning process. The resnapping will be done to the snap divisor options.</p>
+<p><strong>Resnap objects</strong>: This will resnap all the hitobjects and resnap sliderends
+during the map cleaning process. The resnapping will be done to the snap
+divisor options.</p>
 </li>
 <li>
-<p>Resnap bookmarks: This will resnap all bookmarks with the default resnapping method. This is a separate option because some maps like to spam bookmarks at a high frequency and it would be a shame if normal resnapping of hitobjects destroyed your bookmarking masterpiece.</p>
+<p><strong>Resnap bookmarks</strong>: This will resnap all bookmarks with the default
+resnapping method. This is a separate option because some maps like to spam
+bookmarks at a high frequency and it would be a shame if normal resnapping of
+hitobjects destroyed your bookmarking masterpiece.</p>
 </li>
 <li>
-<p>Remove muting: This option removes all volume changes and custom index changes on hitsounds with 5% volume. If any timingpoint has 5% volume, then the volume change and custom index change on that will be removed.</p>
+<p><strong>Remove muting</strong>: This option removes all volume changes and custom index
+changes on hitsounds with 5% volume. If any timingpoint has 5% volume, then
+the volume change and custom index change on that will be removed.</p>
 </li>
 <li>
-<p>Mute all unclickables: This will put 5% volume on all hitsound events originating from hitobjects that do not involve active player input. Only circles, sliderheads and hold note heads will be audible. This can be used to get better insight on the rhythm of your map or how it plays.</p>
+<p><strong>Mute all unclickables</strong>: This will put 5% volume on all hitsound events
+originating from hitobjects that do not involve active player input. Only
+circles, sliderheads and hold note heads will be audible. This can be used to
+get better insight on the rhythm of your map or how it plays.</p>
 </li>
 </ul>
 <h2 id="resnapping">Resnapping</h2>
-<p>Resnapping works by moving the time to the nearest tick on the timeline and flooring it to integer. If there is a redline within 10 ms after the time of the hitobject, it will snap to that redline instead. This is to prevent stuff from resnapping to a tick 3 ms before the redline.</p>
-<p>Resnapping sliderends is done in two different ways. First method works by taking the duration of the slider and then changing that to the nearest multiple of a snap divisor. This is similar to using ctrl+shift+S on a slider in the vanilla editor. The second method is only used if there is a redline inside the duration of the slider or up to 20 ms after the slider. This will resnap the end time of the slider to the nearest tick using the previously described method. Note that this creates sliders with an integer duration and the exact length deviates with the rounding around the timeline ticks.</p>
-<p>All spinner ends and hold note ends are also resnapped using this second method.</p>
-<p>If the map is in the osu! mania gamemode then resnapping will also resnap the position of the notes to the middle of the columns and to Y = 192.</p>
+<p>Resnapping works by moving the time to the nearest tick on the timeline and
+flooring it to integer. If there is a redline within 10 ms after the time of
+the hitobject, it will snap to that redline instead. This is to prevent stuff
+from resnapping to a tick 3 ms before the redline.</p>
+<p>Resnapping sliderends is done in two different ways. First method works by
+taking the duration of the slider and then changing that to the nearest
+multiple of a snap divisor. This is similar to using ctrl+shift+S on a slider
+in the vanilla editor. The second method is only used if there is a redline
+inside the duration of the slider or up to 20 ms after the slider. This will
+resnap the end time of the slider to the nearest tick using the previously
+described method. Note that this creates sliders with an integer duration and
+the exact length deviates with the rounding around the timeline ticks.</p>
+<p>All spinner ends and hold note ends are also resnapped using this second
+method.</p>
+<p>If the map is in the osu! mania gamemode then resnapping will also resnap the
+position of the notes to the middle of the columns and to Y = 192.</p>
 <h2 id="timeline">Timeline</h2>
-<p>Whenever you run Map Cleaner a little timeline will show all the changes the program made to the timingpoints.</p>
+<p>Whenever you run Map Cleaner a little timeline will show all the changes the
+program made to the timingpoints.</p>
 <ul>
 <li>Red line means a removed timingpoint</li>
 <li>Orange line means a changed timingpoint</li>
 <li>Green line means a timingpoint addition</li>
 </ul>
-<p>If a timingpoint was just moved you will see a red line on the previous offset and a green line on the new offset.</p>
+<p>If a timingpoint was just moved you will see a red line on the previous offset
+and a green line on the new offset.</p>
 <p>You can doubleclick any of the lines to go to that time in the editor.</p>
 
             </div>
