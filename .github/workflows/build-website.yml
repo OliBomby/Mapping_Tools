@@ -15,7 +15,8 @@ jobs:
         repo: Mapping_Tools
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - run: cat >latest_release.json <<<"${{ steps.get_latest_release.outputs.data }}"
+    - run: |
+        cat >latest_release.json <<- EOF${{ steps.get_latest_release.outputs.data }}EOF
 
     - name: download zola
       run: curl -L https://github.com/getzola/zola/releases/download/v0.10.1/zola-v0.10.1-x86_64-unknown-linux-gnu.tar.gz > zola.tar.gz
