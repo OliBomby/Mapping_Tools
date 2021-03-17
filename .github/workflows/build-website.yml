@@ -26,6 +26,9 @@ jobs:
     - name: unpack zola
       run: tar -xzf zola.tar.gz
 
+    - name: copy-release-info
+      run: cp latest_release.json website
+
     - name: build
       run: ./zola --root website build -u https://olibomby.github.io/Mapping_Tools -o build
 
