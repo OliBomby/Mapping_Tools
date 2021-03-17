@@ -1,7 +1,15 @@
 {% extends "page.html" %}
 
 {% block content %}
+    {% set releases = load_data(path="all_releases.json") %}
+
     <h1>Changelog</h1>
 
-    Under construction...
+    {% for release in releases %}
+    <h3>
+        {{ release.name }}
+        <small>(<a href="{{ release.html_url }}">Github</a>)</small>
+    </h3>
+    {{ release.body | markdown | safe }}
+    {% endfor %}
 {% endblock %}
