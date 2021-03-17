@@ -8,6 +8,19 @@ jobs:
     - uses: actions/checkout@master
 
     - uses: octokit/request-action@v2.x
+      id: get_all_releases
+      with:
+        route: GET /repos/{owner}/{repo}/releases
+        owner: OliBomby
+        repo: Mapping_Tools
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - run: |
+        cat >all_releases.json <<- EOF
+        ${{ steps.get_all_releases.outputs.data }}
+        EOF
+
+    - uses: octokit/request-action@v2.x
       id: get_latest_release
       with:
         route: GET /repos/{owner}/{repo}/releases/latest
@@ -27,13 +40,17 @@ jobs:
       run: tar -xzf zola.tar.gz
 
     - name: copy-release-info
-      run: cp latest_release.json website
+      run: |
+        cp all_releases.json website
+        cp latest_release.json website
 
     - name: build
       run: ./zola --root website build -u https://olibomby.github.io/Mapping_Tools -o build
 
     - name: copy-release-info
-      run: cp latest_release.json build
+      run: |
+        cp all_releases.json build
+        cp latest_release.json build
 
     - name: deploy
       uses: peaceiris/actions-gh-pages@v3
