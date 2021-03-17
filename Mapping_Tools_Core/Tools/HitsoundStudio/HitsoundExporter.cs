@@ -191,7 +191,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
             sampleNames[sample] = name;
         }
 
-        public static Dictionary<ISampleGenerator, Vector2> GenerateHitsoundPositions(IEnumerable<ISampleGenerator> samples) {
+        public static Dictionary<ISample, Vector2> GenerateHitsoundPositions(IEnumerable<ISample> samples) {
             var sampleArray = samples.ToArray();
             var sampleCount = sampleArray.Length;
 
@@ -207,7 +207,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
                     spacingY /= 2;
             }
 
-            var positions = new Dictionary<ISampleGenerator, Vector2>();
+            var positions = new Dictionary<ISample, Vector2>();
             int x = 0;
             int y = 0;
             foreach (var sample in sampleArray) {
@@ -227,14 +227,14 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
             return positions;
         }
 
-        public static Dictionary<ISampleGenerator, Vector2> GenerateManiaHitsoundPositions(IEnumerable<ISampleGenerator> samples) {
+        public static Dictionary<ISample, Vector2> GenerateManiaHitsoundPositions(IEnumerable<ISample> samples) {
             var sampleArray = samples.ToArray();
             var sampleCount = sampleArray.Length;
 
             // One key per unique sample but clamped between 1 and 18
             int numKeys = MathHelper.Clamp(sampleCount, 1, 18);
 
-            var positions = new Dictionary<ISampleGenerator, Vector2>();
+            var positions = new Dictionary<ISample, Vector2>();
             double x = 256d / numKeys;
             foreach (var sample in sampleArray) {
                 positions.Add(sample, new Vector2(Math.Round(x), 192));
