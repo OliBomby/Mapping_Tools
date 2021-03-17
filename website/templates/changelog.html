@@ -1,12 +1,7 @@
 {% extends "page.html" %}
 
 {% block content %}
-    {% set data = load_data(path="tags.json") %}
-
     <h1>Changelog</h1>
 
-    {% for tag in data %}
-        <h3>{{ tag.tag_name }}</h3>
-        <p>{{ tag.body | markdown | safe }}</p>
-    {% endfor %}
+    Under construction...
 {% endblock %}
