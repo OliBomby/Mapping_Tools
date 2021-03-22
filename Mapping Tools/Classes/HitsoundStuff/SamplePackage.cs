@@ -38,7 +38,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             int bestPriority = int.MaxValue;
             foreach (var sample in Samples)
             {
-                if (sample.Hitsound == 0 && sample.Priority < bestPriority)
+                if (sample.Hitsound == 0 && sample.Priority <= bestPriority)
                 {
                     sampleSet = sample.SampleSet;
                     bestPriority = sample.Priority;
@@ -52,7 +52,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             SampleSet additions = SampleSet.Auto;
             int bestPriority = int.MaxValue;
             foreach (Sample sample in Samples) {
-                if (sample.Hitsound != 0 && sample.Priority < bestPriority) {
+                if (sample.Hitsound != 0 && sample.Priority <= bestPriority) {
                     additions = sample.SampleSet;
                     bestPriority = sample.Priority;
                 }
