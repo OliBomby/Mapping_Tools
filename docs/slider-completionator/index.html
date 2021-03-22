@@ -55,7 +55,7 @@
                 <div class="list docu-listgroup">
                 
                     <a class="list-group-item list-group-item-primary list-group-item-action
-                        active"
+                        "
                         href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/general">
                         General
                     </a>
@@ -79,7 +79,7 @@
                     </a>
                 
                     <a class="list-group-item list-group-item-primary list-group-item-action
-                        "
+                        active"
                         href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/slider-completionator">
                         Slider Completionator
                     </a>
@@ -111,72 +111,20 @@
                 </div>
             </div>
             <div class="col docu-content">
-                <h1>General</h1>
-                <p>Mapping Tools is meant to combine all the mapping tools you need into one
-program.</p>
-<p>It ensures reliable quality by using shared algorithms, automatic updating and
-backups.</p>
-<p>Mapping tools stores all it’s config files in a map inside Documents called
-Mapping-Tools.</p>
-<p>It stores the general configs and configs of individual tools separately.</p>
-<p>The backups and custom Hitsound Studio saves also get saved there by default.</p>
-<p>Current map is a global variable which is used by most of the tools. It’s a
-path to the .osu file of a beatmap. This map will be the map that most tools do
-their work on.</p>
-<p>You can set the current map by clicking on File and then use either Open
-beatmap or Open current beatmap. </p>
-<ul>
-<li>
-<p>Open beatmap will open a file browsing window that defaults to your osu!
-songs folder.</p>
-</li>
-<li>
-<p>Open current beatmap will read the memory of your osu! client to get the path
-to the beatmap that is currently selected in the osu! client. This will not
-work if osu! is closed, there are multiple osu! clients open or if the path
-to your osu! folder is configured incorrectly.</p>
-</li>
-</ul>
-<p>Generate backup will make a copy of the current map and store it in the backups
-folder.</p>
-<p>The backups folder is inside the folder where mapping tools stores all of it’s
-configuration.</p>
-<p>You can use Options &gt; Open backups folder to easily open the backups folder.</p>
-<p>Inside the Tools menu item you can find all the available mapping tools.</p>
-<p>In the About menu item you can find some info about the contributors to mapping
-tools and the version of mapping tools. There is also a link to the Github.</p>
-<h2 id="get-started">Get started</h2>
-<p>It shows info letting you know how to use a tool from mapping tools.</p>
-<p>It shows a list of recent maps that were selected as current map paired with
-the time they were last selected.</p>
-<p>If you double click on one of the items in the list, it will select that map as
-the current map.</p>
-<h2 id="preferences">Preferences</h2>
-<p>You can find the preferences in the Options menu item. You can:</p>
-<ul>
-<li>Toggle dark mode</li>
-<li>Set the path to your osu! folder</li>
-<li>Set the path to your songs folder</li>
-<li>Set the path to your backups folder</li>
-<li>Toggle making automatic backups</li>
-</ul>
-<h2 id="text-boxes">Text boxes</h2>
-<p>All text boxes that want you to input some kind of number have a special way of
-parsing the text. You can input the number in the form of an equation. For
-instance “1 + 1/4” will be interpreted as 1.25. Both dots and commas will be
-interpreted as decimal separators.</p>
-<p>If the text cannot be interpreted then it will go to a default value. Most of
-the time this default value will have the program completely ignore that
-feature, so there will be no adverse and unexpected results.</p>
-<p>All text boxes that want you to input a path have a folder button next to it
-that you can use to summon a file browsing dialog.</p>
-<p>All text boxes that want you to input a path to a beatmap also have a download
-looking button next to it that when you click it will get the current map from
-your osu! client and put the path in the text box just like how the get current
-map works. </p>
-<h2 id="backups">Backups</h2>
-<p>Every time you run a tool that changes a beatmap a backup will automatically be
-made and put in the backups folder. You can disable this in the preferences.</p>
+                <h1>Slider Completionator</h1>
+                <p>Change the pixel length and the duration of sliders without having to deal with
+SV. </p>
+<p>This tool works on the current map.</p>
+<p>If require bookmarks is checked then the program will only target bookmarked
+sliders. If it’s not checked then the program will work on every slider in the
+current map.</p>
+<p>Temporal length sets the duration of the slider in beats. If the textbox can’t
+be parsed then it will not change the duration.</p>
+<p>Spatial length sets the pixel length of the slider as a fraction of the
+complete length of the path defined by the anchors. For example inputting 1
+makes the slider go the complete path of the anchors and the sliderend will be
+exactly on top of the last anchor. Inputting 3 makes for Pencilina sliders. If
+the textbox can’t be parsed then it will not change the pixel length.</p>
 
             </div>
         </div>

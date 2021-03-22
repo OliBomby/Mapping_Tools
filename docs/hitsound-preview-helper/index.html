@@ -55,7 +55,7 @@
                 <div class="list docu-listgroup">
                 
                     <a class="list-group-item list-group-item-primary list-group-item-action
-                        active"
+                        "
                         href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/general">
                         General
                     </a>
@@ -103,7 +103,7 @@
                     </a>
                 
                     <a class="list-group-item list-group-item-primary list-group-item-action
-                        "
+                        active"
                         href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/hitsound-preview-helper">
                         Hitsound Preview Helper
                     </a>
@@ -111,72 +111,28 @@
                 </div>
             </div>
             <div class="col docu-content">
-                <h1>General</h1>
-                <p>Mapping Tools is meant to combine all the mapping tools you need into one
-program.</p>
-<p>It ensures reliable quality by using shared algorithms, automatic updating and
-backups.</p>
-<p>Mapping tools stores all it’s config files in a map inside Documents called
-Mapping-Tools.</p>
-<p>It stores the general configs and configs of individual tools separately.</p>
-<p>The backups and custom Hitsound Studio saves also get saved there by default.</p>
-<p>Current map is a global variable which is used by most of the tools. It’s a
-path to the .osu file of a beatmap. This map will be the map that most tools do
-their work on.</p>
-<p>You can set the current map by clicking on File and then use either Open
-beatmap or Open current beatmap. </p>
-<ul>
-<li>
-<p>Open beatmap will open a file browsing window that defaults to your osu!
-songs folder.</p>
-</li>
-<li>
-<p>Open current beatmap will read the memory of your osu! client to get the path
-to the beatmap that is currently selected in the osu! client. This will not
-work if osu! is closed, there are multiple osu! clients open or if the path
-to your osu! folder is configured incorrectly.</p>
-</li>
-</ul>
-<p>Generate backup will make a copy of the current map and store it in the backups
-folder.</p>
-<p>The backups folder is inside the folder where mapping tools stores all of it’s
-configuration.</p>
-<p>You can use Options &gt; Open backups folder to easily open the backups folder.</p>
-<p>Inside the Tools menu item you can find all the available mapping tools.</p>
-<p>In the About menu item you can find some info about the contributors to mapping
-tools and the version of mapping tools. There is also a link to the Github.</p>
-<h2 id="get-started">Get started</h2>
-<p>It shows info letting you know how to use a tool from mapping tools.</p>
-<p>It shows a list of recent maps that were selected as current map paired with
-the time they were last selected.</p>
-<p>If you double click on one of the items in the list, it will select that map as
-the current map.</p>
-<h2 id="preferences">Preferences</h2>
-<p>You can find the preferences in the Options menu item. You can:</p>
-<ul>
-<li>Toggle dark mode</li>
-<li>Set the path to your osu! folder</li>
-<li>Set the path to your songs folder</li>
-<li>Set the path to your backups folder</li>
-<li>Toggle making automatic backups</li>
-</ul>
-<h2 id="text-boxes">Text boxes</h2>
-<p>All text boxes that want you to input some kind of number have a special way of
-parsing the text. You can input the number in the form of an equation. For
-instance “1 + 1/4” will be interpreted as 1.25. Both dots and commas will be
-interpreted as decimal separators.</p>
-<p>If the text cannot be interpreted then it will go to a default value. Most of
-the time this default value will have the program completely ignore that
-feature, so there will be no adverse and unexpected results.</p>
-<p>All text boxes that want you to input a path have a folder button next to it
-that you can use to summon a file browsing dialog.</p>
-<p>All text boxes that want you to input a path to a beatmap also have a download
-looking button next to it that when you click it will get the current map from
-your osu! client and put the path in the text box just like how the get current
-map works. </p>
-<h2 id="backups">Backups</h2>
-<p>Every time you run a tool that changes a beatmap a backup will automatically be
-made and put in the backups folder. You can disable this in the preferences.</p>
+                <h1>Hitsound Preview Helper</h1>
+                <p>Hitsound Preview Helper helps by placing hitsounds on all the objects of the
+current map based on the positions of the objects. That way you can hear the
+hitsounds play while you hitsound without having to assign them manually and
+later import them to Hitsound Studio.</p>
+<p>This tool is meant to help a very specific hitsounding workflow. If you
+hitsound by placing circles on different parts on the screen and treat each
+position as a different layer of hitsounds. For example using a mania map and
+have each column represent a different sound.</p>
+<p>You define a list of positions and their hitsounds (hitsound zones) using the
+tool's GUI.</p>
+<p>For each object the tool finds the nearest hitsound zone and applies the
+hitsounds from that hitsound zone to the object.</p>
+<p>Inputting -1 for a coordinate of the hitsound zone will make it act like that
+coordinate could be any value. For example -1 in the X coordinate will make it
+effectively a horizontal line and each object will calculate the distance from
+it using only the Y coordinate.</p>
+<h2 id="saving-projects">Saving projects</h2>
+<p>You can save and load your configuration of hitsound zones and it will also
+automatically save your current configuration for when you close Mapping Tools.
+That way you don't lose your possibly large configurations and it enables you
+to work on multiple hitsound projects at the same time.</p>
 
             </div>
         </div>

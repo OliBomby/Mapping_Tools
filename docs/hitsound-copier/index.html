@@ -55,7 +55,7 @@
                 <div class="list docu-listgroup">
                 
                     <a class="list-group-item list-group-item-primary list-group-item-action
-                        active"
+                        "
                         href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/general">
                         General
                     </a>
@@ -91,7 +91,7 @@
                     </a>
                 
                     <a class="list-group-item list-group-item-primary list-group-item-action
-                        "
+                        active"
                         href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/hitsound-copier">
                         Hitsound Copier
                     </a>
@@ -111,72 +111,62 @@
                 </div>
             </div>
             <div class="col docu-content">
-                <h1>General</h1>
-                <p>Mapping Tools is meant to combine all the mapping tools you need into one
-program.</p>
-<p>It ensures reliable quality by using shared algorithms, automatic updating and
-backups.</p>
-<p>Mapping tools stores all it’s config files in a map inside Documents called
-Mapping-Tools.</p>
-<p>It stores the general configs and configs of individual tools separately.</p>
-<p>The backups and custom Hitsound Studio saves also get saved there by default.</p>
-<p>Current map is a global variable which is used by most of the tools. It’s a
-path to the .osu file of a beatmap. This map will be the map that most tools do
-their work on.</p>
-<p>You can set the current map by clicking on File and then use either Open
-beatmap or Open current beatmap. </p>
-<ul>
-<li>
-<p>Open beatmap will open a file browsing window that defaults to your osu!
-songs folder.</p>
-</li>
-<li>
-<p>Open current beatmap will read the memory of your osu! client to get the path
-to the beatmap that is currently selected in the osu! client. This will not
-work if osu! is closed, there are multiple osu! clients open or if the path
-to your osu! folder is configured incorrectly.</p>
-</li>
-</ul>
-<p>Generate backup will make a copy of the current map and store it in the backups
-folder.</p>
-<p>The backups folder is inside the folder where mapping tools stores all of it’s
-configuration.</p>
-<p>You can use Options &gt; Open backups folder to easily open the backups folder.</p>
-<p>Inside the Tools menu item you can find all the available mapping tools.</p>
-<p>In the About menu item you can find some info about the contributors to mapping
-tools and the version of mapping tools. There is also a link to the Github.</p>
-<h2 id="get-started">Get started</h2>
-<p>It shows info letting you know how to use a tool from mapping tools.</p>
-<p>It shows a list of recent maps that were selected as current map paired with
-the time they were last selected.</p>
-<p>If you double click on one of the items in the list, it will select that map as
-the current map.</p>
-<h2 id="preferences">Preferences</h2>
-<p>You can find the preferences in the Options menu item. You can:</p>
-<ul>
-<li>Toggle dark mode</li>
-<li>Set the path to your osu! folder</li>
-<li>Set the path to your songs folder</li>
-<li>Set the path to your backups folder</li>
-<li>Toggle making automatic backups</li>
-</ul>
-<h2 id="text-boxes">Text boxes</h2>
-<p>All text boxes that want you to input some kind of number have a special way of
-parsing the text. You can input the number in the form of an equation. For
-instance “1 + 1/4” will be interpreted as 1.25. Both dots and commas will be
-interpreted as decimal separators.</p>
-<p>If the text cannot be interpreted then it will go to a default value. Most of
-the time this default value will have the program completely ignore that
-feature, so there will be no adverse and unexpected results.</p>
-<p>All text boxes that want you to input a path have a folder button next to it
-that you can use to summon a file browsing dialog.</p>
-<p>All text boxes that want you to input a path to a beatmap also have a download
-looking button next to it that when you click it will get the current map from
-your osu! client and put the path in the text box just like how the get current
-map works. </p>
-<h2 id="backups">Backups</h2>
-<p>Every time you run a tool that changes a beatmap a backup will automatically be
-made and put in the backups folder. You can disable this in the preferences.</p>
+                <h1>Hitsound Copier</h1>
+                <p>Copies hitsounds from A to B.</p>
+<p>There are 2 modes. First mode is overwrite everything. This will basically
+first remove the hitsounds from the map you’re copying to and then copy the
+hitsounds.</p>
+<p>Second mode is copying only the defined hitsounds. A defined hitsound is when
+there is something there in the map you’re copying from. This mode will copy
+over all the hitsounds from the map you’re copying from. Anything in the map
+you’re copying to that has not been defined in the map you’re copying from will
+not change. For instance muted sliderends will remain there.</p>
+<p>Temporal leniency is the maximum amount milliseconds two hitsounds can be away
+from each other in the two maps to still copy over the hitsounds.</p>
+<p>The temporal distance between the two hitsounds has to be less than or equal to
+the temporal leniency.</p>
+<p>Sliderbody hitsounds are greenlines in the body of a slider that change custom
+index or volume during the slider.</p>
+<h2 id="copying-storyboarded-samples">Copying storyboarded samples</h2>
+<p>To copy storyboarded samples simply check the checkbox that says &quot;Copy
+storyboarded samples&quot;.</p>
+<p>It will add the storyboarded samples from the map you are copying from to the
+map you are copying to.</p>
+<p>If the map you are copying to already contains an exact copy of a storyboarded
+sample in the map you are copying from then that storyboarded sample will not
+be added.</p>
+<p>If the overwrite everything copying mode is selected then it will first remove
+all the storyboarded samples of the map you are copying to and then copy.</p>
+<p>Checking the box of &quot;Ignore hitsound satisfied samples&quot; will make the program
+try to not copy over storyboarded samples for samples that already get played
+by the hitsounds.</p>
+<p>Temporal leniency also applies here.</p>
+<p>If a hitsound plays sample X at time Y then the storyboarded sample of X at
+time Y +/- temporal leniency will not get copied over.</p>
+<p>The algorithm also looks for files that have different names/locations but have
+the same sound, so you don't have to worry about your storyboarded samples
+using different files.</p>
+<p>However the algorithm can't detect if there are samples made out of multiple
+sounds mixed together. It will treat those as unique sounds.</p>
+<h2 id="muting-sliderends">Muting Sliderends</h2>
+<p>You can enable sliderend muting in Hitsound Copier by checking the mute
+sliderends checkbox. Despite the name this muting also applies to spinnerends.</p>
+<p>Only sliderends that are not defined will be eligible to get muted. If you want
+to ignore that filter you can just copy from an empty map with the overwrite
+only defined hitsounds option.</p>
+<p>Sliderends from repeating sliders won’t get muted.</p>
+<p>You can configure the minimum snap that the sliderend must have to be eligible
+to get muted.</p>
+<p>You can also configure the minimum length the slider must have to be eligible
+to get sliderend muting. The time you input is in number of beats. If the
+textbox for the minimum length can’t be parsed then it will default to 0.</p>
+<p>You can configure how the program mutes sliderends. Under muted config the
+textbox is to configure what customindex gets given to muted sliderends. If the
+textbox can’t be parsed then it will not change the custom index on the
+sliderend. You can also tell the program what sampleset the muted sliderend
+must be.</p>
+<p>In addition to the stuff you configured, all muted sliderends will have 5%
+volume, auto for additions and no hitsounds.</p>
 
             </div>
         </div>
