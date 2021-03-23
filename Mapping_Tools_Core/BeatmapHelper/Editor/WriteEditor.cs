@@ -1,16 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using Mapping_Tools_Core.BeatmapHelper.Encoding;
+using System.Collections.Generic;
 using System.IO;
-using Mapping_Tools_Core.BeatmapHelper.Decoding;
-using Mapping_Tools_Core.BeatmapHelper.Encoding;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Editor {
     /// <summary>
-    /// A <see cref="IReadWriteEditor{T}"/> that connects an object to a file
-    /// using a <see cref="IEncoder{T}"/> and a <see cref="IDecoder{T}"/>./>
+    /// A <see cref="IWriteEditor{T}"/> that helps write an object to a file using a <see cref="IEncoder{T}"/>./>
     /// </summary>
-    public class Editor<T> : IReadWriteEditor<T> {
+    public class WriteEditor<T> : IWriteEditor<T> {
         protected readonly IEncoder<T> encoder;
-        protected readonly IDecoder<T> decoder;
 
         /// <summary>
         /// The file path to the serialized file.
@@ -21,10 +18,8 @@ namespace Mapping_Tools_Core.BeatmapHelper.Editor {
         /// Initializes a new editor.
         /// </summary>
         /// <param name="encoder">The encoder for the file type</param>
-        /// <param name="decoder">The decoder for the file type</param>
-        public Editor(IEncoder<T> encoder, IDecoder<T> decoder) {
+        public WriteEditor(IEncoder<T> encoder) {
             this.encoder = encoder;
-            this.decoder = decoder;
         }
 
         /// <summary>
@@ -34,14 +29,8 @@ namespace Mapping_Tools_Core.BeatmapHelper.Editor {
         /// <param name="encoder">The encoder for the file type</param>
         /// <param name="decoder">The decoder for the file type</param>
         /// <param name="path">The path of the physical file</param>
-        public Editor(IEncoder<T> encoder, IDecoder<T> decoder, string path) : this(encoder, decoder) {
+        public WriteEditor(IEncoder<T> encoder, string path) : this(encoder) {
             Path = path;
-        }
-
-        public virtual T ReadFile() {
-            // Get contents of the file
-            var lines = File.ReadAllLines(Path);
-            return decoder.DecodeNew(lines);
         }
 
         public virtual void WriteFile(T instance) {

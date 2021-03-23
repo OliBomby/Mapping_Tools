@@ -3,8 +3,8 @@ using System.Linq;
 using Mapping_Tools_Core.BeatmapHelper.Events;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Encoding {
-    public class OsuStoryboardEncoder : IEncoder<Storyboard> {
-        public IEnumerable<string> Encode(Storyboard obj) {
+    public class OsuStoryboardEncoder : IEncoder<IStoryboard> {
+        public IEnumerable<string> Encode(IStoryboard obj) {
             yield return "[Events]";
             yield return "//Background and Video events";
             foreach (string s in obj.BackgroundAndVideoEvents.Select(e => e.GetLine())) yield return s;

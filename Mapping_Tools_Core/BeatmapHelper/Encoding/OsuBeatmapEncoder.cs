@@ -2,15 +2,15 @@
 using System.Linq;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Encoding {
-    public class OsuBeatmapEncoder : IEncoder<Beatmap> {
-        private readonly IEncoder<Storyboard> storyboardParser = new OsuStoryboardEncoder();
+    public class OsuBeatmapEncoder : IEncoder<IBeatmap> {
+        private readonly IEncoder<IStoryboard> storyboardParser = new OsuStoryboardEncoder();
 
         /// <summary>
         /// When true, all coordinates and times will be serialized without rounding.
         /// </summary>
         public bool SaveWithFloatPrecision { get; set; } = false;
 
-        public IEnumerable<string> Encode(Beatmap beatmap) {
+        public IEnumerable<string> Encode(IBeatmap beatmap) {
             // Getting all the stuff
             yield return "osu file format v14";
             yield return "";

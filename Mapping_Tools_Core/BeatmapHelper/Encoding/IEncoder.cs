@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Encoding {
-    public interface IEncoder<T> {
+    public interface IEncoder<in T> {
         /// <summary>
         /// Serializes an object to lines of text.
         /// </summary>
