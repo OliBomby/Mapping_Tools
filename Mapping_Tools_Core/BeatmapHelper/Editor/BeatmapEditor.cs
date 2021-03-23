@@ -1,11 +1,11 @@
 ﻿using System.IO;
-using Mapping_Tools_Core.BeatmapHelper.Parsing;
+using Mapping_Tools_Core.BeatmapHelper.Decoding;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Editor {
     public class BeatmapEditor : Editor<Beatmap> {
-        public BeatmapEditor() : base(new OsuBeatmapParser()) {}
+        public BeatmapEditor() : base(new OsuBeatmapDecoder()) {}
 
-        public BeatmapEditor(string path) : base(new OsuBeatmapParser(), path) {}
+        public BeatmapEditor(string path) : base(new OsuBeatmapDecoder(), path) {}
 
         /// <summary>
         /// Saves the beatmap using <see cref=".SaveFile()"/> but also updates the filename according to the metadata of the <see cref="Beatmap"/>

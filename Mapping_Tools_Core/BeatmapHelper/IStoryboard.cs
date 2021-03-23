@@ -13,6 +13,12 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         List<Event> BackgroundAndVideoEvents { get; }
 
         /// <summary>
+        /// A list of all Breaks under the [Events] -> (Break Periods) section.
+        /// </summary>
+        [NotNull]
+        List<Break> BreakPeriods { get; }
+
+        /// <summary>
         /// A list of all Events under the [Events] -> (Storyboard Layer 0 (Background)) section.
         /// </summary>
         [NotNull]

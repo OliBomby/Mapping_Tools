@@ -2,8 +2,8 @@
 using System.IO;
 using System.Linq;
 using Mapping_Tools_Core.BeatmapHelper;
+using Mapping_Tools_Core.BeatmapHelper.Decoding;
 using Mapping_Tools_Core.BeatmapHelper.Editor;
-using Mapping_Tools_Core.BeatmapHelper.Parsing;
 using Mapping_Tools_Core.MathUtil;
 using Newtonsoft.Json;
 
@@ -80,7 +80,7 @@ namespace Mapping_Tools_Core.Tools.PatternGallery {
 
         public void SavePatternBeatmap(Beatmap beatmap, string filename) {
             var editor = new Editor<Beatmap>(
-                new OsuBeatmapParser {SaveWithFloatPrecision = true},
+                new OsuBeatmapDecoder {SaveWithFloatPrecision = true},
                 GetPatternPath(filename));
 
             editor.WriteFile(beatmap);

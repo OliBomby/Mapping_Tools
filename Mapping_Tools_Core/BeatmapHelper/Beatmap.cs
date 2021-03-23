@@ -34,9 +34,9 @@ namespace Mapping_Tools_Core.BeatmapHelper {
 
         public Storyboard StoryBoard { get; set; }
 
-        public List<Break> BreakPeriods { get; set; }
-
         public List<Event> BackgroundAndVideoEvents => StoryBoard.BackgroundAndVideoEvents;
+
+        public List<Break> BreakPeriods => StoryBoard.BreakPeriods;
 
         public List<Event> StoryboardLayerBackground => StoryBoard.StoryboardLayerBackground;
 
@@ -69,7 +69,6 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             ComboColoursList = new List<IComboColour>();
             SpecialColours = new Dictionary<string, IComboColour>();
             StoryBoard = new Storyboard();
-            BreakPeriods = new List<Break>();
             HitObjects = new List<HitObject>();
             BeatmapTiming = new Timing(1.4);
 

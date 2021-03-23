@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using Mapping_Tools_Core.BeatmapHelper.Parsing;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Editor {
     /// <summary>

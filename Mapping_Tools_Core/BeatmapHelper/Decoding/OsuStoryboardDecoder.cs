@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Mapping_Tools_Core.BeatmapHelper.Events;
+﻿using Mapping_Tools_Core.BeatmapHelper.Events;
+using System.Collections.Generic;
 
-namespace Mapping_Tools_Core.BeatmapHelper.Parsing {
-    public class OsuStoryboardParser : IParser<Storyboard> {
-        public void Parse(Storyboard obj, IReadOnlyCollection<string> lines) {
+namespace Mapping_Tools_Core.BeatmapHelper.Decoding {
+    public class OsuStoryboardDecoder : IDecoder<Storyboard> {
+        public void Decode(Storyboard obj, IReadOnlyCollection<string> lines) {
             // Load up all the stuff
             IEnumerable<string> backgroundAndVideoEventsLines = FileFormatHelper.GetCategoryLines(lines, "//Background and Video events", new[] { "[", "//" });
             IEnumerable<string> storyboardLayerBackgroundLines = FileFormatHelper.GetCategoryLines(lines, "//Storyboard Layer 0 (Background)", new[] { "[", "//" });
@@ -29,32 +28,11 @@ namespace Mapping_Tools_Core.BeatmapHelper.Parsing {
             }
         }
 
-        public Storyboard ParseNew(IReadOnlyCollection<string> lines) {
+        public Storyboard DecodeNew(IReadOnlyCollection<string> lines) {
             var storyboard = new Storyboard();
-            Parse(storyboard, lines);
+            Decode(storyboard, lines);
 
             return storyboard;
-        }
-
-        public IEnumerable<string> Serialize(Storyboard obj) {
-            yield return "[Events]";
-            yield return "//Background and Video events";
-            foreach (string s in obj.BackgroundAndVideoEvents.Select(e => e.GetLine())) yield return s;
-            yield return "//Break Periods";
-            foreach (string s in obj.BreakPeriods.Select(b => b.GetLine())) yield return s;
-            yield return "//Storyboard Layer 0 (Background)";
-            foreach (string s in Event.SerializeEventTree(obj.StoryboardLayerBackground)) yield return s;
-            yield return "//Storyboard Layer 1 (Fail)";
-            foreach (string s in Event.SerializeEventTree(obj.StoryboardLayerFail)) yield return s;
-            yield return "//Storyboard Layer 2 (Pass)";
-            foreach (string s in Event.SerializeEventTree(obj.StoryboardLayerPass)) yield return s;
-            yield return "//Storyboard Layer 3 (Foreground)";
-            foreach (string s in Event.SerializeEventTree(obj.StoryboardLayerForeground)) yield return s;
-            yield return "//Storyboard Layer 4 (Overlay)";
-            foreach (string s in Event.SerializeEventTree(obj.StoryboardLayerOverlay)) yield return s;
-            yield return "//Storyboard Sound Samples";
-            foreach (string s in obj.StoryboardSoundSamples.Select(sbss => sbss.GetLine())) yield return s;
-            yield return "";
         }
     }
 }

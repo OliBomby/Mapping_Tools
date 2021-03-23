@@ -69,12 +69,6 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         Dictionary<string, TValue> Difficulty { get; }
 
         /// <summary>
-        /// A list of all Breaks under the [Events] -> (Break Periods) section.
-        /// </summary>
-        [NotNull]
-        List<Break> BreakPeriods { get; }
-
-        /// <summary>
         /// Contains all the basic combo colours. The order of this list is the same as how they are numbered in the .osu.
         /// There can not be more than 8 combo colours.
         /// <c>Combo1 : 245,222,139</c>

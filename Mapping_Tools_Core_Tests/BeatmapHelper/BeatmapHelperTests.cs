@@ -1,9 +1,9 @@
 ﻿using Mapping_Tools_Core.BeatmapHelper;
-using Mapping_Tools_Core.BeatmapHelper.Parsing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Mapping_Tools_Core.BeatmapHelper.Decoding;
 
 namespace Mapping_Tools_Core_Tests.BeatmapHelper {
     [TestClass]
@@ -12,7 +12,7 @@ namespace Mapping_Tools_Core_Tests.BeatmapHelper {
         public void UnchangingEmptyMapCodeTest() {
             var path = "Resources\\EmptyTestMap.osu";
             var lines = File.ReadAllLines(path).ToList();
-            var parser = new OsuBeatmapParser();
+            var parser = new OsuBeatmapDecoder();
 
             TestUnchanging(lines, parser);
         }
@@ -21,7 +21,7 @@ namespace Mapping_Tools_Core_Tests.BeatmapHelper {
         public void UnchangingComplicatedMapCodeTest() {
             var path = "Resources\\ComplicatedTestMap.osu";
             var lines = File.ReadAllLines(path).ToList();
-            var parser = new OsuBeatmapParser();
+            var parser = new OsuBeatmapDecoder();
 
             TestUnchanging(lines, parser);
         }
