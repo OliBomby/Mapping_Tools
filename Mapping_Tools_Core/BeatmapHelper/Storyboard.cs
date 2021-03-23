@@ -1,24 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using Mapping_Tools_Core.BeatmapHelper.Events;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
-using JetBrains.Annotations;
-using Mapping_Tools_Core.BeatmapHelper.Events;
 
 namespace Mapping_Tools_Core.BeatmapHelper {
     /// <summary>
     /// Stores everything under the [Events] section of an osu beatmap or storyboard.
     /// </summary>
-    public class StoryBoard : IStoryboard
+    public class Storyboard : IStoryboard
     {
         /// <summary>
         /// A list of all Events under the [Events] -> (Background and Video events) section.
         /// </summary>
         public List<Event> BackgroundAndVideoEvents { get; set; }
-
-        /// <summary>
-        /// A list of all Breaks under the [Events] -> (Break Periods) section.
-        /// </summary>
-        public List<Break> BreakPeriods { get; set; }
 
         /// <summary>
         /// A list of all Events under the [Events] -> (Storyboard Layer 0 (Background)) section.
@@ -53,9 +47,8 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// <summary>
         /// Initializes an empty storyboard.
         /// </summary>
-        public StoryBoard() {
+        public Storyboard() {
             BackgroundAndVideoEvents = new List<Event>();
-            BreakPeriods = new List<Break>();
             StoryboardLayerBackground = new List<Event>();
             StoryboardLayerPass = new List<Event>();
             StoryboardLayerFail = new List<Event>();
@@ -70,7 +63,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// <c>Artist - Title (Host).osb</c>
         /// </summary>
         /// <returns>String of file name.</returns>
-        public string GetFileName(string artist, string title, string creator) {
+        public static string GetFileName(string artist, string title, string creator) {
             string fileName = $"{artist} - {title} ({creator}).osb";
 
             string regexSearch = new string(Path.GetInvalidFileNameChars());

@@ -3,11 +3,10 @@ using System.Linq;
 using Mapping_Tools_Core.BeatmapHelper.Events;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Parsing {
-    public class OsuStoryboardParser : IParser<StoryBoard> {
-        public void Parse(StoryBoard obj, IReadOnlyCollection<string> lines) {
+    public class OsuStoryboardParser : IParser<Storyboard> {
+        public void Parse(Storyboard obj, IReadOnlyCollection<string> lines) {
             // Load up all the stuff
             IEnumerable<string> backgroundAndVideoEventsLines = FileFormatHelper.GetCategoryLines(lines, "//Background and Video events", new[] { "[", "//" });
-            IEnumerable<string> breakPeriodsLines = FileFormatHelper.GetCategoryLines(lines, "//Break Periods", new[] { "[", "//" });
             IEnumerable<string> storyboardLayerBackgroundLines = FileFormatHelper.GetCategoryLines(lines, "//Storyboard Layer 0 (Background)", new[] { "[", "//" });
             IEnumerable<string> storyboardLayerFailLines = FileFormatHelper.GetCategoryLines(lines, "//Storyboard Layer 1 (Fail)", new[] { "[", "//" });
             IEnumerable<string> storyboardLayerPassLines = FileFormatHelper.GetCategoryLines(lines, "//Storyboard Layer 2 (Pass)", new[] { "[", "//" });
@@ -17,9 +16,6 @@ namespace Mapping_Tools_Core.BeatmapHelper.Parsing {
 
             foreach (string line in backgroundAndVideoEventsLines) {
                 obj.BackgroundAndVideoEvents.Add(Event.MakeEvent(line));
-            }
-            foreach (string line in breakPeriodsLines) {
-                obj.BreakPeriods.Add(new Break(line));
             }
 
             obj.StoryboardLayerBackground.AddRange(Event.ParseEventTree(storyboardLayerBackgroundLines));
@@ -33,14 +29,14 @@ namespace Mapping_Tools_Core.BeatmapHelper.Parsing {
             }
         }
 
-        public StoryBoard ParseNew(IReadOnlyCollection<string> lines) {
-            var storyboard = new StoryBoard();
+        public Storyboard ParseNew(IReadOnlyCollection<string> lines) {
+            var storyboard = new Storyboard();
             Parse(storyboard, lines);
 
             return storyboard;
         }
 
-        public IEnumerable<string> Serialize(StoryBoard obj) {
+        public IEnumerable<string> Serialize(Storyboard obj) {
             yield return "[Events]";
             yield return "//Background and Video events";
             foreach (string s in obj.BackgroundAndVideoEvents.Select(e => e.GetLine())) yield return s;

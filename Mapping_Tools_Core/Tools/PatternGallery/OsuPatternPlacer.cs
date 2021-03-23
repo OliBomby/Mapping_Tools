@@ -73,7 +73,7 @@ namespace Mapping_Tools_Core.Tools.PatternGallery {
         public void PlaceOsuPattern(Beatmap patternBeatmap, Beatmap beatmap, double offset = 0, bool protectBeatmapPattern = true) {
             if (protectBeatmapPattern) {
                 // Copy so the original pattern doesnt get changed
-                patternBeatmap = patternBeatmap.DeepCopy();
+                patternBeatmap = patternBeatmap.DeepClone();
             }
 
             // Do the offset

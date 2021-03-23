@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using Mapping_Tools_Core.BeatmapHelper.Events;
 
@@ -9,12 +11,6 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// </summary>
         [NotNull]
         List<Event> BackgroundAndVideoEvents { get; }
-
-        /// <summary>
-        /// A list of all Breaks under the [Events] -> (Break Periods) section.
-        /// </summary>
-        [NotNull]
-        List<Break> BreakPeriods { get; }
 
         /// <summary>
         /// A list of all Events under the [Events] -> (Storyboard Layer 0 (Background)) section.

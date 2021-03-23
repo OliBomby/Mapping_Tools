@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Mapping_Tools_Core.BeatmapHelper.Events;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Parsing {
     public class OsuBeatmapParser : IParser<Beatmap> {
@@ -17,6 +18,7 @@ namespace Mapping_Tools_Core.BeatmapHelper.Parsing {
             IEnumerable<string> metadataLines = FileFormatHelper.GetCategoryLines(lines, "[Metadata]");
             IEnumerable<string> difficultyLines = FileFormatHelper.GetCategoryLines(lines, "[Difficulty]");
             IEnumerable<string> timingLines = FileFormatHelper.GetCategoryLines(lines, "[TimingPoints]");
+            IEnumerable<string> breakPeriodsLines = FileFormatHelper.GetCategoryLines(lines, "//Break Periods", new[] { "[", "//" });
             IEnumerable<string> colourLines = FileFormatHelper.GetCategoryLines(lines, "[Colours]");
             IEnumerable<string> hitobjectLines = FileFormatHelper.GetCategoryLines(lines, "[HitObjects]");
 
@@ -24,6 +26,10 @@ namespace Mapping_Tools_Core.BeatmapHelper.Parsing {
             FileFormatHelper.FillDictionary(beatmap.Editor, editorLines);
             FileFormatHelper.FillDictionary(beatmap.Metadata, metadataLines);
             FileFormatHelper.FillDictionary(beatmap.Difficulty, difficultyLines);
+
+            foreach (string line in breakPeriodsLines) {
+                beatmap.BreakPeriods.Add(new Break(line));
+            }
 
             foreach (string line in colourLines) {
                 if (line.Substring(0, 5) == "Combo") {

@@ -28,7 +28,7 @@ namespace Mapping_Tools_Core.Tools.PatternGallery {
             if (!beatmap.HitObjects.Any(h => h.IsSelected)) throw new Exception("No selected hit objects found.");
 
             // Copy it so the changes dont affect the given beatmap object
-            patternBeatmap = beatmap.DeepCopy();
+            patternBeatmap = beatmap.DeepClone();
 
             RemoveStoryboard(patternBeatmap);
             RemoveEverythingThatIsNotTheseHitObjects(patternBeatmap, patternBeatmap.HitObjects.Where(h => h.IsSelected).ToList());

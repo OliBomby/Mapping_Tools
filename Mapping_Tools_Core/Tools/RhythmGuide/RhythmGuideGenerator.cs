@@ -8,7 +8,7 @@ namespace Mapping_Tools_Core.Tools.RhythmGuide {
     public class RhythmGuideGenerator {
         public static Beatmap NewRhythmGuide(IRhythmGuideArgs args, Beatmap templateBeatmap, GameMode gameMode, string diffName) {
             // Scuffed beatmap copy
-            var newBeatmap = templateBeatmap.DeepCopy();
+            var newBeatmap = templateBeatmap.DeepClone();
 
             // Remove all greenlines
             newBeatmap.BeatmapTiming.RemoveAll(o => !o.Uninherited);
