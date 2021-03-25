@@ -9,9 +9,9 @@ namespace Mapping_Tools_Core.Tools.SnappingTools.DataStructure.RelevantObject.Re
         public HitObject HitObject { get; set; }
 
         public override double Time {
-            get => HitObject.Time;
+            get => HitObject.StartTime;
             set {
-                HitObject.Time = value;
+                HitObject.StartTime = value;
                 if (ChildObjects == null) return;
                 foreach (var relevantObject in ChildObjects) {
                     relevantObject.UpdateTime();

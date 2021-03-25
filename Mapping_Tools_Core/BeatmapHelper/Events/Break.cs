@@ -1,9 +1,11 @@
 ﻿
+using Mapping_Tools_Core.BeatmapHelper.Types;
+
 namespace Mapping_Tools_Core.BeatmapHelper.Events {
     public class Break : Event, IHasStartTime, IHasEndTime {
         public string EventType { get; set; }
-        public int StartTime { get; set; }
-        public int EndTime { get; set; }
+        public double StartTime { get; set; }
+        public double EndTime { get; set; }
 
         public Break() { }
 
@@ -12,7 +14,7 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
         }
 
         public override string GetLine() {
-            return $"{EventType},{StartTime.ToInvariant()},{EndTime.ToInvariant()}";
+            return $"{EventType},{StartTime.ToRoundInvariant()},{EndTime.ToRoundInvariant()}";
         }
 
         public sealed override void SetLine(string line) {
@@ -25,11 +27,11 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
 
             EventType = values[0];
 
-            if (InputParsers.TryParseInt(values[1], out int startTime))
+            if (InputParsers.TryParseDouble(values[1], out double startTime))
                 StartTime = startTime;
             else throw new BeatmapParsingException("Failed to parse start time of break.", line);
 
-            if (InputParsers.TryParseInt(values[2], out int endTime))
+            if (InputParsers.TryParseDouble(values[2], out double endTime))
                 EndTime = endTime;
             else throw new BeatmapParsingException("Failed to parse end time of break.", line);
         }

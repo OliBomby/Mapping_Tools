@@ -1,8 +1,9 @@
 ﻿using System;
+using Mapping_Tools_Core.BeatmapHelper.Types;
 using Mapping_Tools_Core.MathUtil;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Events {
-    public class Animation : Event, IHasDuration {
+    public class Animation : Event, IHasDuration, IHasRepeatDuration {
         public StoryboardLayer Layer { get; set; }
         public Origin Origin { get; set; }
 
@@ -68,7 +69,12 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
         }
 
         public double Duration { 
-            get => FrameDelay;
+            get => FrameDelay * FrameCount;
+            set => FrameDelay = value / FrameCount;
+        }
+
+        public double RepeatDuration { 
+            get => FrameDelay; 
             set => FrameDelay = value;
         }
     }

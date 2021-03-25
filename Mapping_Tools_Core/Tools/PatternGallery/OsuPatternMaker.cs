@@ -71,7 +71,7 @@ namespace Mapping_Tools_Core.Tools.PatternGallery {
                 hitObjects.RemoveAll(o => o.EndTime < filterStartTime);
             }
             if (filterEndTime != -1) {
-                hitObjects.RemoveAll(o => o.Time > filterEndTime);
+                hitObjects.RemoveAll(o => o.StartTime > filterEndTime);
             }
 
             RemoveEverythingThatIsNotTheseHitObjects(patternBeatmap, hitObjects);

@@ -55,7 +55,7 @@ namespace Mapping_Tools_Core.Tools.ComboColourStudio {
                 // the sequence before the burst is equivalent to this sequence
                 if (!(lastBurst && lastNormalSequence != null && IsSubSequence(bestSequence, lastNormalSequence) &&
                       (bestSequence.Length == lastNormalSequence.Length || bestContribution <= bestSequence.Length))) {
-                    colourPoints.Add(new ColourPoint(firstComboHitObject.Time, mode, colourSequence));
+                    colourPoints.Add(new ColourPoint(firstComboHitObject.StartTime, mode, colourSequence));
                 }
 
                 lastBurst = mode == ColourPointMode.Burst;

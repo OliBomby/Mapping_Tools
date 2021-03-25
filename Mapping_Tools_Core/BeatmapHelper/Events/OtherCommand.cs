@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Mapping_Tools_Core.BeatmapHelper.Types;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Events {
     /// <summary>
@@ -8,7 +9,7 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
     /// </summary>
     public class OtherCommand : Command, IHasEndTime {
         public EasingType Easing { get; set; }
-        public int EndTime { get; set; }
+        public double EndTime { get; set; }
 
         /// <summary>
         /// All other parameters
@@ -22,9 +23,9 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
             builder.Append(',');
             builder.Append(((int) Easing).ToInvariant());
             builder.Append(',');
-            builder.Append(StartTime.ToInvariant());
+            builder.Append(StartTime.ToRoundInvariant());
             builder.Append(',');
-            builder.Append(EndTime.ToInvariant());
+            builder.Append(EndTime.ToRoundInvariant());
 
             foreach (var param in Params) {
                 builder.Append(',');
@@ -46,7 +47,7 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
                 Easing = easingType;
             else throw new BeatmapParsingException("Failed to parse easing of command.", line);
 
-            if (InputParsers.TryParseInt(values[2], out int startTime))
+            if (InputParsers.TryParseDouble(values[2], out double startTime))
                 StartTime = startTime;
             else throw new BeatmapParsingException("Failed to parse start time of command.", line);
 
@@ -55,7 +56,7 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
                 EndTime = StartTime;
             }
             else {
-                if (InputParsers.TryParseInt(values[3], out int endTime))
+                if (InputParsers.TryParseDouble(values[3], out double endTime))
                     EndTime = endTime;
                 else throw new BeatmapParsingException("Failed to parse end time of command.", line);
             }

@@ -171,7 +171,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.LayerImporters {
         }
 
         private static List<double> CalculateCumulativeTime(List<TempoEvent> tempos, int deltaTicksPerQuarter) {
-            // Time is in miliseconds
+            // StartTime is in miliseconds
             List<double> times = new List<double>(tempos.Count);
 
             TempoEvent last = null;

@@ -129,7 +129,7 @@ namespace Mapping_Tools_Core.Tools.MapCleanerStuff {
                 if (ho.IsSlider) // SliderVelocity changes
                 {
                     TimingPoint tp = ho.TimingPoint.Copy();
-                    tp.Offset = ho.Time;
+                    tp.Offset = ho.StartTime;
                     tp.MpB = ho.SliderVelocity;
                     timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true));
                 }
@@ -154,7 +154,7 @@ namespace Mapping_Tools_Core.Tools.MapCleanerStuff {
                 if (ho.IsSlider && samplesetActuallyChanged) // Make it start out with the right sampleset
                 {
                     TimingPoint tp = ho.HitsoundTimingPoint.Copy();
-                    tp.Offset = ho.Time;
+                    tp.Offset = ho.StartTime;
                     timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: true));
                 }
             }

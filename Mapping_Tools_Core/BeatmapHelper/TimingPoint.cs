@@ -20,7 +20,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         public double MpB { get; set; }
 
         /// <summary>
-        /// Time signature to x/4
+        /// StartTime signature to x/4
         /// </summary>
         public TempoSignature Meter { get; set; }
 

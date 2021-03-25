@@ -583,7 +583,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             }
 
             // Don't resnap if it would move outside
-            if (newTime <= ho.Time + 1 || newTime >= ho.EndTime - 1) {
+            if (newTime <= ho.StartTime + 1 || newTime >= ho.EndTime - 1) {
                 newTime = time;
             }
 
@@ -788,7 +788,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// <summary>
         /// Calculates the duration of a slider using the slider velocity and milliseconds per beat at a given time, global multiplier and the pixel length.
         /// </summary>
-        /// <param name="time">Time of slider.</param>
+        /// <param name="time">StartTime of slider.</param>
         /// <param name="length">Pixel length of slider.</param>
         /// <returns>The duration of the slider in milliseconds.</returns>
         public double CalculateSliderTemporalLength(double time, double length) {

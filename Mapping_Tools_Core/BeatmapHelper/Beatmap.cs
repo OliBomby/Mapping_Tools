@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.BeatmapHelper.Events;
+using Mapping_Tools_Core.BeatmapHelper.Types;
 using Mapping_Tools_Core.MathUtil;
 
 namespace Mapping_Tools_Core.BeatmapHelper {
@@ -202,7 +203,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
                     HitObject objectN = HitObjects[n];
                     if (objectN.IsSpinner) continue;
 
-                    if (objectN.Time - stackBaseObject.EndTime > stackThresold)
+                    if (objectN.StartTime - stackBaseObject.EndTime > stackThresold)
                         //We are no longer within stacking range of the next object.
                         break;
 
@@ -251,7 +252,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
 
                         if (objectN.IsSpinner) continue;
 
-                        if (objectI.Time - objectN.EndTime > stackThresold)
+                        if (objectI.StartTime - objectN.EndTime > stackThresold)
                             //We are no longer within stacking range of the previous object.
                             break;
 
@@ -296,7 +297,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
 
                         if (objectN.IsSpinner) continue;
 
-                        if (objectI.Time - objectN.Time > stackThresold)
+                        if (objectI.StartTime - objectN.StartTime > stackThresold)
                             //We are no longer within stacking range of the previous object.
                             break;
 
@@ -391,11 +392,11 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// </summary>
         public void GiveObjectsGreenlines() {
             foreach (var ho in HitObjects) {
-                ho.SliderVelocity = BeatmapTiming.GetSvAtTime(ho.Time);
-                ho.TimingPoint = BeatmapTiming.GetTimingPointAtTime(ho.Time);
-                ho.HitsoundTimingPoint = BeatmapTiming.GetTimingPointAtTime(ho.Time + 5);
-                ho.UnInheritedTimingPoint = BeatmapTiming.GetRedlineAtTime(ho.Time);
-                ho.BodyHitsounds = BeatmapTiming.GetTimingPointsInRange(ho.Time, ho.EndTime, false);
+                ho.SliderVelocity = BeatmapTiming.GetSvAtTime(ho.StartTime);
+                ho.TimingPoint = BeatmapTiming.GetTimingPointAtTime(ho.StartTime);
+                ho.HitsoundTimingPoint = BeatmapTiming.GetTimingPointAtTime(ho.StartTime + 5);
+                ho.UnInheritedTimingPoint = BeatmapTiming.GetRedlineAtTime(ho.StartTime);
+                ho.BodyHitsounds = BeatmapTiming.GetTimingPointsInRange(ho.StartTime, ho.EndTime, false);
                 foreach (var time in ho.GetAllTloTimes(BeatmapTiming)) {
                     ho.BodyHitsounds.RemoveAll(o => Math.Abs(time - o.Offset) <= 5);
                 }
@@ -436,7 +437,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// <param name="end">The end of the time range.</param>
         /// <returns>All <see cref="HitObject"/> that are found within specified range.</returns>
         public List<HitObject> GetHitObjectsWithRangeInRange(double start, double end) {
-            return HitObjects.FindAll(o => o.EndTime >= start && o.Time <= end);
+            return HitObjects.FindAll(o => o.EndTime >= start && o.StartTime <= end);
         }
 
         /// <summary>
@@ -481,12 +482,12 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// <returns>A list of hit objects that have a bookmark in their range.</returns>
         public List<HitObject> GetBookmarkedObjects() {
             List<double> bookmarks = GetBookmarks();
-            List<HitObject> markedObjects = HitObjects.FindAll(ho => bookmarks.Exists(o => (ho.Time <= o && o <= ho.EndTime)));
+            List<HitObject> markedObjects = HitObjects.FindAll(ho => bookmarks.Exists(o => (ho.StartTime <= o && o <= ho.EndTime)));
             return markedObjects;
         }
 
         public double GetHitObjectStartTime() {
-            return HitObjects.Min(h => h.Time);
+            return HitObjects.Min(h => h.StartTime);
         }
 
         public double GetHitObjectEndTime() {
@@ -513,7 +514,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
                 leadInTime = Math.Max(-eventsWithStartTime.Min(o => o.StartTime), leadInTime);
             if (HitObjects.Count > 0) {
                 var approachTime = GetApproachTime(Difficulty["ApproachRate"].DoubleValue);
-                leadInTime = Math.Max(approachTime - HitObjects[0].Time, leadInTime);
+                leadInTime = Math.Max(approachTime - HitObjects[0].StartTime, leadInTime);
             }
             return leadInTime + window50 + 1000;
         }
@@ -572,7 +573,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             var time = InputParsers.ParseOsuTimestamp(code).TotalMilliseconds;
 
             // Enumerate through the hit objects from the first object at the time
-            int objectIndex = HitObjects.FindIndex(h => h.Time >= time);
+            int objectIndex = HitObjects.FindIndex(h => h.StartTime >= time);
             foreach (var comboNumber in comboNumbers) {
                 while (comboNumber != -1 && objectIndex < HitObjects.Count && HitObjects[objectIndex].ComboIndex != comboNumber) {
                     objectIndex++;
@@ -613,7 +614,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
 
         public Beatmap DeepClone() {
             var newBeatmap = (Beatmap)MemberwiseClone();
-            newBeatmap.HitObjects = HitObjects.Select(h => h.DeepCopy()).ToList();
+            newBeatmap.HitObjects = HitObjects.Select(h => h.DeepClone()).ToList();
             newBeatmap.BeatmapTiming = new Timing(BeatmapTiming.TimingPoints.Select(t => t.Copy()).ToList(), BeatmapTiming.SliderMultiplier);
             newBeatmap.GiveObjectsGreenlines();
             return newBeatmap;

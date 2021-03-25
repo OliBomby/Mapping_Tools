@@ -20,29 +20,29 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             foreach (HitObject ho in hitObjects) {
                 ho.TimelineObjects = new List<TimelineObject>();
                 if (ho.IsCircle) {
-                    TimelineObjects.Add(new TimelineObject(ho, ho.Time, ho.ObjectType, 0, ho.Hitsounds, ho.SampleSet, ho.AdditionSet));
+                    TimelineObjects.Add(new TimelineObject(ho, ho.StartTime, ho.ObjectType, 0, ho.Hitsounds, ho.SampleSet, ho.AdditionSet));
                     ho.TimelineObjects.Add(TimelineObjects.Last());
                 }
                 else if (ho.IsSlider) {
                     // Adding TimeLineObject for every repeat of the slider
-                    double sliderTemporalLength = timing.CalculateSliderTemporalLength(ho.Time, ho.PixelLength);
+                    double sliderTemporalLength = timing.CalculateSliderTemporalLength(ho.StartTime, ho.PixelLength);
 
                     for (int i = 0; i <= ho.Repeat; i++) {
-                        double time = Math.Floor(ho.Time + sliderTemporalLength * i);
+                        double time = Math.Floor(ho.StartTime + sliderTemporalLength * i);
                         TimelineObjects.Add(new TimelineObject(ho, time, ho.ObjectType, i, ho.EdgeHitsounds[i], ho.EdgeSampleSets[i], ho.EdgeAdditionSets[i]));
                         ho.TimelineObjects.Add(TimelineObjects.Last());
                     }
                 }
                 else if (ho.IsSpinner) // Only the end has hitsounds
                 {
-                    TimelineObjects.Add(new TimelineObject(ho, ho.Time, ho.ObjectType, 0, 0, 0, 0));
+                    TimelineObjects.Add(new TimelineObject(ho, ho.StartTime, ho.ObjectType, 0, 0, 0, 0));
                     ho.TimelineObjects.Add(TimelineObjects.Last());
                     TimelineObjects.Add(new TimelineObject(ho, ho.EndTime, ho.ObjectType, 1, ho.Hitsounds, ho.SampleSet, ho.AdditionSet));
                     ho.TimelineObjects.Add(TimelineObjects.Last());
                 }
                 else // Hold note. Only start has hitsounds
                 {
-                    TimelineObjects.Add(new TimelineObject(ho, ho.Time, ho.ObjectType, 0, ho.Hitsounds, ho.SampleSet, ho.AdditionSet));
+                    TimelineObjects.Add(new TimelineObject(ho, ho.StartTime, ho.ObjectType, 0, ho.Hitsounds, ho.SampleSet, ho.AdditionSet));
                     ho.TimelineObjects.Add(TimelineObjects.Last());
                     TimelineObjects.Add(new TimelineObject(ho, ho.EndTime, ho.ObjectType, 1, 0, 0, 0));
                     ho.TimelineObjects.Add(TimelineObjects.Last());

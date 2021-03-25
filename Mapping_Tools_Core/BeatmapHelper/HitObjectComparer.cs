@@ -22,7 +22,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
                 return false;
             if (CheckPosition && x.Pos != y.Pos)
                 return false;
-            if (CheckTime && x.Time != y.Time)
+            if (CheckTime && x.StartTime != y.StartTime)
                 return false;
             if (!(x.Hitsounds == y.Hitsounds &&
                   x.Filename == y.Filename &&
