@@ -4,5 +4,6 @@
     /// </summary>
     public interface IHasDuration {
         double Duration { get; set; }
+        double EndTime { get; set; }
     }
 }

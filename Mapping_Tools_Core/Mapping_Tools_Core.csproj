@@ -26,7 +26,4 @@
     <PackageReference Include="NVorbis" Version="0.10.1" />
     <PackageReference Include="OggVorbisEncoder" Version="1.2.0" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="BeatmapHelper\Objects\" />
-  </ItemGroup>
 </Project>

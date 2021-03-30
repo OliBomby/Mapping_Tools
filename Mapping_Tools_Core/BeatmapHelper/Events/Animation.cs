@@ -3,7 +3,7 @@ using Mapping_Tools_Core.BeatmapHelper.Types;
 using Mapping_Tools_Core.MathUtil;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Events {
-    public class Animation : Event, IHasDuration, IHasRepeatDuration {
+    public class Animation : Event, IHasDuration {
         public StoryboardLayer Layer { get; set; }
         public Origin Origin { get; set; }
 

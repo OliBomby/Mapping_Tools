@@ -11,7 +11,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
     /// Base class for a hit object in osu! stable.
     /// Has extra fields for easier editing and analysis.
     /// </summary>
-    public abstract class HitObject : IComparable<HitObject>, IHasStartTime {
+    public abstract class HitObject : IComparable<HitObject>, IHasPosition, IHasStartTime {
         /// <summary>
         /// Selected hit object.
         /// </summary>
