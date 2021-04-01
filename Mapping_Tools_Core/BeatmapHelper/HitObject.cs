@@ -45,52 +45,10 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         public int ComboSkip { get; set; }
 
         /// <summary>
-        /// Whether to play the hitnormal hitsound.
-        /// In the osu! std gamemode this gets played regardless.
+        /// The hitsounds of this hit object.
         /// </summary>
-        public bool Normal { get; set; }
-
-        /// <summary>
-        /// Wether to play the hitwhistle hitsound.
-        /// </summary>
-        public bool Whistle { get; set; }
-
-        /// <summary>
-        /// Wether to play the hitfinish hitsound.
-        /// </summary>
-        public bool Finish { get; set; }
-
-        /// <summary>
-        /// Wether to play the hitclap hitsound.
-        /// </summary>
-        public bool Clap { get; set; }
-
-        /// <summary>
-        /// The sample set to use for the hitnormal, sliderslider, and slidertick hitsounds.
-        /// </summary>
-        public SampleSet SampleSet { get; set; }
-
-        /// <summary>
-        /// The sample set to use for the hitwhistle, hitfinish, and hitclap hitsounds.
-        /// </summary>
-        public SampleSet AdditionSet { get; set; }
-
-        /// <summary>
-        /// The index for custom hitsound sample sets.
-        /// Index zero indicates no custom samples are used.
-        /// </summary>
-        public int CustomIndex { get; set; }
-
-        /// <summary>
-        /// The hitsound volume of this hit object.
-        /// </summary>
-        public double SampleVolume { get; set; }
-
-        /// <summary>
-        /// The filename of the custom sample to play as the hitsound of this hit object.
-        /// If a valid filename is used, the file will override all other hitsounds.
-        /// </summary>
-        public string Filename { get; set; }
+        [NotNull]
+        public HitSampleInfo Hitsounds { get; set; }
 
         // Special combined with beatmap
         /// <summary>
@@ -150,17 +108,14 @@ namespace Mapping_Tools_Core.BeatmapHelper {
 
         // Special combined with timeline
         /// <summary>
-        /// Indicates the number of timeline objects this object should have.
-        /// </summary>
-        public abstract int TloCount { get; }
-
-        /// <summary>
         /// The timeline objects associated with this hit object.
         /// </summary>
         [NotNull]
         public List<TimelineObject> TimelineObjects { get; set; }
 
         protected HitObject() {
+            Hitsounds = new HitSampleInfo();
+
             TimelineObjects = new List<TimelineObject>();
         }
 
@@ -176,15 +131,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// Also clears hitsounds from timeline objects and clears body hitsounds.
         /// </summary>
         public virtual void ResetHitsounds() {
-            Normal = false;
-            Whistle = false;
-            Finish = false;
-            Clap = false;
-            SampleSet = SampleSet.Auto;
-            AdditionSet = SampleSet.Auto;
-            SampleVolume = 0;
-            CustomIndex = 0;
-            Filename = string.Empty;
+            Hitsounds = new HitSampleInfo();
 
             foreach (var tlo in TimelineObjects) {
                 tlo.ResetHitsounds();
@@ -205,9 +152,9 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// Update the associated timeline object with new time information.
         /// </summary>
         public virtual void UpdateTimelineObjectTimes() {
-            if (this is IHasRepeatDuration hasRepeatDuration) {
+            if (this is IHasRepeats hasRepeats) {
                 for (int i = 0; i < TimelineObjects.Count; i++) {
-                    double time = Math.Floor(StartTime + hasRepeatDuration.RepeatDuration * i);
+                    double time = Math.Floor(StartTime + hasRepeats.RepeatDuration * i);
                     TimelineObjects[i].Time = time;
                 }
             }
@@ -250,7 +197,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             return newHitObject;
         }
 
-        protected virtual void DeepCloneAdd(HitObject clonedHitObject) { }
+        protected abstract void DeepCloneAdd(HitObject clonedHitObject);
 
         public int CompareTo(HitObject other) {
             if (ReferenceEquals(this, other)) return 0;

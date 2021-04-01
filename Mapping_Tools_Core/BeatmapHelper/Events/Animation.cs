@@ -1,9 +1,8 @@
-﻿using System;
-using Mapping_Tools_Core.BeatmapHelper.Types;
-using Mapping_Tools_Core.MathUtil;
+﻿using Mapping_Tools_Core.MathUtil;
+using System;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Events {
-    public class Animation : Event, IHasDuration {
+    public class Animation : Event {
         public StoryboardLayer Layer { get; set; }
         public Origin Origin { get; set; }
 
@@ -66,16 +65,6 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
             if (Enum.TryParse(values[8], out LoopType loopType))
                 LoopType = loopType;
             else throw new BeatmapParsingException("Failed to parse loop type of animation.", line);
-        }
-
-        public double Duration { 
-            get => FrameDelay * FrameCount;
-            set => FrameDelay = value / FrameCount;
-        }
-
-        public double RepeatDuration { 
-            get => FrameDelay; 
-            set => FrameDelay = value;
         }
     }
 }
