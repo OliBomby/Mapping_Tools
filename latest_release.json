@@ -1,9 +1,9 @@
 {
-  "url": "https://api.github.com/repos/OliBomby/Mapping_Tools/releases/35204262",
-  "assets_url": "https://api.github.com/repos/OliBomby/Mapping_Tools/releases/35204262/assets",
-  "upload_url": "https://uploads.github.com/repos/OliBomby/Mapping_Tools/releases/35204262/assets{?name,label}",
-  "html_url": "https://github.com/OliBomby/Mapping_Tools/releases/tag/v1.8.0.2",
-  "id": 35204262,
+  "url": "https://api.github.com/repos/OliBomby/Mapping_Tools/releases/40899030",
+  "assets_url": "https://api.github.com/repos/OliBomby/Mapping_Tools/releases/40899030/assets",
+  "upload_url": "https://uploads.github.com/repos/OliBomby/Mapping_Tools/releases/40899030/assets{?name,label}",
+  "html_url": "https://github.com/OliBomby/Mapping_Tools/releases/tag/v1.8.1.0",
+  "id": 40899030,
   "author": {
     "login": "OliBomby",
     "id": 17460441,
@@ -24,19 +24,19 @@
     "type": "User",
     "site_admin": false
   },
-  "node_id": "MDc6UmVsZWFzZTM1MjA0MjYy",
-  "tag_name": "v1.8.0.2",
+  "node_id": "MDc6UmVsZWFzZTQwODk5MDMw",
+  "tag_name": "v1.8.1.0",
   "target_commitish": "master",
-  "name": "Release version 1.8.0.2",
+  "name": "Release version 1.8.1.0",
   "draft": false,
   "prerelease": false,
-  "created_at": "2020-12-13T13:39:10Z",
-  "published_at": "2020-12-13T13:54:30Z",
+  "created_at": "2021-04-03T12:59:01Z",
+  "published_at": "2021-04-03T13:16:44Z",
   "assets": [
     {
-      "url": "https://api.github.com/repos/OliBomby/Mapping_Tools/releases/assets/29498381",
-      "id": 29498381,
-      "node_id": "MDEyOlJlbGVhc2VBc3NldDI5NDk4Mzgx",
+      "url": "https://api.github.com/repos/OliBomby/Mapping_Tools/releases/assets/34403661",
+      "id": 34403661,
+      "node_id": "MDEyOlJlbGVhc2VBc3NldDM0NDAzNjYx",
       "name": "mapping-tools.exe",
       "label": null,
       "uploader": {
@@ -61,16 +61,16 @@
       },
       "content_type": "application/x-msdownload",
       "state": "uploaded",
-      "size": 4455347,
-      "download_count": 105,
-      "created_at": "2020-12-13T13:54:02Z",
-      "updated_at": "2020-12-13T13:54:05Z",
-      "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.0.2/mapping-tools.exe"
+      "size": 4454818,
+      "download_count": 0,
+      "created_at": "2021-04-03T13:16:39Z",
+      "updated_at": "2021-04-03T13:16:42Z",
+      "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.1.0/mapping-tools.exe"
     },
     {
-      "url": "https://api.github.com/repos/OliBomby/Mapping_Tools/releases/assets/29498382",
-      "id": 29498382,
-      "node_id": "MDEyOlJlbGVhc2VBc3NldDI5NDk4Mzgy",
+      "url": "https://api.github.com/repos/OliBomby/Mapping_Tools/releases/assets/34403658",
+      "id": 34403658,
+      "node_id": "MDEyOlJlbGVhc2VBc3NldDM0NDAzNjU4",
       "name": "Release.zip",
       "label": null,
       "uploader": {
@@ -95,14 +95,14 @@
       },
       "content_type": "application/x-zip-compressed",
       "state": "uploaded",
-      "size": 4292605,
-      "download_count": 21,
-      "created_at": "2020-12-13T13:54:06Z",
-      "updated_at": "2020-12-13T13:54:10Z",
-      "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.0.2/Release.zip"
+      "size": 4293385,
+      "download_count": 0,
+      "created_at": "2021-04-03T13:16:34Z",
+      "updated_at": "2021-04-03T13:16:38Z",
+      "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.1.0/Release.zip"
     }
   ],
-  "tarball_url": "https://api.github.com/repos/OliBomby/Mapping_Tools/tarball/v1.8.0.2",
-  "zipball_url": "https://api.github.com/repos/OliBomby/Mapping_Tools/zipball/v1.8.0.2",
-  "body": "- Fixed 'Beats between every marker' feature in Timing Helper.\r\n- Fixed Property Transformer messing up object end time.\r\n- Fixed serialization of volume fields in Hitsound Studio.\r\n- Fixed unexpected behaviour while exporting patterns without timing in Pattern Gallery.\r\n- Fixed unexpected NCs in Pattern Gallery exports."
+  "tarball_url": "https://api.github.com/repos/OliBomby/Mapping_Tools/tarball/v1.8.1.0",
+  "zipball_url": "https://api.github.com/repos/OliBomby/Mapping_Tools/zipball/v1.8.1.0",
+  "body": "- Now the program will attempt to keep running after an unhandled exception.\r\n- Added blacklist and whitelist filters to Property Transformer.\r\n- Added option to assign additions sampleset and custom index with Hitsound Preview Helper.\r\n- Added option to exit without saving the settings. Right-click the exit button.\r\n- Added hints to various text boxes.\r\n- Added Auto sampleset option to default sample in Hitsound Studio.\r\n- Let hotkey fields update on lost focus instead of property changed.\r\n- Fixed sampleset of default sample in Hitsound Studio not working.\r\n- Fixed sliderend muting incorrectly detecting snap divisors."
 }
