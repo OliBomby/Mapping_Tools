@@ -220,9 +220,13 @@ namespace Mapping_Tools.Classes.SystemTools {
             System.Windows.Application.Current.Dispatcher.Invoke(BackupManager.QuickUndo);
         }
 
-        private static void QuickBetterSave()
-        {
-            EditorReaderStuff.BetterSave();
+        private static void QuickBetterSave() {
+            try {
+                EditorReaderStuff.BetterSave();
+            }
+            catch (Exception e) {
+                e.Show();
+            }
         }
 
         private static void SmartQuickRun()
