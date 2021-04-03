@@ -22,6 +22,8 @@ using System.Windows.Input;
 namespace Mapping_Tools {
 
     public partial class MainWindow {
+        private bool autoSave = true;
+
         public ViewCollection Views;
         public ListenerManager ListenerManager;
         public bool SessionhasAdminRights;
@@ -34,9 +36,6 @@ namespace Mapping_Tools {
         public static SnackbarMessageQueue MessageQueue { get; set; }
 
         public MainWindow() {
-            // Initialize exception logging
-            //AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-
             try {
                 AppWindow = this;
                 AppCommon = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -92,6 +91,29 @@ namespace Mapping_Tools {
                 item.Click += ViewSelectMenuItemOnClick;
                 return item;
             }).OrderBy(o => o.Header);
+        }
+
+        private void Window_Closing(object sender, EventArgs e) {
+            // Perform saving of settings at application exit
+            if (autoSave) {
+                Views.AutoSaveSettings();
+                if (DataContext is MappingTool mt) {
+                    mt.Dispose();
+                }
+                SettingsManager.UpdateSettings();
+                SettingsManager.WriteToJson();
+            }
+        }
+
+        //Close window
+        private void CloseWin(object sender, RoutedEventArgs e) {
+            Close();
+        }
+
+        //Close window without saving
+        private void CloseWinNoSave(object sender, RoutedEventArgs e) {
+            autoSave = false;
+            Close();
         }
 
         private void SetCurrentView(string name) {
@@ -445,15 +467,6 @@ namespace Mapping_Tools {
         //Minimize window on click
         private void MinimizeWin(object sender, RoutedEventArgs e) {
             WindowState = WindowState.Minimized;
-        }
-
-        //Close window
-        private void CloseWin(object sender, RoutedEventArgs e) {
-            Views.AutoSaveSettings();
-            if (DataContext is MappingTool mt){ mt.Dispose(); }
-            SettingsManager.UpdateSettings();
-            SettingsManager.WriteToJson();
-            Close();
         }
 
         //Enable drag control of window and set icons when docked
