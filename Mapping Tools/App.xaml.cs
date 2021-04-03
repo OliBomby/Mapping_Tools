@@ -2,6 +2,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Threading;
+using static Mapping_Tools.MainWindow;
 
 namespace Mapping_Tools {
     /// <summary>
@@ -9,8 +10,8 @@ namespace Mapping_Tools {
     /// </summary>
     public partial class App : Application
     {
-        void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e) {
-            // Process unhandled exception
+        private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e) {
+         // Log the exception, display it, etc
             var exception = e.Exception;
             var lines = new List<string> { exception.Message, exception.StackTrace, exception.Source };
 
@@ -22,12 +23,13 @@ namespace Mapping_Tools {
                 lines.Add(exception.Source);
             }
 
-            var path = Path.Combine("crash-log.txt");
+            const string filename = "crash-log.txt";
+            var path = AppDataPath != null ? Path.Combine(AppDataPath, filename) : filename;
             File.WriteAllLines(path, lines);
-            MessageBox.Show($"The program encountered an unhandled exception. Look in crash-log.txt for more info:\n{path}", "Error");
+            MessageBox.Show($"The program encountered an unhandled exception. Look in {filename} for more info:\n{path}", "Error");
 
             // Prevent default unhandled exception processing
-            e.Handled = true;
+            e.Handled = AppDataPath != null;
         }
     }
 }

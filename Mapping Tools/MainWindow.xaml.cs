@@ -2,13 +2,12 @@
 using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.Exceptions;
 using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Views;
 using Mapping_Tools.Views.Standard;
 using MaterialDesignThemes.Wpf;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -19,7 +18,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Mapping_Tools.Classes.ToolHelpers;
 
 namespace Mapping_Tools {
 
@@ -37,7 +35,7 @@ namespace Mapping_Tools {
 
         public MainWindow() {
             // Initialize exception logging
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            //AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
             try {
                 AppWindow = this;
@@ -66,24 +64,6 @@ namespace Mapping_Tools {
             } catch (Exception ex) {
                 ex.Show();
             }
-        }
-
-        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e) {
-            // Log the exception, display it, etc
-            if (!(e.ExceptionObject is Exception exception)) return;
-            var lines = new List<string> {exception.Message, exception.StackTrace, exception.Source};
-
-            while (exception.InnerException != null) {
-                exception = exception.InnerException;
-                lines.Add("\nInner exception:");
-                lines.Add(exception.Message);
-                lines.Add(exception.StackTrace);
-                lines.Add(exception.Source);
-            }
-
-            var path = Path.Combine(AppDataPath, "crash-log.txt");
-            File.WriteAllLines(path, lines);
-            MessageBox.Show($"The program encountered an unhandled exception. Look in crash-log.txt for more info:\n{path}", "Error");
         }
 
         private void Setup() {
