@@ -331,7 +331,6 @@ ASALocalRun/
 # Local History for Visual Studio
 .localhistory/
 
-
 # Packages
 packages/
 !packages/EditorReader.dll

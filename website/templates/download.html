@@ -1,0 +1,26 @@
+{% extends "page.html" %}
+
+{% block content %}
+    {% set latest_release = load_data(path="latest_release.json") %}
+
+    <h1>Download</h1>
+
+    <h3>Latest release <code>{{ latest_release.tag_name }}</code></h3>
+
+    <div>{{ latest_release.body | markdown | safe }}</div>
+
+    <h4>Files</h4>
+
+    <ul>
+    {% for asset in latest_release.assets %}
+        <li>
+            <a href="{{ asset.browser_download_url }}">
+                {{ asset.name }}
+            </a>
+            ({{ asset.size | filesizeformat }})
+        </li>
+    {% endfor %}
+    </ul>
+
+    See older releases on the <a href="https://github.com/OliBomby/Mapping_Tools/releases">Github releases page</a>.
+{% endblock %}

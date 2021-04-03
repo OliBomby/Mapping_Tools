@@ -6,10 +6,10 @@
             <div class="col-2 tab-container">
                 {% set section = get_section(path=page.ancestors | last) %}
                 <div class="list docu-listgroup">
-                {% for docpage in section.pages %}
+                {% for docpage in section.pages | sort(attribute="relative_path") %}
                     <a class="list-group-item list-group-item-primary list-group-item-action
                         {% if page.slug == docpage.slug %}active{% endif %}"
-                        href="../{{ docpage.slug | safe }}">
+                        href="{{ config.base_url}}/docs/{{ docpage.slug | safe }}">
                         {{ docpage.title }}
                     </a>
                 {% endfor %}
