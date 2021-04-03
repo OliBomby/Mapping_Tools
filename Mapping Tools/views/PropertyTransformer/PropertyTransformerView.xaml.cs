@@ -1,17 +1,16 @@
-﻿using System;
+﻿using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.BeatmapHelper.Events;
+using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.ToolHelpers;
+using Mapping_Tools.Viewmodels;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.BeatmapHelper.Events;
-using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.ToolHelpers;
-using Mapping_Tools.Classes.Tools;
-using Mapping_Tools.Viewmodels;
 
 namespace Mapping_Tools.Views.PropertyTransformer {
     /// <summary>
@@ -35,16 +34,19 @@ namespace Mapping_Tools.Views.PropertyTransformer {
             e.Result = TransformProperties((PropertyTransformerVm)e.Argument, bgw, e);
         }
 
-        private bool Filter(double value, double time, bool doMatch, bool doRange, double match, double min, double max) {
-            return (!doMatch || Precision.AlmostEquals(value, match, 0.01)) && (!doRange || (time >= min && time <= max));
-        }
-
-        private string TransformProperties(PropertyTransformerVm vm, BackgroundWorker worker, DoWorkEventArgs _) {
-            bool doFilterMatch = vm.MatchFilter != -1 && vm.EnableFilters;
-            bool doFilterRange = (vm.MinTimeFilter != -1 || vm.MaxTimeFilter != -1) && vm.EnableFilters;
+        private bool Filter(double value, double time, PropertyTransformerVm vm) {
+            bool doFilterMatch = vm.MatchFilter.Length > 0 && vm.EnableFilters;
+            bool doFilterUnmatch = vm.UnmatchFilter.Length > 0 && vm.EnableFilters;
+            bool doFilterRange = (vm.MinTimeFilter != -1 || vm.MaxTimeFilter != -1) && vm.EnableFilters && !double.IsNaN(time);
             double min = vm.MinTimeFilter == -1 ? double.NegativeInfinity : vm.MinTimeFilter;
             double max = vm.MaxTimeFilter == -1 ? double.PositiveInfinity : vm.MaxTimeFilter;
 
+            return (!doFilterMatch || vm.MatchFilter.Any(o => Precision.AlmostEquals(value, o, 0.001))) && 
+                   (!doFilterUnmatch || !vm.UnmatchFilter.Any(o => Precision.AlmostEquals(value, o, 0.001))) &&
+                   (!doFilterRange || (time >= min && time <= max));
+        }
+
+        private string TransformProperties(PropertyTransformerVm vm, BackgroundWorker worker, DoWorkEventArgs _) {
             var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
 
             foreach (string path in vm.ExportPaths) {
@@ -62,7 +64,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                     foreach (TimingPoint tp in beatmap.BeatmapTiming.TimingPoints) {
                         // Offset
                         if (vm.TimingpointOffsetMultiplier != 1 || vm.TimingpointOffsetOffset != 0) {
-                            if (Filter(tp.Offset, tp.Offset, doFilterMatch, doFilterRange, vm.MatchFilter, min, max)) {
+                            if (Filter(tp.Offset, tp.Offset, vm)) {
                                 tp.Offset = Math.Round(tp.Offset * vm.TimingpointOffsetMultiplier +
                                                        vm.TimingpointOffsetOffset);
                             }
@@ -71,8 +73,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                         // BPM
                         if (vm.TimingpointBPMMultiplier != 1 || vm.TimingpointBPMOffset != 0) {
                             if (tp.Uninherited) {
-                                if (Filter(tp.GetBpm(), tp.Offset, doFilterMatch, doFilterRange, vm.MatchFilter, min,
-                                    max)) {
+                                if (Filter(tp.GetBpm(), tp.Offset, vm)) {
                                     double newBPM = tp.GetBpm() * vm.TimingpointBPMMultiplier + vm.TimingpointBPMOffset;
                                     newBPM = vm.ClipProperties
                                         ? MathHelper.Clamp(newBPM, 15, 10000)
@@ -84,8 +85,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
 
                         // Slider Velocity
                         if (vm.TimingpointSVMultiplier != 1 || vm.TimingpointSVOffset != 0) {
-                            if (Filter(beatmap.BeatmapTiming.GetSvMultiplierAtTime(tp.Offset), tp.Offset, doFilterMatch,
-                                doFilterRange, vm.MatchFilter, min, max)) {
+                            if (Filter(beatmap.BeatmapTiming.GetSvMultiplierAtTime(tp.Offset), tp.Offset, vm)) {
                                 TimingPoint tpchanger = tp.Copy();
                                 double newSV =
                                     beatmap.BeatmapTiming.GetSvMultiplierAtTime(tp.Offset) *
@@ -100,8 +100,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
 
                         // Index
                         if (vm.TimingpointIndexMultiplier != 1 || vm.TimingpointIndexOffset != 0) {
-                            if (Filter(tp.SampleIndex, tp.Offset, doFilterMatch, doFilterRange, vm.MatchFilter, min,
-                                max)) {
+                            if (Filter(tp.SampleIndex, tp.Offset, vm)) {
                                 int newIndex =
                                     (int) Math.Round(tp.SampleIndex * vm.TimingpointIndexMultiplier +
                                                      vm.TimingpointIndexOffset);
@@ -111,7 +110,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
 
                         // Volume
                         if (vm.TimingpointVolumeMultiplier != 1 || vm.TimingpointVolumeOffset != 0) {
-                            if (Filter(tp.Volume, tp.Offset, doFilterMatch, doFilterRange, vm.MatchFilter, min, max)) {
+                            if (Filter(tp.Volume, tp.Offset, vm)) {
                                 int newVolume =
                                     (int) Math.Round(tp.Volume * vm.TimingpointVolumeMultiplier +
                                                      vm.TimingpointVolumeOffset);
@@ -128,13 +127,13 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                             // Get the end time early because the start time gets modified
                             double oldEndTime = ho.GetEndTime(false);
 
-                            if (Filter(ho.Time, ho.Time, doFilterMatch, doFilterRange, vm.MatchFilter, min, max)) {
+                            if (Filter(ho.Time, ho.Time, vm)) {
                                 ho.Time = Math.Round(ho.Time * vm.HitObjectTimeMultiplier + vm.HitObjectTimeOffset);
                             }
 
                             // Transform end time of hold notes and spinner
                             if ((ho.IsHoldNote || ho.IsSpinner) &&
-                                Filter(oldEndTime, oldEndTime, doFilterMatch, doFilterRange, vm.MatchFilter, min, max)) {
+                                Filter(oldEndTime, oldEndTime, vm)) {
                                 ho.EndTime = Math.Round(oldEndTime * vm.HitObjectTimeMultiplier + vm.HitObjectTimeOffset);
                             }
                         }
@@ -147,7 +146,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                         List<double> newBookmarks = new List<double>();
                         List<double> bookmarks = beatmap.GetBookmarks();
                         foreach (double bookmark in bookmarks) {
-                            if (Filter(bookmark, bookmark, doFilterMatch, doFilterRange, vm.MatchFilter, min, max)) {
+                            if (Filter(bookmark, bookmark, vm)) {
                                 newBookmarks.Add(
                                     Math.Round(bookmark * vm.BookmarkTimeMultiplier + vm.BookmarkTimeOffset));
                             }
@@ -166,8 +165,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                         foreach (Event ev in beatmap.StoryboardLayerBackground.Concat(beatmap.StoryboardLayerFail)
                             .Concat(beatmap.StoryboardLayerPass).Concat(beatmap.StoryboardLayerForeground)
                             .Concat(beatmap.StoryboardLayerOverlay)) {
-                            TransformEventTime(ev, vm.SBEventTimeMultiplier, vm.SBEventTimeOffset, doFilterMatch,
-                                doFilterRange, vm.MatchFilter, min, max);
+                            TransformEventTime(ev, vm.SBEventTimeMultiplier, vm.SBEventTimeOffset, vm);
                         }
                     }
 
@@ -176,8 +174,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                     // Storyboarded sample time
                     if (vm.SBSampleTimeMultiplier != 1 || vm.SBSampleTimeOffset != 0) {
                         foreach (StoryboardSoundSample ss in beatmap.StoryboardSoundSamples) {
-                            if (Filter(ss.StartTime, ss.StartTime, doFilterMatch, doFilterRange, vm.MatchFilter, min,
-                                max)) {
+                            if (Filter(ss.StartTime, ss.StartTime, vm)) {
                                 ss.StartTime =
                                     (int) Math.Round(ss.StartTime * vm.SBSampleTimeMultiplier + vm.SBSampleTimeOffset);
                             }
@@ -189,14 +186,12 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                     // Break time
                     if (vm.BreakTimeMultiplier != 1 || vm.BreakTimeOffset != 0) {
                         foreach (Break br in beatmap.BreakPeriods) {
-                            if (Filter(br.StartTime, br.StartTime, doFilterMatch, doFilterRange, vm.MatchFilter, min,
-                                max)) {
+                            if (Filter(br.StartTime, br.StartTime, vm)) {
                                 br.StartTime =
                                     (int) Math.Round(br.StartTime * vm.BreakTimeMultiplier + vm.BreakTimeOffset);
                             }
 
-                            if (Filter(br.EndTime, br.EndTime, doFilterMatch, doFilterRange, vm.MatchFilter, min,
-                                max)) {
+                            if (Filter(br.EndTime, br.EndTime, vm)) {
                                 br.EndTime = (int) Math.Round(br.EndTime * vm.BreakTimeMultiplier + vm.BreakTimeOffset);
                             }
                         }
@@ -208,8 +203,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                     if (vm.VideoTimeMultiplier != 1 || vm.VideoTimeOffset != 0) {
                         foreach (Event ev in beatmap.BackgroundAndVideoEvents) {
                             if (ev is Video video) {
-                                if (Filter(video.StartTime, video.StartTime, doFilterMatch, doFilterRange,
-                                    vm.MatchFilter, min, max)) {
+                                if (Filter(video.StartTime, video.StartTime, vm)) {
                                     video.StartTime =
                                         (int) Math.Round(video.StartTime * vm.VideoTimeMultiplier + vm.VideoTimeOffset);
                                 }
@@ -224,8 +218,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                         if (beatmap.General.ContainsKey("PreviewTime") &&
                             beatmap.General["PreviewTime"].IntValue != -1) {
                             var previewTime = beatmap.General["PreviewTime"].DoubleValue;
-                            if (Filter(previewTime, previewTime, doFilterMatch, doFilterRange, vm.MatchFilter, min,
-                                max)) {
+                            if (Filter(previewTime, previewTime, vm)) {
                                 var newPreviewTime =
                                     Math.Round(previewTime * vm.PreviewTimeMultiplier + vm.PreviewTimeOffset);
                                 beatmap.General["PreviewTime"].SetDouble(newPreviewTime);
@@ -249,8 +242,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                         foreach (Event ev in storyboard.StoryboardLayerBackground.Concat(storyboard.StoryboardLayerFail)
                             .Concat(storyboard.StoryboardLayerPass).Concat(storyboard.StoryboardLayerForeground)
                             .Concat(storyboard.StoryboardLayerOverlay)) {
-                            TransformEventTime(ev, vm.SBEventTimeMultiplier, vm.SBEventTimeOffset, doFilterMatch,
-                                doFilterRange, vm.MatchFilter, min, max);
+                            TransformEventTime(ev, vm.SBEventTimeMultiplier, vm.SBEventTimeOffset, vm);
                         }
                     }
 
@@ -259,8 +251,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                     // Storyboarded sample time
                     if (vm.SBSampleTimeMultiplier != 1 || vm.SBSampleTimeOffset != 0) {
                         foreach (StoryboardSoundSample ss in storyboard.StoryboardSoundSamples) {
-                            if (Filter(ss.StartTime, ss.StartTime, doFilterMatch, doFilterRange, vm.MatchFilter, min,
-                                max)) {
+                            if (Filter(ss.StartTime, ss.StartTime, vm)) {
                                 ss.StartTime =
                                     (int)Math.Round(ss.StartTime * vm.SBSampleTimeMultiplier + vm.SBSampleTimeOffset);
                             }
@@ -273,8 +264,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                     if (vm.VideoTimeMultiplier != 1 || vm.VideoTimeOffset != 0) {
                         foreach (Event ev in storyboard.BackgroundAndVideoEvents) {
                             if (ev is Video video) {
-                                if (Filter(video.StartTime, video.StartTime, doFilterMatch, doFilterRange,
-                                    vm.MatchFilter, min, max)) {
+                                if (Filter(video.StartTime, video.StartTime, vm)) {
                                     video.StartTime =
                                         (int)Math.Round(video.StartTime * vm.VideoTimeMultiplier + vm.VideoTimeOffset);
                                 }
@@ -294,33 +284,33 @@ namespace Mapping_Tools.Views.PropertyTransformer {
             return "Done!";
         }
 
-        private void TransformEventTime(Event ev, double multiplier, double offset, bool doMatch, bool doRange, double match, double min, double max) {
+        private void TransformEventTime(Event ev, double multiplier, double offset, PropertyTransformerVm vm) {
             // Commands under loops use relative time so they shouldn't get offset
             if (ev.ParentEvent is StandardLoop || ev.ParentEvent is TriggerLoop) {
-                if (ev is IHasStartTime st && Filter(st.StartTime, st.StartTime, doMatch, doRange, match, min, max)) {
+                if (ev is IHasStartTime st && Filter(st.StartTime, st.StartTime, vm)) {
                     st.StartTime = (int) Math.Round(st.StartTime * multiplier);
                 }
-                if (ev is IHasEndTime et && Filter(et.EndTime, et.EndTime, doMatch, doRange, match, min, max)) {
+                if (ev is IHasEndTime et && Filter(et.EndTime, et.EndTime, vm)) {
                     et.EndTime = (int) Math.Round(et.EndTime * multiplier);
                 }
-                if (ev is IHasDuration d && Filter(d.Duration, 0, doMatch, false, match, min, max)) {  // Just a duration doesnt have a time to filter
+                if (ev is IHasDuration d && Filter(d.Duration, double.NaN, vm)) {  // Just a duration doesnt have a time to filter
                     d.Duration *= multiplier;
                 }
             } else {
-                if (ev is IHasStartTime st && Filter(st.StartTime, st.StartTime, doMatch, doRange, match, min, max)) {
+                if (ev is IHasStartTime st && Filter(st.StartTime, st.StartTime, vm)) {
                     st.StartTime = (int)Math.Round(st.StartTime * multiplier + offset);
                 }
-                if (ev is IHasEndTime et && Filter(et.EndTime, et.EndTime, doMatch, doRange, match, min, max)) {
+                if (ev is IHasEndTime et && Filter(et.EndTime, et.EndTime, vm)) {
                     et.EndTime = (int)Math.Round(et.EndTime * multiplier + offset);
                 }
-                if (ev is IHasDuration d && Filter(d.Duration, 0, doMatch, false, match, min, max)) {  // Just a duration doesnt have a time to filter
+                if (ev is IHasDuration d && Filter(d.Duration, double.NaN, vm)) {  // Just a duration doesnt have a time to filter
                     d.Duration *= multiplier;
                 }
             }
 
             // Recurse to also transform all the children events
             foreach (var child in ev.ChildEvents) {
-                TransformEventTime(child, multiplier, offset, doMatch, doRange, match, min, max);
+                TransformEventTime(child, multiplier, offset, vm);
             }
         }
 

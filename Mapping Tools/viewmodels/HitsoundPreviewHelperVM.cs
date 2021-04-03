@@ -1,5 +1,7 @@
 ﻿using Mapping_Tools.Classes;
+using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.HitsoundStuff;
+using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Components.Domain;
 using Mapping_Tools.Views.RhythmGuide;
 using System;
@@ -9,10 +11,6 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Classes.ToolHelpers;
-using Mapping_Tools.Classes.Tools;
 
 namespace Mapping_Tools.Viewmodels {
     public class HitsoundPreviewHelperVm : INotifyPropertyChanged
@@ -77,7 +75,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public ObservableCollection<HitsoundZone> Items {
-            get { return _items; }
+            get => _items;
             set {
                 if (_items == value) return;
                 _items = value;
@@ -86,7 +84,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public bool? IsAllItemsSelected {
-            get { return _isAllItemsSelected; }
+            get => _isAllItemsSelected;
             set {
                 if (_isAllItemsSelected == value) return;
 

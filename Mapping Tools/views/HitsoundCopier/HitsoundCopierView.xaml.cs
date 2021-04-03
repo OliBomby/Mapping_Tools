@@ -594,7 +594,8 @@ namespace Mapping_Tools.Views.HitsoundCopier {
 
             // Get all the divisors which the sliderend could possibly be snapped to
             var possibleDivisors =
-                allBeatDivisors.Where(d => Precision.AlmostEquals(beatsFromRedline % d.GetValue(), 0));
+                allBeatDivisors.Where(d => Precision.AlmostEquals(beatsFromRedline % d.GetValue(), 0) ||
+                                           Precision.AlmostEquals(beatsFromRedline % d.GetValue(), 1));
 
             // Make sure all the possible beat divisors of lower priority are in the muted category
             if (possibleDivisors.TakeWhile(d => !arg.MutedDivisors.Contains(d)).Any()) {

@@ -36,12 +36,21 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public SampleSet GetSampleSet() {
             SampleSet sampleSet = SampleSet.Auto;
             int bestPriority = int.MaxValue;
-            foreach (var sample in Samples)
-            {
-                if (sample.Hitsound == 0 && sample.Priority <= bestPriority)
-                {
+            foreach (var sample in Samples) {
+                if (sample.Hitsound == 0 && sample.Priority <= bestPriority) {
                     sampleSet = sample.SampleSet;
                     bestPriority = sample.Priority;
+                }
+            }
+
+            // If only auto was found, try to get a sampleset from the additions
+            if (sampleSet == SampleSet.Auto) {
+                bestPriority = int.MaxValue;
+                foreach (var sample in Samples) {
+                    if (sample.Hitsound != 0 && sample.Priority <= bestPriority) {
+                        sampleSet = sample.SampleSet;
+                        bestPriority = sample.Priority;
+                    }
                 }
             }
 
@@ -51,12 +60,24 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public SampleSet GetAdditions() {
             SampleSet additions = SampleSet.Auto;
             int bestPriority = int.MaxValue;
-            foreach (Sample sample in Samples) {
+            foreach (var sample in Samples) {
                 if (sample.Hitsound != 0 && sample.Priority <= bestPriority) {
                     additions = sample.SampleSet;
                     bestPriority = sample.Priority;
                 }
             }
+
+            // If only auto was found, try to get a sampleset from the normals
+            if (additions == SampleSet.Auto) {
+                bestPriority = int.MaxValue;
+                foreach (var sample in Samples) {
+                    if (sample.Hitsound == 0 && sample.Priority <= bestPriority) {
+                        additions = sample.SampleSet;
+                        bestPriority = sample.Priority;
+                    }
+                }
+            }
+
             return additions;
         }
 

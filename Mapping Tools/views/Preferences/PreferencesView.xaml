@@ -97,7 +97,7 @@
             <StackPanel Margin="5 10 0 0">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Width="150" VerticalAlignment="Center" Text="QuickRun hotkey:" ToolTip="QuickRun lets you quickly run a tool on the beatmap you have open in the editor."/>
-                    <components:HotkeyEditorControl Width="150" Hotkey="{Binding QuickRunHotkey}"/>
+                    <components:HotkeyEditorControl Width="150" Hotkey="{Binding QuickRunHotkey, UpdateSourceTrigger=LostFocus}"/>
 
                     <CheckBox x:Name="SmartQuickRunCheckBox" IsChecked="{Binding SmartQuickRunEnabled}" Margin="15 0 0 0" VerticalAlignment="Center"
                               ToolTip="Enable SmartQuickRun to modify the behavior of QuickRun based on the number of objects currently selected on the editor."/>
@@ -123,13 +123,13 @@
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Width="150" VerticalAlignment="Center" Text="QuickUndo hotkey:" 
                                ToolTip="Quickly loads the latest backup into the beatmap currently open in the editor."/>
-                    <components:HotkeyEditorControl Width="150" Hotkey="{Binding QuickUndoHotkey}"/>
+                    <components:HotkeyEditorControl Width="150" Hotkey="{Binding QuickUndoHotkey, UpdateSourceTrigger=LostFocus}"/>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Width="150" VerticalAlignment="Center" Text="BetterSave™ hotkey:" 
                                ToolTip="BetterSave saves the current map with proper rounding instead of truncating values."/>
-                    <components:HotkeyEditorControl Width="150" Hotkey="{Binding BetterSaveHotkey}"/>
+                    <components:HotkeyEditorControl Width="150" Hotkey="{Binding BetterSaveHotkey, UpdateSourceTrigger=LostFocus}"/>
                 </StackPanel>
             </StackPanel>
 

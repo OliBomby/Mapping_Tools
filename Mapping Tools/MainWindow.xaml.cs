@@ -2,13 +2,12 @@
 using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.Exceptions;
 using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Views;
 using Mapping_Tools.Views.Standard;
 using MaterialDesignThemes.Wpf;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -19,11 +18,12 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Mapping_Tools.Classes.ToolHelpers;
 
 namespace Mapping_Tools {
 
     public partial class MainWindow {
+        private bool autoSave = true;
+
         public ViewCollection Views;
         public ListenerManager ListenerManager;
         public bool SessionhasAdminRights;
@@ -36,9 +36,6 @@ namespace Mapping_Tools {
         public static SnackbarMessageQueue MessageQueue { get; set; }
 
         public MainWindow() {
-            // Initialize exception logging
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-
             try {
                 AppWindow = this;
                 AppCommon = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -68,24 +65,6 @@ namespace Mapping_Tools {
             }
         }
 
-        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e) {
-            // Log the exception, display it, etc
-            if (!(e.ExceptionObject is Exception exception)) return;
-            var lines = new List<string> {exception.Message, exception.StackTrace, exception.Source};
-
-            while (exception.InnerException != null) {
-                exception = exception.InnerException;
-                lines.Add("\nInner exception:");
-                lines.Add(exception.Message);
-                lines.Add(exception.StackTrace);
-                lines.Add(exception.Source);
-            }
-
-            var path = Path.Combine(AppDataPath, "crash-log.txt");
-            File.WriteAllLines(path, lines);
-            MessageBox.Show($"The program encountered an unhandled exception. Look in crash-log.txt for more info:\n{path}", "Error");
-        }
-
         private void Setup() {
             SessionhasAdminRights = IsUserAdministrator();
 
@@ -112,6 +91,29 @@ namespace Mapping_Tools {
                 item.Click += ViewSelectMenuItemOnClick;
                 return item;
             }).OrderBy(o => o.Header);
+        }
+
+        private void Window_Closing(object sender, EventArgs e) {
+            // Perform saving of settings at application exit
+            if (autoSave) {
+                Views.AutoSaveSettings();
+                if (DataContext is MappingTool mt) {
+                    mt.Dispose();
+                }
+                SettingsManager.UpdateSettings();
+                SettingsManager.WriteToJson();
+            }
+        }
+
+        //Close window
+        private void CloseWin(object sender, RoutedEventArgs e) {
+            Close();
+        }
+
+        //Close window without saving
+        private void CloseWinNoSave(object sender, RoutedEventArgs e) {
+            autoSave = false;
+            Close();
         }
 
         private void SetCurrentView(string name) {
@@ -465,15 +467,6 @@ namespace Mapping_Tools {
         //Minimize window on click
         private void MinimizeWin(object sender, RoutedEventArgs e) {
             WindowState = WindowState.Minimized;
-        }
-
-        //Close window
-        private void CloseWin(object sender, RoutedEventArgs e) {
-            Views.AutoSaveSettings();
-            if (DataContext is MappingTool mt){ mt.Dispose(); }
-            SettingsManager.UpdateSettings();
-            SettingsManager.WriteToJson();
-            Close();
         }
 
         //Enable drag control of window and set icons when docked
