@@ -234,6 +234,12 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _matchFilter, value);
         }
 
+        private double _unmatchFilter;
+        public double UnmatchFilter {
+            get => _unmatchFilter;
+            set => Set(ref _unmatchFilter, value);
+        }
+
         private double _minTimeFilter;
         public double MinTimeFilter {
             get => _minTimeFilter;
@@ -265,6 +271,7 @@ namespace Mapping_Tools.Viewmodels {
             ClipProperties = false;
             EnableFilters = false;
             MatchFilter = -1;
+            UnmatchFilter = -1;
             MinTimeFilter = -1;
             MaxTimeFilter = -1;
 

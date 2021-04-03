@@ -160,12 +160,22 @@
                 <StackPanel Visibility="{Binding Path=EnableFilters, UpdateSourceTrigger=PropertyChanged,  
                                  Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
                     <TextBox x:Name="MatchBox" Text="{Binding Path=MatchFilter, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=-1}"
-                            ToolTip="Parameters must match this value to be changed." HorizontalAlignment="Left" Width="259"/>
+                             Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                             materialDesign:HintAssist.Hint="Whitelist"
+                            ToolTip="Parameters must match this value to be eligible for change." HorizontalAlignment="Left" Width="259"/>
+                    <TextBox x:Name="UnmatchBox" Text="{Binding Path=UnmatchFilter, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=-1}"
+                             Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                             materialDesign:HintAssist.Hint="Blacklist"
+                             ToolTip="Parameters must NOT match this value to be eligible for change." HorizontalAlignment="Left" Width="259"/>
                     <StackPanel Orientation="Horizontal">
                         <TextBox x:Name="MinBox" Text="{Binding Path=MinTimeFilter, Mode=TwoWay, Converter={StaticResource TimeToStringConverter}, ConverterParameter=-1}"
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                 materialDesign:HintAssist.Hint="Start time"
                                 ToolTip="Minimum time in milliseconds of the object for the parameters to be changed." MinWidth="120"/>
                         <TextBlock Text=" to " VerticalAlignment="Center"/>
                         <TextBox x:Name="MaxBox" Text="{Binding Path=MaxTimeFilter, Mode=TwoWay, Converter={StaticResource TimeToStringConverter}, ConverterParameter=-1}"
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                 materialDesign:HintAssist.Hint="End time"
                                 ToolTip="Maximum time in milliseconds of the object for the parameters to be changed." MinWidth="120"/>
                     </StackPanel>
                 </StackPanel>
