@@ -435,6 +435,7 @@
     <Compile Include="Components\Dialogs\CustomDialog\CustomDialog.xaml.cs">
       <DependentUpon>CustomDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Components\Domain\DoubleArrayToStringConverter.cs" />
     <Compile Include="Components\Domain\ColorToBrushConverter.cs" />
     <Compile Include="Components\Domain\CommandImplementation.cs" />
     <Compile Include="Components\Domain\BeatDivisorArrayToStringConverter.cs" />

@@ -35,14 +35,14 @@ namespace Mapping_Tools.Views.PropertyTransformer {
         }
 
         private bool Filter(double value, double time, PropertyTransformerVm vm) {
-            bool doFilterMatch = vm.MatchFilter != -1 && vm.EnableFilters;
-            bool doFilterUnmatch = vm.UnmatchFilter != -1 && vm.EnableFilters;
+            bool doFilterMatch = vm.MatchFilter.Length > 0 && vm.EnableFilters;
+            bool doFilterUnmatch = vm.UnmatchFilter.Length > 0 && vm.EnableFilters;
             bool doFilterRange = (vm.MinTimeFilter != -1 || vm.MaxTimeFilter != -1) && vm.EnableFilters && !double.IsNaN(time);
             double min = vm.MinTimeFilter == -1 ? double.NegativeInfinity : vm.MinTimeFilter;
             double max = vm.MaxTimeFilter == -1 ? double.PositiveInfinity : vm.MaxTimeFilter;
 
-            return (!doFilterMatch || Precision.AlmostEquals(value, vm.MatchFilter, 0.001)) && 
-                   (!doFilterUnmatch || !Precision.AlmostEquals(value, vm.UnmatchFilter, 0.001)) &&
+            return (!doFilterMatch || vm.MatchFilter.Any(o => Precision.AlmostEquals(value, o, 0.001))) && 
+                   (!doFilterUnmatch || !vm.UnmatchFilter.Any(o => Precision.AlmostEquals(value, o, 0.001))) &&
                    (!doFilterRange || (time >= min && time <= max));
         }
 
