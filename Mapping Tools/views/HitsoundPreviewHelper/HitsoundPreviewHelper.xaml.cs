@@ -97,10 +97,12 @@ namespace Mapping_Tools.Views.HitsoundPreviewHelper
                         }
                     }
 
+                    if (column == null) continue;
 
                     tlo.Filename = column.Filename;
                     tlo.SampleSet = column.SampleSet;
-                    tlo.AdditionSet = SampleSet.Auto;
+                    tlo.AdditionSet = column.AdditionsSet;
+                    tlo.CustomIndex = column.CustomIndex;
                     tlo.SetHitsound(column.Hitsound);
                     tlo.HitsoundsToOrigin();
 

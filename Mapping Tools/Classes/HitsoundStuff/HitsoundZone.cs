@@ -1,16 +1,10 @@
-﻿using Mapping_Tools.Classes.MathUtil;
+﻿using Mapping_Tools.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Classes.MathUtil;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.BeatmapHelper.Enums;
 
-namespace Mapping_Tools.Classes.HitsoundStuff
-{
+namespace Mapping_Tools.Classes.HitsoundStuff {
     /// <summary>
     /// 
     /// </summary>
@@ -21,29 +15,33 @@ namespace Mapping_Tools.Classes.HitsoundStuff
         private string _filename;
         private double _xPos;
         private double _yPos;
-        private SampleSet _sampleSet;
         private Hitsound _hitsound;
+        private SampleSet _sampleSet;
+        private SampleSet _additionsSet;
+        private int _customIndex;
 
-        /// <inheritdoc />
         public HitsoundZone() {
             _isSelected = false;
             _name = "";
             _filename = "";
             _xPos = -1;
             _yPos = -1;
-            _sampleSet = SampleSet.Auto;
             _hitsound = Hitsound.Normal;
+            _sampleSet = SampleSet.Auto;
+            _additionsSet = SampleSet.Auto;
+            _customIndex = 0;
         }
 
-        /// <inheritdoc />
-        public HitsoundZone(bool isSelected, string name, string filename, double xPos, double yPos, SampleSet sampleSet, Hitsound hitsound) {
+        public HitsoundZone(bool isSelected, string name, string filename, double xPos, double yPos, Hitsound hitsound, SampleSet sampleSet, SampleSet additionsSet, int customIndex) {
             _isSelected = isSelected;
             _name = name;
             _filename = filename;
             _xPos = xPos;
             _yPos = yPos;
-            _sampleSet = sampleSet;
             _hitsound = hitsound;
+            _sampleSet = sampleSet;
+            _additionsSet = additionsSet;
+            _customIndex = customIndex;
         }
 
         /// <summary>
@@ -62,11 +60,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff
         /// </summary>
         /// <returns></returns>
         public HitsoundZone Copy() {
-            return new HitsoundZone(IsSelected, Name, Filename, XPos, YPos, SampleSet, Hitsound);
+            return new HitsoundZone(IsSelected, Name, Filename, XPos, YPos, Hitsound, SampleSet, AdditionsSet, CustomIndex);
         }
 
         public bool IsSelected {
-            get { return _isSelected; }
+            get => _isSelected;
             set {
                 if (_isSelected == value) return;
                 _isSelected = value;
@@ -110,6 +108,15 @@ namespace Mapping_Tools.Classes.HitsoundStuff
             }
         }
 
+        public Hitsound Hitsound {
+            get => _hitsound;
+            set {
+                if (_hitsound == value) return;
+                _hitsound = value;
+                OnPropertyChanged();
+            }
+        }
+
         public SampleSet SampleSet {
             get => _sampleSet;
             set {
@@ -119,11 +126,20 @@ namespace Mapping_Tools.Classes.HitsoundStuff
             }
         }
 
-        public Hitsound Hitsound {
-            get => _hitsound;
+        public SampleSet AdditionsSet {
+            get => _additionsSet;
             set {
-                if (_hitsound == value) return;
-                _hitsound = value;
+                if (_additionsSet == value) return;
+                _additionsSet = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int CustomIndex {
+            get => _customIndex;
+            set {
+                if (_customIndex == value) return;
+                _customIndex = value;
                 OnPropertyChanged();
             }
         }
