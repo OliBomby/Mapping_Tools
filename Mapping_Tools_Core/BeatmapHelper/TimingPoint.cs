@@ -202,8 +202,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// Can clarify if the current timing point should snap to the nearest beat of the previous timing point.
         /// </summary>
         /// <param name="timing"></param>
-        /// <param name="snap1"></param>
-        /// <param name="snap2"></param>
+        /// <param name="beatDivisors"></param>
         /// <param name="floor"></param>
         /// <param name="tp"></param>
         /// <param name="firstTP"></param>
@@ -246,6 +245,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
 
         /// <summary>
         /// Grabs the current Beats Per Minute from the <see cref="TimingPoint"/>
+        /// assuming this is an uninherited timing point.
         /// </summary>
         /// <returns></returns>
         public double GetBpm() {
@@ -253,14 +253,46 @@ namespace Mapping_Tools_Core.BeatmapHelper {
                 return 60000 / MpB;
             }
 
-            return -100 / MpB;
+            throw new InvalidOperationException("Cannot get BPM from an inherited timingpoint.");
         }
 
+        /// <summary>
+        /// Sets the current Beats Per Minute of the <see cref="TimingPoint"/>
+        /// assuming this is an uninherited timing point.
+        /// </summary>
+        /// <returns></returns>
         public void SetBpm(double bpm) {
             if (Uninherited) {
                 MpB = 60000 / bpm;
             } else {
+                throw new InvalidOperationException("Cannot set BPM on an inherited timingpoint.");
+            }
+        }
+
+        /// <summary>
+        /// Grabs the current slider velocity multiplier from the <see cref="TimingPoint"/>
+        /// assuming this is an inherited timing point.
+        /// Returns 1x slider velocity if this is an uninherited timing point.
+        /// </summary>
+        /// <returns></returns>
+        public double GetSliderVelocity() {
+            if (!Uninherited) {
+                return -100 / MpB;
+            }
+
+            return 1;
+        }
+
+        /// <summary>
+        /// Sets the current slider velocity multiplier of the <see cref="TimingPoint"/>
+        /// assuming this is an inherited timing point.
+        /// </summary>
+        /// <returns></returns>
+        public void SetSliderVelocity(double bpm) {
+            if (!Uninherited) {
                 MpB = -100 / bpm;
+            } else {
+                throw new InvalidOperationException("Cannot set slider velocity on an uninherited timingpoint.");
             }
         }
 

@@ -5,6 +5,7 @@ using Mapping_Tools_Core.MathUtil;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Mapping_Tools_Core.BeatmapHelper.Contexts;
 
 namespace Mapping_Tools_Core.BeatmapHelper {
     /// <summary>
@@ -21,11 +22,6 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// Base position of hit object.
         /// </summary>
         public Vector2 Pos { get; set; }
-
-        /// <summary>
-        /// Stacked position of hit object. Must be computed by beatmap.
-        /// </summary>
-        public Vector2 StackedPos { get; set; }
 
         /// <summary>
         /// Absolute time of the hit object in milliseconds.
@@ -50,81 +46,69 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         [NotNull]
         public HitSampleInfo Hitsounds { get; set; }
 
-        // Special combined with beatmap
         /// <summary>
-        /// The stack count indicates the number of hit objects that this object is stacked upon.
-        /// Used for calculating stack offset.
+        /// Additional properties.
+        /// The objects always have the type of their key.
         /// </summary>
-        public int StackCount { get; set; }
-
-        /// <summary>
-        /// Whether a new combo starts on this hit object.
-        /// </summary>
-        public bool ActualNewCombo { get; set; }
-
-        /// <summary>
-        /// The combo number of this hit object.
-        /// </summary>
-        public int ComboIndex { get; set; }
-
-        /// <summary>
-        /// The colour index of the hit object.
-        /// Determines which combo colour of the beatmap to use.
-        /// </summary>
-        public int ColourIndex { get; set; }
-
-        /// <summary>
-        /// The colour of this hit object.
-        /// </summary>
-        public IComboColour Colour { get; set; }
-
-        // Special combined with greenline
-        /// <summary>
-        /// The greenline slider velocity at the start time of this hit object.
-        /// 100x inverse of actual slider velocity multiplier. TODO yeet this 100x inverse BS
-        /// </summary>
-        public double SliderVelocity { get; set; }
-
-        /// <summary>
-        /// The timing point active at the start time of this hit object.
-        /// Usefull for determining slider velocity.
-        /// </summary>
-        [CanBeNull]
-        public TimingPoint TimingPoint { get; set; }
-
-        /// <summary>
-        /// The timing point active 5 milliseconds after the start time of this hit object.
-        /// This is the timing point determining the hitsounds for this hit object at the start time.
-        /// </summary>
-        [CanBeNull]
-        public TimingPoint HitsoundTimingPoint { get; set; }
-
-        /// <summary>
-        /// The uninherited timing point active at the start time of this hit object.
-        /// Determines the BPM at the start time of this hit object.
-        /// </summary>
-        [CanBeNull]
-        public TimingPoint UnInheritedTimingPoint { get; set; }
-
-        // Special combined with timeline
-        /// <summary>
-        /// The timeline objects associated with this hit object.
-        /// </summary>
-        [NotNull]
-        public List<TimelineObject> TimelineObjects { get; set; }
+        private Dictionary<Type, IContext> contexts;
 
         protected HitObject() {
             Hitsounds = new HitSampleInfo();
-
-            TimelineObjects = new List<TimelineObject>();
+            contexts = new Dictionary<Type, IContext>();
         }
 
         /// <summary>
-        /// Gets all times of timeline objects of this object.
+        /// Gets the context with type T.
         /// </summary>
-        /// <param name="timing">The timing to align the timeline object times to.</param>
-        /// <returns>List of all timeline object times.</returns>
-        public abstract List<double> GetAllTloTimes(Timing timing);
+        /// <typeparam name="T">The type to get the context of.</typeparam>
+        /// <exception cref="KeyNotFoundException">If the context does not exist in this hit object.</exception>
+        /// <returns>The context object with type T.</returns>
+        public T GetContext<T>() where T : IContext {
+            return (T) contexts[typeof(T)];
+        }
+
+        /// <summary>
+        /// Tries to get the context with type T.
+        /// </summary>
+        /// <param name="context">The found context with type T.</param>
+        /// <typeparam name="T">The type to get the context of.</typeparam>
+        /// <returns>Whether the context exists in this hit object.</returns>
+        public bool TryGetContext<T>(out T context) where T : IContext {
+            if (contexts.TryGetValue(typeof(T), out var context2)) {
+                context = (T) context2;
+                return true;
+            }
+
+            context = default;
+            return false;
+        }
+        
+        /// <summary>
+        /// Sets the context object of type T.
+        /// </summary>
+        /// <typeparam name="T">The context type to set.</typeparam>
+        /// <param name="context">The context object to store in this hit object.</param>
+        public void SetContext<T>(T context) where T : IContext {
+            contexts[typeof(T)] = context;
+        }
+
+        /// <summary>
+        /// Removes the context of type T from the hit object.
+        /// </summary>
+        /// <typeparam name="T">The type to remove the context of.</typeparam>
+        /// <returns>Whether a context was removed.</returns>
+        public bool RemoveContext<T>() where T : IContext {
+            return RemoveContext(typeof(T));
+        }
+
+        /// <summary>
+        /// Removes the context of type T from the hit object.
+        /// </summary>
+        /// <param name="t">The type to remove the context of.</param>
+        /// <returns>Whether a context was removed.</returns>
+        public bool RemoveContext(Type t) {
+            return contexts.Remove(t);
+        }
 
         /// <summary>
         /// Removes all hitounds and sets samplesets to auto.
@@ -132,10 +116,6 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// </summary>
         public virtual void ResetHitsounds() {
             Hitsounds = new HitSampleInfo();
-
-            foreach (var tlo in TimelineObjects) {
-                tlo.ResetHitsounds();
-            }
         }
 
         /// <summary>
@@ -143,21 +123,6 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// <param name="deltaTime"></param>
         public virtual void MoveTime(double deltaTime) {
             StartTime += deltaTime;
-
-            // Move its timelineobjects
-            foreach (var tlo in TimelineObjects) tlo.Time += deltaTime;
-        }
-
-        /// <summary>
-        /// Update the associated timeline object with new time information.
-        /// </summary>
-        public virtual void UpdateTimelineObjectTimes() {
-            if (this is IHasRepeats hasRepeats) {
-                for (int i = 0; i < TimelineObjects.Count; i++) {
-                    double time = Math.Floor(StartTime + hasRepeats.RepeatDuration * i);
-                    TimelineObjects[i].Time = time;
-                }
-            }
         }
 
         /// <summary>
@@ -185,11 +150,11 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// <returns>The deep clone of this hit object.</returns>
         public HitObject DeepClone() {
             var newHitObject = (HitObject) MemberwiseClone();
-            newHitObject.TimelineObjects = TimelineObjects.Select(o => o.Copy()).ToList();
-            newHitObject.TimingPoint = TimingPoint?.Copy();
-            newHitObject.HitsoundTimingPoint = HitsoundTimingPoint?.Copy();
-            newHitObject.UnInheritedTimingPoint = UnInheritedTimingPoint?.Copy();
-            newHitObject.Colour = (IComboColour) Colour?.Clone();
+
+            newHitObject.contexts = new Dictionary<Type, IContext>();
+            foreach (var (type, context) in contexts) {
+                newHitObject.contexts.Add(type, context.Copy());
+            }
 
             // Deep clone for the types inheriting HitObject
             DeepCloneAdd(newHitObject);

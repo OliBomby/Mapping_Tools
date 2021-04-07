@@ -5,21 +5,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using Mapping_Tools_Core.BeatmapHelper.Contexts;
 using Mapping_Tools_Core.BeatmapHelper.SliderPathStuff;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Objects {
-    public class Slider : HitObject, IHasRepeats, IHasEndTime {
+    public class Slider : HitObject, IHasRepeats {
         /// <summary>
         /// Position of slider end. By default is equal to the start position.
         /// </summary>
         public Vector2 EndPos { get; set; }
 
-        /// <summary>
-        /// Stacked slider end position of hit object. Must be computed by beatmap.
-        /// </summary>
-        public Vector2 StackedEndPos { get; set; }
-
         public PathType SliderType { get; set; }
+
         [NotNull]
         public List<Vector2> CurvePoints { get; set; }
 
@@ -29,15 +26,25 @@ namespace Mapping_Tools_Core.BeatmapHelper.Objects {
         [NotNull]
         public List<HitSampleInfo> EdgeHitsounds { get; set; }
 
-        // Special combined with greenline
-        [NotNull]
-        public List<TimingPoint> BodyHitsounds { get; set; }
-        
-        public double Duration { get; set; }
+        public double Duration => SpanDuration * ((IHasRepeats) this).SpanCount;
 
-        public double EndTime {
-            get => GetEndTime();
-            set => SetEndTime(value);
+        public double SpanDuration => GetSpanDuration();
+
+        public double EndTime => GetEndTime();
+
+        public Slider() {
+            CurvePoints = new List<Vector2>();
+            EdgeHitsounds = new List<HitSampleInfo>();
+        }
+
+        /// <summary>
+        /// Calculates repeat duration based on the timing context.
+        /// </summary>
+        /// <exception cref="KeyNotFoundException">If no timing context was found in this hit object.</exception>
+        /// <returns>The duration of one repeat in milliseconds.</returns>
+        public double GetSpanDuration() {
+            var timing = GetContext<TimingContext>();
+            return SvHelper.CalculateSliderDuration(PixelLength, timing.UninheritedTimingPoint.MpB, timing.SliderVelocity, timing.GlobalSliderVelocity);
         }
 
         public double GetEndTime(bool floor = true) {
@@ -45,33 +52,9 @@ namespace Mapping_Tools_Core.BeatmapHelper.Objects {
             return floor ? Math.Floor(endTime + Precision.DOUBLE_EPSILON) : endTime;
         }
 
-        private void SetEndTime(double value) {
-            Duration = value - StartTime;
-        }
-
-        public Slider() {
-            CurvePoints = new List<Vector2>();
-            EdgeHitsounds = new List<HitSampleInfo>();
-            BodyHitsounds = new List<TimingPoint>();
-        }
-
         public bool GetSliderExtras() {
             return EdgeHitsounds.Any(o => !o.Equals(Hitsounds)) ||
                    !Hitsounds.Equals(new HitSampleInfo());
-        }
-
-        public override List<double> GetAllTloTimes(Timing timing) {
-            var times = new List<double>();
-
-            // Adding time for every repeat of the slider
-            var sliderTemporalLength = timing.CalculateSliderTemporalLength(StartTime, PixelLength);
-
-            for (var i = 0; i < ((IHasRepeats)this).SpanCount + 1; i++) {
-                var time = Math.Floor(StartTime + sliderTemporalLength * i);
-                times.Add(time);
-            }
-
-            return times;
         }
 
         public List<string> GetPlayingBodyFilenames(double sliderTickRate, bool includeDefaults = true) {

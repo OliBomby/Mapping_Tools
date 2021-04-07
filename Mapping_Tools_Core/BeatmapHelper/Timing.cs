@@ -748,28 +748,18 @@ namespace Mapping_Tools_Core.BeatmapHelper {
 
         /// <summary>
         /// Gets the slider velocity multiplier at a given time.
-        /// Its that number on inherited timing points that ranges from 0.1 to 10.
-        /// </summary>
-        /// <param name="time"></param>
-        /// <returns></returns>
-        public double GetSvMultiplierAtTime(double time) {
-            return -100 / GetSvAtTime(time);
-        }
-
-        /// <summary>
-        /// Gets the slider velocity at a given time.
         /// This gives the value from the .osu.
-        /// Ranges from -1000 to -10.
+        /// Ranges from 0.1 to 10.
         /// </summary>
         /// <param name="time"></param>
         /// <returns></returns>
         public double GetSvAtTime(double time) {
             var lastTp = GetTimingPointAtTime(time, _timingPoints, null);
             if (lastTp == null || lastTp.Uninherited) {
-                return -100;
+                return 1;
             }
 
-            return MathHelper.Clamp(lastTp.MpB, -1000, -10);
+            return MathHelper.Clamp(lastTp.GetSliderVelocity(), 0.1, 10);
         }
 
         /// <summary>
