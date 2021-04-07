@@ -62,7 +62,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// CircleSize,
         /// OverallDifficulty,
         /// ApproachRate,
-        /// SliderMultiplier,
+        /// GlobalSliderMultiplier,
         /// SliderTickRate
         /// </summary>
         [NotNull]

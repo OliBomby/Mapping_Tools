@@ -444,7 +444,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
                 times.Add(Time);
             } else if (IsSlider) {
                 // Adding time for every repeat of the slider
-                var sliderTemporalLength = timing.CalculateSliderTemporalLength(Time, PixelLength);
+                var sliderTemporalLength = timing.CalculateSliderDuration(Time, PixelLength);
 
                 for (var i = 0; i <= Repeat; i++) {
                     var time = Math.Floor(Time + sliderTemporalLength * i);
@@ -512,8 +512,8 @@ namespace Mapping_Tools_Core.BeatmapHelper {
                 TemporalLength = 0;
             } else {
                 TemporalLength = useOwnSv
-                    ? timing.CalculateSliderTemporalLength(Time, PixelLength, SliderVelocity)
-                    : timing.CalculateSliderTemporalLength(Time, PixelLength);
+                    ? timing.CalculateSliderDuration(Time, PixelLength, SliderVelocity)
+                    : timing.CalculateSliderDuration(Time, PixelLength);
             }
         }
 
@@ -521,7 +521,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             if (Repeat == 0) return;
 
             if (IsSlider) {
-                var deltaLength = -10000 * timing.SliderMultiplier * deltaTemporalTime /
+                var deltaLength = -10000 * timing.GlobalSliderMultiplier * deltaTemporalTime /
                                   (UnInheritedTimingPoint.MpB *
                                    (double.IsNaN(SliderVelocity) ? -100 : SliderVelocity)); // Divide by repeats because the endtime is multiplied by repeats
                 PixelLength += deltaLength; // Change the pixel length to match the new time

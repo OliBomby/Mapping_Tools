@@ -91,7 +91,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
 
             // Set the timing stuff
             BeatmapTiming.SetTimingPoints(timingPoints);
-            BeatmapTiming.SliderMultiplier = globalSv;
+            BeatmapTiming.GlobalSliderMultiplier = globalSv;
 
             if (!BeatmapTiming.Contains(firstUnInheritedTimingPoint)) {
                 BeatmapTiming.Add(firstUnInheritedTimingPoint);
@@ -615,7 +615,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         public Beatmap DeepClone() {
             var newBeatmap = (Beatmap)MemberwiseClone();
             newBeatmap.HitObjects = HitObjects.Select(h => h.DeepClone()).ToList();
-            newBeatmap.BeatmapTiming = new Timing(BeatmapTiming.TimingPoints.Select(t => t.Copy()).ToList(), BeatmapTiming.SliderMultiplier);
+            newBeatmap.BeatmapTiming = new Timing(BeatmapTiming.TimingPoints.Select(t => t.Copy()).ToList(), BeatmapTiming.GlobalSliderMultiplier);
             newBeatmap.GiveObjectsGreenlines();
             return newBeatmap;
         }

@@ -321,7 +321,7 @@ namespace Mapping_Tools_Core.Tools.PatternGallery {
             }
 
             // Fix SV for the new global SV
-            var globalSvFactor =  transformOriginalTiming.SliderMultiplier / transformPatternTiming.SliderMultiplier;
+            var globalSvFactor =  transformOriginalTiming.GlobalSliderMultiplier / transformPatternTiming.GlobalSliderMultiplier;
             if (FixGlobalSv) {
                 foreach (HitObject ho in patternBeatmap.HitObjects.Where(o => o.IsSlider)) {
                     ho.SliderVelocity *= globalSvFactor;
@@ -350,7 +350,7 @@ namespace Mapping_Tools_Core.Tools.PatternGallery {
             // Construct a new timing which is a mix of the beatmap and the pattern.
             // If scaleToNewTiming then use beat relative values to determine the duration of timing sections in the pattern.
             // scaleToNewTiming must scale all the partitions, timingpoints, hitobjects, and events (if applicable).
-            Timing newTiming = new Timing(transformOriginalTiming.SliderMultiplier);
+            Timing newTiming = new Timing(transformOriginalTiming.GlobalSliderMultiplier);
 
             var lastEndTime = double.NegativeInfinity;
             foreach (var part in parts) {
@@ -467,11 +467,11 @@ namespace Mapping_Tools_Core.Tools.PatternGallery {
                         if (scaleToNewTiming) {
                             var wantedMsDuration = (newTiming.GetMilliseconds(ho.GetEndTime(false), patternStartTime) -
                                                     newTiming.GetMilliseconds(ho.StartTime, patternStartTime)) / ho.Repeat;
-                            var trueMsDuration = newTiming.CalculateSliderTemporalLength(SnapToNewTiming ? newTiming.ResnapBeatTime(ho.StartTime, BeatDivisors) : ho.StartTime, ho.PixelLength, ho.SliderVelocity);
+                            var trueMsDuration = newTiming.CalculateSliderDuration(SnapToNewTiming ? newTiming.ResnapBeatTime(ho.StartTime, BeatDivisors) : ho.StartTime, ho.PixelLength, ho.SliderVelocity);
                             ho.SliderVelocity /= trueMsDuration / wantedMsDuration;
                         }
                         else {
-                            ho.TemporalLength = newTiming.CalculateSliderTemporalLength(SnapToNewTiming ? newTiming.Resnap(ho.StartTime, BeatDivisors) : ho.StartTime, ho.PixelLength, ho.SliderVelocity);
+                            ho.TemporalLength = newTiming.CalculateSliderDuration(SnapToNewTiming ? newTiming.Resnap(ho.StartTime, BeatDivisors) : ho.StartTime, ho.PixelLength, ho.SliderVelocity);
                         }
                     }
                 }

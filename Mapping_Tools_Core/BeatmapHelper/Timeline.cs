@@ -25,7 +25,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
                 }
                 else if (ho.IsSlider) {
                     // Adding TimeLineObject for every repeat of the slider
-                    double sliderTemporalLength = timing.CalculateSliderTemporalLength(ho.StartTime, ho.PixelLength);
+                    double sliderTemporalLength = timing.CalculateSliderDuration(ho.StartTime, ho.PixelLength);
 
                     for (int i = 0; i <= ho.Repeat; i++) {
                         double time = Math.Floor(ho.StartTime + sliderTemporalLength * i);

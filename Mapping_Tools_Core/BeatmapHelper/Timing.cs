@@ -29,21 +29,21 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// <summary>
         /// The global slider multiplier of a <see cref="Beatmap"/>. This is here for convenience sake to calculate absolute slider velocities.
         /// </summary>
-        public double SliderMultiplier { get; set; }
+        public double GlobalSliderMultiplier { get; set; }
 
-        public Timing(double sliderMultiplier) {
+        public Timing(double globalSliderMultiplier) {
             SetTimingPoints(null);
-            SliderMultiplier = sliderMultiplier;
+            GlobalSliderMultiplier = globalSliderMultiplier;
         }
 
-        public Timing(List<TimingPoint> timingPoints, double sliderMultiplier) {
+        public Timing(List<TimingPoint> timingPoints, double globalSliderMultiplier) {
             SetTimingPoints(timingPoints);
-            SliderMultiplier = sliderMultiplier;
+            GlobalSliderMultiplier = globalSliderMultiplier;
         }
 
-        public Timing(IEnumerable<string> timingLines, double sliderMultiplier) {
+        public Timing(IEnumerable<string> timingLines, double globalSliderMultiplier) {
             SetTimingPoints(GetTimingPoints(timingLines).ToList());
-            SliderMultiplier = sliderMultiplier;
+            GlobalSliderMultiplier = globalSliderMultiplier;
         }
 
         /// <summary>
@@ -186,7 +186,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         }
 
         public Timing Copy() {
-            return new Timing(_timingPoints.Select(o => o.Copy()).ToList(), SliderMultiplier);
+            return new Timing(_timingPoints.Select(o => o.Copy()).ToList(), GlobalSliderMultiplier);
         }
 
         #endregion
@@ -781,34 +781,17 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// <param name="time">StartTime of slider.</param>
         /// <param name="length">Pixel length of slider.</param>
         /// <returns>The duration of the slider in milliseconds.</returns>
-        public double CalculateSliderTemporalLength(double time, double length) {
+        public double CalculateSliderDuration(double time, double length) {
             var sv = GetSvAtTime(time);
-            return CalculateSliderTemporalLength(time, length, sv);
+            return CalculateSliderDuration(time, length, sv);
         }
 
-        public double CalculateSliderTemporalLength(double time, double length, double sv) {
-            return (length * GetMpBAtTime(time) * (double.IsNaN(sv) ? -100 : MathHelper.Clamp(sv, -1000, -10))) / 
-                   (-10000 * SliderMultiplier);
+        public double CalculateSliderDuration(double time, double length, double sv) {
+            return SvHelper.CalculateSliderDuration(length, GetMpBAtTime(time), sv, GlobalSliderMultiplier);
         }
 
         public double CalculateSliderBeatLength(double length, double sv) {
-            return (length * (double.IsNaN(sv) ? -100 : MathHelper.Clamp(sv, -1000, -10))) / 
-                   (-10000 * SliderMultiplier);
-        }
-
-        /// <summary>
-        /// Calculates the pixel length of a slider using the duration of the slider.
-        /// </summary>
-        /// <param name="time"></param>
-        /// <param name="temporalLength"></param>
-        /// <returns></returns>
-        public double CalculateSliderLength(double time, double temporalLength) {
-            var sv = GetSvAtTime(time);
-            return ( -10000 * temporalLength * SliderMultiplier ) / ( GetMpBAtTime(time) * (double.IsNaN(sv) ? -100 : sv) );
-        }
-
-        public double CalculateSliderLengthCustomSv(double time, double temporalLength, double sv) {
-            return ( -10000 * temporalLength * SliderMultiplier ) / ( GetMpBAtTime(time) * (double.IsNaN(sv) ? -100 : sv) );
+            return SvHelper.CalculateSliderBeatLength(length, sv, GlobalSliderMultiplier);
         }
 
         private static IEnumerable<TimingPoint> GetTimingPoints(IEnumerable<string> timingLines) {

@@ -1,11 +1,9 @@
 ﻿using JetBrains.Annotations;
-using Mapping_Tools_Core.BeatmapHelper.Enums;
+using Mapping_Tools_Core.BeatmapHelper.Contexts;
 using Mapping_Tools_Core.BeatmapHelper.Types;
 using Mapping_Tools_Core.MathUtil;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Mapping_Tools_Core.BeatmapHelper.Contexts;
 
 namespace Mapping_Tools_Core.BeatmapHelper {
     /// <summary>

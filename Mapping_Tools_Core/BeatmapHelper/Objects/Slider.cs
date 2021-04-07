@@ -3,6 +3,7 @@ using Mapping_Tools_Core.BeatmapHelper.Types;
 using Mapping_Tools_Core.MathUtil;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using Mapping_Tools_Core.BeatmapHelper.Contexts;
@@ -10,11 +11,6 @@ using Mapping_Tools_Core.BeatmapHelper.SliderPathStuff;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Objects {
     public class Slider : HitObject, IHasRepeats {
-        /// <summary>
-        /// Position of slider end. By default is equal to the start position.
-        /// </summary>
-        public Vector2 EndPos { get; set; }
-
         public PathType SliderType { get; set; }
 
         [NotNull]
@@ -32,6 +28,11 @@ namespace Mapping_Tools_Core.BeatmapHelper.Objects {
 
         public double EndTime => GetEndTime();
 
+        /// <summary>
+        /// Cache for end position.
+        /// </summary>
+        private Vector2? endPos;
+
         public Slider() {
             CurvePoints = new List<Vector2>();
             EdgeHitsounds = new List<HitSampleInfo>();
@@ -43,6 +44,10 @@ namespace Mapping_Tools_Core.BeatmapHelper.Objects {
         /// <exception cref="KeyNotFoundException">If no timing context was found in this hit object.</exception>
         /// <returns>The duration of one repeat in milliseconds.</returns>
         public double GetSpanDuration() {
+            if (double.IsNaN(PixelLength) || PixelLength < 0 || CurvePoints.All(o => o == Pos)) {
+                return 0;
+            }
+
             var timing = GetContext<TimingContext>();
             return SvHelper.CalculateSliderDuration(PixelLength, timing.UninheritedTimingPoint.MpB, timing.SliderVelocity, timing.GlobalSliderVelocity);
         }
@@ -52,27 +57,51 @@ namespace Mapping_Tools_Core.BeatmapHelper.Objects {
             return floor ? Math.Floor(endTime + Precision.DOUBLE_EPSILON) : endTime;
         }
 
-        public bool GetSliderExtras() {
+        /// <summary>
+        /// Whether the slider extras should be written in the .osu file.
+        /// </summary>
+        public bool NeedSliderExtras() {
             return EdgeHitsounds.Any(o => !o.Equals(Hitsounds)) ||
                    !Hitsounds.Equals(new HitSampleInfo());
         }
+        
+        /// <summary>
+        /// Gets the end position of the slider path. Might be slow.
+        /// If it's outdated use <see cref="RecalculateEndPosition"/>.
+        /// </summary>
+        /// <returns></returns>
+        public Vector2 GetEndPosition() {
+            if (!endPos.HasValue) {
+                RecalculateEndPosition();
+            }
+
+            Debug.Assert(endPos != null, nameof(endPos) + " != null");
+            return endPos.Value;
+        }
+
+        /// <summary>
+        /// Recalculates the <see cref="endPos"/> from the control points and pixel length.
+        /// </summary>
+        public void RecalculateEndPosition() {
+            endPos = GetSliderPath().PositionAt(1);
+        }
 
         public List<string> GetPlayingBodyFilenames(double sliderTickRate, bool includeDefaults = true) {
-            if (TimingPoint == null || UnInheritedTimingPoint == null) {
-                throw new InvalidOperationException("Slider is not initialized with timing. Can not get the playing body filenames.");
+            if (!TryGetContext<TimingContext>(out var timing)) {
+                throw new InvalidOperationException("Slider is not initialized with timing context. Can not get the playing body filenames.");
             }
 
             var samples = new List<string>();
             
             // Get sliderslide hitsounds for every timingpoint in the slider
-            if (includeDefaults || TimingPoint.SampleIndex != 0) {
-                var firstSampleSet = Hitsounds.SampleSet == SampleSet.Auto ? TimingPoint.SampleSet : Hitsounds.SampleSet;
-                samples.Add(GetSliderFilename(firstSampleSet, "slide", TimingPoint.SampleIndex));
+            if (includeDefaults || timing.TimingPoint.SampleIndex != 0) {
+                var firstSampleSet = Hitsounds.SampleSet == SampleSet.Auto ? timing.TimingPoint.SampleSet : Hitsounds.SampleSet;
+                samples.Add(GetSliderFilename(firstSampleSet, "slide", timing.TimingPoint.SampleIndex));
                 if (Hitsounds.Whistle)
-                    samples.Add(GetSliderFilename(firstSampleSet, "whistle", TimingPoint.SampleIndex));
+                    samples.Add(GetSliderFilename(firstSampleSet, "whistle", timing.TimingPoint.SampleIndex));
             }
 
-            foreach (var bodyTp in BodyHitsounds)
+            foreach (var bodyTp in timing.BodyHitsounds)
                 if (includeDefaults || bodyTp.SampleIndex != 0) {
                     var sampleSet = Hitsounds.SampleSet == SampleSet.Auto ? bodyTp.SampleSet : Hitsounds.SampleSet;
                     samples.Add(GetSliderFilename(sampleSet, "slide", bodyTp.SampleIndex));
@@ -82,15 +111,15 @@ namespace Mapping_Tools_Core.BeatmapHelper.Objects {
 
             // Add tick samples
             // 10 ms over tick time is tick
-            var t = StartTime + UnInheritedTimingPoint.MpB / sliderTickRate;
+            var t = StartTime + timing.UninheritedTimingPoint.MpB / sliderTickRate;
             while (t + 10 < EndTime) {
-                var bodyTp = Timing.GetTimingPointAtTime(t, BodyHitsounds, TimingPoint);
+                var bodyTp = Timing.GetTimingPointAtTime(t, timing.BodyHitsounds, timing.TimingPoint);
                 if (includeDefaults || bodyTp.SampleIndex != 0) {
                     var sampleSet = Hitsounds.SampleSet == SampleSet.Auto ? bodyTp.SampleSet : Hitsounds.SampleSet;
                     samples.Add(GetSliderFilename(sampleSet, "tick", bodyTp.SampleIndex));
                 }
 
-                t += UnInheritedTimingPoint.MpB / sliderTickRate;
+                t += timing.UninheritedTimingPoint.MpB / sliderTickRate;
             }
 
             return samples;
@@ -116,74 +145,49 @@ namespace Mapping_Tools_Core.BeatmapHelper.Objects {
                 EdgeHitsounds[i] = new HitSampleInfo();
             }
 
-            BodyHitsounds.Clear();
+            // TODO: check references to and manually remove or move timing context body hitsounds
 
             base.ResetHitsounds();
         }
 
-        public override void MoveTime(double deltaTime) {
-            base.MoveTime(deltaTime);
-
-            BodyHitsounds.RemoveAll(s => s.Offset >= EndTime || s.Offset <= StartTime);
+        /// <summary>
+        /// Sets the actual end time of the slider by changing the <see cref="PixelLength"/>.
+        /// </summary>
+        /// <param name="endTime">The new end time in milliseconds.</param>
+        public void SetEndTimeByPixelLength(double endTime) {
+            SetSpanDurationByPixelLength((endTime - StartTime) / ((IHasRepeats)this).SpanCount);
         }
 
         /// <summary>
-        /// Changes the actual end time of the slider by changing the <see cref="PixelLength"/>.
+        /// Sets the actual end time of the slider by changing the <see cref="PixelLength"/>.
         /// </summary>
-        /// <param name="timing">The timing to recalculate the new pixel length with.</param>
-        /// <param name="deltaTime">The time in milliseconds to offset the end time by.</param>
-        public void MoveEndTime(Timing timing, double deltaTime) {
-            ChangeDuration(timing, deltaTime / ((IHasRepeats)this).SpanCount);
+        /// <param name="endTime">The new end time in milliseconds.</param>
+        public void SetEndTimeBySliderVelocity (double endTime) {
+            SetSpanDurationBySliderVelocity((endTime - StartTime) / ((IHasRepeats)this).SpanCount);
         }
 
         /// <summary>
-        /// Changes the actual duration of the slider by changing the <see cref="PixelLength"/>.
+        /// Sets the actual duration of the slider by changing the <see cref="PixelLength"/>.
         /// </summary>
-        /// <param name="timing">The timing to recalculate the new pixel length with.</param>
-        /// <param name="deltaDuration">The time in milliseconds to offset the duration by.</param>
-        public void ChangeDuration(Timing timing, double deltaDuration) {
-            TimingPoint redline = UnInheritedTimingPoint;
-            double sv = SliderVelocity;
-            if (redline == null) {
-                // Slider is probably not initialized with a timing
-                redline = timing.GetRedlineAtTime(StartTime);
-                sv = timing.GetSvAtTime(StartTime);
-            }
+        /// <exception cref="KeyNotFoundException">If no timing context was found in this hit object.</exception>
+        /// <param name="duration">The new duration duration.</param>
+        public void SetSpanDurationByPixelLength(double duration) {
+            var timing = GetContext<TimingContext>();
 
-            var deltaLength = -10000 * timing.SliderMultiplier * deltaDuration /
-                              (redline.MpB *
-                               (double.IsNaN(sv) ? -100 : sv));
-
-            // Change
-            PixelLength += deltaLength; // Change the pixel length to match the new time
-            Duration += deltaDuration;
-
-            // Move body objects
-            UpdateTimelineObjectTimes();
-
-            BodyHitsounds.RemoveAll(s => s.Offset >= EndTime);
+            // Change the pixel length to match the new time
+            PixelLength = SvHelper.CalculatePixelLength(duration, timing.UninheritedTimingPoint.MpB, timing.SliderVelocity, timing.GlobalSliderVelocity);
         }
 
         /// <summary>
-        /// Calculates the <see cref="Duration"/> accurate to the timing and pixellength.
+        /// Sets the actual duration of the slider by changing the <see cref="TimingContext.SliderVelocity"/>.
         /// </summary>
-        /// <param name="timing">The timing to calculate the duration with.</param>
-        /// <param name="useOwnSv">Whether to use the SV of a greenline in the timing or use the SliderVelocity of this object.</param>
-        public void CalculateSliderDuration(Timing timing, bool useOwnSv) {
-            if (double.IsNaN(PixelLength) || PixelLength < 0 || CurvePoints.All(o => o == Pos)) {
-                Duration = 0;
-            } else {
-                Duration = useOwnSv
-                    ? timing.CalculateSliderTemporalLength(StartTime, PixelLength, SliderVelocity)
-                    : timing.CalculateSliderTemporalLength(StartTime, PixelLength);
-            }
-        }
+        /// <exception cref="KeyNotFoundException">If no timing context was found in this hit object.</exception>
+        /// <param name="duration">The new duration duration.</param>
+        public void SetSpanDurationBySliderVelocity(double duration) {
+            var timing = GetContext<TimingContext>();
 
-        /// <summary>
-        /// Calculates the <see cref="EndPos"/> for sliders.
-        /// </summary>
-        public void CalculateEndPosition() {
-            EndPos = GetSliderPath().PositionAt(1);
+            // Change the pixel length to match the new time
+            timing.SliderVelocity = SvHelper.CalculateSliderVelocity(PixelLength, timing.UninheritedTimingPoint.MpB, duration, timing.GlobalSliderVelocity);
         }
 
         public override void Move(Vector2 delta) {
@@ -235,7 +239,6 @@ namespace Mapping_Tools_Core.BeatmapHelper.Objects {
 
             slider.CurvePoints.AddRange(CurvePoints);
             slider.EdgeHitsounds.AddRange(EdgeHitsounds.Select(o => o.Clone()));
-            slider.BodyHitsounds.AddRange(BodyHitsounds.Select(o => o.Copy()));
         }
     }
 }
