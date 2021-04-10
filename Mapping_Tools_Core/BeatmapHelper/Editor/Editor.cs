@@ -40,7 +40,7 @@ namespace Mapping_Tools_Core.BeatmapHelper.Editor {
 
         public virtual T ReadFile() {
             // Get contents of the file
-            var lines = File.ReadAllLines(Path);
+            var lines = File.ReadAllText(Path);
             return decoder.DecodeNew(lines);
         }
 
