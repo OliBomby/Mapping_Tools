@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Linq;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.BeatmapHelper.Objects;
 using Mapping_Tools_Core.MathUtil;
@@ -81,6 +82,28 @@ namespace Mapping_Tools_Core.BeatmapHelper.Decoding.HitObject {
             }
 
             return HitObjectType.Circle;
+        }
+
+        public static PathType GetPathType(string[] sliderData) {
+            for (var i = sliderData.Length - 1; i >= 0; i--) {
+                // Iterating in reverse to get the last valid letter
+                var letter =
+                    sliderData[i].Any() ? sliderData[i][0] : '0'; // 0 is not a letter so it will get ignored
+                if (char.IsLetter(letter))
+                    switch (letter) {
+                        case 'L':
+                            return PathType.Linear;
+                        case 'B':
+                            return PathType.Bezier;
+                        case 'P':
+                            return PathType.PerfectCurve;
+                        case 'C':
+                            return PathType.Catmull;
+                    }
+            }
+
+            // If there is no valid letter it will literally default to catmull
+            return PathType.Catmull;
         }
 
         public static string[] SplitLine(string line) {

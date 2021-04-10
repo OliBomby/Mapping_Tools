@@ -46,7 +46,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// <summary>
         /// The sample volume.
         /// </summary>
-        public int Volume { get; set; }
+        public double Volume { get; set; }
 
         public HitSampleInfo() {
             SampleSet = SampleSet.Auto;
