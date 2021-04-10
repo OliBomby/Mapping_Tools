@@ -9,6 +9,9 @@ namespace Mapping_Tools_Core.BeatmapHelper.Objects {
 
         public double EndTime { get; set; }
 
+        // Spinners ignore combo skip
+        public override int ComboSkip => 0;
+
         public Spinner() {
 
         }

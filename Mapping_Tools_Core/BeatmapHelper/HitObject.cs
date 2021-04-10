@@ -36,7 +36,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// By default a new combo adds one to the colour index.
         /// This value adds additional increments to the colour index each new combo.
         /// </summary>
-        public int ComboSkip { get; set; }
+        public virtual int ComboSkip { get; set; }
 
         /// <summary>
         /// The hitsounds of this hit object.
