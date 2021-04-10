@@ -22,7 +22,9 @@ namespace Mapping_Tools_Core.BeatmapHelper.Objects {
         [NotNull]
         public List<HitSampleInfo> EdgeHitsounds { get; set; }
 
-        public double Duration => SpanDuration * ((IHasRepeats) this).SpanCount;
+        public int SpanCount => RepeatCount + 1;
+
+        public double Duration => SpanDuration * SpanCount;
 
         public double SpanDuration => GetSpanDuration();
 
@@ -155,7 +157,7 @@ namespace Mapping_Tools_Core.BeatmapHelper.Objects {
         /// </summary>
         /// <param name="endTime">The new end time in milliseconds.</param>
         public void SetEndTimeByPixelLength(double endTime) {
-            SetSpanDurationByPixelLength((endTime - StartTime) / ((IHasRepeats)this).SpanCount);
+            SetSpanDurationByPixelLength((endTime - StartTime) / SpanCount);
         }
 
         /// <summary>
@@ -163,7 +165,7 @@ namespace Mapping_Tools_Core.BeatmapHelper.Objects {
         /// </summary>
         /// <param name="endTime">The new end time in milliseconds.</param>
         public void SetEndTimeBySliderVelocity (double endTime) {
-            SetSpanDurationBySliderVelocity((endTime - StartTime) / ((IHasRepeats)this).SpanCount);
+            SetSpanDurationBySliderVelocity((endTime - StartTime) / SpanCount);
         }
 
         /// <summary>
