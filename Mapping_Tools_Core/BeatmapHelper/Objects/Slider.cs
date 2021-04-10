@@ -24,11 +24,17 @@ namespace Mapping_Tools_Core.BeatmapHelper.Objects {
 
         public int SpanCount => RepeatCount + 1;
 
-        public double Duration => SpanDuration * SpanCount;
+        public double Duration {
+            get => SpanDuration * SpanCount;
+            set => SetSpanDurationByPixelLength(value / SpanCount);
+        }
 
         public double SpanDuration => GetSpanDuration();
 
-        public double EndTime => GetEndTime();
+        public double EndTime {
+            get => GetEndTime();
+            set => Duration = value - StartTime;
+        }
 
         /// <summary>
         /// Cache for end position.

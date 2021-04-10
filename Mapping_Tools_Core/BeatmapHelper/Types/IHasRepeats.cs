@@ -3,7 +3,7 @@
         /// <summary>
         /// The amount of times the object repeats.
         /// </summary>
-        int RepeatCount { get; }
+        int RepeatCount { get; set; }
 
         /// <summary>
         /// The amount of times the length of the object spans.
