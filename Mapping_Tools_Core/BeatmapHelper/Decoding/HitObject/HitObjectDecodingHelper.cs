@@ -24,14 +24,17 @@ namespace Mapping_Tools_Core.BeatmapHelper.Decoding.HitObject {
                 hitObject.ComboSkip = MathHelper.GetIntFromBitArray(new BitArray(new[] { b[4], b[5], b[6] }));
             } else throw new BeatmapParsingException("Failed to parse type of hit object.", string.Join(',', values));
 
-            if (InputParsers.TryParseInt(values[4], out var hitsounds)) {
-                var b = new BitArray(new[] { hitsounds });
-                hitObject.Hitsounds.Normal = b[0];
-                hitObject.Hitsounds.Whistle = b[1];
-                hitObject.Hitsounds.Finish = b[2];
-                hitObject.Hitsounds.Clap = b[3];
-            }
+            if (InputParsers.TryParseInt(values[4], out var hitsounds))
+                DecodeHitsounds(hitObject.Hitsounds, hitsounds);
             else throw new BeatmapParsingException("Failed to parse hitsound of hit object.", JoinLine(values));
+        }
+
+        public static void DecodeHitsounds(HitSampleInfo hitSampleInfo, int hitsounds) {
+            var b = new BitArray(new[] { hitsounds });
+            hitSampleInfo.Normal = b[0];
+            hitSampleInfo.Whistle = b[1];
+            hitSampleInfo.Finish = b[2];
+            hitSampleInfo.Clap = b[3];
         }
 
         public static void DecodeExtras(BeatmapHelper.HitObject hitObject, string extras) {
