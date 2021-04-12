@@ -32,7 +32,7 @@ namespace Mapping_Tools_Core.BeatmapHelper.Encoding.HitObject {
                 Slider slider => sliderEncoder.Encode(slider),
                 Spinner spinner => spinnerEncoder.Encode(spinner),
                 HoldNote holdNote => holdNoteEncoder.Encode(holdNote),
-                _ => throw new ArgumentException("Unrecognized hit object type.", nameof(obj))
+                _ => throw new ArgumentOutOfRangeException(nameof(obj))
             };
         }
     }

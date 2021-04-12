@@ -38,7 +38,7 @@ namespace Mapping_Tools_Core.BeatmapHelper.Decoding.HitObject {
                     holdNoteDecoder.Decode(holdNote, code);
                     break;
                 default:
-                    throw new ArgumentException("Unrecognized hit object type.", nameof(obj));
+                    throw new ArgumentOutOfRangeException(nameof(obj));
             }
         }
 

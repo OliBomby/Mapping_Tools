@@ -37,13 +37,13 @@ namespace Mapping_Tools_Core.BeatmapHelper.Encoding.HitObject.Objects {
             return builder.ToString();
         }
 
-        private string GetPathTypeString(PathType sliderType) {
+        private static string GetPathTypeString(PathType sliderType) {
             return sliderType switch {
                 PathType.Linear => "L",
                 PathType.PerfectCurve => "P",
                 PathType.Catmull => "C",
                 PathType.Bezier => "B",
-                _ => throw new ArgumentOutOfRangeException()
+                _ => throw new ArgumentOutOfRangeException(nameof(sliderType))
             };
         }
     }
