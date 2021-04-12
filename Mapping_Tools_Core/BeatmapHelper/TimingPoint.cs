@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using Mapping_Tools_Core.BeatmapHelper.BeatDivisors;
+﻿using Mapping_Tools_Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.MathUtil;
-using Newtonsoft.Json;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Mapping_Tools_Core.BeatmapHelper {
-    public class TimingPoint : ITextLine, IComparable<TimingPoint> {
+    public class TimingPoint : IComparable<TimingPoint> {
         // Offset, Milliseconds per Beat, Meter, Sample Set, Sample Index, Volume, Inherited, Kiai Mode
         /// <summary>
         /// The millisecond value of the timing point.
@@ -62,12 +61,6 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         public bool OmitFirstBarLine { get; set; }
 
         /// <summary>
-        /// When true, all coordinates and times will be serialized without rounding.
-        /// </summary>
-        [JsonIgnore]
-        public bool SaveWithFloatPrecision { get; set; }
-
-        /// <summary>
         /// Creates a new <see cref="TimingPoint"/>
         /// </summary>
         /// <param name="offset">The offset from the start of the audio in milliseconds</param>
@@ -116,14 +109,6 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             OmitFirstBarLine = omitFirstBarLine;
         }
 
-        /// <summary>
-        /// Creates a new Timing Point from the string line of the .osu file.
-        /// </summary>
-        /// <param name="line"></param>
-        public TimingPoint(string line) {
-            SetLine(line);
-        }
-
         public TimingPoint()
         {
             MpB = 60000;
@@ -142,51 +127,9 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// Generates the line from the selected <see cref="TimingPoint"/>
         /// </summary>
         /// <returns></returns>
-        public string GetLine() {
+        public override string ToString() {
             int style = MathHelper.GetIntFromBitArray(new BitArray(new[] { Kiai, false, false, OmitFirstBarLine }));
-            return $"{(SaveWithFloatPrecision ? Offset.ToInvariant() : Offset.ToRoundInvariant())},{MpB.ToInvariant()},{Meter.TempoNumerator.ToInvariant()},{SampleSet.ToIntInvariant()},{SampleIndex.ToInvariant()},{(SaveWithFloatPrecision ? Volume.ToInvariant() : Volume.ToRoundInvariant())},{Convert.ToInt32(Uninherited).ToInvariant()},{style.ToInvariant()}";
-        }
-
-        /// <summary>
-        /// Sets a <see cref="TimingPoint"/> from the line of the beatmap file.
-        /// </summary>
-        /// <param name="line"></param>
-        /// <exception cref="BeatmapParsingException">If the beatmap can not be read correctly.</exception>
-        public void SetLine(string line) {
-            string[] values = line.Split(',');
-
-            if (InputParsers.TryParseDouble(values[0], out double offset))
-                Offset = offset;
-            else throw new BeatmapParsingException("Failed to parse offset of timing point", line);
-
-            if (InputParsers.TryParseDouble(values[1], out double mpb))
-                MpB = mpb;
-            else throw new BeatmapParsingException("Failed to parse milliseconds per beat of timing point", line);
-
-            if (InputParsers.TryParseInt(values[2], out int meter))
-                Meter = new TempoSignature(meter);
-            else throw new BeatmapParsingException("Failed to parse meter of timing point", line);
-
-            if (Enum.TryParse(values[3], out SampleSet ss))
-                SampleSet = ss;
-            else throw new BeatmapParsingException("Failed to parse sampleset of timing point", line);
-
-            if (InputParsers.TryParseInt(values[4], out int ind))
-                SampleIndex = ind;
-            else throw new BeatmapParsingException("Failed to parse sample index of timing point", line);
-
-            if (InputParsers.TryParseDouble(values[5], out double vol))
-                Volume = vol;
-            else throw new BeatmapParsingException("Failed to parse volume of timing point", line);
-
-            Uninherited = values[6] == "1";
-
-            if (values.Length <= 7) return;
-            if (InputParsers.TryParseInt(values[7], out int style)) {
-                BitArray b = new BitArray(new int[] { style });
-                Kiai = b[0];
-                OmitFirstBarLine = b[3];
-            } else throw new BeatmapParsingException("Failed to style of timing point", line);
+            return $"{Offset.ToInvariant()},{MpB.ToInvariant()},{Meter.TempoNumerator.ToInvariant()},{SampleSet.ToIntInvariant()},{SampleIndex.ToInvariant()},{Volume.ToInvariant()},{Convert.ToInt32(Uninherited).ToInvariant()},{style.ToInvariant()}";
         }
 
         /// <summary>

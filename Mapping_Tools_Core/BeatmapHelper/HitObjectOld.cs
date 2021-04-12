@@ -13,7 +13,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
     /// <summary>
     /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
-    public class HitObjectOld : ITextLine, IComparable<HitObjectOld> {
+    public class HitObjectOld : IComparable<HitObjectOld> {
 
         public HitObjectOld() { }
 
