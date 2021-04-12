@@ -7,12 +7,14 @@ namespace Mapping_Tools_Core.BeatmapHelper.Decoding {
     public class OsuBeatmapDecoder : IDecoder<Beatmap> {
         private readonly IDecoder<Storyboard> storyboardDecoder;
         private readonly IDecoder<BeatmapHelper.HitObject> hitObjectDecoder;
+        private readonly IDecoder<TimingPoint> timingPointDecoder;
 
-        public OsuBeatmapDecoder() : this(new OsuStoryboardDecoder(), new HitObjectDecoder()) { }
+        public OsuBeatmapDecoder() : this(new OsuStoryboardDecoder(), new HitObjectDecoder(), new TimingPointDecoder()) { }
 
-        public OsuBeatmapDecoder(IDecoder<Storyboard> storyboardDecoder, IDecoder<BeatmapHelper.HitObject> hitObjectDecoder) {
+        public OsuBeatmapDecoder(IDecoder<Storyboard> storyboardDecoder, IDecoder<BeatmapHelper.HitObject> hitObjectDecoder, IDecoder<TimingPoint> timingPointDecoder) {
             this.storyboardDecoder = storyboardDecoder;
             this.hitObjectDecoder = hitObjectDecoder;
+            this.timingPointDecoder = timingPointDecoder;
         }
 
         public void Decode(Beatmap beatmap, string code) {
@@ -53,7 +55,11 @@ namespace Mapping_Tools_Core.BeatmapHelper.Decoding {
             storyboardDecoder.Decode(beatmap.StoryBoard, code);
 
             // Set the timing object
-            beatmap.BeatmapTiming = new Timing(timingLines, beatmap.Difficulty["SliderMultiplier"].DoubleValue);
+            beatmap.BeatmapTiming = new Timing(beatmap.Difficulty["SliderMultiplier"].DoubleValue);
+
+            foreach (var timingLine in timingLines) {
+                beatmap.BeatmapTiming.Add(timingPointDecoder.DecodeNew(timingLine));
+            }
 
             beatmap.SortHitObjects();
             beatmap.CalculateHitObjectComboStuff();

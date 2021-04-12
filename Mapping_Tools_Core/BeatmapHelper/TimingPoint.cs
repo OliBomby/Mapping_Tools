@@ -135,7 +135,6 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             Uninherited = false;
             Kiai = false;
             OmitFirstBarLine = false;
-
         }
 
 

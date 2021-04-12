@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
-
-namespace Mapping_Tools_Core.BeatmapHelper.Encoding {
+﻿namespace Mapping_Tools_Core.BeatmapHelper.Encoding {
     public interface IEncoder<in T> {
         /// <summary>
-        /// Serializes an object to lines of text.
+        /// Serializes an object to a code string.
         /// </summary>
-        /// <param name="obj">The object to serialize</param>
-        /// <returns>The lines of serialized text</returns>
-        IEnumerable<string> Encode(T obj);
+        /// <param name="obj">The object to encode</param>
+        /// <returns>The code</returns>
+        string Encode(T obj);
     }
 }

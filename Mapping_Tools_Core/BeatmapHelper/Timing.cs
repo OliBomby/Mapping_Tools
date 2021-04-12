@@ -41,11 +41,6 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             GlobalSliderMultiplier = globalSliderMultiplier;
         }
 
-        public Timing(IEnumerable<string> timingLines, double globalSliderMultiplier) {
-            SetTimingPoints(GetTimingPoints(timingLines).ToList());
-            GlobalSliderMultiplier = globalSliderMultiplier;
-        }
-
         /// <summary>
         /// Replaces all the timingpoints and sorts again.
         /// </summary>
@@ -792,10 +787,6 @@ namespace Mapping_Tools_Core.BeatmapHelper {
 
         public double CalculateSliderBeatLength(double length, double sv) {
             return SvHelper.CalculateSliderBeatLength(length, sv, GlobalSliderMultiplier);
-        }
-
-        private static IEnumerable<TimingPoint> GetTimingPoints(IEnumerable<string> timingLines) {
-            return timingLines.Select(line => new TimingPoint(line));
         }
 
         public TimingPoint GetFirstTimingPointExtended() {

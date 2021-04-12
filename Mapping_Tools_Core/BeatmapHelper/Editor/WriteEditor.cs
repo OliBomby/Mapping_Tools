@@ -27,7 +27,6 @@ namespace Mapping_Tools_Core.BeatmapHelper.Editor {
         /// Optionally loads the instance from the path aswell.
         /// </summary>
         /// <param name="encoder">The encoder for the file type</param>
-        /// <param name="decoder">The decoder for the file type</param>
         /// <param name="path">The path of the physical file</param>
         public WriteEditor(IEncoder<T> encoder, string path) : this(encoder) {
             Path = path;
