@@ -13,6 +13,9 @@
         /// <summary>
         /// The duration of one span.
         /// </summary>
-        double SpanDuration => Duration / SpanCount;
+        double SpanDuration {
+            get => Duration / SpanCount;
+            set => Duration = value * SpanCount;
+        }
     }
 }
