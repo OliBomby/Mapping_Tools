@@ -1,8 +1,7 @@
-﻿using System;
+﻿using Mapping_Tools_Core.BeatmapHelper.Encoding.HitObject;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Mapping_Tools_Core.BeatmapHelper.Encoding.HitObject;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Encoding {
     public class OsuBeatmapEncoder : IEnumeratingEncoder<IBeatmap> {
