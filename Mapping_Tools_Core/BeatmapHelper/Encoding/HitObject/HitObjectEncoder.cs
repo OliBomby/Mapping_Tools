@@ -1,16 +1,39 @@
-﻿namespace Mapping_Tools_Core.BeatmapHelper.Encoding.HitObject {
-    public class HitObjectEncoder : IEncoder<BeatmapHelper.HitObject> {
-        /// <summary>
-        /// When true, all coordinates and times will be serialized without rounding.
-        /// </summary>
-        public readonly bool EncodeWithFloatPrecision;
+﻿using System;
+using Mapping_Tools_Core.BeatmapHelper.Encoding.HitObject.Objects;
+using Mapping_Tools_Core.BeatmapHelper.Objects;
 
-        public HitObjectEncoder(bool encodeWithFloatPrecision = false) {
-            EncodeWithFloatPrecision = encodeWithFloatPrecision;
+namespace Mapping_Tools_Core.BeatmapHelper.Encoding.HitObject {
+    public class HitObjectEncoder : IEncoder<BeatmapHelper.HitObject> {
+        private readonly IEncoder<HitCircle> hitCircleEncoder;
+        private readonly IEncoder<Slider> sliderEncoder;
+        private readonly IEncoder<Spinner> spinnerEncoder;
+        private readonly IEncoder<HoldNote> holdNoteEncoder;
+
+        public HitObjectEncoder(bool encodeWithFloatPrecision = false) : this(
+            new HitCircleEncoder(encodeWithFloatPrecision), 
+            new SliderEncoder(encodeWithFloatPrecision), 
+            new SpinnerEncoder(encodeWithFloatPrecision), 
+            new HoldNoteEncoder(encodeWithFloatPrecision)) { }
+
+        public HitObjectEncoder(
+            IEncoder<HitCircle> hitCircleEncoder, 
+            IEncoder<Slider> sliderEncoder,
+            IEncoder<Spinner> spinnerEncoder, 
+            IEncoder<HoldNote> holdNoteEncoder) {
+            this.hitCircleEncoder = hitCircleEncoder;
+            this.sliderEncoder = sliderEncoder;
+            this.spinnerEncoder = spinnerEncoder;
+            this.holdNoteEncoder = holdNoteEncoder;
         }
 
         public string Encode(BeatmapHelper.HitObject obj) {
-            throw new System.NotImplementedException();
+            return obj switch {
+                HitCircle hitCircle => hitCircleEncoder.Encode(hitCircle),
+                Slider slider => sliderEncoder.Encode(slider),
+                Spinner spinner => spinnerEncoder.Encode(spinner),
+                HoldNote holdNote => holdNoteEncoder.Encode(holdNote),
+                _ => throw new ArgumentException("Unrecognized hit object type.", nameof(obj))
+            };
         }
     }
 }
