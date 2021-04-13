@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using Mapping_Tools_Core.BeatmapHelper.Decoding;
+﻿using Mapping_Tools_Core.BeatmapHelper.Decoding;
 using Mapping_Tools_Core.BeatmapHelper.Encoding;
+using System.IO;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Editor {
     /// <summary>
@@ -51,12 +50,12 @@ namespace Mapping_Tools_Core.BeatmapHelper.Editor {
         /// <summary>
         /// Saves given lines to <see cref="Path"/>.
         /// </summary>
-        protected virtual void SaveFile(IEnumerable<string> lines) {
+        protected virtual void SaveFile(string lines) {
             if (!File.Exists(Path)) {
                 File.Create(Path).Dispose();
             }
 
-            File.WriteAllLines(Path, lines);
+            File.WriteAllText(Path, lines);
         }
 
         public string GetParentFolder() {

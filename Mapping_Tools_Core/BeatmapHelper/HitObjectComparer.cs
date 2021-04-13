@@ -1,8 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Mapping_Tools_Core.BeatmapHelper.Encoding.HitObject;
+using Mapping_Tools_Core.BeatmapHelper.Objects;
 
 namespace Mapping_Tools_Core.BeatmapHelper {
     public class HitObjectComparer : IEqualityComparer<HitObject> {
+        private readonly HitObjectEncoder hitObjectEncoder = new HitObjectEncoder();
+
         public bool CheckIsSelected { get; set; }
         public bool CheckPosition { get; set; }
         public bool CheckTime { get; set; }
@@ -24,39 +28,28 @@ namespace Mapping_Tools_Core.BeatmapHelper {
                 return false;
             if (CheckTime && x.StartTime != y.StartTime)
                 return false;
-            if (!(x.Hitsounds == y.Hitsounds &&
-                  x.Filename == y.Filename &&
-                  x.SampleVolume == y.SampleVolume &&
-                  x.CustomIndex == y.CustomIndex &&
-                  x.AdditionSet == y.AdditionSet &&
-                  x.SampleSet == y.SampleSet &&
+            if (!(x.Hitsounds.Equals(y.Hitsounds) &&
                   x.NewCombo == y.NewCombo &&
                   x.ComboSkip == y.ComboSkip))
                 return false;
-            if (x.IsCircle && y.IsCircle) {
-                return true;
-            }
-            if (x.IsSlider && y.IsSlider) {
-                return x.SliderType == y.SliderType &&
-                       (!CheckPosition || x.CurvePoints.SequenceEqual(y.CurvePoints)) &&
-                    x.Repeat == y.Repeat &&
-                    x.PixelLength == y.PixelLength &&
-                    x.EdgeHitsounds.SequenceEqual(y.EdgeHitsounds) &&
-                    x.EdgeSampleSets.SequenceEqual(y.EdgeSampleSets) &&
-                    x.EdgeAdditionSets.SequenceEqual(y.EdgeAdditionSets);
-            }
-            if (x.IsSpinner && y.IsSpinner) {
-                return x.EndTime == y.EndTime;
-            }
-            if (x.IsHoldNote && y.IsHoldNote) {
-                return x.EndTime == y.EndTime;
-            }
+            return x switch {
+                HitCircle _ when y is HitCircle => true,
+                Slider sliderX when y is Slider sliderY => sliderX.SliderType == sliderY.SliderType &&
+                                                           (!CheckPosition ||
+                                                            sliderX.CurvePoints.SequenceEqual(sliderY.CurvePoints)) &&
+                                                           sliderX.RepeatCount == sliderY.RepeatCount &&
+                                                           sliderX.PixelLength == sliderY.PixelLength &&
+                                                           sliderX.EdgeHitsounds.SequenceEqual(sliderY.EdgeHitsounds),
+                Spinner spinnerX when y is Spinner spinnerY => spinnerX.EndTime == spinnerY.EndTime,
+                HoldNote holdNoteX when y is HoldNote holdNoteY => holdNoteX.EndTime == holdNoteY.EndTime,
+                _ => false
+            };
 
-            return false;
+            // Types dont match
         }
 
         public int GetHashCode(HitObject obj) {
-            return EqualityComparer<string>.Default.GetHashCode(obj.GetLine());
+            return EqualityComparer<string>.Default.GetHashCode(hitObjectEncoder.Encode(obj));
         }
     }
 }

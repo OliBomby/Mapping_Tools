@@ -1,9 +1,7 @@
-﻿using Mapping_Tools_Core.BeatmapHelper.BeatDivisors;
-using Mapping_Tools_Core.BeatmapHelper.Enums;
+﻿using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.MathUtil;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 
 namespace Mapping_Tools_Core.BeatmapHelper {
     public class TimingPoint : IComparable<TimingPoint> {
@@ -138,22 +136,6 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// <returns>An exact replica of the <see cref="TimingPoint"/></returns>
         public TimingPoint Copy() {
             return new TimingPoint(Offset, MpB, Meter, SampleSet, SampleIndex, Volume, Uninherited, Kiai, OmitFirstBarLine);
-        }
-
-        /// <summary>
-        /// Can clarify if the current timing point should snap to the nearest beat of the previous timing point.
-        /// </summary>
-        /// <param name="timing"></param>
-        /// <param name="beatDivisors"></param>
-        /// <param name="floor"></param>
-        /// <param name="tp"></param>
-        /// <param name="firstTP"></param>
-        /// <returns></returns>
-        public bool ResnapSelf(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor=true, TimingPoint tp=null, TimingPoint firstTP = null) {
-            double newTime = timing.Resnap(Offset, beatDivisors, floor, tp: tp, firstTp: firstTP);
-            double deltaTime = newTime - Offset;
-            Offset += deltaTime;
-            return deltaTime != 0;
         }
 
         public bool Equals(TimingPoint tp) {

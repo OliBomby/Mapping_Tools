@@ -274,5 +274,26 @@ namespace Mapping_Tools_Core.ToolHelpers {
         }
 
         #endregion
+
+        #region TimingPoints
+
+        /// <summary>
+        /// Can clarify if the current timing point should snap to the nearest beat of the previous timing point.
+        /// </summary>
+        /// <param name="thisTimingPoint">The timing point to resnap.</param>
+        /// <param name="timing"></param>
+        /// <param name="beatDivisors"></param>
+        /// <param name="floor"></param>
+        /// <param name="tp"></param>
+        /// <param name="firstTP"></param>
+        /// <returns></returns>
+        public static bool ResnapSelf(this TimingPoint thisTimingPoint, Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint tp = null, TimingPoint firstTP = null) {
+            double newTime = timing.Resnap(thisTimingPoint.Offset, beatDivisors, floor, tp: tp, firstTp: firstTP);
+            double deltaTime = newTime - thisTimingPoint.Offset;
+            thisTimingPoint.Offset += deltaTime;
+            return deltaTime != 0;
+        }
+
+        #endregion
     }
 }

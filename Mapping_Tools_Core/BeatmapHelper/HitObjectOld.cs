@@ -7,6 +7,7 @@ using Mapping_Tools_Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools_Core.MathUtil;
+using Mapping_Tools_Core.ToolHelpers;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools_Core.BeatmapHelper {
@@ -814,8 +815,8 @@ namespace Mapping_Tools_Core.BeatmapHelper {
                    CurvePoints.All(o => o == Pos);
         }
 
-        public HitObject DeepCopy() {
-            var newHitObject = (HitObject)MemberwiseClone();
+        public HitObjectOld DeepCopy() {
+            var newHitObject = (HitObjectOld)MemberwiseClone();
             newHitObject.BodyHitsounds = BodyHitsounds?.Select(o => o.Copy()).ToList();
             newHitObject.TimelineObjects = TimelineObjects?.Select(o => o.Copy()).ToList();
             newHitObject.CurvePoints = CurvePoints?.Copy();
