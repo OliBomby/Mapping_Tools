@@ -15,7 +15,7 @@ namespace Mapping_Tools_Core.BeatmapHelper.Decoding.HitObject.Objects {
                 throw new BeatmapParsingException("Spinner object is missing values.", code);
 
             if (InputParsers.TryParseDouble(values[5], out var et))
-                obj.EndTime = et;
+                obj.SetEndTime(et);
             else throw new BeatmapParsingException("Failed to parse end time of spinner.", code);
 
             // Extras on 6
