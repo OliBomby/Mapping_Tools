@@ -10,7 +10,7 @@ using Mapping_Tools_Core.BeatmapHelper.Contexts;
 using Mapping_Tools_Core.BeatmapHelper.SliderPathStuff;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Objects {
-    public class Slider : HitObject, IHasRepeats {
+    public class Slider : HitObject, IRepeats {
         public PathType SliderType { get; set; }
 
         [NotNull]
@@ -24,17 +24,13 @@ namespace Mapping_Tools_Core.BeatmapHelper.Objects {
 
         public int SpanCount => RepeatCount + 1;
 
-        public double Duration {
-            get => SpanDuration * SpanCount;
-            set => SetSpanDurationByPixelLength(value / SpanCount);
-        }
+        public override double EndTime => GetEndTime();
+
+        public override double Duration => SpanDuration * SpanCount;
+
+        public override Vector2 EndPos => GetEndPosition();
 
         public double SpanDuration => GetSpanDuration();
-
-        public double EndTime {
-            get => GetEndTime();
-            set => Duration = value - StartTime;
-        }
 
         /// <summary>
         /// Cache for end position.
@@ -44,6 +40,26 @@ namespace Mapping_Tools_Core.BeatmapHelper.Objects {
         public Slider() {
             CurvePoints = new List<Vector2>();
             EdgeHitsounds = new List<HitSampleInfo>();
+        }
+
+        public void SetDuration(double duration) {
+            SetSpanDurationByPixelLength(duration / SpanCount);
+        }
+
+        public void SetEndTime(double endTime) {
+            SetDuration(endTime - StartTime);
+        }
+
+        public void SetRepeatCount(int repeatCount) {
+            RepeatCount = repeatCount;
+        }
+
+        public void SetSpanCount(int spanCount) {
+            RepeatCount = spanCount - 1;
+        }
+
+        public void SetSpanDuration(double spanDuration) {
+            SetSpanDurationByPixelLength(spanDuration);
         }
 
         /// <summary>

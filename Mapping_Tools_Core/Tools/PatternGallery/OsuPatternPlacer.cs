@@ -123,7 +123,7 @@ namespace Mapping_Tools_Core.Tools.PatternGallery {
                 beatmap.FixComboSkip();
             }
 
-            beatmap.GiveObjectsGreenlines();
+            beatmap.GiveObjectsTimingContext();
             beatmap.CalculateSliderEndTimes();
         }
 
@@ -675,7 +675,7 @@ namespace Mapping_Tools_Core.Tools.PatternGallery {
             patternTiming.Clear();
             TimingPointsChange.ApplyChanges(patternTiming, timingPointsChanges);
 
-            patternBeatmap.GiveObjectsGreenlines();
+            patternBeatmap.GiveObjectsTimingContext();
             patternBeatmap.CalculateSliderEndTimes();
         }
     }

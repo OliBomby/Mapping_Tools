@@ -2,9 +2,10 @@
 using Mapping_Tools_Core.BeatmapHelper.Types;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Events {
-    public class Break : Event, IHasStartTime, IHasEndTime {
+    public class Break : Event, IHasStartTime, IHasDuration {
         public string EventType { get; set; }
         public double StartTime { get; set; }
+        public double Duration => EndTime - StartTime;
         public double EndTime { get; set; }
 
         public Break() { }

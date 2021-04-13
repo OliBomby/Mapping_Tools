@@ -229,27 +229,27 @@ namespace Mapping_Tools_Core.ToolHelpers {
 
         }
 
-        public static bool ResnapEndTime(this IHasDuration obj, Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint tp = null,
+        public static bool ResnapEndTime(this IDuration obj, Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint tp = null,
             TimingPoint firstTp = null) {
             var newTime = timing.Resnap(obj.EndTime, beatDivisors, floor, tp: tp, firstTp: firstTp);
 
             var deltaTime = newTime - obj.EndTime;
-            obj.EndTime = newTime;
+            obj.SetEndTime(newTime);
 
             return Math.Abs(deltaTime) > Precision.DOUBLE_EPSILON;
         }
 
-        public static bool ResnapDuration(this IHasDuration obj, double time, Timing timing, IEnumerable<IBeatDivisor> beatDivisors, TimingPoint firstTp = null) {
+        public static bool ResnapDuration(this IDuration obj, double time, Timing timing, IEnumerable<IBeatDivisor> beatDivisors, TimingPoint firstTp = null) {
             double deltaTime;
-            if (obj is IHasRepeats repeating) {
+            if (obj is IRepeats repeating) {
                 var newDuration = timing.ResnapDuration(time, repeating.SpanDuration, beatDivisors, false, firstTp: firstTp);
                 deltaTime = newDuration - repeating.SpanDuration;
-                repeating.SpanDuration = newDuration;
+                repeating.SetSpanDuration(newDuration);
             }
             else {
                 var newDuration = timing.ResnapDuration(time, obj.Duration, beatDivisors, false, firstTp: firstTp);
                 deltaTime = newDuration - obj.Duration;
-                obj.Duration = newDuration;
+                obj.SetDuration(newDuration);
             }
 
             return Math.Abs(deltaTime) > Precision.DOUBLE_EPSILON;

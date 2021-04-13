@@ -4,8 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
+using Mapping_Tools_Core.BeatmapHelper.Contexts;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.BeatmapHelper.Events;
+using Mapping_Tools_Core.BeatmapHelper.Objects;
 using Mapping_Tools_Core.BeatmapHelper.Types;
 using Mapping_Tools_Core.MathUtil;
 
@@ -102,8 +104,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             General["Mode"] = new TValue(((int) gameMode).ToInvariant());
 
             SortHitObjects();
-            CalculateSliderEndTimes();
-            GiveObjectsGreenlines();
+            GiveObjectsTimingContext();
             CalculateHitObjectComboStuff();
         }
 
@@ -145,20 +146,14 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         }
 
         /// <summary>
-        /// Calculates the temporal length for all <see cref="HitObject"/> sliders and stores it to their internal property.
-        /// </summary>
-        public void CalculateSliderEndTimes() {
-            foreach (var ho in HitObjects.Where(ho => ho.IsSlider)) {
-                ho.CalculateSliderTemporalLength(BeatmapTiming, false);
-            }
-        }
-
-        /// <summary>
         /// Calculates the end position for all hit objects.
+        /// WARNING: Slow!
         /// </summary>
         public void CalculateEndPositions() {
             foreach (var ho in HitObjects) {
-                ho.CalculateEndPosition();
+                if (ho is Slider slider) {
+                    slider.RecalculateEndPosition();
+                }
             }
         }
 
@@ -189,8 +184,15 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             float stackThresold = (float) (preEmpt * stackLeniency);
 
             // Reset stacking inside the update range
-            for (int i = startIndex; i <= endIndex; i++)
-                HitObjects[i].StackCount = 0;
+            // Make sure stacking context exists for all objects
+            for (int i = 0; i < HitObjects.Count; i++) {
+                if (i >= startIndex && i <= endIndex || !HitObjects[i].HasContext<StackingContext>()) {
+                    HitObjects[i].SetContext(new StackingContext(stackVector));
+                }
+                else {
+                    HitObjects[i].GetContext<StackingContext>().StackVector = stackVector;
+                }
+            }
 
             // Extend the end index to include objects they are stacked on
             int extendedEndIndex = endIndex;
@@ -198,21 +200,21 @@ namespace Mapping_Tools_Core.BeatmapHelper {
                 int stackBaseIndex = i;
                 for (int n = stackBaseIndex + 1; n < HitObjects.Count; n++) {
                     HitObject stackBaseObject = HitObjects[stackBaseIndex];
-                    if (stackBaseObject.IsSpinner) break;
+                    if (stackBaseObject is Spinner) break;
 
                     HitObject objectN = HitObjects[n];
-                    if (objectN.IsSpinner) continue;
+                    if (objectN is Spinner) continue;
 
                     if (objectN.StartTime - stackBaseObject.EndTime > stackThresold)
                         //We are no longer within stacking range of the next object.
                         break;
 
                     if (Vector2.Distance(stackBaseObject.Pos, objectN.Pos) < STACK_LENIENCE ||
-                        (stackBaseObject.IsSlider && Vector2.Distance(stackBaseObject.EndPos, objectN.Pos) < STACK_LENIENCE)) {
+                        (stackBaseObject is Slider && Vector2.Distance(stackBaseObject.EndPos, objectN.Pos) < STACK_LENIENCE)) {
                         stackBaseIndex = n;
 
                         // HitObjects after the specified update range haven't been reset yet
-                        objectN.StackCount = 0;
+                        objectN.GetContext<StackingContext>().StackCount = 0;
                     }
                 }
 
@@ -239,18 +241,20 @@ namespace Mapping_Tools_Core.BeatmapHelper {
                     */
 
                 HitObject objectI = HitObjects[i];
+                StackingContext stackingI = objectI.GetContext<StackingContext>();
 
-                if (objectI.StackCount != 0 || objectI.IsSpinner) continue;
+                if (stackingI.StackCount != 0 || objectI is Spinner) continue;
 
                 /* If this object is a hitcircle, then we enter this "special" case.
                     * It either ends with a stack of hitcircles only, or a stack of hitcircles that are underneath a slider.
                     * Any other case is handled by the "is Slider" code below this.
                     */
-                if (objectI.IsCircle) {
+                if (objectI is HitCircle) {
                     while (--n >= 0) {
                         HitObject objectN = HitObjects[n];
+                        StackingContext stackingN = objectN.GetContext<StackingContext>();
 
-                        if (objectN.IsSpinner) continue;
+                        if (objectN is Spinner) continue;
 
                         if (objectI.StartTime - objectN.EndTime > stackThresold)
                             //We are no longer within stacking range of the previous object.
@@ -258,7 +262,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
 
                         // HitObjects before the specified update range haven't been reset yet
                         if (n < extendedStartIndex) {
-                            objectN.StackCount = 0;
+                            objectN.GetContext<StackingContext>().StackCount = 0;
                             extendedStartIndex = n;
                         }
 
@@ -267,12 +271,12 @@ namespace Mapping_Tools_Core.BeatmapHelper {
                             *        o <- hitCircle has stack of -1
                             *         o <- hitCircle has stack of -2
                             */
-                        if (objectN.IsSlider && Vector2.Distance(objectN.EndPos, objectI.Pos) < STACK_LENIENCE) {
-                            int offset = objectI.StackCount - objectN.StackCount + 1;
+                        if (objectN is Slider && Vector2.Distance(objectN.EndPos, objectI.Pos) < STACK_LENIENCE) {
+                            int offset = stackingI.StackCount - stackingN.StackCount + 1;
                             for (int j = n + 1; j <= i; j++) {
                                 //For each object which was declared under this slider, we will offset it to appear *below* the slider end (rather than above).
                                 if (Vector2.Distance(objectN.EndPos, HitObjects[j].Pos) < STACK_LENIENCE)
-                                    HitObjects[j].StackCount -= offset;
+                                    HitObjects[j].GetContext<StackingContext>().StackCount -= offset;
                             }
 
                             //We have hit a slider.  We should restart calculation using this as the new base.
@@ -284,35 +288,30 @@ namespace Mapping_Tools_Core.BeatmapHelper {
                             //Keep processing as if there are no sliders.  If we come across a slider, this gets cancelled out.
                             //NOTE: Sliders with start positions stacking are a special case that is also handled here.
 
-                            objectN.StackCount = objectI.StackCount + 1;
+                            stackingN.StackCount = stackingI.StackCount + 1;
                             objectI = objectN;
                         }
                     }
-                } else if (objectI.IsSlider) {
+                } else if (objectI is Slider) {
                     /* We have hit the first slider in a possible stack.
                         * From this point on, we ALWAYS stack positive regardless.
                         */
                     while (--n >= startIndex) {
                         HitObject objectN = HitObjects[n];
+                        StackingContext stackingN = objectN.GetContext<StackingContext>();
 
-                        if (objectN.IsSpinner) continue;
+                        if (objectN is Spinner) continue;
 
                         if (objectI.StartTime - objectN.StartTime > stackThresold)
                             //We are no longer within stacking range of the previous object.
                             break;
 
                         if (Vector2.Distance(objectN.EndPos, objectI.Pos) < STACK_LENIENCE) {
-                            objectN.StackCount = objectI.StackCount + 1;
+                            stackingN.StackCount = stackingI.StackCount + 1;
                             objectI = objectN;
                         }
                     }
                 }
-            }
-
-            for (int i = startIndex; i <= endIndex; i++) {
-                HitObject currHitObject = HitObjects[i];
-                currHitObject.StackedPos = currHitObject.Pos - currHitObject.StackCount * stackVector;
-                currHitObject.StackedEndPos = currHitObject.EndPos - currHitObject.StackCount * stackVector;
             }
         }
 
@@ -330,10 +329,10 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             var actingComboColours = ComboColoursList.Count == 0 ? ComboColour.GetDefaultComboColours() : ComboColoursList.ToArray();
 
             foreach (var hitObject in HitObjects) {
-                hitObject.ActualNewCombo = IsNewCombo(hitObject, previousHitObject);
+                var actualNewCombo = IsNewCombo(hitObject, previousHitObject);
 
-                if (hitObject.ActualNewCombo) {
-                    var colourIncrement = hitObject.IsSpinner ? hitObject.ComboSkip : hitObject.ComboSkip + 1;
+                if (actualNewCombo) {
+                    var colourIncrement = hitObject.ComboIncrement + hitObject.ComboSkip;
 
                     colourIndex = MathHelper.Mod(colourIndex + colourIncrement, actingComboColours.Length);
                     comboIndex = 1;
@@ -341,9 +340,8 @@ namespace Mapping_Tools_Core.BeatmapHelper {
                     comboIndex++;
                 }
 
-                hitObject.ComboIndex = comboIndex;
-                hitObject.ColourIndex = colourIndex;
-                hitObject.Colour = actingComboColours[colourIndex];
+                // Add the combo context
+                hitObject.SetContext(new ComboContext(actualNewCombo, comboIndex, colourIndex, actingComboColours[colourIndex]));
 
                 previousHitObject = hitObject;
             }
@@ -351,6 +349,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
 
         /// <summary>
         /// Adjusts combo skip for all the hitobjects so colour index is correct.
+        /// Assumes a <see cref="ComboContext"/> is present for all hit objects.
         /// </summary>
         public void FixComboSkip() {
             HitObject previousHitObject = null;
@@ -363,9 +362,9 @@ namespace Mapping_Tools_Core.BeatmapHelper {
                 bool newCombo = IsNewCombo(hitObject, previousHitObject);
 
                 if (newCombo) {
-                    int colourIncrement = hitObject.IsSpinner ? 0 : 1;
+                    int colourIncrement = hitObject.ComboIncrement;
                     var newColourIndex = MathHelper.Mod(colourIndex + colourIncrement, actingComboColours.Length);
-                    var wantedColourIndex = hitObject.ColourIndex;
+                    var wantedColourIndex = hitObject.GetContext<ComboContext>().ColourIndex;
                     var diff = wantedColourIndex - newColourIndex;
 
                     if (diff > 0) {
@@ -374,7 +373,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
                         hitObject.ComboSkip = (actingComboColours.Length + diff);
                     }
 
-                    int newColourIncrement = hitObject.IsSpinner ? hitObject.ComboSkip : hitObject.ComboSkip + 1;
+                    int newColourIncrement = hitObject.ComboIncrement + hitObject.ComboSkip;
                     colourIndex = MathHelper.Mod(colourIndex + newColourIncrement, actingComboColours.Length);
                 }
 
@@ -383,23 +382,21 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         }
 
         public static bool IsNewCombo(HitObject hitObject, HitObject previousHitObject) {
-            return hitObject.NewCombo || hitObject.IsSpinner || previousHitObject == null || previousHitObject.IsSpinner;
+            return hitObject.NewCombo || hitObject is Spinner || previousHitObject == null || previousHitObject is Spinner;
         }
 
         /// <summary>
         /// For each hit object it stores the timingpoints from <see cref="BeatmapTiming"/> which are affecting that hit object.
-        /// Basically making all hit objects aware of the effects on themselves coming from the <see cref="BeatmapTiming"/>.
+        /// Basically making all hit objects independent of <see cref="BeatmapTiming"/>.
         /// </summary>
-        public void GiveObjectsGreenlines() {
+        public void GiveObjectsTimingContext() {
             foreach (var ho in HitObjects) {
-                ho.SliderVelocity = BeatmapTiming.GetSvAtTime(ho.StartTime);
-                ho.TimingPoint = BeatmapTiming.GetTimingPointAtTime(ho.StartTime);
-                ho.HitsoundTimingPoint = BeatmapTiming.GetTimingPointAtTime(ho.StartTime + 5);
-                ho.UnInheritedTimingPoint = BeatmapTiming.GetRedlineAtTime(ho.StartTime);
-                ho.BodyHitsounds = BeatmapTiming.GetTimingPointsInRange(ho.StartTime, ho.EndTime, false);
-                foreach (var time in ho.GetAllTloTimes(BeatmapTiming)) {
-                    ho.BodyHitsounds.RemoveAll(o => Math.Abs(time - o.Offset) <= 5);
-                }
+                ho.SetContext(new TimingContext(BeatmapTiming.GlobalSliderMultiplier, 
+                    BeatmapTiming.GetSvAtTime(ho.StartTime),
+                    BeatmapTiming.GetTimingPointAtTime(ho.StartTime),
+                    BeatmapTiming.GetTimingPointAtTime(ho.StartTime + 5),
+                    BeatmapTiming.GetRedlineAtTime(ho.StartTime),
+                    BeatmapTiming.GetTimingPointsInRange(ho.StartTime, ho.EndTime, false)));
             }
         }
 
@@ -527,7 +524,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             var endTime = HitObjects.Count > 0
                 ? Math.Max(GetHitObjectEndTime() + 200, HitObjects.Last().EndTime + 3000)
                 : double.NegativeInfinity;
-            var eventsWithEndTime = EnumerateAllEvents().OfType<IHasEndTime>().ToArray();
+            var eventsWithEndTime = EnumerateAllEvents().OfType<IHasDuration>().ToArray();
             if (eventsWithEndTime.Length > 0)
                 endTime = Math.Max(endTime, eventsWithEndTime.Max(o => o.EndTime) - 500);
             return endTime;
@@ -575,7 +572,8 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             // Enumerate through the hit objects from the first object at the time
             int objectIndex = HitObjects.FindIndex(h => h.StartTime >= time);
             foreach (var comboNumber in comboNumbers) {
-                while (comboNumber != -1 && objectIndex < HitObjects.Count && HitObjects[objectIndex].ComboIndex != comboNumber) {
+                while (comboNumber != -1 && objectIndex < HitObjects.Count && 
+                       HitObjects[objectIndex].GetContext<ComboContext>().ComboIndex != comboNumber) {
                     objectIndex++;
                 }
 
@@ -616,7 +614,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             var newBeatmap = (Beatmap)MemberwiseClone();
             newBeatmap.HitObjects = HitObjects.Select(h => h.DeepClone()).ToList();
             newBeatmap.BeatmapTiming = new Timing(BeatmapTiming.TimingPoints.Select(t => t.Copy()).ToList(), BeatmapTiming.GlobalSliderMultiplier);
-            newBeatmap.GiveObjectsGreenlines();
+            newBeatmap.GiveObjectsTimingContext();
             return newBeatmap;
         }
     }

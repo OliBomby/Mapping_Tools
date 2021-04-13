@@ -245,7 +245,7 @@ namespace Mapping_Tools_Core.Tools.MapCleanerStuff {
             // Replace the old timingpoints
             timing.Clear();
             TimingPointsChange.ApplyChanges(timing, timingPointsChanges);
-            beatmap.GiveObjectsGreenlines();
+            beatmap.GiveObjectsTimingContext();
 
             UpdateProgressBar(worker, 90);
 

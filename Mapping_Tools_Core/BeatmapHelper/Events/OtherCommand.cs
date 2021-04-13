@@ -7,8 +7,9 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
     /// Represents all the commands
     /// The exceptions being loops and triggers because these have different syntax.
     /// </summary>
-    public class OtherCommand : Command, IHasEndTime {
+    public class OtherCommand : Command, IHasDuration {
         public EasingType Easing { get; set; }
+        public double Duration => EndTime - StartTime;
         public double EndTime { get; set; }
 
         /// <summary>

@@ -10,7 +10,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
     /// Base class for a hit object in osu! stable.
     /// Has extra fields for easier editing and analysis.
     /// </summary>
-    public abstract class HitObject : IComparable<HitObject>, IHasPosition, IHasStartTime {
+    public abstract class HitObject : IComparable<HitObject>, IHasPosition, IHasStartTime, IHasDuration, IHasEndPosition {
         /// <summary>
         /// Selected hit object.
         /// </summary>
@@ -39,10 +39,31 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         public virtual int ComboSkip { get; set; }
 
         /// <summary>
+        /// How much the combo increments when a new combo is on this hit object.
+        /// Ignores <see cref="ComboSkip"/>, so this is the default increment.
+        /// </summary>
+        public virtual int ComboIncrement => 1;
+
+        /// <summary>
         /// The hitsounds of this hit object.
         /// </summary>
         [NotNull]
         public HitSampleInfo Hitsounds { get; set; }
+
+        /// <summary>
+        /// The duration of this hit object.
+        /// </summary>
+        public virtual double Duration => 0;
+
+        /// <summary>
+        /// The end time of this hit object.
+        /// </summary>
+        public virtual double EndTime => StartTime;
+
+        /// <summary>
+        /// The end position of this hit object.
+        /// </summary>
+        public virtual Vector2 EndPos => Pos;
 
         /// <summary>
         /// Additional properties.
@@ -53,6 +74,15 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         protected HitObject() {
             Hitsounds = new HitSampleInfo();
             contexts = new Dictionary<Type, IContext>();
+        }
+
+        /// <summary>
+        /// Checks whether this object has the context with type T.
+        /// </summary>
+        /// <typeparam name="T">The type to check the context of.</typeparam>
+        /// <returns>Whether the context object with type T exists in this object.</returns>
+        public bool HasContext<T>() where T : IContext {
+            return contexts.ContainsKey(typeof(T));
         }
 
         /// <summary>

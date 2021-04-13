@@ -3,7 +3,7 @@
         /// <summary>
         /// The amount of times the object repeats.
         /// </summary>
-        int RepeatCount { get; set; }
+        int RepeatCount { get; }
 
         /// <summary>
         /// The amount of times the length of the object spans.
@@ -13,9 +13,6 @@
         /// <summary>
         /// The duration of one span.
         /// </summary>
-        double SpanDuration {
-            get => Duration / SpanCount;
-            set => Duration = value * SpanCount;
-        }
+        double SpanDuration => Duration / SpanCount;
     }
 }

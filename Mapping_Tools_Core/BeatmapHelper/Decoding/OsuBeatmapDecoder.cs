@@ -63,8 +63,7 @@ namespace Mapping_Tools_Core.BeatmapHelper.Decoding {
 
             beatmap.SortHitObjects();
             beatmap.CalculateHitObjectComboStuff();
-            beatmap.GiveObjectsGreenlines();
-            beatmap.CalculateSliderEndTimes();
+            beatmap.GiveObjectsTimingContext();
         }
 
         public Beatmap DecodeNew(string code) {
