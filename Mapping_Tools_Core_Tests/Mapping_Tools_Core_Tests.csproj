@@ -14,10 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Mapping_Tools_Core\Mapping_Tools_Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="Resources\04 Compute It With Some Devilish Alcoholic Steampunk Engines.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
