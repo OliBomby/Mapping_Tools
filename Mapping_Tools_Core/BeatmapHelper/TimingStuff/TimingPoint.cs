@@ -1,9 +1,9 @@
-﻿using Mapping_Tools_Core.BeatmapHelper.Enums;
-using Mapping_Tools_Core.MathUtil;
-using System;
+﻿using System;
 using System.Collections;
+using Mapping_Tools_Core.BeatmapHelper.Enums;
+using Mapping_Tools_Core.MathUtil;
 
-namespace Mapping_Tools_Core.BeatmapHelper {
+namespace Mapping_Tools_Core.BeatmapHelper.TimingStuff {
     public class TimingPoint : IComparable<TimingPoint> {
         // Offset, Milliseconds per Beat, Meter, Sample Set, Sample Index, Volume, Inherited, Kiai Mode
         /// <summary>

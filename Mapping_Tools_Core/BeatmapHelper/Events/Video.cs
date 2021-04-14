@@ -1,4 +1,5 @@
 ﻿using Mapping_Tools_Core.BeatmapHelper.Types;
+using Mapping_Tools_Core.Exceptions;
 using Mapping_Tools_Core.MathUtil;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Events {

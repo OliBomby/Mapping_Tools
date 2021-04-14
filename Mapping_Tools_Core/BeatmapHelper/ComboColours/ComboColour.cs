@@ -1,6 +1,7 @@
 ﻿using System;
+using Mapping_Tools_Core.Exceptions;
 
-namespace Mapping_Tools_Core.BeatmapHelper {
+namespace Mapping_Tools_Core.BeatmapHelper.ComboColours {
     /// <summary>
     /// The british alternative because main developer wants to keep the spelling.
     /// Its spelled "Colours" in the game.

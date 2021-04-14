@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
+using Mapping_Tools_Core.BeatmapHelper.ComboColours;
 using Mapping_Tools_Core.BeatmapHelper.Events;
+using Mapping_Tools_Core.BeatmapHelper.TimingStuff;
 
 namespace Mapping_Tools_Core.BeatmapHelper {
     public interface IBeatmap : IComboColourCollection {

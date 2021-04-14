@@ -1,5 +1,6 @@
 ﻿
 using Mapping_Tools_Core.BeatmapHelper.Types;
+using Mapping_Tools_Core.Exceptions;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Events {
     public class Break : Event, IHasStartTime, IHasDuration {

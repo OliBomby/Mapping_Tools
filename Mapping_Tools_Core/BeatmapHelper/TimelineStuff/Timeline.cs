@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Mapping_Tools_Core.BeatmapHelper.Contexts;
+using Mapping_Tools_Core.BeatmapHelper.TimingStuff;
 using Mapping_Tools_Core.BeatmapHelper.Types;
 
 namespace Mapping_Tools_Core.BeatmapHelper.TimelineStuff {

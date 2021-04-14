@@ -1,7 +1,9 @@
 ﻿using System;
 using Mapping_Tools_Core.BeatmapHelper.Events;
 using System.Collections.Generic;
+using Mapping_Tools_Core.BeatmapHelper.ComboColours;
 using Mapping_Tools_Core.BeatmapHelper.Decoding.HitObject;
+using Mapping_Tools_Core.BeatmapHelper.TimingStuff;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Decoding {
     public class OsuBeatmapDecoder : IDecoder<Beatmap> {

@@ -1,5 +1,6 @@
 ﻿using Mapping_Tools_Core.MathUtil;
 using System;
+using Mapping_Tools_Core.Exceptions;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Events {
     public class Animation : Event {

@@ -5,6 +5,7 @@ using Mapping_Tools_Core.BeatmapHelper;
 using Mapping_Tools_Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.BeatmapHelper.Objects;
+using Mapping_Tools_Core.BeatmapHelper.TimingStuff;
 using Mapping_Tools_Core.BeatmapHelper.Types;
 using Mapping_Tools_Core.MathUtil;
 

@@ -6,7 +6,7 @@ using Mapping_Tools_Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.MathUtil;
 
-namespace Mapping_Tools_Core.BeatmapHelper {
+namespace Mapping_Tools_Core.BeatmapHelper.TimingStuff {
     /// <summary>
     /// The timing of a beatmap. This objects contains all the timing points (data from the [TimingPoints] section) plus the global slider multiplier.
     /// This also has a number of helper methods to fetch data from the timing points.

@@ -1,4 +1,6 @@
-﻿namespace Mapping_Tools_Core.BeatmapHelper.Contexts {
+﻿using Mapping_Tools_Core.BeatmapHelper.ComboColours;
+
+namespace Mapping_Tools_Core.BeatmapHelper.Contexts {
     public class ComboContext : IContext {
         /// <summary>
         /// Whether a new combo starts on this hit object.

@@ -10,6 +10,7 @@ using Mapping_Tools_Core.BeatmapHelper.Contexts;
 using Mapping_Tools_Core.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools_Core.BeatmapHelper.TimelineStuff;
 using Mapping_Tools_Core.BeatmapHelper.TimelineStuff.TimelineObjects;
+using Mapping_Tools_Core.BeatmapHelper.TimingStuff;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Objects {
     public class Slider : HitObject, IRepeats, IHasTimelineObjects {

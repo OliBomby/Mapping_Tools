@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using Mapping_Tools_Core.BeatmapHelper.Types;
+using Mapping_Tools_Core.Exceptions;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Events {
     /// <summary>

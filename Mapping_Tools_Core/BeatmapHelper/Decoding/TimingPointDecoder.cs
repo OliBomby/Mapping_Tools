@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
+using Mapping_Tools_Core.BeatmapHelper.TimingStuff;
+using Mapping_Tools_Core.Exceptions;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Decoding {
     public class TimingPointDecoder : IDecoder<TimingPoint> {

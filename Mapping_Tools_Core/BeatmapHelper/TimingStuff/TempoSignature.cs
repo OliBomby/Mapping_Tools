@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Mapping_Tools_Core.BeatmapHelper {
+namespace Mapping_Tools_Core.BeatmapHelper.TimingStuff {
     public class TempoSignature : IEquatable<TempoSignature>
     {
         /// <summary>

@@ -1,4 +1,6 @@
 ﻿
+using Mapping_Tools_Core.Exceptions;
+
 namespace Mapping_Tools_Core.BeatmapHelper.Events {
     /// <summary>
     /// Represents the standard loop event. This event has a different syntax so it can't be a <see cref="OtherCommand"/>.

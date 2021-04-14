@@ -2,6 +2,7 @@
 using Mapping_Tools_Core.BeatmapHelper.Decoding.HitObject.Objects;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.BeatmapHelper.Objects;
+using Mapping_Tools_Core.Exceptions;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Decoding.HitObject {
     public class HitObjectDecoder : IDecoder<BeatmapHelper.HitObject> {

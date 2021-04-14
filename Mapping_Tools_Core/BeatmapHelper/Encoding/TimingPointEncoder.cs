@@ -1,6 +1,7 @@
 ﻿using Mapping_Tools_Core.MathUtil;
 using System;
 using System.Collections;
+using Mapping_Tools_Core.BeatmapHelper.TimingStuff;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Encoding {
     public class TimingPointEncoder : IEncoder<TimingPoint> {

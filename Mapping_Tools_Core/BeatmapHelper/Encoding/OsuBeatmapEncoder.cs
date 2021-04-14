@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Mapping_Tools_Core.BeatmapHelper.ComboColours;
+using Mapping_Tools_Core.BeatmapHelper.TimingStuff;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Encoding {
     public class OsuBeatmapEncoder : IEnumeratingEncoder<IBeatmap> {

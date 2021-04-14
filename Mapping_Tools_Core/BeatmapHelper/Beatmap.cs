@@ -4,11 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
+using Mapping_Tools_Core.BeatmapHelper.ComboColours;
 using Mapping_Tools_Core.BeatmapHelper.Contexts;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.BeatmapHelper.Events;
 using Mapping_Tools_Core.BeatmapHelper.Objects;
 using Mapping_Tools_Core.BeatmapHelper.TimelineStuff;
+using Mapping_Tools_Core.BeatmapHelper.TimingStuff;
 using Mapping_Tools_Core.BeatmapHelper.Types;
 using Mapping_Tools_Core.MathUtil;
 
