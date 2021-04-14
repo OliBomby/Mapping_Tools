@@ -5,6 +5,6 @@
     public interface IDuration : IHasDuration {
         void SetDuration(double duration);
 
-        void SetEndTime(double endTime);
+        void SetEndTime(double newEndTime);
     }
 }

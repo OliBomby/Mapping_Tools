@@ -8,6 +8,7 @@ using Mapping_Tools_Core.Audio.SampleGeneration.Decorators;
 using Mapping_Tools_Core.BeatmapHelper;
 using Mapping_Tools_Core.BeatmapHelper.Editor;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
+using Mapping_Tools_Core.BeatmapHelper.TimelineStuff;
 using Mapping_Tools_Core.Tools.HitsoundStudio.Model;
 using Mapping_Tools_Core.Tools.HitsoundStudio.Model.LayerImportArgs;
 using Mapping_Tools_Core.Tools.HitsoundStudio.Model.LayerSourceRef;

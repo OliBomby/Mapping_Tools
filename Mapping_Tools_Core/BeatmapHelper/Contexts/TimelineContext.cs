@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using Mapping_Tools_Core.BeatmapHelper.TimelineStuff;
 using Mapping_Tools_Core.BeatmapHelper.Types;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Contexts {
@@ -12,8 +13,12 @@ namespace Mapping_Tools_Core.BeatmapHelper.Contexts {
         [NotNull]
         public List<TimelineObject> TimelineObjects { get; set; }
 
+        public TimelineContext() {
+            TimelineObjects = new List<TimelineObject>();
+        }
+
         public TimelineContext(IEnumerable<TimelineObject> timelineObjects) {
-            TimelineObjects = timelineObjects.Select(o => o.Copy()).ToList();
+            TimelineObjects = timelineObjects.ToList();
         }
 
         /// <summary>
@@ -30,7 +35,7 @@ namespace Mapping_Tools_Core.BeatmapHelper.Contexts {
         }
 
         public IContext Copy() {
-            return new TimelineContext(TimelineObjects);
+            return new TimelineContext(TimelineObjects.Select(o => o.Copy()));
         }
     }
 }

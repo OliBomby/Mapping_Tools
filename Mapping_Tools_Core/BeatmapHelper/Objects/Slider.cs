@@ -8,9 +8,11 @@ using System.Linq;
 using JetBrains.Annotations;
 using Mapping_Tools_Core.BeatmapHelper.Contexts;
 using Mapping_Tools_Core.BeatmapHelper.SliderPathStuff;
+using Mapping_Tools_Core.BeatmapHelper.TimelineStuff;
+using Mapping_Tools_Core.BeatmapHelper.TimelineStuff.TimelineObjects;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Objects {
-    public class Slider : HitObject, IRepeats {
+    public class Slider : HitObject, IRepeats, IHasTimelineObjects {
         public PathType SliderType { get; set; }
 
         [NotNull]
@@ -46,8 +48,8 @@ namespace Mapping_Tools_Core.BeatmapHelper.Objects {
             SetSpanDurationByPixelLength(duration / SpanCount);
         }
 
-        public void SetEndTime(double endTime) {
-            SetDuration(endTime - StartTime);
+        public void SetEndTime(double newEndTime) {
+            SetDuration(newEndTime - StartTime);
         }
 
         public void SetRepeatCount(int repeatCount) {
@@ -263,6 +265,18 @@ namespace Mapping_Tools_Core.BeatmapHelper.Objects {
 
             slider.CurvePoints.AddRange(CurvePoints);
             slider.EdgeHitsounds.AddRange(EdgeHitsounds.Select(o => o.Clone()));
+        }
+
+        public IEnumerable<TimelineObject> GetTimelineObjects() {
+            var context = new TimelineContext();
+            // Adding TimeLineObject for every edge of the slider
+            for (int i = 0; i < SpanCount + 1; i++) {
+                double time = Math.Floor(StartTime + SpanDuration * i);
+                var tlo = new SliderNode(time, GetNodeSamples(i).Clone(), i) { Origin = this };
+                context.TimelineObjects.Add(tlo);
+                yield return tlo;
+            }
+            SetContext(context);
         }
     }
 }

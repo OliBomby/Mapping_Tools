@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Mapping_Tools_Core.BeatmapHelper.TimelineStuff;
 
 namespace Mapping_Tools_Core.Tools.MapCleanerStuff {
     public partial class MapCleaner {

@@ -8,6 +8,7 @@ using Mapping_Tools_Core.BeatmapHelper.Contexts;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.BeatmapHelper.Events;
 using Mapping_Tools_Core.BeatmapHelper.Objects;
+using Mapping_Tools_Core.BeatmapHelper.TimelineStuff;
 using Mapping_Tools_Core.BeatmapHelper.Types;
 using Mapping_Tools_Core.MathUtil;
 
@@ -444,8 +445,8 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// </summary>
         /// <returns></returns>
         public Timeline GetTimeline() {
-            Timeline tl = new Timeline(HitObjects, BeatmapTiming);
-            tl.GiveTimingPoints(BeatmapTiming);
+            Timeline tl = new Timeline(HitObjects);
+            tl.GiveTimingContext(BeatmapTiming);
             return tl;
         }
 
