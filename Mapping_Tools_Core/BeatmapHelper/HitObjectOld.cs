@@ -846,10 +846,9 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             foreach (var tlo in TimelineObjects) {
                 Console.WriteLine(@"timelineobject:");
                 Console.WriteLine(@"time: " + tlo.Time);
-                Console.WriteLine(@"repeat: " + tlo.Repeat);
-                Console.WriteLine(@"index: " + tlo.CustomIndex);
-                Console.WriteLine(@"volume: " + tlo.SampleVolume);
-                Console.WriteLine(@"filename: " + tlo.Filename);
+                Console.WriteLine(@"index: " + tlo.Hitsounds.CustomIndex);
+                Console.WriteLine(@"volume: " + tlo.Hitsounds.Volume);
+                Console.WriteLine(@"filename: " + tlo.Hitsounds.Filename);
                 Console.WriteLine(@"feno index: " + tlo.FenoCustomIndex);
                 Console.WriteLine(@"feno volume: " + tlo.FenoSampleVolume);
             }

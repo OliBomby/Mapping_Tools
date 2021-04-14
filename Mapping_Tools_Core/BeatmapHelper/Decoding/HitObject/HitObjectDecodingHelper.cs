@@ -43,7 +43,7 @@ namespace Mapping_Tools_Core.BeatmapHelper.Decoding.HitObject {
             var i = 0;
             if (hitObject is HoldNote holdNote) {
                 if (InputParsers.TryParseDouble(split[i++], out var et))
-                    holdNote.EndTime = et;
+                    holdNote.SetEndTime(et);
                 else throw new BeatmapParsingException("Failed to parse end time of hold note.", extras);
             }
 
