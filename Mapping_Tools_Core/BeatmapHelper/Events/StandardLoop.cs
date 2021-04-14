@@ -1,4 +1,5 @@
-﻿using static Mapping_Tools_Core.BeatmapHelper.FileFormatHelper;
+﻿
+using Mapping_Tools_Core.Exceptions;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Events {
     /// <summary>
@@ -10,18 +11,18 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
         public int LoopCount { get; set; }
 
         public override string GetLine() {
-            return $"{EventType},{StartTime.ToInvariant()},{LoopCount.ToInvariant()}";
+            return $"{EventType},{StartTime.ToRoundInvariant()},{LoopCount.ToInvariant()}";
         }
 
         public override void SetLine(string line) {
             var subLine = RemoveIndents(line);
             var values = subLine.Split(',');
 
-            if (FileFormatHelper.TryParseInt(values[1], out int startTime))
+            if (InputParsers.TryParseDouble(values[1], out double startTime))
                 StartTime = startTime;
             else throw new BeatmapParsingException("Failed to parse start time of event param.", line);
 
-            if (FileFormatHelper.TryParseInt(values[2], out int loopCount))
+            if (InputParsers.TryParseInt(values[2], out int loopCount))
                 LoopCount = loopCount;
             else throw new BeatmapParsingException("Failed to parse loop count of event param.", line);
         }

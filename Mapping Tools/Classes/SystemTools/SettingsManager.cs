@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using Mapping_Tools_Core;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public static class SettingsManager {

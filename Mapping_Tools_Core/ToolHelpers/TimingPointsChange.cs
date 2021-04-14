@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Mapping_Tools_Core.BeatmapHelper;
+using Mapping_Tools_Core.BeatmapHelper.Encoding;
+using Mapping_Tools_Core.BeatmapHelper.TimingStuff;
 
 namespace Mapping_Tools_Core.ToolHelpers {
     public struct TimingPointsChange {
@@ -114,7 +116,7 @@ namespace Mapping_Tools_Core.ToolHelpers {
         }
 
         public void Debug() {
-            Console.WriteLine(MyTP.GetLine());
+            Console.WriteLine(new TimingPointEncoder(true).Encode(MyTP));
             Console.WriteLine($"{MpB}, {Meter}, {Sampleset}, {Index}, {Volume}, {UnInherited}, {Kiai}, {OmitFirstBarLine}");
         }
     }

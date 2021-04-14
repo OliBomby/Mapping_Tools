@@ -1,14 +1,13 @@
-﻿using Mapping_Tools_Core.BeatmapHelper.Parsing;
+﻿using Mapping_Tools_Core.BeatmapHelper.Decoding;
+using Mapping_Tools_Core.BeatmapHelper.Encoding;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Editor {
     /// <summary>
     /// Editor specifically for storyboards
     /// </summary>
-    public class StoryboardEditor : Editor<StoryBoard> {
-        public StoryBoard StoryBoard => Instance;
+    public class StoryboardEditor : Editor<Storyboard> {
+        public StoryboardEditor() : base(new OsuStoryboardEncoder(), new OsuStoryboardDecoder()) {}
 
-        public StoryboardEditor() : base(new OsuStoryboardParser()) {}
-
-        public StoryboardEditor(string path) : base(new OsuStoryboardParser(), path) {}
+        public StoryboardEditor(string path) : base(new OsuStoryboardEncoder(), new OsuStoryboardDecoder(), path) {}
     }
 }

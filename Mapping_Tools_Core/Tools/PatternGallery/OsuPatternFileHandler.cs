@@ -1,12 +1,15 @@
-﻿using System.Data;
-using System.IO;
-using System.Linq;
+﻿using Mapping_Tools_Core.BeatmapHelper;
+using Mapping_Tools_Core.BeatmapHelper.Editor;
+using Mapping_Tools_Core.BeatmapHelper.Encoding;
 using Mapping_Tools_Core.MathUtil;
 using Newtonsoft.Json;
+using System.Data;
+using System.IO;
+using System.Linq;
 
 namespace Mapping_Tools_Core.Tools.PatternGallery {
-    public class OsuPatternFileHandler {
-        public string PatternFilesFolderName => @"Pattern Files";
+    public class OsuPatternFileHandler : IOsuPatternFileHandler {
+        public static string PatternFilesFolderName => @"Pattern Files";
 
         [JsonIgnore]
         public string BasePath { get; set; }
@@ -69,6 +72,18 @@ namespace Mapping_Tools_Core.Tools.PatternGallery {
 
             Directory.Move(GetCollectionFolderPath(), Path.Combine(BasePath, newName));
             CollectionFolderName = newName;
+        }
+
+        public IBeatmap GetPatternBeatmap(string filename) {
+            return new BeatmapEditor(GetPatternPath(filename)).ReadFile();
+        }
+
+        public void SavePatternBeatmap(IBeatmap beatmap, string filename) {
+            var editor = new WriteEditor<IBeatmap>(
+                new OsuBeatmapEncoder {SaveWithFloatPrecision = true},
+                GetPatternPath(filename));
+
+            editor.WriteFile(beatmap);
         }
     }
 }

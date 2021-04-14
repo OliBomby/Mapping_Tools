@@ -15,7 +15,7 @@ namespace Mapping_Tools_Core.Tools {
             public HashSet<int> timesToCheck;
 
             public int GetStartTime() {
-                return (int)unloadableHitObject.Time;
+                return (int)unloadableHitObject.StartTime;
             }
 
             public int GetEndTime() {
@@ -84,7 +84,7 @@ namespace Mapping_Tools_Core.Tools {
             for (int i = 0; i < hitObjects.Count; i++) {
                 var ho = hitObjects[i];
                 var adjEndTime = GetAdjustedEndTime(ho);
-                var negative = adjEndTime < ho.Time - approachTime;
+                var negative = adjEndTime < ho.StartTime - approachTime;
 
                 // Ignore all problem areas which are contained by another unloadable object,
                 // because fixing the outer problem area will also fix all of the problems inside.
@@ -110,7 +110,7 @@ namespace Mapping_Tools_Core.Tools {
                     if (ho2.EndTime < adjEndTime + physicsTime - approachTime) {
                         disruptors.Add(ho2);
 
-                        Disruptors.Add(ho2.Time);
+                        Disruptors.Add(ho2.StartTime);
                     }
                 }
 
@@ -120,7 +120,7 @@ namespace Mapping_Tools_Core.Tools {
                 // The first time after the end time where the object could be loaded
                 var firstRequiredLoadTime = adjEndTime;
                 if (i > 0)
-                    firstRequiredLoadTime = Math.Max(adjEndTime, (int)hitObjects[i - 1].Time - approachTime + 1);
+                    firstRequiredLoadTime = Math.Max(adjEndTime, (int)hitObjects[i - 1].StartTime - approachTime + 1);
                 // It cant load before the map has started
                 firstRequiredLoadTime = Math.Max(firstRequiredLoadTime, mapStartTime);
 
@@ -129,7 +129,7 @@ namespace Mapping_Tools_Core.Tools {
                     firstRequiredLoadTime, firstRequiredLoadTime + physicsTime)) {firstRequiredLoadTime + physicsTime};
 
                 problemAreas.Add(new ProblemArea { index = i, unloadableHitObject = ho, disruptors = disruptors, timesToCheck = timesToCheck });
-                PotentialUnloadingObjects.Add(ho.Time);
+                PotentialUnloadingObjects.Add(ho.StartTime);
             }
 
             int autoFails = 0;
@@ -140,7 +140,7 @@ namespace Mapping_Tools_Core.Tools {
                     var minimalRight = time + approachTime;
 
                     var startIndex = OsuBinarySearch(minimalLeft);
-                    var endIndex = hitObjects.FindIndex(startIndex, ho => ho.Time > minimalRight);
+                    var endIndex = hitObjects.FindIndex(startIndex, ho => ho.StartTime > minimalRight);
                     if (endIndex < 0) {
                         endIndex = hitObjects.Count - 1;
                     }
@@ -148,7 +148,7 @@ namespace Mapping_Tools_Core.Tools {
                     var hitObjectsMinimal = hitObjects.GetRange(startIndex, 1 + endIndex - startIndex);
 
                     if (!hitObjectsMinimal.Contains(problemArea.unloadableHitObject) || time > autoFailCheckTime) {
-                        UnloadingObjects.Add(problemArea.unloadableHitObject.Time);
+                        UnloadingObjects.Add(problemArea.unloadableHitObject.StartTime);
                         autoFails++;
                         break;
                     }
@@ -160,13 +160,13 @@ namespace Mapping_Tools_Core.Tools {
 
         private int GetAdjustedEndTime(HitObject ho) {
             if (ho.IsCircle) {
-                return (int)ho.Time + window50;
+                return (int)ho.StartTime + window50;
             }
             if (ho.IsSlider || ho.IsSpinner) {
                 return (int)ho.EndTime;
             }
 
-            return (int)Math.Max(ho.Time + window50, ho.EndTime);
+            return (int)Math.Max(ho.StartTime + window50, ho.EndTime);
         }
 
         public bool AutoFailFixDialogue(bool autoPlaceFix) {
@@ -233,7 +233,7 @@ namespace Mapping_Tools_Core.Tools {
                     if (t.HasValue) {
                         for (int j = 0; j < paddingSolution[i]; j++) {
                             hitObjects.Add(
-                                new HitObject {Pos = Vector2.Zero, Time = t.Value, ObjectType = 8, EndTime = t.Value - 1});
+                                new HitObject {Pos = Vector2.Zero, StartTime = t.Value, ObjectType = 8, EndTime = t.Value - 1});
                         }
                     } else {
                         throw new Exception($"Can't find a safe place to place objects between {lastTime} and {problemAreas[i].GetStartTime()}.");
@@ -249,7 +249,7 @@ namespace Mapping_Tools_Core.Tools {
                     GetSafePlacementTime(lastTime, autoFailCheckTime - physicsTime);
                 if (t.HasValue) {
                     for (int i = 0; i < paddingSolution.Last(); i++) {
-                        hitObjects.Add(new HitObject {Pos = Vector2.Zero, Time = t.Value, ObjectType = 8, EndTime = t.Value - 1});
+                        hitObjects.Add(new HitObject {Pos = Vector2.Zero, StartTime = t.Value, ObjectType = 8, EndTime = t.Value - 1});
                     }
                 } else {
                     throw new Exception($"Can't find a safe place to place objects between {lastTime} and {mapEndTime}.");
@@ -275,11 +275,11 @@ namespace Mapping_Tools_Core.Tools {
         }
 
         private int? GetSafePlacementTime(int start, int end) {
-            var rangeObjects = hitObjects.FindAll(o => o.EndTime >= start && o.Time <= end);
+            var rangeObjects = hitObjects.FindAll(o => o.EndTime >= start && o.StartTime <= end);
 
             for (int i = end - 1; i >= start; i--) {
                 if (!rangeObjects.Any(ho =>
-                    i >= (int)ho.Time &&
+                    i >= (int)ho.StartTime &&
                     i <= GetAdjustedEndTime(ho) - approachTime)) {
                     return i;
                 }
@@ -442,7 +442,7 @@ namespace Mapping_Tools_Core.Tools {
                 var minimalRight = time + approachTime;
 
                 var startIndex = PaddedOsuBinarySearch(minimalLeft, left, right);
-                var endIndex = hitObjects.FindIndex(startIndex, ho => ho.Time > minimalRight);
+                var endIndex = hitObjects.FindIndex(startIndex, ho => ho.StartTime > minimalRight);
                 if (endIndex < 0) {
                     endIndex = hitObjects.Count - 1;
                 }

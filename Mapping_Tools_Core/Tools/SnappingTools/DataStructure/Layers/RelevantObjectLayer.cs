@@ -31,16 +31,14 @@ namespace Mapping_Tools_Core.Tools.SnappingTools.DataStructure.Layers {
             Objects = new RelevantObjectCollection.RelevantObjectCollection();
         }
 
-        public void SortTimes() {
-            Objects.SortTimes();
-        }
+        public void Add(IEnumerable<IRelevantObject> relevantObjects, bool propagate = true, bool dispose = true,
+            RelevantObjectCollection.RelevantObjectCollection allPreviousCollection = null) {
 
-        public void Add(IEnumerable<IRelevantObject> relevantObjects, bool propagate = true) {
             bool addedAny = false;  // Check any relevant objects get added at all
 
             // Check if this object or something similar exists anywhere in the context or in this layer
             foreach (var relevantObject in relevantObjects) {
-                Add(relevantObject, false);
+                Add(relevantObject, false, dispose, allPreviousCollection);
                 addedAny = true;
             }
 
@@ -50,40 +48,51 @@ namespace Mapping_Tools_Core.Tools.SnappingTools.DataStructure.Layers {
             }
         }
 
-        public void Add(IRelevantObject relevantObject, bool propagate = true) {
+        public void Add(IRelevantObject relevantObject, bool propagate = true, bool dispose = true, 
+            RelevantObjectCollection.RelevantObjectCollection allPreviousCollection = null) {
+
             // Don't add if this layer is over the max
             if (Objects.GetCount() > ParentCollection.MaxObjects) {
-                relevantObject.Dispose();
+                if (dispose)
+                    relevantObject.Dispose();
                 return;
             }
             
-            var previousCollection = GetAllPreviousLayersCollection();
-            if (Objects.FindSimilar(relevantObject, ParentCollection.AcceptableDifference, out var similarObject)) {
-                // Consume object
-                similarObject.Consume(relevantObject);
+            // Check if this object has a similar object in this layer or in any of the previous layers
+            // If there is one in the previous layers, then dispose and not consume the object
+            // If there is one in this layer and not in the previous layers, then consume it and mark the other object to not be disposed
+
+            allPreviousCollection ??= GetAllPreviousLayersCollection();
+
+            // Check if this object appears in any of the previous layers
+            if (allPreviousCollection.FindSimilar(relevantObject, ParentCollection.AcceptableDifference, out _)) {
+                // Don't consume because that causes inheritance issues
                 // Dispose this relevant object
-                relevantObject.Dispose();
-                // Set DoNotDispose for the GenerateNewObjects method
-                if (!similarObject.DoNotDispose && !similarObject.DefinitelyDispose && previousCollection.FindSimilar(similarObject, ParentCollection.AcceptableDifference, out _)) {
-                    similarObject.DefinitelyDispose = true;
-                } else {
-                    similarObject.DoNotDispose = true;
-                }
+                if (dispose)
+                    relevantObject.Dispose();
+
                 return;  // return so the relevant object doesn't get added
             }
 
-            if (previousCollection != null && previousCollection.FindSimilar(relevantObject, ParentCollection.AcceptableDifference, out _)) {
-                // Don't consume because that causes inheritance issues
+            if (Objects.FindSimilar(relevantObject, ParentCollection.AcceptableDifference, out var similarObject)) {
+                // Consume object
+                similarObject.Consume(relevantObject);
+
                 // Dispose this relevant object
-                relevantObject.Dispose();
+                if (dispose)
+                    relevantObject.Dispose();
+
+                // Set DoNotDispose for the GenerateNewObjects method
+                similarObject.DoNotDispose = true;
+
                 return;  // return so the relevant object doesn't get added
             }
             
             // Set DoNotDispose for the GenerateNewObjects method
             relevantObject.DoNotDispose = true;
               
-            // Insert the new object
-            Objects.SortedInsert(relevantObject);
+            // Add the new object
+            Objects.Add(relevantObject);
 
             // Set layer variable in object
             relevantObject.Layer = this;
@@ -94,13 +103,14 @@ namespace Mapping_Tools_Core.Tools.SnappingTools.DataStructure.Layers {
         }
 
         private RelevantObjectCollection.RelevantObjectCollection GetAllPreviousLayersCollection() {
-            if (PreviousLayer == null) return null;
+            if (PreviousLayer == null) return new RelevantObjectCollection.RelevantObjectCollection(Objects.SetComparer);
 
-            var collection = PreviousLayer.GetAllPreviousLayersCollection();
+            // Add the previous collection the the collection of objects before the previous layer
+            var previousPreviousCollection = PreviousLayer.GetAllPreviousLayersCollection();
 
-            return collection == null ? 
-                PreviousLayer.Objects : 
-                RelevantObjectCollection.RelevantObjectCollection.Merge(collection, PreviousLayer.Objects);
+            previousPreviousCollection.MergeWith(PreviousLayer.Objects);
+
+            return previousPreviousCollection;
         }
 
         /// <summary>
@@ -112,8 +122,9 @@ namespace Mapping_Tools_Core.Tools.SnappingTools.DataStructure.Layers {
             // Get all active generators for this layer
             var activeGenerators = GeneratorCollection.GetActiveGenerators().ToArray();
 
-            // Get the previous layers objects if any generators are deep
-            var deepObjects = activeGenerators.Any(o => o.Settings.IsDeep) ? GetAllPreviousLayersCollection() : null;
+            // Get the previous layers objects for if any generators are deep
+            // Also keep this for the similar objects checking when the new objects get added to the layer
+            var allPreviousCollection = GetAllPreviousLayersCollection();
 
             // Initialize list for objects to add later
             var objectsToAdd = new List<IRelevantObject>();
@@ -125,8 +136,8 @@ namespace Mapping_Tools_Core.Tools.SnappingTools.DataStructure.Layers {
 
                 // Get the required relevant object collection for this generator
                 var objects = generator.Settings.IsDeep ? 
-                    deepObjects.GetSubset(generator.Settings.InputPredicate, generator) : 
-                    PreviousLayer?.Objects?.GetSubset(generator.Settings.InputPredicate, generator);
+                    allPreviousCollection.GetSelection(generator.Settings.InputPredicate, generator) : 
+                    PreviousLayer?.Objects?.GetSelection(generator.Settings.InputPredicate, generator);
 
                 // Loop through all generator methods in this generator
                 foreach (var method in methods) {
@@ -213,16 +224,17 @@ namespace Mapping_Tools_Core.Tools.SnappingTools.DataStructure.Layers {
 
             // Add objects to this layer
             // This sets DoNotDispose for all the relevant objects that already exist in this layer and are consuming the objects to add.
-            Add(objectsToAdd, false);
+            // In this case the objectsToAdd are all the objects that this layer should have, so any object with DoNotDispose after this
+            // is unchanged and should therefore not be disposed.
+            Add(objectsToAdd, false, true, allPreviousCollection);
 
-            // Dispose all relevant objects in this layer that were generated from a generator, but not generated now.
-            foreach (var objectLayerObject in Objects.Values) {
-                for (var i = 0; i < objectLayerObject.Count; i++) {
-                    var obj = objectLayerObject[i];
-                    // Continue for relevant objects with no generator or DoNotDispose
-                    if (!obj.DefinitelyDispose && (obj.Generator == null || obj.DoNotDispose)) continue;
-                    obj.Dispose();
-                    i--;
+            // Dispose all relevant objects that shouldn't be in this layer,
+            // so those are objects which are generated from a generator (not locked) and not generated in this iteration.
+            foreach (var objectSet in Objects.Values) {
+                var toRemove = objectSet.Where(o => o.Generator != null && !o.DoNotDispose).ToArray();
+                
+                foreach (var obj in toRemove) {
+                    obj.Dispose();  // This will also remove it from this layer, assuming the Layer property hasn't been tampered with
                 }
             }
 

@@ -14,10 +14,10 @@ namespace Mapping_Tools_Core.Tools.SnappingTools.DataStructure.RelevantObjectGen
             RelevantObjectCollection.RelevantObjectCollection collection) {
             // Handle special case
             if (collection == null || dependencies.Length == 0) {
-                return new[] {new IRelevantObject[0] };
+                return new[] { Array.Empty<IRelevantObject>() };
             }
 
-            var sortedObjects = collection.GetSortedSubset(new HashSet<Type>(dependencies));
+            var sortedObjects = collection.GetTypes(new HashSet<Type>(dependencies));
 
             var combinations = new List<IRelevantObject[]>();
 
@@ -25,9 +25,8 @@ namespace Mapping_Tools_Core.Tools.SnappingTools.DataStructure.RelevantObjectGen
             var firstIndex = 0;
             var indicesFound = new List<int>();
             var combination = new IRelevantObject[dependencies.Length];
-            while (i < sortedObjects.Count) {
-                var obj = sortedObjects[i];
 
+            foreach (var obj in sortedObjects) {
                 // Ignore the uninheritable objects
                 if (!obj.IsInheritable) {
                     i++;
@@ -75,7 +74,7 @@ namespace Mapping_Tools_Core.Tools.SnappingTools.DataStructure.RelevantObjectGen
 
             // Handle special case
             if (collection == null || dependencies.Length == 0) {
-                return new[] {new IRelevantObject[0] };
+                return new[] { Array.Empty<IRelevantObject>() };
             }
 
             // Count how many of every type are in the neededCombinations
@@ -93,13 +92,13 @@ namespace Mapping_Tools_Core.Tools.SnappingTools.DataStructure.RelevantObjectGen
             }*/
 
             // Check if the collection contains enough inheritable items to ever satisfy the needed combinations
-            foreach (var neededCombination in neededCombinations) {
-                if (collection.TryGetValue(neededCombination.Key, out var list)) {
-                    if (list.Count(o => o.IsInheritable) < neededCombination.Value) {
-                        return new IRelevantObject[0][];
+            foreach (var (type, value) in neededCombinations) {
+                if (collection.TryGetValue(type, out var list)) {
+                    if (list.Count(o => o.IsInheritable) < value) {
+                        return Array.Empty<IRelevantObject[]>();
                     }
                 } else {
-                    return new IRelevantObject[0][];
+                    return Array.Empty<IRelevantObject[]>();
                 }
             }
             //Console.WriteLine("Check succeeded");

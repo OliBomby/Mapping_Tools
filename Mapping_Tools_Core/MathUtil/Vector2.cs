@@ -63,16 +63,6 @@ namespace Mapping_Tools_Core.MathUtil {
         }
 
         /// <summary>
-        /// Constructs a new Vector2.
-        /// </summary>
-        /// <param name="x">The x coordinate of the net Vector2.</param>
-        /// <param name="y">The y coordinate of the net Vector2.</param>
-        public Vector2(System.Windows.Point p) {
-            X = p.X;
-            Y = p.Y;
-        }
-
-        /// <summary>
         /// Gets or sets the value at the index of the Vector.
         /// </summary>
         public double this[int index] {

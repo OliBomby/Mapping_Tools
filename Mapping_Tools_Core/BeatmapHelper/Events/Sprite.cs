@@ -1,6 +1,6 @@
 ﻿using System;
+using Mapping_Tools_Core.Exceptions;
 using Mapping_Tools_Core.MathUtil;
-using static Mapping_Tools_Core.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Events {
     public class Sprite : Event {
@@ -43,10 +43,10 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
 
             FilePath = values[3].Trim('"');
 
-            if (!FileFormatHelper.TryParseDouble(values[4], out double x))
+            if (!InputParsers.TryParseDouble(values[4], out double x))
                 throw new BeatmapParsingException("Failed to parse X position of sprite.", line);
 
-            if (!FileFormatHelper.TryParseDouble(values[5], out double y))
+            if (!InputParsers.TryParseDouble(values[5], out double y))
                 throw new BeatmapParsingException("Failed to parse Y position of sprite.", line);
 
             Pos = new Vector2(x, y);

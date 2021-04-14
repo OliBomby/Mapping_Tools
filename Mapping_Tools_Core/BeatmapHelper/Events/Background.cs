@@ -1,10 +1,11 @@
-﻿using Mapping_Tools_Core.MathUtil;
-using static Mapping_Tools_Core.BeatmapHelper.FileFormatHelper;
+﻿using Mapping_Tools_Core.BeatmapHelper.Types;
+using Mapping_Tools_Core.Exceptions;
+using Mapping_Tools_Core.MathUtil;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Events {
-    public class Background : Event {
+    public class Background : Event, IHasStartTime {
         public string EventType { get; set; }
-        public int StartTime { get; set; }
+        public double StartTime { get; set; }
         public string Filename { get; set; }
         public int XOffset { get; set; }
         public int YOffset { get; set; }
@@ -15,7 +16,7 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
 
         public override string GetLine() {
             // Writing the offset is optional if its 0,0 but we add it anyways because that is what osu! does.
-            return $"{EventType},{StartTime.ToInvariant()},\"{Filename}\",{XOffset.ToInvariant()},{YOffset.ToInvariant()}";
+            return $"{EventType},{StartTime.ToRoundInvariant()},\"{Filename}\",{XOffset.ToInvariant()},{YOffset.ToInvariant()}";
         }
 
         public override void SetLine(string line) {
@@ -28,7 +29,7 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
             EventType = values[0];
 
             // This start time is usually 0 for backgrounds but lets parse it anyways
-            if (FileFormatHelper.TryParseInt(values[1], out int startTime))
+            if (InputParsers.TryParseDouble(values[1], out double startTime))
                 StartTime = startTime;
             else throw new BeatmapParsingException("Failed to parse start time of background.", line);
 
@@ -36,11 +37,11 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
 
             // Writing offset is optional
             if (values.Length > 3) {
-                if (FileFormatHelper.TryParseInt(values[3], out int xOffset))
+                if (InputParsers.TryParseInt(values[3], out int xOffset))
                     XOffset = xOffset;
                 else throw new BeatmapParsingException("Failed to parse X offset of background.", line);
 
-                if (FileFormatHelper.TryParseInt(values[4], out int yOffset))
+                if (InputParsers.TryParseInt(values[4], out int yOffset))
                     YOffset = yOffset;
                 else throw new BeatmapParsingException("Failed to parse Y offset of background.", line);
             } else {

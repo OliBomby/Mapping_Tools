@@ -35,7 +35,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.LayerImporters {
             foreach (var ho in beatmap.HitObjects.Where(ho => 
                 (Math.Abs(ho.Pos.X - x) <= leniency + Precision.DOUBLE_EPSILON || xIgnore) && 
                 (Math.Abs(ho.Pos.Y - y) <= leniency + Precision.DOUBLE_EPSILON || yIgnore))) {
-                yield return ho.Time;
+                yield return ho.StartTime;
             }
         }
     }

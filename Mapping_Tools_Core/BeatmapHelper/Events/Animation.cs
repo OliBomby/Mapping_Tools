@@ -1,9 +1,9 @@
-﻿using System;
-using Mapping_Tools_Core.MathUtil;
-using static Mapping_Tools_Core.BeatmapHelper.FileFormatHelper;
+﻿using Mapping_Tools_Core.MathUtil;
+using System;
+using Mapping_Tools_Core.Exceptions;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Events {
-    public class Animation : Event, IHasDuration {
+    public class Animation : Event {
         public StoryboardLayer Layer { get; set; }
         public Origin Origin { get; set; }
 
@@ -47,30 +47,25 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
 
             FilePath = values[3].Trim('"');
 
-            if (!FileFormatHelper.TryParseDouble(values[4], out double x))
+            if (!InputParsers.TryParseDouble(values[4], out double x))
                 throw new BeatmapParsingException("Failed to parse X position of animation.", line);
 
-            if (!FileFormatHelper.TryParseDouble(values[5], out double y))
+            if (!InputParsers.TryParseDouble(values[5], out double y))
                 throw new BeatmapParsingException("Failed to parse Y position of animation.", line);
 
             Pos = new Vector2(x, y);
 
-            if (FileFormatHelper.TryParseInt(values[6], out int frameCount))
+            if (InputParsers.TryParseInt(values[6], out int frameCount))
                 FrameCount = frameCount;
             else throw new BeatmapParsingException("Failed to parse frame count of animation.", line);
 
-            if (FileFormatHelper.TryParseDouble(values[7], out double frameDelay))
+            if (InputParsers.TryParseDouble(values[7], out double frameDelay))
                 FrameDelay = frameDelay;
             else throw new BeatmapParsingException("Failed to parse frame delay of animation.", line);
 
             if (Enum.TryParse(values[8], out LoopType loopType))
                 LoopType = loopType;
             else throw new BeatmapParsingException("Failed to parse loop type of animation.", line);
-        }
-
-        public double Duration { 
-            get => FrameDelay;
-            set => FrameDelay = value;
         }
     }
 }

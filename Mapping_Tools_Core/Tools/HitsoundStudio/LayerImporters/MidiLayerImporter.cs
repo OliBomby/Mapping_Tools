@@ -92,7 +92,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.LayerImporters {
                         // Make sample generating args
                         var note = new MidiNote(bank, patch, key, velocity, length);
 
-                        var sampleArgs = new SampleGeneratingArgs(new MidiSampleGenerator(note), 1.0);
+                        var sampleArgs = new MidiSampleGenerator(note);
 
                         // Make source ref
                         var sourceRef = new MidiLayerSourceRef(
@@ -171,7 +171,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.LayerImporters {
         }
 
         private static List<double> CalculateCumulativeTime(List<TempoEvent> tempos, int deltaTicksPerQuarter) {
-            // Time is in miliseconds
+            // StartTime is in miliseconds
             List<double> times = new List<double>(tempos.Count);
 
             TempoEvent last = null;

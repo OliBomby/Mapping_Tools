@@ -4,9 +4,9 @@ using System.Linq;
 namespace Mapping_Tools_Core.BeatmapHelper.Events {
     /// <summary>
     /// Abstract event type. Represents everything that can be put in the [Events] section.
-    /// TODO: When actually doing storyboard stuff some of the types should have child and parent events instead of indents, so we get a tree structure. BTW this would break ITextLine
+    /// TODO: When actually doing storyboard stuff some of the types should have child and parent events instead of indents, so we get a tree structure.
     /// </summary>
-    public abstract class Event : ITextLine {
+    public abstract class Event {
         protected Event() {
             ChildEvents = new List<Event>();
         }
@@ -91,7 +91,7 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
                 }
 
                 // Add this event to the tree or return it if it's at the top level
-                var parent = parentEvents.Last.Value;
+                var parent = parentEvents.Last?.Value;
                 if (parent == null) {
                     yield return ev;
                 } else {

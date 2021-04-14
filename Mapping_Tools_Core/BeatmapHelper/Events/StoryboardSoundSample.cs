@@ -1,5 +1,6 @@
 ﻿using System;
-using static Mapping_Tools_Core.BeatmapHelper.FileFormatHelper;
+using Mapping_Tools_Core.BeatmapHelper.Types;
+using Mapping_Tools_Core.Exceptions;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Events {
     /// <summary>
@@ -8,11 +9,11 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
     /// <example>
     /// Sample,56056,0,"soft-hitnormal.wav",30
     /// </example>
-    public class StoryboardSoundSample : Event, IEquatable<StoryboardSoundSample>, IHasStartTime, IHasEndTime, IComparable<StoryboardSoundSample> {
+    public class StoryboardSoundSample : Event, IEquatable<StoryboardSoundSample>, IHasStartTime, IComparable<StoryboardSoundSample> {
         /// <summary>
         /// The time when this sound event occurs.
         /// </summary>
-        public int StartTime { get; set; }
+        public double StartTime { get; set; }
 
         /// <summary>
         /// The storyboard layer this event belongs to.
@@ -64,7 +65,7 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
                 throw new BeatmapParsingException("This line is not a storyboarded sample.", line);
             }
 
-            if (FileFormatHelper.TryParseInt(values[1], out int t))
+            if (InputParsers.TryParseDouble(values[1], out double t))
                 StartTime = t;
             else throw new BeatmapParsingException("Failed to parse time of storyboarded sample.", line);
 
@@ -75,7 +76,7 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
             FilePath = values[3].Trim('"');
 
             if (values.Length > 4) {
-                if (FileFormatHelper.TryParseDouble(values[4], out double vol))
+                if (InputParsers.TryParseDouble(values[4], out double vol))
                     Volume = vol;
                 else throw new BeatmapParsingException("Failed to parse volume of storyboarded sample.", line);
             }
@@ -92,11 +93,6 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
                                   Layer == other.Layer &&
                                   FilePath == other.FilePath &&
                                   Volume == other.Volume);
-        }
-
-        public int EndTime { 
-            get => StartTime;
-            set => StartTime = value;
         }
 
         public int CompareTo(StoryboardSoundSample other) {

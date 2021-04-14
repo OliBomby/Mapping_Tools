@@ -1,16 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
+﻿using Mapping_Tools_Core.Audio.DuplicateDetection;
 using Mapping_Tools_Core.BeatmapHelper;
 using Mapping_Tools_Core.BeatmapHelper.Editor;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.BeatmapHelper.Events;
 using Mapping_Tools_Core.MathUtil;
 using Mapping_Tools_Core.ToolHelpers;
-using Mapping_Tools_Core.Tools.HitsoundStudio;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using Mapping_Tools_Core.BeatmapHelper.TimelineStuff;
 
 namespace Mapping_Tools_Core.Tools.MapCleanerStuff {
     public partial class MapCleaner {
@@ -21,16 +22,17 @@ namespace Mapping_Tools_Core.Tools.MapCleanerStuff {
         /// <param name="args">The arguments for how to clean the beatmap.</param>
         /// <param name="worker">The BackgroundWorker for updating progress.</param>
         /// <returns>Number of resnapped objects.</returns>
-        public static MapCleanerResult CleanMap(BeatmapEditor editor, MapCleanerArgs args, BackgroundWorker worker = null) {
+        public static IMapCleanerResult CleanMap(BeatmapEditor editor, IMapCleanerArgs args, BackgroundWorker worker = null) {
             UpdateProgressBar(worker, 0);
 
-            Beatmap beatmap = editor.Beatmap;
+            Beatmap beatmap = editor.ReadFile();
             Timing timing = beatmap.BeatmapTiming;
 
             GameMode mode = (GameMode)beatmap.General["Mode"].IntValue;
             double circleSize = beatmap.Difficulty["CircleSize"].DoubleValue;
             string mapDir = editor.GetParentFolder();
-            Dictionary<string, string> firstSamples = HitsoundImporter.AnalyzeSamples(mapDir);
+            Dictionary<string, string> firstSamples =
+                new MonolithicDuplicateSampleDetector().AnalyzeSamples(mapDir, out _, true);
 
             int objectsResnapped = 0;
             int samplesRemoved = 0;
@@ -128,7 +130,7 @@ namespace Mapping_Tools_Core.Tools.MapCleanerStuff {
                 if (ho.IsSlider) // SliderVelocity changes
                 {
                     TimingPoint tp = ho.TimingPoint.Copy();
-                    tp.Offset = ho.Time;
+                    tp.Offset = ho.StartTime;
                     tp.MpB = ho.SliderVelocity;
                     timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true));
                 }
@@ -153,7 +155,7 @@ namespace Mapping_Tools_Core.Tools.MapCleanerStuff {
                 if (ho.IsSlider && samplesetActuallyChanged) // Make it start out with the right sampleset
                 {
                     TimingPoint tp = ho.HitsoundTimingPoint.Copy();
-                    tp.Offset = ho.Time;
+                    tp.Offset = ho.StartTime;
                     timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: true));
                 }
             }
@@ -244,13 +246,13 @@ namespace Mapping_Tools_Core.Tools.MapCleanerStuff {
             // Replace the old timingpoints
             timing.Clear();
             TimingPointsChange.ApplyChanges(timing, timingPointsChanges);
-            beatmap.GiveObjectsGreenlines();
+            beatmap.GiveObjectsTimingContext();
 
             UpdateProgressBar(worker, 90);
 
             // Remove unused samples
             if (args.RemoveUnusedSamples)
-                RemoveUnusedSamples(mapDir);
+                samplesRemoved = RemoveUnusedSamples(mapDir);
 
             // Complete progressbar
             UpdateProgressBar(worker, 100);
@@ -266,7 +268,7 @@ namespace Mapping_Tools_Core.Tools.MapCleanerStuff {
             List<string> beatmaps = Directory.GetFiles(mapDir, "*.osu", SearchOption.TopDirectoryOnly).ToList();
             foreach (string path in beatmaps) {
                 BeatmapEditor editor = new BeatmapEditor(path);
-                Beatmap beatmap = editor.Beatmap;
+                Beatmap beatmap = editor.ReadFile();
 
                 GameMode mode = (GameMode)beatmap.General["Mode"].IntValue;
                 double sliderTickRate = beatmap.Difficulty["SliderTickRate"].DoubleValue;
@@ -292,7 +294,7 @@ namespace Mapping_Tools_Core.Tools.MapCleanerStuff {
             List<string> storyboards = Directory.GetFiles(mapDir, "*.osb", SearchOption.TopDirectoryOnly).ToList();
             foreach (string path in storyboards) {
                 StoryboardEditor editor = new StoryboardEditor(path);
-                StoryBoard storyboard = editor.StoryBoard;
+                Storyboard storyboard = editor.ReadFile();
 
                 foreach (StoryboardSoundSample sbss in storyboard.StoryboardSoundSamples) {
                     allFilenames.Add(sbss.FilePath);

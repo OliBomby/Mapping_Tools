@@ -8,7 +8,7 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio.Model {
     /// Represents a hitsound sample in osu!
     /// with the addition of an outside volume parameter.
     /// </summary>
-    public interface ISample : ICloneable {
+    public interface ISample : ICloneable, IEquatable<ISample> {
         [CanBeNull]
         ISampleGenerator SampleGenerator { get; set; }
 

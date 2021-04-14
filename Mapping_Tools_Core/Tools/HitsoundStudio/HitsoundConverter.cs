@@ -181,29 +181,31 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
         /// <returns></returns>
         public static List<IHitsoundEvent> GetHitsounds(ICollection<ISamplePackage> samplePackages,
             ref Dictionary<ISampleGenerator, string> names,
-            ref Dictionary<ISampleGenerator, Vector2> positions,
+            ref Dictionary<ISample, Vector2> positions,
             bool maniaPositions=false, bool includeRegularHitsounds=true, bool allowNamingGrowth=false) {
 
-            HashSet<ISampleGenerator> allSampleArgs = new HashSet<ISampleGenerator>();
+            // Get all unique ISample and ISampleGenerator objects
+            HashSet<ISample> allSamples = new HashSet<ISample>();
             foreach (ISamplePackage sp in samplePackages) {
-                allSampleArgs.UnionWith(sp.Samples.Select(o => o.SampleGenerator));
+                allSamples.UnionWith(sp.Samples);
             }
 
+            HashSet<ISampleGenerator> allSampleArgs = new HashSet<ISampleGenerator>(allSamples.Select(o => o.SampleGenerator));
+
+            // Generate names and positions for the hitsounds
             if (names == null) {
                 names = HitsoundExporter.GenerateSampleNames(allSampleArgs);
             }
 
             if (positions == null) {
-                positions = maniaPositions ? HitsoundExporter.GenerateManiaHitsoundPositions(allSampleArgs) :
-                    HitsoundExporter.GenerateHitsoundPositions(allSampleArgs);
+                positions = maniaPositions ? HitsoundExporter.GenerateManiaHitsoundPositions(allSamples) :
+                    HitsoundExporter.GenerateHitsoundPositions(allSamples);
             }
 
             var hitsounds = new List<IHitsoundEvent>();
             foreach (var p in samplePackages) {
                 foreach (var s in p.Samples) {
                     string filename;
-                    //TODO: Fix this so it can choose position based on the Sample
-                    Vector2 position;
 
                     if (s.SampleGenerator == null || !s.SampleGenerator.IsValid()) {
                         filename = string.Empty;
@@ -224,11 +226,11 @@ namespace Mapping_Tools_Core.Tools.HitsoundStudio {
 
                     if (includeRegularHitsounds) {
                         hitsounds.Add(new HitsoundEvent(p.Time,
-                            positions[s.SampleGenerator], s.OutsideVolume, filename, s.SampleSet, s.SampleSet,
+                            positions[s], s.OutsideVolume, filename, s.SampleSet, s.SampleSet,
                             0, s.Hitsound == Hitsound.Whistle, s.Hitsound == Hitsound.Finish, s.Hitsound == Hitsound.Clap));
                     } else {
                         hitsounds.Add(new HitsoundEvent(p.Time,
-                            positions[s.SampleGenerator], s.OutsideVolume, filename, SampleSet.Auto, SampleSet.Auto,
+                            positions[s], s.OutsideVolume, filename, SampleSet.Auto, SampleSet.Auto,
                             0, false, false, false));
                     }
                 }
