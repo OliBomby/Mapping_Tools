@@ -24,7 +24,7 @@ namespace Mapping_Tools_Core.Tools.ComboColourStudio {
                     //Console.WriteLine(comboLength);
 
                     // Get the colour point for this new combo
-                    var colourPoint = GetColourPointAtTime(orderedColourPoints, newCombo.Time, exceptions, comboLength <= project.MaxBurstLength);
+                    var colourPoint = GetColourPointAtTime(orderedColourPoints, newCombo.StartTime, exceptions, comboLength <= project.MaxBurstLength);
                     var colourSequence = colourPoint.ColourSequence.ToList();
 
                     // Add the colour point to the exceptions so it doesnt get used again

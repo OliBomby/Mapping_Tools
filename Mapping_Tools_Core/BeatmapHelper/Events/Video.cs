@@ -1,9 +1,11 @@
-﻿using Mapping_Tools_Core.MathUtil;
+﻿using Mapping_Tools_Core.BeatmapHelper.Types;
+using Mapping_Tools_Core.Exceptions;
+using Mapping_Tools_Core.MathUtil;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Events {
     public class Video : Event, IHasStartTime {
         public string EventType { get; set; }
-        public int StartTime { get; set; }
+        public double StartTime { get; set; }
         public string Filename { get; set; }
         public int XOffset { get; set; }
         public int YOffset { get; set; }
@@ -15,10 +17,10 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
         public override string GetLine() {
             // Dont write the offset if its 0,0
             if (XOffset == 0 && YOffset == 0) {
-                return $"{EventType},{StartTime.ToInvariant()},\"{Filename}\"";
+                return $"{EventType},{StartTime.ToRoundInvariant()},\"{Filename}\"";
             }
 
-            return $"{EventType},{StartTime.ToInvariant()},\"{Filename}\",{XOffset.ToInvariant()},{YOffset.ToInvariant()}";
+            return $"{EventType},{StartTime.ToRoundInvariant()},\"{Filename}\",{XOffset.ToInvariant()},{YOffset.ToInvariant()}";
         }
 
         public override void SetLine(string line) {
@@ -32,7 +34,7 @@ namespace Mapping_Tools_Core.BeatmapHelper.Events {
             EventType = values[0];
 
             // This start time is usually 0 for backgrounds but lets parse it anyways
-            if (InputParsers.TryParseInt(values[1], out int startTime))
+            if (InputParsers.TryParseDouble(values[1], out double startTime))
                 StartTime = startTime;
             else throw new BeatmapParsingException("Failed to parse start time of video.", line);
 

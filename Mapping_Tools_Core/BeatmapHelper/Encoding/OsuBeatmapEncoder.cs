@@ -1,16 +1,27 @@
-﻿using System.Collections.Generic;
+﻿using Mapping_Tools_Core.BeatmapHelper.Encoding.HitObject;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using Mapping_Tools_Core.BeatmapHelper.ComboColours;
+using Mapping_Tools_Core.BeatmapHelper.TimingStuff;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Encoding {
-    public class OsuBeatmapEncoder : IEncoder<IBeatmap> {
-        private readonly IEncoder<IStoryboard> storyboardParser = new OsuStoryboardEncoder();
+    public class OsuBeatmapEncoder : IEnumeratingEncoder<IBeatmap> {
+        private readonly IEnumeratingEncoder<IStoryboard> storyboardEncoder;
+        private readonly IEncoder<BeatmapHelper.HitObject> hitObjectEncoder;
+        private readonly IEncoder<TimingPoint> timingPointEncoder;
 
-        /// <summary>
-        /// When true, all coordinates and times will be serialized without rounding.
-        /// </summary>
-        public bool SaveWithFloatPrecision { get; set; } = false;
+        public OsuBeatmapEncoder() : this(new OsuStoryboardEncoder(), new HitObjectEncoder(), new TimingPointEncoder()) { }
 
-        public IEnumerable<string> Encode(IBeatmap beatmap) {
+        public OsuBeatmapEncoder(IEnumeratingEncoder<IStoryboard> storyboardEncoder,
+            IEncoder<BeatmapHelper.HitObject> hitObjectEncoder,
+            IEncoder<TimingPoint> timingPointEncoder) {
+            this.storyboardEncoder = storyboardEncoder;
+            this.hitObjectEncoder = hitObjectEncoder;
+            this.timingPointEncoder = timingPointEncoder;
+        }
+
+        public IEnumerable<string> EncodeEnumerable(IBeatmap beatmap) {
             // Getting all the stuff
             yield return "osu file format v14";
             yield return "";
@@ -26,11 +37,10 @@ namespace Mapping_Tools_Core.BeatmapHelper.Encoding {
             yield return "[Difficulty]";
             foreach (string s in FileFormatHelper.EnumerateDictionary(beatmap.Difficulty)) yield return s;
             yield return "";
-            foreach (string s in storyboardParser.Encode(beatmap.StoryBoard)) yield return s;
+            foreach (string s in storyboardEncoder.EncodeEnumerable(beatmap.StoryBoard)) yield return s;
             yield return "[TimingPoints]";
             foreach (TimingPoint tp in beatmap.BeatmapTiming.TimingPoints.Where(tp => tp != null)) {
-                tp.SaveWithFloatPrecision = SaveWithFloatPrecision;
-                yield return tp.GetLine();
+                yield return timingPointEncoder.Encode(tp);
             }
             yield return "";
             if (beatmap.ComboColoursList.Any()) {
@@ -45,10 +55,13 @@ namespace Mapping_Tools_Core.BeatmapHelper.Encoding {
             }
             yield return "";
             yield return "[HitObjects]";
-            foreach (HitObject ho in beatmap.HitObjects) {
-                ho.SaveWithFloatPrecision = SaveWithFloatPrecision;
-                yield return ho.GetLine();
+            foreach (BeatmapHelper.HitObject ho in beatmap.HitObjects) {
+                yield return hitObjectEncoder.Encode(ho);
             }
+        }
+
+        public string Encode(IBeatmap obj) {
+            return string.Join(Environment.NewLine, EncodeEnumerable(obj));
         }
     }
 }

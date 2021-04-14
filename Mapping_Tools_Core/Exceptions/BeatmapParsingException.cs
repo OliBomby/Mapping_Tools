@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Mapping_Tools_Core.BeatmapHelper
+namespace Mapping_Tools_Core.Exceptions
 {
     [Serializable]
     class BeatmapParsingException : Exception

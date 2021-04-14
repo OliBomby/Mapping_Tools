@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using Mapping_Tools_Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools_Core.BeatmapHelper.Enums;
 using Mapping_Tools_Core.MathUtil;
-using Newtonsoft.Json;
 
-namespace Mapping_Tools_Core.BeatmapHelper {
-    public class TimingPoint : ITextLine, IComparable<TimingPoint> {
+namespace Mapping_Tools_Core.BeatmapHelper.TimingStuff {
+    public class TimingPoint : IComparable<TimingPoint> {
         // Offset, Milliseconds per Beat, Meter, Sample Set, Sample Index, Volume, Inherited, Kiai Mode
         /// <summary>
         /// The millisecond value of the timing point.
@@ -20,7 +17,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         public double MpB { get; set; }
 
         /// <summary>
-        /// Time signature to x/4
+        /// StartTime signature to x/4
         /// </summary>
         public TempoSignature Meter { get; set; }
 
@@ -60,12 +57,6 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// It can also be utilised for the Nightcore mod of standard by removing a finish sample at the timing point.
         /// </summary>
         public bool OmitFirstBarLine { get; set; }
-
-        /// <summary>
-        /// When true, all coordinates and times will be serialized without rounding.
-        /// </summary>
-        [JsonIgnore]
-        public bool SaveWithFloatPrecision { get; set; }
 
         /// <summary>
         /// Creates a new <see cref="TimingPoint"/>
@@ -116,14 +107,6 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             OmitFirstBarLine = omitFirstBarLine;
         }
 
-        /// <summary>
-        /// Creates a new Timing Point from the string line of the .osu file.
-        /// </summary>
-        /// <param name="line"></param>
-        public TimingPoint(string line) {
-            SetLine(line);
-        }
-
         public TimingPoint()
         {
             MpB = 60000;
@@ -135,7 +118,6 @@ namespace Mapping_Tools_Core.BeatmapHelper {
             Uninherited = false;
             Kiai = false;
             OmitFirstBarLine = false;
-
         }
 
 
@@ -143,51 +125,9 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// Generates the line from the selected <see cref="TimingPoint"/>
         /// </summary>
         /// <returns></returns>
-        public string GetLine() {
+        public override string ToString() {
             int style = MathHelper.GetIntFromBitArray(new BitArray(new[] { Kiai, false, false, OmitFirstBarLine }));
-            return $"{(SaveWithFloatPrecision ? Offset.ToInvariant() : Offset.ToRoundInvariant())},{MpB.ToInvariant()},{Meter.TempoNumerator.ToInvariant()},{SampleSet.ToIntInvariant()},{SampleIndex.ToInvariant()},{(SaveWithFloatPrecision ? Volume.ToInvariant() : Volume.ToRoundInvariant())},{Convert.ToInt32(Uninherited).ToInvariant()},{style.ToInvariant()}";
-        }
-
-        /// <summary>
-        /// Sets a <see cref="TimingPoint"/> from the line of the beatmap file.
-        /// </summary>
-        /// <param name="line"></param>
-        /// <exception cref="BeatmapParsingException">If the beatmap can not be read correctly.</exception>
-        public void SetLine(string line) {
-            string[] values = line.Split(',');
-
-            if (InputParsers.TryParseDouble(values[0], out double offset))
-                Offset = offset;
-            else throw new BeatmapParsingException("Failed to parse offset of timing point", line);
-
-            if (InputParsers.TryParseDouble(values[1], out double mpb))
-                MpB = mpb;
-            else throw new BeatmapParsingException("Failed to parse milliseconds per beat of timing point", line);
-
-            if (InputParsers.TryParseInt(values[2], out int meter))
-                Meter = new TempoSignature(meter);
-            else throw new BeatmapParsingException("Failed to parse meter of timing point", line);
-
-            if (Enum.TryParse(values[3], out SampleSet ss))
-                SampleSet = ss;
-            else throw new BeatmapParsingException("Failed to parse sampleset of timing point", line);
-
-            if (InputParsers.TryParseInt(values[4], out int ind))
-                SampleIndex = ind;
-            else throw new BeatmapParsingException("Failed to parse sample index of timing point", line);
-
-            if (InputParsers.TryParseDouble(values[5], out double vol))
-                Volume = vol;
-            else throw new BeatmapParsingException("Failed to parse volume of timing point", line);
-
-            Uninherited = values[6] == "1";
-
-            if (values.Length <= 7) return;
-            if (InputParsers.TryParseInt(values[7], out int style)) {
-                BitArray b = new BitArray(new int[] { style });
-                Kiai = b[0];
-                OmitFirstBarLine = b[3];
-            } else throw new BeatmapParsingException("Failed to style of timing point", line);
+            return $"{Offset.ToInvariant()},{MpB.ToInvariant()},{Meter.TempoNumerator.ToInvariant()},{SampleSet.ToIntInvariant()},{SampleIndex.ToInvariant()},{Volume.ToInvariant()},{Convert.ToInt32(Uninherited).ToInvariant()},{style.ToInvariant()}";
         }
 
         /// <summary>
@@ -196,23 +136,6 @@ namespace Mapping_Tools_Core.BeatmapHelper {
         /// <returns>An exact replica of the <see cref="TimingPoint"/></returns>
         public TimingPoint Copy() {
             return new TimingPoint(Offset, MpB, Meter, SampleSet, SampleIndex, Volume, Uninherited, Kiai, OmitFirstBarLine);
-        }
-
-        /// <summary>
-        /// Can clarify if the current timing point should snap to the nearest beat of the previous timing point.
-        /// </summary>
-        /// <param name="timing"></param>
-        /// <param name="snap1"></param>
-        /// <param name="snap2"></param>
-        /// <param name="floor"></param>
-        /// <param name="tp"></param>
-        /// <param name="firstTP"></param>
-        /// <returns></returns>
-        public bool ResnapSelf(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor=true, TimingPoint tp=null, TimingPoint firstTP = null) {
-            double newTime = timing.Resnap(Offset, beatDivisors, floor, tp: tp, firstTp: firstTP);
-            double deltaTime = newTime - Offset;
-            Offset += deltaTime;
-            return deltaTime != 0;
         }
 
         public bool Equals(TimingPoint tp) {
@@ -246,6 +169,7 @@ namespace Mapping_Tools_Core.BeatmapHelper {
 
         /// <summary>
         /// Grabs the current Beats Per Minute from the <see cref="TimingPoint"/>
+        /// assuming this is an uninherited timing point.
         /// </summary>
         /// <returns></returns>
         public double GetBpm() {
@@ -253,14 +177,46 @@ namespace Mapping_Tools_Core.BeatmapHelper {
                 return 60000 / MpB;
             }
 
-            return -100 / MpB;
+            throw new InvalidOperationException("Cannot get BPM from an inherited timingpoint.");
         }
 
+        /// <summary>
+        /// Sets the current Beats Per Minute of the <see cref="TimingPoint"/>
+        /// assuming this is an uninherited timing point.
+        /// </summary>
+        /// <returns></returns>
         public void SetBpm(double bpm) {
             if (Uninherited) {
                 MpB = 60000 / bpm;
             } else {
+                throw new InvalidOperationException("Cannot set BPM on an inherited timingpoint.");
+            }
+        }
+
+        /// <summary>
+        /// Grabs the current slider velocity multiplier from the <see cref="TimingPoint"/>
+        /// assuming this is an inherited timing point.
+        /// Returns 1x slider velocity if this is an uninherited timing point.
+        /// </summary>
+        /// <returns></returns>
+        public double GetSliderVelocity() {
+            if (!Uninherited) {
+                return -100 / MpB;
+            }
+
+            return 1;
+        }
+
+        /// <summary>
+        /// Sets the current slider velocity multiplier of the <see cref="TimingPoint"/>
+        /// assuming this is an inherited timing point.
+        /// </summary>
+        /// <returns></returns>
+        public void SetSliderVelocity(double bpm) {
+            if (!Uninherited) {
                 MpB = -100 / bpm;
+            } else {
+                throw new InvalidOperationException("Cannot set slider velocity on an uninherited timingpoint.");
             }
         }
 

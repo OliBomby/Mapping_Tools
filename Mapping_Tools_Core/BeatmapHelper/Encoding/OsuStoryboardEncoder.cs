@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Mapping_Tools_Core.BeatmapHelper.Events;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Encoding {
-    public class OsuStoryboardEncoder : IEncoder<IStoryboard> {
-        public IEnumerable<string> Encode(IStoryboard obj) {
+    public class OsuStoryboardEncoder : IEnumeratingEncoder<IStoryboard> {
+        public IEnumerable<string> EncodeEnumerable(IStoryboard obj) {
             yield return "[Events]";
             yield return "//Background and Video events";
             foreach (string s in obj.BackgroundAndVideoEvents.Select(e => e.GetLine())) yield return s;
@@ -23,6 +25,10 @@ namespace Mapping_Tools_Core.BeatmapHelper.Encoding {
             yield return "//Storyboard Sound Samples";
             foreach (string s in obj.StoryboardSoundSamples.Select(sbss => sbss.GetLine())) yield return s;
             yield return "";
+        }
+
+        public string Encode(IStoryboard obj) {
+            return string.Join(Environment.NewLine, EncodeEnumerable(obj));
         }
     }
 }

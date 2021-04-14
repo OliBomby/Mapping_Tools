@@ -1,9 +1,12 @@
-﻿using Mapping_Tools_Core.BeatmapHelper.Events;
+﻿using System;
+using Mapping_Tools_Core.BeatmapHelper.Events;
 using System.Collections.Generic;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Decoding {
     public class OsuStoryboardDecoder : IDecoder<Storyboard> {
-        public void Decode(Storyboard obj, IReadOnlyCollection<string> lines) {
+        public void Decode(Storyboard obj, string code) {
+            var lines = code.Split(Environment.NewLine);
+
             // Load up all the stuff
             IEnumerable<string> backgroundAndVideoEventsLines = FileFormatHelper.GetCategoryLines(lines, "//Background and Video events", new[] { "[", "//" });
             IEnumerable<string> storyboardLayerBackgroundLines = FileFormatHelper.GetCategoryLines(lines, "//Storyboard Layer 0 (Background)", new[] { "[", "//" });
@@ -28,9 +31,9 @@ namespace Mapping_Tools_Core.BeatmapHelper.Decoding {
             }
         }
 
-        public Storyboard DecodeNew(IReadOnlyCollection<string> lines) {
+        public Storyboard DecodeNew(string code) {
             var storyboard = new Storyboard();
-            Decode(storyboard, lines);
+            Decode(storyboard, code);
 
             return storyboard;
         }

@@ -1,11 +1,27 @@
-﻿using Mapping_Tools_Core.BeatmapHelper.Events;
+﻿using System;
+using Mapping_Tools_Core.BeatmapHelper.Events;
 using System.Collections.Generic;
+using Mapping_Tools_Core.BeatmapHelper.ComboColours;
+using Mapping_Tools_Core.BeatmapHelper.Decoding.HitObject;
+using Mapping_Tools_Core.BeatmapHelper.TimingStuff;
 
 namespace Mapping_Tools_Core.BeatmapHelper.Decoding {
     public class OsuBeatmapDecoder : IDecoder<Beatmap> {
-        private readonly IDecoder<Storyboard> storyboardDecoder = new OsuStoryboardDecoder();
+        private readonly IDecoder<Storyboard> storyboardDecoder;
+        private readonly IDecoder<BeatmapHelper.HitObject> hitObjectDecoder;
+        private readonly IDecoder<TimingPoint> timingPointDecoder;
 
-        public void Decode(Beatmap beatmap, IReadOnlyCollection<string> lines) {
+        public OsuBeatmapDecoder() : this(new OsuStoryboardDecoder(), new HitObjectDecoder(), new TimingPointDecoder()) { }
+
+        public OsuBeatmapDecoder(IDecoder<Storyboard> storyboardDecoder, IDecoder<BeatmapHelper.HitObject> hitObjectDecoder, IDecoder<TimingPoint> timingPointDecoder) {
+            this.storyboardDecoder = storyboardDecoder;
+            this.hitObjectDecoder = hitObjectDecoder;
+            this.timingPointDecoder = timingPointDecoder;
+        }
+
+        public void Decode(Beatmap beatmap, string code) {
+            var lines = code.Split(Environment.NewLine);
+
             // Load up all the shit
             IEnumerable<string> generalLines = FileFormatHelper.GetCategoryLines(lines, "[General]");
             IEnumerable<string> editorLines = FileFormatHelper.GetCategoryLines(lines, "[Editor]");
@@ -34,24 +50,27 @@ namespace Mapping_Tools_Core.BeatmapHelper.Decoding {
             }
 
             foreach (string line in hitobjectLines) {
-                beatmap.HitObjects.Add(new HitObject(line));
+                beatmap.HitObjects.Add(hitObjectDecoder.DecodeNew(line));
             }
 
             // Give the lines to the storyboard
-            storyboardDecoder.Decode(beatmap.StoryBoard, lines);
+            storyboardDecoder.Decode(beatmap.StoryBoard, code);
 
             // Set the timing object
-            beatmap.BeatmapTiming = new Timing(timingLines, beatmap.Difficulty["SliderMultiplier"].DoubleValue);
+            beatmap.BeatmapTiming = new Timing(beatmap.Difficulty["SliderMultiplier"].DoubleValue);
+
+            foreach (var timingLine in timingLines) {
+                beatmap.BeatmapTiming.Add(timingPointDecoder.DecodeNew(timingLine));
+            }
 
             beatmap.SortHitObjects();
             beatmap.CalculateHitObjectComboStuff();
-            beatmap.CalculateSliderEndTimes();
-            beatmap.GiveObjectsGreenlines();
+            beatmap.GiveObjectsTimingContext();
         }
 
-        public Beatmap DecodeNew(IReadOnlyCollection<string> lines) {
+        public Beatmap DecodeNew(string code) {
             var beatmap = new Beatmap();
-            Decode(beatmap, lines);
+            Decode(beatmap, code);
 
             return beatmap;
         }

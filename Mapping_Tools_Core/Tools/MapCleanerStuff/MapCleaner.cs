@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Mapping_Tools_Core.BeatmapHelper.TimelineStuff;
 
 namespace Mapping_Tools_Core.Tools.MapCleanerStuff {
     public partial class MapCleaner {
@@ -129,7 +130,7 @@ namespace Mapping_Tools_Core.Tools.MapCleanerStuff {
                 if (ho.IsSlider) // SliderVelocity changes
                 {
                     TimingPoint tp = ho.TimingPoint.Copy();
-                    tp.Offset = ho.Time;
+                    tp.Offset = ho.StartTime;
                     tp.MpB = ho.SliderVelocity;
                     timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true));
                 }
@@ -154,7 +155,7 @@ namespace Mapping_Tools_Core.Tools.MapCleanerStuff {
                 if (ho.IsSlider && samplesetActuallyChanged) // Make it start out with the right sampleset
                 {
                     TimingPoint tp = ho.HitsoundTimingPoint.Copy();
-                    tp.Offset = ho.Time;
+                    tp.Offset = ho.StartTime;
                     timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: true));
                 }
             }
@@ -245,7 +246,7 @@ namespace Mapping_Tools_Core.Tools.MapCleanerStuff {
             // Replace the old timingpoints
             timing.Clear();
             TimingPointsChange.ApplyChanges(timing, timingPointsChanges);
-            beatmap.GiveObjectsGreenlines();
+            beatmap.GiveObjectsTimingContext();
 
             UpdateProgressBar(worker, 90);
 
