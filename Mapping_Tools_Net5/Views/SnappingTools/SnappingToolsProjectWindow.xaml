@@ -1,0 +1,121 @@
+﻿<Window x:Class="Mapping_Tools.Views.SnappingTools.SnappingToolsProjectWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:components="clr-namespace:Mapping_Tools.Components.Domain"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:components1="clr-namespace:Mapping_Tools.Components"
+        xmlns:serialization="clr-namespace:Mapping_Tools.Classes.Tools.SnappingTools.Serialization"
+        mc:Ignorable="d"
+        Title="Geometry Dashboard Projects" Height="500" Width="570" MinWidth="575" MinHeight="360"
+        WindowStyle="None"
+        ResizeMode="CanResize"
+        AllowsTransparency="False"
+        WindowStartupLocation="CenterScreen"
+        TextElement.FontWeight="Medium"
+        TextElement.FontSize="14"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" Background="{DynamicResource MaterialDesignPaper}"
+        d:DataContext="{d:DesignData SnappingToolsProjectWindow}">
+    
+    <WindowChrome.WindowChrome>
+        <WindowChrome 
+            CaptionHeight="35"
+            ResizeBorderThickness="5" />
+    </WindowChrome.WindowChrome>
+ 
+    <Window.Resources>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid x:Name="FirstGrid" Grid.Row="0">
+            <StackPanel WindowChrome.IsHitTestVisibleInChrome="false" HorizontalAlignment="Left" Orientation="Horizontal">
+                <materialDesign:ColorZone Width="24" Height="24" Margin="9,6,0,0" Mode="Inverted">
+                    <materialDesign:ColorZone.OpacityMask>
+                        <ImageBrush ImageSource="/Data/mt_logo_white_24.png"/>
+                    </materialDesign:ColorZone.OpacityMask>
+                </materialDesign:ColorZone>
+                <TextBlock Text="Savestates" Foreground="{DynamicResource MaterialDesignBody}" Margin="8,11,0,0" FontWeight="Normal"/>
+            </StackPanel>
+
+            <StackPanel WindowChrome.IsHitTestVisibleInChrome="true" HorizontalAlignment="Right" Orientation="Horizontal">
+                <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowCLose}" Click="CloseButton_Click" HorizontalAlignment="Right" Height="35" Foreground="{DynamicResource MaterialDesignBody}"/>
+            </StackPanel>
+        </Grid>
+
+        <ListView Grid.Row="1" Grid.RowSpan="2" x:Name="SaveSlotsGrid" ItemsSource="{Binding Project.SaveSlots}" VerticalContentAlignment="Center">
+            <ListView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Duplicate" ToolTip="Duplicate selected saves." Command="{Binding DuplicateCommand}"></MenuItem>
+                    <MenuItem Header="Remove" ToolTip="Remove all selected saves." Command="{Binding RemoveCommand}"></MenuItem>
+                </ContextMenu>
+            </ListView.ContextMenu>
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn x:Name="NameHeader" Header="Name" Width="150">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate DataType="serialization:SnappingToolsSaveSlot">
+                                <TextBox Width="{Binding ElementName=NameHeader, Path=Width}"
+                                         materialDesign:HintAssist.Hint="Name" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn x:Name="HotkeyHeader" Header="Hotkey" Width="130">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate DataType="serialization:SnappingToolsSaveSlot">
+                                <components1:HotkeyEditorControl Width="{Binding ElementName=HotkeyHeader, Path=Width}"
+                                    HorizontalAlignment="Center" Hotkey="{Binding ProjectHotkey, UpdateSourceTrigger=LostFocus}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate DataType="serialization:SnappingToolsSaveSlot">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button x:Name="SaveButton" ToolTip="Save current settings to this slot."
+                                            Command="{Binding SaveCommand}" Margin="0 0 8 0" materialDesign:ButtonAssist.CornerRadius="7">
+                                        Save
+                                    </Button>
+
+                                    <Button x:Name="LoadButton" ToolTip="Load settings from this slot."
+                                            Command="{Binding LoadCommand}" Margin="0 0 8 0" materialDesign:ButtonAssist.CornerRadius="7">
+                                        Load
+                                    </Button>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 0 0 10">
+            <Button x:Name="DebugButton" Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Re-register hotkeys in case something broke."
+                   Click="DebugButton_OnClick" Margin="0 0 8 0">
+                <materialDesign:PackIcon Kind="Reload" Height="24" Width="24" />
+            </Button>
+            <Button x:Name="AddButton" Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a new save slot."
+                                Command="{Binding AddCommand}" Margin="0 0 8 0">
+                <materialDesign:PackIcon Kind="Plus" Height="24" Width="24" />
+            </Button>
+
+            <Button x:Name="DeleteButton" Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove all selected saves or the last save if nothing is selected."
+                                Command="{Binding RemoveCommand}" Margin="0 0 8 0">
+                <materialDesign:PackIcon Kind="Minus" Height="24" Width="24"/>
+            </Button>
+        </StackPanel>
+
+        <Border BorderThickness="1" Grid.Row="0" Grid.RowSpan="4" Background="{x:Null}" BorderBrush="{DynamicResource PrimaryHueDarkBrush}"/>
+    </Grid>
+</Window>

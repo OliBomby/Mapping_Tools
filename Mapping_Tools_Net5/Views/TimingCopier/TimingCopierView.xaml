@@ -1,0 +1,128 @@
+﻿<local:SingleRunMappingTool x:Class="Mapping_Tools.Views.TimingCopier.TimingCopierView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Mapping_Tools.Views"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
+             mc:Ignorable="d" 
+             x:Name="This"
+             d:DesignHeight="650" Width="759.5">
+    <UserControl.Resources>
+        <domain:MapPathStringToCountStringConverter x:Key="MapPathStringToCountStringConverter"/>
+        <domain:BeatDivisorArrayToStringConverter x:Key="BeatDivisorArrayToStringConverter"/>
+    </UserControl.Resources>
+    <Grid Name="MasterGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid Name="FirstGrid" Grid.Row="0">
+            <StackPanel Grid.Row="0" Margin="0,0,120,0">
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
+                    <Run Text="Timing Copier"/>
+                  </TextBlock>
+                    <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom" ToolTip="Click me!">
+                    <materialDesign:PopupBox.ToggleContent>
+                      <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
+                    </materialDesign:PopupBox.ToggleContent>
+                    <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
+                      Copies timing from A to B.
+                      <LineBreak/>
+                      There are 3 modes that describe how this program will handle moving objects (hitobjects/timingpoints/bookmarks) to the new timing:
+                      <LineBreak/>
+                      "Number of beats between objects stays the same" will move the objects so that the number of beats between objects stays the same. After that it will also resnap to the specified snap divisors. Make sure everything is snapped and don't use this if your new timing is supposed to change the number of beats between objects.
+                      <LineBreak/>
+                      "Just resnap" will snap the objects to the new timing on the specified snap divisors. This doesn't resnap bookmarks.
+                      <LineBreak/>
+                      "Don't move objects" will not move the objects at all.
+                        </TextBlock>
+                  </materialDesign:PopupBox>
+                </StackPanel>
+              
+                <Grid Margin="0,20,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" Text="{Binding ImportPath}" Margin="0,0,5,0"
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Copy timing from"
+                        ToolTip="Path to the beatmap to copy timing from."/>
+                    <Button Grid.Column="1" Cursor="Hand" Command="{Binding ImportLoadCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                            ToolTip="Fetch the selected beatmap from your osu! client.">
+                        <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="RestoreFromTrash" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                    </Button >
+                    <Button Grid.Column="3" Cursor="Hand" Command="{Binding ImportBrowseCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                            ToolTip="Select beatmaps with File Explorer.">
+                        <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                    </Button >
+                </Grid>
+                <Grid Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" x:Name="ExportPathBox" Text="{Binding ExportPath}"
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Copy timing to"
+                        ToolTip="Beatmap(s) to copy timing to. You can input multiple beatmap paths seperated with '|'."/>
+                    <TextBlock Grid.Column="1" Margin="3 15 5 0" FontStyle="Italic"
+                               ToolTip="Multiple beatmaps can be inputted in this field. Separate the paths with the '|' character."
+                               Text="{Binding ElementName=ExportPathBox, Path=Text, Converter={StaticResource MapPathStringToCountStringConverter}}"/>
+                    <Button Grid.Column="2" Cursor="Hand" Command="{Binding ExportLoadCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                            ToolTip="Fetch the selected beatmap from your osu! client.">
+                        <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="RestoreFromTrash" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                    </Button >
+                    <Button Grid.Column="4" Cursor="Hand" Command="{Binding ExportBrowseCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                            ToolTip="Select beatmaps with File Explorer.">
+                        <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                    </Button >
+                </Grid>
+                <ComboBox Margin="0,20,0,0" Cursor="Hand" Text="{Binding ResnapMode}"
+                    Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Resnapping mode"
+                    ToolTip="Choose how to move hit objects to the new timing.">
+                    <ComboBoxItem Content="Number of beats between objects stays the same" Cursor="Hand"/>
+                    <ComboBoxItem Content="Just resnap" Cursor="Hand"/>
+                    <ComboBoxItem Content="Don't move objects" Cursor="Hand"/>
+                </ComboBox>
+                <TextBlock Text="Signatures" Margin="0,20,0,0" FontSize="14" FontWeight="Bold"
+                           ToolTip="Beat snap divisors for resnapping."/>
+                <TextBox Text="{Binding BeatDivisors, Converter={StaticResource BeatDivisorArrayToStringConverter}}" 
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                         HorizontalAlignment="Left" MinWidth="100" FontSize="14" Cursor="Hand"
+                         materialDesign:HintAssist.Hint="Beat divisors"
+                         ToolTip="Input any number of beat divisors here separated with commas. Example: 1/4, 1/12, 1/7, 4/5, 0.13435622499"/>
+            </StackPanel>
+            <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
+                <Button
+                    IsEnabled="{Binding ElementName=This, Path=CanRun}"
+                    Style="{StaticResource MaterialDesignFloatingActionButton}"
+                    Click="Start_Click"
+                    ToolTip="Run this tool.">
+                    <materialDesign:PackIcon
+                        Kind="Play" Height="36" Width="36" />
+                </Button>
+            </Viewbox>
+        </Grid>
+        <Grid Name="SecondGrid" Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Opacity="0.58"/>
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <ProgressBar Value="{Binding ElementName=This, Path=Progress}" Margin="20,0,20,0" Height="20" Background="{x:Null}" BorderBrush="{x:Null}"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</local:SingleRunMappingTool>

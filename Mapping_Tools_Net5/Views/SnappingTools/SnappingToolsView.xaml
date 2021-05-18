@@ -1,0 +1,187 @@
+﻿<local:MappingTool x:Class="Mapping_Tools.Views.SnappingTools.SnappingToolsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Mapping_Tools.Views"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:relevantObjectGenerators="clr-namespace:Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators"
+             mc:Ignorable="d"
+             d:DesignHeight="450" Width="759.5" d:DataContext="{d:DesignData SnappingToolsVm}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid Name="FirstGrid" Grid.Row="0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
+                    <Run Text="Geometry Dashboard"/>
+                        </TextBlock>
+                        <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom" ToolTip="Click me!">
+                            <materialDesign:PopupBox.ToggleContent>
+                                <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
+                            </materialDesign:PopupBox.ToggleContent>
+                            <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="10" xml:space="preserve">This tool derives virtual points, lines and circles from the hit objects in your editor and overlays them over the editor. 
+You can then snap your mouse to those virtual points, lines and circles using a hotkey, so you can use the geometry in your map.
+<LineBreak/>
+There are also hotkeys for selecting, locking and toggling usability on virtual objects. Locked objects don't disappear on themselves and non-usable objects always get ignored by generators.
+You can find and configure all the hotkeys in the preferences (top right gear button). You can configure just about everything else too. 
+Hover your mouse over the names of things to probably get a tooltip which gives more explanation. I encourage you to try out everything!
+<LineBreak/>
+Virtual objects are generated in layers. The first layer has the hit objects of your editor, the second layer has virtual objects derived from those hit objects, the third layer has virtual objects derived from the previous virtual objects, etc.
+You can specify the number of layers in the preferences. More layers generally results in exponentially more virtual objects.
+<LineBreak/>
+In the big list below are all the generators. These generators generate new virtual objects from previous virtual objects or hit objects.
+All the generators in the basic section only take hit objects as an input, so when activating one of them you can instantly see the effect.
+The more advanced generators all take virtual objects as input, so you need to activate at least one basic generator active for them to work.
+<LineBreak/>
+Every generator also has it's own settings. You can access those settings by clicking the 'Configure' button on each generator.
+In these generator settings you can do thing like customize what virtual objects the generator accepts as input or change the properties of the output of the generator.
+<LineBreak/>
+Lastly there are savestates which you can use to quickly change out preferences and generator settings using hotkeys. As an advanced user this can save lots of time continuously changing generators and stuff.
+The savestates window is opened by clicking the button next to the preferences button.
+<LineBreak/>
+⚠ You must specify your user config file in the Mapping Tools Preferences (Options -> Preferences) for this tool to function.</TextBlock>
+                        </materialDesign:PopupBox>
+                    </StackPanel>
+
+                    <Grid Margin="0,0,0,10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                            <Button x:Name="SelectionButton" Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Toggle selection on all virtual objects. Hold shift for enable all, hold ctrl for disable all."
+                                    Command="{Binding SelectedToggleCommand}" Margin="0 0 8 0">
+                                <materialDesign:PackIcon Kind="SelectAll" Height="24" Width="24" />
+                            </Button>
+                            <Button x:Name="LockedButton" Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Toggle locked on all virtual objects. Hold shift for enable all, hold ctrl for disable all."
+                                    Command="{Binding LockedToggleCommand}" Margin="0 0 8 0">
+                                <materialDesign:PackIcon Kind="Lock" Height="24" Width="24" />
+                            </Button>
+                            <Button x:Name="InheritableButton" Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Toggle usability on all virtual objects. Hold shift for enable all, hold ctrl for disable all."
+                                    Command="{Binding InheritableToggleCommand}" Margin="0 0 28 0">
+                                <materialDesign:PackIcon Kind="Pizza" Height="24" Width="24" />
+                            </Button>
+
+                            <Button x:Name="ProjectsButton" Style="{StaticResource MaterialDesignFloatingActionMiniButton}" ToolTip="Savestates..."
+                                    Click="ProjectsButton_Click" Margin="0 0 8 0">
+                                <materialDesign:PackIcon Kind="ContentSaveAll" Height="24" Width="24" />
+                            </Button>
+
+                            <Button x:Name="PreferencesButton" Style="{StaticResource MaterialDesignFloatingActionMiniButton}" ToolTip="Preferences..."
+                                Click="PreferencesButton_Click">
+                                <materialDesign:PackIcon Kind="SettingsOutline" Height="24" Width="24" />
+                            </Button>
+                        </StackPanel>
+                        
+                        <TextBlock x:Name="FilterTextBlock" Grid.Column="0" Text="Search" VerticalAlignment="Center" Margin="10,0"/>
+                        <TextBox Grid.Column="1" Margin="0,0,10,10" Name="TxtFilter" ToolTip="Search for a generator." Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Grid>
+                </StackPanel>
+
+                <ScrollViewer x:Name="GeneratorsScrollViewer" Grid.Row="1" VerticalScrollBarVisibility="Visible" CanContentScroll="True" PreviewMouseWheel="UIElement_OnPreviewMouseWheel" PreviewMouseDown="UIElement_OnPreviewMouseDown" ScrollChanged="ScrollViewer_OnScrollChanged">
+                    <ListView SelectionMode="Single" ItemsSource="{Binding Generators}" ScrollViewer.CanContentScroll="False">
+                        <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Active">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
+                                        <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding Settings.IsActive}" Cursor="Hand"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Settings">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
+                                        <Viewbox Width="100" Height="30" Margin="-5,-5,15,-5">
+                                            <Button ToolTip="Generator settings..." Command="{Binding GeneratorSettingsCommand}" materialDesign:ButtonAssist.CornerRadius="7">
+                                                Configure
+                                            </Button>
+                                        </Viewbox>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Name" Width="500">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
+                                        <TextBlock Text="{Binding Name}" ToolTip="{Binding Tooltip}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Sequential">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
+                                        <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding Settings.IsSequential}" Cursor="Hand"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Deep">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
+                                        <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding Settings.IsDeep}" Cursor="Hand"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+
+                    <ListView.GroupStyle>
+                        <GroupStyle>
+                            <GroupStyle.ContainerStyle>
+                                <Style TargetType="{x:Type GroupItem}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate>
+                                                <Expander IsExpanded="True">
+                                                    <Expander.Header>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="Gray" FontSize="22" VerticalAlignment="Bottom" />
+                                                            <TextBlock Text="{Binding ItemCount}" FontSize="22" Foreground="Green" FontWeight="Bold" FontStyle="Italic" Margin="10,0,0,0" VerticalAlignment="Bottom" />
+                                                            <TextBlock Text=" item(s)" FontSize="22" Foreground="Silver" FontStyle="Italic" VerticalAlignment="Bottom" />
+                                                        </StackPanel>
+                                                    </Expander.Header>
+                                                    <ItemsPresenter />
+                                                </Expander>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </GroupStyle.ContainerStyle>
+                        </GroupStyle>
+                    </ListView.GroupStyle>
+                </ListView>
+                </ScrollViewer>
+            </Grid>
+        </Grid>
+        
+        <Grid Name="SecondGrid" Grid.Row="1" Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Opacity="0.58"/>
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <ProgressBar x:Name="Progress" Margin="20,0,20,0" Height="20" Foreground="#FF838383" Background="{x:Null}" BorderBrush="{x:Null}"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</local:MappingTool>

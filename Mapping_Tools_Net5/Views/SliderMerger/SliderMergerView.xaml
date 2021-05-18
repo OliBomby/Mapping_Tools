@@ -1,0 +1,119 @@
+﻿<local:SingleRunMappingTool x:Class="Mapping_Tools.Views.SliderMerger.SliderMergerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Mapping_Tools.Views"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
+             mc:Ignorable="d" 
+             x:Name="This"
+             d:DesignHeight="450" Width="759.5" d:DataContext="{d:DesignData SliderMergerVM}">
+    <local:SingleRunMappingTool.Resources>
+        <domain:DoubleToStringConverter x:Key="DoubleToStringConverter"/>
+        <domain:TimeToStringConverter x:Key="TimeToStringConverter"/>
+    </local:SingleRunMappingTool.Resources>
+    <Grid Name="MasterGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid Name="FirstGrid" Grid.Row="0">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
+                    <Run Text="Slider Merger"/>
+                    </TextBlock>
+                    <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom" ToolTip="Click me!">
+                        <materialDesign:PopupBox.ToggleContent>
+                            <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
+                        </materialDesign:PopupBox.ToggleContent>
+                        <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
+                    Merge 2 or more sliders into one big slider. The pixel length of the resulting slider is the sum of the pixel lengths of the sliders that made it up.
+                    <LineBreak/>
+                    This program will automatically convert any type of slider into a Beziér slider for the purpose of merging.
+                    <LineBreak/>
+                    In order for 2 sliders to merge, place the second slider on top of the last anchor of the first slider.
+                        </TextBlock>
+                    </materialDesign:PopupBox>
+                    <materialDesign:PopupBox Margin="0,10,10,10" VerticalAlignment="Bottom" ToolTip="Click me!">
+                        <materialDesign:PopupBox.ToggleContent>
+                            <materialDesign:PackIcon Kind="LightningBoltCircle" Width="24" Height="24" Foreground="{DynamicResource PrimaryHueLightBrush}"/>
+                        </materialDesign:PopupBox.ToggleContent>
+                        <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
+                            This tool is compatible with QuickRun!
+                        </TextBlock>
+                    </materialDesign:PopupBox>
+                </StackPanel>
+
+                <TextBox x:Name="LeniencyBox" Width="258" HorizontalAlignment="Left" Margin="0,20,0,0"
+                    Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Merge connection leniency"
+                    ToolTip="The maximum distance in osu! pixels between two merging hit objects.">
+                    <TextBox.Text>
+                        <Binding Path="Leniency" Mode="TwoWay" UpdateSourceTrigger="LostFocus"  NotifyOnValidationError="True">
+                            <Binding.Converter>
+                                <domain:DoubleToStringConverter/>
+                            </Binding.Converter>
+                            <Binding.ValidationRules>
+                                <domain:IsGreaterOrEqualValidationRule>
+                                    <domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                        <domain:DoubleWrapper Value="0"/>
+                                    </domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                </domain:IsGreaterOrEqualValidationRule>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+
+                <StackPanel Orientation="Horizontal" Margin="0,26,0,0" HorizontalAlignment="Left">
+                    <ComboBox x:Name="SelectionModeBox" Cursor="Hand" Width="258"
+                              ItemsSource="{Binding ImportModes}" SelectedItem="{Binding ImportModeSetting}"
+                              Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Object selection mode"
+                              ToolTip="Choose how to select hit objects to merge. Slider Merger will not always merge all the specified objects, because the distance between every pair of objects must still be within the connection distance leniency.">
+                    </ComboBox>
+                    <TextBox Margin="15 0 0 0" Width="258" Text="{Binding TimeCode}" Visibility="{Binding TimeCodeBoxVisibility}"
+                             Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Time code"
+                             ToolTip="Input a time code here. Example time code: 00:56:823 (1,2,1,2) - "/>
+                </StackPanel>
+                
+
+                <ComboBox x:Name="ConnectionModeBox" Margin="0,26,0,0" Cursor="Hand" Width="258" HorizontalAlignment="Left" 
+                          ItemsSource="{Binding ConnectionModes}" SelectedItem="{Binding ConnectionModeSetting}"
+                          Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Object connection mode"
+                          ToolTip="Choose what to do with space gaps between hit objects that want to merge.">
+                </ComboBox>
+
+                <CheckBox x:Name="MergeOnSliderEndBox" Margin="0 26 0 0" Content="Merge on slider end" IsChecked="{Binding MergeOnSliderEnd}"
+                          ToolTip="Merge on the slider end instead of the last anchor of the slider."/>
+
+                <CheckBox x:Name="LinearOnLinearBox" Margin="0,5,0,0" Content="Use linear curve type on fully linear merge" IsChecked="{Binding LinearOnLinear}"
+                          ToolTip="This option will make Slider Merger, if possible, use linear curve type and no red anchors for the resulting slider."></CheckBox>
+            </StackPanel>
+
+            <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
+                <Button
+                    IsEnabled="{Binding ElementName=This, Path=CanRun}"
+                    Style="{StaticResource MaterialDesignFloatingActionButton}"
+                    Click="Start_Click"
+                    ToolTip="Run this tool.">
+                    <materialDesign:PackIcon
+                        Kind="Play" Height="36" Width="36" />
+                </Button>
+            </Viewbox>
+        </Grid>
+        <Grid Name="SecondGrid" Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Opacity="0.58"/>
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <ProgressBar Value="{Binding ElementName=This, Path=Progress}" Margin="20,0,20,0" Height="20" Background="{x:Null}" BorderBrush="{x:Null}"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</local:SingleRunMappingTool>

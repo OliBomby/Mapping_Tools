@@ -1,5 +1,4 @@
-﻿using AutoUpdaterDotNET;
-using Mapping_Tools.Classes;
+﻿using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.Exceptions;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.ToolHelpers;
@@ -52,7 +51,7 @@ namespace Mapping_Tools {
                 SettingsManager.LoadConfig();
                 ListenerManager = new ListenerManager();
 
-                if (SettingsManager.Settings.MainWindowRestoreBounds is Rect r) {
+                if( SettingsManager.Settings.MainWindowRestoreBounds is Rect r ) {
                     SetToRect(r);
                 }
                 SetFullscreen(SettingsManager.Settings.MainWindowMaximized);
@@ -60,7 +59,8 @@ namespace Mapping_Tools {
                 SetCurrentView(typeof(StandardView)); // Generate Standard view model to show on startup
 
                 SetCurrentMaps(SettingsManager.GetLatestCurrentMaps()); // Set currentmap to previously opened map
-            } catch (Exception ex) {
+            }
+            catch( Exception ex ) {
                 ex.Show();
             }
         }
@@ -69,8 +69,10 @@ namespace Mapping_Tools {
             SessionhasAdminRights = IsUserAdministrator();
 
             try {
-                AutoUpdater.ParseUpdateInfoEvent += AutoUpdaterOnParseUpdateInfoEvent;
-                AutoUpdater.Start("https://mappingtools.seira.moe/current/updater.json");
+                /*
+                                AutoUpdater.ParseUpdateInfoEvent += AutoUpdaterOnParseUpdateInfoEvent;
+                                AutoUpdater.Start("https://mappingtools.seira.moe/current/updater.json");
+                */
             }
             catch( Exception ex ) {
                 Console.WriteLine(ex.Message);
@@ -87,7 +89,7 @@ namespace Mapping_Tools {
             Views = new ViewCollection(); // Make a ViewCollection object
             ToolsMenu.ItemsSource = ViewCollection.GetAllToolTypes().Where(o => o.GetCustomAttribute<HiddenToolAttribute>() == null).Select(o => {
                 var name = ViewCollection.GetName(o);
-                var item = new MenuItem {Header = "_" + name, ToolTip = $"Open {name}."};
+                var item = new MenuItem { Header = "_" + name, ToolTip = $"Open {name}." };
                 item.Click += ViewSelectMenuItemOnClick;
                 return item;
             }).OrderBy(o => o.Header);
@@ -95,9 +97,9 @@ namespace Mapping_Tools {
 
         private void Window_Closing(object sender, EventArgs e) {
             // Perform saving of settings at application exit
-            if (autoSave) {
+            if( autoSave ) {
                 Views.AutoSaveSettings();
-                if (DataContext is MappingTool mt) {
+                if( DataContext is MappingTool mt ) {
                     mt.Dispose();
                 }
                 SettingsManager.UpdateSettings();
@@ -119,7 +121,8 @@ namespace Mapping_Tools {
         private void SetCurrentView(string name) {
             try {
                 SetCurrentView(Views.GetView(name));
-            } catch (ArgumentException ex) {
+            }
+            catch( ArgumentException ex ) {
                 ex.Show();
             }
         }
@@ -127,24 +130,26 @@ namespace Mapping_Tools {
         private void SetCurrentView(Type type) {
             try {
                 SetCurrentView(Views.GetView(type));
-            } catch (ArgumentException ex) {
+            }
+            catch( ArgumentException ex ) {
                 ex.Show();
             }
         }
 
         public void SetCurrentView(object view) {
-            if (view == null) return;
+            if( view == null )
+                return;
 
             var type = view.GetType();
 
-            if (FindName("header") is TextBlock txt) {
+            if( FindName("header") is TextBlock txt ) {
                 txt.Text = type.GetCustomAttribute<DontShowTitleAttribute>() == null ? $"Mapping Tools - {ViewCollection.GetName(type)}" : "Mapping Tools";
             }
 
-            if (DataContext is MappingTool mt) {
+            if( DataContext is MappingTool mt ) {
                 mt.Deactivate();
             }
-            if (view is MappingTool nmt) {
+            if( view is MappingTool nmt ) {
                 nmt.Activate();
             }
 
@@ -153,9 +158,10 @@ namespace Mapping_Tools {
         }
 
         private void ViewSelectMenuItemOnClick(object sender, RoutedEventArgs e) {
-            if (((MenuItem) sender).Header == null) return;
+            if( ( (MenuItem) sender ).Header == null )
+                return;
 
-            var toolName = ((MenuItem) sender).Header.ToString().Substring(1);
+            var toolName = ( (MenuItem) sender ).Header.ToString().Substring(1);
             SetCurrentView(toolName);
         }
 
@@ -175,20 +181,23 @@ namespace Mapping_Tools {
             return isAdmin;
         }
 
-        private void AutoUpdaterOnParseUpdateInfoEvent(ParseUpdateInfoEventArgs args) {
-            try {
-                dynamic json = JsonConvert.DeserializeObject(args.RemoteData);
-                args.UpdateInfo = new UpdateInfoEventArgs {
-                    CurrentVersion = json.version,
-                    ChangelogURL = json.changelog,
-                    Mandatory = json.mandatory,
-                    DownloadURL = json.url
-                };
-            }
-            catch( Exception ex ) {
-                Console.WriteLine(ex.Message);
-            }
-        }
+        /*
+                private void AutoUpdaterOnParseUpdateInfoEvent(ParseUpdateInfoEventArgs args) {
+                    try {
+                        dynamic json = JsonConvert.DeserializeObject(args.RemoteData);
+                        args.UpdateInfo = new UpdateInfoEventArgs {
+                            CurrentVersion = json.version,
+                            ChangelogURL = json.changelog,
+                            Mandatory = json.mandatory,
+                            DownloadURL = json.url
+                        };
+                    }
+                    catch( Exception ex ) {
+                        Console.WriteLine(ex.Message);
+                    }
+                }
+
+        */
 
         public object GetCurrentView() {
             return DataContext;
@@ -215,11 +224,11 @@ namespace Mapping_Tools {
         private void OpenBeatmap(object sender, RoutedEventArgs e) {
             try {
                 string[] paths = IOHelper.BeatmapFileDialog(true);
-                if (paths.Length != 0) {
+                if( paths.Length != 0 ) {
                     SetCurrentMaps(paths);
                 }
             }
-            catch (Exception ex) {
+            catch( Exception ex ) {
                 ex.Show();
             }
         }
@@ -227,10 +236,11 @@ namespace Mapping_Tools {
         private void OpenGetCurrentBeatmap(object sender, RoutedEventArgs e) {
             try {
                 string path = IOHelper.GetCurrentBeatmap();
-                if (path != "") {
+                if( path != "" ) {
                     SetCurrentMaps(new[] { path });
                 }
-            } catch (Exception ex) {
+            }
+            catch( Exception ex ) {
                 ex.Show();
             }
         }
@@ -239,9 +249,10 @@ namespace Mapping_Tools {
             try {
                 var paths = GetCurrentMaps();
                 var result = BackupManager.SaveMapBackup(paths, true, "UB");  // UB stands for User Backup
-                if (result)
-                    Task.Factory.StartNew(() => MessageQueue.Enqueue($"Beatmap{(paths.Length == 1 ? "" : "s")} successfully copied!"));
-            } catch (Exception ex) {
+                if( result )
+                    Task.Factory.StartNew(() => MessageQueue.Enqueue($"Beatmap{( paths.Length == 1 ? "" : "s" )} successfully copied!"));
+            }
+            catch( Exception ex ) {
                 ex.Show();
             }
         }
@@ -249,34 +260,38 @@ namespace Mapping_Tools {
         private void LoadBackup(object sender, RoutedEventArgs e) {
             try {
                 var paths = GetCurrentMaps();
-                if (paths.Length > 1) {
+                if( paths.Length > 1 ) {
                     throw new Exception($"Can't load backup into multiple beatmaps. You currently have {paths.Length} beatmaps selected.");
                 }
                 var backupPaths = IOHelper.BeatmapFileDialog(SettingsManager.GetBackupsPath(), false);
-                if (backupPaths.Length == 1) {
+                if( backupPaths.Length == 1 ) {
                     try {
                         BackupManager.LoadMapBackup(backupPaths[0], paths[0], false);
                     }
-                    catch (BeatmapIncompatibleException ex) {
+                    catch( BeatmapIncompatibleException ex ) {
                         var exResult = ex.Show();
-                        if (exResult == MessageBoxResult.Cancel) return;
+                        if( exResult == MessageBoxResult.Cancel )
+                            return;
                         var result = MessageBox.Show("Do you want to load the backup anyways?", "Load backup",
                             MessageBoxButton.YesNo);
-                        if (result == MessageBoxResult.Yes) {
+                        if( result == MessageBoxResult.Yes ) {
                             BackupManager.LoadMapBackup(backupPaths[0], paths[0], true);
-                        } else {
+                        }
+                        else {
                             return;
                         }
                     }
                     Task.Factory.StartNew(() => MessageQueue.Enqueue("Backup successfully loaded!"));
                 }
-            } catch (Exception ex) {
+            }
+            catch( Exception ex ) {
                 ex.Show();
             }
         }
 
-        private void ViewChanged() { 
-            if (!(FindName("ProjectMenu") is MenuItem projectMenu)) return;
+        private void ViewChanged() {
+            if( !( FindName("ProjectMenu") is MenuItem projectMenu ) )
+                return;
 
             var isSavable = DataContext.GetType().GetInterfaces().Any(x =>
                               x.IsGenericType &&
@@ -285,7 +300,7 @@ namespace Mapping_Tools {
             projectMenu.Visibility = Visibility.Collapsed;
             projectMenu.Items.Clear();
 
-            if (isSavable) {
+            if( isSavable ) {
                 projectMenu.Visibility = Visibility.Visible;
 
                 projectMenu.Items.Add(GetSaveProjectMenuItem());
@@ -293,10 +308,10 @@ namespace Mapping_Tools {
                 projectMenu.Items.Add(GetNewProjectMenuItem());
             }
 
-            if (DataContext is IHaveExtraProjectMenuItems havingExtraProjectMenuItems) {
+            if( DataContext is IHaveExtraProjectMenuItems havingExtraProjectMenuItems ) {
                 projectMenu.Visibility = Visibility.Visible;
 
-                foreach (var menuItem in havingExtraProjectMenuItems.GetMenuItems()) {
+                foreach( var menuItem in havingExtraProjectMenuItems.GetMenuItems() ) {
                     projectMenu.Items.Add(menuItem);
                 }
             }
@@ -304,7 +319,8 @@ namespace Mapping_Tools {
 
         private MenuItem GetSaveProjectMenuItem() {
             var menu = new MenuItem {
-                Header = "_Save project", Icon = new PackIcon {Kind = PackIconKind.ContentSave},
+                Header = "_Save project",
+                Icon = new PackIcon { Kind = PackIconKind.ContentSave },
                 ToolTip = "Save tool settings to file."
             };
             menu.Click += SaveProject;
@@ -314,7 +330,8 @@ namespace Mapping_Tools {
 
         private MenuItem GetLoadProjectMenuItem() {
             var menu = new MenuItem {
-                Header = "_Load project", Icon = new PackIcon {Kind = PackIconKind.Folder},
+                Header = "_Load project",
+                Icon = new PackIcon { Kind = PackIconKind.Folder },
                 ToolTip = "Load tool settings from file."
             };
             menu.Click += LoadProject;
@@ -324,7 +341,8 @@ namespace Mapping_Tools {
 
         private MenuItem GetNewProjectMenuItem() {
             var menu = new MenuItem {
-                Header = "_New project", Icon = new PackIcon { Kind = PackIconKind.Rocket },
+                Header = "_New project",
+                Icon = new PackIcon { Kind = PackIconKind.Rocket },
                 ToolTip = "Load the default tool settings."
             };
             menu.Click += NewProject;
@@ -347,7 +365,7 @@ namespace Mapping_Tools {
         }
 
         private void NewProject(object sender, RoutedEventArgs e) {
-            if (!ProjectManager.IsSavable(DataContext))
+            if( !ProjectManager.IsSavable(DataContext) )
                 return;
             dynamic data = DataContext;
             ProjectManager.NewProject(data, true);
@@ -366,7 +384,8 @@ namespace Mapping_Tools {
         private void OpenConfig(object sender, RoutedEventArgs e) {
             try {
                 System.Diagnostics.Process.Start(AppDataPath);
-            } catch (Exception ex) {
+            }
+            catch( Exception ex ) {
                 ex.Show();
             }
         }
@@ -378,8 +397,8 @@ namespace Mapping_Tools {
         private void CoolSave(object sender, RoutedEventArgs e) {
             try {
                 EditorReaderStuff.BetterSave();
-            } 
-            catch (Exception ex) {
+            }
+            catch( Exception ex ) {
                 ex.Show();
             }
         }
@@ -435,23 +454,24 @@ namespace Mapping_Tools {
         }
 
         private void SetFullscreen(bool fullscreen, bool actuallyChangeFullscreen = true) {
-            if (!(FindName("toggle_button") is Button bt)) return;
+            if( !( FindName("toggle_button") is Button bt ) )
+                return;
 
-            if (fullscreen && WindowState != WindowState.Maximized) {
-
-                if (actuallyChangeFullscreen) {
+            if( fullscreen && WindowState != WindowState.Maximized ) {
+                if( actuallyChangeFullscreen ) {
                     WindowState = WindowState.Maximized;
                     MasterGrid.Margin = new Thickness(5);
                 }
 
                 window_border.BorderThickness = new Thickness(0);
                 bt.Content = new PackIcon { Kind = PackIconKind.WindowRestore };
-            } else if (!fullscreen && WindowState == WindowState.Maximized) {
-                if (actuallyChangeFullscreen) {
+            }
+            else if( !fullscreen && WindowState == WindowState.Maximized ) {
+                if( actuallyChangeFullscreen ) {
                     WindowState = WindowState.Normal;
                     MasterGrid.Margin = new Thickness(0);
                 }
-                
+
                 window_border.BorderThickness = new Thickness(1);
                 bt.Content = new PackIcon { Kind = PackIconKind.WindowMaximize };
             }
@@ -471,17 +491,18 @@ namespace Mapping_Tools {
 
         //Enable drag control of window and set icons when docked
         private void DragWin(object sender, MouseButtonEventArgs e) {
-            if (e.ChangedButton != MouseButton.Left) return;
-            
-            if(WindowState == WindowState.Maximized) {
+            if( e.ChangedButton != MouseButton.Left )
+                return;
+
+            if( WindowState == WindowState.Maximized ) {
                 var point = PointToScreen(e.MouseDevice.GetPosition(this));
 
                 if( point.X <= RestoreBounds.Width / 2 )
                     Left = 0;
-                else if( point.X >= RestoreBounds.Width)
-                    Left = point.X - (RestoreBounds.Width - ( ActualWidth - point.X ) );
+                else if( point.X >= RestoreBounds.Width )
+                    Left = point.X - ( RestoreBounds.Width - ( ActualWidth - point.X ) );
                 else
-                    Left = point.X - (RestoreBounds.Width / 2 );
+                    Left = point.X - ( RestoreBounds.Width / 2 );
 
                 Top = point.Y - ( ( (FrameworkElement) sender ).ActualHeight / 2 );
             }

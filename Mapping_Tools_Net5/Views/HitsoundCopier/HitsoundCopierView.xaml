@@ -1,0 +1,211 @@
+﻿<local:SingleRunMappingTool x:Class="Mapping_Tools.Views.HitsoundCopier.HitsoundCopierView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Mapping_Tools.Views"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
+             mc:Ignorable="d" 
+             x:Name="This"
+             d:DesignHeight="650" Width="759.5" d:DataContext="{d:DesignData HitsoundCopierVm}">
+    <local:SingleRunMappingTool.Resources>
+        <domain:MapPathStringToCountStringConverter x:Key="MapPathStringToCountStringConverter"/>
+        <domain:DoubleToStringConverter x:Key="DoubleToStringConverter"/>
+        <domain:IntToStringConverter x:Key="IntToStringConverter"/>
+        <domain:BeatDivisorArrayToStringConverter x:Key="BeatDivisorArrayToStringConverter"/>
+    </local:SingleRunMappingTool.Resources>
+    <Grid Name="MasterGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid Name="FirstGrid" Grid.Row="0">
+            <StackPanel Grid.Row="0" Margin="0,0,120,0">
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
+                    <Run Text="Hitsound Copier"/>
+                  </TextBlock>
+                    <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom" ToolTip="Click me!">
+                    <materialDesign:PopupBox.ToggleContent>
+                      <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
+                    </materialDesign:PopupBox.ToggleContent>
+                    <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
+                      Copies hitsounds from A to B.
+                      <LineBreak/>
+                      There are 2 modes. First mode is overwrite everything. This will basically first remove the hitsounds from the map you’re copying to and then copy the hitsounds.
+                      <LineBreak/>
+                      Second mode is copying only the defined hitsounds. A defined hitsound is when there is something there in the map you’re copying from. This mode will copy over all the hitsounds from the map you’re copying from. Anything in the map you’re copying to that has not been defined in the map you’re copying from will not change. For instance muted sliderends will remain there.
+                    </TextBlock>
+                  </materialDesign:PopupBox>
+                </StackPanel>
+              
+                <Grid Margin="0,20,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" x:Name="BeatmapFromBox" Margin="0,0,5,0" Text="{Binding PathFrom}"
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Copy hitsounds from"
+                        ToolTip="Hitsounds get copied from this map."/>
+                    <Button Grid.Column="1" Cursor="Hand" Command="{Binding ImportLoadCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                            ToolTip="Fetch the selected beatmap from your osu! client.">
+                        <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="RestoreFromTrash" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                    </Button >
+                    <Button Grid.Column="3" Cursor="Hand" Command="{Binding ImportBrowseCommand}"  Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                            ToolTip="Select beatmaps with File Explorer.">
+                        <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                    </Button >
+                </Grid>
+                <Grid Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" x:Name="BeatmapToBox" Margin="0,0,5,0" Text="{Binding PathTo}"
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Copy hitsounds to"
+                        ToolTip="Hitsounds get copied to these maps. You can input multiple maps separated with '|'."/>
+                    <TextBlock Grid.Column="1" Margin="3 15 5 0" FontStyle="Italic"
+                               ToolTip="Multiple beatmaps can be inputted in this field. Separate the paths with the '|' character."
+                               Text="{Binding ElementName=BeatmapToBox, Path=Text, Converter={StaticResource MapPathStringToCountStringConverter}}"/>
+                    <Button Grid.Column="2" Cursor="Hand" Command="{Binding ExportLoadCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                            ToolTip="Fetch the selected beatmap from your osu! client.">
+                        <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="RestoreFromTrash" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                    </Button >
+                    <Button Grid.Column="4" Cursor="Hand" Command="{Binding ExportBrowseCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                            ToolTip="Select beatmaps with File Explorer.">
+                        <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                    </Button >
+                </Grid>
+                <ComboBox x:Name="CopyModeBox" Margin="0,20,0,0" SelectedIndex="{Binding CopyMode}" Cursor="Hand"
+                    Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Copying mode"
+                    ToolTip="'Overwrite everything' works like traditional hitsound copiers and 'Overwrite only defined' will only copy over hitsounds from the source beatmap and keep all the other hitsounds intact.">
+                    <ComboBoxItem Content="Overwrite everything" Cursor="Hand"/>
+                    <ComboBoxItem Content="Overwrite only defined" Cursor="Hand"/>
+                </ComboBox>
+                <TextBox x:Name="LeniencyBox" Margin="0,10,0,0"
+                    Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Temporal leniency"
+                    ToolTip="This field specifies how many milliseconds two objects can be from eachother while still copying hitsounds. This helps if your beatmaps are not perfectly aligned.">
+                    <TextBox.Text>
+                        <Binding Path="TemporalLeniency" Mode="TwoWay" UpdateSourceTrigger="LostFocus"  NotifyOnValidationError="True">
+                            <Binding.Converter>
+                                <domain:DoubleToStringConverter/>
+                            </Binding.Converter>
+                            <Binding.ValidationRules>
+                                <domain:IsGreaterOrEqualValidationRule>
+                                    <domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                        <domain:DoubleWrapper Value="0"/>
+                                    </domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                </domain:IsGreaterOrEqualValidationRule>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+                <CheckBox x:Name="CopyHitsoundsBox" IsChecked="{Binding CopyHitsounds}" Content="Copy hitsounds" Margin="0,10,0,0"
+                          ToolTip="Copy hitsounds from circles, slider heads/repeats/ends, spinner ends, and hold note heads."/>
+                <CheckBox x:Name="CopyBodyBox" IsChecked="{Binding CopyBodyHitsounds}" Content="Copy sliderbody hitsounds"
+                          ToolTip="Copy hitsounds from sliderbodies."/>
+                <CheckBox x:Name="CopySamplesetBox" IsChecked="{Binding CopySampleSets}" Content="Copy samplesets"
+                          ToolTip="Copy sample sets."/>
+                <CheckBox x:Name="CopyVolumeBox" IsChecked="{Binding CopyVolumes}" Content="Copy volumes"
+                          ToolTip="Copy volumes."/>
+                <CheckBox x:Name="AlwaysPreserve5VolumeBox" IsChecked="{Binding AlwaysPreserve5Volume}" Content="Always preserve 5% volume" Margin="20,0,0,0"
+                    ToolTip="Objects in the target beatmap with 5% volume will always stay at 5% volume regardless of the copying mode."
+                    Visibility="{Binding Path=IsChecked, ElementName=CopyVolumeBox, UpdateSourceTrigger=PropertyChanged,  
+                                 Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"/>
+                <CheckBox x:Name="CopyStoryboardedSamplesBox" IsChecked="{Binding CopyStoryboardedSamples}" Content="Copy storyboarded samples"
+                          ToolTip="Copy sound sample events from the storyboard."/>
+                <CheckBox x:Name="IgnoreHitsoundSatisfiedSamplesBox" IsChecked="{Binding IgnoreHitsoundSatisfiedSamples}"
+                          Content="Ignore samples satisfied by hitsounds" Margin="20,0,0,0"
+                    ToolTip="Don't copy storyboarded samples that are already played by the hitsounds. You can use this if you like to have the storyboard play missing hitsounds."
+                    Visibility="{Binding Path=IsChecked, ElementName=CopyStoryboardedSamplesBox, UpdateSourceTrigger=PropertyChanged,  
+                                 Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"/>
+                <CheckBox IsChecked="{Binding CopyToSliderTicks}" Content="Copy to slider ticks"
+                          IsEnabled="{Binding SmartCopyModeSelected}"
+                          ToolTip="With this option enabled, Hitsound Copier will try to assign custom samples to slider ticks when there is no other object to copy hitsounds to. New sample files will be generated which you'll have to put in your mapset folder. Only works for 'Overwrite only defined' copy mode."/>
+                <CheckBox IsChecked="{Binding CopyToSliderSlides}" Content="Copy to slider slides"
+                          IsEnabled="{Binding SmartCopyModeSelected}"
+                          ToolTip="With this option enabled, Hitsound Copier will try to assign custom samples to slider slides when there is no other object to copy hitsounds to. New sample files will be generated which you'll have to put in your mapset folder. Only works for 'Overwrite only defined' copy mode."/>
+                <TextBox Text="{Binding StartIndex, Converter={StaticResource IntToStringConverter}, ConverterParameter=100}"
+                         Margin="0 0 0 5"
+                         ToolTip="Starting sample set index for generating new slidertick and sliderslide samples."
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Start index"
+                         Visibility="{Binding StartIndexBoxVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                         IsEnabled="{Binding SmartCopyModeSelected}"/>
+                <CheckBox x:Name="MuteSliderendBox" IsChecked="{Binding MuteSliderends}" Content="Mute sliderends"
+                          ToolTip="Automatically mute slider ends or spinner ends which have no hitsounds in the source beatmap and follow these extra criteria."/>
+                <StackPanel Visibility="{Binding Path=IsChecked, ElementName=MuteSliderendBox, UpdateSourceTrigger=PropertyChanged,  
+                                 Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
+                    <TextBlock FontSize="14" Margin="0,10,0,0"><Run Text="Sliderend muting filter:"/></TextBlock>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="5"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="5"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Text="{Binding BeatDivisors, Converter={StaticResource BeatDivisorArrayToStringConverter}}" 
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                 MinWidth="100" FontSize="14" Cursor="Hand" Grid.Column="0"
+                                 materialDesign:HintAssist.Hint="All beat divisors"
+                                 ToolTip="Input ALL the used beat divisors here separated with commas. Example: 1/4, 1/12, 1/7, 4/5, 0.13435622499"/>
+                        <TextBox Text="{Binding MutedDivisors, Converter={StaticResource BeatDivisorArrayToStringConverter}}" 
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                 MinWidth="100" FontSize="14" Cursor="Hand" Grid.Column="2"
+                                 materialDesign:HintAssist.Hint="Muted beat divisors"
+                                 ToolTip="Input ALL the mutable beat divisors here separated with commas. Example: 1/4, 1/12, 1/7, 4/5, 0.13435622499"/>
+                        <TextBox x:Name="MutedMinLengthBox" Grid.Column="4"
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                 materialDesign:HintAssist.Hint="Minimum duration"
+                            Text="{Binding MinLength, Converter={StaticResource DoubleToStringConverter}}" 
+                            ToolTip="Minimum duration of slider in beats to be eligible for sliderend muting. Use this to not accidentally mute kicksliders."/>
+                    </Grid>
+                    <TextBlock FontSize="14" Margin="0,10,0,0"><Run Text="Muted config:"/></TextBlock>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="5"/>
+                            <ColumnDefinition Width="70"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" x:Name="MutedCustomIndexBox" 
+                                 Text="{Binding MutedIndex, Converter={StaticResource IntToStringConverter}, ConverterParameter=-1}"
+                            ToolTip="Custom index of the muted sliderend. Leave as -1 for no change."/>
+                        <ComboBox Grid.Column="2" x:Name="MutedSampleSetBox" SelectedItem="{Binding MutedSampleSet}" Cursor="Hand"
+                            ToolTip="Sampleset of the muted sliderend." ItemsSource="{Binding MutedSampleSets}">
+                        </ComboBox>
+                    </Grid>
+                </StackPanel>
+            </StackPanel>
+            <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
+                <Button
+                    IsEnabled="{Binding ElementName=This, Path=CanRun}"
+                    Style="{StaticResource MaterialDesignFloatingActionButton}"
+                    Click="Start_Click"
+                    ToolTip="Run this tool.">
+                    <materialDesign:PackIcon
+                        Kind="Play" Height="36" Width="36" />
+                </Button>
+            </Viewbox>
+        </Grid>
+        <Grid Name="SecondGrid" Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Opacity="0.58"/>
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <ProgressBar Value="{Binding ElementName=This, Path=Progress}" Margin="20,0,20,0" Height="20" Background="{x:Null}" BorderBrush="{x:Null}"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</local:SingleRunMappingTool>

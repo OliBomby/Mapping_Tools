@@ -1,0 +1,356 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Data\mt_icon.ico" />
+    <None Remove="Data\mt_logo_white_24.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="..\packages\EditorReader.dll"></Reference>
+    <Reference Include="..\packages\OggVorbisEncoder.dll"></Reference>
+    <Reference Include="..\packages\OsuMemoryDataProvider.dll"></Reference>
+    <Reference Include="..\packages\ProcessMemoryDataFinder.dll"></Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="2021.1.0" />
+    <PackageReference Include="MaterialDesignColors" Version="1.2.0" />
+    <PackageReference Include="MaterialDesignThemes" Version="2.6.0" />
+    <PackageReference Include="Microsoft-WindowsAPICodePack-Core" Version="1.1.3.3" />
+    <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.3.3" />
+    <PackageReference Include="NAudio" Version="1.9.0" />
+    <PackageReference Include="NAudio.Vorbis" Version="1.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="NonInvasiveKeyboardHookLibrary" Version="1.4.0" />
+    <PackageReference Include="NVorbis" Version="0.8.6" />
+    <PackageReference Include="Overlay.NET" Version="1.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Mapping_Tools_Net5_Updater\Mapping_Tools_Net5_Updater.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Data\mt_icon.ico" />
+    <Resource Include="Data\mt_logo_white_24.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ApplicationDefinition Update="App.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </ApplicationDefinition>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="App.xaml.cs">
+      <SubType>Code</SubType>
+      <DependentUpon>App.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Components\Dialogs\BeatmapImportDialog.xaml.cs">
+      <DependentUpon>BeatmapImportDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Components\Dialogs\CustomDialog\CustomDialog.xaml.cs">
+      <DependentUpon>CustomDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Components\Dialogs\MessageDialog.xaml.cs">
+      <DependentUpon>MessageDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Components\Dialogs\SampleDialog\SampleDialog.xaml.cs">
+      <DependentUpon>SampleDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Components\Dialogs\TypeValueDialog.xaml.cs">
+      <DependentUpon>TypeValueDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Components\Graph\Anchor.xaml.cs">
+      <DependentUpon>Anchor.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Components\Graph\Graph.xaml.cs">
+      <DependentUpon>Graph.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Components\Graph\TensionAnchor.xaml.cs">
+      <DependentUpon>TensionAnchor.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Components\HotkeyEditorControl.xaml.cs">
+      <DependentUpon>HotkeyEditorControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Components\ObjectVisualiser\HitObject.xaml.cs">
+      <DependentUpon>HitObject.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Components\ObjectVisualiser\ObjectPlayfield.xaml.cs">
+      <DependentUpon>ObjectPlayfield.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Components\ObjectVisualiser\SliderAnchor.xaml.cs">
+      <DependentUpon>SliderAnchor.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Components\ObjectVisualiser\SliderAnchorLine.xaml.cs">
+      <DependentUpon>SliderAnchorLine.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Components\TimeLine\TimeLine.xaml.cs">
+      <DependentUpon>TimeLine.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Components\TimeLine\TimeLineElement.xaml.cs">
+      <DependentUpon>TimeLineElement.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Components\TimeLine\TimeLineMark.xaml.cs">
+      <DependentUpon>TimeLineMark.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Components\TimingStudio\StudioTimingPointGraphic.xaml.cs">
+      <DependentUpon>StudioTimingPointGraphic.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Components\TimingStudio\TimingStudioTimeline.xaml.cs">
+      <DependentUpon>TimingStudioTimeline.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Components\ViewHeaderComponent.xaml.cs">
+      <DependentUpon>ViewHeaderComponent.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="MainWindow.xaml.cs">
+      <SubType>Code</SubType>
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Views\AutoFailDetector\AutoFailDetectorView.xaml.cs">
+      <DependentUpon>AutoFailDetectorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\ComboColourStudio\ComboColourStudioView.xaml.cs">
+      <DependentUpon>ComboColourStudioView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\HitsoundCopier\HitsoundCopierView.xaml.cs">
+      <DependentUpon>HitsoundCopierView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\HitsoundPreviewHelper\HitsoundPreviewHelper.xaml.cs">
+      <DependentUpon>HitsoundPreviewHelper.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\HitsoundStudio\HitsoundLayerImportWindow.xaml.cs">
+      <DependentUpon>HitsoundLayerImportWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\HitsoundStudio\HitsoundStudioExportDialog.xaml.cs">
+      <DependentUpon>HitsoundStudioExportDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\HitsoundStudio\HitsoundStudioView.xaml.cs">
+      <DependentUpon>HitsoundStudioView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\MapCleaner\CleanerView.xaml.cs">
+      <DependentUpon>CleanerView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\MetadataManager\MetadataManagerView.xaml.cs">
+      <DependentUpon>MetadataManagerView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\PatternGallery\PatternGalleryView.xaml.cs">
+      <DependentUpon>PatternGalleryView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Preferences\PreferencesView.xaml.cs">
+      <DependentUpon>PreferencesView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\PropertyTransformer\PropertyTransformerView.xaml.cs">
+      <DependentUpon>PropertyTransformerView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\RhythmGuide\RhythmGuideView.xaml.cs">
+      <DependentUpon>RhythmGuideView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\RhythmGuide\RhythmGuideWindow.xaml.cs">
+      <DependentUpon>RhythmGuideWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Sliderator\SlideratorView.xaml.cs">
+      <DependentUpon>SlideratorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\SliderCompletionator\SliderCompletionatorView.xaml.cs">
+      <DependentUpon>SliderCompletionatorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\SliderMerger\SliderMergerView.xaml.cs">
+      <DependentUpon>SliderMergerView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\SnappingTools\GeneratorSettingsWindow.xaml.cs">
+      <DependentUpon>GeneratorSettingsWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\SnappingTools\SnappingToolsPreferencesWindow.xaml.cs">
+      <DependentUpon>SnappingToolsPreferencesWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\SnappingTools\SnappingToolsProjectWindow.xaml.cs">
+      <DependentUpon>SnappingToolsProjectWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\SnappingTools\SnappingToolsView.xaml.cs">
+      <DependentUpon>SnappingToolsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Standard\StandardView.xaml.cs">
+      <DependentUpon>StandardView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\TimingCopier\TimingCopierView.xaml.cs">
+      <DependentUpon>TimingCopierView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\TimingHelper\TimingHelperView.xaml.cs">
+      <DependentUpon>TimingHelperView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\TimingStudio\TimingStudioView.xaml.cs">
+      <DependentUpon>TimingStudioView.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Components\Dialogs\BeatmapImportDialog.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Components\Dialogs\CustomDialog\CustomDialog.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Components\Dialogs\MessageDialog.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Components\Dialogs\SampleDialog\SampleDialog.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Components\Dialogs\TypeValueDialog.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Components\Graph\Anchor.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Components\Graph\Graph.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Components\Graph\TensionAnchor.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Components\HotkeyEditorControl.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Components\ObjectVisualiser\HitObject.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Components\ObjectVisualiser\ObjectPlayfield.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Components\ObjectVisualiser\SliderAnchor.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Components\ObjectVisualiser\SliderAnchorLine.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Components\Spectrum\Spectrum.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Components\TimeLine\TimeLine.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Components\TimeLine\TimeLineElement.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Components\TimeLine\TimeLineMark.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Components\TimingStudio\StudioTimingPointGraphic.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Components\TimingStudio\TimingStudioTimeline.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Components\ViewHeaderComponent.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="MainWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\AutoFailDetector\AutoFailDetectorView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\ComboColourStudio\ComboColourStudioView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\HitsoundCopier\HitsoundCopierView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\HitsoundPreviewHelper\HitsoundPreviewHelper.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\HitsoundStudio\HitsoundLayerImportWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\HitsoundStudio\HitsoundStudioExportDialog.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\HitsoundStudio\HitsoundStudioView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\MapCleaner\CleanerView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\MetadataManager\MetadataManagerView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\PatternGallery\PatternGalleryView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Preferences\PreferencesView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\PropertyTransformer\PropertyTransformerView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\RhythmGuide\RhythmGuideView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\RhythmGuide\RhythmGuideWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Sliderator\SlideratorView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\SliderCompletionator\SliderCompletionatorView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\SliderMerger\SliderMergerView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\SnappingTools\GeneratorSettingsWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\SnappingTools\SnappingToolsPreferencesWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\SnappingTools\SnappingToolsProjectWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\SnappingTools\SnappingToolsView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Standard\StandardView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\TimingCopier\TimingCopierView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\TimingHelper\TimingHelperView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\TimingStudio\TimingStudioView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,237 @@
+﻿<local:SingleRunMappingTool x:Class="Mapping_Tools.Views.ComboColourStudio.ComboColourStudioView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Mapping_Tools.Views"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
+             xmlns:beatmapHelper="clr-namespace:Mapping_Tools.Classes.BeatmapHelper"
+             xmlns:comboColourStudio="clr-namespace:Mapping_Tools.Classes.Tools.ComboColourStudio"
+             mc:Ignorable="d" 
+             x:Name="This"
+             d:DesignHeight="650" Width="759.5" d:DataContext="{d:DesignData ComboColourStudioVm}">
+    <UserControl.Resources>
+        <domain:DoubleToStringConverter x:Key="DoubleToStringConverter"/>
+        <domain:TimeToStringConverter x:Key="TimeToStringConverter"/>
+        <domain:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Orientation="Horizontal">
+                <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
+                    <Run Text="Combo Colour Studio"/>
+                </TextBlock>
+                <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom" ToolTip="Click me!">
+                    <materialDesign:PopupBox.ToggleContent>
+                        <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
+                    </materialDesign:PopupBox.ToggleContent>
+                    <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
+                        With Combo Colour Studio you can easily customize the combo colours of your beatmap. AKA colour haxing.
+                        <LineBreak/>
+                        You define colored sections much like how you use timing points in the osu! editor. Just add a new colour point and define the sequence of combo colours.
+                        <LineBreak/>
+                        You can also define 'burst' colour points which only work for one combo, so you can emphasize specific patterns using colour.
+                        <LineBreak/>
+                        You can get started by adding a combo colour using the plus on the bottom left or by importing combo colours from an existing map.
+                        The combo colours can be edited by clicking on the coloured circles.
+                        <LineBreak/>
+                        Add a colour point by clicking on the plus on the bottom right. You can edit the colour sequence by double clicking the colour sequence cell.
+                    </TextBlock>
+                </materialDesign:PopupBox>
+            </StackPanel>
+
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <DataGrid Grid.Row="0" ItemsSource="{Binding Project.ColourPoints}" SelectionMode="Extended"
+                          CanUserSortColumns="True"
+                          CanUserAddRows="False"
+                          AutoGenerateColumns="False"
+                          materialDesign:DataGridAssist.CellPadding="13 8 8 8"
+                          materialDesign:DataGridAssist.ColumnHeaderPadding="8"
+                          VerticalScrollBarVisibility="Auto">
+                    <DataGrid.Resources>
+                        <Style TargetType="DataGridRow" BasedOn="{StaticResource MaterialDesignDataGridRow}">
+                            <Setter Property="IsSelected"
+                                    Value="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </Style>
+                    </DataGrid.Resources>
+                    <DataGrid.Columns>
+                        <materialDesign:MaterialDataGridTextColumn
+                            Binding="{Binding Time, UpdateSourceTrigger=LostFocus, Converter={StaticResource TimeToStringConverter}}"
+                            Header="Offset"
+                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}" />
+                        <materialDesign:MaterialDataGridComboBoxColumn
+                            Header="Mode"
+                            SelectedValueBinding="{Binding Mode, UpdateSourceTrigger=PropertyChanged}"
+                            ItemsSourceBinding="{Binding ColourPointModes}" />
+                        <DataGridTemplateColumn Header="Colour Sequence" Width="{Binding Width, ElementName=SmallColourSequence}">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate DataType="comboColourStudio:ColourPoint">
+                                    <ItemsControl ItemsSource="{Binding ColourSequence}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <materialDesign:PackIcon Kind="Circle" Width="24" Height="24" ToolTip="{Binding Name}" Foreground="{Binding Color, Converter={StaticResource ColorToBrushConverter}}"/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                            <DataGridTemplateColumn.CellEditingTemplate>
+                                <DataTemplate DataType="comboColourStudio:ColourPoint">
+                                    <StackPanel Orientation="Horizontal">
+                                        <ListBox ItemsSource="{Binding ColourSequence}">
+                                            <ListBox.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel Orientation="Horizontal"/>
+                                                </ItemsPanelTemplate>
+                                            </ListBox.ItemsPanel>
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate DataType="beatmapHelper:SpecialColour">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <materialDesign:Chip Content="{Binding Name}" ToolTip="{Binding Name}" IconBackground="{Binding Color, Converter={StaticResource ColorToBrushConverter}}" Icon="" 
+                                                                             IsDeletable="True" DeleteCommand="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}, Path=DataContext.RemoveCommand}" DeleteCommandParameter="{Binding}"/>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
+                                        <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a new colour." VerticalAlignment="Center" Margin="5 0 5 0" Command="{Binding AddCommand}" CommandParameter="{Binding ElementName=This}">
+                                            <materialDesign:PackIcon Kind="Plus" Width="24" Height="24"/>
+                                        </Button>
+                                        <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove last colour." VerticalAlignment="Center" Margin="5 0 5 0" Command="{Binding RemoveCommand}">
+                                            <materialDesign:PackIcon Kind="Minus" Width="24" Height="24"/>
+                                        </Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellEditingTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="1">
+                        <materialDesign:Card VerticalAlignment="Bottom" HorizontalAlignment="Stretch" UniformCornerRadius="5" Padding="2" Margin="0 10 5 5">
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Import colours" Click="ImportColoursButton_OnClick" Margin="5 0 5 0"
+                                        ToolTip="Import combo colours from a beatmap."/>
+                                <Button Content="Import colorhax" Click="ImportColourHaxButton_OnClick" Margin="5 0 20 0"
+                                        ToolTip="Import colour haxing from a beatmap and populate the colour points."/>
+
+                                <TextBox Width="120" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="10 0 10 5"
+                                         materialDesign:HintAssist.Hint="Max burst length" 
+                                         ToolTip="Determines the maximum combo size for burst combos. Combos longer than this value can't get a colour from burst colour points."
+                                         Text="{Binding Project.MaxBurstLength}"/>
+                            </StackPanel>
+                        </materialDesign:Card>
+                    </Grid>
+
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" VerticalAlignment="Top" Orientation="Horizontal">
+                            <materialDesign:Card UniformCornerRadius="5">
+                                <ListBox ItemsSource="{Binding Project.ComboColours}">
+                                    <ListBox.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ListBox.ItemsPanel>
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate DataType="beatmapHelper:SpecialColour">
+                                            <materialDesign:PopupBox StaysOpen="True" ToolTip="{Binding Name}">
+                                                <materialDesign:PopupBox.ToggleContent>
+                                                    <materialDesign:PackIcon Kind="Circle" Foreground="{Binding Color, Converter={StaticResource ColorToBrushConverter}}" Width="35" Height="35"/>
+                                                </materialDesign:PopupBox.ToggleContent>
+                                                <StackPanel Orientation="Horizontal" Margin="20">
+                                                    <TextBox Text="{Binding Color, ElementName=ColorPicker}"
+                                                             Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" materialDesign:HintAssist.Hint="Color HEX value"
+                                                             Width="120" Margin="2,0,10,2"/>
+                                                    <materialDesign:ColorPicker Color="{Binding Color}" x:Name="ColorPicker" Width="300"/>
+                                                </StackPanel>
+                                            </materialDesign:PopupBox>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </materialDesign:Card>
+                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a new combo colour." VerticalAlignment="Center" Margin="10 5 5 5" Command="{Binding Project.AddComboCommand}">
+                                <materialDesign:PackIcon Kind="Plus" Width="24" Height="24"/>
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove last combo colour." VerticalAlignment="Center" Margin="5" Command="{Binding Project.RemoveComboCommand}">
+                                <materialDesign:PackIcon Kind="Minus" Width="24" Height="24"/>
+                            </Button>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal">
+                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a new colour point. Hold shift to add current editor time." VerticalAlignment="Center" Margin="5" Command="{Binding Project.AddColourPointCommand}">
+                                <materialDesign:PackIcon Kind="Plus" Width="24" Height="24"/>
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove selected colour points or last colour point." VerticalAlignment="Center" Margin="5" Command="{Binding Project.RemoveColourPointCommand}">
+                                <materialDesign:PackIcon Kind="Minus" Width="24" Height="24"/>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+
+                
+                <Viewbox Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
+                    <Button
+                        IsEnabled="{Binding ElementName=This, Path=CanRun}"
+                        Style="{StaticResource MaterialDesignFloatingActionButton}"
+                        Click="Start_Click"
+                        ToolTip="Run this tool.">
+                        <materialDesign:PackIcon
+                            Kind="Play" Height="36" Width="36" />
+                    </Button>
+                </Viewbox>
+            </Grid>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Opacity="0.58"/>
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <ProgressBar Value="{Binding ElementName=This, Path=Progress}" Margin="20,0,20,0" Height="20" Background="{x:Null}" BorderBrush="{x:Null}"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</local:SingleRunMappingTool>
