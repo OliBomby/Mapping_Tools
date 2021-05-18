@@ -17,7 +17,6 @@
 </head>
 
 <body>
-  <noscript>You need to enable JavaScript to run this app.</noscript>
   <div class="App grid-container">
     
     <div class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -31,7 +30,7 @@
 
             <div class="collapse navbar-collapse" id="basic-navbar-nav">
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item"><a class="nav-link" href="https://olibomby.github.io/Mapping_Tools/downloads">Downloads</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://olibomby.github.io/Mapping_Tools/download">Download</a></li>
                     <li class="nav-item"><a class="nav-link" href="https://olibomby.github.io/Mapping_Tools/docs">Documentation</a></li>
                     <li class="nav-item"><a class="nav-link" href="https://olibomby.github.io/Mapping_Tools/faq">FAQ</a></li>
                     <li class="nav-item"><a class="nav-link" href="https://olibomby.github.io/Mapping_Tools/changelog">Changelog</a></li>
@@ -54,14 +53,199 @@
     <h1>Changelog</h1>
 
     
-        <h3>v1.6.3.1</h3>
-        <p><ul>
+    <h3>
+        Release version 1.8.1.0
+        <small>(<a href="https:&#x2F;&#x2F;github.com&#x2F;OliBomby&#x2F;Mapping_Tools&#x2F;releases&#x2F;tag&#x2F;v1.8.1.0">Github</a>)</small>
+    </h3>
+    <ul>
+<li>Now the program will attempt to keep running after an unhandled exception.</li>
+<li>Added blacklist and whitelist filters to Property Transformer.</li>
+<li>Added option to assign additions sampleset and custom index with Hitsound Preview Helper.</li>
+<li>Added option to exit without saving the settings. Right-click the exit button.</li>
+<li>Added hints to various text boxes.</li>
+<li>Added Auto sampleset option to default sample in Hitsound Studio.</li>
+<li>Let hotkey fields update on lost focus instead of property changed.</li>
+<li>Fixed sampleset of default sample in Hitsound Studio not working.</li>
+<li>Fixed sliderend muting incorrectly detecting snap divisors.</li>
+</ul>
+
+    
+    <h3>
+        Release version 1.8.0.2
+        <small>(<a href="https:&#x2F;&#x2F;github.com&#x2F;OliBomby&#x2F;Mapping_Tools&#x2F;releases&#x2F;tag&#x2F;v1.8.0.2">Github</a>)</small>
+    </h3>
+    <ul>
+<li>Fixed 'Beats between every marker' feature in Timing Helper.</li>
+<li>Fixed Property Transformer messing up object end time.</li>
+<li>Fixed serialization of volume fields in Hitsound Studio.</li>
+<li>Fixed unexpected behaviour while exporting patterns without timing in Pattern Gallery.</li>
+<li>Fixed unexpected NCs in Pattern Gallery exports.</li>
+</ul>
+
+    
+    <h3>
+        Release version 1.8.0.1
+        <small>(<a href="https:&#x2F;&#x2F;github.com&#x2F;OliBomby&#x2F;Mapping_Tools&#x2F;releases&#x2F;tag&#x2F;v1.8.0.1">Github</a>)</small>
+    </h3>
+    <ul>
+<li>Fixed 'Scale to new timing' in Pattern Gallery.</li>
+</ul>
+
+    
+    <h3>
+        Release version 1.8.0.0
+        <small>(<a href="https:&#x2F;&#x2F;github.com&#x2F;OliBomby&#x2F;Mapping_Tools&#x2F;releases&#x2F;tag&#x2F;v1.8.0.0">Github</a>)</small>
+    </h3>
+    <ul>
+<li>Added Pattern Gallery.</li>
+<li>Added fast editor detection to skip slow search when editor is closed.</li>
+<li>Fixed periodic backups being made when the editor is closed.</li>
+<li>Fixed index out-of-bounds exception in Sliderator.</li>
+<li>Fixed typo in Get Started.</li>
+</ul>
+
+    
+    <h3>
+        Release version 1.7.1.2
+        <small>(<a href="https:&#x2F;&#x2F;github.com&#x2F;OliBomby&#x2F;Mapping_Tools&#x2F;releases&#x2F;tag&#x2F;v1.7.1.2">Github</a>)</small>
+    </h3>
+    <ul>
+<li>Fixed sliderend resnapping.</li>
+</ul>
+
+    
+    <h3>
+        Release version 1.7.1.1
+        <small>(<a href="https:&#x2F;&#x2F;github.com&#x2F;OliBomby&#x2F;Mapping_Tools&#x2F;releases&#x2F;tag&#x2F;v1.7.1.1">Github</a>)</small>
+    </h3>
+    <ul>
+<li>Fixed bad, ugly, terrible Sliderator path generation.</li>
+</ul>
+
+    
+    <h3>
+        Release version 1.7.1.0
+        <small>(<a href="https:&#x2F;&#x2F;github.com&#x2F;OliBomby&#x2F;Mapping_Tools&#x2F;releases&#x2F;tag&#x2F;v1.7.1.0">Github</a>)</small>
+    </h3>
+    <ul>
+<li>All tools now support ALL beat snap divisors.</li>
+<li>Improved the timestamp input converter, so it accepts more types of inputs.</li>
+<li>Added midi sample export option in Hitsound Studio.</li>
+<li>Hitsound Copier now allows an empty 'Copy from' field to use as an empty beatmap.</li>
+<li>Sliderend muting now no longer mutes objects with hitsounds on them.</li>
+<li>Added a cancel button to skip showing inner exceptions.</li>
+<li>Optimized timing points querying operations for faster running times across all tools.</li>
+<li>Fixed a minor inconsistency between osu! beatmap saving and Mapping Tools beatmap saving.</li>
+</ul>
+
+    
+    <h3>
+        Release version 1.7.0.1
+        <small>(<a href="https:&#x2F;&#x2F;github.com&#x2F;OliBomby&#x2F;Mapping_Tools&#x2F;releases&#x2F;tag&#x2F;v1.7.0.1">Github</a>)</small>
+    </h3>
+    <ul>
+<li>Fixed Auto-fail Detector generating solutions which are impossible to place.</li>
+<li>Fixed timeline in Auto-fail Detector not removing lines after running with less showing options checked.</li>
+</ul>
+
+    
+    <h3>
+        Release version 1.7.0.0
+        <small>(<a href="https:&#x2F;&#x2F;github.com&#x2F;OliBomby&#x2F;Mapping_Tools&#x2F;releases&#x2F;tag&#x2F;v1.7.0.0">Github</a>)</small>
+    </h3>
+    <ul>
+<li>Added Auto-fail Detector.</li>
+<li>Updated About page for all contributors and supporters.</li>
+</ul>
+
+    
+    <h3>
+        Release version 1.6.8.1
+        <small>(<a href="https:&#x2F;&#x2F;github.com&#x2F;OliBomby&#x2F;Mapping_Tools&#x2F;releases&#x2F;tag&#x2F;v1.6.8.1">Github</a>)</small>
+    </h3>
+    <ul>
+<li>Red lines in Sliderator now have snapping.</li>
+<li>Mapping Tools window position now gets retained on restart. </li>
+<li>Geometry Dashboard now no longer responds to hotkeys while osu! is deactivated.</li>
+<li>Fixed snapping in Geometry Dashboard sometimes getting confused.</li>
+<li>Fixed the 'Remove unclickable hitsounds' function from Map Cleaner.</li>
+<li>Improved success rate of 'Get current beatmap'.</li>
+<li>Fixed crash when trying to run a tool with an invalid path.</li>
+<li>Made it less likely to crash on startup without any error showing.</li>
+<li>Fixed the filenames of automatic backup files.</li>
+<li>Fixed slidertick/sliderslide copy when copying to multiple maps at the same time in Hitsound Copier.</li>
+<li>Fixed slidertick/sliderslide copy trying to convert for invalid samples.</li>
+<li>Fixed tags field in Metadata Manager being able to remove duplicate tags while you're still typing.</li>
+<li>Fixed error when trying to run Timing Helper on a beatmap without any redlines.</li>
+<li>Fixed weird fullscreen behaviour of the main window.</li>
+</ul>
+
+    
+    <h3>
+        Release version 1.6.8.0
+        <small>(<a href="https:&#x2F;&#x2F;github.com&#x2F;OliBomby&#x2F;Mapping_Tools&#x2F;releases&#x2F;tag&#x2F;v1.6.8.0">Github</a>)</small>
+    </h3>
+    <ul>
+<li>Hitsound Copier can now copy regular hitsounds to slidertick and sliderslide samples and it will automatically generate the required slidertick and sliderslide samples.</li>
+<li>Any backups made by Mapping Tools now use the newest version from editor memory.</li>
+<li>Added saving and loading of locked virtual objects in the project menu of Geometry Dashboard.</li>
+<li>Added single point circle generator to Geometry Dashboard.</li>
+<li>Added menu item that opens the Mapping Tools folder.</li>
+<li>Added a 'New project' project menu item that resets any tool back to default settings.</li>
+<li>Added indentation to config.json.</li>
+<li>Increased default merge leniency in Slider Merger.</li>
+<li>Fixed locked objects in Geometry Dashboard being impossible to snap to.</li>
+<li>Fixed the lock hotkey accidentally removing too many locked virtual objects.</li>
+<li>Fixed crash loop for people with corrupt registry.</li>
+<li>Fixed tool's project possibly being null and breaking stuff.</li>
+<li>Fixed .ogg Vorbis sample export not being compatible with weird sample rate source.</li>
+<li>Fixed interactions on bezier sliders which end on a red anchor.</li>
+</ul>
+
+    
+    <h3>
+        Release version 1.6.7.0
+        <small>(<a href="https:&#x2F;&#x2F;github.com&#x2F;OliBomby&#x2F;Mapping_Tools&#x2F;releases&#x2F;tag&#x2F;v1.6.7.0">Github</a>)</small>
+    </h3>
+    <ul>
+<li>Added a QuickUndo hotkey to the preferences that lets you instantly load the latest backup.</li>
+<li>Added 'Load backup' menu item for loading backups to the current beatmap.</li>
+<li>Added discernible beatmap backup filenames for periodic backups and manual backups.</li>
+<li>Improved snapping behaviour in Geometry Dashboard when dragging objects.</li>
+<li>Fixed backend not reading changed fields when using QuickRun.</li>
+<li>Fixed break end time being set to the break start time.</li>
+</ul>
+
+    
+    <h3>
+        Release version 1.6.6.0
+        <small>(<a href="https:&#x2F;&#x2F;github.com&#x2F;OliBomby&#x2F;Mapping_Tools&#x2F;releases&#x2F;tag&#x2F;v1.6.6.0">Github</a>)</small>
+    </h3>
+    <ul>
+<li>Property Transformer can now transform all storyboard events, break periods, and video offsets.</li>
+<li>Property Transformer can now work on .osb files.</li>
+<li>You can now automatically fetch hit object coordinates for new hitsound zones in Hitsound Preview Helper by shift-clicking the add button.</li>
+<li>Success message of most tools is now displayed less intrusively.</li>
+<li>Crash message now shows the whole path to the crash-log file.</li>
+<li>Fixed Sliderator making bad paths.</li>
+<li>Fixed crash on automatic osu! save override with BetterSave.</li>
+<li>Fixed Hitsound Studio sometimes not converting non-Wave samples to Wave.</li>
+</ul>
+
+    
+    <h3>
+        Release version 1.6.3.1
+        <small>(<a href="https:&#x2F;&#x2F;github.com&#x2F;OliBomby&#x2F;Mapping_Tools&#x2F;releases&#x2F;tag&#x2F;v1.6.3.1">Github</a>)</small>
+    </h3>
+    <ul>
 <li>Mapping Tools now actually runs in 64-bit mode.</li>
 <li>Fixed greenline spam in Hitsound Copier when trying to conserve 5% volume greenlines with a map that only uses note specific sample volume.</li>
 <li>Fixed problems when trying to export hitsounds in Hitsound Studio on coinciding mode while using the previous sample schema.</li>
 </ul>
-</p>
+
     
+
+    See older releases on the <a href="https://github.com/OliBomby/Mapping_Tools/releases">Github releases page</a>.
 
     </div>
     
@@ -81,7 +265,7 @@
                 </a>
             </div>
             <div class="footer-discord">
-                <a href="https://discord.gg/JhP964H">
+                <a href="https://discord.gg/YfjKN2yjQV">
                     <i class="fa fa-discord"></i> Discord
                 </a>
             </div>

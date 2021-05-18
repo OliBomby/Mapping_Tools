@@ -17,7 +17,6 @@
 </head>
 
 <body>
-  <noscript>You need to enable JavaScript to run this app.</noscript>
   <div class="App grid-container">
     
     <div class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -31,7 +30,7 @@
 
             <div class="collapse navbar-collapse" id="basic-navbar-nav">
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item"><a class="nav-link" href="https://olibomby.github.io/Mapping_Tools/downloads">Downloads</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://olibomby.github.io/Mapping_Tools/download">Download</a></li>
                     <li class="nav-item"><a class="nav-link" href="https://olibomby.github.io/Mapping_Tools/docs">Documentation</a></li>
                     <li class="nav-item"><a class="nav-link" href="https://olibomby.github.io/Mapping_Tools/faq">FAQ</a></li>
                     <li class="nav-item"><a class="nav-link" href="https://olibomby.github.io/Mapping_Tools/changelog">Changelog</a></li>
@@ -57,33 +56,74 @@
                 
                     <a class="list-group-item list-group-item-primary list-group-item-action
                         "
-                        href="../general">
+                        href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/general">
                         General
                     </a>
                 
                     <a class="list-group-item list-group-item-primary list-group-item-action
                         "
-                        href="../map-cleaner">
+                        href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/map-cleaner">
                         Map Cleaner
                     </a>
                 
                     <a class="list-group-item list-group-item-primary list-group-item-action
                         active"
-                        href="../property-transformer">
+                        href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/property-transformer">
                         Property Transformer
+                    </a>
+                
+                    <a class="list-group-item list-group-item-primary list-group-item-action
+                        "
+                        href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/slider-merger">
+                        Slider Merger
+                    </a>
+                
+                    <a class="list-group-item list-group-item-primary list-group-item-action
+                        "
+                        href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/slider-completionator">
+                        Slider Completionator
+                    </a>
+                
+                    <a class="list-group-item list-group-item-primary list-group-item-action
+                        "
+                        href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/timing-helper">
+                        Timing Helper
+                    </a>
+                
+                    <a class="list-group-item list-group-item-primary list-group-item-action
+                        "
+                        href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/hitsound-copier">
+                        Hitsound Copier
+                    </a>
+                
+                    <a class="list-group-item list-group-item-primary list-group-item-action
+                        "
+                        href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/hitsound-studio">
+                        Hitsound Studio
+                    </a>
+                
+                    <a class="list-group-item list-group-item-primary list-group-item-action
+                        "
+                        href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/hitsound-preview-helper">
+                        Hitsound Preview Helper
                     </a>
                 
                 </div>
             </div>
             <div class="col docu-content">
                 <h1>Property Transformer</h1>
-                <p>Multiple and add to properties of all the timingpoints, hitobjects, bookmarks and storyboarded samples of the current map.</p>
-<p>The new value is the old value times the multiplier plus the offset. The multiplier is the left textbox and the offset is the right textbox. The multiplier gets done first.</p>
+                <p>Multiple and add to properties of all the timingpoints, hitobjects, bookmarks
+and storyboarded samples of the current map.</p>
+<p>The new value is the old value times the multiplier plus the offset. The
+multiplier is the left textbox and the offset is the right textbox. The
+multiplier gets done first.</p>
 <p>Resulting values get rounded if they have to be integer.</p>
 <p>If the multiplier can’t be parsed then it will default to 1.</p>
 <p>If the offset can’t be parsed then it will default to 0.</p>
 <h2 id="clipping-properties">Clipping properties</h2>
-<p>Clip properties will make the properties not go outside of bounds. Properties that have 1x multiplier and 0 offset will not get clipped. The clipping works with the following boundaries:</p>
+<p>Clip properties will make the properties not go outside of bounds. Properties
+that have 1x multiplier and 0 offset will not get clipped. The clipping works
+with the following boundaries:</p>
 <ul>
 <li>Timingpoints offset: None</li>
 <li>Timingpoints BPM: 15 - 10000</li>
@@ -96,10 +136,17 @@
 </ul>
 <h2 id="filters">Filters</h2>
 <p>Filters let you direct the things that get targeted by Property Transformer. </p>
-<p>The first text box is for matching. All parameters that match that value are able to get transformed. This filter will only be active if the enable filters checkbox is checked and the textbox can be parsed to a number.</p>
-<p>The next filter is a time range. To get targeted by Property Transformer, the object that holds the parameter must have a time greater than or equal to the first value and less than or equal to the second value. The times specified are in milliseconds.</p>
-<p>If one of the textboxes can’t be parsed it will default to negative infinity for the minimum time and positive infinity for the maximum time.</p>
-<p>The filter is only active if one of the two textboxes can be parsed and the enable filters checkbox is checked.</p>
+<p>The first text box is for matching. All parameters that match that value are
+able to get transformed. This filter will only be active if the enable filters
+checkbox is checked and the textbox can be parsed to a number.</p>
+<p>The next filter is a time range. To get targeted by Property Transformer, the
+object that holds the parameter must have a time greater than or equal to the
+first value and less than or equal to the second value. The times specified are
+in milliseconds.</p>
+<p>If one of the textboxes can’t be parsed it will default to negative infinity
+for the minimum time and positive infinity for the maximum time.</p>
+<p>The filter is only active if one of the two textboxes can be parsed and the
+enable filters checkbox is checked.</p>
 
             </div>
         </div>
@@ -123,7 +170,7 @@
                 </a>
             </div>
             <div class="footer-discord">
-                <a href="https://discord.gg/JhP964H">
+                <a href="https://discord.gg/YfjKN2yjQV">
                     <i class="fa fa-discord"></i> Discord
                 </a>
             </div>

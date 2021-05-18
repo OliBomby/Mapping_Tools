@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="Mapping-Tools enables you to fully realize every one of your osu! mapping ideas. Use a wide variety of ever inceasing tools to transform and manipulate evey aspect of what makes your osu! map.">
+
+  <title>Mapping-Tools for osu!</title>
+
+  <link rel="shortcut icon" href="https://olibomby.github.io/Mapping_Tools/favicon.ico" />
+  <link rel="manifest" href="https://olibomby.github.io/Mapping_Tools/manifest.json" />
+  <link rel="stylesheet" href="https://olibomby.github.io/Mapping_Tools/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://olibomby.github.io/Mapping_Tools/main.css" />
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+</head>
+
+<body>
+  <div class="App grid-container">
+    
+    <div class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="https://olibomby.github.io/Mapping_Tools">
+                <img class="header-logo" src="https://olibomby.github.io/Mapping_Tools/logo.png" alt="mapping tools - logo" /> Mapping Tools
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#basic-navbar-nav" aria-controls="basic-navbar-nav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="basic-navbar-nav">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item"><a class="nav-link" href="https://olibomby.github.io/Mapping_Tools/download">Download</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://olibomby.github.io/Mapping_Tools/docs">Documentation</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://olibomby.github.io/Mapping_Tools/faq">FAQ</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://olibomby.github.io/Mapping_Tools/changelog">Changelog</a></li>
+                </ul>
+                <!-- <div inline="true">
+                    <span class="os-content"><strong>Auto Detected:</strong> {OS_STATES[this.state.OS.currentOS]} {!this.state.OS.isSupported && "-> Currently not supported!"}</span>
+                    {this.state.OS.isSupported &&
+                        <Button variant="primary" onClick={() => this.download(this.state.OS.currentOS)}>Download now</Button>
+                    }
+                </div>
+            -->
+            </div>
+        </div>
+    </div>
+
+    <div class="container content" style="margin-top: 24px;">
+      
+    <div class="docs">
+        <div class="row">
+            <div class="col-2 tab-container">
+                
+                <div class="list docu-listgroup">
+                
+                    <a class="list-group-item list-group-item-primary list-group-item-action
+                        "
+                        href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/general">
+                        General
+                    </a>
+                
+                    <a class="list-group-item list-group-item-primary list-group-item-action
+                        "
+                        href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/map-cleaner">
+                        Map Cleaner
+                    </a>
+                
+                    <a class="list-group-item list-group-item-primary list-group-item-action
+                        "
+                        href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/property-transformer">
+                        Property Transformer
+                    </a>
+                
+                    <a class="list-group-item list-group-item-primary list-group-item-action
+                        "
+                        href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/slider-merger">
+                        Slider Merger
+                    </a>
+                
+                    <a class="list-group-item list-group-item-primary list-group-item-action
+                        "
+                        href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/slider-completionator">
+                        Slider Completionator
+                    </a>
+                
+                    <a class="list-group-item list-group-item-primary list-group-item-action
+                        "
+                        href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/timing-helper">
+                        Timing Helper
+                    </a>
+                
+                    <a class="list-group-item list-group-item-primary list-group-item-action
+                        "
+                        href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/hitsound-copier">
+                        Hitsound Copier
+                    </a>
+                
+                    <a class="list-group-item list-group-item-primary list-group-item-action
+                        active"
+                        href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/hitsound-studio">
+                        Hitsound Studio
+                    </a>
+                
+                    <a class="list-group-item list-group-item-primary list-group-item-action
+                        "
+                        href="https:&#x2F;&#x2F;olibomby.github.io&#x2F;Mapping_Tools/docs/hitsound-preview-helper">
+                        Hitsound Preview Helper
+                    </a>
+                
+                </div>
+            </div>
+            <div class="col docu-content">
+                <h1>Hitsound Studio</h1>
+                <p>Hitsound Studio is the tool that lets you import data from multiple outside
+sources and convert them to osu! standard hitsounds in the form of a
+hitsounding difficulty that can you copy to other beatmaps.</p>
+<p>It represents hitsounds as a list of layers (hitsound layers). One layer
+contains a unique sound, the sampleset and hitsound that accompany that sound
+and a list of times that sound has to be played.</p>
+<h2 id="managing-hitsounds">Managing hitsounds</h2>
+<h3 id="adding-layers">Adding layers</h3>
+<p>When you click the plus button underneath the list there will appear a little
+window for adding layers. There are different ways to add layers for each
+import type.</p>
+<ul>
+<li>
+<p><strong>Simple layer</strong>. You can add a layer which doesn’t import times from any
+outside source if you just want to input the times via the gui.</p>
+</li>
+<li>
+<p><strong>Import stack</strong>. You can import the times from a beatmap. This import type
+will look at one specific coordinate, column or row of a beatmap and get the
+times of all the objects on there for your hitsound layer. That way you can
+use the osu! editor to make the times in your hitsound layers.</p>
+</li>
+<li>
+<p><strong>Import hitsounds</strong>.  You can import the complete hitsounding of a beatmap.
+This import type will look at every sample that plays on every object and
+generate multiple hitsound layers that would recreate the same hitsounds.
+This ignores slidertick and sliderslide hitsounds. When you import hitsounds
+with this mode it will also look for duplicate custom samples in the
+beatmap’s folder to avoid hitsound layers that have the same sound, sampleset
+and hitsound, but a different sound file. However it can’t detect samples
+that are made out of multiple other samples combined.</p>
+</li>
+<li>
+<p><strong>Import MIDI</strong>. You can import MIDI’s for hitsounds. This import type will
+generate a layer for every unique sound the MIDI wants to play. It will also
+automatically fill in the arguments for SoundFonts.</p>
+</li>
+</ul>
+<p>It will automatically fill in the current beatmap for beatmap fields in the
+importing window.</p>
+<h3 id="editing-layers">Editing layers</h3>
+<p>Taking up most of the screen is a list that shows all the hitsound layers. You
+can select one or more layers and edit their properties in the panel to the
+left.</p>
+<p>Double clicking a hitsound layer will make it play it’s sample, so you can
+check what it sounds like. If it doesn’t play a sound then it probably couldn’t
+find the sample.</p>
+<p>In the editing panel you can edit the following properties:</p>
+<ul>
+<li>
+<p>Name. It has no other use than letting yourself know what each layer is supposed to represent.</p>
+</li>
+<li>
+<p>Sample set. It defines which sample set will be used for the sample of the layer.</p>
+</li>
+<li>
+<p>Hitsound. It defines which hitsound will be used for the sample of the layer.</p>
+</li>
+<li>
+<p>Times. This is the list of times in milliseconds separated by commas which defines when the sample will be played. You can edit this in the tool, but it’s recommended to make all edits in the source of the layer and reloading the layer instead of editing the layer itself.</p>
+</li>
+<li>
+<p>Hitsound sample. A path to a file that contains the custom sound the hitsound must make. Supported file types are wave, vorbis and SoundFont. If you input a path to a SoundFont file there will appear extra inputs for generating sounds from a SoundFont. If Hitsound Studio can’t load the sample it will instead treat it like you want it to play the skin’s default sample, so no custom sound.</p>
+</li>
+<li>
+<p>Import info. This holds information that define what this layer is compared to the source of the layer, so you can reload the data from the source to the times of the layer. It’s like the layer’s identity for outside sources.</p>
+</li>
+<li>
+<p>Reload from source will re-do importing for all the selected layers and replace their times property will new values. This is based of of their import info.</p>
+</li>
+</ul>
+<p>You can use the up/down buttons underneath the list to move the selected layers
+up/down and this actually serves an extra purpose.</p>
+<p>Hitsound Studio treats the list as a hierarchy so the top layers have the most
+priority and the bottom layers have the lowest priority. In case multiple
+hitsounds mix at the same time it will take the sampleset of the layer with the
+highest priority.</p>
+<p>If you press the garbage can button underneath the list it will ask you to
+confirm deletion and if you press yes it will remove the selected layers.</p>
+<h2 id="using-sounds-from-soundfont">Using sounds from SoundFont</h2>
+<p>Inputting a path to a SoundFont file (.sf2) in the path for the hitsound sample
+will make extra controls appear which allow you to generate the right sound out
+of the SoundFont. You cannot use SoundFont for the default sample.</p>
+<ul>
+<li>
+<p><strong>Bank</strong>. This is the bank number to the bank to use. Usually bank 0 contains
+all the instruments and bank 128 contains all the percussion.</p>
+</li>
+<li>
+<p><strong>Patch</strong>. This defines which patch to use. Patches are like different
+instruments. Here’s a helpful link that tells you the patch numbers
+corresponding to instruments: https://pjb.com.au/muscript/gm.html.</p>
+</li>
+<li>
+<p><strong>Instrument</strong>. Sometimes a patch contains multiple instruments, so you can
+use this to give an index of which part of a patch to use.</p>
+</li>
+<li>
+<p><strong>Key</strong>. This defines the key or pitch of the instrument. For the percussion
+bank this can also define which instrument to use instead of pitch. Hitsound
+Studio can pitch shift if the SoundFont doesn’t contain the exact right key.
+Here’s a helpful link if you don’t that tells you how key number translates
+to other stuff
+https://www.inspiredacoustics.com/en/MIDI_note_numbers_and_center_frequencies.</p>
+</li>
+<li>
+<p><strong>Length</strong>. This defines the length in milliseconds to play a sample. If you
+input -1 here it will instead get the full length of the sound.</p>
+</li>
+<li>
+<p><strong>Velocity</strong>. This is a value from 0 to 128 that defines how loud to generate
+a sound. SoundFont can have different samples for different velocities.
+Hitsound Studio will adjust volume for the velocity value. Inputting -1 will
+act like 128 velocity or 100% volume.</p>
+</li>
+</ul>
+<p>Inputting -1 for bank, patch, instrument or key will make it look through every
+entry until it finds the first suitable sample, so that’s your best bet if you
+don’t know which bank or patch etc to use.</p>
+<p>Also remember you can double click the layer to hear what sound it makes.</p>
+<p>Hitsound Studio adds a small fadeout extension to the sounds to make the ending
+sound natural. If you input -1 into the length field it will not extend the
+length but still keep the small fadeout.</p>
+<p>Times are in seconds. It will extend by 0.4 seconds if the length is not
+defined as -1 and then do the following fade:</p>
+<pre><code>If the length of the sample is less than 0.4 seconds:
+  Fade start = length * 0.7;
+  Fade length = length * 0.2;
+else:
+  Fade start = length - 0.4;
+  Fade length = 0.3;
+</code></pre>
+<h3 id="base-beatmap">Base beatmap</h3>
+<p>The base beatmap is a beatmap that contains all the timing, metadata and volume
+changes for the hitsounding difficulty. Basically the hitsounding difficulty
+will be exactly this map but with all objects and custom indices replaced. Also
+mode will be set to osu! standard, circle size will be set to 4 and the
+difficulty will be called “Hitsounds”.</p>
+<h3 id="default-sample">Default sample</h3>
+<p>You tell Hitsound Studio what sample and sample set to use for undefined
+hitnormals.</p>
+<p>Default sample is required because in osu! standard an object will always play
+a hitnormal sample. For example if you told Hitsound Studio you want a whistle
+at 10s with a certain sound without telling it what hitnormal to play at 10s,
+then Hitsound Studio doesn’t know what sample to play for the hitnormal at 10s.
+The default sample will fill that place. </p>
+<p>If Hitsound Studio can’t load the sample it will instead treat it like you want
+it to play the skin’s default sample, so no custom sound.</p>
+<h2 id="exporting-hitsounds">Exporting hitsounds</h2>
+<p>Press the play button to run the algorithm and export the files to the exports
+folder. When it’s done it will open the export folder filled with all the
+files.</p>
+<ul>
+<li>
+<p>One hitsounds beatmap that contains all the data of hitsounding and that you
+can copy from.</p>
+</li>
+<li>
+<p>A bunch of wav files that is all the necessary custom samples to properly
+play the hitsounds in the hitsounds beatmap. These wav files are encoded with
+16-bit PCM.</p>
+</li>
+</ul>
+<p>The algorithm takes the hitsound layers, base beatmap and default sample and
+converts them to osu! standard hitsounds. It uses advanced algorithms to
+generate the optimal custom indices that require the least amount of samples.
+It also optimises to use the least amount of greenlines.</p>
+<p>Press the question mark button to run the algorithm without exporting any files
+and just display the number of custom indices, samples and greenlines it would
+have.</p>
+<h3 id="mixing-samples">Mixing samples</h3>
+<p>To make osu! standard hitsounds it sometimes has to mix multiple samples
+together into one sample.</p>
+<p>To prevent clipping of audio it scales volume with the following formula:</p>
+<pre><code>Volume = 1 / Sqrt(number of samples * average volume)
+</code></pre>
+<p>Volume is a scale 0 to 1 and number of sounds is the number of samples that get
+mixed into one sample.</p>
+<p>The resulting sample will get the sample rate of the highest sample rate sample
+out of the samples that make it up.</p>
+<p>The resulting sample will be stereo if at least one of the samples that make it
+up is stereo.</p>
+<h2 id="saving-projects">Saving projects</h2>
+<p>You can save and load your configuration by using the project menu in the top
+bar and it will also automatically save your current configuration for when you
+close Mapping Tools. That way you don't lose your work and it enables you to
+work on multiple hitsound projects at the same time.</p>
+
+            </div>
+        </div>
+    </div>
+
+    </div>
+    
+    <div class="footer footer-flex-container">
+        <div class="footer-flex-container footer-description">
+            <p>made by OliBomby</p>
+        </div>
+        <div class="footer-flex-container footer-social">
+            <div class="footer-donate">
+                <a href="https://www.patreon.com/OliBomby">
+                    <i class="fa fa-heart"></i> Donate
+                </a>
+            </div>
+            <div class="footer-github">
+                <a href="https://github.com/OliBomby/Mapping_Tools">
+                    <i class="fa fa-github"></i> GitHub
+                </a>
+            </div>
+            <div class="footer-discord">
+                <a href="https://discord.gg/YfjKN2yjQV">
+                    <i class="fa fa-discord"></i> Discord
+                </a>
+            </div>
+        </div>
+    </div>
+
+  </div>
+</body>
+
+</html>
