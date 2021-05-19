@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Mapping_Tools.Classes.SystemTools;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using Mapping_Tools.Classes.SystemTools;
-using Newtonsoft.Json;
 
 namespace Mapping_Tools.Views.Standard {
     [DontShowTitle]
@@ -10,11 +10,6 @@ namespace Mapping_Tools.Views.Standard {
         public static readonly string ToolName = "Get started";
 
         public static readonly string ToolDescription = $@"";
-
-        private static readonly Dictionary<string, string> jankReplacements = new Dictionary<string, string>() {
-            { @"<br/>", "\n" },
-            { @"<br>", "\n" }
-        };
 
         public StandardView() {
             InitializeComponent();
@@ -30,40 +25,30 @@ namespace Mapping_Tools.Views.Standard {
             public string Text { get; set; }
             public string Date { get; set; }
             public string Author { get; set; }
-            public string Type { get; set; }
         }
 
         private async void SetChangelogList() {
             try {
-                var values = new Dictionary<string, string>();
-                var content = new FormUrlEncodedContent(values);
-                var responseString = "";
-                using (HttpResponseMessage response = await MainWindow.HttpClient.PostAsync("https://mappingtools.seira.moe/changelog/logs/", content)) {
+                string responseString;
+                using (HttpResponseMessage response = await MainWindow.HttpClient.GetAsync("https://api.github.com/repos/OliBomby/Mapping_Tools/releases")) {
                     responseString = await response.Content.ReadAsStringAsync();
                 }
                 dynamic json = JsonConvert.DeserializeObject(responseString);
 
+                if (json == null) return;
+
                 foreach (dynamic dict in json) {
                     ChangelogList.Items.Add(new ChangelogItem {
-                        ID = dict["_id"],
-                        Title = dict["title"],
-                        Text = JankParse((string)dict["text"], jankReplacements),
-                        Date = dict["date"],
-                        Author = dict["author"],
-                        Type = dict["type"]
+                        ID = dict["id"],
+                        Title = dict["name"],
+                        Text = dict["body"],
+                        Date = dict["published_at"],
+                        Author = dict["author"]["login"],
                     });
                 }
             } catch (Exception ex) {
                 Console.WriteLine(ex.Message);
             }
-        }
-
-        private static string JankParse(string text, Dictionary<string, string> replacements) {
-            string result = text;
-            foreach (KeyValuePair<string, string> kvp in replacements) {
-                result = result.Replace(kvp.Key, kvp.Value);
-            }
-            return result;
         }
 
         public void SetRecentList() {

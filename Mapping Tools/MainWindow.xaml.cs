@@ -42,6 +42,7 @@ namespace Mapping_Tools {
                 AppDataPath = Path.Combine(AppCommon, "Mapping Tools");
                 ExportPath = Path.Combine(AppDataPath, "Exports");
                 HttpClient = new HttpClient();
+                HttpClient.DefaultRequestHeaders.Add("user-agent", "Mapping Tools");
 
                 InitializeComponent();
 
