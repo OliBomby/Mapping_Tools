@@ -16,7 +16,8 @@ namespace Mapping_Tools.Classes.SystemTools {
     public static class ProjectManager {
         private static readonly JsonSerializer Serializer = new JsonSerializer {
             NullValueHandling = NullValueHandling.Ignore,
-            TypeNameHandling = TypeNameHandling.All,
+            TypeNameHandling = TypeNameHandling.Auto,
+            TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
             Formatting = Formatting.Indented,
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore, 
             Converters = { new Vector2Converter()}
