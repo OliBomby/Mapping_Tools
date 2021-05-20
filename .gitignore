@@ -333,6 +333,3 @@ ASALocalRun/
 
 # Packages
 packages/
-!packages/EditorReader.dll
-!packages/OsuMemoryDataProvider.dll
-!packages/ProcessMemoryDataFinder.dll
