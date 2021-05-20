@@ -26,7 +26,7 @@
                 </TextBlock>
                     <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom" ToolTip="Click me!">
                     <materialDesign:PopupBox.ToggleContent>
-                    <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
+                    <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryHueMidBrush}"/>
                     </materialDesign:PopupBox.ToggleContent>
                     <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
                     Change the length and duration of marked sliders and this tool will automatically handle the SliderVelocity for you.

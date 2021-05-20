@@ -34,7 +34,7 @@
                 </TextBlock>
                     <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom" ToolTip="Click me!">
                   <materialDesign:PopupBox.ToggleContent>
-                    <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
+                    <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryHueMidBrush}"/>
                   </materialDesign:PopupBox.ToggleContent>
                   <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
                     Hitsound Preview Helper helps by placing hitsounds on all the objects of the current map based on the positions of the objects. That way you can hear the hitsounds play while you hitsound without having to assign them manually and later import them to Hitsound Studio.
@@ -86,36 +86,36 @@
                                 </Border>
                             </DataGridCheckBoxColumn.Header>
                         </DataGridCheckBoxColumn>
-                        <materialDesign:MaterialDataGridTextColumn
+                        <materialDesign:DataGridTextColumn
                             Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
                             Header="Name"
                             EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}" />
-                        <materialDesign:MaterialDataGridTextColumn
+                        <materialDesign:DataGridTextColumn
                             Binding="{Binding Filename, UpdateSourceTrigger=PropertyChanged}"
                             Header="Filename"
                             EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}" />
-                        <materialDesign:MaterialDataGridTextColumn
+                        <materialDesign:DataGridTextColumn
                             Binding="{Binding XPos, Converter={StaticResource D2SConverter}, ConverterParameter=-1, UpdateSourceTrigger=PropertyChanged}"
                             Header="X position"
                             EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"/>
-                        <materialDesign:MaterialDataGridTextColumn
+                        <materialDesign:DataGridTextColumn
                             Binding="{Binding YPos, Converter={StaticResource D2SConverter}, ConverterParameter=-1, UpdateSourceTrigger=PropertyChanged}"
                             Header="Y position"
                             EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"/>
                         <!-- use custom combo box column to get better combos. Use ItemsSourceBinding as your binding template to be applied to each combo -->
-                        <materialDesign:MaterialDataGridComboBoxColumn
+                        <materialDesign:DataGridComboBoxColumn
                             Header="Hitsound"
                             SelectedValueBinding="{Binding Hitsound, Converter={StaticResource HS2SConverter}, UpdateSourceTrigger=PropertyChanged}"
                             ItemsSourceBinding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}, Path=DataContext.Hitsounds}" />
-                        <materialDesign:MaterialDataGridComboBoxColumn
+                        <materialDesign:DataGridComboBoxColumn
                             Header="SampleSet"
                             SelectedValueBinding="{Binding SampleSet, Converter={StaticResource SS2SConverter}, UpdateSourceTrigger=PropertyChanged}"
                             ItemsSourceBinding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}, Path=DataContext.SampleSets}" />
-                        <materialDesign:MaterialDataGridComboBoxColumn
+                        <materialDesign:DataGridComboBoxColumn
                             Header="Additions"
                             SelectedValueBinding="{Binding AdditionsSet, Converter={StaticResource SS2SConverter}, UpdateSourceTrigger=PropertyChanged}"
                             ItemsSourceBinding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}, Path=DataContext.SampleSets}" />
-                        <materialDesign:MaterialDataGridTextColumn
+                        <materialDesign:DataGridTextColumn
                             Binding="{Binding CustomIndex, Converter={StaticResource I2SConverter}, ConverterParameter=0, UpdateSourceTrigger=PropertyChanged}"
                             Header="Custom index"
                             EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"/>

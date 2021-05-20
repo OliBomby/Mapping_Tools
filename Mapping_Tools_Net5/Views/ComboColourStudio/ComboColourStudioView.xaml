@@ -34,7 +34,7 @@
                 </TextBlock>
                 <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom" ToolTip="Click me!">
                     <materialDesign:PopupBox.ToggleContent>
-                        <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
+                        <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryHueMidBrush}"/>
                     </materialDesign:PopupBox.ToggleContent>
                     <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
                         With Combo Colour Studio you can easily customize the combo colours of your beatmap. AKA colour haxing.
@@ -71,11 +71,11 @@
                         </Style>
                     </DataGrid.Resources>
                     <DataGrid.Columns>
-                        <materialDesign:MaterialDataGridTextColumn
+                        <materialDesign:DataGridTextColumn
                             Binding="{Binding Time, UpdateSourceTrigger=LostFocus, Converter={StaticResource TimeToStringConverter}}"
                             Header="Offset"
                             EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}" />
-                        <materialDesign:MaterialDataGridComboBoxColumn
+                        <materialDesign:DataGridComboBoxColumn
                             Header="Mode"
                             SelectedValueBinding="{Binding Mode, UpdateSourceTrigger=PropertyChanged}"
                             ItemsSourceBinding="{Binding ColourPointModes}" />
@@ -178,7 +178,7 @@
                                                 </materialDesign:PopupBox.ToggleContent>
                                                 <StackPanel Orientation="Horizontal" Margin="20">
                                                     <TextBox Text="{Binding Color, ElementName=ColorPicker}"
-                                                             Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" materialDesign:HintAssist.Hint="Color HEX value"
+                                                             Style="{StaticResource MaterialDesignFilledTextBox}" materialDesign:HintAssist.Hint="Color HEX value"
                                                              Width="120" Margin="2,0,10,2"/>
                                                     <materialDesign:ColorPicker Color="{Binding Color}" x:Name="ColorPicker" Width="300"/>
                                                 </StackPanel>

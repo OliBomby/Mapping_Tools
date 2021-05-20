@@ -28,7 +28,7 @@
                         </TextBlock>
                         <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom" ToolTip="Click me!">
                             <materialDesign:PopupBox.ToggleContent>
-                                <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
+                                <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryHueMidBrush}"/>
                             </materialDesign:PopupBox.ToggleContent>
                             <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="10" xml:space="preserve">This tool derives virtual points, lines and circles from the hit objects in your editor and overlays them over the editor. 
 You can then snap your mouse to those virtual points, lines and circles using a hotkey, so you can use the geometry in your map.

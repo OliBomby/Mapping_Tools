@@ -29,7 +29,7 @@
             </TextBlock>
             <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom" ToolTip="Click me!">
                 <materialDesign:PopupBox.ToggleContent>
-                    <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
+                    <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryHueMidBrush}"/>
                 </materialDesign:PopupBox.ToggleContent>
                 <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
                     Sliderator is a tool meant to make sliders with variable velocity. That means sliders that change speed during the animation. You can also make variable velocity streams with this tool.
