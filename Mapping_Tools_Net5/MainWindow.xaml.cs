@@ -44,6 +44,7 @@ namespace Mapping_Tools {
                 AppDataPath = Path.Combine(AppCommon, "Mapping Tools");
                 ExportPath = Path.Combine(AppDataPath, "Exports");
                 HttpClient = new HttpClient();
+                HttpClient.DefaultRequestHeaders.Add("user-agent", "Mapping Tools");
                 _updateManager = new UpdateManager("misakura-rin", "mt_net5", "release.zip");
 
                 InitializeComponent();
