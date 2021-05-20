@@ -23,7 +23,14 @@
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <StackPanel x:Name="ReadyPanel" Visibility="Visible" Margin="40 25 40 0">
-                <TextBlock Text="A new update is available"></TextBlock>
+                <Grid Margin="0 0 0 20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Image Source="../Data/mt_logo_256.png" Width="64" Margin="10"/>
+                    <TextBlock Grid.Column="1" Text="A new version of Mapping Tools is ready to install!" FontSize="18" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                </Grid>
                 <Button x:Name="RestartBtn" Click="RestartBtn_Click" Content="Install now" Margin="0 0 0 20"></Button>
                 <Button x:Name="WaitBtn" Click="WaitBtn_Click" Content="Install after closing" Margin="0 0 0 20"></Button>
                 <Button x:Name="SkipBtn" Click="SkipBtn_Click" Content="Skip this version"></Button>
