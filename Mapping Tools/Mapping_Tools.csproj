@@ -120,7 +120,7 @@
       <HintPath>..\packages\Autoupdater.NET.Official.1.5.8\lib\net40\AutoUpdater.NET.dll</HintPath>
     </Reference>
     <Reference Include="EditorReader">
-      <HintPath>..\packages\EditorReader.dll</HintPath>
+      <HintPath>..\lib\EditorReader.dll</HintPath>
     </Reference>
     <Reference Include="MaterialDesignColors, Version=1.2.0.325, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MaterialDesignColors.1.2.0\lib\net45\MaterialDesignColors.dll</HintPath>
@@ -151,10 +151,10 @@
     </Reference>
     <Reference Include="OggVorbisEncoder, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\OggVorbisEncoder.dll</HintPath>
+      <HintPath>..\lib\OggVorbisEncoder.dll</HintPath>
     </Reference>
     <Reference Include="OsuMemoryDataProvider">
-      <HintPath>..\packages\OsuMemoryDataProvider.dll</HintPath>
+      <HintPath>..\lib\OsuMemoryDataProvider.dll</HintPath>
     </Reference>
     <Reference Include="Overlay.NET, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Overlay.NET.1.0.2\lib\Overlay.NET.dll</HintPath>
@@ -163,7 +163,7 @@
       <HintPath>..\packages\Overlay.NET.1.0.2\lib\Process.NET.dll</HintPath>
     </Reference>
     <Reference Include="ProcessMemoryDataFinder">
-      <HintPath>..\packages\ProcessMemoryDataFinder.dll</HintPath>
+      <HintPath>..\lib\ProcessMemoryDataFinder.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
