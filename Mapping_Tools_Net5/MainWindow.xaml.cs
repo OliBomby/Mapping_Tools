@@ -13,7 +13,6 @@ using System.Net.Http;
 using System.Reflection;
 using System.Security.Principal;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -23,7 +22,6 @@ namespace Mapping_Tools {
 
     public partial class MainWindow {
         private bool autoSave = true;
-        private readonly IUpdateManager _updateManager;
         private UpdaterWindow _updaterWindow;
 
         public ViewCollection Views;
@@ -45,7 +43,6 @@ namespace Mapping_Tools {
                 ExportPath = Path.Combine(AppDataPath, "Exports");
                 HttpClient = new HttpClient();
                 HttpClient.DefaultRequestHeaders.Add("user-agent", "Mapping Tools");
-                _updateManager = new UpdateManager("misakura-rin", "mt_net5", "release.zip");
 
                 InitializeComponent();
 
@@ -71,47 +68,13 @@ namespace Mapping_Tools {
             }
         }
 
+        private void MainWindow_OnLoaded(object sender, RoutedEventArgs e) {
+            Update();
+        }
+
         private void Setup() {
             SessionhasAdminRights = IsUserAdministrator();
-
-            try {
-                Task.Run(async () => {
-                    var hasUpdate = await _updateManager.FetchUpdateAsync();
-
-                    if( !hasUpdate ) {
-                        return;
-                    }
-
-                    var updateThread = new Thread(() => {
-                        _updaterWindow = new UpdaterWindow(_updateManager) {
-                            ShowActivated = true
-                        };
-
-                        _updaterWindow.Closing += (sender, e) => {
-                            if( _updaterWindow.NeedsRestart ) {
-                                Dispatcher.Invoke(Close);
-                            }
-                            else {
-                                Dispatcher.Invoke(Activate);
-                            }
-                        };
-
-                        _updaterWindow.Show();
-
-                        _updaterWindow.StartUpdateProcess();
-
-                        System.Windows.Threading.Dispatcher.Run();
-                    });
-
-                    updateThread.SetApartmentState(ApartmentState.STA);
-                    updateThread.Start();
-                });
-            }
-
-            catch( Exception ex ) {
-                Console.WriteLine(ex.Message);
-            }
-
+            
             try {
                 Directory.CreateDirectory(AppDataPath);
                 Directory.CreateDirectory(ExportPath);
@@ -131,6 +94,60 @@ namespace Mapping_Tools {
             }).OrderBy(o => o.Header);
         }
 
+        private void Update() {
+            Task.Run(async () => {
+                try {
+                    var updateManager = new UpdateManager("OliBomby", "Mapping_Tools", "release.zip");
+
+                    var hasUpdate = await updateManager.FetchUpdateAsync();
+
+                    if (!hasUpdate) {
+                        return;
+                    }
+
+                    Dispatcher.Invoke(() => {
+                        _updaterWindow = new UpdaterWindow(updateManager.Progress) {
+                            ShowActivated = true
+                        };
+
+                        _updaterWindow.ActionSelected += async (sender, action) => {
+                            switch (action) {
+                                case UpdateAction.Restart:
+                                    await updateManager.DownloadUpdateAsync();
+                                    updateManager.RestartAfterUpdate = true;
+                                    updateManager.StartUpdateProcess();
+
+                                    _updaterWindow.Close();
+                                    Close();
+                                    break;
+
+                                case UpdateAction.Wait:
+                                    await updateManager.DownloadUpdateAsync();
+                                    updateManager.RestartAfterUpdate = false;
+                                    updateManager.StartUpdateProcess();
+
+                                    _updaterWindow.Close();
+                                    break;
+
+                                case UpdateAction.Skip:
+                                default:
+                                    _updaterWindow.Close();
+                                    break;
+                            }
+                        };
+
+                        _updaterWindow.Closed += (sender, e) => {
+                            updateManager.Dispose();
+                        };
+
+                        _updaterWindow.Show();
+                    });
+                } catch (Exception e) {
+                    MessageBox.Show("UPDATER_EXCEPTION: " + e.Message);
+                }
+            });
+        }
+
         private void Window_Closing(object sender, EventArgs e) {
             // Perform saving of settings at application exit
             if( autoSave ) {
@@ -140,10 +157,6 @@ namespace Mapping_Tools {
                 }
                 SettingsManager.UpdateSettings();
                 SettingsManager.WriteToJson();
-            }
-
-            if( _updaterWindow != null ) {
-                _updateManager.Release();
             }
         }
 

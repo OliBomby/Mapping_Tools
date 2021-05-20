@@ -22,6 +22,7 @@
         ShowInTaskbar="True"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
         Background="{DynamicResource MaterialDesignPaper}"
+        Loaded="MainWindow_OnLoaded"
         Closing="Window_Closing">
     <WindowChrome.WindowChrome>
         <WindowChrome

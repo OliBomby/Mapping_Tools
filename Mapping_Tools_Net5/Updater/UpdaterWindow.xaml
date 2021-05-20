@@ -19,18 +19,19 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
-            <RowDefinition Height="100"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
-            <StackPanel x:Name="ReadyPanel" Visibility="Hidden" Margin="40 25 40 0">
-                <Button x:Name="RestartBtn" Click="RestartBtn_Click" Content="Restart now" Margin="0 0 0 20"></Button>
-                <Button x:Name="WaitBtn" Click="WaitBtn_Click" Content="Wait until the app is closed" Margin="0 0 0 20"></Button>
+            <StackPanel x:Name="ReadyPanel" Visibility="Visible" Margin="40 25 40 0">
+                <TextBlock Text="A new update is available"></TextBlock>
+                <Button x:Name="RestartBtn" Click="RestartBtn_Click" Content="Install now" Margin="0 0 0 20"></Button>
+                <Button x:Name="WaitBtn" Click="WaitBtn_Click" Content="Install after closing" Margin="0 0 0 20"></Button>
                 <Button x:Name="SkipBtn" Click="SkipBtn_Click" Content="Skip this version"></Button>
             </StackPanel>
-            <TextBlock Name="DownloadText" FontSize="15" Text="Downloading new update ..." HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontWeight="Normal"></TextBlock>
+            <TextBlock Name="DownloadText" Visibility="Hidden" FontSize="15" Text="Downloading new update ..." HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontWeight="Normal"></TextBlock>
         </Grid>
         <Grid Grid.Row="1" Margin="10 -50 10 0">
-            <ProgressBar Name="ProgressBar" Height="15" Minimum="0" Maximum="1"></ProgressBar>
+            <ProgressBar Name="ProgressBar" Visibility="Hidden"  Height="15" Minimum="0" Maximum="1"></ProgressBar>
         </Grid>
     </Grid>
 </Window>
