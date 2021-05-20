@@ -1,0 +1,116 @@
+﻿<local:SingleRunMappingTool x:Class="Mapping_Tools.Views.AutoFailDetector.AutoFailDetectorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Mapping_Tools.Views"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
+             mc:Ignorable="d" 
+             x:Name="This"
+             d:DesignHeight="450" Width="759.5" d:DataContext="{d:DesignData AutoFailDetectorVm}">
+    <local:SingleRunMappingTool.Resources>
+        <domain:DoubleToStringConverter x:Key="DoubleToStringConverter"/>
+        <domain:TimeToStringConverter x:Key="TimeToStringConverter"/>
+    </local:SingleRunMappingTool.Resources>
+    <Grid Name="MasterGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid Name="FirstGrid" Grid.Row="0">
+            <StackPanel>
+              <StackPanel Orientation="Horizontal">
+                    <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
+                        <Run Text="Auto-fail Detector"/>
+                    </TextBlock>
+                    <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom" ToolTip="Click me!">
+                        <materialDesign:PopupBox.ToggleContent>
+                        <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
+                        </materialDesign:PopupBox.ToggleContent>
+                        <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
+                            Detects cases of incorrect object loading in a beatmap which makes osu! unable to calculate scores correctly. 
+                            <LineBreak/> 
+                            Auto-fail is most often caused by placing other hit objects during sliders, so there are multiple hit objects going on at the same time also known as "2B" patterns.
+                            <LineBreak/>
+                            Use the AR and OD override options to see what would happen when you use hardrock mod on the map.
+                        </TextBlock>
+                    </materialDesign:PopupBox>
+                  <materialDesign:PopupBox Margin="0,10,10,10" VerticalAlignment="Bottom" ToolTip="Click me!">
+                      <materialDesign:PopupBox.ToggleContent>
+                          <materialDesign:PackIcon Kind="LightningBoltCircle" Width="24" Height="24" Foreground="{DynamicResource PrimaryHueLightBrush}"/>
+                      </materialDesign:PopupBox.ToggleContent>
+                      <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
+                          This tool is compatible with QuickRun!
+                      </TextBlock>
+                  </materialDesign:PopupBox>
+                </StackPanel>
+
+                <CheckBox FontSize="14" IsChecked="{Binding ShowUnloadingObjects}" Cursor="Hand"
+                          ToolTip="Show the start times of unloading hit objects which cause auto-fail. Red in the timeline.">
+                    Show unloading hit objects
+                </CheckBox>
+                <CheckBox FontSize="14" IsChecked="{Binding ShowPotentialUnloadingObjects}" Cursor="Hand"
+                          ToolTip="Show the start times of hit objects which could unload to cause auto-fail depending on the object counts. Green in the timeline.">
+                    Show potential unloading hit objects
+                </CheckBox>
+                <CheckBox FontSize="14" IsChecked="{Binding ShowPotentialDisruptors}" Cursor="Hand"
+                          ToolTip="Show the start times of hit objects which cause the potential unloading of other hit objects. Purple in the timeline.">
+                    Show disrupting hit objects
+                </CheckBox>
+                <CheckBox FontSize="14" IsChecked="{Binding GetAutoFailFix}" Cursor="Hand"
+                          ToolTip="Get a guide on where to place extra objects such that there will be no auto-fail anymore.">
+                    Get auto-fail fix guide
+                </CheckBox>
+                <CheckBox FontSize="14" IsChecked="{Binding AutoPlaceFix}" Cursor="Hand"
+                          ToolTip="Automatically place spinners according to the guide on where to place extra objects such that there will be no auto-fail anymore. This adds negative length spinners at probably unwanted moments. It's recommended to place your objects yourself.">
+                    Auto-insert spinners
+                </CheckBox>
+                <TextBox Width="258" HorizontalAlignment="Left" Margin="0,10,0,0"
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="AR override"
+                        ToolTip="Override the approach rate used for finding the loaded hit objects. Use -1 for no override."
+                        Text="{Binding ApproachRateOverride, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=-1}">
+                </TextBox>
+                <TextBox Width="258" HorizontalAlignment="Left" Margin="0,10,0,0"
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="OD override"
+                         ToolTip="Override the overall difficulty used for finding which hit objects unload incorrectly. Use -1 for no override."
+                         Text="{Binding OverallDifficultyOverride, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=-1}">
+                </TextBox>
+                <TextBox Width="258" HorizontalAlignment="Left" Margin="0,20,0,0"
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Physics update leniency"
+                         ToolTip="Time in milliseconds to require objects to unload later to account for the update frequency of the physics engine. A value of 9ms or higher is recommended, so players with 120fps (8.33ms frame time) can pass the map. Increase it further if your map is really laggy."
+                         Text="{Binding PhysicsUpdateLeniency}">
+                </TextBox>
+            </StackPanel>
+            <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
+                <Button
+                    Style="{StaticResource MaterialDesignFloatingActionButton}"
+                    IsEnabled="{Binding ElementName=This, Path=CanRun}"
+                    Click="Start_Click"
+                    ToolTip="Run this tool.">
+                    <materialDesign:PackIcon
+                        Kind="Play" Height="36" Width="36" />
+                </Button>
+            </Viewbox>
+        </Grid>
+        <Grid Name="SecondGrid" Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby &amp; Karoo" FontWeight="Bold" Opacity="0.58"/>
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <ProgressBar Value="{Binding ElementName=This, Path=Progress}" Margin="20,0,20,0" Height="20" Background="{x:Null}" BorderBrush="{x:Null}"/>
+            </Grid>
+        </Grid>
+        <Grid Name="FourthGrid" Grid.Row="2">
+            <StackPanel x:Name="tl_host"
+                        ToolTip="This timeline shows where the auto-fail occurs. Red lines show the objects which unload and cause auto-fail. Green lines show the objects which could potentially unload with different object counts. Purple lines show objects which make other objects potentially unload. You can double-click the lines to go to that time."/>
+        </Grid>
+    </Grid>
+</local:SingleRunMappingTool>

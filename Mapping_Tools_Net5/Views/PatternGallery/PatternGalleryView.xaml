@@ -1,0 +1,319 @@
+﻿<local:SingleRunMappingTool x:Class="Mapping_Tools.Views.PatternGallery.PatternGalleryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Mapping_Tools.Views"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
+             xmlns:viewmodels="clr-namespace:Mapping_Tools.Viewmodels"
+             x:Name="This"
+             mc:Ignorable="d" Width="900" Height="700" d:DataContext="{d:DesignInstance viewmodels:PatternGalleryVm}">
+    <UserControl.Resources>
+        <domain:DoubleToStringConverter x:Key="D2SConverter"/>
+        <domain:IntToStringConverter x:Key="I2SConverter"/>
+        <domain:BeatDivisorArrayToStringConverter x:Key="BeatDivisorArrayToStringConverter"/>
+    </UserControl.Resources>
+    <Grid Name="MasterGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid Name="FirstGrid" Grid.Row="0">
+            <Grid Margin="0,0,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Orientation="Horizontal" Grid.Row="0">
+                <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
+                  <Run Text="Pattern Gallery"/>
+                </TextBlock>
+                    <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom" ToolTip="Click me!">
+                  <materialDesign:PopupBox.ToggleContent>
+                    <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
+                  </materialDesign:PopupBox.ToggleContent>
+                  <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
+                      Import and export patterns from osu! beatmaps and create pattern collections which you can share with your friends.<LineBreak/>
+                      You can add or remove patterns by using the buttons at the bottom.<LineBreak/>
+                      To export a pattern to the current beatmap simply select one or more patterns and click the run button. You can also double-click a pattern to instantly export it.<LineBreak/>
+                      On the right there are export options which allow for additional processing on the pattern during export.<LineBreak/>
+                      With the 'Project' menu you can save/load/rename/import/export your pattern collections.
+                  </TextBlock>
+                    </materialDesign:PopupBox>
+                  <materialDesign:PopupBox Margin="0,10,10,10" VerticalAlignment="Bottom" ToolTip="Click me!">
+                      <materialDesign:PopupBox.ToggleContent>
+                          <materialDesign:PackIcon Kind="LightningBoltCircle" Width="24" Height="24" Foreground="{DynamicResource PrimaryHueLightBrush}"/>
+                      </materialDesign:PopupBox.ToggleContent>
+                      <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
+                          This tool is compatible with QuickRun!
+                      </TextBlock>
+                  </materialDesign:PopupBox>
+                </StackPanel>
+
+                <TextBlock 
+                    Grid.Row="0"
+                    FontSize="35"
+                    FontWeight="Thin"
+                    Foreground="{DynamicResource PrimaryHueLightBrush}"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Text="{Binding CollectionName}"
+                    MouseDown="CollectionName_MouseDown">
+                </TextBlock>
+
+                <Grid Grid.Row="1" Margin="0 18 0 0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="240"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid Grid.Column="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <DataGrid
+                            Grid.Row="0"
+                            Margin="0 0 0 0"
+                            ItemsSource="{Binding Patterns}"
+                            CanUserSortColumns="True"
+                            CanUserAddRows="False"
+                            AutoGenerateColumns="False"
+                            materialDesign:DataGridAssist.CellPadding="13 8 8 8"
+                            materialDesign:DataGridAssist.ColumnHeaderPadding="8"
+                            VerticalScrollBarVisibility="Auto"
+                            VerticalAlignment="Stretch">
+                            <DataGrid.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Delete" Command="{Binding RemoveCommand}" Tag="Delete"
+                                      ToolTip="Delete selected patterns. Hold shift to skip dialog.">
+                                        <MenuItem.Icon>
+                                            <materialDesign:PackIcon Kind="TrashCan"/>
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <MenuItem Header="Open in File Explorer" Command="{Binding OpenExplorerSelectedCommand}"
+                                      ToolTip="Open the source files of the selected patterns in the File Explorer.">
+                                        <MenuItem.Icon>
+                                            <materialDesign:PackIcon Kind="ArrowTopRightThick"/>
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                </ContextMenu>
+                            </DataGrid.ContextMenu>
+                            <DataGrid.Resources>
+                                <Style TargetType="DataGridRow" BasedOn="{StaticResource MaterialDesignDataGridRow}">
+                                    <Setter Property="IsSelected"
+                                Value="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    <EventSetter Event="MouseDoubleClick" Handler="PatternRow_MouseDoubleClick"/>
+                                </Style>
+                            </DataGrid.Resources>
+                            <DataGrid.Columns>
+                                <DataGridCheckBoxColumn
+                            Binding="{Binding IsSelected}"
+                            ElementStyle="{StaticResource MaterialDesignDataGridCheckBoxColumnStyle}"
+                            EditingElementStyle="{StaticResource MaterialDesignDataGridCheckBoxColumnEditingStyle}">
+                                    <DataGridCheckBoxColumn.Header>
+                                        <!--padding to allow hit test to pass thru for sorting -->
+                                        <Border
+                                    Background="Transparent"
+                                    Padding="6 0 6 0"
+                                    HorizontalAlignment="Center">
+                                            <CheckBox
+                                        HorizontalAlignment="Center"
+                                        DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext}"
+                                        IsChecked="{Binding IsAllItemsSelected}" />
+                                        </Border>
+                                    </DataGridCheckBoxColumn.Header>
+                                </DataGridCheckBoxColumn>
+                                <materialDesign:MaterialDataGridTextColumn
+                            Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
+                            Header="Name"
+                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}" />
+                                <materialDesign:MaterialDataGridTextColumn
+                            Binding="{Binding UseCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                            Header="Use count"/>
+                                <materialDesign:MaterialDataGridTextColumn
+                            Binding="{Binding ObjectCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                            Header="Object count"/>
+                                <materialDesign:MaterialDataGridTextColumn
+                            Binding="{Binding Duration, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                            Header="Duration"/>
+                                <materialDesign:MaterialDataGridTextColumn
+                            Binding="{Binding BeatLength, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                            Header="Number of beats"/>
+                                <materialDesign:MaterialDataGridTextColumn
+                            Binding="{Binding CreationTime, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                            Header="Time of creation"/>
+                                <materialDesign:MaterialDataGridTextColumn
+                            Binding="{Binding LastUsedTime, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                            Header="Time of last use"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <StackPanel
+                            Grid.Row="1"
+                            Margin="5"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Bottom"
+                            Orientation="Horizontal">
+                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a pattern from .osu code." Command="{Binding AddCodeCommand}" Margin="5">
+                                <materialDesign:PackIcon Kind="CodeBraces" Height="24" Width="24" />
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a pattern from a file." Command="{Binding AddFileCommand}" Margin="5">
+                                <materialDesign:PackIcon Kind="FilePlus" Height="24" Width="24" />
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a pattern from selected hit objects." Command="{Binding AddSelectedCommand}" Margin="5">
+                                <materialDesign:PackIcon Kind="PlusBox" Height="24" Width="24" />
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Delete selected patterns. Hold shift to skip dialog." Command="{Binding RemoveCommand}" Margin="5">
+                                <materialDesign:PackIcon Kind="Trashcan" Height="24" Width="24" />
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+
+                    <GridSplitter Grid.Column="1" Width="2" Margin="0,0,0,10" HorizontalAlignment="Center"/>
+
+                    <Grid Grid.Column="2" Margin="0 0 0 0">
+                        <StackPanel>
+                            <ComboBox SelectedItem="{Binding ExportTimeMode}" ItemsSource="{Binding ExportTimeModes}"
+                              Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                              materialDesign:HintAssist.Hint="Export offset" Margin="0 7 0 0"
+                              ToolTip="Determines at what time to put the pattern."/>
+                            <TextBox Margin="0 5 0 0" materialDesign:HintAssist.Hint="Custom export offset" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                             ToolTip="Determines at what time to put the pattern for the custom offset mode." 
+                             Visibility="{Binding CustomExportTimeVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <TextBox.Text>
+                                    <Binding Path="CustomExportTime" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
+                                        <Binding.Converter>
+                                            <domain:TimeToStringConverter/>
+                                        </Binding.Converter>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
+                            <TextBox Margin="0 5 0 0" materialDesign:HintAssist.Hint="Deletion margin" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                             ToolTip="Extra time in milliseconds around the patterns for deleting parts of the original map.">
+                                <TextBox.Text>
+                                    <Binding Path="Padding" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
+                                        <Binding.Converter>
+                                            <domain:DoubleToStringConverter/>
+                                        </Binding.Converter>
+                                        <Binding.ValidationRules>
+                                            <domain:IsGreaterOrEqualValidationRule>
+                                                <domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                                    <domain:DoubleWrapper Value="0"/>
+                                                </domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                            </domain:IsGreaterOrEqualValidationRule>
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
+                            <TextBox Margin="0 5 0 0" materialDesign:HintAssist.Hint="Parting distance" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                             ToolTip="Minimum number of beats required in a gap to split a pattern into smaller parts.">
+                                <TextBox.Text>
+                                    <Binding Path="PartingDistance" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
+                                        <Binding.Converter>
+                                            <domain:DoubleToStringConverter/>
+                                        </Binding.Converter>
+                                        <Binding.ValidationRules>
+                                            <domain:IsGreaterOrEqualValidationRule>
+                                                <domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                                    <domain:DoubleWrapper Value="0"/>
+                                                </domain:IsGreaterOrEqualValidationRule.ValueWrapper>
+                                            </domain:IsGreaterOrEqualValidationRule>
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
+                            <TextBox Text="{Binding BeatDivisors, Converter={StaticResource BeatDivisorArrayToStringConverter}}" 
+                             Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                             materialDesign:HintAssist.Hint="Beat divisors" Margin="0 5 0 0"
+                             ToolTip="Input any number of beat divisors here separated with commas. Example: 1/4, 1/12, 1/7, 4/5, 0.13435622499"/>
+                            <Grid Margin="0 5 0 0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="5"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding CustomScale, Converter={StaticResource D2SConverter}}" 
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                 materialDesign:HintAssist.Hint="Custom scale" Grid.Column="0"
+                                 ToolTip="Scalar to change the size of the pattern."/>
+                                <TextBox Text="{Binding CustomRotate, Converter={StaticResource D2SConverter}}" 
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                 materialDesign:HintAssist.Hint="Custom rotate" Grid.Column="2"
+                                 ToolTip="Degrees to rotate the pattern clockwise."/>
+                            </Grid>
+                            <ComboBox SelectedItem="{Binding PatternOverwriteMode}" ItemsSource="{Binding PatternOverwriteModes}"
+                              Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                              materialDesign:HintAssist.Hint="Pattern overwrite mode" Margin="0 5 0 0"
+                              ToolTip="Determines how to overwrite the objects in the original beatmap when a pattern gets placed on them."/>
+                            <ComboBox SelectedItem="{Binding TimingOverwriteMode}" ItemsSource="{Binding TimingOverwriteModes}"
+                              Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                              materialDesign:HintAssist.Hint="Timing overwrite mode" Margin="0 5 0 0"
+                              ToolTip="Determines how to combine the timing of the orignal beatmap and the timing of the pattern."/>
+
+                            <CheckBox Content="Include hitsounds" Margin="0 5 0 0"
+                              ToolTip="Export the pattern with the hitsound effects of the pattern timing points."
+                              IsChecked="{Binding IncludeHitsounds}"/>
+                            <CheckBox Content="Include kiai"
+                              ToolTip="Export the pattern with the kiai of the pattern."
+                              IsChecked="{Binding IncludeKiai}"/>
+                            <CheckBox Content="Scale to new circle size"
+                              ToolTip="Scale the pattern such that the spacing relative to the circle size stays the same."
+                              IsChecked="{Binding ScaleToNewCircleSize}"/>
+                            <CheckBox Content="Scale to new timing"
+                              ToolTip="Scale the pattern in time such that the number of beats between objects stays the same in the new timing. Incorrect snaps can occur if your timing has unsnapped redlines. Do not use this if you have 0 or infinite BPM redlines."
+                              IsChecked="{Binding ScaleToNewTiming}"/>
+                            <CheckBox Content="Snap to new timing"
+                              ToolTip="Snap the objects of the pattern to the new timing using the specified beat divisors."
+                              IsChecked="{Binding SnapToNewTiming}"/>
+                            <CheckBox Content="Manualify stacks"
+                              ToolTip="Manually stack objects of the pattern."
+                              IsChecked="{Binding FixStackLeniency}"/>
+                            <CheckBox Content="Fix global SV"
+                              ToolTip="Adjust greenline SV in the pattern to the new global SV so sliders have the same SV in the new beatmap."
+                              IsChecked="{Binding FixGlobalSv}"/>
+                            <CheckBox Content="Fix BPM SV"
+                              ToolTip="Adjust greenline SV in the pattern to the new BPM so sliders have the same SV in the new beatmap. It is recommended to disable this feature if you are using the 'Scale to new timing' feature."
+                              IsChecked="{Binding FixBpmSv}"/>
+                            <CheckBox Content="Fix colourhax"
+                              ToolTip="Adjust colour skip such that the colour indices of objects stay the same for the pattern and the original beatmap."
+                              IsChecked="{Binding FixColourHax}"/>
+                            <CheckBox Content="Fix slider tick rate"
+                              ToolTip="Multiply BPM in the pattern so the slider tick rate in the pattern stays the same."
+                              IsChecked="{Binding FixTickRate}"/>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Grid>
+
+            <Viewbox Grid.Column="2" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
+                <Button
+                    IsEnabled="{Binding ElementName=This, Path=CanRun}"
+                    Style="{StaticResource MaterialDesignFloatingActionButton}"
+                    Click="Start_Click"
+                    ToolTip="Run this tool.">
+                    <materialDesign:PackIcon
+                        Kind="Play" Height="36" Width="36" />
+                </Button>
+            </Viewbox>
+        </Grid>
+        <Grid Name="SecondGrid" Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Opacity="0.58"/>
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <ProgressBar Value="{Binding ElementName=This, Path=Progress}" Margin="20,0,20,0" Height="20" Background="{x:Null}" BorderBrush="{x:Null}"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</local:SingleRunMappingTool>

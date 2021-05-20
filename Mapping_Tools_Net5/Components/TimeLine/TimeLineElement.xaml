@@ -1,0 +1,11 @@
+﻿<UserControl x:Class="Mapping_Tools.Components.TimeLine.TimeLineElement"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d">
+    <Canvas x:Name="mainCanvas" Width="5" MouseLeftButtonDown="OpenLink" Cursor="Hand">
+        <Rectangle x:Name="rectOuter" Fill="#FF58F50F" Width="5" Opacity="0.3"/>
+        <Rectangle x:Name="rectInner" Fill="#FF17B41E" Canvas.Left="2" Width="1"/>
+    </Canvas>
+</UserControl>

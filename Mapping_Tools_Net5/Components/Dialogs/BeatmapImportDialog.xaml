@@ -1,0 +1,62 @@
+﻿<UserControl x:Class="Mapping_Tools.Components.Dialogs.BeatmapImportDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Mapping_Tools.Components"
+             xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:wpf="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800" d:DataContext="{d:DesignData BeatmapImportDialog}">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <TextBlock>Import from beatmap:</TextBlock>
+        <Grid Grid.Row="1" Margin="0 6 0 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox wpf:HintAssist.Hint="Path" Style="{DynamicResource MaterialDesignFloatingHintTextBox}" Grid.Column="0" MaxWidth="200" Width="200">
+                <TextBox.Text>
+                    <Binding Path="Path" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <domain:NotEmptyValidationRule ValidatesOnTargetUpdated="True"/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+            <Button Grid.Column="1" Cursor="Hand" Click="BeatmapLoad_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                    ToolTip="Fetch the selected beatmap from your osu! client.">
+                <wpf:PackIcon Width="30" Height="30" Cursor="Hand" Kind="RestoreFromTrash" Foreground="{DynamicResource PrimaryHueMidBrush}"/>            
+            </Button >
+            <Button Grid.Column="3" Cursor="Hand" Click="BeatmapBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                    ToolTip="Select beatmaps with File Explorer.">
+                <wpf:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+            </Button >
+        </Grid>
+        <StackPanel Orientation="Horizontal" Grid.Row="2"
+                    Margin="0 16 0 0" HorizontalAlignment="Center">
+            <Button IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}"
+                    Command="{x:Static wpf:DialogHost.CloseDialogCommand}">
+                <Button.CommandParameter>
+                    <system:Boolean>True</system:Boolean>
+                </Button.CommandParameter>
+                ACCEPT
+            </Button>
+            <Button IsCancel="True" Margin="8 0 0 0" Style="{DynamicResource MaterialDesignFlatButton}"
+                    Command="{x:Static wpf:DialogHost.CloseDialogCommand}">
+                <Button.CommandParameter>
+                    <system:Boolean>False</system:Boolean>
+                </Button.CommandParameter>
+                CANCEL
+            </Button>
+        </StackPanel>
+    </Grid>
+</UserControl>

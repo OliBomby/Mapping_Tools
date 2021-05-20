@@ -1,0 +1,78 @@
+﻿<!--
+    TODO: Change layout to timeline layout using spectrum using the currently selected beatmaps' audio file.
+    Timeline layout should have a button to toggle between osu! view and "daw" view 
+        (show beats and ms like in Reaper)
+    Show an envelope like line in the timeline with adjustable range of bpm (15 - 960)
+    osu! view should include all previewed bpm points with the time, signature (x/4 - x being from 1 - inf)
+        and the reccomended snap divisor for that section if needed (e.g. if 7/5 is used)
+        User can decide if bpm should double or half depending on the current time signature 
+            (this can increase and/or decrease the number of timing points in the beatmap/project)
+        User can decide the snap divisor (in preferences) when using gradual bpm increase/decrease 
+            (this can increase and/or decrease the number of timing points in the beatmap)
+    Implement an import, project and prefferences section to Timing Helper
+    Allow import of midi, rpp (reaper project file), current beatmap (using Timing Helpers importer).
+    -->
+    
+<local:SingleRunMappingTool x:Class="Mapping_Tools.Views.TimingStudio.TimingStudioView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Mapping_Tools.Views"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             x:Name="This"
+             d:DesignHeight="450" Width="759.5">
+    <Grid Name="MasterGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid Name="FirstGrid" Grid.Row="0">
+            <StackPanel>
+              <StackPanel Orientation="Horizontal">
+                <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
+                  <Run Text="Timing Helper"/>
+                </TextBlock>
+                    <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom" ToolTip="Click me!">
+                  <materialDesign:PopupBox.ToggleContent>
+                    <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
+                  </materialDesign:PopupBox.ToggleContent>
+                  <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
+                    Timing Helper is meant to speed up your timing job by placing the redlines for you. You only have to tell it where exactly all the sounds are.
+                    <LineBreak/>
+                    What you do is place 'markers' exactly on the correct timing of sounds. These markers can be hit objects, bookmarks, greenlines and redlines.
+                    <LineBreak/>
+                    Timing Helper will then adjust BPM and/or add redlines to make every marker be snapped.
+                  </TextBlock>
+                </materialDesign:PopupBox>
+              </StackPanel>
+            </StackPanel>
+            <ContentControl Grid.Row="1" x:Name="TimelineHost" Margin="20 20 20 100" ></ContentControl>
+            <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
+                <Button
+                    IsEnabled="{Binding ElementName=This, Path=CanRun}"
+                    Style="{StaticResource MaterialDesignFloatingActionButton}"
+                    Click="Start_Click"
+                    ToolTip="Run this tool.">
+                    <materialDesign:PackIcon
+                        Kind="Play" Height="36" Width="36" />
+                </Button>
+            </Viewbox>
+        </Grid>
+        <Grid Name="SecondGrid" Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap" Text="Made by Coppertine" FontWeight="Bold" Opacity="0.58"/>
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <ProgressBar Value="{Binding ElementName=This, Path=Progress}" Margin="20,0,20,0" Height="20" Background="{x:Null}" BorderBrush="{x:Null}"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</local:SingleRunMappingTool>

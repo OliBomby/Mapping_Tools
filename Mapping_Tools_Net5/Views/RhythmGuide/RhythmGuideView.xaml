@@ -1,0 +1,129 @@
+﻿<local:SingleRunMappingTool x:Class="Mapping_Tools.Views.RhythmGuide.RhythmGuideView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Mapping_Tools.Views"
+             xmlns:cm="clr-namespace:System.ComponentModel;assembly=System"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
+             mc:Ignorable="d" 
+             x:Name="This"
+             d:DesignHeight="650" Width="759.5" d:DataContext="{d:DesignData RhythmGuideVm}">
+    <UserControl.Resources>
+        <domain:StringArrayToStringConverter x:Key="Sa2SConverter"/>
+        <domain:MapPathStringToCountStringConverter x:Key="MapPathStringToCountStringConverter"/>
+    </UserControl.Resources>
+    <Grid Name="MasterGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid Name="FirstGrid" Grid.Row="0">
+            <StackPanel Grid.Row="0" Margin="0,0,120,0">
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
+                    <Run Text="Rhythm Guide"/>
+                  </TextBlock>
+                    <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom" ToolTip="Click me!">
+                    <materialDesign:PopupBox.ToggleContent>
+                      <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
+                    </materialDesign:PopupBox.ToggleContent>
+                    <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
+                      Make a beatmap with circles from the rhythm of multiple maps, so you have a reference for hitsounding.
+                      <LineBreak/>
+                      You can add the circles to an existing map or make a new map with the circles.
+                      <LineBreak/>
+                      Use the browse button to choose mutliple maps at the same time.
+                    </TextBlock>
+                  </materialDesign:PopupBox>
+                </StackPanel>
+              
+                <Grid Margin="0,20,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" x:Name="ImportPathBox" Text="{Binding GuideGeneratorArgs.Paths, Converter={StaticResource Sa2SConverter}}"
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Copy rhythm from"
+                        ToolTip="Beatmap(s) to import rhythm from. You can input multiple beatmap paths seperated by '|'."/>
+                    <TextBlock Grid.Column="1" Margin="3 15 5 0" FontStyle="Italic"
+                               ToolTip="Multiple beatmaps can be inputted in this field. Separate the paths with the '|' character."
+                               Text="{Binding ElementName=ImportPathBox, Path=Text, Converter={StaticResource MapPathStringToCountStringConverter}}"/>
+                    <Button Grid.Column="2" Cursor="Hand" Command="{Binding ImportLoadCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                            ToolTip="Fetch the selected beatmap from your osu! client.">
+                        <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="RestoreFromTrash" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                    </Button >
+                    <Button Grid.Column="4" Cursor="Hand" Command="{Binding ImportBrowseCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                            ToolTip="Select beatmaps with File Explorer.">
+                        <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                    </Button >
+                </Grid>
+                <Grid Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" Text="{Binding GuideGeneratorArgs.ExportPath}" Margin="0,0,5,0"
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Copy rhythm to"
+                        ToolTip="Where to save the rhythm guide map. Can also be an existing beatmap."/>
+                    <Button Grid.Column="1" Cursor="Hand" Command="{Binding ExportLoadCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                            ToolTip="Fetch the selected beatmap from your osu! client.">
+                        <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="RestoreFromTrash" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                    </Button >
+                    <Button Grid.Column="3" Cursor="Hand" Command="{Binding ExportBrowseCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                            ToolTip="Select beatmaps with File Explorer.">
+                        <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                    </Button >
+                </Grid>
+                <ComboBox SelectedItem="{Binding GuideGeneratorArgs.ExportMode}" ItemsSource="{Binding ExportModes}"
+                          Width="300" HorizontalAlignment="Left" Margin="0 10 0 0"
+                          Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Export mode"
+                          ToolTip="Choose to either generate a completely new map or add the rhythm guide onto what's already in the map in the export field."/>
+                <ComboBox SelectedItem="{Binding GuideGeneratorArgs.OutputGameMode}" ItemsSource="{Binding ExportGameModes}"
+                          Width="300" HorizontalAlignment="Left" Margin="0 10 0 0"
+                          Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Export map game mode"
+                          ToolTip="The game mode of the rhythm guide. Only works in NewMap mode."/>
+                <TextBox Text="{Binding GuideGeneratorArgs.OutputName}" 
+                         Margin="0 10 0 0" Width="300" HorizontalAlignment="Left"
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Export map diff name"
+                         ToolTip="The difficulty name of the rhythm guide. Only works in NewMap mode."/>
+                <CheckBox IsChecked="{Binding GuideGeneratorArgs.NcEverything}"
+                          Margin="0 30 0 0"  Content="NC everything"/>
+                <ComboBox SelectedItem="{Binding GuideGeneratorArgs.SelectionMode}" ItemsSource="{Binding SelectionModes}"
+                          Width="300" HorizontalAlignment="Left" Margin="0 10 0 0"
+                          Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Selection mode"
+                          ToolTip="Select which events should be included in the rhythm guide map."/>
+            </StackPanel>
+            <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
+                <Button
+                    IsEnabled="{Binding ElementName=This, Path=CanRun}"
+                    Style="{StaticResource MaterialDesignFloatingActionButton}"
+                    Click="Start_Click"
+                    ToolTip="Run this tool.">
+                    <materialDesign:PackIcon
+                        Kind="Play" Height="36" Width="36" />
+                </Button>
+            </Viewbox>
+        </Grid>
+        <Grid Name="SecondGrid" Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Opacity="0.58"/>
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <ProgressBar Value="{Binding ElementName=This, Path=Progress}" Margin="20,0,20,0" Height="20" Background="{x:Null}" BorderBrush="{x:Null}"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</local:SingleRunMappingTool>

@@ -1,0 +1,398 @@
+﻿<local:SingleRunMappingTool x:Class="Mapping_Tools.Views.HitsoundStudio.HitsoundStudioView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Mapping_Tools.Views"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
+             x:Name="This"
+             mc:Ignorable="d" Width="900" Height="700">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.PopupBox.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <domain:DoubleToStringConverter x:Key="D2SConverter"/>
+            <domain:SampleSetToStringConverter x:Key="SS2SConverter"/>
+            <domain:HitsoundToStringConverter x:Key="HS2SConverter"/>
+            <domain:VolumeToPercentageConverter x:Key="V2PConverter"/>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid Name="MasterGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="260"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="90"/>
+        </Grid.RowDefinitions>
+        <Grid Name="TitleGrid" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+          <StackPanel Orientation="Horizontal">
+            <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
+              <Run Text="Hitsound Studio"/>
+            </TextBlock>
+                <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom" ToolTip="Click me!">
+              <materialDesign:PopupBox.ToggleContent>
+                <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
+              </materialDesign:PopupBox.ToggleContent>
+              <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
+                Hitsound Studio is the tool that lets you import data from multiple outside sources and convert them to osu! standard hitsounds in the form of a hitsounding difficulty that can you copy to other beatmaps.
+              <LineBreak/>
+                It represents hitsounds as a list of layers (hitsound layers). One layer contains a unique sound, the sampleset and hitsound that accompany that sound and a list of times that sound has to be played.
+              </TextBlock>
+            </materialDesign:PopupBox>
+          </StackPanel>
+        </Grid>
+        <Grid Name="FirstGrid" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <GridSplitter Grid.Column="1" Grid.RowSpan="2" 
+                VerticalAlignment="Stretch"
+                ResizeBehavior="PreviousAndNext"
+                Width="1" Background="{DynamicResource MaterialDesignDivider}"
+                Margin="0,10,0,10"/>
+
+            <Grid Grid.RowSpan="2" Grid.Column="0" Margin="0,0,10,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <ScrollViewer Grid.Row="0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <StackPanel x:Name="EditPanel" Margin="0,0,0,20">
+                        <TextBlock FontSize="14" FontWeight="Bold"><Run Text="General"/></TextBlock>
+                        <TextBox x:Name="SelectedNameBox" TextChanged="SelectedNameBox_TextChanged" Margin="0,5,0,0"
+                            Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Name"
+                            ToolTip="Name of this hitsound layer."/>
+
+                        <ComboBox x:Name="SelectedSampleSetBox" SelectionChanged="SelectedSampleSetBox_SelectionChanged" Cursor="Hand" Margin="0,5,0,0"
+                            Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="SampleSet"
+                            ToolTip="Sample set corresponding to the sound of this hitsound layer.">
+                            <ComboBoxItem Content="Normal" Cursor="Hand"/>
+                            <ComboBoxItem Content="Soft" Cursor="Hand"/>
+                            <ComboBoxItem Content="Drum" Cursor="Hand"/>
+                        </ComboBox>
+                        <ComboBox x:Name="SelectedHitsoundBox" SelectionChanged="SelectedHitsoundBox_SelectionChanged" Cursor="Hand" Margin="0,5,0,0"
+                            Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Hitsound"
+                            ToolTip="Hitsound corresponding to the sound of this hitsound layer.">
+                            <ComboBoxItem Content="Normal" Cursor="Hand"/>
+                            <ComboBoxItem Content="Whistle" Cursor="Hand"/>
+                            <ComboBoxItem Content="Finish" Cursor="Hand"/>
+                            <ComboBoxItem Content="Clap" Cursor="Hand"/>
+                        </ComboBox>
+                        <CheckBox x:Name="ShowTimesBox" Content="Show times" Margin="0,5,0,0"/>
+                        <StackPanel Visibility="{Binding Path=IsChecked, ElementName=ShowTimesBox, UpdateSourceTrigger=PropertyChanged,  
+                                 Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
+                            <TextBox x:Name="TimesBox" TextChanged="TimesBox_TextChanged" TextWrapping="Wrap" materialDesign:HintAssist.Hint="Times"
+                                     ToolTip="List of times when the sound of this hitsound layer has to be played.">
+                                <TextBox.Text>
+                                    <Binding Path="EditTimes" UpdateSourceTrigger="PropertyChanged">
+                                        <Binding.ValidationRules>
+                                            <domain:ParsableDoubleListValidationRule ValidatesOnTargetUpdated="True" />
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
+                        </StackPanel>
+
+                        <TextBlock FontSize="14" FontWeight="Bold" Margin="0,20,0,0"><Run Text="Hitsound sample"/></TextBlock>
+                        <Grid Margin="0,5,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" x:Name="SelectedSamplePathBox" TextChanged="SelectedSamplePathBox_TextChanged" Margin="0,0,5,0"
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Path"
+                                ToolTip="Path to the sound sample that this hitsound layer is supposed to play."/>
+                            <Button Grid.Column="1" Cursor="Hand" Click="SelectedSamplePathBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                                    ToolTip="Select files with File Explorer.">
+                                <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                            </Button >
+                        </Grid>
+                        <TextBox x:Name="SelectedSampleVolumeBox" LostFocus="SelectedSampleVolumeBox_TextChanged" Margin="0,5,0,0"
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Volume %"
+                                ToolTip="The volume at which the sound of this hitsound layer has to play. Ranges from 0 to 100."/>
+                        <StackPanel x:Name="SoundFontArgsPanel">
+                            <TextBox x:Name="SelectedSampleBankBox" TextChanged="SelectedSampleBankBox_TextChanged" Margin="0,5,0,0"
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Bank"
+                                ToolTip="The bank number of the sample."/>
+                            <TextBox x:Name="SelectedSamplePatchBox" TextChanged="SelectedSamplePatchBox_TextChanged" Margin="0,5,0,0"
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Patch"
+                                ToolTip="The patch number of the sample."/>
+                            <TextBox x:Name="SelectedSampleInstrumentBox" TextChanged="SelectedSampleInstrumentBox_TextChanged" Margin="0,5,0,0"
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Instrument"
+                                ToolTip="The sub-zone index of the patch of the sample."/>
+                            <TextBox x:Name="SelectedSampleKeyBox" TextChanged="SelectedSampleKeyBox_TextChanged" Margin="0,5,0,0"
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Key"
+                                ToolTip="The key number of the sample."/>
+                            <TextBox x:Name="SelectedSampleLengthBox" TextChanged="SelectedSampleLengthBox_TextChanged" Margin="0,5,0,0"
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Length"
+                                ToolTip="The length in milliseconds of the sample."/>
+                            <TextBox x:Name="SelectedSampleVelocityBox" LostFocus="SelectedSampleVelocityBox_TextChanged" Margin="0,5,0,0"
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Velocity"
+                                ToolTip="The velocity of the sample. Synonymous with the volume field."/>
+                        </StackPanel>
+
+                        <TextBlock FontSize="14" FontWeight="Bold" Margin="0,20,0,0" Text="Import info"
+                                   ToolTip="Holds all the info from importing such that the layer can be re-imported with the same result."/>
+                        <ComboBox x:Name="SelectedImportTypeBox" SelectionChanged="SelectedImportTypeBox_SelectionChanged" Cursor="Hand" Margin="0,5,0,0"
+                            Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Import type"
+                            ToolTip="How to import the source of this hitsound layer.">
+                            <ComboBoxItem Content="None" Cursor="Hand"/>
+                            <ComboBoxItem Content="Stack" Cursor="Hand"/>
+                            <ComboBoxItem Content="Hitsounds" Cursor="Hand"/>
+                            <ComboBoxItem Content="Storyboard" Cursor="Hand"/>
+                            <ComboBoxItem Content="MIDI" Cursor="Hand"/>
+                        </ComboBox>
+                        <StackPanel x:Name="ImportArgsPanel">
+                            <Grid Margin="0,5,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="5"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0" x:Name="SelectedImportPathBox" TextChanged="SelectedImportPathBox_TextChanged" Margin="0,0,5,0"
+                                    Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Source path"
+                                    ToolTip="The source of this hitsound layer."/>
+                                <Button Grid.Column="1" Cursor="Hand" Click="SelectedImportPathLoad_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                                        ToolTip="Fetch the selected beatmap from your osu! client.">
+                                    <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="RestoreFromTrash" Foreground="{DynamicResource PrimaryHueMidBrush}"/>                             
+                                </Button >
+                                <Button Grid.Column="3" Cursor="Hand" Click="SelectedImportPathBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                                        ToolTip="Select beatmaps with File Explorer.">
+                                    <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                                </Button >
+                            </Grid>
+                            <StackPanel x:Name="SelectedStackPanel">
+                                <Grid Margin="0,5,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="5"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" x:Name="SelectedImportXCoordBox" TextChanged="SelectedImportXCoordBox_TextChanged"
+                                    Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="X coordinate"
+                                    ToolTip="The X coordinate of the stack in the source beatmap which dictates all the times when the sound has to be played."/>
+                                    <TextBox Grid.Column="2" x:Name="SelectedImportYCoordBox" TextChanged="SelectedImportYCoordBox_TextChanged"
+                                    Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Y coordinate"
+                                    ToolTip="The Y coordinate of the stack in the source beatmap which dictates all the times when the sound has to be played."/>
+                                </Grid>
+                            </StackPanel>
+                            <StackPanel x:Name="SelectedHitsoundsPanel">
+                                <Grid Margin="0,5,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" x:Name="SelectedImportSamplePathBox" TextChanged="SelectedImportSamplePathBox_TextChanged" Margin="0,0,5,0"
+                                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Sample path"
+                                        ToolTip="Unique sample which this layer imported from the source beatmap."/>
+                                    <Button Grid.Column="1" Cursor="Hand" Click="SelectedImportSamplePathBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                                            ToolTip="Select files with File Explorer.">
+                                        <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                                    </Button >
+                                </Grid>
+                                <CheckBox x:Name="SelectedHitsoundImportDiscriminateVolumesBox" Margin="0 5 0 0"
+                                          Checked="SelectedImportDiscriminateVolumesBox_OnChecked" Unchecked="SelectedImportDiscriminateVolumesBox_OnUnchecked"
+                                          Content="Discriminate volumes"
+                                          ToolTip="Make seperate hitsound layers for all the different volumes a sample gets played."/>
+                                <CheckBox x:Name="SelectedHitsoundImportDetectDuplicateSamplesBox" Margin="0 0 0 0"
+                                          Checked="SelectedHitsoundImportDetectDuplicateSamplesBox_OnChecked" Unchecked="SelectedHitsoundImportDetectDuplicateSamplesBox_OnUnchecked"
+                                          Content="Detect duplicate samples"
+                                          ToolTip="Scan all the sound sample files in the source beatmap folder and merge hitsound layers which produce the exact same sound."/>
+                                <CheckBox x:Name="SelectedHitsoundImportRemoveDuplicatesBox" Margin="0 0 0 0"
+                                          Checked="SelectedImportRemoveDuplicatesBox_OnChecked" Unchecked="SelectedImportRemoveDuplicatesBox_OnUnchecked"
+                                          Content="Remove duplicates"
+                                          ToolTip="Remove duplicate values in the Times field. Usefull for importing from mania maps."/>
+                            </StackPanel>
+                            <StackPanel x:Name="SelectedStoryboardPanel">
+                                <Grid Margin="0,5,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" x:Name="SelectedStoryboardImportSamplePathBox" TextChanged="SelectedImportSamplePathBox_TextChanged" Margin="0,0,5,0"
+                                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Sample path"
+                                        ToolTip="Unique sample which this layer imported from the source beatmap."/>
+                                    <Button Grid.Column="1" Cursor="Hand" Click="SelectedImportSamplePathBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                                            ToolTip="Select beatmaps with File Explorer.">
+                                        <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                                    </Button >
+                                </Grid>
+                                <CheckBox x:Name="SelectedStoryboardImportDiscriminateVolumesBox" Margin="0 5 0 0"
+                                          Checked="SelectedImportDiscriminateVolumesBox_OnChecked" Unchecked="SelectedImportDiscriminateVolumesBox_OnUnchecked"
+                                          Content="Discriminate volumes"
+                                          ToolTip="Make seperate hitsound layers for all the different volumes a sample gets played."/>
+                                <CheckBox x:Name="SelectedStoryboardImportRemoveDuplicatesBox" Margin="0 0 0 0"
+                                          Checked="SelectedImportRemoveDuplicatesBox_OnChecked" Unchecked="SelectedImportRemoveDuplicatesBox_OnUnchecked"
+                                          Content="Remove duplicates"
+                                          ToolTip="Remove duplicate values in the Times field."/>
+                            </StackPanel>
+                            <StackPanel x:Name="SelectedMIDIPanel">
+                                <TextBox x:Name="SelectedImportBankBox" TextChanged="SelectedImportBankBox_TextChanged" Margin="0,5,0,0"
+                                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Bank"
+                                        ToolTip="Bank number of the unique sound this hitsound layer imported from the source MIDI."/>
+                                <TextBox x:Name="SelectedImportPatchBox" TextChanged="SelectedImportPatchBox_TextChanged" Margin="0,5,0,0"
+                                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Patch"
+                                        ToolTip="Patch number of the unique sound this hitsound layer imported from the source MIDI."/>
+                                <TextBox x:Name="SelectedImportKeyBox" TextChanged="SelectedImportKeyBox_TextChanged" Margin="0,5,0,0"
+                                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Key"
+                                        ToolTip="Key number of the unique sound this hitsound layer imported from the source MIDI."/>
+                                <TextBox x:Name="SelectedImportLengthBox" TextChanged="SelectedImportLengthBox_TextChanged" Margin="0,5,0,0"
+                                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Length"
+                                        ToolTip="Length of the unique sound this hitsound layer imported from the source MIDI."/>
+                                <TextBox x:Name="SelectedImportLengthRoughnessBox" TextChanged="SelectedImportLengthRoughnessBox_TextChanged"
+                                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Length roughness"
+                                        ToolTip="Length roughness used to import the unique sound this hitsound layer imported from the source MIDI."/>
+                                <TextBox x:Name="SelectedImportVelocityBox" TextChanged="SelectedImportVelocityBox_TextChanged" Margin="0,5,0,0"
+                                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Velocity"
+                                        ToolTip="Velocity of the unique sound this hitsound layer imported from the source MIDI."/>
+                                <TextBox x:Name="SelectedImportVelocityRoughnessBox" TextChanged="SelectedImportVelocityRoughnessBox_TextChanged" Margin="0,5,0,0"
+                                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Velocity roughness"
+                                        ToolTip="Velocity roughness used to import the unique sound this hitsound layer imported from the source MIDI."/>
+                            </StackPanel>
+                            <Button Margin="0,20,0,0" Content="Reload from source" FontWeight="Bold" FontSize="16" Click="ReloadFromSource_Click"
+                                    ToolTip="Re-import this hitsound layer from the source file and update the Times field."/>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+
+            <ListView x:Name="LayersList" Grid.Row="0" Grid.Column="2" Margin="10,0,0,0" ScrollViewer.VerticalScrollBarVisibility="Visible"
+                        ScrollViewer.HorizontalScrollBarVisibility="Auto" SelectionChanged="LayersList_SelectionChanged"
+                        ItemsSource="{Binding HitsoundLayers}" SelectionMode="Extended">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MaterialDesignGridViewItem}">
+                        <EventSetter Event="MouseDoubleClick" Handler="HitsoundLayer_MouseDoubleClick"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="_Name" Width="200" DisplayMemberBinding="{Binding Name}" />
+                        <GridViewColumn Header="_Amount" Width="90" DisplayMemberBinding="{Binding Times.Count}" />
+                        <GridViewColumn Header="_SampleSet" Width="90" DisplayMemberBinding="{Binding SampleSetString}" />
+                        <GridViewColumn Header="_Hitsound" Width="90" DisplayMemberBinding="{Binding HitsoundString}" />
+                        <GridViewColumn Header="_Sample Path" Width="1000" DisplayMemberBinding="{Binding SampleArgs.Path}" />
+                    </GridView>
+                </ListView.View>
+            </ListView>
+            <StackPanel Grid.Column="2" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Import layers..." Click="Add_Click" Margin="5">
+                    <materialDesign:PackIcon Kind="Plus" Height="24" Width="24" />
+                </Button>
+                <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove selected layers." Click="Delete_Click" Margin="5">
+                    <materialDesign:PackIcon Kind="Trashcan" Height="24" Width="24" />
+                </Button>
+                <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Raise selected layers to higher priority." Click="Raise_Click" Margin="5">
+                    <materialDesign:PackIcon Kind="KeyboardArrowUp" Height="24" Width="24" />
+                </Button>
+                <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Drop selected layers to lower priority." Click="Lower_Click" Margin="5">
+                    <materialDesign:PackIcon Kind="KeyboardArrowDown" Height="24" Width="24" />
+                </Button>
+            </StackPanel>
+        </Grid>
+        <Grid Name="SecondGrid" Grid.Row="2" Grid.Column="1">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Right" Orientation="Horizontal">
+                <Viewbox Margin="10">
+                    <Button
+                        IsEnabled="{Binding ElementName=This, Path=CanRun}"
+                        Style="{StaticResource MaterialDesignFloatingActionButton}"
+                        Click="Start_Click"
+                        ToolTip="Run this tool.">
+                        <materialDesign:PackIcon
+                            Kind="Play" Height="36" Width="36" />
+                    </Button>
+                </Viewbox>
+            </StackPanel>
+        </Grid>
+        <Grid Name="ThirdGrid" Grid.Row="2" Grid.Column="0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="20"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0">
+                    <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="30"/>
+                                <ColumnDefinition Width="5"/>
+                                <ColumnDefinition Width="30"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock FontSize="14" Margin="0,8,0,0" Text="Base beatmap:"
+                                       ToolTip="This beatmap serves as the base for exported hitsounds diff. Timing, volumes, and metadata will all come from this beatmap."/>
+                            <TextBox Grid.Column="1" x:Name="BaseBeatmapPathBox" Text="{Binding BaseBeatmap, Mode=TwoWay}" Margin="5,0,5,0"
+                                     ToolTip="Path to the base beatmap. This beatmap serves as the base for exported hitsounds diff. Timing, volumes, and metadata will all come from this beatmap."/>
+                            <Button Grid.Column="2" Cursor="Hand" Click="BaseBeatmapLoad_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                                    ToolTip="Fetch the selected beatmap from your osu! client.">
+                                <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="RestoreFromTrash" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                            </Button >
+                            <Button Grid.Column="4" Cursor="Hand" Click="BaseBeatmapBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                                    ToolTip="Select beatmaps with File Explorer.">
+                                <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                            </Button >
+                        </Grid>
+                        <Grid DataContext="{Binding DefaultSample}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="30"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock FontSize="14" Margin="0,8,0,0" Text="Default sample:"
+                                       ToolTip="This sample will be used fill up any hitnormal hitsounds which get left over by the hitsound layers."/>
+                            <TextBox Grid.Column="1" x:Name="DefaultSamplePathBox" Text="{Binding SampleArgs.Path, Mode=TwoWay}" Margin="5,0,5,0"
+                                     ToolTip="Path to the default sound sample. This sample will be used fill up any hitnormal hitsounds which get left over by the hitsound layers."/>
+                            <TextBox Grid.Column="3" x:Name="DefaultSampleVolumeBox" Width="50" Text="{Binding SampleArgs.Volume, Mode=TwoWay, Converter={StaticResource V2PConverter}, ConverterParameter=100}" Margin="0,0,5,0"
+                                        ToolTip="Volume % of the default sample. Use -1 for invariant volume." materialDesign:HintAssist.Hint="Volume"/>
+                            <Button Grid.Column="4" Cursor="Hand" Click="DefaultSampleBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                                    ToolTip="Select files with File Explorer.">
+                                <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                            </Button >
+                            <ComboBox Grid.Column="2" x:Name="DefaultSampleSetBox" Width="70" VerticalAlignment="Stretch" Margin="0,0,5,0" 
+                                      SelectedValue="{Binding SampleSet, Mode=TwoWay, Converter={StaticResource SS2SConverter}}" 
+                                      SelectedValuePath="Content" Cursor="Hand"
+                                      ToolTip="Sample set of the default sample.">
+                                <ComboBoxItem Content="Auto" Cursor="Hand"/>
+                                <ComboBoxItem Content="Normal" Cursor="Hand"/>
+                                <ComboBoxItem Content="Soft" Cursor="Hand"/>
+                                <ComboBoxItem Content="Drum" Cursor="Hand"/>
+                            </ComboBox>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0" Grid.Row="1">
+                        <WrapPanel VerticalAlignment="Bottom">
+                            <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Opacity="0.58"/>
+                        </WrapPanel>
+                    </Grid>
+                    <Grid Grid.Column="1" Grid.Row="1">
+                        <DockPanel>
+                            <ProgressBar Value="{Binding ElementName=This, Path=Progress}" Margin="5,0,5,0" Height="20" Background="{x:Null}" BorderBrush="{x:Null}"/>
+                        </DockPanel>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</local:SingleRunMappingTool>

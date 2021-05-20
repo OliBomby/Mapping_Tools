@@ -1,0 +1,17 @@
+﻿<local:GraphPointControl x:Class="Mapping_Tools.Components.Graph.TensionAnchor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Mapping_Tools.Components.Graph"
+             mc:Ignorable="d"
+             MouseLeftButtonDown="ThisLeftMouseDown"
+             PreviewMouseRightButtonDown="Anchor_OnPreviewMouseRightButtonDown"
+             MouseLeftButtonUp="ThisMouseUp"
+             MouseRightButtonUp="ThisMouseUp"
+             MouseMove="ThisMouseMove">
+    <Grid>
+        <Rectangle Fill="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="-5"></Rectangle>
+        <Ellipse x:Name="MainShape" Stroke="#AAAAAA" Fill="#55AAAAAA" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" StrokeThickness="1.4"/>
+    </Grid>
+</local:GraphPointControl>

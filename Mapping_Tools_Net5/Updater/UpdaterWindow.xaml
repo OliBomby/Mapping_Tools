@@ -1,0 +1,36 @@
+﻿<Window x:Class="Mapping_Tools_Net5.Updater.UpdaterWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Mapping_Tools_Net5.Updater" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+        Title="Mapping Tools - Updater"
+        ResizeMode="CanResize"
+        Width="500"
+        Height="300"
+        AllowsTransparency="False"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Medium"
+        TextElement.FontSize="14"
+        ShowInTaskbar="True"
+        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
+        Background="{DynamicResource MaterialDesignPaper}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="100"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <StackPanel x:Name="ReadyPanel" Visibility="Hidden" Margin="40 25 40 0">
+                <Button x:Name="RestartBtn" Click="RestartBtn_Click" Content="Restart now" Margin="0 0 0 20"></Button>
+                <Button x:Name="WaitBtn" Click="WaitBtn_Click" Content="Wait until the app is closed" Margin="0 0 0 20"></Button>
+                <Button x:Name="SkipBtn" Click="SkipBtn_Click" Content="Skip this version"></Button>
+            </StackPanel>
+            <TextBlock Name="DownloadText" FontSize="15" Text="Downloading new update ..." HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontWeight="Normal"></TextBlock>
+        </Grid>
+        <Grid Grid.Row="1" Margin="10 -50 10 0">
+            <ProgressBar Name="ProgressBar" Height="15" Minimum="0" Maximum="1"></ProgressBar>
+        </Grid>
+    </Grid>
+</Window>
