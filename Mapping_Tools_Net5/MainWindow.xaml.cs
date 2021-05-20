@@ -396,7 +396,7 @@ namespace Mapping_Tools {
         //Open backup folder in file explorer
         private void OpenBackups(object sender, RoutedEventArgs e) {
             try {
-                System.Diagnostics.Process.Start(SettingsManager.GetBackupsPath());
+                System.Diagnostics.Process.Start("explorer.exe", SettingsManager.GetBackupsPath());
             }
             catch( Exception ex ) {
                 ex.Show();
@@ -405,7 +405,7 @@ namespace Mapping_Tools {
 
         private void OpenConfig(object sender, RoutedEventArgs e) {
             try {
-                System.Diagnostics.Process.Start(AppDataPath);
+                System.Diagnostics.Process.Start("explorer.exe", AppDataPath);
             }
             catch( Exception ex ) {
                 ex.Show();
@@ -413,7 +413,7 @@ namespace Mapping_Tools {
         }
 
         private void OpenWebsite(object sender, RoutedEventArgs e) {
-            System.Diagnostics.Process.Start("https://mappingtools.seira.moe/");
+            System.Diagnostics.Process.Start("explorer.exe", "https://mappingtools.seira.moe/");
         }
 
         private void CoolSave(object sender, RoutedEventArgs e) {
@@ -427,7 +427,7 @@ namespace Mapping_Tools {
 
         //Open project in browser
         private void OpenGitHub(object sender, RoutedEventArgs e) {
-            System.Diagnostics.Process.Start("https://github.com/OliBomby/Mapping_Tools");
+            System.Diagnostics.Process.Start("explorer.exe", "https://github.com/OliBomby/Mapping_Tools");
         }
 
         //Open info screen

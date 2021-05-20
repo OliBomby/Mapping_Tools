@@ -291,7 +291,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
 
                     HitsoundExporter.ExportSampleSchema(sampleSchema, exportFolder);
 
-                    System.Diagnostics.Process.Start(exportFolder);
+                    System.Diagnostics.Process.Start("explorer.exe", exportFolder);
                 }
 
                 // Update progressbar

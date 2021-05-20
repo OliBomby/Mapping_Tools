@@ -110,7 +110,7 @@ namespace Mapping_Tools.Components.TimeLine {
 
         //Open osu at timestamp
         private void OpenLink(object sender, RoutedEventArgs e) {
-            System.Diagnostics.Process.Start("osu://edit/" + Math.Round(Milliseconds));
+            System.Diagnostics.Process.Start("explorer.exe", "osu://edit/" + Math.Round(Milliseconds));
         }
     }
 }

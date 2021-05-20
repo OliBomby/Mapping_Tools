@@ -242,7 +242,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
 
             // Open export folder
             if (arg.ExportSamples || arg.ExportMap) {
-                System.Diagnostics.Process.Start(arg.ExportFolder);
+                System.Diagnostics.Process.Start("explorer.exe", arg.ExportFolder);
             }
 
             // Collect garbage
