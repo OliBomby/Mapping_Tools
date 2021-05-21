@@ -178,7 +178,7 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.Serialization {
             }
             clone.RelevantObjectPreferences = new Dictionary<string, RelevantObjectPreferences>();
             foreach (var kvp in RelevantObjectPreferences) {
-                clone.RelevantObjectPreferences.Add(string.Copy(kvp.Key), (RelevantObjectPreferences)kvp.Value.Clone());
+                clone.RelevantObjectPreferences.Add(kvp.Key, (RelevantObjectPreferences)kvp.Value.Clone());
             }
             return clone;
         }

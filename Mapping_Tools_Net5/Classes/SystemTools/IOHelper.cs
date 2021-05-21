@@ -178,7 +178,7 @@ namespace Mapping_Tools.Classes.SystemTools {
                 catch (Exception ex2) {
                     Console.WriteLine(ex2.Message);
                     Console.WriteLine(ex2.StackTrace);
-                    throw ex;
+                    throw;
                 }
             }
             
