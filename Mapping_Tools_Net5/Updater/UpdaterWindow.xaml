@@ -45,7 +45,7 @@
         <StackPanel Grid.Row="1" Grid.Column="1" x:Name="ReadyPanel" Visibility="Visible" VerticalAlignment="Center" Margin="20 0 0 0">
             <Button x:Name="RestartBtn" Click="RestartBtn_Click" Content="Install now" Style="{StaticResource MaterialDesignRaisedButton}" Margin="0 0 0 20"/>
             <Button x:Name="WaitBtn" Click="WaitBtn_Click" Content="Install after closing" Style="{StaticResource MaterialDesignRaisedLightButton}" Margin="0 0 0 20"/>
-            <Button x:Name="SkipBtn" Click="SkipBtn_Click" Content="Skip this version" Style="{StaticResource MaterialDesignRaisedDarkButton}"/>
+            <Button x:Name="SkipBtn" Click="SkipBtn_Click" Content="Skip this version" Style="{StaticResource MaterialDesignFlatDarkBgButton}" Background="{DynamicResource MaterialDesignPaper}" Margin="20 20 20 0"/>
         </StackPanel>
         <Grid Grid.Row="1" Grid.ColumnSpan="2">
             <TextBlock Name="DownloadText" Visibility="Hidden" FontSize="15" Text="Downloading new update ..." HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontWeight="Normal"></TextBlock>
