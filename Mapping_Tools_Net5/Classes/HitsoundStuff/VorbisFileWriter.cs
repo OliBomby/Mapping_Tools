@@ -46,13 +46,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             // most of the codec setup parameters) which is mandated by the Ogg
             // bitstream spec.  The second header holds any comment fields.  The
             // third header holds the bitstream codebook.
-            var headerBuilder = new HeaderPacketBuilder();
             
             var comments = new Comments();
 
-            var infoPacket = headerBuilder.BuildInfoPacket(info);
-            var commentsPacket = headerBuilder.BuildCommentsPacket(comments);
-            var booksPacket = headerBuilder.BuildBooksPacket(info);
+            var infoPacket = HeaderPacketBuilder.BuildInfoPacket(info);
+            var commentsPacket = HeaderPacketBuilder.BuildCommentsPacket(comments);
+            var booksPacket = HeaderPacketBuilder.BuildBooksPacket(info);
 
             oggStream.PacketIn(infoPacket);
             oggStream.PacketIn(commentsPacket);
