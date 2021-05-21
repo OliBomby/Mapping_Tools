@@ -69,7 +69,7 @@ namespace Mapping_Tools {
         }
 
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e) {
-            Update();
+            _ = Update();
         }
 
         private void Setup() {
@@ -94,69 +94,74 @@ namespace Mapping_Tools {
             }).OrderBy(o => o.Header);
         }
 
-        private void Update() {
-            Task.Run(async () => {
-                try {
-                    var updateManager = new UpdateManager("OliBomby", "Mapping_Tools", "release.zip");
+        private async Task Update(bool allowSkip = true, bool notifyUser = false) {
+            try {
+                var updateManager = new UpdateManager("OliBomby", "Mapping_Tools", "release.zip");
 
-                    var hasUpdate = await updateManager.FetchUpdateAsync();
+                var hasUpdate = await updateManager.FetchUpdateAsync();
 
-                    if (!hasUpdate) {
-                        return;
-                    }
-
-                    // Check if this version is newer than the version we skip
-                    var skipVersion = SettingsManager.Settings.SkipVersion;
-                    if (skipVersion != null && !(updateManager.UpdatesResult.LastVersion > skipVersion)) {
-                        return;
-                    }
-
-                    Dispatcher.Invoke(() => {
-                        _updaterWindow = new UpdaterWindow(updateManager.Progress) {
-                            ShowActivated = true
-                        };
-
-                        _updaterWindow.ActionSelected += async (sender, action) => {
-                            switch (action) {
-                                case UpdateAction.Restart:
-                                    await updateManager.DownloadUpdateAsync();
-                                    updateManager.RestartAfterUpdate = true;
-                                    updateManager.StartUpdateProcess();
-
-                                    _updaterWindow.Close();
-                                    Close();
-                                    break;
-
-                                case UpdateAction.Wait:
-                                    await updateManager.DownloadUpdateAsync();
-                                    updateManager.RestartAfterUpdate = false;
-                                    updateManager.StartUpdateProcess();
-
-                                    _updaterWindow.Close();
-                                    break;
-
-                                case UpdateAction.Skip:
-                                    // Update the skip version so we skip this version in the future
-                                    SettingsManager.Settings.SkipVersion = updateManager.UpdatesResult.LastVersion;
-                                    _updaterWindow.Close();
-                                    break;
-
-                                default:
-                                    _updaterWindow.Close();
-                                    break;
-                            }
-                        };
-
-                        _updaterWindow.Closed += (sender, e) => {
-                            updateManager.Dispose();
-                        };
-
-                        _updaterWindow.Show();
-                    });
-                } catch (Exception e) {
-                    MessageBox.Show("UPDATER_EXCEPTION: " + e.Message);
+                if (!hasUpdate) {
+                    if (notifyUser)
+                        MessageQueue.Enqueue("No new versions available.");
+                    return;
                 }
-            });
+
+                // Check if this version is newer than the version we skip
+                var skipVersion = SettingsManager.Settings.SkipVersion;
+                if (allowSkip && skipVersion != null && !(updateManager.UpdatesResult.LastVersion > skipVersion)) {
+                    if (notifyUser)
+                        MessageQueue.Enqueue($"Version {updateManager.UpdatesResult.LastVersion} skipped because of user config.");
+                    return;
+                }
+
+                Dispatcher.Invoke(() => {
+                    _updaterWindow = new UpdaterWindow(updateManager.Progress) {
+                        ShowActivated = true
+                    };
+
+                    _updaterWindow.ActionSelected += async (sender, action) => {
+                        switch (action) {
+                            case UpdateAction.Restart:
+                                await updateManager.DownloadUpdateAsync();
+                                updateManager.RestartAfterUpdate = true;
+                                updateManager.StartUpdateProcess();
+
+                                _updaterWindow.Close();
+                                Close();
+                                break;
+
+                            case UpdateAction.Wait:
+                                await updateManager.DownloadUpdateAsync();
+                                updateManager.RestartAfterUpdate = false;
+                                updateManager.StartUpdateProcess();
+
+                                _updaterWindow.Close();
+                                break;
+
+                            case UpdateAction.Skip:
+                                // Update the skip version so we skip this version in the future
+                                SettingsManager.Settings.SkipVersion = updateManager.UpdatesResult.LastVersion;
+                                _updaterWindow.Close();
+                                break;
+
+                            default:
+                                _updaterWindow.Close();
+                                break;
+                        }
+                    };
+
+                    _updaterWindow.Closed += (sender, e) => {
+                        updateManager.Dispose();
+                    };
+
+                    _updaterWindow.Show();
+                });
+            } catch (Exception e) {
+                MessageBox.Show("UPDATER_EXCEPTION: " + e.Message);
+                if (notifyUser) {
+                    MessageQueue.Enqueue("Error fetching update: " + e.Message);
+                }
+            }
         }
 
         private void Window_Closing(object sender, EventArgs e) {
@@ -555,6 +560,10 @@ namespace Mapping_Tools {
             if( e.LeftButton == MouseButtonState.Pressed )
                 DragMove();
             //bt.Content = new PackIcon { Kind = PackIconKind.WindowRestore };
+        }
+
+        private async void MenuItem_OnClick(object sender, RoutedEventArgs e) {
+            await Update(false, true);
         }
     }
 }
