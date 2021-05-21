@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Mapping_Tools;
+using Newtonsoft.Json;
+using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -18,6 +22,24 @@ namespace Mapping_Tools_Net5.Updater {
             InitializeComponent();
 
             progress.ProgressChanged += OnDownloadProgressChanged;
+
+            _ = LoadReleaseNotes();
+        }
+
+        private async Task LoadReleaseNotes() {
+            string responseString;
+            using (HttpResponseMessage response = await MainWindow.HttpClient.GetAsync("https://api.github.com/repos/OliBomby/Mapping_Tools/releases/latest")) {
+                responseString = await response.Content.ReadAsStringAsync();
+            }
+            dynamic json = JsonConvert.DeserializeObject(responseString);
+
+            if (json == null)
+                return;
+
+            Dispatcher.Invoke(() => {
+                ReleaseTitleTextBlock.Text = json["name"];
+                ReleaseBodyTextBlock.Text = json["body"];
+            });
         }
 
         private void OnDownloadProgressChanged(object sender, double progress) {
