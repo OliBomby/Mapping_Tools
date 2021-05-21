@@ -9,6 +9,7 @@ namespace Mapping_Tools_Net5.Updater {
     public interface IUpdateManager {
         Progress<double> Progress { get; }
         IPackageResolver PackageResolver { get; }
+        public CheckForUpdatesResult UpdatesResult { get; }
         bool RestartAfterUpdate { get; set; }
 
         Task<bool> FetchUpdateAsync();

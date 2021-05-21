@@ -105,6 +105,12 @@ namespace Mapping_Tools {
                         return;
                     }
 
+                    // Check if this version is newer than the version we skip
+                    var skipVersion = SettingsManager.Settings.SkipVersion;
+                    if (skipVersion != null && !(updateManager.UpdatesResult.LastVersion > skipVersion)) {
+                        return;
+                    }
+
                     Dispatcher.Invoke(() => {
                         _updaterWindow = new UpdaterWindow(updateManager.Progress) {
                             ShowActivated = true
@@ -130,6 +136,11 @@ namespace Mapping_Tools {
                                     break;
 
                                 case UpdateAction.Skip:
+                                    // Update the skip version so we skip this version in the future
+                                    SettingsManager.Settings.SkipVersion = updateManager.UpdatesResult.LastVersion;
+                                    _updaterWindow.Close();
+                                    break;
+
                                 default:
                                     _updaterWindow.Close();
                                     break;

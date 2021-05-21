@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
+using Mapping_Tools.Annotations;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public class Settings : BindableBase {
@@ -122,6 +123,13 @@ namespace Mapping_Tools.Classes.SystemTools {
             set => Set(ref _quickUndoHotkey, value);
         }
 
+        [CanBeNull] private Version _skipVersion;
+        [CanBeNull]
+        public Version SkipVersion {
+            get => _skipVersion;
+            set => Set(ref _skipVersion, value);
+        }
+
         /// <summary>
         /// Makes a new Settings objects and initializes default settings.
         /// </summary>
@@ -144,6 +152,7 @@ namespace Mapping_Tools.Classes.SystemTools {
             MakePeriodicBackups = true;
             PeriodicBackupInterval = TimeSpan.FromMinutes(10);
             CurrentBeatmapDefaultFolder = true;
+            SkipVersion = null;
         }
 
         public void CopyTo(Settings other) {
