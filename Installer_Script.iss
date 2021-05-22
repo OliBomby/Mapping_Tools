@@ -5,7 +5,7 @@
 #define MyAppVersion "0.0.0"
 #define MyAppPublisher "OliBomby"
 #define MyAppURL "https://mappingtools.github.io/"
-#define MyAppExeName "Mapping_Tools.exe"
+#define MyAppExeName "Mapping Tools.exe"
 #define BuildFolderPath "Mapping_Tools\bin\Release\net5.0-windows"
 
 [Setup]
