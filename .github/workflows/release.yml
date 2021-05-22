@@ -28,10 +28,10 @@ jobs:
       run: sed -i 's/OutputBaseFilename=mapping-tools-installer/OutputBaseFilename=mapping-tools-installer-${{ steps.get_version.outputs.version-without-v }}/' Installer_Script.iss
 
     - name: Replace Assembly version
-      run: sed -i 's/<AssemblyVersion>\b[0-9]*.\b[0-9]*.\b[0-9]*/<AssemblyVersion>${{ steps.get_version.outputs.version-without-v }}/' Mapping_Tools\\Mapping_Tools.csproj
+      run: sed -i 's/<AssemblyVersion>\b[0-9]*.\b[0-9]*.\b[0-9]*/<AssemblyVersion>${{ steps.get_version.outputs.version-without-v }}/' Mapping_Tools/Mapping_Tools.csproj
 
     - name: Replace File version
-      run: sed -i 's/<FileVersion>\b[0-9]*.\b[0-9]*.\b[0-9]*/<FileVersion>${{ steps.get_version.outputs.version-without-v }}/' Mapping_Tools\\Mapping_Tools.csproj
+      run: sed -i 's/<FileVersion>\b[0-9]*.\b[0-9]*.\b[0-9]*/<FileVersion>${{ steps.get_version.outputs.version-without-v }}/' Mapping_Tools/Mapping_Tools.csproj
 
     - name: Restore dependencies
       run: dotnet restore Mapping_Tools
