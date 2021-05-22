@@ -51,6 +51,7 @@ namespace Mapping_Tools_Net5.Updater {
 
             Dispatcher.Invoke(() => {
                 ReadyPanel.Visibility = Visibility.Hidden;
+                ReadyPanel2.Visibility = Visibility.Hidden;
                 DownloadText.Visibility = Visibility.Visible;
                 ProgressBar.Visibility = Visibility.Visible;
             });
@@ -61,6 +62,7 @@ namespace Mapping_Tools_Net5.Updater {
 
             Dispatcher.Invoke(() => {
                 ReadyPanel.Visibility = Visibility.Hidden;
+                ReadyPanel2.Visibility = Visibility.Hidden;
                 DownloadText.Visibility = Visibility.Visible;
                 ProgressBar.Visibility = Visibility.Visible;
             });
