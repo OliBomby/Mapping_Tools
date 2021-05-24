@@ -332,7 +332,5 @@ ASALocalRun/
 .localhistory/
 
 # Packages
+packages
 packages/
-!packages/EditorReader.dll
-!packages/OsuMemoryDataProvider.dll
-!packages/ProcessMemoryDataFinder.dll

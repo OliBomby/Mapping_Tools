@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.Versioning;
 using System.Windows.Input;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
@@ -11,6 +12,7 @@ using Mapping_Tools.Classes.Tools.SnappingTools.Serialization;
 using Mapping_Tools.Views;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+[assembly: SupportedOSPlatform("Windows7.0")]
 namespace Mapping_Tools_Tests {
     [TestClass]
     public class SerializationTests {
@@ -196,7 +198,7 @@ namespace Mapping_Tools_Tests {
 
             var deserializedSymmetrySettings = ProjectManager.LoadJson<GeneratorSettings>(path);
  
-            Assert.AreEqual(deserializedSymmetrySettings.IsActive, symmetrySettings.IsActive);
+            Assert.AreEqual(symmetrySettings.IsActive, deserializedSymmetrySettings.IsActive);
             
             var castedSymmetrySettings = deserializedSymmetrySettings as SymmetryGeneratorSettings;
             Assert.IsNotNull(castedSymmetrySettings);

@@ -34,7 +34,6 @@ See the [Trello board](https://trello.com/b/iTmmw3eP/mapping-tools).
 ## Used libraries
 - [MaterialDesignInXamlToolkit](https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit)
 - [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)
-- [AutoUpdater.NET](https://github.com/ravibpatel/AutoUpdater.NET)
 - [NAudio](https://github.com/naudio/NAudio)
 - [NAudio Vorbis](https://github.com/naudio/Vorbis)
 - [OsuMemoryDataProvider](https://github.com/Piotrekol)
@@ -43,4 +42,5 @@ See the [Trello board](https://trello.com/b/iTmmw3eP/mapping-tools).
 - [NonInvasiveKeyboardHook](https://github.com/kfirprods/NonInvasiveKeyboardHook)
 - [Overlay.NET](https://github.com/lolp1/Overlay.NET)
 - [.NET Ogg Vorbis Encoder](https://github.com/SteveLillis/.NET-Ogg-Vorbis-Encoder)
+- [Onova](https://github.com/Tyrrrz/Onova)
 

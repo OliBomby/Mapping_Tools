@@ -1,0 +1,61 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+      
+jobs:
+  build:
+    runs-on: windows-2019
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+
+    - name: Get latest release version number
+      id: get_version
+      uses: battila7/get-version-action@v2
+
+    - name: Replace Installer version
+      run: sed -i 's/#define MyAppVersion \"\b[0-9]*.\b[0-9]*.\b[0-9]*\"/#define MyAppVersion \"${{ steps.get_version.outputs.version-without-v }}\"/' Installer_Script.iss
+    
+    - name: Replace Installer .exe version
+      run: sed -i 's/OutputBaseFilename=mapping-tools-installer/OutputBaseFilename=mapping-tools-installer-${{ steps.get_version.outputs.version-without-v }}/' Installer_Script.iss
+
+    - name: Replace Assembly version
+      run: sed -i 's/<AssemblyVersion>\b[0-9]*.\b[0-9]*.\b[0-9]*/<AssemblyVersion>${{ steps.get_version.outputs.version-without-v }}/' Mapping_Tools/Mapping_Tools.csproj
+
+    - name: Replace File version
+      run: sed -i 's/<FileVersion>\b[0-9]*.\b[0-9]*.\b[0-9]*/<FileVersion>${{ steps.get_version.outputs.version-without-v }}/' Mapping_Tools/Mapping_Tools.csproj
+
+    - name: Restore dependencies
+      run: dotnet restore Mapping_Tools
+      
+    - name: Build
+      run: dotnet build Mapping_Tools -c Release --no-restore
+      
+    - name: Test
+      run: dotnet test Mapping_Tools --no-build --verbosity normal
+      
+    - name: Build Installer
+      run: iscc Installer_Script.iss
+
+    - name: Create release.zip
+      uses: papeloto/action-zip@v1
+      with:
+        files: Mapping_Tools/bin/Release/net5.0-windows/
+        dest: release.zip
+
+    - uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        prerelease: false
+        title: "Release version ${{ steps.get_version.outputs.version-without-v }}"
+        files: |
+          release.zip
+          mapping-tools-installer-${{ steps.get_version.outputs.version-without-v }}.exe
