@@ -1,8 +1,12 @@
-﻿using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.MathUtil;
+﻿using Editor_Reader;
+using Mapping_Tools.Classes;
+using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Components.Domain;
+using Mapping_Tools.Components.Graph;
+using Mapping_Tools.Views.Sliderator;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,13 +14,6 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using Editor_Reader;
-using Mapping_Tools.Classes;
-using Mapping_Tools.Classes.ToolHelpers;
-using Mapping_Tools.Components.Graph;
-using Mapping_Tools.Views;
-using Mapping_Tools.Views.Sliderator;
-using Newtonsoft.Json;
 using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
 
 namespace Mapping_Tools.Viewmodels {
@@ -411,14 +408,15 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         private void SetLoadedHitObjects(ObservableCollection<HitObject> value) {
-            if (!Set(ref _loadedHitObjects, value, nameof(LoadedHitObjects))) return;
-            LoadedHitObjects.CollectionChanged += LoadedHitObjectsOnCollectionChanged;
-            if (LoadedHitObjects.Count == 0) return;
-            if (VisibleHitObjectIndex == 0) {
-                VisibleHitObject = LoadedHitObjects[0];
-            } else {
-                VisibleHitObjectIndex = 0;
-            }
+            Set(ref _loadedHitObjects, value, nameof(LoadedHitObjects), () => {
+                LoadedHitObjects.CollectionChanged += LoadedHitObjectsOnCollectionChanged;
+                if (LoadedHitObjects.Count == 0) return;
+                if (VisibleHitObjectIndex == 0) {
+                    VisibleHitObject = LoadedHitObjects[0];
+                } else {
+                    VisibleHitObjectIndex = 0;
+                }
+            });
         }
 
         private void LoadedHitObjectsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
@@ -431,8 +429,10 @@ namespace Mapping_Tools.Viewmodels {
         private void SetCurrentHitObject(HitObject value) {
             Set(ref _visibleHitObject, value, nameof(VisibleHitObject), () => {
                 if (VisibleHitObject.UnInheritedTimingPoint == null) return;
+                // Gotta watch out because the BPM and GraphBeats edit the TemporalLength of the VisibleHitObject
+                var temporalLengthTemp = VisibleHitObject.TemporalLength;
                 BeatsPerMinute = VisibleHitObject.UnInheritedTimingPoint.GetBpm();
-                GraphBeats = VisibleHitObject.TemporalLength * BeatsPerMinute / 60000;
+                GraphBeats = temporalLengthTemp * BeatsPerMinute / 60000;
                 ExportTime = VisibleHitObject.Time;
                 PixelLength = VisibleHitObject.PixelLength;
             });
