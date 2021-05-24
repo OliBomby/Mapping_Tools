@@ -305,7 +305,7 @@ namespace Mapping_Tools.Viewmodels {
                     SlideratorView.RunFast();
                     SlideratorView.RunFinished += SlideratorViewOnRunFinishedMoveLeftOnce;
                 } else {
-                    VisibleHitObjectIndex = MathHelper.Clamp(VisibleHitObjectIndex - 1, 0, LoadedHitObjects.Count - 1);
+                    MoveLeftOnce();
                 }
             });
             MoveRightCommand = new CommandImplementation(_ => {
@@ -313,7 +313,7 @@ namespace Mapping_Tools.Viewmodels {
                     SlideratorView.RunFast();
                     SlideratorView.RunFinished += SlideratorViewOnRunFinishedMoveRightOnce;
                 } else {
-                    VisibleHitObjectIndex = MathHelper.Clamp(VisibleHitObjectIndex + 1, 0, LoadedHitObjects.Count - 1);
+                    MoveRightOnce();
                 }
             });
             GraphToggleCommand = new CommandImplementation(ToggleGraphMode);
@@ -321,16 +321,34 @@ namespace Mapping_Tools.Viewmodels {
 
         private void SlideratorViewOnRunFinishedMoveLeftOnce(object sender, EventArgs e) {
             Application.Current.Dispatcher?.Invoke(() => {
-                VisibleHitObjectIndex = MathHelper.Clamp(VisibleHitObjectIndex - 1, 0, LoadedHitObjects.Count - 1);
                 SlideratorView.RunFinished -= SlideratorViewOnRunFinishedMoveLeftOnce;
+                MoveLeftOnce();
             });
         }
 
         private void SlideratorViewOnRunFinishedMoveRightOnce(object sender, EventArgs e) {
             Application.Current.Dispatcher?.Invoke(() => {
-                VisibleHitObjectIndex = MathHelper.Clamp(VisibleHitObjectIndex + 1, 0, LoadedHitObjects.Count - 1);
                 SlideratorView.RunFinished -= SlideratorViewOnRunFinishedMoveRightOnce;
+                MoveRightOnce();
             });
+        }
+
+        private void MoveRightOnce() {
+            var newIndex = VisibleHitObjectIndex + 1;
+            if (newIndex < LoadedHitObjects.Count) {
+                VisibleHitObjectIndex = newIndex;
+            } else {
+                MessageBox.Show("You've reached the end of the slider list.");
+            }
+        }
+
+        private void MoveLeftOnce() {
+            var newIndex = VisibleHitObjectIndex - 1;
+            if (newIndex >= 0) {
+                VisibleHitObjectIndex = newIndex;
+            } else {
+                MessageBox.Show("You've reached the start of the slider list.");
+            }
         }
 
         public void Import(string path) {
@@ -411,18 +429,20 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         private void SetCurrentHitObject(HitObject value) {
-            if (!Set(ref _visibleHitObject, value, nameof(VisibleHitObject))) return;
-            if (VisibleHitObject.UnInheritedTimingPoint == null) return;
-            BeatsPerMinute = VisibleHitObject.UnInheritedTimingPoint.GetBpm();
-            GraphBeats = VisibleHitObject.TemporalLength * BeatsPerMinute / 60000;
-            ExportTime = VisibleHitObject.Time;
-            PixelLength = VisibleHitObject.PixelLength;
+            Set(ref _visibleHitObject, value, nameof(VisibleHitObject), () => {
+                if (VisibleHitObject.UnInheritedTimingPoint == null) return;
+                BeatsPerMinute = VisibleHitObject.UnInheritedTimingPoint.GetBpm();
+                GraphBeats = VisibleHitObject.TemporalLength * BeatsPerMinute / 60000;
+                ExportTime = VisibleHitObject.Time;
+                PixelLength = VisibleHitObject.PixelLength;
+            });
         }
 
         private void SetCurrentHitObjectIndex(int value) {
-            if (!Set(ref _visibleHitObjectIndex, value, nameof(VisibleHitObjectIndex))) return;
-            if (VisibleHitObjectIndex < 0 || VisibleHitObjectIndex >= LoadedHitObjects.Count) return;
-            VisibleHitObject = LoadedHitObjects[VisibleHitObjectIndex];
+            Set(ref _visibleHitObjectIndex, value, nameof(VisibleHitObjectIndex), () => {
+                if (VisibleHitObjectIndex < 0 || VisibleHitObjectIndex >= LoadedHitObjects.Count) return;
+                VisibleHitObject = LoadedHitObjects[VisibleHitObjectIndex];
+            });
         }
 
         private void UpdateAnimationDuration() {

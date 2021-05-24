@@ -224,6 +224,7 @@ namespace Mapping_Tools.Views.Sliderator {
                 case nameof(ViewModel.VisibleHitObject):
                     if (ViewModel.PixelLength < HitObjectElement.MaxPixelLength)
                         AnimateProgress(GraphHitObjectElement);
+                    UpdateVelocity();
                     UpdatePointsOfInterest();
                     break;
                 case nameof(ViewModel.SvGraphMultiplier):
