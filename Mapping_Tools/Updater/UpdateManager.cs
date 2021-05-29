@@ -1,10 +1,10 @@
-﻿using Onova;
+﻿using System;
+using System.Threading.Tasks;
+using Onova;
 using Onova.Models;
 using Onova.Services;
-using System;
-using System.Threading.Tasks;
 
-namespace Mapping_Tools_Net5.Updater {
+namespace Mapping_Tools.Updater {
 
     public interface IUpdateManager {
         Progress<double> Progress { get; }

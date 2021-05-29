@@ -4,7 +4,6 @@ using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Views;
 using Mapping_Tools.Views.Standard;
-using Mapping_Tools_Net5.Updater;
 using MaterialDesignThemes.Wpf;
 using System;
 using System.IO;
@@ -17,6 +16,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Mapping_Tools.Updater;
 
 namespace Mapping_Tools {
 

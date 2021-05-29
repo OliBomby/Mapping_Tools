@@ -1,12 +1,10 @@
-﻿using Mapping_Tools;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Threading;
+using Newtonsoft.Json;
 
-namespace Mapping_Tools_Net5.Updater {
+namespace Mapping_Tools.Updater {
 
     public enum UpdateAction {
         Skip,
