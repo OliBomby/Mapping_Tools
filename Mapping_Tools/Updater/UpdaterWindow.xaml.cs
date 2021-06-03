@@ -12,7 +12,7 @@ namespace Mapping_Tools.Updater {
         Wait
     }
 
-    public partial class UpdaterWindow : Window {
+    public partial class UpdaterWindow {
 
         public event EventHandler<UpdateAction> ActionSelected;
 
@@ -48,10 +48,8 @@ namespace Mapping_Tools.Updater {
             ActionSelected?.Invoke(this, UpdateAction.Restart);
 
             Dispatcher.Invoke(() => {
-                ReadyPanel.Visibility = Visibility.Hidden;
-                ReadyPanel2.Visibility = Visibility.Hidden;
-                DownloadText.Visibility = Visibility.Visible;
-                ProgressBar.Visibility = Visibility.Visible;
+                ReadyPanel.Visibility = Visibility.Collapsed;
+                DownloadPanel.Visibility = Visibility.Visible;
             });
         }
 
@@ -59,10 +57,8 @@ namespace Mapping_Tools.Updater {
             ActionSelected?.Invoke(this, UpdateAction.Wait);
 
             Dispatcher.Invoke(() => {
-                ReadyPanel.Visibility = Visibility.Hidden;
-                ReadyPanel2.Visibility = Visibility.Hidden;
-                DownloadText.Visibility = Visibility.Visible;
-                ProgressBar.Visibility = Visibility.Visible;
+                ReadyPanel.Visibility = Visibility.Collapsed;
+                DownloadPanel.Visibility = Visibility.Visible;
             });
         }
 
