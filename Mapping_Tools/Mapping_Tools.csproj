@@ -5,8 +5,8 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
-    <AssemblyVersion>1.8.7</AssemblyVersion>
-    <FileVersion>1.8.7</FileVersion>
+    <AssemblyVersion>1.8.8</AssemblyVersion>
+    <FileVersion>1.8.8</FileVersion>
     <AssemblyName>Mapping Tools</AssemblyName>
     <ApplicationIcon>Data\mt_icon.ico</ApplicationIcon>
     <Platforms>AnyCPU;x86;x64</Platforms>
