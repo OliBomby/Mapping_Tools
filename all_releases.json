@@ -97,7 +97,7 @@
         "content_type": "application/octet-stream",
         "state": "uploaded",
         "size": 5090387,
-        "download_count": 467,
+        "download_count": 482,
         "created_at": "2021-05-24T20:16:48Z",
         "updated_at": "2021-05-24T20:16:49Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.7/release.zip"
@@ -1069,7 +1069,7 @@
         "content_type": "application/x-zip-compressed",
         "state": "uploaded",
         "size": 4211292,
-        "download_count": 4,
+        "download_count": 5,
         "created_at": "2020-10-20T18:16:17Z",
         "updated_at": "2020-10-20T18:16:26Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.7.1.1/Release.zip"
