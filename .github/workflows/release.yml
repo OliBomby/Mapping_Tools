@@ -37,10 +37,7 @@ jobs:
       run: dotnet restore Mapping_Tools
       
     - name: Build
-      run: dotnet build Mapping_Tools -c Release --no-restore
-      
-    - name: Test
-      run: dotnet test Mapping_Tools --no-build --verbosity normal
+      run: dotnet build Mapping_Tools -c Release /p:Platform=x86 --no-restore
       
     - name: Build Installer
       run: iscc Installer_Script.iss
@@ -48,7 +45,7 @@ jobs:
     - name: Create release.zip
       uses: papeloto/action-zip@v1
       with:
-        files: Mapping_Tools/bin/Release/net5.0-windows/
+        files: Mapping_Tools/bin/x86/Release/net5.0-windows/
         dest: release.zip
 
     - uses: "marvinpinto/action-automatic-releases@latest"
