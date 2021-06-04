@@ -34,7 +34,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// </summary>
         /// <returns></returns>
         public SampleSet GetSampleSet() {
-            SampleSet sampleSet = SampleSet.Auto;
+            SampleSet sampleSet = SampleSet.None;
             int bestPriority = int.MaxValue;
             foreach (var sample in Samples) {
                 if (sample.Hitsound == 0 && sample.Priority <= bestPriority) {
@@ -44,7 +44,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
 
             // If only auto was found, try to get a sampleset from the additions
-            if (sampleSet == SampleSet.Auto) {
+            if (sampleSet == SampleSet.None) {
                 bestPriority = int.MaxValue;
                 foreach (var sample in Samples) {
                     if (sample.Hitsound != 0 && sample.Priority <= bestPriority) {
@@ -58,7 +58,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         public SampleSet GetAdditions() {
-            SampleSet additions = SampleSet.Auto;
+            SampleSet additions = SampleSet.None;
             int bestPriority = int.MaxValue;
             foreach (var sample in Samples) {
                 if (sample.Hitsound != 0 && sample.Priority <= bestPriority) {
@@ -68,7 +68,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
 
             // If only auto was found, try to get a sampleset from the normals
-            if (additions == SampleSet.Auto) {
+            if (additions == SampleSet.None) {
                 bestPriority = int.MaxValue;
                 foreach (var sample in Samples) {
                     if (sample.Hitsound == 0 && sample.Priority <= bestPriority) {

@@ -641,7 +641,7 @@ namespace Mapping_Tools.Views.Sliderator {
 
             // Get hit object that might be present at the export time or make a new one
             var hitObjectHere = beatmap.HitObjects.FirstOrDefault(o => Math.Abs(arg.ExportTime - o.Time) < 5) ??
-                                new HitObject(arg.ExportTime, 0, SampleSet.Auto, SampleSet.Auto);
+                                new HitObject(arg.ExportTime, 0, SampleSet.None, SampleSet.None);
 
 
             // Clone the hit object to not affect the already existing hit object instance with changes

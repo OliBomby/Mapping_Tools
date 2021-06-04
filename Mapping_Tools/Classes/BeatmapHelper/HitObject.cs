@@ -107,8 +107,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                     EdgeSampleSets = Array.ConvertAll(ob.SampleSetList, ss => (SampleSet) ss).ToList();
                 if (ob.SampleSetAdditionsList != null)
                     EdgeAdditionSets = Array.ConvertAll(ob.SampleSetAdditionsList, ss => (SampleSet) ss).ToList();
-                for (var i = EdgeSampleSets.Count; i < Repeat + 1; i++) EdgeSampleSets.Add(SampleSet.Auto);
-                for (var i = EdgeAdditionSets.Count; i < Repeat + 1; i++) EdgeAdditionSets.Add(SampleSet.Auto);
+                for (var i = EdgeSampleSets.Count; i < Repeat + 1; i++) EdgeSampleSets.Add(SampleSet.None);
+                for (var i = EdgeAdditionSets.Count; i < Repeat + 1; i++) EdgeAdditionSets.Add(SampleSet.None);
             } else if (IsSpinner || IsHoldNote) {
                 Repeat = 1;
             } else {
@@ -339,15 +339,15 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                     for (var i = 0; i < Math.Min(split.Length, Repeat + 1); i++) {
                         EdgeSampleSets.Add(TryParseInt(split[i].Split(':')[0], out var ess)
                             ? (SampleSet) ess
-                            : SampleSet.Auto);
+                            : SampleSet.None);
                         EdgeAdditionSets.Add(TryParseInt(split[i].Split(':')[1], out var eas)
                             ? (SampleSet) eas
-                            : SampleSet.Auto);
+                            : SampleSet.None);
                     }
                 }
 
-                for (var i = EdgeSampleSets.Count; i < Repeat + 1; i++) EdgeSampleSets.Add(SampleSet.Auto);
-                for (var i = EdgeAdditionSets.Count; i < Repeat + 1; i++) EdgeAdditionSets.Add(SampleSet.Auto);
+                for (var i = EdgeSampleSets.Count; i < Repeat + 1; i++) EdgeSampleSets.Add(SampleSet.None);
+                for (var i = EdgeAdditionSets.Count; i < Repeat + 1; i++) EdgeAdditionSets.Add(SampleSet.None);
 
                 // Extras on 10
                 if (values.Length > 10)
@@ -440,7 +440,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             if (IsSlider) {
                 // Get sliderslide hitsounds for every timingpoint in the slider
                 if (includeDefaults || TimingPoint.SampleIndex != 0) {
-                    var firstSampleSet = SampleSet == SampleSet.Auto ? TimingPoint.SampleSet : SampleSet;
+                    var firstSampleSet = SampleSet == SampleSet.None ? TimingPoint.SampleSet : SampleSet;
                     samples.Add(GetSliderFilename(firstSampleSet, "slide", TimingPoint.SampleIndex));
                     if (Whistle)
                         samples.Add(GetSliderFilename(firstSampleSet, "whistle", TimingPoint.SampleIndex));
@@ -448,7 +448,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
                 foreach (var bodyTp in BodyHitsounds)
                     if (includeDefaults || bodyTp.SampleIndex != 0) {
-                        var sampleSet = SampleSet == SampleSet.Auto ? bodyTp.SampleSet : SampleSet;
+                        var sampleSet = SampleSet == SampleSet.None ? bodyTp.SampleSet : SampleSet;
                         samples.Add(GetSliderFilename(sampleSet, "slide", bodyTp.SampleIndex));
                         if (Whistle)
                             samples.Add(GetSliderFilename(sampleSet, "whistle", bodyTp.SampleIndex));
@@ -460,7 +460,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 while (t + 10 < EndTime) {
                     var bodyTp = Timing.GetTimingPointAtTime(t, BodyHitsounds, TimingPoint);
                     if (includeDefaults || bodyTp.SampleIndex != 0) {
-                        var sampleSet = SampleSet == SampleSet.Auto ? bodyTp.SampleSet : SampleSet;
+                        var sampleSet = SampleSet == SampleSet.None ? bodyTp.SampleSet : SampleSet;
                         samples.Add(GetSliderFilename(sampleSet, "tick", bodyTp.SampleIndex));
                     }
 
@@ -520,8 +520,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         public void ResetHitsounds() {
             SetHitsounds(1);
-            SampleSet = SampleSet.Auto;
-            AdditionSet = SampleSet.Auto;
+            SampleSet = SampleSet.None;
+            AdditionSet = SampleSet.None;
             SampleVolume = 0;
             CustomIndex = 0;
             Filename = string.Empty;
@@ -530,10 +530,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                     EdgeHitsounds[i] = 0;
                 }
                 for (int i = 0; i < EdgeSampleSets.Count; i++) {
-                    EdgeSampleSets[i] = SampleSet.Auto;
+                    EdgeSampleSets[i] = SampleSet.None;
                 }
                 for (int i = 0; i < EdgeAdditionSets.Count; i++) {
-                    EdgeAdditionSets[i] = SampleSet.Auto;
+                    EdgeAdditionSets[i] = SampleSet.None;
                 }
             }
 
@@ -682,9 +682,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         private bool GetSliderExtras() {
             var hitsounds = GetHitsounds();
             return (EdgeHitsounds != null && EdgeHitsounds.Any(o => o != hitsounds)) ||
-                   (EdgeSampleSets != null && EdgeSampleSets.Any(o => o != SampleSet.Auto)) ||
-                   (EdgeAdditionSets != null && EdgeAdditionSets.Any(o => o != SampleSet.Auto)) ||
-                   SampleSet != SampleSet.Auto || AdditionSet != SampleSet.Auto || CustomIndex != 0 || 
+                   (EdgeSampleSets != null && EdgeSampleSets.Any(o => o != SampleSet.None)) ||
+                   (EdgeAdditionSets != null && EdgeAdditionSets.Any(o => o != SampleSet.None)) ||
+                   SampleSet != SampleSet.None || AdditionSet != SampleSet.None || CustomIndex != 0 || 
                    Math.Abs(SampleVolume) > Precision.DOUBLE_EPSILON || !string.IsNullOrEmpty(Filename);
         }
 
@@ -792,8 +792,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 Repeat = 1;
             }
 
-            SampleSet = SampleSet.Auto;
-            AdditionSet = SampleSet.Auto;
+            SampleSet = SampleSet.None;
+            AdditionSet = SampleSet.None;
             CustomIndex = 0;
             SampleVolume = 0;
             Filename = "";

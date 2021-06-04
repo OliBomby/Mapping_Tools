@@ -272,7 +272,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             string sampleset = split[0];
             switch (sampleset) {
                 case "auto":
-                    return SampleSet.Auto;
+                    return SampleSet.None;
                 case "normal":
                     return SampleSet.Normal;
                 case "soft":

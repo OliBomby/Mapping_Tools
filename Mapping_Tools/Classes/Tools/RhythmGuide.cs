@@ -214,7 +214,7 @@ namespace Mapping_Tools.Classes.Tools {
             }
 
             // Generate hitcircles at those times
-            foreach (var ho in times.Select(time => new HitObject(time, 0, SampleSet.Auto, SampleSet.Auto))) {
+            foreach (var ho in times.Select(time => new HitObject(time, 0, SampleSet.None, SampleSet.None))) {
                 ho.NewCombo = args.NcEverything;
                 beatmap.HitObjects.Add(ho);
             }
