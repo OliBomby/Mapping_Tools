@@ -67,6 +67,6 @@ jobs:
         title: Release version ${{ steps.get_version.outputs.version-without-v }}
         files: |
           release.zip
-          release_64.zip
+          release_x64.zip
           mapping_tools_installer_x86.exe
           mapping_tools_installer_x64.exe
