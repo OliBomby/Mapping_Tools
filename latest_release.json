@@ -37,7 +37,7 @@
       "url": "https://api.github.com/repos/OliBomby/Mapping_Tools/releases/assets/38025714",
       "id": 38025714,
       "node_id": "MDEyOlJlbGVhc2VBc3NldDM4MDI1NzE0",
-      "name": "mapping-tools-installer-1.8.8.exe",
+      "name": "mapping-tools-installer.exe",
       "label": "",
       "uploader": {
         "login": "github-actions[bot]",
@@ -62,10 +62,10 @@
       "content_type": "application/octet-stream",
       "state": "uploaded",
       "size": 5097793,
-      "download_count": 31,
+      "download_count": 38,
       "created_at": "2021-06-03T18:39:42Z",
-      "updated_at": "2021-06-03T18:39:42Z",
-      "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.8/mapping-tools-installer-1.8.8.exe"
+      "updated_at": "2021-06-14T22:36:13Z",
+      "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.8/mapping-tools-installer.exe"
     },
     {
       "url": "https://api.github.com/repos/OliBomby/Mapping_Tools/releases/assets/38025711",
@@ -96,7 +96,7 @@
       "content_type": "application/octet-stream",
       "state": "uploaded",
       "size": 5200128,
-      "download_count": 599,
+      "download_count": 604,
       "created_at": "2021-06-03T18:39:41Z",
       "updated_at": "2021-06-03T18:39:42Z",
       "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.8/release.zip"
