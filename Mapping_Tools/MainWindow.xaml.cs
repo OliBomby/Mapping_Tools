@@ -53,8 +53,8 @@ namespace Mapping_Tools {
                 SettingsManager.LoadConfig();
                 ListenerManager = new ListenerManager();
 
-                if( SettingsManager.Settings.MainWindowRestoreBounds is Rect r ) {
-                    SetToRect(r);
+                if (SettingsManager.Settings.MainWindowRestoreBounds.HasValue) {
+                    SetToRect(SettingsManager.Settings.MainWindowRestoreBounds.Value);
                 }
 
                 SetFullscreen(SettingsManager.Settings.MainWindowMaximized);
@@ -529,10 +529,10 @@ namespace Mapping_Tools {
         }
 
         private void SetToRect(Rect rect) {
-            Left = rect.Left;
-            Top = rect.Top;
-            Width = rect.Width;
-            Height = rect.Height;
+            Left = Math.Max(rect.Left, SystemParameters.VirtualScreenLeft);
+            Top = Math.Max(rect.Top, SystemParameters.VirtualScreenTop);
+            Width = Math.Max(rect.Width, 300);
+            Height = Math.Max(rect.Height, 100);
         }
 
         //Minimize window on click
