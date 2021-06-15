@@ -442,7 +442,7 @@ namespace Mapping_Tools {
         }
 
         private void OpenWebsite(object sender, RoutedEventArgs e) {
-            System.Diagnostics.Process.Start("explorer.exe", "https://mappingtools.seira.moe/");
+            System.Diagnostics.Process.Start("explorer.exe", "https://mappingtools.github.io");
         }
 
         private void CoolSave(object sender, RoutedEventArgs e) {
