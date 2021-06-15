@@ -2,6 +2,7 @@
 using Mapping_Tools.Classes.Exceptions;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.ToolHelpers;
+using Mapping_Tools.Updater;
 using Mapping_Tools.Views;
 using Mapping_Tools.Views.Standard;
 using MaterialDesignThemes.Wpf;
@@ -16,7 +17,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Mapping_Tools.Updater;
 
 namespace Mapping_Tools {
 
@@ -96,8 +96,8 @@ namespace Mapping_Tools {
 
         private async Task Update(bool allowSkip = true, bool notifyUser = false) {
             try {
-                var updateManager = new UpdateManager("OliBomby", "Mapping_Tools", "release.zip");
-
+                var assetNamePattern = Environment.Is64BitProcess ? "release_x64.zip" : "release.zip";
+                var updateManager = new UpdateManager("OliBomby", "Mapping_Tools", assetNamePattern);
                 var hasUpdate = await updateManager.FetchUpdateAsync();
 
                 if (!hasUpdate) {
