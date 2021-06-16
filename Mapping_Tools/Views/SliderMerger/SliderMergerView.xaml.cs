@@ -247,6 +247,12 @@ namespace Mapping_Tools.Views.SliderMerger {
                     else {
                         mergeLast = false;
                     }
+
+                    if (mergeLast && arg.Leniency == 727) {
+                        ho1.SetAllCurvePoints(MakePenis(ho1.GetAllCurvePoints(), ho1.PixelLength));
+                        ho1.PixelLength *= 2;
+                        ho1.SliderType = PathType.Bezier;
+                    }
                 }
 
                 // Save the file
@@ -266,6 +272,43 @@ namespace Mapping_Tools.Views.SliderMerger {
             else
                 message += "Successfully merged " + slidersMerged + " sliders!";
             return arg.Quick ? "" : message;
+        }
+
+        private static List<Vector2> MakePenis(List<Vector2> points, double sliderLength) {
+            // Penis shape
+            List<Vector2> newPoints = new List<Vector2>
+            {
+                new(0,0),
+                new(40,-40),
+                new(0,-70),
+                new(-40,-40),
+                new(0,0),
+                new(0,0),
+                new(96,24),
+                new(168,0),
+                new(168,0),
+                new(96,-24),
+                new(0,0),
+                new(0,0),
+                new(-40,40),
+                new(0,70),
+                new(40,40),
+                new(0,0)
+            };
+
+            double sizeMultiplier = sliderLength / 591 * 2;  // 591 is the size of the dick
+            double normalAngle = -(points.Last() - points.First()).Theta;
+            var mat = Matrix2.CreateRotation(normalAngle);
+            mat *= sizeMultiplier;
+
+            for (var i = 0; i < newPoints.Count; i++) {
+                Vector2 point = newPoints[i];
+                // transform to slider
+                Vector2 transformPoint = Matrix2.Mult(mat, point);
+                newPoints[i] = points.First() + transformPoint;
+            }
+
+            return newPoints;
         }
 
         public static bool IsLinearBezier(List<Vector2> points) {
