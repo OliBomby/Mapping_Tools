@@ -27,7 +27,7 @@
   "node_id": "MDc6UmVsZWFzZTQ0NjUwNDIw",
   "tag_name": "v1.8.9",
   "target_commitish": "master",
-  "name": "v1.8.9",
+  "name": "Release version 1.8.9",
   "draft": false,
   "prerelease": false,
   "created_at": "2021-06-15T14:20:55Z",
@@ -62,7 +62,7 @@
       "content_type": "application/octet-stream",
       "state": "uploaded",
       "size": 5211265,
-      "download_count": 0,
+      "download_count": 62,
       "created_at": "2021-06-15T14:23:19Z",
       "updated_at": "2021-06-15T14:23:20Z",
       "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.9/mapping_tools_installer_x64.exe"
@@ -96,7 +96,7 @@
       "content_type": "application/octet-stream",
       "state": "uploaded",
       "size": 5206297,
-      "download_count": 0,
+      "download_count": 6,
       "created_at": "2021-06-15T14:23:18Z",
       "updated_at": "2021-06-15T14:23:19Z",
       "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.9/mapping_tools_installer_x86.exe"
@@ -130,13 +130,47 @@
       "content_type": "application/octet-stream",
       "state": "uploaded",
       "size": 5200543,
-      "download_count": 0,
+      "download_count": 91,
       "created_at": "2021-06-15T14:23:18Z",
       "updated_at": "2021-06-15T14:23:18Z",
       "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.9/release.zip"
+    },
+    {
+      "url": "https://api.github.com/repos/OliBomby/Mapping_Tools/releases/assets/38625783",
+      "id": 38625783,
+      "node_id": "MDEyOlJlbGVhc2VBc3NldDM4NjI1Nzgz",
+      "name": "release_x64.zip",
+      "label": null,
+      "uploader": {
+        "login": "OliBomby",
+        "id": 17460441,
+        "node_id": "MDQ6VXNlcjE3NDYwNDQx",
+        "avatar_url": "https://avatars.githubusercontent.com/u/17460441?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/OliBomby",
+        "html_url": "https://github.com/OliBomby",
+        "followers_url": "https://api.github.com/users/OliBomby/followers",
+        "following_url": "https://api.github.com/users/OliBomby/following{/other_user}",
+        "gists_url": "https://api.github.com/users/OliBomby/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/OliBomby/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/OliBomby/subscriptions",
+        "organizations_url": "https://api.github.com/users/OliBomby/orgs",
+        "repos_url": "https://api.github.com/users/OliBomby/repos",
+        "events_url": "https://api.github.com/users/OliBomby/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/OliBomby/received_events",
+        "type": "User",
+        "site_admin": false
+      },
+      "content_type": "application/x-zip-compressed",
+      "state": "uploaded",
+      "size": 5019897,
+      "download_count": 11,
+      "created_at": "2021-06-15T14:29:25Z",
+      "updated_at": "2021-06-15T14:29:28Z",
+      "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.9/release_x64.zip"
     }
   ],
   "tarball_url": "https://api.github.com/repos/OliBomby/Mapping_Tools/tarball/v1.8.9",
   "zipball_url": "https://api.github.com/repos/OliBomby/Mapping_Tools/zipball/v1.8.9",
-  "body": "## Commits\n- 196ec29: Changed sample set Auto to None. (OliBomby)\n- ea97fc9: Changed release to not include version in installer file name (OliBomby)\n- a7c26e4: Added x64 & x86 releases and automatic dependency installation (OliBomby)\n- 177ee25: Fixed MainWindowRestoreBounds being able to set window offscreen and tiny (OliBomby)\n- d69f589: Updated updater to look for x64 release when on x64 process (OliBomby)\n- b85aaaf: Updated the website link (OliBomby)\n- f9a4bfb: Improved automatic osu! songs folder detection (OliBomby)\n- f3d9a69: Number increase (OliBomby)"
+  "body": "- Renamed sample set Auto to None, so it matches with the .osu file format.\r\n- Added x64 & x86 releases and automatic .NET installation in the installer.\r\n- Fixed MainWindowRestoreBounds being able to make the main window tiny and placed offscreen.\r\n- Updated the auto-updater to look for x64 release when on x64 process.\r\n- Updated the website link.\r\n- Improved automatic osu! songs folder detection."
 }
