@@ -6,7 +6,7 @@
         /// <summary>
         /// (Hitobject only) Uses the current inherited timing points' hitsound sampleset and custom list.
         /// </summary>
-        Auto = 0,
+        None = 0,
         /// <summary>
         /// The sampleset of Normal.
         /// </summary>

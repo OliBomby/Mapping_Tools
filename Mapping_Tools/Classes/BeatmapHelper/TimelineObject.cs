@@ -239,8 +239,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Whistle = false;
             Finish = false;
             Clap = false;
-            SampleSet = SampleSet.Auto;
-            AdditionSet = SampleSet.Auto;
+            SampleSet = SampleSet.None;
+            AdditionSet = SampleSet.None;
         }
 
         /// <summary>

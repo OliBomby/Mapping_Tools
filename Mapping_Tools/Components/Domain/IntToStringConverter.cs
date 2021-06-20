@@ -7,7 +7,12 @@ using Mapping_Tools.Classes.SystemTools;
 namespace Mapping_Tools.Components.Domain {
     internal class IntToStringConverter : IValueConverter {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
-            if (value != null) return ((int) value).ToString(CultureInfo.InvariantCulture);
+            if (value != null) {
+                if ((int)value == 727) {
+                    return "727 WYSI";
+                }
+                return ((int) value).ToString(CultureInfo.InvariantCulture);
+            }
             return parameter != null ? parameter.ToString() : "";
         }
 
@@ -17,6 +22,10 @@ namespace Mapping_Tools.Components.Domain {
                     return (int) parameter;
                 }
                 return new ValidationResult(false, "Cannot convert back null.");
+            }
+
+            if (value.ToString() == "727 WYSI") {
+                return 727;
             }
 
             if (parameter == null) {

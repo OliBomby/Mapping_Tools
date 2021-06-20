@@ -188,7 +188,7 @@ namespace Mapping_Tools.Viewmodels {
             };
             MinLength = 0.5;
             MutedIndex = -1;
-            MutedSampleSet = SampleSet.Auto;
+            MutedSampleSet = SampleSet.None;
 
             ImportLoadCommand = new CommandImplementation(
                 _ => {

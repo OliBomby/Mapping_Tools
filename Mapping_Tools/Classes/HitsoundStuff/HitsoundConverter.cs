@@ -211,7 +211,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                             0, s.Whistle, s.Finish, s.Clap));
                     } else {
                         hitsounds.Add(new HitsoundEvent(p.Time,
-                            positions[s.SampleArgs], s.OutsideVolume, filename, SampleSet.Auto, SampleSet.Auto,
+                            positions[s.SampleArgs], s.OutsideVolume, filename, SampleSet.None, SampleSet.None,
                             0, false, false, false));
                     }
                 }

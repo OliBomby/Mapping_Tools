@@ -27,8 +27,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             _xPos = -1;
             _yPos = -1;
             _hitsound = Hitsound.Normal;
-            _sampleSet = SampleSet.Auto;
-            _additionsSet = SampleSet.Auto;
+            _sampleSet = SampleSet.None;
+            _additionsSet = SampleSet.None;
             _customIndex = 0;
         }
 

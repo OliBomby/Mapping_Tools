@@ -243,7 +243,7 @@
                                                             </materialDesign:PopupBox.ToggleContent>
                                                             <StackPanel Orientation="Horizontal" Margin="20">
                                                                 <TextBox Text="{Binding Color, ElementName=ColorPicker}"
-                                                                         Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" materialDesign:HintAssist.Hint="Color HEX value"
+                                                                         Style="{StaticResource MaterialDesignFilledTextBox}" materialDesign:HintAssist.Hint="Color HEX value"
                                                                          Width="120" Margin="2,0,10,2"/>
                                                                 <materialDesign:ColorPicker Color="{Binding Color}" x:Name="ColorPicker" Width="300"/>
                                                             </StackPanel>
@@ -272,7 +272,7 @@
                                                                 </materialDesign:PopupBox.ToggleContent>
                                                                 <StackPanel Orientation="Horizontal" Margin="20">
                                                                     <TextBox Text="{Binding Color, ElementName=ColorPicker}"
-                                                                             Style="{StaticResource MaterialDesignFilledTextFieldTextBox}" materialDesign:HintAssist.Hint="Color HEX value"
+                                                                             Style="{StaticResource MaterialDesignFilledTextBox}" materialDesign:HintAssist.Hint="Color HEX value"
                                                                              Width="120" Margin="2,0,10,2"/>
                                                                     <materialDesign:ColorPicker Color="{Binding Color}" x:Name="ColorPicker" Width="300"/>
                                                                 </StackPanel>

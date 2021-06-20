@@ -2,9 +2,9 @@
 using Mapping_Tools.Classes.Exceptions;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.ToolHelpers;
+using Mapping_Tools.Updater;
 using Mapping_Tools.Views;
 using Mapping_Tools.Views.Standard;
-using Mapping_Tools_Net5.Updater;
 using MaterialDesignThemes.Wpf;
 using System;
 using System.IO;
@@ -53,8 +53,8 @@ namespace Mapping_Tools {
                 SettingsManager.LoadConfig();
                 ListenerManager = new ListenerManager();
 
-                if( SettingsManager.Settings.MainWindowRestoreBounds is Rect r ) {
-                    SetToRect(r);
+                if (SettingsManager.Settings.MainWindowRestoreBounds.HasValue) {
+                    SetToRect(SettingsManager.Settings.MainWindowRestoreBounds.Value);
                 }
 
                 SetFullscreen(SettingsManager.Settings.MainWindowMaximized);
@@ -96,8 +96,8 @@ namespace Mapping_Tools {
 
         private async Task Update(bool allowSkip = true, bool notifyUser = false) {
             try {
-                var updateManager = new UpdateManager("OliBomby", "Mapping_Tools", "release.zip");
-
+                var assetNamePattern = Environment.Is64BitProcess ? "release_x64.zip" : "release.zip";
+                var updateManager = new UpdateManager("OliBomby", "Mapping_Tools", assetNamePattern);
                 var hasUpdate = await updateManager.FetchUpdateAsync();
 
                 if (!hasUpdate) {
@@ -442,7 +442,7 @@ namespace Mapping_Tools {
         }
 
         private void OpenWebsite(object sender, RoutedEventArgs e) {
-            System.Diagnostics.Process.Start("explorer.exe", "https://mappingtools.seira.moe/");
+            System.Diagnostics.Process.Start("explorer.exe", "https://mappingtools.github.io");
         }
 
         private void CoolSave(object sender, RoutedEventArgs e) {
@@ -529,10 +529,10 @@ namespace Mapping_Tools {
         }
 
         private void SetToRect(Rect rect) {
-            Left = rect.Left;
-            Top = rect.Top;
-            Width = rect.Width;
-            Height = rect.Height;
+            Left = Math.Max(rect.Left, SystemParameters.VirtualScreenLeft);
+            Top = Math.Max(rect.Top, SystemParameters.VirtualScreenTop);
+            Width = Math.Max(rect.Width, 300);
+            Height = Math.Max(rect.Height, 100);
         }
 
         //Minimize window on click

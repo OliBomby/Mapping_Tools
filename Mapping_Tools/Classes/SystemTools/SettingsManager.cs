@@ -102,23 +102,42 @@ namespace Mapping_Tools.Classes.SystemTools {
         }
 
         public static void DefaultPaths() {
-            if (Settings.OsuPath == "") {
+            if (string.IsNullOrWhiteSpace(Settings.OsuPath)) {
                 try {
                     var regKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall");
                     Settings.OsuPath = FindByDisplayName(regKey, "osu!");
-                } catch (Exception) {
+                } catch (KeyNotFoundException) {
                     Settings.OsuPath = Path.Combine(MainWindow.AppCommon, "osu!");
+                    MessageBox.Show("Could not automatically find osu! install directory. Please set the correct paths in the Preferences.");
                 }
             }
 
-            if (Settings.SongsPath == "") {
-                Settings.SongsPath = Path.Combine(Settings.OsuPath, "Songs");
+            if (string.IsNullOrWhiteSpace(Settings.SongsPath)) {
+                var beatmapDirectory =
+                    GetBeatmapDirectory(Path.Combine(Settings.OsuPath, $"osu!.{Environment.UserName}.cfg"));
+                Settings.SongsPath = Path.Combine(Settings.OsuPath, beatmapDirectory);
             }
 
-            if (Settings.BackupsPath == "") {
+            if (string.IsNullOrWhiteSpace(Settings.BackupsPath)) {
                 Settings.BackupsPath = Path.Combine(MainWindow.AppDataPath, "Backups");
                 Directory.CreateDirectory(Settings.BackupsPath);
             }
+        }
+
+        private static string GetBeatmapDirectory(string configPath) {
+            try {
+                foreach (var line in File.ReadLines(configPath)) {
+                    var split = line.Split('=');
+                    if (split[0].Trim() == "BeatmapDirectory") {
+                        return split[1].Trim();
+                    }
+                }
+            }
+            catch (Exception exception) {
+                Console.WriteLine(exception);
+            }
+
+            return "Songs";
         }
 
         private static string FindByDisplayName(RegistryKey parentKey, string name) {
@@ -133,7 +152,7 @@ namespace Mapping_Tools.Classes.SystemTools {
                 } catch (NullReferenceException) { }
             }
 
-            throw new Exception();
+            throw new KeyNotFoundException($"Could not find registry key with display name \"{name}\".");
         }
 
         public static List<string[]> GetRecentMaps() {
