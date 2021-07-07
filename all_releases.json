@@ -63,7 +63,7 @@
         "content_type": "application/octet-stream",
         "state": "uploaded",
         "size": 5211265,
-        "download_count": 171,
+        "download_count": 532,
         "created_at": "2021-06-15T14:23:19Z",
         "updated_at": "2021-06-15T14:23:20Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.9/mapping_tools_installer_x64.exe"
@@ -97,7 +97,7 @@
         "content_type": "application/octet-stream",
         "state": "uploaded",
         "size": 5206297,
-        "download_count": 10,
+        "download_count": 36,
         "created_at": "2021-06-15T14:23:18Z",
         "updated_at": "2021-06-15T14:23:19Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.9/mapping_tools_installer_x86.exe"
@@ -131,7 +131,7 @@
         "content_type": "application/octet-stream",
         "state": "uploaded",
         "size": 5200543,
-        "download_count": 223,
+        "download_count": 438,
         "created_at": "2021-06-15T14:23:18Z",
         "updated_at": "2021-06-15T14:23:18Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.9/release.zip"
@@ -165,7 +165,7 @@
         "content_type": "application/x-zip-compressed",
         "state": "uploaded",
         "size": 5019897,
-        "download_count": 31,
+        "download_count": 83,
         "created_at": "2021-06-15T14:29:25Z",
         "updated_at": "2021-06-15T14:29:28Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.9/release_x64.zip"
@@ -239,7 +239,7 @@
         "content_type": "application/octet-stream",
         "state": "uploaded",
         "size": 5097793,
-        "download_count": 39,
+        "download_count": 41,
         "created_at": "2021-06-03T18:39:42Z",
         "updated_at": "2021-06-14T22:36:13Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.8/mapping-tools-installer.exe"
@@ -273,7 +273,7 @@
         "content_type": "application/octet-stream",
         "state": "uploaded",
         "size": 5200128,
-        "download_count": 605,
+        "download_count": 606,
         "created_at": "2021-06-03T18:39:41Z",
         "updated_at": "2021-06-03T18:39:42Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.8/release.zip"
