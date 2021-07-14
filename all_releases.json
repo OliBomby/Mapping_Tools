@@ -63,7 +63,7 @@
         "content_type": "application/octet-stream",
         "state": "uploaded",
         "size": 5211265,
-        "download_count": 532,
+        "download_count": 667,
         "created_at": "2021-06-15T14:23:19Z",
         "updated_at": "2021-06-15T14:23:20Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.9/mapping_tools_installer_x64.exe"
@@ -97,7 +97,7 @@
         "content_type": "application/octet-stream",
         "state": "uploaded",
         "size": 5206297,
-        "download_count": 36,
+        "download_count": 47,
         "created_at": "2021-06-15T14:23:18Z",
         "updated_at": "2021-06-15T14:23:19Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.9/mapping_tools_installer_x86.exe"
@@ -131,7 +131,7 @@
         "content_type": "application/octet-stream",
         "state": "uploaded",
         "size": 5200543,
-        "download_count": 438,
+        "download_count": 507,
         "created_at": "2021-06-15T14:23:18Z",
         "updated_at": "2021-06-15T14:23:18Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.9/release.zip"
@@ -165,7 +165,7 @@
         "content_type": "application/x-zip-compressed",
         "state": "uploaded",
         "size": 5019897,
-        "download_count": 83,
+        "download_count": 100,
         "created_at": "2021-06-15T14:29:25Z",
         "updated_at": "2021-06-15T14:29:28Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.9/release_x64.zip"
@@ -779,7 +779,7 @@
         "content_type": "application/x-msdownload",
         "state": "uploaded",
         "size": 4454818,
-        "download_count": 51,
+        "download_count": 52,
         "created_at": "2021-04-03T13:16:39Z",
         "updated_at": "2021-04-03T13:16:42Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.1.0/mapping-tools.exe"
@@ -813,7 +813,7 @@
         "content_type": "application/x-zip-compressed",
         "state": "uploaded",
         "size": 4293385,
-        "download_count": 30,
+        "download_count": 31,
         "created_at": "2021-04-03T13:16:34Z",
         "updated_at": "2021-04-03T13:16:38Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.1.0/Release.zip"
@@ -887,7 +887,7 @@
         "content_type": "application/x-msdownload",
         "state": "uploaded",
         "size": 4455347,
-        "download_count": 105,
+        "download_count": 107,
         "created_at": "2020-12-13T13:54:02Z",
         "updated_at": "2020-12-13T13:54:05Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.0.2/mapping-tools.exe"
@@ -921,7 +921,7 @@
         "content_type": "application/x-zip-compressed",
         "state": "uploaded",
         "size": 4292605,
-        "download_count": 24,
+        "download_count": 25,
         "created_at": "2020-12-13T13:54:06Z",
         "updated_at": "2020-12-13T13:54:10Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.0.2/Release.zip"
@@ -995,7 +995,7 @@
         "content_type": "application/x-msdownload",
         "state": "uploaded",
         "size": 4452352,
-        "download_count": 23,
+        "download_count": 24,
         "created_at": "2020-11-14T18:06:46Z",
         "updated_at": "2020-11-14T18:06:49Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.0.1/mapping-tools.exe"
@@ -1029,7 +1029,7 @@
         "content_type": "application/x-zip-compressed",
         "state": "uploaded",
         "size": 4292586,
-        "download_count": 5,
+        "download_count": 7,
         "created_at": "2020-11-14T18:06:48Z",
         "updated_at": "2020-11-14T18:06:51Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.0.1/Release.zip"
@@ -1103,7 +1103,7 @@
         "content_type": "application/x-msdownload",
         "state": "uploaded",
         "size": 4452208,
-        "download_count": 3,
+        "download_count": 6,
         "created_at": "2020-11-14T16:55:37Z",
         "updated_at": "2020-11-14T16:55:40Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.0.0/mapping-tools.exe"
@@ -1137,7 +1137,7 @@
         "content_type": "application/x-zip-compressed",
         "state": "uploaded",
         "size": 4292592,
-        "download_count": 2,
+        "download_count": 3,
         "created_at": "2020-11-14T16:55:34Z",
         "updated_at": "2020-11-14T16:55:37Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.8.0.0/Release.zip"
@@ -1211,7 +1211,7 @@
         "content_type": "application/x-msdownload",
         "state": "uploaded",
         "size": 4393935,
-        "download_count": 17,
+        "download_count": 19,
         "created_at": "2020-10-31T22:57:38Z",
         "updated_at": "2020-10-31T22:57:42Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.7.1.2/mapping-tools.exe"
@@ -1245,7 +1245,7 @@
         "content_type": "application/x-zip-compressed",
         "state": "uploaded",
         "size": 4213550,
-        "download_count": 4,
+        "download_count": 6,
         "created_at": "2020-10-31T22:57:57Z",
         "updated_at": "2020-10-31T22:58:00Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.7.1.2/Release.zip"
@@ -1319,7 +1319,7 @@
         "content_type": "application/x-msdownload",
         "state": "uploaded",
         "size": 4397989,
-        "download_count": 11,
+        "download_count": 12,
         "created_at": "2020-10-20T18:16:14Z",
         "updated_at": "2020-10-20T18:16:18Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.7.1.1/mapping-tools.exe"
@@ -1353,7 +1353,7 @@
         "content_type": "application/x-zip-compressed",
         "state": "uploaded",
         "size": 4211292,
-        "download_count": 5,
+        "download_count": 6,
         "created_at": "2020-10-20T18:16:17Z",
         "updated_at": "2020-10-20T18:16:26Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.7.1.1/Release.zip"
@@ -1427,7 +1427,7 @@
         "content_type": "application/x-msdownload",
         "state": "uploaded",
         "size": 4389691,
-        "download_count": 9,
+        "download_count": 10,
         "created_at": "2020-10-13T21:25:01Z",
         "updated_at": "2020-10-13T21:25:04Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.7.1.0/mapping-tools.exe"
@@ -1461,7 +1461,7 @@
         "content_type": "application/x-zip-compressed",
         "state": "uploaded",
         "size": 4210845,
-        "download_count": 2,
+        "download_count": 4,
         "created_at": "2020-10-13T21:25:03Z",
         "updated_at": "2020-10-13T21:25:12Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.7.1.0/Release.zip"
@@ -1535,7 +1535,7 @@
         "content_type": "application/x-msdownload",
         "state": "uploaded",
         "size": 4382342,
-        "download_count": 40,
+        "download_count": 41,
         "created_at": "2020-09-01T16:56:32Z",
         "updated_at": "2020-09-01T16:56:36Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.7.0.1/mapping-tools.exe"
@@ -1569,7 +1569,7 @@
         "content_type": "application/x-zip-compressed",
         "state": "uploaded",
         "size": 4201755,
-        "download_count": 7,
+        "download_count": 8,
         "created_at": "2020-09-01T16:56:34Z",
         "updated_at": "2020-09-01T16:56:38Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.7.0.1/Release.zip"
@@ -1643,7 +1643,7 @@
         "content_type": "application/x-msdownload",
         "state": "uploaded",
         "size": 4386353,
-        "download_count": 5,
+        "download_count": 7,
         "created_at": "2020-08-29T23:27:48Z",
         "updated_at": "2020-08-29T23:27:51Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.7.0.0/mapping-tools.exe"
@@ -1677,7 +1677,7 @@
         "content_type": "application/x-zip-compressed",
         "state": "uploaded",
         "size": 4201355,
-        "download_count": 2,
+        "download_count": 3,
         "created_at": "2020-08-29T23:27:51Z",
         "updated_at": "2020-08-29T23:27:54Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.7.0.0/Release.zip"
@@ -1751,7 +1751,7 @@
         "content_type": "application/x-msdownload",
         "state": "uploaded",
         "size": 4370703,
-        "download_count": 20,
+        "download_count": 21,
         "created_at": "2020-08-14T16:02:49Z",
         "updated_at": "2020-08-14T16:02:52Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.6.8.1/mapping-tools.exe"
@@ -1785,7 +1785,7 @@
         "content_type": "application/x-zip-compressed",
         "state": "uploaded",
         "size": 4184066,
-        "download_count": 3,
+        "download_count": 4,
         "created_at": "2020-08-14T16:02:51Z",
         "updated_at": "2020-08-14T16:02:55Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.6.8.1/Release.zip"
@@ -1859,7 +1859,7 @@
         "content_type": "application/x-msdownload",
         "state": "uploaded",
         "size": 4366677,
-        "download_count": 24,
+        "download_count": 25,
         "created_at": "2020-07-20T19:19:16Z",
         "updated_at": "2020-07-20T19:19:19Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.6.8.0/mapping-tools.exe"
@@ -1893,7 +1893,7 @@
         "content_type": "application/x-zip-compressed",
         "state": "uploaded",
         "size": 4183408,
-        "download_count": 5,
+        "download_count": 6,
         "created_at": "2020-07-20T19:18:53Z",
         "updated_at": "2020-07-20T19:18:56Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.6.8.0/Release.zip"
@@ -1967,7 +1967,7 @@
         "content_type": "application/x-msdownload",
         "state": "uploaded",
         "size": 4371123,
-        "download_count": 14,
+        "download_count": 16,
         "created_at": "2020-06-26T11:24:51Z",
         "updated_at": "2020-06-26T11:25:34Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.6.7.0/mapping-tools.exe"
@@ -2001,7 +2001,7 @@
         "content_type": "application/x-zip-compressed",
         "state": "uploaded",
         "size": 4178818,
-        "download_count": 3,
+        "download_count": 4,
         "created_at": "2020-06-26T11:24:54Z",
         "updated_at": "2020-06-26T11:25:35Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.6.7.0/Release.zip"
@@ -2075,7 +2075,7 @@
         "content_type": "application/x-msdownload",
         "state": "uploaded",
         "size": 4289522,
-        "download_count": 13,
+        "download_count": 15,
         "created_at": "2020-06-08T16:32:43Z",
         "updated_at": "2020-06-08T16:32:59Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.6.6.0/mapping-tools.exe"
@@ -2109,7 +2109,7 @@
         "content_type": "application/x-zip-compressed",
         "state": "uploaded",
         "size": 4176612,
-        "download_count": 3,
+        "download_count": 5,
         "created_at": "2020-06-08T16:31:24Z",
         "updated_at": "2020-06-08T16:31:44Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.6.6.0/Release.zip"
@@ -2183,7 +2183,7 @@
         "content_type": "application/x-msdownload",
         "state": "uploaded",
         "size": 4284194,
-        "download_count": 48,
+        "download_count": 49,
         "created_at": "2020-03-31T21:03:11Z",
         "updated_at": "2020-03-31T21:03:14Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.6.3.1/mapping-tools.exe"
@@ -2217,7 +2217,7 @@
         "content_type": "application/x-zip-compressed",
         "state": "uploaded",
         "size": 4155116,
-        "download_count": 9,
+        "download_count": 10,
         "created_at": "2020-03-31T21:03:39Z",
         "updated_at": "2020-03-31T21:03:43Z",
         "browser_download_url": "https://github.com/OliBomby/Mapping_Tools/releases/download/v1.6.3.1/Release.zip"
