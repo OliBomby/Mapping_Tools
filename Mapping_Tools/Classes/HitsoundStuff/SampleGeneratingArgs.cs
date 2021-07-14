@@ -53,7 +53,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// <summary>
         /// Checks if the specified path is a cafewalk soundfont file.
         /// </summary>
-        public bool UsesSoundFont => GetExtension() == ".sf2";
+        public bool UsesSoundFont => GetExtension().ToLower() == ".sf2";
 
         /// <summary>
         /// Means you can export this sample by simply copy pasting the source file in <see cref="Path"/>.
@@ -115,7 +115,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// <summary>Returns a string that represents the current object and can be used as a filename.</summary>
         public string GetFilename() {
             var filename = System.IO.Path.GetFileNameWithoutExtension(Path);
-            return GetExtension() == ".sf2" ? 
+            return GetExtension().ToLower() == ".sf2" ? 
                 $"{filename}-{Bank}-{Patch}-{Instrument}-{Key}-{(int)Length}-{Velocity}" : 
                 Math.Abs(Volume - 1) < Precision.DOUBLE_EPSILON ?
                    filename :
@@ -133,7 +133,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// <summary>Returns a string that represents the current object.</summary>
         /// <returns>A string that represents the current object.</returns>
         public override string ToString() {
-            return GetExtension() == ".sf2" ? 
+            return GetExtension().ToLower() == ".sf2" ? 
                 $"{Path} {Bank},{Patch},{Instrument},{Key},{Length},{Velocity}" : 
                 $"{Path} {Volume * 100}%";
         }

@@ -29,7 +29,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <inheritdoc />
         public Editor(string path) {
             Path = path;
-            if (System.IO.Path.GetExtension(path) == ".osb") {
+            if (System.IO.Path.GetExtension(path).ToLower() == ".osb") {
                 TextFile = new StoryBoard(ReadFile(path));
             } else {
                 TextFile = new Beatmap(ReadFile(path));

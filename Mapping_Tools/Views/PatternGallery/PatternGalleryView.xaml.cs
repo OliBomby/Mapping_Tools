@@ -237,7 +237,7 @@ namespace Mapping_Tools.Views.PatternGallery {
                 if (result == MessageBoxResult.Yes) {
                     string collectionFolderPath = Path.Combine(ViewModel.FileHandler.BasePath, archiveFolderName);
                     // Get the first .json file in the imported collection folder
-                    string savePath = Directory.GetFiles(collectionFolderPath).First(o => Path.GetExtension(o) == ".json");
+                    string savePath = Directory.GetFiles(collectionFolderPath).First(o => Path.GetExtension(o).ToLower() == ".json");
                     var project = ProjectManager.LoadJson<PatternGalleryVm>(savePath);
 
                     SetSaveData(project);

@@ -51,7 +51,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
 
             foreach (string path in vm.ExportPaths) {
                 Editor editor;
-                if (Path.GetExtension(path) == ".osb") {
+                if (Path.GetExtension(path).ToLower() == ".osb") {
                     editor = new StoryboardEditor(path);
                 } else {
                     editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader);

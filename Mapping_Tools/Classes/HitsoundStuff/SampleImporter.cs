@@ -16,7 +16,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             ".wav", ".ogg", ".mp3", ".sf2"};
 
         public static bool ValidateSamplePath(string path) {
-            return (File.Exists(path) && ValidSamplePathExtensions.Contains(Path.GetExtension(path)));
+            return File.Exists(path) && ValidSamplePathExtensions.Contains(Path.GetExtension(path).ToLower());
         }
 
         public static bool ValidateSampleArgs(SampleGeneratingArgs args, bool validateSampleFile = true) {
@@ -30,7 +30,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
   
         public static WaveStream OpenSample(string path) {
-            return Path.GetExtension(path) == ".ogg" ? (WaveStream)new VorbisWaveReader(path) : new MediaFoundationReader(path);
+            return Path.GetExtension(path).ToLower() == ".ogg" ? (WaveStream)new VorbisWaveReader(path) : new MediaFoundationReader(path);
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 }
 
                 try {
-                    switch (Path.GetExtension(path)) {
+                    switch (Path.GetExtension(path).ToLower()) {
                         case ".sf2": {
                             var sf2 = new SoundFont(path);
                             foreach (var args in pair.Value) {
@@ -103,7 +103,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         public static SampleSoundGenerator ImportSample(SampleGeneratingArgs args) {
             string path = args.Path;
-            switch (Path.GetExtension(path)) {
+            switch (Path.GetExtension(path).ToLower()) {
                 case ".sf2": {
                     SoundFont sf2 = new SoundFont(path);
                     SampleSoundGenerator wave = ImportFromSoundFont(args, sf2);
