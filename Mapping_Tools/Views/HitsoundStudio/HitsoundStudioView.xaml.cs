@@ -33,6 +33,8 @@ namespace Mapping_Tools.Views.HitsoundStudio
         private List<HitsoundLayer> selectedLayers;
         private HitsoundLayer selectedLayer;
 
+        private static IWavePlayer outputDevice;
+
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "hsstudioproject.json");
 
         public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Hitsound Studio Projects");
@@ -480,13 +482,13 @@ namespace Mapping_Tools.Views.HitsoundStudio
                     MessageBox.Show("Could not load the specified sample.");
                     return;
                 }
+                
+                outputDevice = new WasapiOut();
+                outputDevice.PlaybackStopped += PlayerStopped;
 
-                WaveOutEvent player = new WaveOutEvent();
+                outputDevice.Init(mainOutputStream.GetSampleProvider());
 
-                player.Init(mainOutputStream.GetSampleProvider());
-                player.PlaybackStopped += PlayerStopped;
-
-                player.Play();
+                outputDevice.Play();
             }
             catch (FileNotFoundException) { MessageBox.Show("Could not find the specified sample."); }
             catch (DirectoryNotFoundException) { MessageBox.Show("Could not find the specified sample's directory."); }
@@ -495,8 +497,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
 
         private static void PlayerStopped(object sender, StoppedEventArgs e)
         {
-            ((WaveOutEvent)sender).Dispose();
-            GC.Collect();
+            ((IWavePlayer)sender).Dispose();
         }
 
         private void Num_Layers_Changed()
