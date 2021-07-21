@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Input;
 using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Classes.ToolHelpers;
@@ -86,29 +87,54 @@ namespace Mapping_Tools.Views.SliderCompletionator {
 
                 Beatmap beatmap = editor.Beatmap;
                 Timing timing = beatmap.BeatmapTiming;
-                List<HitObject> markedObjects = arg.ImportModeSetting == SliderCompletionatorVm.ImportMode.Selected ? selected :
-                                                arg.ImportModeSetting == SliderCompletionatorVm.ImportMode.Bookmarked ? beatmap.GetBookmarkedObjects() :
-                                                arg.ImportModeSetting == SliderCompletionatorVm.ImportMode.Time ? beatmap.QueryTimeCode(arg.TimeCode).ToList() :
-                                                                         beatmap.HitObjects;
+
+                List<HitObject> markedObjects = arg.ImportModeSetting switch {
+                    SliderCompletionatorVm.ImportMode.Selected => selected,
+                    SliderCompletionatorVm.ImportMode.Bookmarked => beatmap.GetBookmarkedObjects(),
+                    SliderCompletionatorVm.ImportMode.Time => beatmap.QueryTimeCode(arg.TimeCode).ToList(),
+                    SliderCompletionatorVm.ImportMode.Everything => beatmap.HitObjects,
+                    _ => throw new ArgumentException("Unexpected import mode.")
+                };
 
                 for (int i = 0; i < markedObjects.Count; i++) {
                     HitObject ho = markedObjects[i];
                     if (ho.IsSlider) {
-                        double oldSpatialLength = ho.PixelLength;
-                        double newSpatialLength = arg.SpatialLength != -1 ? ho.GetSliderPath(fullLength: true).Distance * arg.SpatialLength : oldSpatialLength;
+                        double mpb = timing.GetMpBAtTime(ho.Time);
 
-                        double oldTemporalLength = timing.CalculateSliderTemporalLength(ho.Time, ho.PixelLength);
-                        double newTemporalLength = arg.TemporalLength != -1 ? timing.GetMpBAtTime(ho.Time) * arg.TemporalLength : oldTemporalLength;
-
+                        double oldDuration = timing.CalculateSliderTemporalLength(ho.Time, ho.PixelLength);
+                        double oldLength = ho.PixelLength;
                         double oldSv = timing.GetSvAtTime(ho.Time);
-                        double newSv = oldSv / ((newSpatialLength / oldSpatialLength) / (newTemporalLength / oldTemporalLength));
+
+                        double newDuration = arg.UseEndTime ? arg.EndTime == -1 ? oldDuration : arg.EndTime - ho.Time : 
+                                                              arg.Duration == -1 ? oldDuration : timing.WalkBeatsInMillisecondTime(arg.Duration, ho.Time) - ho.Time;
+                        double newLength = arg.Length == -1 ? oldLength : ho.GetSliderPath(fullLength: true).Distance * arg.Length;
+                        double newSv = arg.SliderVelocity == -1 ? oldSv : -100 / arg.SliderVelocity;
+
+                        switch (arg.FreeVariableSetting) {
+                            case SliderCompletionatorVm.FreeVariable.Velocity:
+                                newSv = -10000 * timing.SliderMultiplier * newDuration / (newLength * mpb);
+                                break;
+                            case SliderCompletionatorVm.FreeVariable.Duration:
+                                // This actually doesn't get used anymore because the .osu doesn't store the duration
+                                newDuration = newLength * newSv * mpb / (-10000 * timing.SliderMultiplier);
+                                break;
+                            case SliderCompletionatorVm.FreeVariable.Length:
+                                newLength = -10000 * timing.SliderMultiplier * newDuration / (newSv * mpb);
+                                break;
+                            default:
+                                throw new ArgumentException("Unexpected free variable setting.");
+                        }
 
                         if (double.IsNaN(newSv)) {
                             throw new Exception("Encountered NaN slider velocity. Make sure none of the inputs are zero.");
                         }
 
+                        if (newDuration < 0) {
+                            throw new Exception("Encountered slider with negative duration. Make sure the end time is greater than the end time of all selected sliders.");
+                        }
+
                         ho.SliderVelocity = newSv;
-                        ho.PixelLength = newSpatialLength;
+                        ho.PixelLength = newLength;
 
                         // Scale anchors to completion
                         if (arg.MoveAnchors) {
@@ -128,12 +154,34 @@ namespace Mapping_Tools.Views.SliderCompletionator {
                 List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
                 // Add Hitobject stuff
                 foreach (HitObject ho in beatmap.HitObjects) {
-                    if (ho.IsSlider) // SliderVelocity changes
-                    {
+                    // SliderVelocity changes
+                    if (ho.IsSlider) {
+                        if (markedObjects.Contains(ho) && arg.DelegateToBpm) {
+                            var tpAfter = timing.GetRedlineAtTime(ho.Time).Copy();
+                            var tpOn = tpAfter.Copy();
+
+                            tpAfter.Offset = ho.Time;
+                            tpOn.Offset = ho.Time - 1;  // This one will be on the slider
+
+                            tpAfter.OmitFirstBarLine = true;
+                            tpOn.OmitFirstBarLine = true;
+
+                            // Express velocity in BPM
+                            tpOn.MpB *= ho.SliderVelocity / -100;
+                            // NaN SV results in removal of slider ticks
+                            ho.SliderVelocity = arg.RemoveSliderTicks ? double.NaN : -100;
+
+                            // Add redlines
+                            timingPointsChanges.Add(new TimingPointsChange(tpOn, mpb: true, unInherited: true, omitFirstBarLine: true, fuzzyness: Precision.DOUBLE_EPSILON));
+                            timingPointsChanges.Add(new TimingPointsChange(tpAfter, mpb: true, unInherited: true, omitFirstBarLine: true, fuzzyness: Precision.DOUBLE_EPSILON));
+
+                            ho.Time -= 1;
+                        }
+
                         TimingPoint tp = ho.TimingPoint.Copy();
                         tp.Offset = ho.Time;
                         tp.MpB = ho.SliderVelocity;
-                        timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, fuzzyness: 0.4));
+                        timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, fuzzyness: Precision.DOUBLE_EPSILON));
                     }
                 }
 

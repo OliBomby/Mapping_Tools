@@ -688,7 +688,7 @@ namespace Mapping_Tools.Views.Sliderator {
                     tpOn.OmitFirstBarLine = true;
 
                     // Express velocity in BPM
-                    tpOn.MpB /= -100 / clone.SliderVelocity;
+                    tpOn.MpB *= clone.SliderVelocity / -100;
                     // NaN SV results in removal of slider ticks
                     clone.SliderVelocity = arg.RemoveSliderTicks ? double.NaN : -100;
                     

@@ -5,8 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Mapping_Tools.Views"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
-             mc:Ignorable="d" 
+             xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain" xmlns:viewmodels="clr-namespace:Mapping_Tools.Viewmodels"
+                            mc:Ignorable="d" 
              x:Name="This"
              d:DesignHeight="450" Width="759.5" d:DataContext="{d:DesignData SliderCompletionatorVm}">
     <local:SingleRunMappingTool.Resources>
@@ -41,29 +41,66 @@
                       </TextBlock>
                   </materialDesign:PopupBox>
                 </StackPanel>
-              
-                <TextBox x:Name="TemporalBox" Width="258" HorizontalAlignment="Left" Margin="0,20,0,0"
-                         Text="{Binding TemporalLength, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=-1}"
-                    Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Temporal length (beats)"
-                         ToolTip="Wanted duration of the slider in beats. Input -1 to get no change."/>
-                <TextBox x:Name="SpatialBox" Width="258" HorizontalAlignment="Left" Margin="0,20,0,0"
-                         Text="{Binding SpatialLength, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=-1}"
-                    Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Spatial length (fraction of full path)"
-                         ToolTip="Wanted length of the slider. This value represents a fraction of the complete path defined by the anchors, so '1' lets the slider end be exactly on the last anchor."/>
 
-                <CheckBox x:Name="MoveAnchorsBox" HorizontalAlignment="Left" Margin="0,20,0,0" Content="Move anchors to new length"
-                          IsChecked="{Binding MoveAnchors}"
-                          ToolTip="Move the anchors such that the last anchor is exactly on the slider end. Much like using Ctrl+G twice in the editor, but better."/>
+                <StackPanel Width="531" HorizontalAlignment="Left">
+                    <StackPanel Orientation="Horizontal" Margin="0,26,0,0" HorizontalAlignment="Left">
+                        <ComboBox x:Name="SelectionModeBox" Cursor="Hand" Width="258"
+                            Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Object selection mode"
+                            ItemsSource="{Binding ImportModes}" SelectedItem="{Binding ImportModeSetting}"
+                            ToolTip="Choose how to select sliders to completionate.">
+                        </ComboBox>
+                        <TextBox Margin="15 0 0 0" Width="258" Text="{Binding TimeCode}" Visibility="{Binding TimeCodeBoxVisibility}"
+                            Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Time code"
+                            ToolTip="Input a time code here. Example time code: 00:56:823 (1,2,1,2) - "/>
+                    </StackPanel>
 
-                <StackPanel Orientation="Horizontal" Margin="0,26,0,0" HorizontalAlignment="Left">
-                    <ComboBox x:Name="SelectionModeBox" Cursor="Hand" Width="258"
-                              Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Object selection mode"
-                              ItemsSource="{Binding ImportModes}" SelectedItem="{Binding ImportModeSetting}"
-                              ToolTip="Choose how to select sliders to completionate.">
+                    <CheckBox x:Name="MoveAnchorsBox" Margin="0,20,0,0" Content="Move anchors to new length"
+                        IsChecked="{Binding MoveAnchors}"
+                        ToolTip="Move the anchors such that the last anchor is exactly on the slider end. Much like using Ctrl+G twice in the editor, but better."/>
+
+                    <CheckBox x:Name="UseEndTimeBox" Content="Use slider end time"
+                        IsChecked="{Binding UseEndTime}"
+                        ToolTip="Lets you input the slider end time instead of the duration. This will replace the duration field with the end time field."/>
+
+                    <CheckBox x:Name="DelegateSvToBpmBox" Content="Delegate SV to BPM" Margin="0 0 0 0"
+                              ToolTip="Use BPM to determine the velocity of the slider instead of greenline SV."
+                              IsChecked="{Binding DelegateToBpm}"/>
+                    <CheckBox Content="Remove slider ticks"
+                              ToolTip="Use a NaN greenline to remove slider ticks from the slider."
+                              IsEnabled="{Binding DelegateToBpm}"
+                              IsChecked="{Binding RemoveSliderTicks}"/>
+
+                    <Separator Margin="0 20"/>
+                </StackPanel>
+
+                <StackPanel HorizontalAlignment="Left" Width="258">
+                    <ComboBox x:Name="FreeVariableBox" Cursor="Hand" Margin="0,0,0,0"
+                              Style="{StaticResource MaterialDesignOutlinedComboBox}" materialDesign:HintAssist.Hint="Free variable"
+                              ItemsSource="{Binding FreeVariables}" SelectedItem="{Binding FreeVariableSetting}"
+                              ToolTip="Choose which variable will be calculated by Slider Completionator.">
                     </ComboBox>
-                    <TextBox Margin="15 0 0 0" Width="258" Text="{Binding TimeCode}" Visibility="{Binding TimeCodeBoxVisibility}"
-                             Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Time code"
-                             ToolTip="Input a time code here. Example time code: 00:56:823 (1,2,1,2) - "/>
+
+                    <TextBox x:Name="TemporalBox" Margin="0,20,0,0"
+                         Text="{Binding Duration, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=-1}"
+                    Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Duration (beats)"
+                         Visibility="{Binding DurationBoxVisibility}"
+                         ToolTip="Wanted duration of the slider in beats. Input -1 for no change."/>
+                    <TextBox x:Name="EndTimeBox" Margin="0,20,0,0"
+                         Text="{Binding EndTime, Converter={StaticResource TimeToStringConverter}, ConverterParameter=-1}"
+                    Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="End time (ms)"
+                         Visibility="{Binding EndTimeBoxVisibility}"
+                         ToolTip="Wanted slider end time in milliseconds. Input -1 for no change. You can also input osu! timestamps like '00:56:823'."/>
+                    <TextBox x:Name="SpatialBox" Margin="0,20,0,0"
+                         Text="{Binding Length, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=-1}"
+                    Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Length (fraction of full path)"
+                         Visibility="{Binding LengthBoxVisibility}"
+                         ToolTip="Wanted length of the slider. This value represents a fraction of the complete path defined by the anchors, so '1' lets the slider end be exactly on the last anchor."/>
+                    <TextBox x:Name="VelocityBox" Margin="0,20,0,0"
+                         Text="{Binding SliderVelocity, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=-1}"
+                    Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Slider velocity multiplier"
+                         Visibility="{Binding VelocityBoxVisibility}"
+                         ToolTip="Wanted slider velocity multiplier of the inherited timing point. Input -1 for no change."/>
+
                 </StackPanel>
             </StackPanel>
 
