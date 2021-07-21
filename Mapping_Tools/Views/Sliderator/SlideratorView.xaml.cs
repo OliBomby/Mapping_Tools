@@ -693,8 +693,8 @@ namespace Mapping_Tools.Views.Sliderator {
                     clone.SliderVelocity = arg.RemoveSliderTicks ? double.NaN : -100;
                     
                     // Add redlines
-                    timingPointsChanges.Add(new TimingPointsChange(tpOn, mpb:true, unInherited:true, omitFirstBarLine:true, fuzzyness:0));
-                    timingPointsChanges.Add(new TimingPointsChange(tpAfter, mpb:true, unInherited:true, omitFirstBarLine:true, fuzzyness:0));
+                    timingPointsChanges.Add(new TimingPointsChange(tpOn, mpb: true, unInherited: true, omitFirstBarLine: true, fuzzyness: Precision.DOUBLE_EPSILON));
+                    timingPointsChanges.Add(new TimingPointsChange(tpAfter, mpb: true, unInherited: true, omitFirstBarLine: true, fuzzyness: Precision.DOUBLE_EPSILON));
 
                     clone.Time -= 1;
                 }
@@ -705,7 +705,7 @@ namespace Mapping_Tools.Views.Sliderator {
                         var tp = timing.GetTimingPointAtTime(ho.Time).Copy();
                         tp.MpB = sv;
                         tp.Offset = ho.Time;
-                        return new TimingPointsChange(tp, mpb: true, fuzzyness:0);
+                        return new TimingPointsChange(tp, mpb: true, fuzzyness: Precision.DOUBLE_EPSILON);
                     }));
 
                 TimingPointsChange.ApplyChanges(timing, timingPointsChanges);

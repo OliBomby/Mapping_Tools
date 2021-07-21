@@ -185,7 +185,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             tp.Offset = ho.Time;
             tp.Uninherited = false;
             tp.MpB = ho.SliderVelocity;
-            return new TimingPointsChange(tp, true);
+            return new TimingPointsChange(tp, true, fuzzyness: 0.4);
         }
 
         private static TimingPointsChange GetHitsoundChange(HitObject ho) {
@@ -627,7 +627,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
 
             // Add SliderVelocity changes for taiko and mania
             if (includePatternSliderVelocity && (targetMode == GameMode.Taiko || targetMode == GameMode.Mania)) {
-                timingPointsChanges.AddRange(svChanges.Select(tp => new TimingPointsChange(tp, mpb: true)));
+                timingPointsChanges.AddRange(svChanges.Select(tp => new TimingPointsChange(tp, mpb: true, fuzzyness: 0.4)));
             }
 
             // Add Kiai toggles
@@ -640,7 +640,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                     TimingPoint tp = ho.TimingPoint.Copy();
                     tp.Offset = ho.Time;
                     tp.MpB = ho.SliderVelocity;
-                    timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true));
+                    timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, fuzzyness: 0.4));
                 }
 
                 if (!IncludeHitsounds) {

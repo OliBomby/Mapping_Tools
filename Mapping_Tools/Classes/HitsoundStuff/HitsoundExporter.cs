@@ -37,7 +37,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
                 // Add red lines
                 var redlines = beatmap.BeatmapTiming.Redlines;
                 List<TimingPointsChange> timingPointsChanges = redlines.Select(tp =>
-                        new TimingPointsChange(tp, mpb: true, meter: true, unInherited: true, omitFirstBarLine: true))
+                        new TimingPointsChange(tp, mpb: true, meter: true, unInherited: true, omitFirstBarLine: true, fuzzyness: 0.4))
                     .ToList();
 
                 // Add hitsound stuff

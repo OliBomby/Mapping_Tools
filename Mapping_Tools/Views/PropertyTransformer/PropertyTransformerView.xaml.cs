@@ -94,7 +94,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                                     ? MathHelper.Clamp(newSV, 0.1, 10)
                                     : newSV; // Clip the value if specified
                                 tpchanger.MpB = -100 / newSV;
-                                timingPointsChanges.Add(new TimingPointsChange(tpchanger, mpb: true));
+                                timingPointsChanges.Add(new TimingPointsChange(tpchanger, mpb: true, fuzzyness: 0.4));
                             }
                         }
 

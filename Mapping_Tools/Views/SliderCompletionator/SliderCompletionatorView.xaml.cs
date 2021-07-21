@@ -133,7 +133,7 @@ namespace Mapping_Tools.Views.SliderCompletionator {
                         TimingPoint tp = ho.TimingPoint.Copy();
                         tp.Offset = ho.Time;
                         tp.MpB = ho.SliderVelocity;
-                        timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true));
+                        timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, fuzzyness: 0.4));
                     }
                 }
 
