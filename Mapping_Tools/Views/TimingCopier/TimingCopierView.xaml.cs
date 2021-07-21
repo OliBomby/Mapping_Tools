@@ -16,6 +16,7 @@ namespace Mapping_Tools.Views.TimingCopier {
     /// <summary>
     /// Interactielogica voor TimingCopierView.xaml
     /// </summary>
+    [VerticalContentScroll]
     public partial class TimingCopierView : ISavable<TimingCopierVm> {
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "timingcopierproject.json");
 

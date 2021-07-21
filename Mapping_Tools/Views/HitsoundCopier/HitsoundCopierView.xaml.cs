@@ -19,6 +19,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
     /// <summary>
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
+    [VerticalContentScroll]
     public partial class HitsoundCopierView : ISavable<HitsoundCopierVm> {
         public static readonly string ToolName = "Hitsound Copier";
 

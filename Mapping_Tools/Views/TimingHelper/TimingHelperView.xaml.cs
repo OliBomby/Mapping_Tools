@@ -20,6 +20,8 @@ namespace Mapping_Tools.Views.TimingHelper {
     /// Interactielogica voor TimingHelperView.xaml
     /// </summary>
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
+    [VerticalContentScroll]
+    [HorizontalContentScroll]
     public partial class TimingHelperView : IQuickRun, ISavable<TimingHelperVm> {
         public static readonly string ToolName = "Timing Helper";
 

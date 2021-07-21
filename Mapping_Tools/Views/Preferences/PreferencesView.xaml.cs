@@ -9,6 +9,8 @@ namespace Mapping_Tools.Views.Preferences
     /// <summary>
     /// Interaktionslogik für UserControl2.xaml
     /// </summary>
+    [VerticalContentScroll]
+    [HorizontalContentScroll]
     public partial class PreferencesView {
 
         public static readonly string ToolName = "Preferences";

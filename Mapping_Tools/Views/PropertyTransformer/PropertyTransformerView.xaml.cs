@@ -16,6 +16,8 @@ namespace Mapping_Tools.Views.PropertyTransformer {
     /// <summary>
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
+    [VerticalContentScroll]
+    [HorizontalContentScroll]
     public partial class PropertyTransformerView : ISavable<PropertyTransformerVm> {
         public static readonly string ToolName = "Property Transformer";
 

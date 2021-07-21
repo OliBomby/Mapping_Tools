@@ -22,6 +22,8 @@ namespace Mapping_Tools.Views.SliderMerger {
     ///     Interaktionslogik für UserControl1.xaml
     /// </summary>
     [SmartQuickRunUsage(SmartQuickRunTargets.MultipleSelection)]
+    [VerticalContentScroll]
+    [HorizontalContentScroll]
     public partial class SliderMergerView : IQuickRun, ISavable<SliderMergerVm> {
         public static readonly string ToolName = "Slider Merger";
 

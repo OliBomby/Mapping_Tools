@@ -123,7 +123,10 @@
                     </Grid>
                     <Separator Background="{DynamicResource MaterialDesignDivider}" Grid.Row="1" />
                     <Grid x:Name="ThirdGrid" Grid.Row="2">
-                        <ContentControl Margin="20" Name="content_views" Content="{Binding}"></ContentControl>
+
+                        <ScrollViewer x:Name="ContentScroller" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                            <ContentControl Margin="20" Name="content_views" Content="{Binding}"></ContentControl>
+                        </ScrollViewer>
 
                         <materialDesign:Snackbar x:Name="MainSnackbar" />
                     </Grid>

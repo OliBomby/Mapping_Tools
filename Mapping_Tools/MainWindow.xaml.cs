@@ -206,19 +206,31 @@ namespace Mapping_Tools {
         }
 
         public void SetCurrentView(object view) {
-            if( view == null )
+            if (view == null)
                 return;
 
             var type = view.GetType();
 
-            if( FindName("header") is TextBlock txt ) {
+            if (FindName("header") is TextBlock txt) {
                 txt.Text = type.GetCustomAttribute<DontShowTitleAttribute>() == null ? $"Mapping Tools - {ViewCollection.GetName(type)}" : "Mapping Tools";
             }
 
-            if( DataContext is MappingTool mt ) {
+            if (type.GetCustomAttribute<VerticalContentScrollAttribute>() != null) {
+                ContentScroller.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+            } else {
+                ContentScroller.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+            }
+
+            if (type.GetCustomAttribute<HorizontalContentScrollAttribute>() != null) {
+                ContentScroller.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
+            } else {
+                ContentScroller.HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
+            }
+
+            if (DataContext is MappingTool mt) {
                 mt.Deactivate();
             }
-            if( view is MappingTool nmt ) {
+            if (view is MappingTool nmt) {
                 nmt.Activate();
             }
 
@@ -339,7 +351,7 @@ namespace Mapping_Tools {
         }
 
         private void ViewChanged() {
-            if( !( FindName("ProjectMenu") is MenuItem projectMenu ) )
+            if (FindName("ProjectMenu") is not MenuItem projectMenu)
                 return;
 
             var isSavable = DataContext.GetType().GetInterfaces().Any(x =>
@@ -349,7 +361,7 @@ namespace Mapping_Tools {
             projectMenu.Visibility = Visibility.Collapsed;
             projectMenu.Items.Clear();
 
-            if( isSavable ) {
+            if (isSavable) {
                 projectMenu.Visibility = Visibility.Visible;
 
                 projectMenu.Items.Add(GetSaveProjectMenuItem());
@@ -357,10 +369,10 @@ namespace Mapping_Tools {
                 projectMenu.Items.Add(GetNewProjectMenuItem());
             }
 
-            if( DataContext is IHaveExtraProjectMenuItems havingExtraProjectMenuItems ) {
+            if (DataContext is IHaveExtraProjectMenuItems havingExtraProjectMenuItems) {
                 projectMenu.Visibility = Visibility.Visible;
 
-                foreach( var menuItem in havingExtraProjectMenuItems.GetMenuItems() ) {
+                foreach (var menuItem in havingExtraProjectMenuItems.GetMenuItems()) {
                     projectMenu.Items.Add(menuItem);
                 }
             }

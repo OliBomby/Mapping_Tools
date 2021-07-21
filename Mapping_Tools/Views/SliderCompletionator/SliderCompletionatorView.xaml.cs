@@ -19,6 +19,8 @@ namespace Mapping_Tools.Views.SliderCompletionator {
     /// Interaktionslogik für UserControl1.xaml
     /// </summary>
     [SmartQuickRunUsage(SmartQuickRunTargets.AnySelection)]
+    [VerticalContentScroll]
+    [HorizontalContentScroll]
     public partial class SliderCompletionatorView : IQuickRun, ISavable<SliderCompletionatorVm> {
         public event EventHandler RunFinished;
 

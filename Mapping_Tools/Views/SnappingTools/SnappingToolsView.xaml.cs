@@ -12,10 +12,8 @@ using Mapping_Tools.Classes.Tools.SnappingTools.Serialization;
 using Mapping_Tools.Viewmodels;
 using MaterialDesignThemes.Wpf;
 
-namespace Mapping_Tools.Views.SnappingTools
-{
-    public partial class SnappingToolsView : ISavable<SnappingToolsProject>, IHaveExtraProjectMenuItems
-    {
+namespace Mapping_Tools.Views.SnappingTools {
+    public partial class SnappingToolsView : ISavable<SnappingToolsProject>, IHaveExtraProjectMenuItems {
 
         public static readonly string ToolName = "Geometry Dashboard";
 

@@ -17,6 +17,8 @@ using Mapping_Tools.Viewmodels;
 
 namespace Mapping_Tools.Views.MapCleaner {
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
+    [VerticalContentScroll]
+    [HorizontalContentScroll]
     public partial class CleanerView : IQuickRun, ISavable<MapCleanerVm> {
         private List<double> _timingpointsRemoved;
         private List<double> _timingpointsAdded;
