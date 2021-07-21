@@ -284,58 +284,56 @@ namespace Mapping_Tools {
             }
         }
 
-        private void OpenGetCurrentBeatmap(object sender, RoutedEventArgs e) {
+        private async void OpenGetCurrentBeatmap(object sender, RoutedEventArgs e) {
             try {
-                string path = IOHelper.GetCurrentBeatmap();
-                if( path != "" ) {
+                string path = await Task.Run(() => IOHelper.GetCurrentBeatmap());
+                if (path != "") {
                     SetCurrentMaps(new[] { path });
                 }
-            }
-            catch( Exception ex ) {
+            } catch (Exception ex) {
                 ex.Show();
             }
         }
 
-        private void SaveBackup(object sender, RoutedEventArgs e) {
+        private async void SaveBackup(object sender, RoutedEventArgs e) {
             try {
                 var paths = GetCurrentMaps();
-                var result = BackupManager.SaveMapBackup(paths, true, "UB");  // UB stands for User Backup
-                if( result )
-                    Task.Factory.StartNew(() => MessageQueue.Enqueue($"Beatmap{( paths.Length == 1 ? "" : "s" )} successfully copied!"));
-            }
-            catch( Exception ex ) {
+                var result = await Task.Run(() => BackupManager.SaveMapBackup(paths, true, "UB"));  // UB stands for User Backup
+                if (result) {
+                    await Task.Run(() => MessageQueue.Enqueue($"Beatmap{( paths.Length == 1 ? "" : "s" )} successfully copied!"));
+                }
+            } catch (Exception ex) {
                 ex.Show();
             }
         }
 
-        private void LoadBackup(object sender, RoutedEventArgs e) {
+        private async void LoadBackup(object sender, RoutedEventArgs e) {
             try {
                 var paths = GetCurrentMaps();
-                if( paths.Length > 1 ) {
+                if (paths.Length > 1) {
                     throw new Exception($"Can't load backup into multiple beatmaps. You currently have {paths.Length} beatmaps selected.");
                 }
                 var backupPaths = IOHelper.BeatmapFileDialog(SettingsManager.GetBackupsPath(), false);
-                if( backupPaths.Length == 1 ) {
+                if (backupPaths.Length == 1) {
                     try {
-                        BackupManager.LoadMapBackup(backupPaths[0], paths[0], false);
-                    }
-                    catch( BeatmapIncompatibleException ex ) {
+                        await Task.Run(() => BackupManager.LoadMapBackup(backupPaths[0], paths[0], false));
+                    } catch (BeatmapIncompatibleException ex) {
                         var exResult = ex.Show();
-                        if( exResult == MessageBoxResult.Cancel )
+                        if (exResult == MessageBoxResult.Cancel) {
                             return;
+                        }
+
                         var result = MessageBox.Show("Do you want to load the backup anyways?", "Load backup",
                             MessageBoxButton.YesNo);
-                        if( result == MessageBoxResult.Yes ) {
-                            BackupManager.LoadMapBackup(backupPaths[0], paths[0], true);
-                        }
-                        else {
+                        if (result == MessageBoxResult.Yes) {
+                            await Task.Run(() => BackupManager.LoadMapBackup(backupPaths[0], paths[0], true));
+                        } else {
                             return;
                         }
                     }
-                    Task.Factory.StartNew(() => MessageQueue.Enqueue("Backup successfully loaded!"));
+                    await Task.Run(() => MessageQueue.Enqueue("Backup successfully loaded!"));
                 }
-            }
-            catch( Exception ex ) {
+            } catch (Exception ex) {
                 ex.Show();
             }
         }
@@ -445,11 +443,10 @@ namespace Mapping_Tools {
             System.Diagnostics.Process.Start("explorer.exe", "https://mappingtools.github.io");
         }
 
-        private void CoolSave(object sender, RoutedEventArgs e) {
+        private async void CoolSave(object sender, RoutedEventArgs e) {
             try {
-                EditorReaderStuff.BetterSave();
-            }
-            catch( Exception ex ) {
+                await Task.Run(() => EditorReaderStuff.BetterSave());
+            } catch (Exception ex) {
                 ex.Show();
             }
         }
