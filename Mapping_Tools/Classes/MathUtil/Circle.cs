@@ -68,12 +68,12 @@ namespace Mapping_Tools.Classes.MathUtil {
             double c = d2 * p1 - d1 * p2 - d2 * c1 + d1 * c2;
             double disc = r * r * ds - c * c;
 
-            if (disc <= -Precision.DOUBLE_EPSILON) {
+            if (disc <= -Precision.DOUBLE_EPSILON * 10) {
                 intersections = new Vector2[0];
                 return false;
             }
 
-            if (Math.Abs(disc) < Precision.DOUBLE_EPSILON) {
+            if (Math.Abs(disc) < Precision.DOUBLE_EPSILON * 10) {
                 intersections = new Vector2[1] { new Vector2(c * d2 / ds + c1, -c * d1 / ds + c2) };
                 return true;
             }
