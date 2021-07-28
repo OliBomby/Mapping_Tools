@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Classes.Tools;
@@ -15,6 +16,7 @@ namespace Mapping_Tools.Views.TimingCopier {
     /// <summary>
     /// Interactielogica voor TimingCopierView.xaml
     /// </summary>
+    [VerticalContentScroll]
     public partial class TimingCopierView : ISavable<TimingCopierVm> {
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "timingcopierproject.json");
 
@@ -97,7 +99,7 @@ namespace Mapping_Tools.Views.TimingCopier {
                 // Add redlines
                 var redlines = timingFrom.Redlines;
                 foreach (TimingPoint tp in redlines) {
-                    timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, meter: true, unInherited: true, omitFirstBarLine: true));
+                    timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, meter: true, unInherited: true, omitFirstBarLine: true, fuzzyness: Precision.DOUBLE_EPSILON));
                 }
 
                 // Apply timing changes

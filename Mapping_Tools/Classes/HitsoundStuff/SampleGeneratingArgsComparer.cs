@@ -15,7 +15,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 return false;
 
             if (UseSampleFile) {
-                if (x.GetExtension() == ".sf2" && y.GetExtension() == ".sf2") {
+                if (x.GetExtension().ToLower() == ".sf2" && y.GetExtension().ToLower() == ".sf2") {
                     return x.Path == y.Path &&
                            x.Bank == y.Bank &&
                            x.Patch == y.Patch &&
@@ -42,7 +42,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             var hashCode = 0x34894079;
             hashCode = hashCode * -0x5AAAAAD7 + EqualityComparer<string>.Default.GetHashCode(obj.Path);
             hashCode = hashCode * -0x5AAAAAD7 + obj.Volume.GetHashCode();
-            if (!UseSampleFile || obj.GetExtension() == ".sf2") {
+            if (!UseSampleFile || obj.GetExtension().ToLower() == ".sf2") {
                 hashCode = hashCode * -0x5AAAAAD7 + obj.Bank.GetHashCode();
                 hashCode = hashCode * -0x5AAAAAD7 + obj.Patch.GetHashCode();
                 hashCode = hashCode * -0x5AAAAAD7 + obj.Instrument.GetHashCode();

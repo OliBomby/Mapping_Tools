@@ -13,6 +13,7 @@ using Mapping_Tools.Classes.ToolHelpers;
 
 namespace Mapping_Tools.Views.AutoFailDetector {
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
+    [VerticalContentScroll]
     public partial class AutoFailDetectorView : IQuickRun {
         private List<double> _unloadingObjects;
         private List<double> _potentialUnloadingObjects;

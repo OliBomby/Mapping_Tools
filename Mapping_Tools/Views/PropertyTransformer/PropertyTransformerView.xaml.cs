@@ -16,6 +16,8 @@ namespace Mapping_Tools.Views.PropertyTransformer {
     /// <summary>
     /// Interactielogica voor HitsoundCopierView.xaml
     /// </summary>
+    [VerticalContentScroll]
+    [HorizontalContentScroll]
     public partial class PropertyTransformerView : ISavable<PropertyTransformerVm> {
         public static readonly string ToolName = "Property Transformer";
 
@@ -51,7 +53,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
 
             foreach (string path in vm.ExportPaths) {
                 Editor editor;
-                if (Path.GetExtension(path) == ".osb") {
+                if (Path.GetExtension(path).ToLower() == ".osb") {
                     editor = new StoryboardEditor(path);
                 } else {
                     editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader);
@@ -94,7 +96,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                                     ? MathHelper.Clamp(newSV, 0.1, 10)
                                     : newSV; // Clip the value if specified
                                 tpchanger.MpB = -100 / newSV;
-                                timingPointsChanges.Add(new TimingPointsChange(tpchanger, mpb: true));
+                                timingPointsChanges.Add(new TimingPointsChange(tpchanger, mpb: true, fuzzyness: 0.4));
                             }
                         }
 

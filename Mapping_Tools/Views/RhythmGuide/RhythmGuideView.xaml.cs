@@ -11,6 +11,7 @@ namespace Mapping_Tools.Views.RhythmGuide {
     /// <summary>
     /// Interactielogica voor RhythmGuideView.xaml
     /// </summary>
+    [VerticalContentScroll]
     public partial class RhythmGuideView : ISavable<RhythmGuideVm> {
         public static readonly string ToolName = "Rhythm Guide";
 

@@ -37,7 +37,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
                 // Add red lines
                 var redlines = beatmap.BeatmapTiming.Redlines;
                 List<TimingPointsChange> timingPointsChanges = redlines.Select(tp =>
-                        new TimingPointsChange(tp, mpb: true, meter: true, unInherited: true, omitFirstBarLine: true))
+                        new TimingPointsChange(tp, mpb: true, meter: true, unInherited: true, omitFirstBarLine: true, fuzzyness: 0.4))
                     .ToList();
 
                 // Add hitsound stuff
@@ -108,11 +108,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff
         private static bool IsCopyCompatible(SampleGeneratingArgs sampleGeneratingArgs, WaveFormatEncoding waveEncoding, SampleExportFormat exportFormat) {
             switch (exportFormat) {
                 case SampleExportFormat.WaveIeeeFloat:
-                    return waveEncoding == WaveFormatEncoding.IeeeFloat && sampleGeneratingArgs.GetExtension() == ".wav";
+                    return waveEncoding == WaveFormatEncoding.IeeeFloat && sampleGeneratingArgs.GetExtension().ToLower() == ".wav";
                 case SampleExportFormat.WavePcm:
-                    return waveEncoding == WaveFormatEncoding.Pcm && sampleGeneratingArgs.GetExtension() == ".wav";
+                    return waveEncoding == WaveFormatEncoding.Pcm && sampleGeneratingArgs.GetExtension().ToLower() == ".wav";
                 case SampleExportFormat.OggVorbis:
-                    return sampleGeneratingArgs.GetExtension() == ".ogg";
+                    return sampleGeneratingArgs.GetExtension().ToLower() == ".ogg";
                 default:
                     return true;
             }
@@ -152,7 +152,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
             var sourceWaveEncoding = sampleSoundGenerator.Wave.WaveFormat.Encoding;
 
             // Either if it is the blank sample or the source file is literally what the user wants to be exported
-            if (sampleSoundGenerator.BlankSample && sampleGeneratingArgs.GetExtension() == ".wav" || 
+            if (sampleSoundGenerator.BlankSample && sampleGeneratingArgs.GetExtension().ToLower() == ".wav" || 
                 sampleGeneratingArgs.CanCopyPaste && IsCopyCompatible(sampleGeneratingArgs, sourceWaveEncoding, format)) {
 
                 var dest = Path.Combine(exportFolder, name + sampleGeneratingArgs.GetExtension());

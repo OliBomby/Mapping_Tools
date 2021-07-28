@@ -111,7 +111,7 @@ namespace Mapping_Tools.Classes.Tools.MapCleanerStuff {
             // Add SliderVelocity changes for taiko and mania
             if (mode == GameMode.Taiko || mode == GameMode.Mania) {
                 foreach (TimingPoint tp in svChanges) {
-                    timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true));
+                    timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, fuzzyness: 0.4));
                 }
             }
             UpdateProgressBar(worker, 60);
@@ -129,7 +129,7 @@ namespace Mapping_Tools.Classes.Tools.MapCleanerStuff {
                     TimingPoint tp = ho.TimingPoint.Copy();
                     tp.Offset = ho.Time;
                     tp.MpB = ho.SliderVelocity;
-                    timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true));
+                    timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, fuzzyness: 0.4));
                 }
                 // Body hitsounds
                 bool vol = (ho.IsSlider && args.VolumeSliders) || (ho.IsSpinner && args.VolumeSpinners);

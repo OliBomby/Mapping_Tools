@@ -368,7 +368,7 @@
                                       SelectedValue="{Binding SampleSet, Mode=TwoWay, Converter={StaticResource SS2SConverter}}" 
                                       SelectedValuePath="Content" Cursor="Hand"
                                       ToolTip="Sample set of the default sample.">
-                                <ComboBoxItem Content="Auto" Cursor="Hand"/>
+                                <ComboBoxItem Content="None" Cursor="Hand"/>
                                 <ComboBoxItem Content="Normal" Cursor="Hand"/>
                                 <ComboBoxItem Content="Soft" Cursor="Hand"/>
                                 <ComboBoxItem Content="Drum" Cursor="Hand"/>
