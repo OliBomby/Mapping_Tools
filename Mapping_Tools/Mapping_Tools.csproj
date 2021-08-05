@@ -318,6 +318,10 @@
     <Page Update="Views\AutoFailDetector\AutoFailDetectorView.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="Views\MapsetMerger\MapsetMergerView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Views\ComboColourStudio\ComboColourStudioView.xaml">
       <SubType>Designer</SubType>
     </Page>
