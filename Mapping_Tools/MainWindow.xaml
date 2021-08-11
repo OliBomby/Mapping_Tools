@@ -9,7 +9,8 @@
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:viewmodels="clr-namespace:Mapping_Tools.Viewmodels"
     xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
-    xmlns:standard="clr-namespace:Mapping_Tools.Views.Standard" d:DataContext="{d:DesignInstance Type=viewmodels:MainWindowVm}"
+    xmlns:standard="clr-namespace:Mapping_Tools.Views.Standard"
+    d:DataContext="{d:DesignInstance Type=viewmodels:MainWindowVm}"
     mc:Ignorable="d"
     Title="Mapping Tools"
     ResizeMode="CanResize"
@@ -40,117 +41,118 @@
     </Window.Resources>
 
     <Grid x:Name="MasterGrid">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="35" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
+        <materialDesign:DialogHost
+            Identifier="RootDialog"
+            DialogTheme="Inherit"
+            SnackbarMessageQueue="{Binding ElementName=MainSnackbar, Path=MessageQueue}"
+            Style="{StaticResource MaterialDesignEmbeddedDialogHost}">
 
-            <Grid x:Name="FirstGrid" Grid.Row="0">
-                <StackPanel WindowChrome.IsHitTestVisibleInChrome="true" HorizontalAlignment="Left" Orientation="Horizontal">
-                    <materialDesign:ColorZone Width="24" Height="24" Margin="9,6,0,0" Mode="Inverted">
-                        <materialDesign:ColorZone.OpacityMask>
-                            <ImageBrush ImageSource="data/mt_logo_white_24.png" />
-                        </materialDesign:ColorZone.OpacityMask>
-                    </materialDesign:ColorZone>
-                    <TextBlock Name="header" Text="Mapping Tools" Foreground="{DynamicResource MaterialDesignBody}" Margin="8,11,0,0" FontWeight="Normal" />
-                </StackPanel>
-                <StackPanel WindowChrome.IsHitTestVisibleInChrome="true" HorizontalAlignment="Right" Orientation="Horizontal">
-                    <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowMinimize}" Click="MinimizeWin" Panel.ZIndex="1" Foreground="{DynamicResource MaterialDesignBody}" />
-                    <Button x:Name="toggle_button" Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowMaximize}" Click="ToggleWin" Foreground="{DynamicResource MaterialDesignBody}" />
-                    <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowCLose}" Click="CloseWin" Foreground="{DynamicResource MaterialDesignBody}">
-                        <Button.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem Header="_Exit without saving" Click="CloseWinNoSave"
-                                          ToolTip="Exits the program without saving any preferences or tool settings." />
-                            </ContextMenu>
-                        </Button.ContextMenu>
-                    </Button>
-                </StackPanel>
-            </Grid>
+            <materialDesign:DrawerHost
+                LeftDrawerCloseOnClickAway="True"
+                IsLeftDrawerOpen="{Binding DrawerOpen}">
+                <materialDesign:DrawerHost.LeftDrawerContent>
+                    <DockPanel MinWidth="220">
+                        <ToggleButton 
+                            WindowChrome.IsHitTestVisibleInChrome="true"
+                            Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
+                            DockPanel.Dock="Top"
+                            HorizontalAlignment="Right" 
+                            Margin="16"
+                            IsChecked="{Binding DrawerOpen}"/>
 
-            <materialDesign:DialogHost Grid.Row="1" Identifier="RootDialog"
-                                       SnackbarMessageQueue="{Binding ElementName=MainSnackbar, Path=MessageQueue}"
-                                       Style="{StaticResource MaterialDesignEmbeddedDialogHost}">
+                        <TextBox 
+                            x:Name="ToolSearchBox"
+                            Text="{Binding SearchKeyword, UpdateSourceTrigger=PropertyChanged}"
+                            DockPanel.Dock="Top"
+                            Margin="16, 4"
+                            Width="200"
+                            materialDesign:HintAssist.Hint="Search"
+                            materialDesign:HintAssist.IsFloating="True"
+                            materialDesign:TextFieldAssist.HasClearButton="True"
+                            materialDesign:TextFieldAssist.HasOutlinedTextField="True"
+                            materialDesign:TextFieldAssist.DecorationVisibility="Collapsed"
+                            materialDesign:TextFieldAssist.TextFieldCornerRadius="4">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Return" 
+                                    Command="{Binding GoToSearchResult}"/>
+                            </TextBox.InputBindings>
+                        </TextBox>
+
+                        <ListBox 
+                            x:Name="ToolsMenu" 
+                            Margin="0 16 0 16"
+                            SelectedIndex="{Binding SelectedPageIndex}"
+                            SelectedItem="{Binding SelectedPageItem, UpdateSourceTrigger=PropertyChanged}"
+                            ItemsSource="{Binding NavigationItems}"
+                            AutomationProperties.Name="ToolsMenu"
+                            Style="{StaticResource MaterialDesignListBox}">
+                            <ListBox.Resources>
+                                <Style TargetType="ScrollBar" BasedOn="{StaticResource MaterialDesignScrollBarMinimal}"/>
+                            </ListBox.Resources>
+                        </ListBox>
+                    </DockPanel>
+                </materialDesign:DrawerHost.LeftDrawerContent>
 
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="35" />
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
+                    <materialDesign:ColorZone
+                        Grid.Row="0"
+                        Padding="16"
+                        materialDesign:ShadowAssist.ShadowDepth="Depth2"
+                        Mode="PrimaryMid">
+                        <DockPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <ToggleButton
+                                    WindowChrome.IsHitTestVisibleInChrome="true"
+                                    x:Name="MenuToggleButton"
+                                    Style="{StaticResource MaterialDesignHamburgerToggleButton}"
+                                    Click="MenuToggleButton_OnClick"
+                                    IsChecked="{Binding DrawerOpen}"
+                                    AutomationProperties.Name="HamburgerToggleButton"/>
 
-                    <Grid x:Name="SecondGrid" Grid.Row="0">
-                        <Menu Foreground="{DynamicResource MaterialDesignBody}">
-                            <MenuItem Height="31" Header="_File" Padding="12,0,0,0" MinWidth="50">
-                                <MenuItem Header="_Open beatmap" Click="OpenBeatmap" Icon="{materialDesign:PackIcon Folder}"
-                                          ToolTip="Select the current beatmap with File Explorer." />
-                                <MenuItem Header="_Open current beatmap" Click="OpenGetCurrentBeatmap" Icon="{materialDesign:PackIcon RestoreFromTrash}"
-                                          ToolTip="Set the current beatmap to the selected beatmap in your osu! client." />
-                                <MenuItem Header="_Generate backup" Click="SaveBackup" Icon="{materialDesign:PackIcon Backup}"
-                                          ToolTip="Save a backup of the current beatmap to the backups folder." />
-                                <MenuItem Header="_Load backup" Click="LoadBackup" Icon="{materialDesign:PackIcon BackupRestore}"
-                                          ToolTip="Load a backup from the backups folder into the current beatmap." />
-                                <MenuItem Header="_BetterSave™ current beatmap" Click="CoolSave" Icon="{materialDesign:PackIcon ContentSave}"
-                                          ToolTip="Save the beatmap which is currently open in your osu! editor. BetterSave™ saves the beatmap just like the vanilla editor, but decimal values get rounded instead of truncated." />
-                            </MenuItem>
-                            <MenuItem x:Name="ToolsMenu" Height="31" Header="_Tools" Padding="12,0,0,0" MinWidth="65">
-                            </MenuItem>
-                            <MenuItem Height="31" Header="_Options" Padding="12,0,0,0" MinWidth="80">
-                                <MenuItem Header="_Get started" Click="ViewSelectMenuItemOnClick" Icon="{materialDesign:PackIcon ArrowRight}"
-                                          ToolTip="Open the Get Started page." />
-                                <MenuItem Header="_Preferences" Click="ViewSelectMenuItemOnClick" Icon="{materialDesign:PackIcon Settings}"
-                                          ToolTip="Open the Preferences page." />
-                                <MenuItem Header="_Open backups folder" Click="OpenBackups" Icon="{materialDesign:PackIcon FolderOpen}"
-                                          ToolTip="Open the backups folder." />
-                                <MenuItem Header="_Open Mapping Tools folder" Click="OpenConfig" Icon="{materialDesign:PackIcon FolderOpen}"
-                                          ToolTip="Open the Mapping Tools folder." />
-                            </MenuItem>
-                            <MenuItem Height="31" Header="_About" Padding="12,0,0,0" MinWidth="67">
-                                <MenuItem Header="_Check for updates" Click="MenuItem_OnClick" Icon="{materialDesign:PackIcon Update}"
-                                          ToolTip="Check if there are updates available." />
-                                <MenuItem Header="_Website" Click="OpenWebsite" Icon="{materialDesign:PackIcon OpenInBrowser}"
-                                          ToolTip="Open the official Mapping Tools website in your browser." />
-                                <MenuItem Header="_Github" Click="OpenGitHub" Icon="{materialDesign:PackIcon Github}"
-                                          ToolTip="Go to the Mapping Tools Github." />
-                                <MenuItem Header="_About" Click="OpenInfo" Icon="{materialDesign:PackIcon InfoCircle}"
-                                          ToolTip="Information about your Mapping Tools client and credits." />
-                            </MenuItem>
-                            <MenuItem x:Name="ProjectMenu" Visibility="Collapsed" Height="31" Header="_Project" Padding="12,0,0,0" MinWidth="67">
-                            </MenuItem>
-                        </Menu>
-                    </Grid>
-                    <Separator Background="{DynamicResource MaterialDesignDivider}" Grid.Row="1" />
-                    <Grid x:Name="ThirdGrid" Grid.Row="2">
+                            </StackPanel>
 
-                        <ScrollViewer x:Name="ContentScroller" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                            <ContentControl Margin="20" Name="content_views" Content="{Binding View}"></ContentControl>
-                        </ScrollViewer>
+                            <StackPanel DockPanel.Dock="Right" WindowChrome.IsHitTestVisibleInChrome="true" HorizontalAlignment="Right" Orientation="Horizontal">
+                                <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowMinimize}" Click="MinimizeWin" Panel.ZIndex="1" Foreground="{DynamicResource MaterialDesignBody}" />
+                                <Button x:Name="toggle_button" Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowMaximize}" Click="ToggleWin" Foreground="{DynamicResource MaterialDesignBody}" />
+                                <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowCLose}" Click="CloseWin" Foreground="{DynamicResource MaterialDesignBody}">
+                                    <Button.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="_Exit without saving" Click="CloseWinNoSave"
+                                              ToolTip="Exits the program without saving any preferences or tool settings." />
+                                        </ContextMenu>
+                                    </Button.ContextMenu>
+                                </Button>
+                            </StackPanel>
 
-                        <materialDesign:Snackbar x:Name="MainSnackbar" />
-                    </Grid>
-                    <materialDesign:ColorZone Mode="PrimaryDark" Grid.Row="3" Padding="10 10 10 0">
-                        <Grid x:Name="ForthGrid"
-                              ToolTip="This is the current beatmap. Most of the tools do their work on this beatmap.">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <Grid Grid.Column="0">
-                                <TextBlock Text="Current Map: " Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontWeight="Normal" />
-                            </Grid>
-                            <Grid Grid.Column="1">
-                                <TextBlock x:FieldModifier="public" Name="currentMap" Height="35" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" FontWeight="Normal" />
-                            </Grid>
-                            <TextBlock Grid.Column="2" Margin="2 0 0 0" Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}" Height="35" FontStyle="Italic"
-                                       Text="{Binding ElementName=currentMap, Path=Text, Converter={StaticResource MapPathStringToCountStringConverter}}" />
-                        </Grid>
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                FontSize="22"
+                                Margin="10 0"
+                                x:Name="currentMap"
+                                Text="Mapping Tools"/>
+                        </DockPanel>
                     </materialDesign:ColorZone>
+
+                    <ScrollViewer 
+                        Grid.Row="1"
+                        x:Name="ContentScroller" 
+                        VerticalScrollBarVisibility="{Binding VerticalContentScrollBarVisibility}" 
+                        HorizontalScrollBarVisibility="{Binding HorizontalContentScrollBarVisibility}">
+                        <ContentControl Margin="20" Name="content_views" Content="{Binding View}"></ContentControl>
+                    </ScrollViewer>
+
+                    <materialDesign:Snackbar 
+                        Grid.Row="1" 
+                        x:Name="MainSnackbar" 
+                        MessageQueue="{materialDesign:MessageQueue}" />
                 </Grid>
-            </materialDesign:DialogHost>
-        </Grid>
+            </materialDesign:DrawerHost>
+        </materialDesign:DialogHost>
         <Border Name="window_border" BorderThickness="1" Background="{x:Null}" BorderBrush="{DynamicResource PrimaryHueDarkBrush}" />
     </Grid>
 </Window>
