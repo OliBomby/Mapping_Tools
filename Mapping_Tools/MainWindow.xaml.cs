@@ -402,22 +402,22 @@ namespace Mapping_Tools {
 
         //Enable drag control of window and set icons when docked
         private void DragWin(object sender, MouseButtonEventArgs e) {
-            if( e.ChangedButton != MouseButton.Left )
+            if (e.ChangedButton != MouseButton.Left)
                 return;
 
-            if( WindowState == WindowState.Maximized ) {
+            if (WindowState == WindowState.Maximized) {
                 var point = PointToScreen(e.MouseDevice.GetPosition(this));
 
-                if( point.X <= RestoreBounds.Width / 2 )
+                if (point.X <= RestoreBounds.Width / 2)
                     Left = 0;
-                else if( point.X >= RestoreBounds.Width )
-                    Left = point.X - ( RestoreBounds.Width - ( ActualWidth - point.X ) );
+                else if (point.X >= RestoreBounds.Width)
+                    Left = point.X - (RestoreBounds.Width - (ActualWidth - point.X));
                 else
-                    Left = point.X - ( RestoreBounds.Width / 2 );
+                    Left = point.X - (RestoreBounds.Width / 2);
 
-                Top = point.Y - ( ( (FrameworkElement) sender ).ActualHeight / 2 );
+                Top = point.Y - (((FrameworkElement)sender).ActualHeight / 2);
             }
-            if( e.LeftButton == MouseButtonState.Pressed )
+            if (e.LeftButton == MouseButtonState.Pressed)
                 DragMove();
             //bt.Content = new PackIcon { Kind = PackIconKind.WindowRestore };
         }

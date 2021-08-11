@@ -1,6 +1,5 @@
 ﻿<Window
     StateChanged="Window_StateChanged"
-    MouseDown="DragWin"
     x:Class="Mapping_Tools.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -93,7 +92,7 @@
                     </DockPanel>
                 </materialDesign:DrawerHost.LeftDrawerContent>
 
-                <Grid>
+                <Grid MouseDown="DragWin">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
