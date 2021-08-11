@@ -9,7 +9,7 @@
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:viewmodels="clr-namespace:Mapping_Tools.Viewmodels"
     xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
-    xmlns:standard="clr-namespace:Mapping_Tools.Views.Standard"
+    xmlns:standard="clr-namespace:Mapping_Tools.Views.Standard" d:DataContext="{d:DesignInstance Type=viewmodels:MainWindowVm}"
     mc:Ignorable="d"
     Title="Mapping Tools"
     ResizeMode="CanResize"
@@ -125,7 +125,7 @@
                     <Grid x:Name="ThirdGrid" Grid.Row="2">
 
                         <ScrollViewer x:Name="ContentScroller" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                            <ContentControl Margin="20" Name="content_views" Content="{Binding}"></ContentControl>
+                            <ContentControl Margin="20" Name="content_views" Content="{Binding View}"></ContentControl>
                         </ScrollViewer>
 
                         <materialDesign:Snackbar x:Name="MainSnackbar" />

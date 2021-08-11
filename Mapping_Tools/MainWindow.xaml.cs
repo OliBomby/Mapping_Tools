@@ -3,6 +3,7 @@ using Mapping_Tools.Classes.Exceptions;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Updater;
+using Mapping_Tools.Viewmodels;
 using Mapping_Tools.Views;
 using Mapping_Tools.Views.Standard;
 using MaterialDesignThemes.Wpf;
@@ -23,6 +24,7 @@ namespace Mapping_Tools {
     public partial class MainWindow {
         private bool autoSave = true;
         private UpdaterWindow _updaterWindow;
+        private MainWindowVm ViewModel => (MainWindowVm)DataContext;
 
         public ViewCollection Views;
         public ListenerManager ListenerManager;
@@ -45,6 +47,8 @@ namespace Mapping_Tools {
                 HttpClient.DefaultRequestHeaders.Add("user-agent", "Mapping Tools");
 
                 InitializeComponent();
+
+                DataContext = new MainWindowVm();
 
                 MessageQueue = new SnackbarMessageQueue(TimeSpan.FromSeconds(2));
                 MainSnackbar.MessageQueue = MessageQueue;
@@ -166,9 +170,9 @@ namespace Mapping_Tools {
 
         private void Window_Closing(object sender, EventArgs e) {
             // Perform saving of settings at application exit
-            if( autoSave ) {
+            if (autoSave) {
                 Views.AutoSaveSettings();
-                if( DataContext is MappingTool mt ) {
+                if (ViewModel.View is MappingTool mt) {
                     mt.Dispose();
                 }
                 SettingsManager.UpdateSettings();
@@ -227,14 +231,14 @@ namespace Mapping_Tools {
                 ContentScroller.HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
             }
 
-            if (DataContext is MappingTool mt) {
+            if (ViewModel.View is MappingTool mt) {
                 mt.Deactivate();
             }
             if (view is MappingTool nmt) {
                 nmt.Activate();
             }
 
-            DataContext = view;
+            ViewModel.View = view;
             ViewChanged();
         }
 
@@ -263,7 +267,7 @@ namespace Mapping_Tools {
         }
 
         public object GetCurrentView() {
-            return DataContext;
+            return ViewModel.View;
         }
 
         public void SetCurrentMaps(string[] paths) {
@@ -354,7 +358,7 @@ namespace Mapping_Tools {
             if (FindName("ProjectMenu") is not MenuItem projectMenu)
                 return;
 
-            var isSavable = DataContext.GetType().GetInterfaces().Any(x =>
+            var isSavable = ViewModel.View.GetType().GetInterfaces().Any(x =>
                               x.IsGenericType &&
                               x.GetGenericTypeDefinition() == typeof(ISavable<>));
 
@@ -369,7 +373,7 @@ namespace Mapping_Tools {
                 projectMenu.Items.Add(GetNewProjectMenuItem());
             }
 
-            if (DataContext is IHaveExtraProjectMenuItems havingExtraProjectMenuItems) {
+            if (ViewModel.View is IHaveExtraProjectMenuItems havingExtraProjectMenuItems) {
                 projectMenu.Visibility = Visibility.Visible;
 
                 foreach (var menuItem in havingExtraProjectMenuItems.GetMenuItems()) {
@@ -412,23 +416,23 @@ namespace Mapping_Tools {
         }
 
         private void LoadProject(object sender, RoutedEventArgs e) {
-            if( !ProjectManager.IsSavable(DataContext) )
+            if (!ProjectManager.IsSavable(ViewModel.View))
                 return;
-            dynamic data = DataContext;
+            dynamic data = ViewModel.View;
             ProjectManager.LoadProject(data, true);
         }
 
         private void SaveProject(object sender, RoutedEventArgs e) {
-            if( !ProjectManager.IsSavable(DataContext) )
+            if (!ProjectManager.IsSavable(ViewModel.View))
                 return;
-            dynamic data = DataContext;
+            dynamic data = ViewModel.View;
             ProjectManager.SaveProject(data, true);
         }
 
         private void NewProject(object sender, RoutedEventArgs e) {
-            if( !ProjectManager.IsSavable(DataContext) )
+            if (!ProjectManager.IsSavable(ViewModel.View))
                 return;
-            dynamic data = DataContext;
+            dynamic data = ViewModel.View;
             ProjectManager.NewProject(data, true);
         }
 
