@@ -167,8 +167,6 @@ namespace Mapping_Tools {
             }
         }
 
-        private void MenuToggleButton_OnClick(object sender, RoutedEventArgs e) => ToolSearchBox.Focus();
-
         //Close window
         private void CloseWin(object sender, RoutedEventArgs e) {
             Close();

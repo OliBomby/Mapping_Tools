@@ -13,6 +13,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 
 namespace Mapping_Tools.Viewmodels {
     public class MainWindowVm : BindableBase {
@@ -103,6 +104,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public CommandImplementation GoToSearchResult { get; }
+        public CommandImplementation ToggleNavigationDrawer { get; }
 
         public MainWindowVm() {
             projectMenuItems = new ObservableCollection<MenuItem>();
@@ -121,6 +123,10 @@ namespace Mapping_Tools.Viewmodels {
                 if (string.IsNullOrEmpty(name)) return;
                 SetCurrentView(name);
                 SearchKeyword = string.Empty;
+            });
+
+            ToggleNavigationDrawer = new CommandImplementation(p => {
+                DrawerOpen = !DrawerOpen;
             });
         }
 

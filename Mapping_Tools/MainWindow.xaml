@@ -39,7 +39,14 @@
         </DataTemplate>
     </Window.Resources>
 
-    <Grid x:Name="MasterGrid">
+    <Window.InputBindings>
+        <KeyBinding 
+            Key="K" 
+            Modifiers="Ctrl"
+            Command="{Binding ToggleNavigationDrawer}" />
+    </Window.InputBindings>
+
+    <Grid x:Name="MasterGrid">      
         <materialDesign:DialogHost
             Identifier="RootDialog"
             DialogTheme="Inherit"
@@ -65,6 +72,7 @@
                             DockPanel.Dock="Top"
                             Margin="16, 4"
                             Width="200"
+                            domain:FocusExtension.IsFocused="{Binding DrawerOpen}"
                             materialDesign:HintAssist.Hint="Search"
                             materialDesign:HintAssist.IsFloating="True"
                             materialDesign:TextFieldAssist.HasClearButton="True"
@@ -99,21 +107,27 @@
                     </Grid.RowDefinitions>
                     <materialDesign:ColorZone
                         Grid.Row="0"
-                        Padding="16"
+                        Padding="0"
+                        Height="48"
                         materialDesign:ShadowAssist.ShadowDepth="Depth2"
                         Mode="PrimaryMid">
                         <DockPanel>
                             <StackPanel Orientation="Horizontal">
                                 <ToggleButton
-                                    WindowChrome.IsHitTestVisibleInChrome="true"
                                     x:Name="MenuToggleButton"
+                                    WindowChrome.IsHitTestVisibleInChrome="true"
+                                    VerticalAlignment="Center"
+                                    Margin="16 0"
                                     Style="{StaticResource MaterialDesignHamburgerToggleButton}"
-                                    Click="MenuToggleButton_OnClick"
                                     IsChecked="{Binding DrawerOpen}"
-                                    AutomationProperties.Name="HamburgerToggleButton"/>
+                                    AutomationProperties.Name="HamburgerToggleButton"
+                                    ToolTip="Use Ctrl+K to use this toggle anywhere in the program."/>
 
                                 <Menu 
                                     WindowChrome.IsHitTestVisibleInChrome="true" 
+                                    IsMainMenu="True"
+                                    Background="{DynamicResource PrimaryHueMidBrush}"
+                                    Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
                                     Margin="20 0 0 0">
                                     <MenuItem Header="_File" MinWidth="50">
                                         <MenuItem Header="_Open beatmap" Click="OpenBeatmap" Icon="{materialDesign:PackIcon Folder}"
@@ -127,6 +141,7 @@
                                         <MenuItem Header="_BetterSave™ current beatmap" Click="CoolSave" Icon="{materialDesign:PackIcon ContentSave}"
                                           ToolTip="Save the beatmap which is currently open in your osu! editor. BetterSave™ saves the beatmap just like the vanilla editor, but decimal values get rounded instead of truncated." />
                                     </MenuItem>
+                                    <Separator/>
                                     <MenuItem Header="_About" MinWidth="67">
                                         <MenuItem Header="_About" Click="OpenInfo" Icon="{materialDesign:PackIcon InfoCircle}"/>
                                         <MenuItem Header="_Website" Click="OpenWebsite" Icon="{materialDesign:PackIcon OpenInBrowser}"
@@ -140,15 +155,30 @@
                                         <MenuItem Header="_Check for updates" Click="MenuItem_OnClick" Icon="{materialDesign:PackIcon Update}"
                                           ToolTip="Check if there are updates available." />
                                     </MenuItem>
-                                    <MenuItem Visibility="{Binding ProjectMenuVisibility}" Header="_Project" MinWidth="67">
-                                    </MenuItem>
+                                    <MenuItem Visibility="{Binding ProjectMenuVisibility}" Header="_Project" MinWidth="67" ItemsSource="{Binding ProjectMenuItems}"/>
                                 </Menu>
+
                             </StackPanel>
 
-                            <StackPanel DockPanel.Dock="Right" WindowChrome.IsHitTestVisibleInChrome="true" HorizontalAlignment="Right" Orientation="Horizontal">
-                                <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowMinimize}" Click="MinimizeWin" Panel.ZIndex="1" Foreground="{DynamicResource MaterialDesignBody}" />
-                                <Button x:Name="toggle_button" Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowMaximize}" Click="ToggleWin" Foreground="{DynamicResource MaterialDesignBody}" />
-                                <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowCLose}" Click="CloseWin" Foreground="{DynamicResource MaterialDesignBody}">
+                            <StackPanel DockPanel.Dock="Right"  
+                                        Panel.ZIndex="5" 
+                                        WindowChrome.IsHitTestVisibleInChrome="true" 
+                                        HorizontalAlignment="Right" 
+                                        VerticalAlignment="Top"
+                                        Orientation="Horizontal">
+                                <Button Style="{DynamicResource MaterialDesignFlatButton}" 
+                                        Content="{materialDesign:PackIcon WindowMinimize}" 
+                                        Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
+                                        Click="MinimizeWin" />
+                                <Button x:Name="toggle_button" 
+                                        Style="{DynamicResource MaterialDesignFlatButton}" 
+                                        Content="{materialDesign:PackIcon WindowMaximize}" 
+                                        Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
+                                        Click="ToggleWin" />
+                                <Button Style="{DynamicResource MaterialDesignFlatButton}" 
+                                        Content="{materialDesign:PackIcon WindowCLose}" 
+                                        Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
+                                        Click="CloseWin">
                                     <Button.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem Header="_Exit without saving" Click="CloseWinNoSave"
@@ -158,16 +188,15 @@
                                 </Button>
                             </StackPanel>
 
-                            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                                
 
-                                <TextBlock
-                                VerticalAlignment="Center"
-                                FontSize="22"
-                                Margin="10 0"
-                                x:Name="currentMap"
-                                Text="Mapping Tools"/>
-                            </StackPanel>
+                            <TextBlock
+                                    VerticalAlignment="Center"
+                                    FontSize="22"
+                                    Margin="10 0"
+                                    TextWrapping="NoWrap"
+                                    TextTrimming="CharacterEllipsis"
+                                    x:Name="currentMap"
+                                    Text="Mapping Tools Mapping Tools Mapping Tools Mapping Tools Mapping Tools Mapping Tools Mapping Tools Mapping Tools "/>
                         </DockPanel>
                     </materialDesign:ColorZone>
 
