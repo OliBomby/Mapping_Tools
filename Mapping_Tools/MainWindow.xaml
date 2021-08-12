@@ -112,6 +112,37 @@
                                     IsChecked="{Binding DrawerOpen}"
                                     AutomationProperties.Name="HamburgerToggleButton"/>
 
+                                <Menu 
+                                    WindowChrome.IsHitTestVisibleInChrome="true" 
+                                    Margin="20 0 0 0">
+                                    <MenuItem Header="_File" MinWidth="50">
+                                        <MenuItem Header="_Open beatmap" Click="OpenBeatmap" Icon="{materialDesign:PackIcon Folder}"
+                                          ToolTip="Select the current beatmap with File Explorer." />
+                                        <MenuItem Header="_Open current beatmap" Click="OpenGetCurrentBeatmap" Icon="{materialDesign:PackIcon RestoreFromTrash}"
+                                          ToolTip="Set the current beatmap to the selected beatmap in your osu! client." />
+                                        <MenuItem Header="_Generate backup" Click="SaveBackup" Icon="{materialDesign:PackIcon Backup}"
+                                          ToolTip="Save a backup of the current beatmap to the backups folder." />
+                                        <MenuItem Header="_Load backup" Click="LoadBackup" Icon="{materialDesign:PackIcon BackupRestore}"
+                                          ToolTip="Load a backup from the backups folder into the current beatmap." />
+                                        <MenuItem Header="_BetterSave™ current beatmap" Click="CoolSave" Icon="{materialDesign:PackIcon ContentSave}"
+                                          ToolTip="Save the beatmap which is currently open in your osu! editor. BetterSave™ saves the beatmap just like the vanilla editor, but decimal values get rounded instead of truncated." />
+                                    </MenuItem>
+                                    <MenuItem Header="_About" MinWidth="67">
+                                        <MenuItem Header="_About" Click="OpenInfo" Icon="{materialDesign:PackIcon InfoCircle}"/>
+                                        <MenuItem Header="_Website" Click="OpenWebsite" Icon="{materialDesign:PackIcon OpenInBrowser}"
+                                          ToolTip="Open the official Mapping Tools website in your browser." />
+                                        <MenuItem Header="_Github" Click="OpenGitHub" Icon="{materialDesign:PackIcon Github}"
+                                          ToolTip="Go to the Mapping Tools Github." />
+                                        <MenuItem Header="_Open backups folder" Click="OpenBackups" Icon="{materialDesign:PackIcon FolderOpen}"
+                                          ToolTip="Open the backups folder." />
+                                        <MenuItem Header="_Open Mapping Tools folder" Click="OpenConfig" Icon="{materialDesign:PackIcon FolderOpen}"
+                                          ToolTip="Open the Mapping Tools folder." />
+                                        <MenuItem Header="_Check for updates" Click="MenuItem_OnClick" Icon="{materialDesign:PackIcon Update}"
+                                          ToolTip="Check if there are updates available." />
+                                    </MenuItem>
+                                    <MenuItem Visibility="{Binding ProjectMenuVisibility}" Header="_Project" MinWidth="67">
+                                    </MenuItem>
+                                </Menu>
                             </StackPanel>
 
                             <StackPanel DockPanel.Dock="Right" WindowChrome.IsHitTestVisibleInChrome="true" HorizontalAlignment="Right" Orientation="Horizontal">
@@ -127,13 +158,16 @@
                                 </Button>
                             </StackPanel>
 
-                            <TextBlock
-                                HorizontalAlignment="Center"
+                            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                                
+
+                                <TextBlock
                                 VerticalAlignment="Center"
                                 FontSize="22"
                                 Margin="10 0"
                                 x:Name="currentMap"
                                 Text="Mapping Tools"/>
+                            </StackPanel>
                         </DockPanel>
                     </materialDesign:ColorZone>
 
