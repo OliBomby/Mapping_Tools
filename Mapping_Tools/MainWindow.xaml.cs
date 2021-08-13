@@ -46,14 +46,14 @@ namespace Mapping_Tools {
 
                 InitializeComponent();
 
+                Setup();
+                SettingsManager.LoadConfig();
+                ListenerManager = new ListenerManager();
+
                 DataContext = new MainWindowVm();
 
                 MessageQueue = new SnackbarMessageQueue(TimeSpan.FromSeconds(2));
                 MainSnackbar.MessageQueue = MessageQueue;
-
-                Setup();
-                SettingsManager.LoadConfig();
-                ListenerManager = new ListenerManager();
 
                 if (SettingsManager.Settings.MainWindowRestoreBounds.HasValue) {
                     SetToRect(SettingsManager.Settings.MainWindowRestoreBounds.Value);
@@ -199,17 +199,17 @@ namespace Mapping_Tools {
         }
 
         public void SetCurrentMaps(string[] paths) {
-            currentMap.Text = string.Join("|", paths);
+            ViewModel.CurrentBeatmaps = string.Join("|", paths);
             SettingsManager.AddRecentMap(paths, DateTime.Now);
         }
 
         public void SetCurrentMapsString(string paths) {
-            currentMap.Text = paths;
+            ViewModel.CurrentBeatmaps = paths;
             SettingsManager.AddRecentMap(paths.Split('|'), DateTime.Now);
         }
 
         public string[] GetCurrentMaps() {
-            return currentMap.Text.Split('|');
+            return ViewModel.CurrentBeatmaps.Split('|');
         }
 
         public string GetCurrentMapsString() {

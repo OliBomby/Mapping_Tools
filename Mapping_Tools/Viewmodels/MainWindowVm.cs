@@ -103,8 +103,11 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref navigationItems, value);
         }
 
-        public CommandImplementation GoToSearchResult { get; }
-        public CommandImplementation ToggleNavigationDrawer { get; }
+        private string currentBeatmaps;
+        public string CurrentBeatmaps {
+            get => currentBeatmaps;
+            set => Set(ref currentBeatmaps, value);
+        }
 
         public MainWindowVm() {
             projectMenuItems = new ObservableCollection<MenuItem>();
@@ -129,6 +132,9 @@ namespace Mapping_Tools.Viewmodels {
                 DrawerOpen = !DrawerOpen;
             });
         }
+
+        public CommandImplementation GoToSearchResult { get; }
+        public CommandImplementation ToggleNavigationDrawer { get; }
 
         private ObservableCollection<FrameworkElement> GenerateNavigationItems() {
             var tools = ViewCollection.GetAllToolTypes()

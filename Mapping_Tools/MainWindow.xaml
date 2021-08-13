@@ -34,6 +34,7 @@
 
     <Window.Resources>
         <domain:MapPathStringToCountStringConverter x:Key="MapPathStringToCountStringConverter" />
+        <domain:MapPathStringAddNewLinesConverter x:Key="MapPathStringAddNewLinesConverter" />
         <DataTemplate DataType="{x:Type viewmodels:StandardVm}">
             <standard:StandardView DataContext="{Binding}" />
         </DataTemplate>
@@ -157,7 +158,6 @@
                                     </MenuItem>
                                     <MenuItem Visibility="{Binding ProjectMenuVisibility}" Header="_Project" MinWidth="67" ItemsSource="{Binding ProjectMenuItems}"/>
                                 </Menu>
-
                             </StackPanel>
 
                             <StackPanel DockPanel.Dock="Right"  
@@ -188,15 +188,45 @@
                                 </Button>
                             </StackPanel>
 
-
-                            <TextBlock
-                                    VerticalAlignment="Center"
-                                    FontSize="22"
-                                    Margin="10 0"
-                                    TextWrapping="NoWrap"
-                                    TextTrimming="CharacterEllipsis"
-                                    x:Name="currentMap"
-                                    Text="Mapping Tools Mapping Tools Mapping Tools Mapping Tools Mapping Tools Mapping Tools Mapping Tools Mapping Tools "/>
+                            <materialDesign:ColorZone
+                                WindowChrome.IsHitTestVisibleInChrome="true" 
+                                ToolTip="{Binding CurrentBeatmaps, Converter={StaticResource MapPathStringAddNewLinesConverter}}"
+                                VerticalAlignment="Center"
+                                Margin="10 0"
+                                CornerRadius="2"
+                                Padding="8"
+                                Mode="PrimaryDark">
+                                <materialDesign:ColorZone.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="_Open beatmap" Click="OpenBeatmap" Icon="{materialDesign:PackIcon Folder}"
+                                          ToolTip="Select the current beatmap with File Explorer." />
+                                        <MenuItem Header="_Open current beatmap" Click="OpenGetCurrentBeatmap" Icon="{materialDesign:PackIcon RestoreFromTrash}"
+                                          ToolTip="Set the current beatmap to the selected beatmap in your osu! client." />
+                                        <MenuItem Header="_Generate backup" Click="SaveBackup" Icon="{materialDesign:PackIcon Backup}"
+                                          ToolTip="Save a backup of the current beatmap to the backups folder." />
+                                        <MenuItem Header="_Load backup" Click="LoadBackup" Icon="{materialDesign:PackIcon BackupRestore}"
+                                          ToolTip="Load a backup from the backups folder into the current beatmap." />
+                                        <MenuItem Header="_BetterSave™ current beatmap" Click="CoolSave" Icon="{materialDesign:PackIcon ContentSave}"
+                                          ToolTip="Save the beatmap which is currently open in your osu! editor. BetterSave™ saves the beatmap just like the vanilla editor, but decimal values get rounded instead of truncated." />
+                                    </ContextMenu>
+                                </materialDesign:ColorZone.ContextMenu>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock 
+                                        Grid.Column="0"
+                                        Name="currentMaps" 
+                                        HorizontalAlignment="Right"
+                                        TextWrapping="NoWrap" 
+                                        TextTrimming="None" 
+                                        FontWeight="Normal" 
+                                        Text="{Binding CurrentBeatmaps}"/>
+                                    <TextBlock Grid.Column="1" Margin="2 0 0 0" FontStyle="Italic" FontWeight="ExtraBold"
+                                       Text="{Binding CurrentBeatmaps, Converter={StaticResource MapPathStringToCountStringConverter}}" />
+                                </Grid>
+                            </materialDesign:ColorZone>                            
                         </DockPanel>
                     </materialDesign:ColorZone>
 
