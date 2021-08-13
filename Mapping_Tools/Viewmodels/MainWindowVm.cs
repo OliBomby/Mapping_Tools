@@ -148,15 +148,15 @@ namespace Mapping_Tools.Viewmodels {
             collection.Add(new Separator());
 
             foreach (var tool in tools) {
-                collection.Add(CreateNavigationItem(tool));
+                collection.Add(CreateNavigationItem(tool, 2));
             }
 
             return collection;
         }
 
-        private ListBoxItem CreateNavigationItem(Type type) {
+        private ListBoxItem CreateNavigationItem(Type type, double verticalMargin=4) {
             var name = ViewCollection.GetName(type);
-            var content = new TextBlock { Text = name, Margin = new Thickness(10, 4, 0, 4) };
+            var content = new TextBlock { Text = name, Margin = new Thickness(10, verticalMargin, 0, verticalMargin) };
             var item = new ListBoxItem { Tag = name, ToolTip = $"Open {name}.", Content = content };
             return item;
         }
