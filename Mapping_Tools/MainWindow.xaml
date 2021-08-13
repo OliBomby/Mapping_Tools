@@ -128,8 +128,7 @@
                                     WindowChrome.IsHitTestVisibleInChrome="true" 
                                     IsMainMenu="True"
                                     Background="{DynamicResource PrimaryHueMidBrush}"
-                                    Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
-                                    Margin="20 0 0 0">
+                                    Foreground="{DynamicResource PrimaryHueMidForegroundBrush}">
                                     <MenuItem Header="_File" MinWidth="50">
                                         <MenuItem Header="_Open beatmap" Click="OpenBeatmap" Icon="{materialDesign:PackIcon Folder}"
                                           ToolTip="Select the current beatmap with File Explorer." />
