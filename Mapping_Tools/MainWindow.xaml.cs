@@ -8,6 +8,7 @@ using Mapping_Tools.Views;
 using MaterialDesignThemes.Wpf;
 using System;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Security.Principal;
@@ -209,7 +210,13 @@ namespace Mapping_Tools {
         }
 
         public string[] GetCurrentMaps() {
-            return ViewModel.CurrentBeatmaps.Split('|');
+            var maps = ViewModel.CurrentBeatmaps.Split('|');
+            
+            if (maps.Any(o => !File.Exists(o))) {
+                MessageQueue.Enqueue("It seems like one of the selected beatmaps does not exist. Please re-select the file with 'File > Open beatmap'.", true);
+            }
+
+            return maps;
         }
 
         public string GetCurrentMapsString() {
