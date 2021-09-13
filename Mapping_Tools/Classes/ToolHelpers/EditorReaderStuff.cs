@@ -46,7 +46,7 @@ namespace Mapping_Tools.Classes.ToolHelpers {
         /// <returns></returns>
         /// <exception cref="EditorReaderDisabledException"></exception>
         /// <exception cref="InvalidEditorReaderStateException"></exception>
-        public static EditorReader GetFullEditorReader() {
+        public static EditorReader GetFullEditorReader(bool autoDeStack = true) {
             if (!SettingsManager.Settings.UseEditorReader) {
                 throw new EditorReaderDisabledException();
             }
@@ -54,6 +54,10 @@ namespace Mapping_Tools.Classes.ToolHelpers {
             if (!IsEditorOpen()) {
                 throw new Exception("No active editor detected.");
             }
+
+            var reader = GetEditorReader();
+
+            reader.autoDeStack = autoDeStack;
 
             /*editorReader.FetchEditor();
             editorReader.SetHOM();
@@ -65,31 +69,31 @@ namespace Mapping_Tools.Classes.ToolHelpers {
             editorReader.ReadObjects();
             editorReader.FetchBookmarks();*/
 
-            editorReader.FetchAll();
+            reader.FetchAll();
 
-            var removed = FixFullReader(editorReader);
+            var removed = FixFullReader(reader);
             if (removed > 1) {
-                LogEditorReader(editorReader);
+                LogEditorReader(reader);
                 throw new InvalidEditorReaderStateException();
             }
 
-            var valid = ValidateFullReader(editorReader);
+            var valid = ValidateFullReader(reader);
             if (!valid) {
-                LogEditorReader(editorReader);
+                LogEditorReader(reader);
                 throw new InvalidEditorReaderStateException();
             }
 
-            return editorReader;
+            return reader;
         }
 
-        public static EditorReader GetFullEditorReaderOrNot() {
-            return GetFullEditorReaderOrNot(out _);
+        public static EditorReader GetFullEditorReaderOrNot(bool autoDeStack = true) {
+            return GetFullEditorReaderOrNot(out _, autoDeStack);
         }
 
-        public static EditorReader GetFullEditorReaderOrNot(out Exception exception) {
+        public static EditorReader GetFullEditorReaderOrNot(out Exception exception, bool autoDeStack = true) {
             exception = null;
             try {
-                return GetFullEditorReader();
+                return GetFullEditorReader(autoDeStack);
             } catch (Exception ex) {
                 exception = ex;
                 return null;
