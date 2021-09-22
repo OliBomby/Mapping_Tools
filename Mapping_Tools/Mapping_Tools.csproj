@@ -363,6 +363,10 @@
     <Page Update="Views\SliderCompletionator\SliderCompletionatorView.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="Views\SliderInvisiblator\SliderInvisiblatorView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Views\SliderMerger\SliderMergerView.xaml">
       <SubType>Designer</SubType>
     </Page>
