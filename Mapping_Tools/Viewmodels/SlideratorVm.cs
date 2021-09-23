@@ -44,6 +44,7 @@ namespace Mapping_Tools.Viewmodels {
         private bool _delegateToBpm;
         private bool _removeSliderTicks;
         private bool _exportAsStream;
+        private bool _exportAsInvisibleSlider;
 
         #region Properties
 
@@ -219,8 +220,12 @@ namespace Mapping_Tools.Viewmodels {
                 if (ExportAsStream) {
                     return (long) (GraphBeats * BeatSnapDivisor) + 1;
                 }
+                if (ExportAsInvisibleSlider) {
+                    var timeLength = (long)(GraphBeats / BeatsPerMinute * 60000);
+                    return 15 + 5 * (timeLength - 1);
+                }
                 var newLength = NewVelocity * 100 * GlobalSv * GraphBeats;
-                return (long) ((newLength - DistanceTraveled) / MinDendrite + DistanceTraveled / 10);
+                return (long) ((newLength - DistanceTraveled) / MinDendrite * 2 + DistanceTraveled / 10);
             }
         }
 
@@ -238,6 +243,15 @@ namespace Mapping_Tools.Viewmodels {
             get => _exportAsStream;
             set {
                 if (Set(ref _exportAsStream, value)) {
+                    RaisePropertyChanged(nameof(ExpectedSegments));
+                }
+            }
+        }
+
+        public bool ExportAsInvisibleSlider {
+            get => _exportAsInvisibleSlider;
+            set {
+                if (Set(ref _exportAsInvisibleSlider, value)) {
                     RaisePropertyChanged(nameof(ExpectedSegments));
                 }
             }
