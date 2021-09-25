@@ -43,6 +43,7 @@ namespace Mapping_Tools.Viewmodels {
         private double _distanceTraveled;
         private bool _delegateToBpm;
         private bool _removeSliderTicks;
+        private bool _exportAsNormal;
         private bool _exportAsStream;
         private bool _exportAsInvisibleSlider;
 
@@ -122,10 +123,7 @@ namespace Mapping_Tools.Viewmodels {
         [JsonIgnore]
         public double SvGraphMultiplier {
             get => _svGraphMultiplier;
-            set {
-                if (Set(ref _svGraphMultiplier, value)) {
-                }
-            }
+            set => Set(ref _svGraphMultiplier, value);
         }
 
         public ImportMode ImportModeSetting {
@@ -222,7 +220,7 @@ namespace Mapping_Tools.Viewmodels {
                 }
                 if (ExportAsInvisibleSlider) {
                     var timeLength = (long)(GraphBeats / BeatsPerMinute * 60000);
-                    return 15 + 5 * (timeLength - 1);
+                    return 16 + 7 * (timeLength - 1);
                 }
                 var newLength = NewVelocity * 100 * GlobalSv * GraphBeats;
                 return (long) ((newLength - DistanceTraveled) / MinDendrite * 2 + DistanceTraveled / 10);
@@ -237,6 +235,15 @@ namespace Mapping_Tools.Viewmodels {
         public bool RemoveSliderTicks {
             get => _removeSliderTicks;
             set => Set(ref _removeSliderTicks, value);
+        }
+
+        public bool ExportAsNormal {
+            get => _exportAsNormal;
+            set {
+                if (Set(ref _exportAsNormal, value)) {
+                    RaisePropertyChanged(nameof(ExpectedSegments));
+                }
+            }
         }
 
         public bool ExportAsStream {
@@ -306,6 +313,7 @@ namespace Mapping_Tools.Viewmodels {
             ExportAsStream = false;
             DoEditorRead = false;
             Quick = false;
+            ExportAsNormal = true;
 
             ImportCommand = new CommandImplementation(_ => Import(ImportModeSetting == ImportMode.Selected ? 
                 IOHelper.GetCurrentBeatmapOrCurrentBeatmap() : 

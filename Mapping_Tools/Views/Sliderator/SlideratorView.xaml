@@ -13,8 +13,24 @@
              Loaded="SlideratorView_OnLoaded"
              d:DesignHeight="450" Width="759.5" d:DataContext="{d:DesignData SlideratorVm}">
     <local:SingleRunMappingTool.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisConverter"/>
         <domain:DoubleToStringConverter x:Key="DoubleToStringConverter"/>
         <domain:TimeToStringConverter x:Key="TimeToStringConverter"/>
+        <domain:MultiValueConverterGroup x:Key="BooleanInvertToVisibilityConverter">
+            <domain:BooleanInvertConverter/>
+            <domain:BooleanToVisibilityConverter/>
+        </domain:MultiValueConverterGroup>
+        <domain:MultiValueConverterGroup x:Key="BooleanAOrNotBConverter">
+            <domain:IdentityConverter/>
+            <domain:BooleanInvertConverter/>
+            <domain:BooleanOrConverter/>
+        </domain:MultiValueConverterGroup>
+        <domain:MultiValueConverterGroup x:Key="BooleanAAndNotBConverter">
+            <domain:IdentityConverter/>
+            <domain:BooleanInvertConverter/>
+            <domain:BooleanAndConverter/>
+        </domain:MultiValueConverterGroup>
+        <domain:BooleanInvertConverter x:Key="BooleanInvertConverter"/>
     </local:SingleRunMappingTool.Resources>
     <Grid Name="MasterGrid">
         <Grid.RowDefinitions>
@@ -210,7 +226,7 @@
                     <RadioButton Content="Export as slider" Margin="0 10 0 0"
                                  GroupName="exportFormat"
                                  ToolTip="Exports a normal sliderated slider."
-                                 IsChecked="True"/>
+                                 IsChecked="{Binding ExportAsNormal}"/>
                     <RadioButton Content="Export as stream" Margin="0 0 0 0"
                                  GroupName="exportFormat"
                                  ToolTip="Exports an accelerating stream. This stream uses the beat snap divisor of the graph to determine the density of notes."
@@ -222,10 +238,11 @@
 
                     <CheckBox x:Name="ManualSvBox" Content="Manually choose new SV" Margin="0 10 0 5"
                               ToolTip="Allows you to manually choose the SV for the sliderator algorithm and optimise the resulting slider."
-                              IsChecked="{Binding ManualVelocity}"/>
+                              IsChecked="{Binding ManualVelocity}" Visibility="{Binding ExportAsNormal, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    </CheckBox>
                     <TextBox materialDesign:HintAssist.Hint="New SV" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 0 5"
                              ToolTip="The new SV for the sliderated slider. This SV influences the Sliderator algorithm. Use lower SV for less lag."
-                             IsEnabled="{Binding ManualVelocity}">
+                             IsEnabled="{Binding ManualVelocity}" Visibility="{Binding ExportAsNormal, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <TextBox.Text>
                             <Binding Path="NewVelocity" Mode="TwoWay" UpdateSourceTrigger="LostFocus"  NotifyOnValidationError="True">
                                 <Binding.Converter>
@@ -242,7 +259,8 @@
                         </TextBox.Text>
                     </TextBox>
                     <TextBox materialDesign:HintAssist.Hint="Minimum tumour length" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                             ToolTip="Minimum length for tumours which slow down the sliderball in the sliderated slider. Longer tumours result in less lag but a more shaky sliderball.">
+                             ToolTip="Minimum length for tumours which slow down the sliderball in the sliderated slider. Longer tumours result in less lag but a more shaky sliderball."
+                             Visibility="{Binding ExportAsNormal, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <TextBox.Text>
                             <Binding Path="MinDendrite" Mode="TwoWay" UpdateSourceTrigger="LostFocus"  NotifyOnValidationError="True">
                                 <Binding.Converter>
@@ -273,11 +291,11 @@
 
                     <CheckBox x:Name="DelegateSvToBpmBox" Content="Delegate SV to BPM" Margin="0 15 0 0"
                               ToolTip="Use BPM to determine the velocity of the resulting slider instead of greenline SV. This allows you to use SV higher than 10x."
-                              IsChecked="{Binding DelegateToBpm}"/>
+                              IsChecked="{Binding DelegateToBpm}" Visibility="{Binding ExportAsNormal, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                     <CheckBox Content="Remove slider ticks"
                               ToolTip="Use a NaN greenline to remove slider ticks from the resulting slider."
-                              IsEnabled="{Binding DelegateToBpm}"
-                              IsChecked="{Binding RemoveSliderTicks}"/>
+                              IsChecked="{Binding RemoveSliderTicks}" Visibility="{Binding ExportAsNormal, Converter={StaticResource BooleanToVisibilityConverter}}"
+                              IsEnabled="{Binding DelegateToBpm}"/>
                 </StackPanel>
             </ScrollViewer>
 
@@ -297,7 +315,8 @@
                     <TextBox Grid.Column="0" Margin="0 0 8 0" HorizontalAlignment="Left"
                              materialDesign:HintAssist.Hint="SV limit" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                              MaxWidth="140" MinWidth="100"
-                             ToolTip="Self-imposed SV limit to help you make sure the slope in the graph doesn't become greater than this speed limit. For example use 10x SV limit to match the osu! speed limit.">
+                             ToolTip="Self-imposed SV limit to help you make sure the slope in the graph doesn't become greater than this speed limit. For example use 10x SV limit to match the osu! speed limit."
+                             Visibility="{Binding ExportAsNormal, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <TextBox.Text>
                             <Binding Path="VelocityLimit" Mode="TwoWay" Converter="{StaticResource DoubleToStringConverter}" ConverterParameter="10" UpdateSourceTrigger="LostFocus"  NotifyOnValidationError="True">
                                 <Binding.ValidationRules>
@@ -341,7 +360,7 @@
                 </Grid>
 
                 <Slider Grid.Row="1" Minimum="1" Maximum="16" Value="{Binding BeatSnapDivisor}" Style="{StaticResource MaterialDesignDiscreteSlider}"
-                        ToolTip="Beat snap divisor."/>
+                        ToolTip="Beat snap divisor." Margin="0 5 0 0"/>
 
                 <ToolBarOverflowPanel HorizontalAlignment="Left" Grid.Row="2" Margin="5 10 5 0">
                     <CheckBox IsChecked="{Binding ShowRedAnchors}" Content="Show red anchors" Margin="0 0 5 0"
