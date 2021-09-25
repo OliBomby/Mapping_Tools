@@ -43,6 +43,7 @@ namespace Mapping_Tools.Viewmodels {
         private double _distanceTraveled;
         private bool _delegateToBpm;
         private bool _removeSliderTicks;
+        private bool _exportAsNormal;
         private bool _exportAsStream;
         private bool _exportAsInvisibleSlider;
 
@@ -122,10 +123,7 @@ namespace Mapping_Tools.Viewmodels {
         [JsonIgnore]
         public double SvGraphMultiplier {
             get => _svGraphMultiplier;
-            set {
-                if (Set(ref _svGraphMultiplier, value)) {
-                }
-            }
+            set => Set(ref _svGraphMultiplier, value);
         }
 
         public ImportMode ImportModeSetting {
@@ -231,17 +229,21 @@ namespace Mapping_Tools.Viewmodels {
 
         public bool DelegateToBpm {
             get => _delegateToBpm;
-            set {
-                if (Set(ref _delegateToBpm, value)) {
-                    RemoveSliderTicks = false;
-                    RaisePropertyChanged(nameof(RemoveSliderTicks));
-                }
-            }
+            set => Set(ref _delegateToBpm, value);
         }
 
         public bool RemoveSliderTicks {
             get => _removeSliderTicks;
             set => Set(ref _removeSliderTicks, value);
+        }
+
+        public bool ExportAsNormal {
+            get => _exportAsNormal;
+            set {
+                if (Set(ref _exportAsNormal, value)) {
+                    RaisePropertyChanged(nameof(ExpectedSegments));
+                }
+            }
         }
 
         public bool ExportAsStream {
@@ -257,14 +259,6 @@ namespace Mapping_Tools.Viewmodels {
             get => _exportAsInvisibleSlider;
             set {
                 if (Set(ref _exportAsInvisibleSlider, value)) {
-                    if (ExportAsInvisibleSlider) {
-                        RemoveSliderTicks = true;
-                        RaisePropertyChanged(nameof(RemoveSliderTicks));
-                        DelegateToBpm = true;
-                        RaisePropertyChanged(nameof(DelegateToBpm));
-                        ManualVelocity = false;
-                        RaisePropertyChanged(nameof(ManualVelocity));
-                    }
                     RaisePropertyChanged(nameof(ExpectedSegments));
                 }
             }
@@ -319,6 +313,7 @@ namespace Mapping_Tools.Viewmodels {
             ExportAsStream = false;
             DoEditorRead = false;
             Quick = false;
+            ExportAsNormal = true;
 
             ImportCommand = new CommandImplementation(_ => Import(ImportModeSetting == ImportMode.Selected ? 
                 IOHelper.GetCurrentBeatmapOrCurrentBeatmap() : 

@@ -95,7 +95,7 @@ namespace Mapping_Tools.Views.Sliderator {
             var anchor = (Anchor) sender;
 
             // Correct the anchor change if it resulted in a speed limit violation
-            if (PrevOverSpeedLimit(anchor) || NextOverSpeedLimit(anchor)) {
+            if (ViewModel.ExportAsNormal && (PrevOverSpeedLimit(anchor) || NextOverSpeedLimit(anchor))) {
                 _ignoreAnchorsChange = true;
                 Graph.IgnoreAnchorUpdates = true;
 
@@ -480,12 +480,12 @@ namespace Mapping_Tools.Views.Sliderator {
             }
 
             var maxVelocity = ViewModel.NewVelocity;
-            if (double.IsInfinity(maxVelocity)) {
+            if (ViewModel.ExportAsNormal && double.IsInfinity(maxVelocity)) {
                 message = "Infinite slope on the path is illegal.";
                 return false;
             }
 
-            if (maxVelocity > ViewModel.VelocityLimit + Precision.DOUBLE_EPSILON) {
+            if (ViewModel.ExportAsNormal && maxVelocity > ViewModel.VelocityLimit + Precision.DOUBLE_EPSILON) {
                 message = "A velocity faster than the SV limit is illegal. Please check your graph or increase the SV limit.";
                 return false;
             }
@@ -633,16 +633,20 @@ namespace Mapping_Tools.Views.Sliderator {
                     slideration.AddRange(controlPoints);
                     newSliderType = PathType.Linear;
                     newVelocity = framedist;
-                    newLength = QuickCalculateLength(controlPoints);
+                    newLength = QuickCalculateLength(controlPoints) * 2;
                 } else {
                     slideration = sliderator.Sliderate();
                     newLength = sliderator.MaxS;
+
+                    // Check for some illegal output
+                    if (double.IsInfinity(sliderator.MaxS) || double.IsNaN(sliderator.MaxS)) {
+                        return "Encountered unexpected values from Sliderator. Please check your input.";
+                    }
                 }
 
                 // Check for some illegal output
-                if (double.IsInfinity(sliderator.MaxS) || double.IsNaN(sliderator.MaxS) ||
-                    slideration.Any(v => double.IsNaN(v.X) || double.IsNaN(v.Y))) {
-                    return "Encountered unexpected values from Sliderator. Please check your input.";
+                if (slideration.Any(v => double.IsNaN(v.X) || double.IsNaN(v.Y))) {
+                    return "Encountered NaN coordinates. Please check your input.";
                 }
             }
             
@@ -693,6 +697,11 @@ namespace Mapping_Tools.Views.Sliderator {
                 }
 
                 clone.PixelLength = newLength;
+
+                // Remove repeats for NaN SV sliders to prevent gamebreaking
+                if (delegateToBpm && removeSliderTicks) {
+                    clone.Repeat = 1;
+                }
 
                 // Convert px/ms to SV
                 var newVelocitySV = newVelocity / (arg.SvGraphMultiplier * arg.PixelLength * arg.BeatsPerMinute / 60000);
