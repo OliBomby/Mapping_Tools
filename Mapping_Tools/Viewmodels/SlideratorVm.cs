@@ -222,7 +222,7 @@ namespace Mapping_Tools.Viewmodels {
                 }
                 if (ExportAsInvisibleSlider) {
                     var timeLength = (long)(GraphBeats / BeatsPerMinute * 60000);
-                    return 15 + 5 * (timeLength - 1);
+                    return 16 + 7 * (timeLength - 1);
                 }
                 var newLength = NewVelocity * 100 * GlobalSv * GraphBeats;
                 return (long) ((newLength - DistanceTraveled) / MinDendrite * 2 + DistanceTraveled / 10);
@@ -231,7 +231,12 @@ namespace Mapping_Tools.Viewmodels {
 
         public bool DelegateToBpm {
             get => _delegateToBpm;
-            set => Set(ref _delegateToBpm, value);
+            set {
+                if (Set(ref _delegateToBpm, value)) {
+                    RemoveSliderTicks = false;
+                    RaisePropertyChanged(nameof(RemoveSliderTicks));
+                }
+            }
         }
 
         public bool RemoveSliderTicks {
@@ -252,6 +257,14 @@ namespace Mapping_Tools.Viewmodels {
             get => _exportAsInvisibleSlider;
             set {
                 if (Set(ref _exportAsInvisibleSlider, value)) {
+                    if (ExportAsInvisibleSlider) {
+                        RemoveSliderTicks = true;
+                        RaisePropertyChanged(nameof(RemoveSliderTicks));
+                        DelegateToBpm = true;
+                        RaisePropertyChanged(nameof(DelegateToBpm));
+                        ManualVelocity = false;
+                        RaisePropertyChanged(nameof(ManualVelocity));
+                    }
                     RaisePropertyChanged(nameof(ExpectedSegments));
                 }
             }
