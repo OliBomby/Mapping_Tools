@@ -18,7 +18,7 @@ namespace Mapping_Tools.Components.Domain
         }
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
-            throw new NotSupportedException("BooleanOrConverter is a OneWay converter.");
+            throw new NotSupportedException("BooleanAndConverter is a OneWay converter.");
         }
     }
 }
