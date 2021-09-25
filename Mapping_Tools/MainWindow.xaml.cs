@@ -340,11 +340,13 @@ namespace Mapping_Tools {
             builder.AppendLine("Pon -");
             builder.AppendLine("Ryuusei Aika");
             builder.AppendLine("Joshua Saku");
+            builder.AppendLine("spon");
             builder.AppendLine();
             builder.AppendLine("Contributors:");
             builder.AppendLine("Potoofu");
             builder.AppendLine("Karoo13");
             builder.AppendLine("Coppertine");
+            builder.AppendLine("JPK314");
 
             MessageBox.Show(builder.ToString(), "Info");
         }

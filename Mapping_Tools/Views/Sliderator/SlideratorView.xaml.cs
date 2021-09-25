@@ -35,7 +35,7 @@ namespace Mapping_Tools.Views.Sliderator {
     public partial class SlideratorView : ISavable<SlideratorVm>, IQuickRun {
         public static readonly string ToolName = "Sliderator";
 
-        public static readonly string ToolDescription = "Sliderator is a tool meant to make sliders with variable velocity. That means sliders that change speed during the animation. You can also make variable velocity streams with this tool." +
+        public static readonly string ToolDescription = "Sliderator is a tool meant to make sliders or streams with variable velocity. That means sliders that change speed during the animation. You can also make variable velocity streams with this tool." +
                                                         Environment.NewLine + Environment.NewLine +
                                                         "The UI consists of a slider import section, some options, a position/velocity graph, and a slider preview." +
                                                         Environment.NewLine + Environment.NewLine +
@@ -95,7 +95,7 @@ namespace Mapping_Tools.Views.Sliderator {
             var anchor = (Anchor) sender;
 
             // Correct the anchor change if it resulted in a speed limit violation
-            if (PrevOverSpeedLimit(anchor) || NextOverSpeedLimit(anchor)) {
+            if (ViewModel.ExportAsNormal && (PrevOverSpeedLimit(anchor) || NextOverSpeedLimit(anchor))) {
                 _ignoreAnchorsChange = true;
                 Graph.IgnoreAnchorUpdates = true;
 
@@ -480,12 +480,12 @@ namespace Mapping_Tools.Views.Sliderator {
             }
 
             var maxVelocity = ViewModel.NewVelocity;
-            if (double.IsInfinity(maxVelocity)) {
+            if (ViewModel.ExportAsNormal && double.IsInfinity(maxVelocity)) {
                 message = "Infinite slope on the path is illegal.";
                 return false;
             }
 
-            if (maxVelocity > ViewModel.VelocityLimit + Precision.DOUBLE_EPSILON) {
+            if (ViewModel.ExportAsNormal && maxVelocity > ViewModel.VelocityLimit + Precision.DOUBLE_EPSILON) {
                 message = "A velocity faster than the SV limit is illegal. Please check your graph or increase the SV limit.";
                 return false;
             }
@@ -569,28 +569,37 @@ namespace Mapping_Tools.Views.Sliderator {
                     AnchorCollection.GetMinDerivative(arg.GraphState.Anchors));
             }
 
-            // Dont do Sliderator if the velocity is constant AND equal to the new velocity
-            var simplifyShape = constantVelocity && Precision.AlmostEquals(
+            // Skip Sliderator if the velocity is constant AND equal to the new velocity
+            var simplifyShape = !arg.ExportAsInvisibleSlider && !arg.ExportAsStream && 
+                                    constantVelocity && Precision.AlmostEquals(
                                     arg.PixelLength / arg.GraphBeats / arg.GlobalSv / 100,
                                     arg.NewVelocity);
 
             // Get the highest velocity occuring in the graph
             double velocity = arg.NewVelocity; // Velocity is in SV
             // Do bad stuff to the velocity to make sure its the same SV as after writing it to .osu code
-            velocity = -100 / double.Parse((-100 / velocity).ToInvariant(), CultureInfo.InvariantCulture);
-            // Other velocity is in px / ms
-            var otherVelocity = velocity * arg.SvGraphMultiplier * arg.PixelLength * arg.BeatsPerMinute / 60000;
+            velocity = -100 / float.Parse((-100 / velocity).ToInvariant(), CultureInfo.InvariantCulture);
+            // New velocity is in px / ms
+            var newVelocity = velocity * arg.SvGraphMultiplier * arg.PixelLength * arg.BeatsPerMinute / 60000;
+            var newSliderType = PathType.Bezier;
+            // Placeholder value. This is the length of the input slider
+            var newLength = velocity * arg.SvGraphMultiplier * arg.PixelLength * arg.GraphBeats;
 
             // Time between timeline ticks for stream export
             var deltaT = 60000 / arg.BeatsPerMinute / arg.BeatSnapDivisor;
+
+            // Delegate to BPM and remove ticks when exporting as invisible slider because it uses extreme speeds
+            var delegateToBpm = arg.DelegateToBpm || arg.ExportAsInvisibleSlider;
+            var removeSliderTicks = arg.RemoveSliderTicks || arg.ExportAsInvisibleSlider;
 
             // Update progressbar
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(10);
 
             List<Vector2> slideration = new List<Vector2>();
             var sliderator = new Classes.Tools.SlideratorStuff.Sliderator {
-                PositionFunction = positionFunction, MaxT = arg.GraphBeats / arg.BeatsPerMinute * 60000,
-                Velocity = otherVelocity,
+                PositionFunction = positionFunction,
+                MaxT = arg.GraphBeats / arg.BeatsPerMinute * 60000,
+                Velocity = newVelocity,
                 MinDendriteLength = arg.MinDendrite
             };
 
@@ -608,14 +617,36 @@ namespace Mapping_Tools.Views.Sliderator {
                 // Do Sliderator
                 sliderator.SetPath(path);
 
-                slideration = arg.ExportAsStream ? 
-                    sliderator.SliderateStream(deltaT) : 
-                    sliderator.Sliderate();
+                if (arg.ExportAsStream) {
+                    slideration = sliderator.SliderateStream(deltaT);
+                } else if (arg.ExportAsInvisibleSlider) {
+                    // Calculate sbPositions
+                    int duration = (int)Math.Round(sliderator.MaxT);
+
+                    Vector2[] sbPositions = new Vector2[duration + 1];
+                    for (int i = 0; i < duration + 1; i++) {
+                        sbPositions[i] = sliderPath.SliderballPositionAt((int)Math.Round(duration * positionFunction(i) / sliderPath.Distance), duration);
+                    }
+
+                    var (controlPoints, framedist) = SliderInvisiblator.Invisiblate(duration, sbPositions);
+
+                    slideration.AddRange(controlPoints);
+                    newSliderType = PathType.Linear;
+                    newVelocity = framedist;
+                    newLength = QuickCalculateLength(controlPoints) * 2;
+                } else {
+                    slideration = sliderator.Sliderate();
+                    newLength = sliderator.MaxS;
+
+                    // Check for some illegal output
+                    if (double.IsInfinity(sliderator.MaxS) || double.IsNaN(sliderator.MaxS)) {
+                        return "Encountered unexpected values from Sliderator. Please check your input.";
+                    }
+                }
 
                 // Check for some illegal output
-                if (double.IsInfinity(sliderator.MaxS) || double.IsNaN(sliderator.MaxS) ||
-                    slideration.Any(v => double.IsNaN(v.X) || double.IsNaN(v.Y))) {
-                    return "Encountered unexpected values from Sliderator. Please check your input.";
+                if (slideration.Any(v => double.IsNaN(v.X) || double.IsNaN(v.Y))) {
+                    return "Encountered NaN coordinates. Please check your input.";
                 }
             }
             
@@ -653,6 +684,8 @@ namespace Mapping_Tools.Views.Sliderator {
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(70);
 
             if (!arg.ExportAsStream) {
+                // Export as a sliderated slider
+
                 // Give the new hit object the sliderated anchors
                 if (simplifyShape) {
                     // The velocity is constant, so you can simplify to the original slider shape
@@ -660,11 +693,19 @@ namespace Mapping_Tools.Views.Sliderator {
                     clone.SliderType = arg.VisibleHitObject.SliderType;
                 } else {
                     clone.SetAllCurvePoints(slideration);
-                    clone.SliderType = PathType.Bezier;
+                    clone.SliderType = newSliderType;
                 }
 
-                clone.PixelLength = sliderator.MaxS;
-                clone.SliderVelocity = -100 / velocity;
+                clone.PixelLength = newLength;
+
+                // Remove repeats for NaN SV sliders to prevent gamebreaking
+                if (delegateToBpm && removeSliderTicks) {
+                    clone.Repeat = 1;
+                }
+
+                // Convert px/ms to SV
+                var newVelocitySV = newVelocity / (arg.SvGraphMultiplier * arg.PixelLength * arg.BeatsPerMinute / 60000);
+                clone.SliderVelocity = -100 / newVelocitySV;
                 
                 // Add hit object
                 if (arg.ExportModeSetting == SlideratorVm.ExportMode.Add) {
@@ -677,7 +718,7 @@ namespace Mapping_Tools.Views.Sliderator {
                 // Add SV
                 var timingPointsChanges = new List<TimingPointsChange>();
 
-                if (arg.DelegateToBpm) {
+                if (delegateToBpm) {
                     var tpAfter = timing.GetRedlineAtTime(clone.Time).Copy();
                     var tpOn = tpAfter.Copy();
 
@@ -690,7 +731,7 @@ namespace Mapping_Tools.Views.Sliderator {
                     // Express velocity in BPM
                     tpOn.MpB *= clone.SliderVelocity / -100;
                     // NaN SV results in removal of slider ticks
-                    clone.SliderVelocity = arg.RemoveSliderTicks ? double.NaN : -100;
+                    clone.SliderVelocity = removeSliderTicks ? double.NaN : -100;
                     
                     // Add redlines
                     timingPointsChanges.Add(new TimingPointsChange(tpOn, mpb: true, unInherited: true, omitFirstBarLine: true, fuzzyness: Precision.DOUBLE_EPSILON));
@@ -742,6 +783,14 @@ namespace Mapping_Tools.Views.Sliderator {
             RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true,  arg.Reload && editorRead, arg.Quick));
 
             return arg.Quick ? string.Empty : "Done!";
+        }
+
+        private static float QuickCalculateLength(Vector2[] controlPoints) {
+            float length = 0;
+            for (int i = 0; i < controlPoints.Length - 1; i++) {
+                length += (float)Vector2.Distance(controlPoints[i], controlPoints[i + 1]);
+            }
+            return length;
         }
 
         public SlideratorVm GetSaveData() {
