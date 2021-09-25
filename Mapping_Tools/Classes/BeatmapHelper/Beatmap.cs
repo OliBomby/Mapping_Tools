@@ -829,12 +829,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         /// <returns>String of file name.</returns>
         public static string GetFileName(string artist, string title, string creator, string version) {
-            string fileName = $"{artist} - {title} ({creator}) [{version}].osu";
+            string fileName = $"{artist} - {title} ({creator}) [{version}]";
 
             string regexSearch = new string(Path.GetInvalidFileNameChars());
             Regex r = new Regex($"[{Regex.Escape(regexSearch)}]");
             fileName = r.Replace(fileName, "");
-            return fileName;
+
+            return fileName.Substring(0, Math.Min(184, fileName.Length)) + ".osu";
         }
 
         public Beatmap DeepCopy() {

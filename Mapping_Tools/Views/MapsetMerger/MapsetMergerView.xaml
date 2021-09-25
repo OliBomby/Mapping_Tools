@@ -1,0 +1,177 @@
+﻿<local:SingleRunMappingTool x:Class="Mapping_Tools.Views.ComboColourStudio.MapsetMergerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Mapping_Tools.Views"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
+             xmlns:beatmapHelper="clr-namespace:Mapping_Tools.Classes.BeatmapHelper" 
+             xmlns:viewmodels="clr-namespace:Mapping_Tools.Viewmodels"
+             mc:Ignorable="d" 
+             x:Name="This"
+             d:DesignHeight="650" Width="759.5" d:DataContext="{d:DesignInstance Type=viewmodels:MapsetMergerVm}">
+    <UserControl.Resources>
+        <domain:DoubleToStringConverter x:Key="DoubleToStringConverter"/>
+        <domain:TimeToStringConverter x:Key="TimeToStringConverter"/>
+        <domain:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
+        <domain:ColorToStringConverter x:Key="ColorToStringConverter"/>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Orientation="Horizontal">
+                <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
+                    <Run Text="Mapset Merger"/>
+                </TextBlock>
+                <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom" ToolTip="Click me!">
+                    <materialDesign:PopupBox.ToggleContent>
+                        <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryHueMidBrush}"/>
+                    </materialDesign:PopupBox.ToggleContent>
+                    <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
+                        Combine multiple mapsets into one mapset and automatically resolve file conflicts.
+                    </TextBlock>
+                </materialDesign:PopupBox>
+            </StackPanel>
+
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <DataGrid Grid.Row="0" ItemsSource="{Binding Mapsets}" SelectionMode="Extended"
+                          CanUserSortColumns="True"
+                          CanUserAddRows="False"
+                          AutoGenerateColumns="False"
+                          materialDesign:DataGridAssist.CellPadding="13 8 8 8"
+                          materialDesign:DataGridAssist.ColumnHeaderPadding="8"
+                          VerticalScrollBarVisibility="Auto">
+                    <DataGrid.Resources>
+                        <Style TargetType="DataGridRow" BasedOn="{StaticResource MaterialDesignDataGridRow}">
+                            <Setter Property="IsSelected"
+                                    Value="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </Style>
+                    </DataGrid.Resources>
+                    <DataGrid.Columns>
+                        <materialDesign:DataGridTextColumn
+                            Binding="{Binding Name, UpdateSourceTrigger=LostFocus}"
+                            Header="Name"
+                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}" />
+                        <DataGridTemplateColumn Header="Path" Width="{Binding Width, ElementName=MapsetPathText}">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate DataType="MapsetMergerVm:MapsetItem">
+                                    <TextBlock Name="MapsetPathText" Text="{Binding Path}"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                            <DataGridTemplateColumn.CellEditingTemplate>
+                                <DataTemplate DataType="MapsetMergerVm:MapsetItem">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBox Text="{Binding Path}" Width=" 200"/>
+                                        <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" 
+                                                ToolTip="Browse" VerticalAlignment="Center" Margin="5 0 5 0" 
+                                                Command="{Binding BrowseCommand}" CommandParameter="{Binding ElementName=This}">
+                                            <materialDesign:PackIcon Kind="Folder" Width="24" Height="24"/>
+                                        </Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellEditingTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="1">
+                        <materialDesign:Card VerticalAlignment="Bottom" HorizontalAlignment="Stretch" UniformCornerRadius="5" Padding="10 5 10 10" Margin="0 10 5 5">
+                            <Grid Grid.Row="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0 0 10 0"
+                                         materialDesign:HintAssist.Hint="Export path" 
+                                         ToolTip="The folder to put the merged mapset files in."
+                                         Text="{Binding ExportPath}"/>
+                                <Button Grid.Column="1" Cursor="Hand" Command="{Binding BrowseExportPathCommand}" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                                    ToolTip="Select export path with File Explorer.">
+                                    <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                                </Button>
+                                <CheckBox Grid.Column="2" Content="Move storyboard to .osu" Margin="10 0 5 0"
+                                          ToolTip="Moves the content of any .osb files into the .osu for beatmap-specific storyboards."
+                                          IsChecked="{Binding MoveSbToBeatmap}"/>
+                            </Grid>
+                        </materialDesign:Card>
+                    </Grid>
+
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal">
+                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" 
+                                    ToolTip="Add a mapset. Hold shift to get current beatmap from osu! client." 
+                                    VerticalAlignment="Center" Margin="5" Command="{Binding AddMapsetCommand}">
+                                <materialDesign:PackIcon Kind="Plus" Width="24" Height="24"/>
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" 
+                                    ToolTip="Remove selected mapsets or last mapset."
+                                    VerticalAlignment="Center" Margin="5" Command="{Binding RemoveMapsetCommand}">
+                                <materialDesign:PackIcon Kind="Minus" Width="24" Height="24"/>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+
+                
+                <Viewbox Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
+                    <Button
+                        IsEnabled="{Binding ElementName=This, Path=CanRun}"
+                        Style="{StaticResource MaterialDesignFloatingActionButton}"
+                        Click="Start_Click"
+                        ToolTip="Run this tool.">
+                        <materialDesign:PackIcon
+                            Kind="Play" Height="36" Width="36" />
+                    </Button>
+                </Viewbox>
+            </Grid>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Opacity="0.58"/>
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <ProgressBar Value="{Binding ElementName=This, Path=Progress}" Margin="20,0,20,0" Height="20" Background="{x:Null}" BorderBrush="{x:Null}"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</local:SingleRunMappingTool>

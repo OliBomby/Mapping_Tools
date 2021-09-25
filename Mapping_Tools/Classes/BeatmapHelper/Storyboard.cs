@@ -51,6 +51,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public List<StoryboardSoundSample> StoryboardSoundSamples { get; set; }
 
         /// <summary>
+        /// Whether to add the overlay layer header even if there are no events in that layer.
+        /// </summary>
+        public bool ForceAddOverlayLayer { get; set; }
+
+        /// <summary>
         /// Initializes an empty storyboard.
         /// </summary>
         public StoryBoard() {
@@ -88,6 +93,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             IEnumerable<string> storyboardLayerOverlayLines = FileFormatHelper.GetCategoryLines(lines, "//Storyboard Layer 4 (Overlay)", new[] { "[", "//" });
             IEnumerable<string> storyboardSoundSamplesLines = FileFormatHelper.GetCategoryLines(lines, "//Storyboard Sound Samples", new[] { "[", "//" });
 
+            ForceAddOverlayLayer = FileFormatHelper.CategoryExists(lines, "//Storyboard Layer 4 (Overlay)");
+
             foreach (string line in backgroundAndVideoEventsLines) {
                 BackgroundAndVideoEvents.Add(Event.MakeEvent(line));
             }
@@ -124,8 +131,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             lines.Add("[Events]");
             lines.Add("//Background and Video events");
             lines.AddRange(BackgroundAndVideoEvents.Select(e => e.GetLine()));
-            lines.Add("//Break Periods");
-            lines.AddRange(BreakPeriods.Select(b => b.GetLine()));
             lines.Add("//Storyboard Layer 0 (Background)");
             lines.AddRange(Event.SerializeEventTree(StoryboardLayerBackground));
             lines.Add("//Storyboard Layer 1 (Fail)");
@@ -134,8 +139,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             lines.AddRange(Event.SerializeEventTree(StoryboardLayerPass));
             lines.Add("//Storyboard Layer 3 (Foreground)");
             lines.AddRange(Event.SerializeEventTree(StoryboardLayerForeground));
-            lines.Add("//Storyboard Layer 4 (Overlay)");
-            lines.AddRange(Event.SerializeEventTree(StoryboardLayerOverlay));
+            if (ForceAddOverlayLayer || StoryboardLayerOverlay.Count > 0) {
+                lines.Add("//Storyboard Layer 4 (Overlay)");
+                lines.AddRange(Event.SerializeEventTree(StoryboardLayerOverlay));
+            }
             lines.Add("//Storyboard Sound Samples");
             lines.AddRange(StoryboardSoundSamples.Select(sbss => sbss.GetLine()));
             lines.Add("");

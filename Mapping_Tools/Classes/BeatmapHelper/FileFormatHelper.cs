@@ -83,5 +83,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 }
             }
         }
+
+        public static bool CategoryExists(IEnumerable<string> lines, string category) {
+            return lines.Any(l => l == category);
+        }
     }
 }

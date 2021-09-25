@@ -5,8 +5,8 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
-    <AssemblyVersion>1.8.12</AssemblyVersion>
-    <FileVersion>1.8.12</FileVersion>
+    <AssemblyVersion>1.9.1</AssemblyVersion>
+    <FileVersion>1.9.1</FileVersion>
     <AssemblyName>Mapping Tools</AssemblyName>
     <ApplicationIcon>Data\mt_icon.ico</ApplicationIcon>
     <Platforms>AnyCPU;x86;x64</Platforms>
@@ -316,6 +316,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="Views\AutoFailDetector\AutoFailDetectorView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\MapsetMerger\MapsetMergerView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\ComboColourStudio\ComboColourStudioView.xaml">

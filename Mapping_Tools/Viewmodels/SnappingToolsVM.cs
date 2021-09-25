@@ -392,7 +392,8 @@ namespace Mapping_Tools.Viewmodels {
         }
         
         private List<HitObject> GetHitObjects(SelectedHitObjectMode selectionMode) {
-            var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
+            // We want the actual position as seen on screen
+            var reader = EditorReaderStuff.GetFullEditorReaderOrNot(false);
 
             if (reader == null)
                 return new List<HitObject>();

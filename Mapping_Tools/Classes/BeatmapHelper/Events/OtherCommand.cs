@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Mapping_Tools.Classes.MathUtil;
+using System;
 using System.Text;
 using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
 
@@ -25,7 +26,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
             builder.Append(',');
             builder.Append(StartTime.ToInvariant());
             builder.Append(',');
-            builder.Append(EndTime.ToInvariant());
+            if (!Precision.AlmostEquals(StartTime, EndTime)) {
+                builder.Append(EndTime.ToInvariant());
+            }
 
             foreach (var param in Params) {
                 builder.Append(',');
