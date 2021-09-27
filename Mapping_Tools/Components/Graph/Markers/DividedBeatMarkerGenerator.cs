@@ -26,7 +26,8 @@ namespace Mapping_Tools.Components.Graph.Markers {
                 step *= 2;
             }
 
-            var v = start;
+            var vStart = Math.Ceiling(start / step) * step;
+            var v = vStart;
             int i = 0;
             while (v <= end + Precision.DOUBLE_EPSILON) {
                 Color markerColor;
@@ -59,7 +60,7 @@ namespace Mapping_Tools.Components.Graph.Markers {
                     MarkerColor = markerColor, MarkerLength = markerLength, Text = null, Snappable = Snappable
                 });
 
-                v = start + step * ++i;
+                v = vStart + step * ++i;
             }
 
             return markers;

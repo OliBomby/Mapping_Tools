@@ -9,6 +9,7 @@
              MouseEnter="Graph_OnMouseEnter"
              MouseLeave="Graph_OnMouseLeave"
              SizeChanged="Graph_OnSizeChanged"
+             MouseWheel="Graph_OnMouseWheel"
              d:DesignHeight="300" d:DesignWidth="300">
     <materialDesign:DialogHost x:Name="GraphDialogHost"
                                Style="{StaticResource MaterialDesignEmbeddedDialogHost}"
