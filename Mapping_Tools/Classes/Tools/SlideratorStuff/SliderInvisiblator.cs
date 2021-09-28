@@ -1,85 +1,128 @@
 ﻿using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using System;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
-    public static class SliderInvisiblator {
-        public static int SNAPTOL => (int)Math.Pow(2,20);
+    public static class SliderInvisiblator
+    {
+        public static int SNAPTOL => (int)Math.Pow(2, 5) * 3;
 
-        public static (Vector2[], long) Invisiblate(HitObject ho, Timing timing, Vector2[] sbPositions = null) {
-            ho.CalculateSliderTemporalLength(timing, false);
-            int timeLength = (int)Math.Round(ho.TemporalLength);
-
-            if (sbPositions == null) sbPositions = ho.SliderPath.SliderballPositions(timeLength);
-
-            // Round all positions
-            for (int i = 0; i < sbPositions.Length; i++) {
-                sbPositions[i].Round();
+        public static (Vector2[], double) Invisiblate(int duration, Vector2[] sbPositions, double globalSV = 1.4)
+        {
+            // Before rounding sbPositions, calculate starting coordinate for each ms' final segment to make the sliderball rotate appropriately
+            Vector2[] msLastSegStart = new Vector2[duration + 1];
+            double ang;
+            // We don't care about msLastSegStart[0] so we'll leave it at 0. Technically we could save one Vector2's worth of space here but it would make indexing harder to read than necessary.
+            // Find the first angle - we can't calculate the angle between points that are the same, but the sliderball's rotation should be the same as it was before.
+            double savedAng = 0;
+            for (int i = 1; i < duration + 1; i++) {
+                if (sbPositions[0] != sbPositions[i]) {
+                    savedAng = Math.Atan2(sbPositions[i - 1].Y - sbPositions[i].Y, sbPositions[i - 1].X - sbPositions[i].X);
+                }
             }
-
-            return Invisiblate(timeLength, sbPositions);
-        }
-        
-        public static (Vector2[], long) Invisiblate(int duration, Vector2[] sbPositions) {
-
-            // Round all positions
-            for (int i = 0; i < sbPositions.Length; i++) {
-                sbPositions[i].Round();
-            }
-
-            Vector2[] controlPoints = new Vector2[14 + 7 * (duration - 1)];
-            Vector2 maxXY = new Vector2(768, 412);
-            long frameDist = (long)(2 * 67141632 + 2 * 33587200 + 2 * maxXY.X + 2 * maxXY.Y - sbPositions[0].X - sbPositions[0].Y - sbPositions[1].X - sbPositions[1].Y);
-
-            // Zigzagging to maintain invisibility during snaking process
-            controlPoints[0] = sbPositions[0];
-            controlPoints[1] = new Vector2(4196352, 0) + new Vector2(maxXY.X, sbPositions[0].Y);
-            controlPoints[2] = new Vector2(4196352, 2099200) + maxXY;
-            controlPoints[3] = new Vector2(8392704, 2099200) + maxXY;
-            controlPoints[4] = new Vector2(8392704, 4198400) + maxXY;
-            controlPoints[5] = new Vector2(16785408, 4198400) + maxXY;
-            controlPoints[6] = new Vector2(16785408, 8396800) + maxXY;
-            controlPoints[7] = new Vector2(33570816, 8396800) + maxXY;
-            controlPoints[8] = new Vector2(33570816, 16793600) + maxXY;
-            controlPoints[9] = new Vector2(67141632, 16793600) + maxXY;
-            controlPoints[10] = new Vector2(67141632, 33587200 + SNAPTOL) + maxXY;
-            controlPoints[11] = new Vector2(67141632, 0) + new Vector2(maxXY.X, sbPositions[1].Y);
-            controlPoints[12] = new Vector2(4 * SNAPTOL, sbPositions[1].Y);
-            controlPoints[13] = new Vector2(sbPositions[1].X, sbPositions[1].Y);
-
-            int ctrlPtIdx = 14;
-            for (int i = 2; i < duration + 1; i++) {
-                // Move to a safely small position to add length early. It's OK if we lose or gain 2px here or there as long as it's compatible with floats.
-                int leftover = (int) Math.Round((frameDist - (2 * 67141632 + 2 * 33587200 + 2 * maxXY.X + 2 * maxXY.Y - sbPositions[i - 1].X - sbPositions[i - 1].Y - sbPositions[i].X - sbPositions[i].Y)) / 2);
-                if (leftover > 0) {
-                    controlPoints[ctrlPtIdx] = sbPositions[i - 1] + new Vector2(0, leftover);
-                    controlPoints[ctrlPtIdx + 1] = sbPositions[i - 1];
-                    controlPoints[ctrlPtIdx + 2] = new Vector2(67141632, 0) + new Vector2(maxXY.X, sbPositions[i - 1].Y);
-                    controlPoints[ctrlPtIdx + 3] = new Vector2(67141632, 33587200) + maxXY;
-                    controlPoints[ctrlPtIdx + 4] = new Vector2(67141632, 0) + new Vector2(maxXY.X, sbPositions[i].Y);
-                    controlPoints[ctrlPtIdx + 5] = new Vector2(4 * SNAPTOL, sbPositions[i].Y);
-                    controlPoints[ctrlPtIdx + 6] = new Vector2(sbPositions[i].X, sbPositions[i].Y);
-                    ctrlPtIdx += 7;
+            for (int i = 1; i < duration + 1; i++) {
+                if (sbPositions[i - 1] == sbPositions[i]) {
+                    ang = savedAng;
                 }
                 else {
-                    controlPoints[ctrlPtIdx] = new Vector2(67141632, 0) + new Vector2(maxXY.X, sbPositions[i - 1].Y);
-                    controlPoints[ctrlPtIdx + 1] = new Vector2(67141632, 33587200 + leftover) + maxXY;
-                    controlPoints[ctrlPtIdx + 2] = new Vector2(67141632, 0) + new Vector2(maxXY.X, sbPositions[i].Y);
-                    controlPoints[ctrlPtIdx + 3] = new Vector2(4 * SNAPTOL, sbPositions[i].Y);
-                    controlPoints[ctrlPtIdx + 4] = new Vector2(sbPositions[i].X, sbPositions[i].Y);
-                    ctrlPtIdx += 5;
+                    ang = Math.Atan2(sbPositions[i - 1].Y - sbPositions[i].Y, sbPositions[i - 1].X - sbPositions[i].X);
+                    savedAng = ang;
                 }
-                
+                msLastSegStart[i] = new Vector2((float)(SNAPTOL * Math.Cos(ang) + (float)sbPositions[i].Rounded().X), (float)(SNAPTOL * Math.Sin(ang) + (float)sbPositions[i].Rounded().Y));
             }
-            Vector2[] newControlPoints = new Vector2[ctrlPtIdx + 2];
+
+            // Round all positions to float precision values
+            for (int i = 0; i < sbPositions.Length; i++) {
+                sbPositions[i].Round();
+                sbPositions[i] = new Vector2((float)sbPositions[i].X, (float)sbPositions[i].Y);
+            }
+
+            Vector2[] controlPoints = new Vector2[8 + 4 * (duration - 1)];
+            Vector2 maxXY = new Vector2(768, 412);
+
+            List<Vector2> curMsPath = new List<Vector2>();
+            // First ms travel adds SNAPTOL
+            curMsPath.Add(sbPositions[0]);
+            curMsPath.Add(new Vector2((float)(67141632 + maxXY.X), (float)sbPositions[0].Y));
+            curMsPath.Add(new Vector2((float)(67141632 + maxXY.X), (float)(33587200 - (SNAPTOL / 6) + maxXY.Y)));
+            curMsPath.Add(new Vector2((float)(67141632 + maxXY.X), (float)msLastSegStart[1].Y));
+            curMsPath.Add(msLastSegStart[1]);
+            curMsPath.Add(sbPositions[1]);
+
+            // The precision of bpm calculation might be important when trying to be this precise with virtual sliderball position. Although the bpm is stored as a G17, it's written to the .osu as a G15 because that's the default for ToString().
+            // So we will be using G15 to not fuck people over in the editor as they use this tool and continue mapping.
+
+            double frameDist = OsuStableDistance(curMsPath) - 2 * SNAPTOL / 3;
+
+            double MpB = 100 * globalSV / frameDist;
+            MpB = Double.Parse(MpB.ToString());
+
+            frameDist = 100 * globalSV / MpB;
+
+
+            curMsPath.ToArray().CopyTo(controlPoints, 0);
+
+            int ctrlPtIdx = 6;
+            double correction = 0;
+
+            for (int i = 2; i < duration + 1; i++) {
+                curMsPath.Clear();
+                // The first point on this path is the last point of the previous path
+                curMsPath.Add(sbPositions[i - 1]);
+
+                // verticalTravel tells us how far down we need to go before going over and back up
+                double verticalTravel = correction + frameDist - (Math.Abs(sbPositions[i - 1].X - msLastSegStart[i].X) + (sbPositions[i - 1].Y - msLastSegStart[i].Y) + SNAPTOL);
+
+                curMsPath.Add(new Vector2((float)sbPositions[i - 1].X, (float)(sbPositions[i - 1].Y + verticalTravel / 2)));
+                if (sbPositions[i - 1].X != msLastSegStart[i].X) {
+                    curMsPath.Add(new Vector2((float)msLastSegStart[i].X, (float)(sbPositions[i - 1].Y + verticalTravel / 2)));
+                }
+                curMsPath.Add(msLastSegStart[i]);
+                curMsPath.Add(sbPositions[i]);
+
+                // Here we calculate what osu! finds for the distance travelled here, so that we can correct for it on the next iteration.
+                double pathDist = OsuStableDistance(curMsPath);
+                correction += frameDist - pathDist;
+
+                // Copy curMsPath into controlPoints. We use ctrlPtIdx-1 because we have the last point of the previous path in this path as well.
+                curMsPath.ToArray().CopyTo(controlPoints, ctrlPtIdx - 1);
+
+                // Update ctrlPtIdx
+                ctrlPtIdx += curMsPath.Count - 1;
+
+                double wtf = OsuStableDistance(controlPoints.Take(ctrlPtIdx)) % frameDist;
+
+            }
+            Vector2[] newControlPoints = new Vector2[ctrlPtIdx+2];
             Array.Copy(controlPoints, newControlPoints, ctrlPtIdx);
 
-            // Add extra segment of length 0 to end for rendering purposes
-            Vector2 lastPt = sbPositions[sbPositions.Length - 1];
-            newControlPoints[ctrlPtIdx] = new Vector2(lastPt.X, lastPt.Y);
-            newControlPoints[ctrlPtIdx + 1] = new Vector2(lastPt.X, lastPt.Y);
+            // Add extra segment of length 0 to end for sliderend snapping abuse
+            Vector2 lastPt = sbPositions[duration];
+            newControlPoints[ctrlPtIdx] = new Vector2((float)lastPt.X, (float)lastPt.Y);
+            newControlPoints[ctrlPtIdx + 1] = new Vector2((float)lastPt.X, (float)lastPt.Y);
 
             return (newControlPoints, frameDist);
         }
+
+        private static double OsuStableDistance(IEnumerable<Vector2> controlPoints)
+        {
+            double length = 0;
+            Vector2 cp, lp;
+            float num1, num2, num3, cpX, cpY, lpX, lpY;
+            for (int i = 1; i < controlPoints.Count(); i++) {
+                lp = controlPoints.ElementAt(i - 1);
+                cp = controlPoints.ElementAt(i);
+                num1 = (float)Math.Round(lp.X)- (float)Math.Round(cp.X);
+                num2 = (float)Math.Round(lp.Y) - (float)Math.Round(cp.Y);
+                num3 = num1 * num1 + num2 * num2;
+
+                length += (float)Math.Sqrt((double)num3);
+            }
+            return length;
+        }
     }
+
+    
 }
