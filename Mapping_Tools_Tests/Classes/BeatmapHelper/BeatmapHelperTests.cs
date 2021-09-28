@@ -29,5 +29,17 @@ namespace Mapping_Tools_Tests.Classes.BeatmapHelper {
                 Assert.AreEqual(lines[i], lines2[i]);
             }
         }
+
+        [TestMethod]
+        public void UnchangingStoryboardCodeTest() {
+            var path = "Resources\\TestStoryboard.osb";
+            var lines = File.ReadAllLines(path).ToList();
+            var editor = new StoryboardEditor(path);
+            var lines2 = editor.StoryBoard.GetLines();
+
+            for (int i = 0; i < lines.Count; i++) {
+                Assert.AreEqual(lines[i], lines2[i]);
+            }
+        }
     }
 }

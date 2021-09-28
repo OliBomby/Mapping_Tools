@@ -633,7 +633,7 @@ namespace Mapping_Tools.Views.Sliderator {
                     slideration.AddRange(controlPoints);
                     newSliderType = PathType.Linear;
                     newVelocity = framedist;
-                    newLength = QuickCalculateLength(controlPoints) * 2;
+                    newLength = HitObject.QuickCalculateLength(controlPoints) * 2;
                 } else {
                     slideration = sliderator.Sliderate();
                     newLength = sliderator.MaxS;
@@ -783,14 +783,6 @@ namespace Mapping_Tools.Views.Sliderator {
             RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true,  arg.Reload && editorRead, arg.Quick));
 
             return arg.Quick ? string.Empty : "Done!";
-        }
-
-        private static float QuickCalculateLength(Vector2[] controlPoints) {
-            float length = 0;
-            for (int i = 0; i < controlPoints.Length - 1; i++) {
-                length += (float)Vector2.Distance(controlPoints[i], controlPoints[i + 1]);
-            }
-            return length;
         }
 
         public SlideratorVm GetSaveData() {

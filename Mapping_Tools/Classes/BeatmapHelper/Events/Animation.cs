@@ -23,7 +23,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         /// </summary>
         /// <returns></returns>
         public override string GetLine() {
-            return $"Animation,{Layer},{Origin},\"{FilePath}\",{Pos.X.ToRoundInvariant()},{Pos.Y.ToRoundInvariant()},{FrameCount.ToInvariant()},{FrameDelay.ToInvariant()},{LoopType}";
+            return $"Animation,{Layer},{Origin},\"{FilePath}\",{Pos.X.ToInvariant()},{Pos.Y.ToInvariant()},{FrameCount.ToInvariant()},{FrameDelay.ToInvariant()},{LoopType}";
         }
 
         /// <summary>

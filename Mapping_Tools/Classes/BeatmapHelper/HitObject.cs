@@ -216,7 +216,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public int ColourIndex { get; set; }
         [JsonProperty]
         public ComboColour Colour { get; set; }
-        
+
+        public double TrueLength { get; set; } // Requires more calculation
         [JsonProperty]
         public double TemporalLength { get; set; } // Duration of one repeat
 
@@ -562,15 +563,43 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             ChangeTemporalTime(timing, deltaTime / Repeat);
         }
 
+        /// <summary>
+        /// Calculates the linear distance between each control point.
+        /// </summary>
+        public static float QuickCalculateLength(IEnumerable<Vector2> controlPoints) {
+            float length = 0;
+            Vector2? lastPoint = null;
+            foreach (var cp in controlPoints) {
+                if (lastPoint.HasValue) {
+                    length += (float)Vector2.Distance(lastPoint.Value, cp);
+                }
+                lastPoint = cp;
+            }
+            return length;
+        }
+
+        public void CalculateSliderTrueLength() {            
+            if (!IsSlider || double.IsNaN(PixelLength) || PixelLength < 0 || CurvePoints.All(o => o == Pos)) {
+                TrueLength = 0;
+                return;
+            }
+            if (SliderType == PathType.Linear && CurvePoints.Count > 1 && 
+                CurvePoints[^1] == CurvePoints[^2]) {
+                TrueLength = Math.Min(PixelLength, QuickCalculateLength(GetAllCurvePoints()));
+                return;
+            }
+
+            TrueLength = PixelLength;
+        }
+
         public void CalculateSliderTemporalLength(Timing timing, bool useOwnSv) {
             if (!IsSlider) return;
-            if (double.IsNaN(PixelLength) || PixelLength < 0 || CurvePoints.All(o => o == Pos)) {
-                TemporalLength = 0;
-            } else {
-                TemporalLength = useOwnSv
-                    ? timing.CalculateSliderTemporalLength(Time, PixelLength, SliderVelocity)
-                    : timing.CalculateSliderTemporalLength(Time, PixelLength);
-            }
+
+            CalculateSliderTrueLength();
+
+            TemporalLength = useOwnSv
+                ? timing.CalculateSliderTemporalLength(Time, TrueLength, SliderVelocity)
+                : timing.CalculateSliderTemporalLength(Time, TrueLength);
         }
 
         public void ChangeTemporalTime(Timing timing, double deltaTemporalTime) {

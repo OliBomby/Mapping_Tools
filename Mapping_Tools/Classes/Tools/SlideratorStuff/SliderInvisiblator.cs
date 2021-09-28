@@ -7,7 +7,8 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
         public static int SNAPTOL => (int)Math.Pow(2,20);
 
         public static (Vector2[], long) Invisiblate(HitObject ho, Timing timing, Vector2[] sbPositions = null) {
-            int timeLength = (int)Math.Round(timing.CalculateSliderTemporalLength(ho.Time, ho.PixelLength));
+            ho.CalculateSliderTemporalLength(timing, false);
+            int timeLength = (int)Math.Round(ho.TemporalLength);
 
             if (sbPositions == null) sbPositions = ho.SliderPath.SliderballPositions(timeLength);
 
