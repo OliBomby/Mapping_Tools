@@ -628,11 +628,12 @@ namespace Mapping_Tools.Views.Sliderator {
                         sbPositions[i] = sliderPath.SliderballPositionAt((int)Math.Round(duration * positionFunction(i) / sliderPath.Distance), duration);
                     }
 
-                    var (controlPoints, framedist) = SliderInvisiblator.Invisiblate(duration, sbPositions);
+                    var (controlPoints, framedist) = SliderInvisiblator.Invisiblate(duration, sbPositions, arg.GlobalSv);
 
                     slideration.AddRange(controlPoints);
                     newSliderType = PathType.Linear;
                     newVelocity = framedist;
+                    // We double to abuse linear slider sliderend snapping when the last segment has length 0
                     newLength = HitObject.QuickCalculateLength(controlPoints) * 2;
                 } else {
                     slideration = sliderator.Sliderate();
