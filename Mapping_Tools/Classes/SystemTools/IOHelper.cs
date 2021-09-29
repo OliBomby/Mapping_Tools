@@ -7,6 +7,7 @@ using Mapping_Tools.Classes.ToolHelpers;
 using Microsoft.Win32;
 using OsuMemoryDataProvider.OsuMemoryModels;
 using OsuMemoryDataProvider.OsuMemoryModels.Direct;
+using System.Collections.Generic;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public class IOHelper {
@@ -205,6 +206,18 @@ namespace Mapping_Tools.Classes.SystemTools {
             catch {
                 return MainWindow.AppWindow.GetCurrentMaps()[0];
             }
+        }
+
+        public static void ReplaceSettingTypePaths(string path, Tuple<string, string>[] replacements) {
+            if (replacements.Length == 0) return;
+
+            var contents = File.ReadAllText(path);
+
+            foreach (var (oldPath, newPath) in replacements) {
+                contents = contents.Replace(oldPath, newPath);
+            }
+
+            File.WriteAllText(path, contents);
         }
     }
 }
