@@ -26,8 +26,10 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
+        [JsonIgnore]
         public IEnumerable<ImportMode> ImportModes => Enum.GetValues(typeof(ImportMode)).Cast<ImportMode>();
 
+        [JsonIgnore]
         public Visibility TimeCodeBoxVisibility => ImportModeSetting == ImportMode.Time ? Visibility.Visible : Visibility.Collapsed;
 
         private string _timeCode;
@@ -42,6 +44,7 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _connectionModeSetting, value);
         }
 
+        [JsonIgnore]
         public IEnumerable<ConnectionMode> ConnectionModes => Enum.GetValues(typeof(ConnectionMode)).Cast<ConnectionMode>();
 
         private double _leniency;

@@ -1,5 +1,6 @@
 ﻿using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.MathUtil;
+using Newtonsoft.Json;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -63,6 +64,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return new HitsoundZone(IsSelected, Name, Filename, XPos, YPos, Hitsound, SampleSet, AdditionsSet, CustomIndex);
         }
 
+        [JsonIgnore]
         public bool IsSelected {
             get => _isSelected;
             set {

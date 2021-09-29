@@ -76,6 +76,7 @@ namespace Mapping_Tools.Viewmodels {
 
         public class MapsetItem : BindableBase {
             private bool isSelected;
+            [JsonIgnore]
             public bool IsSelected {
                 get => isSelected;
                 set => Set(ref isSelected, value);

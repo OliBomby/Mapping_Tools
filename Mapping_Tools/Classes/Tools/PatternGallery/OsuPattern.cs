@@ -1,6 +1,7 @@
 ﻿using Mapping_Tools.Classes.SystemTools;
 using System;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Newtonsoft.Json;
 
 namespace Mapping_Tools.Classes.Tools.PatternGallery {
     /// <summary>
@@ -12,6 +13,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
         #region Fields
 
         private bool _isSelected;
+        [JsonIgnore]
         public bool IsSelected {
             get => _isSelected;
             set => Set(ref _isSelected, value);

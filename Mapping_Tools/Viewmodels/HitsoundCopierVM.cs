@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.BeatmapHelper.BeatDivisors;
@@ -53,6 +54,7 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
+        [JsonIgnore]
         public bool SmartCopyModeSelected => CopyMode == 1;
 
         public double TemporalLeniency {
@@ -113,6 +115,7 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
+        [JsonIgnore]
         public bool StartIndexBoxVisible => CopyToSliderSlides || CopyToSliderTicks;
 
         public int StartIndex {
@@ -150,11 +153,16 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _mutedSampleSet, value);
         }
 
+        [JsonIgnore]
         public IEnumerable<SampleSet> MutedSampleSets => Enum.GetValues(typeof(SampleSet)).Cast<SampleSet>();
 
+        [JsonIgnore]
         public CommandImplementation ImportLoadCommand { get; }
+        [JsonIgnore]
         public CommandImplementation ImportBrowseCommand { get; }
+        [JsonIgnore]
         public CommandImplementation ExportLoadCommand { get; }
+        [JsonIgnore]
         public CommandImplementation ExportBrowseCommand { get; }
 
         #endregion

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Windows;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.BeatmapHelper.Enums;
+using Newtonsoft.Json;
 
 namespace Mapping_Tools.Viewmodels {
     public class HitsoundStudioVm : BindableBase {
@@ -90,12 +91,15 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
+        [JsonIgnore]
         public Visibility StandardExtraSettingsVisibility =>
             HitsoundExportModeSetting == HitsoundExportMode.Standard ? Visibility.Visible : Visibility.Collapsed;
 
+        [JsonIgnore]
         public Visibility CoincidingExtraSettingsVisibility =>
             HitsoundExportModeSetting == HitsoundExportMode.Coinciding ? Visibility.Visible : Visibility.Collapsed;
 
+        [JsonIgnore]
         public Visibility StoryboardExtraSettingsVisibility =>
             HitsoundExportModeSetting == HitsoundExportMode.Storyboard ? Visibility.Visible : Visibility.Collapsed;
         
@@ -106,7 +110,8 @@ namespace Mapping_Tools.Viewmodels {
             get => _hitsoundExportGameMode;
             set => Set(ref _hitsoundExportGameMode, value);
         }
-        
+
+        [JsonIgnore]
         public IEnumerable<GameMode> HitsoundExportGameModes => Enum.GetValues(typeof(GameMode)).Cast<GameMode>();
 
         private double _zipLayersLeniency;
@@ -151,6 +156,7 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
+        [JsonIgnore]
         public readonly Dictionary<HitsoundExporter.SampleExportFormat, string> SampleExportFormatDisplayNameMapping = 
             new Dictionary<HitsoundExporter.SampleExportFormat, string> {{HitsoundExporter.SampleExportFormat.Default, "Default"}, 
                 {HitsoundExporter.SampleExportFormat.WaveIeeeFloat, "IEEE Float (.wav)"},
@@ -159,6 +165,7 @@ namespace Mapping_Tools.Viewmodels {
                 {HitsoundExporter.SampleExportFormat.MidiChords, "Single-chord Midi (.mid)"}
             };
 
+        [JsonIgnore]
         public IEnumerable<string> SampleExportFormatDisplayNames => SampleExportFormatDisplayNameMapping.Values;
 
         public string SingleSampleExportFormatDisplay {

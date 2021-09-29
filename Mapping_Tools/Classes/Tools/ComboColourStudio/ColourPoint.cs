@@ -82,6 +82,7 @@ namespace Mapping_Tools.Classes.Tools.ComboColourStudio {
             set => Set(ref _mode, value);
         }
 
+        [JsonIgnore]
         public bool IsSelected {
             get => _isSelected;
             set => Set(ref _isSelected, value);
@@ -93,9 +94,12 @@ namespace Mapping_Tools.Classes.Tools.ComboColourStudio {
             get => _parentProject;
             set => Set(ref _parentProject, value);
         }
-        
+
+        [JsonIgnore]
         public IEnumerable<ColourPointMode> ColourPointModes => Enum.GetValues(typeof(ColourPointMode)).Cast<ColourPointMode>();
+        [JsonIgnore]
         public CommandImplementation AddCommand { get; }
+        [JsonIgnore]
         public CommandImplementation RemoveCommand { get; }
 
         public object Clone() {

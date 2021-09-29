@@ -34,7 +34,8 @@ namespace Mapping_Tools.Viewmodels {
 
         public OsuPatternFileHandler FileHandler { get; set; }
 
-        private bool? _isAllItemsSelected;
+        private bool? _isAllItemsSelected = false;
+        [JsonIgnore]
         public bool? IsAllItemsSelected {
             get => _isAllItemsSelected;
             set {
