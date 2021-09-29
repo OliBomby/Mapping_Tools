@@ -21,6 +21,8 @@ namespace Mapping_Tools.Components.Graph {
     public partial class Graph {
         private bool _initialized;
         private bool _drawAnchors;
+        private bool _isDragging;
+        private Point _lastMousePoint;
         private readonly List<GraphMarker> _markers;
 
         public bool IgnoreAnchorUpdates { get; set; }
@@ -520,6 +522,14 @@ namespace Mapping_Tools.Components.Graph {
             ViewMaxY = MaxY;
         }
 
+        private void SetCursor() {
+            if (ViewMinX == MinX && ViewMinY == MinY && ViewMaxX == MaxX && ViewMaxY == MaxY) {
+                Cursor = Cursors.Arrow;
+            } else {
+                Cursor = Cursors.SizeAll;
+            }
+        }
+
         #region GraphStuff
 
         public Anchor AddAnchor(Vector2 pos) {
@@ -717,6 +727,7 @@ namespace Mapping_Tools.Components.Graph {
 
         private static void OnViewChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             var g = (Graph)d;
+            g.SetCursor();
             g.RegenerateMarkers();
         }
 
@@ -903,6 +914,7 @@ namespace Mapping_Tools.Components.Graph {
                     if (x + d < ViewMinX || x - d > ViewMaxX)
                         continue;
 
+                    x = Math.Clamp(x, ViewMinX, ViewMaxX);
                     var p = Vector2.Clamp(new Vector2(x, GetValue(x)), b1, b2);
 
                     points.Add(GetRelativePoint(p));
@@ -911,7 +923,7 @@ namespace Mapping_Tools.Components.Graph {
             if (Anchors[^1].Pos.X >= ViewMinX && Anchors[^1].Pos.X <= ViewMaxX) {
                 points.Add(GetRelativePoint(Vector2.Clamp(Anchors[^1].Pos, b1, b2)));
             }
-            
+
             // Draw line
             var line = new Polyline {Points = points, Stroke = Stroke, StrokeThickness = 2, IsHitTestVisible = false,
                 StrokeEndLineCap = PenLineCap.Round, StrokeStartLineCap = PenLineCap.Round, StrokeLineJoin = PenLineJoin.Round};
@@ -1104,6 +1116,52 @@ namespace Mapping_Tools.Components.Graph {
 
         private void Graph_OnSizeChanged(object sender, SizeChangedEventArgs e) {
             RegenerateMarkers();
+        }
+
+        private void UserControl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) {
+            _lastMousePoint = e.GetPosition(this);
+
+            CaptureMouse();
+            _isDragging = true;
+            e.Handled = true;
+        }
+
+        private void UserControl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
+            ReleaseMouseCapture();
+            _isDragging = false;
+            e.Handled = true;
+        }
+
+        private void UserControl_MouseMove(object sender, MouseEventArgs e) {
+            if (!_isDragging) return;
+
+            if (e.RightButton != MouseButtonState.Pressed && e.LeftButton != MouseButtonState.Pressed) {
+                ReleaseMouseCapture();
+                _isDragging = false;
+                return;
+            }
+
+            // Get the position of the mouse relative to the Canvas
+            var newMousePoint = e.GetPosition(this);
+            var diff = _lastMousePoint - newMousePoint;
+            _lastMousePoint = newMousePoint;
+
+            // Move the view box by diff
+            var valueDiff = GetValueVector(new Point(diff.X, diff.Y));
+
+            var v1 = new Vector2(ViewMinX, ViewMinY);
+            var v2 = new Vector2(ViewMaxX, ViewMaxY);
+            var b1 = new Vector2(MinX, MinY);
+            var b2 = new Vector2(MaxX, MaxY);
+
+            valueDiff = Vector2.Clamp(valueDiff, b1 - v1, b2 - v2);
+
+            ViewMinX += valueDiff.X;
+            ViewMinY += valueDiff.Y;
+            ViewMaxX += valueDiff.X;
+            ViewMaxY += valueDiff.Y;
+
+            e.Handled = true;
         }
     }
 }

@@ -10,6 +10,9 @@
              MouseLeave="Graph_OnMouseLeave"
              SizeChanged="Graph_OnSizeChanged"
              MouseWheel="Graph_OnMouseWheel"
+             MouseLeftButtonDown="UserControl_MouseLeftButtonDown"
+             MouseLeftButtonUp="UserControl_MouseLeftButtonUp"
+             MouseMove="UserControl_MouseMove"
              d:DesignHeight="300" d:DesignWidth="300">
     <materialDesign:DialogHost x:Name="GraphDialogHost"
                                Style="{StaticResource MaterialDesignEmbeddedDialogHost}"
