@@ -16,7 +16,7 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
         [RelevantObjectsGeneratorMethod]
         public RelevantPoint GetRelevantObjects(RelevantHitObject relevantHitObject) {
             var ho = relevantHitObject.HitObject;
-            if (ho.CurvePoints.Count == 0)
+            if (ho.CurvePoints == null || ho.CurvePoints.Count == 0)
                 return null;
             return ho.IsSlider ? new RelevantPoint(ho.CurvePoints.Last()) : null;
         }
