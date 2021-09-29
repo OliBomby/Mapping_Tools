@@ -711,6 +711,7 @@ namespace Mapping_Tools.Components.Graph {
                                              g.ScaleOnBoundChangeVertical ? g.MinY + (g.MaxY - g.MinY) * (anchor.Pos.Y - oldMinY) / (oldMaxY - oldMinY) : anchor.Pos.Y);
                 }
             }
+            g.ResetView();
             g.RegenerateMarkers();
         }
 
