@@ -905,10 +905,12 @@ namespace Mapping_Tools.Components.Graph {
                     points.Add(previousPoint);
                 }
 
-                var maxPoints = Math.Min(100, nextPoint.X - previousPoint.X);
+                var maxPoints = Math.Min(1000, nextPoint.X - previousPoint.X);
                 var width = nextPos.X - previousPos.X;
                 var d = width / maxPoints;
-                for (int k = 1; k < maxPoints; k++) {
+                var start = previous.Pos.X >= ViewMinX && previous.Pos.X <= ViewMaxX ? 1 : 0;
+                var end = next.Pos.X >= ViewMinX && next.Pos.X <= ViewMaxX ? maxPoints - 1 : maxPoints;
+                for (int k = start; k <= end; k++) {
                     var x = previousPos.X + k * d;
 
                     if (x + d < ViewMinX || x - d > ViewMaxX)
