@@ -188,7 +188,7 @@
                             </StackPanel>
 
                             <materialDesign:ColorZone
-                                WindowChrome.IsHitTestVisibleInChrome="true" 
+                                WindowChrome.IsHitTestVisibleInChrome="False" 
                                 ToolTip="{Binding CurrentBeatmaps, Converter={StaticResource MapPathStringAddNewLinesConverter}}"
                                 VerticalAlignment="Center"
                                 Margin="10 0"
