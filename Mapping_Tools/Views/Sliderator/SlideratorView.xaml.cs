@@ -233,6 +233,7 @@ namespace Mapping_Tools.Views.Sliderator {
                         AnimateProgress(GraphHitObjectElement);
                     UpdatePointsOfInterest();
                     break;
+                case nameof(ViewModel.BeatsPerMinute):
                 case nameof(ViewModel.BeatSnapDivisor):
                     Graph.HorizontalMarkerGenerator = GetHorizontalMarkerGenerator();
                     break;
@@ -318,7 +319,13 @@ namespace Mapping_Tools.Views.Sliderator {
         }
 
         private IMarkerGenerator GetHorizontalMarkerGenerator() {
-            return new DividedBeatMarkerGenerator(ViewModel.BeatSnapDivisor, true);
+            return new CompositeMarkerGenerator(new IMarkerGenerator[] {
+                new DividedBeatMarkerGenerator(ViewModel.BeatSnapDivisor, true) ,
+                new CustomMarkerGenerator{
+                    Snappable = true,
+                    StepSize = ViewModel.BeatsPerMinute / 60000,
+                }
+            });
         }
 
         private void AnimateProgress(HitObjectElement element) {

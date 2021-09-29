@@ -10,7 +10,7 @@ namespace Mapping_Tools.Components.Graph.Markers {
 
         public double Offset { get; set; }
 
-        public double Size { get; set; }
+        public double StepSize { get; set; }
 
         public bool Snappable { get; set; }
 
@@ -27,7 +27,7 @@ namespace Mapping_Tools.Components.Graph.Markers {
         public CustomMarkerGenerator() { }
 
         public IEnumerable<GraphMarker> GenerateMarkers(double start, double end, Orientation orientation, int maxMarkers) {
-            double step = Size;
+            double step = StepSize;
             if ((end - start) / step > maxMarkers) {
                 if (Reduce) {
                     while ((end - start) / step > maxMarkers) {
