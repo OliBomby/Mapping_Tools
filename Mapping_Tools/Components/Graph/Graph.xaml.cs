@@ -884,16 +884,21 @@ namespace Mapping_Tools.Components.Graph {
                     continue;
                 }
 
-                var previousPoint = GetRelativePoint(Vector2.Clamp(previous.Pos, b1, b2));
-                var nextPoint = GetRelativePoint(Vector2.Clamp(next.Pos, b1, b2));
+                var previousPos = Vector2.Clamp(previous.Pos, b1, b2);
+                var nextPos = Vector2.Clamp(next.Pos, b1, b2);
+
+                var previousPoint = GetRelativePoint(previousPos);
+                var nextPoint = GetRelativePoint(nextPos);
 
                 if (previous.Pos.X >= ViewMinX && previous.Pos.X <= ViewMaxX) {
                     points.Add(previousPoint);
                 }
 
-                var d = ViewWidth / ActualWidth;
-                for (int k = 1; k < GetRelativePointX(next.Pos.X) - GetRelativePointX(previous.Pos.X); k++) {
-                    var x = previous.Pos.X + k * d;
+                var maxPoints = Math.Min(100, nextPoint.X - previousPoint.X);
+                var width = nextPos.X - previousPos.X;
+                var d = width / maxPoints;
+                for (int k = 1; k < maxPoints; k++) {
+                    var x = previousPos.X + k * d;
 
                     if (x + d < ViewMinX || x - d > ViewMaxX)
                         continue;
