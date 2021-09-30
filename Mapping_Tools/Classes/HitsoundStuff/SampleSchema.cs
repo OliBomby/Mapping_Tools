@@ -26,6 +26,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         public SampleSchema(Dictionary<SampleGeneratingArgs, string> sampleNames) {
             foreach (var sample in sampleNames) {
+                if (string.IsNullOrEmpty(sample.Value)) continue;
                 Add(sample.Value, new List<SampleGeneratingArgs> {sample.Key});
             }
         }
