@@ -1,6 +1,7 @@
 ﻿using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Components.Graph;
 using Newtonsoft.Json;
+using System;
 
 namespace Mapping_Tools.Viewmodels {
     public class TumourGeneratorVm : BindableBase {
