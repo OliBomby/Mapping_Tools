@@ -19,6 +19,31 @@ namespace Mapping_Tools.Components.Graph.Interpolation {
             }
         }
 
+        /// <summary>
+        /// Returns the index of the interpolator type or -1 if it can't be found.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static int GetInterpolatorIndex(Type type) {
+            var interpolators = GetInterpolators();
+            for (int i = 0; i < interpolators.Length; i++) {
+                if (interpolators[i] == type) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// Returns the interpolator type of a certain index or null if it can't be found.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public static Type GetInterpolatorByIndex(int index) {
+            var interpolators = GetInterpolators();
+            return index < 0 || index >= interpolators.Length ? null : interpolators[index];
+        }
+
         public static string GetName(Type type) {
             var nameAttribute = type.GetCustomAttribute<DisplayNameAttribute>();
             return nameAttribute != null ? nameAttribute.DisplayName : type.Name;
