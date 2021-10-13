@@ -373,6 +373,10 @@
     <Page Update="Views\RhythmGuide\RhythmGuideWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="Views\TumourGenerator\TumourGeneratorView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Views\Sliderator\SlideratorView.xaml">
       <SubType>Designer</SubType>
     </Page>
