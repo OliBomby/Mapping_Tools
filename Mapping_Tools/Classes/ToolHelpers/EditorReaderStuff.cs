@@ -166,9 +166,10 @@ namespace Mapping_Tools.Classes.ToolHelpers {
                 @"ProcessTitle: " + reader.ProcessTitle(),
                 @"[HitObjects]",
             };
-            lines.AddRange(reader.hitObjects.Select(readerHitObject => readerHitObject.ToString()));
+            // Using .ToList() to prevent possibly modifying the list while being enumerated
+            lines.AddRange(reader.hitObjects.ToList().Select(readerHitObject => readerHitObject.ToString()));
             lines.Add(@"[TimingPoints]");
-            lines.AddRange(reader.controlPoints.Select(readerControlPoint => readerControlPoint.ToString()));
+            lines.AddRange(reader.controlPoints.ToList().Select(readerControlPoint => readerControlPoint.ToString()));
 
             File.WriteAllLines(path, lines);
         }
