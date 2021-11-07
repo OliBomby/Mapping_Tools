@@ -61,7 +61,7 @@ namespace Mapping_Tools {
 
             try {
                 AutoUpdater.ParseUpdateInfoEvent += AutoUpdaterOnParseUpdateInfoEvent;
-                AutoUpdater.Start("https://mappingtools.seira.moe/current/updater.json");
+                //AutoUpdater.Start("https://mappingtools.seira.moe/current/updater.json");
             }
             catch( Exception ex ) {
                 Console.WriteLine(ex.Message);
