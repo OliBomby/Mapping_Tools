@@ -587,7 +587,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
             }
 
             // Check filter snap
-            var allBeatDivisors = arg.BeatDivisors;
+            var allBeatDivisors = arg.BeatDivisors.Concat(arg.MutedDivisors).ToList();
 
             var timingPoint = beatmapTo.BeatmapTiming.GetRedlineAtTime(tloTo.Time - 1);
             var resnappedTime = beatmapTo.BeatmapTiming.Resnap(tloTo.Time, allBeatDivisors, false, tp: timingPoint);
@@ -596,10 +596,10 @@ namespace Mapping_Tools.Views.HitsoundCopier {
             // Get all the divisors which the sliderend could possibly be snapped to
             var possibleDivisors =
                 allBeatDivisors.Where(d => Precision.AlmostEquals(beatsFromRedline % d.GetValue(), 0) ||
-                                           Precision.AlmostEquals(beatsFromRedline % d.GetValue(), 1));
+                                           Precision.AlmostEquals(beatsFromRedline % d.GetValue(), d.GetValue())).ToList();
 
             // Make sure all the possible beat divisors of lower priority are in the muted category
-            if (possibleDivisors.TakeWhile(d => !arg.MutedDivisors.Contains(d)).Any()) {
+            if (possibleDivisors.Count == 0 || possibleDivisors.TakeWhile(d => !arg.MutedDivisors.Contains(d)).Any()) {
                 return false;
             }
 
