@@ -82,7 +82,11 @@
                             materialDesign:TextFieldAssist.TextFieldCornerRadius="4">
                             <TextBox.InputBindings>
                                 <KeyBinding Key="Return" 
-                                    Command="{Binding GoToSearchResult}"/>
+                                    Command="{Binding GoToSelectedPage}"/>
+                                <KeyBinding Key="Up" 
+                                            Command="{Binding SelectedPageUp}"/>
+                                <KeyBinding Key="Down" 
+                                            Command="{Binding SelectedPageDown}"/>
                             </TextBox.InputBindings>
                         </TextBox>
 

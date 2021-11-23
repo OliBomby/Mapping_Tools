@@ -53,12 +53,10 @@ namespace Mapping_Tools.Viewmodels {
         public ListBoxItem SelectedPageItem {
             get => selectedPageItem;
             set {
-                if (Set(ref selectedPageItem, value)) {
-                    if (value?.Content == null)
-                        return;
-
-                    var toolName = value.Tag.ToString();
-                    SetCurrentView(toolName);
+                // Detect if the selection change was by a mouse click by checking button state
+                // This is pretty ghetto and should be changed
+                if (Set(ref selectedPageItem, value) && Mouse.LeftButton == MouseButtonState.Pressed) {
+                    GoToSelectedPage.Execute(null);
                 }
             }
         }
@@ -69,6 +67,8 @@ namespace Mapping_Tools.Viewmodels {
             set {
                 if (Set(ref searchKeyword, value)) {
                     navigationItemsView.Refresh();
+                    navigationItemsView.MoveCurrentToFirst();
+                    SelectedPageItem = navigationItemsView.CurrentItem as ListBoxItem;
                 }
             }
         }
@@ -116,24 +116,38 @@ namespace Mapping_Tools.Viewmodels {
 
             SetCurrentView(typeof(StandardView)); // Generate Standard view model to show on startup
 
-            NavigationItems = GenerateNavigationItems();
-
-            navigationItemsView = CollectionViewSource.GetDefaultView(NavigationItems);
-            navigationItemsView.Filter = SearchItemsFilter;
-
-            GoToSearchResult = new CommandImplementation(_ => {
-                var name = NavigationItems.FirstOrDefault(o => SearchItemsFilter(o))?.Tag?.ToString();
+            GoToSelectedPage = new CommandImplementation(_ => {
+                var item = selectedPageItem;
+                if (item?.Content == null) return;
+                string name = item.Tag.ToString();
                 if (string.IsNullOrEmpty(name)) return;
                 SetCurrentView(name);
                 SearchKeyword = string.Empty;
             });
 
+            SelectedPageUp = new CommandImplementation(_ => {
+                navigationItemsView.MoveCurrentToPrevious();
+                SelectedPageItem = navigationItemsView.CurrentItem as ListBoxItem;
+            });
+
+            SelectedPageDown = new CommandImplementation(_ => {
+                navigationItemsView.MoveCurrentToNext();
+                SelectedPageItem = navigationItemsView.CurrentItem as ListBoxItem;
+            });
+
             ToggleNavigationDrawer = new CommandImplementation(p => {
                 DrawerOpen = !DrawerOpen;
             });
+
+            NavigationItems = GenerateNavigationItems();
+
+            navigationItemsView = CollectionViewSource.GetDefaultView(NavigationItems);
+            navigationItemsView.Filter = SearchItemsFilter;
         }
 
-        public CommandImplementation GoToSearchResult { get; }
+        public CommandImplementation GoToSelectedPage { get; }
+        public CommandImplementation SelectedPageUp { get; }
+        public CommandImplementation SelectedPageDown { get; }
         public CommandImplementation ToggleNavigationDrawer { get; }
 
         private ObservableCollection<FrameworkElement> GenerateNavigationItems() {
