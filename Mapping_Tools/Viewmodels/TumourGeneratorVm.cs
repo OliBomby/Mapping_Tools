@@ -8,6 +8,8 @@ namespace Mapping_Tools.Viewmodels {
 
         #region Properties
 
+
+
         public GraphState GraphState { get; set; }
 
         [JsonIgnore]
