@@ -1,6 +1,6 @@
 ﻿using Mapping_Tools.Classes.MathUtil;
 
-namespace Mapping_Tools.Classes.Tools.TumourGenerator {
+namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
     public struct PathPoint {
         public Vector2 Pos;
         public Vector2 Dir;
