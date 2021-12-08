@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
     public static class PathHelper {
@@ -15,6 +16,9 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
             // Count the number of nodes already between start and end
             // Interpolate path points at roughly equal distance intervals
             int inbetweenCount = 1;
+            int pointsToAdd = count - inbetweenCount;
+
+            path.InsertRange(start + 1, Enumerable.Range(0, pointsToAdd).Select(i => new PathPoint()));
         }
 
         /// <summary>

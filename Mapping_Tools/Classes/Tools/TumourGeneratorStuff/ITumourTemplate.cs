@@ -16,9 +16,9 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
         Vector2 GetOffset(double t);
 
         /// <summary>
-        /// Gets the minimum number of points required to properly approximate this tumour shape.
+        /// Gets the total length of this tumour shape.
         /// </summary>
-        /// <returns>The minimum number of points required to properly approximate this tumour shape.</returns>
-        int GetResolution();
+        /// <returns>The total length of this tumour shape.</returns>
+        int GetLength();
     }
 }
