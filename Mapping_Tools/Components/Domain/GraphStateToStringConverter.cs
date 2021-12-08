@@ -9,6 +9,7 @@ using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Components.Graph;
 using Mapping_Tools.Components.Graph.Interpolation;
+using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
 
 namespace Mapping_Tools.Components.Domain {
     public class GraphStateToStringConverter : IValueConverter {
@@ -30,10 +31,13 @@ namespace Mapping_Tools.Components.Domain {
             // Convert anchors to string
             var builder = new StringBuilder();
             builder.AppendJoin('|', state.Anchors.Select(
-                o => $"{o.Pos.X.ToString("0.###", CultureInfo.InvariantCulture)}:" +
-                $"{o.Pos.Y.ToString("0.###", CultureInfo.InvariantCulture)}:" +
-                $"{InterpolatorHelper.GetInterpolatorIndex(o.Interpolator.GetType()).ToInvariant()}:" +
-                $"{o.Interpolator.P.ToString("0.###", CultureInfo.InvariantCulture)}"));
+                o => {
+                    var interpolator = o.Interpolator ?? new SingleCurveInterpolator();
+                    return $"{o.Pos.X.ToString("0.###", CultureInfo.InvariantCulture)}:" +
+                    $"{o.Pos.Y.ToString("0.###", CultureInfo.InvariantCulture)}:" +
+                    $"{InterpolatorHelper.GetInterpolatorIndex(interpolator.GetType()).ToInvariant()}:" +
+                    $"{interpolator.P.ToString("0.###", CultureInfo.InvariantCulture)}";
+                }));
 
             return builder.ToString();
         }
