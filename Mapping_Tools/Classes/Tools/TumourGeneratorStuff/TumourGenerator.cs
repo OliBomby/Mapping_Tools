@@ -63,6 +63,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
                 var offset = tumourTemplate.GetOffset(t) * scalar;
                 var np = wrappingMode switch {
                     WrappingMode.Wrap => p,
+                    WrappingMode.RoundWrap => new PathPoint(p.Pos, Vector2.Lerp(startP.Dir, endP.Dir, t), p.Dist, p.CumulativeLength),
                     WrappingMode.Replace => new PathPoint(Vector2.Lerp(startP.Pos, endP.Pos, t), endP.Pos - startP.Pos, p.Dist, p.CumulativeLength),
                     WrappingMode.RoundReplace => new PathPoint(Vector2.Lerp(startP.Pos, endP.Pos, t), Vector2.Lerp(startP.Dir, endP.Dir, t), p.Dist, p.CumulativeLength),
                     _ => p
