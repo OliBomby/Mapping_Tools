@@ -42,11 +42,14 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
 
             // Make sure there are enough points between start and end for the tumour shape and resolution
             int wantedPointsBetween = Math.Max(pointsBetween, (int)(tumourTemplate.GetLength() * resolution));  // The needed number of points for the tumour
-            pointsBetween = path.Subdivide(start, end, wantedPointsBetween);
+            pointsBetween += path.Subdivide(start, end, wantedPointsBetween);
+            pointsBetween += path.EnsureCriticalPoints(start, end, tumourTemplate.GetCriticalPoints());
 
             // Add tumour offsets
             var startP = start.Value;
             var endP = end.Value;
+            double startT = startP.T;
+            double endT = endP.T;
             double dist = endP.CumulativeLength - startP.CumulativeLength;
             double startDist = startP.CumulativeLength;
             pn = start;
@@ -56,7 +59,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
                 var p = pn.Value;
 
                 double t = Precision.AlmostEquals(dist, 0) ?
-                    (double)(i + 1) / (pointsBetween + 1) :
+                    (p.T - startT) / (endT - startT) :
                     (p.CumulativeLength - startDist) / dist;
 
                 // Get the offset, original pos, and direction

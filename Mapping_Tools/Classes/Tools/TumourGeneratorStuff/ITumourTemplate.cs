@@ -1,4 +1,5 @@
-﻿using Mapping_Tools.Classes.MathUtil;
+﻿using System.Collections.Generic;
+using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
     /// <summary>
@@ -20,5 +21,12 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
         /// </summary>
         /// <returns>The total length of this tumour shape.</returns>
         int GetLength();
+
+        /// <summary>
+        /// Gets a list of t values which should definitely get a point.
+        /// This is to ensure sharp corners in the tumour shape stay sharp.
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<double> GetCriticalPoints();
     }
 }
