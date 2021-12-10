@@ -5,6 +5,28 @@ using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
     public static class PathHelper {
+        private static void Interpolate(LinkedListNode<PathPoint> p1, IEnumerable<double> ts) {
+            var p2 = p1.Next;
+            
+            var v1 = p1.Previous?.Value ?? p1.Value;
+            var v2 = p1.Value;
+            var v3 = p1.Next?.Value ?? v2 + v2 - v1;
+            var v4 = p1.Next?.Next?.Value ?? v3 + v3 - v2;
+
+            // Find possible red anchors near p1
+
+
+
+            foreach (var t in ts) {
+                p1.List.AddAfter(p1, new LinkedListNode<PathPoint>(new PathPoint()));
+            }
+
+            for( int c = 0; c < catmull_detail; c++ ) {
+                result.Add(CatmullFindPoint(ref v1, ref v2, ref v3, ref v4, (double) c / catmull_detail));
+                result.Add(CatmullFindPoint(ref v1, ref v2, ref v3, ref v4, (double) ( c + 1 ) / catmull_detail));
+            }
+        }
+
         /// <summary>
         /// Modifies <see cref="path"/> such that there are at least <see cref="count"/> roughly equally spaced
         /// path points between <see cref="start"/> and <see cref="end"/>.
