@@ -21,6 +21,8 @@ namespace Mapping_Tools.Components.Graph {
     public partial class Graph {
         private bool _initialized;
         private bool _drawAnchors;
+        private bool _isDragging;
+        private Point _lastMousePoint;
         private readonly List<GraphMarker> _markers;
 
         public bool IgnoreAnchorUpdates { get; set; }
@@ -98,6 +100,58 @@ namespace Mapping_Tools.Components.Graph {
             get => (double) GetValue(MaxYProperty);
             set => SetValue(MaxYProperty, value);
         }
+
+        public static readonly DependencyProperty ViewMinXProperty =
+            DependencyProperty.Register(nameof(ViewMinX),
+                typeof(double),
+                typeof(Graph),
+                new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.None,
+                    OnViewChanged));
+
+        public double ViewMinX {
+            get => (double)GetValue(ViewMinXProperty);
+            set => SetValue(ViewMinXProperty, value);
+        }
+
+        public static readonly DependencyProperty ViewMinYProperty =
+            DependencyProperty.Register(nameof(ViewMinY),
+                typeof(double),
+                typeof(Graph),
+                new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.None,
+                    OnViewChanged));
+
+        public double ViewMinY {
+            get => (double)GetValue(ViewMinYProperty);
+            set => SetValue(ViewMinYProperty, value);
+        }
+
+        public static readonly DependencyProperty ViewMaxXProperty =
+            DependencyProperty.Register(nameof(ViewMaxX),
+                typeof(double),
+                typeof(Graph),
+                new FrameworkPropertyMetadata(1d, FrameworkPropertyMetadataOptions.None,
+                    OnViewChanged));
+
+        public double ViewMaxX {
+            get => (double)GetValue(ViewMaxXProperty);
+            set => SetValue(ViewMaxXProperty, value);
+        }
+
+        public static readonly DependencyProperty ViewMaxYProperty =
+            DependencyProperty.Register(nameof(ViewMaxY),
+                typeof(double),
+                typeof(Graph),
+                new FrameworkPropertyMetadata(1d, FrameworkPropertyMetadataOptions.None,
+                    OnViewChanged));
+
+        public double ViewMaxY {
+            get => (double)GetValue(ViewMaxYProperty);
+            set => SetValue(ViewMaxYProperty, value);
+        }
+
+        public double ViewWidth => ViewMaxX - ViewMinX;
+
+        public double ViewHeight => ViewMaxY - ViewMinY;
 
         public static readonly DependencyProperty HorizontalAxisProperty =
             DependencyProperty.Register(nameof(HorizontalAxis),
@@ -457,7 +511,23 @@ namespace Mapping_Tools.Components.Graph {
             MinY = graphState.MinY;
             MaxX = graphState.MaxX;
             MaxY = graphState.MaxY;
+            ResetView();
             Anchors = new AnchorCollection(graphState.Anchors.Select(a => a.GetAnchor()));
+        }
+
+        public void ResetView() {
+            ViewMinX = MinX;
+            ViewMinY = MinY;
+            ViewMaxX = MaxX;
+            ViewMaxY = MaxY;
+        }
+
+        private void SetCursor() {
+            if (ViewMinX == MinX && ViewMinY == MinY && ViewMaxX == MaxX && ViewMaxY == MaxY) {
+                Cursor = Cursors.Arrow;
+            } else {
+                Cursor = Cursors.SizeAll;
+            }
         }
 
         #region GraphStuff
@@ -515,6 +585,8 @@ namespace Mapping_Tools.Components.Graph {
         /// Removes all anchors between the first and last anchor and resets all tension values.
         /// </summary>
         public void Clear() {
+            ResetView();
+
             for (int i = 1; i < Anchors.Count - 1; ) {
                 RemoveAnchorAt(i);
             }
@@ -551,34 +623,32 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         public Point GetRelativePoint(Vector2 value) {
-            var t = new Vector2((value.X - MinX) / (MaxX - MinX), (value.Y - MinY) / (MaxY - MinY));
-            return new Point(t.X * ActualWidth, ActualHeight - t.Y * ActualHeight);
+            return new Point(GetRelativePointX(value.X), GetRelativePointY(value.Y));
         }
 
         public double GetRelativePointX(double valueX) {
-            return (valueX - MinX) / (MaxX - MinX) * ActualWidth;
+            return (valueX - ViewMinX) / ViewWidth * ActualWidth;
         }
 
         public double GetRelativePointY(double valueY) {
-            return  ActualHeight - (valueY - MinY) / (MaxY - MinY) * ActualHeight;
+            return  ActualHeight - (valueY - ViewMinY) / ViewHeight * ActualHeight;
         }
 
         public Vector2 GetValue(Point pos) {
-            var t = new Vector2(pos.X / ActualWidth, (ActualHeight - pos.Y) / ActualHeight);
-            return new Vector2(MinX + (MaxX - MinX) * t.X, MinY + (MaxY - MinY) * t.Y);
+            return new Vector2(GetValueX(pos.X), GetValueY(pos.Y));
         }
 
-        public Vector2 GetValueRelative(Point pos) {
-            var t = new Vector2(pos.X / ActualWidth, - pos.Y / ActualHeight);
-            return new Vector2((MaxX - MinX) * t.X,  (MaxY - MinY) * t.Y);
+        public Vector2 GetValueVector(Point pos) {
+            var t = new Vector2(pos.X / ActualWidth, -pos.Y / ActualHeight);
+            return new Vector2(ViewWidth * t.X, ViewHeight * t.Y);
         }
 
         public double GetValueX(double pointX) {
-            return MinX + (MaxX - MinX) * (pointX / ActualWidth);
+            return ViewMinX + ViewWidth * (pointX / ActualWidth);
         }
 
         public double GetValueY(double pointY) {
-            return MinY + (MaxY - MinY) * ((ActualHeight - pointY) / ActualHeight);
+            return ViewMinY + ViewHeight * ((ActualHeight - pointY) / ActualHeight);
         }
 
         public Vector2 GetValue(GraphMarker marker) {
@@ -645,10 +715,19 @@ namespace Mapping_Tools.Components.Graph {
                     oldMaxY = (double) e.OldValue;
                     break;
             }
-            foreach (var anchor in g.Anchors) {
-                anchor.Pos = new Vector2(g.ScaleOnBoundChangeHorizontal ? g.MinX + (g.MaxX - g.MinX) * (anchor.Pos.X - oldMinX) / (oldMaxX - oldMinX) : anchor.Pos.X,
-                                         g.ScaleOnBoundChangeVertical ? g.MinY + (g.MaxY - g.MinY) * (anchor.Pos.Y - oldMinY) / (oldMaxY - oldMinY) : anchor.Pos.Y);
+            if (g.ScaleOnBoundChangeHorizontal || g.ScaleOnBoundChangeVertical) {
+                foreach (var anchor in g.Anchors) {
+                    anchor.Pos = new Vector2(g.ScaleOnBoundChangeHorizontal ? g.MinX + (g.MaxX - g.MinX) * (anchor.Pos.X - oldMinX) / (oldMaxX - oldMinX) : anchor.Pos.X,
+                                             g.ScaleOnBoundChangeVertical ? g.MinY + (g.MaxY - g.MinY) * (anchor.Pos.Y - oldMinY) / (oldMaxY - oldMinY) : anchor.Pos.Y);
+                }
             }
+            g.ResetView();
+            g.RegenerateMarkers();
+        }
+
+        private static void OnViewChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            var g = (Graph)d;
+            g.SetCursor();
             g.RegenerateMarkers();
         }
 
@@ -744,10 +823,10 @@ namespace Mapping_Tools.Components.Graph {
         public void RegenerateMarkers() {
             _markers.Clear();
             if (HorizontalMarkerGenerator != null)
-                _markers.AddRange(HorizontalMarkerGenerator.GenerateMarkers(MinX, MaxX, Orientation.Vertical,
+                _markers.AddRange(HorizontalMarkerGenerator.GenerateMarkers(ViewMinX, ViewMaxX, Orientation.Vertical,
                     (int)(ActualWidth / MinMarkerSpacing)));
             if (VerticalMarkerGenerator != null)
-                _markers.AddRange(VerticalMarkerGenerator.GenerateMarkers(MinY, MaxY, Orientation.Horizontal,
+                _markers.AddRange(VerticalMarkerGenerator.GenerateMarkers(ViewMinY, ViewMaxY, Orientation.Horizontal,
                     (int)(ActualHeight / MinMarkerSpacing)));
 
             UpdateMarkers();
@@ -800,22 +879,53 @@ namespace Mapping_Tools.Components.Graph {
             // Check if there are at least 2 anchors
             if (Anchors == null || Anchors.Count < 2) return;
 
+            // Get the clamping bounds of the view
+            var b1 = new Vector2(ViewMinX, ViewMinY);
+            var b2 = new Vector2(ViewMaxX, ViewMaxY);
+
             // Calculate interpolation line
             var points = new PointCollection();
             for (int i = 1; i < Anchors.Count; i++) {
+                if (ViewWidth <= 0) continue;
+
                 var previous = Anchors[i - 1];
                 var next = Anchors[i];
 
-                points.Add(GetRelativePoint(previous.Pos));
+                if (next.Pos.X < ViewMinX || previous.Pos.X > ViewMaxX) {
+                    continue;
+                }
 
-                for (int k = 1; k < GetRelativePointX(next.Pos.X) - GetRelativePointX(previous.Pos.X); k++) {
-                    var x = previous.Pos.X + k / ActualWidth * (MaxX - MinX);
+                var previousPos = Vector2.Clamp(previous.Pos, b1, b2);
+                var nextPos = Vector2.Clamp(next.Pos, b1, b2);
 
-                    points.Add(GetRelativePoint(new Vector2(x, GetValue(x))));
+                var previousPoint = GetRelativePoint(previousPos);
+                var nextPoint = GetRelativePoint(nextPos);
+
+                if (previous.Pos.X >= ViewMinX && previous.Pos.X <= ViewMaxX) {
+                    points.Add(previousPoint);
+                }
+
+                var maxPoints = Math.Min(1000, nextPoint.X - previousPoint.X);
+                var width = nextPos.X - previousPos.X;
+                var d = width / maxPoints;
+                var start = previous.Pos.X >= ViewMinX && previous.Pos.X <= ViewMaxX ? 1 : 0;
+                var end = next.Pos.X >= ViewMinX && next.Pos.X <= ViewMaxX ? maxPoints - 1 : maxPoints;
+                for (int k = start; k <= end; k++) {
+                    var x = previousPos.X + k * d;
+
+                    if (x + d < ViewMinX || x - d > ViewMaxX)
+                        continue;
+
+                    x = Math.Clamp(x, ViewMinX, ViewMaxX);
+                    var p = Vector2.Clamp(new Vector2(x, GetValue(x)), b1, b2);
+
+                    points.Add(GetRelativePoint(p));
                 }
             }
-            points.Add(GetRelativePoint(Anchors[Anchors.Count - 1].Pos));
-            
+            if (Anchors[^1].Pos.X >= ViewMinX && Anchors[^1].Pos.X <= ViewMaxX) {
+                points.Add(GetRelativePoint(Vector2.Clamp(Anchors[^1].Pos, b1, b2)));
+            }
+
             // Draw line
             var line = new Polyline {Points = points, Stroke = Stroke, StrokeThickness = 2, IsHitTestVisible = false,
                 StrokeEndLineCap = PenLineCap.Round, StrokeStartLineCap = PenLineCap.Round, StrokeLineJoin = PenLineJoin.Round};
@@ -823,7 +933,8 @@ namespace Mapping_Tools.Components.Graph {
 
             // Draw area under line
             var points2 = new PointCollection(points) {
-                GetRelativePoint(new Vector2(Anchors[Anchors.Count - 1].Pos.X, VerticalAxis)), GetRelativePoint(new Vector2(Anchors[0].Pos.X, VerticalAxis))
+                GetRelativePoint(Vector2.Clamp(new Vector2(Anchors[Anchors.Count - 1].Pos.X, VerticalAxis), b1, b2)),
+                GetRelativePoint(Vector2.Clamp(new Vector2(Anchors[0].Pos.X, VerticalAxis), b1, b2))
             };
 
             var polygon = new Polygon {Points = points2, Fill = Fill, IsHitTestVisible = false};
@@ -857,6 +968,11 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private void RenderGraphPoint(GraphPointControl point) {
+            if (point.Pos.X < ViewMinX || point.Pos.X > ViewMaxX ||
+                point.Pos.Y < ViewMinY || point.Pos.Y > ViewMaxY) {
+                return;
+            }
+
             MainCanvas.Children.Add(point);
             var p = GetRelativePoint(point.Pos);
             Canvas.SetLeft(point, p.X - point.Width / 2);
@@ -951,6 +1067,39 @@ namespace Mapping_Tools.Components.Graph {
             UpdateVisual();
         }
 
+        private void Graph_OnMouseWheel(object sender, MouseWheelEventArgs e) {
+            var zoomPoint = GetValue(e.GetPosition(this));
+
+            if (zoomPoint.X < 0 || zoomPoint.Y < 0 || zoomPoint.X > MaxX || zoomPoint.Y > MaxY)
+                return;
+
+            var scale = Math.Pow(2, -e.Delta / 240d);
+            var scaleX = Keyboard.IsKeyDown(Key.LeftCtrl) ? 1 : scale;
+            var scaleY = Keyboard.IsKeyDown(Key.LeftShift) ? 1 : scale;
+
+            // Get new view box
+            var v1 = new Vector2(
+                (ViewMinX - zoomPoint.X) * scaleX,
+                (ViewMinY - zoomPoint.Y) * scaleY) + zoomPoint;
+            var v2 = new Vector2(
+                (ViewMaxX - zoomPoint.X) * scaleX,
+                (ViewMaxY - zoomPoint.Y) * scaleY) + zoomPoint;
+
+            // Clamp into bounds of graph
+            var b1 = new Vector2(MinX, MinY);
+            var b2 = new Vector2(MaxX, MaxY);
+
+            v1 = Vector2.Clamp(v1, b1, b2);
+            v2 = Vector2.Clamp(v2, b1, b2);
+
+            ViewMinX = v1.X;
+            ViewMinY = v1.Y;
+            ViewMaxX = v2.X;
+            ViewMaxY = v2.Y;
+
+            RegenerateMarkers();
+        }
+
         private void UpdateMarkers() {
             foreach (var graphMarker in _markers.Concat(ExtraMarkers)) {
                 graphMarker.Stroke = EdgesBrush;
@@ -969,6 +1118,52 @@ namespace Mapping_Tools.Components.Graph {
 
         private void Graph_OnSizeChanged(object sender, SizeChangedEventArgs e) {
             RegenerateMarkers();
+        }
+
+        private void UserControl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) {
+            _lastMousePoint = e.GetPosition(this);
+
+            CaptureMouse();
+            _isDragging = true;
+            e.Handled = true;
+        }
+
+        private void UserControl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
+            ReleaseMouseCapture();
+            _isDragging = false;
+            e.Handled = true;
+        }
+
+        private void UserControl_MouseMove(object sender, MouseEventArgs e) {
+            if (!_isDragging) return;
+
+            if (e.RightButton != MouseButtonState.Pressed && e.LeftButton != MouseButtonState.Pressed) {
+                ReleaseMouseCapture();
+                _isDragging = false;
+                return;
+            }
+
+            // Get the position of the mouse relative to the Canvas
+            var newMousePoint = e.GetPosition(this);
+            var diff = _lastMousePoint - newMousePoint;
+            _lastMousePoint = newMousePoint;
+
+            // Move the view box by diff
+            var valueDiff = GetValueVector(new Point(diff.X, diff.Y));
+
+            var v1 = new Vector2(ViewMinX, ViewMinY);
+            var v2 = new Vector2(ViewMaxX, ViewMaxY);
+            var b1 = new Vector2(MinX, MinY);
+            var b2 = new Vector2(MaxX, MaxY);
+
+            valueDiff = Vector2.Clamp(valueDiff, b1 - v1, b2 - v2);
+
+            ViewMinX += valueDiff.X;
+            ViewMinY += valueDiff.Y;
+            ViewMaxX += valueDiff.X;
+            ViewMaxY += valueDiff.Y;
+
+            e.Handled = true;
         }
     }
 }

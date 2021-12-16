@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.BeatmapHelper.BeatDivisors;
+using System.Text.Json.Serialization;
 
 namespace Mapping_Tools.Viewmodels {
 
@@ -102,9 +103,13 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
+        [JsonIgnore]
         public CommandImplementation ImportLoadCommand { get; }
+        [JsonIgnore]
         public CommandImplementation ImportBrowseCommand { get; }
+        [JsonIgnore]
         public CommandImplementation ExportLoadCommand { get; }
+        [JsonIgnore]
         public CommandImplementation ExportBrowseCommand { get; }
 
         public event PropertyChangedEventHandler PropertyChanged;

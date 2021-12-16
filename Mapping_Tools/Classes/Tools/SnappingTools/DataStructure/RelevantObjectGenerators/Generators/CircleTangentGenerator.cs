@@ -24,8 +24,12 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
             var d = Vector2.Distance(point.Child, c);
             var r = circle.Child.Radius;
 
-            var b = r / (d * Math.Sqrt(1 - r * r / (d * d)));
+            if (d - r < 0.5) {
+                // Degenerate to single tangent line
+                return new[] { new RelevantLine(new Line2(point.Child, (point.Child - c).PerpendicularLeft)) };
+            }
 
+            var b = r / (d * Math.Sqrt(1 - r * r / (d * d)));
             var v = (point.Child - c).PerpendicularLeft * b;
 
             return new[] {

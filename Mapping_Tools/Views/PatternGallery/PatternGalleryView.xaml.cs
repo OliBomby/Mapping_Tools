@@ -280,6 +280,11 @@ namespace Mapping_Tools.Views.PatternGallery {
 
         private void PatternRow_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
             try {
+                if (sender is DataGridRow row && row.Item is OsuPattern pattern) {
+                    // Select only this pattern
+                    ViewModel.IsAllItemsSelected = false;
+                    pattern.IsSelected = true;
+                }
                 QuickRun();
             } catch (Exception ex) { ex.Show(); }
         }

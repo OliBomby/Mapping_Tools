@@ -223,7 +223,7 @@ namespace Mapping_Tools.Components.Graph {
                 drag.X = 0;
             }
 
-            var movement = Graph.GetValueRelative(new Point(drag.X, drag.Y));
+            var movement = Graph.GetValueVector(new Point(drag.X, drag.Y));
             Graph.MoveAnchorTo(this, Pos + movement);
         }
 

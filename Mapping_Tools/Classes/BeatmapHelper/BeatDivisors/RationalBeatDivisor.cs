@@ -58,5 +58,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper.BeatDivisors {
         public static IBeatDivisor[] GetDefaultBeatDivisors() {
             return new IBeatDivisor[] {new RationalBeatDivisor(16), new RationalBeatDivisor(12)};
         }
+
+        public override string ToString() {
+            return $"{Numerator}/{Denominator}";
+        }
     }
 }

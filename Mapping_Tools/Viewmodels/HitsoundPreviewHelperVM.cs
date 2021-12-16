@@ -4,6 +4,7 @@ using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Components.Domain;
 using Mapping_Tools.Views.RhythmGuide;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -16,7 +17,7 @@ namespace Mapping_Tools.Viewmodels {
     public class HitsoundPreviewHelperVm : INotifyPropertyChanged
     {
         private ObservableCollection<HitsoundZone> _items;
-        private bool? _isAllItemsSelected;
+        private bool? _isAllItemsSelected = false;
         private RhythmGuideWindow _rhythmGuideWindow;
 
         public HitsoundPreviewHelperVm() {
@@ -83,6 +84,7 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
+        [JsonIgnore]
         public bool? IsAllItemsSelected {
             get => _isAllItemsSelected;
             set {
@@ -103,13 +105,19 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
+        [JsonIgnore]
         public CommandImplementation RhythmGuideCommand { get; }
+        [JsonIgnore]
         public CommandImplementation AddCommand { get; }
+        [JsonIgnore]
         public CommandImplementation CopyCommand { get; }
+        [JsonIgnore]
         public CommandImplementation RemoveCommand { get; }
 
+        [JsonIgnore]
         public IEnumerable<string> SampleSets => Enum.GetNames(typeof(SampleSet));
 
+        [JsonIgnore]
         public IEnumerable<string> Hitsounds => Enum.GetNames(typeof(Hitsound));
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -103,6 +103,7 @@ namespace Mapping_Tools.Views.HitsoundPreviewHelper
                     tlo.SampleSet = column.SampleSet;
                     tlo.AdditionSet = column.AdditionsSet;
                     tlo.CustomIndex = column.CustomIndex;
+                    tlo.SampleVolume = 0;
                     tlo.SetHitsound(column.Hitsound);
                     tlo.HitsoundsToOrigin();
 

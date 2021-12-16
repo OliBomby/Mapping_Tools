@@ -11,6 +11,7 @@ using System.Windows.Media;
 using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.MathUtil;
+using System.Text.Json.Serialization;
 
 namespace Mapping_Tools.Viewmodels {
 
@@ -280,6 +281,7 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
+        [JsonIgnore]
         public Visibility BeatmapFileNameOverflowErrorVisibility {
             get => _beatmapFileNameOverflowErrorVisibility;
             set {
@@ -289,15 +291,24 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
+        [JsonIgnore]
         public CommandImplementation ImportLoadCommand { get; }
+        [JsonIgnore]
         public CommandImplementation ImportBrowseCommand { get; }
+        [JsonIgnore]
         public CommandImplementation ImportCommand { get; }
+        [JsonIgnore]
         public CommandImplementation ExportLoadCommand { get; }
+        [JsonIgnore]
         public CommandImplementation ExportBrowseCommand { get; }
 
+        [JsonIgnore]
         public CommandImplementation AddCommand { get; }
+        [JsonIgnore]
         public CommandImplementation RemoveCommand { get; }
+        [JsonIgnore]
         public CommandImplementation AddSpecialCommand { get; }
+        [JsonIgnore]
         public CommandImplementation RemoveSpecialCommand { get; }
 
         public event PropertyChangedEventHandler PropertyChanged;

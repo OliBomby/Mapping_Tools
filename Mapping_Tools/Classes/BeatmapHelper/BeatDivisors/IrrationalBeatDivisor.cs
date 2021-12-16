@@ -34,5 +34,9 @@
         public override int GetHashCode() {
             return Value.GetHashCode();
         }
+
+        public override string ToString() {
+            return GetValue().ToInvariant();
+        }
     }
 }

@@ -31,6 +31,7 @@ using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGene
 using Mapping_Tools.Classes.Tools.SnappingTools.Serialization;
 using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
 using MessageBox = System.Windows.MessageBox;
+using System.Diagnostics;
 
 namespace Mapping_Tools.Viewmodels {
     public class SnappingToolsVm : IDisposable
@@ -296,7 +297,13 @@ namespace Mapping_Tools.Viewmodels {
                     // Update old osu activated variable
                     _osuActivated = osuActivated;
 
-                    _coordinateConverter.OsuWindowPosition = new Vector2(_osuWindow.X, _osuWindow.Y);
+                    // Try to get the current osu window position, this can throw an exception
+                    try {
+                        _coordinateConverter.OsuWindowPosition = new Vector2(_osuWindow.X, _osuWindow.Y);
+                    } catch (Exception ex) {
+                        Debug.WriteLine(ex);
+                    }
+                    
                     _overlay.Update();
 
                     // Don't do hotkeys if osu is deactivated
@@ -392,7 +399,8 @@ namespace Mapping_Tools.Viewmodels {
         }
         
         private List<HitObject> GetHitObjects(SelectedHitObjectMode selectionMode) {
-            var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
+            // We want the actual position as seen on screen
+            var reader = EditorReaderStuff.GetFullEditorReaderOrNot(false);
 
             if (reader == null)
                 return new List<HitObject>();

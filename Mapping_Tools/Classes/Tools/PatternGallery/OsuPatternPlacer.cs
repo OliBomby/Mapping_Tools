@@ -1,12 +1,12 @@
 ﻿using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.BeatmapHelper.BeatDivisors;
+using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.ToolHelpers;
+using Mapping_Tools.Classes.Tools.MapCleanerStuff;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Mapping_Tools.Classes.BeatmapHelper.BeatDivisors;
-using Mapping_Tools.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Classes.ToolHelpers;
-using Mapping_Tools.Classes.Tools.MapCleanerStuff;
 
 namespace Mapping_Tools.Classes.Tools.PatternGallery {
     /// <summary>
@@ -144,17 +144,23 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
 
                 if (Precision.AlmostBigger(gap, PartingDistance)) {
                     parts.Add(new Part(beatmap.HitObjects[startIndex].Time,
-                        beatmap.HitObjects[i-1].GetEndTime(!beatMode), 
+                        GetEndTimeNoZeroLength(beatmap.HitObjects[i-1], beatMode), 
                         beatmap.HitObjects.GetRange(startIndex, i - startIndex)));
 
                     startIndex = i;
                 }
             }
             parts.Add(new Part(beatmap.HitObjects[startIndex].Time,
-                beatmap.HitObjects[beatmap.HitObjects.Count-1].GetEndTime(!beatMode), 
+                GetEndTimeNoZeroLength(beatmap.HitObjects[^1], beatMode), 
                 beatmap.HitObjects.GetRange(startIndex, beatmap.HitObjects.Count - startIndex)));
 
             return parts;
+        }
+
+        private static double GetEndTimeNoZeroLength(HitObject ho, bool beatMode) {
+            var endTime = ho.GetEndTime(!beatMode);
+            // We want sliders to have at least 1 ms of length so the start time can always get a redline and have the part end after the slider start
+            return Precision.AlmostEquals(endTime, ho.Time, 1) && ho.IsSlider && !beatMode ? endTime + 1 : endTime;
         }
 
         private class Part {
@@ -341,8 +347,8 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 parts = PartitionBeatmap(patternBeatmap, scaleToNewTiming);
             } else {
                 parts = new List<Part> {
-                    new Part(patternBeatmap.HitObjects[0].Time, 
-                        patternBeatmap.HitObjects[patternBeatmap.HitObjects.Count-1].Time, 
+                    new(patternBeatmap.HitObjects.Min(o => o.Time), 
+                        patternBeatmap.HitObjects.Max(o => o.GetEndTime(!scaleToNewTiming)), 
                         patternBeatmap.HitObjects)
                 };
             }
@@ -355,7 +361,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             var lastEndTime = double.NegativeInfinity;
             foreach (var part in parts) {
                 var startTime = part.StartTime;
-                var endTime = part.EndTime;  // Subtract one to omit BPM changes right on the end of the part.
+                var endTime = part.EndTime;
 
                 // Add the redlines in between patterns
                 newTiming.AddRange(transformOriginalTiming.GetRedlinesInRange(lastEndTime, startTime, false));
@@ -382,7 +388,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                         inPartRedlines = tempInPartRedlines.Select(tp => {
                             if (Precision.AlmostEquals(tp.MpB, patternDefaultMpb)) {
                                 var tp2 = transformOriginalTiming.GetRedlineAtTime(tp.Offset).Copy();
-                                tp2.Offset = tp2.Offset;
+                                tp2.Offset = tp.Offset;
                                 return tp2;
                             }
 

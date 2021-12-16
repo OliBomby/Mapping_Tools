@@ -105,6 +105,84 @@ namespace Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff {
             return InterpolateVertices(IndexOfDistance(d), d);
         }
 
+        /// <summary>
+        /// Computes the position of the sliderball on the slider at a given ms
+        /// that ranges from 0 (beginning of the path) to timeLength (end of the path).
+        /// </summary>
+        /// <param name="ms">Ranges from 0 (beginning of the path) to timeLength (end of the path).</param>
+        /// <param name="timeLength"> Indicates the ms duration of the slider, using the slider velocity.</param>
+        /// <returns></returns>
+        public Vector2 SliderballPositionAt(int ms, int timeLength) {
+            EnsureInitialised();
+
+            int msSegmentIndex = IndexOfDistance(ProgressToDistance((double) ms / timeLength));
+            if (msSegmentIndex != 0) {
+                int testMsIndex;
+                int minMsInSegment = 0;
+                int maxMsInSegment = timeLength;
+                for (int testMs = ms; testMs >= 0; testMs--) {
+                    testMsIndex = IndexOfDistance(ProgressToDistance((double) testMs / timeLength));
+                    if (testMsIndex != msSegmentIndex) {
+                        minMsInSegment = testMs + 1;
+                        break;
+                    }
+                }
+                for (int testMs = ms; testMs <= timeLength; testMs++) {
+                    testMsIndex = IndexOfDistance(ProgressToDistance((double) testMs / timeLength));
+                    if (testMsIndex != msSegmentIndex) {
+                        maxMsInSegment = testMs - 1;
+                        break;
+                    }
+                }
+                int totalMsInSegment = maxMsInSegment - minMsInSegment + 1;
+                double msFracOfSegment = (double) (ms - minMsInSegment + 1) / totalMsInSegment;
+
+                Vector2 p0 = calculatedPath[msSegmentIndex - 1];
+                Vector2 p1 = calculatedPath[msSegmentIndex];
+
+                return p0 + (p1 - p0) * msFracOfSegment;
+            }
+            else {
+                return calculatedPath[0];
+            }
+        }
+
+        /// <summary>
+        /// Computes the position of the sliderball on the slider at all ms from 0 to timeLength.
+        /// </summary>
+        /// <param name="timeLength"> Indicates the ms duration of the slider, using the slider velocity.</param>
+        /// <returns>
+        /// A Vector2 array such that the index i contains the position of the sliderball at the ith ms.
+        /// </returns>
+        public Vector2[] SliderballPositions(int timeLength) {
+            EnsureInitialised();
+
+            Vector2[] sbPositions = new Vector2[timeLength + 1];
+            int[] msPerSegment = new int[cumulativeLength.Count];
+            for (int i = 0; i < timeLength+1; i++) {
+                int idx = IndexOfDistance(ProgressToDistance((double)i / timeLength));
+                if (idx < 0) idx = 0;
+                if (idx >= cumulativeLength.Count) idx = cumulativeLength.Count - 1;
+                msPerSegment[idx]++;
+            }
+
+            int curMs = 0;
+            for (int j = 0; j < msPerSegment[0]; j++) {
+                sbPositions[curMs] = calculatedPath[0];
+                curMs++;
+            }
+            for (int i = 1; i < cumulativeLength.Count; i++) {
+                Vector2 p0 = calculatedPath[i - 1];
+                Vector2 p1 = calculatedPath[i];
+                for (int j = 1; j < msPerSegment[i]+1; j++) {
+                    sbPositions[curMs] = p0 + (p1 - p0) * j / msPerSegment[i];
+                    curMs++;
+                }
+            }
+
+            return sbPositions;
+        }
+
         private void EnsureInitialised() {
             if( isInitialised )
                 return;
