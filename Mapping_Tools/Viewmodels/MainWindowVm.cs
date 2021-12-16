@@ -209,7 +209,7 @@ namespace Mapping_Tools.Viewmodels {
 
         private void CreateContextMenu(FrameworkElement item, string name) {
             var cm = new ContextMenu();
-            var menuItem = new MenuItem { Header = "_Favorite", Tag = item };
+            var menuItem = new MenuItem { Tag = item };
             UpdateMenuItem(menuItem, SettingsManager.Settings.FavoriteTools.Contains(name));
             menuItem.Click += FavoriteItem_OnClick;
             cm.Items.Add(menuItem);
@@ -238,6 +238,7 @@ namespace Mapping_Tools.Viewmodels {
             mi.Icon = isFavorite ?
                 new PackIcon { Kind = PackIconKind.Star } :
                 new PackIcon { Kind = PackIconKind.StarBorder };
+            mi.Header = isFavorite ? @"_Unfavorite" : @"_Favorite";
         }
 
         private bool SearchItemsFilter(object obj) {
