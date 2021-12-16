@@ -18,7 +18,7 @@ using System.Windows.Input;
 
 namespace Mapping_Tools.Viewmodels {
     public class MainWindowVm : BindableBase {
-        private readonly ICollectionView navigationItemsView;
+        private ICollectionView navigationItemsView;
 
         private List<FrameworkElement> DefaultItems;
         private List<FrameworkElement> ToolItems;
@@ -146,9 +146,6 @@ namespace Mapping_Tools.Viewmodels {
 
             GenerateNavigationItems();
             UpdateNavigationItems();
-
-            navigationItemsView = CollectionViewSource.GetDefaultView(NavigationItems);
-            navigationItemsView.Filter = SearchItemsFilter;
         }
 
         public CommandImplementation GoToSelectedPage { get; }
@@ -193,6 +190,8 @@ namespace Mapping_Tools.Viewmodels {
             items = items.Concat(ToolItems);
             
             NavigationItems = new ObservableCollection<FrameworkElement>(items);
+            navigationItemsView = CollectionViewSource.GetDefaultView(NavigationItems);
+            navigationItemsView.Filter = SearchItemsFilter;
         }
 
         private ListBoxItem CreateNavigationItem(Type type, double verticalMargin=4) {
