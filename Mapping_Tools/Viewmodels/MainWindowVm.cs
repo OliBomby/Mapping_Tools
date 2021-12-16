@@ -162,16 +162,18 @@ namespace Mapping_Tools.Viewmodels {
 
         private void GenerateToolItems() {
             var tools = ViewCollection.GetAllToolTypes()
-                .Where(o => o.GetCustomAttribute<HiddenToolAttribute>() == null)
+                .Where(o => o.GetCustomAttribute<HiddenToolAttribute>() == null &&
+                            !SettingsManager.Settings.FavoriteTools.Contains(ViewCollection.GetName(o)))
                 .OrderBy(ViewCollection.GetName);
             ToolItems = tools.Select(o => (FrameworkElement)CreateNavigationItem(o, 2)).ToList();
         }
 
         private void GenerateFavoriteToolItems() {
-            FavoriteItems = SettingsManager.Settings.FavoriteTools.Select(ViewCollection.GetType)
-                .Where(o => o is not null && o.GetCustomAttribute<HiddenToolAttribute>() == null)
-                .OrderBy(ViewCollection.GetName)
-                .Select(o => (FrameworkElement)CreateNavigationItem(o, 2)).ToList();
+            var tools = ViewCollection.GetAllToolTypes()
+                .Where(o => o.GetCustomAttribute<HiddenToolAttribute>() == null &&
+                            SettingsManager.Settings.FavoriteTools.Contains(ViewCollection.GetName(o)))
+                .OrderBy(ViewCollection.GetName);
+            FavoriteItems = tools.Select(o => (FrameworkElement)CreateNavigationItem(o, 2)).ToList();
         }
 
         private void GenerateNavigationItems() {
@@ -224,6 +226,7 @@ namespace Mapping_Tools.Viewmodels {
                 }
                 // Update favorite list in UI
                 GenerateFavoriteToolItems();
+                GenerateToolItems();
                 UpdateNavigationItems();
             }
         }
