@@ -57,13 +57,7 @@ namespace Mapping_Tools.Viewmodels {
         private ListBoxItem selectedPageItem;
         public ListBoxItem SelectedPageItem {
             get => selectedPageItem;
-            set {
-                // Detect if the selection change was by a mouse click by checking button state
-                // This is pretty ghetto and should be changed
-                if (Set(ref selectedPageItem, value) && Mouse.LeftButton == MouseButtonState.Pressed) {
-                    GoToSelectedPage.Execute(null);
-                }
-            }
+            set => Set(ref selectedPageItem, value);
         }
 
         private string searchKeyword;
@@ -201,9 +195,18 @@ namespace Mapping_Tools.Viewmodels {
             var content = new TextBlock { Text = name, Margin = new Thickness(10, verticalMargin, 0, verticalMargin) };
             var item = new ListBoxItem { Tag = name, ToolTip = $"Open {name}.", Content = content};
             CreateContextMenu(item, name);
+            item.PreviewMouseLeftButtonDown += ItemOnPreviewMouseLeftButtonDown;
             return item;
         }
-        
+
+        private void ItemOnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) {
+            if (sender is ListBoxItem item) {
+                selectedPageItem = item;
+                GoToSelectedPage.Execute(null);
+                e.Handled = true;
+            }
+        }
+
         private void CreateContextMenu(FrameworkElement item, string name) {
             var cm = new ContextMenu();
             var menuItem = new MenuItem { Header = "_Favorite", Tag = item };
