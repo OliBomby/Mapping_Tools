@@ -101,6 +101,10 @@
                             <ListBox.Resources>
                                 <Style TargetType="ScrollBar" BasedOn="{StaticResource MaterialDesignScrollBarMinimal}"/>
                             </ListBox.Resources>
+                            <ListBox.InputBindings>
+                                <KeyBinding Key="Return" 
+                                            Command="{Binding GoToSelectedPage}"/>
+                            </ListBox.InputBindings>
                         </ListBox>
                     </DockPanel>
                 </materialDesign:DrawerHost.LeftDrawerContent>
