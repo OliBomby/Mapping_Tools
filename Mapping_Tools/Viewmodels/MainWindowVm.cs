@@ -131,13 +131,13 @@ namespace Mapping_Tools.Viewmodels {
             });
 
             SelectedPageUp = new CommandImplementation(_ => {
-                navigationItemsView.MoveCurrentToPrevious();
                 SelectedPageItem = navigationItemsView.CurrentItem as ListBoxItem;
+                SelectedPageItem?.Focus();
             });
 
             SelectedPageDown = new CommandImplementation(_ => {
-                navigationItemsView.MoveCurrentToNext();
                 SelectedPageItem = navigationItemsView.CurrentItem as ListBoxItem;
+                SelectedPageItem?.Focus();
             });
 
             ToggleNavigationDrawer = new CommandImplementation(_ => {
