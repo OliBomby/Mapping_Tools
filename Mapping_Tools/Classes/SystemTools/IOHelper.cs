@@ -201,9 +201,9 @@ namespace Mapping_Tools.Classes.SystemTools {
 
         public static string GetCurrentBeatmapOrCurrentBeatmap() {
             try {
-                return GetCurrentBeatmap();
-            }
-            catch {
+                string path = GetCurrentBeatmap();
+                return File.Exists(path) ? path : MainWindow.AppWindow.GetCurrentMaps()[0];
+            } catch {
                 return MainWindow.AppWindow.GetCurrentMaps()[0];
             }
         }
