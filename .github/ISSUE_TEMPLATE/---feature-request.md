@@ -15,6 +15,5 @@ assignees: ''
 ## Description
 A clear and concise description of what the feature is
 
-
 ## Motivation
 Outline the motivation for this feature and why it should be implemented. Has it been requested by a large amount of users? Does it address a problem that currently can't, or is difficult to, be fixed?
