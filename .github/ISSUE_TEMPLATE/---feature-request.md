@@ -10,7 +10,7 @@ assignees: ''
 ## Prerequisites
 <!-- replace the space between brackets to an `x` to "check" them -->
 
-- [ ] I have asked on the [Mapping Tools Discord](https://discord.gg/YfijKN2yjQV) and confirmed that the feature requested does not already exist in Mapping Tools
+- [ ] I have checked the [Trello](https://trello.com/b/iTmmw3eP/mapping-tools) and confirmed that the feature is not already planned
 
 ## Description
 A clear and concise description of what the feature is
