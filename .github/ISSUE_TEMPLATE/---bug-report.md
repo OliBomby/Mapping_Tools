@@ -21,11 +21,7 @@ assignees: ''
 **Mapping Tools version**: 
 
 ## Description
-<!-- A clear and concise description of the bug, ie "what actually happened" -->
-
-
-### Expected behavior
-A clear and concise description of what you expected to happen
+A clear and concise description of the bug. What did you expect to happen, and what actually happened?
 
 ### Reproduction
 <!-- Are you able to reliably reproduce this bug? If so, describe the minimal steps needed to do so -->
