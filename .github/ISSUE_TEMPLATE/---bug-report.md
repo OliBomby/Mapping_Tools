@@ -8,6 +8,8 @@ assignees: ''
 ---
 
 ## Prerequisites
+<!-- replace the space between brackets to an `x` to "check" them -->
+
 - [ ] I have read the [Mapping Tools FAQ](https://mappingtools.github.io/faq)
 
 ## Environment

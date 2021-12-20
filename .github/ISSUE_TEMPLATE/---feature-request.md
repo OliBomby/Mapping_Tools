@@ -8,6 +8,8 @@ assignees: ''
 ---
 
 ## Prerequisites
+<!-- replace the space between brackets to an `x` to "check" them -->
+
 - [ ] I have asked on the [Mapping Tools Discord](https://discord.gg/YfijKN2yjQV) and confirmed that the feature requested does not already exist in Mapping Tools
 
 ## Description
