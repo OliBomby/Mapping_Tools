@@ -29,7 +29,7 @@
 
 
               <StackPanel Orientation="Horizontal" Grid.Row="0">
-                <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
+                <TextBlock FontSize="32" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
                   <Run Text="Hitsound Preview Helper"/>
                 </TextBlock>
                     <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom" ToolTip="Click me!">

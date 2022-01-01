@@ -31,7 +31,7 @@
         </Grid.RowDefinitions>
         <Grid Name="TitleGrid" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
           <StackPanel Orientation="Horizontal">
-            <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
+            <TextBlock FontSize="32" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
               <Run Text="Hitsound Studio"/>
             </TextBlock>
                 <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom" ToolTip="Click me!">

@@ -8,7 +8,7 @@
              d:DesignWidth="300"
              mc:Ignorable="d">
     <StackPanel x:Name="MainPanel" Orientation="Horizontal">
-        <TextBlock x:Name="HeaderTextBlock" Text="Test" FontSize="40" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,5,0" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+        <TextBlock x:Name="HeaderTextBlock" Text="Test" FontSize="32" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,5,0" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
         <materialDesign:PopupBox x:Name="DescriptionIcon" Margin="5">
             <materialDesign:PopupBox.ToggleContent>
                 <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryAccentBrush}"/>
