@@ -35,6 +35,7 @@
     <Window.Resources>
         <domain:MapPathStringToCountStringConverter x:Key="MapPathStringToCountStringConverter" />
         <domain:MapPathStringAddNewLinesConverter x:Key="MapPathStringAddNewLinesConverter" />
+        <domain:MapPathStringJustFilenameConverter x:Key="MapPathStringJustFilenameConverter" />
         <DataTemplate DataType="{x:Type viewmodels:StandardVm}">
             <standard:StandardView DataContext="{Binding}" />
         </DataTemplate>
@@ -54,25 +55,156 @@
             SnackbarMessageQueue="{Binding ElementName=MainSnackbar, Path=MessageQueue}"
             Style="{StaticResource MaterialDesignEmbeddedDialogHost}">
 
-            <materialDesign:DrawerHost
-                LeftDrawerCloseOnClickAway="True"
-                IsLeftDrawerOpen="{Binding DrawerOpen}">
-                <materialDesign:DrawerHost.LeftDrawerContent>
-                    <DockPanel MinWidth="220">
-                        <ToggleButton 
-                            WindowChrome.IsHitTestVisibleInChrome="true"
-                            Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
-                            DockPanel.Dock="Top"
-                            HorizontalAlignment="Right" 
-                            Margin="16"
-                            IsChecked="{Binding DrawerOpen}"/>
+            <Grid MouseDown="DragWin">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <materialDesign:ColorZone
+                    Grid.Row="0"
+                    Padding="0"
+                    Height="35"
+                    materialDesign:ShadowAssist.ShadowDepth="Depth2"
+                    Mode="PrimaryMid">
+                    <DockPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <ToggleButton
+                                x:Name="MenuToggleButton"
+                                WindowChrome.IsHitTestVisibleInChrome="true"
+                                VerticalAlignment="Center"
+                                Margin="5 0"
+                                Style="{StaticResource MaterialDesignActionToggleButton}"
+                                Height="35"
+                                IsChecked="{Binding DrawerOpen}"
+                                AutomationProperties.Name="HamburgerToggleButton"
+                                ToolTip="Use Ctrl+K to use this toggle anywhere in the program.">
+                                <ToggleButton.Content>
+                                    <materialDesign:PackIcon Width="28" Height="28" Kind="Menu" Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                </ToggleButton.Content>
+                                <materialDesign:ToggleButtonAssist.OnContent>
+                                    <materialDesign:PackIcon Width="28" Height="28" Kind="Menu"/>
+                                </materialDesign:ToggleButtonAssist.OnContent>
+                            </ToggleButton>
 
-                        <TextBox 
+                            <Menu 
+                                WindowChrome.IsHitTestVisibleInChrome="true" 
+                                IsMainMenu="True"
+                                Background="{DynamicResource PrimaryHueMidBrush}"
+                                Foreground="{DynamicResource PrimaryHueMidForegroundBrush}">
+                                <MenuItem Header="_File" MinWidth="50" Height="35">
+                                    <MenuItem Header="_Open beatmap" Click="OpenBeatmap" Icon="{materialDesign:PackIcon Folder}"
+                                        ToolTip="Select the current beatmap with File Explorer." />
+                                    <MenuItem Header="_Open current beatmap" Click="OpenGetCurrentBeatmap" Icon="{materialDesign:PackIcon RestoreFromTrash}"
+                                        ToolTip="Set the current beatmap to the selected beatmap in your osu! client." />
+                                    <MenuItem Header="_Generate backup" Click="SaveBackup" Icon="{materialDesign:PackIcon Backup}"
+                                        ToolTip="Save a backup of the current beatmap to the backups folder." />
+                                    <MenuItem Header="_Load backup" Click="LoadBackup" Icon="{materialDesign:PackIcon BackupRestore}"
+                                        ToolTip="Load a backup from the backups folder into the current beatmap." />
+                                    <MenuItem Header="_BetterSave™ current beatmap" Click="CoolSave" Icon="{materialDesign:PackIcon ContentSave}"
+                                        ToolTip="Save the beatmap which is currently open in your osu! editor. BetterSave™ saves the beatmap just like the vanilla editor, but decimal values get rounded instead of truncated." />
+                                </MenuItem>
+                                <Separator/>
+                                <MenuItem Header="_About" MinWidth="67" Height="35">
+                                    <MenuItem Header="_About" Click="OpenInfo" Icon="{materialDesign:PackIcon InfoCircle}"/>
+                                    <MenuItem Header="_Website" Click="OpenWebsite" Icon="{materialDesign:PackIcon OpenInBrowser}"
+                                        ToolTip="Open the official Mapping Tools website in your browser." />
+                                    <MenuItem Header="_Github" Click="OpenGitHub" Icon="{materialDesign:PackIcon Github}"
+                                        ToolTip="Go to the Mapping Tools Github." />
+                                    <MenuItem Header="_Open backups folder" Click="OpenBackups" Icon="{materialDesign:PackIcon FolderOpen}"
+                                        ToolTip="Open the backups folder." />
+                                    <MenuItem Header="_Open Mapping Tools folder" Click="OpenConfig" Icon="{materialDesign:PackIcon FolderOpen}"
+                                        ToolTip="Open the Mapping Tools folder." />
+                                    <MenuItem Header="_Check for updates" Click="MenuItem_OnClick" Icon="{materialDesign:PackIcon Update}"
+                                        ToolTip="Check if there are updates available." />
+                                </MenuItem>
+                                <MenuItem Visibility="{Binding ProjectMenuVisibility}" Header="_Project" Height="35" MinWidth="67" ItemsSource="{Binding ProjectMenuItems}"/>
+                            </Menu>
+                        </StackPanel>
+
+                        <StackPanel DockPanel.Dock="Right"  
+                                    Panel.ZIndex="5" 
+                                    WindowChrome.IsHitTestVisibleInChrome="true" 
+                                    HorizontalAlignment="Right" 
+                                    VerticalAlignment="Top"
+                                    Orientation="Horizontal">
+                            <Button Style="{DynamicResource MaterialDesignFlatButton}" 
+                                    Content="{materialDesign:PackIcon WindowMinimize}" 
+                                    Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
+                                    Click="MinimizeWin" />
+                            <Button x:Name="toggle_button" 
+                                    Style="{DynamicResource MaterialDesignFlatButton}" 
+                                    Content="{materialDesign:PackIcon WindowMaximize}" 
+                                    Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
+                                    Click="ToggleWin" />
+                            <Button Style="{DynamicResource MaterialDesignFlatButton}" 
+                                    Content="{materialDesign:PackIcon WindowCLose}" 
+                                    Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
+                                    Click="CloseWin">
+                                <Button.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="_Exit without saving" Click="CloseWinNoSave"
+                                            ToolTip="Exits the program without saving any preferences or tool settings." />
+                                    </ContextMenu>
+                                </Button.ContextMenu>
+                            </Button>
+                        </StackPanel>
+
+                        <materialDesign:ColorZone
+                            WindowChrome.IsHitTestVisibleInChrome="True" 
+                            ToolTip="{Binding CurrentBeatmaps, Converter={StaticResource MapPathStringAddNewLinesConverter}}"
+                            VerticalAlignment="Center"
+                            Margin="10 0"
+                            CornerRadius="2"
+                            Padding="5"
+                            Mode="PrimaryDark">
+                            <materialDesign:ColorZone.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="_Open beatmap" Click="OpenBeatmap" Icon="{materialDesign:PackIcon Folder}"
+                                        ToolTip="Select the current beatmap with File Explorer." />
+                                    <MenuItem Header="_Open current beatmap" Click="OpenGetCurrentBeatmap" Icon="{materialDesign:PackIcon RestoreFromTrash}"
+                                        ToolTip="Set the current beatmap to the selected beatmap in your osu! client." />
+                                    <MenuItem Header="_Generate backup" Click="SaveBackup" Icon="{materialDesign:PackIcon Backup}"
+                                        ToolTip="Save a backup of the current beatmap to the backups folder." />
+                                    <MenuItem Header="_Load backup" Click="LoadBackup" Icon="{materialDesign:PackIcon BackupRestore}"
+                                        ToolTip="Load a backup from the backups folder into the current beatmap." />
+                                    <MenuItem Header="_BetterSave™ current beatmap" Click="CoolSave" Icon="{materialDesign:PackIcon ContentSave}"
+                                        ToolTip="Save the beatmap which is currently open in your osu! editor. BetterSave™ saves the beatmap just like the vanilla editor, but decimal values get rounded instead of truncated." />
+                                </ContextMenu>
+                            </materialDesign:ColorZone.ContextMenu>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock 
+                                    Grid.Column="0"
+                                    Name="currentMaps" 
+                                    HorizontalAlignment="Center"
+                                    TextWrapping="NoWrap" 
+                                    TextTrimming="None" 
+                                    FontWeight="Normal" 
+                                    Text="{Binding CurrentBeatmaps, Converter={StaticResource MapPathStringJustFilenameConverter}, Mode=OneWay}"/>
+                                <TextBlock Grid.Column="1" Margin="2 0 0 0" FontStyle="Italic" FontWeight="ExtraBold"
+                                    Text="{Binding CurrentBeatmaps, Converter={StaticResource MapPathStringToCountStringConverter}, Mode=OneWay}" />
+                            </Grid>
+                        </materialDesign:ColorZone>
+                    </DockPanel>
+                </materialDesign:ColorZone>
+
+                <materialDesign:DrawerHost
+                    Grid.Row="1"
+                    LeftDrawerCloseOnClickAway="True"
+                    IsLeftDrawerOpen="{Binding DrawerOpen, FallbackValue=True}"
+                    OpenMode="Standard">
+                    <materialDesign:DrawerHost.LeftDrawerContent>
+                        <DockPanel MinWidth="200">
+                            <TextBox 
                             x:Name="ToolSearchBox"
                             Text="{Binding SearchKeyword, UpdateSourceTrigger=PropertyChanged}"
                             DockPanel.Dock="Top"
-                            Margin="16, 4"
-                            Width="200"
+                            Margin="16 16 16 0"
+                            Padding="8"
+                            Width="Auto"
                             domain:FocusExtension.IsFocused="{Binding DrawerOpen}"
                             materialDesign:HintAssist.Hint="Search"
                             materialDesign:HintAssist.IsFloating="True"
@@ -80,17 +212,17 @@
                             materialDesign:TextFieldAssist.HasOutlinedTextField="True"
                             materialDesign:TextFieldAssist.DecorationVisibility="Collapsed"
                             materialDesign:TextFieldAssist.TextFieldCornerRadius="4">
-                            <TextBox.InputBindings>
-                                <KeyBinding Key="Return" 
+                                <TextBox.InputBindings>
+                                    <KeyBinding Key="Return" 
                                     Command="{Binding GoToSelectedPage}"/>
-                                <KeyBinding Key="Up" 
+                                    <KeyBinding Key="Up" 
                                             Command="{Binding SelectedPageUp}"/>
-                                <KeyBinding Key="Down" 
+                                    <KeyBinding Key="Down" 
                                             Command="{Binding SelectedPageDown}"/>
-                            </TextBox.InputBindings>
-                        </TextBox>
+                                </TextBox.InputBindings>
+                            </TextBox>
 
-                        <ListBox 
+                            <ListBox 
                             x:Name="ToolsMenu" 
                             Margin="0 16 0 16"
                             SelectedIndex="{Binding SelectedPageIndex}"
@@ -99,159 +231,36 @@
                             AutomationProperties.Name="ToolsMenu"
                             Style="{StaticResource MaterialDesignListBox}"
                             IsTextSearchEnabled="True">
-                            <ListBox.Resources>
-                                <Style TargetType="ScrollBar" BasedOn="{StaticResource MaterialDesignScrollBarMinimal}"/>
-                            </ListBox.Resources>
-                            <ListBox.InputBindings>
-                                <KeyBinding Key="Return" 
+                                <ListBox.Resources>
+                                    <Style TargetType="ScrollBar" BasedOn="{StaticResource MaterialDesignScrollBarMinimal}"/>
+                                </ListBox.Resources>
+                                <ListBox.InputBindings>
+                                    <KeyBinding Key="Return" 
                                             Command="{Binding GoToSelectedPage}"/>
-                            </ListBox.InputBindings>
-                        </ListBox>
-                    </DockPanel>
-                </materialDesign:DrawerHost.LeftDrawerContent>
-
-                <Grid MouseDown="DragWin">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <materialDesign:ColorZone
-                        Grid.Row="0"
-                        Padding="0"
-                        Height="48"
-                        materialDesign:ShadowAssist.ShadowDepth="Depth2"
-                        Mode="PrimaryMid">
-                        <DockPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <ToggleButton
-                                    x:Name="MenuToggleButton"
-                                    WindowChrome.IsHitTestVisibleInChrome="true"
-                                    VerticalAlignment="Center"
-                                    Margin="16 0"
-                                    Style="{StaticResource MaterialDesignHamburgerToggleButton}"
-                                    IsChecked="{Binding DrawerOpen}"
-                                    AutomationProperties.Name="HamburgerToggleButton"
-                                    ToolTip="Use Ctrl+K to use this toggle anywhere in the program."/>
-
-                                <Menu 
-                                    WindowChrome.IsHitTestVisibleInChrome="true" 
-                                    IsMainMenu="True"
-                                    Background="{DynamicResource PrimaryHueMidBrush}"
-                                    Foreground="{DynamicResource PrimaryHueMidForegroundBrush}">
-                                    <MenuItem Header="_File" MinWidth="50">
-                                        <MenuItem Header="_Open beatmap" Click="OpenBeatmap" Icon="{materialDesign:PackIcon Folder}"
-                                          ToolTip="Select the current beatmap with File Explorer." />
-                                        <MenuItem Header="_Open current beatmap" Click="OpenGetCurrentBeatmap" Icon="{materialDesign:PackIcon RestoreFromTrash}"
-                                          ToolTip="Set the current beatmap to the selected beatmap in your osu! client." />
-                                        <MenuItem Header="_Generate backup" Click="SaveBackup" Icon="{materialDesign:PackIcon Backup}"
-                                          ToolTip="Save a backup of the current beatmap to the backups folder." />
-                                        <MenuItem Header="_Load backup" Click="LoadBackup" Icon="{materialDesign:PackIcon BackupRestore}"
-                                          ToolTip="Load a backup from the backups folder into the current beatmap." />
-                                        <MenuItem Header="_BetterSave™ current beatmap" Click="CoolSave" Icon="{materialDesign:PackIcon ContentSave}"
-                                          ToolTip="Save the beatmap which is currently open in your osu! editor. BetterSave™ saves the beatmap just like the vanilla editor, but decimal values get rounded instead of truncated." />
-                                    </MenuItem>
-                                    <Separator/>
-                                    <MenuItem Header="_About" MinWidth="67">
-                                        <MenuItem Header="_About" Click="OpenInfo" Icon="{materialDesign:PackIcon InfoCircle}"/>
-                                        <MenuItem Header="_Website" Click="OpenWebsite" Icon="{materialDesign:PackIcon OpenInBrowser}"
-                                          ToolTip="Open the official Mapping Tools website in your browser." />
-                                        <MenuItem Header="_Github" Click="OpenGitHub" Icon="{materialDesign:PackIcon Github}"
-                                          ToolTip="Go to the Mapping Tools Github." />
-                                        <MenuItem Header="_Open backups folder" Click="OpenBackups" Icon="{materialDesign:PackIcon FolderOpen}"
-                                          ToolTip="Open the backups folder." />
-                                        <MenuItem Header="_Open Mapping Tools folder" Click="OpenConfig" Icon="{materialDesign:PackIcon FolderOpen}"
-                                          ToolTip="Open the Mapping Tools folder." />
-                                        <MenuItem Header="_Check for updates" Click="MenuItem_OnClick" Icon="{materialDesign:PackIcon Update}"
-                                          ToolTip="Check if there are updates available." />
-                                    </MenuItem>
-                                    <MenuItem Visibility="{Binding ProjectMenuVisibility}" Header="_Project" MinWidth="67" ItemsSource="{Binding ProjectMenuItems}"/>
-                                </Menu>
-                            </StackPanel>
-
-                            <StackPanel DockPanel.Dock="Right"  
-                                        Panel.ZIndex="5" 
-                                        WindowChrome.IsHitTestVisibleInChrome="true" 
-                                        HorizontalAlignment="Right" 
-                                        VerticalAlignment="Top"
-                                        Orientation="Horizontal">
-                                <Button Style="{DynamicResource MaterialDesignFlatButton}" 
-                                        Content="{materialDesign:PackIcon WindowMinimize}" 
-                                        Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
-                                        Click="MinimizeWin" />
-                                <Button x:Name="toggle_button" 
-                                        Style="{DynamicResource MaterialDesignFlatButton}" 
-                                        Content="{materialDesign:PackIcon WindowMaximize}" 
-                                        Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
-                                        Click="ToggleWin" />
-                                <Button Style="{DynamicResource MaterialDesignFlatButton}" 
-                                        Content="{materialDesign:PackIcon WindowCLose}" 
-                                        Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
-                                        Click="CloseWin">
-                                    <Button.ContextMenu>
-                                        <ContextMenu>
-                                            <MenuItem Header="_Exit without saving" Click="CloseWinNoSave"
-                                              ToolTip="Exits the program without saving any preferences or tool settings." />
-                                        </ContextMenu>
-                                    </Button.ContextMenu>
-                                </Button>
-                            </StackPanel>
-
-                            <materialDesign:ColorZone
-                                WindowChrome.IsHitTestVisibleInChrome="False" 
-                                ToolTip="{Binding CurrentBeatmaps, Converter={StaticResource MapPathStringAddNewLinesConverter}}"
-                                VerticalAlignment="Center"
-                                Margin="10 0"
-                                CornerRadius="2"
-                                Padding="8"
-                                Mode="PrimaryDark">
-                                <materialDesign:ColorZone.ContextMenu>
-                                    <ContextMenu>
-                                        <MenuItem Header="_Open beatmap" Click="OpenBeatmap" Icon="{materialDesign:PackIcon Folder}"
-                                          ToolTip="Select the current beatmap with File Explorer." />
-                                        <MenuItem Header="_Open current beatmap" Click="OpenGetCurrentBeatmap" Icon="{materialDesign:PackIcon RestoreFromTrash}"
-                                          ToolTip="Set the current beatmap to the selected beatmap in your osu! client." />
-                                        <MenuItem Header="_Generate backup" Click="SaveBackup" Icon="{materialDesign:PackIcon Backup}"
-                                          ToolTip="Save a backup of the current beatmap to the backups folder." />
-                                        <MenuItem Header="_Load backup" Click="LoadBackup" Icon="{materialDesign:PackIcon BackupRestore}"
-                                          ToolTip="Load a backup from the backups folder into the current beatmap." />
-                                        <MenuItem Header="_BetterSave™ current beatmap" Click="CoolSave" Icon="{materialDesign:PackIcon ContentSave}"
-                                          ToolTip="Save the beatmap which is currently open in your osu! editor. BetterSave™ saves the beatmap just like the vanilla editor, but decimal values get rounded instead of truncated." />
-                                    </ContextMenu>
-                                </materialDesign:ColorZone.ContextMenu>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock 
-                                        Grid.Column="0"
-                                        Name="currentMaps" 
-                                        HorizontalAlignment="Right"
-                                        TextWrapping="NoWrap" 
-                                        TextTrimming="None" 
-                                        FontWeight="Normal" 
-                                        Text="{Binding CurrentBeatmaps}"/>
-                                    <TextBlock Grid.Column="1" Margin="2 0 0 0" FontStyle="Italic" FontWeight="ExtraBold"
-                                       Text="{Binding CurrentBeatmaps, Converter={StaticResource MapPathStringToCountStringConverter}}" />
-                                </Grid>
-                            </materialDesign:ColorZone>                            
+                                </ListBox.InputBindings>
+                            </ListBox>
                         </DockPanel>
-                    </materialDesign:ColorZone>
+                    </materialDesign:DrawerHost.LeftDrawerContent>
 
-                    <ScrollViewer 
-                        Grid.Row="1"
-                        x:Name="ContentScroller" 
-                        VerticalScrollBarVisibility="{Binding VerticalContentScrollBarVisibility}" 
-                        HorizontalScrollBarVisibility="{Binding HorizontalContentScrollBarVisibility}">
-                        <ContentControl Margin="20" Name="content_views" Content="{Binding View}"></ContentControl>
-                    </ScrollViewer>
 
-                    <materialDesign:Snackbar 
-                        Grid.Row="1" 
-                        x:Name="MainSnackbar" 
-                        MessageQueue="{materialDesign:MessageQueue}" />
-                </Grid>
-            </materialDesign:DrawerHost>
+                    <Grid x:Name="MainContentGrid" MouseDown="DragWin">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <ScrollViewer 
+                            x:Name="ContentScroller" 
+                            VerticalScrollBarVisibility="{Binding VerticalContentScrollBarVisibility}" 
+                            HorizontalScrollBarVisibility="{Binding HorizontalContentScrollBarVisibility}">
+                            <ContentControl Margin="20" Name="content_views" Content="{Binding View}"></ContentControl>
+                        </ScrollViewer>
+
+                        <materialDesign:Snackbar 
+                            x:Name="MainSnackbar" 
+                            MessageQueue="{materialDesign:MessageQueue}" />
+                    </Grid>
+                </materialDesign:DrawerHost>
+            </Grid>
         </materialDesign:DialogHost>
         <Border Name="window_border" BorderThickness="1" Background="{x:Null}" BorderBrush="{DynamicResource PrimaryHueDarkBrush}" />
     </Grid>

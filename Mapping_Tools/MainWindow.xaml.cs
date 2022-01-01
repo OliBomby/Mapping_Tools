@@ -382,7 +382,7 @@ namespace Mapping_Tools {
                     WindowState = WindowState.Maximized;
                 }
 
-                MasterGrid.Margin = new Thickness(5);
+                MasterGrid.Margin = new Thickness(7);
                 window_border.BorderThickness = new Thickness(0);
                 bt.Content = new PackIcon { Kind = PackIconKind.WindowRestore };
             } else {

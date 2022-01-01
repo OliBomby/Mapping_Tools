@@ -187,7 +187,7 @@ namespace Mapping_Tools.Views.MapCleaner {
         private void FillTimeLine() {
             _tl?.mainCanvas.Children.Clear();
             try {
-                _tl = new TimeLine(MainWindow.AppWindow.ActualWidth, 100.0, _endTimeMonitor);
+                _tl = new TimeLine(MainWindow.AppWindow.MainContentGrid.ActualWidth, 100.0, _endTimeMonitor);
                 foreach (double timingS in _timingpointsAdded) {
                     _tl.AddElement(timingS, 1);
                 }
