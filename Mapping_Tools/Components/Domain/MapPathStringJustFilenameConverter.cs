@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Windows.Data;
 
 namespace Mapping_Tools.Components.Domain {
-    internal class MapPathStringAddNewLinesConverter : IValueConverter {
+    internal class MapPathStringJustFilenameConverter : IValueConverter {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
-            if (value is not string str) return string.Empty;
-            return str.Replace('|', '\n');
+            return value is not string str ? string.Empty : string.Join(" | ", str.Split('|').Select(Path.GetFileName));
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
-            if (value is not string str) return string.Empty;
-            return str.Replace('\n', '|');
+            throw new InvalidOperationException("MapPathStringJustFilenameConverter can not convert back values.");
         }
     }
 }

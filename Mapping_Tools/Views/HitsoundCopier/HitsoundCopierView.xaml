@@ -23,7 +23,7 @@
         <Grid Name="FirstGrid" Grid.Row="0">
             <StackPanel Grid.Row="0" Margin="0,0,120,0">
                 <StackPanel Orientation="Horizontal">
-                  <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
+                  <TextBlock FontSize="32" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
                     <Run Text="Hitsound Copier"/>
                   </TextBlock>
                     <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom" ToolTip="Click me!">

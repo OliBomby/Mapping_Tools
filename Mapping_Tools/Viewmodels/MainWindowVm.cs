@@ -140,6 +140,8 @@ namespace Mapping_Tools.Viewmodels {
 
             GenerateNavigationItems();
             UpdateNavigationItems();
+
+            DrawerOpen = true;
         }
 
         public CommandImplementation GoToSelectedPage { get; }
@@ -294,7 +296,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         private void ViewChanged() {
-            DrawerOpen = false;
+            //DrawerOpen = false;
 
             var isSavable = View.GetType().GetInterfaces().Any(x =>
                               x.IsGenericType &&

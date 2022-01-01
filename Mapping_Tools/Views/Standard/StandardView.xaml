@@ -4,8 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <domain:MapPathStringJustFilenameConverter x:Key="MapPathStringJustFilenameConverter" />
+    </UserControl.Resources>
     <Grid Grid.Row="1">
         <Grid.RowDefinitions>
             <RowDefinition Height="0.5*"/>
@@ -24,7 +28,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" FontSize="40" Foreground="{DynamicResource PrimaryHueMidBrush}"><Run Text="Get started"/></TextBlock>
+            <TextBlock Grid.Row="0" FontSize="32" Foreground="{DynamicResource PrimaryHueMidBrush}"><Run Text="Get started"/></TextBlock>
 
             <ListView HorizontalAlignment="Left" Grid.Row="1" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <ListViewItem>
@@ -58,7 +62,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" FontSize="40" Foreground="{DynamicResource PrimaryHueMidBrush}"><Run Text="Changelog"/></TextBlock>
+            <TextBlock Grid.Row="0" FontSize="32" Foreground="{DynamicResource PrimaryHueMidBrush}"><Run Text="Changelog"/></TextBlock>
             <ListView Grid.Row="1" x:Name="ChangelogList" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                 <ListView.ItemTemplate>
                     <DataTemplate>
@@ -78,13 +82,13 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" FontSize="40" Foreground="{DynamicResource PrimaryHueMidBrush}"><Run Text="Recent"/></TextBlock>
+            <TextBlock Grid.Row="0" FontSize="32" Foreground="{DynamicResource PrimaryHueMidBrush}"><Run Text="Recent"/></TextBlock>
             <ListView Grid.Row="1" x:Name="recentList" MouseDoubleClick="RecentList_MouseDoubleClick"
                       ToolTip="Double-click any selection of items to set them as the current beatmap.">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="Path" DisplayMemberBinding="{Binding Path}"/>
-                        <GridViewColumn Header="Date" DisplayMemberBinding="{Binding Date}"/>
+                        <GridViewColumn Header="Path" DisplayMemberBinding="{Binding Path, Converter={StaticResource MapPathStringJustFilenameConverter}, Mode=OneWay}"/>
+                        <GridViewColumn Header="Date" DisplayMemberBinding="{Binding Date, Mode=OneWay}"/>
                     </GridView>
                 </ListView.View>
             </ListView>

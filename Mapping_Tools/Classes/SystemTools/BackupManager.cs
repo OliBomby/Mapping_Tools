@@ -18,7 +18,7 @@ namespace Mapping_Tools.Classes.SystemTools {
                 if (string.IsNullOrEmpty(filename))
                     filename = Path.GetFileName(fileToCopy);
 
-                if (SettingsManager.Settings.UseEditorReader) {
+                if (SettingsManager.Settings.UseEditorReader && Path.GetExtension(fileToCopy) == ".osu") {
                     fileToCopy = GetNewestVersionPath(fileToCopy);
                 }
 
