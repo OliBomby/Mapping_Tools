@@ -4,8 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <domain:MapPathStringJustFilenameConverter x:Key="MapPathStringJustFilenameConverter" />
+    </UserControl.Resources>
     <Grid Grid.Row="1">
         <Grid.RowDefinitions>
             <RowDefinition Height="0.5*"/>
@@ -83,8 +87,8 @@
                       ToolTip="Double-click any selection of items to set them as the current beatmap.">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="Path" DisplayMemberBinding="{Binding Path}"/>
-                        <GridViewColumn Header="Date" DisplayMemberBinding="{Binding Date}"/>
+                        <GridViewColumn Header="Path" DisplayMemberBinding="{Binding Path, Converter={StaticResource MapPathStringJustFilenameConverter}, Mode=OneWay}"/>
+                        <GridViewColumn Header="Date" DisplayMemberBinding="{Binding Date, Mode=OneWay}"/>
                     </GridView>
                 </ListView.View>
             </ListView>
