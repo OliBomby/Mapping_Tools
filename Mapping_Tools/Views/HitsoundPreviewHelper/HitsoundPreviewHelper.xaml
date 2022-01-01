@@ -20,7 +20,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid Name="FirstGrid" Grid.Row="0">
-            <Grid Margin="0,0,120,0">
+            <Grid Margin="0,0,0,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
@@ -54,7 +54,7 @@
               
                 <DataGrid
                     Grid.Row="1"
-                    Margin="0 18 0 0"
+                    Margin="0 18 0 50"
                     ItemsSource="{Binding Items}"
                     CanUserSortColumns="True"
                     CanUserAddRows="False"
@@ -124,7 +124,7 @@
 
                 <StackPanel
                         Grid.Row="2"
-                        Margin="5"
+                        Margin="5 5 100 5"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Bottom"
                         Orientation="Horizontal">
