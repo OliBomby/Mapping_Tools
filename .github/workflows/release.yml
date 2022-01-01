@@ -49,16 +49,18 @@ jobs:
       run: iscc Installer_Script_x64.iss
 
     - name: Create x86 release.zip
-      uses: papeloto/action-zip@v1
+      uses: thedoctor0/zip-release@master
       with:
-        files: Mapping_Tools/bin/x86/Release/net5.0-windows/
-        dest: release.zip
+        type: 'zip'
+        filename: 'release.zip'
+        directory: 'Mapping_Tools/bin/x86/Release/net5.0-windows/'
 
     - name: Create x64 release_x64.zip
-      uses: papeloto/action-zip@v1
+      uses: thedoctor0/zip-release@master
       with:
-        files: Mapping_Tools/bin/Release/net5.0-windows/
-        dest: release_x64.zip
+        type: 'zip'
+        filename: 'release_x64.zip'
+        directory: 'Mapping_Tools/bin/Release/net5.0-windows/'
 
     - uses: "marvinpinto/action-automatic-releases@latest"
       with:
@@ -66,7 +68,7 @@ jobs:
         prerelease: false
         title: Release version ${{ steps.get_version.outputs.version-without-v }}
         files: |
-          release.zip
-          release_x64.zip
+          Mapping_Tools/bin/x86/Release/net5.0-windows/release.zip
+          Mapping_Tools/bin/Release/net5.0-windows/release_x64.zip
           mapping_tools_installer_x86.exe
           mapping_tools_installer_x64.exe
