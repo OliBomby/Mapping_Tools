@@ -49,13 +49,13 @@ jobs:
       run: iscc Installer_Script_x64.iss
 
     - name: Create x86 release.zip
-      uses: papeloto/action-zip@v1
+      uses: papeloto/action-zip@v2
       with:
         files: Mapping_Tools/bin/x86/Release/net5.0-windows/
         dest: release.zip
 
     - name: Create x64 release_x64.zip
-      uses: papeloto/action-zip@v1
+      uses: papeloto/action-zip@v2
       with:
         files: Mapping_Tools/bin/Release/net5.0-windows/
         dest: release_x64.zip
