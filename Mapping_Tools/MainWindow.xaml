@@ -72,7 +72,7 @@
                                 WindowChrome.IsHitTestVisibleInChrome="true"
                                 VerticalAlignment="Center"
                                 Margin="5 0"
-                                Style="{StaticResource MaterialDesignActionLightToggleButton}"
+                                Style="{StaticResource MaterialDesignActionToggleButton}"
                                 Height="35"
                                 IsChecked="{Binding DrawerOpen}"
                                 AutomationProperties.Name="HamburgerToggleButton"
