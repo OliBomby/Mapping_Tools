@@ -42,6 +42,10 @@ namespace Mapping_Tools.Views {
                 .ToArray();
         }
 
+        public static bool ViewExists(string name) {
+            return GetAllViewTypes().Any(o => GetName(o) == name);
+        }
+
         public static string[] GetNames(Type[] types) {
             return types.Where(o => o.GetField("ToolName") != null)
                 .Select(GetName).ToArray();

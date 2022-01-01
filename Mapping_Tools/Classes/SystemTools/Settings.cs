@@ -6,6 +6,7 @@ using Mapping_Tools.Annotations;
 namespace Mapping_Tools.Classes.SystemTools {
     public class Settings : BindableBase {
         public List<string[]> RecentMaps { get; set; }
+        public List<string> FavoriteTools { get; set; }
         public Rect? MainWindowRestoreBounds { get; set; }
         public bool MainWindowMaximized { get; set; }
 
@@ -135,6 +136,7 @@ namespace Mapping_Tools.Classes.SystemTools {
         /// </summary>
         public Settings() {
             RecentMaps = new List<string[]>();
+            FavoriteTools = new List<string>();
             MainWindowRestoreBounds = null;
             MainWindowMaximized = false;
             OsuPath = "";

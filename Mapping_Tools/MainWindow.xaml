@@ -97,10 +97,15 @@
                             SelectedItem="{Binding SelectedPageItem, UpdateSourceTrigger=PropertyChanged}"
                             ItemsSource="{Binding NavigationItems}"
                             AutomationProperties.Name="ToolsMenu"
-                            Style="{StaticResource MaterialDesignListBox}">
+                            Style="{StaticResource MaterialDesignListBox}"
+                            IsTextSearchEnabled="True">
                             <ListBox.Resources>
                                 <Style TargetType="ScrollBar" BasedOn="{StaticResource MaterialDesignScrollBarMinimal}"/>
                             </ListBox.Resources>
+                            <ListBox.InputBindings>
+                                <KeyBinding Key="Return" 
+                                            Command="{Binding GoToSelectedPage}"/>
+                            </ListBox.InputBindings>
                         </ListBox>
                     </DockPanel>
                 </materialDesign:DrawerHost.LeftDrawerContent>

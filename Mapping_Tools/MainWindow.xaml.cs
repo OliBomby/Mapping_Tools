@@ -341,6 +341,7 @@ namespace Mapping_Tools {
             builder.AppendLine("Ryuusei Aika");
             builder.AppendLine("Joshua Saku");
             builder.AppendLine("spon");
+            builder.AppendLine("Julaaaan");
             builder.AppendLine();
             builder.AppendLine("Contributors:");
             builder.AppendLine("Potoofu");
