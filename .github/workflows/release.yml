@@ -50,17 +50,17 @@ jobs:
 
     - name: Create x86 release.zip
       uses: thedoctor0/zip-release@master
-        with:
-          type: 'zip'
-          filename: 'release.zip'
-          path: 'Mapping_Tools/bin/x86/Release/net5.0-windows/'
+      with:
+        type: 'zip'
+        filename: 'release.zip'
+        path: 'Mapping_Tools/bin/x86/Release/net5.0-windows/'
 
     - name: Create x64 release_x64.zip
       uses: thedoctor0/zip-release@master
-        with:
-          type: 'zip'
-          filename: 'release_x64.zip'
-          path: 'Mapping_Tools/bin/Release/net5.0-windows/'
+      with:
+        type: 'zip'
+        filename: 'release_x64.zip'
+        path: 'Mapping_Tools/bin/Release/net5.0-windows/'
 
     - uses: "marvinpinto/action-automatic-releases@latest"
       with:
