@@ -242,7 +242,7 @@
                     </materialDesign:DrawerHost.LeftDrawerContent>
 
 
-                    <Grid MouseDown="DragWin">
+                    <Grid x:Name="MainContentGrid" MouseDown="DragWin">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
