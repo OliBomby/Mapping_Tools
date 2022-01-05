@@ -6,17 +6,22 @@ using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
     public static class PathHelper {
-        private static void Interpolate(LinkedListNode<PathPoint> p1, double t) {
+        public static void Interpolate(LinkedListNode<PathPoint> p1, double t) {
             Interpolate(p1, new[] { t });
         }
 
-        private static void Interpolate(LinkedListNode<PathPoint> p1, IEnumerable<double> ts) {
+        public static void Interpolate(LinkedListNode<PathPoint> p1, IEnumerable<double> ts) {
             var p2 = p1.Next;
 
             PathPoint v1 = p1.Previous is not null && !p1.Value.Red ? p1.Previous.Value : p1.Value;
             PathPoint v2 = p1.Value;
             PathPoint v3 = p2?.Value ?? v2 + v2 - v1;
             PathPoint v4 = p2?.Next is not null && !v3.Red ? p1.Next.Next.Value : v3 + v3 - v2;
+
+            // Normalize v1 and v4 to prevent extreme curvature
+            double length = Vector2.Distance(v2.Pos, v3.Pos);
+            v1.Pos = (v1.Pos - v2.Pos).LengthSquared > Precision.DOUBLE_EPSILON ? v2.Pos + (v1.Pos - v2.Pos).Normalized() * length : v1.Pos;
+            v4.Pos = (v4.Pos - v3.Pos).LengthSquared > Precision.DOUBLE_EPSILON ? v3.Pos + (v4.Pos - v3.Pos).Normalized() * length : v4.Pos;
 
             foreach (var t in ts) {
                 var v = PathPoint.Lerp(v2, v3, t);
