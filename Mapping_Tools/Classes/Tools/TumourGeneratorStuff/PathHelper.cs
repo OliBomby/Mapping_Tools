@@ -1,29 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
     public static class PathHelper {
+        private static void Interpolate(LinkedListNode<PathPoint> p1, double t) {
+            Interpolate(p1, new[] { t });
+        }
+
         private static void Interpolate(LinkedListNode<PathPoint> p1, IEnumerable<double> ts) {
             var p2 = p1.Next;
-            
-            var v1 = p1.Previous?.Value ?? p1.Value;
-            var v2 = p1.Value;
-            var v3 = p1.Next?.Value ?? v2 + v2 - v1;
-            var v4 = p1.Next?.Next?.Value ?? v3 + v3 - v2;
 
-            // Find possible red anchors near p1
-
-
+            PathPoint v1 = p1.Previous is not null && !p1.Value.Red ? p1.Previous.Value : p1.Value;
+            PathPoint v2 = p1.Value;
+            PathPoint v3 = p2?.Value ?? v2 + v2 - v1;
+            PathPoint v4 = p2?.Next is not null && !v3.Red ? p1.Next.Next.Value : v3 + v3 - v2;
 
             foreach (var t in ts) {
-                p1.List.AddAfter(p1, new LinkedListNode<PathPoint>(new PathPoint()));
-            }
-
-            for( int c = 0; c < catmull_detail; c++ ) {
-                result.Add(CatmullFindPoint(ref v1, ref v2, ref v3, ref v4, (double) c / catmull_detail));
-                result.Add(CatmullFindPoint(ref v1, ref v2, ref v3, ref v4, (double) ( c + 1 ) / catmull_detail));
+                var v = PathPoint.Lerp(v2, v3, t);
+                v.Pos = PathApproximator.CatmullFindPoint(ref v1.Pos, ref v2.Pos, ref v3.Pos, ref v4.Pos, t); ;
+                var p = new LinkedListNode<PathPoint>(v);
+                p1.List.AddAfter(p1, p);
+                p1 = p;
             }
         }
 
