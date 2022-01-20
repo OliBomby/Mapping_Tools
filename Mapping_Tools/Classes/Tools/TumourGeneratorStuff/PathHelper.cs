@@ -11,12 +11,16 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
         }
 
         public static void Interpolate(LinkedListNode<PathPoint> p1, IEnumerable<double> ts) {
+            if (p1.List is null) {
+                throw new ArgumentException(@"Point 1 must be part of a linked list.", nameof(p1));
+            }
+
             var p2 = p1.Next;
 
             PathPoint v1 = p1.Previous is not null && !p1.Value.Red ? p1.Previous.Value : p1.Value;
             PathPoint v2 = p1.Value;
             PathPoint v3 = p2?.Value ?? v2 + v2 - v1;
-            PathPoint v4 = p2?.Next is not null && !v3.Red ? p1.Next.Next.Value : v3 + v3 - v2;
+            PathPoint v4 = p2?.Next is not null && !v3.Red ? p2.Next.Value : v3 + v3 - v2;
 
             // Normalize v1 and v4 to prevent extreme curvature
             double length = Vector2.Distance(v2.Pos, v3.Pos);
@@ -27,7 +31,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
                 var v = PathPoint.Lerp(v2, v3, t);
                 v.Pos = PathApproximator.CatmullFindPoint(ref v1.Pos, ref v2.Pos, ref v3.Pos, ref v4.Pos, t); ;
                 var p = new LinkedListNode<PathPoint>(v);
-                p1.List.AddAfter(p1, p);
+                p1.List!.AddAfter(p1, p);
                 p1 = p;
             }
         }
