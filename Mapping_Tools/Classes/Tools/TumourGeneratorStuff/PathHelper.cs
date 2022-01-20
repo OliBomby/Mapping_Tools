@@ -37,23 +37,67 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
         }
 
         /// <summary>
-        /// Modifies <see cref="path"/> such that there are at least <see cref="count"/> roughly equally spaced
+        /// Modifies <see cref="path"/> such that there are at least <see cref="wantedCount"/> roughly equally spaced
         /// path points between <see cref="start"/> and <see cref="end"/>.
         /// </summary>
         /// <param name="path">The path to subdivide.</param>
         /// <param name="start">The start point.</param>
         /// <param name="end">The end point. This node has to come after start or be equal to start.</param>
-        /// <param name="count">The wanted number of points between start and end.</param>
+        /// <param name="wantedCount">The wanted number of points between start and end.</param>
         /// <returns>The number of points added between start and end.</returns>
-        public static int Subdivide(this LinkedList<PathPoint> path, LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end, int count) {
-            // Get the cumulative length between start and end
-            // Count the number of nodes already between start and end
-            // Interpolate path points at roughly equal distance intervals
-            int inbetweenCount = 1;
-            int pointsToAdd = count - inbetweenCount;
-            // If start cumulative length == end cumulative length add t values in PathPoint
+        public static int Subdivide(this LinkedList<PathPoint> path, LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end, int wantedCount) {
+            if (wantedCount <= 0) {
+                return 0;
+            }
 
-            return count;
+            // Ensure that there is a copy of the start point at the end point if we add in-between points
+            // and the start and end points are the same node.
+            if (ReferenceEquals(start, end) && double.IsNaN(start.Value.T)) {
+                var startP = start.Value;
+                startP.T = 0;
+                start.Value = startP;
+                var endP = end.Value;
+                endP.T = 1;
+                end = new LinkedListNode<PathPoint>(endP);
+                start.List!.AddAfter(start, end);
+            }
+            
+            // Get the cumulative length between start and end
+            var dist = end.Value.CumulativeLength - start.Value.CumulativeLength;
+
+            // If dist ~= we go to T mode which means interpolate with T values in [0,1]
+            // Otherwise dist > 0, tumour T values will be based on distance so it's only necessary
+            // to subdivide segments of dist > 0 for that's where resolution is necessary.
+
+            var tMode = Precision.AlmostEquals(dist, 0);
+
+            if (tMode) {
+                var tStart = start.Value.T;
+                var tEnd = end.Value.T;
+
+                // Count the number of nodes already between start and end
+                int count = 0;
+                var p = start;
+                while (p.Next is not null && p.Next != end) {
+                    count++;
+                    p = p.Next;
+                }
+
+                if (p.Next is null) {
+                    throw new ArgumentException(
+                        @"The end point has to be a node that comes after the starting node in the linked list.",
+                        nameof(end));
+                }
+
+                // Interpolate path points at roughly equal distance intervals
+                int pointsToAdd = wantedCount - count;
+                for (int i = 0; i < pointsToAdd; i++) {
+                    // Add a point between the two furthest apart segment points
+                    // Add a T value in between tStart and tEnd
+                }
+            }
+
+            return wantedCount;
         }
 
         /// <summary>
