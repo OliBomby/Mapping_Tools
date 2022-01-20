@@ -7,6 +7,22 @@ using Mapping_Tools.Annotations;
 namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
     public class TumourGenerator {
         /// <summary>
+        /// The wrapping mode controls how the tumour sits on the slider.
+        /// </summary>
+        public WrappingMode WrappingMode { get; set; }
+
+        /// <summary>
+        /// The number of points per osu! pixel used to approximate the shape of the tumours.
+        /// </summary>
+        public double Resolution { get; set; } = 1;
+
+        /// <summary>
+        /// The size scalar of tumours.
+        /// </summary>
+
+        public double Scalar { get; set; } = 1;
+
+        /// <summary>
         /// Places a tumour onto the path between the specified start and end points.
         /// May increase the size of path.
         /// </summary>
@@ -14,12 +30,8 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
         /// <param name="tumourTemplate">The tumour shape</param>
         /// <param name="start">The start point</param>
         /// <param name="end">The end point</param>
-        /// <param name="wrappingMode">The wrapping mode</param>
-        /// <param name="resolution">The resolution in points per unit</param>
-        /// <param name="scalar">Size scalar of tumour</param>
-        public static void PlaceTumour([NotNull]LinkedList<PathPoint> path, [NotNull]ITumourTemplate tumourTemplate, 
-            [NotNull]LinkedListNode<PathPoint> start, [NotNull]LinkedListNode<PathPoint> end, WrappingMode wrappingMode, 
-            double resolution = 1, double scalar = 1) {
+        public void PlaceTumour([NotNull]LinkedList<PathPoint> path, [NotNull]ITumourTemplate tumourTemplate, 
+            [NotNull]LinkedListNode<PathPoint> start, [NotNull]LinkedListNode<PathPoint> end) {
             if (start.List != path) {
                 throw new ArgumentException(@"Start node has to be part of the provided path.", nameof(start));
             }
@@ -41,7 +53,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
             }
 
             // Make sure there are enough points between start and end for the tumour shape and resolution
-            int wantedPointsBetween = Math.Max(pointsBetween, (int)(tumourTemplate.GetLength() * resolution));  // The needed number of points for the tumour
+            int wantedPointsBetween = Math.Max(pointsBetween, (int)(tumourTemplate.GetLength() * Resolution));  // The needed number of points for the tumour
             pointsBetween += path.Subdivide(start, end, wantedPointsBetween);
             pointsBetween += path.EnsureCriticalPoints(start, end, tumourTemplate.GetCriticalPoints());
 
@@ -63,8 +75,8 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
                     (p.CumulativeLength - startDist) / dist;
 
                 // Get the offset, original pos, and direction
-                var offset = tumourTemplate.GetOffset(t) * scalar;
-                var np = wrappingMode switch {
+                var offset = tumourTemplate.GetOffset(t) * Scalar;
+                var np = WrappingMode switch {
                     WrappingMode.Wrap => p,
                     WrappingMode.RoundWrap => new PathPoint(p.Pos, Vector2.Lerp(startP.Dir, endP.Dir, t), p.Dist, p.CumulativeLength),
                     WrappingMode.Replace => new PathPoint(Vector2.Lerp(startP.Pos, endP.Pos, t), endP.Pos - startP.Pos, p.Dist, p.CumulativeLength),
