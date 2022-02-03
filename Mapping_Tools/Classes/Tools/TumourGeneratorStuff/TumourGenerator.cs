@@ -40,31 +40,55 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
                 throw new ArgumentException(@"Start node has to be part of the provided path.", nameof(end));
             }
 
-            // Count the number of nodes between start and end
-            int pointsBetween = 0;
-            LinkedListNode<PathPoint> pn = start;
-            while (pn.Next != null && pn.Next != end) {
-                pointsBetween++;
-                pn = pn.Next;
-            }
-            
-            if (pn.Next == null && start != end) {
-                throw new ArgumentException("The end index can not be smaller than the start index.");
-            }
-
-            // Make sure there are enough points between start and end for the tumour shape and resolution
-            int wantedPointsBetween = Math.Max(pointsBetween, (int)(tumourTemplate.GetLength() * Resolution));  // The needed number of points for the tumour
-            pointsBetween += path.Subdivide(start, end, wantedPointsBetween);
-            pointsBetween += path.EnsureCriticalPoints(start, end, tumourTemplate.GetCriticalPoints());
-
-            // Add tumour offsets
             var startP = start.Value;
             var endP = end.Value;
             double startT = startP.T;
             double endT = endP.T;
             double dist = endP.CumulativeLength - startP.CumulativeLength;
+            double distT = endT - startT;
+
+            // Ensure that there is a copy of the start point at the end point if we add in-between points
+            // and the start and end points are the same node.
+            if (ReferenceEquals(start, end)) {
+                end = new LinkedListNode<PathPoint>(endP);
+                start.List!.AddAfter(start, end);
+            }
+
+            if (Precision.AlmostEquals(dist, 0)) {
+                // Wii Sports Resort to T mode
+
+                // T should either be undefined on both start and end point because T is not yet initialized for this distance
+                // or T should be defined for both
+                // If T is defined, then 0 should be on the first occurance of this dist and 1 on the last occurance of this dist
+
+                if (double.IsNaN(startP.T) ^ double.IsNaN(endP.T)) {
+                    throw new InvalidOperationException(
+                        "T value must be both defined or both undefined for the same distance value.");
+                }
+
+                if (double.IsNaN(startP.T)) {
+                    // Initialize T properly
+                    var firstOccurance = FindFirstOccuranceOfDist(start);
+                    var lastOccurance = FindLastOccuranceOfDist(end);
+                    // TODO
+
+                }
+                // T is initialized
+            }
+
+            // Count the number of nodes between start and end
+            int pointsBetween = PathHelper.CountPointsBetween(start, end);
+
+            // Make sure there are enough points between start and end for the tumour shape and resolution
+            int wantedPointsBetween = Math.Max(pointsBetween, (int)(tumourTemplate.GetLength() * Resolution));  // The needed number of points for the tumour
+            if (pointsBetween < wantedPointsBetween) {
+                pointsBetween += path.Subdivide(start, end, wantedPointsBetween);
+            }
+            pointsBetween += path.EnsureCriticalPoints(start, end, tumourTemplate.GetCriticalPoints());
+
+            // Add tumour offsets
             double startDist = startP.CumulativeLength;
-            pn = start;
+            var pn = start;
             for (int i = 0; i < pointsBetween; i++) {
                 pn = pn.Next;
                 Debug.Assert(pn != null, nameof(pn) + " != null");
@@ -90,6 +114,14 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
                 // Modify the path
                 pn.Value = new PathPoint(newPos, p.Dir, p.Dist, p.CumulativeLength);
             }
+        }
+
+        private LinkedListNode<PathPoint> FindFirstOccuranceOfDist(LinkedListNode<PathPoint> start) {
+            throw new NotImplementedException();
+        }
+
+        private LinkedListNode<PathPoint> FindLastOccuranceOfDist(LinkedListNode<PathPoint> start) {
+            throw new NotImplementedException();
         }
     }
 }
