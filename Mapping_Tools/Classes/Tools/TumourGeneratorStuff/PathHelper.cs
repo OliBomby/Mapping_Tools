@@ -81,6 +81,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
                 
                 // Add pointsToAddToEachSegment number of points in each segment of the arc
                 // TODO: I can actually be smarter about this and base the number of points on the distT of the segment and leave this implementation for the distT = 0 case
+                // TODO: Create a SortedList with each point between and the segment distT. Take the largest segment, divide it by a number proportional to distT / total distT, and update list.
                 var p = start;
                 while (p != end) {
                     var nextP = p!.Next;
