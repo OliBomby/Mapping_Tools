@@ -21,7 +21,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid Name="FirstGrid" Grid.Row="0">
-            <StackPanel Grid.Row="0" Margin="0,0,120,0">
+            <StackPanel Grid.Row="0" Margin="0,0,0,100">
                 <StackPanel Orientation="Horizontal">
                   <TextBlock FontSize="32" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
                     <Run Text="Hitsound Copier"/>
