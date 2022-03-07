@@ -5,9 +5,21 @@ using System.Diagnostics;
 using Mapping_Tools.Annotations;
 
 namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
+    /// <summary>
+    /// Generates tumours on sliders.
+    /// We first have a slider represented by a linked list of <see cref="PathPoint"/> and a set of reconstruction hints
+    /// which tell us how to reconstruct specific parts of the path with anchors. We also have a set of tumour specifications.
+    /// As invariant, the reconstruction hints must not be overlapping with exception of the endpoints.
+    /// We apply the tumours by updating the path and reconstruction hints:
+    /// Tumours with the Simple <see cref="WrappingMode"/> will only update the reconstruction hints and not the path.
+    /// Complex tumours will instead update the path with their combined offsets. No reconstruction hints will be present for these areas, but instead red anchor hints will be on the path points.
+    /// A special slider reconstructor will take the path and reconstruction hints to create anchors for the slider.
+    /// All reconstruction hints must be used when reconstructing the slider.
+    /// </summary>
     public class TumourGenerator {
         /// <summary>
         /// The wrapping mode controls how the tumour sits on the slider.
+        /// TODO: remove this
         /// </summary>
         public WrappingMode WrappingMode { get; set; }
 
@@ -19,7 +31,6 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
         /// <summary>
         /// The size scalar of tumours.
         /// </summary>
-
         public double Scalar { get; set; } = 1;
 
         /// <summary>

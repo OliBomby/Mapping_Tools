@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
     public static class PathHelper {
+        public static PathWithHints CreatePathWithHints(PathType type, Vector2[] controlPoints, double? expectedDistance = null) {
+            // Insert slightly altered copy of SliderPath.cs
+            throw new NotImplementedException();
+        }
+
         public static void Interpolate(LinkedListNode<PathPoint> p1, double t) {
             Interpolate(p1, new[] { t });
         }

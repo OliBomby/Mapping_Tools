@@ -19,14 +19,17 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
         /// <summary>
         /// Gets the total length of this tumour shape.
         /// </summary>
-        /// <returns>The total length of this tumour shape.</returns>
-        int GetLength();
+        double GetLength();
 
         /// <summary>
         /// Gets a list of t values which should definitely get a point.
         /// This is to ensure sharp corners in the tumour shape stay sharp.
         /// </summary>
-        /// <returns></returns>
         IEnumerable<double> GetCriticalPoints();
+
+        /// <summary>
+        /// Gets the list of anchors which reconstructs the shape of this tumour.
+        /// </summary>
+        List<Vector2> GetReconstructionHint();
     }
 }
