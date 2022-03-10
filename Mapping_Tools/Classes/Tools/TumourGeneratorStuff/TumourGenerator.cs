@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Mapping_Tools.Annotations;
+using Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Enums;
+using Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Options;
 
 namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
     /// <summary>

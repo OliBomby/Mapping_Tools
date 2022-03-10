@@ -1,4 +1,7 @@
-﻿namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
+﻿using Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Enums;
+using Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Options;
+
+namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
     public interface ITumourAssignment {
         /// <summary>
         /// The pixel length cumulative distance of the start of the tumour.
@@ -11,9 +14,19 @@
         double End { get; }
 
         /// <summary>
-        /// The size scalar of tumours.
+        /// The longitudinal length of the tumour.
+        /// </summary>
+        public double Length { get; }
+
+        /// <summary>
+        /// The size scalar of the tumour.
         /// </summary>
         public double Scalar { get; }
+
+        /// <summary>
+        /// Rotational offset of the tumour in radians.
+        /// </summary>
+        public double Rotation { get; }
 
         /// <summary>
         /// The wrapping mode controls how the tumour sits on the slider.

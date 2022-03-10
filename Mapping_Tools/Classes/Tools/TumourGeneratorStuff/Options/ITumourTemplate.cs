@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Mapping_Tools.Classes.MathUtil;
 
-namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
+namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Options {
     /// <summary>
     /// Parametric shape of a tumour.
     /// </summary>
