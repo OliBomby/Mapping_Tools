@@ -57,8 +57,6 @@
                 </materialDesign:PopupBox>
             </StackPanel>
 
-            <components:ValueOrGraphControl Grid.Row="1" GraphState="{Binding GraphState}"/>
-
             <Viewbox Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
                 <Button
                         IsEnabled="{Binding ElementName=This, Path=CanRun}"

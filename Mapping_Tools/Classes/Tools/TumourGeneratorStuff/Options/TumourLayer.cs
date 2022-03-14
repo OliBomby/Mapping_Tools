@@ -63,5 +63,15 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Options {
             get => _recalculate;
             set => Set(ref _recalculate, value);
         }
+
+        /// <summary>
+        /// Freezes all freezable properties of this tumour layer.
+        /// </summary>
+        public void Freeze() {
+            if (TumourLength.CanFreeze) TumourLength.Freeze();
+            if (TumourDistance.CanFreeze) TumourDistance.Freeze();
+            if (TumourRotation.CanFreeze) TumourRotation.Freeze();
+            if (TumourScale.CanFreeze) TumourScale.Freeze();
+        }
     }
 }

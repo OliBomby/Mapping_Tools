@@ -1,24 +1,14 @@
-﻿using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
-using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.SystemTools.QuickRun;
-using Mapping_Tools.Classes.ToolHelpers;
-using Mapping_Tools.Classes.Tools.SlideratorStuff;
-using Mapping_Tools.Components.Dialogs;
-using Mapping_Tools.Components.Graph;
-using Mapping_Tools.Viewmodels;
-using MaterialDesignThemes.Wpf;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel;
-using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
+using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.SystemTools.QuickRun;
+using Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Options;
+using Mapping_Tools.Components.Dialogs;
+using Mapping_Tools.Viewmodels;
+using MaterialDesignThemes.Wpf;
 
 namespace Mapping_Tools.Views.TumourGenerator {
     //[HiddenTool]
@@ -72,8 +62,9 @@ namespace Mapping_Tools.Views.TumourGenerator {
             ViewModel.Path = path;
             ViewModel.Quick = quick;
             ViewModel.Reload = reload;
-            //ViewModel.GraphState = Graph.GetGraphState();
-            if (ViewModel.GraphState.CanFreeze) ViewModel.GraphState.Freeze();
+            foreach (var tumourLayer in ViewModel.TumourLayers) {
+                tumourLayer.Freeze();
+            }
 
             BackgroundWorker.RunWorkerAsync(ViewModel);
             CanRun = false;
@@ -86,9 +77,17 @@ namespace Mapping_Tools.Views.TumourGenerator {
 
         private string TumourGenerate(TumourGeneratorVm arg, BackgroundWorker worker) {
             
+            // Load sliders from the selector
+
+            // Initialize the Tumour Generator
+
+            // Generate copious amounts of tumours on each slider
+
+            // Save the beatmap
+
             // Complete progressbar
-            if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(100);
-            
+            if (worker is {WorkerReportsProgress: true}) worker.ReportProgress(100);
+
             // Do stuff
             RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true,  arg.Reload, arg.Quick));
 
@@ -96,7 +95,9 @@ namespace Mapping_Tools.Views.TumourGenerator {
         }
 
         public TumourGeneratorVm GetSaveData() {
-            //if (ViewModel.GraphState.CanFreeze) ViewModel.GraphState.Freeze();
+            foreach (var tumourLayer in ViewModel.TumourLayers) {
+                tumourLayer.Freeze();
+            }
 
             return ViewModel;
         }
