@@ -139,7 +139,7 @@ namespace Mapping_Tools.Classes.Tools.MapCleanerStuff {
                 foreach (TimingPoint tp in ho.BodyHitsounds) {
                     if (tp.Volume == 5 && args.RemoveMuting) {
                         vol = false;  // Removing sliderbody silencing
-                        ind = false;  // Removing silent custom index
+                        //ind = false;  // Removing silent custom index
                     }
                     timingPointsChanges.Add(new TimingPointsChange(tp, volume: vol, index: ind, sampleset: sam));
                     if (tp.SampleSet != ho.HitsoundTimingPoint.SampleSet) {
