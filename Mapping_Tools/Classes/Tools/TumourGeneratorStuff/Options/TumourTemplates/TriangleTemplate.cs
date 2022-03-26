@@ -12,6 +12,10 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Options.TumourTemplat
             return 2 * Math.Sqrt(0.5);
         }
 
+        public double GetDefaultSpan() {
+            return 1;
+        }
+
         public IEnumerable<double> GetCriticalPoints() {
             yield return 0.5;
         }

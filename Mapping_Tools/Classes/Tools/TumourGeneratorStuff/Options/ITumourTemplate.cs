@@ -22,6 +22,12 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Options {
         double GetLength();
 
         /// <summary>
+        /// Gets the default distance between the start point and the end point of the tumour.
+        /// Could be used to determine the scale of <see cref="GetOffset(double)"/>.
+        /// </summary>
+        double GetDefaultSpan();
+
+        /// <summary>
         /// Gets a list of t values which should definitely get a point.
         /// This is to ensure sharp corners in the tumour shape stay sharp.
         /// </summary>

@@ -13,6 +13,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Options {
         private double _tumourStart;
         private double _tumourEnd;
         private bool _recalculate;
+        private bool _isActive = true;
 
         public ITumourTemplate TumourTemplate {
             get => _tumourTemplate;
@@ -62,6 +63,11 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Options {
         public bool Recalculate {
             get => _recalculate;
             set => Set(ref _recalculate, value);
+        }
+
+        public bool IsActive {
+            get => _isActive;
+            set => Set(ref _isActive, value);
         }
 
         /// <summary>
