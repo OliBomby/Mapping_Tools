@@ -7,13 +7,14 @@ using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.ToolHelpers;
+using Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Enums;
 using Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Options;
 using Mapping_Tools.Components.Domain;
 using Mapping_Tools.Components.Graph;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Viewmodels {
-    public class TumourGeneratorVm : BindableBase {
+    public partial class TumourGeneratorVm : BindableBase {
         #region Properties
 
         private HitObject _previewHitObject;
@@ -50,11 +51,23 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _tumourLayers, value);
         }
 
+        private TumourLayer _currentLayer;
+        public TumourLayer CurrentLayer {
+            get => _currentLayer;
+            set => Set(ref _currentLayer, value);
+        }
+
         private bool _justMiddleAnchors;
         public bool JustMiddleAnchors {
             get => _justMiddleAnchors;
             set => Set(ref _justMiddleAnchors, value);
         }
+
+        [JsonIgnore]
+        public IEnumerable<TumourTemplate> TumourTemplates => Enum.GetValues(typeof(TumourTemplate)).Cast<TumourTemplate>();
+
+        [JsonIgnore]
+        public IEnumerable<TumourSidedness> TumourSides => Enum.GetValues(typeof(TumourSidedness)).Cast<TumourSidedness>();
 
         [JsonIgnore]
         public string Path { get; set; }

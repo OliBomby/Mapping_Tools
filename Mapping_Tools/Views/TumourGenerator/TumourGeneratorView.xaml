@@ -10,6 +10,7 @@
              xmlns:objectVisualiser="clr-namespace:Mapping_Tools.Components.ObjectVisualiser"
              xmlns:viewmodels="clr-namespace:Mapping_Tools.Viewmodels"
              xmlns:tumourGeneratorOptions="clr-namespace:Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Options"
+             xmlns:tumourGeneratorDomain="clr-namespace:Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Domain"
              d:DataContext="{d:DesignInstance Type=viewmodels:TumourGeneratorVm}"
              mc:Ignorable="d" 
              x:Name="This"
@@ -18,6 +19,7 @@
     <local:SingleRunMappingTool.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisConverter"/>
         <domain:DoubleToStringConverter x:Key="DoubleToStringConverter"/>
+        <domain:IntToStringConverter x:Key="IntToStringConverter"/>
         <domain:TimeToStringConverter x:Key="TimeToStringConverter"/>
         <domain:MultiValueConverterGroup x:Key="BooleanInvertToVisibilityConverter">
             <domain:BooleanInvertConverter/>
@@ -34,6 +36,7 @@
             <domain:BooleanAndConverter/>
         </domain:MultiValueConverterGroup>
         <domain:BooleanInvertConverter x:Key="BooleanInvertConverter"/>
+        <tumourGeneratorDomain:TumourTemplateToEnumConverter x:Key="TumourTemplateToEnumConverter"/>
     </local:SingleRunMappingTool.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -68,12 +71,43 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Row="0">
+                <StackPanel Grid.Column="0" Margin="0 0 10 0">
                     <!-- Add options about individual tumours: template, scale, length, rotation -->
+                    <ComboBox ItemsSource="{Binding TumourTemplates}"
+                              SelectedItem="{Binding CurrentLayer.TumourTemplate, Converter={StaticResource TumourTemplateToEnumConverter}}"
+                              Margin="0 10 0 0"
+                              ToolTip="Tumour template. Determines the shape of the tumour."/>
+                    <TextBlock Text="Scale" FontWeight="Bold" Margin="0 10 0 0"/>
+                    <components:ValueOrGraphControl GraphState="{Binding CurrentLayer.Scale}"
+                                                    ToolTip="The scale of the tumour determines how far the tumour protrudes from the slider."/>
+                    <TextBlock Text="Length" FontWeight="Bold" Margin="0 10 0 0"/>
+                    <components:ValueOrGraphControl GraphState="{Binding CurrentLayer.Length}"
+                                                    ToolTip="The length of the tumour determines how much length the tumour takes up on the slider."/>
+                    <TextBlock Text="Rotation" FontWeight="Bold" Margin="0 10 0 0"/>
+                    <components:ValueOrGraphControl GraphState="{Binding CurrentLayer.Rotation}"
+                                                    ToolTip="The rotation of the tumour determines which way the tumour points in relation to the slider."/>
                 </StackPanel>
 
-                <StackPanel Grid.Row="1">
+                <StackPanel Grid.Column="1" Margin="0 0 10 0">
                     <!-- Add options about placement of multiple tumours: sidedness, distance, count, start, end, recalculate -->
+                    <ComboBox ItemsSource="{Binding TumourSides}"
+                              SelectedItem="{Binding CurrentLayer.TumourSidedness}"
+                              Margin="0 10 0 0"
+                              ToolTip="Tumour sidedness. Determines on which side of the slider to place the tumours."/>
+                    <TextBlock Text="Length" FontWeight="Bold" Margin="0 10 0 0"/>
+                    <components:ValueOrGraphControl GraphState="{Binding CurrentLayer.TumourDistance}"
+                                                    ToolTip="The tumour distance determines the distance between the centre of each tumour."/>
+                    <TextBox materialDesign:HintAssist.Hint="Count" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                             Text="{Binding CurrentLayer.TumourCount, Converter={StaticResource IntToStringConverter}, ConverterParameter=-1}"
+                             ToolTip="The number of tumours to place on the slider. If -1 this count will be automatically determined using the distance and slider length."/>
+                    <TextBox materialDesign:HintAssist.Hint="Start" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                             Text="{Binding CurrentLayer.TumourStart, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=-1}"
+                             ToolTip="The distance along the slider in osu! pixels where to start the placement of tumours."/>
+                    <TextBox materialDesign:HintAssist.Hint="End" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                             Text="{Binding CurrentLayer.TumourEnd, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=-1}"
+                             ToolTip="The distance along the slider in osu! pixels where to end the placement of tumours."/>
+                    <CheckBox IsChecked="{Binding CurrentLayer.Recalculate}"
+                              Content="Recalculate" ToolTip="Whether to recalculate the distances and angles of the slider before applying this layer. If true, tumours will be placed on top of tumours of the previous layers as if they were part of the slider, instead of merging with those tumours."/>
                 </StackPanel>
 
                 <Grid Grid.Column="2">
@@ -88,7 +122,9 @@
                                                    Stroke="YellowGreen" Fill="DarkSlateGray" SliderBallStroke="White" Thickness="50"/>
                     </materialDesign:Card>
 
-                    <ListBox Grid.Row="1" ItemsSource="{Binding TumourLayers}" SelectionMode="Single">
+                    <ListBox Grid.Row="1" ItemsSource="{Binding TumourLayers}"
+                             SelectionMode="Single"
+                             SelectedItem="{Binding CurrentLayer}">
                         <ListBox.ItemTemplate>
                             <DataTemplate DataType="tumourGeneratorOptions:TumourLayer">
                                 <Grid HorizontalAlignment="Stretch">

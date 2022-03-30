@@ -1,9 +1,10 @@
-﻿using Mapping_Tools.Components.Graph;
+﻿using Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Enums;
+using Mapping_Tools.Components.Graph;
 
 namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Options {
     public interface ITumourLayer {
         ITumourTemplate TumourTemplate { get; }
-        int TumourSidedness { get; }
+        TumourSidedness TumourSidedness { get; }
         GraphState TumourLength { get; }
         GraphState TumourScale { get; }
         GraphState TumourRotation { get; }

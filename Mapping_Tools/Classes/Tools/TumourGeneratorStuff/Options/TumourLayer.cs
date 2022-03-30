@@ -1,10 +1,12 @@
 ﻿using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Enums;
+using Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Options.TumourTemplates;
 using Mapping_Tools.Components.Graph;
 
 namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Options {
     public class TumourLayer : BindableBase, ITumourLayer {
         private ITumourTemplate _tumourTemplate;
-        private int _tumourSidedness;
+        private TumourSidedness _tumourSidedness;
         private GraphState _tumourLength;
         private GraphState _tumourScale;
         private GraphState _tumourRotation;
@@ -13,14 +15,14 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Options {
         private double _tumourStart;
         private double _tumourEnd;
         private bool _recalculate;
-        private bool _isActive = true;
+        private bool _isActive;
 
         public ITumourTemplate TumourTemplate {
             get => _tumourTemplate;
             set => Set(ref _tumourTemplate, value);
         }
 
-        public int TumourSidedness {
+        public TumourSidedness TumourSidedness {
             get => _tumourSidedness;
             set => Set(ref _tumourSidedness, value);
         }
@@ -70,14 +72,19 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Options {
             set => Set(ref _isActive, value);
         }
 
+        public TumourLayer() {
+            TumourTemplate = new TriangleTemplate();
+            IsActive = true;
+        }
+
         /// <summary>
         /// Freezes all freezable properties of this tumour layer.
         /// </summary>
         public void Freeze() {
-            if (TumourLength.CanFreeze) TumourLength.Freeze();
-            if (TumourDistance.CanFreeze) TumourDistance.Freeze();
-            if (TumourRotation.CanFreeze) TumourRotation.Freeze();
-            if (TumourScale.CanFreeze) TumourScale.Freeze();
+            if (TumourLength is not null && TumourLength.CanFreeze) TumourLength.Freeze();
+            if (TumourDistance is not null && TumourDistance.CanFreeze) TumourDistance.Freeze();
+            if (TumourRotation is not null && TumourRotation.CanFreeze) TumourRotation.Freeze();
+            if (TumourScale is not null && TumourScale.CanFreeze) TumourScale.Freeze();
         }
     }
 }
