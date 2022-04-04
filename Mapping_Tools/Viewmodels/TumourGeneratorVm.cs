@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.BeatmapHelper;
@@ -10,17 +12,25 @@ using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Enums;
 using Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Options;
 using Mapping_Tools.Components.Domain;
-using Mapping_Tools.Components.Graph;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Viewmodels {
     public partial class TumourGeneratorVm : BindableBase {
         #region Properties
 
+        private CancellationTokenSource previewTokenSource;
+        private readonly object previewTokenLock = new();
+
         private HitObject _previewHitObject;
         public HitObject PreviewHitObject {
             get => _previewHitObject;
-            set => Set(ref _previewHitObject, value);
+            set => Set(ref _previewHitObject, value, action: RegeneratePreview);
+        }
+
+        private HitObject _tumouredPreviewHitObject;
+        public HitObject TumouredPreviewHitObject {
+            get => _tumouredPreviewHitObject;
+            set => Set(ref _tumouredPreviewHitObject, value);
         }
 
         private ImportMode _importModeSetting;
@@ -134,6 +144,46 @@ namespace Mapping_Tools.Viewmodels {
             } catch (Exception ex) {
                 ex.Show();
             }
+        }
+
+        /// <summary>
+        /// Asynchronously starts regenerating the tumoured preview slider with the current settings. <see cref="TumouredPreviewHitObject"/>
+        /// At all times, only the latest slider is being tumoured.
+        /// </summary>
+        private void RegeneratePreview() {
+            // Cancel any task that might be running right now and make a new token
+            CancellationToken ct;
+            lock (previewTokenLock) {
+                if (previewTokenSource is null) {
+                    previewTokenSource = new CancellationTokenSource();
+                } else {
+                    previewTokenSource.Cancel();
+                    previewTokenSource.Dispose();
+                    previewTokenSource = new CancellationTokenSource();
+                }
+                ct = previewTokenSource.Token;
+            }
+            
+            Task.Run(() => {
+                var args = PreviewHitObject.DeepCopy();
+
+                ct.ThrowIfCancellationRequested();
+                // Do a lot of tumour generating
+                Thread.Sleep(10000);
+                ct.ThrowIfCancellationRequested();
+
+                // Send the tumoured slider to the main thread
+                Application.Current.Dispatcher.Invoke(() => {
+                    TumouredPreviewHitObject = args;
+                });
+
+                // Clean up the cancellation token
+                lock (previewTokenLock) {
+                    ct.ThrowIfCancellationRequested();
+                    previewTokenSource.Dispose();
+                    previewTokenSource = null;
+                }
+            }, ct);
         }
 
         public enum ImportMode {
