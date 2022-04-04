@@ -108,7 +108,7 @@ namespace Mapping_Tools.Viewmodels {
         public TumourGeneratorVm() {
             PreviewHitObject = new HitObject("95,319,75,2,0,P|271:304|421:48,1,475");
             ImportModeSetting = ImportMode.Selected;
-            TumourLayers = new ObservableCollection<TumourLayer> { new TumourLayer() };
+            TumourLayers = new ObservableCollection<TumourLayer>();
             JustMiddleAnchors = false;
 
             ImportCommand = new CommandImplementation(_ => Import(ImportModeSetting == ImportMode.Selected ?
