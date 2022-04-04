@@ -73,9 +73,10 @@
 
                 <StackPanel Grid.Column="0" Margin="0 0 10 0">
                     <!-- Add options about individual tumours: template, scale, length, rotation -->
+                    <TextBlock Text="Template" FontWeight="Bold" Margin="0 10 0 0"/>
                     <ComboBox ItemsSource="{Binding TumourTemplates}"
                               SelectedItem="{Binding CurrentLayer.TumourTemplate, Converter={StaticResource TumourTemplateToEnumConverter}}"
-                              Margin="0 10 0 0"
+                              Margin="0 0 0 0"
                               ToolTip="Tumour template. Determines the shape of the tumour."/>
                     <TextBlock Text="Scale" FontWeight="Bold" Margin="0 10 0 0"/>
                     <components:ValueOrGraphControl GraphState="{Binding CurrentLayer.Scale}"
@@ -90,9 +91,10 @@
 
                 <StackPanel Grid.Column="1" Margin="0 0 10 0">
                     <!-- Add options about placement of multiple tumours: sidedness, distance, count, start, end, recalculate -->
+                    <TextBlock Text="Sidedness" FontWeight="Bold" Margin="0 10 0 0"/>
                     <ComboBox ItemsSource="{Binding TumourSides}"
                               SelectedItem="{Binding CurrentLayer.TumourSidedness}"
-                              Margin="0 10 0 0"
+                              Margin="0 0 0 0"
                               ToolTip="Tumour sidedness. Determines on which side of the slider to place the tumours."/>
                     <TextBlock Text="Length" FontWeight="Bold" Margin="0 10 0 0"/>
                     <components:ValueOrGraphControl GraphState="{Binding CurrentLayer.TumourDistance}"
