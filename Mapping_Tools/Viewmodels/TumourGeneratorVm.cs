@@ -15,12 +15,19 @@ using Mapping_Tools.Components.Domain;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Viewmodels {
-    public partial class TumourGeneratorVm : BindableBase {
+    public class TumourGeneratorVm : BindableBase {
         #region Properties
 
         private CancellationTokenSource previewTokenSource;
         private readonly object previewTokenLock = new();
 
+        private bool _isProcessingPreview;
+        [JsonIgnore]
+        public bool IsProcessingPreview {
+            get => _isProcessingPreview;
+            set => Set(ref _isProcessingPreview, value);
+        }
+        
         private HitObject _previewHitObject;
         public HitObject PreviewHitObject {
             get => _previewHitObject;
@@ -28,9 +35,14 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         private HitObject _tumouredPreviewHitObject;
+        [JsonIgnore]
         public HitObject TumouredPreviewHitObject {
             get => _tumouredPreviewHitObject;
-            set => Set(ref _tumouredPreviewHitObject, value);
+            set {
+                if (Set(ref _tumouredPreviewHitObject, value)) {
+                    IsProcessingPreview = false;
+                }
+            }
         }
 
         private ImportMode _importModeSetting;
@@ -138,9 +150,13 @@ namespace Mapping_Tools.Viewmodels {
                         break;
                 }
 
-                if (markedObjects == null || !markedObjects.Any(o => o.IsSlider)) return;
+                if (markedObjects == null || !markedObjects.Any(o => o.IsSlider)) {
+                    Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue(@"Found 0 sliders in imported hit objects."));
+                    return;
+                }
 
                 PreviewHitObject = markedObjects.First(s => s.IsSlider);
+                Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue(@"Successfully imported slider."));
             } catch (Exception ex) {
                 ex.Show();
             }
@@ -154,22 +170,23 @@ namespace Mapping_Tools.Viewmodels {
             // Cancel any task that might be running right now and make a new token
             CancellationToken ct;
             lock (previewTokenLock) {
-                if (previewTokenSource is null) {
-                    previewTokenSource = new CancellationTokenSource();
-                } else {
+                if (previewTokenSource is not null) {
                     previewTokenSource.Cancel();
                     previewTokenSource.Dispose();
-                    previewTokenSource = new CancellationTokenSource();
                 }
+                previewTokenSource = new CancellationTokenSource();
                 ct = previewTokenSource.Token;
             }
+
+            // Raise property changed for the load indicator in the preview
+            IsProcessingPreview = true;
             
             Task.Run(() => {
                 var args = PreviewHitObject.DeepCopy();
 
                 ct.ThrowIfCancellationRequested();
                 // Do a lot of tumour generating
-                Thread.Sleep(10000);
+                Thread.Sleep(1000);
                 ct.ThrowIfCancellationRequested();
 
                 // Send the tumoured slider to the main thread
@@ -183,6 +200,15 @@ namespace Mapping_Tools.Viewmodels {
                     previewTokenSource.Dispose();
                     previewTokenSource = null;
                 }
+            }, ct).ContinueWith(task => {
+                // Show the error if one occured while generating preview
+                if (task.IsFaulted) {
+                    task.Exception.Show();
+                }
+                // Stop the processing indicator
+                Application.Current.Dispatcher.Invoke(() => {
+                    IsProcessingPreview = false;
+                });
             }, ct);
         }
 

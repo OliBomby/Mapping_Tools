@@ -123,6 +123,11 @@
                         <objectVisualiser:HitObjectElement x:Name="GraphHitObjectElement" HitObject="{Binding TumouredPreviewHitObject}"
                                                    Stroke="YellowGreen" Fill="DarkSlateGray" SliderBallStroke="White" Thickness="50"/>
                     </materialDesign:Card>
+                    <ProgressBar Grid.Row="0"
+                        Style="{StaticResource MaterialDesignCircularProgressBar}"
+                        Visibility="{Binding IsProcessingPreview, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"
+                        Value="0"
+                        IsIndeterminate="True" />
 
                     <ListBox Grid.Row="1" ItemsSource="{Binding TumourLayers}"
                              SelectionMode="Single"
