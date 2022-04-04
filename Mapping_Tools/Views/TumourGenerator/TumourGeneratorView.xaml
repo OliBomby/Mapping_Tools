@@ -79,13 +79,13 @@
                               Margin="0 0 0 0"
                               ToolTip="Tumour template. Determines the shape of the tumour."/>
                     <TextBlock Text="Scale" FontWeight="Bold" Margin="0 10 0 0"/>
-                    <components:ValueOrGraphControl GraphState="{Binding CurrentLayer.Scale}"
+                    <components:ValueOrGraphControl GraphState="{Binding CurrentLayer.TumourScale}"
                                                     ToolTip="The scale of the tumour determines how far the tumour protrudes from the slider."/>
                     <TextBlock Text="Length" FontWeight="Bold" Margin="0 10 0 0"/>
-                    <components:ValueOrGraphControl GraphState="{Binding CurrentLayer.Length}"
+                    <components:ValueOrGraphControl GraphState="{Binding CurrentLayer.TumourLength}"
                                                     ToolTip="The length of the tumour determines how much length the tumour takes up on the slider."/>
                     <TextBlock Text="Rotation" FontWeight="Bold" Margin="0 10 0 0"/>
-                    <components:ValueOrGraphControl GraphState="{Binding CurrentLayer.Rotation}"
+                    <components:ValueOrGraphControl GraphState="{Binding CurrentLayer.TumourRotation}"
                                                     ToolTip="The rotation of the tumour determines which way the tumour points in relation to the slider."/>
                 </StackPanel>
 
