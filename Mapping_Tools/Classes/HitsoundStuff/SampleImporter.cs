@@ -118,7 +118,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         public static SampleSoundGenerator ImportFromAudio(SampleGeneratingArgs args) {
-            var generator = new SampleSoundGenerator(new AudioFileReader(args.Path)) {
+            var generator = new SampleSoundGenerator(new MediaFoundationReader(args.Path)) {
                 VolumeCorrection = (float)args.Volume
             };
             return generator;
