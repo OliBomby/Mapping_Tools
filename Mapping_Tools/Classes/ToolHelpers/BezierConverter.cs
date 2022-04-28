@@ -33,7 +33,7 @@ namespace Mapping_Tools.Classes.ToolHelpers
         }
 
         /// <summary>
-        /// 
+        /// Converts sliderpath to a bezier sliderpath with the same shape.
         /// </summary>
         /// <param name="sliderPath"></param>
         /// <returns></returns>
@@ -48,11 +48,29 @@ namespace Mapping_Tools.Classes.ToolHelpers
                 case PathType.Catmull:
                     return ConvertCatmullToBezier(sliderPath);
                 case PathType.Bezier:
-                    break;
+                    return sliderPath;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            return sliderPath;
+        }
+
+        /// <summary>
+        /// Converts anchors to a bezier representation of the anchors.
+        /// </summary>
+        /// <returns></returns>
+        public static List<Vector2> ConvertToBezier(List<Vector2> anchors, PathType pathType) {
+            switch (pathType) {
+                case PathType.Linear:
+                    return ConvertLinearToBezierAnchors(anchors);
+                case PathType.PerfectCurve:
+                    return ConvertCircleToBezierAnchors(anchors);
+                case PathType.Catmull:
+                    return ConvertCatmullToBezierAnchors(anchors);
+                case PathType.Bezier:
+                    return anchors;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         /// <summary>
