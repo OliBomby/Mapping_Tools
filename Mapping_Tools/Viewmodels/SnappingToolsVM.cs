@@ -73,8 +73,9 @@ namespace Mapping_Tools.Viewmodels {
         private readonly DispatcherTimer _lockTimer;
         private readonly DispatcherTimer _inheritTimer;
 
+        private const double RelevancyBias = 5;
         private const double PointsBias = 3;
-        private const double SpecialBias = 3;
+        private const double SpecialBias = 1;
         private const double SelectionRange = 80;
 
         private readonly CoordinateConverter _coordinateConverter;
@@ -505,7 +506,7 @@ namespace Mapping_Tools.Viewmodels {
 
         private IRelevantDrawable GetNearestDrawable(Vector2 cursorPos, DrawableFetchPriority specialPriority = 0, HitObject[] heldHitObjects = null, double range = double.PositiveInfinity) {
             // Get all the relevant drawables
-            var drawables = LayerCollection.GetAllRelevantDrawables().ToArray();
+            var drawables = LayerCollection.GetAllRelevantDrawables();
 
             // Hit object comparer for finding a parent held hit object
             var comparer = new HitObjectComparer(checkPosition:false);
@@ -519,6 +520,9 @@ namespace Mapping_Tools.Viewmodels {
                 if (dist > range) {
                     continue;
                 }
+
+                // Prioritize relevant points
+                dist -= RelevancyBias * MathHelper.Clamp(o.Relevancy, 0 ,1);
 
                 if (o is RelevantPoint) {
                     // Prioritize points to be able to snap to intersections

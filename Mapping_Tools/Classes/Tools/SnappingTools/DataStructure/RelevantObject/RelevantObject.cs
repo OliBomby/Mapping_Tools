@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.Layers;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
@@ -48,7 +49,7 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
 
         private double _relevancy;
         public double Relevancy {
-            get => _relevancy;
+            get => _isSelected ? 1 : _relevancy;
             set {
                 _relevancy = value;
                 if (ChildObjects == null) return;
@@ -210,7 +211,11 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
         
         public void Consume(IRelevantObject other) {
             if (IsLocked) return;
-            ParentObjects.UnionWith(other.ParentObjects);
+            if (!DoNotDispose || !ParentObjects.IsSupersetOf(other.ParentObjects)) {
+                Relevancy += other.Relevancy;
+                ParentObjects.UnionWith(other.ParentObjects);
+                ParentObjects.RemoveWhere(o => o.Disposed);
+            }
             ChildObjects.UnionWith(other.ChildObjects);
         }
 
