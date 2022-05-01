@@ -115,9 +115,6 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.Layers {
             // Get the previous layers objects if any generators are deep
             var deepObjects = activeGenerators.Any(o => o.Settings.IsDeep) ? GetAllPreviousLayersCollection() : null;
 
-            // Initialize list for objects to add later
-            var objectsToAdd = new List<IRelevantObject>();
-
             // Keep track of count to avoid adding too many objects
             var initialCount = Objects.GetCount();
             var addedCount = 0;
