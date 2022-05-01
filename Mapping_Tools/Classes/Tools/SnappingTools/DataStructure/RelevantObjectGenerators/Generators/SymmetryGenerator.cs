@@ -19,6 +19,7 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
         public SymmetryGenerator() : base(new SymmetryGeneratorSettings()) {
             Settings.Generator = this;
 
+            Settings.RelevancyRatio = 0.8;
             Settings.IsActive = true;
             Settings.IsDeep = true;
             MySettings.AxisInputPredicate.Predicates.Add(new SelectionPredicate {NeedSelected = true, NeedLocked = true, NeedGeneratedNotByThis = true});

@@ -72,6 +72,11 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
             set {
                 if (_isSelected == value) return;
                 _isSelected = value;
+                if (ChildObjects != null) {
+                    foreach (var relevantObject in ChildObjects) {
+                        relevantObject.UpdateRelevancy();
+                    }
+                }
                 if (!AutoPropagate) return;
                 Layer?.NextLayer?.GenerateNewObjects(true);
             }

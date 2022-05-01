@@ -6,8 +6,12 @@
              xmlns:local="clr-namespace:Mapping_Tools.Views"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:relevantObjectGenerators="clr-namespace:Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators"
+             xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
              mc:Ignorable="d"
              d:DesignHeight="450" Width="759.5" d:DataContext="{d:DesignData SnappingToolsVm}">
+    <local:MappingTool.Resources>
+        <domain:DoubleToStringConverter x:Key="DoubleToStringConverter"/>
+    </local:MappingTool.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -130,10 +134,10 @@ The savestates window is opened by clicking the button next to the preferences b
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Header="Deep">
+                            <GridViewColumn Header="Relevancy">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate DataType="relevantObjectGenerators:RelevantObjectsGenerator">
-                                        <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding Settings.IsDeep}" Cursor="Hand"/>
+                                        <TextBox Width="50" Text="{Binding Settings.RelevancyRatio, Converter={StaticResource DoubleToStringConverter}}" Cursor="Hand"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>

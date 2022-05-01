@@ -15,7 +15,7 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
         public SameTransformGenerator3Reversed() {
             Settings.IsSequential = true;
             Settings.IsDeep = true;
-            Settings.InputPredicate.Predicates.Add(new SelectionPredicate {NeedSelected = true});
+            Settings.InputPredicate.Predicates.Add(new SelectionPredicate {NeedSelected = true, MinRelevancy = 0.5});
             Settings.InputPredicate.Predicates.Add(new SelectionPredicate {NeedGeneratedByThis = true});
         }
 

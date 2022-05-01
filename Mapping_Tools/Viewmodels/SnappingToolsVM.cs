@@ -73,9 +73,9 @@ namespace Mapping_Tools.Viewmodels {
         private readonly DispatcherTimer _lockTimer;
         private readonly DispatcherTimer _inheritTimer;
 
-        private const double RelevancyBias = 5;
+        private const double RelevancyBias = 4;
         private const double PointsBias = 3;
-        private const double SpecialBias = 1;
+        private const double SpecialBias = 2;
         private const double SelectionRange = 80;
 
         private readonly CoordinateConverter _coordinateConverter;

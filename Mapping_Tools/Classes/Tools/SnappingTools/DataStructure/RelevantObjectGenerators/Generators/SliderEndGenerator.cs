@@ -8,6 +8,10 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
         public override string Tooltip => "Generates virtual points on the actual ends of sliders.";
         public override GeneratorType GeneratorType => GeneratorType.Basic;
 
+        public SliderEndGenerator() {
+            Settings.RelevancyRatio = 0.8;
+        }
+
         [RelevantObjectsGeneratorMethod]
         public RelevantPoint GetRelevantObjects(RelevantHitObject relevantHitObject) {
             var ho = relevantHitObject.HitObject;

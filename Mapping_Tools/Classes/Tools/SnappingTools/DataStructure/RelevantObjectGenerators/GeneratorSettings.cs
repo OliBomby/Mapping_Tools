@@ -14,7 +14,7 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
         public RelevantObjectsGenerator Generator { get; set; }
 
         public GeneratorSettings() {
-            _relevancyRatio = 0.8;
+            _relevancyRatio = 0.4;
             _generatesInheritable = true;
             _inputPredicate = new SelectionPredicateCollection();
         }
@@ -22,7 +22,7 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
         public GeneratorSettings(RelevantObjectsGenerator generator) {
             Generator = generator;
 
-            _relevancyRatio = 0.8;
+            _relevancyRatio = 0.4;
             _generatesInheritable = true;
             _inputPredicate = new SelectionPredicateCollection();
         }

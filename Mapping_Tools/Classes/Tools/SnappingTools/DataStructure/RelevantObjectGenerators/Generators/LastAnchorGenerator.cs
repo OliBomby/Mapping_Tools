@@ -10,6 +10,7 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
         public override GeneratorType GeneratorType => GeneratorType.Basic;
 
         public LastAnchorGenerator() {
+            Settings.RelevancyRatio = 1;
             Settings.IsActive = true;
         }
 

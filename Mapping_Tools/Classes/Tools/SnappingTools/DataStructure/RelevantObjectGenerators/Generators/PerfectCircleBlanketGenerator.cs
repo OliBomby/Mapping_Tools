@@ -11,6 +11,7 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
         public override GeneratorType GeneratorType => GeneratorType.Basic;
 
         public PerfectCircleBlanketGenerator() {
+            Settings.RelevancyRatio = 0.8;
             Settings.IsActive = true;
         }
 

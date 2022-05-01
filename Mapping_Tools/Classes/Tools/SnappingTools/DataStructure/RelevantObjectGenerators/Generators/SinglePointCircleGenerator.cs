@@ -21,7 +21,7 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
 
             Settings.IsActive = false;
             Settings.IsDeep = false;
-            Settings.InputPredicate.Predicates.Add(new SelectionPredicate { NeedSelected = true });
+            Settings.InputPredicate.Predicates.Add(new SelectionPredicate { NeedSelected = true, MinRelevancy = 0.5 });
             MySettings.Radius = 100;
         }
 

@@ -15,6 +15,7 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
         public SliderPathGenerator() : base(new SliderPathGeneratorSettings()) {
             Settings.Generator = this;
 
+            Settings.RelevancyRatio = 0.6;
             Settings.GeneratesInheritable = false;
             ((SliderPathGeneratorSettings) Settings).PointDensity = 0.5;
         }
