@@ -420,20 +420,12 @@ namespace Mapping_Tools {
                 return;
 
             if (WindowState == WindowState.Maximized) {
-                var point = PointToScreen(e.MouseDevice.GetPosition(this));
-
-                if (point.X <= RestoreBounds.Width / 2)
-                    Left = 0;
-                else if (point.X >= RestoreBounds.Width)
-                    Left = point.X - (RestoreBounds.Width - (ActualWidth - point.X));
-                else
-                    Left = point.X - (RestoreBounds.Width / 2);
-
-                Top = point.Y - (((FrameworkElement)sender).ActualHeight / 2);
+                SetFullscreen(false);
             }
-            if (e.LeftButton == MouseButtonState.Pressed)
+
+            if (e.LeftButton == MouseButtonState.Pressed) {
                 DragMove();
-            //bt.Content = new PackIcon { Kind = PackIconKind.WindowRestore };
+            }
         }
 
         private async void MenuItem_OnClick(object sender, RoutedEventArgs e) {
