@@ -262,7 +262,7 @@ namespace Mapping_Tools.Classes.Tools.MapCleanerStuff {
 
             // Remove unused samples
             if (args.RemoveUnusedSamples)
-                RemoveUnusedSamples(mapDir);
+                samplesRemoved += RemoveUnusedSamples(mapDir, editor);
 
             // Fix this extremely specific thing
             Fix2BDoubleTaps(beatmap);
@@ -290,14 +290,14 @@ namespace Mapping_Tools.Classes.Tools.MapCleanerStuff {
             }
         }
 
-        public static int RemoveUnusedSamples(string mapDir) {
+        public static int RemoveUnusedSamples(string mapDir, BeatmapEditor thisEditor) {
             // Collect all the used samples
             HashSet<string> allFilenames = new HashSet<string>();
             bool anySpinners = false;
 
             List<string> beatmaps = Directory.GetFiles(mapDir, "*.osu", SearchOption.TopDirectoryOnly).ToList();
             foreach (string path in beatmaps) {
-                BeatmapEditor editor = new BeatmapEditor(path);
+                BeatmapEditor editor = path == thisEditor.Path ? thisEditor : new BeatmapEditor(path);
                 Beatmap beatmap = editor.Beatmap;
 
                 GameMode mode = (GameMode)beatmap.General["Mode"].IntValue;
