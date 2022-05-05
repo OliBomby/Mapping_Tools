@@ -8,6 +8,7 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
         public override string Name => "Points on Slider Paths";
         public override string Tooltip => "Generates many virtual points on the paths of sliders. The density of generated points is configurable.";
         public override GeneratorType GeneratorType => GeneratorType.Basic;
+        public override GeneratorTemporalPositioning TemporalPositioning => GeneratorTemporalPositioning.Custom;
 
         /// <summary>
         /// Initializes SliderPathGenerator with a custom settings object
@@ -32,7 +33,9 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
             var sliderPath = ho.GetSliderPath();
             
             for (int i = 0; i < numPoints; i++) {
-                points[i] = new RelevantPoint(sliderPath.PositionAt((double)i / (numPoints - 1)));
+                points[i] = new RelevantPoint(sliderPath.PositionAt((double)i / (numPoints - 1))) {
+                    CustomTime = (double)i / (numPoints - 1) * (ho.EndTime - ho.Time) + ho.Time
+                };
             }
 
             return points;

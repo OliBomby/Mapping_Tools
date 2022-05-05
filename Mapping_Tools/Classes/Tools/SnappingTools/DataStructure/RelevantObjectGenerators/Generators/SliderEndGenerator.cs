@@ -7,6 +7,7 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
         public override string Name => "Points on Slider Ends";
         public override string Tooltip => "Generates virtual points on the actual ends of sliders.";
         public override GeneratorType GeneratorType => GeneratorType.Basic;
+        public override GeneratorTemporalPositioning TemporalPositioning => GeneratorTemporalPositioning.Custom;
 
         public SliderEndGenerator() {
             Settings.RelevancyRatio = 0.8;
@@ -15,7 +16,7 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
         [RelevantObjectsGeneratorMethod]
         public RelevantPoint GetRelevantObjects(RelevantHitObject relevantHitObject) {
             var ho = relevantHitObject.HitObject;
-            return ho.IsSlider ? new RelevantPoint(ho.GetSliderPath().PositionAt(1)) : null;
+            return ho.IsSlider ? new RelevantPoint(ho.GetSliderPath().PositionAt(1)) { CustomTime = ho.EndTime } : null;
         }
     }
 }

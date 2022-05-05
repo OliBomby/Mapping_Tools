@@ -47,6 +47,16 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
             }
         }
 
+        private double _customTime;
+        public double CustomTime {
+            get => _customTime;
+            set {
+                _customTime = value;
+                if (Generator?.TemporalPositioning != GeneratorTemporalPositioning.Custom) return;
+                UpdateTime();
+            }
+        }
+
         private double _relevancy;
         public double Relevancy {
             get => _isSelected ? 1 : _relevancy;
@@ -187,6 +197,9 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
                     break;
                 case GeneratorTemporalPositioning.Before:
                     Time = 2 * ParentObjects.Min(o => o.Time) - ParentObjects.Sum(o => o.Time) / ParentObjects.Count;
+                    break;
+                case GeneratorTemporalPositioning.Custom:
+                    Time = CustomTime;
                     break;
                 default:
                     Time = ParentObjects.Sum(o => o.Time) / ParentObjects.Count;
