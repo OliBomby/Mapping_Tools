@@ -48,6 +48,12 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref drawerOpen, value);
         }
 
+        private bool searchFocused;
+        public bool SearchFocused {
+            get => searchFocused;
+            set => Set(ref searchFocused, value);
+        }
+
         private int selectedPageIndex;
         public int SelectedPageIndex {
             get => selectedPageIndex;
@@ -134,20 +140,23 @@ namespace Mapping_Tools.Viewmodels {
                 SelectedPageItem?.Focus();
             });
 
-            ToggleNavigationDrawer = new CommandImplementation(_ => {
-                DrawerOpen = !DrawerOpen;
+            OpenNavigationDrawer = new CommandImplementation(_ => {
+                DrawerOpen = true;
+                SearchFocused = false;
+                SearchFocused = true;
             });
 
             GenerateNavigationItems();
             UpdateNavigationItems();
 
             DrawerOpen = true;
+            SearchFocused = true;
         }
 
         public CommandImplementation GoToSelectedPage { get; }
         public CommandImplementation SelectedPageUp { get; }
         public CommandImplementation SelectedPageDown { get; }
-        public CommandImplementation ToggleNavigationDrawer { get; }
+        public CommandImplementation OpenNavigationDrawer { get; }
 
         private void GenerateDefaultItems() {
             DefaultItems = new List<FrameworkElement> {

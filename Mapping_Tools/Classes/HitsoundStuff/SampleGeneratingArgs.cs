@@ -13,6 +13,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public SampleGeneratingArgs() {
             Path = "";
             Volume = 1;
+            Panning = 0;
+            PitchShift = 0;
             Bank = -1;
             Patch = -1;
             Instrument = -1;
@@ -23,6 +25,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public SampleGeneratingArgs(string path) {
             Path = path;
             Volume = 1;
+            Panning = 0;
+            PitchShift = 0;
             Bank = -1;
             Patch = -1;
             Instrument = -1;
@@ -30,9 +34,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Length = -1;
         }
 
-        public SampleGeneratingArgs(string path, double volume, int bank, int patch, int instrument, int key, double length) {
+        public SampleGeneratingArgs(string path, double volume, double panning, double pitchShift, int bank, int patch, int instrument, int key, double length) {
             Path = path;
             Volume = volume;
+            Panning = panning;
+            PitchShift = pitchShift;
             Bank = bank;
             Patch = patch;
             Instrument = instrument;
@@ -42,6 +48,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         public SampleGeneratingArgs(string path, int bank, int patch, int instrument, int key, double length, int velocity) {
             Path = path;
+            Panning = 0;
+            PitchShift = 0;
             Bank = bank;
             Patch = patch;
             Instrument = instrument;
@@ -58,7 +66,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// <summary>
         /// Means you can export this sample by simply copy pasting the source file in <see cref="Path"/>.
         /// </summary>
-        public bool CanCopyPaste => !string.IsNullOrEmpty(GetExtension()) && !UsesSoundFont && Math.Abs(Volume - 1) < Precision.DOUBLE_EPSILON;
+        public bool CanCopyPaste => !string.IsNullOrEmpty(GetExtension()) &&
+                                    !UsesSoundFont &&
+                                    Math.Abs(Volume - 1) < Precision.DOUBLE_EPSILON &&
+                                    Math.Abs(Panning) < Precision.DOUBLE_EPSILON &&
+                                    Math.Abs(PitchShift) < Precision.DOUBLE_EPSILON;
 
         private string path;
         public string Path {
@@ -74,6 +86,18 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     RaisePropertyChanged(nameof(Velocity));
                 }
             }
+        }
+
+        private double panning;
+        public double Panning {
+            get => panning;
+            set => Set(ref panning, value);
+        }
+
+        private double pitchShift;
+        public double PitchShift {
+            get => pitchShift;
+            set => Set(ref pitchShift, value);
         }
 
         private int bank;
@@ -115,11 +139,16 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// <summary>Returns a string that represents the current object and can be used as a filename.</summary>
         public string GetFilename() {
             var filename = System.IO.Path.GetFileNameWithoutExtension(Path);
-            return GetExtension().ToLower() == ".sf2" ? 
-                $"{filename}-{Bank}-{Patch}-{Instrument}-{Key}-{(int)Length}-{Velocity}" : 
-                Math.Abs(Volume - 1) < Precision.DOUBLE_EPSILON ?
+            return GetExtension().ToLower() == ".sf2" ?
+                Math.Abs(Panning) < Precision.DOUBLE_EPSILON &&
+                Math.Abs(PitchShift) < Precision.DOUBLE_EPSILON ?
+                    $"{filename}-{Bank}-{Patch}-{Instrument}-{Key}-{(int)Length}-{Velocity}" :
+                $"{filename}-{(int)(Panning * 100)}-{(int)(PitchShift * 100)}-{Bank}-{Patch}-{Instrument}-{Key}-{(int)Length}-{Velocity}" :
+                Math.Abs(Volume - 1) < Precision.DOUBLE_EPSILON &&
+                Math.Abs(Panning) < Precision.DOUBLE_EPSILON &&
+                Math.Abs(PitchShift) < Precision.DOUBLE_EPSILON ?
                    filename :
-                $"{filename}-{(int)(Volume * 100)}";
+                $"{filename}-{(int)(Volume * 100)}-{(int)(Panning * 100)}-{(int)(PitchShift * 100)}";
         }
 
         /// <summary>
@@ -134,24 +163,26 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// <returns>A string that represents the current object.</returns>
         public override string ToString() {
             return GetExtension().ToLower() == ".sf2" ? 
-                $"{Path} {Bank},{Patch},{Instrument},{Key},{Length},{Velocity}" : 
-                $"{Path} {Volume * 100}%";
+                $"{Path} p{Panning:N1} s{PitchShift:N3} {Bank},{Patch},{Instrument},{Key},{Length},{Velocity}" :
+                $"{Path} {Volume * 100}% p{Panning:N1} s{PitchShift:N2}";
         }
 
         public SampleGeneratingArgs Copy() {
-            return new SampleGeneratingArgs(Path, Volume, Bank, Patch, Instrument, Key, Length);
+            return new SampleGeneratingArgs(Path, Volume, Panning, PitchShift, Bank, Patch, Instrument, Key, Length);
         }
 
         public bool Equals(SampleGeneratingArgs other) {
             if (other is null) return false;
 
             return Path == other.Path &&
-                   Volume == other.Volume &&
+                   Math.Abs(Volume - other.Volume) < Precision.DOUBLE_EPSILON &&
+                   Math.Abs(Panning - other.Panning) < Precision.DOUBLE_EPSILON &&
+                   Math.Abs(PitchShift - other.PitchShift) < Precision.DOUBLE_EPSILON &&
                    Bank == other.Bank &&
                    Patch == other.Patch &&
                    Instrument == other.Instrument &&
                    Key == other.Key &&
-                   Length == other.Length;
+                   Math.Abs(Length - other.Length) < Precision.DOUBLE_EPSILON;
         }
 
         public override bool Equals(object obj) {
@@ -168,6 +199,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             var hashCode = 0x34894079;
             hashCode = hashCode * -0x5AAAAAD7 + EqualityComparer<string>.Default.GetHashCode(Path);
             hashCode = hashCode * -0x5AAAAAD7 + Volume.GetHashCode();
+            hashCode = hashCode * -0x5AAAAAD7 + Panning.GetHashCode();
+            hashCode = hashCode * -0x5AAAAAD7 + PitchShift.GetHashCode();
             hashCode = hashCode * -0x5AAAAAD7 + Bank.GetHashCode();
             hashCode = hashCode * -0x5AAAAAD7 + Patch.GetHashCode();
             hashCode = hashCode * -0x5AAAAAD7 + Instrument.GetHashCode();

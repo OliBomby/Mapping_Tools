@@ -104,17 +104,25 @@ namespace Mapping_Tools.Classes.SystemTools {
         public static void DefaultPaths() {
             if (string.IsNullOrWhiteSpace(Settings.OsuPath)) {
                 try {
-                    var regKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall");
+                    var regKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall");
                     Settings.OsuPath = FindByDisplayName(regKey, "osu!");
                 } catch (KeyNotFoundException) {
-                    Settings.OsuPath = Path.Combine(MainWindow.AppCommon, "osu!");
-                    MessageBox.Show("Could not automatically find osu! install directory. Please set the correct paths in the Preferences.");
+                    try {
+                        var regKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall");
+                        Settings.OsuPath = FindByDisplayName(regKey, "osu!");
+                    } catch (KeyNotFoundException) {
+                        Settings.OsuPath = Path.Combine(MainWindow.AppCommon, "osu!");
+                        MessageBox.Show("Could not automatically find osu! install directory. Please set the correct paths in the Preferences.");
+                    }
                 }
             }
 
+            if (string.IsNullOrWhiteSpace(Settings.OsuConfigPath)) {
+                Settings.OsuConfigPath = Path.Combine(Settings.OsuPath, $"osu!.{Environment.UserName}.cfg");
+            }
+
             if (string.IsNullOrWhiteSpace(Settings.SongsPath)) {
-                var beatmapDirectory =
-                    GetBeatmapDirectory(Path.Combine(Settings.OsuPath, $"osu!.{Environment.UserName}.cfg"));
+                var beatmapDirectory = GetBeatmapDirectory(Settings.OsuConfigPath);
                 Settings.SongsPath = Path.Combine(Settings.OsuPath, beatmapDirectory);
             }
 

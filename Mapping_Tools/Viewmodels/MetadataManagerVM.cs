@@ -28,6 +28,7 @@ namespace Mapping_Tools.Viewmodels {
         private string _beatmapCreator;
         private string _source;
         private string _tags;
+        private bool _removeDuplicateTags;
 
         private double _previewTime;
         private bool _useComboColours;
@@ -37,6 +38,7 @@ namespace Mapping_Tools.Viewmodels {
         public MetadataManagerVm() {
             _importPath = "";
             _exportPath = "";
+            _removeDuplicateTags = true;
 
             _useComboColours = true;
             ComboColours = new ObservableCollection<ComboColour>();
@@ -117,10 +119,10 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
-            if (e.PropertyName == "Artist" || e.PropertyName == "Title" || e.PropertyName == "BeatmapCreator") {
+            if (e.PropertyName == nameof(RomanisedArtist) || e.PropertyName == nameof(RomanisedTitle) || e.PropertyName == nameof(BeatmapCreator)) {
                 // Update error visibility if there is an error
-                string filename = Beatmap.GetFileName(Artist, Title, BeatmapCreator, "");
-                BeatmapFileNameOverflowErrorVisibility = filename.Length > 255 ? Visibility.Visible : Visibility.Collapsed;
+                var length = 13 + RomanisedArtist?.Length ?? 0 + RomanisedTitle?.Length ?? 0 + BeatmapCreator?.Length ?? 0;
+                BeatmapFileNameOverflowErrorVisibility = length > 255 ? Visibility.Visible : Visibility.Collapsed;
             }
         }
 
@@ -239,7 +241,23 @@ namespace Mapping_Tools.Viewmodels {
             set {
                 if( _tags == value )
                     return;
-                _tags = RemoveDuplicateTags(value);
+                _tags = value;
+                if (_removeDuplicateTags)
+                    _tags = RemoveDuplicateTags(value);
+                TagsOverflowErrorVisibility = _tags.Length > 1024 || _tags.Split(' ').Length > 100 ? Visibility.Visible : Visibility.Collapsed;
+                OnPropertyChanged(nameof(TagsOverflowErrorVisibility));
+                OnPropertyChanged();
+            }
+        }
+
+        public bool DoRemoveDuplicateTags {
+            get => _removeDuplicateTags;
+            set {
+                if( _removeDuplicateTags == value )
+                    return;
+                _removeDuplicateTags = value;
+                if (_removeDuplicateTags)
+                    Tags = RemoveDuplicateTags(Tags);
                 OnPropertyChanged();
             }
         }
@@ -290,6 +308,9 @@ namespace Mapping_Tools.Viewmodels {
                 OnPropertyChanged();
             }
         }
+
+        [JsonIgnore]
+        public Visibility TagsOverflowErrorVisibility { get; set; }
 
         [JsonIgnore]
         public CommandImplementation ImportLoadCommand { get; }
