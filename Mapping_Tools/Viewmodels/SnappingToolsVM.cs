@@ -225,7 +225,7 @@ namespace Mapping_Tools.Viewmodels {
                         _fetchEditorFails++;
                         if (_fetchEditorFails <= 3) return;
 
-                        MessageBox.Show("Editor Reader seems to be failing a lot. Try restarting osu! and opening Geometry Dashboard again.");
+                        MessageBox.Show("Editor Reader seems to be failing a lot. Try restarting osu! and opening Geometry Dashboard again or refer to the FAQ.");
                         ex.Show();
 
                         _updateTimer.IsEnabled = false;
@@ -985,7 +985,7 @@ namespace Mapping_Tools.Viewmodels {
             try {
                 _configWatcher.EnableRaisingEvents = true;
             } catch (Exception ex) {
-                MessageBox.Show("Can't enable filesystem watcher. osu! config path is probably incorrect. You can fix this in the Options > Preferences.", "Warning");
+                MessageBox.Show("Can not enable filesystem watcher. osu! config path is probably incorrect. Please set the correct path in the Preferences or your overlay might have the wrong position.", "Warning");
                 ex.Show();
             }
 
@@ -1002,7 +1002,7 @@ namespace Mapping_Tools.Viewmodels {
             try {
                 _configWatcher.EnableRaisingEvents = false;
             } catch (Exception ex) {
-                MessageBox.Show("Can't disable filesystem watcher. osu! config path is probably incorrect. You can fix this in the Options > Preferences.", "Warning");
+                MessageBox.Show("Can not enable filesystem watcher. osu! config path is probably incorrect. Please set the correct path in the Preferences or your overlay might have the wrong position.", "Warning");
                 ex.Show();
             }
 
