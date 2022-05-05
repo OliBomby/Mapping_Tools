@@ -433,6 +433,8 @@ namespace Mapping_Tools.Views.HitsoundStudio
 
             SelectedSamplePathBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Path);
             SelectedSampleVolumeBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Volume * 100, CultureInfo.InvariantCulture);
+            SelectedSamplePanningBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Panning, CultureInfo.InvariantCulture);
+            SelectedSamplePitchShiftBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.PitchShift, CultureInfo.InvariantCulture);
             SelectedSampleBankBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Bank);
             SelectedSamplePatchBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Patch);
             SelectedSampleInstrumentBox.Text = selectedLayers.AllToStringOrDefault(o => o.SampleArgs.Instrument);
@@ -760,6 +762,30 @@ namespace Mapping_Tools.Views.HitsoundStudio
             foreach (HitsoundLayer hitsoundLayer in selectedLayers)
             {
                 hitsoundLayer.SampleArgs.Volume = t / 100;
+            }
+            UpdateEditingField();
+        }
+
+        private void SelectedSamplePanningBox_TextChanged(object sender, RoutedEventArgs e)
+        {
+            if (suppressEvents) return;
+
+            double t = (sender as TextBox).GetDouble(0);
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers)
+            {
+                hitsoundLayer.SampleArgs.Panning = t;
+            }
+            UpdateEditingField();
+        }
+
+        private void SelectedSamplePitchShiftBox_TextChanged(object sender, RoutedEventArgs e)
+        {
+            if (suppressEvents) return;
+
+            double t = (sender as TextBox).GetDouble(0);
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers)
+            {
+                hitsoundLayer.SampleArgs.PitchShift = t;
             }
             UpdateEditingField();
         }

@@ -122,6 +122,12 @@
                         <TextBox x:Name="SelectedSampleVolumeBox" LostFocus="SelectedSampleVolumeBox_TextChanged" Margin="0,5,0,0"
                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Volume %"
                                 ToolTip="The volume at which the sound of this hitsound layer has to play. Ranges from 0 to 100."/>
+                        <TextBox x:Name="SelectedSamplePanningBox" LostFocus="SelectedSamplePanningBox_TextChanged" Margin="0,5,0,0"
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Panning"
+                                 ToolTip="Panning of the sound. -1 means all left and 1 means all right."/>
+                        <TextBox x:Name="SelectedSamplePitchShiftBox" LostFocus="SelectedSamplePitchShiftBox_TextChanged" Margin="0,5,0,0"
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Pitch shift"
+                                 ToolTip="Pitch shift of the sound in keys. 12 is plus one octave. -12 is minus one octave."/>
                         <StackPanel x:Name="SoundFontArgsPanel">
                             <TextBox x:Name="SelectedSampleBankBox" TextChanged="SelectedSampleBankBox_TextChanged" Margin="0,5,0,0"
                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Bank"

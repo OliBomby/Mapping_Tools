@@ -107,6 +107,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 case ".sf2": {
                     SoundFont sf2 = new SoundFont(path);
                     SampleSoundGenerator wave = ImportFromSoundFont(args, sf2);
+                    wave.Panning = args.Panning;
+                    wave.PitchShift = args.PitchShift;
                     GC.Collect();
                     return wave;
                 }
@@ -119,14 +121,18 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         public static SampleSoundGenerator ImportFromAudio(SampleGeneratingArgs args) {
             var generator = new SampleSoundGenerator(new MediaFoundationReader(args.Path)) {
-                VolumeCorrection = (float)args.Volume
+                VolumeCorrection = args.Volume,
+                Panning = args.Panning,
+                PitchShift = args.PitchShift
             };
             return generator;
         }
 
         public static SampleSoundGenerator ImportFromVorbis(SampleGeneratingArgs args) {
             var generator = new SampleSoundGenerator(new VorbisWaveReader(args.Path)) {
-                VolumeCorrection = (float)args.Volume
+                VolumeCorrection = args.Volume,
+                Panning = args.Panning,
+                PitchShift = args.PitchShift
             };
             return generator;
         }
@@ -440,7 +446,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
-        public static ISampleProvider PitchShift(ISampleProvider sample, int correction) {
+        public static ISampleProvider PitchShift(ISampleProvider sample, double correction) {
             float factor = (float)Math.Pow(2, correction / 12f);
             SmbPitchShiftingSampleProvider shifter = new SmbPitchShiftingSampleProvider(sample, 1024, 4, factor);
             return shifter;
