@@ -251,10 +251,30 @@ namespace Mapping_Tools.Classes.Tools.MapCleanerStuff {
             if (args.RemoveUnusedSamples)
                 RemoveUnusedSamples(mapDir);
 
+            // Fix this extremely specific thing
+            Fix2BDoubleTaps(beatmap);
+
             // Complete progressbar
             UpdateProgressBar(worker, 100);
 
             return new MapCleanerResult(objectsResnapped, samplesRemoved);
+        }
+
+        private static void Fix2BDoubleTaps(Beatmap beatmap) {
+            /*
+             * When having doubletap circle+slider on the exact same time, slider-notelock can happen if the circle is
+             * the second object instead of the first. What this means is that when hitting the object like a regular
+             * doubletap, the slider registers but the circle will always miss. This phenomenon can be observed either
+             * in the .osu file (the circle will be on the line after the slider), or the editor.
+             */
+            for (var i = 0; i < beatmap.HitObjects.Count - 1; i++) {
+                var ho1 = beatmap.HitObjects[i];
+                var ho2 = beatmap.HitObjects[i + 1];
+                if (ho1.IsSlider && ho2.IsCircle && Precision.AlmostEquals(ho1.Time, ho2.Time)) {
+                    // Swap the two objects
+                    (beatmap.HitObjects[i], beatmap.HitObjects[i + 1]) = (ho2, ho1);
+                }
+            }
         }
 
         public static int RemoveUnusedSamples(string mapDir) {
