@@ -28,6 +28,7 @@ namespace Mapping_Tools.Viewmodels {
         private string _beatmapCreator;
         private string _source;
         private string _tags;
+        private bool _removeDuplicateTags;
 
         private double _previewTime;
         private bool _useComboColours;
@@ -37,6 +38,7 @@ namespace Mapping_Tools.Viewmodels {
         public MetadataManagerVm() {
             _importPath = "";
             _exportPath = "";
+            _removeDuplicateTags = true;
 
             _useComboColours = true;
             ComboColours = new ObservableCollection<ComboColour>();
@@ -239,9 +241,23 @@ namespace Mapping_Tools.Viewmodels {
             set {
                 if( _tags == value )
                     return;
-                _tags = RemoveDuplicateTags(value);
+                _tags = value;
+                if (_removeDuplicateTags)
+                    _tags = RemoveDuplicateTags(value);
                 TagsOverflowErrorVisibility = _tags.Length > 1024 || _tags.Split(' ').Length > 100 ? Visibility.Visible : Visibility.Collapsed;
                 OnPropertyChanged(nameof(TagsOverflowErrorVisibility));
+                OnPropertyChanged();
+            }
+        }
+
+        public bool DoRemoveDuplicateTags {
+            get => _removeDuplicateTags;
+            set {
+                if( _removeDuplicateTags == value )
+                    return;
+                _removeDuplicateTags = value;
+                if (_removeDuplicateTags)
+                    Tags = RemoveDuplicateTags(Tags);
                 OnPropertyChanged();
             }
         }
