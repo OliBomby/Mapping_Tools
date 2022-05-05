@@ -399,8 +399,8 @@ namespace Mapping_Tools {
         }
 
         private void SetToRect(Rect rect) {
-            Left = MathHelper.Clamp(rect.Left, 0, SystemParameters.VirtualScreenLeft - 300);
-            Top = MathHelper.Clamp(rect.Top, 0, SystemParameters.VirtualScreenTop - 100);
+            Left = MathHelper.Clamp(rect.Left, SystemParameters.VirtualScreenLeft, SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth - 300);
+            Top = MathHelper.Clamp(rect.Top, SystemParameters.VirtualScreenTop, SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight - 100);
             Width = Math.Max(rect.Width, 300);
             Height = Math.Max(rect.Height, 100);
         }
@@ -420,6 +420,8 @@ namespace Mapping_Tools {
                 return;
 
             if (WindowState == WindowState.Maximized) {
+                var point = PointToScreen(e.MouseDevice.GetPosition(this));
+                Top = point.Y - (((FrameworkElement)sender).ActualHeight / 2);
                 SetFullscreen(false);
             }
 
