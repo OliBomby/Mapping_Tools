@@ -664,8 +664,7 @@ namespace Mapping_Tools.Viewmodels {
             // Set the locked variable of the nearest drawable
             if (_lockedToggle) {
                 if (!nearest.IsLocked) {
-                    LayerCollection.LockedLayer.Add(nearest.GetLockedRelevantObject());
-                    LayerCollection.LockedLayer.NextLayer?.GenerateNewObjects(true);
+                    LayerCollection.GetRootLayer().Add(nearest.GetLockedRelevantObject());
                 }
             } else {
                 if (nearest.IsLocked && !_unlockedSomething) {
@@ -888,9 +887,7 @@ namespace Mapping_Tools.Viewmodels {
                     }
                 }
 
-                foreach (var relevantObject in lockedObjectsToAdd) {
-                    LayerCollection.LockedLayer.Add(relevantObject.GetLockedRelevantObject());
-                }
+                LayerCollection.GetRootLayer().Add(lockedObjectsToAdd.Select(o => o.GetLockedRelevantObject()));
                 foreach (var relevantObject in lockedObjectsToDispose) {
                     relevantObject.Dispose();
                 }
@@ -961,12 +958,11 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public RelevantObjectCollection GetLockedObjects() {
-            return LayerCollection.LockedLayer.Objects;
+            return LayerCollection.GetRootLayer().Objects.ObjectsWhere(o => o.IsLocked);
         }
 
         public void SetLockedObjects(RelevantObjectCollection objects) {
-            LayerCollection.LockedLayer.Objects = objects;
-            objects.SetParentLayer(LayerCollection.LockedLayer);
+            LayerCollection.GetRootLayer().Objects.MergeWith(objects);
 
             _overlay.OverlayWindow.InvalidateVisual();
         }

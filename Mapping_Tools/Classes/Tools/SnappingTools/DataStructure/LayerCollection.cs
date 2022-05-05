@@ -12,27 +12,20 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure {
 
         public RelevantObjectsGeneratorCollection AllGenerators;
 
-        public RelevantObjectLayer LockedLayer;
-
         public double AcceptableDifference { get; set; }
 
         /// <summary>
         /// This is the maximum number of relevant objects any layer may hold
         /// </summary>
-        public int MaxObjects { get; } = 1000;
+        public int MaxObjects => 1000;
 
         public LayerCollection(RelevantObjectsGeneratorCollection generators, double acceptableDifference) {
             ObjectLayers = new List<RelevantObjectLayer>();
             AllGenerators = generators;
             AcceptableDifference = acceptableDifference;
-            LockedLayer = new RelevantObjectLayer(this, null);
 
             // Generate 1 layer
-            ObjectLayers.Add(new RelevantObjectLayer(this, AllGenerators));
-
-            // Set the previous layer of the rootlayer to the locked layer so every layer has the locked layer
-            GetRootLayer().PreviousLayer = LockedLayer;
-            LockedLayer.NextLayer = GetRootLayer();
+            ObjectLayers.Add(new RelevantObjectLayer(this, null));
         }
 
         public void SetInceptionLevel(int inceptionLevel) {
@@ -67,7 +60,7 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure {
         }
 
         public IEnumerable<IRelevantObject> GetAllRelevantObjects() {
-            return ObjectLayers.Concat(new []{LockedLayer}).SelectMany(a => a.Objects.Values.SelectMany(b => b));
+            return ObjectLayers.SelectMany(a => a.Objects.Values.SelectMany(b => b));
         }
 
         /// <summary>
@@ -75,7 +68,7 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure {
         /// </summary>
         /// <returns></returns>
         public IEnumerable<IRelevantDrawable> GetAllRelevantDrawables() {
-            return ObjectLayers.Concat(new []{LockedLayer})
+            return ObjectLayers
                 .SelectMany(layer =>
                     layer.Objects.Where(kvp => typeof(IRelevantDrawable).IsAssignableFrom(kvp.Key))
                         .SelectMany(kvp => kvp.Value)).Cast<IRelevantDrawable>();
