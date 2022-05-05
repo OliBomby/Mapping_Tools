@@ -12,6 +12,7 @@ namespace Mapping_Tools.Classes.Tools.MapCleanerStuff {
         private bool _resnapObjects;
         private bool _resnapBookmarks;
         private bool _removeUnusedSamples;
+        private bool _removeHitsounds;
         private bool _removeMuting;
         private bool _removeUnclickableHitsounds;
         private IBeatDivisor[] _beatDivisors;
@@ -46,6 +47,11 @@ namespace Mapping_Tools.Classes.Tools.MapCleanerStuff {
             set => Set(ref _removeUnusedSamples, value);
         }
 
+        public bool RemoveHitsounds {
+            get => _removeHitsounds;
+            set => Set(ref _removeHitsounds, value);
+        }
+
         public bool RemoveMuting {
             get => _removeMuting;
             set => Set(ref _removeMuting, value);
@@ -61,20 +67,21 @@ namespace Mapping_Tools.Classes.Tools.MapCleanerStuff {
             set => Set(ref _beatDivisors, value);
         }
 
-        public MapCleanerArgs(bool volumeSliders, bool sampleSetSliders, bool volumeSpinners, bool resnapObjects, bool resnapBookmarks, bool removeUnusedSamples, bool removeMuting, bool removeUnclickableHitsounds, IEnumerable<IBeatDivisor> beatDivisors) {
+        public MapCleanerArgs(bool volumeSliders, bool sampleSetSliders, bool volumeSpinners, bool resnapObjects, bool resnapBookmarks, bool removeUnusedSamples, bool removeHitsounds, bool removeMuting, bool removeUnclickableHitsounds, IEnumerable<IBeatDivisor> beatDivisors) {
             _volumeSliders = volumeSliders;
             _sampleSetSliders = sampleSetSliders;
             _volumeSpinners = volumeSpinners;
             _resnapObjects = resnapObjects;
             _resnapBookmarks = resnapBookmarks;
             _removeUnusedSamples = removeUnusedSamples;
+            _removeHitsounds = removeHitsounds;
             _removeMuting = removeMuting;
             _removeUnclickableHitsounds = removeUnclickableHitsounds;
             _beatDivisors = beatDivisors.ToArray();
         }
 
-        public static readonly MapCleanerArgs BasicClean = new MapCleanerArgs(true, true, true, false, false, false, false, false, RationalBeatDivisor.GetDefaultBeatDivisors());
+        public static readonly MapCleanerArgs BasicClean = new MapCleanerArgs(true, true, true, false, false, false, false, false, false, RationalBeatDivisor.GetDefaultBeatDivisors());
 
-        public static readonly MapCleanerArgs BasicResnap = new MapCleanerArgs(true, true, true, true, false, false, false, false, RationalBeatDivisor.GetDefaultBeatDivisors());
+        public static readonly MapCleanerArgs BasicResnap = new MapCleanerArgs(true, true, true, true, false, false, false, false, false, RationalBeatDivisor.GetDefaultBeatDivisors());
     }
 }

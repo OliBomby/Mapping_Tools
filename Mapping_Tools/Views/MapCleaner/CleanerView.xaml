@@ -54,6 +54,10 @@
                           ToolTip="Resnap bookmarks.">
                     Resnap bookmarks
                 </CheckBox>
+                <CheckBox FontSize="14" x:Name="RemoveHitsounds" IsChecked="{Binding MapCleanerArgs.RemoveHitsounds}" Cursor="Hand"
+                          ToolTip="Remove all hitsounds from the beatmap.">
+                    Remove hitsounds
+                </CheckBox>
                 <CheckBox FontSize="14" x:Name="RemoveUnusedSamples" IsChecked="{Binding MapCleanerArgs.RemoveUnusedSamples}" Cursor="Hand"
                           ToolTip="Remove all samples that are unused by all maps and storyboards in the set.">
                     Remove unused samples
