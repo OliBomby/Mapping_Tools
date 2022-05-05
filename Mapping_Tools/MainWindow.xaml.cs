@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools {
 
@@ -394,13 +395,18 @@ namespace Mapping_Tools {
                 window_border.BorderThickness = new Thickness(1);
                 bt.Content = new PackIcon { Kind = PackIconKind.WindowMaximize };
             }
+            EnsureOnScreen();
         }
 
         private void SetToRect(Rect rect) {
-            Left = Math.Max(rect.Left, SystemParameters.VirtualScreenLeft);
-            Top = Math.Max(rect.Top, SystemParameters.VirtualScreenTop);
+            Left = MathHelper.Clamp(rect.Left, 0, SystemParameters.VirtualScreenLeft - 300);
+            Top = MathHelper.Clamp(rect.Top, 0, SystemParameters.VirtualScreenTop - 100);
             Width = Math.Max(rect.Width, 300);
             Height = Math.Max(rect.Height, 100);
+        }
+
+        private void EnsureOnScreen() {
+            SetToRect(new Rect(Left, Top, Width, Height));
         }
 
         //Minimize window on click
