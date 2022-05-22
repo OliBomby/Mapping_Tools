@@ -85,6 +85,18 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _justMiddleAnchors, value);
         }
 
+        private bool _delegateToBpm;
+        public bool DelegateToBpm {
+            get => _delegateToBpm;
+            set => Set(ref _delegateToBpm, value);
+        }
+
+        private bool _removeSliderTicks;
+        public bool RemoveSliderTicks {
+            get => _removeSliderTicks;
+            set => Set(ref _removeSliderTicks, value);
+        }
+
         [JsonIgnore]
         public IEnumerable<TumourTemplate> TumourTemplates => Enum.GetValues(typeof(TumourTemplate)).Cast<TumourTemplate>();
 
@@ -92,7 +104,7 @@ namespace Mapping_Tools.Viewmodels {
         public IEnumerable<TumourSidedness> TumourSides => Enum.GetValues(typeof(TumourSidedness)).Cast<TumourSidedness>();
 
         [JsonIgnore]
-        public string Path { get; set; }
+        public string[] Paths { get; set; }
 
         [JsonIgnore]
         public bool Quick { get; set; }
@@ -215,7 +227,8 @@ namespace Mapping_Tools.Viewmodels {
         public enum ImportMode {
             Selected,
             Bookmarked,
-            Time
+            Time,
+            Everything
         }
     }
 }

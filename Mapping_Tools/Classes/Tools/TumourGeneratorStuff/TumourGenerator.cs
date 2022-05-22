@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Mapping_Tools.Annotations;
+using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Enums;
 using Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Options;
 
@@ -34,6 +35,10 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
         /// The size scalar of tumours.
         /// </summary>
         public double Scalar { get; set; } = 1;
+
+        public bool JustMiddleAnchors { get; set; }
+
+        public IReadOnlyList<ITumourLayer> TumourLayers  { get; set; }
 
         /// <summary>
         /// Places a tumour onto the path between the specified start and end points.
@@ -135,6 +140,12 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
 
         private LinkedListNode<PathPoint> FindLastOccuranceOfDist(LinkedListNode<PathPoint> start) {
             throw new NotImplementedException();
+        }
+
+        public bool TumourGenerate(HitObject ho) {
+            if (!ho.IsSlider) return false;
+
+            return true;
         }
     }
 }

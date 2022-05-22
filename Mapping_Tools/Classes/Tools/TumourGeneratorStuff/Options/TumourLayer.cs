@@ -75,6 +75,9 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Options {
         public TumourLayer() {
             TumourTemplate = new TriangleTemplate();
             IsActive = true;
+            TumourCount = -1;
+            TumourStart = -1;
+            TumourEnd = -1;
         }
 
         /// <summary>
