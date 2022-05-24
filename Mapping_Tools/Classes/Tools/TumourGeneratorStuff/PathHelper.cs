@@ -7,9 +7,93 @@ using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
     public static class PathHelper {
-        public static PathWithHints CreatePathWithHints(PathType type, Vector2[] controlPoints, double? expectedDistance = null) {
-            // Insert slightly altered copy of SliderPath.cs
-            throw new NotImplementedException();
+        public static PathWithHints CreatePathWithHints(SliderPath sliderPath) {
+            var pathWithHints = new PathWithHints();
+            var path = pathWithHints.Path;
+
+            // Get all segments of the slider path
+            var controlPoints = sliderPath.ControlPoints;
+            var segments = new List<List<Vector2>>();
+            int start = 0;
+            int end = 0;
+            for (int i = 0; i < controlPoints.Length(); i++) {
+                end++;
+
+                if (i == controlPoints.Length() - 1 || controlPoints[i] == controlPoints[i + 1] && i != controlPoints.Length() - 2) {
+                    List<Vector2> cpSpan = controlPoints.GetRange(start, end - start);
+                    segments.Add(cpSpan);
+                    start = end;
+                }
+            }
+
+            var calculatedPath = sliderPath.CalculatedPath;
+            var segmentsStarts = sliderPath.SegmentStarts;
+            var segmentIndex = 0;
+            LinkedListNode<PathPoint> segmentStartNode = null;
+            for (int i = 0; i < calculatedPath.Count; i++) {
+                bool red = false;
+                // Check if i is the start of the next segment so we know its a red anchor
+                // This is a while loop because there could be multiple identical segment starts in a row
+                // which means there are segments with no calculated points
+                while (i != 0 && segmentIndex < segmentsStarts.Count && i == segmentsStarts[segmentIndex]) {
+                    segmentIndex++;
+                    red = true;
+                }
+
+                path.AddLast(new PathPoint(calculatedPath[i], Vector2.UnitX, 0, 0, red: red));
+
+                // Add a reconstruction hint for each segment of the slider path
+                segmentStartNode ??= path.Last;
+                if (red || i == calculatedPath.Count - 1) {
+                    pathWithHints.AddReconstructionHint(new ReconstructionHint(segmentStartNode, path.Last, segments[segmentIndex - 1], -1));
+                    segmentStartNode = path.Last;
+                }
+            }
+
+            // Calculate directions and distances
+            Recalculate(path);
+
+            return pathWithHints;
+        }
+
+        /// <summary>
+        /// Recalculates directions and distances of the path.
+        /// The linked list nodes stay the same object.
+        /// </summary>
+        /// <param name="path">The path to recalculate</param>
+        public static void Recalculate(LinkedList<PathPoint> path) {
+            var current = path.First;
+            var cumulativeLength = 0d;
+            while (current is not null) {
+                var point = current.Value;
+                var pos = point.Pos;
+
+                Vector2? v1 = null;
+                Vector2? v2 = null;
+                double dist = 0;
+                if (current.Previous is not null) {
+                    var prevPos = current.Previous.Value.Pos;
+                    dist = Vector2.Distance(prevPos, pos);
+                    v1 = (pos - prevPos).Normalized();
+                }
+
+                if (current.Next is not null) {
+                    var nextPos = current.Next.Value.Pos;
+                    v2 = (nextPos - pos).Normalized();
+                }
+
+                cumulativeLength += dist;
+                // Calculate the average dir of the previous and next segment
+                var dir = v1.HasValue && v2.HasValue ? (v1.Value + v2.Value).LengthSquared < Precision.DOUBLE_EPSILON
+                        ? v1.Value
+                        : (v1.Value + v2.Value).Normalized() :
+                    v1 ?? (v2 ?? Vector2.UnitX);
+
+                // Update the path point of current
+                current.Value = new PathPoint(pos, dir, dist, cumulativeLength, point.T, point.Red);
+
+                current = current.Next;
+            }
         }
 
         public static void Interpolate(LinkedListNode<PathPoint> p1, double t) {

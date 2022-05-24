@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
+using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Enums;
 using Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Options;
 
@@ -38,7 +41,40 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
 
         public bool JustMiddleAnchors { get; set; }
 
-        public IReadOnlyList<ITumourLayer> TumourLayers  { get; set; }
+        public IReadOnlyCollection<ITumourLayer> TumourLayers  { get; set; }
+
+        /// <summary>
+        /// Places copious amounts of tumours on the slider.
+        /// Changes slider curvepoints, pixel length, and velocity
+        /// </summary>
+        /// <param name="ho"></param>
+        /// <returns></returns>
+        public bool TumourGenerate(HitObject ho) {
+            if (!ho.IsSlider) return false;
+
+            var oldPixelLength = ho.PixelLength;
+
+            // Convert slider to bezier
+            var bezierSliderPath = BezierConverter.ConvertToBezier(ho.GetSliderPath());
+            // TODO: move anchors to length
+
+            // Create path
+            var pathWithHints = PathHelper.CreatePathWithHints(bezierSliderPath);
+
+            // TODO Add tumours
+
+            // Set the new slider path
+            var reconstructor = new Reconstructor();
+            var newSliderPath = new SliderPath(PathType.Bezier, reconstructor.Reconstruct(pathWithHints).ToArray());
+
+            ho.SetSliderPath(newSliderPath);
+
+            // Update velocity
+            var newPixelLength = ho.PixelLength;
+            ho.SliderVelocity *= oldPixelLength / newPixelLength;
+
+            return true;
+        }
 
         /// <summary>
         /// Places a tumour onto the path between the specified start and end points.
@@ -140,12 +176,6 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
 
         private LinkedListNode<PathPoint> FindLastOccuranceOfDist(LinkedListNode<PathPoint> start) {
             throw new NotImplementedException();
-        }
-
-        public bool TumourGenerate(HitObject ho) {
-            if (!ho.IsSlider) return false;
-
-            return true;
         }
     }
 }

@@ -15,11 +15,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
         /// </summary>
         public bool Red;
 
-        public PathPoint(Vector2 pos, Vector2 dir, double dist, double cumulativeLength) : this (pos, dir, dist, cumulativeLength, double.NaN, false) { }
-
-        public PathPoint(Vector2 pos, Vector2 dir, double dist, double cumulativeLength, double t) : this(pos, dir, dist, cumulativeLength, t, false) { }
-
-        public PathPoint(Vector2 pos, Vector2 dir, double dist, double cumulativeLength, double t, bool red) {
+        public PathPoint(Vector2 pos, Vector2 dir, double dist, double cumulativeLength, double t = double.NaN, bool red = false) {
             Pos = pos;
             Dir = dir;
             Dist = dist;
