@@ -36,7 +36,6 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
                 // This is a while loop because there could be multiple identical segment starts in a row
                 // which means there are segments with no calculated points
                 while (i != 0 && segmentIndex < segmentsStarts.Count && i == segmentsStarts[segmentIndex]) {
-                    segmentIndex++;
                     red = true;
                 }
 
@@ -45,6 +44,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
                 // Add a reconstruction hint for each segment of the slider path
                 segmentStartNode ??= path.Last;
                 if (red || i == calculatedPath.Count - 1) {
+                    segmentIndex++;
                     pathWithHints.AddReconstructionHint(new ReconstructionHint(segmentStartNode, path.Last, segments[segmentIndex - 1], -1));
                     segmentStartNode = path.Last;
                 }

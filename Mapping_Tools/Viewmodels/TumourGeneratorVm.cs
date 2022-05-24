@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -70,7 +72,32 @@ namespace Mapping_Tools.Viewmodels {
         private ObservableCollection<TumourLayer> _tumourLayers;
         public ObservableCollection<TumourLayer> TumourLayers {
             get => _tumourLayers;
-            set => Set(ref _tumourLayers, value);
+            set {
+                if (Set(ref _tumourLayers, value, action: RegeneratePreview)) {
+                    foreach (TumourLayer tumourLayer in _tumourLayers) {
+                        tumourLayer.PropertyChanged += TumourLayerOnPropertyChanged;
+                    }
+                    _tumourLayers.CollectionChanged += TumourLayersOnCollectionChanged;
+                }
+            }
+        }
+
+        private void TumourLayersOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+            if (e.NewItems is not null) {
+                foreach (object eNewItem in e.NewItems) {
+                    ((TumourLayer) eNewItem).PropertyChanged += TumourLayerOnPropertyChanged;
+                }
+            }
+
+            if (e.OldItems is not null) {
+                foreach (object eOldItem in e.OldItems) {
+                    ((TumourLayer) eOldItem).PropertyChanged -= TumourLayerOnPropertyChanged;
+                }
+            }
+        }
+
+        private void TumourLayerOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
+            RegeneratePreview();
         }
 
         private TumourLayer _currentLayer;
@@ -82,7 +109,7 @@ namespace Mapping_Tools.Viewmodels {
         private bool _justMiddleAnchors;
         public bool JustMiddleAnchors {
             get => _justMiddleAnchors;
-            set => Set(ref _justMiddleAnchors, value);
+            set => Set(ref _justMiddleAnchors, value, action: RegeneratePreview);
         }
 
         private bool _delegateToBpm;
@@ -198,7 +225,12 @@ namespace Mapping_Tools.Viewmodels {
 
                 ct.ThrowIfCancellationRequested();
                 // Do a lot of tumour generating
-                Thread.Sleep(1000);
+                var tumourGenerator = new Classes.Tools.TumourGeneratorStuff.TumourGenerator {
+                    TumourLayers = TumourLayers,
+                    JustMiddleAnchors = JustMiddleAnchors
+                };
+                tumourGenerator.TumourGenerate(args);
+
                 ct.ThrowIfCancellationRequested();
 
                 // Send the tumoured slider to the main thread
