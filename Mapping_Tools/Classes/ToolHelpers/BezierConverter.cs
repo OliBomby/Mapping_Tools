@@ -55,6 +55,24 @@ namespace Mapping_Tools.Classes.ToolHelpers
             return sliderPath;
         }
 
+        public static List<Vector2> ConvertToBezierAnchors(List<Vector2> anchors, PathType type)
+        {
+            switch (type)
+            {
+                case PathType.Linear:
+                    return ConvertLinearToBezierAnchors(anchors);
+                case PathType.PerfectCurve:
+                    return ConvertCircleToBezierAnchors(anchors);
+                case PathType.Catmull:
+                    return ConvertCatmullToBezierAnchors(anchors);
+                case PathType.Bezier:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            return anchors;
+        }
+
         /// <summary>
         /// 
         /// </summary>

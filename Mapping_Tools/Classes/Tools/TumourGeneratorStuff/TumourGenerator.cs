@@ -55,11 +55,12 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
             var oldPixelLength = ho.PixelLength;
 
             // Convert slider to bezier
-            var bezierSliderPath = BezierConverter.ConvertToBezier(ho.GetSliderPath());
-            // TODO: move anchors to length
+            var bezierAnchors = BezierConverter.ConvertToBezierAnchors(ho.GetAllCurvePoints(), ho.SliderType);
+            var normalizedAnchors =
+                SliderPathUtil.MoveAnchorsToLength(bezierAnchors, PathType.Bezier, oldPixelLength, out _);
 
             // Create path
-            var pathWithHints = PathHelper.CreatePathWithHints(bezierSliderPath);
+            var pathWithHints = PathHelper.CreatePathWithHints(new SliderPath(PathType.Bezier, normalizedAnchors.ToArray()));
 
             // TODO Add tumours
 
