@@ -19,35 +19,43 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
             for (int i = 0; i < controlPoints.Length(); i++) {
                 end++;
 
-                if (i == controlPoints.Length() - 1 || controlPoints[i] == controlPoints[i + 1] && i != controlPoints.Length() - 2) {
-                    List<Vector2> cpSpan = controlPoints.GetRange(start, end - start);
-                    segments.Add(cpSpan);
-                    start = end;
+                if (i != controlPoints.Length() - 1 &&
+                    (controlPoints[i] != controlPoints[i + 1] || i == controlPoints.Length() - 2)) {
+                    continue;
                 }
+
+                List<Vector2> cpSpan = controlPoints.GetRange(start, end - start);
+                segments.Add(cpSpan);
+                start = end;
             }
 
             var calculatedPath = sliderPath.CalculatedPath;
             var segmentsStarts = sliderPath.SegmentStarts;
-            var segmentIndex = 0;
+            var segmentIndex = 1;
             LinkedListNode<PathPoint> segmentStartNode = null;
             for (int i = 0; i < calculatedPath.Count; i++) {
-                bool red = false;
-                // Check if i is the start of the next segment so we know its a red anchor
                 // This is a while loop because there could be multiple identical segment starts in a row
                 // which means there are segments with no calculated points
-                while (i != 0 && segmentIndex < segmentsStarts.Count && i == segmentsStarts[segmentIndex]) {
-                    red = true;
-                }
-
-                path.AddLast(new PathPoint(calculatedPath[i], Vector2.UnitX, 0, 0, red: red));
-
-                // Add a reconstruction hint for each segment of the slider path
-                segmentStartNode ??= path.Last;
-                if (red || i == calculatedPath.Count - 1) {
+                while (segmentIndex < segmentsStarts.Count && i + 1 > segmentsStarts[segmentIndex]) {
                     segmentIndex++;
-                    pathWithHints.AddReconstructionHint(new ReconstructionHint(segmentStartNode, path.Last, segments[segmentIndex - 1], -1));
-                    segmentStartNode = path.Last;
                 }
+
+                // Check if i+1 is the first point in the next segment so we know i is a red anchor
+                bool isRedAnchor = segmentIndex < segmentsStarts.Count && i + 1 == segmentsStarts[segmentIndex] &&
+                                   i != 0;
+
+                path.AddLast(new PathPoint(calculatedPath[i], Vector2.UnitX, 0, 0, red: isRedAnchor));
+
+                // Make sure the start node is initialized
+                segmentStartNode ??= path.Last;
+
+                if (!isRedAnchor && i != calculatedPath.Count - 1 || i == 0) {
+                    continue;
+                }
+
+                // Add a segment from the previous red anchor to this red anchor
+                pathWithHints.AddReconstructionHint(new ReconstructionHint(segmentStartNode, path.Last, segments[segmentIndex - 1], -1));
+                segmentStartNode = path.Last;
             }
 
             // Calculate directions and distances

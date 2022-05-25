@@ -129,5 +129,9 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
             a.Red = blend < 0.5 ? a.Red : b.Red;
             return a;
         }
+
+        public override string ToString() {
+            return $"{Pos} {Dir} {Dist} {CumulativeLength} {T} {Red}";
+        }
     }
 }

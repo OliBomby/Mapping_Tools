@@ -35,26 +35,31 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
             }
 
             // Handle overlapping hints
-            var overlaps = reconstructionHints.GetRange(startIndex, endIndex - startIndex);
-            if (overlaps.All(o => o.Layer < hint.Layer)) {
-                // We can replace the hints
-                reconstructionHints.RemoveRange(startIndex, endIndex - startIndex);
-                // Insert into list
+            if (endIndex < startIndex) {
+                // No overlaps
                 reconstructionHints.Insert(startIndex, hint);
             } else {
-                // Void all overlapping hints
-                reconstructionHints.RemoveRange(startIndex, endIndex - startIndex);
+                var overlaps = reconstructionHints.GetRange(startIndex, endIndex - startIndex);
+                if (overlaps.All(o => o.Layer < hint.Layer)) {
+                    // We can replace the hints
+                    reconstructionHints.RemoveRange(startIndex, endIndex - startIndex);
+                    // Insert into list
+                    reconstructionHints.Insert(startIndex, hint);
+                } else {
+                    // Void all overlapping hints
+                    reconstructionHints.RemoveRange(startIndex, endIndex - startIndex);
 
-                // Make a void hint
-                var startL = Math.Min(hint.Start.Value.CumulativeLength,
-                    overlaps.Min(o => o.Start.Value.CumulativeLength));
-                var endL = Math.Max(hint.End.Value.CumulativeLength,
-                    overlaps.Max(o => o.End.Value.CumulativeLength));
-                var layer = Math.Max(hint.Layer, overlaps.Max(o => o.Layer));
+                    // Make a void hint
+                    var startL = Math.Min(hint.Start.Value.CumulativeLength,
+                        overlaps.Min(o => o.Start.Value.CumulativeLength));
+                    var endL = Math.Max(hint.End.Value.CumulativeLength,
+                        overlaps.Max(o => o.End.Value.CumulativeLength));
+                    var layer = Math.Max(hint.Layer, overlaps.Max(o => o.Layer));
 
-                reconstructionHints.Insert(startIndex,
-                    new ReconstructionHint(Path.GetCumulativeLength(startL), Path.GetCumulativeLength(endL),
-                        null, layer));
+                    reconstructionHints.Insert(startIndex,
+                        new ReconstructionHint(Path.GetCumulativeLength(startL), Path.GetCumulativeLength(endL),
+                            null, layer));
+                }
             }
         }
     }
