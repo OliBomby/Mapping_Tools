@@ -17,24 +17,35 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
             LinkedListNode<PathPoint> hintSegmentStart = null;
 
             while (current is not null) {
-                if (current == hints[nextHint].End) {
+                if (current == hints[nextHint].End && hintSegmentStart is not null) {
                     // Add segment between start and this
                     var hint = hints[nextHint++];
-                    var hintDir = hint.Anchors.Last() - hint.Anchors.First();
-                    var segmentDir = current.Value.Pos - hintSegmentStart.Value.Pos;
-                    Matrix2 transform;
-                    if (hintDir.LengthSquared < Precision.DOUBLE_EPSILON &&
-                        segmentDir.LengthSquared < Precision.DOUBLE_EPSILON) {
-                        transform = Matrix2.Identity;
-                    } else if (hintDir.LengthSquared < Precision.DOUBLE_EPSILON) {
-                        transform = Matrix2.CreateRotation(segmentDir.Theta);
-                    } else if (segmentDir.LengthSquared < Precision.DOUBLE_EPSILON) {
-                        transform = Matrix2.CreateRotation(current.Value.Dir.Theta - hintDir.Theta);
+                    if (hint.Anchors is null || hint.Anchors.Count == 0) {
+                        // Null segment, should be reconstructed from points
+                        // TODO reconstruct parts without hints correctly. This code here does not trigger for parts without hints
+                        anchors.Add(hintSegmentStart.Value.Pos);
+                        anchors.Add(current.Value.Pos);
                     } else {
-                        transform = Matrix2.CreateRotation(segmentDir.Theta - hintDir.Theta) * (segmentDir.Length / hintDir.Length);
-                    }
+                        // Add hint anchors
+                        var hintStartPos = hint.Anchors.First();
+                        var segmentStartPos = hintSegmentStart.Value.Pos;
+                        var hintDir = hint.Anchors.Last() - hintStartPos;
+                        var segmentDir = current.Value.Pos - segmentStartPos;
+                        Matrix2 transform;
+                        if (hintDir.LengthSquared < Precision.DOUBLE_EPSILON &&
+                            segmentDir.LengthSquared < Precision.DOUBLE_EPSILON) {
+                            transform = Matrix2.Identity;
+                        } else if (hintDir.LengthSquared < Precision.DOUBLE_EPSILON) {
+                            transform = Matrix2.CreateRotation(segmentDir.Theta);
+                        } else if (segmentDir.LengthSquared < Precision.DOUBLE_EPSILON) {
+                            transform = Matrix2.CreateRotation(current.Value.Dir.Theta - hintDir.Theta);
+                        } else {
+                            transform = Matrix2.CreateRotation(hintDir.Theta - segmentDir.Theta) * (segmentDir.Length / hintDir.Length);
+                        }
 
-                    anchors.AddRange(hint.Anchors.Select(hintAnchor => Matrix2.Mult(transform, hintAnchor)));
+                        anchors.AddRange(hint.Anchors.Select(hintAnchor =>
+                            Matrix2.Mult(transform, hintAnchor - hintStartPos) + segmentStartPos));
+                    }
 
                     hintSegmentStart = null;
                 }

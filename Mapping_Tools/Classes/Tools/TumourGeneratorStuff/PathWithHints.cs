@@ -29,7 +29,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
             }
 
             var endIndex = BinarySearchUtil.BinarySearch(reconstructionHints, hint.End.Value.CumulativeLength,
-                o => o.End.Value.CumulativeLength, BinarySearchUtil.EqualitySelection.Leftmost);
+                o => o.Start.Value.CumulativeLength, BinarySearchUtil.EqualitySelection.Leftmost);
             if (endIndex < 0) {
                 endIndex = ~endIndex;
             }

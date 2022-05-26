@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.BeatmapHelper.Enums;
@@ -50,7 +51,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
         /// <param name="ho"></param>
         /// <returns></returns>
         public bool TumourGenerate(HitObject ho) {
-            if (!ho.IsSlider) return false;
+            if (!ho.IsSlider || TumourLayers.Count == 0) return false;
 
             var oldPixelLength = ho.PixelLength;
 
@@ -63,6 +64,25 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
             var pathWithHints = PathHelper.CreatePathWithHints(new SliderPath(PathType.Bezier, normalizedAnchors.ToArray()));
 
             // TODO Add tumours
+            var middleIndex = pathWithHints.Path.Count / 2;
+            var i = 0;
+            var current = pathWithHints.Path.First;
+            while (current is not null) {
+                if (i++ == middleIndex) {
+                    // Add a tumour
+                    var next = current;
+                    while (next is not null) {
+                        if (next.Value.CumulativeLength - current.Value.CumulativeLength > 30) {
+                            break;
+                        }
+                        next = next.Next;
+                    }
+
+                    var anchors = TumourLayers.First().TumourTemplate.GetReconstructionHint();
+                    pathWithHints.AddReconstructionHint(new ReconstructionHint(current, next, anchors, 0));
+                }
+                current = current.Next;
+            }
 
             // Set the new slider path
             var reconstructor = new Reconstructor();
