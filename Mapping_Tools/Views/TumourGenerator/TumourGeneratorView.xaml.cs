@@ -195,6 +195,7 @@ namespace Mapping_Tools.Views.TumourGenerator {
                 saveData.TumourLayers.Add(new TumourLayer());
             }
             DataContext = saveData;
+            ViewModel.RegeneratePreview();
         }
         
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "tumourgeneratorproject.json");

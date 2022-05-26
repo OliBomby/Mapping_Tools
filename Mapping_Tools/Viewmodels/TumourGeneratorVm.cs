@@ -72,28 +72,7 @@ namespace Mapping_Tools.Viewmodels {
         private ObservableCollection<TumourLayer> _tumourLayers;
         public ObservableCollection<TumourLayer> TumourLayers {
             get => _tumourLayers;
-            set {
-                if (Set(ref _tumourLayers, value, action: RegeneratePreview)) {
-                    foreach (TumourLayer tumourLayer in _tumourLayers) {
-                        tumourLayer.PropertyChanged += TumourLayerOnPropertyChanged;
-                    }
-                    _tumourLayers.CollectionChanged += TumourLayersOnCollectionChanged;
-                }
-            }
-        }
-
-        private void TumourLayersOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
-            if (e.NewItems is not null) {
-                foreach (object eNewItem in e.NewItems) {
-                    ((TumourLayer) eNewItem).PropertyChanged += TumourLayerOnPropertyChanged;
-                }
-            }
-
-            if (e.OldItems is not null) {
-                foreach (object eOldItem in e.OldItems) {
-                    ((TumourLayer) eOldItem).PropertyChanged -= TumourLayerOnPropertyChanged;
-                }
-            }
+            set => Set(ref _tumourLayers, value, action: RegeneratePreview);
         }
 
         private void TumourLayerOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
@@ -101,9 +80,20 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         private TumourLayer _currentLayer;
+        [JsonIgnore]
         public TumourLayer CurrentLayer {
             get => _currentLayer;
-            set => Set(ref _currentLayer, value);
+            set {
+                if (Set(ref _currentLayer, value)) {
+                    _currentLayer.PropertyChanged += TumourLayerOnPropertyChanged;
+                }
+            }
+        }
+
+        private int _currentLayerIndex;
+        public int CurrentLayerIndex {
+            get => _currentLayerIndex;
+            set => Set(ref _currentLayerIndex, value);
         }
 
         private bool _justMiddleAnchors;
@@ -205,7 +195,7 @@ namespace Mapping_Tools.Viewmodels {
         /// Asynchronously starts regenerating the tumoured preview slider with the current settings. <see cref="TumouredPreviewHitObject"/>
         /// At all times, only the latest slider is being tumoured.
         /// </summary>
-        private void RegeneratePreview() {
+        public void RegeneratePreview() {
             // Cancel any task that might be running right now and make a new token
             CancellationToken ct;
             lock (previewTokenLock) {

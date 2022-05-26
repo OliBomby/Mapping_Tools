@@ -131,7 +131,8 @@
 
                     <ListBox Grid.Row="1" ItemsSource="{Binding TumourLayers}"
                              SelectionMode="Single"
-                             SelectedItem="{Binding CurrentLayer}">
+                             SelectedItem="{Binding CurrentLayer}"
+                             SelectedIndex="{Binding CurrentLayerIndex}">
                         <ListBox.ItemTemplate>
                             <DataTemplate DataType="tumourGeneratorOptions:TumourLayer">
                                 <Grid HorizontalAlignment="Stretch">
