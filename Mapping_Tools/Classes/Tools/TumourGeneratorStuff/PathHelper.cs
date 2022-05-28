@@ -220,7 +220,21 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
         /// <param name="cumulativeLength">The wanted cumulative length</param>
         /// <returns></returns>
         public static LinkedListNode<PathPoint> GetCumulativeLength(this LinkedList<PathPoint> path, double cumulativeLength) {
-            throw new NotImplementedException();
+            var node = path.First;
+            var minDist = double.MaxValue;
+            var minNode = path.First;
+
+            while (node != null) {
+                var dist = Math.Abs(node.Value.CumulativeLength - cumulativeLength);
+                if (dist < minDist) {
+                    minDist = dist;
+                    minNode = node;
+                }
+
+                node = node.Next;
+            }
+
+            return minNode;
         }
 
         /// <summary>
@@ -233,7 +247,30 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
         /// <returns></returns>
         public static LinkedListNode<PathPoint> GetExactCumulativeLength(this LinkedList<PathPoint> path, 
             double cumulativeLength, double epsilon = Precision.DOUBLE_EPSILON) {
-            throw new NotImplementedException();
+            var node = GetCumulativeLength(path, cumulativeLength);
+
+            if (Math.Abs(node.Value.CumulativeLength - cumulativeLength) < epsilon) {
+                return node;
+            }
+
+            if (cumulativeLength - node.Value.CumulativeLength > 0) {
+                if (node.Next == null || Precision.AlmostEquals(node.Next.Value.CumulativeLength, node.Value.CumulativeLength)) {
+                    return node;
+                }
+
+                var t = (cumulativeLength - node.Value.CumulativeLength) / (node.Next.Value.CumulativeLength - node.Value.CumulativeLength);
+                Interpolate(node, t);
+                return node.Next;
+            } else {
+                if (node.Previous == null || Precision.AlmostEquals(node.Value.CumulativeLength, node.Previous.Value.CumulativeLength)) {
+                    return node;
+                }
+
+                var t = (cumulativeLength - node.Previous.Value.CumulativeLength) / (node.Value.CumulativeLength - node.Previous.Value.CumulativeLength);
+                Interpolate(node.Previous, t);
+                return node.Previous;
+            }
+
         }
 
         /// <summary>
