@@ -50,7 +50,11 @@ namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
                     hintSegmentStart = null;
                 }
                 if (nextHint < hints.Count && current == hints[nextHint].Start) {
-                    hintSegmentStart = current;
+                    if (hints[nextHint].Anchors is null || hints[nextHint].Anchors.Count == 0) {
+                        nextHint++;
+                    } else {
+                        hintSegmentStart = current;
+                    }
                 }
 
                 current = current.Next;
