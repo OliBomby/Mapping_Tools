@@ -1,4 +1,4 @@
-﻿namespace Mapping_Tools.Classes.Tools.TumourGenerator.Enums {
+﻿namespace Mapping_Tools.Classes.Tools.TumourGenerating.Enums {
     public enum TumourSidedness {
         Left,
         Right,

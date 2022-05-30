@@ -1,7 +1,7 @@
-﻿using Mapping_Tools.Classes.Tools.TumourGenerator.Enums;
+﻿using Mapping_Tools.Classes.Tools.TumourGenerating.Enums;
 using Mapping_Tools.Components.Graph;
 
-namespace Mapping_Tools.Classes.Tools.TumourGenerator.Options {
+namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
     public interface ITumourLayer {
         ITumourTemplate TumourTemplate { get; }
         TumourSidedness TumourSidedness { get; }

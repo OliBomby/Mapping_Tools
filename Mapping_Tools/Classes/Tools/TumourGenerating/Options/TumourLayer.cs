@@ -1,9 +1,9 @@
 ﻿using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.Tools.TumourGenerator.Enums;
-using Mapping_Tools.Classes.Tools.TumourGenerator.Options.TumourTemplates;
+using Mapping_Tools.Classes.Tools.TumourGenerating.Enums;
+using Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourTemplates;
 using Mapping_Tools.Components.Graph;
 
-namespace Mapping_Tools.Classes.Tools.TumourGenerator.Options {
+namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
     public class TumourLayer : BindableBase, ITumourLayer {
         private ITumourTemplate _tumourTemplate;
         private TumourSidedness _tumourSidedness;

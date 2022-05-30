@@ -11,9 +11,9 @@ using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.ToolHelpers;
-using Mapping_Tools.Classes.Tools.TumourGenerator;
-using Mapping_Tools.Classes.Tools.TumourGenerator.Enums;
-using Mapping_Tools.Classes.Tools.TumourGenerator.Options;
+using Mapping_Tools.Classes.Tools.TumourGenerating;
+using Mapping_Tools.Classes.Tools.TumourGenerating.Enums;
+using Mapping_Tools.Classes.Tools.TumourGenerating.Options;
 using Mapping_Tools.Components.Domain;
 using Newtonsoft.Json;
 

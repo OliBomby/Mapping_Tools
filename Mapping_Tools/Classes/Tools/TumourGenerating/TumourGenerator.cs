@@ -9,10 +9,10 @@ using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.ToolHelpers.Sliders;
 using Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen;
-using Mapping_Tools.Classes.Tools.TumourGenerator.Enums;
-using Mapping_Tools.Classes.Tools.TumourGenerator.Options;
+using Mapping_Tools.Classes.Tools.TumourGenerating.Enums;
+using Mapping_Tools.Classes.Tools.TumourGenerating.Options;
 
-namespace Mapping_Tools.Classes.Tools.TumourGenerator {
+namespace Mapping_Tools.Classes.Tools.TumourGenerating {
     /// <summary>
     /// Generates tumours on sliders.
     /// We first have a slider represented by a linked list of <see cref="PathPoint"/> and a set of reconstruction hints

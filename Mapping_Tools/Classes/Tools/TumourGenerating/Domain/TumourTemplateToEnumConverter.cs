@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Globalization;
 using System.Windows.Data;
-using Mapping_Tools.Classes.Tools.TumourGenerator.Enums;
-using Mapping_Tools.Classes.Tools.TumourGenerator.Options.TumourTemplates;
+using Mapping_Tools.Classes.Tools.TumourGenerating.Enums;
+using Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourTemplates;
 
-namespace Mapping_Tools.Classes.Tools.TumourGenerator.Domain
+namespace Mapping_Tools.Classes.Tools.TumourGenerating.Domain
 {
     public class TumourTemplateToEnumConverter : IValueConverter {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
