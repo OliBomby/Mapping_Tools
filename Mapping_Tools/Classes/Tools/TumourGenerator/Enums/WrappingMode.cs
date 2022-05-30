@@ -1,4 +1,4 @@
-﻿namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Enums {
+﻿namespace Mapping_Tools.Classes.Tools.TumourGenerator.Enums {
     public enum WrappingMode {
         Simple,
         Replace,

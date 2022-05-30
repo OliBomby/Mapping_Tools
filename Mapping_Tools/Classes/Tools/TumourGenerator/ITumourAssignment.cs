@@ -1,7 +1,7 @@
-﻿using Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Enums;
-using Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Options;
+﻿using Mapping_Tools.Classes.Tools.TumourGenerator.Enums;
+using Mapping_Tools.Classes.Tools.TumourGenerator.Options;
 
-namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
+namespace Mapping_Tools.Classes.Tools.TumourGenerator {
     public interface ITumourAssignment {
         /// <summary>
         /// The pixel length cumulative distance of the start of the tumour.

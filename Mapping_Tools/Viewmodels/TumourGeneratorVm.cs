@@ -11,8 +11,9 @@ using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.ToolHelpers;
-using Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Enums;
-using Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Options;
+using Mapping_Tools.Classes.Tools.TumourGenerator;
+using Mapping_Tools.Classes.Tools.TumourGenerator.Enums;
+using Mapping_Tools.Classes.Tools.TumourGenerator.Options;
 using Mapping_Tools.Components.Domain;
 using Newtonsoft.Json;
 
@@ -215,7 +216,7 @@ namespace Mapping_Tools.Viewmodels {
 
                 ct.ThrowIfCancellationRequested();
                 // Do a lot of tumour generating
-                var tumourGenerator = new Classes.Tools.TumourGeneratorStuff.TumourGenerator {
+                var tumourGenerator = new TumourGenerator {
                     TumourLayers = TumourLayers,
                     JustMiddleAnchors = JustMiddleAnchors
                 };

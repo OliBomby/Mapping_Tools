@@ -7,7 +7,6 @@ using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.ToolHelpers.Sliders;
 using Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen;
-using Mapping_Tools.Classes.Tools.TumourGeneratorStuff;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools_Tests.Classes.Tools.TumourGenerator {

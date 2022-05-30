@@ -1,5 +1,4 @@
-﻿using Mapping_Tools.Classes.MathUtil;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -7,13 +6,13 @@ using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
-using Mapping_Tools.Classes.ToolHelpers;
+using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.ToolHelpers.Sliders;
 using Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen;
-using Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Enums;
-using Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Options;
+using Mapping_Tools.Classes.Tools.TumourGenerator.Enums;
+using Mapping_Tools.Classes.Tools.TumourGenerator.Options;
 
-namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
+namespace Mapping_Tools.Classes.Tools.TumourGenerator {
     /// <summary>
     /// Generates tumours on sliders.
     /// We first have a slider represented by a linked list of <see cref="PathPoint"/> and a set of reconstruction hints

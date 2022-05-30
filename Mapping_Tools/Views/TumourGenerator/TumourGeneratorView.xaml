@@ -9,8 +9,8 @@
              xmlns:components="clr-namespace:Mapping_Tools.Components"
              xmlns:objectVisualiser="clr-namespace:Mapping_Tools.Components.ObjectVisualiser"
              xmlns:viewmodels="clr-namespace:Mapping_Tools.Viewmodels"
-             xmlns:tumourGeneratorOptions="clr-namespace:Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Options"
-             xmlns:tumourGeneratorDomain="clr-namespace:Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Domain"
+             xmlns:domain1="clr-namespace:Mapping_Tools.Classes.Tools.TumourGenerator.Domain"
+             xmlns:options="clr-namespace:Mapping_Tools.Classes.Tools.TumourGenerator.Options"
              d:DataContext="{d:DesignInstance Type=viewmodels:TumourGeneratorVm}"
              mc:Ignorable="d" 
              x:Name="This"
@@ -36,7 +36,7 @@
             <domain:BooleanAndConverter/>
         </domain:MultiValueConverterGroup>
         <domain:BooleanInvertConverter x:Key="BooleanInvertConverter"/>
-        <tumourGeneratorDomain:TumourTemplateToEnumConverter x:Key="TumourTemplateToEnumConverter"/>
+        <domain1:TumourTemplateToEnumConverter x:Key="TumourTemplateToEnumConverter"/>
     </local:SingleRunMappingTool.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -134,7 +134,7 @@
                              SelectedItem="{Binding CurrentLayer}"
                              SelectedIndex="{Binding CurrentLayerIndex}">
                         <ListBox.ItemTemplate>
-                            <DataTemplate DataType="tumourGeneratorOptions:TumourLayer">
+                            <DataTemplate DataType="options:TumourLayer">
                                 <Grid HorizontalAlignment="Stretch">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>

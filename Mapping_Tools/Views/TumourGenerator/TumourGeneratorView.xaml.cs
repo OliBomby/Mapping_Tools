@@ -10,7 +10,7 @@ using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Classes.ToolHelpers;
-using Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Options;
+using Mapping_Tools.Classes.Tools.TumourGenerator.Options;
 using Mapping_Tools.Components.Dialogs;
 using Mapping_Tools.Viewmodels;
 using MaterialDesignThemes.Wpf;
@@ -86,7 +86,7 @@ namespace Mapping_Tools.Views.TumourGenerator {
             int slidersTumourated = 0;
 
             // Initialize the Tumour Generator
-            var tumourGenerator = new Classes.Tools.TumourGeneratorStuff.TumourGenerator {
+            var tumourGenerator = new Classes.Tools.TumourGenerator.TumourGenerator {
                 TumourLayers = arg.TumourLayers,
                 JustMiddleAnchors = arg.JustMiddleAnchors
             };
