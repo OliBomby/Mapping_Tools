@@ -58,7 +58,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
 
                     reconstructionHints.Insert(startIndex,
                         new ReconstructionHint(Path.GetCumulativeLength(startL), Path.GetCumulativeLength(endL),
-                            null, layer));
+                            layer, null));
                 }
             }
         }

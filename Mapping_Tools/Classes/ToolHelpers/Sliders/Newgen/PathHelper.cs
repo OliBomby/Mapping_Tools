@@ -53,7 +53,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                 }
 
                 // Add a segment from the previous red anchor to this red anchor
-                pathWithHints.AddReconstructionHint(new ReconstructionHint(segmentStartNode, path.Last, segments[segmentIndex - 1], -1));
+                pathWithHints.AddReconstructionHint(new ReconstructionHint(segmentStartNode, path.Last, -1, segments[segmentIndex - 1]));
                 segmentStartNode = path.Last;
             }
 
