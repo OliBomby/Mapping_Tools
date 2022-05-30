@@ -8,6 +8,8 @@ using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Classes.ToolHelpers;
+using Mapping_Tools.Classes.ToolHelpers.Sliders;
+using Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen;
 using Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Enums;
 using Mapping_Tools.Classes.Tools.TumourGeneratorStuff.Options;
 

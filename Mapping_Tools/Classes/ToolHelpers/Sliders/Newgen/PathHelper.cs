@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Classes.MathUtil;
 
-namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
+namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
     public static class PathHelper {
         public static PathWithHints CreatePathWithHints(SliderPath sliderPath) {
             var pathWithHints = new PathWithHints();

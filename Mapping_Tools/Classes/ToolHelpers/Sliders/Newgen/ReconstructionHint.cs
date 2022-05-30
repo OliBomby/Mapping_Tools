@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Mapping_Tools.Classes.MathUtil;
 
-namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
+namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
     public struct ReconstructionHint {
         public LinkedListNode<PathPoint> Start;
         

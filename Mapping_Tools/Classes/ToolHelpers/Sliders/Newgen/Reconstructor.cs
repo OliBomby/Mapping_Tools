@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Mapping_Tools.Classes.MathUtil;
 
-namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
+namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
     /// <summary>
     /// Reconstructs the anchors of a complete slider out of a <see cref="PathWithHints"/>.
     /// </summary>

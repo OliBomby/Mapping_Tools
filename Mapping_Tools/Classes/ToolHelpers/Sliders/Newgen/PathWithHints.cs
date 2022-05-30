@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Mapping_Tools.Classes.MathUtil;
 
-namespace Mapping_Tools.Classes.Tools.TumourGeneratorStuff {
+namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
     /// <summary>
     /// Its a path with reconstruction hints.
     /// </summary>

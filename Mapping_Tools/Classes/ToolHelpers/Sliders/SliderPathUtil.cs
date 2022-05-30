@@ -5,7 +5,7 @@ using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Classes.MathUtil;
 
-namespace Mapping_Tools.Classes.ToolHelpers {
+namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
     public class SliderPathUtil {
         public static List<Vector2> MoveAnchorsToLength(List<Vector2> anchors, PathType pathType, double newLength, out PathType newPathType) {
             var newAnchors = new List<Vector2>();

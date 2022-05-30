@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Mapping_Tools.Classes.MathUtil;
 
-namespace Mapping_Tools.Classes.ToolHelpers {
+namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
     /// <summary>
     /// This class can generate bezier anchors which approximate arbitrary paths
     /// </summary>
