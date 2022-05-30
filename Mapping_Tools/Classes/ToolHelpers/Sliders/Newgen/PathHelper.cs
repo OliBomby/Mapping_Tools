@@ -52,13 +52,24 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                     continue;
                 }
 
+                double lengthP = double.NaN;
+                if (i == calculatedPath.Count - 1) {
+                    // This is the last point of the path and the last segment to add
+                    // Calculate the directions and distances of the path because it is complete now
+                    Recalculate(path);
+
+                    // Adjust the length of the last hint to account for slider pixel length
+                    var totalLength = path.Last!.Value.CumulativeLength;
+                    var lengthAtStartOfLastHint = segmentStartNode!.Value.CumulativeLength;
+                    lengthP = totalLength - lengthAtStartOfLastHint;
+                }
+
                 // Add a segment from the previous red anchor to this red anchor
-                pathWithHints.AddReconstructionHint(new ReconstructionHint(segmentStartNode, path.Last, -1, segments[segmentIndex - 1]));
+                pathWithHints.AddReconstructionHint(new ReconstructionHint(segmentStartNode, path.Last, -1,
+                    segments[segmentIndex - 1], lengthP: lengthP));
+
                 segmentStartNode = path.Last;
             }
-
-            // Calculate directions and distances
-            Recalculate(path);
 
             return pathWithHints;
         }

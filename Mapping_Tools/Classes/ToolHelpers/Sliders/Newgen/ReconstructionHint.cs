@@ -32,24 +32,26 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         public readonly PathType PathType;
 
         /// <summary>
-        /// Pixel length that must be cut from the start of the path.
+        /// Pixel length at which to start in the path of the anchors.
+        /// NaN or 0 means no margin.
         /// </summary>
-        public readonly double StartMargin;
+        public readonly double StartP;
 
         /// <summary>
-        /// Pixel lenth that must be cut from the end of the path.
+        /// Pixel length amount of the path of the anchors that must be used.
+        /// NaN means use all available length.
         /// </summary>
-        public readonly double EndMargin;
+        public readonly double LengthP;
 
         public ReconstructionHint(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end, int layer, List<Vector2> anchors,
-            PathType pathType = PathType.Bezier, double startMargin = 0, double endMargin = 0) {
+            PathType pathType = PathType.Bezier, double startP = double.NaN, double lengthP = double.NaN) {
             Start = start;
             End = end;
             Anchors = anchors;
             Layer = layer;
             PathType = pathType;
-            StartMargin = startMargin;
-            EndMargin = endMargin;
+            StartP = startP;
+            LengthP = lengthP;
         }
     }
 }
