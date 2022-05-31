@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
@@ -114,7 +112,6 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                         yield return overlap;
                     } else {
                         // Right overlap, cut to right segment
-                        var overlapLength = p4 - p1;
                         yield return CutHint(overlap, hint.End, overlap.End);
                     }
                 } else {
