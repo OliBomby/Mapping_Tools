@@ -137,7 +137,6 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             if (hintYieldedRight.Value.CumulativeLength < hint.End.Value.CumulativeLength) {
                 yield return CutHint(hint, hintYieldedRight, hint.End);
             }
-            // TODO: Fix the StartP and LengthP values so they reflect length on the actual hint anchors
             // TODO: Add unit tests
         }
 
@@ -146,8 +145,11 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         }
 
         private static ReconstructionHint CutHint(ReconstructionHint hint, LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end) {
+            var factor = (hint.EndP - hint.StartP) / (hint.End.Value.CumulativeLength - hint.Start.Value.CumulativeLength);
+            var startP = (start.Value.CumulativeLength - hint.Start.Value.CumulativeLength) * factor + hint.StartP;
+            var endP = (end.Value.CumulativeLength - hint.Start.Value.CumulativeLength) * factor + hint.StartP;
             return new ReconstructionHint(start, end, hint.Layer, hint.Anchors,
-                hint.PathType, hint.StartP, hint.LengthP);
+                hint.PathType, startP, endP);
         }
     }
 }

@@ -32,40 +32,26 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         public readonly PathType PathType;
 
         /// <summary>
-        /// Pixel length at which to start in the path of the anchors.
-        /// NaN or 0 means no margin.
+        /// Completion at which to start in the path of the anchors.
+        /// 0 means no margin.
         /// </summary>
         public readonly double StartP;
 
         /// <summary>
-        /// Pixel length amount of the path of the anchors that must be used.
-        /// NaN means use all available length.
+        /// Completion at which to end in the path of the anchors.
+        /// 1 means use all available length.
         /// </summary>
-        public readonly double LengthP;
+        public readonly double EndP;
 
         public ReconstructionHint(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end, int layer, List<Vector2> anchors,
-            PathType pathType = PathType.Bezier, double startP = double.NaN, double lengthP = double.NaN) {
+            PathType pathType = PathType.Bezier, double startP = 0, double endP = 1) {
             Start = start;
             End = end;
             Anchors = anchors;
             Layer = layer;
             PathType = pathType;
             StartP = startP;
-            LengthP = lengthP;
-        }
-
-        /// <summary>
-        /// Gets <see cref="StartP"/> with NaN converted to 0.
-        /// </summary>
-        public double GetStartP() {
-            return double.IsNaN(LengthP) ? 0 : LengthP;
-        }
-
-        /// <summary>
-        /// Gets <see cref="LengthP"/> with NaN recalculated to the segment length in the point path.
-        /// </summary>
-        public double GetLengthP() {
-            return double.IsNaN(LengthP) ? End.Value.CumulativeLength - Start.Value.CumulativeLength : LengthP;
+            EndP = endP;
         }
     }
 }
