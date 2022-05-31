@@ -68,22 +68,18 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                         hintYieldedRight = hint.End;
                     } else {
                         // Enclosing overlap, has to be split into left and right segments
-                        var overlapLengthL = p2 - p3;
-                        yield return new ReconstructionHint(overlap.Start, hint.Start, overlap.Layer, overlap.Anchors,
-                            overlap.PathType, overlap.StartP, overlap.GetLengthP() - overlapLengthL);
+                        yield return CutHint(overlap, overlap.Start, hint.Start);
 
                         // Yield all remaining hint, because this must be the last overlap
                         // The hint doesn't have to be cut in this case
                         if (overlap.Layer < hint.Layer) {
                             yield return hint;
                         } else {
-                            yield return new ReconstructionHint(hint.Start, hint.End, hint.Layer, null);
+                            yield return CreateVoid(hint.Start, hint.End, hint.Layer);
                         }
                         hintYieldedRight = hint.End;
 
-                        var overlapLengthR = p4 - p1;
-                        yield return new ReconstructionHint(hint.End, overlap.End, overlap.Layer, overlap.Anchors,
-                            overlap.PathType, overlap.GetStartP() + overlapLengthR, overlap.LengthP - overlapLengthR);
+                        yield return CutHint(overlap, hint.End, overlap.End);
                     }
                 } else if (p1 < p3) {
                     if (overlap.Layer > hint.Layer) {
@@ -92,28 +88,23 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                         hintYieldedRight = overlap.End;
                     } else {
                         // Left overlap, cut to left segment
-                        var overlapLength = p2 - p3;
-                        yield return new ReconstructionHint(overlap.Start, hint.Start, overlap.Layer, overlap.Anchors,
-                            overlap.PathType, overlap.StartP, overlap.GetLengthP() - overlapLength);
+                        yield return CutHint(overlap, overlap.Start, hint.Start);
 
                         // Cut and void some of the hint in the part of the overlap
                         if (overlap.Layer >= hint.Layer) {
-                            yield return new ReconstructionHint(hintYieldedRight, overlap.End, hint.Layer, null);
+                            yield return CreateVoid(hintYieldedRight, overlap.End, hint.Layer);
                             hintYieldedRight = overlap.End;
                         }
                     }
                 } else if (p2 > p4) {
                     // Yield all remaining hint, because this must be the last overlap
                     if (overlap.Layer < hint.Layer) {
-                        yield return new ReconstructionHint(hintYieldedRight, hint.End, hint.Layer, hint.Anchors,
-                            hint.PathType, hint.StartP, hint.LengthP);
+                        yield return CutHint(hint, hintYieldedRight, hint.End);
                     } else if (overlap.Layer == hint.Layer) {
-                        yield return new ReconstructionHint(hintYieldedRight, overlap.Start, hint.Layer, hint.Anchors,
-                            hint.PathType, hint.StartP, hint.LengthP);
-                        yield return new ReconstructionHint(overlap.Start, hint.End, hint.Layer, null);
+                        yield return CutHint(hint, hintYieldedRight, overlap.Start);
+                        yield return CreateVoid(overlap.Start, hint.End, hint.Layer);
                     } else {
-                        yield return new ReconstructionHint(hintYieldedRight, overlap.Start, hint.Layer, hint.Anchors,
-                            hint.PathType, hint.StartP, hint.LengthP);
+                        yield return CutHint(hint, hintYieldedRight, overlap.Start);
                     }
 
                     hintYieldedRight = hint.End;
@@ -124,21 +115,18 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                     } else {
                         // Right overlap, cut to right segment
                         var overlapLength = p4 - p1;
-                        yield return new ReconstructionHint(hint.End, overlap.End, overlap.Layer, overlap.Anchors,
-                            overlap.PathType, overlap.GetStartP() + overlapLength, overlap.LengthP - overlapLength);
+                        yield return CutHint(overlap, hint.End, overlap.End);
                     }
                 } else {
                     // Enclosed overlap, remove overlap completely
                     if (overlap.Layer == hint.Layer) {
                         // Cut hint until the overlap and void the overlapping part
-                        yield return new ReconstructionHint(hintYieldedRight, overlap.Start, hint.Layer, hint.Anchors,
-                            hint.PathType, hint.StartP, hint.LengthP);
-                        yield return new ReconstructionHint(overlap.Start, overlap.End, hint.Layer, null);
+                        yield return CutHint(hint, hintYieldedRight, overlap.Start);
+                        yield return CreateVoid(overlap.Start, overlap.End, hint.Layer);
                         hintYieldedRight = overlap.End;
                     } else if (overlap.Layer > hint.Layer) {
                         // Cut hint until the overlap and add the overlapping part
-                        yield return new ReconstructionHint(hintYieldedRight, overlap.Start, hint.Layer, hint.Anchors,
-                            hint.PathType, hint.StartP, hint.LengthP);
+                        yield return CutHint(hint, hintYieldedRight, overlap.Start);
                         hintYieldedRight = overlap.End;
                         yield return overlap;
                     }
@@ -147,11 +135,19 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
 
             // Yield all remaining hint, if not yielded already
             if (hintYieldedRight.Value.CumulativeLength < hint.End.Value.CumulativeLength) {
-                yield return new ReconstructionHint(hintYieldedRight, hint.End, hint.Layer, hint.Anchors,
-                    hint.PathType, hint.StartP, hint.LengthP);
+                yield return CutHint(hint, hintYieldedRight, hint.End);
             }
             // TODO: Fix the StartP and LengthP values so they reflect length on the actual hint anchors
             // TODO: Add unit tests
+        }
+
+        private static ReconstructionHint CreateVoid(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end, int layer) {
+            return new ReconstructionHint(start, end, layer, null);
+        }
+
+        private static ReconstructionHint CutHint(ReconstructionHint hint, LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end) {
+            return new ReconstructionHint(start, end, hint.Layer, hint.Anchors,
+                hint.PathType, hint.StartP, hint.LengthP);
         }
     }
 }
