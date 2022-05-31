@@ -40,26 +40,67 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                 reconstructionHints.Insert(startIndex, hint);
             } else {
                 var overlaps = reconstructionHints.GetRange(startIndex, endIndex - startIndex);
-                if (overlaps.All(o => o.Layer < hint.Layer)) {
-                    // We can replace the hints
-                    reconstructionHints.RemoveRange(startIndex, endIndex - startIndex);
-                    // Insert into list
-                    reconstructionHints.Insert(startIndex, hint);
-                } else {
-                    // Void all overlapping hints
-                    reconstructionHints.RemoveRange(startIndex, endIndex - startIndex);
 
-                    // Make a void hint
-                    var startL = Math.Min(hint.Start.Value.CumulativeLength,
-                        overlaps.Min(o => o.Start.Value.CumulativeLength));
-                    var endL = Math.Max(hint.End.Value.CumulativeLength,
-                        overlaps.Max(o => o.End.Value.CumulativeLength));
-                    var layer = Math.Max(hint.Layer, overlaps.Max(o => o.Layer));
+                // Remove all overlapping segments now, parts of the overlaps can be added back after
+                reconstructionHints.RemoveRange(startIndex, endIndex - startIndex);
 
-                    reconstructionHints.Insert(startIndex,
-                        new ReconstructionHint(Path.GetCumulativeLength(startL), Path.GetCumulativeLength(endL),
-                            layer, null));
+                // Add the merged overlaps
+                reconstructionHints.InsertRange(startIndex, MergeOverlaps(hint, overlaps));
+            }
+        }
+
+        private static IEnumerable<ReconstructionHint> MergeOverlaps(ReconstructionHint hint, List<ReconstructionHint> overlaps) {
+            bool hintYielded = false;
+            foreach (ReconstructionHint overlap in overlaps) {
+                // Determine the positions of overlap
+                var p1 = overlap.Start.Value.CumulativeLength;
+                var p2 = overlap.End.Value.CumulativeLength;
+                var p3 = hint.Start.Value.CumulativeLength;
+                var p4 = hint.End.Value.CumulativeLength;
+
+                // Yield the hint if we reach the right overlap
+                if (p1 >= p3 && p2 > p4 && !hintYielded) {
+                    yield return hint;
+                    hintYielded = true;
                 }
+
+                if (p1 < p3 &&
+                    p2 > p4) {
+                    // Enclosing overlap, has to be split into left and right segments
+                    var overlapLengthL = p2 - p3;
+                    var overlapLengthR = p4 - p1;
+                    yield return new ReconstructionHint(overlap.Start, hint.Start, overlap.Layer, overlap.Anchors,
+                        overlap.PathType, overlap.StartP, overlap.GetLengthP() - overlapLengthL);
+                    yield return hint;
+                    yield return new ReconstructionHint(hint.End, overlap.End, overlap.Layer, overlap.Anchors,
+                        overlap.PathType, overlap.GetStartP() + overlapLengthR, overlap.LengthP - overlapLengthR);
+
+                    hintYielded = true;
+                } else if (p1 < p3) {
+                    // Left overlap, cut to left segment
+                    var overlapLength = p2 - p3;
+                    yield return new ReconstructionHint(overlap.Start, hint.Start, overlap.Layer, overlap.Anchors,
+                        overlap.PathType, overlap.StartP, overlap.GetLengthP() - overlapLength);
+                } else if (p2 > p4) {
+                    // Right overlap, cut to right segment
+                    var overlapLength = p4 - p1;
+                    yield return new ReconstructionHint(hint.End, overlap.End, overlap.Layer, overlap.Anchors,
+                        overlap.PathType, overlap.GetStartP() + overlapLength, overlap.LengthP - overlapLength);
+                } else {
+                    // Enclosed overlap, remove overlaps completely
+                }
+
+                if (overlap.Layer < hint.Layer) {
+                }
+                // If its on a previous layer then remove all overlapping parts of the overlapping hint
+
+                // If its on the same layer then void all overlapping parts of the overlapping hint
+
+                // Parts of the hint which do no overlap get to stay but they are cut to just the part which is not overlapping
+            }
+
+            if (!hintYielded) {
+                yield return hint;
             }
         }
     }

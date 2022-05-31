@@ -53,5 +53,19 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             StartP = startP;
             LengthP = lengthP;
         }
+
+        /// <summary>
+        /// Gets <see cref="StartP"/> with NaN converted to 0.
+        /// </summary>
+        public double GetStartP() {
+            return double.IsNaN(LengthP) ? 0 : LengthP;
+        }
+
+        /// <summary>
+        /// Gets <see cref="LengthP"/> with NaN recalculated to the segment length in the point path.
+        /// </summary>
+        public double GetLengthP() {
+            return double.IsNaN(LengthP) ? End.Value.CumulativeLength - Start.Value.CumulativeLength : LengthP;
+        }
     }
 }
