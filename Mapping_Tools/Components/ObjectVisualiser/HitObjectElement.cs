@@ -151,6 +151,7 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
 
         private void OnSizeChanged(object sender, SizeChangedEventArgs e) {
             UpdateGeometryTransform();
+            InvalidateVisual();
         }
 
         private void UpdateGeometryTransform() {
