@@ -1,7 +1,8 @@
-﻿using Mapping_Tools.Classes.MathUtil;
+﻿using System;
+using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
-    public struct PathPoint {
+    public struct PathPoint : IComparable<PathPoint> {
         public Vector2 Pos;
         public Vector2 Dir;
         public double Dist;
@@ -132,6 +133,27 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
 
         public override string ToString() {
             return $"{Pos} {Dir} {Dist} {CumulativeLength} {T} {Red}";
+        }
+
+        public int CompareTo(PathPoint other) {
+            var cumulativeLengthComparison = CumulativeLength.CompareTo(other.CumulativeLength);
+            return cumulativeLengthComparison != 0 ? cumulativeLengthComparison : T.CompareTo(other.T);
+        }
+
+        public static bool operator <(PathPoint left, PathPoint right) {
+            return left.CompareTo(right) < 0;
+        }
+
+        public static bool operator >(PathPoint left, PathPoint right) {
+            return left.CompareTo(right) > 0;
+        }
+
+        public static bool operator <=(PathPoint left, PathPoint right) {
+            return left.CompareTo(right) <= 0;
+        }
+
+        public static bool operator >=(PathPoint left, PathPoint right) {
+            return left.CompareTo(right) >= 0;
         }
     }
 }

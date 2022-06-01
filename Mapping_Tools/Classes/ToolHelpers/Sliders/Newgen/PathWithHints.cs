@@ -17,8 +17,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         public IReadOnlyList<ReconstructionHint> ReconstructionHints => reconstructionHints;
 
         public void AddReconstructionHint(ReconstructionHint hint) {
-            if (hint.Start.Value.CumulativeLength >= hint.End.Value.CumulativeLength ||
-                (Precision.AlmostEquals(hint.Start.Value.CumulativeLength, hint.End.Value.CumulativeLength) && hint.Start.Value.T >= hint.End.Value.T)) {
+            if (hint.Start.Value >= hint.End.Value) {
                 throw new ArgumentException("Hint start must be before end.");
             }
 
@@ -60,10 +59,10 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                 // If the overlap is on a previous layer then remove all overlapping parts and keep the hint completely
                 // If the overlap is on the same layer then void all overlapping parts
                 // If the overlap is on a later layer, then remove all overlapping hint and keep the overlap
-                var p1 = overlap.Start.Value.CumulativeLength;
-                var p2 = overlap.End.Value.CumulativeLength;
-                var p3 = hint.Start.Value.CumulativeLength;
-                var p4 = hint.End.Value.CumulativeLength;
+                var p1 = overlap.Start.Value;
+                var p2 = overlap.End.Value;
+                var p3 = hint.Start.Value;
+                var p4 = hint.End.Value;
 
                 if (p1 < p3 && p2 > p4) {
                     if (overlap.Layer > hint.Layer) {
@@ -94,11 +93,13 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                         // Left overlap, cut to left segment
                         yield return CutHint(overlap, overlap.Start, hint.Start);
 
-                        // Cut and void some of the hint in the part of the overlap
-                        if (overlap.Layer >= hint.Layer) {
-                            yield return CreateVoid(hintYieldedRight, overlap.End, hint.Layer);
-                            hintYieldedRight = overlap.End;
+                        if (overlap.Layer < hint.Layer) {
+                            continue;
                         }
+
+                        // Cut and void some of the hint in the part of the overlap
+                        yield return CreateVoid(hintYieldedRight, overlap.End, hint.Layer);
+                        hintYieldedRight = overlap.End;
                     }
                 } else if (p2 > p4) {
                     // Yield all remaining hint, because this must be the last overlap
