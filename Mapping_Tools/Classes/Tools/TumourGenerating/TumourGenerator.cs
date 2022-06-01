@@ -82,7 +82,8 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
             // Set the new slider path
             var reconstructor = new Reconstructor();
-            var newSliderPath = new SliderPath(PathType.Bezier, reconstructor.Reconstruct(pathWithHints).ToArray());
+            var (anchors, pathType) = reconstructor.Reconstruct(pathWithHints);
+            var newSliderPath = new SliderPath(pathType, anchors.ToArray());
 
             ho.SetSliderPath(newSliderPath);
 

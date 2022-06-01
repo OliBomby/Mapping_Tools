@@ -10,14 +10,17 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
     /// Reconstructs the anchors of a complete slider out of a <see cref="PathWithHints"/>.
     /// </summary>
     public class Reconstructor {
-        public List<Vector2> Reconstruct(PathWithHints pathWithHints) {
+        public (List<Vector2>, PathType) Reconstruct(PathWithHints pathWithHints) {
             var anchors = new List<Vector2>();
 
             var current = pathWithHints.Path.First;
             var hints = pathWithHints.ReconstructionHints;
             var nextHint = 0;
             LinkedListNode<PathPoint> hintSegmentStart = null;
-            var pathType = PathType.Bezier;  // TODO: Get this from the path itself.
+            var pathType = hints.Count == 1 && hints[0].Start == pathWithHints.Path.First &&
+                           hints[0].End == pathWithHints.Path.Last
+                ? hints[0].PathType
+                : PathType.Bezier;
 
             while (current is not null) {
                 if (nextHint < hints.Count && current == hints[nextHint].End && hintSegmentStart is not null) {
@@ -57,7 +60,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                 current = current.Next;
             }
 
-            return anchors;
+            return (anchors, pathType);
         }
 
         private static List<Vector2> CutAnchors(List<Vector2> anchors, PathType pathType, double startP, double endP, out PathType newPathType) {
