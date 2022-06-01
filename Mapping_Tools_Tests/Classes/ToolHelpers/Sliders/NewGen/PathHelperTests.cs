@@ -5,11 +5,10 @@ using System.Globalization;
 using System.Linq;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.ToolHelpers.Sliders;
 using Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools_Tests.Classes.Tools.TumourGenerator {
+namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
     [TestClass]
     public class PathHelperTests {
         [TestMethod]

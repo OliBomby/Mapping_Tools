@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
@@ -16,6 +17,11 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         public IReadOnlyList<ReconstructionHint> ReconstructionHints => reconstructionHints;
 
         public void AddReconstructionHint(ReconstructionHint hint) {
+            if (hint.Start.Value.CumulativeLength >= hint.End.Value.CumulativeLength ||
+                (Precision.AlmostEquals(hint.Start.Value.CumulativeLength, hint.End.Value.CumulativeLength) && hint.Start.Value.T >= hint.End.Value.T)) {
+                throw new ArgumentException("Hint start must be before end.");
+            }
+
             // Find sorted place in the list
             // The hints are not overlapping so end times are also sorted
             var startIndex = BinarySearchUtil.BinarySearch(reconstructionHints, hint.Start.Value.CumulativeLength,
@@ -134,7 +140,6 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             if (hintYieldedRight.Value.CumulativeLength < hint.End.Value.CumulativeLength) {
                 yield return CutHint(hint, hintYieldedRight, hint.End);
             }
-            // TODO: Add unit tests
         }
 
         private static ReconstructionHint CreateVoid(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end, int layer) {
