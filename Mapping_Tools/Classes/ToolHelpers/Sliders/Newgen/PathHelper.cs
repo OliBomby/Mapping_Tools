@@ -31,6 +31,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             var calculatedPath = sliderPath.CalculatedPath;
             var segmentsStarts = sliderPath.SegmentStarts;
             var segmentIndex = 1;
+            var cumulativeLength = 0d;
             LinkedListNode<PathPoint> segmentStartNode = null;
             for (int i = 0; i < calculatedPath.Count; i++) {
                 // This is a while loop because there could be multiple identical segment starts in a row
@@ -40,10 +41,17 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                 }
 
                 // Check if i+1 is the first point in the next segment so we know i is a red anchor
-                bool isRedAnchor = segmentIndex < segmentsStarts.Count && i + 1 == segmentsStarts[segmentIndex] &&
-                                   i != 0;
+                bool isRedAnchor = segmentIndex < segmentsStarts.Count && i + 1 == segmentsStarts[segmentIndex] && i != 0;
 
-                path.AddLast(new PathPoint(calculatedPath[i], Vector2.UnitX, 0, 0, red: isRedAnchor));
+                // Update cumulative length
+                double dist = 0;
+                if (path.Last is not null) {
+                    var prevPos = path.Last.Value.Pos;
+                    dist = Vector2.Distance(prevPos, calculatedPath[i]);
+                }
+                cumulativeLength += dist;
+
+                path.AddLast(new PathPoint(calculatedPath[i], Vector2.UnitX, cumulativeLength, red: isRedAnchor));
 
                 // Make sure the start node is initialized
                 segmentStartNode ??= path.Last;
@@ -110,7 +118,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                     v1 ?? (v2 ?? Vector2.UnitX);
 
                 // Update the path point of current
-                current.Value = new PathPoint(pos, dir, dist, cumulativeLength, point.T, point.Red);
+                current.Value = new PathPoint(pos, dir, cumulativeLength, point.T, point.Red);
 
                 current = current.Next;
             }

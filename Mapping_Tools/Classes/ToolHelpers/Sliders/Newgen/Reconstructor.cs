@@ -77,11 +77,12 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                 anchors.Reverse();
                 var sliderPath = new SliderPath(pathType, anchors.ToArray(), newLengthStart);
                 anchors = SliderPathUtil.MoveAnchorsToLength(sliderPath, fullLength, newLengthStart, out newPathType);
+                pathType = newPathType;
                 fullLength = newLengthStart;
                 anchors.Reverse();
             }
 
-            if (!Precision.AlmostEquals(endP, 0)) {
+            if (!Precision.AlmostEquals(endP, 1)) {
                 var sliderPath = new SliderPath(pathType, anchors.ToArray(), newLengthEnd);
                 anchors = SliderPathUtil.MoveAnchorsToLength(sliderPath, fullLength, newLengthEnd, out newPathType);
             }

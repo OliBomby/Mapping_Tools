@@ -179,9 +179,9 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 var offset = tumourTemplate.GetOffset(t) * Scalar;
                 var np = WrappingMode switch {
                     WrappingMode.Wrap => p,
-                    WrappingMode.RoundWrap => new PathPoint(p.Pos, Vector2.Lerp(startP.Dir, endP.Dir, t), p.Dist, p.CumulativeLength),
-                    WrappingMode.Replace => new PathPoint(Vector2.Lerp(startP.Pos, endP.Pos, t), endP.Pos - startP.Pos, p.Dist, p.CumulativeLength),
-                    WrappingMode.RoundReplace => new PathPoint(Vector2.Lerp(startP.Pos, endP.Pos, t), Vector2.Lerp(startP.Dir, endP.Dir, t), p.Dist, p.CumulativeLength),
+                    WrappingMode.RoundWrap => new PathPoint(p.Pos, Vector2.Lerp(startP.Dir, endP.Dir, t), p.CumulativeLength),
+                    WrappingMode.Replace => new PathPoint(Vector2.Lerp(startP.Pos, endP.Pos, t), endP.Pos - startP.Pos, p.CumulativeLength),
+                    WrappingMode.RoundReplace => new PathPoint(Vector2.Lerp(startP.Pos, endP.Pos, t), Vector2.Lerp(startP.Dir, endP.Dir, t), p.CumulativeLength),
                     _ => p
                 };
 
@@ -189,7 +189,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 var newPos = np.Pos + Vector2.Rotate(offset, np.Dir.Theta);
 
                 // Modify the path
-                pn.Value = new PathPoint(newPos, p.Dir, p.Dist, p.CumulativeLength);
+                pn.Value = new PathPoint(newPos, p.Dir, p.CumulativeLength);
             }
         }
 
