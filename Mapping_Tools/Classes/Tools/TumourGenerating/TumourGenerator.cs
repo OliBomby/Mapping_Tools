@@ -75,7 +75,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     }
 
                     var anchors = TumourLayers.First().TumourTemplate.GetReconstructionHint();
-                    pathWithHints.AddReconstructionHint(new ReconstructionHint(current, next, 0, anchors));
+                    pathWithHints.AddReconstructionHint(new ReconstructionHint(current, next, 0, anchors, PathType.Linear));
                 }
                 current = current.Next;
             }
