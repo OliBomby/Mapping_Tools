@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
 
 namespace Mapping_Tools.Components.ObjectVisualiser {
@@ -54,6 +55,17 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
         public double? CustomPixelLength {
             get => (double?) GetValue(CustomPixelLengthProperty);
             set => SetValue(CustomPixelLengthProperty, value);
+        }
+
+        public static readonly DependencyProperty ShowAnchorsProperty =
+            DependencyProperty.Register("ShowAnchors",
+                typeof(bool),
+                typeof(HitObjectElement),
+                new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender));
+
+        public bool ShowAnchors {
+            get => (bool) GetValue(ShowAnchorsProperty);
+            set => SetValue(ShowAnchorsProperty, value);
         }
 
         public static readonly DependencyProperty ExtraMarkersProperty =
@@ -173,6 +185,23 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
                     drawingContext.DrawGeometry(Fill, GetSliderBallPen(), GetCircleGeometryAtProgress(Progress));
                 }
 
+                if (ShowAnchors) {
+                    // Draw the lines between the anchors
+                    var anchors = _sliderPath.ControlPoints;
+                    var controlPointLinePen = GetControlPointLinePen();
+                    for (var i = 0; i < anchors.Count - 1; i++) {
+                        var geom = GetLineGeometry(anchors[i], anchors[i + 1]);
+                        drawingContext.DrawGeometry(null, controlPointLinePen, geom);
+                    }
+                    // Draw the slider anchors
+                    var controlPointOutlinePen = GetControlPointOutLinePen();
+                    for (var i = 0; i < anchors.Count; i++) {
+                        var fill = i != 0 && anchors[i] == anchors[i - 1] ? Brushes.Red : Brushes.LightGray;
+                        var geom = GetSquareGeometry(anchors[i], 0.2);
+                        drawingContext.DrawGeometry(fill, controlPointOutlinePen, geom);
+                    }
+                }
+
                 // Draw extra markers
                 foreach (var marker in ExtraMarkers.Where(o => o.Progress >= 0 && o.Progress <= 1)) {
                     drawingContext.DrawGeometry(marker.Brush, new Pen(Brushes.Black, 1), 
@@ -191,6 +220,14 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
 
         private Pen GetSliderBallPen() {
             return SliderBallStroke == null ? null : new Pen(SliderBallStroke, Thickness * _scale * BorderThickness);
+        }
+
+        private Pen GetControlPointLinePen() {
+            return new Pen(Brushes.White, 1);
+        }
+
+        private Pen GetControlPointOutLinePen() {
+            return new Pen(Brushes.Black, 1);
         }
 
         private Geometry GetProgressGeometry(double[] progresses) {
@@ -232,6 +269,10 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
                 new Point(pos.X + ThicknessWithoutOutline * 0.5 * size, pos.Y + ThicknessWithoutOutline * 0.5 * size)), 
                 0, 0, _figureTransform);
             return geom;
+        }
+
+        private Geometry GetLineGeometry(Vector2 p1, Vector2 p2, double size = 1) {
+            return new LineGeometry(new Point(p1.X, p1.Y), new Point(p2.X, p2.Y), _figureTransform);
         }
 
         private static void OnHitObjectChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {

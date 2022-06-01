@@ -121,7 +121,7 @@
                     <materialDesign:Card Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0" Padding="10"
                                  ToolTip="Result preview">
                         <objectVisualiser:HitObjectElement x:Name="GraphHitObjectElement" HitObject="{Binding TumouredPreviewHitObject}"
-                                                   Stroke="YellowGreen" Fill="DarkSlateGray" SliderBallStroke="White" Thickness="50"/>
+                                                   Stroke="YellowGreen" Fill="DarkSlateGray" SliderBallStroke="White" Thickness="50" ShowAnchors="True"/>
                     </materialDesign:Card>
                     <ProgressBar Grid.Row="0"
                         Style="{StaticResource MaterialDesignCircularProgressBar}"
