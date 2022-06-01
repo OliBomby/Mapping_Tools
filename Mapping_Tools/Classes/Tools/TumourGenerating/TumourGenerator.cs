@@ -43,6 +43,8 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
         public bool JustMiddleAnchors { get; set; }
 
+        public double Position { get; set; } = 0.5;
+
         public IReadOnlyCollection<ITumourLayer> TumourLayers  { get; set; }
 
         /// <summary>
@@ -60,22 +62,25 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             var pathWithHints = PathHelper.CreatePathWithHints(ho.GetSliderPath());
 
             // TODO Add tumours
-            var middleIndex = pathWithHints.Path.Count / 2;
+            var middleIndex = (int)(pathWithHints.Path.Count * Position);
             var i = 0;
             var current = pathWithHints.Path.First;
             while (current is not null) {
                 if (i++ == middleIndex) {
                     // Add a tumour
                     var next = current;
-                    while (next is not null) {
+                    while (true) {
                         if (next.Value.CumulativeLength - current.Value.CumulativeLength > 30) {
                             break;
                         }
+
+                        if (next.Next is null) break;
                         next = next.Next;
                     }
 
-                    var anchors = TumourLayers.First().TumourTemplate.GetReconstructionHint();
-                    pathWithHints.AddReconstructionHint(new ReconstructionHint(current, next, 0, anchors, PathType.Linear));
+                    if (next == current) continue;
+                    var hintAnchors = TumourLayers.First().TumourTemplate.GetReconstructionHint();
+                    pathWithHints.AddReconstructionHint(new ReconstructionHint(current, next, 0, hintAnchors, PathType.Linear));
                 }
                 current = current.Next;
             }

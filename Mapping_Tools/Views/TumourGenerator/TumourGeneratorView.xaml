@@ -110,6 +110,7 @@
                              ToolTip="The distance along the slider in osu! pixels where to end the placement of tumours."/>
                     <CheckBox IsChecked="{Binding CurrentLayer.Recalculate}"
                               Content="Recalculate" ToolTip="Whether to recalculate the distances and angles of the slider before applying this layer. If true, tumours will be placed on top of tumours of the previous layers as if they were part of the slider, instead of merging with those tumours."/>
+                    <Slider Minimum="0" Maximum="1" TickFrequency="0.1" Value="{Binding Position}"/>
                 </StackPanel>
 
                 <Grid Grid.Column="2">

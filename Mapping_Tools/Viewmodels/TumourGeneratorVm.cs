@@ -115,6 +115,12 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _removeSliderTicks, value);
         }
 
+        private double _position;
+        public double Position {
+            get => _position;
+            set => Set(ref _position, value, action: RegeneratePreview);
+        }
+
         [JsonIgnore]
         public IEnumerable<TumourTemplate> TumourTemplates => Enum.GetValues(typeof(TumourTemplate)).Cast<TumourTemplate>();
 
@@ -218,7 +224,8 @@ namespace Mapping_Tools.Viewmodels {
                 // Do a lot of tumour generating
                 var tumourGenerator = new TumourGenerator {
                     TumourLayers = TumourLayers,
-                    JustMiddleAnchors = JustMiddleAnchors
+                    JustMiddleAnchors = JustMiddleAnchors,
+                    Position = Position
                 };
                 tumourGenerator.TumourGenerate(args);
 

@@ -88,7 +88,8 @@ namespace Mapping_Tools.Views.TumourGenerator {
             // Initialize the Tumour Generator
             var tumourGenerator = new Classes.Tools.TumourGenerating.TumourGenerator {
                 TumourLayers = arg.TumourLayers,
-                JustMiddleAnchors = arg.JustMiddleAnchors
+                JustMiddleAnchors = arg.JustMiddleAnchors,
+                Position = arg.Position
             };
             
             // Load sliders from the selector
