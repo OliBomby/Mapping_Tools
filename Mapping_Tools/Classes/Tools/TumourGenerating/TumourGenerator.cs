@@ -45,7 +45,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
         public double Position { get; set; } = 0.5;
 
-        public IReadOnlyCollection<ITumourLayer> TumourLayers  { get; set; }
+        public IReadOnlyList<ITumourLayer> TumourLayers  { get; set; }
 
         /// <summary>
         /// Places copious amounts of tumours on the slider.
@@ -60,29 +60,57 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
             // Create path
             var pathWithHints = PathHelper.CreatePathWithHints(ho.GetSliderPath());
+            if (pathWithHints.Path.Count == 0) {
+                return false;
+            }
+            var totalLength = pathWithHints.Path.Last!.Value.CumulativeLength;
+            var random = new Random();
 
-            // TODO Add tumours
-            var middleIndex = (int)(pathWithHints.Path.Count * Position);
-            var i = 0;
-            var current = pathWithHints.Path.First;
-            while (current is not null) {
-                if (i++ == middleIndex) {
-                    // Add a tumour
-                    var next = current;
-                    while (true) {
-                        if (next.Value.CumulativeLength - current.Value.CumulativeLength > 30) {
-                            break;
-                        }
+            // Add tumours
+            int layer = 0;
+            for (int i = 0; i < TumourLayers.Count; i++) {
+                var tumourLayer = TumourLayers[i];
 
-                        if (next.Next is null) break;
-                        next = next.Next;
-                    }
-
-                    if (next == current) continue;
-                    var hintAnchors = TumourLayers.First().TumourTemplate.GetReconstructionHint();
-                    pathWithHints.AddReconstructionHint(new ReconstructionHint(current, next, 0, hintAnchors, PathType.Linear));
+                // Recalculate
+                if (tumourLayer.Recalculate) {
+                    PathHelper.Recalculate(pathWithHints.Path);
+                    totalLength = pathWithHints.Path.Last!.Value.CumulativeLength;
+                    layer++;
                 }
-                current = current.Next;
+
+                // Calculate count multiplier
+                var totalDist = tumourLayer.TumourEnd - tumourLayer.TumourStart;
+                var countDist = totalDist / tumourLayer.TumourCount;
+
+                // Find the start of the tumours
+                var current = pathWithHints.Path.First;
+                var nextDist = tumourLayer.TumourStart;
+                var side = false;
+
+                while (nextDist < tumourLayer.TumourEnd && current is not null) {
+                    var length = tumourLayer.TumourLength.GetValue(nextDist / totalLength);
+                    var endDist = nextDist + length;
+                    var start = FindFirstOccuranceExact(current, nextDist);
+                    var end = FindLastOccuranceExact(start, endDist);
+
+                    // Calculate the T start/end for the tumour template
+                    var startT = (start.Value.CumulativeLength - nextDist) / length;
+                    var endT = (end.Value.CumulativeLength - nextDist) / length;
+
+                    // Get which side the tumour should be on
+                    side = tumourLayer.TumourSidedness switch {
+                        TumourSidedness.Left => false,
+                        TumourSidedness.Right => true,
+                        TumourSidedness.Alternating => !side,
+                        TumourSidedness.Random => random.NextDouble() < 0.5,
+                        _ => false
+                    };
+
+                    PlaceTumour(pathWithHints.Path, tumourLayer, layer, start, end, startT, endT, side);
+
+                    current = start;
+                    nextDist = tumourLayer.TumourCount > 0 ? countDist : tumourLayer.TumourDistance.GetValue(nextDist / totalLength);
+                }
             }
 
             // Set the new slider path
@@ -104,11 +132,16 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
         /// May increase the size of path.
         /// </summary>
         /// <param name="path">The path to add a tumour to</param>
-        /// <param name="tumourTemplate">The tumour shape</param>
+        /// <param name="layer">The layer index for hints</param>
         /// <param name="start">The start point</param>
         /// <param name="end">The end point</param>
-        public void PlaceTumour([NotNull]LinkedList<PathPoint> path, [NotNull]ITumourTemplate tumourTemplate, 
-            [NotNull]LinkedListNode<PathPoint> start, [NotNull]LinkedListNode<PathPoint> end) {
+        /// <param name="tumourLayer">The tumour layer</param>
+        /// <param name="startTemplateT">T value for where to start with the tumour template</param>
+        /// <param name="endTemplateT">T value for where to end with the tumour template</param>
+        /// <param name="otherSide">Whether to place the tumour on the other side of the slider</param>
+        private void PlaceTumour([NotNull]LinkedList<PathPoint> path, [NotNull]ITumourLayer tumourLayer, int layer,
+            [NotNull]LinkedListNode<PathPoint> start, [NotNull]LinkedListNode<PathPoint> end,
+            double startTemplateT, double endTemplateT, bool otherSide) {
             if (start.List != path) {
                 throw new ArgumentException(@"Start node has to be part of the provided path.", nameof(start));
             }
@@ -145,8 +178,8 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
                 if (double.IsNaN(startP.T)) {
                     // Initialize T properly
-                    var firstOccurance = FindFirstOccuranceOfDist(start);
-                    var lastOccurance = FindLastOccuranceOfDist(end);
+                    var firstOccurance = FindFirstOccurance(start, start.Value.CumulativeLength);
+                    var lastOccurance = FindLastOccurance(end, start.Value.CumulativeLength);
                     // TODO
 
                 }
@@ -157,6 +190,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             int pointsBetween = PathHelper.CountPointsBetween(start, end);
 
             // Make sure there are enough points between start and end for the tumour shape and resolution
+            var tumourTemplate = tumourLayer.TumourTemplate;
             int wantedPointsBetween = Math.Max(pointsBetween, (int)(tumourTemplate.GetLength() * Resolution));  // The needed number of points for the tumour
             if (pointsBetween < wantedPointsBetween) {
                 pointsBetween += path.Subdivide(start, end, wantedPointsBetween);
@@ -193,11 +227,19 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             }
         }
 
-        private LinkedListNode<PathPoint> FindFirstOccuranceOfDist(LinkedListNode<PathPoint> start) {
+        private LinkedListNode<PathPoint> FindFirstOccurance(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN) {
             throw new NotImplementedException();
         }
 
-        private LinkedListNode<PathPoint> FindLastOccuranceOfDist(LinkedListNode<PathPoint> start) {
+        private LinkedListNode<PathPoint> FindLastOccurance(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN) {
+            throw new NotImplementedException();
+        }
+
+        private LinkedListNode<PathPoint> FindFirstOccuranceExact(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN) {
+            throw new NotImplementedException();
+        }
+
+        private LinkedListNode<PathPoint> FindLastOccuranceExact(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN) {
             throw new NotImplementedException();
         }
     }
