@@ -187,7 +187,7 @@ namespace Mapping_Tools.Viewmodels {
                 }
 
                 if (markedObjects == null || !markedObjects.Any(o => o.IsSlider)) {
-                    Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue(@"Found 0 sliders in imported hit objects."));
+                    Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue(@"Could not find any sliders in imported hit objects."));
                     return;
                 }
 
@@ -203,6 +203,8 @@ namespace Mapping_Tools.Viewmodels {
         /// At all times, only the latest slider is being tumoured.
         /// </summary>
         public void RegeneratePreview() {
+            if (TumourLayers is null) return;
+
             // Cancel any task that might be running right now and make a new token
             CancellationToken ct;
             lock (previewTokenLock) {
@@ -216,6 +218,11 @@ namespace Mapping_Tools.Viewmodels {
 
             // Raise property changed for the load indicator in the preview
             IsProcessingPreview = true;
+
+            // Freeze all layers for thread safety
+            foreach (var tumourLayer in TumourLayers) {
+                tumourLayer.Freeze();
+            }
             
             Task.Run(() => {
                 var args = PreviewHitObject.DeepCopy();
