@@ -90,8 +90,8 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 while (nextDist < tumourLayer.TumourEnd && current is not null) {
                     var length = tumourLayer.TumourLength.GetValue(nextDist / totalLength);
                     var endDist = nextDist + length;
-                    var start = FindFirstOccuranceExact(current, nextDist);
-                    var end = FindLastOccuranceExact(start, endDist);
+                    var start = PathHelper.FindFirstOccuranceExact(current, nextDist);
+                    var end = PathHelper.FindLastOccuranceExact(start, endDist);
 
                     // Calculate the T start/end for the tumour template
                     var startT = (start.Value.CumulativeLength - nextDist) / length;
@@ -178,8 +178,8 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
                 if (double.IsNaN(startP.T)) {
                     // Initialize T properly
-                    var firstOccurance = FindFirstOccurance(start, start.Value.CumulativeLength);
-                    var lastOccurance = FindLastOccurance(end, start.Value.CumulativeLength);
+                    var firstOccurance = PathHelper.FindFirstOccurance(start, start.Value.CumulativeLength);
+                    var lastOccurance = PathHelper.FindLastOccurance(end, start.Value.CumulativeLength);
                     // TODO
 
                 }
@@ -225,22 +225,6 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 // Modify the path
                 pn.Value = new PathPoint(newPos, p.Dir, p.CumulativeLength);
             }
-        }
-
-        private LinkedListNode<PathPoint> FindFirstOccurance(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN) {
-            throw new NotImplementedException();
-        }
-
-        private LinkedListNode<PathPoint> FindLastOccurance(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN) {
-            throw new NotImplementedException();
-        }
-
-        private LinkedListNode<PathPoint> FindFirstOccuranceExact(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN) {
-            throw new NotImplementedException();
-        }
-
-        private LinkedListNode<PathPoint> FindLastOccuranceExact(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN) {
-            throw new NotImplementedException();
         }
     }
 }
