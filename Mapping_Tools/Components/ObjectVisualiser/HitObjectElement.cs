@@ -82,8 +82,8 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
 
         public static readonly DependencyProperty ThicknessProperty =
             DependencyProperty.Register("Thickness",
-                typeof(double), 
-                typeof(HitObjectElement), 
+                typeof(double),
+                typeof(HitObjectElement),
                 new FrameworkPropertyMetadata(40d, FrameworkPropertyMetadataOptions.AffectsRender,
                     OnThicknessChanged));
 
@@ -102,6 +102,17 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
         public double BorderThickness {
             get => (double) GetValue(BorderThicknessProperty);
             set => SetValue(BorderThicknessProperty, value);
+        }
+
+        public static readonly DependencyProperty AnchorSizeProperty =
+            DependencyProperty.Register("AnchorSize",
+                typeof(double),
+                typeof(HitObjectElement),
+                new FrameworkPropertyMetadata(0.2d, FrameworkPropertyMetadataOptions.AffectsRender));
+
+        public double AnchorSize {
+            get => (double) GetValue(AnchorSizeProperty);
+            set => SetValue(AnchorSizeProperty, value);
         }
 
         public static readonly DependencyProperty StrokeProperty =
@@ -198,7 +209,7 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
                     var controlPointOutlinePen = GetControlPointOutLinePen();
                     for (var i = 0; i < anchors.Count; i++) {
                         var fill = i != 0 && anchors[i] == anchors[i - 1] ? Brushes.Red : Brushes.LightGray;
-                        var geom = GetSquareGeometry(anchors[i], 0.2);
+                        var geom = GetSquareGeometry(anchors[i], AnchorSize);
                         drawingContext.DrawGeometry(fill, controlPointOutlinePen, geom);
                     }
                 }
