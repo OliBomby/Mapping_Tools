@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
 
 namespace Mapping_Tools.Components.Graph.Interpolation {
     public class InterpolatorHelper {
@@ -41,7 +42,7 @@ namespace Mapping_Tools.Components.Graph.Interpolation {
         /// <returns></returns>
         public static Type GetInterpolatorByIndex(int index) {
             var interpolators = GetInterpolators();
-            return index < 0 || index >= interpolators.Length ? null : interpolators[index];
+            return index < 0 || index >= interpolators.Length ? typeof(LinearInterpolator) : interpolators[index];
         }
 
         public static string GetName(Type type) {

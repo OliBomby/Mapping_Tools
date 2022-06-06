@@ -115,10 +115,10 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _removeSliderTicks, value);
         }
 
-        private double _position;
-        public double Position {
-            get => _position;
-            set => Set(ref _position, value, action: RegeneratePreview);
+        private double _scale;
+        public double Scale {
+            get => _scale;
+            set => Set(ref _scale, value, action: RegeneratePreview);
         }
 
         [JsonIgnore]
@@ -146,6 +146,7 @@ namespace Mapping_Tools.Viewmodels {
             ImportModeSetting = ImportMode.Selected;
             TumourLayers = new ObservableCollection<TumourLayer>();
             JustMiddleAnchors = false;
+            Scale = 1;
 
             ImportCommand = new CommandImplementation(_ => Import(ImportModeSetting == ImportMode.Selected ?
                 IOHelper.GetCurrentBeatmapOrCurrentBeatmap() :
@@ -232,7 +233,7 @@ namespace Mapping_Tools.Viewmodels {
                 var tumourGenerator = new TumourGenerator {
                     TumourLayers = TumourLayers,
                     JustMiddleAnchors = JustMiddleAnchors,
-                    Position = Position
+                    Scalar = Scale
                 };
                 tumourGenerator.TumourGenerate(args);
 

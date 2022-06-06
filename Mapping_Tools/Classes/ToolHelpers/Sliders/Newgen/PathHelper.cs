@@ -309,7 +309,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                     }
 
                     prev = p;
-                    p = p.Next;
+                    p = p.Previous;
                 }
             }
 
@@ -357,7 +357,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                     }
 
                     prev = p;
-                    p = p.Next;
+                    p = p.Previous;
                 }
             }
 

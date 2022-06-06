@@ -103,14 +103,14 @@
                              Text="{Binding CurrentLayer.TumourCount, Converter={StaticResource IntToStringConverter}, ConverterParameter=-1}"
                              ToolTip="The number of tumours to place on the slider. If -1 this count will be automatically determined using the distance and slider length."/>
                     <TextBox materialDesign:HintAssist.Hint="Start" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                             Text="{Binding CurrentLayer.TumourStart, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=-1}"
-                             ToolTip="The distance along the slider in osu! pixels where to start the placement of tumours."/>
+                             Text="{Binding CurrentLayer.TumourStart, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=0}"
+                             ToolTip="The progression along the slider where to start the placement of tumours. 0 is the slider head, 1 is the slider end."/>
                     <TextBox materialDesign:HintAssist.Hint="End" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                             Text="{Binding CurrentLayer.TumourEnd, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=-1}"
-                             ToolTip="The distance along the slider in osu! pixels where to end the placement of tumours."/>
+                             Text="{Binding CurrentLayer.TumourEnd, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=1}"
+                             ToolTip="The progression along the slider where to end the placement of tumours. 0 is the slider head, 1 is the slider end."/>
                     <CheckBox IsChecked="{Binding CurrentLayer.Recalculate}"
                               Content="Recalculate" ToolTip="Whether to recalculate the distances and angles of the slider before applying this layer. If true, tumours will be placed on top of tumours of the previous layers as if they were part of the slider, instead of merging with those tumours."/>
-                    <Slider Minimum="0" Maximum="1" TickFrequency="0.1" Value="{Binding Position}"/>
+                    <Slider Minimum="0" Maximum="1" TickFrequency="0.1" Value="{Binding Scale}"/>
                 </StackPanel>
 
                 <Grid Grid.Column="2">

@@ -10,7 +10,15 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
         GraphState TumourRotation { get; }
         GraphState TumourDistance { get; }
         int TumourCount { get; }
+
+        /// <summary>
+        /// Completion at which to start generating the tumours.
+        /// </summary>
         double TumourStart { get; }
+
+        /// <summary>
+        /// Completion at which to stop generating the tumours.
+        /// </summary>
         double TumourEnd { get; }
         bool Recalculate { get; }
     }

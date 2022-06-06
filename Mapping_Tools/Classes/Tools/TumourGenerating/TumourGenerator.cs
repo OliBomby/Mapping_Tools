@@ -43,8 +43,6 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
         public bool JustMiddleAnchors { get; set; }
 
-        public double Position { get; set; } = 0.5;
-
         public IReadOnlyList<ITumourLayer> TumourLayers  { get; set; }
 
         /// <summary>
@@ -70,6 +68,8 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             int layer = 0;
             for (int i = 0; i < TumourLayers.Count; i++) {
                 var tumourLayer = TumourLayers[i];
+                var tumourStart = MathHelper.Clamp(tumourLayer.TumourStart, 0, 1);
+                var tumourEnd = MathHelper.Clamp(tumourLayer.TumourEnd, 0, 1);
 
                 // Recalculate
                 if (tumourLayer.Recalculate) {
@@ -79,15 +79,15 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 }
 
                 // Calculate count multiplier
-                var totalDist = tumourLayer.TumourEnd - tumourLayer.TumourStart;
-                var countDist = totalDist / tumourLayer.TumourCount;
+                var totalDist = tumourEnd - tumourStart;
+                var countDist = totalDist * totalLength / tumourLayer.TumourCount;
 
                 // Find the start of the tumours
                 var current = pathWithHints.Path.First;
-                var nextDist = tumourLayer.TumourStart;
+                var nextDist = tumourStart * totalLength;
                 var side = false;
 
-                while (nextDist < tumourLayer.TumourEnd && current is not null) {
+                while (nextDist < tumourEnd * totalLength && current is not null) {
                     var length = tumourLayer.TumourLength.GetValue(nextDist / totalLength);
                     var endDist = nextDist + length;
                     var start = PathHelper.FindFirstOccurrenceExact(current, nextDist);
@@ -153,12 +153,6 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
             var startP = start.Value;
             var endP = end.Value;
-            var startProg = startP.CumulativeLength / path.Last!.Value.CumulativeLength;
-            var endProg = endP.CumulativeLength / path.Last!.Value.CumulativeLength;
-            double startT = startP.T;
-            double endT = endP.T;
-            double dist = endP.CumulativeLength - startP.CumulativeLength;
-            double distT = endT - startT;
 
             // Ensure that there is a copy of the start point at the end point if we add in-between points
             // and the start and end points are the same node.
@@ -167,7 +161,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 start.List!.AddAfter(start, end);
             }
 
-            if (Precision.AlmostEquals(dist, 0)) {
+            if (Precision.AlmostEquals(startP.CumulativeLength, endP.CumulativeLength)) {
                 // Wii Sports Resort to T mode
 
                 // T should either be undefined on both start and end point because T is not yet initialized for this distance
@@ -181,16 +175,36 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
                 if (double.IsNaN(startP.T)) {
                     // Initialize T properly
-                    var firstOccurance = PathHelper.FindFirstOccurrence(start, start.Value.CumulativeLength);
-                    var lastOccurance = PathHelper.FindLastOccurrence(end, start.Value.CumulativeLength);
-                    // TODO
+                    var firstOccurrence = PathHelper.FindFirstOccurrence(start, start.Value.CumulativeLength);
+                    var lastOccurrence = PathHelper.FindLastOccurrence(end, end.Value.CumulativeLength);
 
+                    int pointsBetweenTi = PathHelper.CountPointsBetween(firstOccurrence, lastOccurrence);
+                    var dti = 1d / (pointsBetweenTi + 1);
+                    var tti = 0d;
+                    var pti = firstOccurrence;
+                    while (pti != lastOccurrence) {
+                        pti.Value = pti.Value.SetT(tti);
+                        tti += dti;
+                        pti = pti.Next;
+                    }
+
+                    lastOccurrence.Value = lastOccurrence.Value.SetT(1);
                 }
                 // T is initialized
             }
 
             // Count the number of nodes between start and end
             int pointsBetween = PathHelper.CountPointsBetween(start, end);
+
+            var totalLength = path.Last.Value.CumulativeLength;
+            startP = start.Value;
+            endP = end.Value;
+            var startProg = startP.CumulativeLength / totalLength;
+            var endProg = endP.CumulativeLength / totalLength;
+            double startT = startP.T;
+            double endT = endP.T;
+            double dist = endP.CumulativeLength - startP.CumulativeLength;
+            double distT = endT - startT;
 
             // Make sure there are enough points between start and end for the tumour shape and resolution
             var tumourTemplate = tumourLayer.TumourTemplate;
@@ -209,14 +223,15 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 var p = pn.Value;
 
                 double t = Precision.AlmostEquals(dist, 0) ?
-                    (p.T - startT) / (endT - startT) :
+                    (p.T - startT) / distT :
                     (p.CumulativeLength - startDist) / dist;
 
                 // Scale to template T
                 t = t * (endTemplateT - startTemplateT) + startTemplateT;
 
                 // Get the offset, original pos, and direction
-                var offset = tumourTemplate.GetOffset(t) * Scalar;
+                var scale = tumourLayer.TumourScale.GetValue(t * (endProg - startProg) + startProg) * Scalar;
+                var offset = tumourTemplate.GetOffset(t) * scale;
                 var np = WrappingMode switch {
                     WrappingMode.Wrap => p,
                     WrappingMode.RoundWrap => new PathPoint(p.Pos, Vector2.Lerp(startP.Dir, endP.Dir, t), p.CumulativeLength),
@@ -233,12 +248,13 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             }
 
             // Maybe add a hint
-            if (WrappingMode == WrappingMode.Replace) {
+            if (WrappingMode == WrappingMode.Simple) {
                 var hintAnchors = tumourTemplate.GetReconstructionHint();
                 var hintType = tumourTemplate.GetReconstructionHintPathType();
-                foreach (BezierSubdivision hintSegment in SliderPathUtil.ChopAnchors(hintAnchors)) {
-                    pathWithHints.AddReconstructionHint(new ReconstructionHint(start, end, layer, hintAnchors, hintType));
-                }
+                var scale = tumourLayer.TumourScale.GetValue(startProg) * Scalar;
+                var scaledAnchors = Precision.AlmostEquals(scale, 1) ? hintAnchors :
+                    hintAnchors.Select(o => new Vector2(o.X, o.Y * scale)).ToList();
+                pathWithHints.AddReconstructionHint(new ReconstructionHint(start, end, layer, scaledAnchors, hintType));
             }
         }
     }

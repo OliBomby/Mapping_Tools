@@ -23,6 +23,10 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             Red = red;
         }
 
+        public PathPoint SetT(double t) {
+            return new PathPoint(Pos, Dir, CumulativeLength, t, Red);
+        }
+
         /// <summary>
         /// Adds the specified instances.
         /// </summary>
