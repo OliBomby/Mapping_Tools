@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourTemplates {
@@ -21,7 +22,11 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourTemplates {
         }
 
         public List<Vector2> GetReconstructionHint() {
-            return new() { Vector2.Zero, new Vector2(0.5, -0.5), Vector2.UnitX };
+            return new List<Vector2> { Vector2.Zero, new(0.5, -0.5), Vector2.UnitX };
+        }
+
+        public PathType GetReconstructionHintPathType() {
+            return PathType.Linear;
         }
     }
 }

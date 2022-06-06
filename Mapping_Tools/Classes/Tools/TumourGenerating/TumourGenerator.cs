@@ -106,7 +106,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                         _ => false
                     };
 
-                    PlaceTumour(pathWithHints.Path, tumourLayer, layer, start, end, startT, endT, side);
+                    PlaceTumour(pathWithHints, tumourLayer, layer, start, end, startT, endT, side);
 
                     current = start;
                     nextDist += tumourLayer.TumourCount > 0 ? countDist : tumourLayer.TumourDistance.GetValue(nextDist / totalLength);
