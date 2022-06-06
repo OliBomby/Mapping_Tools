@@ -90,12 +90,12 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 while (nextDist < tumourLayer.TumourEnd && current is not null) {
                     var length = tumourLayer.TumourLength.GetValue(nextDist / totalLength);
                     var endDist = nextDist + length;
-                    var start = PathHelper.FindFirstOccuranceExact(current, nextDist);
-                    var end = PathHelper.FindLastOccuranceExact(start, endDist);
+                    var start = PathHelper.FindFirstOccurrenceExact(current, nextDist);
+                    var end = PathHelper.FindLastOccurrenceExact(start, endDist);
 
                     // Calculate the T start/end for the tumour template
                     var startT = (start.Value.CumulativeLength - nextDist) / length;
-                    var endT = (end.Value.CumulativeLength - nextDist) / length;
+                    var endT = (end.Value.CumulativeLength - endDist) / length;
 
                     // Get which side the tumour should be on
                     side = tumourLayer.TumourSidedness switch {
@@ -109,7 +109,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     PlaceTumour(pathWithHints.Path, tumourLayer, layer, start, end, startT, endT, side);
 
                     current = start;
-                    nextDist = tumourLayer.TumourCount > 0 ? countDist : tumourLayer.TumourDistance.GetValue(nextDist / totalLength);
+                    nextDist += tumourLayer.TumourCount > 0 ? countDist : tumourLayer.TumourDistance.GetValue(nextDist / totalLength);
                 }
             }
 
@@ -178,8 +178,8 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
                 if (double.IsNaN(startP.T)) {
                     // Initialize T properly
-                    var firstOccurance = PathHelper.FindFirstOccurance(start, start.Value.CumulativeLength);
-                    var lastOccurance = PathHelper.FindLastOccurance(end, start.Value.CumulativeLength);
+                    var firstOccurance = PathHelper.FindFirstOccurrence(start, start.Value.CumulativeLength);
+                    var lastOccurance = PathHelper.FindLastOccurrence(end, start.Value.CumulativeLength);
                     // TODO
 
                 }

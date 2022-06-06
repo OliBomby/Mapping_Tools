@@ -234,66 +234,6 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         }
 
         /// <summary>
-        /// Gets the node of <see cref="path"/> with a cumulative length closest to <see cref="cumulativeLength"/>.
-        /// </summary>
-        /// <param name="path">The path to find the node in</param>
-        /// <param name="cumulativeLength">The wanted cumulative length</param>
-        /// <returns></returns>
-        public static LinkedListNode<PathPoint> GetCumulativeLength(this LinkedList<PathPoint> path, double cumulativeLength) {
-            var node = path.First;
-            var minDist = double.MaxValue;
-            var minNode = path.First;
-
-            while (node != null) {
-                var dist = Math.Abs(node.Value.CumulativeLength - cumulativeLength);
-                if (dist < minDist) {
-                    minDist = dist;
-                    minNode = node;
-                }
-
-                node = node.Next;
-            }
-
-            return minNode;
-        }
-
-        /// <summary>
-        /// Gets the node of <see cref="path"/> with a cumulative length equal to <see cref="cumulativeLength"/>.
-        /// This will interpolate a new point if no accurate match exists already.
-        /// </summary>
-        /// <param name="path">The path to find the node in</param>
-        /// <param name="cumulativeLength">The wanted cumulative length</param>
-        /// <param name="epsilon">The maximum allowed difference in cumulative length</param>
-        /// <returns></returns>
-        public static LinkedListNode<PathPoint> GetExactCumulativeLength(this LinkedList<PathPoint> path, 
-            double cumulativeLength, double epsilon = Precision.DOUBLE_EPSILON) {
-            var node = GetCumulativeLength(path, cumulativeLength);
-
-            if (Math.Abs(node.Value.CumulativeLength - cumulativeLength) < epsilon) {
-                return node;
-            }
-
-            if (cumulativeLength - node.Value.CumulativeLength > 0) {
-                if (node.Next == null || Precision.AlmostEquals(node.Next.Value.CumulativeLength, node.Value.CumulativeLength)) {
-                    return node;
-                }
-
-                var t = (cumulativeLength - node.Value.CumulativeLength) / (node.Next.Value.CumulativeLength - node.Value.CumulativeLength);
-                Interpolate(node, t);
-                return node.Next;
-            } else {
-                if (node.Previous == null || Precision.AlmostEquals(node.Value.CumulativeLength, node.Previous.Value.CumulativeLength)) {
-                    return node;
-                }
-
-                var t = (cumulativeLength - node.Previous.Value.CumulativeLength) / (node.Value.CumulativeLength - node.Previous.Value.CumulativeLength);
-                Interpolate(node.Previous, t);
-                return node.Previous;
-            }
-
-        }
-
-        /// <summary>
         /// Counts the number of nodes between the start and end node.
         /// </summary>
         /// <param name="start">The start node.</param>
@@ -314,20 +254,172 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                 : count;
         }
 
-        public static LinkedListNode<PathPoint> FindFirstOccurrence(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN) {
-            throw new NotImplementedException();
+        private static bool InsideViableRange(PathPoint p, double cumLength, double t, double epsilon) {
+            return double.IsNaN(t)
+                ? Precision.AlmostEquals(p.CumulativeLength, cumLength, epsilon)
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
+                : p.CumulativeLength == cumLength && Precision.AlmostEquals(p.T, t);
         }
 
-        public static LinkedListNode<PathPoint> FindLastOccurrence(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN) {
-            throw new NotImplementedException();
+        private static bool BeforeWantedPoint(PathPoint p, double cumLength, double t) {
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
+            return p.CumulativeLength < cumLength || (p.CumulativeLength == cumLength && !double.IsNaN(t) && p.T < t);
         }
 
-        public static LinkedListNode<PathPoint> FindFirstOccurrenceExact(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN) {
-            throw new NotImplementedException();
+        /// <summary>
+        /// Finds the first point from start which matches the distance and T value within the given epsilon.
+        /// If no such point exists, the point before the wanted distance is returned.
+        /// </summary>
+        /// <param name="start">The start node for the search.</param>
+        /// <param name="cumLength">The wanted distance.</param>
+        /// <param name="t">The wanted T value. If NaN then it is ignored.</param>
+        /// <param name="epsilon">The maximum difference in distance or T.</param>
+        /// <returns>The first matching occurrence from start.</returns>
+        // Finds the first point from start which matches the distance and T value within the given epsilon.
+        // If no such point exists, the point before the wanted distance is returned.
+        public static LinkedListNode<PathPoint> FindFirstOccurrence(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN, double epsilon = Precision.DOUBLE_EPSILON) {
+            var p = start;
+            var prev = start;
+
+            if (BeforeWantedPoint(start.Value, cumLength - epsilon, t - epsilon)) {
+                // Search forwards
+                // Either the current point is inside viable range and the previous point is outside viable range or
+                // the current point is before the viable range and the next point is after the viable range.
+                while (p is not null) {
+                    if (InsideViableRange(p.Value, cumLength, t, epsilon) && !InsideViableRange(prev.Value, cumLength, t, epsilon)) {
+                        return p;
+                    }
+                    if (!InsideViableRange(prev.Value, cumLength, t, epsilon) && !BeforeWantedPoint(p.Value, cumLength, t) && BeforeWantedPoint(prev.Value, cumLength, t)) {
+                        return prev;
+                    }
+
+                    prev = p;
+                    p = p.Next;
+                }
+            } else {
+                // Search backwards
+                // Either the next point is outside viable range and the current point is inside viable range or
+                // the current point is before the viable range and the previous point is after the viable range.
+                while (p is not null) {
+                    if (!InsideViableRange(p.Value, cumLength, t, epsilon) && InsideViableRange(prev.Value, cumLength, t, epsilon)) {
+                        return prev;
+                    }
+                    if (!InsideViableRange(p.Value, cumLength, t, epsilon) && BeforeWantedPoint(p.Value, cumLength, t) && !BeforeWantedPoint(prev.Value, cumLength, t)) {
+                        return p;
+                    }
+
+                    prev = p;
+                    p = p.Next;
+                }
+            }
+
+            return prev;
         }
 
-        public static LinkedListNode<PathPoint> FindLastOccurrenceExact(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN) {
-            throw new NotImplementedException();
+        /// <summary>
+        /// Finds the last point from start which matches the distance and T value within the given epsilon.
+        /// If no such point exists, the point after the wanted distance is returned.
+        /// </summary>
+        /// <param name="start">The start node for the search.</param>
+        /// <param name="cumLength">The wanted distance.</param>
+        /// <param name="t">The wanted T value. If NaN then it is ignored.</param>
+        /// <param name="epsilon">The maximum difference in distance or T.</param>
+        /// <returns>The last matching occurrence from start.</returns>
+        public static LinkedListNode<PathPoint> FindLastOccurrence(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN, double epsilon = Precision.DOUBLE_EPSILON) {
+            var p = start;
+            var prev = start;
+
+            if (BeforeWantedPoint(start.Value, cumLength + epsilon, t + epsilon)) {
+                // Search forwards
+                // Either the current point is inside viable range and the next point is outside viable range or
+                // the current point is after the viable range and the previous point is before the viable range.
+                while (p is not null) {
+                    if (InsideViableRange(prev.Value, cumLength, t, epsilon) && !InsideViableRange(p.Value, cumLength, t, epsilon)) {
+                        return prev;
+                    }
+                    if (!InsideViableRange(p.Value, cumLength, t, epsilon) && !BeforeWantedPoint(p.Value, cumLength, t) && BeforeWantedPoint(prev.Value, cumLength, t)) {
+                        return p;
+                    }
+
+                    prev = p;
+                    p = p.Next;
+                }
+            } else {
+                // Search backwards
+                // Either the previous point is outside viable range and the current point is inside viable range or
+                // the current point is after the viable range and the next point is before the viable range.
+                while (p is not null) {
+                    if (!InsideViableRange(prev.Value, cumLength, t, epsilon) && InsideViableRange(p.Value, cumLength, t, epsilon)) {
+                        return p;
+                    }
+                    if (!InsideViableRange(prev.Value, cumLength, t, epsilon) && BeforeWantedPoint(p.Value, cumLength, t) && !BeforeWantedPoint(prev.Value, cumLength, t)) {
+                        return prev;
+                    }
+
+                    prev = p;
+                    p = p.Next;
+                }
+            }
+
+            return prev;
+        }
+
+        /// <summary>
+        /// Finds the first point from start which matches the distance and T value within the given epsilon.
+        /// If no such point exists, a new point is inserted into the list which matches the distance and T exactly.
+        /// </summary>
+        /// <param name="start">The start node for the search.</param>
+        /// <param name="cumLength">The wanted distance.</param>
+        /// <param name="t">The wanted T value. If NaN then it is ignored.</param>
+        /// <param name="epsilon">The maximum difference in distance or T.</param>
+        /// <returns>The first matching occurrence from start.</returns>
+        public static LinkedListNode<PathPoint> FindFirstOccurrenceExact(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN, double epsilon = Precision.DOUBLE_EPSILON) {
+            var node = FindFirstOccurrence(start, cumLength, t, epsilon);
+
+            if (InsideViableRange(node.Value, cumLength, t, epsilon) || !BeforeWantedPoint(node.Value, cumLength, t) || node.Next is null) {
+                return node;
+            }
+
+            // The point we want is between node and node.Next.
+            double dt;
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
+            if (double.IsNaN(t) || node.Value.CumulativeLength != node.Next.Value.CumulativeLength) {
+                dt = (cumLength - node.Value.CumulativeLength) / (node.Next.Value.CumulativeLength - node.Value.CumulativeLength);
+            } else {
+                dt = (cumLength - node.Value.T) / (node.Next.Value.T - node.Value.T);
+            }
+
+            Interpolate(node, dt);
+            return node.Next;
+        }
+
+        /// <summary>
+        /// Finds the last point from start which matches the distance and T value within the given epsilon.
+        /// If no such point exists, a new point is inserted into the list which matches the distance and T exactly.
+        /// </summary>
+        /// <param name="start">The start node for the search.</param>
+        /// <param name="cumLength">The wanted distance.</param>
+        /// <param name="t">The wanted T value. If NaN then it is ignored.</param>
+        /// <param name="epsilon">The maximum difference in distance or T.</param>
+        /// <returns>The last matching occurrence from start.</returns>
+        public static LinkedListNode<PathPoint> FindLastOccurrenceExact(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN, double epsilon = Precision.DOUBLE_EPSILON) {
+            var node = FindLastOccurrence(start, cumLength, t, epsilon);
+
+            if (InsideViableRange(node.Value, cumLength, t, epsilon) || BeforeWantedPoint(node.Value, cumLength, t) || node.Previous is null) {
+                return node;
+            }
+
+            // The point we want is between node and node.Previous.
+            double dt;
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
+            if (double.IsNaN(t) || node.Value.CumulativeLength != node.Previous.Value.CumulativeLength) {
+                dt = (cumLength - node.Previous.Value.CumulativeLength) / (node.Value.CumulativeLength - node.Previous.Value.CumulativeLength);
+            } else {
+                dt = (cumLength - node.Previous.Value.T) / (node.Value.T - node.Previous.Value.T);
+            }
+
+            Interpolate(node.Previous, dt);
+            return node.Previous;
         }
     }
 }

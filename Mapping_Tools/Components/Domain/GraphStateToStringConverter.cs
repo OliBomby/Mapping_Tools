@@ -54,8 +54,8 @@ namespace Mapping_Tools.Components.Domain {
                     MaxX = 1,
                     MaxY = Math.Max(0, doubleValue * 2),
                     Anchors = new List<AnchorState>() {
-                        new AnchorState { Pos = new Vector2(0, doubleValue) },
-                        new AnchorState { Pos = new Vector2(1, doubleValue) }
+                        new() { Pos = new Vector2(0, doubleValue), Interpolator = new LinearInterpolator() },
+                        new() { Pos = new Vector2(1, doubleValue), Interpolator = new LinearInterpolator() }
                     }
                 };
             }
