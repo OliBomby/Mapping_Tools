@@ -313,5 +313,21 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                     nameof(end))
                 : count;
         }
+
+        public static LinkedListNode<PathPoint> FindFirstOccurrence(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN) {
+            throw new NotImplementedException();
+        }
+
+        public static LinkedListNode<PathPoint> FindLastOccurrence(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN) {
+            throw new NotImplementedException();
+        }
+
+        public static LinkedListNode<PathPoint> FindFirstOccurrenceExact(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN) {
+            throw new NotImplementedException();
+        }
+
+        public static LinkedListNode<PathPoint> FindLastOccurrenceExact(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN) {
+            throw new NotImplementedException();
+        }
     }
 }
