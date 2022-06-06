@@ -131,7 +131,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
         /// Places a tumour onto the path between the specified start and end points.
         /// May increase the size of path.
         /// </summary>
-        /// <param name="path">The path to add a tumour to</param>
+        /// <param name="pathWithHints">The path to add a tumour to</param>
         /// <param name="layer">The layer index for hints</param>
         /// <param name="start">The start point</param>
         /// <param name="end">The end point</param>
@@ -139,19 +139,22 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
         /// <param name="startTemplateT">T value for where to start with the tumour template</param>
         /// <param name="endTemplateT">T value for where to end with the tumour template</param>
         /// <param name="otherSide">Whether to place the tumour on the other side of the slider</param>
-        private void PlaceTumour([NotNull]LinkedList<PathPoint> path, [NotNull]ITumourLayer tumourLayer, int layer,
+        private void PlaceTumour([NotNull]PathWithHints pathWithHints, [NotNull]ITumourLayer tumourLayer, int layer,
             [NotNull]LinkedListNode<PathPoint> start, [NotNull]LinkedListNode<PathPoint> end,
             double startTemplateT, double endTemplateT, bool otherSide) {
+            var path = pathWithHints.Path;
             if (start.List != path) {
                 throw new ArgumentException(@"Start node has to be part of the provided path.", nameof(start));
             }
 
             if (end.List != path) {
-                throw new ArgumentException(@"Start node has to be part of the provided path.", nameof(end));
+                throw new ArgumentException(@"End node has to be part of the provided path.", nameof(end));
             }
 
             var startP = start.Value;
             var endP = end.Value;
+            var startProg = startP.CumulativeLength / path.Last!.Value.CumulativeLength;
+            var endProg = endP.CumulativeLength / path.Last!.Value.CumulativeLength;
             double startT = startP.T;
             double endT = endP.T;
             double dist = endP.CumulativeLength - startP.CumulativeLength;
@@ -209,6 +212,9 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     (p.T - startT) / (endT - startT) :
                     (p.CumulativeLength - startDist) / dist;
 
+                // Scale to template T
+                t = t * (endTemplateT - startTemplateT) + startTemplateT;
+
                 // Get the offset, original pos, and direction
                 var offset = tumourTemplate.GetOffset(t) * Scalar;
                 var np = WrappingMode switch {
@@ -216,14 +222,23 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     WrappingMode.RoundWrap => new PathPoint(p.Pos, Vector2.Lerp(startP.Dir, endP.Dir, t), p.CumulativeLength),
                     WrappingMode.Replace => new PathPoint(Vector2.Lerp(startP.Pos, endP.Pos, t), endP.Pos - startP.Pos, p.CumulativeLength),
                     WrappingMode.RoundReplace => new PathPoint(Vector2.Lerp(startP.Pos, endP.Pos, t), Vector2.Lerp(startP.Dir, endP.Dir, t), p.CumulativeLength),
-                    _ => p
+                    _ => new PathPoint(Vector2.Lerp(startP.Pos, endP.Pos, t), endP.Pos - startP.Pos, p.CumulativeLength)
                 };
 
                 // Add the offset to the point
                 var newPos = np.Pos + Vector2.Rotate(offset, np.Dir.Theta);
 
                 // Modify the path
-                pn.Value = new PathPoint(newPos, p.Dir, p.CumulativeLength);
+                pn.Value = new PathPoint(newPos, p.Dir, p.CumulativeLength, p.T, p.Red);
+            }
+
+            // Maybe add a hint
+            if (WrappingMode == WrappingMode.Replace) {
+                var hintAnchors = tumourTemplate.GetReconstructionHint();
+                var hintType = tumourTemplate.GetReconstructionHintPathType();
+                foreach (BezierSubdivision hintSegment in SliderPathUtil.ChopAnchors(hintAnchors)) {
+                    pathWithHints.AddReconstructionHint(new ReconstructionHint(start, end, layer, hintAnchors, hintType));
+                }
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
@@ -37,5 +38,10 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
         /// Gets the list of anchors which reconstructs the shape of this tumour.
         /// </summary>
         List<Vector2> GetReconstructionHint();
+
+        /// <summary>
+        /// Gets the path type for the anchors which reconstructs the shape of this tumour.
+        /// </summary>
+        PathType GetReconstructionHintPathType();
     }
 }
