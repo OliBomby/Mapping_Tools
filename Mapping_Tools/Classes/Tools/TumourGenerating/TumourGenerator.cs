@@ -87,7 +87,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 var nextDist = tumourStart * totalLength;
                 var side = false;
 
-                while (nextDist < tumourEnd * totalLength && current is not null) {
+                while (nextDist <= tumourEnd * totalLength + Precision.DOUBLE_EPSILON && current is not null) {
                     var length = tumourLayer.TumourLength.GetValue(nextDist / totalLength);
                     var endDist = nextDist + length;
                     var start = PathHelper.FindFirstOccurrenceExact(current, nextDist);
@@ -109,7 +109,9 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     PlaceTumour(pathWithHints, tumourLayer, layer, start, end, startT, endT, side);
 
                     current = start;
-                    nextDist += tumourLayer.TumourCount > 0 ? countDist : tumourLayer.TumourDistance.GetValue(nextDist / totalLength);
+                    var dist = Math.Max(1, tumourLayer.TumourCount > 0 ? countDist
+                            : tumourLayer.TumourDistance.GetValue(nextDist / totalLength));
+                    nextDist += dist;
                 }
             }
 
