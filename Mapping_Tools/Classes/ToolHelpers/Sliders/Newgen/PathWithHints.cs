@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
@@ -23,16 +24,16 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
 
             // Find sorted place in the list
             // The hints are not overlapping so end times are also sorted
-            var startIndex = BinarySearchUtil.BinarySearch(reconstructionHints, hint.Start.Value.CumulativeLength,
-                o => o.End.Value.CumulativeLength, BinarySearchUtil.EqualitySelection.Rightmost);
+            var startIndex = BinarySearchUtil.BinarySearch(reconstructionHints, hint.Start.Value,
+                o => o.End.Value, BinarySearchUtil.EqualitySelection.Rightmost);
             if (startIndex < 0) {
                 startIndex = ~startIndex;
             } else {
                 startIndex++;
             }
 
-            var endIndex = BinarySearchUtil.BinarySearch(reconstructionHints, hint.End.Value.CumulativeLength,
-                o => o.Start.Value.CumulativeLength, BinarySearchUtil.EqualitySelection.Leftmost);
+            var endIndex = BinarySearchUtil.BinarySearch(reconstructionHints, hint.End.Value,
+                o => o.Start.Value, BinarySearchUtil.EqualitySelection.Leftmost);
             if (endIndex < 0) {
                 endIndex = ~endIndex;
             }
@@ -48,11 +49,12 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                 reconstructionHints.RemoveRange(startIndex, endIndex - startIndex);
 
                 // Add the merged overlaps
-                reconstructionHints.InsertRange(startIndex, MergeOverlaps(hint, overlaps));
+                reconstructionHints.InsertRange(startIndex,
+                    MergeOverlaps(hint, overlaps).Where(o => o.HasValue).Select(o => o.Value));
             }
         }
 
-        private static IEnumerable<ReconstructionHint> MergeOverlaps(ReconstructionHint hint, List<ReconstructionHint> overlaps) {
+        private static IEnumerable<ReconstructionHint?> MergeOverlaps(ReconstructionHint hint, List<ReconstructionHint> overlaps) {
             LinkedListNode<PathPoint> hintYieldedRight = hint.Start;
             foreach (ReconstructionHint overlap in overlaps) {
                 // Determine the positions of overlap
@@ -138,7 +140,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             }
 
             // Yield all remaining hint, if not yielded already
-            if (hintYieldedRight.Value.CumulativeLength < hint.End.Value.CumulativeLength) {
+            if (hintYieldedRight.Value < hint.End.Value) {
                 yield return CutHint(hint, hintYieldedRight, hint.End);
             }
         }
@@ -147,12 +149,24 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             return new ReconstructionHint(start, end, layer, null);
         }
 
-        private static ReconstructionHint CutHint(ReconstructionHint hint, LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end) {
-            var factor = (hint.EndP - hint.StartP) / (hint.End.Value.CumulativeLength - hint.Start.Value.CumulativeLength);
-            var startP = (start.Value.CumulativeLength - hint.Start.Value.CumulativeLength) * factor + hint.StartP;
-            var endP = (end.Value.CumulativeLength - hint.Start.Value.CumulativeLength) * factor + hint.StartP;
-            return new ReconstructionHint(start, end, hint.Layer, hint.Anchors,
-                hint.PathType, startP, endP);
+        private static ReconstructionHint? CutHint(ReconstructionHint hint, LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end) {
+            var dist = hint.End.Value.CumulativeLength - hint.Start.Value.CumulativeLength;
+            double startP;
+            double endP;
+            if (Precision.AlmostEquals(dist, 0)) {
+                // Use T
+                var factor = (hint.EndP - hint.StartP) / (hint.End.Value.T - hint.Start.Value.T);
+                startP = (start.Value.T - hint.Start.Value.T) * factor + hint.StartP;
+                endP = (end.Value.T - hint.Start.Value.T) * factor + hint.StartP;
+
+            } else {
+                // Use distance
+                var factor = (hint.EndP - hint.StartP) / dist;
+                startP = (start.Value.CumulativeLength - hint.Start.Value.CumulativeLength) * factor + hint.StartP;
+                endP = (end.Value.CumulativeLength - hint.Start.Value.CumulativeLength) * factor + hint.StartP;
+            }
+            return Precision.AlmostEquals(startP, endP) ? null
+                : new ReconstructionHint(start, end, hint.Layer, hint.Anchors, hint.PathType, startP, endP);
         }
     }
 }

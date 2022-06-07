@@ -103,9 +103,13 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             } else if (hintDir.LengthSquared < Precision.DOUBLE_EPSILON) {
                 transform = Matrix2.CreateRotation(segmentDir.Theta);
             } else if (segmentDir.LengthSquared < Precision.DOUBLE_EPSILON) {
-                transform = Matrix2.CreateRotation(theta - hintDir.Theta);
+                transform = Matrix2.CreateRotation(hintDir.Theta - theta);
             } else {
-                transform = Matrix2.CreateRotation(hintDir.Theta - segmentDir.Theta) * (segmentDir.Length / hintDir.Length);
+                // Scale along the axis of hintDir
+                transform = Matrix2.CreateRotation(-segmentDir.Theta);
+                transform = Matrix2.Mult(transform, Matrix2.CreateScale(segmentDir.Length / hintDir.Length, 1));
+                transform = Matrix2.Mult(transform, Matrix2.CreateRotation(hintDir.Theta));
+                //transform = Matrix2.CreateRotation(hintDir.Theta - segmentDir.Theta) * (segmentDir.Length / hintDir.Length);
             }
 
             // Transform all the anchors and put them into an array

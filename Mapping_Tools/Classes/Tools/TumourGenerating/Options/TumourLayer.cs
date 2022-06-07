@@ -1,7 +1,11 @@
-﻿using Mapping_Tools.Classes.SystemTools;
+﻿using System;
+using System.Collections.Generic;
+using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools.TumourGenerating.Enums;
 using Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourTemplates;
 using Mapping_Tools.Components.Graph;
+using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
 
 namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
     public class TumourLayer : BindableBase, ITumourLayer {
@@ -75,9 +79,26 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
         public TumourLayer() {
             TumourTemplate = new TriangleTemplate();
             IsActive = true;
+            TumourLength = GetGraphState(15);
+            TumourScale = GetGraphState(30);
+            TumourRotation = GetGraphState(0);
+            TumourDistance = GetGraphState(100);
             TumourCount = -1;
-            TumourStart = -1;
-            TumourEnd = -1;
+            TumourStart = 0;
+            TumourEnd = 1;
+        }
+
+        private static GraphState GetGraphState(double value) {
+            return new GraphState {
+                MinX = 0,
+                MinY = Math.Min(0, value * 2),
+                MaxX = 1,
+                MaxY = Math.Max(0, value * 2),
+                Anchors = new List<AnchorState>() {
+                    new() { Pos = new Vector2(0, value), Interpolator = new SingleCurveInterpolator() },
+                    new() { Pos = new Vector2(1, value), Interpolator = new SingleCurveInterpolator() }
+                }
+            };
         }
 
         /// <summary>

@@ -68,7 +68,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             int layer = 0;
             for (int i = 0; i < TumourLayers.Count; i++) {
                 var tumourLayer = TumourLayers[i];
-                var tumourStart = MathHelper.Clamp(tumourLayer.TumourStart, 0, 1);
+                var tumourStart = MathHelper.Clamp(tumourLayer.TumourStart, -1, 1);
                 var tumourEnd = MathHelper.Clamp(tumourLayer.TumourEnd, 0, 1);
 
                 // Recalculate
@@ -80,7 +80,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
                 // Calculate count multiplier
                 var totalDist = tumourEnd - tumourStart;
-                var countDist = totalDist * totalLength / tumourLayer.TumourCount;
+                var countDist = totalDist * totalLength / (tumourLayer.TumourCount - 1);
 
                 // Find the start of the tumours
                 var current = pathWithHints.Path.First;
@@ -89,26 +89,30 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
                 while (nextDist <= tumourEnd * totalLength + Precision.DOUBLE_EPSILON && current is not null) {
                     var length = tumourLayer.TumourLength.GetValue(nextDist / totalLength);
-                    var endDist = nextDist + length;
-                    var start = PathHelper.FindFirstOccurrenceExact(current, nextDist);
-                    var end = PathHelper.FindLastOccurrenceExact(start, endDist);
+                    var endDist = Math.Min(nextDist + length, tumourEnd * totalLength);
 
-                    // Calculate the T start/end for the tumour template
-                    var startT = (start.Value.CumulativeLength - nextDist) / length;
-                    var endT = (end.Value.CumulativeLength - endDist) / length;
+                    if (endDist >= 0) {
+                        var start = PathHelper.FindFirstOccurrenceExact(current, nextDist);
+                        var end = PathHelper.FindLastOccurrenceExact(start, endDist);
 
-                    // Get which side the tumour should be on
-                    side = tumourLayer.TumourSidedness switch {
-                        TumourSidedness.Left => false,
-                        TumourSidedness.Right => true,
-                        TumourSidedness.Alternating => !side,
-                        TumourSidedness.Random => random.NextDouble() < 0.5,
-                        _ => false
-                    };
+                        // Calculate the T start/end for the tumour template
+                        var startT = (start.Value.CumulativeLength - nextDist) / length;
+                        var endT = (end.Value.CumulativeLength - endDist) / length;
 
-                    PlaceTumour(pathWithHints, tumourLayer, layer, start, end, startT, endT, side);
+                        // Get which side the tumour should be on
+                        side = tumourLayer.TumourSidedness switch {
+                            TumourSidedness.Left => false,
+                            TumourSidedness.Right => true,
+                            TumourSidedness.Alternating => !side,
+                            TumourSidedness.Random => random.NextDouble() < 0.5,
+                            _ => false
+                        };
 
-                    current = start;
+                        PlaceTumour(pathWithHints, tumourLayer, layer, start, end, startT, endT, side);
+
+                        current = start;
+                    }
+
                     var dist = Math.Max(1, tumourLayer.TumourCount > 0 ? countDist
                             : tumourLayer.TumourDistance.GetValue(nextDist / totalLength));
                     nextDist += dist;
