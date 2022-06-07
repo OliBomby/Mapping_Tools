@@ -74,8 +74,9 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             var newLengthEnd = (endP - startP) * fullLength;
 
             if (!Precision.AlmostEquals(startP, 0)) {
-                anchors.Reverse();
-                var sliderPath = new SliderPath(pathType, anchors.ToArray(), newLengthStart);
+                var anchorsReversed = anchors.ToArray();
+                Array.Reverse(anchorsReversed);
+                var sliderPath = new SliderPath(pathType, anchorsReversed, newLengthStart);
                 anchors = SliderPathUtil.MoveAnchorsToLength(sliderPath, fullLength, newLengthStart, out newPathType);
                 pathType = newPathType;
                 fullLength = newLengthStart;
