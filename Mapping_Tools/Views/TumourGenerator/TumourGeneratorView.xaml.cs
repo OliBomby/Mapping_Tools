@@ -17,7 +17,7 @@ using MaterialDesignThemes.Wpf;
 
 namespace Mapping_Tools.Views.TumourGenerator {
     //[HiddenTool]
-    [SmartQuickRunUsage(SmartQuickRunTargets.SingleSelection)]
+    [SmartQuickRunUsage(SmartQuickRunTargets.AnySelection)]
     public partial class TumourGeneratorView : ISavable<TumourGeneratorVm>, IQuickRun {
         public static readonly string ToolName = "Tumour Generator 2";
 
