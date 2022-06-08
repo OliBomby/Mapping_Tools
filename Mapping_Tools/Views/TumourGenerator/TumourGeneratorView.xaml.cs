@@ -193,7 +193,7 @@ namespace Mapping_Tools.Views.TumourGenerator {
         public void SetSaveData(TumourGeneratorVm saveData) {
             if (saveData.TumourLayers.Count == 0) {
                 // Make sure there is always at least one tumour layer
-                saveData.TumourLayers.Add(new TumourLayer());
+                saveData.TumourLayers.Add(TumourLayer.GetDefaultLayer());
             }
             DataContext = saveData;
             ViewModel.RegeneratePreview();

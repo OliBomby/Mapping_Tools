@@ -76,16 +76,19 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
             set => Set(ref _isActive, value);
         }
 
-        public TumourLayer() {
-            TumourTemplate = new TriangleTemplate();
-            IsActive = true;
-            TumourLength = GetGraphState(15);
-            TumourScale = GetGraphState(30);
-            TumourRotation = GetGraphState(0);
-            TumourDistance = GetGraphState(100);
-            TumourCount = -1;
-            TumourStart = 0;
-            TumourEnd = 1;
+        public static TumourLayer GetDefaultLayer() {
+            var l = new TumourLayer {
+                TumourTemplate = new TriangleTemplate(),
+                IsActive = true,
+                TumourCount = -1,
+                TumourStart = 0,
+                TumourEnd = 1,
+                TumourLength = GetGraphState(15),
+                TumourScale = GetGraphState(30),
+                TumourRotation = GetGraphState(0),
+                TumourDistance = GetGraphState(100)
+            };
+            return l;
         }
 
         private static GraphState GetGraphState(double value) {
