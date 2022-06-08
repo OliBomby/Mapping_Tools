@@ -68,7 +68,8 @@ OutputBaseFilename=mapping_tools_installer_x64
 SetupIconFile=.\Mapping_Tools\Data\mt_icon.ico
 Compression=lzma
 SolidCompression=yes
-WizardStyle=modern   
+WizardStyle=modern  
+LicenseFile=LICENCE
 //SourceDir=lib
 
 MinVersion=6.0
