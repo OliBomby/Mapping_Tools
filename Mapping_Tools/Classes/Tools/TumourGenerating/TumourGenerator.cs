@@ -90,6 +90,15 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     var length = tumourLayer.TumourLength.GetValue(nextDist / totalLength);
                     var endDist = Math.Min(nextDist + length, tumourEnd * totalLength);
 
+                    // Get which side the tumour should be on
+                    side = tumourLayer.TumourSidedness switch {
+                        TumourSidedness.Left => false,
+                        TumourSidedness.Right => true,
+                        TumourSidedness.Alternating => !side,
+                        TumourSidedness.Random => random.NextDouble() < 0.5,
+                        _ => false
+                    };
+
                     if (endDist >= 0) {
                         var start = PathHelper.FindFirstOccurrenceExact(current, nextDist, epsilon:0.5);
                         var end = PathHelper.FindLastOccurrenceExact(start, endDist, epsilon:0.5);
@@ -101,15 +110,6 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                             startT = (start.Value.CumulativeLength - nextDist) / length;
                             endT = (end.Value.CumulativeLength - endDist) / length;
                         }
-
-                        // Get which side the tumour should be on
-                        side = tumourLayer.TumourSidedness switch {
-                            TumourSidedness.Left => false,
-                            TumourSidedness.Right => true,
-                            TumourSidedness.Alternating => !side,
-                            TumourSidedness.Random => random.NextDouble() < 0.5,
-                            _ => false
-                        };
 
                         PlaceTumour(pathWithHints, tumourLayer, layer, start, end, startT, endT, side);
 
