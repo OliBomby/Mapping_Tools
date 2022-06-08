@@ -96,7 +96,7 @@
                               SelectedItem="{Binding CurrentLayer.TumourSidedness}"
                               Margin="0 0 0 0"
                               ToolTip="Tumour sidedness. Determines on which side of the slider to place the tumours."/>
-                    <TextBlock Text="Length" FontWeight="Bold" Margin="0 10 0 0"/>
+                    <TextBlock Text="Distance" FontWeight="Bold" Margin="0 10 0 0"/>
                     <components:ValueOrGraphControl GraphState="{Binding CurrentLayer.TumourDistance}"
                                                     ToolTip="The tumour distance determines the distance between the centre of each tumour."/>
                     <TextBox materialDesign:HintAssist.Hint="Count" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
