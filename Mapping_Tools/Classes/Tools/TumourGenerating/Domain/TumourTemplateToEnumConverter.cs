@@ -10,12 +10,17 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Domain
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
             return value switch {
                 TriangleTemplate => TumourTemplate.Triangle,
+                SquareTemplate => TumourTemplate.Square,
                 _ => TumourTemplate.Custom
             };
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
-            throw new NotImplementedException();
+            return value switch {
+                TumourTemplate.Triangle => new TriangleTemplate(),
+                TumourTemplate.Square => new SquareTemplate(),
+                _ => new TriangleTemplate()
+            };
         }
     }
 }
