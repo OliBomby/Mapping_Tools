@@ -91,8 +91,8 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     var endDist = Math.Min(nextDist + length, tumourEnd * totalLength);
 
                     if (endDist >= 0) {
-                        var start = PathHelper.FindFirstOccurrenceExact(current, nextDist, epsilon:1);
-                        var end = PathHelper.FindLastOccurrenceExact(start, endDist, epsilon:1);
+                        var start = PathHelper.FindFirstOccurrenceExact(current, nextDist, epsilon:0.5);
+                        var end = PathHelper.FindLastOccurrenceExact(start, endDist, epsilon:0.5);
 
                         // Calculate the T start/end for the tumour template
                         double startT= 0;
