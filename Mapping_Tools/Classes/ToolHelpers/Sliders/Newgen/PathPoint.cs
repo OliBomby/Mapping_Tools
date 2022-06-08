@@ -4,7 +4,8 @@ using Mapping_Tools.Classes.MathUtil;
 namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
     public struct PathPoint : IComparable<PathPoint> {
         public Vector2 Pos;
-        public Vector2 Dir;
+        public double PreAngle;
+        public double PostAngle;
         public double CumulativeLength;
         /// <summary>
         /// Used to define distance between points which are on the same position. [0,1]
@@ -15,16 +16,20 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         /// </summary>
         public bool Red;
 
-        public PathPoint(Vector2 pos, Vector2 dir, double cumulativeLength, double t = double.NaN, bool red = false) {
+        public PathPoint(Vector2 pos, double preAngle, double postAngle, double cumulativeLength, double t = double.NaN, bool red = false) {
             Pos = pos;
-            Dir = dir;
+            PreAngle = preAngle;
+            PostAngle = postAngle;
             CumulativeLength = cumulativeLength;
             T = t;
             Red = red;
         }
 
+        public double AvgAngle => double.IsNaN(PreAngle) ? PostAngle :
+            double.IsNaN(PostAngle) ? PreAngle : (PreAngle + PostAngle) / 2;
+
         public PathPoint SetT(double t) {
-            return new PathPoint(Pos, Dir, CumulativeLength, t, Red);
+            return new PathPoint(Pos, PreAngle, PostAngle, CumulativeLength, t, Red);
         }
 
         /// <summary>
@@ -35,8 +40,8 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         /// <returns>Result of addition.</returns>
         public static PathPoint operator +(PathPoint left, PathPoint right) {
             left.Pos += right.Pos;
-            left.Dir += right.Dir;
-            left.Dir.Normalize();
+            left.PreAngle += right.PreAngle;
+            left.PostAngle += right.PostAngle;
             left.CumulativeLength += right.CumulativeLength;
             left.Red |= right.Red;
             return left;
@@ -50,8 +55,8 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         /// <returns>Result of subtraction.</returns>
         public static PathPoint operator -(PathPoint left, PathPoint right) {
             left.Pos -= right.Pos;
-            left.Dir -= right.Dir;
-            left.Dir.Normalize();
+            left.PreAngle -= right.PreAngle;
+            left.PostAngle -= right.PostAngle;
             left.CumulativeLength -= right.CumulativeLength;
             left.Red &= right.Red;
             return left;
@@ -64,7 +69,8 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         /// <returns>Result of negation.</returns>
         public static PathPoint operator -(PathPoint vec) {
             vec.Pos = -vec.Pos;
-            vec.Dir = -vec.Dir;
+            vec.PreAngle += Math.PI;
+            vec.PostAngle += Math.PI;
             return vec;
         }
 
@@ -76,8 +82,6 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         /// <returns>Result of multiplication.</returns>
         public static PathPoint operator *(PathPoint vec, double scale) {
             vec.Pos *= scale;
-            vec.Dir *= scale;
-            vec.Dir.Normalize();
             vec.CumulativeLength *= scale;
             return vec;
         }
@@ -90,8 +94,6 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         /// <returns>Result of multiplication.</returns>
         public static PathPoint operator *(double scale, PathPoint vec) {
             vec.Pos *= scale;
-            vec.Dir *= scale;
-            vec.Dir.Normalize();
             vec.CumulativeLength *= scale;
             return vec;
         }
@@ -104,8 +106,6 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         /// <returns>Result of the division.</returns>
         public static PathPoint operator /(PathPoint vec, double scale) {
             vec.Pos /= scale;
-            vec.Dir /= scale;
-            vec.Dir.Normalize();
             vec.CumulativeLength /= scale;
             return vec;
         }
@@ -119,8 +119,10 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         /// <returns>a when blend=0, b when blend=1, and a linear combination otherwise</returns>
         public static PathPoint Lerp(PathPoint a, PathPoint b, double blend) {
             a.Pos = blend * (b.Pos - a.Pos) + a.Pos;
-            a.Dir = blend * (b.Dir - a.Dir) + a.Dir;
-            a.Dir.Normalize();
+            var angle1 = a.Red ? a.PostAngle : a.AvgAngle;
+            var angle2 = b.Red ? b.PreAngle : b.AvgAngle;
+            a.PreAngle = blend * (angle2 - angle1) + angle1;
+            a.PostAngle = a.PreAngle;
             a.CumulativeLength = blend * (b.CumulativeLength - a.CumulativeLength) + a.CumulativeLength;
             a.T = blend * (b.T - a.T) + a.T;
             a.Red = blend < 0.5 ? a.Red : b.Red;
@@ -128,7 +130,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         }
 
         public override string ToString() {
-            return $"{Pos} {Dir} {CumulativeLength} {T} {Red}";
+            return $"{Pos} ({PreAngle}, {PostAngle}) {CumulativeLength} {T} {Red}";
         }
 
         public int CompareTo(PathPoint other) {

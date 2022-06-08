@@ -66,8 +66,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
             // Add tumours
             int layer = 0;
-            for (int i = 0; i < TumourLayers.Count; i++) {
-                var tumourLayer = TumourLayers[i];
+            foreach (var tumourLayer in TumourLayers) {
                 var tumourStart = MathHelper.Clamp(tumourLayer.TumourStart, -1, 1);
                 var tumourEnd = MathHelper.Clamp(tumourLayer.TumourEnd, 0, 1);
 
@@ -92,12 +91,16 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     var endDist = Math.Min(nextDist + length, tumourEnd * totalLength);
 
                     if (endDist >= 0) {
-                        var start = PathHelper.FindFirstOccurrenceExact(current, nextDist);
-                        var end = PathHelper.FindLastOccurrenceExact(start, endDist);
+                        var start = PathHelper.FindFirstOccurrenceExact(current, nextDist, epsilon:1);
+                        var end = PathHelper.FindLastOccurrenceExact(start, endDist, epsilon:1);
 
                         // Calculate the T start/end for the tumour template
-                        var startT = (start.Value.CumulativeLength - nextDist) / length;
-                        var endT = (end.Value.CumulativeLength - endDist) / length;
+                        double startT= 0;
+                        double endT = 1;
+                        if (Precision.DefinitelyBigger(length, 0)) {
+                            startT = (start.Value.CumulativeLength - nextDist) / length;
+                            endT = (end.Value.CumulativeLength - endDist) / length;
+                        }
 
                         // Get which side the tumour should be on
                         side = tumourLayer.TumourSidedness switch {
@@ -114,7 +117,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     }
 
                     var dist = Math.Max(1, tumourLayer.TumourCount > 0 ? countDist
-                            : tumourLayer.TumourDistance.GetValue(nextDist / totalLength));
+                        : tumourLayer.TumourDistance.GetValue(nextDist / totalLength));
                     nextDist += dist;
                 }
             }
@@ -211,6 +214,9 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             double endT = endP.T;
             double dist = endP.CumulativeLength - startP.CumulativeLength;
             double distT = endT - startT;
+            double betweenAngle = (endP.Pos - startP.Pos).LengthSquared > Precision.DOUBLE_EPSILON
+                ? (endP.Pos - startP.Pos).Theta
+                : (startP.AvgAngle + endP.AvgAngle) / 2;
 
             // Make sure there are enough points between start and end for the tumour shape and resolution
             var tumourTemplate = tumourLayer.TumourTemplate;
@@ -236,21 +242,31 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 t = t * (endTemplateT - startTemplateT) + startTemplateT;
 
                 // Get the offset, original pos, and direction
-                var scale = tumourLayer.TumourScale.GetValue(t * (endProg - startProg) + startProg) * Scalar;
-                var offset = tumourTemplate.GetOffset(t) * scale;
-                var np = WrappingMode switch {
-                    WrappingMode.Wrap => p,
-                    WrappingMode.RoundWrap => new PathPoint(p.Pos, Vector2.Lerp(startP.Dir, endP.Dir, t), p.CumulativeLength),
-                    WrappingMode.Replace => new PathPoint(Vector2.Lerp(startP.Pos, endP.Pos, t), endP.Pos - startP.Pos, p.CumulativeLength),
-                    WrappingMode.RoundReplace => new PathPoint(Vector2.Lerp(startP.Pos, endP.Pos, t), Vector2.Lerp(startP.Dir, endP.Dir, t), p.CumulativeLength),
-                    _ => new PathPoint(Vector2.Lerp(startP.Pos, endP.Pos, t), endP.Pos - startP.Pos, p.CumulativeLength)
+                var np = PathPoint.Lerp(startP, endP, t);
+                var pos = WrappingMode switch {
+                    WrappingMode.Simple => np.Pos,
+                    WrappingMode.Replace => np.Pos,
+                    WrappingMode.RoundReplace => np.Pos,
+                    _ => p.Pos
                 };
+                var angle = WrappingMode switch {
+                    WrappingMode.Simple => betweenAngle,
+                    WrappingMode.Replace => betweenAngle,
+                    WrappingMode.RoundReplace => np.AvgAngle,
+                    WrappingMode.RoundWrap => np.AvgAngle,
+                    WrappingMode.Wrap => p.AvgAngle,
+                    _ => betweenAngle,
+                };
+                // Rotate to a side
+                angle = otherSide ? angle - Math.PI / 2 : angle + Math.PI / 2;
 
                 // Add the offset to the point
-                var newPos = np.Pos + Vector2.Rotate(offset, np.Dir.Theta);
+                var scale = tumourLayer.TumourScale.GetValue(t * (endProg - startProg) + startProg) * Scalar;
+                var offset = tumourTemplate.GetOffset(t) * scale;
+                var newPos = pos + Vector2.Rotate(offset, angle);
 
                 // Modify the path
-                pn.Value = new PathPoint(newPos, p.Dir, p.CumulativeLength, p.T, p.Red);
+                pn.Value = new PathPoint(newPos, p.PreAngle, p.PostAngle, p.CumulativeLength, p.T, p.Red);
             }
 
             // Maybe add a hint
@@ -258,6 +274,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 var hintAnchors = tumourTemplate.GetReconstructionHint();
                 var hintType = tumourTemplate.GetReconstructionHintPathType();
                 var scale = tumourLayer.TumourScale.GetValue(startProg) * Scalar;
+                if (otherSide) scale = -scale;
                 var scaledAnchors = Precision.AlmostEquals(scale, 1) ? hintAnchors :
                     hintAnchors.Select(o => new Vector2(o.X, o.Y * scale)).ToList();
                 pathWithHints.AddReconstructionHint(new ReconstructionHint(start, end, layer, scaledAnchors, hintType));

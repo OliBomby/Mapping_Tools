@@ -51,7 +51,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                 }
                 cumulativeLength += dist;
 
-                path.AddLast(new PathPoint(calculatedPath[i], Vector2.UnitX, cumulativeLength, red: isRedAnchor));
+                path.AddLast(new PathPoint(calculatedPath[i], 0, 0, cumulativeLength, red: isRedAnchor));
 
                 // Make sure the start node is initialized
                 segmentStartNode ??= path.Last;
@@ -92,6 +92,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         public static void Recalculate(LinkedList<PathPoint> path) {
             var current = path.First;
             var cumulativeLength = 0d;
+            var lastAngle = double.NaN;
             while (current is not null) {
                 var point = current.Value;
                 var pos = point.Pos;
@@ -102,23 +103,26 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                 if (current.Previous is not null) {
                     var prevPos = current.Previous.Value.Pos;
                     dist = Vector2.Distance(prevPos, pos);
-                    v1 = (pos - prevPos).Normalized();
+                    v1 = pos - prevPos;
                 }
 
                 if (current.Next is not null) {
                     var nextPos = current.Next.Value.Pos;
-                    v2 = (nextPos - pos).Normalized();
+                    v2 = nextPos - pos;
                 }
 
                 cumulativeLength += dist;
-                // Calculate the average dir of the previous and next segment
-                var dir = v1.HasValue && v2.HasValue ? (v1.Value + v2.Value).LengthSquared < Precision.DOUBLE_EPSILON
-                        ? v1.Value
-                        : (v1.Value + v2.Value).Normalized() :
-                    v1 ?? (v2 ?? Vector2.UnitX);
+
+                // Calculate the angles
+                lastAngle = v1.HasValue
+                    ? v1.Value.LengthSquared > Precision.DOUBLE_EPSILON ? v1.Value.Theta : lastAngle
+                    : double.NaN;
+                var nextAngle = v2.HasValue
+                    ? v2.Value.LengthSquared > Precision.DOUBLE_EPSILON ? v2.Value.Theta : lastAngle
+                    : double.NaN;
 
                 // Update the path point of current
-                current.Value = new PathPoint(pos, dir, cumulativeLength, point.T, point.Red);
+                current.Value = new PathPoint(pos, lastAngle, nextAngle, cumulativeLength, point.T, point.Red);
 
                 current = current.Next;
             }
@@ -139,12 +143,15 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             if (p1.List is null) {
                 throw new ArgumentException(@"Point 1 must be part of a linked list.", nameof(p1));
             }
+            if (p1.Next is null) {
+                throw new ArgumentException(@"Point 1 must have a successor.", nameof(p1));
+            }
 
             var p2 = p1.Next;
 
-            PathPoint v1 = p1.Previous is not null && !p1.Value.Red ? p1.Previous.Value : p1.Value;
             PathPoint v2 = p1.Value;
-            PathPoint v3 = p2?.Value ?? v2 + v2 - v1;
+            PathPoint v3 = p2.Value;
+            PathPoint v1 = p1.Previous is not null && !p1.Value.Red ? p1.Previous.Value : v2 + v2 - v3;
             PathPoint v4 = p2?.Next is not null && !v3.Red ? p2.Next.Value : v3 + v3 - v2;
 
             // Normalize v1 and v4 to prevent extreme curvature
@@ -154,7 +161,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
 
             foreach (var t in ts) {
                 var v = PathPoint.Lerp(v2, v3, t);
-                v.Pos = PathApproximator.CatmullFindPoint(ref v1.Pos, ref v2.Pos, ref v3.Pos, ref v4.Pos, t); ;
+                v.Pos = PathApproximator.CatmullFindPoint(ref v1.Pos, ref v2.Pos, ref v3.Pos, ref v4.Pos, t);
                 var p = new LinkedListNode<PathPoint>(v);
                 p1.List!.AddAfter(p1, p);
                 p1 = p;
