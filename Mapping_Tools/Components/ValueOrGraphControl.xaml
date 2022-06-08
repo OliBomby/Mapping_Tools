@@ -20,7 +20,7 @@
         </Grid.ColumnDefinitions>
         <TextBox Text="{Binding GraphState, ElementName=UserControl, Converter={StaticResource GraphStateToStringConverter}, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" 
                  Grid.Column="0"
-                 HorizontalContentAlignment="Center"
+                 HorizontalContentAlignment="Stretch"
                  VerticalContentAlignment="Center"/>
         <Button Margin="8 0 0 0" 
                 Grid.Column="1"
