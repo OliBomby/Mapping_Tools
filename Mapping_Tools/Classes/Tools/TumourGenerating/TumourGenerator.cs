@@ -216,7 +216,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             double distT = endT - startT;
             double betweenAngle = (endP.Pos - startP.Pos).LengthSquared > Precision.DOUBLE_EPSILON
                 ? (endP.Pos - startP.Pos).Theta
-                : (startP.AvgAngle + endP.AvgAngle) / 2;
+                : MathHelper.LerpAngle(startP.AvgAngle, endP.AvgAngle, 0.5);
 
             // Make sure there are enough points between start and end for the tumour shape and resolution
             var tumourTemplate = tumourLayer.TumourTemplate;

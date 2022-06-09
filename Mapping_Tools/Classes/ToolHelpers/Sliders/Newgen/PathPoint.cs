@@ -26,7 +26,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         }
 
         public double AvgAngle => double.IsNaN(PreAngle) ? PostAngle :
-            double.IsNaN(PostAngle) ? PreAngle : (PreAngle + PostAngle) / 2;
+            double.IsNaN(PostAngle) ? PreAngle : MathHelper.LerpAngle(PreAngle, PostAngle, 0.5);
 
         public PathPoint SetT(double t) {
             return new PathPoint(Pos, PreAngle, PostAngle, CumulativeLength, t, Red);
@@ -121,7 +121,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             a.Pos = blend * (b.Pos - a.Pos) + a.Pos;
             var angle1 = a.Red ? a.PostAngle : a.AvgAngle;
             var angle2 = b.Red ? b.PreAngle : b.AvgAngle;
-            a.PreAngle = blend * (angle2 - angle1) + angle1;
+            a.PreAngle = MathHelper.LerpAngle(angle1, angle1, blend);
             a.PostAngle = a.PreAngle;
             a.CumulativeLength = blend * (b.CumulativeLength - a.CumulativeLength) + a.CumulativeLength;
             a.T = blend * (b.T - a.T) + a.T;

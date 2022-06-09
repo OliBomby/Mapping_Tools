@@ -44,7 +44,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
 
                         // Add hint anchors
                         anchors.AddRange(TransformAnchors(convertedAnchors, hintSegmentStart.Value.Pos, current.Value.Pos,
-                            (hintSegmentStart.Value.AvgAngle + current.Value.AvgAngle) / 2));
+                            MathHelper.LerpAngle(hintSegmentStart.Value.AvgAngle, current.Value.AvgAngle, 0.5)));
                     }
 
                     hintSegmentStart = null;
