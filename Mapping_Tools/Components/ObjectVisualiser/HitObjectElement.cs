@@ -170,6 +170,7 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
         }
 
         private void UpdateBounds() {
+            if (_sliderPathGeometry is null) return;
             _bounds = _sliderPathGeometry.Bounds;
             _bounds.Inflate(Thickness * 0.5, Thickness * 0.5);
             UpdateTransform();
@@ -318,9 +319,9 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
                 _sliderPathGeometry = geom;
                 UpdateBounds();
             } else {
-                _bounds = new Rect(new Point(hitObject.Pos.X - Thickness * 0.5, hitObject.Pos.Y - Thickness * 0.5),
-                    new Size(Thickness, Thickness));
-                UpdateTransform();
+                var point = new Point(hitObject.Pos.X, hitObject.Pos.Y);
+                _sliderPathGeometry = new LineGeometry(point, point);
+                UpdateBounds();
             }
         }
 
