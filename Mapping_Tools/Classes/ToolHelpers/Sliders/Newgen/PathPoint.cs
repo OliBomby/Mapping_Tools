@@ -121,7 +121,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             a.Pos = blend * (b.Pos - a.Pos) + a.Pos;
             var angle1 = a.Red ? a.PostAngle : a.AvgAngle;
             var angle2 = b.Red ? b.PreAngle : b.AvgAngle;
-            a.PreAngle = MathHelper.LerpAngle(angle1, angle1, blend);
+            a.PreAngle = MathHelper.LerpAngle(angle1, angle2, blend);
             a.PostAngle = a.PreAngle;
             a.CumulativeLength = blend * (b.CumulativeLength - a.CumulativeLength) + a.CumulativeLength;
             a.T = blend * (b.T - a.T) + a.T;
