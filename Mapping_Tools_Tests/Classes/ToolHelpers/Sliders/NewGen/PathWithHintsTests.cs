@@ -17,7 +17,7 @@ namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
             points = new List<LinkedListNode<PathPoint>>();
             path = new PathWithHints();
             for (int i = 0; i < NumPoints; i++) {
-                path.Path.AddLast(new PathPoint(new Vector2(i, 0), Vector2.UnitX, i == 0 ? 0 : 1, i));
+                path.Path.AddLast(new PathPoint(new Vector2(i, 0), 0, 0, i));
                 points.Add(path.Path.Last);
             }
             path.AddReconstructionHint(new ReconstructionHint(path.Path.First, path.Path.Last, -1, new List<Vector2> {

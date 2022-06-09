@@ -79,13 +79,14 @@ namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
             var path = new LinkedList<PathPoint>(new[] {
-                new PathPoint(new Vector2(-9, 0), new Vector2(1, 0), 0, 0),
-                new PathPoint(new Vector2(1, 0), new Vector2(1, 1), 1, 1),
-                new PathPoint(new Vector2(2, 1), new Vector2(1, 0), 2, 3),
-                new PathPoint(new Vector2(12, 1), new Vector2(1, 0), 1, 4),
+                new PathPoint(new Vector2(-9, 0)),
+                new PathPoint(new Vector2(1, 0)),
+                new PathPoint(new Vector2(2, 1)),
+                new PathPoint(new Vector2(12, 1))
             });
+            PathHelper.Recalculate(path);
 
-            var p1 = path.First.Next;
+            var p1 = path.First!.Next;
             PathHelper.Interpolate(p1, Enumerable.Range(1, 9).Select(i => i / 10d));
 
             foreach (var p in path) {
@@ -93,13 +94,14 @@ namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
             }
 
             var path2 = new LinkedList<PathPoint>(new[] {
-                new PathPoint(new Vector2(-9, 0), new Vector2(1, 0), 0, 0),
-                new PathPoint(new Vector2(1, 0), new Vector2(1, 1), 1, 1),
-                new PathPoint(new Vector2(2, 1), new Vector2(1, 0), 2, 3, 0, true),
-                new PathPoint(new Vector2(12, 1), new Vector2(1, 0), 1, 4),
+                new PathPoint(new Vector2(-9, 0)),
+                new PathPoint(new Vector2(1, 0)),
+                new PathPoint(new Vector2(2, 1), red: true),
+                new PathPoint(new Vector2(12, 1))
             });
+            PathHelper.Recalculate(path2);
 
-            var p2 = path2.First.Next;
+            var p2 = path2.First!.Next;
             PathHelper.Interpolate(p2, Enumerable.Range(1, 9).Select(i => i / 10d));
 
             foreach (var p in path2) {

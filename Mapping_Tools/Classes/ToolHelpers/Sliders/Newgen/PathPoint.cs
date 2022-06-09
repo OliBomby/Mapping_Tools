@@ -16,7 +16,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         /// </summary>
         public bool Red;
 
-        public PathPoint(Vector2 pos, double preAngle, double postAngle, double cumulativeLength, double t = double.NaN, bool red = false) {
+        public PathPoint(Vector2 pos, double preAngle = 0, double postAngle = 0, double cumulativeLength = 0, double t = double.NaN, bool red = false) {
             Pos = pos;
             PreAngle = preAngle;
             PostAngle = postAngle;
