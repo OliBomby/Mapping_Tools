@@ -1,5 +1,6 @@
 ﻿using Mapping_Tools.Classes.MathUtil;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
@@ -11,13 +12,16 @@ using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
 namespace Mapping_Tools.Components.ObjectVisualiser {
     public class HitObjectElement : FrameworkElement {
         private SliderPath _sliderPath;
+        private List<Vector2> _controlPoints;
         private Geometry _sliderPathGeometry;
         private Rect _bounds;
         private TranslateTransform _figureTranslate;
         private double _scale;
         private Transform _figureTransform;
 
-        public const double MaxPixelLength = 1e5;
+        public const double MaxPixelLength = 1e6;
+        public const double MaxSegmentCount = 1e6;
+        public const double MaxAnchorCount = 1500;
 
         #region Properties
 
@@ -210,9 +214,9 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
                     DrawCircleAtProgress(drawingContext, Fill, GetSliderBallPen(), Progress);
                 }
 
-                if (ShowAnchors) {
+                if (ShowAnchors && _controlPoints.Count <= MaxAnchorCount) {
                     // Draw the lines between the anchors
-                    var anchors = _sliderPath.ControlPoints;
+                    var anchors = _controlPoints;
                     var controlPointLinePen = GetWhiteFinePen();
                     for (var i = 0; i < anchors.Count - 1; i++) {
                         DrawLine(drawingContext, controlPointLinePen, anchors[i], anchors[i + 1]);
@@ -308,6 +312,8 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
                 var path = CustomPixelLength == null ? hitObject.GetSliderPath() :
                     new SliderPath(hitObject.SliderType, hitObject.GetAllCurvePoints().ToArray(), CustomPixelLength);
 
+                if (path.CalculatedPath.Count > MaxSegmentCount) return;
+
                 using (StreamGeometryContext gc = geom.Open()) {
                     gc.BeginFigure(new Point(hitObject.Pos.X, hitObject.Pos.Y), false, false);
                     foreach (Vector2 pos in path.CalculatedPath) {
@@ -316,6 +322,7 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
                 }
 
                 _sliderPath = path;
+                _controlPoints = path.ControlPoints;
                 _sliderPathGeometry = geom;
                 UpdateBounds();
             } else {
