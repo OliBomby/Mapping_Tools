@@ -91,7 +91,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
             return l;
         }
 
-        private static GraphState GetGraphState(double value) {
+        public static GraphState GetGraphState(double value) {
             return new GraphState {
                 MinX = 0,
                 MinY = Math.Min(0, value * 2),

@@ -148,7 +148,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
         /// <param name="startTemplateT">T value for where to start with the tumour template</param>
         /// <param name="endTemplateT">T value for where to end with the tumour template</param>
         /// <param name="otherSide">Whether to place the tumour on the other side of the slider</param>
-        private void PlaceTumour([NotNull]PathWithHints pathWithHints, [NotNull]ITumourLayer tumourLayer, int layer,
+        public void PlaceTumour([NotNull]PathWithHints pathWithHints, [NotNull]ITumourLayer tumourLayer, int layer,
             [NotNull]LinkedListNode<PathPoint> start, [NotNull]LinkedListNode<PathPoint> end,
             double startTemplateT, double endTemplateT, bool otherSide) {
             var path = pathWithHints.Path;
