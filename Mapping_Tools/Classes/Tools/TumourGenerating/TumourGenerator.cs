@@ -214,8 +214,8 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             double endT = endP.T;
             double dist = endP.CumulativeLength - startP.CumulativeLength;
             double distT = endT - startT;
-            double betweenAngle = (endP.Pos - startP.Pos).LengthSquared > Precision.DOUBLE_EPSILON
-                ? (endP.Pos - startP.Pos).Theta
+            double betweenAngle = (endP.OgPos - startP.OgPos).LengthSquared > Precision.DOUBLE_EPSILON
+                ? (endP.OgPos - startP.OgPos).Theta
                 : MathHelper.LerpAngle(startP.AvgAngle, endP.AvgAngle, 0.5);
 
             // Make sure there are enough points between start and end for the tumour shape and resolution
@@ -244,10 +244,10 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 // Get the offset, original pos, and direction
                 var np = PathPoint.Lerp(startP, endP, t);
                 var pos = WrappingMode switch {
-                    WrappingMode.Simple => np.Pos,
-                    WrappingMode.Replace => np.Pos,
-                    WrappingMode.RoundReplace => np.Pos,
-                    _ => p.Pos
+                    WrappingMode.Simple => np.OgPos,
+                    WrappingMode.Replace => np.OgPos,
+                    WrappingMode.RoundReplace => np.OgPos,
+                    _ => p.OgPos
                 };
                 var angle = WrappingMode switch {
                     WrappingMode.Simple => betweenAngle,
@@ -262,11 +262,12 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
                 // Add the offset to the point
                 var scale = tumourLayer.TumourScale.GetValue(t * (endProg - startProg) + startProg) * Scalar;
-                var offset = tumourTemplate.GetOffset(t) * scale;
-                var newPos = pos + Vector2.Rotate(offset, angle);
+                var offset = Vector2.Rotate(tumourTemplate.GetOffset(t) * scale, angle);
+                var actualOffset = pos + offset - p.OgPos;
+                var newPos = p.Pos + actualOffset;
 
                 // Modify the path
-                pn.Value = new PathPoint(newPos, p.PreAngle, p.PostAngle, p.CumulativeLength, p.T, p.Red);
+                pn.Value = new PathPoint(newPos, p.OgPos, p.PreAngle, p.PostAngle, p.CumulativeLength, p.T, p.Red);
             }
 
             // Maybe add a hint

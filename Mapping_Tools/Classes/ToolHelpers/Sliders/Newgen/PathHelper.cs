@@ -51,7 +51,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                 }
                 cumulativeLength += dist;
 
-                path.AddLast(new PathPoint(calculatedPath[i], 0, 0, cumulativeLength, red: isRedAnchor));
+                path.AddLast(new PathPoint(calculatedPath[i], calculatedPath[i], 0, 0, cumulativeLength, red: isRedAnchor));
 
                 // Make sure the start node is initialized
                 segmentStartNode ??= path.Last;
@@ -122,7 +122,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                     : double.NaN;
 
                 // Update the path point of current
-                current.Value = new PathPoint(pos, lastAngle, nextAngle, cumulativeLength, point.T, point.Red);
+                current.Value = new PathPoint(pos, pos, lastAngle, nextAngle, cumulativeLength, point.T, point.Red);
 
                 current = current.Next;
             }
