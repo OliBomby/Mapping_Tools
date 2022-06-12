@@ -22,12 +22,14 @@ namespace Mapping_Tools_Tests.Classes.Tools.TumourGenerating {
 
         [TestMethod]
         public void TestPlaceTumour() {
+            const int res = 10;
             var tumourGenerator = new TumourGenerator {
-                WrappingMode = WrappingMode.Simple
+                WrappingMode = WrappingMode.Simple,
+                Resolution = res
             };
             var tumourLayer = TumourLayer.GetDefaultLayer();
             tumourLayer.TumourLength = TumourLayer.GetGraphState(10);
-            tumourLayer.TumourScale = TumourLayer.GetGraphState(5);
+            tumourLayer.TumourScale = TumourLayer.GetGraphState(10);
             const int layer = 0;
             const double startT = 0;
             const double endT = 1;
@@ -56,10 +58,11 @@ namespace Mapping_Tools_Tests.Classes.Tools.TumourGenerating {
                 current = current.Next;
             }
             
-            Assert.IsTrue(count > 2);
+            Assert.IsTrue(count >= 2 + res);
 
             // Check hint
             Assert.AreEqual(4, pathWithHints.ReconstructionHints.Count);
+            
         }
     }
 }

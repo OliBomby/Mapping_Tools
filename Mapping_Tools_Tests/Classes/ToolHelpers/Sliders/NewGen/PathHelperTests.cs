@@ -108,5 +108,32 @@ namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
                 Debug.WriteLine(p.Pos.ToInvariant());
             }
         }
+
+        [TestMethod]
+        public void SubdivideTest() {
+            var path = new LinkedList<PathPoint>(new[] {
+                new PathPoint(new Vector2(-9, 0)),
+                new PathPoint(new Vector2(1, 0)),
+                new PathPoint(new Vector2(2, 1)),
+                new PathPoint(new Vector2(12, 1))
+            });
+            PathHelper.Recalculate(path);
+
+            var start = path.First!.Next;
+            var middle = start!.Next;
+            var end = path.Last;
+            var added = path.Subdivide(start, end, 5);
+
+            Assert.AreEqual(4, added);
+
+            Assert.IsTrue(start!.Next!.Value > start.Value);
+            Assert.IsTrue(start.Next.Next!.Value > start.Next.Value);
+            Assert.IsTrue(start.Next.Next.Next!.Value > start.Next.Next.Value);
+            Assert.AreSame(middle, start.Next.Next.Next);
+            Assert.IsTrue(start.Next.Next.Next.Next!.Value > start.Next.Next.Next.Value);
+            Assert.IsTrue(start.Next.Next.Next.Next.Next!.Value > start.Next.Next.Next.Next.Value);
+            Assert.IsTrue(start.Next.Next.Next.Next.Next.Next!.Value > start.Next.Next.Next.Next.Next.Value);
+            Assert.AreSame(end, start.Next.Next.Next.Next.Next.Next);
+        }
     }
 }

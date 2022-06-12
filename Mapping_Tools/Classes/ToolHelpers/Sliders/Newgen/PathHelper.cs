@@ -219,7 +219,24 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                 }
             } else {
                 // Distance mode
+                // Count the number of nodes already between start and end
+                int count = CountPointsBetween(start, end);
 
+                // Interpolate path points at roughly equal distance intervals
+                int pointsToAdd = wantedCount - count;
+                int pointsToAddToEachSegment = (int) Math.Ceiling(pointsToAdd / (double) (count + 1));
+
+                // Add pointsToAddToEachSegment number of points in each segment of the arc
+                var p = start;
+                while (p != end) {
+                    var nextP = p!.Next;
+
+                    // Add pointsToAddToEachSegment after p
+                    Interpolate(p, pointsToAddToEachSegment);
+                    addedPoints += pointsToAddToEachSegment;
+
+                    p = nextP;
+                }
             }
 
             return addedPoints;

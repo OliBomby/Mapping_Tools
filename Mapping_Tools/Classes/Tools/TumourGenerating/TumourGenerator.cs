@@ -258,7 +258,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     _ => betweenAngle,
                 };
                 // Rotate to a side
-                angle = otherSide ? angle - Math.PI / 2 : angle + Math.PI / 2;
+                angle = otherSide ? angle + Math.PI : angle;
 
                 // Add the offset to the point
                 var scale = tumourLayer.TumourScale.GetValue(t * (endProg - startProg) + startProg) * Scalar;
