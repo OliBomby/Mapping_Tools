@@ -249,12 +249,28 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         /// <param name="path">The path to subdivide.</param>
         /// <param name="start">The start point.</param>
         /// <param name="end">The end point. This node has to come after start or be equal to start.</param>
+        /// <param name="startTemplateT">The template T of the start node.</param>
+        /// <param name="endTemplateT">The template t of the end node.</param>
         /// <param name="criticalPoints">The wanted values of t between start and end.</param>
         /// <returns>The number of points added between start and end.</returns>
         public static int EnsureCriticalPoints(this LinkedList<PathPoint> path, LinkedListNode<PathPoint> start,
-            LinkedListNode<PathPoint> end, IEnumerable<double> criticalPoints) {
+            LinkedListNode<PathPoint> end, double startTemplateT, double endTemplateT, IEnumerable<double> criticalPoints) {
+            var startCount = path.Count;
+
             // If start cumulative length == end cumulative length add t values in PathPoint
-            return 0;
+            foreach (double criticalPoint in criticalPoints.Where(t => t >= startTemplateT && t <= endTemplateT)) {
+                if (Precision.AlmostEquals(start.Value.CumulativeLength, end.Value.CumulativeLength)) {
+                    var t = (criticalPoint - startTemplateT) / (endTemplateT - startTemplateT) *
+                        (end.Value.T - start.Value.T) + start.Value.T;
+                    FindFirstOccurrenceExact(start, start.Value.CumulativeLength, t);
+                } else {
+                    var t = (criticalPoint - startTemplateT) / (endTemplateT - startTemplateT) *
+                        (end.Value.CumulativeLength - start.Value.CumulativeLength) + start.Value.CumulativeLength;
+                    FindFirstOccurrenceExact(start, t);
+                }
+            }
+
+            return path.Count - startCount;
         }
 
         /// <summary>

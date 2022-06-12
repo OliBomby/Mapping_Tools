@@ -224,7 +224,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             if (pointsBetween < wantedPointsBetween) {
                 pointsBetween += path.Subdivide(start, end, wantedPointsBetween);
             }
-            pointsBetween += path.EnsureCriticalPoints(start, end, tumourTemplate.GetCriticalPoints());
+            pointsBetween += path.EnsureCriticalPoints(start, end, startTemplateT, endTemplateT, tumourTemplate.GetCriticalPoints());
 
             // Add tumour offsets
             double startDist = startP.CumulativeLength;

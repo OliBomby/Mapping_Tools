@@ -37,6 +37,7 @@ namespace Mapping_Tools_Tests.Classes.Tools.TumourGenerating {
             var current = pathWithHints.Path.First;
             var start = PathHelper.FindFirstOccurrenceExact(current, 100, epsilon:0.5);
             var end = PathHelper.FindLastOccurrenceExact(start, 110, epsilon:0.5);
+            var end2 = PathHelper.FindLastOccurrenceExact(start, 115, epsilon:0.5);
 
             tumourGenerator.PlaceTumour(pathWithHints, tumourLayer, layer, start, end, startT, endT, false);
 
@@ -59,10 +60,48 @@ namespace Mapping_Tools_Tests.Classes.Tools.TumourGenerating {
             }
             
             Assert.IsTrue(count >= 2 + res);
+            var mid = PathHelper.FindFirstOccurrence(start, 105);
+            Assert.AreEqual(105, mid.Value.CumulativeLength, Precision.DOUBLE_EPSILON);
 
             // Check hint
             Assert.AreEqual(4, pathWithHints.ReconstructionHints.Count);
-            
+
+            // Add another overlapping tumour
+            tumourGenerator.PlaceTumour(pathWithHints, tumourLayer, layer, mid, end2, startT, endT, false);
+
+            current = start;
+            count = 1;
+            while (current is not null && current != end2) {
+                var pos = current.Value.Pos;
+                count++;
+
+                switch (pos.X) {
+                    case >= 100 and <= 105:
+                        Assert.AreEqual(-pos.X + 100, pos.Y, Precision.DOUBLE_EPSILON);
+                        break;
+                    case > 105 and <= 110:
+                        Assert.AreEqual(-5, pos.Y, Precision.DOUBLE_EPSILON);
+                        break;
+                    case > 110 and <= 115:
+                        Assert.AreEqual(pos.X - 115, pos.Y, Precision.DOUBLE_EPSILON);
+                        break;
+                }
+
+                current = current.Next;
+            }
+
+            // Check hint
+            Assert.AreEqual(6, pathWithHints.ReconstructionHints.Count);
+
+            Assert.AreEqual(-1, pathWithHints.ReconstructionHints[0].Layer);
+            Assert.AreEqual(layer, pathWithHints.ReconstructionHints[1].Layer);
+            Assert.IsNotNull(pathWithHints.ReconstructionHints[1].Anchors);
+            Assert.AreEqual(layer, pathWithHints.ReconstructionHints[2].Layer);
+            Assert.IsNull(pathWithHints.ReconstructionHints[2].Anchors);
+            Assert.AreEqual(layer, pathWithHints.ReconstructionHints[3].Layer);
+            Assert.IsNotNull(pathWithHints.ReconstructionHints[3].Anchors);
+            Assert.AreEqual(-1, pathWithHints.ReconstructionHints[4].Layer);
+            Assert.AreEqual(-1, pathWithHints.ReconstructionHints[5].Layer);
         }
     }
 }
