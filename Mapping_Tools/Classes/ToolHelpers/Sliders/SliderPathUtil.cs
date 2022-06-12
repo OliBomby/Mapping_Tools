@@ -77,7 +77,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
                             subdivision = bezierSubdivision;
                             var length = bezierSubdivision.SubdividedApproximationLength();
 
-                            if (totalLength + length > newLength) {
+                            if (Precision.AlmostBigger(totalLength + length, newLength)) {
                                 break;
                             }
 
@@ -111,7 +111,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
                                 newAnchors.Add(bezierSubdivision.Points[0]);
                                 var length = bezierSubdivision.Length();
 
-                                if (totalLength + length > newLength) {
+                                if (Precision.AlmostBigger(totalLength + length, newLength)) {
                                     break;
                                 }
 

@@ -102,6 +102,30 @@ namespace Mapping_Tools_Tests.Classes.Tools.TumourGenerating {
             Assert.IsNotNull(pathWithHints.ReconstructionHints[3].Anchors);
             Assert.AreEqual(-1, pathWithHints.ReconstructionHints[4].Layer);
             Assert.AreEqual(-1, pathWithHints.ReconstructionHints[5].Layer);
+
+            var reconstructor = new Reconstructor();
+            var (anchors, pathType) = reconstructor.Reconstruct(pathWithHints);
+
+            Assert.AreEqual(PathType.Bezier, pathType);
+            Assert.AreEqual(12, anchors.Count);
+
+            AssertEqual(new Vector2(0, 0), anchors[0]);
+            AssertEqual(new Vector2(100, 0), anchors[1]);
+            AssertEqual(new Vector2(100, 0), anchors[2]);
+            AssertEqual(new Vector2(105, -5), anchors[3]);
+            AssertEqual(new Vector2(105, -5), anchors[4]);
+            AssertEqual(new Vector2(110, -5), anchors[5]);
+            AssertEqual(new Vector2(110, -5), anchors[6]);
+            AssertEqual(new Vector2(115, 0), anchors[7]);
+            AssertEqual(new Vector2(115, 0), anchors[8]);
+            AssertEqual(new Vector2(192, 0), anchors[9]);
+            AssertEqual(new Vector2(192, 0), anchors[10]);
+            AssertEqual(new Vector2(192, 192), anchors[11]);
+        }
+
+        private void AssertEqual(Vector2 l, Vector2 r) {
+            Assert.AreEqual(l.X, r.X);
+            Assert.AreEqual(l.Y, r.Y);
         }
     }
 }

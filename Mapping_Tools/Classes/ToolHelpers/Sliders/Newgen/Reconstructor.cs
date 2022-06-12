@@ -50,11 +50,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                     hintSegmentStart = null;
                 }
                 if (nextHint < hints.Count && current == hints[nextHint].Start) {
-                    if (hints[nextHint].Anchors is null || hints[nextHint].Anchors.Count == 0) {
-                        nextHint++;
-                    } else {
-                        hintSegmentStart = current;
-                    }
+                    hintSegmentStart = current;
                 }
 
                 current = current.Next;
