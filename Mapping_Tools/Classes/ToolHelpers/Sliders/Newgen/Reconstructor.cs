@@ -102,10 +102,10 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                 transform = Matrix2.CreateRotation(hintDir.Theta - theta);
             } else {
                 // Scale along the axis of hintDir
-                transform = Matrix2.CreateRotation(-segmentDir.Theta);
-                transform = Matrix2.Mult(transform, Matrix2.CreateScale(segmentDir.Length / hintDir.Length, 1));
-                transform = Matrix2.Mult(transform, Matrix2.CreateRotation(hintDir.Theta));
-                //transform = Matrix2.CreateRotation(hintDir.Theta - segmentDir.Theta) * (segmentDir.Length / hintDir.Length);
+                //transform = Matrix2.CreateRotation(-segmentDir.Theta);
+                //transform = Matrix2.Mult(transform, Matrix2.CreateScale(segmentDir.Length / hintDir.Length, 1));
+                //transform = Matrix2.Mult(transform, Matrix2.CreateRotation(hintDir.Theta));
+                transform = Matrix2.CreateRotation(hintDir.Theta - segmentDir.Theta) * (segmentDir.Length / hintDir.Length);
             }
 
             // Transform all the anchors and put them into an array

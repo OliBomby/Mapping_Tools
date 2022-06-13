@@ -245,6 +245,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         /// <summary>
         /// Modifies <see cref="path"/> such that each wanted t value becomes an exact point in the
         /// path points between <see cref="start"/> and <see cref="end"/>.
+        /// Also makes sure the start, end, and critical points are marked as red.
         /// </summary>
         /// <param name="path">The path to subdivide.</param>
         /// <param name="start">The start point.</param>
@@ -252,9 +253,10 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         /// <param name="startTemplateT">The template T of the start node.</param>
         /// <param name="endTemplateT">The template t of the end node.</param>
         /// <param name="criticalPoints">The wanted values of t between start and end.</param>
+        /// <param name="redify">Whether to make the start, end, and critical points red.</param>
         /// <returns>The number of points added between start and end.</returns>
         public static int EnsureCriticalPoints(this LinkedList<PathPoint> path, LinkedListNode<PathPoint> start,
-            LinkedListNode<PathPoint> end, double startTemplateT, double endTemplateT, IEnumerable<double> criticalPoints) {
+            LinkedListNode<PathPoint> end, double startTemplateT, double endTemplateT, IEnumerable<double> criticalPoints, bool redify) {
             var startCount = path.Count;
 
             // If start cumulative length == end cumulative length add t values in PathPoint
@@ -262,11 +264,15 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                 if (Precision.AlmostEquals(start.Value.CumulativeLength, end.Value.CumulativeLength)) {
                     var t = (criticalPoint - startTemplateT) / (endTemplateT - startTemplateT) *
                         (end.Value.T - start.Value.T) + start.Value.T;
-                    FindFirstOccurrenceExact(start, start.Value.CumulativeLength, t);
+                    var node = FindFirstOccurrenceExact(start, start.Value.CumulativeLength, t);
+                    if (redify)
+                        node.Value = node.Value.SetRed(true);
                 } else {
                     var t = (criticalPoint - startTemplateT) / (endTemplateT - startTemplateT) *
                         (end.Value.CumulativeLength - start.Value.CumulativeLength) + start.Value.CumulativeLength;
-                    FindFirstOccurrenceExact(start, t);
+                    var node = FindFirstOccurrenceExact(start, t);
+                    if (redify)
+                        node.Value = node.Value.SetRed(true);
                 }
             }
 

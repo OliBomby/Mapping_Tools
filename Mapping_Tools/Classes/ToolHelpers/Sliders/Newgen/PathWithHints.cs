@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Mapping_Tools.Classes.MathUtil;
 
@@ -8,13 +9,16 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
     /// Its a path with reconstruction hints.
     /// </summary>
     public class PathWithHints {
+        [NotNull]
         public LinkedList<PathPoint> Path { get; } = new();
 
         /// <summary>
         /// Invariant: Non-overlapping and sorted
         /// </summary>
+        [NotNull]
         private readonly List<ReconstructionHint> reconstructionHints = new();
 
+        [NotNull]
         public IReadOnlyList<ReconstructionHint> ReconstructionHints => reconstructionHints;
 
         public void AddReconstructionHint(ReconstructionHint hint) {

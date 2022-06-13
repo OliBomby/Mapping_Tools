@@ -4,10 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.ToolHelpers.Sliders;
 using Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen;
 using Mapping_Tools.Classes.Tools.TumourGenerating.Enums;
 using Mapping_Tools.Classes.Tools.TumourGenerating.Options;
@@ -88,7 +86,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
                 while (nextDist <= tumourEnd * totalLength + Precision.DOUBLE_EPSILON && current is not null) {
                     var length = tumourLayer.TumourLength.GetValue(nextDist / totalLength);
-                    var endDist = Math.Min(nextDist + length, tumourEnd * totalLength);
+                    var endDist = Math.Min(nextDist + length, tumourLayer.TumourCount > 0 ? totalLength : tumourEnd * totalLength);
 
                     // Get which side the tumour should be on
                     side = tumourLayer.TumourSidedness switch {
@@ -103,12 +101,16 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                         var start = PathHelper.FindFirstOccurrenceExact(current, nextDist, epsilon:0.5);
                         var end = PathHelper.FindLastOccurrenceExact(start, endDist, epsilon:0.5);
 
+                        // Make sure start and end are red
+                        start.Value = start.Value.SetRed(true);
+                        end.Value = end.Value.SetRed(true);
+
                         // Calculate the T start/end for the tumour template
                         double startT= 0;
                         double endT = 1;
                         if (Precision.DefinitelyBigger(length, 0)) {
                             startT = (start.Value.CumulativeLength - nextDist) / length;
-                            endT = (end.Value.CumulativeLength - endDist) / length;
+                            endT = (end.Value.CumulativeLength - nextDist) / length;
                         }
 
                         PlaceTumour(pathWithHints, tumourLayer, layer, start, end, startT, endT, side);
@@ -191,7 +193,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     var dti = 1d / (pointsBetweenTi + 1);
                     var tti = 0d;
                     var pti = firstOccurrence;
-                    while (pti != lastOccurrence) {
+                    while (pti != lastOccurrence && pti is not null) {
                         pti.Value = pti.Value.SetT(tti);
                         tti += dti;
                         pti = pti.Next;
@@ -205,7 +207,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             // Count the number of nodes between start and end
             int pointsBetween = PathHelper.CountPointsBetween(start, end);
 
-            var totalLength = path.Last.Value.CumulativeLength;
+            var totalLength = path.Last!.Value.CumulativeLength;
             startP = start.Value;
             endP = end.Value;
             var startProg = startP.CumulativeLength / totalLength;
@@ -221,10 +223,11 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             // Make sure there are enough points between start and end for the tumour shape and resolution
             var tumourTemplate = tumourLayer.TumourTemplate;
             int wantedPointsBetween = Math.Max(pointsBetween, (int)(tumourTemplate.GetLength() * Resolution));  // The needed number of points for the tumour
+            pointsBetween += path.EnsureCriticalPoints(start, end, startTemplateT, endTemplateT,
+                tumourTemplate.GetCriticalPoints(), true);
             if (pointsBetween < wantedPointsBetween) {
                 pointsBetween += path.Subdivide(start, end, wantedPointsBetween);
             }
-            pointsBetween += path.EnsureCriticalPoints(start, end, startTemplateT, endTemplateT, tumourTemplate.GetCriticalPoints());
 
             // Add tumour offsets
             double startDist = startP.CumulativeLength;
@@ -276,10 +279,16 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 var hintType = tumourTemplate.GetReconstructionHintPathType();
                 var scale = tumourLayer.TumourScale.GetValue(startProg) * Scalar;
                 if (otherSide) scale = -scale;
-                var scaledAnchors = Precision.AlmostEquals(scale, 1) ? hintAnchors :
-                    hintAnchors.Select(o => new Vector2(o.X, o.Y * scale)).ToList();
+                var scaledAnchors =
+                    TransformAnchors(hintAnchors, Vector2.Distance(start.Value.Pos, end.Value.Pos), scale);
                 pathWithHints.AddReconstructionHint(new ReconstructionHint(start, end, layer, scaledAnchors, hintType));
             }
+        }
+
+        private static List<Vector2> TransformAnchors(List<Vector2> anchors, double scaleX, double scaleY) {
+            return Precision.AlmostEquals(scaleX, 1) && Precision.AlmostEquals(scaleY, 1)
+                ? anchors
+                : anchors.Select(o => new Vector2(o.X * scaleX, o.Y * scaleY)).ToList();
         }
     }
 }

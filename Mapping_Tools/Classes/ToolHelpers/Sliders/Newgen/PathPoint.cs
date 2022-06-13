@@ -37,6 +37,10 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             return new PathPoint(Pos, OgPos, PreAngle, PostAngle, CumulativeLength, t, Red);
         }
 
+        public PathPoint SetRed(bool red) {
+            return new PathPoint(Pos, OgPos, PreAngle, PostAngle, CumulativeLength, T, red);
+        }
+
         /// <summary>
         /// Adds the specified instances.
         /// </summary>
