@@ -6,7 +6,6 @@
              xmlns:local="clr-namespace:Mapping_Tools.Views"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
-             xmlns:beatmapHelper="clr-namespace:Mapping_Tools.Classes.BeatmapHelper" 
              xmlns:viewmodels="clr-namespace:Mapping_Tools.Viewmodels"
              mc:Ignorable="d" 
              x:Name="This"
@@ -69,12 +68,12 @@
                             EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}" />
                         <DataGridTemplateColumn Header="Path" Width="{Binding Width, ElementName=MapsetPathText}">
                             <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate DataType="MapsetMergerVm:MapsetItem">
+                                <DataTemplate>
                                     <TextBlock Name="MapsetPathText" Text="{Binding Path}"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                             <DataGridTemplateColumn.CellEditingTemplate>
-                                <DataTemplate DataType="MapsetMergerVm:MapsetItem">
+                                <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBox Text="{Binding Path}" Width=" 200"/>
                                         <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" 

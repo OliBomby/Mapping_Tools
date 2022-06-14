@@ -249,6 +249,9 @@
     <Compile Update="Views\TimingStudio\TimingStudioView.xaml.cs">
       <DependentUpon>TimingStudioView.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\MapsetMerger\MapsetMergerView.cs">
+      <DependentUpon>MapsetMergerView.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
