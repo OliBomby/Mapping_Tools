@@ -184,6 +184,8 @@ namespace Mapping_Tools.Viewmodels {
                         markedObjects = editor.Beatmap.QueryTimeCode(TimeCode).ToList();
                         break;
                     default:
+                        editor = new BeatmapEditor(path);
+                        markedObjects = editor.Beatmap.HitObjects;
                         break;
                 }
 
