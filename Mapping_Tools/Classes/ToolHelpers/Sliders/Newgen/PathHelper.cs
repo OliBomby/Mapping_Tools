@@ -327,7 +327,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             var p = start;
             var prev = start;
 
-            if (BeforeWantedPoint(start.Value, cumLength - epsilon, t - epsilon)) {
+            if (BeforeWantedPoint(start.Value, double.IsNaN(t) ? cumLength - epsilon : cumLength, t - epsilon)) {
                 // Search forwards
                 // Either the current point is inside viable range and the previous point is outside viable range or
                 // the current point is before the viable range and the next point is after the viable range.
@@ -375,7 +375,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             var p = start;
             var prev = start;
 
-            if (BeforeWantedPoint(start.Value, cumLength + epsilon, t + epsilon)) {
+            if (BeforeWantedPoint(start.Value, double.IsNaN(t) ? cumLength + epsilon : cumLength, t + epsilon)) {
                 // Search forwards
                 // Either the current point is inside viable range and the next point is outside viable range or
                 // the current point is after the viable range and the previous point is before the viable range.
@@ -432,7 +432,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             if (double.IsNaN(t) || node.Value.CumulativeLength != node.Next.Value.CumulativeLength) {
                 dt = (cumLength - node.Value.CumulativeLength) / (node.Next.Value.CumulativeLength - node.Value.CumulativeLength);
             } else {
-                dt = (cumLength - node.Value.T) / (node.Next.Value.T - node.Value.T);
+                dt = (t - node.Value.T) / (node.Next.Value.T - node.Value.T);
             }
 
             Interpolate(node, dt);
@@ -461,7 +461,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             if (double.IsNaN(t) || node.Value.CumulativeLength != node.Previous.Value.CumulativeLength) {
                 dt = (cumLength - node.Previous.Value.CumulativeLength) / (node.Value.CumulativeLength - node.Previous.Value.CumulativeLength);
             } else {
-                dt = (cumLength - node.Previous.Value.T) / (node.Value.T - node.Previous.Value.T);
+                dt = (t - node.Previous.Value.T) / (node.Value.T - node.Previous.Value.T);
             }
 
             Interpolate(node.Previous, dt);
