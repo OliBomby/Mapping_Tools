@@ -121,6 +121,7 @@
                         <RowDefinition Height="2*"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <materialDesign:Card Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0" Padding="10"
@@ -153,6 +154,21 @@
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
+                    <StackPanel
+                        Grid.Row="3"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom"
+                        Orientation="Horizontal">
+                        <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a tumour layer." Command="{Binding AddCommand}" Margin="5">
+                            <materialDesign:PackIcon Kind="Plus" Height="24" Width="24" />
+                        </Button>
+                        <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Copy selected tumour layer." Command="{Binding CopyCommand}" Margin="5">
+                            <materialDesign:PackIcon Kind="ContentCopy" Height="24" Width="24" />
+                        </Button>
+                        <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove selected tumour layer." Command="{Binding RemoveCommand}" Margin="5">
+                            <materialDesign:PackIcon Kind="Trashcan" Height="24" Width="24" />
+                        </Button>
+                    </StackPanel>
                 </Grid>
             </Grid>
 

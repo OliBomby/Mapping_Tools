@@ -138,6 +138,12 @@ namespace Mapping_Tools.Viewmodels {
 
         [JsonIgnore]
         public CommandImplementation ImportCommand { get; }
+        [JsonIgnore]
+        public CommandImplementation AddCommand { get; }
+        [JsonIgnore]
+        public CommandImplementation CopyCommand { get; }
+        [JsonIgnore]
+        public CommandImplementation RemoveCommand { get; }
 
         #endregion
 
@@ -152,6 +158,32 @@ namespace Mapping_Tools.Viewmodels {
                 IOHelper.GetCurrentBeatmapOrCurrentBeatmap() :
                 MainWindow.AppWindow.GetCurrentMaps()[0])
             );
+            AddCommand = new CommandImplementation(
+                _ => {
+                    try {
+                        TumourLayers.Add(TumourLayer.GetDefaultLayer());
+                        RegeneratePreview();
+                    } catch (Exception ex) { ex.Show(); }
+                });
+            CopyCommand = new CommandImplementation(
+                _ => {
+                    try {
+                        var copy = TumourLayers[CurrentLayerIndex].Copy();
+                        TumourLayers.Insert(CurrentLayerIndex + 1, copy);
+                        RegeneratePreview();
+                    } catch (Exception ex) { ex.Show(); }
+                });
+            RemoveCommand = new CommandImplementation(
+                _ => {
+                    try {
+                        if (TumourLayers.Count > 1) {
+                            var indexToRemove = CurrentLayerIndex;
+                            CurrentLayerIndex = indexToRemove == 0 ? 1 : CurrentLayerIndex - 1;
+                            TumourLayers.RemoveAt(indexToRemove);
+                            RegeneratePreview();
+                        }
+                    } catch (Exception ex) { ex.Show(); }
+                });
         }
 
         public void Import(string path) {

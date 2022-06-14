@@ -113,5 +113,10 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
             if (TumourRotation is not null && TumourRotation.CanFreeze) TumourRotation.Freeze();
             if (TumourScale is not null && TumourScale.CanFreeze) TumourScale.Freeze();
         }
+
+        public TumourLayer Copy() {
+            Freeze();
+            return (TumourLayer) MemberwiseClone();
+        }
     }
 }
