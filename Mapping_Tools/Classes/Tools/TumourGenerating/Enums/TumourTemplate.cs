@@ -5,6 +5,7 @@
         Square,
         Wave,
         Circle,
+        Parabola,
         Custom
     }
 }

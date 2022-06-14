@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourTemplates {
-    public class TriangleTemplate : ITumourTemplate {
+    public class ParabolaTemplate : ITumourTemplate {
         public Vector2 GetOffset(double t) {
-            return t < 0.5 ? -2 * t * Vector2.UnitY : 2 * (-1 + t) * Vector2.UnitY;
+            return (4 * t * t - 4 * t) * Vector2.UnitY;
         }
 
         public double GetLength() {
-            return 2.5;
+            return 3;
         }
 
         public double GetDefaultSpan() {
@@ -18,7 +19,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourTemplates {
         }
 
         public IEnumerable<double> GetCriticalPoints() {
-            yield return 0.5;
+            return Enumerable.Empty<double>();
         }
 
         public List<Vector2> GetReconstructionHint() {
@@ -26,7 +27,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourTemplates {
         }
 
         public PathType GetReconstructionHintPathType() {
-            return PathType.Linear;
+            return PathType.Bezier;
         }
 
         public Func<double, double> GetDistanceRelation(double _) {

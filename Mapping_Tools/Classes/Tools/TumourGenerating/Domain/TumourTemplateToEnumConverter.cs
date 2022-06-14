@@ -11,6 +11,8 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Domain
             return value switch {
                 TriangleTemplate => TumourTemplate.Triangle,
                 SquareTemplate => TumourTemplate.Square,
+                CircleTemplate => TumourTemplate.Circle,
+                ParabolaTemplate => TumourTemplate.Parabola,
                 _ => TumourTemplate.Custom
             };
         }
@@ -19,6 +21,8 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Domain
             return value switch {
                 TumourTemplate.Triangle => new TriangleTemplate(),
                 TumourTemplate.Square => new SquareTemplate(),
+                TumourTemplate.Circle => new CircleTemplate(),
+                TumourTemplate.Parabola => new ParabolaTemplate(),
                 _ => new TriangleTemplate()
             };
         }
