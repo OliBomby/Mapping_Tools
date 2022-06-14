@@ -6,7 +6,7 @@ using Mapping_Tools.Classes.MathUtil;
 namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourTemplates {
     public class SquareTemplate : ITumourTemplate {
         public Vector2 GetOffset(double t) {
-            return t is 0 or 1 ? Vector2.Zero : Vector2.UnitY;
+            return t is 0 or 1 ? Vector2.Zero : -Vector2.UnitY;
         }
 
         public double GetLength() {
@@ -28,6 +28,20 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourTemplates {
 
         public PathType GetReconstructionHintPathType() {
             return PathType.Linear;
+        }
+
+        public Func<double, double> GetDistanceRelation(double scaleY) {
+            return double.IsNaN(scaleY) ? null :
+                Precision.AlmostEquals(1, scaleY) ? DistanceRelation : t => DistanceRelation(t, scaleY);
+        }
+
+        private static double DistanceRelation(double t) {
+            return Precision.AlmostEquals(t, 0) ? 0 : Precision.AlmostEquals(t, 1) ? 1 : t / 3 + 1 / 3d;
+        }
+
+        private static double DistanceRelation(double t, double scaleY) {
+            var len = 2 * scaleY + 1;
+            return Precision.AlmostEquals(t, 0) ? 0 : Precision.AlmostEquals(t, 1) ? 1 : t / len + scaleY / len;
         }
     }
 }

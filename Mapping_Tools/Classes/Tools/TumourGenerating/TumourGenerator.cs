@@ -70,7 +70,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
                 // Recalculate
                 if (tumourLayer.Recalculate) {
-                    PathHelper.Recalculate(pathWithHints.Path);
+                    pathWithHints.RecalculateAndFixHints();
                     totalLength = pathWithHints.Path.Last!.Value.CumulativeLength;
                     layer++;
                 }
@@ -277,11 +277,16 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             if (WrappingMode == WrappingMode.Simple) {
                 var hintAnchors = tumourTemplate.GetReconstructionHint();
                 var hintType = tumourTemplate.GetReconstructionHintPathType();
-                var scale = tumourLayer.TumourScale.GetValue(startProg) * Scalar;
-                if (otherSide) scale = -scale;
-                var scaledAnchors =
-                    TransformAnchors(hintAnchors, Vector2.Distance(start.Value.Pos, end.Value.Pos), scale);
-                pathWithHints.AddReconstructionHint(new ReconstructionHint(start, end, layer, scaledAnchors, hintType));
+
+                var scaleX = Vector2.Distance(start.Value.OgPos, end.Value.OgPos) / tumourTemplate.GetDefaultSpan();
+                var scaleY = tumourLayer.TumourScale.GetValue(startProg) * Scalar;
+                if (otherSide) scaleY = -scaleY;
+                var scaledAnchors = TransformAnchors(hintAnchors, scaleX, scaleY);
+
+                var distFunc = tumourTemplate.GetDistanceRelation(scaleY / scaleX);
+
+                pathWithHints.AddReconstructionHint(new ReconstructionHint(start, end, layer, scaledAnchors, hintType,
+                    distFunc: distFunc));
             }
         }
 

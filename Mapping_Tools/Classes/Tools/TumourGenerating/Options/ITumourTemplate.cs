@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.MathUtil;
 
@@ -43,5 +44,12 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
         /// Gets the path type for the anchors which reconstructs the shape of this tumour.
         /// </summary>
         PathType GetReconstructionHintPathType();
+
+        /// <summary>
+        /// The relation [0,1] -> [0,1] between cumulative length on the curve and cumulative length on the hint path.
+        /// If null, this relation is assumed to be linear.
+        /// </summary>
+        /// <param name="scaleY">Scaling applied to the Y-axis which changes the shape of the tumour.</param>
+        Func<double, double> GetDistanceRelation(double scaleY);
     }
 }

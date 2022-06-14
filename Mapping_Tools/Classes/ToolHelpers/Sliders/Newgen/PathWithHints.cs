@@ -169,8 +169,29 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                 startP = (start.Value.CumulativeLength - hint.Start.Value.CumulativeLength) * factor + hint.StartP;
                 endP = (end.Value.CumulativeLength - hint.Start.Value.CumulativeLength) * factor + hint.StartP;
             }
+
+            if (hint.DistFunc is not null) {
+                // Adjust to distance along hint
+                startP = hint.DistFunc(startP);
+                endP = hint.DistFunc(endP);
+            }
+
             return Precision.AlmostEquals(startP, endP) ? null
-                : new ReconstructionHint(start, end, hint.Layer, hint.Anchors, hint.PathType, startP, endP);
+                : hint.Cut(start, end, startP, endP);
+        }
+
+        /// <summary>
+        /// Recalculates directions and distances of the path and fixes distance relations on hints
+        /// The linked list nodes stay the same object.
+        /// </summary>
+        public void RecalculateAndFixHints() {
+            PathHelper.Recalculate(Path);
+
+            // Fix distance relations on hints
+            for (var i = 0; i < reconstructionHints.Count; i++) {
+                ReconstructionHint hint = reconstructionHints[i];
+                reconstructionHints[i] = hint.SetDistFunc(null);
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.MathUtil;
 
@@ -43,8 +44,14 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         /// </summary>
         public readonly double EndP;
 
+        /// <summary>
+        /// The relation [0,1] -> [0,1] between cumulative length on the curve and cumulative length on the hint path.
+        /// If null, this relation is assumed to be linear.
+        /// </summary>
+        public readonly Func<double, double> DistFunc;
+
         public ReconstructionHint(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end, int layer, List<Vector2> anchors,
-            PathType pathType = PathType.Bezier, double startP = 0, double endP = 1) {
+            PathType pathType = PathType.Bezier, double startP = 0, double endP = 1, Func<double, double> distFunc = null) {
             Start = start;
             End = end;
             Anchors = anchors;
@@ -52,6 +59,15 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             PathType = pathType;
             StartP = startP;
             EndP = endP;
+            DistFunc = distFunc;
+        }
+
+        public ReconstructionHint Cut(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end, double startP = 0, double endP = 1) {
+            return new ReconstructionHint(start, end, Layer, Anchors, PathType, startP, endP, DistFunc);
+        }
+
+        public ReconstructionHint SetDistFunc(Func<double, double> distFunc) {
+            return new ReconstructionHint(Start, End, Layer, Anchors, PathType, StartP, EndP, distFunc);
         }
     }
 }

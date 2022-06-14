@@ -28,5 +28,9 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourTemplates {
         public PathType GetReconstructionHintPathType() {
             return PathType.Linear;
         }
+
+        public Func<double, double> GetDistanceRelation(double _) {
+            return null;
+        }
     }
 }
