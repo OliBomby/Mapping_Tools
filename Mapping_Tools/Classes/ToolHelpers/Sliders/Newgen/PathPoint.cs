@@ -135,8 +135,8 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         public static PathPoint Lerp(PathPoint a, PathPoint b, double blend) {
             a.Pos = blend * (b.Pos - a.Pos) + a.Pos;
             a.OgPos = blend * (b.OgPos - a.OgPos) + a.OgPos;
-            var angle1 = a.Red ? a.PostAngle : a.AvgAngle;
-            var angle2 = b.Red ? b.PreAngle : b.AvgAngle;
+            var angle1 = a.Red && !double.IsNaN(a.PostAngle) ? a.PostAngle : a.AvgAngle;
+            var angle2 = b.Red && !double.IsNaN(b.PreAngle) ? b.PreAngle : b.AvgAngle;
             a.PreAngle = MathHelper.LerpAngle(angle1, angle2, blend);
             a.PostAngle = a.PreAngle;
             a.CumulativeLength = blend * (b.CumulativeLength - a.CumulativeLength) + a.CumulativeLength;

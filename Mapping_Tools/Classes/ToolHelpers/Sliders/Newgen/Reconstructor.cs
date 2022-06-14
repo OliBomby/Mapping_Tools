@@ -95,7 +95,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
 
             if (hintDir.LengthSquared < Precision.DOUBLE_EPSILON &&
                 segmentDir.LengthSquared < Precision.DOUBLE_EPSILON) {
-                transform = Matrix2.Identity;
+                transform = Matrix2.CreateRotation(-theta);
             } else if (hintDir.LengthSquared < Precision.DOUBLE_EPSILON) {
                 transform = Matrix2.CreateRotation(segmentDir.Theta);
             } else if (segmentDir.LengthSquared < Precision.DOUBLE_EPSILON) {
