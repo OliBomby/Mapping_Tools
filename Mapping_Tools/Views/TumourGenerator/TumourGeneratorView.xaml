@@ -135,7 +135,8 @@
                         Value="0"
                         IsIndeterminate="True" />
 
-                    <Slider Grid.Row="1" Minimum="0" Maximum="1" TickFrequency="0.1" Value="{Binding Scale}" Margin="5"/>
+                    <Slider Grid.Row="1" Minimum="0" Maximum="1" TickFrequency="0.1" Value="{Binding Scale}" Margin="5"
+                            ToolTip="Tumour scale"/>
                     
                     <ListBox Grid.Row="2"  ItemsSource="{Binding TumourLayers}"
                              SelectionMode="Single"
