@@ -22,7 +22,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourTemplates {
         }
 
         public List<Vector2> GetReconstructionHint() {
-            return new List<Vector2> { Vector2.Zero, new(1, -1), Vector2.UnitX };
+            return new List<Vector2> { Vector2.Zero, new(0.5, -1), Vector2.UnitX };
         }
 
         public PathType GetReconstructionHintPathType() {
