@@ -21,7 +21,10 @@ namespace Mapping_Tools.Views.TumourGenerator {
     public partial class TumourGeneratorView : ISavable<TumourGeneratorVm>, IQuickRun {
         public static readonly string ToolName = "Tumour Generator 2";
 
-        public static readonly string ToolDescription = "Tumour Generator will automatically generate tumours on sliders of your beatmap.";
+        public static readonly string ToolDescription = @"Tumour Generator generates copious amounts of tumours on sliders.
+You can adjust the shape and size of tumours and choose where they should be placed along the path.
+You can also generate multiple layers of tumours. A layer will either merge the tumours with the tumours of the previous layer or place the tumours on top of the previous tumours.
+To get started, select a slider in your beatmap and click 'Preview slider' to preview changes or click the run button to instantly generate tumours on the selected sliders.";
 
         private bool _initialized;
 

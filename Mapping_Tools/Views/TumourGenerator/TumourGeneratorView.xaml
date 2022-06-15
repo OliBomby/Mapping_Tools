@@ -59,7 +59,13 @@
                         <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryHueMidBrush}"/>
                     </materialDesign:PopupBox.ToggleContent>
                     <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
-                        Tumour Generator generates copious amounts of tumours.
+                        Tumour Generator generates copious amounts of tumours on sliders.
+                        <LineBreak/>
+                        You can adjust the shape and size of tumours and choose where they should be placed along the path.
+                        <LineBreak/>
+                        You can also generate multiple layers of tumours. A layer will either merge the tumours with the tumours of the previous layer or place the tumours on top of the previous tumours.
+                        <LineBreak/>
+                        To get started, select a slider in your beatmap and click 'Preview slider' to preview changes or click the run button to instantly generate tumours on the selected sliders.
                     </TextBlock>
                 </materialDesign:PopupBox>
             </StackPanel>
