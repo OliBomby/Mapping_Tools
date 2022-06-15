@@ -197,7 +197,7 @@
                     IsLeftDrawerOpen="{Binding DrawerOpen, FallbackValue=True}"
                     OpenMode="Standard">
                     <materialDesign:DrawerHost.LeftDrawerContent>
-                        <DockPanel MinWidth="200">
+                        <DockPanel MinWidth="200" MaxWidth="200">
                             <TextBox 
                             x:Name="ToolSearchBox"
                             Text="{Binding SearchKeyword, UpdateSourceTrigger=PropertyChanged}"
