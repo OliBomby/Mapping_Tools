@@ -65,6 +65,8 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             // Add tumours
             int layer = 0;
             foreach (var tumourLayer in TumourLayers) {
+                if (!tumourLayer.IsActive) continue;
+
                 var tumourStart = MathHelper.Clamp(tumourLayer.TumourStart, -1, 1);
                 var tumourEnd = MathHelper.Clamp(tumourLayer.TumourEnd, 0, 1);
 

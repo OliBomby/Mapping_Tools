@@ -21,5 +21,6 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
         /// </summary>
         double TumourEnd { get; }
         bool Recalculate { get; }
+        bool IsActive { get; }
     }
 }
