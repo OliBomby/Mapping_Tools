@@ -161,7 +161,9 @@ namespace Mapping_Tools.Viewmodels {
             AddCommand = new CommandImplementation(
                 _ => {
                     try {
-                        TumourLayers.Add(TumourLayer.GetDefaultLayer());
+                        var newLayer = TumourLayer.GetDefaultLayer();
+                        newLayer.Name = "Layer " + (TumourLayers.Count + 1);
+                        TumourLayers.Add(newLayer);
                         RegeneratePreview();
                     } catch (Exception ex) { ex.Show(); }
                 });
@@ -169,6 +171,7 @@ namespace Mapping_Tools.Viewmodels {
                 _ => {
                     try {
                         var copy = TumourLayers[CurrentLayerIndex].Copy();
+                        copy.Name = $"{copy.Name} (Copy)";
                         TumourLayers.Insert(CurrentLayerIndex + 1, copy);
                         RegeneratePreview();
                     } catch (Exception ex) { ex.Show(); }

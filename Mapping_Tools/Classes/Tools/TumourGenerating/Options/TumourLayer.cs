@@ -20,6 +20,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
         private double _tumourEnd;
         private bool _recalculate;
         private bool _isActive;
+        private string _name;
 
         public ITumourTemplate TumourTemplate {
             get => _tumourTemplate;
@@ -76,10 +77,16 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
             set => Set(ref _isActive, value);
         }
 
+        public string Name {
+            get => _name;
+            set => Set(ref _name, value);
+        }
+
         public static TumourLayer GetDefaultLayer() {
             var l = new TumourLayer {
                 TumourTemplate = new TriangleTemplate(),
                 IsActive = true,
+                Name = "Layer",
                 TumourCount = -1,
                 TumourStart = 0,
                 TumourEnd = 1,
