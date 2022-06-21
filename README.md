@@ -1,7 +1,7 @@
 # Mapping Tools
 Collection of tools for manipulating osu! beatmaps
 
-[Website](https://mappingtools.seira.moe/)
+[Website](https://mappingtools.github.io/)
 
 
 <p align="left">
