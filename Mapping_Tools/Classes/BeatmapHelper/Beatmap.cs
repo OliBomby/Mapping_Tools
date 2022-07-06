@@ -642,9 +642,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// Returns all hit objects that have a bookmark in their range.
         /// </summary>
         /// <returns>A list of hit objects that have a bookmark in their range.</returns>
-        public List<HitObject> GetBookmarkedObjects() {
+        public List<HitObject> GetBookmarkedObjects(double leniency = 5) {
             List<double> bookmarks = GetBookmarks();
-            List<HitObject> markedObjects = HitObjects.FindAll(ho => bookmarks.Exists(o => (ho.Time <= o && o <= ho.EndTime)));
+            List<HitObject> markedObjects = HitObjects.FindAll(ho =>
+                bookmarks.Exists(o => ho.Time - leniency <= o && o <= ho.EndTime + leniency));
             return markedObjects;
         }
 
