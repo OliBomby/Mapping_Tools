@@ -115,6 +115,18 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _removeSliderTicks, value);
         }
 
+        private bool _advancedOptions;
+        public bool AdvancedOptions {
+            get => _advancedOptions;
+            set {
+                if (Set(ref _advancedOptions, value)) {
+                    RaisePropertyChanged(nameof(TumourStartSliderMin));
+                }
+            }
+        }
+
+        public double TumourStartSliderMin => AdvancedOptions ? -1 : 0;
+
         private double _scale;
         public double Scale {
             get => _scale;
