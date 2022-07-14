@@ -122,5 +122,36 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
 
             return transformedAnchors;
         }
+
+        /// <summary>
+        /// Constructs full hints for a path.
+        /// </summary>
+        /// <param name="path">The path to construct hints for</param>
+        /// <param name="existingHints">Existing hints to be used instead of generated hints if they are more efficient.</param>
+        public List<ReconstructionHint> ConstructHints(LinkedList<PathPoint> path, IReadOnlyList<ReconstructionHint> existingHints = null) {
+            var hints = existingHints is null ? new List<ReconstructionHint>() : new List<ReconstructionHint>(existingHints);
+
+            var current = path.First;
+            var nextHint = 0;
+            LinkedListNode<PathPoint> hintSegmentStart = null;
+
+            while (current is not null) {
+                if (nextHint < hints.Count && current == hints[nextHint].End && hintSegmentStart is not null) {
+                    // Add segment between start and this
+                    var hint = hints[nextHint++];
+
+                    // TODO: do thing
+
+                    hintSegmentStart = null;
+                }
+                if (nextHint < hints.Count && current == hints[nextHint].Start) {
+                    hintSegmentStart = current;
+                }
+
+                current = current.Next;
+            }
+
+            return hints;
+        }
     }
 }
