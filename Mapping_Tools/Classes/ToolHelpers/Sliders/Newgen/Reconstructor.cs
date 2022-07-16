@@ -10,11 +10,12 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
     /// Reconstructs the anchors of a complete slider out of a <see cref="PathWithHints"/>.
     /// </summary>
     public class Reconstructor {
+        private PathGenerator2 PathGenerator { get; set; } = new();
+
         public (List<Vector2>, PathType) Reconstruct(PathWithHints pathWithHints) {
             var anchors = new List<Vector2>();
-
             var current = pathWithHints.Path.First;
-            var hints = pathWithHints.ReconstructionHints;
+            var hints = ConstructHints(pathWithHints.Path, pathWithHints.ReconstructionHints);;
             var nextHint = 0;
             LinkedListNode<PathPoint> hintSegmentStart = null;
             var pathType = hints.Count == 1 && hints[0].Start == pathWithHints.Path.First &&
@@ -125,33 +126,66 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
 
         /// <summary>
         /// Constructs full hints for a path.
+        /// Accurate angle and distances must be calculated on the path beforehand.
         /// </summary>
         /// <param name="path">The path to construct hints for</param>
         /// <param name="existingHints">Existing hints to be used instead of generated hints if they are more efficient.</param>
         public List<ReconstructionHint> ConstructHints(LinkedList<PathPoint> path, IReadOnlyList<ReconstructionHint> existingHints = null) {
-            var hints = existingHints is null ? new List<ReconstructionHint>() : new List<ReconstructionHint>(existingHints);
+            var hints = existingHints is null
+                ? new List<ReconstructionHint>()
+                : new List<ReconstructionHint>(existingHints.Where(o => o.Anchors is not null));
 
+            var layer = existingHints is null ? 0 : existingHints.Max(hint => hint.Layer) + 1;
             var current = path.First;
             var nextHint = 0;
-            LinkedListNode<PathPoint> hintSegmentStart = null;
+            ReconstructionHint? currentHint = null;
+            LinkedListNode<PathPoint> segmentStart = null;
 
+            // Loop through path and find all segments which are either an existing hint or a gap between two hints
+            // Also split on all red points
             while (current is not null) {
-                if (nextHint < hints.Count && current == hints[nextHint].End && hintSegmentStart is not null) {
-                    // Add segment between start and this
-                    var hint = hints[nextHint++];
+                if (segmentStart is not null && (
+                        currentHint.HasValue && current == currentHint.Value.End ||
+                        (nextHint < hints.Count && current == hints[nextHint].Start) ||
+                        (!currentHint.HasValue && current.Value.Red) ||
+                        current.Next is null)) {
+                    // End of hint and hint active or its the start of hint and there is no hint active
+                    // Create between start and this
+                    var segmentEnd = current;
 
-                    // TODO: do thing
+                    // Construct a hint
+                    var constructedHint = ConstructHint(segmentStart, segmentEnd, layer);
 
-                    hintSegmentStart = null;
+                    if (currentHint.HasValue) {
+                        // Keep the better hint
+                        if (currentHint.Value.Anchors.Count > constructedHint.Anchors.Count) {
+                            hints[nextHint - 1] = constructedHint;
+                        }
+                    } else {
+                        // Insert the constructed hint
+                        hints.Insert(nextHint++, constructedHint);
+                    }
+
+                    currentHint = null;
+                    segmentStart = null;
                 }
-                if (nextHint < hints.Count && current == hints[nextHint].Start) {
-                    hintSegmentStart = current;
+                if (segmentStart is null) {
+                    segmentStart = current;
+
+                    if (nextHint < hints.Count && current == hints[nextHint].Start) {
+                        currentHint = hints[nextHint++];
+                    }
                 }
 
                 current = current.Next;
             }
 
             return hints;
+        }
+
+        private ReconstructionHint ConstructHint(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end, int layer) {
+            var anchors = PathGenerator.GeneratePath(start, end).ToList();
+            return new ReconstructionHint(start, end, layer, anchors);
         }
     }
 }

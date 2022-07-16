@@ -126,11 +126,13 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 }
             }
 
-            // Set the new slider path
+            // Reconstruct the slider
+            PathHelper.Recalculate(pathWithHints.Path);
             var reconstructor = new Reconstructor();
             var (anchors, pathType) = reconstructor.Reconstruct(pathWithHints);
             var newSliderPath = new SliderPath(pathType, anchors.ToArray());
 
+            // Set the new slider path
             ho.SetSliderPath(newSliderPath);
 
             // Update velocity

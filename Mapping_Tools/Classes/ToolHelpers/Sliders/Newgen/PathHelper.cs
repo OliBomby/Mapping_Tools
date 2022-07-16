@@ -300,6 +300,24 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                 : count;
         }
 
+        /// <summary>
+        /// Iterates the range of points from start to end.
+        /// </summary>
+        /// <param name="start">The start node</param>
+        /// <param name="end">The end node</param>
+        /// <returns>The list containing points between start and end inclusive</returns>
+        public static IEnumerable<PathPoint> EnumerateBetween(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end) {
+            if (start.Value > end.Value) {
+                throw new ArgumentException(@"The end point has to be a points that comes after the starting point in the path.");
+            }
+
+            var p = start;
+            while (p is not null && p.Previous != end) {
+                yield return p.Value;
+                p = p.Next;
+            }
+        }
+
         private static bool InsideViableRange(PathPoint p, double cumLength, double t, double epsilon) {
             return double.IsNaN(t)
                 ? Precision.AlmostEquals(p.CumulativeLength, cumLength, epsilon)

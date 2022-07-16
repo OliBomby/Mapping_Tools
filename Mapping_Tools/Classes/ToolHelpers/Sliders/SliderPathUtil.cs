@@ -195,7 +195,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
             double totalLoss = 0;
 
             foreach (var point in points) {
-                var minLoss = Double.PositiveInfinity;
+                var minLoss = double.PositiveInfinity;
 
                 for (int i = 0; i < labels.Count - 1; i++) {
                     var p1 = labels[i];
