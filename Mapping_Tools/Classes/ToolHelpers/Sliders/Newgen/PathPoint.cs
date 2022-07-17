@@ -141,7 +141,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             a.PostAngle = a.PreAngle;
             a.CumulativeLength = blend * (b.CumulativeLength - a.CumulativeLength) + a.CumulativeLength;
             a.T = blend * (b.T - a.T) + a.T;
-            a.Red = blend < 0.5 ? a.Red : b.Red;
+            a.Red = false;
             return a;
         }
 
