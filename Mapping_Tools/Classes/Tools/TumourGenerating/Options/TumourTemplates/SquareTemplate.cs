@@ -5,8 +5,10 @@ using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourTemplates {
     public class SquareTemplate : ITumourTemplate {
+        private const double SideMargin = 0.0001;
+
         public Vector2 GetOffset(double t) {
-            return t is 0 or 1 ? Vector2.Zero : -Vector2.UnitY;
+            return t < SideMargin ? -t / SideMargin * Vector2.UnitY : t > 1 - SideMargin ? (t - 1) / SideMargin * Vector2.UnitY : -Vector2.UnitY;
         }
 
         public double GetLength() {
@@ -18,12 +20,12 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourTemplates {
         }
 
         public IEnumerable<double> GetCriticalPoints() {
-            yield return 0.0001;
-            yield return 0.9999;
+            yield return SideMargin;
+            yield return 1 - SideMargin;
         }
 
         public List<Vector2> GetReconstructionHint() {
-            return new List<Vector2> { Vector2.Zero, new(0, -1), new(1, -1), Vector2.UnitX };
+            return new List<Vector2> { Vector2.Zero, new(SideMargin, -1), new(1 - SideMargin, -1), Vector2.UnitX };
         }
 
         public PathType GetReconstructionHintPathType() {
@@ -31,17 +33,15 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourTemplates {
         }
 
         public Func<double, double> GetDistanceRelation(double scaleY) {
-            return double.IsNaN(scaleY) ? null :
-                Precision.AlmostEquals(1, scaleY) ? DistanceRelation : t => DistanceRelation(t, scaleY);
-        }
-
-        private static double DistanceRelation(double t) {
-            return Precision.AlmostEquals(t, 0) ? 0 : Precision.AlmostEquals(t, 1) ? 1 : t / 3 + 1 / 3d;
+            return double.IsNaN(scaleY) ? null : t => DistanceRelation(t, scaleY);
         }
 
         private static double DistanceRelation(double t, double scaleY) {
-            var len = 2 * scaleY + 1;
-            return Precision.AlmostEquals(t, 0) ? 0 : Precision.AlmostEquals(t, 1) ? 1 : t / len + scaleY / len;
+            var marginLen = Math.Sqrt(scaleY * scaleY + SideMargin * SideMargin);
+            var len = 2 * marginLen + 1 - 2 * SideMargin;
+            return t < SideMargin ? t / SideMargin * marginLen / len :
+                t > 1 - SideMargin ? 1 + (t - 1) / SideMargin * marginLen / len :
+                (t - SideMargin) / len + marginLen / len;
         }
     }
 }
