@@ -286,8 +286,6 @@ namespace Mapping_Tools.Viewmodels {
                 };
                 tumourGenerator.TumourGenerate(args);
 
-                ct.ThrowIfCancellationRequested();
-
                 // Send the tumoured slider to the main thread
                 Application.Current.Dispatcher.Invoke(() => {
                     TumouredPreviewHitObject = args;
