@@ -228,7 +228,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             var tumourTemplate = tumourLayer.TumourTemplate;
             int wantedPointsBetween = Math.Max(pointsBetween, (int)(tumourTemplate.GetLength() * Resolution));  // The needed number of points for the tumour
             pointsBetween += path.EnsureCriticalPoints(start, end, startTemplateT, endTemplateT,
-                tumourTemplate.GetCriticalPoints(), true);
+                tumourTemplate.GetCriticalPoints(), out var ensuredPoints);
             if (pointsBetween < wantedPointsBetween) {
                 pointsBetween += path.Subdivide(start, end, wantedPointsBetween);
             }
@@ -248,6 +248,13 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 // Scale to template T
                 t = t * (endTemplateT - startTemplateT) + startTemplateT;
 
+                // Check if this is a critical point
+                bool isCritical = false;
+                if (ensuredPoints.First != null && ensuredPoints.First.Value == pn) {
+                    ensuredPoints.RemoveFirst();
+                    isCritical = true;
+                }
+
                 // Get the offset, original pos, and direction
                 var np = PathPoint.Lerp(startP, endP, t);
                 var pos = WrappingMode switch {
@@ -264,6 +271,13 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     WrappingMode.Wrap => p.AvgAngle,
                     _ => betweenAngle,
                 };
+                var red = WrappingMode switch {
+                    WrappingMode.Simple => isCritical || (p.Red && p.Pos != p.OgPos),
+                    WrappingMode.Replace => isCritical || (p.Red && p.Pos != p.OgPos),
+                    WrappingMode.RoundReplace => isCritical || (p.Red && p.Pos != p.OgPos),
+                    _ => isCritical || p.Red
+                };
+
                 // Rotate to a side
                 angle = otherSide ? angle + Math.PI : angle;
 
@@ -274,7 +288,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 var newPos = p.Pos + actualOffset;
 
                 // Modify the path
-                pn.Value = new PathPoint(newPos, p.OgPos, p.PreAngle, p.PostAngle, p.CumulativeLength, p.T, p.Red);
+                pn.Value = new PathPoint(newPos, p.OgPos, p.PreAngle, p.PostAngle, p.CumulativeLength, p.T, red);
             }
 
             // Maybe add a hint

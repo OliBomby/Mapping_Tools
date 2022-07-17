@@ -32,6 +32,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
         /// <summary>
         /// Gets a list of t values which should definitely get a point.
         /// This is to ensure sharp corners in the tumour shape stay sharp.
+        /// This should not contain 0 or 1 and be in increasing order.
         /// </summary>
         IEnumerable<double> GetCriticalPoints();
 

@@ -31,7 +31,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourTemplates {
         }
 
         public Func<double, double> GetDistanceRelation(double _) {
-            return null;
+            return null;  // TODO: This is not linear!!!
         }
     }
 }

@@ -257,11 +257,12 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         /// <param name="startTemplateT">The template T of the start node.</param>
         /// <param name="endTemplateT">The template t of the end node.</param>
         /// <param name="criticalPoints">The wanted values of t between start and end.</param>
-        /// <param name="redify">Whether to make the start, end, and critical points red.</param>
+        /// <param name="ensuredPoints">The critical points found or created by this algorithm.</param>
         /// <returns>The number of points added between start and end.</returns>
         public static int EnsureCriticalPoints(this LinkedList<PathPoint> path, LinkedListNode<PathPoint> start,
-            LinkedListNode<PathPoint> end, double startTemplateT, double endTemplateT, IEnumerable<double> criticalPoints, bool redify) {
+            LinkedListNode<PathPoint> end, double startTemplateT, double endTemplateT, IEnumerable<double> criticalPoints, out LinkedList<LinkedListNode<PathPoint>> ensuredPoints) {
             var startCount = path.Count;
+            ensuredPoints = new LinkedList<LinkedListNode<PathPoint>>();
 
             // If start cumulative length == end cumulative length add t values in PathPoint
             foreach (double criticalPoint in criticalPoints.Where(t => t >= startTemplateT && t <= endTemplateT)) {
@@ -269,14 +270,12 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                     var t = (criticalPoint - startTemplateT) / (endTemplateT - startTemplateT) *
                         (end.Value.T - start.Value.T) + start.Value.T;
                     var node = FindFirstOccurrenceExact(start, start.Value.CumulativeLength, t);
-                    if (redify)
-                        node.Value = node.Value.SetRed(true);
+                    ensuredPoints.AddLast(node);
                 } else {
                     var t = (criticalPoint - startTemplateT) / (endTemplateT - startTemplateT) *
                         (end.Value.CumulativeLength - start.Value.CumulativeLength) + start.Value.CumulativeLength;
                     var node = FindFirstOccurrenceExact(start, t);
-                    if (redify)
-                        node.Value = node.Value.SetRed(true);
+                    ensuredPoints.AddLast(node);
                 }
             }
 
