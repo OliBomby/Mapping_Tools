@@ -8,7 +8,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
     /// Version of <see cref="PathGenerator"/> but working with <see cref="PathPoint"/> instead.
     /// </summary>
     public class PathGenerator2 {
-        private double MaxAngle { get; set; } = Math.PI * 1 / 4;
+        private double MaxAngle { get; set; } = Math.PI * 1 / 3;
         private ApproximationMode Approximation { get; set; } = ApproximationMode.Best;
         private int NumTestPoints { get; set; } = 100;
 
@@ -51,6 +51,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             var labels = PathHelper.EnumerateBetween(start, end).Select(o => o.Pos).ToList();
 
             Vector2?[] middles = {
+                null,
                 TangentIntersectionApproximation(start, end),
                 DoubleMiddleApproximation(start, end)
             };
@@ -59,7 +60,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             double bestLoss = double.PositiveInfinity;
 
             foreach (var middle in middles) {
-                var bezier = new BezierCurveQuadric(p1, p2, middle ?? (p2 - p1) / 2);
+                var bezier = new BezierCurveQuadric(p1, p2, middle ?? (p2 + p1) / 2);
 
                 var interpolatedPoints = new Vector2[NumTestPoints];
                 for (int i = 0; i < NumTestPoints; i++) {
@@ -69,7 +70,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
 
                 var loss = SliderPathUtil.CalculateLoss(interpolatedPoints, labels);
 
-                if (!(loss < bestLoss)) {
+                if (Precision.AlmostBigger(loss, bestLoss)) {
                     continue;
                 }
 
@@ -87,7 +88,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             var a1 = start.Value.PostAngle;
             var a2 = end.Value.PreAngle;
 
-            if (Math.Abs(MathHelper.AngleDifference(a1, a2)) <= 0.1) {
+            if (Math.Abs(MathHelper.AngleDifference(a1, a2)) < Precision.DOUBLE_EPSILON) {
                 return null;
             }
 
@@ -107,14 +108,14 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         private Vector2? DoubleMiddleApproximation(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end) {
             var p1 = start.Value.Pos;
             var p2 = end.Value.Pos;
+            var averagePoint = (p1 + p2) / 2;
 
             var d1 = start.Value.CumulativeLength;
             var d2 = end.Value.CumulativeLength;
             var dm = (d1 + d2) / 2;
             var middle = GetExactPointAtDistance(start, dm);
-
-            var averagePoint = (p1 + p2) / 2;
             var middlePoint = middle.Pos;
+
 
             if (Vector2.DistanceSquared(averagePoint, middlePoint) < 0.1) {
                 return null;
@@ -147,22 +148,22 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             var subRanges = new List<(LinkedListNode<PathPoint>, LinkedListNode<PathPoint>, double)>();
             // Loop through the whole path and divide it into sub-ranges at every inflection point
             while (current is not null && current.Previous != end) {
-                var angleChange = current == start || current == end ? 0 : MathHelper.AngleDifference(current.Value.PreAngle, current.Value.PostAngle);
+                var angleChange = current == start || current == end || current.Value.Red ? 0 : MathHelper.AngleDifference(current.Value.PreAngle, current.Value.PostAngle);
 
                 // Check for inflection point or red anchors
                 if ((angleChange * lastAngleChange < -Precision.DOUBLE_EPSILON && current != startSubRange && current.Previous != startSubRange) ||
-                    current.Value.Red) {
+                    current.Value.Red && current != startSubRange) {
                     subRanges.Add((startSubRange, current, subRangeAngleChange));
 
                     startSubRange = current;
                     subRangeAngleChange = -Math.Abs(angleChange);  // Negate the angle change because this point invalidates the angle
                 }
-                else if (angleChange == 0 && lastAngleChange != 0) {
+                else if (Precision.AlmostEquals(angleChange, 0) && !Precision.AlmostEquals(lastAngleChange, 0)) {
                     subRanges.Add((startSubRange, current, subRangeAngleChange));
 
                     startSubRange = current;
                     subRangeAngleChange = -Math.Abs(angleChange);  // Negate the angle change because this point invalidates the angle
-                } else if (angleChange != 0 && lastAngleChange == 0 && current != startSubRange) {  // Extra check to prevent subranges going backwards with i - 1
+                } else if (!Precision.AlmostEquals(angleChange, 0) && Precision.AlmostEquals(lastAngleChange, 0) && current != startSubRange && current.Previous != startSubRange) {  // Extra check to prevent subranges going backwards with i - 1
                     // Place on the previous index for symmetry with the part going into the zero chain
                     subRanges.Add((startSubRange, current.Previous, 0));
 
@@ -230,7 +231,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
 
         private static PathPoint GetExactPointAtDistance(LinkedListNode<PathPoint> start, double distance) {
             var middleFirst = PathHelper.FindFirstOccurrence(start, distance).Value;
-            var middleLast = PathHelper.FindFirstOccurrence(start, distance).Value;
+            var middleLast = PathHelper.FindLastOccurrence(start, distance).Value;
 
             if (Precision.AlmostEquals(middleFirst.CumulativeLength, middleLast.CumulativeLength)) {
                 return middleFirst;

@@ -32,7 +32,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
         /// <summary>
         /// The number of points per osu! pixel used to approximate the shape of the tumours.
         /// </summary>
-        public double Resolution { get; set; } = 1;
+        public double Resolution { get; set; } = 3;
 
         /// <summary>
         /// The size scalar of tumours.
