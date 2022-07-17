@@ -158,10 +158,14 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             double length = Vector2.Distance(v2.Pos, v3.Pos);
             v1.Pos = (v1.Pos - v2.Pos).LengthSquared > Precision.DOUBLE_EPSILON ? v2.Pos + (v1.Pos - v2.Pos).Normalized() * length : v1.Pos;
             v4.Pos = (v4.Pos - v3.Pos).LengthSquared > Precision.DOUBLE_EPSILON ? v3.Pos + (v4.Pos - v3.Pos).Normalized() * length : v4.Pos;
+            double ogLength = Vector2.Distance(v2.OgPos, v3.OgPos);
+            v1.OgPos = (v1.OgPos - v2.OgPos).LengthSquared > Precision.DOUBLE_EPSILON ? v2.OgPos + (v1.OgPos - v2.OgPos).Normalized() * ogLength : v1.OgPos;
+            v4.OgPos = (v4.OgPos - v3.OgPos).LengthSquared > Precision.DOUBLE_EPSILON ? v3.OgPos + (v4.OgPos - v3.OgPos).Normalized() * ogLength : v4.OgPos;
 
             foreach (var t in ts) {
                 var v = PathPoint.Lerp(v2, v3, t);
                 v.Pos = PathApproximator.CatmullFindPoint(ref v1.Pos, ref v2.Pos, ref v3.Pos, ref v4.Pos, t);
+                v.OgPos = PathApproximator.CatmullFindPoint(ref v1.OgPos, ref v2.OgPos, ref v3.OgPos, ref v4.OgPos, t);
                 var p = new LinkedListNode<PathPoint>(v);
                 p1.List!.AddAfter(p1, p);
                 p1 = p;
