@@ -39,6 +39,8 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         }
 
         private Vector2? BestApproximation(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end) {
+            const double nullBias = 0.2;
+
             // Make sure start index is before end index
             // The results will be the same for flipped indices
             if (start.Value > end.Value) {
@@ -69,6 +71,10 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                 }
 
                 var loss = SliderPathUtil.CalculateLoss(interpolatedPoints, labels);
+
+                // Add some bias towards not using a middle anchor
+                if (!middle.HasValue)
+                    loss -= nullBias;
 
                 if (Precision.AlmostBigger(loss, bestLoss)) {
                     continue;
@@ -151,7 +157,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                 var angleChange = current == start || current == end || current.Value.Red ? 0 : MathHelper.AngleDifference(current.Value.PreAngle, current.Value.PostAngle);
 
                 // Check for inflection point or red anchors
-                if ((angleChange * lastAngleChange < -Precision.DOUBLE_EPSILON && current != startSubRange && current.Previous != startSubRange) ||
+                if ((angleChange * lastAngleChange < -1E-5D && current != startSubRange && current.Previous != startSubRange) ||
                     current.Value.Red && current != startSubRange) {
                     subRanges.Add((startSubRange, current, subRangeAngleChange));
 
