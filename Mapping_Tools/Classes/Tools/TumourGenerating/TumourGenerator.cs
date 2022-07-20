@@ -32,7 +32,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
         /// <summary>
         /// The number of points per osu! pixel used to approximate the shape of the tumours.
         /// </summary>
-        public double Resolution { get; set; } = 3;
+        public double Resolution { get; set; } = 1;
 
         /// <summary>
         /// The size scalar of tumours.
@@ -224,12 +224,17 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 ? (endP.OgPos - startP.OgPos).Theta
                 : MathHelper.LerpAngle(startP.AvgAngle, endP.AvgAngle, 0.5);
 
+            var length = Vector2.Distance(start.Value.OgPos, end.Value.OgPos);
             var scale = tumourLayer.TumourScale.GetValue(startProg) * Scalar;
             var rotation = MathHelper.DegreesToRadians(tumourLayer.TumourRotation.GetValue(startProg));
 
-            // Make sure there are enough points between start and end for the tumour shape and resolution
+            // Setup tumour template with the correct shape
             var tumourTemplate = tumourLayer.TumourTemplate;
-            int wantedPointsBetween = Math.Max(pointsBetween, (int)(tumourTemplate.GetLength() * Resolution));  // The needed number of points for the tumour
+            tumourTemplate.Width = otherSide ? -scale : scale;
+            tumourTemplate.Length = length;
+
+            // Make sure there are enough points between start and end for the tumour shape and resolution
+            int wantedPointsBetween = Math.Max(pointsBetween, (int)(tumourTemplate.GetDetailLevel() * Resolution));  // The needed number of points for the tumour
             pointsBetween += path.EnsureCriticalPoints(start, end, startTemplateT, endTemplateT,
                 tumourTemplate.GetCriticalPoints(), out var ensuredPoints);
             if (pointsBetween < wantedPointsBetween) {
@@ -281,11 +286,8 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     _ => isCritical || p.Red
                 };
 
-                // Rotate to a side
-                angle = otherSide ? angle + Math.PI : angle;
-
                 // Add the offset to the point
-                var offset = Vector2.Rotate(tumourTemplate.GetOffset(t) * scale, angle + rotation);
+                var offset = Vector2.Rotate(tumourTemplate.GetOffset(t), angle + rotation);
                 var actualOffset = pos + offset - p.OgPos;
                 var newPos = p.Pos + actualOffset;
 
@@ -297,24 +299,12 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             if (WrappingMode == WrappingMode.Simple && Precision.AlmostEquals(MathHelper.AngleDifference(rotation, 0), 0, 1E-6D)) {
                 var hintAnchors = tumourTemplate.GetReconstructionHint();
                 var hintType = tumourTemplate.GetReconstructionHintPathType();
+                var distFunc = tumourTemplate.GetDistanceRelation();
 
-                var scaleX = Vector2.Distance(start.Value.OgPos, end.Value.OgPos) / tumourTemplate.GetDefaultSpan();
-                var scaleY = otherSide ? -scale : scale;
-                var scaledAnchors = TransformAnchors(hintAnchors, scaleX, scaleY);
-
-                var distFunc = tumourTemplate.GetDistanceRelation(scaleY / scaleX);
-
-                pathWithHints.AddReconstructionHint(new ReconstructionHint(start, end, layer, scaledAnchors, hintType,
-                    distFunc: distFunc));
+                pathWithHints.AddReconstructionHint(new ReconstructionHint(start, end, layer, hintAnchors, hintType, distFunc: distFunc));
             } else {
                 pathWithHints.AddReconstructionHint(new ReconstructionHint(start, end, layer, null));
             }
-        }
-
-        private static List<Vector2> TransformAnchors(List<Vector2> anchors, double scaleX, double scaleY) {
-            return Precision.AlmostEquals(scaleX, 1) && Precision.AlmostEquals(scaleY, 1)
-                ? anchors
-                : anchors.Select(o => new Vector2(o.X * scaleX, o.Y * scaleY)).ToList();
         }
     }
 }

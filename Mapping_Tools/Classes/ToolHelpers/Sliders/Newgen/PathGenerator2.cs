@@ -10,7 +10,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
     public class PathGenerator2 {
         private double MaxAngle { get; set; } = Math.PI * 1 / 3;
         private ApproximationMode Approximation { get; set; } = ApproximationMode.Best;
-        private int NumTestPoints { get; set; } = 100;
+        private int NumTestPoints { get; set; } = 10;
 
         /// <summary>
         /// Generates anchors which approximate the path between the given path nodes.

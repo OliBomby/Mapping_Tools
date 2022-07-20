@@ -4,32 +4,36 @@ using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourTemplates {
-    public class CircleTemplate : ITumourTemplate {
-        public Vector2 GetOffset(double t) {
-            return t < 0.5 ? -2 * t * Vector2.UnitY : 2 * (-1 + t) * Vector2.UnitY;
+    public class CircleTemplate : TumourTemplateBase {
+        public override Vector2 GetOffset(double t) {
+            return t < 0.5 ? -2 * Width * t * Vector2.UnitY : 2 * Width * (-1 + t) * Vector2.UnitY;
         }
 
-        public double GetLength() {
-            return 2.5;
+        public override double GetLength() {
+            return 2 * Math.Sqrt(0.25 * Length * Length + Width * Width);
         }
 
-        public double GetDefaultSpan() {
-            return 1;
+        public override double GetDefaultSpan() {
+            return Length;
         }
 
-        public IEnumerable<double> GetCriticalPoints() {
+        public override int GetDetailLevel() {
+            return 10;
+        }
+
+        public override IEnumerable<double> GetCriticalPoints() {
             yield return 0.5;
         }
 
-        public List<Vector2> GetReconstructionHint() {
-            return new List<Vector2> { Vector2.Zero, new(0.5, -1), Vector2.UnitX };
+        public override List<Vector2> GetReconstructionHint() {
+            return new List<Vector2> { Vector2.Zero, new(0.5 * Length, -Width), Length * Vector2.UnitX };
         }
 
-        public PathType GetReconstructionHintPathType() {
+        public override PathType GetReconstructionHintPathType() {
             return PathType.PerfectCurve;
         }
 
-        public Func<double, double> GetDistanceRelation(double _) {
+        public override Func<double, double> GetDistanceRelation() {
             return null;
         }
     }

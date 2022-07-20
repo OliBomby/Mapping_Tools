@@ -9,6 +9,16 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
     /// </summary>
     public interface ITumourTemplate {
         /// <summary>
+        /// The length along the curve.
+        /// </summary>
+        double Length { get; set; }
+
+        /// <summary>
+        /// The size of the protrusion.
+        /// </summary>
+        double Width { get; set; }
+
+        /// <summary>
         /// Gets the position along the tumour shape at completion <see cref="t"/>.
         /// The value of <see cref="t"/> should correspond linearly to the cumulative length of this function.
         /// Imagine the X-axis as the slider going from left to right.
@@ -28,6 +38,11 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
         /// Could be used to determine the scale of <see cref="GetOffset(double)"/>.
         /// </summary>
         double GetDefaultSpan();
+
+        /// <summary>
+        /// Gets how many points should be used to approximate this tumour shape.
+        /// </summary>
+        int GetDetailLevel();
 
         /// <summary>
         /// Gets a list of t values which should definitely get a point.
@@ -50,7 +65,6 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
         /// The relation [0,1] -> [0,1] between cumulative length on the curve and cumulative length on the hint path.
         /// If null, this relation is assumed to be linear.
         /// </summary>
-        /// <param name="scaleY">Scaling applied to the Y-axis which changes the shape of the tumour.</param>
-        Func<double, double> GetDistanceRelation(double scaleY);
+        Func<double, double> GetDistanceRelation();
     }
 }

@@ -13,7 +13,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         private PathGenerator2 PathGenerator { get; set; } = new();
 
         public (List<Vector2>, PathType) Reconstruct(PathWithHints pathWithHints) {
-            //return (pathWithHints.Path.Select(o => o.Pos).ToList(), PathType.Linear);
+            // return (pathWithHints.Path.Select(o => o.Pos).ToList(), PathType.Linear);
 
             var anchors = new List<Vector2>();
             var current = pathWithHints.Path.First;
