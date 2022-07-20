@@ -224,6 +224,9 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 ? (endP.OgPos - startP.OgPos).Theta
                 : MathHelper.LerpAngle(startP.AvgAngle, endP.AvgAngle, 0.5);
 
+            var scale = tumourLayer.TumourScale.GetValue(startProg) * Scalar;
+            var rotation = MathHelper.DegreesToRadians(tumourLayer.TumourRotation.GetValue(startProg));
+
             // Make sure there are enough points between start and end for the tumour shape and resolution
             var tumourTemplate = tumourLayer.TumourTemplate;
             int wantedPointsBetween = Math.Max(pointsBetween, (int)(tumourTemplate.GetLength() * Resolution));  // The needed number of points for the tumour
@@ -282,8 +285,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 angle = otherSide ? angle + Math.PI : angle;
 
                 // Add the offset to the point
-                var scale = tumourLayer.TumourScale.GetValue(t * (endProg - startProg) + startProg) * Scalar;
-                var offset = Vector2.Rotate(tumourTemplate.GetOffset(t) * scale, angle);
+                var offset = Vector2.Rotate(tumourTemplate.GetOffset(t) * scale, angle + rotation);
                 var actualOffset = pos + offset - p.OgPos;
                 var newPos = p.Pos + actualOffset;
 
@@ -292,19 +294,20 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             }
 
             // Maybe add a hint
-            if (WrappingMode == WrappingMode.Simple) {
+            if (WrappingMode == WrappingMode.Simple && Precision.AlmostEquals(MathHelper.AngleDifference(rotation, 0), 0, 1E-6D)) {
                 var hintAnchors = tumourTemplate.GetReconstructionHint();
                 var hintType = tumourTemplate.GetReconstructionHintPathType();
 
                 var scaleX = Vector2.Distance(start.Value.OgPos, end.Value.OgPos) / tumourTemplate.GetDefaultSpan();
-                var scaleY = tumourLayer.TumourScale.GetValue(startProg) * Scalar;
-                if (otherSide) scaleY = -scaleY;
+                var scaleY = otherSide ? -scale : scale;
                 var scaledAnchors = TransformAnchors(hintAnchors, scaleX, scaleY);
 
                 var distFunc = tumourTemplate.GetDistanceRelation(scaleY / scaleX);
 
                 pathWithHints.AddReconstructionHint(new ReconstructionHint(start, end, layer, scaledAnchors, hintType,
                     distFunc: distFunc));
+            } else {
+                pathWithHints.AddReconstructionHint(new ReconstructionHint(start, end, layer, null));
             }
         }
 
