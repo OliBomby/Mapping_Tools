@@ -198,7 +198,8 @@ namespace Mapping_Tools.Viewmodels {
                     try {
                         var newLayer = TumourLayer.GetDefaultLayer();
                         newLayer.Name = "Layer " + (TumourLayers.Count + 1);
-                        TumourLayers.Add(newLayer);
+                        TumourLayers.Insert(CurrentLayerIndex + 1, newLayer);
+                        CurrentLayerIndex++;
                         RegeneratePreview();
                     } catch (Exception ex) { ex.Show(); }
                 });
@@ -208,6 +209,7 @@ namespace Mapping_Tools.Viewmodels {
                         var copy = TumourLayers[CurrentLayerIndex].Copy();
                         copy.Name = $"{copy.Name} (Copy)";
                         TumourLayers.Insert(CurrentLayerIndex + 1, copy);
+                        CurrentLayerIndex++;
                         RegeneratePreview();
                     } catch (Exception ex) { ex.Show(); }
                 });
