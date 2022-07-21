@@ -78,9 +78,18 @@ namespace Mapping_Tools.Viewmodels {
                 if (Set(ref _tumourLayers, value)) {
                     RegeneratePreview();
                     foreach (TumourLayer layer in _tumourLayers) {
-                        _currentLayer.PropertyChanged += TumourLayerOnPropertyChanged;
+                        layer.PropertyChanged += TumourLayerOnPropertyChanged;
                     }
+                    _tumourLayers.CollectionChanged += TumourLayersOnCollectionChanged;
                 }
+            }
+        }
+
+        private void TumourLayersOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+            if (e.NewItems is null) return;
+            foreach (object newObj in e.NewItems) {
+                if (newObj is not TumourLayer layer) continue;
+                layer.PropertyChanged += TumourLayerOnPropertyChanged;
             }
         }
 

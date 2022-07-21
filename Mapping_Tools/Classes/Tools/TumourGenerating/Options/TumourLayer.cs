@@ -87,7 +87,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
                 TumourTemplate = new TriangleTemplate(),
                 IsActive = true,
                 Name = "Layer",
-                TumourCount = -1,
+                TumourCount = 0,
                 TumourStart = 0,
                 TumourEnd = 1,
                 TumourLength = GetGraphState(15),
