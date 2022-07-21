@@ -142,6 +142,11 @@
                                           ToolTip="Show advanced controls. Allows for fine control of parameters and changes over time."/>
                             <TextBlock Text="Advanced" Margin="10 0 0 0"/>
                         </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0 5 0 5">
+                            <ToggleButton IsChecked="{Binding Debug}"
+                                          ToolTip="Show only the path without reconstruction."/>
+                            <TextBlock Text="Debug" Margin="10 0 0 0"/>
+                        </StackPanel>
                     </StackPanel>
                 </Grid>
 

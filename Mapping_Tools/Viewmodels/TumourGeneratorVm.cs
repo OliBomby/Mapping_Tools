@@ -11,6 +11,7 @@ using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.ToolHelpers;
+using Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen;
 using Mapping_Tools.Classes.Tools.TumourGenerating;
 using Mapping_Tools.Classes.Tools.TumourGenerating.Enums;
 using Mapping_Tools.Classes.Tools.TumourGenerating.Options;
@@ -73,7 +74,14 @@ namespace Mapping_Tools.Viewmodels {
         private ObservableCollection<TumourLayer> _tumourLayers;
         public ObservableCollection<TumourLayer> TumourLayers {
             get => _tumourLayers;
-            set => Set(ref _tumourLayers, value, action: RegeneratePreview);
+            set {
+                if (Set(ref _tumourLayers, value)) {
+                    RegeneratePreview();
+                    foreach (TumourLayer layer in _tumourLayers) {
+                        _currentLayer.PropertyChanged += TumourLayerOnPropertyChanged;
+                    }
+                }
+            }
         }
 
         private void TumourLayerOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
@@ -123,6 +131,12 @@ namespace Mapping_Tools.Viewmodels {
                     RaisePropertyChanged(nameof(TumourStartSliderMin));
                 }
             }
+        }
+
+        private bool _debug;
+        public bool Debug {
+            get => _debug;
+            set => Set(ref _debug, value, action: RegeneratePreview);
         }
 
         public double TumourStartSliderMin => AdvancedOptions ? -1 : 0;
@@ -282,7 +296,10 @@ namespace Mapping_Tools.Viewmodels {
                 var tumourGenerator = new TumourGenerator {
                     TumourLayers = TumourLayers,
                     JustMiddleAnchors = JustMiddleAnchors,
-                    Scalar = Scale
+                    Scalar = Scale,
+                    Reconstructor = new Reconstructor {
+                        DebugConstruction = Debug
+                    }
                 };
                 tumourGenerator.TumourGenerate(args);
 

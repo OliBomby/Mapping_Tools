@@ -10,6 +10,7 @@ using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Classes.ToolHelpers;
+using Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen;
 using Mapping_Tools.Classes.Tools.TumourGenerating.Options;
 using Mapping_Tools.Components.Dialogs;
 using Mapping_Tools.Viewmodels;
@@ -92,7 +93,10 @@ To get started, select a slider in your beatmap and click 'Preview slider' to pr
             var tumourGenerator = new Classes.Tools.TumourGenerating.TumourGenerator {
                 TumourLayers = arg.TumourLayers,
                 JustMiddleAnchors = arg.JustMiddleAnchors,
-                Scalar = arg.Scale
+                Scalar = arg.Scale,
+                Reconstructor = new Reconstructor {
+                    DebugConstruction = arg.Debug
+                }
             };
             
             // Load sliders from the selector

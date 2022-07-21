@@ -10,10 +10,14 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
     /// Reconstructs the anchors of a complete slider out of a <see cref="PathWithHints"/>.
     /// </summary>
     public class Reconstructor {
-        private PathGenerator2 PathGenerator { get; set; } = new();
+        public PathGenerator2 PathGenerator { get; init; } = new();
+
+        public bool DebugConstruction { get; set; } = false;
 
         public (List<Vector2>, PathType) Reconstruct(PathWithHints pathWithHints) {
-            // return (pathWithHints.Path.Select(o => o.Pos).ToList(), PathType.Linear);
+            if (DebugConstruction) {
+                return (pathWithHints.Path.Select(o => o.Pos).ToList(), PathType.Linear);
+            }
 
             var anchors = new List<Vector2>();
             var current = pathWithHints.Path.First;

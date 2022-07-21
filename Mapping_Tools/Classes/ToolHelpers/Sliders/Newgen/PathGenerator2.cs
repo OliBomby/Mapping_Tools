@@ -8,9 +8,9 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
     /// Version of <see cref="PathGenerator"/> but working with <see cref="PathPoint"/> instead.
     /// </summary>
     public class PathGenerator2 {
-        private double MaxAngle { get; set; } = Math.PI * 1 / 3;
-        private ApproximationMode Approximation { get; set; } = ApproximationMode.Best;
-        private int NumTestPoints { get; set; } = 10;
+        public double MaxAngle { get; set; } = Math.PI * 1 / 3;
+        public ApproximationMode Approximation { get; set; } = ApproximationMode.Best;
+        public int NumTestPoints { get; set; } = 10;
 
         /// <summary>
         /// Generates anchors which approximate the path between the given path nodes.

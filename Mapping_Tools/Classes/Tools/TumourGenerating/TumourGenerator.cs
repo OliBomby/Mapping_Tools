@@ -43,6 +43,8 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
         public IReadOnlyList<ITumourLayer> TumourLayers  { get; set; }
 
+        public Reconstructor Reconstructor { get; init; } = new();
+
         /// <summary>
         /// Places copious amounts of tumours on the slider.
         /// Changes slider curvepoints, pixel length, and velocity
@@ -129,8 +131,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
             // Reconstruct the slider
             PathHelper.Recalculate(pathWithHints.Path);
-            var reconstructor = new Reconstructor();
-            var (anchors, pathType) = reconstructor.Reconstruct(pathWithHints);
+            var (anchors, pathType) = Reconstructor.Reconstruct(pathWithHints);
             var newSliderPath = new SliderPath(pathType, anchors.ToArray());
 
             // Set the new slider path
