@@ -224,6 +224,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             double betweenAngle = (endP.OgPos - startP.OgPos).LengthSquared > Precision.DOUBLE_EPSILON
                 ? (endP.OgPos - startP.OgPos).Theta
                 : MathHelper.LerpAngle(startP.AvgAngle, endP.AvgAngle, 0.5);
+            double templateRange = endTemplateT - startTemplateT;
 
             var length = Vector2.Distance(start.Value.OgPos, end.Value.OgPos);
             var scale = tumourLayer.TumourScale.GetValue(startProg) * Scalar;
@@ -240,7 +241,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             }
 
             // Make sure there are enough points between start and end for the tumour shape and resolution
-            int wantedPointsBetween = Math.Max(pointsBetween, (int)(tumourTemplate.GetDetailLevel() * Resolution));  // The needed number of points for the tumour
+            int wantedPointsBetween = Math.Max(pointsBetween, (int)(tumourTemplate.GetDetailLevel() * templateRange * Resolution));  // The needed number of points for the tumour
             pointsBetween += path.EnsureCriticalPoints(start, end, startTemplateT, endTemplateT,
                 tumourTemplate.GetCriticalPoints(), out var ensuredPoints);
             if (pointsBetween < wantedPointsBetween) {
@@ -250,9 +251,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             // Add tumour offsets
             double startDist = startP.CumulativeLength;
             var pn = start;
-            for (int i = 0; i < pointsBetween; i++) {
-                pn = pn.Next;
-                Debug.Assert(pn != null, nameof(pn) + " != null");
+            while (pn is not null && pn.Previous != end) {
                 var p = pn.Value;
 
                 double t = Precision.AlmostEquals(dist, 0) ?
@@ -260,7 +259,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     (p.CumulativeLength - startDist) / dist;
 
                 // Scale to template T
-                t = t * (endTemplateT - startTemplateT) + startTemplateT;
+                var templateT = t * templateRange + startTemplateT;
 
                 // Check if this is a critical point
                 bool isCritical = false;
@@ -293,12 +292,14 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 };
 
                 // Add the offset to the point
-                var offset = Vector2.Rotate(tumourTemplate.GetOffset(t), angle + rotation);
+                var offset = Vector2.Rotate(tumourTemplate.GetOffset(templateT), angle + rotation);
                 var actualOffset = pos + offset - p.OgPos;
                 var newPos = p.Pos + actualOffset;
 
                 // Modify the path
                 pn.Value = new PathPoint(newPos, p.OgPos, p.PreAngle, p.PostAngle, p.CumulativeLength, p.T, red);
+
+                pn = pn.Next;
             }
 
             // Maybe add a hint
