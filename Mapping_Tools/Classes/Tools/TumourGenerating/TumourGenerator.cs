@@ -103,7 +103,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     };
 
                     if (endDist >= 0) {
-                        var epsilon = Math.Min(0.9, length / 2);
+                        var epsilon = MathHelper.Clamp(length / 2, Precision.DOUBLE_EPSILON, 0.9);
                         var start = PathHelper.FindFirstOccurrenceExact(current, nextDist, epsilon: epsilon);
                         var end = PathHelper.FindLastOccurrenceExact(start, endDist, epsilon: epsilon);
 
