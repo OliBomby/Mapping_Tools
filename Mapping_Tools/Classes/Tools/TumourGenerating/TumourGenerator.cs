@@ -111,8 +111,8 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                         double startT= 0;
                         double endT = 1;
                         if (Precision.DefinitelyBigger(length, 0) && Precision.DefinitelyBigger(end.Value.CumulativeLength, start.Value.CumulativeLength)) {
-                            startT = (start.Value.CumulativeLength - nextDist) / length;
-                            endT = (end.Value.CumulativeLength - nextDist) / length;
+                            startT = MathHelper.Clamp((start.Value.CumulativeLength - nextDist) / length, 0, 1);
+                            endT = MathHelper.Clamp((end.Value.CumulativeLength - nextDist) / length, 0, 1);
                         }
 
                         PlaceTumour(pathWithHints, tumourLayer, layer, start, end, startT, endT, side);
