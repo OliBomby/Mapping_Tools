@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.MathUtil;
+using Newtonsoft.Json;
 
 namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourTemplates {
     public abstract class TumourTemplateBase : ITumourTemplate {
+        [JsonIgnore]
         public double Length { get; set; }
 
+        [JsonIgnore]
         public double Width { get; set; }
 
         public abstract Vector2 GetOffset(double t);
