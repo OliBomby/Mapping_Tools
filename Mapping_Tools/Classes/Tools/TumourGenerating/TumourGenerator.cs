@@ -106,10 +106,6 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                         var start = PathHelper.FindFirstOccurrenceExact(current, nextDist, epsilon:0.9);
                         var end = PathHelper.FindLastOccurrenceExact(start, endDist);
 
-                        // Make sure start and end are red
-                        start.Value = start.Value.SetRed(true);
-                        end.Value = end.Value.SetRed(true);
-
                         // Calculate the T start/end for the tumour template
                         double startT= 0;
                         double endT = 1;
@@ -291,6 +287,8 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     WrappingMode.RoundReplace => isCritical || (point.Red && point.Pos != point.OgPos),
                     _ => isCritical || point.Red
                 };
+                // Make sure the start and end points are red
+                red |= current == start || current == end;
 
                 // Add the offset to the point
                 var offset = Vector2.Rotate(tumourTemplate.GetOffset(templateT), angle + rotation);
