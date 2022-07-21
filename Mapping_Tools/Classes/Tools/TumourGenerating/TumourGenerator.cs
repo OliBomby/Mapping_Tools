@@ -101,7 +101,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
                     if (endDist >= 0) {
                         var start = PathHelper.FindFirstOccurrenceExact(current, nextDist, epsilon:0.9);
-                        var end = PathHelper.FindLastOccurrenceExact(start, endDist, epsilon:0.9);
+                        var end = PathHelper.FindLastOccurrenceExact(start, endDist);
 
                         // Make sure start and end are red
                         start.Value = start.Value.SetRed(true);
