@@ -217,6 +217,7 @@
                                  ToolTip="The progression along the slider where to start the placement of tumours. 0 is the slider head, 1 is the slider end."
                                  Visibility="{Binding AdvancedOptions, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                         <Slider Minimum="{Binding TumourStartSliderMin}" Maximum="1" Value="{Binding CurrentLayer.TumourStart}"
+                                SmallChange="0.0001" LargeChange="0.1"
                                 ToolTip="The progression along the slider where to start the placement of tumours. 0 is the slider head, 1 is the slider end."/>
                         <TextBlock Text="End" FontWeight="Bold" Margin="0 10 0 0"/>
                         <TextBox materialDesign:HintAssist.Hint="End" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
@@ -224,6 +225,7 @@
                                  ToolTip="The progression along the slider where to end the placement of tumours. 0 is the slider head, 1 is the slider end."
                                  Visibility="{Binding AdvancedOptions, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                         <Slider Minimum="0" Maximum="1" Value="{Binding CurrentLayer.TumourEnd}"
+                                SmallChange="0.0001" LargeChange="0.1"
                                 ToolTip="The progression along the slider where to end the placement of tumours. 0 is the slider head, 1 is the slider end."/>
                         <CheckBox IsChecked="{Binding CurrentLayer.Recalculate}" Margin="0 10 0 0"
                                   Content="Recalculate" ToolTip="Whether to recalculate the distances and angles of the slider before applying this layer. If true, tumours will be placed on top of tumours of the previous layers as if they were part of the slider, instead of merging with those tumours."/>
