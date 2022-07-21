@@ -103,13 +103,14 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     };
 
                     if (endDist >= 0) {
-                        var start = PathHelper.FindFirstOccurrenceExact(current, nextDist, epsilon:0.9);
-                        var end = PathHelper.FindLastOccurrenceExact(start, endDist);
+                        var epsilon = Math.Min(0.9, length / 2);
+                        var start = PathHelper.FindFirstOccurrenceExact(current, nextDist, epsilon: epsilon);
+                        var end = PathHelper.FindLastOccurrenceExact(start, endDist, epsilon: epsilon);
 
                         // Calculate the T start/end for the tumour template
                         double startT= 0;
                         double endT = 1;
-                        if (Precision.DefinitelyBigger(length, 0)) {
+                        if (Precision.DefinitelyBigger(length, 0) && Precision.DefinitelyBigger(end.Value.CumulativeLength, start.Value.CumulativeLength)) {
                             startT = (start.Value.CumulativeLength - nextDist) / length;
                             endT = (end.Value.CumulativeLength - nextDist) / length;
                         }
