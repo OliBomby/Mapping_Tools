@@ -160,7 +160,7 @@ namespace Mapping_Tools.Viewmodels {
         #endregion
 
         public TumourGeneratorVm() {
-            PreviewHitObject = new HitObject("95,319,75,2,0,P|271:304|421:48,1,475");
+            PreviewHitObject = new HitObject("0,0,0,2,0,L|256:0,1,256");
             ImportModeSetting = ImportMode.Selected;
             JustMiddleAnchors = false;
             Scale = 1;
