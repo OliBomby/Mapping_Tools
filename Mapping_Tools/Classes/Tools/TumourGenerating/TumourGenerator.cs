@@ -233,6 +233,11 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             tumourTemplate.Width = otherSide ? -scale : scale;
             tumourTemplate.Length = length;
 
+            // Initialize the template if necessary
+            if (tumourTemplate is IRequireInit initializable) {
+                initializable.Init();
+            }
+
             // Make sure there are enough points between start and end for the tumour shape and resolution
             int wantedPointsBetween = Math.Max(pointsBetween, (int)(tumourTemplate.GetDetailLevel() * Resolution));  // The needed number of points for the tumour
             pointsBetween += path.EnsureCriticalPoints(start, end, startTemplateT, endTemplateT,
