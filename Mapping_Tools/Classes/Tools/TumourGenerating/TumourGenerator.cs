@@ -84,7 +84,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 // Find the start of the tumours
                 var current = pathWithHints.Path.First;
                 var nextDist = tumourStart * totalLength;
-                var side = false;
+                var side = tumourLayer.TumourSidedness == TumourSidedness.AlternatingLeft;
 
                 while (nextDist <= tumourEnd * totalLength + Precision.DOUBLE_EPSILON && current is not null) {
                     var length = tumourLayer.TumourLength.GetValue(nextDist / totalLength);
@@ -94,7 +94,8 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     side = tumourLayer.TumourSidedness switch {
                         TumourSidedness.Left => false,
                         TumourSidedness.Right => true,
-                        TumourSidedness.Alternating => !side,
+                        TumourSidedness.AlternatingLeft => !side,
+                        TumourSidedness.AlternatingRight => !side,
                         TumourSidedness.Random => random.NextDouble() < 0.5,
                         _ => false
                     };

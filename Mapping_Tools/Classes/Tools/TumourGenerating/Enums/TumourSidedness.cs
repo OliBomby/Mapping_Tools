@@ -2,7 +2,8 @@
     public enum TumourSidedness {
         Left,
         Right,
-        Alternating,
+        AlternatingLeft,
+        AlternatingRight,
         Random
     }
 }
