@@ -167,29 +167,29 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 throw new ArgumentException(@"End node has to be part of the provided path.", nameof(end));
             }
 
-            var startP = start.Value;
-            var endP = end.Value;
+            var startPoint = start.Value;
+            var endPoint = end.Value;
 
             // Ensure that there is a copy of the start point at the end point if we add in-between points
             // and the start and end points are the same node.
             if (ReferenceEquals(start, end)) {
-                end = new LinkedListNode<PathPoint>(endP);
+                end = new LinkedListNode<PathPoint>(endPoint);
                 start.List!.AddAfter(start, end);
             }
 
-            if (Precision.AlmostEquals(startP.CumulativeLength, endP.CumulativeLength)) {
+            if (Precision.AlmostEquals(startPoint.CumulativeLength, endPoint.CumulativeLength)) {
                 // Wii Sports Resort to T mode
 
                 // T should either be undefined on both start and end point because T is not yet initialized for this distance
                 // or T should be defined for both
                 // If T is defined, then 0 should be on the first occurance of this dist and 1 on the last occurance of this dist
 
-                if (double.IsNaN(startP.T) ^ double.IsNaN(endP.T)) {
+                if (double.IsNaN(startPoint.T) ^ double.IsNaN(endPoint.T)) {
                     throw new InvalidOperationException(
                         "T value must be both defined or both undefined for the same distance value.");
                 }
 
-                if (double.IsNaN(startP.T)) {
+                if (double.IsNaN(startPoint.T)) {
                     // Initialize T properly
                     var firstOccurrence = PathHelper.FindFirstOccurrence(start, start.Value.CumulativeLength);
                     var lastOccurrence = PathHelper.FindLastOccurrence(end, end.Value.CumulativeLength);
@@ -213,17 +213,17 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             int pointsBetween = PathHelper.CountPointsBetween(start, end);
 
             var totalLength = path.Last!.Value.CumulativeLength;
-            startP = start.Value;
-            endP = end.Value;
-            var startProg = startP.CumulativeLength / totalLength;
-            var endProg = endP.CumulativeLength / totalLength;
-            double startT = startP.T;
-            double endT = endP.T;
-            double dist = endP.CumulativeLength - startP.CumulativeLength;
+            startPoint = start.Value;
+            endPoint = end.Value;
+            var startProg = startPoint.CumulativeLength / totalLength;
+            var endProg = endPoint.CumulativeLength / totalLength;
+            double startT = startPoint.T;
+            double endT = endPoint.T;
+            double dist = endPoint.CumulativeLength - startPoint.CumulativeLength;
             double distT = endT - startT;
-            double betweenAngle = (endP.OgPos - startP.OgPos).LengthSquared > Precision.DOUBLE_EPSILON
-                ? (endP.OgPos - startP.OgPos).Theta
-                : MathHelper.LerpAngle(startP.AvgAngle, endP.AvgAngle, 0.5);
+            double betweenAngle = (endPoint.OgPos - startPoint.OgPos).LengthSquared > Precision.DOUBLE_EPSILON
+                ? (endPoint.OgPos - startPoint.OgPos).Theta
+                : MathHelper.LerpAngle(startPoint.AvgAngle, endPoint.AvgAngle, 0.5);
             double templateRange = endTemplateT - startTemplateT;
 
             var length = Vector2.Distance(start.Value.OgPos, end.Value.OgPos);
@@ -249,57 +249,57 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             }
 
             // Add tumour offsets
-            double startDist = startP.CumulativeLength;
-            var pn = start;
-            while (pn is not null && pn.Previous != end) {
-                var p = pn.Value;
+            double startDist = startPoint.CumulativeLength;
+            var current = start;
+            while (current is not null && current.Previous != end) {
+                var point = current.Value;
 
                 double t = Precision.AlmostEquals(dist, 0) ?
-                    (p.T - startT) / distT :
-                    (p.CumulativeLength - startDist) / dist;
+                    (point.T - startT) / distT :
+                    (point.CumulativeLength - startDist) / dist;
 
                 // Scale to template T
                 var templateT = t * templateRange + startTemplateT;
 
                 // Check if this is a critical point
                 bool isCritical = false;
-                if (ensuredPoints.First != null && ensuredPoints.First.Value == pn) {
+                if (ensuredPoints.First != null && ensuredPoints.First.Value == current) {
                     ensuredPoints.RemoveFirst();
                     isCritical = true;
                 }
 
                 // Get the offset, original pos, and direction
-                var np = PathPoint.Lerp(startP, endP, t);
+                var interpolatedPoint = PathPoint.Lerp(startPoint, endPoint, t);
                 var pos = WrappingMode switch {
-                    WrappingMode.Simple => np.OgPos,
-                    WrappingMode.Replace => np.OgPos,
-                    WrappingMode.RoundReplace => np.OgPos,
-                    _ => p.OgPos
+                    WrappingMode.Simple => interpolatedPoint.OgPos,
+                    WrappingMode.Replace => interpolatedPoint.OgPos,
+                    WrappingMode.RoundReplace => interpolatedPoint.OgPos,
+                    _ => point.OgPos
                 };
                 var angle = WrappingMode switch {
                     WrappingMode.Simple => betweenAngle,
                     WrappingMode.Replace => betweenAngle,
-                    WrappingMode.RoundReplace => np.AvgAngle,
-                    WrappingMode.RoundWrap => np.AvgAngle,
-                    WrappingMode.Wrap => p.AvgAngle,
+                    WrappingMode.RoundReplace => interpolatedPoint.AvgAngle,
+                    WrappingMode.RoundWrap => interpolatedPoint.AvgAngle,
+                    WrappingMode.Wrap => point.AvgAngle,
                     _ => betweenAngle,
                 };
                 var red = WrappingMode switch {
-                    WrappingMode.Simple => isCritical || (p.Red && p.Pos != p.OgPos),
-                    WrappingMode.Replace => isCritical || (p.Red && p.Pos != p.OgPos),
-                    WrappingMode.RoundReplace => isCritical || (p.Red && p.Pos != p.OgPos),
-                    _ => isCritical || p.Red
+                    WrappingMode.Simple => isCritical || (point.Red && point.Pos != point.OgPos),
+                    WrappingMode.Replace => isCritical || (point.Red && point.Pos != point.OgPos),
+                    WrappingMode.RoundReplace => isCritical || (point.Red && point.Pos != point.OgPos),
+                    _ => isCritical || point.Red
                 };
 
                 // Add the offset to the point
                 var offset = Vector2.Rotate(tumourTemplate.GetOffset(templateT), angle + rotation);
-                var actualOffset = pos + offset - p.OgPos;
-                var newPos = p.Pos + actualOffset;
+                var actualOffset = pos + offset - point.OgPos;
+                var newPos = point.Pos + actualOffset;
 
                 // Modify the path
-                pn.Value = new PathPoint(newPos, p.OgPos, p.PreAngle, p.PostAngle, p.CumulativeLength, p.T, red);
+                current.Value = new PathPoint(newPos, point.OgPos, point.PreAngle, point.PostAngle, point.CumulativeLength, point.T, red);
 
-                pn = pn.Next;
+                current = current.Next;
             }
 
             // Maybe add a hint
@@ -307,8 +307,10 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 var hintAnchors = tumourTemplate.GetReconstructionHint();
                 var hintType = tumourTemplate.GetReconstructionHintPathType();
                 var distFunc = tumourTemplate.GetDistanceRelation();
+                var startP = distFunc?.Invoke(startTemplateT) ?? startTemplateT;
+                var endP = distFunc?.Invoke(endTemplateT) ?? endTemplateT;
 
-                pathWithHints.AddReconstructionHint(new ReconstructionHint(start, end, layer, hintAnchors, hintType, distFunc: distFunc));
+                pathWithHints.AddReconstructionHint(new ReconstructionHint(start, end, layer, hintAnchors, hintType, startP, endP, distFunc: distFunc));
             } else {
                 pathWithHints.AddReconstructionHint(new ReconstructionHint(start, end, layer, null));
             }
