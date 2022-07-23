@@ -110,9 +110,11 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                         // Calculate the T start/end for the tumour template
                         double startT= 0;
                         double endT = 1;
-                        if (Precision.DefinitelyBigger(length, 0) && Precision.DefinitelyBigger(end.Value.CumulativeLength, start.Value.CumulativeLength)) {
-                            startT = MathHelper.Clamp((start.Value.CumulativeLength - nextDist) / length, 0, 1);
-                            endT = MathHelper.Clamp((end.Value.CumulativeLength - nextDist) / length, 0, 1);
+                        if (Precision.DefinitelyBigger(length, 0)) {
+                            if (!Precision.AlmostEquals(start.Value.CumulativeLength, nextDist, epsilon))
+                                startT = MathHelper.Clamp((start.Value.CumulativeLength - nextDist) / length, 0, 1);
+                            if (!Precision.AlmostEquals(end.Value.CumulativeLength, nextDist + length, epsilon))
+                                endT = MathHelper.Clamp((end.Value.CumulativeLength - nextDist) / length, 0, 1);
                         }
 
                         PlaceTumour(pathWithHints, tumourLayer, layer, start, end, startT, endT, side);
