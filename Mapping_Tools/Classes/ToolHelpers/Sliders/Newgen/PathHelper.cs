@@ -201,43 +201,39 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             var tMode = Precision.AlmostEquals(dist, 0);
 
             if (tMode) {
-                // Count the number of nodes already between start and end
-                int count = CountPointsBetween(start, end);
-
                 // Interpolate path points at roughly equal distance intervals
-                int pointsToAdd = wantedCount - count;
-                int pointsToAddToEachSegment = (int) Math.Ceiling(pointsToAdd / (double) (count + 1));
+                var wantedGap = (end.Value.T - start.Value.T) / wantedCount;
                 
-                // Add pointsToAddToEachSegment number of points in each segment of the arc
-                // TODO: I can actually be smarter about this and base the number of points on the distT of the segment and leave this implementation for the distT = 0 case
-                // TODO: Create a SortedList with each point between and the segment distT. Take the largest segment, divide it by a number proportional to distT / total distT, and update list.
+                // Interpolate all segments which are too big
                 var p = start;
                 while (p != end) {
                     var nextP = p!.Next;
 
-                    // Add pointsToAddToEachSegment after p
-                    Interpolate(p, pointsToAddToEachSegment);
-                    addedPoints += pointsToAddToEachSegment;
+                    var gap = p.Next!.Value.T - p.Value.T;
+                    if (Precision.DefinitelyBigger(gap, wantedGap)) {
+                        var pointsToAdd = (int) Math.Ceiling(gap / wantedGap);
+                        Interpolate(p, pointsToAdd);
+                        addedPoints += pointsToAdd;
+                    }
 
                     p = nextP;
                 }
             } else {
                 // Distance mode
-                // Count the number of nodes already between start and end
-                int count = CountPointsBetween(start, end);
-
                 // Interpolate path points at roughly equal distance intervals
-                int pointsToAdd = wantedCount - count;
-                int pointsToAddToEachSegment = (int) Math.Ceiling(pointsToAdd / (double) (count + 1));
+                var wantedGap = dist / wantedCount;
 
-                // Add pointsToAddToEachSegment number of points in each segment of the arc
+                // Interpolate all segments which are too big
                 var p = start;
                 while (p != end) {
                     var nextP = p!.Next;
 
-                    // Add pointsToAddToEachSegment after p
-                    Interpolate(p, pointsToAddToEachSegment);
-                    addedPoints += pointsToAddToEachSegment;
+                    var gap = p.Next!.Value.CumulativeLength - p.Value.CumulativeLength;
+                    if (Precision.DefinitelyBigger(gap, wantedGap)) {
+                        var pointsToAdd = (int) Math.Ceiling(gap / wantedGap);
+                        Interpolate(p, pointsToAdd);
+                        addedPoints += pointsToAdd;
+                    }
 
                     p = nextP;
                 }
