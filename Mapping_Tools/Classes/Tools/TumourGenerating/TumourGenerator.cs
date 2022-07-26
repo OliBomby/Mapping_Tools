@@ -275,13 +275,13 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     WrappingMode.RoundReplace => interpolatedPoint.OgPos,
                     _ => point.OgPos
                 };
-                var angle = tumourLayer.WrappingMode switch {
-                    WrappingMode.Simple => betweenAngle,
-                    WrappingMode.Replace => betweenAngle,
-                    WrappingMode.RoundReplace => interpolatedPoint.AvgAngle,
-                    WrappingMode.RoundWrap => interpolatedPoint.AvgAngle,
-                    WrappingMode.Wrap => point.AvgAngle,
-                    _ => betweenAngle,
+                var (preAngle, postAngle) = tumourLayer.WrappingMode switch {
+                    WrappingMode.Simple => (betweenAngle, betweenAngle),
+                    WrappingMode.Replace => (betweenAngle, betweenAngle),
+                    WrappingMode.RoundReplace => (interpolatedPoint.PreAngle, interpolatedPoint.PostAngle),
+                    WrappingMode.RoundWrap => (interpolatedPoint.PreAngle, interpolatedPoint.PostAngle),
+                    WrappingMode.Wrap => (point.PreAngle, point.PostAngle),
+                    _ => (betweenAngle, betweenAngle),
                 };
                 var isOffsetInThisLayer = Vector2.DistanceSquared(point.OgPos, pos) < Precision.DOUBLE_EPSILON;
                 var red = tumourLayer.WrappingMode switch {
@@ -294,16 +294,30 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 // Make sure the start and end points are red
                 red |= current == start || current == end;
 
+                // Get the tumour offset
+                var offset = tumourTemplate.GetOffset(templateT);
+
                 // Handle the case of absolute angled tumours
-                angle = tumourTemplate.AbsoluteAngled ? 0 : angle;
+                (preAngle, postAngle) = tumourTemplate.AbsoluteAngled ? (0, 0) : (preAngle, postAngle);
 
-                // Add the offset to the point
-                var offset = Vector2.Rotate(tumourTemplate.GetOffset(templateT), angle + rotation);
-                var actualOffset = pos + offset - point.OgPos;
-                var newPos = point.Pos + actualOffset;
+                if (red && offset.LengthSquared > Precision.DOUBLE_EPSILON &&
+                    !double.IsNaN(preAngle) && !double.IsNaN(postAngle) && !Precision.AlmostEquals(preAngle, postAngle)) {
+                    // Copy point and offset it by both angles
+                    // Add the offset to the point
+                    var newPos = CalculateNewPos(point, pos, offset, preAngle + rotation);
+                    var newPos2 = CalculateNewPos(point, pos, offset, postAngle + rotation);
 
-                // Modify the path
-                current.Value = new PathPoint(newPos, point.OgPos, point.PreAngle, point.PostAngle, point.CumulativeLength, point.T, red);
+                    // Modify the path
+                    current.List.AddBefore(current, new PathPoint(newPos, point.OgPos, point.PreAngle, point.PostAngle, point.CumulativeLength, point.T, red));
+                    current.Value = new PathPoint(newPos2, point.OgPos, point.PostAngle, point.PostAngle, point.CumulativeLength, point.T, red);
+                } else {
+                    // Add the offset to the point
+                    var angle = MathHelper.LerpAngle(preAngle, postAngle, 0.5);
+                    var newPos = CalculateNewPos(point, pos, offset, angle + rotation);
+
+                    // Modify the path
+                    current.Value = new PathPoint(newPos, point.OgPos, point.PreAngle, point.PostAngle, point.CumulativeLength, point.T, red);
+                }
 
                 current = current.Next;
             }
@@ -320,6 +334,12 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             } else {
                 pathWithHints.AddReconstructionHint(new ReconstructionHint(start, end, layer, null));
             }
+        }
+
+        private static Vector2 CalculateNewPos(PathPoint point, Vector2 pos, Vector2 offset, double angle) {
+            var rotatedOffset = Vector2.Rotate(offset, angle);
+            var actualOffset = pos + rotatedOffset - point.OgPos;
+            return point.Pos + actualOffset;
         }
     }
 }
