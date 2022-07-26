@@ -219,6 +219,8 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="blend">The blending factor</param>
         /// <returns>The linear interpolation from a1 to a2</returns>
         public static double LerpAngle(double a1, double a2, double blend) {
+            if (double.IsNaN(a1)) return a2;
+            if (double.IsNaN(a2)) return a1;
             return blend * AngleDifference(a2, a1) + a1;
         }
 

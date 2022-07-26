@@ -34,8 +34,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                     // Add segment between start and this
                     var hint = hints[nextHint++];
                     if (hint.Anchors is null || hint.Anchors.Count == 0) {
-                        // Null segment, should be reconstructed from points
-                        // TODO reconstruct parts without hints correctly. This code here does not trigger for parts without hints
+                        // Null segment, should have been reconstructed from points by ConstructHints...
                         anchors.Add(hintSegmentStart.Value.Pos);
                         anchors.Add(current.Value.Pos);
                     } else {
@@ -51,7 +50,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
 
                         // Add hint anchors
                         anchors.AddRange(TransformAnchors(convertedAnchors, hintSegmentStart.Value.Pos, current.Value.Pos,
-                            MathHelper.LerpAngle(hintSegmentStart.Value.AvgAngle, current.Value.AvgAngle, 0.5)));
+                            MathHelper.LerpAngle(hintSegmentStart.Value.PreAngle, current.Value.PostAngle, 0.5)));
                     }
 
                     hintSegmentStart = null;
