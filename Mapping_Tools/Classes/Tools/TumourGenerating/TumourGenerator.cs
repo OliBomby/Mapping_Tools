@@ -291,8 +291,12 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     WrappingMode.RoundReplace => isCritical || (point.Red && point.Pos != point.OgPos),
                     _ => isCritical || point.Red
                 };
+
                 // Make sure the start and end points are red
                 red |= current == start || current == end;
+
+                // Handle the case of absolute angled tumours
+                angle = tumourTemplate.AbsoluteAngled ? 0 : angle;
 
                 // Add the offset to the point
                 var offset = Vector2.Rotate(tumourTemplate.GetOffset(templateT), angle + rotation);
@@ -306,7 +310,9 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             }
 
             // Maybe add a hint
-            if (WrappingMode == WrappingMode.Simple && Precision.AlmostEquals(MathHelper.AngleDifference(rotation, 0), 0, 1E-6D)) {
+            if (WrappingMode == WrappingMode.Simple &&
+                Precision.AlmostEquals(MathHelper.AngleDifference(rotation, 0), 0, 1E-6D) &&
+                !tumourTemplate.AbsoluteAngled) {
                 var hintAnchors = tumourTemplate.GetReconstructionHint();
                 var hintType = tumourTemplate.GetReconstructionHintPathType();
                 var distFunc = tumourTemplate.GetDistanceRelation();
