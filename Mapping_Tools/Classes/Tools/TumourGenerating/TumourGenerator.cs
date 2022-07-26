@@ -227,8 +227,8 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             // Setup tumour template with the correct shape
             var tumourTemplate = tumourLayer.TumourTemplate;
             tumourTemplate.Width = otherSide ? -scale : scale;
-            tumourTemplate.Length = length;
-            tumourTemplate.Parameter = tumourTemplate.NeedsParameter ? tumourLayer.TumourParameter.GetValue(startProg) : 0;
+            tumourTemplate.Length = length / templateRange;
+            tumourTemplate.Parameter = tumourTemplate.NeedsParameter && tumourLayer.TumourParameter is not null ? tumourLayer.TumourParameter.GetValue(startProg) : 0;
 
             // Initialize the template if necessary
             if (tumourTemplate is IRequireInit initializable) {
@@ -314,10 +314,8 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 var hintAnchors = tumourTemplate.GetReconstructionHint();
                 var hintType = tumourTemplate.GetReconstructionHintPathType();
                 var distFunc = tumourTemplate.GetDistanceRelation();
-                var startP = distFunc?.Invoke(startTemplateT) ?? startTemplateT;
-                var endP = distFunc?.Invoke(endTemplateT) ?? endTemplateT;
 
-                pathWithHints.AddReconstructionHint(new ReconstructionHint(start, end, layer, hintAnchors, hintType, startP, endP, distFunc: distFunc));
+                pathWithHints.AddReconstructionHint(new ReconstructionHint(start, end, layer, hintAnchors, hintType, startTemplateT, endTemplateT, distFunc: distFunc));
             } else {
                 pathWithHints.AddReconstructionHint(new ReconstructionHint(start, end, layer, null));
             }
