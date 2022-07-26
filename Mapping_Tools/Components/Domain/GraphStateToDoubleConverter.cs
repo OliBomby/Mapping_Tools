@@ -39,7 +39,7 @@ namespace Mapping_Tools.Components.Domain {
                 return null;
             }
 
-            return new GraphState {
+            var state = new GraphState {
                 MinX = 0,
                 MinY = Math.Min(0, doubleValue * 2),
                 MaxX = 1,
@@ -49,6 +49,8 @@ namespace Mapping_Tools.Components.Domain {
                     new() { Pos = new Vector2(1, doubleValue), Interpolator = new SingleCurveInterpolator() }
                 }
             };
+            state.Freeze();
+            return state;
         }
     }
 }

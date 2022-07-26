@@ -48,7 +48,7 @@ namespace Mapping_Tools.Components.Domain {
             }
 
             if (TypeConverters.TryParseDouble(str, out double doubleValue)) {
-                return new GraphState {
+                var state2 = new GraphState {
                     MinX = 0,
                     MinY = Math.Min(0, doubleValue * 2),
                     MaxX = 1,
@@ -58,6 +58,8 @@ namespace Mapping_Tools.Components.Domain {
                         new() { Pos = new Vector2(1, doubleValue), Interpolator = new SingleCurveInterpolator() }
                     }
                 };
+                state2.Freeze();
+                return state2;
             }
 
             // Parse all anchors
@@ -76,13 +78,15 @@ namespace Mapping_Tools.Components.Domain {
             }
 
             var size = Vector2.ComponentMax(Vector2.One, max - min);
-            return new GraphState {
+            var state = new GraphState {
                 MinX = min.X,
                 MinY = min.Y,
                 MaxX = min.X + size.X,
                 MaxY = min.Y + size.Y,
                 Anchors = anchors
             };
+            state.Freeze();
+            return state;
         }
     }
 }
