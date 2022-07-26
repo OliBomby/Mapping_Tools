@@ -95,7 +95,7 @@ To get started, select a slider in your beatmap and click 'Preview slider' to pr
                 JustMiddleAnchors = arg.JustMiddleAnchors,
                 Scalar = arg.Scale,
                 Reconstructor = new Reconstructor {
-                    DebugConstruction = arg.Debug
+                    DebugConstruction = arg.DebugConstruction
                 }
             };
             

@@ -142,10 +142,10 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
-        private bool _debug;
-        public bool Debug {
-            get => _debug;
-            set => Set(ref _debug, value, action: RegeneratePreview);
+        private bool _debugConstruction;
+        public bool DebugConstruction {
+            get => _debugConstruction;
+            set => Set(ref _debugConstruction, value, action: RegeneratePreview);
         }
 
         public double TumourStartSliderMin => AdvancedOptions ? -1 : 0;
@@ -312,7 +312,7 @@ namespace Mapping_Tools.Viewmodels {
                     JustMiddleAnchors = JustMiddleAnchors,
                     Scalar = Scale,
                     Reconstructor = new Reconstructor {
-                        DebugConstruction = Debug
+                        DebugConstruction = DebugConstruction
                     }
                 };
                 tumourGenerator.TumourGenerate(args);

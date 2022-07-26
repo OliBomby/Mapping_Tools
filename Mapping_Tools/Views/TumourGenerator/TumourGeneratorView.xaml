@@ -144,7 +144,7 @@
                             <TextBlock Text="Advanced" Margin="10 0 0 0"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0 5 0 5">
-                            <ToggleButton IsChecked="{Binding Debug}"
+                            <ToggleButton IsChecked="{Binding DebugConstruction}"
                                           ToolTip="Show only the path without reconstruction."/>
                             <TextBlock Text="Debug" Margin="10 0 0 0"/>
                         </StackPanel>
