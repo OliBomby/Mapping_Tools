@@ -308,9 +308,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                 }
             }
 
-            if (end.Previous == prev) {
-                addedPoints += path.Subdivide(prev, end, 2);
-            }
+            addedPoints += path.Subdivide(prev, end, 2);
 
             var nextRed = FindNextRed(end);
             if (nextRed is not null) {
