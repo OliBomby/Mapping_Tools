@@ -39,7 +39,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         }
 
         private Vector2? BestApproximation(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end) {
-            const double nullBias = 0.2;
+            const double nullBias = 1E-3D;
 
             // Make sure start index is before end index
             // The results will be the same for flipped indices

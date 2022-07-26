@@ -211,7 +211,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
 
                     var gap = p.Next!.Value.T - p.Value.T;
                     if (Precision.DefinitelyBigger(gap, wantedGap)) {
-                        var pointsToAdd = (int) Math.Ceiling(gap / wantedGap);
+                        var pointsToAdd = (int) Math.Ceiling(gap / wantedGap) - 1;
                         Interpolate(p, pointsToAdd);
                         addedPoints += pointsToAdd;
                     }
@@ -230,7 +230,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
 
                     var gap = p.Next!.Value.CumulativeLength - p.Value.CumulativeLength;
                     if (Precision.DefinitelyBigger(gap, wantedGap)) {
-                        var pointsToAdd = (int) Math.Ceiling(gap / wantedGap);
+                        var pointsToAdd = (int) Math.Ceiling(gap / wantedGap) - 1;
                         Interpolate(p, pointsToAdd);
                         addedPoints += pointsToAdd;
                     }
@@ -276,6 +276,46 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             }
 
             return path.Count - startCount;
+        }
+
+        /// <summary>
+        /// Ensures there is at least one interplated point between red points after tumour has finished placing.
+        /// </summary>
+        /// <param name="path">The path to subdivide.</param>
+        /// <param name="start">The start point.</param>
+        /// <param name="end">The end point. This node has to come after start or be equal to start.</param>
+        /// <param name="ensuredPoints">Critical points, can be null.</param>
+        /// <returns>The number of points added between start and end.</returns>
+        public static int EnsureLocalCurvature(this LinkedList<PathPoint> path, LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end, IEnumerable<LinkedListNode<PathPoint>> ensuredPoints) {
+            if (ReferenceEquals(start, end)) {
+                throw new ArgumentException(@"Start and end points can not be the same.");
+            }
+
+            int addedPoints = 0;
+
+            var previousRed = FindPreviousRed(start);
+            if (previousRed is not null) {
+                addedPoints += path.Subdivide(previousRed, start, 2);
+            }
+
+            var prev = start;
+            if (ensuredPoints is not null) {
+                foreach (var ensuredPoint in ensuredPoints) {
+                    addedPoints += path.Subdivide(prev, ensuredPoint, 2);
+                    prev = ensuredPoint;
+                }
+            }
+
+            if (end.Previous == prev) {
+                addedPoints += path.Subdivide(prev, end, 2);
+            }
+
+            var nextRed = FindNextRed(end);
+            if (nextRed is not null) {
+                addedPoints += path.Subdivide(end, nextRed, 2);
+            }
+
+            return addedPoints;
         }
 
         /// <summary>
@@ -483,6 +523,30 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
 
             Interpolate(node.Previous, dt);
             return node.Previous;
+        }
+
+        public static LinkedListNode<PathPoint> FindNextRed(LinkedListNode<PathPoint> start) {
+            var current = start?.Next;
+            while (current is not null) {
+                if (current.Value.Red || current.Next is null) {
+                    return current;
+                }
+                current = current.Next;
+            }
+
+            return null;
+        }
+
+        public static LinkedListNode<PathPoint> FindPreviousRed(LinkedListNode<PathPoint> start) {
+            var current = start?.Previous;
+            while (current is not null) {
+                if (current.Value.Red || current.Previous is null) {
+                    return current;
+                }
+                current = current.Previous;
+            }
+
+            return null;
         }
     }
 }

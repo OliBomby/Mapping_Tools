@@ -243,6 +243,10 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 pointsBetween += path.Subdivide(start, end, wantedPointsBetween);
             }
 
+            // Make sure the curvature is maintained by making sure there is at least one point between each critical point
+            // And a point between start and the red point before it and a point between end and the red point after it
+            pointsBetween += path.EnsureLocalCurvature(start, end, ensuredPoints);
+
             // Add tumour offsets
             double startDist = startPoint.CumulativeLength;
             var current = start;
