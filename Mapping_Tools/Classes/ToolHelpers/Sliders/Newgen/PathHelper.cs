@@ -266,12 +266,14 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                     var t = (criticalPoint - startTemplateT) / (endTemplateT - startTemplateT) *
                         (end.Value.T - start.Value.T) + start.Value.T;
                     var node = FindFirstOccurrenceExact(start, start.Value.CumulativeLength, t);
-                    ensuredPoints.AddLast(node);
+                    if (ensuredPoints.Last is null || ensuredPoints.Last.Value.Value < node.Value)
+                        ensuredPoints.AddLast(node);
                 } else {
                     var t = (criticalPoint - startTemplateT) / (endTemplateT - startTemplateT) *
                         (end.Value.CumulativeLength - start.Value.CumulativeLength) + start.Value.CumulativeLength;
                     var node = FindFirstOccurrenceExact(start, t);
-                    ensuredPoints.AddLast(node);
+                    if (ensuredPoints.Last is null || ensuredPoints.Last.Value.Value < node.Value)
+                        ensuredPoints.AddLast(node);
                 }
             }
 
