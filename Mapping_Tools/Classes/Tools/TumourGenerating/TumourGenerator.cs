@@ -283,10 +283,11 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     WrappingMode.Wrap => point.AvgAngle,
                     _ => betweenAngle,
                 };
+                var isOffsetInThisLayer = Vector2.DistanceSquared(point.OgPos, pos) < Precision.DOUBLE_EPSILON;
                 var red = tumourLayer.WrappingMode switch {
-                    WrappingMode.Simple => isCritical || (point.Red && point.Pos != point.OgPos),
-                    WrappingMode.Replace => isCritical || (point.Red && point.Pos != point.OgPos),
-                    WrappingMode.RoundReplace => isCritical || (point.Red && point.Pos != point.OgPos),
+                    WrappingMode.Simple => isCritical || (point.Red && isOffsetInThisLayer),
+                    WrappingMode.Replace => isCritical || (point.Red && isOffsetInThisLayer),
+                    WrappingMode.RoundReplace => isCritical || (point.Red && isOffsetInThisLayer),
                     _ => isCritical || point.Red
                 };
 
