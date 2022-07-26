@@ -80,7 +80,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Grid Grid.Column="0">
+                <Grid Grid.Column="0" Margin="0 0 10 0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
@@ -154,10 +154,10 @@
                               VerticalAlignment="Stretch"
                               ResizeBehavior="PreviousAndNext"
                               Width="2" Background="{DynamicResource MaterialDesignDivider}"
-                              Margin="10"/>
+                              Margin="0 10"/>
 
                 <ScrollViewer Grid.Column="2" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                    <StackPanel>
+                    <StackPanel Margin="10 0">
                         <!-- Add options about individual tumours: template, scale, length, rotation -->
                         <TextBlock Text="Template" FontWeight="Bold" Margin="0 10 0 0"/>
                         <ComboBox ItemsSource="{Binding TumourTemplates}"
@@ -236,15 +236,15 @@
                               VerticalAlignment="Stretch"
                               ResizeBehavior="PreviousAndNext"
                               Width="2" Background="{DynamicResource MaterialDesignDivider}"
-                              Margin="10"/>
+                              Margin="0 10"/>
 
-                <materialDesign:Card Grid.Column="4" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Padding="10"
+                <materialDesign:Card Grid.Column="4" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Padding="10" Margin="10 0 0 0"
                                      ToolTip="Result preview">
                     <objectVisualiser:HitObjectElement x:Name="GraphHitObjectElement" HitObject="{Binding TumouredPreviewHitObject}"
                                                        Stroke="YellowGreen" Fill="DarkSlateGray" SliderBallStroke="White" Thickness="50" ShowAnchors="True" AnchorSize="0.12"/>
                 </materialDesign:Card>
 
-                <ProgressBar Grid.Column="4"
+                <ProgressBar Grid.Column="4" Margin="10 0 0 0"
                              Style="{StaticResource MaterialDesignCircularProgressBar}"
                              Visibility="{Binding IsProcessingPreview, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"
                              Value="0"
