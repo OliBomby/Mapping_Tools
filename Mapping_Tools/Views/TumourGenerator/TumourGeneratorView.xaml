@@ -25,6 +25,7 @@
             <domain:BooleanInvertConverter/>
             <domain:BooleanToVisibilityConverter/>
         </domain:MultiValueConverterGroup>
+        <domain:BooleanOrToVisibilityConverter x:Key="BooleanOrToVisibilityConverter"/>
         <domain:MultiValueConverterGroup x:Key="BooleanAOrNotBConverter">
             <domain:IdentityConverter/>
             <domain:BooleanInvertConverter/>
@@ -188,6 +189,22 @@
                                 Style="{StaticResource MaterialDesignDiscreteSlider}"
                                 Minimum="0" Maximum="360"
                                 ToolTip="The angle of the tumour determines which way the tumour points in relation to the slider."/>
+                        <TextBlock Text="Parameter" FontWeight="Bold" Margin="0 10 0 0"
+                                   Visibility="{Binding CurrentLayer.TumourTemplate.NeedsParameter, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                        <components:ValueOrGraphControl GraphState="{Binding CurrentLayer.TumourParameter}"
+                                                        ToolTip="The special parameter of this tumour template. This parameter changes the shape of the tumour in some way.">
+                            <components:ValueOrGraphControl.Visibility>
+                                <MultiBinding Converter="{StaticResource BooleanOrToVisibilityConverter}">
+                                    <Binding Path="AdvancedOptions"/>
+                                    <Binding Path="CurrentLayer.TumourTemplate.NeedsParameter"/>
+                                </MultiBinding>
+                            </components:ValueOrGraphControl.Visibility>
+                        </components:ValueOrGraphControl>
+                        <Slider Value="{Binding CurrentLayer.TumourParameter, Converter={StaticResource GraphStateToDoubleConverter}}"
+                                Style="{StaticResource MaterialDesignDiscreteSlider}"
+                                Minimum="0" Maximum="500"
+                                ToolTip="The special parameter of this tumour template. This parameter changes the shape of the tumour in some way."
+                                Visibility="{Binding CurrentLayer.TumourTemplate.NeedsParameter, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                         <!-- Add options about placement of multiple tumours: sidedness, distance, count, start, end, recalculate -->
                         <TextBlock Text="Sidedness" FontWeight="Bold" Margin="0 10 0 0"/>
                         <ComboBox ItemsSource="{Binding TumourSides}"

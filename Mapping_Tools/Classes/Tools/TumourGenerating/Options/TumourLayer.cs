@@ -14,6 +14,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
         private GraphState _tumourLength;
         private GraphState _tumourScale;
         private GraphState _tumourRotation;
+        private GraphState _tumourParameter;
         private GraphState _tumourDistance;
         private int _tumourCount;
         private double _tumourStart;
@@ -45,6 +46,11 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
         public GraphState TumourRotation {
             get => _tumourRotation;
             set => Set(ref _tumourRotation, value);
+        }
+
+        public GraphState TumourParameter {
+            get => _tumourParameter;
+            set => Set(ref _tumourParameter, value);
         }
 
         public GraphState TumourDistance {
@@ -93,6 +99,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
                 TumourLength = GetGraphState(15),
                 TumourScale = GetGraphState(30),
                 TumourRotation = GetGraphState(0),
+                TumourParameter = GetGraphState(0),
                 TumourDistance = GetGraphState(100)
             };
             return l;
@@ -118,6 +125,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
             if (TumourLength is not null && TumourLength.CanFreeze) TumourLength.Freeze();
             if (TumourDistance is not null && TumourDistance.CanFreeze) TumourDistance.Freeze();
             if (TumourRotation is not null && TumourRotation.CanFreeze) TumourRotation.Freeze();
+            if (TumourParameter is not null && TumourParameter.CanFreeze) TumourParameter.Freeze();
             if (TumourScale is not null && TumourScale.CanFreeze) TumourScale.Freeze();
         }
 

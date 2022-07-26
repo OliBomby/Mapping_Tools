@@ -19,6 +19,16 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
         double Width { get; set; }
 
         /// <summary>
+        /// The parameter which may or may not do something to the tumour.
+        /// </summary>
+        double Parameter { get; set; }
+
+        /// <summary>
+        /// Whether the parameter is used.
+        /// </summary>
+        bool NeedsParameter { get; }
+
+        /// <summary>
         /// Gets the position along the tumour shape at completion <see cref="t"/>.
         /// The value of <see cref="t"/> should correspond linearly to the cumulative length of this function.
         /// Imagine the X-axis as the slider going from left to right.

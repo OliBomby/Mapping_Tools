@@ -12,6 +12,11 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourTemplates {
         [JsonIgnore]
         public double Width { get; set; }
 
+        [JsonIgnore]
+        public double Parameter { get; set; }
+
+        public virtual bool NeedsParameter => false;
+
         public abstract Vector2 GetOffset(double t);
 
         public abstract double GetLength();

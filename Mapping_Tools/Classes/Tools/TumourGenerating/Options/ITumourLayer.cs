@@ -8,6 +8,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
         GraphState TumourLength { get; }
         GraphState TumourScale { get; }
         GraphState TumourRotation { get; }
+        GraphState TumourParameter { get; }
         GraphState TumourDistance { get; }
         int TumourCount { get; }
 
