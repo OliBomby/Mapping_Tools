@@ -54,7 +54,9 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourTemplates {
         }
 
         public void Init() {
-            sideMargin = MathHelper.Clamp(Parameter / Length, MinSideMargin, 0.5);
+            sideMargin = Precision.AlmostEquals(Length, 0)
+                ? MinSideMargin
+                : MathHelper.Clamp(Parameter / Length, MinSideMargin, 0.5);
         }
     }
 }
