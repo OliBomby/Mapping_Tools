@@ -227,7 +227,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             // Setup tumour template with the correct shape
             var tumourTemplate = tumourLayer.TumourTemplate;
             tumourTemplate.Width = otherSide ? -scale : scale;
-            tumourTemplate.Length = length / templateRange;
+            tumourTemplate.Length = Precision.AlmostEquals(templateRange, 0) ? length : length / templateRange;
             tumourTemplate.Parameter = tumourTemplate.NeedsParameter && tumourLayer.TumourParameter is not null ? tumourLayer.TumourParameter.GetValue(startProg) : 0;
 
             // Initialize the template if necessary
