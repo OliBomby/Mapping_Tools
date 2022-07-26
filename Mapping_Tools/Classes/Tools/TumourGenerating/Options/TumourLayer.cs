@@ -10,6 +10,7 @@ using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
 namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
     public class TumourLayer : BindableBase, ITumourLayer {
         private ITumourTemplate _tumourTemplate;
+        private WrappingMode _wrappingMode;
         private TumourSidedness _tumourSidedness;
         private GraphState _tumourLength;
         private GraphState _tumourScale;
@@ -26,6 +27,11 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
         public ITumourTemplate TumourTemplate {
             get => _tumourTemplate;
             set => Set(ref _tumourTemplate, value);
+        }
+
+        public WrappingMode WrappingMode {
+            get => _wrappingMode;
+            set => Set(ref _wrappingMode, value);
         }
 
         public TumourSidedness TumourSidedness {
@@ -91,6 +97,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
         public static TumourLayer GetDefaultLayer() {
             var l = new TumourLayer {
                 TumourTemplate = new TriangleTemplate(),
+                WrappingMode = WrappingMode.Simple,
                 IsActive = true,
                 Name = "Layer",
                 TumourCount = 0,

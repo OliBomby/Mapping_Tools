@@ -206,6 +206,11 @@
                                 ToolTip="The special parameter of this tumour template. This parameter changes the shape of the tumour in some way."
                                 Visibility="{Binding CurrentLayer.TumourTemplate.NeedsParameter, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                         <!-- Add options about placement of multiple tumours: sidedness, distance, count, start, end, recalculate -->
+                        <TextBlock Text="Wrapping" FontWeight="Bold" Margin="0 10 0 0"/>
+                        <ComboBox ItemsSource="{Binding WrappingModes}"
+                                  SelectedItem="{Binding CurrentLayer.WrappingMode}"
+                                  Margin="0 0 0 0"
+                                  ToolTip="The wrapping mode controls how the tumour wraps around the shape of the slider."/>
                         <TextBlock Text="Sidedness" FontWeight="Bold" Margin="0 10 0 0"/>
                         <ComboBox ItemsSource="{Binding TumourSides}"
                                   SelectedItem="{Binding CurrentLayer.TumourSidedness}"

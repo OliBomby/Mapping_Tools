@@ -160,6 +160,9 @@ namespace Mapping_Tools.Viewmodels {
         public IEnumerable<TumourTemplate> TumourTemplates => Enum.GetValues(typeof(TumourTemplate)).Cast<TumourTemplate>();
 
         [JsonIgnore]
+        public IEnumerable<WrappingMode> WrappingModes => Enum.GetValues(typeof(WrappingMode)).Cast<WrappingMode>();
+
+        [JsonIgnore]
         public IEnumerable<TumourSidedness> TumourSides => Enum.GetValues(typeof(TumourSidedness)).Cast<TumourSidedness>();
 
         [JsonIgnore]

@@ -24,12 +24,6 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
     /// </summary>
     public class TumourGenerator {
         /// <summary>
-        /// The wrapping mode controls how the tumour sits on the slider.
-        /// TODO: remove this
-        /// </summary>
-        public WrappingMode WrappingMode { get; set; }
-
-        /// <summary>
         /// The number of points per osu! pixel used to approximate the shape of the tumours.
         /// </summary>
         public double Resolution { get; set; } = 1;
@@ -271,13 +265,13 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
                 // Get the offset, original pos, and direction
                 var interpolatedPoint = PathPoint.Lerp(startPoint, endPoint, t);
-                var pos = WrappingMode switch {
+                var pos = tumourLayer.WrappingMode switch {
                     WrappingMode.Simple => interpolatedPoint.OgPos,
                     WrappingMode.Replace => interpolatedPoint.OgPos,
                     WrappingMode.RoundReplace => interpolatedPoint.OgPos,
                     _ => point.OgPos
                 };
-                var angle = WrappingMode switch {
+                var angle = tumourLayer.WrappingMode switch {
                     WrappingMode.Simple => betweenAngle,
                     WrappingMode.Replace => betweenAngle,
                     WrappingMode.RoundReplace => interpolatedPoint.AvgAngle,
@@ -285,7 +279,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     WrappingMode.Wrap => point.AvgAngle,
                     _ => betweenAngle,
                 };
-                var red = WrappingMode switch {
+                var red = tumourLayer.WrappingMode switch {
                     WrappingMode.Simple => isCritical || (point.Red && point.Pos != point.OgPos),
                     WrappingMode.Replace => isCritical || (point.Red && point.Pos != point.OgPos),
                     WrappingMode.RoundReplace => isCritical || (point.Red && point.Pos != point.OgPos),
@@ -310,7 +304,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             }
 
             // Maybe add a hint
-            if (WrappingMode == WrappingMode.Simple &&
+            if (tumourLayer.WrappingMode == WrappingMode.Simple &&
                 Precision.AlmostEquals(MathHelper.AngleDifference(rotation, 0), 0, 1E-6D) &&
                 !tumourTemplate.AbsoluteAngled) {
                 var hintAnchors = tumourTemplate.GetReconstructionHint();

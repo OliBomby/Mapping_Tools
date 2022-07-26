@@ -4,6 +4,11 @@ using Mapping_Tools.Components.Graph;
 namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
     public interface ITumourLayer {
         ITumourTemplate TumourTemplate { get; }
+
+        /// <summary>
+        /// The wrapping mode controls how the tumour sits on the slider.
+        /// </summary>
+        WrappingMode WrappingMode { get; set; }
         TumourSidedness TumourSidedness { get; }
         GraphState TumourLength { get; }
         GraphState TumourScale { get; }
