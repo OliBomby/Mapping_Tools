@@ -177,6 +177,8 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
             var startPoint = start.Value;
             var endPoint = end.Value;
+            var hintStart = start;
+            var hintEnd = end;
 
             // Ensure that there is a copy of the start point at the end point if we add in-between points
             // and the start and end points are the same node.
@@ -304,14 +306,27 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 // Get the tumour offset
                 var offset = tumourTemplate.GetOffset(templateT);
 
-                if (red && offset.LengthSquared > Precision.DOUBLE_EPSILON &&
-                    !double.IsNaN(preAngle) && !double.IsNaN(postAngle) && !Precision.AlmostEquals(preAngle, postAngle)) {
+                if (current == start && start.Previous is not null && offset.LengthSquared > Precision.DOUBLE_EPSILON) {
+                    // Copy point and leave one side at 0 offset
+                    var newPos = CalculateNewPos(point, pos, offset, postAngle + rotation);
+
+                    current.List.AddBefore(current, new PathPoint(point.Pos, point.OgPos, point.PreAngle, point.PreAngle, point.CumulativeLength, point.T, true));
+                    current.Value = new PathPoint(newPos, point.OgPos, point.PostAngle, point.PostAngle, point.CumulativeLength, point.T, true);
+                    start = current.Previous;
+                    hintStart = current;
+                } else if (current == end && end.Next is not null && offset.LengthSquared > Precision.DOUBLE_EPSILON) {
+                    // Copy point and leave one side at 0 offset
+                    var newPos = CalculateNewPos(point, pos, offset, preAngle + rotation);
+
+                    current.List.AddBefore(current, new PathPoint(newPos, point.OgPos, point.PreAngle, point.PreAngle, point.CumulativeLength, point.T, true));
+                    current.Value = new PathPoint(point.Pos, point.OgPos, point.PostAngle, point.PostAngle, point.CumulativeLength, point.T, true);
+                    hintEnd = current.Previous;
+                } else if (red && !double.IsNaN(preAngle) && !double.IsNaN(postAngle) && !Precision.AlmostEquals(preAngle, postAngle)
+                           && offset.LengthSquared > Precision.DOUBLE_EPSILON) {
                     // Copy point and offset it by both angles
-                    // Add the offset to the point
                     var newPos = CalculateNewPos(point, pos, offset, preAngle + rotation);
                     var newPos2 = CalculateNewPos(point, pos, offset, postAngle + rotation);
 
-                    // Modify the path
                     current.List.AddBefore(current, new PathPoint(newPos, point.OgPos, point.PreAngle, point.PostAngle, point.CumulativeLength, point.T, red));
                     current.Value = new PathPoint(newPos2, point.OgPos, point.PostAngle, point.PostAngle, point.CumulativeLength, point.T, red);
                 } else {
@@ -333,7 +348,15 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 var hintType = tumourTemplate.GetReconstructionHintPathType();
                 var distFunc = tumourTemplate.GetDistanceRelation();
 
-                pathWithHints.AddReconstructionHint(new ReconstructionHint(start, end, layer, hintAnchors, hintType, startTemplateT, endTemplateT, distFunc: distFunc));
+                pathWithHints.AddReconstructionHint(new ReconstructionHint(hintStart, hintEnd, layer, hintAnchors, hintType, startTemplateT, endTemplateT, distFunc: distFunc));
+
+                // Add null segments for the possible on-continuous endpoints of the tumour
+                if (start.Value < hintStart.Value) {
+                    pathWithHints.AddReconstructionHint(new ReconstructionHint(start, hintStart, layer, null));;
+                }
+                if (end.Value > hintEnd.Value) {
+                    pathWithHints.AddReconstructionHint(new ReconstructionHint(hintEnd, end, layer, null));;
+                }
             } else {
                 pathWithHints.AddReconstructionHint(new ReconstructionHint(start, end, layer, null));
             }
