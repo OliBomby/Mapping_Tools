@@ -303,12 +303,16 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             var prev = start;
             if (ensuredPoints is not null) {
                 foreach (var ensuredPoint in ensuredPoints) {
-                    addedPoints += path.Subdivide(prev, ensuredPoint, 2);
+                    if (ensuredPoint.Value > prev.Value) {
+                        addedPoints += path.Subdivide(prev, ensuredPoint, 2);
+                    }
                     prev = ensuredPoint;
                 }
             }
 
-            addedPoints += path.Subdivide(prev, end, 2);
+            if (end.Value > prev.Value) {
+                addedPoints += path.Subdivide(prev, end, 2);
+            }
 
             var nextRed = FindNextRed(end);
             if (nextRed is not null) {
