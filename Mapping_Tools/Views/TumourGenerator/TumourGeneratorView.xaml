@@ -236,20 +236,22 @@
                         <TextBlock Text="Start" FontWeight="Bold" Margin="0 10 0 0"/>
                         <TextBox materialDesign:HintAssist.Hint="Start" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                                  Text="{Binding CurrentLayer.TumourStart, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=0}"
-                                 ToolTip="The progression along the slider where to start the placement of tumours. 0 is the slider head, 1 is the slider end."
+                                 ToolTip="The progression along the slider where to start the placement of tumours. 0 is the slider head, 1 is the slider end. If 'Absolute range' is checked, then this distance is expressed in osu! pixels."
                                  Visibility="{Binding AdvancedOptions, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                        <Slider Minimum="{Binding TumourStartSliderMin}" Maximum="1" Value="{Binding CurrentLayer.TumourStart}"
-                                SmallChange="0.0001" LargeChange="0.1"
-                                ToolTip="The progression along the slider where to start the placement of tumours. 0 is the slider head, 1 is the slider end."/>
+                        <Slider Minimum="{Binding TumourStartSliderMin}" Maximum="{Binding TumourRangeSliderMax}" Value="{Binding CurrentLayer.TumourStart}"
+                                SmallChange="{Binding TumourRangeSliderSmallChange}"
+                                ToolTip="The progression along the slider where to start the placement of tumours. 0 is the slider head, 1 is the slider end. If 'Absolute range' is checked, then this distance is expressed in osu! pixels."/>
                         <TextBlock Text="End" FontWeight="Bold" Margin="0 10 0 0"/>
                         <TextBox materialDesign:HintAssist.Hint="End" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                                  Text="{Binding CurrentLayer.TumourEnd, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=1}"
-                                 ToolTip="The progression along the slider where to end the placement of tumours. 0 is the slider head, 1 is the slider end."
+                                 ToolTip="The progression along the slider where to end the placement of tumours. 0 is the slider head, 1 is the slider end. If 'Absolute range' is checked, then this distance is expressed in osu! pixels."
                                  Visibility="{Binding AdvancedOptions, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                        <Slider Minimum="0" Maximum="1" Value="{Binding CurrentLayer.TumourEnd}"
-                                SmallChange="0.0001" LargeChange="0.1"
-                                ToolTip="The progression along the slider where to end the placement of tumours. 0 is the slider head, 1 is the slider end."/>
-                        <CheckBox IsChecked="{Binding CurrentLayer.Recalculate}" Margin="0 10 0 0"
+                        <Slider Minimum="0" Maximum="{Binding TumourRangeSliderMax}" Value="{Binding CurrentLayer.TumourEnd}"
+                                SmallChange="{Binding TumourRangeSliderSmallChange}"
+                                ToolTip="The progression along the slider where to end the placement of tumours. 0 is the slider head, 1 is the slider end. If 'Absolute range' is checked, then this distance is expressed in osu! pixels."/>
+                        <CheckBox IsChecked="{Binding CurrentLayer.UseAbsoluteRange}" Margin="0 10 0 0"
+                                  Content="Absolute range" ToolTip="Toggle this to change the meaning of the Start and End fields to mean length in osu! pixels instead of length relative to the length of the slider."/>
+                        <CheckBox IsChecked="{Binding CurrentLayer.Recalculate}" Margin="0 5 0 0"
                                   Content="Recalculate" ToolTip="Whether to recalculate the distances and angles of the slider before applying this layer. If true, tumours will be placed on top of tumours of the previous layers as if they were part of the slider, instead of merging with those tumours."/>
                     </StackPanel>
                 </ScrollViewer>

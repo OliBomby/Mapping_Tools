@@ -21,6 +21,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
         private double _tumourStart;
         private double _tumourEnd;
         private bool _recalculate;
+        private bool _useAbsoluteRange;
         private bool _isActive;
         private string _name;
 
@@ -77,6 +78,11 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
         public double TumourEnd {
             get => _tumourEnd;
             set => Set(ref _tumourEnd, value);
+        }
+
+        public bool UseAbsoluteRange {
+            get => _useAbsoluteRange;
+            set => Set(ref _useAbsoluteRange, value);
         }
 
         public bool Recalculate {

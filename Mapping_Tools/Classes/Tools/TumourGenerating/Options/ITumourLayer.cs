@@ -26,6 +26,12 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
         /// Completion at which to stop generating the tumours.
         /// </summary>
         double TumourEnd { get; }
+
+        /// <summary>
+        /// Whether the <see cref="TumourStart"/> and <see cref="TumourEnd"/> are not relative to the slider's length.
+        /// </summary>
+        bool UseAbsoluteRange { get; }
+
         bool Recalculate { get; }
         bool IsActive { get; }
     }

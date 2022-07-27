@@ -63,9 +63,6 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             foreach (var tumourLayer in TumourLayers) {
                 if (!tumourLayer.IsActive) continue;
 
-                var tumourStart = MathHelper.Clamp(tumourLayer.TumourStart, -1, 1);
-                var tumourEnd = MathHelper.Clamp(tumourLayer.TumourEnd, 0, 1);
-
                 // Recalculate
                 if (tumourLayer.Recalculate) {
                     pathWithHints.RecalculateAndFixHints();
@@ -73,18 +70,26 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     layer++;
                 }
 
+                // Get the start and end dist in osu! pixels
+                var tumourStart = tumourLayer.TumourStart;
+                var tumourEnd = tumourLayer.TumourEnd;
+                if (!tumourLayer.UseAbsoluteRange) {
+                    tumourStart =  MathHelper.Clamp(tumourStart, -1, 1) * totalLength;
+                    tumourEnd = MathHelper.Clamp(tumourLayer.TumourEnd, 0, 1) * totalLength;
+                }
+
                 // Calculate count multiplier
                 var totalDist = tumourEnd - tumourStart;
-                var countDist = totalDist * totalLength / (tumourLayer.TumourCount - 1);
+                var countDist = totalDist / (tumourLayer.TumourCount - 1);
 
                 // Find the start of the tumours
                 var current = pathWithHints.Path.First;
-                var nextDist = tumourStart * totalLength;
+                var nextDist = tumourStart;
                 var side = tumourLayer.TumourSidedness == TumourSidedness.AlternatingLeft;
 
-                while (nextDist <= tumourEnd * totalLength + Precision.DOUBLE_EPSILON && current is not null) {
+                while (nextDist <= Math.Min(totalLength, tumourEnd) + Precision.DOUBLE_EPSILON && current is not null) {
                     var length = tumourLayer.TumourLength.GetValue(nextDist / totalLength);
-                    var endDist = Math.Min(nextDist + length, tumourLayer.TumourCount > 0 ? totalLength : tumourEnd * totalLength);
+                    var endDist = Math.Min(nextDist + length, tumourLayer.TumourCount > 0 ? totalLength : tumourEnd);
 
                     // Get which side the tumour should be on
                     side = tumourLayer.TumourSidedness switch {

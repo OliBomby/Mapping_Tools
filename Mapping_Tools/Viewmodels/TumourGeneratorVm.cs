@@ -94,6 +94,11 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         private void TumourLayerOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
+            if (e.PropertyName == nameof(TumourLayer.UseAbsoluteRange)) {
+                RaisePropertyChanged(nameof(TumourStartSliderMin));
+                RaisePropertyChanged(nameof(TumourRangeSliderMax));
+                RaisePropertyChanged(nameof(TumourRangeSliderSmallChange));
+            }
             RegeneratePreview();
         }
 
@@ -148,13 +153,20 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _debugConstruction, value, action: RegeneratePreview);
         }
 
-        public double TumourStartSliderMin => AdvancedOptions ? -1 : 0;
-
         private double _scale;
         public double Scale {
             get => _scale;
             set => Set(ref _scale, value, action: RegeneratePreview);
         }
+
+        [JsonIgnore]
+        public double TumourStartSliderMin => AdvancedOptions ? CurrentLayer is not null && CurrentLayer.UseAbsoluteRange ? -500 : -1 : 0;
+
+        [JsonIgnore]
+        public double TumourRangeSliderMax => CurrentLayer is not null && CurrentLayer.UseAbsoluteRange ? 500 : 1;
+
+        [JsonIgnore]
+        public double TumourRangeSliderSmallChange => CurrentLayer is not null && CurrentLayer.UseAbsoluteRange ? 1 : 0.0001;
 
         [JsonIgnore]
         public IEnumerable<TumourTemplate> TumourTemplates => Enum.GetValues(typeof(TumourTemplate)).Cast<TumourTemplate>();
