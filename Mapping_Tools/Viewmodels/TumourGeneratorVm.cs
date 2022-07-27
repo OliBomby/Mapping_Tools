@@ -327,7 +327,7 @@ namespace Mapping_Tools.Viewmodels {
                         DebugConstruction = DebugConstruction
                     }
                 };
-                tumourGenerator.TumourGenerate(args);
+                tumourGenerator.TumourGenerate(args, ct);
 
                 // Send the tumoured slider to the main thread
                 Application.Current.Dispatcher.Invoke(() => {

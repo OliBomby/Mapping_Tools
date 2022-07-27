@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
@@ -43,9 +44,10 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
         /// Places copious amounts of tumours on the slider.
         /// Changes slider curvepoints, pixel length, and velocity
         /// </summary>
-        /// <param name="ho"></param>
+        /// <param name="ho">The slider to generate tumours on.</param>
+        /// <param name="ct">Cancellation token to interrupt the tumour generation.</param>
         /// <returns></returns>
-        public bool TumourGenerate(HitObject ho) {
+        public bool TumourGenerate(HitObject ho, CancellationToken ct = default) {
             if (!ho.IsSlider || TumourLayers.Count == 0) return false;
 
             var oldPixelLength = ho.PixelLength;
@@ -61,6 +63,9 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             // Add tumours
             int layer = 0;
             foreach (var tumourLayer in TumourLayers) {
+                ct.ThrowIfCancellationRequested();
+
+                // Skip inactive layers
                 if (!tumourLayer.IsActive) continue;
 
                 // Recalculate
@@ -88,6 +93,8 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 var side = tumourLayer.TumourSidedness == TumourSidedness.AlternatingLeft;
 
                 while (nextDist <= Math.Min(totalLength, tumourEnd) + Precision.DOUBLE_EPSILON && current is not null) {
+                    ct.ThrowIfCancellationRequested();
+
                     var length = tumourLayer.TumourLength.GetValue(nextDist / totalLength);
                     var endDist = Math.Min(nextDist + length, tumourLayer.TumourCount > 0 ? totalLength : tumourEnd);
 
@@ -126,6 +133,8 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     nextDist += dist;
                 }
             }
+
+            ct.ThrowIfCancellationRequested();
 
             // Reconstruct the slider
             PathHelper.Recalculate(pathWithHints.Path);
