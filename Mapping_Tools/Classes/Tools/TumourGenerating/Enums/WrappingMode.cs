@@ -2,8 +2,6 @@
     public enum WrappingMode {
         Simple,
         Wrap,
-        RoundWrap,
-        Replace,
-        RoundReplace
+        Absolute
     }
 }

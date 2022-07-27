@@ -13,7 +13,6 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Domain
                 SquareTemplate => TumourTemplate.Square,
                 CircleTemplate => TumourTemplate.Circle,
                 ParabolaTemplate => TumourTemplate.Parabola,
-                OffsetTemplate => TumourTemplate.Offset,
                 _ => TumourTemplate.Triangle
             };
         }
@@ -24,7 +23,6 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Domain
                 TumourTemplate.Square => new SquareTemplate(),
                 TumourTemplate.Circle => new CircleTemplate(),
                 TumourTemplate.Parabola => new ParabolaTemplate(),
-                TumourTemplate.Offset => new OffsetTemplate(),
                 _ => new TriangleTemplate()
             };
         }

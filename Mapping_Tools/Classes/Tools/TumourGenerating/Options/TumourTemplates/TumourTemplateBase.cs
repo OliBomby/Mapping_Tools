@@ -17,8 +17,6 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourTemplates {
 
         public virtual bool NeedsParameter => false;
 
-        public virtual bool AbsoluteAngled => false;
-
         public abstract Vector2 GetOffset(double t);
 
         public abstract double GetLength();

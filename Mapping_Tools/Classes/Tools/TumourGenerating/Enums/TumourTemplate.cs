@@ -3,7 +3,6 @@
         Triangle,
         Square,
         Circle,
-        Parabola,
-        Offset
+        Parabola
     }
 }

@@ -271,23 +271,16 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 var interpolatedPoint = PathPoint.Lerp(startPoint, endPoint, t);
                 var pos = tumourLayer.WrappingMode switch {
                     WrappingMode.Simple => interpolatedPoint.OgPos,
-                    WrappingMode.Replace => interpolatedPoint.OgPos,
-                    WrappingMode.RoundReplace => interpolatedPoint.OgPos,
                     _ => point.OgPos
                 };
-                var (preAngle, postAngle) = tumourLayer.WrappingMode switch {
+                (double preAngle, double postAngle) = tumourLayer.WrappingMode switch {
                     WrappingMode.Simple => (betweenAngle, betweenAngle),
-                    WrappingMode.Replace => (betweenAngle, betweenAngle),
-                    WrappingMode.RoundReplace => (interpolatedPoint.PreAngle, interpolatedPoint.PostAngle),
-                    WrappingMode.RoundWrap => (interpolatedPoint.PreAngle, interpolatedPoint.PostAngle),
                     WrappingMode.Wrap => (point.PreAngle, point.PostAngle),
-                    _ => (betweenAngle, betweenAngle),
+                    _ => (0, 0),
                 };
                 var isOffsetInThisLayer = Vector2.DistanceSquared(point.OgPos, pos) < Precision.DOUBLE_EPSILON;
                 var red = tumourLayer.WrappingMode switch {
                     WrappingMode.Simple => isCritical || (point.Red && isOffsetInThisLayer),
-                    WrappingMode.Replace => isCritical || (point.Red && isOffsetInThisLayer),
-                    WrappingMode.RoundReplace => isCritical || (point.Red && isOffsetInThisLayer),
                     _ => isCritical || point.Red
                 };
 
@@ -296,9 +289,6 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
                 // Get the tumour offset
                 var offset = tumourTemplate.GetOffset(templateT);
-
-                // Handle the case of absolute angled tumours
-                (preAngle, postAngle) = tumourTemplate.AbsoluteAngled ? (0, 0) : (preAngle, postAngle);
 
                 if (red && offset.LengthSquared > Precision.DOUBLE_EPSILON &&
                     !double.IsNaN(preAngle) && !double.IsNaN(postAngle) && !Precision.AlmostEquals(preAngle, postAngle)) {
@@ -324,8 +314,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
             // Maybe add a hint
             if (tumourLayer.WrappingMode == WrappingMode.Simple &&
-                Precision.AlmostEquals(MathHelper.AngleDifference(rotation, 0), 0, 1E-6D) &&
-                !tumourTemplate.AbsoluteAngled) {
+                Precision.AlmostEquals(MathHelper.AngleDifference(rotation, 0), 0, 1E-6D)) {
                 var hintAnchors = tumourTemplate.GetReconstructionHint();
                 var hintType = tumourTemplate.GetReconstructionHintPathType();
                 var distFunc = tumourTemplate.GetDistanceRelation();
