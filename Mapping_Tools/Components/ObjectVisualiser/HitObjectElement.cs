@@ -22,6 +22,7 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
         public const double MaxPixelLength = 1e6;
         public const double MaxSegmentCount = 1e6;
         public const double MaxAnchorCount = 1500;
+        public const int HardMaxAnchorCount = 5000;
 
         #region Properties
 
@@ -307,7 +308,7 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
         private void SetHitObject(Classes.BeatmapHelper.HitObject hitObject) {
             if (hitObject == null) return;
 
-            if (hitObject.IsSlider && hitObject.PixelLength < MaxPixelLength) {
+            if (hitObject.IsSlider && hitObject.PixelLength < MaxPixelLength && hitObject.CurvePoints.Count < HardMaxAnchorCount) {
                 var geom = new StreamGeometry();
                 var path = CustomPixelLength == null ? hitObject.GetSliderPath() :
                     new SliderPath(hitObject.SliderType, hitObject.GetAllCurvePoints().ToArray(), CustomPixelLength);
