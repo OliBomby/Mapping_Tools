@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
@@ -217,5 +218,11 @@ To get started, select a slider in your beatmap and click 'Preview slider' to pr
         }
 
         public event EventHandler RunFinished;
+
+        private void LayerNameBox_OnPreviewMouseDown(object sender, MouseButtonEventArgs e) {
+            if (sender is TextBox { Tag: TumourLayer t}) {
+                ViewModel.CurrentLayer = t;
+            }
+        }
     }
 }

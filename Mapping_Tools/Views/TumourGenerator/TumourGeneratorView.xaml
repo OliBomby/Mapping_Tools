@@ -117,7 +117,8 @@
                                     <materialDesign:PackIcon Grid.Column="1" Width="24" Height="24"
                                                              Kind="{Binding TumourTemplateEnum, Converter={StaticResource TumourTemplateToIconConverter}}"
                                                              Margin="5 0" VerticalAlignment="Center"/>
-                                    <TextBox Grid.Column="2" Text="{Binding Name}" TextWrapping="NoWrap" MinWidth="50" Margin="5 0"/>
+                                    <TextBox Grid.Column="2" Text="{Binding Name}" TextWrapping="NoWrap" MinWidth="50" Margin="5 0"
+                                             Tag="{Binding}" PreviewMouseDown="LayerNameBox_OnPreviewMouseDown"/>
                                 </Grid>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
