@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools.TumourGenerating.Enums;
@@ -9,7 +10,12 @@ using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
 
 namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
     public class TumourLayer : BindableBase, ITumourLayer {
-        private ITumourTemplate _tumourTemplate;
+        private static readonly ITumourTemplate TriangleTemplate = new TriangleTemplate();
+        private static readonly ITumourTemplate SquareTemplate = new SquareTemplate();
+        private static readonly ITumourTemplate CircleTemplate = new CircleTemplate();
+        private static readonly ITumourTemplate ParabolaTemplate = new ParabolaTemplate();
+
+        private TumourTemplate _tumourTemplateEnum;
         private WrappingMode _wrappingMode;
         private TumourSidedness _tumourSidedness;
         private GraphState _tumourLength;
@@ -25,10 +31,23 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
         private bool _isActive;
         private string _name;
 
-        public ITumourTemplate TumourTemplate {
-            get => _tumourTemplate;
-            set => Set(ref _tumourTemplate, value);
+        public TumourTemplate TumourTemplateEnum {
+            get => _tumourTemplateEnum;
+            set {
+                if (Set(ref _tumourTemplateEnum, value)) {
+                    RaisePropertyChanged(nameof(TumourTemplate));
+                }
+            }
         }
+
+        [JsonIgnore]
+        public ITumourTemplate TumourTemplate => _tumourTemplateEnum switch {
+            Enums.TumourTemplate.Triangle => TriangleTemplate,
+            Enums.TumourTemplate.Square => SquareTemplate,
+            Enums.TumourTemplate.Circle => CircleTemplate,
+            Enums.TumourTemplate.Parabola => ParabolaTemplate,
+            _ => TriangleTemplate
+        };
 
         public WrappingMode WrappingMode {
             get => _wrappingMode;
@@ -102,7 +121,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
 
         public static TumourLayer GetDefaultLayer() {
             var l = new TumourLayer {
-                TumourTemplate = new TriangleTemplate(),
+                TumourTemplateEnum = Enums.TumourTemplate.Triangle,
                 WrappingMode = WrappingMode.Simple,
                 IsActive = true,
                 Name = "Layer",

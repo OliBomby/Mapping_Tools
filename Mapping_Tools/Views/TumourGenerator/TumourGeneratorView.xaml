@@ -9,7 +9,6 @@
              xmlns:components="clr-namespace:Mapping_Tools.Components"
              xmlns:objectVisualiser="clr-namespace:Mapping_Tools.Components.ObjectVisualiser"
              xmlns:viewmodels="clr-namespace:Mapping_Tools.Viewmodels"
-             xmlns:domain1="clr-namespace:Mapping_Tools.Classes.Tools.TumourGenerating.Domain"
              xmlns:options="clr-namespace:Mapping_Tools.Classes.Tools.TumourGenerating.Options"
              d:DataContext="{d:DesignInstance Type=viewmodels:TumourGeneratorVm}"
              mc:Ignorable="d"
@@ -37,7 +36,6 @@
             <domain:BooleanAndConverter/>
         </domain:MultiValueConverterGroup>
         <domain:BooleanInvertConverter x:Key="BooleanInvertConverter"/>
-        <domain1:TumourTemplateToEnumConverter x:Key="TumourTemplateToEnumConverter"/>
         <domain:GraphStateToDoubleConverter x:Key="GraphStateToDoubleConverter"/>
     </local:SingleRunMappingTool.Resources>
     <Grid>
@@ -164,8 +162,7 @@
                         <!-- Add options about individual tumours: template, scale, length, rotation -->
                         <TextBlock Text="Template" FontWeight="Bold" Margin="0 10 0 0"/>
                         <ComboBox ItemsSource="{Binding TumourTemplates}"
-                                  SelectedItem="{Binding CurrentLayer.TumourTemplate, Converter={StaticResource TumourTemplateToEnumConverter}}"
-                                  Margin="0 0 0 0"
+                                  SelectedItem="{Binding CurrentLayer.TumourTemplateEnum}"
                                   ToolTip="Tumour template. Determines the shape of the tumour."/>
                         <TextBlock Text="Scale" FontWeight="Bold" Margin="0 10 0 0"/>
                         <components:ValueOrGraphControl GraphState="{Binding CurrentLayer.TumourScale}"
