@@ -108,7 +108,9 @@ namespace Mapping_Tools.Viewmodels {
             get => _currentLayer;
             set {
                 if (Set(ref _currentLayer, value)) {
-                    _currentLayer.PropertyChanged += TumourLayerOnPropertyChanged;
+                    if (_currentLayer is not null) {
+                        _currentLayer.PropertyChanged += TumourLayerOnPropertyChanged;
+                    }
                 }
             }
         }
@@ -194,6 +196,10 @@ namespace Mapping_Tools.Viewmodels {
         public CommandImplementation CopyCommand { get; }
         [JsonIgnore]
         public CommandImplementation RemoveCommand { get; }
+        [JsonIgnore]
+        public CommandImplementation RaiseCommand { get; }
+        [JsonIgnore]
+        public CommandImplementation LowerCommand { get; }
 
         #endregion
 
@@ -235,6 +241,24 @@ namespace Mapping_Tools.Viewmodels {
                             var indexToRemove = CurrentLayerIndex;
                             CurrentLayerIndex = indexToRemove == 0 ? 1 : CurrentLayerIndex - 1;
                             TumourLayers.RemoveAt(indexToRemove);
+                            RegeneratePreview();
+                        }
+                    } catch (Exception ex) { ex.Show(); }
+                });
+            RaiseCommand = new CommandImplementation(
+                _ => {
+                    try {
+                        if (CurrentLayerIndex < TumourLayers.Count - 1) {
+                            TumourLayers.Move(CurrentLayerIndex, CurrentLayerIndex + 1);
+                            RegeneratePreview();
+                        }
+                    } catch (Exception ex) { ex.Show(); }
+                });
+            LowerCommand = new CommandImplementation(
+                _ => {
+                    try {
+                        if (CurrentLayerIndex > 0) {
+                            TumourLayers.Move(CurrentLayerIndex, CurrentLayerIndex - 1);
                             RegeneratePreview();
                         }
                     } catch (Exception ex) { ex.Show(); }

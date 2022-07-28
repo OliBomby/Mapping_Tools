@@ -119,21 +119,23 @@
                         </ListBox.ItemTemplate>
                     </ListBox>
 
-                    <StackPanel
-                        Grid.Row="1"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Bottom"
-                        Orientation="Horizontal">
-                        <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a tumour layer." Command="{Binding AddCommand}" Margin="5">
-                            <materialDesign:PackIcon Kind="Plus" Height="24" Width="24" />
+                    <ToolBar Grid.Row="1">
+                        <Button ToolTip="Add a tumour layer." Command="{Binding AddCommand}">
+                            <materialDesign:PackIcon Kind="Plus" />
                         </Button>
-                        <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Copy selected tumour layer." Command="{Binding CopyCommand}" Margin="5">
-                            <materialDesign:PackIcon Kind="ContentCopy" Height="24" Width="24" />
+                        <Button ToolTip="Remove selected tumour layer." Command="{Binding RemoveCommand}">
+                            <materialDesign:PackIcon Kind="Trashcan"  />
                         </Button>
-                        <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove selected tumour layer." Command="{Binding RemoveCommand}" Margin="5">
-                            <materialDesign:PackIcon Kind="Trashcan" Height="24" Width="24" />
+                        <Button ToolTip="Copy selected tumour layer." Command="{Binding CopyCommand}">
+                            <materialDesign:PackIcon Kind="ContentCopy" />
                         </Button>
-                    </StackPanel>
+                        <Button ToolTip="Move selected layer to higher in the list." Command="{Binding RaiseCommand}" >
+                            <materialDesign:PackIcon Kind="KeyboardArrowUp"  />
+                        </Button>
+                        <Button ToolTip="Move selected layer to lower in the list." Command="{Binding LowerCommand}" >
+                            <materialDesign:PackIcon Kind="KeyboardArrowDown" />
+                        </Button>
+                    </ToolBar>
 
                     <StackPanel Grid.Row="2">
                         <Slider Minimum="0" Maximum="1" TickFrequency="0.1" Value="{Binding Scale}" Margin="5 10"
