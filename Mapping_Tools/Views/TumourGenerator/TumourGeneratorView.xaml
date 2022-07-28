@@ -10,6 +10,7 @@
              xmlns:objectVisualiser="clr-namespace:Mapping_Tools.Components.ObjectVisualiser"
              xmlns:viewmodels="clr-namespace:Mapping_Tools.Viewmodels"
              xmlns:options="clr-namespace:Mapping_Tools.Classes.Tools.TumourGenerating.Options"
+             xmlns:domain2="clr-namespace:Mapping_Tools.Classes.Tools.TumourGenerating.Domain"
              d:DataContext="{d:DesignInstance Type=viewmodels:TumourGeneratorVm}"
              mc:Ignorable="d"
              x:Name="This"
@@ -37,6 +38,7 @@
         </domain:MultiValueConverterGroup>
         <domain:BooleanInvertConverter x:Key="BooleanInvertConverter"/>
         <domain:GraphStateToDoubleConverter x:Key="GraphStateToDoubleConverter"/>
+        <domain2:TumourTemplateToIconConverter x:Key="TumourTemplateToIconConverter"/>
     </local:SingleRunMappingTool.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -107,11 +109,15 @@
                             <DataTemplate DataType="options:TumourLayer">
                                 <Grid HorizontalAlignment="Stretch">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="30"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <CheckBox Grid.Column="0" IsChecked="{Binding IsActive}"/>
-                                    <TextBox Grid.Column="1" Text="{Binding Name}" TextWrapping="NoWrap" MinWidth="50"/>
+                                    <ToggleButton Grid.Column="0" IsChecked="{Binding IsActive}" Margin="2 0"/>
+                                    <materialDesign:PackIcon Grid.Column="1" Width="24" Height="24"
+                                                             Kind="{Binding TumourTemplateEnum, Converter={StaticResource TumourTemplateToIconConverter}}"
+                                                             Margin="5 0" VerticalAlignment="Center"/>
+                                    <TextBox Grid.Column="2" Text="{Binding Name}" TextWrapping="NoWrap" MinWidth="50" Margin="5 0"/>
                                 </Grid>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
