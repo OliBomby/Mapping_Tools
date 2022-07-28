@@ -55,6 +55,12 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
 
                     hintSegmentStart = null;
                 }
+
+                // Skip any zero length hints
+                while (nextHint < hints.Count && current == hints[nextHint].End) {
+                    nextHint++;
+                }
+
                 if (nextHint < hints.Count && current == hints[nextHint].Start) {
                     hintSegmentStart = current;
                 }
