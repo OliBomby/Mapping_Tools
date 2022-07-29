@@ -181,8 +181,6 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
             var startPoint = start.Value;
             var endPoint = end.Value;
-            var hintStart = start;
-            var hintEnd = end;
 
             // Ensure that there is a copy of the start point at the end point if we add in-between points
             // and the start and end points are the same node.
@@ -239,6 +237,8 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 ? (endPoint.OgPos - startPoint.OgPos).Theta
                 : MathHelper.LerpAngle(startPoint.AvgAngle, endPoint.AvgAngle, 0.5);
             double templateRange = endTemplateT - startTemplateT;
+            var hintStart = start;
+            var hintEnd = end;
 
             var length = Vector2.Distance(start.Value.OgPos, end.Value.OgPos);
             var scale = tumourLayer.TumourScale.GetValue(startProg) * Scalar;
@@ -355,10 +355,10 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 pathWithHints.AddReconstructionHint(new ReconstructionHint(hintStart, hintEnd, layer, hintAnchors, hintType, startTemplateT, endTemplateT, distFunc: distFunc));
 
                 // Add null segments for the possible on-continuous endpoints of the tumour
-                if (start.Value < hintStart.Value) {
+                if (start != hintStart) {
                     pathWithHints.AddReconstructionHint(new ReconstructionHint(start, hintStart, layer, null));;
                 }
-                if (end.Value > hintEnd.Value) {
+                if (end != hintEnd) {
                     pathWithHints.AddReconstructionHint(new ReconstructionHint(hintEnd, end, layer, null));;
                 }
             } else {
