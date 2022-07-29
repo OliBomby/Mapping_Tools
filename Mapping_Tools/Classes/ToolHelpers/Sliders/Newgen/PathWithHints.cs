@@ -176,7 +176,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                 endP = hint.DistFunc(endP);
             }
 
-            return Precision.AlmostEquals(startP, endP) ? null
+            return double.IsNaN(startP) || double.IsNaN(endP) || Precision.AlmostEquals(startP, endP) ? null
                 : hint.Cut(start, end, startP, endP);
         }
 
