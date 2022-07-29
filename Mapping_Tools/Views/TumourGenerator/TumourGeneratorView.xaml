@@ -37,6 +37,7 @@
             <domain:BooleanAndConverter/>
         </domain:MultiValueConverterGroup>
         <domain:BooleanInvertConverter x:Key="BooleanInvertConverter"/>
+        <domain:BooleanAndConverter x:Key="BooleanAndConverter"/>
         <domain:GraphStateToDoubleConverter x:Key="GraphStateToDoubleConverter"/>
         <domain2:TumourTemplateToIconConverter x:Key="TumourTemplateToIconConverter"/>
     </local:SingleRunMappingTool.Resources>
@@ -155,6 +156,23 @@
                                           ToolTip="Show only the path without reconstruction."/>
                             <TextBlock Text="Debug" Margin="10 0 0 0"/>
                         </StackPanel>
+                        <CheckBox Content="Fix SV" Margin="0 5 0 0"
+                                  ToolTip="Automatically adjust SV such that the slider keeps the same duration after getting tumours."
+                                  IsChecked="{Binding FixSv}"/>
+                        <CheckBox Content="Delegate SV to BPM"
+                                  ToolTip="Use BPM to determine the velocity of the slider instead of greenline SV."
+                                  IsEnabled="{Binding FixSv}"
+                                  IsChecked="{Binding DelegateToBpm}"/>
+                        <CheckBox Content="Remove slider ticks"
+                                  ToolTip="Use a NaN greenline to remove slider ticks from the slider."
+                                  IsChecked="{Binding RemoveSliderTicks}">
+                            <CheckBox.IsEnabled>
+                                <MultiBinding Converter="{StaticResource BooleanAndConverter}">
+                                    <Binding Path="FixSv"/>
+                                    <Binding Path="DelegateToBpm"/>
+                                </MultiBinding>
+                            </CheckBox.IsEnabled>
+                        </CheckBox>
                     </StackPanel>
                 </Grid>
 

@@ -127,6 +127,12 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _justMiddleAnchors, value, action: RegeneratePreview);
         }
 
+        private bool _fixSv;
+        public bool FixSv {
+            get => _fixSv;
+            set => Set(ref _fixSv, value);
+        }
+
         private bool _delegateToBpm;
         public bool DelegateToBpm {
             get => _delegateToBpm;
