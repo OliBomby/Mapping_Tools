@@ -19,53 +19,34 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                 return (pathWithHints.Path.Select(o => o.Pos).ToList(), PathType.Linear);
             }
 
-            var anchors = new List<Vector2>();
-            var current = pathWithHints.Path.First;
             var hints = ConstructHints(pathWithHints.Path, pathWithHints.ReconstructionHints);;
-            var nextHint = 0;
-            LinkedListNode<PathPoint> hintSegmentStart = null;
+
+            var anchors = new List<Vector2>();
             var pathType = hints.Count == 1 && hints[0].Start == pathWithHints.Path.First &&
                            hints[0].End == pathWithHints.Path.Last
                 ? hints[0].PathType
                 : PathType.Bezier;
 
-            while (current is not null) {
-                if (nextHint < hints.Count && current == hints[nextHint].End && hintSegmentStart is not null) {
-                    // Add segment between start and this
-                    var hint = hints[nextHint++];
-                    if (hint.Anchors is null || hint.Anchors.Count == 0) {
-                        // Null segment, should have been reconstructed from points by ConstructHints...
-                        anchors.Add(hintSegmentStart.Value.Pos);
-                        anchors.Add(current.Value.Pos);
-                    } else {
-                        // Cut hint anchors to completion
-                        var cutAnchors = CutAnchors(hint.Anchors, hint.PathType, hint.StartP, hint.EndP, out var hintPathType);
+            foreach (ReconstructionHint hint in hints) {
+                if (hint.Anchors is null || hint.Anchors.Count == 0) {
+                    // Null segment, should have been reconstructed from points by ConstructHints...
+                    anchors.Add(hint.Start.Value.Pos);
+                    anchors.Add(hint.End.Value.Pos);
+                } else {
+                    // Cut hint anchors to completion
+                    var cutAnchors = CutAnchors(hint.Anchors, hint.PathType, hint.StartP, hint.EndP, out var hintPathType);
 
-                        // Convert hint path type
-                        if (pathType != PathType.Bezier && hintPathType != pathType) {
-                            throw new Exception("Can not convert hint path to non-bezier path type.");
-                        }
-
-                        var convertedAnchors = pathType == PathType.Bezier ? BezierConverter.ConvertToBezierAnchors(cutAnchors, hintPathType) : cutAnchors;
-
-                        // Add hint anchors
-                        anchors.AddRange(TransformAnchors(convertedAnchors, hintSegmentStart.Value.Pos, current.Value.Pos,
-                            MathHelper.LerpAngle(hintSegmentStart.Value.PreAngle, current.Value.PostAngle, 0.5)));
+                    // Convert hint path type
+                    if (pathType != PathType.Bezier && hintPathType != pathType) {
+                        throw new Exception("Can not convert hint path to non-bezier path type.");
                     }
 
-                    hintSegmentStart = null;
-                }
+                    var convertedAnchors = pathType == PathType.Bezier ? BezierConverter.ConvertToBezierAnchors(cutAnchors, hintPathType) : cutAnchors;
 
-                // Skip any zero length hints
-                while (nextHint < hints.Count && current == hints[nextHint].End) {
-                    nextHint++;
+                    // Add hint anchors
+                    anchors.AddRange(TransformAnchors(convertedAnchors, hint.Start.Value.Pos, hint.End.Value.Pos,
+                        MathHelper.LerpAngle(hint.Start.Value.PreAngle, hint.End.Value.PostAngle, 0.5)));
                 }
-
-                if (nextHint < hints.Count && current == hints[nextHint].Start) {
-                    hintSegmentStart = current;
-                }
-
-                current = current.Next;
             }
 
             return (anchors, pathType);
