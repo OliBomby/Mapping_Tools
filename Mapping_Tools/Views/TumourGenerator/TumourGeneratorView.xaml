@@ -156,6 +156,11 @@
                                           ToolTip="Show only the path without reconstruction."/>
                             <TextBlock Text="Debug" Margin="10 0 0 0"/>
                         </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0 5 0 5">
+                            <ToggleButton IsChecked="{Binding JustMiddleAnchors}"
+                                          ToolTip="Construct path with only the middle anchors of all tumours."/>
+                            <TextBlock Text="Only middle anchors" Margin="10 0 0 0"/>
+                        </StackPanel>
                         <CheckBox Content="Fix SV" Margin="0 5 0 0"
                                   ToolTip="Automatically adjust SV such that the slider keeps the same duration after getting tumours."
                                   IsChecked="{Binding FixSv}"/>
