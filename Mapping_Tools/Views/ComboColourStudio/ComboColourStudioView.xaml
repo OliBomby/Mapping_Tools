@@ -109,7 +109,7 @@
                                             <ListBox.ItemTemplate>
                                                 <DataTemplate DataType="beatmapHelper:SpecialColour">
                                                     <StackPanel Orientation="Horizontal">
-                                                        <materialDesign:Chip Content="{Binding Name}" ToolTip="{Binding Name}" IconBackground="{Binding Color, Converter={StaticResource ColorToBrushConverter}}" Icon="" 
+                                                        <materialDesign:Chip ToolTip="{Binding Name}" IconBackground="{Binding Color, Converter={StaticResource ColorToBrushConverter}}" Icon=""
                                                                              IsDeletable="True" DeleteCommand="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}, Path=DataContext.RemoveCommand}" DeleteCommandParameter="{Binding}"/>
                                                     </StackPanel>
                                                 </DataTemplate>
