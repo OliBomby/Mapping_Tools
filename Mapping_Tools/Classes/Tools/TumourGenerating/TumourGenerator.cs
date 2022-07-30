@@ -192,33 +192,24 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
             if (Precision.AlmostEquals(startPoint.CumulativeLength, endPoint.CumulativeLength)) {
                 // Wii Sports Resort to T mode
-
-                // T should either be undefined on both start and end point because T is not yet initialized for this distance
-                // or T should be defined for both
                 // If T is defined, then 0 should be on the first occurance of this dist and 1 on the last occurance of this dist
 
-                if (double.IsNaN(startPoint.T) ^ double.IsNaN(endPoint.T)) {
-                    throw new InvalidOperationException(
-                        "T value must be both defined or both undefined for the same distance value.");
+                // Initialize T properly
+                var firstOccurrence = PathHelper.FindFirstOccurrence(start, start.Value.CumulativeLength);
+                var lastOccurrence = PathHelper.FindLastOccurrence(end, end.Value.CumulativeLength);
+
+                int pointsBetweenTi = PathHelper.CountPointsBetween(firstOccurrence, lastOccurrence);
+                var dti = 1d / (pointsBetweenTi + 1);
+                var tti = 0d;
+                var pti = firstOccurrence;
+                while (pti != lastOccurrence && pti is not null) {
+                    pti.Value = pti.Value.SetT(tti);
+                    tti += dti;
+                    pti = pti.Next;
                 }
 
-                if (double.IsNaN(startPoint.T)) {
-                    // Initialize T properly
-                    var firstOccurrence = PathHelper.FindFirstOccurrence(start, start.Value.CumulativeLength);
-                    var lastOccurrence = PathHelper.FindLastOccurrence(end, end.Value.CumulativeLength);
+                lastOccurrence.Value = lastOccurrence.Value.SetT(1);
 
-                    int pointsBetweenTi = PathHelper.CountPointsBetween(firstOccurrence, lastOccurrence);
-                    var dti = 1d / (pointsBetweenTi + 1);
-                    var tti = 0d;
-                    var pti = firstOccurrence;
-                    while (pti != lastOccurrence && pti is not null) {
-                        pti.Value = pti.Value.SetT(tti);
-                        tti += dti;
-                        pti = pti.Next;
-                    }
-
-                    lastOccurrence.Value = lastOccurrence.Value.SetT(1);
-                }
                 // T is initialized
             }
 
