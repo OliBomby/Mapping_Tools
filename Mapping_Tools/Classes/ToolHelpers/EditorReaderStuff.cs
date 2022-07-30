@@ -7,7 +7,9 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Editor_Reader;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.Exceptions;
+using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Process.NET;
 using Process.NET.Memory;
@@ -371,7 +373,7 @@ namespace Mapping_Tools.Classes.ToolHelpers {
 
             List<HitObject> selected = new List<HitObject>();
             beatmap.HitObjects = reader.hitObjects.Select(o => {
-                var nho = (HitObject) o;
+                var nho = ConvertHitObject(o);
                 if (o.IsSelected) selected.Add(nho); 
                 return nho;
             }).ToList();
@@ -399,7 +401,57 @@ namespace Mapping_Tools.Classes.ToolHelpers {
         /// <param name="reader"></param>
         /// <returns></returns>
         public static List<HitObject> GetHitObjects(EditorReader reader) {
-            return reader.hitObjects.Select(o => (HitObject)o).ToList();
+            return reader.hitObjects.Select(ConvertHitObject).ToList();
+        }
+
+
+        public static HitObject ConvertHitObject(Editor_Reader.HitObject ob) {
+            var ho = new HitObject {
+                PixelLength = ob.SpatialLength,
+                Time = ob.StartTime,
+                ObjectType = ob.Type,
+                EndTime = ob.EndTime,
+                Hitsounds = ob.SoundType,
+                Pos = new Vector2(ob.X, ob.Y),
+                EndPos = new Vector2(ob.X, ob.Y),  // To be recalculated later
+                Filename = ob.SampleFile,
+                SampleVolume = ob.SampleVolume,
+                SampleSet = (SampleSet) ob.SampleSet,
+                AdditionSet = (SampleSet) ob.SampleSetAdditions,
+                CustomIndex = ob.CustomSampleSet,
+                IsSelected = ob.IsSelected
+            };
+
+            if (ho.IsSlider) {
+                ho.Repeat = ob.SegmentCount;
+
+                ho.SliderType = (PathType) ob.CurveType;
+                if (ob.sliderCurvePoints != null) {
+                    ho.CurvePoints = new List<Vector2>(ob.sliderCurvePoints.Length / 2);
+                    for (var i = 1; i < ob.sliderCurvePoints.Length / 2; i++)
+                        ho.CurvePoints.Add(new Vector2(ob.sliderCurvePoints[i * 2], ob.sliderCurvePoints[i * 2 + 1]));
+                }
+
+                ho.EdgeHitsounds = new List<int>(ho.Repeat + 1);
+                if (ob.SoundTypeList != null)
+                    ho.EdgeHitsounds = ob.SoundTypeList.ToList();
+                for (var i = ho.EdgeHitsounds.Count; i < ho.Repeat + 1; i++) ho.EdgeHitsounds.Add(0);
+
+                ho.EdgeSampleSets = new List<SampleSet>(ho.Repeat + 1);
+                ho.EdgeAdditionSets = new List<SampleSet>(ho.Repeat + 1);
+                if (ob.SampleSetList != null)
+                    ho.EdgeSampleSets = Array.ConvertAll(ob.SampleSetList, ss => (SampleSet) ss).ToList();
+                if (ob.SampleSetAdditionsList != null)
+                    ho.EdgeAdditionSets = Array.ConvertAll(ob.SampleSetAdditionsList, ss => (SampleSet) ss).ToList();
+                for (var i = ho.EdgeSampleSets.Count; i < ho.Repeat + 1; i++) ho.EdgeSampleSets.Add(SampleSet.None);
+                for (var i = ho.EdgeAdditionSets.Count; i < ho.Repeat + 1; i++) ho.EdgeAdditionSets.Add(SampleSet.None);
+            } else if (ho.IsSpinner || ho.IsHoldNote) {
+                ho.Repeat = 1;
+            } else {
+                ho.Repeat = 0;
+            }
+
+            return ho;
         }
     }
 }

@@ -24,6 +24,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff {
 
         private List<Vector2> calculatedPath;
         private List<double> cumulativeLength;
+        private List<int> segmentStarts;
 
         private bool isInitialised;
 
@@ -62,6 +63,27 @@ namespace Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff {
             get {
                 EnsureInitialised();
                 return cumulativeLength.Count == 0 ? 0 : cumulativeLength[cumulativeLength.Count - 1];
+            }
+        }
+
+        public IReadOnlyList<Vector2> CalculatedPath {
+            get {
+                EnsureInitialised();
+                return calculatedPath;
+            }
+        }
+
+        public IReadOnlyList<double> CumulativeLength {
+            get {
+                EnsureInitialised();
+                return cumulativeLength;
+            }
+        }
+
+        public IReadOnlyList<int> SegmentStarts {
+            get {
+                EnsureInitialised();
+                return segmentStarts;
             }
         }
 
@@ -191,6 +213,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff {
             controlPoints = controlPoints ?? Array.Empty<Vector2>();
             calculatedPath = new List<Vector2>();
             cumulativeLength = new List<double>();
+            segmentStarts = new List<int>();
 
             CalculatePath();
             CalculateCumulativeLength();
@@ -235,6 +258,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff {
 
                 if( i == ControlPoints.Length() - 1 || ControlPoints[i] == ControlPoints[i + 1] && i != ControlPoints.Length() - 2) {
                     List<Vector2> cpSpan = ControlPoints.GetRange(start, end - start);
+
+                    // Remember the index of the subpath start
+                    segmentStarts.Add(calculatedPath.Count);
 
                     foreach( Vector2 t in CalculateSubpath(cpSpan) )
                         if( calculatedPath.Count == 0 || calculatedPath.Last() != t )

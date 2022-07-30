@@ -5,25 +5,45 @@ using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Classes.MathUtil;
 
-namespace Mapping_Tools.Classes.ToolHelpers {
-    public class SliderPathUtil {
+namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
+    public static class SliderPathUtil {
         public static List<Vector2> MoveAnchorsToLength(List<Vector2> anchors, PathType pathType, double newLength, out PathType newPathType) {
-            var newAnchors = new List<Vector2>();
             var sliderPath = new SliderPath(pathType, anchors.ToArray(), newLength);
-            var maxSliderPath = new SliderPath(pathType, anchors.ToArray());
+            var fullLength = new SliderPath(pathType, anchors.ToArray()).Distance;
 
-            if (newLength > maxSliderPath.Distance) {
+            return MoveAnchorsToLength(sliderPath, fullLength, newLength, out newPathType);
+        }
+
+        public static List<Vector2> MoveAnchorsToLength(List<Vector2> anchors, PathType pathType, double fullLength, double newLength, out PathType newPathType) {
+            var sliderPath = new SliderPath(pathType, anchors.ToArray(), newLength);
+
+            return MoveAnchorsToLength(sliderPath, fullLength, newLength, out newPathType);
+        }
+
+        public static List<Vector2> MoveAnchorsToCompletion(List<Vector2> anchors, PathType pathType, double completion, out PathType newPathType) {
+            var fullLength = new SliderPath(pathType, anchors.ToArray()).Distance;
+            var sliderPath = new SliderPath(pathType, anchors.ToArray(), completion * fullLength);
+
+            return MoveAnchorsToLength(sliderPath, fullLength, sliderPath.Distance, out newPathType);
+        }
+
+        public static List<Vector2> MoveAnchorsToLength(SliderPath sliderPath, double fullLength, double newLength, out PathType newPathType) {
+            var newAnchors = new List<Vector2>();
+            var pathType = sliderPath.Type;
+            var anchors = sliderPath.ControlPoints;
+
+            if (newLength > fullLength) {
                 // Extend linearly
                 switch (pathType) {
                     case PathType.Bezier:
                         newPathType = PathType.Bezier;
                         newAnchors.AddRange(anchors);
 
-                        if (newAnchors.Count > 1 && newAnchors[newAnchors.Count - 2] == newAnchors[newAnchors.Count - 1]) {
-                            newAnchors[newAnchors.Count - 2] = newAnchors[newAnchors.Count - 2] + Vector2.UnitX;
+                        if (newAnchors.Count > 1 && newAnchors[^2] == newAnchors[^1]) {
+                            newAnchors[^2] += Vector2.UnitX;
                         }
 
-                        newAnchors.Add(anchors.Last());
+                        newAnchors.Add(anchors[^1]);
                         newAnchors.Add(sliderPath.PositionAt(1));
                         break;
                     case PathType.Catmull:
@@ -37,7 +57,7 @@ namespace Mapping_Tools.Classes.ToolHelpers {
                     default:
                         newPathType = pathType;
                         newAnchors.AddRange(anchors);
-                        newAnchors[newAnchors.Count - 1] = sliderPath.PositionAt(1);
+                        newAnchors[^1] = sliderPath.PositionAt(1);
                         break;
                 }
             } else {
@@ -57,7 +77,7 @@ namespace Mapping_Tools.Classes.ToolHelpers {
                             subdivision = bezierSubdivision;
                             var length = bezierSubdivision.SubdividedApproximationLength();
 
-                            if (totalLength + length > newLength) {
+                            if (Precision.AlmostBigger(totalLength + length, newLength)) {
                                 break;
                             }
 
@@ -91,7 +111,7 @@ namespace Mapping_Tools.Classes.ToolHelpers {
                                 newAnchors.Add(bezierSubdivision.Points[0]);
                                 var length = bezierSubdivision.Length();
 
-                                if (totalLength + length > newLength) {
+                                if (Precision.AlmostBigger(totalLength + length, newLength)) {
                                     break;
                                 }
 
@@ -100,7 +120,7 @@ namespace Mapping_Tools.Classes.ToolHelpers {
                             newAnchors.Add(sliderPath.PositionAt(1));
                         } else {
                             newAnchors.AddRange(anchors);
-                            newAnchors[newAnchors.Count - 1] = sliderPath.PositionAt(1);
+                            newAnchors[^1] = sliderPath.PositionAt(1);
                         }
                         break;
                 }
@@ -175,7 +195,7 @@ namespace Mapping_Tools.Classes.ToolHelpers {
             double totalLoss = 0;
 
             foreach (var point in points) {
-                var minLoss = Double.PositiveInfinity;
+                var minLoss = double.PositiveInfinity;
 
                 for (int i = 0; i < labels.Count - 1; i++) {
                     var p1 = labels[i];

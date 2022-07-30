@@ -65,7 +65,7 @@ namespace Mapping_Tools.Components.Graph {
             DependencyProperty.Register(nameof(Interpolator),
                 typeof(IGraphInterpolator), 
                 typeof(Anchor), 
-                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None,
+                new FrameworkPropertyMetadata(new LinearInterpolator(), FrameworkPropertyMetadataOptions.None,
                     OnInterpolatorChanged));
         
         [NotNull]

@@ -10,6 +10,7 @@ using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Classes.ToolHelpers;
+using Mapping_Tools.Classes.ToolHelpers.Sliders;
 using Mapping_Tools.Viewmodels;
 
 namespace Mapping_Tools.Views.SliderMerger {
@@ -117,8 +118,8 @@ namespace Mapping_Tools.Views.SliderMerger {
                             ho1.SliderType = pathType;
                         }
 
-                        var sp1 = BezierConverter.ConvertToBezier(ho1.GetAllCurvePoints(), ho1.SliderType);
-                        var sp2 = BezierConverter.ConvertToBezier(ho2.GetAllCurvePoints(), ho2.SliderType);
+                        var sp1 = BezierConverter.ConvertToBezierAnchors(ho1.GetAllCurvePoints(), ho1.SliderType);
+                        var sp2 = BezierConverter.ConvertToBezierAnchors(ho2.GetAllCurvePoints(), ho2.SliderType);
 
                         double extraLength = 0;
                         switch (arg.ConnectionModeSetting) {
@@ -157,7 +158,7 @@ namespace Mapping_Tools.Views.SliderMerger {
                         mergeLast = true;
                     } else if (ho1.IsSlider && ho2.IsCircle) {
                         if (Precision.DefinitelyBigger(dist, 0)) {
-                            var sp1 = BezierConverter.ConvertToBezier(ho1.GetAllCurvePoints(), ho1.SliderType);
+                            var sp1 = BezierConverter.ConvertToBezierAnchors(ho1.GetAllCurvePoints(), ho1.SliderType);
 
                             sp1.Add(sp1.Last());
                             sp1.Add(ho2.Pos);
@@ -189,7 +190,7 @@ namespace Mapping_Tools.Views.SliderMerger {
                         mergeLast = true;
                     } else if (ho1.IsCircle && ho2.IsSlider) {
                         if (Precision.DefinitelyBigger(dist, 0)) {
-                            var sp2 = BezierConverter.ConvertToBezier(ho2.GetAllCurvePoints(), ho2.SliderType);
+                            var sp2 = BezierConverter.ConvertToBezierAnchors(ho2.GetAllCurvePoints(), ho2.SliderType);
 
                             sp2.Insert(0, sp2.First());
                             sp2.Insert(0, ho1.Pos);
