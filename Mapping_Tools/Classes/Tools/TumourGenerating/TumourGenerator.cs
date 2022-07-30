@@ -315,16 +315,16 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     // Copy point and leave one side at 0 offset
                     var newPos = CalculateNewPos(point, pos, offset, postAngle + rotation);
 
-                    current.List.AddBefore(current, new PathPoint(point.Pos, point.OgPos, point.PreAngle, point.PreAngle, point.CumulativeLength, point.T, true));
-                    current.Value = new PathPoint(newPos, point.OgPos, point.PostAngle, point.PostAngle, point.CumulativeLength, point.T, true);
+                    current.List.AddBefore(current, new PathPoint(point.Pos, point.OgPos, point.PreAngle, point.PreAngle, point.CumulativeLength, -1, true));
+                    current.Value = new PathPoint(newPos, point.OgPos, point.PostAngle, point.PostAngle, point.CumulativeLength, 0, true);
                     start = current.Previous;
                     hintStart = current;
                 } else if (current == end && end.Next is not null && offset.LengthSquared > Precision.DOUBLE_EPSILON) {
                     // Copy point and leave one side at 0 offset
                     var newPos = CalculateNewPos(point, pos, offset, preAngle + rotation);
 
-                    current.List.AddBefore(current, new PathPoint(newPos, point.OgPos, point.PreAngle, point.PreAngle, point.CumulativeLength, point.T, true));
-                    current.Value = new PathPoint(point.Pos, point.OgPos, point.PostAngle, point.PostAngle, point.CumulativeLength, point.T, true);
+                    current.List.AddBefore(current, new PathPoint(newPos, point.OgPos, point.PreAngle, point.PreAngle, point.CumulativeLength, 1, true));
+                    current.Value = new PathPoint(point.Pos, point.OgPos, point.PostAngle, point.PostAngle, point.CumulativeLength, 2, true);
                     hintEnd = current.Previous;
                 } else if (red && !double.IsNaN(preAngle) && !double.IsNaN(postAngle) && !Precision.AlmostEquals(preAngle, postAngle)
                            && offset.LengthSquared > Precision.DOUBLE_EPSILON) {
