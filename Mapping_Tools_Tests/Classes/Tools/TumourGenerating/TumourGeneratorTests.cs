@@ -24,12 +24,11 @@ namespace Mapping_Tools_Tests.Classes.Tools.TumourGenerating {
         public void TestPlaceTumour() {
             const int res = 10;
             var tumourGenerator = new TumourGenerator {
-                WrappingMode = WrappingMode.Simple,
                 Resolution = res
             };
             var tumourLayer = TumourLayer.GetDefaultLayer();
             tumourLayer.TumourLength = TumourLayer.GetGraphState(10);
-            tumourLayer.TumourScale = TumourLayer.GetGraphState(10);
+            tumourLayer.TumourScale = TumourLayer.GetGraphState(5);
             const int layer = 0;
             const double startT = 0;
             const double endT = 1;
@@ -58,8 +57,7 @@ namespace Mapping_Tools_Tests.Classes.Tools.TumourGenerating {
 
                 current = current.Next;
             }
-            
-            Assert.IsTrue(count >= 2 + res);
+
             var mid = PathHelper.FindFirstOccurrence(start, 105);
             Assert.AreEqual(105, mid.Value.CumulativeLength, Precision.DOUBLE_EPSILON);
 

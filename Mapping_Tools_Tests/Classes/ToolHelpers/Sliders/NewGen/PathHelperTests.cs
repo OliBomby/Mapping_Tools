@@ -127,9 +127,9 @@ namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
             Assert.AreEqual(4, added);
 
             Assert.IsTrue(start!.Next!.Value > start.Value);
+            Assert.AreSame(middle, start.Next);
             Assert.IsTrue(start.Next.Next!.Value > start.Next.Value);
             Assert.IsTrue(start.Next.Next.Next!.Value > start.Next.Next.Value);
-            Assert.AreSame(middle, start.Next.Next.Next);
             Assert.IsTrue(start.Next.Next.Next.Next!.Value > start.Next.Next.Next.Value);
             Assert.IsTrue(start.Next.Next.Next.Next.Next!.Value > start.Next.Next.Next.Next.Value);
             Assert.IsTrue(start.Next.Next.Next.Next.Next.Next!.Value > start.Next.Next.Next.Next.Next.Value);
