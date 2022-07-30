@@ -150,7 +150,8 @@
                         </StackPanel>
 
                         <materialDesign:ColorZone
-                            WindowChrome.IsHitTestVisibleInChrome="True" 
+                            WindowChrome.IsHitTestVisibleInChrome="True"
+                            PreviewMouseDown="DragWin"
                             ToolTip="{Binding CurrentBeatmaps, Converter={StaticResource MapPathStringAddNewLinesConverter}}"
                             VerticalAlignment="Center"
                             Margin="10 0"
