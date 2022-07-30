@@ -1,6 +1,8 @@
-﻿using Mapping_Tools.Classes.MathUtil;
+﻿using System.Diagnostics.CodeAnalysis;
+using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Components.Graph.Interpolation;
 using System.Windows;
+using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
 
 namespace Mapping_Tools.Components.Graph {
     public class AnchorState : Freezable, IGraphAnchor {
@@ -20,8 +22,9 @@ namespace Mapping_Tools.Components.Graph {
             DependencyProperty.Register(nameof(Interpolator),
                 typeof(IGraphInterpolator), 
                 typeof(AnchorState), 
-                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None));
-        
+                new FrameworkPropertyMetadata(new LinearInterpolator(), FrameworkPropertyMetadataOptions.None));
+
+        [NotNull]
         public IGraphInterpolator Interpolator {
             get => (IGraphInterpolator) GetValue(InterpolatorProperty);
             set => SetValue(InterpolatorProperty, value);

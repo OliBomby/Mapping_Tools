@@ -124,6 +124,9 @@
     <Compile Update="Components\Graph\TensionAnchor.xaml.cs">
       <DependentUpon>TensionAnchor.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Components\ValueOrGraphControl.xaml.cs">
+      <DependentUpon>ValueOrGraphControl.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Components\HotkeyEditorControl.xaml.cs">
       <DependentUpon>HotkeyEditorControl.xaml</DependentUpon>
     </Compile>
@@ -246,6 +249,9 @@
     <Compile Update="Views\TimingStudio\TimingStudioView.xaml.cs">
       <DependentUpon>TimingStudioView.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\MapsetMerger\MapsetMergerView.cs">
+      <DependentUpon>MapsetMergerView.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -285,6 +291,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Components\Graph\TensionAnchor.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Components\ValueOrGraphControl.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Components\HotkeyEditorControl.xaml">
@@ -371,6 +381,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\RhythmGuide\RhythmGuideWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\TumourGenerator\TumourGeneratorView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\Sliderator\SlideratorView.xaml">

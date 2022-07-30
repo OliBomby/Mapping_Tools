@@ -260,7 +260,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff {
         /// <param name="vec4">The fourth vector.</param>
         /// <param name="t">The parameter at which to find the point on the spline, in the range [0, 1].</param>
         /// <returns>The point on the spline at <paramref name="t"/>.</returns>
-        private static Vector2 CatmullFindPoint(ref Vector2 vec1, ref Vector2 vec2, ref Vector2 vec3, ref Vector2 vec4, double t) {
+        public static Vector2 CatmullFindPoint(ref Vector2 vec1, ref Vector2 vec2, ref Vector2 vec3, ref Vector2 vec4, double t) {
             double t2 = t * t;
             double t3 = t * t2;
 

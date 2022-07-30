@@ -1,0 +1,357 @@
+﻿<local:SingleRunMappingTool x:Class="Mapping_Tools.Views.TumourGenerator.TumourGeneratorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:Mapping_Tools.Views"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
+             xmlns:components="clr-namespace:Mapping_Tools.Components"
+             xmlns:objectVisualiser="clr-namespace:Mapping_Tools.Components.ObjectVisualiser"
+             xmlns:viewmodels="clr-namespace:Mapping_Tools.Viewmodels"
+             xmlns:options="clr-namespace:Mapping_Tools.Classes.Tools.TumourGenerating.Options"
+             xmlns:domain2="clr-namespace:Mapping_Tools.Classes.Tools.TumourGenerating.Domain"
+             d:DataContext="{d:DesignInstance Type=viewmodels:TumourGeneratorVm}"
+             mc:Ignorable="d"
+             x:Name="This"
+             Loaded="OnLoaded"
+             d:DesignHeight="450" Width="759.5">
+    <local:SingleRunMappingTool.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisConverter"/>
+        <domain:DoubleToStringConverter x:Key="DoubleToStringConverter"/>
+        <domain:IntToStringConverter x:Key="IntToStringConverter"/>
+        <domain:TimeToStringConverter x:Key="TimeToStringConverter"/>
+        <domain:MultiValueConverterGroup x:Key="BooleanInvertToVisibilityConverter">
+            <domain:BooleanInvertConverter/>
+            <domain:BooleanToVisibilityConverter/>
+        </domain:MultiValueConverterGroup>
+        <domain:BooleanOrToVisibilityConverter x:Key="BooleanOrToVisibilityConverter"/>
+        <domain:MultiValueConverterGroup x:Key="BooleanAOrNotBConverter">
+            <domain:IdentityConverter/>
+            <domain:BooleanInvertConverter/>
+            <domain:BooleanOrConverter/>
+        </domain:MultiValueConverterGroup>
+        <domain:MultiValueConverterGroup x:Key="BooleanAAndNotBConverter">
+            <domain:IdentityConverter/>
+            <domain:BooleanInvertConverter/>
+            <domain:BooleanAndConverter/>
+        </domain:MultiValueConverterGroup>
+        <domain:BooleanInvertConverter x:Key="BooleanInvertConverter"/>
+        <domain:BooleanAndConverter x:Key="BooleanAndConverter"/>
+        <domain:GraphStateToDoubleConverter x:Key="GraphStateToDoubleConverter"/>
+        <domain2:TumourTemplateToIconConverter x:Key="TumourTemplateToIconConverter"/>
+    </local:SingleRunMappingTool.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Orientation="Horizontal">
+                <TextBlock FontSize="40" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
+                    <Run Text="Tumour Generator 2"/>
+                </TextBlock>
+                <materialDesign:PopupBox Margin="10" VerticalAlignment="Bottom" ToolTip="Click me!">
+                    <materialDesign:PopupBox.ToggleContent>
+                        <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryHueMidBrush}"/>
+                    </materialDesign:PopupBox.ToggleContent>
+                    <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
+                        Tumour Generator 2 generates copious amounts of tumours on sliders.
+                        <LineBreak/>
+                        You can adjust the shape and size of tumours and choose where they should be placed along the path.
+                        <LineBreak/>
+                        You can also generate multiple layers of tumours. A layer will either merge the tumours with the tumours of the previous layer or place the tumours on top of the previous tumours.
+                        <LineBreak/>
+                        To get started, select a slider in your beatmap and click 'Preview slider' to preview changes or click the run button to instantly generate tumours on the selected sliders.
+                    </TextBlock>
+                </materialDesign:PopupBox>
+            </StackPanel>
+
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Column="0" Margin="0 0 10 0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <ListBox Grid.Row="0"  ItemsSource="{Binding TumourLayers}"
+                             VerticalAlignment="Top"
+                             SelectionMode="Single"
+                             SelectedItem="{Binding CurrentLayer}"
+                             SelectedIndex="{Binding CurrentLayerIndex}">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="{x:Type ListBoxItem}"
+                                   BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                                <Setter Property="DockPanel.Dock"
+                                        Value="Bottom" />
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <DockPanel LastChildFill="False" />
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="options:TumourLayer">
+                                <Grid HorizontalAlignment="Stretch">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <ToggleButton Grid.Column="0" IsChecked="{Binding IsActive}" Margin="2 0"/>
+                                    <materialDesign:PackIcon Grid.Column="1" Width="24" Height="24"
+                                                             Kind="{Binding TumourTemplateEnum, Converter={StaticResource TumourTemplateToIconConverter}}"
+                                                             Margin="5 0" VerticalAlignment="Center"/>
+                                    <TextBox Grid.Column="2" Text="{Binding Name}" TextWrapping="NoWrap" MinWidth="50" Margin="5 0"
+                                             Tag="{Binding}" PreviewMouseDown="LayerNameBox_OnPreviewMouseDown"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <ToolBar Grid.Row="1">
+                        <Button ToolTip="Add a tumour layer." Command="{Binding AddCommand}">
+                            <materialDesign:PackIcon Kind="Plus" />
+                        </Button>
+                        <Button ToolTip="Remove selected tumour layer." Command="{Binding RemoveCommand}">
+                            <materialDesign:PackIcon Kind="Trashcan"  />
+                        </Button>
+                        <Button ToolTip="Copy selected tumour layer." Command="{Binding CopyCommand}">
+                            <materialDesign:PackIcon Kind="ContentCopy" />
+                        </Button>
+                        <Button ToolTip="Move selected layer to higher in the list." Command="{Binding RaiseCommand}" >
+                            <materialDesign:PackIcon Kind="KeyboardArrowUp"  />
+                        </Button>
+                        <Button ToolTip="Move selected layer to lower in the list." Command="{Binding LowerCommand}" >
+                            <materialDesign:PackIcon Kind="KeyboardArrowDown" />
+                        </Button>
+                    </ToolBar>
+
+                    <StackPanel Grid.Row="2" Margin="0 0 0 10">
+                        <Slider Minimum="0" Maximum="1" TickFrequency="0.1" Value="{Binding Scale}" Margin="5 10"
+                                ToolTip="Tumour scale"/>
+                        <StackPanel Orientation="Horizontal" Margin="0 5 0 15">
+                            <ToggleButton IsChecked="{Binding AdvancedOptions}"
+                                          Style="{StaticResource MaterialDesignSwitchAccentToggleButton}"
+                                          ToolTip="Show advanced controls. Allows for fine control of parameters and changes over time."/>
+                            <TextBlock Text="Advanced" Margin="10 0 0 0"/>
+                        </StackPanel>
+                        <CheckBox Content="Debug construction"
+                                  IsChecked="{Binding DebugConstruction}"
+                                  ToolTip="Skip intelligent path reconstruction."/>
+                        <CheckBox Content="Only middle anchors"
+                                  IsChecked="{Binding JustMiddleAnchors}"
+                                  ToolTip="Construct path with only the middle anchors of all tumours."/>
+                        <CheckBox Content="Fix SV"
+                                  ToolTip="Automatically adjust SV such that the slider keeps the same duration after getting tumours."
+                                  IsChecked="{Binding FixSv}"/>
+                        <CheckBox Content="Delegate SV to BPM"
+                                  ToolTip="Use BPM to determine the velocity of the slider instead of greenline SV."
+                                  IsEnabled="{Binding FixSv}"
+                                  IsChecked="{Binding DelegateToBpm}"/>
+                        <CheckBox Content="Remove slider ticks"
+                                  ToolTip="Use a NaN greenline to remove slider ticks from the slider."
+                                  IsChecked="{Binding RemoveSliderTicks}">
+                            <CheckBox.IsEnabled>
+                                <MultiBinding Converter="{StaticResource BooleanAndConverter}">
+                                    <Binding Path="FixSv"/>
+                                    <Binding Path="DelegateToBpm"/>
+                                </MultiBinding>
+                            </CheckBox.IsEnabled>
+                        </CheckBox>
+                    </StackPanel>
+                </Grid>
+
+                <GridSplitter Grid.Column="1"
+                              VerticalAlignment="Stretch"
+                              ResizeBehavior="PreviousAndNext"
+                              Width="2" Background="{DynamicResource MaterialDesignDivider}"
+                              Margin="0 10"/>
+
+                <ScrollViewer Grid.Column="2" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <StackPanel Margin="10 0">
+                        <!-- Add options about individual tumours: template, scale, length, rotation -->
+                        <TextBlock Text="Template" FontWeight="Bold" Margin="0 10 0 0"/>
+                        <ComboBox ItemsSource="{Binding TumourTemplates}"
+                                  SelectedItem="{Binding CurrentLayer.TumourTemplateEnum}"
+                                  ToolTip="Tumour template. Determines the shape of the tumour."/>
+                        <TextBlock Text="Scale" FontWeight="Bold" Margin="0 10 0 0"/>
+                        <components:ValueOrGraphControl GraphState="{Binding CurrentLayer.TumourScale}"
+                                                        ToolTip="The scale of the tumour determines how far the tumour protrudes from the slider."
+                                                        Visibility="{Binding AdvancedOptions, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                        <Slider Value="{Binding CurrentLayer.TumourScale, Converter={StaticResource GraphStateToDoubleConverter}}"
+                                Style="{StaticResource MaterialDesignDiscreteSlider}"
+                                Minimum="0" Maximum="500"
+                                ToolTip="The scale of the tumour determines how far the tumour protrudes from the slider."/>
+                        <TextBlock Text="Length" FontWeight="Bold" Margin="0 10 0 0"/>
+                        <components:ValueOrGraphControl GraphState="{Binding CurrentLayer.TumourLength}"
+                                                        ToolTip="The length of the tumour determines how much length the tumour takes up on the slider."
+                                                        Visibility="{Binding AdvancedOptions, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                        <Slider Value="{Binding CurrentLayer.TumourLength, Converter={StaticResource GraphStateToDoubleConverter}}"
+                                Style="{StaticResource MaterialDesignDiscreteSlider}"
+                                Minimum="0" Maximum="500"
+                                ToolTip="The length of the tumour determines how much length the tumour takes up on the slider."/>
+                        <TextBlock Text="Angle" FontWeight="Bold" Margin="0 10 0 0"/>
+                        <components:ValueOrGraphControl GraphState="{Binding CurrentLayer.TumourRotation}"
+                                                        ToolTip="The angle of the tumour determines which way the tumour points in relation to the slider."
+                                                        Visibility="{Binding AdvancedOptions, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                        <Slider Value="{Binding CurrentLayer.TumourRotation, Converter={StaticResource GraphStateToDoubleConverter}}"
+                                Style="{StaticResource MaterialDesignDiscreteSlider}"
+                                Minimum="0" Maximum="360"
+                                ToolTip="The angle of the tumour determines which way the tumour points in relation to the slider."/>
+                        <TextBlock Text="Parameter" FontWeight="Bold" Margin="0 10 0 0"
+                                   Visibility="{Binding CurrentLayer.TumourTemplate.NeedsParameter, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                        <components:ValueOrGraphControl GraphState="{Binding CurrentLayer.TumourParameter}"
+                                                        ToolTip="The special parameter of this tumour template. This parameter changes the shape of the tumour in some way.">
+                            <components:ValueOrGraphControl.Visibility>
+                                <MultiBinding Converter="{StaticResource BooleanOrToVisibilityConverter}">
+                                    <Binding Path="AdvancedOptions"/>
+                                    <Binding Path="CurrentLayer.TumourTemplate.NeedsParameter"/>
+                                </MultiBinding>
+                            </components:ValueOrGraphControl.Visibility>
+                        </components:ValueOrGraphControl>
+                        <Slider Value="{Binding CurrentLayer.TumourParameter, Converter={StaticResource GraphStateToDoubleConverter}}"
+                                Style="{StaticResource MaterialDesignDiscreteSlider}"
+                                Minimum="0" Maximum="500"
+                                ToolTip="The special parameter of this tumour template. This parameter changes the shape of the tumour in some way."
+                                Visibility="{Binding CurrentLayer.TumourTemplate.NeedsParameter, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                        <!-- Add options about placement of multiple tumours: sidedness, distance, count, start, end, recalculate -->
+                        <TextBlock Text="Wrapping" FontWeight="Bold" Margin="0 10 0 0"/>
+                        <ComboBox ItemsSource="{Binding WrappingModes}"
+                                  SelectedItem="{Binding CurrentLayer.WrappingMode}"
+                                  Margin="0 0 0 0"
+                                  ToolTip="The wrapping mode controls how the tumour wraps around the shape of the slider."/>
+                        <TextBlock Text="Sidedness" FontWeight="Bold" Margin="0 10 0 0"/>
+                        <ComboBox ItemsSource="{Binding TumourSides}"
+                                  SelectedItem="{Binding CurrentLayer.TumourSidedness}"
+                                  Margin="0 0 0 0"
+                                  ToolTip="Tumour sidedness. Determines on which side of the slider to place the tumours."/>
+                        <TextBlock Text="Distance" FontWeight="Bold" Margin="0 10 0 0"/>
+                        <components:ValueOrGraphControl GraphState="{Binding CurrentLayer.TumourDistance}"
+                                                        ToolTip="The tumour distance determines the distance between the centre of each tumour."
+                                                        Visibility="{Binding AdvancedOptions, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                        <Slider Value="{Binding CurrentLayer.TumourDistance, Converter={StaticResource GraphStateToDoubleConverter}}"
+                                Style="{StaticResource MaterialDesignDiscreteSlider}"
+                                Minimum="5" Maximum="500"
+                                ToolTip="The tumour distance determines the distance between the centre of each tumour."/>
+                        <TextBlock Text="Count" FontWeight="Bold" Margin="0 10 0 0"/>
+                        <TextBox materialDesign:HintAssist.Hint="Count" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                 Text="{Binding CurrentLayer.TumourCount, Converter={StaticResource IntToStringConverter}, ConverterParameter=-1}"
+                                 ToolTip="The number of tumours to place on the slider. If 0 this count will be automatically determined using the distance and slider length."
+                                 Visibility="{Binding AdvancedOptions, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                        <Slider Value="{Binding CurrentLayer.TumourCount}"
+                                Style="{StaticResource MaterialDesignDiscreteSlider}"
+                                Minimum="0" Maximum="50"
+                                ToolTip="The number of tumours to place on the slider. If 0 this count will be automatically determined using the distance and slider length."/>
+                        <TextBlock Text="Start" FontWeight="Bold" Margin="0 10 0 0"/>
+                        <TextBox materialDesign:HintAssist.Hint="Start" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                 Text="{Binding CurrentLayer.TumourStart, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=0}"
+                                 ToolTip="The progression along the slider where to start the placement of tumours. 0 is the slider head, 1 is the slider end. If 'Absolute range' is checked, then this distance is expressed in osu! pixels."
+                                 Visibility="{Binding AdvancedOptions, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                        <Slider Minimum="{Binding TumourStartSliderMin}" Maximum="{Binding TumourRangeSliderMax}" Value="{Binding CurrentLayer.TumourStart}"
+                                SmallChange="{Binding TumourRangeSliderSmallChange}"
+                                ToolTip="The progression along the slider where to start the placement of tumours. 0 is the slider head, 1 is the slider end. If 'Absolute range' is checked, then this distance is expressed in osu! pixels."/>
+                        <TextBlock Text="End" FontWeight="Bold" Margin="0 10 0 0"/>
+                        <TextBox materialDesign:HintAssist.Hint="End" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                 Text="{Binding CurrentLayer.TumourEnd, Converter={StaticResource DoubleToStringConverter}, ConverterParameter=1}"
+                                 ToolTip="The progression along the slider where to end the placement of tumours. 0 is the slider head, 1 is the slider end. If 'Absolute range' is checked, then this distance is expressed in osu! pixels."
+                                 Visibility="{Binding AdvancedOptions, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                        <Slider Minimum="0" Maximum="{Binding TumourRangeSliderMax}" Value="{Binding CurrentLayer.TumourEnd}"
+                                SmallChange="{Binding TumourRangeSliderSmallChange}"
+                                ToolTip="The progression along the slider where to end the placement of tumours. 0 is the slider head, 1 is the slider end. If 'Absolute range' is checked, then this distance is expressed in osu! pixels."/>
+                        <CheckBox IsChecked="{Binding CurrentLayer.UseAbsoluteRange}" Margin="0 10 0 0"
+                                  Content="Absolute range" ToolTip="Toggle this to change the meaning of the Start and End fields to mean length in osu! pixels instead of length relative to the length of the slider."/>
+                        <CheckBox IsChecked="{Binding CurrentLayer.Recalculate}" Margin="0 5 0 0"
+                                  Content="Recalculate" ToolTip="Whether to recalculate the distances and angles of the slider before applying this layer. If true, tumours will be placed on top of tumours of the previous layers as if they were part of the slider, instead of merging with those tumours."/>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <GridSplitter Grid.Column="3"
+                              VerticalAlignment="Stretch"
+                              ResizeBehavior="PreviousAndNext"
+                              Width="2" Background="{DynamicResource MaterialDesignDivider}"
+                              Margin="0 10"/>
+
+                <materialDesign:Card Grid.Column="4" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Padding="10" Margin="10 0 0 0"
+                                     ToolTip="Result preview">
+                    <objectVisualiser:HitObjectElement x:Name="GraphHitObjectElement" HitObject="{Binding TumouredPreviewHitObject}"
+                                                       Stroke="YellowGreen" Fill="DarkSlateGray" SliderBallStroke="White" Thickness="50" ShowAnchors="True" AnchorSize="0.12"/>
+                </materialDesign:Card>
+
+                <ProgressBar Grid.Column="4" Margin="10 0 0 0"
+                             Style="{StaticResource MaterialDesignCircularProgressBar}"
+                             Visibility="{Binding IsProcessingPreview, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"
+                             Value="0"
+                             IsIndeterminate="True" />
+            </Grid>
+
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Column="0" Margin="0 10 10 0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <ComboBox x:Name="SelectionModeBox" Grid.Column="0" ItemsSource="{Binding ImportModes}" SelectedItem="{Binding ImportModeSetting}" Margin="0 0 5 0" VerticalAlignment="Top"
+                                  ToolTip="Slider selection mode. Choose which sliders should be targeted by Tumour Generator 2."/>
+
+                    <TextBox Grid.Column="1" Text="{Binding TimeCode}" Visibility="{Binding TimeCodeBoxVisibility}" Margin="5 0 5 2" Width="100" VerticalAlignment="Top"
+                                 materialDesign:HintAssist.Hint="Time code"
+                                 ToolTip="Input a time code here. Example time code: 00:56:823 (1) - "/>
+
+                    <Button Grid.Column="2" Style="{StaticResource MaterialDesignOutlinedButton}" Command="{Binding ImportCommand}" Margin="5 0 0 0"
+                                ToolTip="Import sliders into the preview." HorizontalAlignment="Right" VerticalAlignment="Top">
+                        Preview slider
+                    </Button>
+                </Grid>
+
+                <Viewbox Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
+                    <Button
+                        IsEnabled="{Binding ElementName=This, Path=CanRun}"
+                        Style="{StaticResource MaterialDesignFloatingActionButton}"
+                        Click="Start_Click"
+                        ToolTip="Generate copious amounts of tumours.">
+                        <materialDesign:PackIcon
+                            Kind="Play" Height="36" Width="36" />
+                    </Button>
+                </Viewbox>
+            </Grid>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Opacity="0.58"/>
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <ProgressBar Value="{Binding ElementName=This, Path=Progress}" Margin="20,0,20,0" Height="20" Background="{x:Null}" BorderBrush="{x:Null}"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</local:SingleRunMappingTool>

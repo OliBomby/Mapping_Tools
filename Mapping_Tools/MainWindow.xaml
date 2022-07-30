@@ -150,7 +150,8 @@
                         </StackPanel>
 
                         <materialDesign:ColorZone
-                            WindowChrome.IsHitTestVisibleInChrome="True" 
+                            WindowChrome.IsHitTestVisibleInChrome="True"
+                            PreviewMouseDown="DragWin"
                             ToolTip="{Binding CurrentBeatmaps, Converter={StaticResource MapPathStringAddNewLinesConverter}}"
                             VerticalAlignment="Center"
                             Margin="10 0"
@@ -197,7 +198,7 @@
                     IsLeftDrawerOpen="{Binding DrawerOpen, FallbackValue=True}"
                     OpenMode="Standard">
                     <materialDesign:DrawerHost.LeftDrawerContent>
-                        <DockPanel MinWidth="200">
+                        <DockPanel MinWidth="200" MaxWidth="200">
                             <TextBox 
                             x:Name="ToolSearchBox"
                             Text="{Binding SearchKeyword, UpdateSourceTrigger=PropertyChanged}"

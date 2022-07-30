@@ -1,0 +1,56 @@
+﻿<UserControl x:Class="Mapping_Tools.Components.ValueOrGraphControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:graph="clr-namespace:Mapping_Tools.Components.Graph"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+			 xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
+             x:Name="UserControl"
+             d:DesignHeight="300"
+             d:DesignWidth="300"
+             MaxHeight="30"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <domain:GraphStateToStringConverter x:Key="GraphStateToStringConverter"/>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <TextBox Text="{Binding GraphState, ElementName=UserControl, Converter={StaticResource GraphStateToStringConverter}, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" 
+                 Grid.Column="0"
+                 HorizontalContentAlignment="Stretch"
+                 VerticalContentAlignment="Center"/>
+        <Button Margin="8 0 0 0" 
+                Grid.Column="1"
+                Content="..."
+                Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
+                materialDesign:DialogHost.DialogOpenedAttached="DialogOpenedEventHandler"
+                materialDesign:DialogHost.DialogClosingAttached="DialogClosingEventHandler">
+            <Button.CommandParameter>
+                <Grid Margin="-1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <graph:Graph Grid.Row="0" x:Name="Graph" MinMarkerSpacing="20" Width="460" Height="300"
+                         Margin="66 43 66 43" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                    <StackPanel Grid.Row="1"
+                                Margin="8"
+                                HorizontalAlignment="Right"
+                                Orientation="Horizontal">
+                        <Button Style="{DynamicResource MaterialDesignFlatButton}"
+                                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                                CommandParameter="0"
+                                Content="CANCEL" />
+                        <Button Style="{DynamicResource MaterialDesignFlatButton}"
+                                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                                CommandParameter="1"
+                                Content="OK" />
+                    </StackPanel>
+                </Grid>
+            </Button.CommandParameter>
+        </Button>
+    </Grid>
+</UserControl>

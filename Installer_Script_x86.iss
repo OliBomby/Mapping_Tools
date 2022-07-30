@@ -69,6 +69,7 @@ SetupIconFile=.\Mapping_Tools\Data\mt_icon.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern   
+LicenseFile=LICENCE
 
 MinVersion=6.0
 PrivilegesRequired=admin

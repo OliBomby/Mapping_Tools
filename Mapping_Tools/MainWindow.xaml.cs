@@ -428,6 +428,8 @@ namespace Mapping_Tools {
             if (e.LeftButton == MouseButtonState.Pressed) {
                 DragMove();
             }
+
+            e.Handled = true;
         }
 
         private async void MenuItem_OnClick(object sender, RoutedEventArgs e) {

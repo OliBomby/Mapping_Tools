@@ -190,6 +190,41 @@ namespace Mapping_Tools.Classes.MathUtil {
         }
 
         /// <summary>
+        /// Returns the positive remainder of x / m.
+        /// </summary>
+        /// <param name="x">The number</param>
+        /// <param name="m">The divisor</param>
+        /// <returns></returns>
+        public static double Mod(double x, double m) {
+            double r = x % m;
+            return r < 0 ? r + m : r;
+        }
+
+        /// <summary>
+        /// Returns the normalized angle difference in radians from a1 to a2
+        /// </summary>
+        /// <param name="a1">The first angle</param>
+        /// <param name="a2">The second angle</param>
+        /// <returns>The angle difference a1 - a2</returns>
+        public static double AngleDifference(double a1, double a2) {
+            return Mod(a1 - a2 + Pi, TwoPi) - Pi;
+        }
+
+        /// <summary>
+        /// Linearly interpolates from a1 to a2 in radians.
+        /// Takes the shortest path around the circle.
+        /// </summary>
+        /// <param name="a1">The first angle</param>
+        /// <param name="a2">The second angle</param>
+        /// <param name="blend">The blending factor</param>
+        /// <returns>The linear interpolation from a1 to a2</returns>
+        public static double LerpAngle(double a1, double a2, double blend) {
+            if (double.IsNaN(a1)) return a2;
+            if (double.IsNaN(a2)) return a1;
+            return blend * AngleDifference(a2, a1) + a1;
+        }
+
+        /// <summary>
         /// Clamps a number between a minimum and a maximum.
         /// </summary>
         /// <param name="n">The number to clamp.</param>

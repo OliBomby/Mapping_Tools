@@ -29,7 +29,7 @@ namespace Mapping_Tools.Classes.Tools.MapCleanerStuff {
             GameMode mode = (GameMode)beatmap.General["Mode"].IntValue;
             double circleSize = beatmap.Difficulty["CircleSize"].DoubleValue;
             string mapDir = editor.GetParentFolder();
-            Dictionary<string, string> firstSamples = HitsoundImporter.AnalyzeSamples(mapDir);
+            Dictionary<string, string> firstSamples = HitsoundImporter.AnalyzeSamples(mapDir, false, args.AnalyzeSamples);
 
             int objectsResnapped = 0;
             int samplesRemoved = 0;
@@ -217,7 +217,7 @@ namespace Mapping_Tools.Classes.Tools.MapCleanerStuff {
                         bool vol = !doUnmute; // Remove volume change muted
 
                         // Index doesn't have to change if the sample it plays currently is the same as the sample it would play with the previous index
-                        if (ind) {
+                        if (ind && args.AnalyzeSamples) {
                             List<string> nativeSamples = tlo.GetFirstPlayingFilenames(mode, mapDir, firstSamples);
 
                             int oldIndex = tlo.FenoCustomIndex;
