@@ -40,6 +40,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourTemplates {
         }
 
         public override List<Vector2> GetReconstructionHint() {
+            if (Precision.AlmostEquals(Length, 0, 1E-3D)) return null;
             return new List<Vector2> { Vector2.Zero, new(0.5 * Length, -Width), Length * Vector2.UnitX };
         }
 
