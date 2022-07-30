@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen;
@@ -138,9 +139,9 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
             // Reconstruct the slider
             PathHelper.Recalculate(pathWithHints.Path);
-            var (anchors, pathType) = Reconstructor.Reconstruct(pathWithHints);
+            var (anchors, pathType) = JustMiddleAnchors ? ReconstructOnlyMiddle(pathWithHints) : Reconstructor.Reconstruct(pathWithHints);
 
-            if (anchors.Count < 2) {
+            if (anchors is null || anchors.Count < 2) {
                 return false;
             }
 
@@ -370,6 +371,38 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             var rotatedOffset = Vector2.Rotate(offset, angle);
             var actualOffset = pos + rotatedOffset - point.OgPos;
             return point.Pos + actualOffset;
+        }
+
+        private (List<Vector2>, PathType) ReconstructOnlyMiddle(PathWithHints pathWithHints) {
+            if (pathWithHints.Path.Count == 0) return (null, PathType.Linear);
+
+            var anchors = new List<Vector2>();
+            var hints = pathWithHints.ReconstructionHints;
+            var current = pathWithHints.Path.First;
+            ReconstructionHint? currentHint = null;
+            var nextHint = 0;
+
+            while (current is not null) {
+                // Skip any finished hints
+                while (nextHint < hints.Count && current == hints[nextHint].End) {
+                    nextHint++;
+                    currentHint = null;
+                }
+
+                if (nextHint < hints.Count && current == hints[nextHint].Start) {
+                    currentHint = hints[nextHint];
+                }
+
+                // Add the red points to the anchors if this is a valid hint
+                if ((currentHint is { Anchors: { }, Layer: >= 0 } && current.Value.Red &&
+                     current != currentHint.Value.Start && current != currentHint.Value.End) || current == pathWithHints.Path.First || current == pathWithHints.Path.Last) {
+                    anchors.Add(current.Value.Pos);
+                }
+
+                current = current.Next;
+            }
+
+            return (anchors, PathType.Linear);
         }
     }
 }
