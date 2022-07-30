@@ -42,7 +42,10 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourTemplates {
         }
 
         public override Func<double, double> GetDistanceRelation() {
-            return t => DistanceRelation(t, Length, Width, sideMargin);
+            var length = Length;
+            var width = Width;
+            var sideMargin2 = sideMargin;
+            return t => DistanceRelation(t, length, width, sideMargin2);
         }
 
         private static double DistanceRelation(double t, double scaleX, double scaleY, double sideMargin) {
