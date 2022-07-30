@@ -18,6 +18,7 @@ namespace Mapping_Tools.Views.HitsoundStudio {
             string path = IOHelper.FolderDialog();
             if (!string.IsNullOrWhiteSpace(path)) {
                 ExportFolderBox.Text = path;
+                Settings.ExportFolder = path;
             }
         }
     }

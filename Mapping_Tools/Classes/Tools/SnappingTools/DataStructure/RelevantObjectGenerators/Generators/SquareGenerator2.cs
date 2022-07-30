@@ -14,7 +14,7 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
         public SquareGenerator2() {
             Settings.IsActive = true;
             Settings.IsDeep = true;
-            Settings.InputPredicate.Predicates.Add(new SelectionPredicate {NeedSelected = true});
+            Settings.InputPredicate.Predicates.Add(new SelectionPredicate {NeedSelected = true, MinRelevancy = 0.5});
         }
 
         [RelevantObjectsGeneratorMethod]

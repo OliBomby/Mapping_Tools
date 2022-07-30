@@ -2,6 +2,7 @@
 using NAudio.Wave.SampleProviders;
 using System;
 using Mapping_Tools.Classes.HitsoundStuff.Effects;
+using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     /// <summary>
@@ -15,6 +16,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// </summary>
         public int KeyCorrection { get; set; }
         public double VolumeCorrection { get; set; }
+        public double Panning { get; set; }
+        public double PitchShift { get; set; }
         public double FadeStart { get; set; }
         public double FadeLength { get; set; }
 
@@ -28,6 +31,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Wave = wave;
             KeyCorrection = 0;
             VolumeCorrection = 1;
+            Panning = 0;
+            PitchShift = 0;
             FadeStart = -1;
             FadeLength = -1;
         }
@@ -37,6 +42,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Wave = wave;
             KeyCorrection = 0;
             VolumeCorrection = 1;
+            Panning = 0;
+            PitchShift = 0;
             FadeStart = fadeStart;
             FadeLength = fadeLength;
         }
@@ -56,8 +63,15 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             if (KeyCorrection != 0) {
                 output = SampleImporter.PitchShift(output, KeyCorrection);
             }
-            if (VolumeCorrection != 1) {
+            if (!Precision.AlmostEquals(VolumeCorrection, 1)) {
                 output = SampleImporter.VolumeChange(output, VolumeCorrection);
+            }
+            if (!Precision.AlmostEquals(Panning, 0)) {
+                output = SampleImporter.SetChannels(output, 1);
+                output = new PanningSampleProvider(output) {Pan = (float)Panning};
+            }
+            if (!Precision.AlmostEquals(PitchShift, 0)) {
+                output = SampleImporter.PitchShift(output, PitchShift);
             }
             return output;
         }

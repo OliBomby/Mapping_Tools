@@ -5,17 +5,12 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using Mapping_Tools.Classes;
-using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
-using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Classes.ToolHelpers.Sliders;
-using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Viewmodels;
 
 namespace Mapping_Tools.Views.SliderMerger {
@@ -123,8 +118,8 @@ namespace Mapping_Tools.Views.SliderMerger {
                             ho1.SliderType = pathType;
                         }
 
-                        var sp1 = BezierConverter.ConvertToBezier(ho1.SliderPath).ControlPoints;
-                        var sp2 = BezierConverter.ConvertToBezier(ho2.SliderPath).ControlPoints;
+                        var sp1 = BezierConverter.ConvertToBezierAnchors(ho1.GetAllCurvePoints(), ho1.SliderType);
+                        var sp2 = BezierConverter.ConvertToBezierAnchors(ho2.GetAllCurvePoints(), ho2.SliderType);
 
                         double extraLength = 0;
                         switch (arg.ConnectionModeSetting) {
@@ -150,9 +145,9 @@ namespace Mapping_Tools.Views.SliderMerger {
                             }
                         }
 
-                        var mergedPath = new SliderPath(linearLinear ? PathType.Linear : PathType.Bezier, mergedAnchors.ToArray(),
-                            ho1.PixelLength + ho2.PixelLength + extraLength);
-                        ho1.SliderPath = mergedPath;
+                        ho1.SetAllCurvePoints(mergedAnchors);
+                        ho1.SliderType = linearLinear ? PathType.Linear : PathType.Bezier;
+                        ho1.PixelLength = ho1.PixelLength + ho2.PixelLength + extraLength;
 
                         beatmap.HitObjects.Remove(ho2);
                         markedObjects.Remove(ho2);
@@ -163,7 +158,7 @@ namespace Mapping_Tools.Views.SliderMerger {
                         mergeLast = true;
                     } else if (ho1.IsSlider && ho2.IsCircle) {
                         if (Precision.DefinitelyBigger(dist, 0)) {
-                            var sp1 = BezierConverter.ConvertToBezier(ho1.SliderPath).ControlPoints;
+                            var sp1 = BezierConverter.ConvertToBezierAnchors(ho1.GetAllCurvePoints(), ho1.SliderType);
 
                             sp1.Add(sp1.Last());
                             sp1.Add(ho2.Pos);
@@ -181,9 +176,9 @@ namespace Mapping_Tools.Views.SliderMerger {
                                 }
                             }
 
-                            var mergedPath = new SliderPath(linearLinear ? PathType.Linear : PathType.Bezier,
-                                mergedAnchors.ToArray(), ho1.PixelLength + extraLength);
-                            ho1.SliderPath = mergedPath;
+                            ho1.SetAllCurvePoints(mergedAnchors);
+                            ho1.SliderType = linearLinear ? PathType.Linear : PathType.Bezier;
+                            ho1.PixelLength += extraLength;
                         }
 
                         beatmap.HitObjects.Remove(ho2);
@@ -195,7 +190,7 @@ namespace Mapping_Tools.Views.SliderMerger {
                         mergeLast = true;
                     } else if (ho1.IsCircle && ho2.IsSlider) {
                         if (Precision.DefinitelyBigger(dist, 0)) {
-                            var sp2 = BezierConverter.ConvertToBezier(ho2.SliderPath).ControlPoints;
+                            var sp2 = BezierConverter.ConvertToBezierAnchors(ho2.GetAllCurvePoints(), ho2.SliderType);
 
                             sp2.Insert(0, sp2.First());
                             sp2.Insert(0, ho1.Pos);
@@ -213,8 +208,9 @@ namespace Mapping_Tools.Views.SliderMerger {
                                 }
                             }
 
-                            var mergedPath = new SliderPath(linearLinear ? PathType.Linear : PathType.Bezier, mergedAnchors.ToArray(), ho2.PixelLength + extraLength);
-                            ho2.SliderPath = mergedPath;
+                            ho2.SetAllCurvePoints(mergedAnchors);
+                            ho2.SliderType = linearLinear ? PathType.Linear : PathType.Bezier;
+                            ho2.PixelLength += extraLength;
                         }
 
                         beatmap.HitObjects.Remove(ho1);
@@ -228,9 +224,9 @@ namespace Mapping_Tools.Views.SliderMerger {
                         if (Precision.DefinitelyBigger(dist, 0)) {
                             var mergedAnchors = new List<Vector2> {ho1.Pos, ho2.Pos};
 
-                            var mergedPath = new SliderPath(arg.LinearOnLinear ? PathType.Linear : PathType.Bezier,
-                                mergedAnchors.ToArray(), (ho1.Pos - ho2.Pos).Length);
-                            ho1.SliderPath = mergedPath;
+                            ho1.SetAllCurvePoints(mergedAnchors);
+                            ho1.SliderType = arg.LinearOnLinear ? PathType.Linear : PathType.Bezier;
+                            ho1.PixelLength = (ho1.Pos - ho2.Pos).Length;
                             ho1.IsCircle = false;
                             ho1.IsSlider = true;
                             ho1.Repeat = 1;

@@ -150,5 +150,15 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
         public int GetCount() {
             return this.Sum(kvp => kvp.Value.Count);
         }
+
+        public RelevantObjectCollection ObjectsWhere(Func<IRelevantObject, bool> predicate) {
+            var newCollection = new RelevantObjectCollection();
+
+            foreach (var key in Keys) {
+                newCollection.Add(key, this[key].Where(predicate).ToList());
+            }
+
+            return newCollection;
+        }
     }
 }

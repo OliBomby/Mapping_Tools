@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools {
 
@@ -394,13 +395,18 @@ namespace Mapping_Tools {
                 window_border.BorderThickness = new Thickness(1);
                 bt.Content = new PackIcon { Kind = PackIconKind.WindowMaximize };
             }
+            EnsureOnScreen();
         }
 
         private void SetToRect(Rect rect) {
-            Left = Math.Max(rect.Left, SystemParameters.VirtualScreenLeft);
-            Top = Math.Max(rect.Top, SystemParameters.VirtualScreenTop);
+            Left = MathHelper.Clamp(rect.Left, SystemParameters.VirtualScreenLeft, SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth - 300);
+            Top = MathHelper.Clamp(rect.Top, SystemParameters.VirtualScreenTop, SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight - 100);
             Width = Math.Max(rect.Width, 300);
             Height = Math.Max(rect.Height, 100);
+        }
+
+        private void EnsureOnScreen() {
+            SetToRect(new Rect(Left, Top, Width, Height));
         }
 
         //Minimize window on click
@@ -415,19 +421,13 @@ namespace Mapping_Tools {
 
             if (WindowState == WindowState.Maximized) {
                 var point = PointToScreen(e.MouseDevice.GetPosition(this));
-
-                if (point.X <= RestoreBounds.Width / 2)
-                    Left = 0;
-                else if (point.X >= RestoreBounds.Width)
-                    Left = point.X - (RestoreBounds.Width - (ActualWidth - point.X));
-                else
-                    Left = point.X - (RestoreBounds.Width / 2);
-
                 Top = point.Y - (((FrameworkElement)sender).ActualHeight / 2);
+                SetFullscreen(false);
             }
-            if (e.LeftButton == MouseButtonState.Pressed)
+
+            if (e.LeftButton == MouseButtonState.Pressed) {
                 DragMove();
-            //bt.Content = new PackIcon { Kind = PackIconKind.WindowRestore };
+            }
         }
 
         private async void MenuItem_OnClick(object sender, RoutedEventArgs e) {

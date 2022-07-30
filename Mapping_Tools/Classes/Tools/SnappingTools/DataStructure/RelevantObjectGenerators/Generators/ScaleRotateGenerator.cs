@@ -19,6 +19,7 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
         public ScaleRotateGenerator() : base(new ScaleRotateGeneratorSettings()) {
             Settings.Generator = this;
 
+            Settings.RelevancyRatio = 0.8;
             Settings.IsActive = true;
             Settings.IsDeep = true;
             MySettings.Angle = 180;

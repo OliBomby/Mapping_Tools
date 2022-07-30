@@ -15,7 +15,7 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
             Settings.IsActive = true;
             Settings.IsSequential = false;
             Settings.IsDeep = true;
-            Settings.InputPredicate.Predicates.Add(new SelectionPredicate {NeedSelected = true});
+            Settings.InputPredicate.Predicates.Add(new SelectionPredicate {NeedSelected = true, MinRelevancy = 0.8});
         }
 
         [RelevantObjectsGeneratorMethod]

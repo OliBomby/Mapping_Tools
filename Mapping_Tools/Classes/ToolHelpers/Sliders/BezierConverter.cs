@@ -50,42 +50,32 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
         }
 
         /// <summary>
-        /// 
+        /// Converts sliderpath to a bezier sliderpath with the same shape.
         /// </summary>
         /// <param name="sliderPath"></param>
         /// <returns></returns>
         public static SliderPath ConvertToBezier(SliderPath sliderPath) {
-            switch (sliderPath.Type) {
-                case PathType.Linear:
-                    return ConvertLinearToBezier(sliderPath);
-                case PathType.PerfectCurve:
-                    return ConvertCircleToBezier(sliderPath);
-                case PathType.Catmull:
-                    return ConvertCatmullToBezier(sliderPath);
-                case PathType.Bezier:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
-            return sliderPath;
+            return sliderPath.Type switch {
+                PathType.Linear => ConvertLinearToBezier(sliderPath),
+                PathType.PerfectCurve => ConvertCircleToBezier(sliderPath),
+                PathType.Catmull => ConvertCatmullToBezier(sliderPath),
+                PathType.Bezier => sliderPath,
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
 
+        /// <summary>
+        /// Converts anchors to a bezier representation of the anchors.
+        /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
         public static List<Vector2> ConvertToBezierAnchors(List<Vector2> anchors, PathType type) {
-            switch (type) {
-                case PathType.Linear:
-                    return ConvertLinearToBezierAnchors(anchors);
-                case PathType.PerfectCurve:
-                    return ConvertCircleToBezierAnchors(anchors);
-                case PathType.Catmull:
-                    return ConvertCatmullToBezierAnchors(anchors);
-                case PathType.Bezier:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
-            return anchors;
+            return type switch {
+                PathType.Linear => ConvertLinearToBezierAnchors(anchors),
+                PathType.PerfectCurve => ConvertCircleToBezierAnchors(anchors),
+                PathType.Catmull => ConvertCatmullToBezierAnchors(anchors),
+                PathType.Bezier => anchors,
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
 
         /// <summary>

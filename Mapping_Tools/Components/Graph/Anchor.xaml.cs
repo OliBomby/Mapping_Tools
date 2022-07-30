@@ -228,6 +228,14 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private void Anchor_OnPreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e) {
+            if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)) {
+                // Delete this anchor
+                Graph.RemoveAnchor(this);
+
+                e.Handled = true;
+                return;
+            }
+
             var cm = GetContextMenu();
 
             var deleteMenuItem = GetDeleteMenuItem();

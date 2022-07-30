@@ -73,8 +73,9 @@ namespace Mapping_Tools.Viewmodels {
         private readonly DispatcherTimer _lockTimer;
         private readonly DispatcherTimer _inheritTimer;
 
+        private const double RelevancyBias = 4;
         private const double PointsBias = 3;
-        private const double SpecialBias = 3;
+        private const double SpecialBias = 2;
         private const double SelectionRange = 80;
 
         private readonly CoordinateConverter _coordinateConverter;
@@ -224,7 +225,7 @@ namespace Mapping_Tools.Viewmodels {
                         _fetchEditorFails++;
                         if (_fetchEditorFails <= 3) return;
 
-                        MessageBox.Show("Editor Reader seems to be failing a lot. Try restarting osu! and opening Geometry Dashboard again.");
+                        MessageBox.Show("Editor Reader seems to be failing a lot. Try restarting osu! and opening Geometry Dashboard again or refer to the FAQ.");
                         ex.Show();
 
                         _updateTimer.IsEnabled = false;
@@ -505,7 +506,7 @@ namespace Mapping_Tools.Viewmodels {
 
         private IRelevantDrawable GetNearestDrawable(Vector2 cursorPos, DrawableFetchPriority specialPriority = 0, HitObject[] heldHitObjects = null, double range = double.PositiveInfinity) {
             // Get all the relevant drawables
-            var drawables = LayerCollection.GetAllRelevantDrawables().ToArray();
+            var drawables = LayerCollection.GetAllRelevantDrawables();
 
             // Hit object comparer for finding a parent held hit object
             var comparer = new HitObjectComparer(checkPosition:false);
@@ -519,6 +520,9 @@ namespace Mapping_Tools.Viewmodels {
                 if (dist > range) {
                     continue;
                 }
+
+                // Prioritize relevant points
+                dist -= RelevancyBias * MathHelper.Clamp(o.Relevancy, 0 ,1);
 
                 if (o is RelevantPoint) {
                     // Prioritize points to be able to snap to intersections
@@ -660,8 +664,7 @@ namespace Mapping_Tools.Viewmodels {
             // Set the locked variable of the nearest drawable
             if (_lockedToggle) {
                 if (!nearest.IsLocked) {
-                    LayerCollection.LockedLayer.Add(nearest.GetLockedRelevantObject());
-                    LayerCollection.LockedLayer.NextLayer?.GenerateNewObjects(true);
+                    LayerCollection.GetRootLayer().Add(nearest.GetLockedRelevantObject());
                 }
             } else {
                 if (nearest.IsLocked && !_unlockedSomething) {
@@ -884,9 +887,7 @@ namespace Mapping_Tools.Viewmodels {
                     }
                 }
 
-                foreach (var relevantObject in lockedObjectsToAdd) {
-                    LayerCollection.LockedLayer.Add(relevantObject.GetLockedRelevantObject());
-                }
+                LayerCollection.GetRootLayer().Add(lockedObjectsToAdd.Select(o => o.GetLockedRelevantObject()));
                 foreach (var relevantObject in lockedObjectsToDispose) {
                     relevantObject.Dispose();
                 }
@@ -957,12 +958,11 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public RelevantObjectCollection GetLockedObjects() {
-            return LayerCollection.LockedLayer.Objects;
+            return LayerCollection.GetRootLayer().Objects.ObjectsWhere(o => o.IsLocked);
         }
 
         public void SetLockedObjects(RelevantObjectCollection objects) {
-            LayerCollection.LockedLayer.Objects = objects;
-            objects.SetParentLayer(LayerCollection.LockedLayer);
+            LayerCollection.GetRootLayer().Objects.MergeWith(objects);
 
             _overlay.OverlayWindow.InvalidateVisual();
         }
@@ -985,7 +985,7 @@ namespace Mapping_Tools.Viewmodels {
             try {
                 _configWatcher.EnableRaisingEvents = true;
             } catch (Exception ex) {
-                MessageBox.Show("Can't enable filesystem watcher. osu! config path is probably incorrect. You can fix this in the Options > Preferences.", "Warning");
+                MessageBox.Show("Can not enable filesystem watcher. osu! config path is probably incorrect. Please set the correct path in the Preferences or your overlay might have the wrong position.", "Warning");
                 ex.Show();
             }
 
@@ -1002,7 +1002,7 @@ namespace Mapping_Tools.Viewmodels {
             try {
                 _configWatcher.EnableRaisingEvents = false;
             } catch (Exception ex) {
-                MessageBox.Show("Can't disable filesystem watcher. osu! config path is probably incorrect. You can fix this in the Options > Preferences.", "Warning");
+                MessageBox.Show("Can not enable filesystem watcher. osu! config path is probably incorrect. Please set the correct path in the Preferences or your overlay might have the wrong position.", "Warning");
                 ex.Show();
             }
 

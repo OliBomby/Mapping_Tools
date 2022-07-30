@@ -9,6 +9,7 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
         public override GeneratorType GeneratorType => GeneratorType.Basic;
 
         public StartPointGenerator() {
+            Settings.RelevancyRatio = 1;
             Settings.IsActive = true;
         }
 

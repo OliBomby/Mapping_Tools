@@ -45,7 +45,7 @@
         <KeyBinding 
             Key="K" 
             Modifiers="Ctrl"
-            Command="{Binding ToggleNavigationDrawer}" />
+            Command="{Binding OpenNavigationDrawer}" />
     </Window.InputBindings>
 
     <Grid x:Name="MasterGrid">      
@@ -205,7 +205,7 @@
                             Margin="16 16 16 0"
                             Padding="8"
                             Width="Auto"
-                            domain:FocusExtension.IsFocused="{Binding DrawerOpen}"
+                            domain:FocusExtension.IsFocused="{Binding SearchFocused}"
                             materialDesign:HintAssist.Hint="Search"
                             materialDesign:HintAssist.IsFloating="True"
                             materialDesign:TextFieldAssist.HasClearButton="True"

@@ -3,6 +3,7 @@ using System.Linq;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation;
+using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 
 namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
@@ -14,6 +15,7 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
         public IntersectionGenerator() {
             Settings.IsActive = true;
             Settings.IsDeep = true;
+            Settings.InputPredicate.Predicates.Add(new SelectionPredicate {MinRelevancy = 0.2});
         }
 
         [RelevantObjectsGeneratorMethod]

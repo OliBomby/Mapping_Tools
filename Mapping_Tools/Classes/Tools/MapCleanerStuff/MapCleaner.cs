@@ -29,7 +29,7 @@ namespace Mapping_Tools.Classes.Tools.MapCleanerStuff {
             GameMode mode = (GameMode)beatmap.General["Mode"].IntValue;
             double circleSize = beatmap.Difficulty["CircleSize"].DoubleValue;
             string mapDir = editor.GetParentFolder();
-            Dictionary<string, string> firstSamples = HitsoundImporter.AnalyzeSamples(mapDir);
+            Dictionary<string, string> firstSamples = HitsoundImporter.AnalyzeSamples(mapDir, false, args.AnalyzeSamples);
 
             int objectsResnapped = 0;
             int samplesRemoved = 0;
@@ -131,6 +131,13 @@ namespace Mapping_Tools.Classes.Tools.MapCleanerStuff {
                     tp.MpB = ho.SliderVelocity;
                     timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, fuzzyness: 0.4));
                 }
+
+                // Skip adding hitsounds if we want to remove them
+                if (args.RemoveHitsounds) {
+                    ho.ResetHitsounds();
+                    continue;
+                }
+
                 // Body hitsounds
                 bool vol = (ho.IsSlider && args.VolumeSliders) || (ho.IsSpinner && args.VolumeSpinners);
                 bool sam = (ho.IsSlider && args.SampleSetSliders && ho.SampleSet == 0);
@@ -158,84 +165,90 @@ namespace Mapping_Tools.Classes.Tools.MapCleanerStuff {
             }
             UpdateProgressBar(worker, 75);
 
-            // Add timeline hitsounds
-            foreach (TimelineObject tlo in timeline.TimelineObjects) {
-                // Change the samplesets in the hitobjects
-                if (tlo.Origin.IsCircle) {
-                    tlo.Origin.SampleSet = tlo.FenoSampleSet;
-                    tlo.Origin.AdditionSet = tlo.FenoAdditionSet;
-                    if (mode == GameMode.Mania) {
-                        tlo.Origin.CustomIndex = tlo.FenoCustomIndex;
-                        tlo.Origin.SampleVolume = tlo.FenoSampleVolume;
+            if (!args.RemoveHitsounds) {
+                // Add timeline hitsounds
+                foreach (TimelineObject tlo in timeline.TimelineObjects) {
+                    // Change the samplesets in the hitobjects
+                    if (tlo.Origin.IsCircle) {
+                        tlo.Origin.SampleSet = tlo.FenoSampleSet;
+                        tlo.Origin.AdditionSet = tlo.FenoAdditionSet;
+                        if (mode == GameMode.Mania) {
+                            tlo.Origin.CustomIndex = tlo.FenoCustomIndex;
+                            tlo.Origin.SampleVolume = tlo.FenoSampleVolume;
+                        }
+                    } else if (tlo.Origin.IsSlider) {
+                        tlo.Origin.EdgeHitsounds[tlo.Repeat] = tlo.GetHitsounds();
+                        tlo.Origin.EdgeSampleSets[tlo.Repeat] = tlo.FenoSampleSet;
+                        tlo.Origin.EdgeAdditionSets[tlo.Repeat] = tlo.FenoAdditionSet;
+                        if (tlo.Origin.EdgeAdditionSets[tlo.Repeat] ==
+                            tlo.Origin.EdgeSampleSets[tlo.Repeat]) // Simplify additions to auto
+                        {
+                            tlo.Origin.EdgeAdditionSets[tlo.Repeat] = 0;
+                        }
+                    } else if (tlo.Origin.IsSpinner) {
+                        if (tlo.Repeat == 1) {
+                            tlo.Origin.SampleSet = tlo.FenoSampleSet;
+                            tlo.Origin.AdditionSet = tlo.FenoAdditionSet;
+                        }
+                    } else if (tlo.Origin.IsHoldNote) {
+                        if (tlo.Repeat == 0) {
+                            tlo.Origin.SampleSet = tlo.FenoSampleSet;
+                            tlo.Origin.AdditionSet = tlo.FenoAdditionSet;
+                            tlo.Origin.CustomIndex = tlo.FenoCustomIndex;
+                            tlo.Origin.SampleVolume = tlo.FenoSampleVolume;
+                        }
                     }
-                } else if (tlo.Origin.IsSlider) {
-                    tlo.Origin.EdgeHitsounds[tlo.Repeat] = tlo.GetHitsounds();
-                    tlo.Origin.EdgeSampleSets[tlo.Repeat] = tlo.FenoSampleSet;
-                    tlo.Origin.EdgeAdditionSets[tlo.Repeat] = tlo.FenoAdditionSet;
-                    if (tlo.Origin.EdgeAdditionSets[tlo.Repeat] == tlo.Origin.EdgeSampleSets[tlo.Repeat])  // Simplify additions to auto
+
+                    if (tlo.Origin.AdditionSet == tlo.Origin.SampleSet) // Simplify additions to auto
                     {
-                        tlo.Origin.EdgeAdditionSets[tlo.Repeat] = 0;
+                        tlo.Origin.AdditionSet = 0;
                     }
-                } else if (tlo.Origin.IsSpinner) {
-                    if (tlo.Repeat == 1) {
-                        tlo.Origin.SampleSet = tlo.FenoSampleSet;
-                        tlo.Origin.AdditionSet = tlo.FenoAdditionSet;
-                    }
-                } else if (tlo.Origin.IsHoldNote) {
-                    if (tlo.Repeat == 0) {
-                        tlo.Origin.SampleSet = tlo.FenoSampleSet;
-                        tlo.Origin.AdditionSet = tlo.FenoAdditionSet;
-                        tlo.Origin.CustomIndex = tlo.FenoCustomIndex;
-                        tlo.Origin.SampleVolume = tlo.FenoSampleVolume;
-                    }
-                }
-                if (tlo.Origin.AdditionSet == tlo.Origin.SampleSet)  // Simplify additions to auto
-                {
-                    tlo.Origin.AdditionSet = 0;
-                }
-                if (tlo.HasHitsound) // Add greenlines for custom indexes and volumes
-                {
-                    TimingPoint tp = tlo.HitsoundTimingPoint.Copy();
 
-                    bool doUnmute = tlo.FenoSampleVolume == 5 && args.RemoveMuting;
-                    bool doMute = args.RemoveUnclickableHitsounds && !args.RemoveMuting &&
-                                  !(tlo.IsCircle || tlo.IsSliderHead || tlo.IsHoldnoteHead);
+                    if (tlo.HasHitsound) // Add greenlines for custom indexes and volumes
+                    {
+                        TimingPoint tp = tlo.HitsoundTimingPoint.Copy();
 
-                    bool ind = !tlo.UsesFilename && !doUnmute;  // Index doesnt have to change if custom is overridden by Filename
-                    bool vol = !doUnmute;  // Remove volume change muted
+                        bool doUnmute = tlo.FenoSampleVolume == 5 && args.RemoveMuting;
+                        bool doMute = args.RemoveUnclickableHitsounds && !args.RemoveMuting &&
+                                      !(tlo.IsCircle || tlo.IsSliderHead || tlo.IsHoldnoteHead);
 
-                    // Index doesn't have to change if the sample it plays currently is the same as the sample it would play with the previous index
-                    if (ind) {
-                        List<string> nativeSamples = tlo.GetFirstPlayingFilenames(mode, mapDir, firstSamples);
+                        bool ind = !tlo.UsesFilename &&
+                                   !doUnmute; // Index doesnt have to change if custom is overridden by Filename
+                        bool vol = !doUnmute; // Remove volume change muted
 
-                        int oldIndex = tlo.FenoCustomIndex;
-                        int newIndex = tlo.FenoCustomIndex;
-                        double latest = double.NegativeInfinity;
-                        foreach (TimingPointsChange tpc in timingPointsChanges) {
-                            if (tpc.Index && tpc.MyTP.Offset <= tlo.Time && tpc.MyTP.Offset >= latest) {
-                                newIndex = tpc.MyTP.SampleIndex;
-                                latest = tpc.MyTP.Offset;
+                        // Index doesn't have to change if the sample it plays currently is the same as the sample it would play with the previous index
+                        if (ind && args.AnalyzeSamples) {
+                            List<string> nativeSamples = tlo.GetFirstPlayingFilenames(mode, mapDir, firstSamples);
+
+                            int oldIndex = tlo.FenoCustomIndex;
+                            int newIndex = tlo.FenoCustomIndex;
+                            double latest = double.NegativeInfinity;
+                            foreach (TimingPointsChange tpc in timingPointsChanges) {
+                                if (tpc.Index && tpc.MyTP.Offset <= tlo.Time && tpc.MyTP.Offset >= latest) {
+                                    newIndex = tpc.MyTP.SampleIndex;
+                                    latest = tpc.MyTP.Offset;
+                                }
                             }
-                        }
 
-                        tp.SampleIndex = newIndex;
-                        tlo.GiveHitsoundTimingPoint(tp);
-                        List<string> newSamples = tlo.GetFirstPlayingFilenames(mode, mapDir, firstSamples);
-                        if (nativeSamples.SequenceEqual(newSamples)) {
-                            // Index changes dont change sound
                             tp.SampleIndex = newIndex;
-                        } else {
-                            tp.SampleIndex = oldIndex;
+                            tlo.GiveHitsoundTimingPoint(tp);
+                            List<string> newSamples = tlo.GetFirstPlayingFilenames(mode, mapDir, firstSamples);
+                            if (nativeSamples.SequenceEqual(newSamples)) {
+                                // Index changes dont change sound
+                                tp.SampleIndex = newIndex;
+                            } else {
+                                tp.SampleIndex = oldIndex;
+                            }
+
+                            tlo.GiveHitsoundTimingPoint(tp);
                         }
-                        
-                        tlo.GiveHitsoundTimingPoint(tp);
+
+                        tp.Offset = tlo.Time;
+                        tp.SampleIndex = tlo.FenoCustomIndex;
+                        tp.Volume = doMute ? 5 : tlo.FenoSampleVolume;
+
+                        timingPointsChanges.Add(new TimingPointsChange(tp, volume: vol, index: ind));
                     }
-
-                    tp.Offset = tlo.Time;
-                    tp.SampleIndex = tlo.FenoCustomIndex;
-                    tp.Volume = doMute ? 5 : tlo.FenoSampleVolume;
-
-                    timingPointsChanges.Add(new TimingPointsChange(tp, volume: vol, index: ind));
                 }
             }
             UpdateProgressBar(worker, 85);
@@ -249,7 +262,10 @@ namespace Mapping_Tools.Classes.Tools.MapCleanerStuff {
 
             // Remove unused samples
             if (args.RemoveUnusedSamples)
-                RemoveUnusedSamples(mapDir);
+                samplesRemoved += RemoveUnusedSamples(mapDir, editor);
+
+            // Fix this extremely specific thing
+            Fix2BDoubleTaps(beatmap);
 
             // Complete progressbar
             UpdateProgressBar(worker, 100);
@@ -257,14 +273,31 @@ namespace Mapping_Tools.Classes.Tools.MapCleanerStuff {
             return new MapCleanerResult(objectsResnapped, samplesRemoved);
         }
 
-        public static int RemoveUnusedSamples(string mapDir) {
+        private static void Fix2BDoubleTaps(Beatmap beatmap) {
+            /*
+             * When having doubletap circle+slider on the exact same time, slider-notelock can happen if the circle is
+             * the second object instead of the first. What this means is that when hitting the object like a regular
+             * doubletap, the slider registers but the circle will always miss. This phenomenon can be observed either
+             * in the .osu file (the circle will be on the line after the slider), or the editor.
+             */
+            for (var i = 0; i < beatmap.HitObjects.Count - 1; i++) {
+                var ho1 = beatmap.HitObjects[i];
+                var ho2 = beatmap.HitObjects[i + 1];
+                if (ho1.IsSlider && ho2.IsCircle && Precision.AlmostEquals(ho1.Time, ho2.Time)) {
+                    // Swap the two objects
+                    (beatmap.HitObjects[i], beatmap.HitObjects[i + 1]) = (ho2, ho1);
+                }
+            }
+        }
+
+        public static int RemoveUnusedSamples(string mapDir, BeatmapEditor thisEditor) {
             // Collect all the used samples
             HashSet<string> allFilenames = new HashSet<string>();
             bool anySpinners = false;
 
             List<string> beatmaps = Directory.GetFiles(mapDir, "*.osu", SearchOption.TopDirectoryOnly).ToList();
             foreach (string path in beatmaps) {
-                BeatmapEditor editor = new BeatmapEditor(path);
+                BeatmapEditor editor = path == thisEditor.Path ? thisEditor : new BeatmapEditor(path);
                 Beatmap beatmap = editor.Beatmap;
 
                 GameMode mode = (GameMode)beatmap.General["Mode"].IntValue;

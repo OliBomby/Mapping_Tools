@@ -45,14 +45,22 @@
                       </TextBlock>
                   </materialDesign:PopupBox>
                 </StackPanel>
-              
-                <CheckBox FontSize="14" x:Name="ResnapObjects" IsChecked="{Binding MapCleanerArgs.ResnapObjects}" Cursor="Hand" Margin="0,10,0,0"
+
+                <CheckBox FontSize="14" x:Name="AnalyzeSamples" IsChecked="{Binding MapCleanerArgs.AnalyzeSamples}" Cursor="Hand" Margin="0,10,0,0"
+                          ToolTip="Analyze the samples used by the beatmap to optimize greenlines further. Disable this if your beatmap uses custom hitsounds but the sound sample files are not yet added.">
+                    Analyze samples
+                </CheckBox>
+                <CheckBox FontSize="14" x:Name="ResnapObjects" IsChecked="{Binding MapCleanerArgs.ResnapObjects}" Cursor="Hand"
                           ToolTip="Resnap hit objects and slider ends.">
                     Resnap objects
                 </CheckBox>
                 <CheckBox FontSize="14" x:Name="ResnapBookmarks" IsChecked="{Binding MapCleanerArgs.ResnapBookmarks}" Cursor="Hand"
                           ToolTip="Resnap bookmarks.">
                     Resnap bookmarks
+                </CheckBox>
+                <CheckBox FontSize="14" x:Name="RemoveHitsounds" IsChecked="{Binding MapCleanerArgs.RemoveHitsounds}" Cursor="Hand"
+                          ToolTip="Remove all hitsounds from the beatmap.">
+                    Remove hitsounds
                 </CheckBox>
                 <CheckBox FontSize="14" x:Name="RemoveUnusedSamples" IsChecked="{Binding MapCleanerArgs.RemoveUnusedSamples}" Cursor="Hand"
                           ToolTip="Remove all samples that are unused by all maps and storyboards in the set.">

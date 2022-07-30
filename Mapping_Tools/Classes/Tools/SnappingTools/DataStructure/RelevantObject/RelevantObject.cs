@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.Layers;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
@@ -46,9 +47,19 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
             }
         }
 
+        private double _customTime;
+        public double CustomTime {
+            get => _customTime;
+            set {
+                _customTime = value;
+                if (Generator?.TemporalPositioning != GeneratorTemporalPositioning.Custom) return;
+                UpdateTime();
+            }
+        }
+
         private double _relevancy;
         public double Relevancy {
-            get => _relevancy;
+            get => _isSelected ? 1 : _relevancy;
             set {
                 _relevancy = value;
                 if (ChildObjects == null) return;
@@ -71,6 +82,11 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
             set {
                 if (_isSelected == value) return;
                 _isSelected = value;
+                if (ChildObjects != null) {
+                    foreach (var relevantObject in ChildObjects) {
+                        relevantObject.UpdateRelevancy();
+                    }
+                }
                 if (!AutoPropagate) return;
                 Layer?.NextLayer?.GenerateNewObjects(true);
             }
@@ -182,6 +198,9 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
                 case GeneratorTemporalPositioning.Before:
                     Time = 2 * ParentObjects.Min(o => o.Time) - ParentObjects.Sum(o => o.Time) / ParentObjects.Count;
                     break;
+                case GeneratorTemporalPositioning.Custom:
+                    Time = CustomTime;
+                    break;
                 default:
                     Time = ParentObjects.Sum(o => o.Time) / ParentObjects.Count;
                     break;
@@ -210,7 +229,11 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
         
         public void Consume(IRelevantObject other) {
             if (IsLocked) return;
-            ParentObjects.UnionWith(other.ParentObjects);
+            if (!DoNotDispose || !ParentObjects.IsSupersetOf(other.ParentObjects)) {
+                Relevancy += other.Relevancy;
+                ParentObjects.UnionWith(other.ParentObjects);
+                ParentObjects.RemoveWhere(o => o.Disposed);
+            }
             ChildObjects.UnionWith(other.ChildObjects);
         }
 

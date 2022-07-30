@@ -2,6 +2,7 @@
     public enum GeneratorTemporalPositioning {
         Before,
         Average,
-        After
+        After,
+        Custom
     }
 }
