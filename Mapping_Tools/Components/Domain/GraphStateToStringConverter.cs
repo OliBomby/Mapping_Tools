@@ -52,7 +52,7 @@ namespace Mapping_Tools.Components.Domain {
                     MinX = 0,
                     MinY = Math.Min(0, doubleValue * 2),
                     MaxX = 1,
-                    MaxY = Math.Max(0, doubleValue * 2),
+                    MaxY = Math.Max(1, doubleValue * 2),
                     Anchors = new List<AnchorState>() {
                         new() { Pos = new Vector2(0, doubleValue), Interpolator = new SingleCurveInterpolator() },
                         new() { Pos = new Vector2(1, doubleValue), Interpolator = new SingleCurveInterpolator() }
