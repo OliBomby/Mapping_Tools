@@ -62,7 +62,7 @@
                         <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryHueMidBrush}"/>
                     </materialDesign:PopupBox.ToggleContent>
                     <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
-                        Tumour Generator generates copious amounts of tumours on sliders.
+                        Tumour Generator 2 generates copious amounts of tumours on sliders.
                         <LineBreak/>
                         You can adjust the shape and size of tumours and choose where they should be placed along the path.
                         <LineBreak/>
@@ -86,7 +86,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <ListBox Grid.Row="0"  ItemsSource="{Binding TumourLayers}"
@@ -143,25 +143,22 @@
                         </Button>
                     </ToolBar>
 
-                    <StackPanel Grid.Row="2">
+                    <StackPanel Grid.Row="2" Margin="0 0 0 10">
                         <Slider Minimum="0" Maximum="1" TickFrequency="0.1" Value="{Binding Scale}" Margin="5 10"
                                 ToolTip="Tumour scale"/>
-                        <StackPanel Orientation="Horizontal" Margin="0 5 0 5">
+                        <StackPanel Orientation="Horizontal" Margin="0 5 0 15">
                             <ToggleButton IsChecked="{Binding AdvancedOptions}"
+                                          Style="{StaticResource MaterialDesignSwitchAccentToggleButton}"
                                           ToolTip="Show advanced controls. Allows for fine control of parameters and changes over time."/>
                             <TextBlock Text="Advanced" Margin="10 0 0 0"/>
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0 5 0 5">
-                            <ToggleButton IsChecked="{Binding DebugConstruction}"
-                                          ToolTip="Show only the path without reconstruction."/>
-                            <TextBlock Text="Debug" Margin="10 0 0 0"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0 5 0 5">
-                            <ToggleButton IsChecked="{Binding JustMiddleAnchors}"
-                                          ToolTip="Construct path with only the middle anchors of all tumours."/>
-                            <TextBlock Text="Only middle anchors" Margin="10 0 0 0"/>
-                        </StackPanel>
-                        <CheckBox Content="Fix SV" Margin="0 5 0 0"
+                        <CheckBox Content="Debug construction"
+                                  IsChecked="{Binding DebugConstruction}"
+                                  ToolTip="Skip intelligent path reconstruction."/>
+                        <CheckBox Content="Only middle anchors"
+                                  IsChecked="{Binding JustMiddleAnchors}"
+                                  ToolTip="Construct path with only the middle anchors of all tumours."/>
+                        <CheckBox Content="Fix SV"
                                   ToolTip="Automatically adjust SV such that the slider keeps the same duration after getting tumours."
                                   IsChecked="{Binding FixSv}"/>
                         <CheckBox Content="Delegate SV to BPM"
@@ -318,7 +315,7 @@
                     </Grid.ColumnDefinitions>
 
                     <ComboBox x:Name="SelectionModeBox" Grid.Column="0" ItemsSource="{Binding ImportModes}" SelectedItem="{Binding ImportModeSetting}" Margin="0 0 5 0" VerticalAlignment="Top"
-                                  ToolTip="Import mode"/>
+                                  ToolTip="Slider selection mode. Choose which sliders should be targeted by Tumour Generator 2."/>
 
                     <TextBox Grid.Column="1" Text="{Binding TimeCode}" Visibility="{Binding TimeCodeBoxVisibility}" Margin="5 0 5 2" Width="100" VerticalAlignment="Top"
                                  materialDesign:HintAssist.Hint="Time code"
