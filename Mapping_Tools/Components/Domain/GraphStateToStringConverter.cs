@@ -69,12 +69,33 @@ namespace Mapping_Tools.Components.Domain {
             var max = new Vector2(double.NegativeInfinity);
             foreach (string anchorString in split) {
                 string[] values = anchorString.Split(':');
-                var pos = new Vector2(TypeConverters.ParseDouble(values[0]), TypeConverters.ParseDouble(values[1]));
+                if (values.Length < 3) continue;
+                if (!TypeConverters.TryParseDouble(values[0], out var x)) continue;
+                if (!TypeConverters.TryParseDouble(values[1], out var y)) continue;
+                if (!TypeConverters.TryParseInt(values[2], out var i)) continue;
+                if (!TypeConverters.TryParseDouble(values[3], out var p)) continue;
+                var pos = new Vector2(x, y);
                 min = Vector2.ComponentMin(pos, min);
                 max = Vector2.ComponentMax(pos, max);
-                var interpolator = InterpolatorHelper.GetInterpolator(InterpolatorHelper.GetInterpolatorByIndex(TypeConverters.ParseInt(values[2])));
-                interpolator.P = TypeConverters.ParseDouble(values[3]);
+                var interpolator = InterpolatorHelper.GetInterpolator(InterpolatorHelper.GetInterpolatorByIndex(i));
+                interpolator.P = p;
                 anchors.Add(new AnchorState { Pos = pos, Interpolator = interpolator });
+            }
+
+            if (anchors.Count < 2) {
+                // Default to something
+                var state2 = new GraphState {
+                    MinX = 0,
+                    MinY = 0,
+                    MaxX = 1,
+                    MaxY = 1,
+                    Anchors = new List<AnchorState>() {
+                        new() { Pos = new Vector2(0, 0), Interpolator = new SingleCurveInterpolator() },
+                        new() { Pos = new Vector2(0, 0), Interpolator = new SingleCurveInterpolator() }
+                    }
+                };
+                state2.Freeze();
+                return state2;
             }
 
             var size = Vector2.ComponentMax(Vector2.One, max - min);
