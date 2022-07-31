@@ -97,8 +97,7 @@ To get started, select a slider in your beatmap and click 'Preview slider' to pr
                 Scalar = arg.Scale,
                 Reconstructor = new Reconstructor {
                     DebugConstruction = arg.DebugConstruction
-                },
-                RandomSeed = new Random().Next()
+                }
             };
             
             // Load sliders from the selector

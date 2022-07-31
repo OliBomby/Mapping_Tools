@@ -41,7 +41,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
         public Reconstructor Reconstructor { get; init; } = new();
 
-        public int RandomSeed { get; set; } = 0;
+        public Random Random { get; set; } = new();
 
         /// <summary>
         /// Places copious amounts of tumours on the slider.
@@ -61,7 +61,6 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 return false;
             }
             var totalLength = pathWithHints.Path.Last!.Value.CumulativeLength;
-            var nonSeedRandom = new Random(RandomSeed);
 
             // Add tumours
             int layer = 0;
@@ -87,7 +86,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 }
 
                 // Find the start of the tumours
-                var random = tumourLayer.RandomSeed != 0 ? new Random(tumourLayer.RandomSeed) : nonSeedRandom;
+                var random = tumourLayer.RandomSeed != 0 ? new Random(tumourLayer.RandomSeed) : Random;
                 var current = pathWithHints.Path.First;
                 var nextDist = tumourStart;
                 var side = tumourLayer.TumourSidedness == TumourSidedness.AlternatingLeft;
