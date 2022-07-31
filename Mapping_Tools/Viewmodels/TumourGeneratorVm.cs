@@ -214,6 +214,7 @@ namespace Mapping_Tools.Viewmodels {
             ImportModeSetting = ImportMode.Selected;
             JustMiddleAnchors = false;
             Scale = 1;
+            FixSv = true;
             TumourLayers = new ObservableCollection<TumourLayer>();
 
             ImportCommand = new CommandImplementation(_ => Import(ImportModeSetting == ImportMode.Selected ?
