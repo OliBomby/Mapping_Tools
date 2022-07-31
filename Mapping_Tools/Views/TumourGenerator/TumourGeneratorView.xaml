@@ -244,15 +244,14 @@
                                   SelectedItem="{Binding CurrentLayer.TumourSidedness}"
                                   Margin="0 0 0 0"
                                   ToolTip="Tumour sidedness. Determines on which side of the slider to place the tumours."/>
-                        <Grid>
+                        <Grid Visibility="{Binding CurrentLayer.TumourSidedness, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter={x:Static enums:TumourSidedness.Random}}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBox Grid.Column="0" materialDesign:HintAssist.Hint="Random seed" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                                      Text="{Binding CurrentLayer.RandomSeed, Converter={StaticResource IntToStringConverter}, ConverterParameter=0}"
-                                     ToolTip="The random seed which determines the sequence of tumour sidedness for this layer."
-                                     Visibility="{Binding CurrentLayer.TumourSidedness, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter={x:Static enums:TumourSidedness.Random}}"/>
+                                     ToolTip="The random seed which determines the sequence of tumour sidedness for this layer."/>
                             <Button Grid.Column="1" Margin="5 0 0 0" VerticalAlignment="Bottom"
                                     Style="{StaticResource MaterialDesignRaisedDarkButton}"
                                     ToolTip="Randomize the random seed." Command="{Binding CurrentLayer.RandomizeRandomSeedCommand}">
