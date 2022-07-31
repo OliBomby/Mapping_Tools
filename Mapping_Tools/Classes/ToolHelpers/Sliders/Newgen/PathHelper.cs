@@ -156,11 +156,11 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
 
             // Normalize v1 and v4 to prevent extreme curvature
             double length = Vector2.Distance(v2.Pos, v3.Pos);
-            v1.Pos = (v1.Pos - v2.Pos).LengthSquared > Precision.DOUBLE_EPSILON ? v2.Pos + (v1.Pos - v2.Pos).Normalized() * length : v1.Pos;
-            v4.Pos = (v4.Pos - v3.Pos).LengthSquared > Precision.DOUBLE_EPSILON ? v3.Pos + (v4.Pos - v3.Pos).Normalized() * length : v4.Pos;
+            v1.Pos = (v1.Pos - v2.Pos).LengthSquared > Precision.DOUBLE_EPSILON ? v2.Pos + (v1.Pos - v2.Pos).Normalized() * length : v2.Pos + v2.Pos - v3.Pos;
+            v4.Pos = (v4.Pos - v3.Pos).LengthSquared > Precision.DOUBLE_EPSILON ? v3.Pos + (v4.Pos - v3.Pos).Normalized() * length : v3.Pos + v3.Pos - v2.Pos;
             double ogLength = Vector2.Distance(v2.OgPos, v3.OgPos);
-            v1.OgPos = (v1.OgPos - v2.OgPos).LengthSquared > Precision.DOUBLE_EPSILON ? v2.OgPos + (v1.OgPos - v2.OgPos).Normalized() * ogLength : v1.OgPos;
-            v4.OgPos = (v4.OgPos - v3.OgPos).LengthSquared > Precision.DOUBLE_EPSILON ? v3.OgPos + (v4.OgPos - v3.OgPos).Normalized() * ogLength : v4.OgPos;
+            v1.OgPos = (v1.OgPos - v2.OgPos).LengthSquared > Precision.DOUBLE_EPSILON ? v2.OgPos + (v1.OgPos - v2.OgPos).Normalized() * ogLength : v2.OgPos + v2.OgPos - v3.OgPos;
+            v4.OgPos = (v4.OgPos - v3.OgPos).LengthSquared > Precision.DOUBLE_EPSILON ? v3.OgPos + (v4.OgPos - v3.OgPos).Normalized() * ogLength : v3.OgPos + v3.OgPos - v2.OgPos;
 
             foreach (var t in ts) {
                 var v = PathPoint.Lerp(v2, v3, t);
