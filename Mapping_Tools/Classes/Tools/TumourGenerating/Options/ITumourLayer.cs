@@ -28,6 +28,11 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
         double TumourEnd { get; }
 
         /// <summary>
+        /// The random seed used for random sidedness.
+        /// </summary>
+        int RandomSeed { get; }
+
+        /// <summary>
         /// Whether the <see cref="TumourStart"/> and <see cref="TumourEnd"/> are not relative to the slider's length.
         /// </summary>
         bool UseAbsoluteRange { get; }

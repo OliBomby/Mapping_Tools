@@ -11,6 +11,7 @@
              xmlns:viewmodels="clr-namespace:Mapping_Tools.Viewmodels"
              xmlns:options="clr-namespace:Mapping_Tools.Classes.Tools.TumourGenerating.Options"
              xmlns:domain2="clr-namespace:Mapping_Tools.Classes.Tools.TumourGenerating.Domain"
+             xmlns:enums="clr-namespace:Mapping_Tools.Classes.Tools.TumourGenerating.Enums"
              d:DataContext="{d:DesignInstance Type=viewmodels:TumourGeneratorVm}"
              mc:Ignorable="d"
              x:Name="This"
@@ -40,6 +41,7 @@
         <domain:BooleanAndConverter x:Key="BooleanAndConverter"/>
         <domain:GraphStateToDoubleConverter x:Key="GraphStateToDoubleConverter"/>
         <domain2:TumourTemplateToIconConverter x:Key="TumourTemplateToIconConverter"/>
+        <domain:EnumToVisibilityConverter x:Key="EnumToVisibilityConverter"/>
     </local:SingleRunMappingTool.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -242,6 +244,21 @@
                                   SelectedItem="{Binding CurrentLayer.TumourSidedness}"
                                   Margin="0 0 0 0"
                                   ToolTip="Tumour sidedness. Determines on which side of the slider to place the tumours."/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" materialDesign:HintAssist.Hint="Random seed" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                     Text="{Binding CurrentLayer.RandomSeed, Converter={StaticResource IntToStringConverter}, ConverterParameter=0}"
+                                     ToolTip="The random seed which determines the sequence of tumour sidedness for this layer."
+                                     Visibility="{Binding CurrentLayer.TumourSidedness, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter={x:Static enums:TumourSidedness.Random}}"/>
+                            <Button Grid.Column="1" Margin="5 0 0 0" VerticalAlignment="Bottom"
+                                    Style="{StaticResource MaterialDesignRaisedDarkButton}"
+                                    ToolTip="Randomize the random seed." Command="{Binding CurrentLayer.RandomizeRandomSeedCommand}">
+                                <materialDesign:PackIcon Kind="DiceMultiple" Width="24" Height="24"/>
+                            </Button>
+                        </Grid>
                         <TextBlock Text="Distance" FontWeight="Bold" Margin="0 10 0 0"/>
                         <components:ValueOrGraphControl GraphState="{Binding CurrentLayer.TumourDistance}"
                                                         ToolTip="The tumour distance determines the distance between the centre of each tumour."

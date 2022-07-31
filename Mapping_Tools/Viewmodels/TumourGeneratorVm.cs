@@ -355,7 +355,8 @@ namespace Mapping_Tools.Viewmodels {
                     Scalar = Scale,
                     Reconstructor = new Reconstructor {
                         DebugConstruction = DebugConstruction
-                    }
+                    },
+                    RandomSeed = new Random().Next()
                 };
                 tumourGenerator.TumourGenerate(args, ct);
 

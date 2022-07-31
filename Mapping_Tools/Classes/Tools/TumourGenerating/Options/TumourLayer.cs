@@ -5,6 +5,7 @@ using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools.TumourGenerating.Enums;
 using Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourTemplates;
+using Mapping_Tools.Components.Domain;
 using Mapping_Tools.Components.Graph;
 using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
 
@@ -26,6 +27,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
         private int _tumourCount;
         private double _tumourStart;
         private double _tumourEnd;
+        private int _randomSeed;
         private bool _recalculate;
         private bool _useAbsoluteRange;
         private bool _isActive;
@@ -99,6 +101,11 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
             set => Set(ref _tumourEnd, value);
         }
 
+        public int RandomSeed {
+            get => _randomSeed;
+            set => Set(ref _randomSeed, value);
+        }
+
         public bool UseAbsoluteRange {
             get => _useAbsoluteRange;
             set => Set(ref _useAbsoluteRange, value);
@@ -119,6 +126,15 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
             set => Set(ref _name, value);
         }
 
+        [JsonIgnore]
+        public CommandImplementation RandomizeRandomSeedCommand { get; }
+
+        public TumourLayer() {
+            RandomizeRandomSeedCommand = new CommandImplementation(_ => {
+                RandomSeed = new Random().Next();
+            });
+        }
+
         public static TumourLayer GetDefaultLayer() {
             var l = new TumourLayer {
                 TumourTemplateEnum = Enums.TumourTemplate.Triangle,
@@ -132,7 +148,8 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
                 TumourScale = GetGraphState(30),
                 TumourRotation = GetGraphState(0),
                 TumourParameter = GetGraphState(0),
-                TumourDistance = GetGraphState(100)
+                TumourDistance = GetGraphState(100),
+                RandomSeed = new Random().Next()
             };
             return l;
         }
