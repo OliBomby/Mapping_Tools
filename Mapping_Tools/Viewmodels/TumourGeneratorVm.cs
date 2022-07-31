@@ -111,6 +111,9 @@ namespace Mapping_Tools.Viewmodels {
                     if (_currentLayer is not null) {
                         _currentLayer.PropertyChanged += TumourLayerOnPropertyChanged;
                     }
+                    RaisePropertyChanged(nameof(TumourStartSliderMin));
+                    RaisePropertyChanged(nameof(TumourRangeSliderMax));
+                    RaisePropertyChanged(nameof(TumourRangeSliderSmallChange));
                 }
             }
         }
