@@ -84,20 +84,18 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     tumourEnd = MathHelper.Clamp(tumourLayer.TumourEnd, 0, 1) * totalLength;
                 }
 
-                // Calculate count multiplier
-                var totalDist = tumourEnd - tumourStart;
-                var countDist = totalDist / (tumourLayer.TumourCount - 1);
-
                 // Find the start of the tumours
                 var current = pathWithHints.Path.First;
                 var nextDist = tumourStart;
                 var side = tumourLayer.TumourSidedness == TumourSidedness.AlternatingLeft;
+                var i = 0;
 
-                while (nextDist <= Math.Min(totalLength, tumourEnd) + Precision.DOUBLE_EPSILON && current is not null) {
+                while (nextDist <= Math.Min(totalLength, tumourEnd) + Precision.DOUBLE_EPSILON && current is not null &&
+                       (tumourLayer.TumourCount == 0 || i++ < tumourLayer.TumourCount)) {
                     ct.ThrowIfCancellationRequested();
 
                     var length = tumourLayer.TumourLength.GetValue(nextDist / totalLength);
-                    var endDist = Math.Min(nextDist + length, tumourLayer.TumourCount > 0 ? totalLength : tumourEnd);
+                    var endDist = Math.Min(nextDist + length, tumourEnd);
 
                     // Get which side the tumour should be on
                     side = tumourLayer.TumourSidedness switch {
@@ -129,8 +127,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                         current = start;
                     }
 
-                    var dist = Math.Max(1, tumourLayer.TumourCount > 0 ? countDist
-                        : tumourLayer.TumourDistance.GetValue(nextDist / totalLength));
+                    var dist = Math.Max(1, tumourLayer.TumourDistance.GetValue(nextDist / totalLength));
                     nextDist += dist;
                 }
             }

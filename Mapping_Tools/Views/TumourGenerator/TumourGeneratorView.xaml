@@ -257,7 +257,7 @@
                                  Visibility="{Binding AdvancedOptions, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                         <Slider Value="{Binding CurrentLayer.TumourCount}"
                                 Style="{StaticResource MaterialDesignDiscreteSlider}"
-                                Minimum="0" Maximum="50"
+                                Minimum="0" Maximum="20"
                                 ToolTip="The number of tumours to place on the slider. If 0 this count will be automatically determined using the distance and slider length."/>
                         <TextBlock Text="Start" FontWeight="Bold" Margin="0 10 0 0"/>
                         <TextBox materialDesign:HintAssist.Hint="Start" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
