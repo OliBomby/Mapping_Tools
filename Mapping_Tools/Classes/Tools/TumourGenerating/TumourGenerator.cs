@@ -138,6 +138,11 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
             // Reconstruct the slider
             PathHelper.Recalculate(pathWithHints.Path);
+
+            if (pathWithHints.Path.Count == 0 || double.IsNaN(pathWithHints.Path.Last.Value.CumulativeLength)) {
+                return false;
+            }
+
             var (anchors, pathType) = JustMiddleAnchors ? ReconstructOnlyMiddle(pathWithHints) : Reconstructor.Reconstruct(pathWithHints);
 
             if (anchors is null || anchors.Count < 2) {

@@ -127,7 +127,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                 ? new List<ReconstructionHint>()
                 : new List<ReconstructionHint>(existingHints.Where(o => o.Anchors is not null));
 
-            var layer = existingHints is null ? 0 : existingHints.Max(hint => hint.Layer) + 1;
+            var layer = existingHints is null || existingHints.Count == 0 ? 0 : existingHints.Max(hint => hint.Layer) + 1;
             var current = path.First;
             var nextHint = 0;
             ReconstructionHint? currentHint = null;
