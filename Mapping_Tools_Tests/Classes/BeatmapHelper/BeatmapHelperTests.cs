@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -13,9 +14,7 @@ namespace Mapping_Tools_Tests.Classes.BeatmapHelper {
             var editor = new BeatmapEditor(path);
             var lines2 = editor.Beatmap.GetLines();
 
-            for (int i = 0; i < lines.Count; i++) {
-                Assert.AreEqual(lines[i], lines2[i]);
-            }
+            CompareLines(lines, lines2);
         }
 
         [TestMethod]
@@ -25,9 +24,17 @@ namespace Mapping_Tools_Tests.Classes.BeatmapHelper {
             var editor = new BeatmapEditor(path);
             var lines2 = editor.Beatmap.GetLines();
 
-            for (int i = 0; i < lines.Count; i++) {
-                Assert.AreEqual(lines[i], lines2[i]);
-            }
+            CompareLines(lines, lines2);
+        }
+
+        [TestMethod]
+        public void UnchangingStoryboardedMapCodeTest() {
+            var path = "Resources\\Camellia - Body F10ating in the Zero Gravity Space (Orange_) [Nonsubmersible].osu";
+            var lines = File.ReadAllLines(path).ToList();
+            var editor = new BeatmapEditor(path);
+            var lines2 = editor.Beatmap.GetLines();
+
+            CompareLines(lines, lines2);
         }
 
         [TestMethod]
@@ -37,9 +44,36 @@ namespace Mapping_Tools_Tests.Classes.BeatmapHelper {
             var editor = new StoryboardEditor(path);
             var lines2 = editor.StoryBoard.GetLines();
 
-            for (int i = 0; i < lines.Count; i++) {
-                Assert.AreEqual(lines[i], lines2[i]);
-            }
+            CompareLines(lines, lines2);
+        }
+
+        private static void CompareLines(IReadOnlyList<string> expected, IReadOnlyList<string> actual) {
+            var expectedGeneralLines = FileFormatHelper.GetCategoryLines(expected, "[General]").ToArray();
+            var expectedEditorLines = FileFormatHelper.GetCategoryLines(expected, "[Editor]").ToArray();
+            var expectedMetadataLines = FileFormatHelper.GetCategoryLines(expected, "[Metadata]").ToArray();
+            var expectedDifficultyLines = FileFormatHelper.GetCategoryLines(expected, "[Difficulty]").ToArray();
+            var expectedEventLines = FileFormatHelper.GetCategoryLines(expected, "[Events]").ToArray();
+            var expectedTimingLines = FileFormatHelper.GetCategoryLines(expected, "[TimingPoints]").ToArray();
+            var expectedColourLines = FileFormatHelper.GetCategoryLines(expected, "[Colours]").ToArray();
+            var expectedHitobjectLines = FileFormatHelper.GetCategoryLines(expected, "[HitObjects]").ToArray();
+
+            var actualGeneralLines = FileFormatHelper.GetCategoryLines(actual, "[General]").ToArray();
+            var actualEditorLines = FileFormatHelper.GetCategoryLines(actual, "[Editor]").ToArray();
+            var actualMetadataLines = FileFormatHelper.GetCategoryLines(actual, "[Metadata]").ToArray();
+            var actualDifficultyLines = FileFormatHelper.GetCategoryLines(actual, "[Difficulty]").ToArray();
+            var actualEventLines = FileFormatHelper.GetCategoryLines(actual, "[Events]").ToArray();
+            var actualTimingLines = FileFormatHelper.GetCategoryLines(actual, "[TimingPoints]").ToArray();
+            var actualColourLines = FileFormatHelper.GetCategoryLines(actual, "[Colours]").ToArray();
+            var actualHitobjectLines = FileFormatHelper.GetCategoryLines(actual, "[HitObjects]").ToArray();
+
+            CollectionAssert.AreEquivalent(expectedGeneralLines, actualGeneralLines);
+            CollectionAssert.AreEquivalent(expectedEditorLines, actualEditorLines);
+            CollectionAssert.AreEquivalent(expectedMetadataLines, actualMetadataLines);
+            CollectionAssert.AreEquivalent(expectedDifficultyLines, actualDifficultyLines);
+            CollectionAssert.AreEqual(expectedEventLines, actualEventLines);
+            CollectionAssert.AreEqual(expectedTimingLines, actualTimingLines);
+            CollectionAssert.AreEqual(expectedColourLines, actualColourLines);
+            CollectionAssert.AreEqual(expectedHitobjectLines, actualHitobjectLines);
         }
     }
 }
