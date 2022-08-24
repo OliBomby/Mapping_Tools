@@ -241,8 +241,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     continue;
                 }
                 ushort velRange = instrumentZone.VelocityRange();
-                byte velLow = (byte)keyRange;
-                byte velHigh = (byte)(keyRange >> 8);
+                byte velLow = (byte)velRange;
+                byte velHigh = (byte)(velRange >> 8);
                 if (!(args.Velocity >= velLow && args.Velocity <= velHigh) && args.Velocity != -1 && velRange != 0) {
                     continue;
                 }
