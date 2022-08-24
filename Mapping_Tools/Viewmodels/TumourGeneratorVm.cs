@@ -290,8 +290,8 @@ namespace Mapping_Tools.Viewmodels {
                     throw new Exception("Could not fetch selected hit objects.", editorReaderException1);
                 }
 
-                BeatmapEditor editor = null;
-                List<HitObject> markedObjects = null;
+                BeatmapEditor editor;
+                List<HitObject> markedObjects;
 
                 switch (ImportModeSetting) {
                     case ImportMode.Selected:
@@ -317,12 +317,13 @@ namespace Mapping_Tools.Viewmodels {
                         break;
                 }
 
-                if (markedObjects == null || !markedObjects.Any(o => o.IsSlider)) {
+                if (markedObjects is null || !markedObjects.Any(o => o.IsSlider)) {
                     Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue(@"Could not find any sliders in imported hit objects."));
                     return;
                 }
 
                 PreviewHitObject = markedObjects.First(s => s.IsSlider);
+                CircleSize = editor.Beatmap.Difficulty["CircleSize"].DoubleValue;
                 Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue(@"Successfully imported slider."));
             } catch (Exception ex) {
                 ex.Show();
