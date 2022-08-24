@@ -96,7 +96,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                        (tumourLayer.TumourCount == 0 || i++ < tumourLayer.TumourCount)) {
                     ct.ThrowIfCancellationRequested();
 
-                    var length = tumourLayer.TumourLength.GetValue(nextDist / totalLength);
+                    var length = tumourLayer.TumourLength.GetValue(ToProgress(nextDist, tumourStart, tumourEnd, totalLength));
                     var endDist = Math.Min(nextDist + length, tumourEnd);
 
                     // Get which side the tumour should be on
@@ -124,12 +124,12 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                                 endT = MathHelper.Clamp((end.Value.CumulativeLength - nextDist) / length, 0, 1);
                         }
 
-                        PlaceTumour(pathWithHints, tumourLayer, layer, start, end, startT, endT, side);
+                        PlaceTumour(pathWithHints, tumourLayer, layer, start, end, startT, endT, Math.Max(0, tumourStart), Math.Min(totalLength, tumourEnd), side);
 
                         current = start;
                     }
 
-                    var dist = Math.Max(1, tumourLayer.TumourDistance.GetValue(nextDist / totalLength));
+                    var dist = Math.Max(1, tumourLayer.TumourDistance.GetValue(ToProgress(nextDist, tumourStart, tumourEnd, totalLength)));
                     nextDist += dist;
                 }
             }
@@ -171,10 +171,12 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
         /// <param name="tumourLayer">The tumour layer</param>
         /// <param name="startTemplateT">T value for where to start with the tumour template</param>
         /// <param name="endTemplateT">T value for where to end with the tumour template</param>
+        /// <param name="tumourStart">The start distance of the sequence of tumours to tumour layer values</param>
+        /// <param name="tumourEnd">The end distance of the sequence of tumours to tumour layer values</param>
         /// <param name="otherSide">Whether to place the tumour on the other side of the slider</param>
         public void PlaceTumour([NotNull]PathWithHints pathWithHints, [NotNull]ITumourLayer tumourLayer, int layer,
             [NotNull]LinkedListNode<PathPoint> start, [NotNull]LinkedListNode<PathPoint> end,
-            double startTemplateT, double endTemplateT, bool otherSide) {
+            double startTemplateT, double endTemplateT, double tumourStart, double tumourEnd, bool otherSide) {
             var path = pathWithHints.Path;
             if (start.List != path) {
                 throw new ArgumentException(@"Start node has to be part of the provided path.", nameof(start));
@@ -223,7 +225,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             var totalLength = path.Last!.Value.CumulativeLength;
             startPoint = start.Value;
             endPoint = end.Value;
-            var startProg = startPoint.CumulativeLength / totalLength;
+            var startProg = ToProgress(startPoint.CumulativeLength, tumourStart, tumourEnd, totalLength);
             var endProg = endPoint.CumulativeLength / totalLength;
             double startT = startPoint.T;
             double endT = endPoint.T;
@@ -360,6 +362,13 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             } else {
                 pathWithHints.AddReconstructionHint(new ReconstructionHint(start, end, layer, null));
             }
+        }
+
+        private static double ToProgress(double dist, double start, double end, double totalLength) {
+            start = Math.Max(0, start);
+            end = Math.Min(totalLength, end);
+
+            return (dist - start) / (end - start);
         }
 
         private static Vector2 CalculateNewPos(PathPoint point, Vector2 pos, Vector2 offset, double angle) {
