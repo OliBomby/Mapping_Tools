@@ -70,10 +70,18 @@ namespace Mapping_Tools_Tests.Classes.BeatmapHelper {
             CollectionAssert.AreEquivalent(expectedEditorLines, actualEditorLines);
             CollectionAssert.AreEquivalent(expectedMetadataLines, actualMetadataLines);
             CollectionAssert.AreEquivalent(expectedDifficultyLines, actualDifficultyLines);
-            CollectionAssert.AreEqual(expectedEventLines, actualEventLines);
-            CollectionAssert.AreEqual(expectedTimingLines, actualTimingLines);
-            CollectionAssert.AreEqual(expectedColourLines, actualColourLines);
-            CollectionAssert.AreEqual(expectedHitobjectLines, actualHitobjectLines);
+            AssertCollectionEqual(expectedEventLines, actualEventLines);
+            AssertCollectionEqual(expectedTimingLines, actualTimingLines);
+            AssertCollectionEqual(expectedColourLines, actualColourLines);
+            AssertCollectionEqual(expectedHitobjectLines, actualHitobjectLines);
+        }
+
+        private static void AssertCollectionEqual(IReadOnlyList<string> expected, IReadOnlyList<string> actual) {
+            for (int i = 0; i < expected.Count; i++) {
+                Assert.AreEqual(expected[i], actual[i], $"At line {i} expected \"{expected[i]}\" but got \"{actual[i]}\".");
+            }
+
+            Assert.AreEqual(expected.Count, actual.Count);
         }
     }
 }
