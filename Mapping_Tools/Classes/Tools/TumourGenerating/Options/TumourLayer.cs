@@ -149,7 +149,9 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
                 TumourRotation = GetGraphState(0),
                 TumourParameter = GetGraphState(0),
                 TumourDistance = GetGraphState(100),
-                RandomSeed = 0
+                RandomSeed = 0,
+                UseAbsoluteRange = true,
+                Recalculate = true
             };
             return l;
         }

@@ -111,8 +111,6 @@ namespace Mapping_Tools.Viewmodels {
                     if (_currentLayer is not null) {
                         _currentLayer.PropertyChanged += TumourLayerOnPropertyChanged;
                     }
-                    RaisePropertyChanged(nameof(TumourStartSliderMin));
-                    RaisePropertyChanged(nameof(TumourRangeSliderMax));
                     RaisePropertyChanged(nameof(TumourRangeSliderSmallChange));
                 }
             }
@@ -121,7 +119,12 @@ namespace Mapping_Tools.Viewmodels {
         private int _currentLayerIndex;
         public int CurrentLayerIndex {
             get => _currentLayerIndex;
-            set => Set(ref _currentLayerIndex, value);
+            set {
+                if (Set(ref _currentLayerIndex, value)) {
+                    RaisePropertyChanged(nameof(TumourStartSliderMin));
+                    RaisePropertyChanged(nameof(TumourRangeSliderMax));
+                }
+            }
         }
 
         private bool _justMiddleAnchors;
@@ -177,10 +180,18 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         [JsonIgnore]
-        public double TumourStartSliderMin => AdvancedOptions ? CurrentLayer is not null && CurrentLayer.UseAbsoluteRange ? -500 : -1 : 0;
+        public double TumourStartSliderMin => AdvancedOptions ? CurrentLayerIndex >= 0 &&
+                                                                CurrentLayerIndex < TumourLayers.Count &&
+                                                                CurrentLayerIndex < layerRangeSliderMaxes.Count &&
+                                                                TumourLayers[CurrentLayerIndex].UseAbsoluteRange ? -layerRangeSliderMaxes[CurrentLayerIndex] : -1 : 0;
 
         [JsonIgnore]
-        public double TumourRangeSliderMax => CurrentLayer is not null && CurrentLayer.UseAbsoluteRange ? 500 : 1;
+        public double TumourRangeSliderMax => CurrentLayerIndex >= 0 &&
+                                              CurrentLayerIndex < TumourLayers.Count &&
+                                              CurrentLayerIndex < layerRangeSliderMaxes.Count &&
+                                              TumourLayers[CurrentLayerIndex].UseAbsoluteRange ? layerRangeSliderMaxes[CurrentLayerIndex] : 1;
+
+        private readonly List<double> layerRangeSliderMaxes = new();
 
         [JsonIgnore]
         public double TumourRangeSliderSmallChange => CurrentLayer is not null && CurrentLayer.UseAbsoluteRange ? 1 : 0.0001;
@@ -236,6 +247,7 @@ namespace Mapping_Tools.Viewmodels {
                     try {
                         var newLayer = TumourLayer.GetDefaultLayer();
                         newLayer.Name = "Layer " + (TumourLayers.Count + 1);
+                        newLayer.TumourEnd = layerRangeSliderMaxes.LastOrDefault() * 10;
                         TumourLayers.Insert(CurrentLayerIndex + 1, newLayer);
                         CurrentLayerIndex++;
                         RegeneratePreview();
@@ -374,6 +386,10 @@ namespace Mapping_Tools.Viewmodels {
                 // Send the tumoured slider to the main thread
                 Application.Current.Dispatcher.Invoke(() => {
                     TumouredPreviewHitObject = args;
+                    layerRangeSliderMaxes.Clear();
+                    layerRangeSliderMaxes.AddRange(tumourGenerator.LayerLengths);
+                    RaisePropertyChanged(nameof(TumourStartSliderMin));
+                    RaisePropertyChanged(nameof(TumourRangeSliderMax));
                 });
 
                 // Clean up the cancellation token

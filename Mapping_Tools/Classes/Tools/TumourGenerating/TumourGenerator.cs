@@ -43,6 +43,13 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
         public Random Random { get; set; } = new();
 
+        private List<double> layerLengths = new();
+
+        /// <summary>
+        /// The lengths of the slider at the start of each layer in the last tumour generate call.
+        /// </summary>
+        public IReadOnlyList<double> LayerLengths => layerLengths;
+
         /// <summary>
         /// Places copious amounts of tumours on the slider.
         /// Changes slider curvepoints, pixel length, and velocity
@@ -62,6 +69,9 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             }
             var totalLength = pathWithHints.Path.Last!.Value.CumulativeLength;
 
+            // Reset the layer lengths
+            layerLengths.Clear();
+
             // Add tumours
             int layer = 0;
             foreach (var tumourLayer in TumourLayers) {
@@ -76,6 +86,9 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     totalLength = pathWithHints.Path.Last!.Value.CumulativeLength;
                     layer++;
                 }
+
+                // Add the length for this layer
+                layerLengths.Add(totalLength);
 
                 // Get the start and end dist in osu! pixels
                 var tumourStart = tumourLayer.TumourStart;
