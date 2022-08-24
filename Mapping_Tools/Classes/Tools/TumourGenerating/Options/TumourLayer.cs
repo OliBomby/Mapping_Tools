@@ -143,7 +143,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
                 Name = "Layer",
                 TumourCount = 0,
                 TumourStart = 0,
-                TumourEnd = 1,
+                TumourEnd = 256,
                 TumourLength = GetGraphState(15),
                 TumourScale = GetGraphState(30),
                 TumourRotation = GetGraphState(0),

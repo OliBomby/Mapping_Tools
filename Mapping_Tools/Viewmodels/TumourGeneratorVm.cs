@@ -247,7 +247,7 @@ namespace Mapping_Tools.Viewmodels {
                     try {
                         var newLayer = TumourLayer.GetDefaultLayer();
                         newLayer.Name = "Layer " + (TumourLayers.Count + 1);
-                        newLayer.TumourEnd = layerRangeSliderMaxes.LastOrDefault() * 10;
+                        newLayer.TumourEnd = layerRangeSliderMaxes.Count > 0 ? layerRangeSliderMaxes.LastOrDefault() : PreviewHitObject.PixelLength;
                         TumourLayers.Insert(CurrentLayerIndex + 1, newLayer);
                         CurrentLayerIndex++;
                         RegeneratePreview();
