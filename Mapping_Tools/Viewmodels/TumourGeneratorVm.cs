@@ -170,6 +170,12 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _scale, value, action: RegeneratePreview);
         }
 
+        private double _circleSize;
+        public double CircleSize {
+            get => _circleSize;
+            set => Set(ref _circleSize, value, action: RegeneratePreview);
+        }
+
         [JsonIgnore]
         public double TumourStartSliderMin => AdvancedOptions ? CurrentLayer is not null && CurrentLayer.UseAbsoluteRange ? -500 : -1 : 0;
 
@@ -217,6 +223,7 @@ namespace Mapping_Tools.Viewmodels {
             ImportModeSetting = ImportMode.Selected;
             JustMiddleAnchors = false;
             Scale = 1;
+            CircleSize = 4;
             FixSv = true;
             TumourLayers = new ObservableCollection<TumourLayer>();
 

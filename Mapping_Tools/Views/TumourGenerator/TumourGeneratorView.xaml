@@ -42,6 +42,7 @@
         <domain:GraphStateToDoubleConverter x:Key="GraphStateToDoubleConverter"/>
         <domain2:TumourTemplateToIconConverter x:Key="TumourTemplateToIconConverter"/>
         <domain:EnumToVisibilityConverter x:Key="EnumToVisibilityConverter"/>
+        <domain:CircleSizeToThicknessConverter x:Key="CircleSizeToThicknessConverter"/>
     </local:SingleRunMappingTool.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -148,6 +149,11 @@
                     <StackPanel Grid.Row="2" Margin="0 0 0 10">
                         <Slider Minimum="0" Maximum="1" TickFrequency="0.1" Value="{Binding Scale}" Margin="5 10"
                                 ToolTip="Tumour scale"/>
+                        <Slider Value="{Binding CircleSize}" Margin="5 10"
+                                Style="{StaticResource MaterialDesignDiscreteSlider}"
+                                TickPlacement="BottomRight" TickFrequency="1"
+                                Minimum="0" Maximum="10" SmallChange="0.1" LargeChange="1"
+                                ToolTip="Circle Size"/>
                         <StackPanel Orientation="Horizontal" Margin="0 5 0 15">
                             <ToggleButton IsChecked="{Binding AdvancedOptions}"
                                           Style="{StaticResource MaterialDesignSwitchAccentToggleButton}"
@@ -307,7 +313,8 @@
                 <materialDesign:Card Grid.Column="4" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Padding="10" Margin="10 0 0 0"
                                      ToolTip="Result preview">
                     <objectVisualiser:HitObjectElement x:Name="GraphHitObjectElement" HitObject="{Binding TumouredPreviewHitObject}"
-                                                       Stroke="YellowGreen" Fill="DarkSlateGray" SliderBallStroke="White" Thickness="50" ShowAnchors="True" AnchorSize="0.12"/>
+                                                       Stroke="YellowGreen" Fill="DarkSlateGray" SliderBallStroke="White" ShowAnchors="True" AnchorSize="6"
+                                                       Thickness="{Binding CircleSize, Converter={StaticResource CircleSizeToThicknessConverter}}"/>
                 </materialDesign:Card>
 
                 <ProgressBar Grid.Column="4" Margin="10 0 0 0"
