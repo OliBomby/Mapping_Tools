@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Classes.ToolHelpers.Sliders;
 
 namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
@@ -181,7 +180,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
                 // Make a new neuron if the path turns around
                 // The position of this turn-around is not entirely accurate because the actual turn-around happens somewhere in between the time steps
                 // This is the cause behind most of the error compared to the expected total length
-                if (direction * lastDirection < 0) {  // Do this to exclude 0 direction sign
+                if (direction * lastDirection < 0 || direction == 0 && lastDirection != 0) {
                     var newNeuron = new Neuron(nearestLatticePoint, time);
                     currentNeuron.Terminal = newNeuron;
 
@@ -219,7 +218,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
                     }
                 }
 
-                lastDirection = direction == 0 ? lastDirection : direction;  // Not update last direction if direction is 0
+                lastDirection = direction;
             }
             // Need to add currentNeuron at the end otherwise the last neuron would get ignored
             currentNeuron.WantedLength += actualLength;
