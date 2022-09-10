@@ -143,13 +143,15 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
                 Name = "Layer",
                 TumourCount = 0,
                 TumourStart = 0,
-                TumourEnd = 1,
+                TumourEnd = 256,
                 TumourLength = GetGraphState(15),
                 TumourScale = GetGraphState(30),
                 TumourRotation = GetGraphState(0),
                 TumourParameter = GetGraphState(0),
                 TumourDistance = GetGraphState(100),
-                RandomSeed = new Random().Next()
+                RandomSeed = 0,
+                UseAbsoluteRange = true,
+                Recalculate = true
             };
             return l;
         }

@@ -111,6 +111,7 @@ namespace Mapping_Tools.Viewmodels {
                     if (_currentLayer is not null) {
                         _currentLayer.PropertyChanged += TumourLayerOnPropertyChanged;
                     }
+                    RaisePropertyChanged(nameof(TumourRangeSliderSmallChange));
                 }
             }
         }
@@ -118,7 +119,12 @@ namespace Mapping_Tools.Viewmodels {
         private int _currentLayerIndex;
         public int CurrentLayerIndex {
             get => _currentLayerIndex;
-            set => Set(ref _currentLayerIndex, value);
+            set {
+                if (Set(ref _currentLayerIndex, value)) {
+                    RaisePropertyChanged(nameof(TumourStartSliderMin));
+                    RaisePropertyChanged(nameof(TumourRangeSliderMax));
+                }
+            }
         }
 
         private bool _justMiddleAnchors;
@@ -167,11 +173,25 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref _scale, value, action: RegeneratePreview);
         }
 
-        [JsonIgnore]
-        public double TumourStartSliderMin => AdvancedOptions ? CurrentLayer is not null && CurrentLayer.UseAbsoluteRange ? -500 : -1 : 0;
+        private double _circleSize;
+        public double CircleSize {
+            get => _circleSize;
+            set => Set(ref _circleSize, value, action: RegeneratePreview);
+        }
 
         [JsonIgnore]
-        public double TumourRangeSliderMax => CurrentLayer is not null && CurrentLayer.UseAbsoluteRange ? 500 : 1;
+        public double TumourStartSliderMin => AdvancedOptions ? CurrentLayerIndex >= 0 &&
+                                                                CurrentLayerIndex < TumourLayers.Count &&
+                                                                CurrentLayerIndex < layerRangeSliderMaxes.Count &&
+                                                                TumourLayers[CurrentLayerIndex].UseAbsoluteRange ? -layerRangeSliderMaxes[CurrentLayerIndex] : -1 : 0;
+
+        [JsonIgnore]
+        public double TumourRangeSliderMax => CurrentLayerIndex >= 0 &&
+                                              CurrentLayerIndex < TumourLayers.Count &&
+                                              CurrentLayerIndex < layerRangeSliderMaxes.Count &&
+                                              TumourLayers[CurrentLayerIndex].UseAbsoluteRange ? layerRangeSliderMaxes[CurrentLayerIndex] : 1;
+
+        private readonly List<double> layerRangeSliderMaxes = new();
 
         [JsonIgnore]
         public double TumourRangeSliderSmallChange => CurrentLayer is not null && CurrentLayer.UseAbsoluteRange ? 1 : 0.0001;
@@ -214,6 +234,8 @@ namespace Mapping_Tools.Viewmodels {
             ImportModeSetting = ImportMode.Selected;
             JustMiddleAnchors = false;
             Scale = 1;
+            CircleSize = 4;
+            FixSv = true;
             TumourLayers = new ObservableCollection<TumourLayer>();
 
             ImportCommand = new CommandImplementation(_ => Import(ImportModeSetting == ImportMode.Selected ?
@@ -225,6 +247,7 @@ namespace Mapping_Tools.Viewmodels {
                     try {
                         var newLayer = TumourLayer.GetDefaultLayer();
                         newLayer.Name = "Layer " + (TumourLayers.Count + 1);
+                        newLayer.TumourEnd = layerRangeSliderMaxes.Count > 0 ? layerRangeSliderMaxes.LastOrDefault() : PreviewHitObject.PixelLength;
                         TumourLayers.Insert(CurrentLayerIndex + 1, newLayer);
                         CurrentLayerIndex++;
                         RegeneratePreview();
@@ -279,8 +302,8 @@ namespace Mapping_Tools.Viewmodels {
                     throw new Exception("Could not fetch selected hit objects.", editorReaderException1);
                 }
 
-                BeatmapEditor editor = null;
-                List<HitObject> markedObjects = null;
+                BeatmapEditor editor;
+                List<HitObject> markedObjects;
 
                 switch (ImportModeSetting) {
                     case ImportMode.Selected:
@@ -306,12 +329,13 @@ namespace Mapping_Tools.Viewmodels {
                         break;
                 }
 
-                if (markedObjects == null || !markedObjects.Any(o => o.IsSlider)) {
+                if (markedObjects is null || !markedObjects.Any(o => o.IsSlider)) {
                     Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue(@"Could not find any sliders in imported hit objects."));
                     return;
                 }
 
                 PreviewHitObject = markedObjects.First(s => s.IsSlider);
+                CircleSize = editor.Beatmap.Difficulty["CircleSize"].DoubleValue;
                 Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue(@"Successfully imported slider."));
             } catch (Exception ex) {
                 ex.Show();
@@ -355,14 +379,17 @@ namespace Mapping_Tools.Viewmodels {
                     Scalar = Scale,
                     Reconstructor = new Reconstructor {
                         DebugConstruction = DebugConstruction
-                    },
-                    RandomSeed = new Random().Next()
+                    }
                 };
                 tumourGenerator.TumourGenerate(args, ct);
 
                 // Send the tumoured slider to the main thread
                 Application.Current.Dispatcher.Invoke(() => {
                     TumouredPreviewHitObject = args;
+                    layerRangeSliderMaxes.Clear();
+                    layerRangeSliderMaxes.AddRange(tumourGenerator.LayerLengths);
+                    RaisePropertyChanged(nameof(TumourStartSliderMin));
+                    RaisePropertyChanged(nameof(TumourRangeSliderMax));
                 });
 
                 // Clean up the cancellation token

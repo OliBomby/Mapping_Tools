@@ -163,6 +163,19 @@ namespace Mapping_Tools.Views.TimingCopier {
                     // Don't move objects
                 }
 
+                // Fix SV for if new redlines were added
+                timingPointsChanges = new List<TimingPointsChange>();
+
+                foreach (var ho in beatmapTo.HitObjects.Where(ho => ho.IsSlider)) {
+                    TimingPoint tp = ho.TimingPoint.Copy();
+                    tp.Offset = ho.Time;
+                    tp.MpB = ho.SliderVelocity;
+                    timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, fuzzyness: Precision.DOUBLE_EPSILON));
+                }
+
+                // Apply timing changes
+                TimingPointsChange.ApplyChanges(timingTo, timingPointsChanges);
+
                 // Save the file
                 editorTo.SaveFile();
 

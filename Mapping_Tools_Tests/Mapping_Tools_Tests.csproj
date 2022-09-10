@@ -6,6 +6,9 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
+    <None Update="Resources\Camellia - Body F10ating in the Zero Gravity Space (Orange_) [Nonsubmersible].osu">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Update="Resources\EmptyTestMap.osu">

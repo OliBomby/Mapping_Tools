@@ -25,6 +25,8 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
     /// All reconstruction hints must be used when reconstructing the slider.
     /// </summary>
     public class TumourGenerator {
+        private const double RelativePropertyScale = 256;
+
         /// <summary>
         /// The number of points per osu! pixel used to approximate the shape of the tumours.
         /// </summary>
@@ -41,7 +43,14 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
         public Reconstructor Reconstructor { get; init; } = new();
 
-        public int RandomSeed { get; set; } = 0;
+        public Random Random { get; set; } = new();
+
+        private readonly List<double> layerLengths = new();
+
+        /// <summary>
+        /// The lengths of the slider at the start of each layer in the last tumour generate call.
+        /// </summary>
+        public IReadOnlyList<double> LayerLengths => layerLengths;
 
         /// <summary>
         /// Places copious amounts of tumours on the slider.
@@ -61,7 +70,10 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 return false;
             }
             var totalLength = pathWithHints.Path.Last!.Value.CumulativeLength;
-            var nonSeedRandom = new Random(RandomSeed);
+            var initialLength = totalLength;
+
+            // Reset the layer lengths
+            layerLengths.Clear();
 
             // Add tumours
             int layer = 0;
@@ -78,6 +90,9 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     layer++;
                 }
 
+                // Add the length for this layer
+                layerLengths.Add(totalLength);
+
                 // Get the start and end dist in osu! pixels
                 var tumourStart = tumourLayer.TumourStart;
                 var tumourEnd = tumourLayer.TumourEnd;
@@ -87,7 +102,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 }
 
                 // Find the start of the tumours
-                var random = tumourLayer.RandomSeed != 0 ? new Random(tumourLayer.RandomSeed) : nonSeedRandom;
+                var random = tumourLayer.RandomSeed != 0 ? new Random(tumourLayer.RandomSeed) : Random;
                 var current = pathWithHints.Path.First;
                 var nextDist = tumourStart;
                 var side = tumourLayer.TumourSidedness == TumourSidedness.AlternatingLeft;
@@ -97,7 +112,9 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                        (tumourLayer.TumourCount == 0 || i++ < tumourLayer.TumourCount)) {
                     ct.ThrowIfCancellationRequested();
 
-                    var length = tumourLayer.TumourLength.GetValue(nextDist / totalLength);
+                    var length = tumourLayer.TumourLength.GetValue(ToProgress(nextDist, tumourStart, tumourEnd, totalLength));
+                    if (!tumourLayer.UseAbsoluteRange)
+                        length *= initialLength / RelativePropertyScale;
                     var endDist = Math.Min(nextDist + length, tumourEnd);
 
                     // Get which side the tumour should be on
@@ -125,12 +142,14 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                                 endT = MathHelper.Clamp((end.Value.CumulativeLength - nextDist) / length, 0, 1);
                         }
 
-                        PlaceTumour(pathWithHints, tumourLayer, layer, start, end, startT, endT, side);
+                        PlaceTumour(pathWithHints, tumourLayer, layer, start, end, startT, endT, Math.Max(0, tumourStart), Math.Min(totalLength, tumourEnd), side, initialLength);
 
                         current = start;
                     }
 
-                    var dist = Math.Max(1, tumourLayer.TumourDistance.GetValue(nextDist / totalLength));
+                    var dist = Math.Max(1, tumourLayer.TumourDistance.GetValue(ToProgress(nextDist, tumourStart, tumourEnd, totalLength)));
+                    if (!tumourLayer.UseAbsoluteRange)
+                        dist *= initialLength / RelativePropertyScale;
                     nextDist += dist;
                 }
             }
@@ -139,6 +158,11 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
             // Reconstruct the slider
             PathHelper.Recalculate(pathWithHints.Path);
+
+            if (pathWithHints.Path.Count == 0 || double.IsNaN(pathWithHints.Path.Last.Value.CumulativeLength)) {
+                return false;
+            }
+
             var (anchors, pathType) = JustMiddleAnchors ? ReconstructOnlyMiddle(pathWithHints) : Reconstructor.Reconstruct(pathWithHints);
 
             if (anchors is null || anchors.Count < 2) {
@@ -167,10 +191,13 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
         /// <param name="tumourLayer">The tumour layer</param>
         /// <param name="startTemplateT">T value for where to start with the tumour template</param>
         /// <param name="endTemplateT">T value for where to end with the tumour template</param>
+        /// <param name="tumourStart">The start distance of the sequence of tumours to tumour layer values</param>
+        /// <param name="tumourEnd">The end distance of the sequence of tumours to tumour layer values</param>
         /// <param name="otherSide">Whether to place the tumour on the other side of the slider</param>
+        /// <param name="initialLength">The initial pixel length of the slider. Determines the scale of the tumour.</param>
         public void PlaceTumour([NotNull]PathWithHints pathWithHints, [NotNull]ITumourLayer tumourLayer, int layer,
             [NotNull]LinkedListNode<PathPoint> start, [NotNull]LinkedListNode<PathPoint> end,
-            double startTemplateT, double endTemplateT, bool otherSide) {
+            double startTemplateT, double endTemplateT, double tumourStart, double tumourEnd, bool otherSide, double initialLength) {
             var path = pathWithHints.Path;
             if (start.List != path) {
                 throw new ArgumentException(@"Start node has to be part of the provided path.", nameof(start));
@@ -219,7 +246,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             var totalLength = path.Last!.Value.CumulativeLength;
             startPoint = start.Value;
             endPoint = end.Value;
-            var startProg = startPoint.CumulativeLength / totalLength;
+            var startProg = ToProgress(startPoint.CumulativeLength, tumourStart, tumourEnd, totalLength);
             var endProg = endPoint.CumulativeLength / totalLength;
             double startT = startPoint.T;
             double endT = endPoint.T;
@@ -234,6 +261,8 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
 
             var length = Vector2.Distance(start.Value.OgPos, end.Value.OgPos);
             var scale = tumourLayer.TumourScale.GetValue(startProg) * Scalar;
+            if (!tumourLayer.UseAbsoluteRange)
+                scale *= initialLength / RelativePropertyScale;
             var rotation = MathHelper.DegreesToRadians(tumourLayer.TumourRotation.GetValue(startProg));
 
             // Setup tumour template with the correct shape
@@ -356,6 +385,13 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             } else {
                 pathWithHints.AddReconstructionHint(new ReconstructionHint(start, end, layer, null));
             }
+        }
+
+        private static double ToProgress(double dist, double start, double end, double totalLength) {
+            start = Math.Max(0, start);
+            end = Math.Min(totalLength, end);
+
+            return (dist - start) / (end - start);
         }
 
         private static Vector2 CalculateNewPos(PathPoint point, Vector2 pos, Vector2 offset, double angle) {

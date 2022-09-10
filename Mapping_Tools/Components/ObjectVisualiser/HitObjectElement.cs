@@ -278,8 +278,8 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
 
         private void DrawSquare(DrawingContext ctx, Brush brush, Pen pen, Vector2 pos, double size = 1) {
             ctx.DrawRectangle(brush, pen, new Rect(
-                new Point(pos.X - ThicknessWithoutOutline * 0.5 * size, pos.Y - ThicknessWithoutOutline * 0.5 * size),
-                new Point(pos.X + ThicknessWithoutOutline * 0.5 * size, pos.Y + ThicknessWithoutOutline * 0.5 * size)));
+                new Point(pos.X - 0.5 * size, pos.Y - 0.5 * size),
+                new Point(pos.X + 0.5 * size, pos.Y + 0.5 * size)));
         }
 
         private static void DrawLine(DrawingContext ctx, Pen pen, Vector2 p1, Vector2 p2) {

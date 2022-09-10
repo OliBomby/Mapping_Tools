@@ -91,6 +91,13 @@ namespace Mapping_Tools.Views.HitsoundCopier {
 
                 Timeline processedTimeline;
 
+                // Get the first timing point time of both beatmaps, so we can prevent hitobjects from adding greenlines before the first redline
+                double firstTime = Math.Min(beatmapFrom.BeatmapTiming.TimingPoints.Count > 0 ?
+                    beatmapTo.BeatmapTiming.TimingPoints[0].Offset :
+                    double.PositiveInfinity, beatmapTo.BeatmapTiming.TimingPoints.Count > 0 ?
+                    beatmapTo.BeatmapTiming.TimingPoints[0].Offset :
+                    double.PositiveInfinity);
+
                 if (arg.CopyMode == 0) {
                     // Every defined hitsound and sampleset on hitsound gets copied to their copyTo destination
                     // Timelines
@@ -116,6 +123,11 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                         new TimingPointsChange(tp, sampleset: arg.CopySampleSets, index: arg.CopySampleSets,
                             volume: arg.CopyVolumes)).ToList();
 
+                    // Add a timing point at the first time too. In case beatmapTo starts earlier than beatmapFrom
+                    var firstTimingPoint = beatmapFrom.BeatmapTiming.GetTimingPointAtTime(firstTime).Copy();
+                    firstTimingPoint.Offset = firstTime;
+                    timingPointsChanges.Add(new TimingPointsChange(firstTimingPoint, sampleset: arg.CopySampleSets, index: arg.CopySampleSets, volume: arg.CopyVolumes));
+
                     // Apply the timingpoint changes
                     TimingPointsChange.ApplyChanges(beatmapTo.BeatmapTiming, timingPointsChanges, true);
 
@@ -127,7 +139,8 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                         processedTimeline.GiveTimingPoints(beatmapTo.BeatmapTiming);
 
                         // Exclude objects which use their own sample volume property instead
-                        foreach (var tloTo in processedTimeline.TimelineObjects.Where(o => Math.Abs(o.SampleVolume) < Precision.DOUBLE_EPSILON)) {
+                        foreach (var tloTo in processedTimeline.TimelineObjects.Where(o =>
+                                     Math.Abs(o.SampleVolume) < Precision.DOUBLE_EPSILON && Precision.AlmostBigger(o.Time, firstTime))) {
                             if (volumeMuteTimes.Contains(tloTo.Time)) {
                                 // Add timingpointschange to copy timingpoint hitsounds
                                 var tp = tloTo.HitsoundTimingPoint.Copy();
@@ -158,7 +171,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                     var firstSamples = HitsoundImporter.AnalyzeSamples(mapDir);
 
                     if (arg.CopyHitsounds) {
-                        CopyHitsounds(arg, beatmapTo, tlFrom, tlTo, timingPointsChanges, mode, mapDir, firstSamples, ref sampleSchema);
+                        CopyHitsounds(arg, firstTime, beatmapTo, tlFrom, tlTo, timingPointsChanges, mode, mapDir, firstSamples, ref sampleSchema);
                     }
 
                     if (arg.CopyBodyHitsounds) {
@@ -245,7 +258,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                     beatmapTo.GiveObjectsGreenlines();
                     processedTimeline.GiveTimingPoints(beatmapTo.BeatmapTiming);
 
-                    foreach (var tloTo in processedTimeline.TimelineObjects) {
+                    foreach (var tloTo in processedTimeline.TimelineObjects.Where(o => Precision.AlmostBigger(o.Time, firstTime))) {
                         if (FilterMuteTlo(tloTo, beatmapTo, arg)) {
                             // Set volume to 5%, remove all hitsounds, apply customindex and sampleset
                             tloTo.SampleSet = arg.MutedSampleSet;
@@ -318,7 +331,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
             }
         }
 
-        private void CopyHitsounds(HitsoundCopierVm arg, Beatmap beatmapTo, 
+        private void CopyHitsounds(HitsoundCopierVm arg, double firstTime, Beatmap beatmapTo,
             Timeline tlFrom, Timeline tlTo,
             List<TimingPointsChange> timingPointsChanges, GameMode mode, string mapDir,
             Dictionary<string, string> firstSamples, ref SampleSchema sampleSchema) {
@@ -334,11 +347,13 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                     // Copy to this tlo
                     CopyHitsounds(arg, tloFrom, tloTo);
 
-                    // Add timingpointschange to copy timingpoint hitsounds
-                    var tp = tloFrom.HitsoundTimingPoint.Copy();
-                    tp.Offset = tloTo.Time;
-                    timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: arg.CopySampleSets,
-                        index: arg.CopySampleSets, volume: arg.CopyVolumes));
+                    if (Precision.AlmostBigger(tloTo.Time, firstTime)) {
+                        // Add timingpointschange to copy timingpoint hitsounds
+                        var tp = tloFrom.HitsoundTimingPoint.Copy();
+                        tp.Offset = tloTo.Time;
+                        timingPointsChanges.Add(new TimingPointsChange(tp, sampleset: arg.CopySampleSets,
+                            index: arg.CopySampleSets, volume: arg.CopyVolumes));
+                    }
                 }
                 // Try to find a slider tick in range to copy the sample to instead.
                 // This slider tick gets a custom sample and timingpoints change to imitate the copied hitsound.
@@ -437,7 +452,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
 
             // Timingpointchange all the undefined tlo from copyFrom
             foreach (var tloTo in tlTo.TimelineObjects) {
-                if (!tloTo.CanCopy) continue;
+                if (!tloTo.CanCopy || !Precision.AlmostBigger(tloTo.Time, firstTime)) continue;
                 var tp = tloTo.HitsoundTimingPoint.Copy();
                 var holdSampleset = arg.CopySampleSets && tloTo.SampleSet == SampleSet.None;
                 var holdIndex = arg.CopySampleSets && !(tloTo.CanCustoms && tloTo.CustomIndex != 0);
