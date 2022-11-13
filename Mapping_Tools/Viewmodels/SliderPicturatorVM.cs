@@ -120,11 +120,7 @@ namespace Mapping_Tools.Viewmodels
             set
             {
                 if (Set(ref _useMapComboColors, value)) {
-                    if (value) {
-                        CurrentTrackColor = ComboColor;
-                    } else {
-                        CurrentTrackColor = Color.FromArgb(TrackColorPickerColor.R, TrackColorPickerColor.G, TrackColorPickerColor.B); ;
-                    }
+                    CurrentTrackColor = value ? ComboColor : Color.FromArgb(TrackColorPickerColor.R, TrackColorPickerColor.G, TrackColorPickerColor.B);
                     RaisePropertyChanged(nameof(ShouldShowCCPicker));
                     RaisePropertyChanged(nameof(ShouldShowPalette));
                 }

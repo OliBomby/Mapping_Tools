@@ -7,21 +7,18 @@ using System.Windows;
 using System.Windows.Input;
 using System.Drawing;
 using System.Drawing.Imaging;
-using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Classes.ToolHelpers;
-using Mapping_Tools.Classes.Tools.SlideratorStuff;
-using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Viewmodels;
 using System.Runtime.InteropServices;
 
 namespace Mapping_Tools.Views.SliderPicturator {
     /// <summary>
-    /// Interaktionslogik für UserControl1.xaml
+    /// Interaktionslogik für SliderPicturatorView.xaml
     /// </summary>
     [SmartQuickRunUsage(SmartQuickRunTargets.AnySelection)]
     [VerticalContentScroll]
@@ -47,7 +44,7 @@ namespace Mapping_Tools.Views.SliderPicturator {
 
         protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
-            e.Result = Picturate((SliderPicturatorVM) e.Argument, bgw, e);
+            e.Result = Picturate((SliderPicturatorVm) e.Argument, bgw, e);
         }
 
        
@@ -139,7 +136,7 @@ namespace Mapping_Tools.Views.SliderPicturator {
 
             // Find nearest hitobject before startTime and get its combo color index
             int currentColorIdx = 0;
-            int idx = beatmap.HitObjects.Select((hitObject) => hitObject.Time).ToList().BinarySearch(startTime);
+            int idx = beatmap.HitObjects.Select(hitObject => hitObject.Time).ToList().BinarySearch(startTime);
             if (idx < 0) {
                 idx = ~idx - 1;
             }
@@ -184,9 +181,10 @@ namespace Mapping_Tools.Views.SliderPicturator {
             ho.SliderVelocity = double.NaN;
 
             // Add redlines
-            var timingPointsChanges = new List<TimingPointsChange>();
-            timingPointsChanges.Add(new TimingPointsChange(tpOn, mpb: true, unInherited: true, omitFirstBarLine: true, fuzzyness: Precision.DOUBLE_EPSILON));
-            timingPointsChanges.Add(new TimingPointsChange(tpAfter, mpb: true, unInherited: true, omitFirstBarLine: true, fuzzyness: Precision.DOUBLE_EPSILON));
+            var timingPointsChanges = new List<TimingPointsChange> {
+                new(tpOn, mpb: true, unInherited: true, omitFirstBarLine: true, fuzzyness: Precision.DOUBLE_EPSILON),
+                new(tpAfter, mpb: true, unInherited: true, omitFirstBarLine: true, fuzzyness: Precision.DOUBLE_EPSILON)
+            };
 
             ho.Time -= 1;
 
@@ -257,19 +255,19 @@ namespace Mapping_Tools.Views.SliderPicturator {
             b.Save(loc, ImageFormat.Bmp);
         }
 
-        private static double OsuStableDistance(IEnumerable<Vector2> controlPoints)
+        private static double OsuStableDistance(List<Vector2> controlPoints)
         {
             double length = 0;
             Vector2 cp, lp;
-            float num1, num2, num3, cpX, cpY, lpX, lpY;
-            for (int i = 1; i < controlPoints.Count(); i++) {
+            float num1, num2, num3;
+            for (int i = 1; i < controlPoints.Count; i++) {
                 lp = controlPoints.ElementAt(i - 1);
                 cp = controlPoints.ElementAt(i);
                 num1 = (float)Math.Round(lp.X) - (float)Math.Round(cp.X);
                 num2 = (float)Math.Round(lp.Y) - (float)Math.Round(cp.Y);
                 num3 = num1 * num1 + num2 * num2;
 
-                length += (float)Math.Sqrt((double)num3);
+                length += (float)Math.Sqrt(num3);
             }
             return length;
         }
