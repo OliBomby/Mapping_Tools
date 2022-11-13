@@ -211,15 +211,8 @@ namespace Mapping_Tools.Viewmodels
             set => Set(ref _duration, value);
         }
 
-        private ICommand _uploadFile;
-        public ICommand UploadFile
-        {
-            get
-            {
-                return _uploadFile ?? (_uploadFile = new CommandHandler(() => SetFile(), () => true));
-            }
-        }
-
+        [JsonIgnore]
+        public CommandImplementation UploadFileCommand { get; }
 
         [System.Runtime.InteropServices.DllImport("gdi32.dll")]
         public static extern bool DeleteObject(IntPtr hObject);
@@ -410,6 +403,8 @@ namespace Mapping_Tools.Viewmodels
             BorderColor = System.Windows.Media.Color.FromArgb(255, 255, 255, 255);
             BMImage = null;
             BM = null;
+
+            UploadFileCommand = new CommandImplementation(_ => SetFile());
         }
     }
     
