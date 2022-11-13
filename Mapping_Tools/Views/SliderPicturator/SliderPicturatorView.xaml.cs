@@ -218,7 +218,7 @@ namespace Mapping_Tools.Views.SliderPicturator {
             DataContext = saveData;
         }
 
-        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "sliderPicturatorproject.json");
+        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "sliderpicturatorproject.json");
 
         public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Slider Picturator Projects");
 
