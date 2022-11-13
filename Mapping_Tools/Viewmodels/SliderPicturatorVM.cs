@@ -17,7 +17,6 @@ using Newtonsoft.Json;
 
 namespace Mapping_Tools.Viewmodels
 {
-
     public class SliderPicturatorVM : BindableBase
     {
         #region Properties
@@ -88,17 +87,27 @@ namespace Mapping_Tools.Viewmodels
         public IEnumerable<Color> AvailableColors {
             get
             {
-                var beatmap = new BeatmapEditor(IOHelper.GetCurrentBeatmapOrCurrentBeatmap()).Beatmap;
-                var comboColors = beatmap.ComboColours;
-                if (comboColors.Count() == 0) {
-                    comboColors = ComboColour.GetDefaultComboColours().ToList();
+                try {
+                    var path = MainWindow.AppWindow.GetCurrentMaps()[0];
+                    var beatmap = new BeatmapEditor(IOHelper.GetCurrentBeatmapOrCurrentBeatmap()).Beatmap;
+                    var comboColors = beatmap.ComboColours;
+
+                    if (comboColors.Count == 0) {
+                        comboColors = ComboColour.GetDefaultComboColours().ToList();
+                    }
+
+                    var availableColors = comboColors.Select(comboColor => Color.FromArgb(comboColor.Color.R, comboColor.Color.G, comboColor.Color.B));
+                    if (beatmap.SpecialColours.ContainsKey("SliderTrackOverride")) {
+                        var tempColor = beatmap.SpecialColours["SliderTrackOverride"].Color;
+                        availableColors = availableColors.Append(Color.FromArgb(tempColor.R, tempColor.G, tempColor.B));
+                    }
+
+                    return availableColors;
                 }
-                var availableColors = comboColors.Select(comboColor => Color.FromArgb(comboColor.Color.R, comboColor.Color.G, comboColor.Color.B));
-                if (beatmap.SpecialColours.ContainsKey("SliderTrackOverride")) {
-                    var tempColor = beatmap.SpecialColours["SliderTrackOverride"].Color;
-                    availableColors.Append(Color.FromArgb(tempColor.R, tempColor.G, tempColor.B));
+                catch (Exception e) {
+                    Console.WriteLine(e);
+                    return Enumerable.Empty<Color>();
                 }
-                return availableColors;
             }
         }
 
@@ -337,7 +346,6 @@ namespace Mapping_Tools.Viewmodels
 
             // Raise property changed for the load indicator in the preview
             IsProcessingPreview = true;
-            var beatmap = new BeatmapEditor(IOHelper.GetCurrentBeatmapOrCurrentBeatmap()).Beatmap;
             Bitmap bm = (Bitmap)BM.Clone();
             Color ctc = Color.FromArgb(CurrentTrackColor.ToArgb());
             Color bc = Color.FromArgb(BorderColor.R, BorderColor.G, BorderColor.B);
@@ -362,7 +370,7 @@ namespace Mapping_Tools.Viewmodels
                     RaisePropertyChanged(nameof(BMImage));
                 });
 
-            }).ContinueWith(task => {
+            }, ct).ContinueWith(task => {
                 // Show the error if one occured while generating preview
                 if (task.IsFaulted) {
                     task.Exception.Show();
