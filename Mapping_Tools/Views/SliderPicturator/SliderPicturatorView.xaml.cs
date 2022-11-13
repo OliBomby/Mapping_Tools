@@ -52,7 +52,7 @@ namespace Mapping_Tools.Views.SliderPicturator {
 
        
         private void Start_Click(object sender, RoutedEventArgs e) {
-            RunTool(new[] {IOHelper.GetCurrentBeatmapOrCurrentBeatmap()});
+            RunTool(MainWindow.AppWindow.GetCurrentMaps());
         }
 
         public void QuickRun() {

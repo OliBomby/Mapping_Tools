@@ -89,7 +89,7 @@ namespace Mapping_Tools.Viewmodels
             {
                 try {
                     var path = MainWindow.AppWindow.GetCurrentMaps()[0];
-                    var beatmap = new BeatmapEditor(IOHelper.GetCurrentBeatmapOrCurrentBeatmap()).Beatmap;
+                    var beatmap = new BeatmapEditor(path).Beatmap;
                     var comboColors = beatmap.ComboColours;
 
                     if (comboColors.Count == 0) {
