@@ -221,7 +221,7 @@
                         ToolTip="Use the image's Alpha channel when determining closest pixel color."/>
                     </StackPanel>
 
-                    <Image Name="ImageViewer" Width="440" Source="{Binding BMImage}"/>
+                    <Image Name="ImageViewer" Width="440" Source="{Binding BMImage}" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
                 </StackPanel>
                 
 
