@@ -191,8 +191,8 @@ namespace Mapping_Tools.Viewmodels
         [JsonIgnore]
         public Visibility ShouldShowPalette => UseMapComboColors ? Visibility.Collapsed : Visibility.Visible;
 
-        private int _timeCode;
-        public int TimeCode
+        private double _timeCode;
+        public double TimeCode
         {
             get => _timeCode;
             set => Set(ref _timeCode, value);

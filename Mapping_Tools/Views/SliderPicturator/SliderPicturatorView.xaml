@@ -12,6 +12,7 @@
              d:DesignHeight="450" Width="759.5" d:DataContext="{d:DesignData SliderPicturatorVm}">
     <local:SingleRunMappingTool.Resources>
         <domain:DoubleToStringConverter x:Key="DoubleToStringConverter"/>
+        <domain:IntToStringConverter x:Key="IntToStringConverter"/>
         <domain:TimeToStringConverter x:Key="TimeToStringConverter"/>
     </local:SingleRunMappingTool.Resources>
     <Grid Name="MasterGrid">
@@ -67,9 +68,9 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBox Grid.Column="0" Width="75" Text="{Binding TimeCode}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Time"
+                                <TextBox Grid.Column="0" Width="75" Text="{Binding TimeCode, Converter={StaticResource TimeToStringConverter}}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Time"
                                 ToolTip="Input the number of ms into the map that the slider should appear."/>
-                                <TextBox Grid.Column="1" Width="75" Text="{Binding Duration}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Duration"
+                                <TextBox Grid.Column="1" Width="75" Text="{Binding Duration, Converter={StaticResource DoubleToStringConverter}}" Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Duration"
                                 ToolTip="Input the number of ms for which the slider should appear."/>
                                 <TextBox Grid.Column="2" Width="75" materialDesign:HintAssist.Hint="Y Resolution" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                                  ToolTip="The height of the resolution of your osu! window.">
