@@ -10,9 +10,9 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
     public static class SliderPicturator
     {
 
-        private const double LIGHTEN_AMOUNT = 0.5;
+        private const double LIGHTEN_AMOUNT = 0.25;
         private const double DARKEN_AMOUNT = 0.1;
-        private const byte ALPHA = 100;
+        private const byte ALPHA = 180;
         public static int SNAPTOL => (int)Math.Pow(2, 5) * 3;
         private static Color getOpaqueColor(Color top, Color bottom)
         {
