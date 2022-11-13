@@ -31,7 +31,7 @@
                                 <materialDesign:PackIcon Kind="HelpCircle" Width="24" Height="24" Foreground="{DynamicResource SecondaryHueMidBrush}"/>
                             </materialDesign:PopupBox.ToggleContent>
                             <TextBlock TextWrapping="Wrap" MaxWidth="600" Padding="5">
-                    Change the length and duration of marked sliders and this tool will automatically handle the SliderVelocity for you.
+                                Import an image and this program will distort a slider into it! To get started click the Browse button to select an image, then play with the colors and options until it looks right. Click the run button to export the slider picture at the specified time and position.
                             </TextBlock>
                         </materialDesign:PopupBox>
                         <materialDesign:PopupBox Margin="0,10,10,10" VerticalAlignment="Bottom" ToolTip="Click me!">
@@ -47,7 +47,7 @@
                         <Label Margin="10,0,0,0" Height="23" Content="Current File:" Name="Label1" FontFamily="Segoe UI" FontSize="12 px" Foreground="White">
                         </Label>
                         <Label Margin="5,0,0,0" Height="25" Name="FileNameLabel" Width="300" FontFamily="Segoe UI" FontSize="12 px" Foreground="White" Content="{Binding PictureFile}"/>
-                        <Button Margin="5,0,0,0" Width="100" Height="32" Content="Browse" Name="BrowseButton" Command="{Binding Path=UploadFile}">
+                        <Button Margin="5,0,0,0" Width="100" Height="32" Content="Browse" Name="BrowseButton" Command="{Binding Path=UploadFileCommand}">
                         </Button>
                     </StackPanel>
                 </StackPanel>

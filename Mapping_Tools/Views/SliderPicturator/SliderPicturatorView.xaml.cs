@@ -31,7 +31,7 @@ namespace Mapping_Tools.Views.SliderPicturator {
 
         public static readonly string ToolName = "Slider Picturator";
 
-        public static readonly string ToolDescription = $@"Import an image and this program will distort a slider into it!";
+        public static readonly string ToolDescription = $@"Import an image and this program will distort a slider into it! To get started click the Browse button to select an image, then play with the colors and options until it looks right. Click the run button to export the slider picture at the specified time and position.";
 
         /// <inheritdoc />
         public SliderPicturatorView()
