@@ -156,10 +156,8 @@ namespace Mapping_Tools.Viewmodels
             }
         }
 
-        public String PickedComboColor
-        {
-            get => ColorTranslator.ToHtml(ComboColor);
-        }
+        [JsonIgnore]
+        public string PickedComboColor => ColorTranslator.ToHtml(ComboColor);
 
         private System.Windows.Media.Color _trackColorPickerColor;
 
@@ -187,15 +185,11 @@ namespace Mapping_Tools.Viewmodels
             }
         }
 
-        public Visibility ShouldShowCCPicker
-        {
-            get => UseMapComboColors ? Visibility.Visible : Visibility.Collapsed;
-        }
+        [JsonIgnore]
+        public Visibility ShouldShowCCPicker => UseMapComboColors ? Visibility.Visible : Visibility.Collapsed;
 
-        public Visibility ShouldShowPalette
-        {
-            get => UseMapComboColors ? Visibility.Collapsed : Visibility.Visible;
-        }
+        [JsonIgnore]
+        public Visibility ShouldShowPalette => UseMapComboColors ? Visibility.Collapsed : Visibility.Visible;
 
         private int _timeCode;
         public int TimeCode
@@ -218,6 +212,7 @@ namespace Mapping_Tools.Viewmodels
         public static extern bool DeleteObject(IntPtr hObject);
 
         private Bitmap _bm;
+        [JsonIgnore]
         public Bitmap BM
         {
             get => _bm;
@@ -225,7 +220,7 @@ namespace Mapping_Tools.Viewmodels
         }
 
         private InteropBitmap _bmImage;
-
+        [JsonIgnore]
         public InteropBitmap BMImage
         {
             get => _bmImage;
