@@ -244,17 +244,6 @@ namespace Mapping_Tools.Viewmodels
             }
         }
 
-        private void SetFile()
-        {
-            OpenFileDialog fileDialog = new OpenFileDialog();
-            fileDialog.DefaultExt = ".png"; // Required file extension 
-            fileDialog.Filter = @"All Image Files|*.BMP;*.bmp;*.JPG;*.JPEG*.jpg;*.jpeg;*.PNG;*.png;*.GIF;*.gif;*.tif;*.tiff;*.ico;*.ICO|PNG|*.PNG;*.png|JPEG|*.JPG;*.JPEG*.jpg;*.jpeg|Bitmap(.BMP,.bmp)|*.BMP;*.bmp|GIF|*.GIF;*.gif|TIF|*.tif;*.tiff|ICO|*.ico;*.ICO";// Optional file extensions
-
-            if (fileDialog.ShowDialog() == DialogResult.OK) {
-                PictureFile = fileDialog.FileName;
-            }
-        }
-
         private bool _blackOn;
         public bool BlackOn
         {
@@ -405,6 +394,17 @@ namespace Mapping_Tools.Viewmodels
             BM = null;
 
             UploadFileCommand = new CommandImplementation(_ => SetFile());
+        }
+
+        private void SetFile()
+        {
+            OpenFileDialog fileDialog = new OpenFileDialog();
+            fileDialog.DefaultExt = ".png"; // Required file extension
+            fileDialog.Filter = @"All Image Files|*.BMP;*.bmp;*.JPG;*.JPEG*.jpg;*.jpeg;*.PNG;*.png;*.GIF;*.gif;*.tif;*.tiff;*.ico;*.ICO|PNG|*.PNG;*.png|JPEG|*.JPG;*.JPEG*.jpg;*.jpeg|Bitmap(.BMP,.bmp)|*.BMP;*.bmp|GIF|*.GIF;*.gif|TIF|*.tif;*.tiff|ICO|*.ico;*.ICO";// Optional file extensions
+
+            if (fileDialog.ShowDialog() == DialogResult.OK) {
+                PictureFile = fileDialog.FileName;
+            }
         }
     }
     
