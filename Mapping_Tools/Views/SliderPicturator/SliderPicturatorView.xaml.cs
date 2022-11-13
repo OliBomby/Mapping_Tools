@@ -26,7 +26,7 @@ namespace Mapping_Tools.Views.SliderPicturator {
     [SmartQuickRunUsage(SmartQuickRunTargets.AnySelection)]
     [VerticalContentScroll]
     [HorizontalContentScroll]
-    public partial class SliderPicturatorView : IQuickRun, ISavable<SliderPicturatorVM> {
+    public partial class SliderPicturatorView : IQuickRun, ISavable<SliderPicturatorVm> {
         public event EventHandler RunFinished;
 
         public static readonly string ToolName = "Slider Picturator";
@@ -39,11 +39,11 @@ namespace Mapping_Tools.Views.SliderPicturator {
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
-            DataContext = new SliderPicturatorVM();
+            DataContext = new SliderPicturatorVm();
             ProjectManager.LoadProject(this, message: false);
         }
 
-        public SliderPicturatorVM ViewModel => (SliderPicturatorVM) DataContext;
+        public SliderPicturatorVm ViewModel => (SliderPicturatorVm) DataContext;
 
         protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
@@ -74,9 +74,7 @@ namespace Mapping_Tools.Views.SliderPicturator {
             CanRun = false;
         }
 
-        private string Picturate(SliderPicturatorVM arg, BackgroundWorker worker, DoWorkEventArgs _) {
-            int slidersCompleted = 0;
-
+        private string Picturate(SliderPicturatorVm arg, BackgroundWorker worker, DoWorkEventArgs _) {
             var reader = EditorReaderStuff.GetFullEditorReaderOrNot(out var editorReaderException1);
 
             if (arg.PictureFile == null) {
@@ -214,11 +212,11 @@ namespace Mapping_Tools.Views.SliderPicturator {
             RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, reader != null, arg.Quick));
             return arg.Quick ? "" : "Done!";
         }
-        public SliderPicturatorVM GetSaveData() {
+        public SliderPicturatorVm GetSaveData() {
             return ViewModel;
         }
 
-        public void SetSaveData(SliderPicturatorVM saveData) {
+        public void SetSaveData(SliderPicturatorVm saveData) {
             DataContext = saveData;
         }
 

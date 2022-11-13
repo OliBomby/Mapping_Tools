@@ -17,7 +17,7 @@ using Newtonsoft.Json;
 
 namespace Mapping_Tools.Viewmodels
 {
-    public class SliderPicturatorVM : BindableBase
+    public class SliderPicturatorVm : BindableBase
     {
         #region Properties
 
@@ -380,7 +380,7 @@ namespace Mapping_Tools.Viewmodels
             RaisePropertyChanged(nameof(AvailableColors));
         }
 
-        public SliderPicturatorVM()
+        public SliderPicturatorVm()
         {
             MainWindow.AppWindow.OnUpdateCurrentBeatmap += HandleCurrentBeatmapUpdate;
             ViewportSize = 16384;

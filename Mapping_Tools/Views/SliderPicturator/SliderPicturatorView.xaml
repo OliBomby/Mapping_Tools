@@ -9,7 +9,7 @@
                             mc:Ignorable="d"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              x:Name="This"
-             d:DesignHeight="450" Width="759.5" d:DataContext="{d:DesignData SliderPicturerVM}">
+             d:DesignHeight="450" Width="759.5" d:DataContext="{d:DesignData SliderPicturatorVm}">
     <local:SingleRunMappingTool.Resources>
         <domain:DoubleToStringConverter x:Key="DoubleToStringConverter"/>
         <domain:TimeToStringConverter x:Key="TimeToStringConverter"/>
