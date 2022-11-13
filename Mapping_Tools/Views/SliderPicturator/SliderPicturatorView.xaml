@@ -176,24 +176,35 @@
                                     </TextBox.Text>
                                 </TextBox>
                             </Grid>
-                            
-                            <CheckBox x:Name="UseMapComboColors" Margin="0,20,0,0" Content="Use Map Combo Colors"
-                                IsChecked="{Binding UseMapComboColors}"
-                                ToolTip="Pick slider track base color using the map's custom combo colors, or the override if defined in the map's .osu file."/>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <TextBlock Text="Track Color:" VerticalAlignment="Center" Visibility="{Binding ShouldShowPalette}"/>
-                                <ComboBox x:Name="SelectionComboColorBox" Cursor="Hand" Width="100" Margin="10,0,25,0"
-                                Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Track Color"
-                                ItemsSource="{Binding AvailableColors}" SelectedItem="{Binding ComboColor}" Visibility="{Binding ShouldShowCCPicker}"
-                                ToolTip="Pick the combo color to be used in the picture.">
-                                </ComboBox>
-                                <Rectangle Width="30" Height="30" Margin="0,0,50,0" Visibility="{Binding ShouldShowCCPicker}" Fill="{Binding PickedComboColor}" />
-                                <xctk:ColorPicker Name="ClrPcker_Track" SelectedColor="{Binding TrackColorPickerColor}"  Visibility="{Binding ShouldShowPalette}" Margin="10,0,0,0"></xctk:ColorPicker>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <TextBlock Text="Border Color:" VerticalAlignment="Center"/>
-                                <xctk:ColorPicker Name="ClrPcker_Border" SelectedColor="{Binding BorderColor}" Margin="10,0,0,0"></xctk:ColorPicker>
-                            </StackPanel>
+
+                            <Grid Margin="0,20,0,0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="40"/>
+                                    <RowDefinition Height="40"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="85"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <CheckBox Grid.Row="0" Grid.ColumnSpan="2" x:Name="UseMapComboColors" Content="Use Map Combo Colors"
+                                          IsChecked="{Binding UseMapComboColors}"
+                                          ToolTip="Pick slider track base color using the map's custom combo colors, or the override if defined in the map's .osu file."/>
+
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Track Color:" VerticalAlignment="Center"/>
+                                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <ComboBox x:Name="SelectionComboColorBox" Cursor="Hand" Width="106" Margin="10,0,25,0"
+                                              Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Track Color"
+                                              ItemsSource="{Binding AvailableColors}" SelectedItem="{Binding ComboColor}" Visibility="{Binding ShouldShowCCPicker}"
+                                              ToolTip="Pick the combo color to be used in the picture.">
+                                    </ComboBox>
+                                    <Rectangle Width="30" Height="30" Visibility="{Binding ShouldShowCCPicker}" Fill="{Binding PickedComboColor}" />
+                                </StackPanel>
+                                <xctk:ColorPicker Grid.Row="1" Grid.Column="1" Name="ClrPcker_Track" SelectedColor="{Binding TrackColorPickerColor}" Visibility="{Binding ShouldShowPalette}" Margin="10,3,0,3"></xctk:ColorPicker>
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Border Color:" VerticalAlignment="Center"/>
+                                <xctk:ColorPicker Grid.Row="2" Grid.Column="1" Name="ClrPcker_Border" SelectedColor="{Binding BorderColor}" Margin="10,3,0,3"></xctk:ColorPicker>
+                            </Grid>
                         </StackPanel>
 
                         <CheckBox x:Name="BlackOnBox" Margin="0,20,0,0" Content="Use transparent black"
