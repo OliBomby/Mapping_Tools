@@ -94,6 +94,7 @@ namespace Mapping_Tools.Views.SliderPicturator {
             bool B = arg.BlueOn;
             bool borderOff = !arg.BorderOn;
             bool blackOff = !arg.BlackOn;
+            bool opaqueOff = !arg.AlphaOn;
             double startTime = arg.TimeCode;
             double startPosX = arg.SliderStartX;
             double startPosY = arg.SliderStartY;
@@ -132,7 +133,7 @@ namespace Mapping_Tools.Views.SliderPicturator {
             //    worker.ReportProgress((int)Math.Round(100 * (time / TIME_SPACING) / files.Length));
             //}
 
-            List<Vector2> sliderPath = Classes.Tools.SlideratorStuff.SliderPicturator.Picturate(img, sliderColor, borderColor, backgroundColor, circleSize, startPos, startPosPic, resY, GPU, blackOff, borderOff, R, G, B);
+            List<Vector2> sliderPath = Classes.Tools.SlideratorStuff.SliderPicturator.Picturate(img, sliderColor, borderColor, backgroundColor, circleSize, startPos, startPosPic, resY, GPU, blackOff, borderOff, opaqueOff, R, G, B);
 
             // Find nearest hitobject before startTime and get its combo color index
             int currentColorIdx = 0;

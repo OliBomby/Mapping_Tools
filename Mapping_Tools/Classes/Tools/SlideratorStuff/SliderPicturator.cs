@@ -52,6 +52,9 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
             for (int i = 0; i < img.Width; i++) {
                 for (int j = 0; j < img.Height; j++) {
                     pixel = img.GetPixel(i, j);
+                    if (!OPAQUE_OFF) {
+                        pixel = getOpaqueColor(pixel, backgroundColor);
+                    }
                     colorVec = new Vector3(R ? pixel.R : 0, G ? pixel.G : 0, B ? pixel.B : 0);
                     proj = Vector3.Dot(colorVec - opaqueOCVec, projVec) / Vector3.Dot(projVec, projVec) * projVec + opaqueOCVec;
                     if (proj.X < opaqueOCVec.X) {
@@ -125,6 +128,9 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
             for (int i = 0; i < pixDist.GetLength(0); i++) {
                 for (int j = 0; j < pixDist.GetLength(1); j++) {
                     pixel = img.GetPixel(i, j);
+                    if (!OPAQUE_OFF) {
+                        pixel = getOpaqueColor(pixel, backgroundColor);
+                    }
                     colorVec = new Vector3(R ? pixel.R : 0, G ? pixel.G : 0, B ? pixel.B : 0);
                     proj = Vector3.Dot(colorVec - opaqueOCVec, projVec) / Vector3.Dot(projVec, projVec) * projVec + opaqueOCVec;
                     if (proj.X < opaqueOCVec.X) {
@@ -143,7 +149,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
                     if (BORDER_OFF || gradientDist < borderDist) {
                         // Test if black would be better
                         if (!BLACK_OFF && blackDist < gradientDist) {
-                            pixDist[i, j] = 1;
+                            pixDist[i, j] = 1.2;
                         }
                         else {
                             pixDist[i, j] = Math.Round(101 * Math.Clamp(1 - (closestGradientVec - opaqueOCVec).Length / projVecLen, 0, 1)) / 128;
@@ -152,7 +158,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
                     else {
                         // Test if black would be better
                         if (!BLACK_OFF && blackDist < borderDist) {
-                            pixDist[i, j] = 1;
+                            pixDist[i, j] = 1.2;
                         }
                         else {
                             pixDist[i, j] = 111.0 / 128;
@@ -161,8 +167,10 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
 
                 }
             }
-
-            Vector2 topLeftOsuPxImage = new Vector2(-64, -72); // (16+20n, 8+20m) for matching editor to gameplay. Further than cs0 slider placed at (0,0)'s bounding box so we should be set.
+            // (16+20n, 8+20m) for matching editor to gameplay. Require 8+20m>=-56 for the bounding box to not be cropped down to be entirely inside the playfield during gameplay (which changes how the distortion is applied).
+            // 16+20n >= x is  required for some x depending on resolution. It's probably the case that x <= -104 for all resolutions. If resY is not a multiple of 60, the distortion will look different in gameplay and in editor.
+            // Currently there are no plans to support resolutions whose heights are not multiples of 60.
+            Vector2 topLeftOsuPxImage = new Vector2(-104, -52); 
             Vector2 startSliderCoordinate = startPos;
             // For now we will ignore the fact that this may interfere with the sample points
             Vector2 topLeftOsuPxSlider = new Vector2(Math.Ceiling(objectRadius * 1.15)) + topLeftOsuPxImage;
@@ -171,12 +179,12 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
             // the game window is 480 osupx tall and resY-16 screenpx tall, so the ratio is (resY-16)/480 screenpx per osupx.
             startPosPic -= topLeftOsuPxImage;
             startPosPic *= (resY - 16) / 480;
-            startPosPic.Round();
+            startPosPic.Round(); 
             Vector2 imageStartOsuPx = topLeftOsuPxImage + OSUPX_BETWEEN_ROWS * startPosPic;
             int columnStartCoordinate, columnEndCoordinate, columnStartOffset, relativeStartX, relativeStartY, absoluteStartX, absoluteStartY;
             int leftToRight = -1;
             double segmentSlope;
-            // In the below loop, gradientDist means something completely different from what it means in the above loop. Here, it is being used to mean the distance in the gradient between two or more points that are evenly distributed along the slider body
+            
             List<Vector2> sliderPath = new List<Vector2>();
             sliderPath.Add(startSliderCoordinate);
             sliderPath.Add(new Vector2(startSliderCoordinate.X, topLeftOsuPxSlider.Y));
@@ -193,6 +201,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
             columnStartOffset = 0;
             absoluteStartY = 0;
             gradientDist = 0;
+            // In the below loop, gradientDist means something completely different from what it means in the above loop. Here, it is being used to mean the distance in the gradient between two or more points that are evenly distributed along the slider body
             for (int i = 0; i < img.Height; i++) {
                 leftToRight = -leftToRight;
                 columnStartCoordinate = (leftToRight == 1) ? 0 : (img.Width - 1);
