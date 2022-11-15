@@ -363,7 +363,7 @@ namespace Mapping_Tools.Viewmodels
         public SliderPicturatorVm()
         {
             MainWindow.AppWindow.OnUpdateCurrentBeatmap += HandleCurrentBeatmapUpdate;
-            ViewportSize = 16384;
+            ViewportSize = 32768;
             TimeCode = 0;
             Duration = 1;
             YResolution = 1080;
