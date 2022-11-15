@@ -199,6 +199,13 @@ namespace Mapping_Tools.Views.SliderPicturator {
 
             TimingPointsChange.ApplyChanges(timing, timingPointsChanges);
 
+            // Set the beatmap slider colors
+            if (arg.SetBeatmapColors) {
+                if (!arg.UseMapComboColors)
+                    beatmap.SpecialColours["SliderTrackOverride"] = new ComboColour(sliderColor.R, sliderColor.G, sliderColor.B);
+                beatmap.SpecialColours["SliderBorder"] = new ComboColour(borderColor.R, borderColor.G, borderColor.B);
+            }
+
             editor.SaveFile();
 
             // Complete progressbar

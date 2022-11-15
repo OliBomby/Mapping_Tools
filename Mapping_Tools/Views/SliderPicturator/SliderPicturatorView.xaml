@@ -230,6 +230,10 @@
                         <CheckBox x:Name="AlphaOnBox" Content="Use image A"
                         IsChecked="{Binding AlphaOn}"
                         ToolTip="Use the image's Alpha channel when determining closest pixel color."/>
+
+                        <CheckBox Content="Set beatmap colors"
+                                  IsChecked="{Binding SetBeatmapColors}"
+                                  ToolTip="Whether to set the beatmap's slider track and border color to the specified colors."/>
                     </StackPanel>
 
                     <Image Name="ImageViewer" Width="440" Source="{Binding BMImage}" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
