@@ -57,7 +57,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
             double frameDist = OsuStableDistance(curMsPath) - 2 * SNAPTOL / 3;
 
             double MpB = 100 * globalSV / frameDist;
-            MpB = Double.Parse(MpB.ToString());
+            MpB = double.Parse(MpB.ToString());
 
             frameDist = 100 * globalSV / MpB;
 
@@ -91,9 +91,6 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
 
                 // Update ctrlPtIdx
                 ctrlPtIdx += curMsPath.Count - 1;
-
-                double wtf = OsuStableDistance(controlPoints.Take(ctrlPtIdx)) % frameDist;
-
             }
             Vector2[] newControlPoints = new Vector2[ctrlPtIdx+2];
             Array.Copy(controlPoints, newControlPoints, ctrlPtIdx);
@@ -106,19 +103,19 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
             return (newControlPoints, frameDist);
         }
 
-        private static double OsuStableDistance(IEnumerable<Vector2> controlPoints)
+        private static double OsuStableDistance(List<Vector2> controlPoints)
         {
             double length = 0;
             Vector2 cp, lp;
-            float num1, num2, num3, cpX, cpY, lpX, lpY;
-            for (int i = 1; i < controlPoints.Count(); i++) {
+            float num1, num2, num3;
+            for (int i = 1; i < controlPoints.Count; i++) {
                 lp = controlPoints.ElementAt(i - 1);
                 cp = controlPoints.ElementAt(i);
                 num1 = (float)Math.Round(lp.X)- (float)Math.Round(cp.X);
                 num2 = (float)Math.Round(lp.Y) - (float)Math.Round(cp.Y);
                 num3 = num1 * num1 + num2 * num2;
 
-                length += (float)Math.Sqrt((double)num3);
+                length += (float)Math.Sqrt(num3);
             }
             return length;
         }

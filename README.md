@@ -27,6 +27,8 @@ Collection of tools for manipulating osu! beatmaps
 - Combo Colour Studio by [OliBomby](https://github.com/OliBomby)
 - Sliderator by [OliBomby](https://github.com/OliBomby) | [Karoo](https://github.com/Karoo13)
 - Pattern Gallery by [OliBomby](https://github.com/OliBomby)
+- Mapset Merger by [OliBomby](https://github.com/OliBomby)
+- Tumour Generator 2 by [OliBomby](https://github.com/OliBomby)
 
 ## Future implementations
 See the [Trello board](https://trello.com/b/iTmmw3eP/mapping-tools).
