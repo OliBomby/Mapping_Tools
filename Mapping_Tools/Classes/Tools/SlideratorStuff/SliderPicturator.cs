@@ -1,7 +1,5 @@
-﻿using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.MathUtil;
+﻿using Mapping_Tools.Classes.MathUtil;
 using System;
-using System.Linq;
 using System.Drawing;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
@@ -10,10 +8,10 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
 {
     public static class SliderPicturator
     {
-
         private const double LIGHTEN_AMOUNT = 0.25;
         private const double DARKEN_AMOUNT = 0.1;
         private const byte ALPHA = 180;
+
         private static Color getOpaqueColor(Color top, Color bottom)
         {
             double GAMMA = 1;
@@ -25,6 +23,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
                 (byte)Math.Round(Math.Pow((Math.Pow(bottom.G, GAMMA) * bottomOpacity * (1 - topOpacity) + Math.Pow(top.G, GAMMA) * topOpacity) / totOpacity, 1 / GAMMA)),
                 (byte)Math.Round(Math.Pow((Math.Pow(bottom.B, GAMMA) * bottomOpacity * (1 - topOpacity) + Math.Pow(top.B, GAMMA) * topOpacity) / totOpacity, 1 / GAMMA)));
         }
+
         public static Bitmap Recolor(Bitmap img, Color sliderColor, Color sliderBorder, Color backgroundColor, bool BLACK_OFF = false, bool BORDER_OFF = false, bool OPAQUE_OFF = false, bool R = true, bool G = true, bool B = true)
         {
             Color innerColor = Color.FromArgb(ALPHA,
@@ -290,11 +289,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
                 sliderPath.Add(new Vector2(absoluteStartX + (columnStartOffset + 0.5) * OSUPX_BETWEEN_ROWS, absoluteStartY + gradientDist * columnStartOffset + OSUPX_BETWEEN_ROWS));
             }
 
-
-
             return sliderPath;
         }
     }
-
-
 }
