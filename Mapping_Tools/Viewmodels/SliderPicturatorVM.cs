@@ -33,7 +33,7 @@ namespace Mapping_Tools.Viewmodels
         }
 
         [JsonIgnore]
-        public string[] Paths { get; set; }
+        public string Path { get; set; }
 
         [JsonIgnore]
         public bool Quick { get; set; }
