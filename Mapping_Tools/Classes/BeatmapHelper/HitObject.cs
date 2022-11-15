@@ -141,6 +141,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public double SampleVolume { get; set; }
         public string Filename { get; set; }
 
+        /// <summary>
+        /// All path types and their index in the curve points array.
+        /// Used for preserving multiple path types in osu! lazer file format.
+        /// </summary>
+        public List<(PathType, int)> AdditionalSliderTypes { get; set; }
         public PathType SliderType { get; set; }
         public List<Vector2> CurvePoints { get; set; }
 
@@ -253,16 +258,18 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 var sliderData = values[5].Split('|');
 
                 SliderType = GetPathType(sliderData);
+                AdditionalSliderTypes = GetAdditionalPathTypes(sliderData);
 
                 var points = new List<Vector2>();
-                for (var i = 1; i < sliderData.Length; i++) {
-                    var spl = sliderData[i].Split(':');
-                    if (spl.Length == 2) // It has to have 2 coordinates inside
-                    {
-                        if (TryParseDouble(spl[0], out var ax) && TryParseDouble(spl[1], out var ay))
-                            points.Add(new Vector2(ax, ay));
-                        else throw new BeatmapParsingException("Failed to parse coordinate of slider anchor.", line);
-                    }
+                foreach (var value in sliderData) {
+                    var spl = value.Split(':');
+
+                    // It has to have 2 coordinates inside
+                    if (spl.Length != 2) continue;
+
+                    if (TryParseDouble(spl[0], out var ax) && TryParseDouble(spl[1], out var ay))
+                        points.Add(new Vector2(ax, ay));
+                    else throw new BeatmapParsingException("Failed to parse coordinate of slider anchor.", line);
                 }
 
                 CurvePoints = points;
@@ -350,8 +357,42 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
             if (IsSlider) {
                 var builder = new StringBuilder();
-                builder.Append(GetPathTypeString());
-                foreach (var p in CurvePoints) builder.Append($"|{(SaveWithFloatPrecision ? p.X.ToInvariant() : p.X.ToRoundInvariant())}:{(SaveWithFloatPrecision ? p.Y.ToInvariant() : p.Y.ToRoundInvariant())}");
+                if (AdditionalSliderTypes is not null && AdditionalSliderTypes.Count > 1) {
+                    int i = 0;
+                    int i2 = 0;
+                    bool first = true;
+                    foreach (var p in CurvePoints) {
+                        while (i2 < AdditionalSliderTypes.Count && AdditionalSliderTypes[i2].Item2 <= i) {
+                            if (!first)
+                                builder.Append('|');
+
+                            builder.Append(GetPathTypeString(AdditionalSliderTypes[i2].Item1));
+                            i++;
+                            i2++;
+                            first = false;
+                        }
+
+                        if (!first)
+                            builder.Append('|');
+
+                        builder.Append($"{(SaveWithFloatPrecision ? p.X.ToInvariant() : p.X.ToRoundInvariant())}:{(SaveWithFloatPrecision ? p.Y.ToInvariant() : p.Y.ToRoundInvariant())}");
+                        i++;
+                        first = false;
+                    }
+                    while (i2 < AdditionalSliderTypes.Count && AdditionalSliderTypes[i2].Item2 <= i) {
+                        if (!first)
+                            builder.Append('|');
+
+                        builder.Append(GetPathTypeString(AdditionalSliderTypes[i2].Item1));
+                        i++;
+                        i2++;
+                        first = false;
+                    }
+                } else {
+                    builder.Append(GetPathTypeString(SliderType));
+                    foreach (var p in CurvePoints)
+                        builder.Append($"|{(SaveWithFloatPrecision ? p.X.ToInvariant() : p.X.ToRoundInvariant())}:{(SaveWithFloatPrecision ? p.Y.ToInvariant() : p.Y.ToRoundInvariant())}");
+                }
                 values.Add(builder.ToString());
                 values.Add(Repeat.ToInvariant());
                 values.Add(PixelLength.ToInvariant());
@@ -596,7 +637,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public void Transform(Matrix2 mat) {
             Pos = Matrix2.Mult(mat, Pos);
             if (!IsSlider) return;
-            for (var i = 0; i < CurvePoints.Count; i++) CurvePoints[i] = Matrix2.Mult(mat, CurvePoints[i]);;
+            for (var i = 0; i < CurvePoints.Count; i++) CurvePoints[i] = Matrix2.Mult(mat, CurvePoints[i]);
         }
 
         public bool ResnapSelf(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint tp = null,
@@ -819,8 +860,34 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return PathType.Catmull;
         }
 
-        private string GetPathTypeString() {
-            switch (SliderType) {
+        private List<(PathType, int)> GetAdditionalPathTypes(string[] sliderData) {
+            var allPathTypes = new List<(PathType, int)>();
+
+            for (var i = 0; i < sliderData.Length; i++) {
+                if (sliderData[i].Length == 0 || !char.IsLetter(sliderData[i][0])) continue;
+
+                var letter = sliderData[i][0];
+                switch (letter) {
+                    case 'L':
+                        allPathTypes.Add((PathType.Linear, i));
+                        break;
+                    case 'B':
+                        allPathTypes.Add((PathType.Bezier, i));
+                        break;
+                    case 'P':
+                        allPathTypes.Add((PathType.PerfectCurve, i));
+                        break;
+                    case 'C':
+                        allPathTypes.Add((PathType.Catmull, i));
+                        break;
+                }
+            }
+
+            return allPathTypes;
+        }
+
+        private string GetPathTypeString(PathType pathType) {
+            switch (pathType) {
                 case PathType.Linear:
                     return "L";
                 case PathType.PerfectCurve:
