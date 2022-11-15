@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using System.Drawing;
 using System.Collections.Generic;
+using System.Drawing.Imaging;
 
 namespace Mapping_Tools.Classes.Tools.SlideratorStuff
 {
@@ -48,47 +49,56 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
             Vector3 colorVec, proj, closestGradientVec, usedColor;
             double gradientDist, borderDist, blackDist;
             Bitmap ret = (Bitmap)img.Clone();
-            for (int i = 0; i < img.Width; i++) {
-                for (int j = 0; j < img.Height; j++) {
-                    pixel = img.GetPixel(i, j);
-                    if (!OPAQUE_OFF) {
-                        pixel = getOpaqueColor(pixel, backgroundColor);
-                    }
-                    colorVec = new Vector3(R ? pixel.R : 0, G ? pixel.G : 0, B ? pixel.B : 0);
-                    proj = Vector3.Dot(colorVec - opaqueOCVec, projVec) / Vector3.Dot(projVec, projVec) * projVec + opaqueOCVec;
-                    if (proj.X < opaqueOCVec.X) {
-                        closestGradientVec = opaqueOCVec;
-                    }
-                    else if (proj.X > opaqueICVec.X) {
-                        closestGradientVec = opaqueICVec;
-                    }
-                    else {
-                        closestGradientVec = proj;
-                    }
-                    gradientDist = (colorVec - closestGradientVec).LengthSquared;
-                    borderDist = (colorVec - sBColVec).LengthSquared;
-                    blackDist = colorVec.LengthSquared;
-                    // Test if border color would be better
-                    if (BORDER_OFF || gradientDist < borderDist) {
-                        // Test if black would be better
-                        if (!BLACK_OFF && blackDist < gradientDist) {
-                            ret.SetPixel(i, j, Color.Black);
+
+            unsafe {
+                int imgWidth = img.Width;
+                int imgHeight = img.Height;
+                BitmapData imgData = img.LockBits(new Rectangle(0, 0, imgWidth, imgHeight), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+                BitmapData retData = ret.LockBits(new Rectangle(0, 0, imgWidth, imgHeight), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+                for (int i = 0; i < imgWidth; i++) {
+                    for (int j = 0; j < imgHeight; j++) {
+                        pixel = Color.FromArgb(((int*)imgData.Scan0)[j * imgWidth + i]);
+                        if (!OPAQUE_OFF) {
+                            pixel = getOpaqueColor(pixel, backgroundColor);
+                        }
+                        colorVec = new Vector3(R ? pixel.R : 0, G ? pixel.G : 0, B ? pixel.B : 0);
+                        proj = Vector3.Dot(colorVec - opaqueOCVec, projVec) / Vector3.Dot(projVec, projVec) * projVec + opaqueOCVec;
+                        if (proj.X < opaqueOCVec.X) {
+                            closestGradientVec = opaqueOCVec;
+                        }
+                        else if (proj.X > opaqueICVec.X) {
+                            closestGradientVec = opaqueICVec;
                         }
                         else {
-                            usedColor = Math.Round(101 * Math.Clamp(1 - (closestGradientVec - opaqueOCVec).Length / projVecLen, 0, 1)) / 128 * projVec + opaqueOCVec;
-                            ret.SetPixel(i, j, Color.FromArgb((int)Math.Round(usedColor[0]), (int)Math.Round(usedColor[1]), (int)Math.Round(usedColor[2])));
+                            closestGradientVec = proj;
                         }
-                    }
-                    else {
-                        // Test if black would be better
-                        if (!BLACK_OFF && blackDist < borderDist) {
-                            ret.SetPixel(i, j, Color.Black);
+                        gradientDist = (colorVec - closestGradientVec).LengthSquared;
+                        borderDist = (colorVec - sBColVec).LengthSquared;
+                        blackDist = colorVec.LengthSquared;
+                        // Test if border color would be better
+                        if (BORDER_OFF || gradientDist < borderDist) {
+                            // Test if black would be better
+                            if (!BLACK_OFF && blackDist < gradientDist) {
+                                ((uint*)retData.Scan0)[j * imgWidth + i] = 0xFF000000;
+                            }
+                            else {
+                                usedColor = Math.Round(101 * Math.Clamp(1 - (closestGradientVec - opaqueOCVec).Length / projVecLen, 0, 1)) / 128 * projVec + opaqueOCVec;
+                                ((int*)retData.Scan0)[j * imgWidth + i] = Color.FromArgb((int)Math.Round(usedColor[0]), (int)Math.Round(usedColor[1]), (int)Math.Round(usedColor[2])).ToArgb();
+                            }
                         }
                         else {
-                            ret.SetPixel(i, j, sliderBorder);
+                            // Test if black would be better
+                            if (!BLACK_OFF && blackDist < borderDist) {
+                                ((uint*)retData.Scan0)[j * imgWidth + i] = 0xFF000000;
+                            }
+                            else {
+                                ((int*)retData.Scan0)[j * imgWidth + i] = sliderBorder.ToArgb();
+                            }
                         }
                     }
                 }
+                img.UnlockBits(imgData);
+                ret.UnlockBits(retData);
             }
             return ret;
         }
@@ -120,51 +130,57 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
             Vector3 opaqueICVec = new Vector3(opaqueIC.R, opaqueIC.G, opaqueIC.B);
             Vector3 sBColVec = new Vector3(sliderBorder.R, sliderBorder.G, sliderBorder.B);
 
-            double[,] pixDist = new double[img.Width, img.Height];
+            int imgWidth = img.Width;
+            int imgHeight = img.Height;
+            double[,] pixDist = new double[imgWidth, imgHeight];
             Color pixel;
             Vector3 colorVec, proj, closestGradientVec;
             double gradientDist, borderDist, blackDist;
-            for (int i = 0; i < pixDist.GetLength(0); i++) {
-                for (int j = 0; j < pixDist.GetLength(1); j++) {
-                    pixel = img.GetPixel(i, j);
-                    if (!OPAQUE_OFF) {
-                        pixel = getOpaqueColor(pixel, backgroundColor);
-                    }
-                    colorVec = new Vector3(R ? pixel.R : 0, G ? pixel.G : 0, B ? pixel.B : 0);
-                    proj = Vector3.Dot(colorVec - opaqueOCVec, projVec) / Vector3.Dot(projVec, projVec) * projVec + opaqueOCVec;
-                    if (proj.X < opaqueOCVec.X) {
-                        closestGradientVec = opaqueOCVec;
-                    }
-                    else if (proj.X > opaqueICVec.X) {
-                        closestGradientVec = opaqueICVec;
-                    }
-                    else {
-                        closestGradientVec = proj;
-                    }
-                    gradientDist = (colorVec - closestGradientVec).LengthSquared;
-                    borderDist = (colorVec - sBColVec).LengthSquared;
-                    blackDist = colorVec.LengthSquared;
-                    // Test if border color would be better
-                    if (BORDER_OFF || gradientDist < borderDist) {
-                        // Test if black would be better
-                        if (!BLACK_OFF && blackDist < gradientDist) {
-                            pixDist[i, j] = 1.2;
+            unsafe {
+                BitmapData imgData = img.LockBits(new Rectangle(0, 0, imgWidth, imgHeight), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+                for (int i = 0; i < imgWidth; i++) {
+                    for (int j = 0; j < imgHeight; j++) {
+                        pixel = Color.FromArgb(((int*) imgData.Scan0)[j * imgWidth + i]);
+                        if (!OPAQUE_OFF) {
+                            pixel = getOpaqueColor(pixel, backgroundColor);
+                        }
+                        colorVec = new Vector3(R ? pixel.R : 0, G ? pixel.G : 0, B ? pixel.B : 0);
+                        proj = Vector3.Dot(colorVec - opaqueOCVec, projVec) / Vector3.Dot(projVec, projVec) * projVec + opaqueOCVec;
+                        if (proj.X < opaqueOCVec.X) {
+                            closestGradientVec = opaqueOCVec;
+                        }
+                        else if (proj.X > opaqueICVec.X) {
+                            closestGradientVec = opaqueICVec;
                         }
                         else {
-                            pixDist[i, j] = Math.Round(101 * Math.Clamp(1 - (closestGradientVec - opaqueOCVec).Length / projVecLen, 0, 1)) / 128;
+                            closestGradientVec = proj;
                         }
-                    }
-                    else {
-                        // Test if black would be better
-                        if (!BLACK_OFF && blackDist < borderDist) {
-                            pixDist[i, j] = 1.2;
+                        gradientDist = (colorVec - closestGradientVec).LengthSquared;
+                        borderDist = (colorVec - sBColVec).LengthSquared;
+                        blackDist = colorVec.LengthSquared;
+                        // Test if border color would be better
+                        if (BORDER_OFF || gradientDist < borderDist) {
+                            // Test if black would be better
+                            if (!BLACK_OFF && blackDist < gradientDist) {
+                                pixDist[i, j] = 1.2;
+                            }
+                            else {
+                                pixDist[i, j] = Math.Round(101 * Math.Clamp(1 - (closestGradientVec - opaqueOCVec).Length / projVecLen, 0, 1)) / 128;
+                            }
                         }
                         else {
-                            pixDist[i, j] = 111.0 / 128;
+                            // Test if black would be better
+                            if (!BLACK_OFF && blackDist < borderDist) {
+                                pixDist[i, j] = 1.2;
+                            }
+                            else {
+                                pixDist[i, j] = 111.0 / 128;
+                            }
                         }
-                    }
 
+                    }
                 }
+                img.UnlockBits(imgData);
             }
             // (16+20n, 8+20m) for matching editor to gameplay. Require 8+20m>=-56 for the bounding box to not be cropped down to be entirely inside the playfield during gameplay (which changes how the distortion is applied).
             // 16+20n >= x is  required for some x depending on resolution. It's probably the case that x <= -104 for all resolutions. If resY is not a multiple of 60, the distortion will look different in gameplay and in editor.
@@ -201,18 +217,18 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
             absoluteStartY = 0;
             gradientDist = 0;
             // In the below loop, gradientDist means something completely different from what it means in the above loop. Here, it is being used to mean the distance in the gradient between two or more points that are evenly distributed along the slider body
-            for (int i = 0; i < img.Height; i++) {
+            for (int i = 0; i < imgHeight; i++) {
                 leftToRight = -leftToRight;
-                columnStartCoordinate = (leftToRight == 1) ? 0 : (img.Width - 1);
+                columnStartCoordinate = (leftToRight == 1) ? 0 : (imgWidth - 1);
                 columnEndCoordinate = columnStartCoordinate;
-                while ((leftToRight == 1) ? (columnStartCoordinate < img.Width) : (columnStartCoordinate >= 0)) {
+                while ((leftToRight == 1) ? (columnStartCoordinate < imgWidth) : (columnStartCoordinate >= 0)) {
                     // Look for gradients
                     columnStartOffset = 0;
                     gradientDist = 0;
-                    if (0 <= columnStartCoordinate + leftToRight && columnStartCoordinate + leftToRight < img.Width) {
+                    if (0 <= columnStartCoordinate + leftToRight && columnStartCoordinate + leftToRight < imgWidth) {
                         gradientDist = pixDist[columnStartCoordinate + leftToRight, i] - pixDist[columnStartCoordinate, i];
                         columnStartOffset += leftToRight;
-                        while (0 <= columnStartCoordinate + columnStartOffset + leftToRight && columnStartCoordinate + columnStartOffset + leftToRight < img.Width
+                        while (0 <= columnStartCoordinate + columnStartOffset + leftToRight && columnStartCoordinate + columnStartOffset + leftToRight < imgWidth
                             && pixDist[columnStartCoordinate + columnStartOffset + leftToRight, i] - pixDist[columnStartCoordinate + columnStartOffset, i] == gradientDist) {
                             columnStartOffset += leftToRight;
                         }
