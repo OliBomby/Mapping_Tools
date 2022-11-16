@@ -399,6 +399,11 @@ Source: "{#BuildFolderPath}\SharpDX.Direct2D1.dll"; DestDir: "{app}"; Flags: ign
 Source: "{#BuildFolderPath}\SharpDX.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#BuildFolderPath}\SharpDX.DXGI.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#BuildFolderPath}\SHARPDX.Mathematics.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#BuildFolderPath}\Xceed.Wpf.Toolkit.NET5.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#BuildFolderPath}\Xceed.Wpf.AvalonDock.NET5.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#BuildFolderPath}\Xceed.Wpf.AvalonDock.Themes.VS2010.NET5.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#BuildFolderPath}\Xceed.Wpf.AvalonDock.Themes.Metro.NET5.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#BuildFolderPath}\Xceed.Wpf.AvalonDock.Themes.Aero.NET5.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
