@@ -77,6 +77,11 @@ namespace Mapping_Tools.Views.MetadataManager {
                     }
                 }
 
+                if (arg.ResetIds) {
+                    beatmap.Metadata["BeatmapID"].Value = @"0";
+                    beatmap.Metadata["BeatmapSetID"].Value = @"-1";
+                }
+
                 // Save the file with name update because we updated the metadata
                 editor.SaveFileWithNameUpdate();
 

@@ -37,6 +37,16 @@ namespace Mapping_Tools {
         public static HttpClient HttpClient { get; set; }
         public static SnackbarMessageQueue MessageQueue { get; set; }
 
+        public delegate void CurrentBeatmapUpdateHandler(object sender, string currentBeatmaps);
+
+        public event CurrentBeatmapUpdateHandler OnUpdateCurrentBeatmap;
+        public void UpdateCurrentBeatmap(string currentBeatmaps)
+        {
+            // Make sure someone is listening to event
+            if (OnUpdateCurrentBeatmap == null) return;
+            OnUpdateCurrentBeatmap(this, currentBeatmaps);
+        }
+
         public MainWindow() {
             try {
                 AppWindow = this;
@@ -201,12 +211,15 @@ namespace Mapping_Tools {
         }
 
         public void SetCurrentMaps(string[] paths) {
-            ViewModel.CurrentBeatmaps = string.Join("|", paths);
+            string strPaths = string.Join("|", paths);
+            ViewModel.CurrentBeatmaps = strPaths;
+            UpdateCurrentBeatmap(strPaths);
             SettingsManager.AddRecentMap(paths, DateTime.Now);
         }
 
         public void SetCurrentMapsString(string paths) {
             ViewModel.CurrentBeatmaps = paths;
+            UpdateCurrentBeatmap(paths);
             SettingsManager.AddRecentMap(paths.Split('|'), DateTime.Now);
         }
 

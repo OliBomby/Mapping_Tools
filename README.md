@@ -29,6 +29,7 @@ Collection of tools for manipulating osu! beatmaps
 - Pattern Gallery by [OliBomby](https://github.com/OliBomby)
 - Mapset Merger by [OliBomby](https://github.com/OliBomby)
 - Tumour Generator 2 by [OliBomby](https://github.com/OliBomby)
+- Slider Picturator by [JPK314](https://github.com/JPK314)
 
 ## Future implementations
 See the [Trello board](https://trello.com/b/iTmmw3eP/mapping-tools).
@@ -45,4 +46,5 @@ See the [Trello board](https://trello.com/b/iTmmw3eP/mapping-tools).
 - [Overlay.NET](https://github.com/lolp1/Overlay.NET)
 - [.NET Ogg Vorbis Encoder](https://github.com/SteveLillis/.NET-Ogg-Vorbis-Encoder)
 - [Onova](https://github.com/Tyrrrz/Onova)
+- [Extended WPF Toolkit](https://github.com/xceedsoftware/wpftoolkit)
 

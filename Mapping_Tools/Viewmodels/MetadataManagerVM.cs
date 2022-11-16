@@ -29,6 +29,7 @@ namespace Mapping_Tools.Viewmodels {
         private string _source;
         private string _tags;
         private bool _removeDuplicateTags;
+        private bool _resetIds;
 
         private double _previewTime;
         private bool _useComboColours;
@@ -258,6 +259,15 @@ namespace Mapping_Tools.Viewmodels {
                 _removeDuplicateTags = value;
                 if (_removeDuplicateTags)
                     Tags = RemoveDuplicateTags(Tags);
+                OnPropertyChanged();
+            }
+        }
+
+        public bool ResetIds {
+            get => _resetIds;
+            set {
+                if( _resetIds == value ) return;
+                _resetIds = value;
                 OnPropertyChanged();
             }
         }
