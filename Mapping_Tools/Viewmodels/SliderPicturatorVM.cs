@@ -33,7 +33,7 @@ namespace Mapping_Tools.Viewmodels
         }
 
         [JsonIgnore]
-        public string[] Paths { get; set; }
+        public string Path { get; set; }
 
         [JsonIgnore]
         public bool Quick { get; set; }
@@ -301,6 +301,13 @@ namespace Mapping_Tools.Viewmodels
             }
         }
 
+        private bool _setBeatmapColors;
+        public bool SetBeatmapColors
+        {
+            get => _setBeatmapColors;
+            set => Set(ref _setBeatmapColors, value);
+        }
+
         #endregion
 
         public void RegeneratePreview() {
@@ -363,7 +370,7 @@ namespace Mapping_Tools.Viewmodels
         public SliderPicturatorVm()
         {
             MainWindow.AppWindow.OnUpdateCurrentBeatmap += HandleCurrentBeatmapUpdate;
-            ViewportSize = 16384;
+            ViewportSize = 32768;
             TimeCode = 0;
             Duration = 1;
             YResolution = 1080;
@@ -377,6 +384,7 @@ namespace Mapping_Tools.Viewmodels
             GreenOn = true;
             BlueOn = true;
             AlphaOn = true;
+            SetBeatmapColors = true;
             UseMapComboColors = false;
             ComboColor = Color.FromArgb(0, 0, 0);
             TrackColorPickerColor = System.Windows.Media.Color.FromArgb(255, 255, 255, 255);

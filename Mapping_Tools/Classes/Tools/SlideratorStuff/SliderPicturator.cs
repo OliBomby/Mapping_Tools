@@ -14,6 +14,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
         private const double LIGHTEN_AMOUNT = 0.25;
         private const double DARKEN_AMOUNT = 0.1;
         private const byte ALPHA = 180;
+
         private static Color getOpaqueColor(Color top, Color bottom)
         {
             double GAMMA = 1;
@@ -25,6 +26,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
                 (byte)Math.Round(Math.Pow((Math.Pow(bottom.G, GAMMA) * bottomOpacity * (1 - topOpacity) + Math.Pow(top.G, GAMMA) * topOpacity) / totOpacity, 1 / GAMMA)),
                 (byte)Math.Round(Math.Pow((Math.Pow(bottom.B, GAMMA) * bottomOpacity * (1 - topOpacity) + Math.Pow(top.B, GAMMA) * topOpacity) / totOpacity, 1 / GAMMA)));
         }
+
         public static Bitmap Recolor(Bitmap img, Color sliderColor, Color sliderBorder, Color backgroundColor, bool BLACK_OFF = false, bool BORDER_OFF = false, bool OPAQUE_OFF = false, bool R = true, bool G = true, bool B = true)
         {
             Color innerColor = Color.FromArgb(ALPHA,

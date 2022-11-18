@@ -49,22 +49,22 @@ namespace Mapping_Tools.Views.SliderPicturator {
 
        
         private void Start_Click(object sender, RoutedEventArgs e) {
-            RunTool(MainWindow.AppWindow.GetCurrentMaps());
+            RunTool(MainWindow.AppWindow.GetCurrentMaps()[0]);
         }
 
         public void QuickRun() {
-            RunTool(new[] { IOHelper.GetCurrentBeatmapOrCurrentBeatmap() }, quick: true);
+            RunTool(IOHelper.GetCurrentBeatmapOrCurrentBeatmap(), quick: true);
         }
 
-        private void RunTool(string[] paths, bool quick = false) {
+        private void RunTool(string path, bool quick = false) {
             if (!CanRun) return;
 
             // Remove logical focus to trigger LostFocus on any fields that didn't yet update the ViewModel
             FocusManager.SetFocusedElement(FocusManager.GetFocusScope(this), null);
 
-            BackupManager.SaveMapBackup(paths);
+            BackupManager.SaveMapBackup(path);
 
-            ViewModel.Paths = paths;
+            ViewModel.Path = path;
             ViewModel.Quick = quick;
 
             BackgroundWorker.RunWorkerAsync(ViewModel);
@@ -75,7 +75,7 @@ namespace Mapping_Tools.Views.SliderPicturator {
             var reader = EditorReaderStuff.GetFullEditorReaderOrNot(out var editorReaderException1);
 
             if (arg.PictureFile == null) {
-                throw new Exception("No image file selected.", editorReaderException1);
+                throw new Exception("No image file selected.");
             }
 
             Bitmap img;
@@ -85,9 +85,11 @@ namespace Mapping_Tools.Views.SliderPicturator {
                 throw new Exception("Not a valid image file.");
             }
 
-            BeatmapEditor editor = new BeatmapEditor(IOHelper.GetCurrentBeatmapOrCurrentBeatmap());
-
+            // Get the latest version of the beatmap
+            var reader = EditorReaderStuff.GetFullEditorReaderOrNot(out var _);
+            var editor = EditorReaderStuff.GetNewestVersionOrNot(arg.Path, reader, out var _, out var _);
             var beatmap = editor.Beatmap;
+
             long GPU = arg.ViewportSize;
             bool R = arg.RedOn;
             bool G = arg.GreenOn;
@@ -198,6 +200,13 @@ namespace Mapping_Tools.Views.SliderPicturator {
             }));
 
             TimingPointsChange.ApplyChanges(timing, timingPointsChanges);
+
+            // Set the beatmap slider colors
+            if (arg.SetBeatmapColors) {
+                if (!arg.UseMapComboColors)
+                    beatmap.SpecialColours["SliderTrackOverride"] = new ComboColour(sliderColor.R, sliderColor.G, sliderColor.B);
+                beatmap.SpecialColours["SliderBorder"] = new ComboColour(borderColor.R, borderColor.G, borderColor.B);
+            }
 
             editor.SaveFile();
 

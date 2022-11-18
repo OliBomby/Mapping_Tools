@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-using Mapping_Tools.Classes.BeatmapHelper;
+﻿using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen;
 using Mapping_Tools.Classes.Tools.TumourGenerating;
-using Mapping_Tools.Classes.Tools.TumourGenerating.Enums;
 using Mapping_Tools.Classes.Tools.TumourGenerating.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -38,13 +36,11 @@ namespace Mapping_Tools_Tests.Classes.Tools.TumourGenerating {
             var end = PathHelper.FindLastOccurrenceExact(start, 110, epsilon:0.5);
             var end2 = PathHelper.FindLastOccurrenceExact(start, 115, epsilon:0.5);
 
-            tumourGenerator.PlaceTumour(pathWithHints, tumourLayer, layer, start, end, startT, endT, false);
+            tumourGenerator.PlaceTumour(pathWithHints, tumourLayer, layer, start, end, startT, endT, 100, 110, false, 384);
 
             current = start;
-            var count = 1;
             while (current is not null && current != end) {
                 var pos = current.Value.Pos;
-                count++;
 
                 switch (pos.X) {
                     case >= 100 and <= 105:
@@ -65,13 +61,11 @@ namespace Mapping_Tools_Tests.Classes.Tools.TumourGenerating {
             Assert.AreEqual(4, pathWithHints.ReconstructionHints.Count);
 
             // Add another overlapping tumour
-            tumourGenerator.PlaceTumour(pathWithHints, tumourLayer, layer, mid, end2, startT, endT, false);
+            tumourGenerator.PlaceTumour(pathWithHints, tumourLayer, layer, mid, end2, startT, endT, 105, 115, false, 384);
 
             current = start;
-            count = 1;
             while (current is not null && current != end2) {
                 var pos = current.Value.Pos;
-                count++;
 
                 switch (pos.X) {
                     case >= 100 and <= 105:
