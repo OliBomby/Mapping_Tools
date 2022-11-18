@@ -72,8 +72,6 @@ namespace Mapping_Tools.Views.SliderPicturator {
         }
 
         private string Picturate(SliderPicturatorVm arg, BackgroundWorker worker, DoWorkEventArgs _) {
-            var reader = EditorReaderStuff.GetFullEditorReaderOrNot(out var editorReaderException1);
-
             if (arg.PictureFile == null) {
                 throw new Exception("No image file selected.");
             }
@@ -97,6 +95,7 @@ namespace Mapping_Tools.Views.SliderPicturator {
             bool borderOff = !arg.BorderOn;
             bool blackOff = !arg.BlackOn;
             bool opaqueOff = !arg.AlphaOn;
+            int quality = arg.Quality;
             double startTime = arg.TimeCode;
             double startPosX = arg.SliderStartX;
             double startPosY = arg.SliderStartY;
@@ -135,7 +134,7 @@ namespace Mapping_Tools.Views.SliderPicturator {
             //    worker.ReportProgress((int)Math.Round(100 * (time / TIME_SPACING) / files.Length));
             //}
 
-            List<Vector2> sliderPath = Classes.Tools.SlideratorStuff.SliderPicturator.Picturate(img, sliderColor, borderColor, backgroundColor, circleSize, startPos, startPosPic, resY, GPU, blackOff, borderOff, opaqueOff, R, G, B);
+            List<Vector2> sliderPath = Classes.Tools.SlideratorStuff.SliderPicturator.Picturate(img, sliderColor, borderColor, backgroundColor, circleSize, startPos, startPosPic, resY, GPU, blackOff, borderOff, opaqueOff, R, G, B, quality);
 
             // Find nearest hitobject before startTime and get its combo color index
             int currentColorIdx = 0;

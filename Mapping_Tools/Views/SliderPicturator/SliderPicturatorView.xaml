@@ -234,9 +234,18 @@
                         <CheckBox Content="Set beatmap colors"
                                   IsChecked="{Binding SetBeatmapColors}"
                                   ToolTip="Whether to set the beatmap's slider track and border color to the specified colors."/>
+                        
+                        <Slider Value="{Binding Quality}" Margin="5 10"
+                                Style="{StaticResource MaterialDesignDiscreteSlider}"
+                                TickPlacement="BottomRight" TickFrequency="1"
+                                Minimum="1" Maximum="101" SmallChange="1" LargeChange="10"
+                                ToolTip="Image Quality"/>
                     </StackPanel>
 
-                    <Image Name="ImageViewer" Width="440" Source="{Binding BMImage}" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+                    <StackPanel>
+                        <Image Name="ImageViewer" Width="440" Source="{Binding BMImage}" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+                        <TextBlock Text="{Binding Path=SegmentCount, StringFormat='Segment Count: {0}'}"></TextBlock>
+                    </StackPanel>
                 </StackPanel>
                 
 

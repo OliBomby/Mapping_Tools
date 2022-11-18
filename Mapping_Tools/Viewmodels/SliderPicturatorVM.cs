@@ -45,6 +45,25 @@ namespace Mapping_Tools.Viewmodels
             set => Set(ref _viewportSize, value);
         }
 
+        private int _quality;
+        public int Quality
+        {
+            get => _quality;
+            set
+            {
+                if (Set(ref _quality, value)) {
+                    RegeneratePreview();
+                }
+            }
+        }
+
+        private long _segmentCount;
+        public long SegmentCount
+        {
+            get => _segmentCount;
+            set => Set(ref _segmentCount, value);
+        }
+
         [JsonIgnore]
         public IEnumerable<long> ViewportSizes => new List<long> { 16384, 32768 };
 
@@ -330,7 +349,7 @@ namespace Mapping_Tools.Viewmodels
             Color ctc = Color.FromArgb(CurrentTrackColor.ToArgb());
             Color bc = Color.FromArgb(BorderColor.R, BorderColor.G, BorderColor.B);
             Task.Run(() => {
-                Bitmap newBM = SliderPicturator.Recolor(bm, ctc, bc, Color.FromArgb(0, 0, 0), !BlackOn, !BorderOn, !AlphaOn, RedOn, GreenOn, BlueOn);
+                (Bitmap newBM, long segmentCount) = SliderPicturator.Recolor(bm, ctc, bc, Color.FromArgb(0, 0, 0), !BlackOn, !BorderOn, !AlphaOn, RedOn, GreenOn, BlueOn, Quality);
                 // Send the new preview to the main thread
                 System.Windows.Application.Current.Dispatcher.Invoke(() => {
                     IntPtr hBitmap = newBM.GetHbitmap();
@@ -347,6 +366,7 @@ namespace Mapping_Tools.Viewmodels
                         DeleteObject(hBitmap);
                     }
                     BMImage = retval;
+                    SegmentCount = segmentCount;
                     RaisePropertyChanged(nameof(BMImage));
                 });
 
@@ -387,6 +407,8 @@ namespace Mapping_Tools.Viewmodels
             SetBeatmapColors = true;
             UseMapComboColors = false;
             ComboColor = Color.FromArgb(0, 0, 0);
+            SegmentCount = 0;
+            Quality = 1;
             TrackColorPickerColor = System.Windows.Media.Color.FromArgb(255, 255, 255, 255);
             BorderColor = System.Windows.Media.Color.FromArgb(255, 255, 255, 255);
             BMImage = null;
