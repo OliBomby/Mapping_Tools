@@ -76,18 +76,17 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
-                        <DataGrid
+                        <ListBox
                             Grid.Row="0"
-                            Margin="0 0 0 0"
                             ItemsSource="{Binding Patterns}"
-                            CanUserSortColumns="True"
-                            CanUserAddRows="False"
-                            AutoGenerateColumns="False"
-                            materialDesign:DataGridAssist.CellPadding="13 8 8 8"
-                            materialDesign:DataGridAssist.ColumnHeaderPadding="8"
-                            VerticalScrollBarVisibility="Auto"
-                            VerticalAlignment="Stretch">
-                            <DataGrid.ContextMenu>
+                            VerticalAlignment="Stretch"
+                            SelectionMode="Extended">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel IsItemsHost="True"/>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                            <ListBox.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Header="Delete" Command="{Binding RemoveCommand}" Tag="Delete"
                                       ToolTip="Delete selected patterns. Hold shift to skip dialog.">
@@ -102,56 +101,22 @@
                                         </MenuItem.Icon>
                                     </MenuItem>
                                 </ContextMenu>
-                            </DataGrid.ContextMenu>
-                            <DataGrid.Resources>
-                                <Style TargetType="DataGridRow" BasedOn="{StaticResource MaterialDesignDataGridRow}">
-                                    <Setter Property="IsSelected"
-                                Value="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </ListBox.ContextMenu>
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem" BasedOn="{StaticResource MaterialDesignListBoxItem}">
+                                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                     <EventSetter Event="MouseDoubleClick" Handler="PatternRow_MouseDoubleClick"/>
                                 </Style>
-                            </DataGrid.Resources>
-                            <DataGrid.Columns>
-                                <DataGridCheckBoxColumn
-                            Binding="{Binding IsSelected}"
-                            ElementStyle="{StaticResource MaterialDesignDataGridCheckBoxColumnStyle}"
-                            EditingElementStyle="{StaticResource MaterialDesignDataGridCheckBoxColumnEditingStyle}">
-                                    <DataGridCheckBoxColumn.Header>
-                                        <!--padding to allow hit test to pass thru for sorting -->
-                                        <Border
-                                    Background="Transparent"
-                                    Padding="6 0 6 0"
-                                    HorizontalAlignment="Center">
-                                            <CheckBox
-                                        HorizontalAlignment="Center"
-                                        DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext}"
-                                        IsChecked="{Binding IsAllItemsSelected}" />
-                                        </Border>
-                                    </DataGridCheckBoxColumn.Header>
-                                </DataGridCheckBoxColumn>
-                                <materialDesign:DataGridTextColumn
-                            Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
-                            Header="Name"
-                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}" />
-                                <materialDesign:DataGridTextColumn
-                            Binding="{Binding UseCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
-                            Header="Use count"/>
-                                <materialDesign:DataGridTextColumn
-                            Binding="{Binding ObjectCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
-                            Header="Object count"/>
-                                <materialDesign:DataGridTextColumn
-                            Binding="{Binding Duration, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
-                            Header="Duration"/>
-                                <materialDesign:DataGridTextColumn
-                            Binding="{Binding BeatLength, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
-                            Header="Number of beats"/>
-                                <materialDesign:DataGridTextColumn
-                            Binding="{Binding CreationTime, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
-                            Header="Time of creation"/>
-                                <materialDesign:DataGridTextColumn
-                            Binding="{Binding LastUsedTime, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
-                            Header="Time of last use"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Width="150" Height="150" BorderThickness="2" BorderBrush="{DynamicResource MaterialDesignDivider}" CornerRadius="8"
+                                            Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
 
                         <StackPanel
                             Grid.Row="1"
