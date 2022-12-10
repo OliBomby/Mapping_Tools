@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Text.Json.Serialization;
 using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.BeatmapHelper;
@@ -233,7 +234,9 @@ namespace Mapping_Tools.Viewmodels {
 
             ExportBrowseCommand = new CommandImplementation(
                 _ => {
-                    string[] paths = IOHelper.BeatmapFileDialog(true, !SettingsManager.Settings.CurrentBeatmapDefaultFolder);
+                    string pathFromDirectory = Directory.GetParent(PathFrom).FullName;
+
+                    string[] paths = IOHelper.BeatmapFileDialog(pathFromDirectory, true);
                     if (paths.Length != 0) {
                         PathTo = string.Join("|", paths);
                     }
