@@ -101,7 +101,7 @@ namespace Mapping_Tools.Views.SliderPicturator {
             double startPosY = arg.SliderStartY;
             double startPosPicX = arg.ImageStartX;
             double startPosPicY = arg.ImageStartY;
-            double duration = arg.Duration;
+            double duration = arg.SelectedSlider == null ? arg.Duration : arg.SelectedSlider.TemporalLength;
             double resY = arg.YResolution;
             Vector2 startPos = new Vector2(startPosX, startPosY);
             Vector2 startPosPic = new Vector2(startPosPicX, startPosPicY);
@@ -134,7 +134,7 @@ namespace Mapping_Tools.Views.SliderPicturator {
             //    worker.ReportProgress((int)Math.Round(100 * (time / TIME_SPACING) / files.Length));
             //}
 
-            List<Vector2> sliderPath = Classes.Tools.SlideratorStuff.SliderPicturator.Picturate(img, sliderColor, borderColor, backgroundColor, circleSize, startPos, startPosPic, resY, GPU, blackOff, borderOff, opaqueOff, R, G, B, quality);
+            var (sliderPath, frameDist) = Classes.Tools.SlideratorStuff.SliderPicturator.Picturate(img, sliderColor, borderColor, backgroundColor, circleSize, startPos, startPosPic, arg.SelectedSlider, resY, GPU, blackOff, borderOff, opaqueOff, R, G, B, quality);
 
             // Find nearest hitobject before startTime and get its combo color index
             int currentColorIdx = 0;
@@ -177,8 +177,17 @@ namespace Mapping_Tools.Views.SliderPicturator {
             tpOn.OmitFirstBarLine = true;
 
             // Express velocity in BPM
-            // We want ho.PixelLength = 5/3*timing.SliderMultiplier*bpm*duration/1000 so bpm = ho.PixelLength*600/(timing.SliderMultiplier*duration). Converting to MpB we get 60000*(timing.SliderMultiplier*duration/(ho.PixelLength*600)) = 100*timing.SliderMultiplier*duration/ho.PixelLength
-            tpOn.MpB = 100 * timing.SliderMultiplier * duration / ho.PixelLength;
+            if (frameDist == 0) {
+                // We want ho.PixelLength = 5/3*timing.SliderMultiplier*bpm*duration/1000
+                // so bpm = ho.PixelLength*600/(timing.SliderMultiplier*duration).
+                // Converting to MpB we get 60000*(timing.SliderMultiplier*duration/(ho.PixelLength*600))
+                // = 100*timing.SliderMultiplier*duration/ho.PixelLength
+                tpOn.MpB = 100 * timing.SliderMultiplier * duration / ho.PixelLength;
+            } else {
+                // We want frameDist = 5/3*timing.SliderMultiplier*bpm/1000
+                // so MpB = 100*timing.SliderMultiplier/frameDist
+                tpOn.MpB = 100 * timing.SliderMultiplier / frameDist;
+            }
             // NaN SV results in removal of slider ticks
             ho.SliderVelocity = double.NaN;
 
@@ -230,39 +239,6 @@ namespace Mapping_Tools.Views.SliderPicturator {
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "sliderpicturatorproject.json");
 
         public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Slider Picturator Projects");
-
-        private Color getOpaqueColor(Color top, Color bottom)
-        {
-            // Bottom color is assumed to be opaque
-            double GAMMA = 1;
-            return Color.FromArgb(255,
-                (byte)Math.Round(Math.Pow(Math.Pow(bottom.R, GAMMA) * (1 - top.A) + Math.Pow(top.R, GAMMA) * top.A, 1 / GAMMA)),
-                (byte)Math.Round(Math.Pow(Math.Pow(bottom.G, GAMMA) * (1 - top.A) + Math.Pow(top.G, GAMMA) * top.A, 1 / GAMMA)),
-                (byte)Math.Round(Math.Pow(Math.Pow(bottom.B, GAMMA) * (1 - top.A) + Math.Pow(top.B, GAMMA) * top.A, 1 / GAMMA)));
-        }
-        private static void MySaveBMP(byte[] buffer, int width, int height, String loc)
-        {
-            Bitmap b = new Bitmap(width, height, PixelFormat.Format24bppRgb);
-
-            Rectangle BoundsRect = new Rectangle(0, 0, width, height);
-            BitmapData bmpData = b.LockBits(BoundsRect,
-                                            ImageLockMode.WriteOnly,
-                                            b.PixelFormat);
-
-            IntPtr ptr = bmpData.Scan0;
-
-            // add back dummy bytes between lines, make each line be a multiple of 4 bytes
-            int skipByte = bmpData.Stride - width * 3;
-            byte[] newBuff = new byte[buffer.Length + skipByte * height];
-            for (int j = 0; j < height; j++) {
-                Buffer.BlockCopy(buffer, j * width * 3, newBuff, j * (width * 3 + skipByte), width * 3);
-            }
-
-            // fill in rgbValues
-            Marshal.Copy(newBuff, 0, ptr, newBuff.Length);
-            b.UnlockBits(bmpData);
-            b.Save(loc, ImageFormat.Bmp);
-        }
 
         private static double OsuStableDistance(List<Vector2> controlPoints)
         {

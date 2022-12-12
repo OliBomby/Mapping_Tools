@@ -9,11 +9,14 @@ using System.Windows.Forms;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using Mapping_Tools.Classes;
+using Editor_Reader;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Classes.Tools.SlideratorStuff;
 using Mapping_Tools.Components.Domain;
 using Newtonsoft.Json;
+using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
 
 namespace Mapping_Tools.Viewmodels
 {
@@ -327,6 +330,23 @@ namespace Mapping_Tools.Viewmodels
             set => Set(ref _setBeatmapColors, value);
         }
 
+        private HitObject _selectedSlider;
+        public HitObject SelectedSlider
+        {
+            get => _selectedSlider;
+            set {
+                if (Set(ref _selectedSlider, value)) {
+                    RegeneratePreview();
+                }
+            }
+        }
+
+        [JsonIgnore]
+        public CommandImplementation ImportCommand
+        {
+            get;
+        }
+
         #endregion
 
         public void RegeneratePreview() {
@@ -348,8 +368,12 @@ namespace Mapping_Tools.Viewmodels
             Bitmap bm = (Bitmap)BM.Clone();
             Color ctc = Color.FromArgb(CurrentTrackColor.ToArgb());
             Color bc = Color.FromArgb(BorderColor.R, BorderColor.G, BorderColor.B);
+            HitObject ss = null;
+            if (SelectedSlider != null) {
+                ss = SelectedSlider.DeepCopy();
+            }
             Task.Run(() => {
-                (Bitmap newBM, long segmentCount) = SliderPicturator.Recolor(bm, ctc, bc, Color.FromArgb(0, 0, 0), !BlackOn, !BorderOn, !AlphaOn, RedOn, GreenOn, BlueOn, Quality);
+                (Bitmap newBM, long segmentCount) = SliderPicturator.Recolor(bm, ctc, bc, Color.FromArgb(0, 0, 0), ss, !BlackOn, !BorderOn, !AlphaOn, RedOn, GreenOn, BlueOn, Quality);
                 // Send the new preview to the main thread
                 System.Windows.Application.Current.Dispatcher.Invoke(() => {
                     IntPtr hBitmap = newBM.GetHbitmap();
@@ -415,6 +439,9 @@ namespace Mapping_Tools.Viewmodels
             BM = null;
 
             UploadFileCommand = new CommandImplementation(_ => SetFile());
+            ImportCommand = new CommandImplementation(_ => Import(
+                IOHelper.GetCurrentBeatmapOrCurrentBeatmap()
+            ));
         }
 
         private void SetFile()
@@ -425,6 +452,30 @@ namespace Mapping_Tools.Viewmodels
 
             if (fileDialog.ShowDialog() == DialogResult.OK) {
                 PictureFile = fileDialog.FileName;
+            }
+        }
+
+        public void Import(string path)
+        {
+            try {
+                EditorReader reader = EditorReaderStuff.GetFullEditorReaderOrNot(out var editorReaderException1);
+
+                if (editorReaderException1 != null) {
+                    throw new Exception("Could not fetch selected hit object.", editorReaderException1);
+                }
+
+                BeatmapEditor editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader, out var selected, out var editorReaderException2);
+                List<HitObject> markedObjects = selected;
+
+                if (editorReaderException2 != null) {
+                    throw new Exception("Could not fetch selected hit object.", editorReaderException2);
+                }
+
+                if (markedObjects == null || markedObjects.Count(o => o.IsSlider) == 0) return;
+
+                SelectedSlider = markedObjects.Find(s => s.IsSlider);
+            } catch (Exception ex) {
+                ex.Show();
             }
         }
     }

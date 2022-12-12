@@ -245,6 +245,10 @@
                     <StackPanel>
                         <Image Name="ImageViewer" Width="440" Source="{Binding BMImage}" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
                         <TextBlock Text="{Binding Path=SegmentCount, StringFormat='Segment Count: {0}'}"></TextBlock>
+                        <Button Grid.Column="2" Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ImportCommand}" Margin="5 0 0 0"
+                                ToolTip="Import a slider for its sliderball path." HorizontalAlignment="Right" VerticalAlignment="Top">
+                            Import slider
+                        </Button>
                     </StackPanel>
                 </StackPanel>
                 
