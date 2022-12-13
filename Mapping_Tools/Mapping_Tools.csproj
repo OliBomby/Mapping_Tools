@@ -63,8 +63,8 @@
 
   <ItemGroup>
     <PackageReference Include="Extended.Wpf.Toolkit" Version="4.4.0" />
-    <PackageReference Include="MaterialDesignColors" Version="2.0.1" />
-    <PackageReference Include="MaterialDesignThemes" Version="4.1.0" />
+    <PackageReference Include="MaterialDesignColors" Version="2.1.0-ci390" />
+    <PackageReference Include="MaterialDesignThemes" Version="4.7.0-ci390" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Core" Version="1.1.4" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.4" />
     <PackageReference Include="NAudio" Version="2.0.0" />
@@ -88,6 +88,8 @@
     <Resource Include="Data\mt_logo_white_24.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
+    <None Remove="Data\sample_pattern.jpg" />
+    <Resource Include="Data\sample_pattern.jpg" />
   </ItemGroup>
 
   <ItemGroup>

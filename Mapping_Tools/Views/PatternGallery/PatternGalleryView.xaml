@@ -119,10 +119,26 @@
                             </ListBox.ItemContainerStyle>
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Width="150" Height="150" BorderThickness="2" BorderBrush="{DynamicResource MaterialDesignDivider}" CornerRadius="8"
-                                            Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                    </Border>
+                                    <materialDesign:Card
+                                        Width="150"
+                                        Height="150"
+                                        UniformCornerRadius="8"
+                                        Style="{StaticResource MaterialDesignOutlinedCard}">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="*" />
+                                                <RowDefinition Height="40" />
+                                            </Grid.RowDefinitions>
+                                            <Rectangle Grid.Row="0" x:Name="imageBox" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Fill="Black" RadiusX="8" RadiusY="8"/>
+                                            <Image Grid.Row="0" Width="150" Stretch="UniformToFill" StretchDirection="Both">
+                                                <Image.Source>
+                                                    <BitmapImage DecodePixelWidth="150"
+                                                                 UriSource="pack://application:,,,/Data/sample_pattern.jpg" />
+                                                </Image.Source>
+                                            </Image>
+                                            <TextBlock Grid.Row="1" Margin="8 0" Text="{Binding Name}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </materialDesign:Card>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
