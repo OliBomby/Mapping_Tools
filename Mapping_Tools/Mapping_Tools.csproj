@@ -75,6 +75,7 @@
     <PackageReference Include="Onova" Version="2.6.2" />
     <PackageReference Include="OsuMemoryDataProvider" Version="0.8.9" />
     <PackageReference Include="Overlay.NET" Version="1.0.2" />
+    <PackageReference Include="VirtualizingWrapPanel" Version="1.5.7" />
   </ItemGroup>
 
   <ItemGroup>

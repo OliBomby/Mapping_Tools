@@ -7,6 +7,7 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
              xmlns:viewmodels="clr-namespace:Mapping_Tools.Viewmodels"
+             xmlns:controls="clr-namespace:WpfToolkit.Controls;assembly=VirtualizingWrapPanel"
              x:Name="This"
              mc:Ignorable="d" Width="900" Height="700" d:DataContext="{d:DesignInstance viewmodels:PatternGalleryVm}">
     <UserControl.Resources>
@@ -80,10 +81,18 @@
                             Grid.Row="0"
                             ItemsSource="{Binding Patterns}"
                             VerticalAlignment="Stretch"
-                            SelectionMode="Extended">
+                            SelectionMode="Extended"
+                            VirtualizingPanel.CacheLengthUnit="Item"
+                            VirtualizingPanel.CacheLength="1,1"
+                            VirtualizingPanel.ScrollUnit="Pixel"
+                            VirtualizingPanel.VirtualizationMode="Recycling">
                             <ListBox.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <WrapPanel IsItemsHost="True"/>
+                                    <controls:VirtualizingWrapPanel
+                                        Orientation="Vertical"
+                                        SpacingMode="None"
+                                        StretchItems="False"
+                                        ItemSize="166,166"/>
                                 </ItemsPanelTemplate>
                             </ListBox.ItemsPanel>
                             <ListBox.ContextMenu>
@@ -255,7 +264,7 @@
                 </Grid>
             </Grid>
 
-            <Viewbox Grid.Column="2" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
+            <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
                 <Button
                     IsEnabled="{Binding ElementName=This, Path=CanRun}"
                     Style="{StaticResource MaterialDesignFloatingActionButton}"
@@ -266,7 +275,7 @@
                 </Button>
             </Viewbox>
         </Grid>
-        <Grid Name="SecondGrid" Grid.Row="1">
+        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition/>
