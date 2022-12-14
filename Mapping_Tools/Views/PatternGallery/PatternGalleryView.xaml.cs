@@ -124,7 +124,7 @@ namespace Mapping_Tools.Views.PatternGallery {
 
             var patternPlacer = args.OsuPatternPlacer;
             foreach (var pattern in args.Patterns.Where(o => o.IsSelected)) {
-                var patternBeatmap = pattern.GetPatternBeatmap(args.FileHandler);
+                var patternBeatmap = args.FileHandler.GetPatternBeatmap(pattern.FileName);
 
                 if (usePatternOffset) {
                     patternPlacer.PlaceOsuPattern(patternBeatmap, editor.Beatmap, protectBeatmapPattern:false);
