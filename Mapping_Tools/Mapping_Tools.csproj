@@ -134,18 +134,6 @@
     <Compile Update="Components\HotkeyEditorControl.xaml.cs">
       <DependentUpon>HotkeyEditorControl.xaml</DependentUpon>
     </Compile>
-    <Compile Update="Components\ObjectVisualiser\HitObject.xaml.cs">
-      <DependentUpon>HitObject.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Components\ObjectVisualiser\ObjectPlayfield.xaml.cs">
-      <DependentUpon>ObjectPlayfield.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Components\ObjectVisualiser\SliderAnchor.xaml.cs">
-      <DependentUpon>SliderAnchor.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Components\ObjectVisualiser\SliderAnchorLine.xaml.cs">
-      <DependentUpon>SliderAnchorLine.xaml</DependentUpon>
-    </Compile>
     <Compile Update="Components\TimeLine\TimeLine.xaml.cs">
       <DependentUpon>TimeLine.xaml</DependentUpon>
     </Compile>
@@ -302,18 +290,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Components\HotkeyEditorControl.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Components\ObjectVisualiser\HitObject.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Components\ObjectVisualiser\ObjectPlayfield.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Components\ObjectVisualiser\SliderAnchor.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Components\ObjectVisualiser\SliderAnchorLine.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Components\Spectrum\Spectrum.xaml">
