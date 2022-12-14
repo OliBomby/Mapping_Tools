@@ -84,8 +84,8 @@
                             ItemsSource="{Binding Patterns}"
                             VerticalAlignment="Stretch"
                             SelectionMode="Extended"
-                            VirtualizingPanel.CacheLengthUnit="Item"
-                            VirtualizingPanel.CacheLength="1,1"
+                            VirtualizingPanel.CacheLengthUnit="Page"
+                            VirtualizingPanel.CacheLength="4,4"
                             VirtualizingPanel.ScrollUnit="Pixel"
                             VirtualizingPanel.VirtualizationMode="Recycling">
                             <ListBox.ItemsPanel>
