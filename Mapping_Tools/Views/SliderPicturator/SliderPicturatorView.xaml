@@ -245,10 +245,16 @@
                     <StackPanel>
                         <Image Name="ImageViewer" Width="440" Source="{Binding BMImage}" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
                         <TextBlock Text="{Binding Path=SegmentCount, StringFormat='Segment Count: {0}'}"></TextBlock>
-                        <Button Grid.Column="2" Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ImportCommand}" Margin="5 0 0 0"
+                        <StackPanel Orientation="Horizontal" >
+                            <Button Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding RemoveCommand}" Margin="5 0 0 0"
+                                    ToolTip="Remove the slider being used for its sliderball path." HorizontalAlignment="Left" VerticalAlignment="Top">
+                                Remove slider
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ImportCommand}" Margin="5 0 0 0"
                                 ToolTip="Import a slider for its sliderball path." HorizontalAlignment="Right" VerticalAlignment="Top">
-                            Import slider
-                        </Button>
+                                Import slider
+                            </Button>
+                        </StackPanel>
                     </StackPanel>
                 </StackPanel>
                 

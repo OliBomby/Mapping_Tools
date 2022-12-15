@@ -347,6 +347,12 @@ namespace Mapping_Tools.Viewmodels
             get;
         }
 
+        [JsonIgnore]
+        public CommandImplementation RemoveCommand
+        {
+            get;
+        }
+
         #endregion
 
         public void RegeneratePreview() {
@@ -437,11 +443,13 @@ namespace Mapping_Tools.Viewmodels
             BorderColor = System.Windows.Media.Color.FromArgb(255, 255, 255, 255);
             BMImage = null;
             BM = null;
+            SelectedSlider = null;
 
             UploadFileCommand = new CommandImplementation(_ => SetFile());
             ImportCommand = new CommandImplementation(_ => Import(
                 IOHelper.GetCurrentBeatmapOrCurrentBeatmap()
             ));
+            RemoveCommand = new CommandImplementation(_ => SelectedSlider = null);
         }
 
         private void SetFile()
