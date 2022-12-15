@@ -131,7 +131,7 @@
                                                 <RowDefinition Height="*" />
                                                 <RowDefinition Height="40" />
                                             </Grid.RowDefinitions>
-                                            <Image Grid.Row="0" Width="150" Stretch="UniformToFill" StretchDirection="Both">
+                                            <Image Grid.Row="0" Width="150" Stretch="None" StretchDirection="Both">
                                                 <Image.Source>
                                                     <MultiBinding Converter="{StaticResource OsuPatternToThumbnailConverter}">
                                                         <Binding Path="FileName" Mode="OneWay" IsAsync="True"/>

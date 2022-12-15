@@ -1,15 +1,25 @@
 ﻿using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Globalization;
+using System.Linq;
 using System.Windows.Data;
 using Mapping_Tools.Classes;
+using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Classes.Tools.PatternGallery;
-using Point = System.Drawing.Point;
 
 namespace Mapping_Tools.Components.ObjectVisualiser {
     public class OsuPatternToThumbnailConverter : IMultiValueConverter {
-        private const int thumbnailWidth = 150;
-        private const int thumbnailHeight = 110;
+        private const int ThumbnailWidth = 150;
+        private const int ThumbnailHeight = 110;
+        private const int Margin = 10;
+        private const float Scale = (ThumbnailWidth - Margin * 2) / 512f;
+        private const double MaxPixelLength = 1e6;
+        private const double MaxSegmentCount = 1e6;
+        private const int MaxAnchorCount = 5000;
+        private const float PenWidth = 0.15f;
+        private const float CircleSizeFactor = 1 / (1 + PenWidth);
 
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture) {
             // Value is a string for the pattern filename. The parameter is the OsuPatternFileHandler
@@ -20,27 +30,74 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
             try {
                 // Load the beatmap
                 var beatmap = fileHandler.GetPatternBeatmap(filename);
+                beatmap.CalculateEndPositions();
+                beatmap.UpdateStacking();
+
+                // Draw the thumbnail
+                using var bmp = new Bitmap(ThumbnailWidth, ThumbnailHeight);
+                using var gfx = Graphics.FromImage(bmp);
+
+                // Draw one thousand random white lines on a dark blue background
+                gfx.SmoothingMode = SmoothingMode.AntiAlias;
+                gfx.Clear(Color.Black);
+                gfx.TranslateTransform(Margin, Margin);
+                gfx.ScaleTransform(Scale, Scale);
+
+                if (beatmap.HitObjects.Count <= 0) {
+                    return bmp.ToBitmapSource();
+                }
+
+                var firstTime = beatmap.HitObjects[0].Time;
+                const double approachTime = 1000;
+                var circleSize = Beatmap.GetHitObjectRadius(beatmap.Difficulty["CircleSize"].DoubleValue);
+                var hitObjects = beatmap.HitObjects.TakeWhile(o => o.Time < firstTime + approachTime).Reverse();
+                using var pen = new Pen(Color.White, (float) circleSize * PenWidth);
+
+                foreach (var hitObject in hitObjects) {
+                    DrawHitObject(gfx, hitObject, circleSize, pen);
+                }
+
+                return bmp.ToBitmapSource();
             } catch {
                 return null;
             }
+        }
 
-            // Draw the thumbnail
-            Random rand = new Random();
-            using var bmp = new Bitmap(thumbnailWidth, thumbnailHeight);
-            using var gfx = Graphics.FromImage(bmp);
-            using var pen = new Pen(Color.White);
+        private void DrawHitObject(Graphics gfx, HitObject hitObject, double circleSize, Pen pen) {
+            var pos = hitObject.StackedPos;
+            var c = CircleSizeFactor * circleSize;
+            var x = (int) (pos.X - c);
+            var y = (int) (pos.Y - c);
+            var s = (int) (c * 2);
+            if (hitObject.IsSlider && hitObject.PixelLength < MaxPixelLength && hitObject.CurvePoints.Count < MaxAnchorCount) {
+                var outlinePen = new Pen(Color.White, (float) circleSize * 1.95f) { LineJoin = LineJoin.Round, StartCap = LineCap.Round, EndCap = LineCap.Round };
+                var insidePen = new Pen(Color.Black, (float) circleSize * 1.65f) { LineJoin = LineJoin.Round, StartCap = LineCap.Round, EndCap = LineCap.Round };
+                var path = hitObject.GetSliderPath();
 
-            // Draw one thousand random white lines on a dark blue background
-            gfx.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-            gfx.Clear(Color.Navy);
-            for (int i = 0; i < 1000; i++)
-            {
-                var pt1 = new Point(rand.Next(bmp.Width), rand.Next(bmp.Height));
-                var pt2 = new Point(rand.Next(bmp.Width), rand.Next(bmp.Height));
-                gfx.DrawLine(pen, pt1, pt2);
+                if (path.CalculatedPath.Count > MaxSegmentCount) return;
+
+                using GraphicsPath gc = new GraphicsPath();
+                var points = path.CalculatedPath.Select(p => new PointF((float) p.X, (float) p.Y)).ToArray();
+                gc.AddLines(points);
+
+                gfx.DrawPath(outlinePen, gc);
+                gfx.DrawPath(insidePen, gc);
+                DrawCircleAtProgress(gfx, pen, path, 1, c);
+                DrawCircleAtProgress(gfx, pen, path, 0, c);
+            } else if (hitObject.IsSpinner) {
+                gfx.DrawEllipse(pen, 256 - 150, 192 - 150, 300, 300);
+                gfx.DrawEllipse(pen, 256 - 5, 192 - 5, 10, 10);
+            } else {
+                gfx.DrawEllipse(pen, x, y, s, s);
             }
+        }
 
-            return bmp.ToBitmapSource();
+        private void DrawCircleAtProgress(Graphics gfx, Pen pen, SliderPath path, double progress, double circleSize) {
+            var pos = path.PositionAt(progress);
+            var x = (int) (pos.X - circleSize);
+            var y = (int) (pos.Y - circleSize);
+            var s = (int) (circleSize * 2);
+            gfx.DrawEllipse(pen, x, y, s, s);
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) {
