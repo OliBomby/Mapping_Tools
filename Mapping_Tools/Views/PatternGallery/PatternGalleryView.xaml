@@ -152,6 +152,8 @@
                             HorizontalAlignment="Right"
                             VerticalAlignment="Bottom"
                             Orientation="Horizontal">
+                            <TextBox Margin="5" Width="200"
+                                     ToolTip="Search for a pattern." Text="{Binding SearchFilter, UpdateSourceTrigger=PropertyChanged}"/>
                             <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a pattern from .osu code." Command="{Binding AddCodeCommand}" Margin="5">
                                 <materialDesign:PackIcon Kind="CodeBraces" Height="24" Width="24" />
                             </Button>

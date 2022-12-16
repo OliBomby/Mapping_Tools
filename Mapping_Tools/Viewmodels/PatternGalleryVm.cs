@@ -16,6 +16,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 
 namespace Mapping_Tools.Viewmodels {
@@ -51,6 +52,14 @@ namespace Mapping_Tools.Viewmodels {
 
         [JsonIgnore]
         public OsuPatternPlacer OsuPatternPlacer { get; set; }
+
+        [JsonIgnore]
+        private readonly CollectionView patternCollectionView;
+
+        [JsonIgnore]
+        private string searchFilter = string.Empty;
+        [JsonIgnore]
+        public string SearchFilter { get => searchFilter; set => SetSearchFilter(value); }
 
         #region Options
 
@@ -209,6 +218,10 @@ namespace Mapping_Tools.Viewmodels {
             ExportTimeMode = ExportTimeMode.Current;
             CustomExportTime = 0;
 
+            // Set up filters
+            patternCollectionView = (CollectionView) CollectionViewSource.GetDefaultView(Patterns);
+            patternCollectionView.Filter = PatternNameFilter;
+
             AddCodeCommand = new CommandImplementation(
                 async _ => {
                     try {
@@ -219,7 +232,7 @@ namespace Mapping_Tools.Viewmodels {
                         var dialog = new CustomDialog(viewModel, 0);
                         var result = await DialogHost.Show(dialog, "RootDialog");
 
-                        if (!(bool)result) return;
+                        if (result is not (true)) return;
 
                         var hitObjects = new List<HitObject>();
                         foreach (string o in Regex.Split(viewModel.HitObjects, Environment.NewLine)) {
@@ -257,7 +270,7 @@ namespace Mapping_Tools.Viewmodels {
                         var dialog = new CustomDialog(viewModel, 0);
                         var result = await DialogHost.Show(dialog, "RootDialog");
 
-                        if (!(bool)result) return;
+                        if (result is not (true)) return;
 
                         var pattern = OsuPatternMaker.FromFileWithSave(
                             viewModel.FilePath, FileHandler, viewModel.Name, viewModel.Filter, viewModel.StartTime, viewModel.EndTime);
@@ -276,7 +289,7 @@ namespace Mapping_Tools.Viewmodels {
                         var dialog = new CustomDialog(viewModel, 0);
                         var result = await DialogHost.Show(dialog, "RootDialog");
 
-                        if (!(bool)result) return;
+                        if (result is not (true)) return;
 
                         var reader = EditorReaderStuff.GetFullEditorReader();
                         var editor = EditorReaderStuff.GetNewestVersion(IOHelper.GetCurrentBeatmap(), reader);
@@ -319,5 +332,20 @@ namespace Mapping_Tools.Viewmodels {
                 model.IsSelected = select;
             }
         }
+
+
+        #region UI helpers
+
+        private bool PatternNameFilter(object item) {
+            return string.IsNullOrEmpty(SearchFilter) || ((OsuPattern)item).Name.Contains(SearchFilter, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private void SetSearchFilter(string value) {
+            searchFilter = value;
+            patternCollectionView.Refresh();
+        }
+
+
+        #endregion
     }
 }
