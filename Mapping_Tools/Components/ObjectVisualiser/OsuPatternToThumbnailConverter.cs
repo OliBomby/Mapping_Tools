@@ -16,11 +16,11 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
         private const int ThumbnailHeight = 110;
         private const int Margin = 10;
         private const float Scale = (ThumbnailWidth - Margin * 2) / 512f;
-        private const double MaxPixelLength = 1e6;
-        private const double MaxSegmentCount = 1e6;
-        private const int MaxAnchorCount = 5000;
         private const float PenWidth = 0.15f;
         private const float CircleSizeFactor = 1 / (1 + PenWidth);
+        
+        private const double MaxPixelLength = 1e6;
+        private const int MaxAnchorCount = 5000;
 
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture) {
             // Value is a string for the pattern filename. The parameter is the OsuPatternFileHandler
