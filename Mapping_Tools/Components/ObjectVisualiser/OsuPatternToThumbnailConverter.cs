@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Globalization;
@@ -30,7 +31,15 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
             try {
                 // Load the beatmap
                 var beatmap = fileHandler.GetPatternBeatmap(filename);
-                beatmap.CalculateEndPositions();
+
+                // Calculate and cache some slider paths
+                var sliderPaths = new Dictionary<HitObject, SliderPath>();
+                foreach (var hitObject in beatmap.HitObjects.Where(hitObject => hitObject.IsSlider && hitObject.PixelLength < MaxPixelLength && hitObject.CurvePoints.Count < MaxAnchorCount)) {
+                    var sliderPath = hitObject.GetSliderPath();
+                    sliderPaths[hitObject] = sliderPath;
+                    hitObject.EndPos = sliderPath.PositionAt(1);
+                }
+
                 beatmap.UpdateStacking();
 
                 // Draw the thumbnail
@@ -54,7 +63,7 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
                 using var pen = new Pen(Color.White, (float) circleSize * PenWidth);
 
                 foreach (var hitObject in hitObjects) {
-                    DrawHitObject(gfx, hitObject, circleSize, pen);
+                    DrawHitObject(gfx, hitObject, circleSize, pen, sliderPaths);
                 }
 
                 return bmp.ToBitmapSource();
@@ -63,18 +72,18 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
             }
         }
 
-        private void DrawHitObject(Graphics gfx, HitObject hitObject, double circleSize, Pen pen) {
+        private void DrawHitObject(Graphics gfx, HitObject hitObject, double circleSize, Pen pen, Dictionary<HitObject, SliderPath> sliderPaths) {
             var pos = hitObject.StackedPos;
             var c = CircleSizeFactor * circleSize;
             var x = (int) (pos.X - c);
             var y = (int) (pos.Y - c);
             var s = (int) (c * 2);
-            if (hitObject.IsSlider && hitObject.PixelLength < MaxPixelLength && hitObject.CurvePoints.Count < MaxAnchorCount) {
+            if (hitObject.IsSlider) {
+                if (!sliderPaths.ContainsKey(hitObject)) return;
+
                 var outlinePen = new Pen(Color.White, (float) circleSize * 1.95f) { LineJoin = LineJoin.Round, StartCap = LineCap.Round, EndCap = LineCap.Round };
                 var insidePen = new Pen(Color.Black, (float) circleSize * 1.65f) { LineJoin = LineJoin.Round, StartCap = LineCap.Round, EndCap = LineCap.Round };
-                var path = hitObject.GetSliderPath();
-
-                if (path.CalculatedPath.Count > MaxSegmentCount) return;
+                var path = sliderPaths[hitObject];
 
                 using GraphicsPath gc = new GraphicsPath();
                 var points = path.CalculatedPath.Select(p => new PointF((float) p.X, (float) p.Y)).ToArray();
