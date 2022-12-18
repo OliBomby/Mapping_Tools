@@ -134,8 +134,8 @@
                                             <Image Grid.Row="0" Width="150" Stretch="None" StretchDirection="Both">
                                                 <Image.Source>
                                                     <MultiBinding Converter="{StaticResource OsuPatternToThumbnailConverter}">
-                                                        <Binding Path="FileName" Mode="OneWay" IsAsync="True"/>
-                                                        <Binding RelativeSource="{RelativeSource AncestorType={x:Type ListBox}}" Path="DataContext.FileHandler" Mode="OneWay" IsAsync="True"/>
+                                                        <Binding Path="FileName" Mode="OneWay"/>
+                                                        <Binding RelativeSource="{RelativeSource AncestorType={x:Type ListBox}}" Path="DataContext.FileHandler" Mode="OneWay"/>
                                                     </MultiBinding>
                                                 </Image.Source>
                                             </Image>
@@ -152,8 +152,8 @@
                             HorizontalAlignment="Right"
                             VerticalAlignment="Bottom"
                             Orientation="Horizontal">
-                            <TextBox Margin="5" Width="200"
-                                     ToolTip="Search for a pattern." Text="{Binding SearchFilter, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBox Margin="5 8" Width="200" Style="{StaticResource MaterialDesignOutlinedTextBox}" materialDesign:HintAssist.Hint="Search"
+                                     ToolTip="Search for a pattern." Text="{Binding SearchFilter, UpdateSourceTrigger=PropertyChanged, Delay=300}"/>
                             <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a pattern from .osu code." Command="{Binding AddCodeCommand}" Margin="5">
                                 <materialDesign:PackIcon Kind="CodeBraces" Height="24" Width="24" />
                             </Button>
