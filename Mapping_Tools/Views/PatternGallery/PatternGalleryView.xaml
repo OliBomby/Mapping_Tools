@@ -99,17 +99,20 @@
                             </ListBox.ItemsPanel>
                             <ListBox.ContextMenu>
                                 <ContextMenu>
-                                    <MenuItem Header="Delete" Command="{Binding RemoveCommand}" Tag="Delete"
+                                    <MenuItem Header="_Delete" Command="{Binding RemoveCommand}" Tag="Delete"
                                       ToolTip="Delete selected patterns. Hold shift to skip dialog.">
                                         <MenuItem.Icon>
                                             <materialDesign:PackIcon Kind="TrashCan"/>
                                         </MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem Header="Open in File Explorer" Command="{Binding OpenExplorerSelectedCommand}"
+                                    <MenuItem Header="_Open in File Explorer" Command="{Binding OpenExplorerSelectedCommand}"
                                       ToolTip="Open the source files of the selected patterns in the File Explorer.">
                                         <MenuItem.Icon>
                                             <materialDesign:PackIcon Kind="ArrowTopRightThick"/>
                                         </MenuItem.Icon>
+                                    </MenuItem>
+                                    <MenuItem Header="_Properties" Command="{Binding ShowDetailsCommand}"
+                                              ToolTip="View additional properties of the pattern.">
                                     </MenuItem>
                                 </ContextMenu>
                             </ListBox.ContextMenu>

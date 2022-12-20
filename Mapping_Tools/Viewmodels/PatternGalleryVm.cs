@@ -201,6 +201,8 @@ namespace Mapping_Tools.Viewmodels {
         public CommandImplementation RemoveCommand { get; }
         [JsonIgnore]
         public CommandImplementation OpenExplorerSelectedCommand { get; }
+        [JsonIgnore]
+        public CommandImplementation ShowDetailsCommand { get; }
 
 
         [JsonIgnore]
@@ -232,7 +234,7 @@ namespace Mapping_Tools.Viewmodels {
                         var dialog = new CustomDialog(viewModel, 0);
                         var result = await DialogHost.Show(dialog, "RootDialog");
 
-                        if (result is not (true)) return;
+                        if (result is not true) return;
 
                         var hitObjects = new List<HitObject>();
                         foreach (string o in Regex.Split(viewModel.HitObjects, Environment.NewLine)) {
@@ -270,7 +272,7 @@ namespace Mapping_Tools.Viewmodels {
                         var dialog = new CustomDialog(viewModel, 0);
                         var result = await DialogHost.Show(dialog, "RootDialog");
 
-                        if (result is not (true)) return;
+                        if (result is not true) return;
 
                         var pattern = OsuPatternMaker.FromFileWithSave(
                             viewModel.FilePath, FileHandler, viewModel.Name, viewModel.Filter, viewModel.StartTime, viewModel.EndTime);
@@ -289,7 +291,7 @@ namespace Mapping_Tools.Viewmodels {
                         var dialog = new CustomDialog(viewModel, 0);
                         var result = await DialogHost.Show(dialog, "RootDialog");
 
-                        if (result is not (true)) return;
+                        if (result is not true) return;
 
                         var reader = EditorReaderStuff.GetFullEditorReader();
                         var editor = EditorReaderStuff.GetNewestVersion(IOHelper.GetCurrentBeatmap(), reader);
@@ -323,6 +325,21 @@ namespace Mapping_Tools.Viewmodels {
                     try {
                         ShowSelectedInExplorer.FilesOrFolders(
                             Patterns.Where(o => o.IsSelected).Select(o => FileHandler.GetPatternPath(o.FileName)));
+                    } catch (Exception ex) { ex.Show(); }
+                });
+            ShowDetailsCommand = new CommandImplementation(
+                async _ => {
+                    try {
+                        var pattern = Patterns.FirstOrDefault(o => o.IsSelected);
+                        if (pattern is null) return;
+
+                        var viewModel = new OsuPatternDetailsVm(pattern);
+                        var dialog = new CustomDialog(viewModel, 0);
+                        var result = await DialogHost.Show(dialog, "RootDialog");
+
+                        if (result is not true) return;
+
+                        pattern.Name = viewModel.Name;
                     } catch (Exception ex) { ex.Show(); }
                 });
         }
