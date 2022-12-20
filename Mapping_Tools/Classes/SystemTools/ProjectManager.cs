@@ -43,13 +43,24 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
         }
 
-        public static void SaveProject<T>(ISavable<T> view, bool dialog=false) {
-            if (dialog)
-                Directory.CreateDirectory(view.DefaultSaveFolder);
-            string path = dialog ? IOHelper.SaveProjectDialog(view.DefaultSaveFolder) : view.AutoSavePath;
+        public static void AutoSaveProject<T>(ISavable<T> view) {
+            string path = view.AutoSavePath;
+            SaveProject(view, path);
 
-            // If the file name is not an empty string open it for saving.  
-            if (path == "") return;
+            if (view is IHasExtraAutoSaveTarget hasExtraAutoSaveTarget) {
+                SaveProject(view, hasExtraAutoSaveTarget.ExtraAutoSavePath);
+            }
+        }
+
+        public static void SaveProjectDialog<T>(ISavable<T> view) {
+            Directory.CreateDirectory(view.DefaultSaveFolder);
+            string path = IOHelper.SaveProjectDialog(view.DefaultSaveFolder);
+            SaveProject(view, path);
+        }
+
+        public static void SaveProject<T>(ISavable<T> view, string path) {
+            // If the file name is not an empty string open it for saving.
+            if (string.IsNullOrEmpty(path)) return;
             try {
                 SaveJson(path, view.GetSaveData());
             } catch (Exception ex) {

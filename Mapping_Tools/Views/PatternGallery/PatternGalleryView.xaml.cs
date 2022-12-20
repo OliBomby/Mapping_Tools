@@ -24,10 +24,12 @@ namespace Mapping_Tools.Views.PatternGallery {
     /// </summary>
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
     //[HiddenTool]
-    public partial class PatternGalleryView : ISavable<PatternGalleryVm>, IQuickRun, IHaveExtraProjectMenuItems {
+    public partial class PatternGalleryView : ISavable<PatternGalleryVm>, IHasExtraAutoSaveTarget, IQuickRun, IHaveExtraProjectMenuItems {
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "patterngalleryproject.json");
 
         public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Pattern Gallery Projects");
+
+        public string ExtraAutoSavePath => Path.Combine(ViewModel.FileHandler.GetCollectionFolderPath(), "project.json");
 
         public static readonly string ToolName = "Pattern Gallery";
         public static readonly string ToolDescription =

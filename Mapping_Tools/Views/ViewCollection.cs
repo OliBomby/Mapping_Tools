@@ -92,7 +92,7 @@ namespace Mapping_Tools.Views {
 
         public void AutoSaveSettings() {
             foreach (var kvp in Views.Where(kvp => ProjectManager.IsSavable(kvp.Key))) {
-                ProjectManager.SaveProject((dynamic)kvp.Value);
+                ProjectManager.AutoSaveProject((dynamic)kvp.Value);
             }
         }
     }
