@@ -152,7 +152,10 @@
                             HorizontalAlignment="Right"
                             VerticalAlignment="Bottom"
                             Orientation="Horizontal">
-                            <TextBox Margin="5 8" Width="200" Style="{StaticResource MaterialDesignOutlinedTextBox}" materialDesign:HintAssist.Hint="Search"
+                            <TextBox Margin="5 8 20 8" Width="200"
+                                     materialDesign:HintAssist.Hint="Search"
+                                     materialDesign:TextFieldAssist.DecorationVisibility="Hidden"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
                                      ToolTip="Search for a pattern." Text="{Binding SearchFilter, UpdateSourceTrigger=PropertyChanged, Delay=100}"/>
                             <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a pattern from .osu code." Command="{Binding AddCodeCommand}" Margin="5">
                                 <materialDesign:PackIcon Kind="CodeBraces" Height="24" Width="24" />
