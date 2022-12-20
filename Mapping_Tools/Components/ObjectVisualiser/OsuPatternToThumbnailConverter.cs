@@ -5,6 +5,7 @@ using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Data;
+using System.Windows.Media.Imaging;
 using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
@@ -22,12 +23,25 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
         private const double MaxPixelLength = 1e6;
         private const int MaxAnchorCount = 5000;
 
+        private static readonly Dictionary<string, BitmapSource> Cache = new();
+
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture) {
             // Value is a string for the pattern filename. The parameter is the OsuPatternFileHandler
             if (values.Length < 2 || values[0] is not string filename || values[1] is not OsuPatternFileHandler fileHandler) {
                 return null;
             }
 
+            // Check if the pattern is in the cache
+            if (Cache.TryGetValue(filename, out var cachedBitmap)) {
+                return cachedBitmap;
+            }
+
+            var bitmapSource = DrawBeatmapFromFile(filename, fileHandler);
+            Cache.Add(filename, bitmapSource);
+            return bitmapSource;
+        }
+
+        private BitmapSource DrawBeatmapFromFile(string filename, OsuPatternFileHandler fileHandler) {
             try {
                 // Load the beatmap
                 var beatmap = fileHandler.GetPatternBeatmap(filename);

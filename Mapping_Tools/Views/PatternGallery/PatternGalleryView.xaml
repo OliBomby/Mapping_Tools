@@ -85,7 +85,7 @@
                             VerticalAlignment="Stretch"
                             SelectionMode="Extended"
                             VirtualizingPanel.CacheLengthUnit="Page"
-                            VirtualizingPanel.CacheLength="4,4"
+                            VirtualizingPanel.CacheLength="1,1"
                             VirtualizingPanel.ScrollUnit="Pixel"
                             VirtualizingPanel.VirtualizationMode="Recycling">
                             <ListBox.ItemsPanel>
@@ -153,7 +153,7 @@
                             VerticalAlignment="Bottom"
                             Orientation="Horizontal">
                             <TextBox Margin="5 8" Width="200" Style="{StaticResource MaterialDesignOutlinedTextBox}" materialDesign:HintAssist.Hint="Search"
-                                     ToolTip="Search for a pattern." Text="{Binding SearchFilter, UpdateSourceTrigger=PropertyChanged, Delay=300}"/>
+                                     ToolTip="Search for a pattern." Text="{Binding SearchFilter, UpdateSourceTrigger=PropertyChanged, Delay=100}"/>
                             <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Add a pattern from .osu code." Command="{Binding AddCodeCommand}" Margin="5">
                                 <materialDesign:PackIcon Kind="CodeBraces" Height="24" Width="24" />
                             </Button>
