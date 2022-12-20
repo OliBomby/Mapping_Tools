@@ -165,6 +165,11 @@ namespace Mapping_Tools.Views.PatternGallery {
 
         public void SetSaveData(PatternGalleryVm saveData)
         {
+            // Save the current project to its collection folder if it has patterns
+            if (ViewModel.Patterns.Count > 0) {
+                ProjectManager.SaveProject(this, ExtraAutoSavePath);
+            }
+
             DataContext = saveData;
             InitializeOsuPatternFileHandler();
         }
