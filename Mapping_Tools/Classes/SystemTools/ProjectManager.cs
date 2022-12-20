@@ -43,6 +43,14 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
         }
 
+        public static T LoadJson<T>(Stream stream) {
+            using (StreamReader fs = new StreamReader(stream)) {
+                using (JsonReader reader = new JsonTextReader(fs)) {
+                    return Serializer.Deserialize<T>(reader);
+                }
+            }
+        }
+
         public static void AutoSaveProject<T>(ISavable<T> view) {
             string path = view.AutoSavePath;
             SaveProject(view, path);
