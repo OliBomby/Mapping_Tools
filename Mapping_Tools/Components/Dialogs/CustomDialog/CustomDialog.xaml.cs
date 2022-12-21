@@ -3,6 +3,7 @@ using Mapping_Tools.Components.Domain;
 using MaterialDesignThemes.Wpf;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
@@ -77,10 +78,8 @@ namespace Mapping_Tools.Components.Dialogs.CustomDialog {
         }
 
         private UIElement GetSettingControl(PropertyInfo prop, object settings) {
-            if (!prop.CanWrite || !prop.CanRead) return null;
+            if (!prop.CanRead) return null;
 
-            var value = prop.GetValue(settings);
-            if (value == null) return null;
 
             string name;
             if (prop.GetCustomAttribute(typeof(DisplayNameAttribute)) is DisplayNameAttribute n) {
@@ -94,12 +93,51 @@ namespace Mapping_Tools.Components.Dialogs.CustomDialog {
                 description = d.Description;
             }
 
-            UIElement content = null;
+            UIElement content = prop.CanWrite
+                ? CreateEditableElement(prop, settings, name, description)
+                : CreateReadOnlyElement(prop, settings, name, description);
+
+            if (content != null && _autoSelectIndex == _populationIndex) {
+                _autoSelectElement = content;
+            }
+            _populationIndex++;
+
+            return content;
+        }
+
+        private UIElement CreateReadOnlyElement(PropertyInfo prop, object settings, string name, string description) {
+            CultureInfo cultureInfo = CultureInfo.CurrentCulture;
+            if (prop.GetCustomAttribute(typeof(InvariantCultureAttribute)) is not null) {
+                cultureInfo = CultureInfo.InvariantCulture;
+            }
+
+            var horizontalPanel = new StackPanel {Orientation = Orientation.Horizontal, Margin = new Thickness(0, 0, 0, 5)};
+
+            var propertyNameText = new TextBlock {
+                Width = 150,
+                Text = name,
+                ToolTip = description
+            };
+            var propertyValueText = new TextBlock {
+                Text = Convert.ToString(prop.GetValue(settings), cultureInfo),
+                ToolTip = description
+            };
+
+            horizontalPanel.Children.Add(propertyNameText);
+            horizontalPanel.Children.Add(propertyValueText);
+
+            return horizontalPanel;
+        }
+
+        private UIElement CreateEditableElement(PropertyInfo prop, object settings, string name, string description) {
+            var value = prop.GetValue(settings);
+            if (value == null) return null;
+
             switch (value) {
                 case bool _:
                     var checkBox = new CheckBox {
-                        Content = name, 
-                        ToolTip = description, 
+                        Content = name,
+                        ToolTip = description,
                         Margin = new Thickness(0, 0, 0, 5)
                     };
 
@@ -107,11 +145,10 @@ namespace Mapping_Tools.Components.Dialogs.CustomDialog {
                         Source = settings
                     };
                     checkBox.SetBinding(ToggleButton.IsCheckedProperty, toggleBinding);
-                    content = checkBox;
-                    break;
+                    return checkBox;
                 case double _:
                     var doubleTextBox = new TextBox {
-                        MinWidth = 100, 
+                        MinWidth = 100,
                         ToolTip = description,
                         Margin = new Thickness(0, 0, 0, 5),
                         Style = Application.Current.FindResource("MaterialDesignFloatingHintTextBox") as Style
@@ -132,11 +169,10 @@ namespace Mapping_Tools.Components.Dialogs.CustomDialog {
                     }
 
                     doubleTextBox.SetBinding(TextBox.TextProperty, doubleBinding);
-                    content = doubleTextBox;
-                    break;
+                    return doubleTextBox;
                 case string _:
                     var stringTextBox = new TextBox {
-                        MinWidth = 100, 
+                        MinWidth = 100,
                         ToolTip = description,
                         Margin = new Thickness(0, 0, 0, 5),
                         Style = Application.Current.FindResource("MaterialDesignFloatingHintTextBox") as Style };
@@ -154,7 +190,7 @@ namespace Mapping_Tools.Components.Dialogs.CustomDialog {
                     };
                     stringTextBox.SetBinding(TextBox.TextProperty, stringBinding);
 
-                    content = stringTextBox;
+                    UIElement content = stringTextBox;
 
                     // Attach a file browser button
                     if (prop.GetCustomAttribute(typeof(FileBrowseAttribute)) != null) {
@@ -166,15 +202,10 @@ namespace Mapping_Tools.Components.Dialogs.CustomDialog {
                         content = AttachBeatmapBrowseHelp(stringTextBox, prop, settings);
                     }
 
-                    break;
+                    return content;
             }
 
-            if (content != null && _autoSelectIndex == _populationIndex) {
-                _autoSelectElement = content;
-            }
-            _populationIndex++;
-
-            return content;
+            return null;
         }
 
         private void CustomDialog_OnLoaded(object sender, RoutedEventArgs e) {
