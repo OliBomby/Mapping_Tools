@@ -405,6 +405,7 @@ Source: "{#BuildFolderPath}\Xceed.Wpf.AvalonDock.Themes.VS2010.NET5.dll"; DestDi
 Source: "{#BuildFolderPath}\Xceed.Wpf.AvalonDock.Themes.Metro.NET5.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#BuildFolderPath}\Xceed.Wpf.AvalonDock.Themes.Aero.NET5.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#BuildFolderPath}\VirtualizingWrapPanel.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#BuildFolderPath}\Microsoft.Xaml.Behaviors.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
