@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Components.Domain;
 using System.ComponentModel;
@@ -56,8 +57,10 @@ namespace Mapping_Tools.Viewmodels {
 
             ExportBrowseCommand = new CommandImplementation(
                 _ => {
-                    string[] paths = IOHelper.BeatmapFileDialog(true, !SettingsManager.Settings.CurrentBeatmapDefaultFolder);
-                    if( paths.Length != 0 ) {
+                    string importPathDirectory = Directory.GetParent(ImportPath).FullName;
+                    
+                    string[] paths = IOHelper.BeatmapFileDialog(importPathDirectory, true);
+                    if ( paths.Length != 0 ) {
                         ExportPath = string.Join("|", paths);
                     }
                 });
