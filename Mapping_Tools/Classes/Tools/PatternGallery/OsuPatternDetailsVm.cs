@@ -7,7 +7,6 @@ using Mapping_Tools.Components.Dialogs.CustomDialog;
 namespace Mapping_Tools.Classes.Tools.PatternGallery {
     public class OsuPatternDetailsVm : BindableBase {
 
-
         #region Fields
 
         private string name;
@@ -29,10 +28,6 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
         [InvariantCulture]
         public int UseCount { get; }
 
-        [DisplayName("File name")]
-        [InvariantCulture]
-        public string FileName { get; }
-
         [DisplayName("Object count")]
         [InvariantCulture]
         public int ObjectCount { get; }
@@ -44,6 +39,10 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
         [DisplayName("Beat length")]
         [InvariantCulture]
         public double BeatLength { get; }
+
+        [DisplayName("File name")]
+        [InvariantCulture]
+        public string FileName { get; }
 
         #endregion
 
