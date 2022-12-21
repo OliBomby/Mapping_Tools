@@ -89,7 +89,7 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
                     }
 
                     // Draw a follow line
-                    if (Vector2.Distance(nextHo.Pos, hitObject.EndPos) > circleSize * 2.5) {
+                    if (!nextHo.ActualNewCombo && Vector2.Distance(nextHo.Pos, hitObject.EndPos) > circleSize * 2.5) {
                         var dist = Vector2.Distance(nextHo.Pos, hitObject.EndPos);
                         var p1 = Vector2.Lerp(nextHo.Pos, hitObject.EndPos, circleSize / dist * 1.2);
                         var p2 = Vector2.Lerp(nextHo.Pos, hitObject.EndPos, 1 - circleSize / dist * 1.2);
