@@ -23,6 +23,14 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
         private const double MaxPixelLength = 1e6;
         private const int MaxAnchorCount = 5000;
 
+        private static readonly Brush CircleInsideBrush = Brushes.Green;
+        private static readonly Brush CircleOutsideBrush = Brushes.White;
+        private static readonly Brush SliderInsideBrush = Brushes.DarkSlateGray;
+        private static readonly Brush SliderOutsideBrush = Brushes.White;
+        private static readonly Brush ComboTextBrush = Brushes.White;
+        private static readonly Brush SpinnerBrush = Brushes.White;
+        private static readonly Brush FollowPointBrush = Brushes.White;
+
         private static readonly Dictionary<string, BitmapSource> Cache = new();
 
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture) {
@@ -74,11 +82,8 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
                 const double approachTime = 1000;
                 var circleSize = Beatmap.GetHitObjectRadius(beatmap.Difficulty["CircleSize"].DoubleValue);
                 var hitObjects = beatmap.HitObjects.TakeWhile(o => o.Time < firstTime + approachTime).Reverse();
-                using var pen = new Pen(Color.White, (float) circleSize * PenWidth);
-                var insideBrush = Brushes.DarkSlateGray;
-                var outsideBrush = Brushes.YellowGreen;
                 using var font = new Font(FontFamily.GenericSansSerif, (float) (circleSize * 0.6), FontStyle.Bold);
-                using var followPen = new Pen(Color.White, (float) circleSize * 0.1f) { DashStyle = DashStyle.Dash };
+                using var followPen = new Pen(FollowPointBrush, (float) circleSize * 0.1f) { DashStyle = DashStyle.Dash };
 
                 // This is the next position because we are iterating in reverse time order
                 HitObject nextHo = null;
@@ -96,11 +101,11 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
                         gfx.DrawLine(followPen, (float) p1.X, (float) p1.Y, (float) p2.X, (float) p2.Y);
                     }
 
-                    DrawHitObject(gfx, nextHo, circleSize, pen, insideBrush, outsideBrush, font, sliderPaths);
+                    DrawHitObject(gfx, nextHo, circleSize, font, sliderPaths);
                     nextHo = hitObject;
                 }
 
-                DrawHitObject(gfx, nextHo, circleSize, pen, insideBrush, outsideBrush, font, sliderPaths);
+                DrawHitObject(gfx, nextHo, circleSize, font, sliderPaths);
 
                 return bmp.ToBitmapSource();
             } catch {
@@ -108,13 +113,13 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
             }
         }
 
-        private void DrawHitObject(Graphics gfx, HitObject hitObject, double circleSize, Pen pen, Brush insideBrush, Brush outsideBrush, Font font, Dictionary<HitObject, SliderPath> sliderPaths) {
+        private void DrawHitObject(Graphics gfx, HitObject hitObject, double circleSize, Font font, Dictionary<HitObject, SliderPath> sliderPaths) {
             var pos = hitObject.StackedPos;
             if (hitObject.IsSlider) {
                 if (!sliderPaths.ContainsKey(hitObject)) return;
 
-                using var outlinePen = new Pen(outsideBrush, (float) circleSize * 1.95f) { LineJoin = LineJoin.Round, StartCap = LineCap.Round, EndCap = LineCap.Round };
-                using var insidePen = new Pen(insideBrush, (float) circleSize * 1.65f) { LineJoin = LineJoin.Round, StartCap = LineCap.Round, EndCap = LineCap.Round };
+                using var outlinePen = new Pen(SliderOutsideBrush, (float) circleSize * 1.95f) { LineJoin = LineJoin.Round, StartCap = LineCap.Round, EndCap = LineCap.Round };
+                using var insidePen = new Pen(SliderInsideBrush, (float) circleSize * 1.65f) { LineJoin = LineJoin.Round, StartCap = LineCap.Round, EndCap = LineCap.Round };
                 var path = sliderPaths[hitObject];
 
                 using GraphicsPath gc = new GraphicsPath();
@@ -123,26 +128,27 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
 
                 gfx.DrawPath(outlinePen, gc);
                 gfx.DrawPath(insidePen, gc);
-                DrawCircleAtProgress(gfx, insideBrush, outsideBrush, path, 1, circleSize);
-                DrawCircleAtProgress(gfx, insideBrush, outsideBrush, path, 0, circleSize);
-                DrawTextAtPos(gfx, Brushes.White, font, hitObject.ComboIndex.ToString(), pos);
+                //DrawCircleAtProgress(gfx, path, 1, circleSize);
+                DrawCircleAtProgress(gfx, path, 0, circleSize);
+                DrawTextAtPos(gfx, ComboTextBrush, font, hitObject.ComboIndex.ToString(), pos);
             } else if (hitObject.IsSpinner) {
+                using var pen = new Pen(SpinnerBrush, (float) circleSize * PenWidth);
                 DrawCircleAtPos(gfx, pen, new Vector2(256, 192), 150);
                 DrawCircleAtPos(gfx, pen, new Vector2(256, 192), 5);
             } else {
-                DrawFilledCircleAtPos(gfx, insideBrush, outsideBrush, pos, circleSize);
-                DrawTextAtPos(gfx, Brushes.White, font, hitObject.ComboIndex.ToString(), pos);
+                DrawFilledCircleAtPos(gfx, pos, circleSize);
+                DrawTextAtPos(gfx, ComboTextBrush, font, hitObject.ComboIndex.ToString(), pos);
             }
         }
 
-        private void DrawCircleAtProgress(Graphics gfx, Brush insideBrush, Brush outsideBrush, SliderPath path, double progress, double circleSize) {
+        private void DrawCircleAtProgress(Graphics gfx, SliderPath path, double progress, double circleSize) {
             var pos = path.PositionAt(progress);
-            DrawFilledCircleAtPos(gfx, insideBrush, outsideBrush, pos, circleSize);
+            DrawFilledCircleAtPos(gfx, pos, circleSize);
         }
 
-        private void DrawFilledCircleAtPos(Graphics gfx, Brush insideBrush, Brush outsideBrush, Vector2 pos, double radius) {
-            DrawFilledCircleAtPos(gfx, outsideBrush, pos, radius);
-            DrawFilledCircleAtPos(gfx, insideBrush, pos, radius * 0.846);
+        private void DrawFilledCircleAtPos(Graphics gfx, Vector2 pos, double radius) {
+            DrawFilledCircleAtPos(gfx, CircleOutsideBrush, pos, radius);
+            DrawFilledCircleAtPos(gfx, CircleInsideBrush, pos, radius * 0.846);
         }
 
         private void DrawFilledCircleAtPos(Graphics gfx, Brush brush, Vector2 pos, double radius) {
