@@ -2,6 +2,7 @@
 using System.Data;
 using System.IO;
 using System.Linq;
+using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using Newtonsoft.Json;
 
@@ -70,6 +71,10 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
 
             Directory.Move(GetCollectionFolderPath(), Path.Combine(BasePath, newName));
             CollectionFolderName = newName;
+        }
+
+        public Beatmap GetPatternBeatmap(string fileName) {
+            return new BeatmapEditor(GetPatternPath(fileName)).Beatmap;
         }
     }
 }

@@ -5,8 +5,8 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
-    <AssemblyVersion>1.12.0</AssemblyVersion>
-    <FileVersion>1.12.0</FileVersion>
+    <AssemblyVersion>1.12.1</AssemblyVersion>
+    <FileVersion>1.12.1</FileVersion>
     <AssemblyName>Mapping Tools</AssemblyName>
     <ApplicationIcon>Data\mt_icon.ico</ApplicationIcon>
     <Platforms>AnyCPU;x86;x64</Platforms>
@@ -63,8 +63,8 @@
 
   <ItemGroup>
     <PackageReference Include="Extended.Wpf.Toolkit" Version="4.4.0" />
-    <PackageReference Include="MaterialDesignColors" Version="2.0.1" />
-    <PackageReference Include="MaterialDesignThemes" Version="4.1.0" />
+    <PackageReference Include="MaterialDesignColors" Version="2.1.0-ci390" />
+    <PackageReference Include="MaterialDesignThemes" Version="4.7.0-ci390" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Core" Version="1.1.4" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.4" />
     <PackageReference Include="NAudio" Version="2.0.0" />
@@ -75,6 +75,7 @@
     <PackageReference Include="Onova" Version="2.6.2" />
     <PackageReference Include="OsuMemoryDataProvider" Version="0.8.9" />
     <PackageReference Include="Overlay.NET" Version="1.0.2" />
+    <PackageReference Include="VirtualizingWrapPanel" Version="1.5.7" />
   </ItemGroup>
 
   <ItemGroup>
@@ -87,6 +88,8 @@
     <Resource Include="Data\mt_logo_white_24.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
+    <None Remove="Data\sample_pattern.jpg" />
+    <Resource Include="Data\sample_pattern.jpg" />
   </ItemGroup>
 
   <ItemGroup>
@@ -130,18 +133,6 @@
     </Compile>
     <Compile Update="Components\HotkeyEditorControl.xaml.cs">
       <DependentUpon>HotkeyEditorControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Components\ObjectVisualiser\HitObject.xaml.cs">
-      <DependentUpon>HitObject.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Components\ObjectVisualiser\ObjectPlayfield.xaml.cs">
-      <DependentUpon>ObjectPlayfield.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Components\ObjectVisualiser\SliderAnchor.xaml.cs">
-      <DependentUpon>SliderAnchor.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Components\ObjectVisualiser\SliderAnchorLine.xaml.cs">
-      <DependentUpon>SliderAnchorLine.xaml</DependentUpon>
     </Compile>
     <Compile Update="Components\TimeLine\TimeLine.xaml.cs">
       <DependentUpon>TimeLine.xaml</DependentUpon>
@@ -299,18 +290,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Components\HotkeyEditorControl.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Components\ObjectVisualiser\HitObject.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Components\ObjectVisualiser\ObjectPlayfield.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Components\ObjectVisualiser\SliderAnchor.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Components\ObjectVisualiser\SliderAnchorLine.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Components\Spectrum\Spectrum.xaml">

@@ -10,12 +10,14 @@ using Mapping_Tools.Components.Domain;
 using MaterialDesignThemes.Wpf;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 
 namespace Mapping_Tools.Viewmodels {
@@ -51,6 +53,27 @@ namespace Mapping_Tools.Viewmodels {
 
         [JsonIgnore]
         public OsuPatternPlacer OsuPatternPlacer { get; set; }
+
+        [JsonIgnore]
+        private readonly ListCollectionView patternCollectionView;
+
+        [JsonIgnore]
+        private string searchFilter = string.Empty;
+        [JsonIgnore]
+        public string SearchFilter { get => searchFilter; set => SetSearchFilter(value); }
+
+        [JsonIgnore]
+        public string[] SortableProperties { get; } = { "Name", "Creation time", "Last used time", "Usage count", "Object count", "Duration", "Beat length" };
+
+        [JsonIgnore]
+        private string sortProperty = "Creation time";
+        [JsonIgnore]
+        public string SortProperty { get => sortProperty; set => SetSortProperty(value); }
+
+        [JsonIgnore]
+        private int sortDirection = 0;
+        [JsonIgnore]
+        public int SortDirection { get => sortDirection; set => SetSortDirection(value); }
 
         #region Options
 
@@ -192,7 +215,8 @@ namespace Mapping_Tools.Viewmodels {
         public CommandImplementation RemoveCommand { get; }
         [JsonIgnore]
         public CommandImplementation OpenExplorerSelectedCommand { get; }
-
+        [JsonIgnore]
+        public CommandImplementation ShowDetailsCommand { get; }
 
         [JsonIgnore]
         public string[] Paths { get; set; }
@@ -209,6 +233,11 @@ namespace Mapping_Tools.Viewmodels {
             ExportTimeMode = ExportTimeMode.Current;
             CustomExportTime = 0;
 
+            // Set up filters
+            patternCollectionView = (ListCollectionView) CollectionViewSource.GetDefaultView(Patterns);
+            patternCollectionView.Filter = PatternNameFilter;
+            patternCollectionView.CustomSort = new CustomPatternSorter { Parent = this };
+
             AddCodeCommand = new CommandImplementation(
                 async _ => {
                     try {
@@ -219,7 +248,7 @@ namespace Mapping_Tools.Viewmodels {
                         var dialog = new CustomDialog(viewModel, 0);
                         var result = await DialogHost.Show(dialog, "RootDialog");
 
-                        if (!(bool)result) return;
+                        if (result is not true) return;
 
                         var hitObjects = new List<HitObject>();
                         foreach (string o in Regex.Split(viewModel.HitObjects, Environment.NewLine)) {
@@ -257,7 +286,7 @@ namespace Mapping_Tools.Viewmodels {
                         var dialog = new CustomDialog(viewModel, 0);
                         var result = await DialogHost.Show(dialog, "RootDialog");
 
-                        if (!(bool)result) return;
+                        if (result is not true) return;
 
                         var pattern = OsuPatternMaker.FromFileWithSave(
                             viewModel.FilePath, FileHandler, viewModel.Name, viewModel.Filter, viewModel.StartTime, viewModel.EndTime);
@@ -276,7 +305,7 @@ namespace Mapping_Tools.Viewmodels {
                         var dialog = new CustomDialog(viewModel, 0);
                         var result = await DialogHost.Show(dialog, "RootDialog");
 
-                        if (!(bool)result) return;
+                        if (result is not true) return;
 
                         var reader = EditorReaderStuff.GetFullEditorReader();
                         var editor = EditorReaderStuff.GetNewestVersion(IOHelper.GetCurrentBeatmap(), reader);
@@ -312,6 +341,21 @@ namespace Mapping_Tools.Viewmodels {
                             Patterns.Where(o => o.IsSelected).Select(o => FileHandler.GetPatternPath(o.FileName)));
                     } catch (Exception ex) { ex.Show(); }
                 });
+            ShowDetailsCommand = new CommandImplementation(
+                async _ => {
+                    try {
+                        var pattern = Patterns.FirstOrDefault(o => o.IsSelected);
+                        if (pattern is null) return;
+
+                        var viewModel = new OsuPatternDetailsVm(pattern);
+                        var dialog = new CustomDialog(viewModel, 0);
+                        var result = await DialogHost.Show(dialog, "RootDialog");
+
+                        if (result is not true) return;
+
+                        pattern.Name = viewModel.Name;
+                    } catch (Exception ex) { ex.Show(); }
+                });
         }
 
         private static void SelectAll(bool select, IEnumerable<OsuPattern> patterns) {
@@ -319,5 +363,50 @@ namespace Mapping_Tools.Viewmodels {
                 model.IsSelected = select;
             }
         }
+
+
+        #region UI helpers
+
+        private bool PatternNameFilter(object item) {
+            return string.IsNullOrEmpty(SearchFilter) || ((OsuPattern)item).Name.Contains(SearchFilter, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private void SetSearchFilter(string value) {
+            searchFilter = value;
+            patternCollectionView.Refresh();
+        }
+
+        private void SetSortProperty(string value) {
+            sortProperty = value;
+            patternCollectionView.Refresh();
+        }
+
+        private void SetSortDirection(int value) {
+            sortDirection = value;
+            patternCollectionView.Refresh();
+        }
+
+        private class CustomPatternSorter : IComparer {
+            public PatternGalleryVm Parent { get; init; }
+
+            public int Compare(object x, object y) {
+                if (x is not OsuPattern p1 || y is not OsuPattern p2) return -1;
+
+                int result = Parent.SortProperty switch {
+                    "Name" => string.Compare(p1.Name, p2.Name, StringComparison.Ordinal),
+                    "Creation time" => DateTime.Compare(p1.CreationTime, p2.CreationTime),
+                    "Last used time" => DateTime.Compare(p1.LastUsedTime, p2.LastUsedTime),
+                    "Usage count" => p1.UseCount.CompareTo(p2.UseCount),
+                    "Object count" => p1.ObjectCount.CompareTo(p2.ObjectCount),
+                    "Duration" => TimeSpan.Compare(p1.Duration, p2.Duration),
+                    "Beat length" => p1.BeatLength.CompareTo(p2.BeatLength),
+                    _ => -1
+                };
+
+                return Parent.SortDirection == 0 ? result : -result;
+            }
+        }
+
+        #endregion
     }
 }
