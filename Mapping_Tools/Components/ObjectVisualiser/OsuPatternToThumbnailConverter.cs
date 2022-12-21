@@ -9,6 +9,7 @@ using System.Windows.Media.Imaging;
 using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
+using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.Tools.PatternGallery;
 
 namespace Mapping_Tools.Components.ObjectVisualiser {
@@ -18,7 +19,6 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
         private const int Margin = 10;
         private const float Scale = (ThumbnailWidth - Margin * 2) / 512f;
         private const float PenWidth = 0.15f;
-        private const float CircleSizeFactor = 1 / (1 + PenWidth);
         
         private const double MaxPixelLength = 1e6;
         private const int MaxAnchorCount = 5000;
@@ -75,9 +75,12 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
                 var circleSize = Beatmap.GetHitObjectRadius(beatmap.Difficulty["CircleSize"].DoubleValue);
                 var hitObjects = beatmap.HitObjects.TakeWhile(o => o.Time < firstTime + approachTime).Reverse();
                 using var pen = new Pen(Color.White, (float) circleSize * PenWidth);
+                var insideBrush = Brushes.DarkSlateGray;
+                var outsideBrush = Brushes.YellowGreen;
+                using var font = new Font(FontFamily.GenericSansSerif, (float) (circleSize * 0.6), FontStyle.Bold);
 
                 foreach (var hitObject in hitObjects) {
-                    DrawHitObject(gfx, hitObject, circleSize, pen, sliderPaths);
+                    DrawHitObject(gfx, hitObject, circleSize, pen, insideBrush, outsideBrush, font, sliderPaths);
                 }
 
                 return bmp.ToBitmapSource();
@@ -86,17 +89,13 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
             }
         }
 
-        private void DrawHitObject(Graphics gfx, HitObject hitObject, double circleSize, Pen pen, Dictionary<HitObject, SliderPath> sliderPaths) {
+        private void DrawHitObject(Graphics gfx, HitObject hitObject, double circleSize, Pen pen, Brush insideBrush, Brush outsideBrush, Font font, Dictionary<HitObject, SliderPath> sliderPaths) {
             var pos = hitObject.StackedPos;
-            var c = CircleSizeFactor * circleSize;
-            var x = (int) (pos.X - c);
-            var y = (int) (pos.Y - c);
-            var s = (int) (c * 2);
             if (hitObject.IsSlider) {
                 if (!sliderPaths.ContainsKey(hitObject)) return;
 
-                var outlinePen = new Pen(Color.White, (float) circleSize * 1.95f) { LineJoin = LineJoin.Round, StartCap = LineCap.Round, EndCap = LineCap.Round };
-                var insidePen = new Pen(Color.Black, (float) circleSize * 1.65f) { LineJoin = LineJoin.Round, StartCap = LineCap.Round, EndCap = LineCap.Round };
+                using var outlinePen = new Pen(outsideBrush, (float) circleSize * 1.95f) { LineJoin = LineJoin.Round, StartCap = LineCap.Round, EndCap = LineCap.Round };
+                using var insidePen = new Pen(insideBrush, (float) circleSize * 1.65f) { LineJoin = LineJoin.Round, StartCap = LineCap.Round, EndCap = LineCap.Round };
                 var path = sliderPaths[hitObject];
 
                 using GraphicsPath gc = new GraphicsPath();
@@ -105,22 +104,45 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
 
                 gfx.DrawPath(outlinePen, gc);
                 gfx.DrawPath(insidePen, gc);
-                DrawCircleAtProgress(gfx, pen, path, 1, c);
-                DrawCircleAtProgress(gfx, pen, path, 0, c);
+                DrawCircleAtProgress(gfx, insideBrush, outsideBrush, path, 1, circleSize);
+                DrawCircleAtProgress(gfx, insideBrush, outsideBrush, path, 0, circleSize);
+                DrawTextAtPos(gfx, Brushes.White, font, hitObject.ComboIndex.ToString(), pos);
             } else if (hitObject.IsSpinner) {
-                gfx.DrawEllipse(pen, 256 - 150, 192 - 150, 300, 300);
-                gfx.DrawEllipse(pen, 256 - 5, 192 - 5, 10, 10);
+                DrawCircleAtPos(gfx, pen, new Vector2(256, 192), 150);
+                DrawCircleAtPos(gfx, pen, new Vector2(256, 192), 5);
             } else {
-                gfx.DrawEllipse(pen, x, y, s, s);
+                DrawFilledCircleAtPos(gfx, insideBrush, outsideBrush, pos, circleSize);
+                DrawTextAtPos(gfx, Brushes.White, font, hitObject.ComboIndex.ToString(), pos);
             }
         }
 
-        private void DrawCircleAtProgress(Graphics gfx, Pen pen, SliderPath path, double progress, double circleSize) {
+        private void DrawCircleAtProgress(Graphics gfx, Brush insideBrush, Brush outsideBrush, SliderPath path, double progress, double circleSize) {
             var pos = path.PositionAt(progress);
-            var x = (int) (pos.X - circleSize);
-            var y = (int) (pos.Y - circleSize);
-            var s = (int) (circleSize * 2);
+            DrawFilledCircleAtPos(gfx, insideBrush, outsideBrush, pos, circleSize);
+        }
+
+        private void DrawFilledCircleAtPos(Graphics gfx, Brush insideBrush, Brush outsideBrush, Vector2 pos, double radius) {
+            DrawFilledCircleAtPos(gfx, outsideBrush, pos, radius);
+            DrawFilledCircleAtPos(gfx, insideBrush, pos, radius * 0.846);
+        }
+
+        private void DrawFilledCircleAtPos(Graphics gfx, Brush brush, Vector2 pos, double radius) {
+            var x = (int) (pos.X - radius);
+            var y = (int) (pos.Y - radius);
+            var s = (int) (radius * 2);
+            gfx.FillEllipse(brush, x, y, s, s);
+        }
+
+        private void DrawCircleAtPos(Graphics gfx, Pen pen, Vector2 pos, double radius) {
+            var x = (int) (pos.X - radius);
+            var y = (int) (pos.Y - radius);
+            var s = (int) (radius * 2);
             gfx.DrawEllipse(pen, x, y, s, s);
+        }
+
+        private void DrawTextAtPos(Graphics gfx, Brush brush, Font font, string text, Vector2 pos) {
+            var textSize = gfx.MeasureString(text, font);
+            gfx.DrawString(text, font, brush, (float) (pos.X - textSize.Width * 0.5), (float) (pos.Y - textSize.Height * 0.5));
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) {
