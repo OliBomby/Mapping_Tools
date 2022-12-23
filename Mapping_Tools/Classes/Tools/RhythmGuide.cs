@@ -6,6 +6,7 @@ using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.HitsoundStuff;
+using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.ToolHelpers;
 
@@ -125,7 +126,9 @@ namespace Mapping_Tools.Classes.Tools {
 
         public enum SelectionMode {
             AllEvents,
-            HitsoundEvents
+            HitsoundEvents,
+            AllEventSeparated,
+            LongNotes
         }
 
         /// <summary>
@@ -190,20 +193,38 @@ namespace Mapping_Tools.Classes.Tools {
         }
 
         private static void PopulateBeatmap(Beatmap beatmap, IEnumerable<Beatmap> beatmaps, RhythmGuideGeneratorArgs args) {
-            // Get the times from all beatmaps
-            var times = new HashSet<double>();
             foreach (var b in beatmaps) {
                 var timeline = b.GetTimeline();
                 foreach (var timelineObject in timeline.TimelineObjects) {
                     // Handle different selection modes
                     switch (args.SelectionMode) {
                         case SelectionMode.AllEvents:
-                            times.Add(b.BeatmapTiming.Resnap(timelineObject.Time, args.BeatDivisors));
-
+                            AddHitObject(timelineObject.Time);
                             break;
                         case SelectionMode.HitsoundEvents:
                             if (timelineObject.HasHitsound) {
-                                times.Add(b.BeatmapTiming.Resnap(timelineObject.Time, args.BeatDivisors));
+                                AddHitObject(timelineObject.Time);
+                            }
+
+                            break;
+                        case SelectionMode.AllEventSeparated:
+                            var active = timelineObject.IsHoldnoteHead || timelineObject.IsCircle || timelineObject.IsSliderHead;
+                            var pos = active ? new Vector2(0, 192) : new Vector2(512, 192);
+
+                            AddHitObject(timelineObject.Time, pos);
+                            break;
+                        case SelectionMode.LongNotes:
+                            var isStart = timelineObject.IsHoldnoteHead || timelineObject.IsCircle ||
+                                          timelineObject.IsSliderHead || timelineObject.IsSpinnerHead;
+
+                            if (isStart) {
+                                AddHitObject(timelineObject.Time);
+                            } else if (beatmap.HitObjects.Count > 0) {
+                                // Extend last object
+                                var last = beatmap.HitObjects[^1];
+                                last.IsCircle = false;
+                                last.IsHoldNote = true;
+                                last.EndTime = timelineObject.Time;
                             }
 
                             break;
@@ -213,9 +234,12 @@ namespace Mapping_Tools.Classes.Tools {
                 }
             }
 
-            // Generate hitcircles at those times
-            foreach (var ho in times.Select(time => new HitObject(time, 0, SampleSet.None, SampleSet.None))) {
-                ho.NewCombo = args.NcEverything;
+            void AddHitObject(double time, Vector2? pos = null) {
+                var t = beatmap.BeatmapTiming.Resnap(time, args.BeatDivisors);
+                var ho = new HitObject(time, 0, SampleSet.None, SampleSet.None) { NewCombo = args.NcEverything };
+                if (pos.HasValue)
+                    ho.Pos = pos.Value;
+
                 beatmap.HitObjects.Add(ho);
             }
         }
