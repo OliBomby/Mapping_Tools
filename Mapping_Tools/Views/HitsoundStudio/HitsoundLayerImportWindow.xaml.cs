@@ -31,10 +31,12 @@ namespace Mapping_Tools.Views.HitsoundStudio {
             InitializeComponent();
             HitsoundLayers = new List<HitsoundLayer>();
             index = i;
-            NameBox0.Text = string.Format("Layer {0}", index + 1);
-            NameBox.Text = string.Format("Layer {0}", index + 1);
-            NameBox2.Text = string.Format("Layer {0}", index + 1);
-            NameBox4.Text = string.Format("Layer {0}", index + 1);
+            var suggestedName = $"Layer {index + 1}";
+            NameBox0.Text = suggestedName;
+            NameBox.Text = suggestedName;
+            NameBox2.Text = suggestedName;
+            NameBox3.Text = suggestedName;
+            NameBox4.Text = suggestedName;
             BeatmapPathBox.Text = MainWindow.AppWindow.GetCurrentMaps()[0];
             BeatmapPathBox2.Text = MainWindow.AppWindow.GetCurrentMapsString();
             BeatmapPathBox4.Text = MainWindow.AppWindow.GetCurrentMapsString();
