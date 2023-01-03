@@ -181,13 +181,13 @@ namespace Mapping_Tools.Viewmodels {
                     _updateTimer.Interval = TimeSpan.FromSeconds(5);
 
                     // Set up objects/overlay
-                    var process = System.Diagnostics.Process.GetProcessesByName("osu!").FirstOrDefault();
+                    var process = EditorReaderStuff.GetOsuProcess();
                     if (process == null) {
                         return;
                     }
 
                     try {
-                        reader.SetProcess();
+                        reader.SetProcess(process);
                     }
                     catch {
                         return;
