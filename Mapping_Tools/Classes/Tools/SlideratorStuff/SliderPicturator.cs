@@ -431,6 +431,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
             double curPathDist = 0;
             double correction = 0;
             double availableDist = 0;
+            int totRepeats = 0;
             int curMs = 2;
             List<Vector2> curMsPath = new List<Vector2>();
             curMsPath.Add(sliderPath.Last());
@@ -463,7 +464,8 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
                     curMsDist += SNAPTOL;
                     // TODO: We could get more distance per segment than this but I can't be bothered
                     availableDist = 2 * (bottomRightOsuPxSlider.X - msLastSegStart[curMs].X);
-                    for (int j = 0; j < Math.Floor((frameDist - curMsDist) / availableDist); j++) {
+                    totRepeats = (int)Math.Floor((frameDist - curMsDist) / availableDist);
+                    for (int j = 0; j < totRepeats; j++) {
                         // We are assuming all slider positions are in the top left quadrant of the box centered on
                         // the top left sample point, so adding segments like this does not interfere with the picture.
                         curMsPath.Add(new Vector2(bottomRightOsuPxSlider.X, msLastSegStart[curMs].Y));
@@ -497,7 +499,8 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
                 curMsPath.Add(msLastSegStart[curMs]);
                 curMsDist += SNAPTOL;
                 availableDist = 2 * (bottomRightOsuPxSlider.X - msLastSegStart[curMs].X);
-                for (int j = 0; j < Math.Floor((frameDist - curMsDist) / availableDist); j++) {
+                totRepeats = (int) Math.Floor((frameDist - curMsDist) / availableDist);
+                for (int j = 0; j < totRepeats; j++) {
                     curMsPath.Add(new Vector2(bottomRightOsuPxSlider.X, msLastSegStart[curMs].Y));
                     curMsPath.Add(msLastSegStart[curMs]);
                     curMsDist += availableDist;
