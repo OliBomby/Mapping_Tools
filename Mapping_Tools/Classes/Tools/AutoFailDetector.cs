@@ -210,7 +210,7 @@ namespace Mapping_Tools.Classes.Tools {
             guideBuilder.AppendLine("Auto-fail fix guide. Place these extra objects to fix auto-fail:\n");
             int lastTime = 0;
             for (int i = 0; i < problemAreas.Count; i++) {
-                if (!(placementTimes != null && !placementTimes[i].HasValue)) {
+                if (!(placementTimes != null && !placementTimes[i].HasValue) && paddingSolution[i] > 0) {
                     guideBuilder.AppendLine(i == 0
                         ? $"Extra objects before {problemAreas[i].GetStartTime()}: {paddingSolution[i]}"
                         : $"Extra objects between {lastTime} - {problemAreas[i].GetStartTime()}: {paddingSolution[i]}");
@@ -218,8 +218,8 @@ namespace Mapping_Tools.Classes.Tools {
                 lastTime = GetAdjustedEndTime(problemAreas[i].unloadableHitObject) - approachTime;
             }
 
-            if (!(placementTimes != null && !placementTimes[placementTimes.Length - 1].HasValue)) {
-                guideBuilder.AppendLine($"Extra objects after {lastTime}: {paddingSolution.Last()}");
+            if (!(placementTimes != null && !placementTimes[^1].HasValue) && paddingSolution[^1] > 0) {
+                guideBuilder.AppendLine($"Extra objects after {lastTime}: {paddingSolution[^1]}");
             }
         }
 
