@@ -1,56 +1,53 @@
-﻿using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.MathUtil;
-using System;
-using System.Linq;
-using System.Drawing;
+﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Drawing.Imaging;
+using System.Linq;
+using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.MathUtil;
 
-namespace Mapping_Tools.Classes.Tools.SlideratorStuff
-{
-    public static class SliderPicturator
-    {
-        public static int SNAPTOL => (int) Math.Pow(2, 5) * 3;
-        private const int OSUPX_BETWEEN_ROWS = 960;
-        private const double LIGHTEN_AMOUNT = 0.25;
-        private const double DARKEN_AMOUNT = 0.1;
-        private const byte ALPHA = 180;
-        private static Color getOpaqueColor(Color top, Color bottom)
-        {
-            double GAMMA = 1;
+namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
+    public static class SliderPicturator {
+        private const int OsupxBetweenRows = 960;
+        private const double LightenAmount = 0.25;
+        private const double DarkenAmount = 0.1;
+        private const byte Alpha = 180;
+        private static int Snaptol => (int) Math.Pow(2, 5) * 3;
+
+        private static Color GetOpaqueColor(Color top, Color bottom) {
+            const double gamma = 1;
             double topOpacity = top.A / 255.0;
             double bottomOpacity = bottom.A / 255.0;
             double totOpacity = topOpacity + bottomOpacity * (1 - topOpacity);
             return Color.FromArgb(255,
-                (byte) Math.Round(Math.Pow((Math.Pow(bottom.R, GAMMA) * bottomOpacity * (1 - topOpacity) + Math.Pow(top.R, GAMMA) * topOpacity) / totOpacity, 1 / GAMMA)),
-                (byte) Math.Round(Math.Pow((Math.Pow(bottom.G, GAMMA) * bottomOpacity * (1 - topOpacity) + Math.Pow(top.G, GAMMA) * topOpacity) / totOpacity, 1 / GAMMA)),
-                (byte) Math.Round(Math.Pow((Math.Pow(bottom.B, GAMMA) * bottomOpacity * (1 - topOpacity) + Math.Pow(top.B, GAMMA) * topOpacity) / totOpacity, 1 / GAMMA)));
+                (byte) Math.Round(Math.Pow((Math.Pow(bottom.R, gamma) * bottomOpacity * (1 - topOpacity) + Math.Pow(top.R, gamma) * topOpacity) / totOpacity, 1 / gamma)),
+                (byte) Math.Round(Math.Pow((Math.Pow(bottom.G, gamma) * bottomOpacity * (1 - topOpacity) + Math.Pow(top.G, gamma) * topOpacity) / totOpacity, 1 / gamma)),
+                (byte) Math.Round(Math.Pow((Math.Pow(bottom.B, gamma) * bottomOpacity * (1 - topOpacity) + Math.Pow(top.B, gamma) * topOpacity) / totOpacity, 1 / gamma)));
         }
+
         // TODO: update segment count after polishing sliderball control segments to reflect an upper bound (x segments per ms)
-        public static (Bitmap, long) Recolor(Bitmap img, Color sliderColor, Color sliderBorder, Color backgroundColor, HitObject slider = null, bool BLACK_OFF = false, bool BORDER_OFF = false, bool OPAQUE_OFF = false, bool R = true, bool G = true, bool B = true, int quality = 101)
-        {
-            Color innerColor = Color.FromArgb(ALPHA,
-                (byte) Math.Min(255, sliderColor.R * (1 + 0.5 * LIGHTEN_AMOUNT) + 255 * LIGHTEN_AMOUNT),
-                (byte) Math.Min(255, sliderColor.G * (1 + 0.5 * LIGHTEN_AMOUNT) + 255 * LIGHTEN_AMOUNT),
-                (byte) Math.Min(255, sliderColor.B * (1 + 0.5 * LIGHTEN_AMOUNT) + 255 * LIGHTEN_AMOUNT));
-            Color outerColor = Color.FromArgb(ALPHA,
-                (byte) Math.Min(255, sliderColor.R / (1 + DARKEN_AMOUNT)),
-                (byte) Math.Min(255, sliderColor.G / (1 + DARKEN_AMOUNT)),
-                (byte) Math.Min(255, sliderColor.B / (1 + DARKEN_AMOUNT)));
+        public static (Bitmap, long) Recolor(Bitmap img, Color sliderColor, Color sliderBorder, Color backgroundColor, HitObject slider = null, bool blackOff = false,
+            bool borderOff = false, bool opaqueOff = false, bool r = true, bool g = true, bool b = true, int quality = 101) {
+            Color innerColor = Color.FromArgb(Alpha,
+                (byte) Math.Min(255, sliderColor.R * (1 + 0.5 * LightenAmount) + 255 * LightenAmount),
+                (byte) Math.Min(255, sliderColor.G * (1 + 0.5 * LightenAmount) + 255 * LightenAmount),
+                (byte) Math.Min(255, sliderColor.B * (1 + 0.5 * LightenAmount) + 255 * LightenAmount));
+            Color outerColor = Color.FromArgb(Alpha,
+                (byte) Math.Min(255, sliderColor.R / (1 + DarkenAmount)),
+                (byte) Math.Min(255, sliderColor.G / (1 + DarkenAmount)),
+                (byte) Math.Min(255, sliderColor.B / (1 + DarkenAmount)));
 
-            Color opaqueIC = getOpaqueColor(innerColor, backgroundColor);
-            Color opaqueOC = getOpaqueColor(outerColor, backgroundColor);
+            Color opaqueIC = GetOpaqueColor(innerColor, backgroundColor);
+            Color opaqueOC = GetOpaqueColor(outerColor, backgroundColor);
 
-            Vector3 projVec = new Vector3(opaqueIC.R - opaqueOC.R, opaqueIC.G - opaqueOC.G, opaqueIC.B - opaqueOC.B);
+            var projVec = new Vector3(opaqueIC.R - opaqueOC.R, opaqueIC.G - opaqueOC.G, opaqueIC.B - opaqueOC.B);
             double projVecLen = projVec.Length;
-            Vector3 opaqueOCVec = new Vector3(opaqueOC.R, opaqueOC.G, opaqueOC.B);
-            Vector3 opaqueICVec = new Vector3(opaqueIC.R, opaqueIC.G, opaqueIC.B);
-            Vector3 sBColVec = new Vector3(sliderBorder.R, sliderBorder.G, sliderBorder.B);
+            var opaqueOCVec = new Vector3(opaqueOC.R, opaqueOC.G, opaqueOC.B);
+            var opaqueICVec = new Vector3(opaqueIC.R, opaqueIC.G, opaqueIC.B);
+            var sBColVec = new Vector3(sliderBorder.R, sliderBorder.G, sliderBorder.B);
 
-            Color pixel;
-            Vector3 colorVec, proj, closestGradientVec, usedColor;
-            double gradientDist, borderDist, blackDist;
-            Bitmap ret = (Bitmap) img.Clone();
+            double gradientDist;
+            var ret = (Bitmap) img.Clone();
 
             int imgWidth = img.Width;
             int imgHeight = img.Height;
@@ -61,12 +58,14 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
                 BitmapData retData = ret.LockBits(new Rectangle(0, 0, imgWidth, imgHeight), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
                 for (int i = 0; i < imgWidth; i++) {
                     for (int j = 0; j < imgHeight; j++) {
-                        pixel = Color.FromArgb(((int*) imgData.Scan0)[j * imgWidth + i]);
-                        if (!OPAQUE_OFF) {
-                            pixel = getOpaqueColor(pixel, backgroundColor);
+                        Color pixel = Color.FromArgb(((int*) imgData.Scan0)[j * imgWidth + i]);
+                        if (!opaqueOff) {
+                            pixel = GetOpaqueColor(pixel, backgroundColor);
                         }
-                        colorVec = new Vector3(R ? pixel.R : 0, G ? pixel.G : 0, B ? pixel.B : 0);
-                        proj = Vector3.Dot(colorVec - opaqueOCVec, projVec) / Vector3.Dot(projVec, projVec) * projVec + opaqueOCVec;
+
+                        var colorVec = new Vector3(r ? pixel.R : 0, g ? pixel.G : 0, b ? pixel.B : 0);
+                        Vector3 proj = Vector3.Dot(colorVec - opaqueOCVec, projVec) / Vector3.Dot(projVec, projVec) * projVec + opaqueOCVec;
+                        Vector3 closestGradientVec;
                         if (proj.X < opaqueOCVec.X) {
                             closestGradientVec = opaqueOCVec;
                         } else if (proj.X > opaqueICVec.X) {
@@ -74,24 +73,25 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
                         } else {
                             closestGradientVec = proj;
                         }
+
                         gradientDist = (colorVec - closestGradientVec).LengthSquared;
-                        borderDist = (colorVec - sBColVec).LengthSquared;
-                        blackDist = colorVec.LengthSquared;
+                        double borderDist = (colorVec - sBColVec).LengthSquared;
+                        double blackDist = colorVec.LengthSquared;
                         // Test if border color would be better
-                        if (BORDER_OFF || gradientDist < borderDist) {
+                        if (borderOff || gradientDist < borderDist) {
                             // Test if black would be better
-                            if (!BLACK_OFF && blackDist < gradientDist) {
+                            if (!blackOff && blackDist < gradientDist) {
                                 pixDist[i, j] = 1.2;
                                 ((uint*) retData.Scan0)[j * imgWidth + i] = 0xFF000000;
                             } else {
-
-                                pixDist[i, j] = Math.Round(quality * Math.Clamp(1 - (closestGradientVec - opaqueOCVec).Length / projVecLen, 0, 1)) * (101 / quality) / 128;
-                                usedColor = opaqueICVec - pixDist[i, j] * projVec;
-                                ((int*) retData.Scan0)[j * imgWidth + i] = Color.FromArgb((int) Math.Round(usedColor[0]), (int) Math.Round(usedColor[1]), (int) Math.Round(usedColor[2])).ToArgb();
+                                pixDist[i, j] = Math.Round(quality * Math.Clamp(1 - (closestGradientVec - opaqueOCVec).Length / projVecLen, 0, 1)) * (101d / quality) / 128;
+                                Vector3 usedColor = opaqueICVec - pixDist[i, j] * projVec;
+                                ((int*) retData.Scan0)[j * imgWidth + i] =
+                                    Color.FromArgb((int) Math.Round(usedColor[0]), (int) Math.Round(usedColor[1]), (int) Math.Round(usedColor[2])).ToArgb();
                             }
                         } else {
                             // Test if black would be better
-                            if (!BLACK_OFF && blackDist < borderDist) {
+                            if (!blackOff && blackDist < borderDist) {
                                 pixDist[i, j] = 1.2;
                                 ((uint*) retData.Scan0)[j * imgWidth + i] = 0xFF000000;
                             } else {
@@ -101,106 +101,113 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
                         }
                     }
                 }
+
                 img.UnlockBits(imgData);
                 ret.UnlockBits(retData);
             }
 
             // Count segments
             long numSegments = 0;
-            int columnStartCoordinate, columnEndCoordinate, columnStartOffset;
             int leftToRight = -1;
             // In the below loop, gradientDist means something completely different from what it means in the above loop. Here, it is being used to mean the distance in the gradient between two or more points that are evenly distributed along the slider body
             for (int i = 0; i < imgHeight; i++) {
                 leftToRight = -leftToRight;
-                columnStartCoordinate = (leftToRight == 1) ? 0 : (imgWidth - 1);
-                columnEndCoordinate = columnStartCoordinate;
-                while ((leftToRight == 1) ? (columnStartCoordinate < imgWidth) : (columnStartCoordinate >= 0)) {
+                int columnStartCoordinate = leftToRight == 1 ? 0 : imgWidth - 1;
+                while (leftToRight == 1 ? columnStartCoordinate < imgWidth : columnStartCoordinate >= 0) {
                     // Look for gradients
-                    columnStartOffset = 0;
-                    gradientDist = 0;
+                    int columnStartOffset = 0;
                     if (0 <= columnStartCoordinate + leftToRight && columnStartCoordinate + leftToRight < imgWidth) {
                         gradientDist = pixDist[columnStartCoordinate + leftToRight, i] - pixDist[columnStartCoordinate, i];
                         columnStartOffset += leftToRight;
-                        while (0 <= columnStartCoordinate + columnStartOffset + leftToRight && columnStartCoordinate + columnStartOffset + leftToRight < imgWidth
-                            && Math.Abs(pixDist[columnStartCoordinate + columnStartOffset + leftToRight, i] - pixDist[columnStartCoordinate + columnStartOffset, i] - gradientDist) <= 0.001) {
+                        while (0 <= columnStartCoordinate + columnStartOffset + leftToRight &&
+                               columnStartCoordinate + columnStartOffset + leftToRight < imgWidth &&
+                               Math.Abs(pixDist[columnStartCoordinate + columnStartOffset + leftToRight, i] - pixDist[columnStartCoordinate + columnStartOffset, i] - gradientDist) <= 0.001) {
                             columnStartOffset += leftToRight;
                         }
                     }
-                    columnEndCoordinate = columnStartCoordinate + columnStartOffset;
+
+                    int columnEndCoordinate = columnStartCoordinate + columnStartOffset;
                     columnStartCoordinate = columnEndCoordinate + leftToRight;
                     numSegments += 2;
                 }
+
                 numSegments += 1;
             }
-            if (slider != null && slider.IsSlider == true) {
-                int duration = (int) Math.Floor(slider.TemporalLength);
 
-                // We make these assumptions to overestimate segment count. GPU probably cancels out
-                double circleSize = 10;
-                double objectRadius = 1.00041 * (54.4 - 4.48 * circleSize);
-                double GPU = 65536;
-                Vector2 topLeftOsuPxImage = new Vector2(-104, -52); ;
-                Vector2 topLeftOsuPxSlider = new Vector2(Math.Ceiling(objectRadius * 1.15)) + topLeftOsuPxImage;
-                Vector2 startSliderCoordinate = new Vector2(topLeftOsuPxSlider.X, topLeftOsuPxSlider.Y);
-                Vector2 bottomRightOsuPxSlider = new Vector2(Math.Floor(OSUPX_BETWEEN_ROWS * GPU - 1.15 * objectRadius)) + topLeftOsuPxImage;
-
-                List<Vector2> curPath = new List<Vector2>();
-                curPath.Add(startSliderCoordinate);
-                curPath.Add(new Vector2(startSliderCoordinate.X, topLeftOsuPxSlider.Y));
-                curPath.Add(new Vector2(bottomRightOsuPxSlider.X, topLeftOsuPxSlider.Y));
-                curPath.Add(bottomRightOsuPxSlider);
-                curPath.Add(new Vector2(bottomRightOsuPxSlider.X, topLeftOsuPxSlider.Y));
-                curPath.Add(topLeftOsuPxSlider);
-                // This estimation seems pretty good for most use cases
-                double frameDist = 2 * OsuStableDistance(curPath);
-                // 700 is an upper bound on the x position of the sliderball
-                double availableDist = 2 * (bottomRightOsuPxSlider.X - 700);
-                numSegments += 2 * ((int) Math.Floor(frameDist / availableDist) + 1) * duration + duration;
+            if (slider is not { IsSlider: true }) {
+                return (ret, numSegments);
             }
+
+            int duration = (int) Math.Floor(slider.TemporalLength);
+
+            // We make these assumptions to overestimate segment count. GPU probably cancels out
+            const double circleSize = 10;
+            const double objectRadius = 1.00041 * (54.4 - 4.48 * circleSize);
+            const double gpu = 65536;
+            var topLeftOsuPxImage = new Vector2(-104, -52);
+            Vector2 topLeftOsuPxSlider = new Vector2(Math.Ceiling(objectRadius * 1.15)) + topLeftOsuPxImage;
+            var startSliderCoordinate = new Vector2(topLeftOsuPxSlider.X, topLeftOsuPxSlider.Y);
+            Vector2 bottomRightOsuPxSlider = new Vector2(Math.Floor(OsupxBetweenRows * gpu - 1.15 * objectRadius)) + topLeftOsuPxImage;
+
+            var curPath = new List<Vector2> {
+                startSliderCoordinate,
+                new(startSliderCoordinate.X, topLeftOsuPxSlider.Y),
+                new(bottomRightOsuPxSlider.X, topLeftOsuPxSlider.Y),
+                bottomRightOsuPxSlider,
+                new(bottomRightOsuPxSlider.X, topLeftOsuPxSlider.Y),
+                topLeftOsuPxSlider
+            };
+            // This estimation seems pretty good for most use cases
+            double frameDist = 2 * OsuStableDistance(curPath);
+            // 700 is an upper bound on the x position of the sliderball
+            double availableDist = 2 * (bottomRightOsuPxSlider.X - 700);
+            numSegments += 2 * ((int) Math.Floor(frameDist / availableDist) + 1) * duration + duration;
 
             return (ret, numSegments);
         }
-        public static (List<Vector2>, double) Picturate(Bitmap img, Color sliderColor, Color sliderBorder, Color backgroundColor, double circleSize, Vector2 startPos, Vector2 startPosPic, HitObject slider = null, double resY = 1080, long GPU = 16384, bool BLACK_OFF = false, bool BORDER_OFF = false, bool OPAQUE_OFF = false, bool R = true, bool G = true, bool B = true, int quality = 101)
-        {
-            Color innerColor = Color.FromArgb(ALPHA,
-                (byte) Math.Min(255, sliderColor.R * (1 + 0.5 * LIGHTEN_AMOUNT) + 255 * LIGHTEN_AMOUNT),
-                (byte) Math.Min(255, sliderColor.G * (1 + 0.5 * LIGHTEN_AMOUNT) + 255 * LIGHTEN_AMOUNT),
-                (byte) Math.Min(255, sliderColor.B * (1 + 0.5 * LIGHTEN_AMOUNT) + 255 * LIGHTEN_AMOUNT));
-            Color outerColor = Color.FromArgb(ALPHA,
-                (byte) Math.Min(255, sliderColor.R / (1 + DARKEN_AMOUNT)),
-                (byte) Math.Min(255, sliderColor.G / (1 + DARKEN_AMOUNT)),
-                (byte) Math.Min(255, sliderColor.B / (1 + DARKEN_AMOUNT)));
 
-            Color opaqueIC = getOpaqueColor(innerColor, backgroundColor);
-            Color opaqueOC = getOpaqueColor(outerColor, backgroundColor);
+        public static (List<Vector2>, double) Picturate(Bitmap img, Color sliderColor, Color sliderBorder, Color backgroundColor, double circleSize, Vector2 startPos,
+            Vector2 startPosPic, HitObject slider = null, double resY = 1080, long gpu = 16384, bool blackOff = false, bool borderOff = false, bool opaqueOff = false,
+            bool r = true, bool g = true, bool b = true, int quality = 101) {
+            Color innerColor = Color.FromArgb(Alpha,
+                (byte) Math.Min(255, sliderColor.R * (1 + 0.5 * LightenAmount) + 255 * LightenAmount),
+                (byte) Math.Min(255, sliderColor.G * (1 + 0.5 * LightenAmount) + 255 * LightenAmount),
+                (byte) Math.Min(255, sliderColor.B * (1 + 0.5 * LightenAmount) + 255 * LightenAmount));
+            Color outerColor = Color.FromArgb(Alpha,
+                (byte) Math.Min(255, sliderColor.R / (1 + DarkenAmount)),
+                (byte) Math.Min(255, sliderColor.G / (1 + DarkenAmount)),
+                (byte) Math.Min(255, sliderColor.B / (1 + DarkenAmount)));
+
+            Color opaqueIC = GetOpaqueColor(innerColor, backgroundColor);
+            Color opaqueOC = GetOpaqueColor(outerColor, backgroundColor);
 
             // startPos, startPosPic are in osupx
             startPos.Round();
             startPosPic.Round();
             double objectRadius = 1.00041 * (54.4 - 4.48 * circleSize);
 
-            Vector3 projVec = new Vector3(opaqueIC.R - opaqueOC.R, opaqueIC.G - opaqueOC.G, opaqueIC.B - opaqueOC.B);
+            var projVec = new Vector3(opaqueIC.R - opaqueOC.R, opaqueIC.G - opaqueOC.G, opaqueIC.B - opaqueOC.B);
             double projVecLen = projVec.Length;
-            Vector3 opaqueOCVec = new Vector3(opaqueOC.R, opaqueOC.G, opaqueOC.B);
-            Vector3 opaqueICVec = new Vector3(opaqueIC.R, opaqueIC.G, opaqueIC.B);
-            Vector3 sBColVec = new Vector3(sliderBorder.R, sliderBorder.G, sliderBorder.B);
+            var opaqueOCVec = new Vector3(opaqueOC.R, opaqueOC.G, opaqueOC.B);
+            var opaqueICVec = new Vector3(opaqueIC.R, opaqueIC.G, opaqueIC.B);
+            var sBColVec = new Vector3(sliderBorder.R, sliderBorder.G, sliderBorder.B);
 
             int imgWidth = img.Width;
             int imgHeight = img.Height;
             double[,] pixDist = new double[imgWidth, imgHeight];
-            Color pixel;
-            Vector3 colorVec, proj, closestGradientVec;
-            double gradientDist, borderDist, blackDist;
+            double gradientDist;
             unsafe {
                 BitmapData imgData = img.LockBits(new Rectangle(0, 0, imgWidth, imgHeight), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
                 for (int i = 0; i < imgWidth; i++) {
                     for (int j = 0; j < imgHeight; j++) {
-                        pixel = Color.FromArgb(((int*) imgData.Scan0)[j * imgWidth + i]);
-                        if (!OPAQUE_OFF) {
-                            pixel = getOpaqueColor(pixel, backgroundColor);
+                        Color pixel = Color.FromArgb(((int*) imgData.Scan0)[j * imgWidth + i]);
+                        if (!opaqueOff) {
+                            pixel = GetOpaqueColor(pixel, backgroundColor);
                         }
-                        colorVec = new Vector3(R ? pixel.R : 0, G ? pixel.G : 0, B ? pixel.B : 0);
-                        proj = Vector3.Dot(colorVec - opaqueOCVec, projVec) / Vector3.Dot(projVec, projVec) * projVec + opaqueOCVec;
+
+                        var colorVec = new Vector3(r ? pixel.R : 0, g ? pixel.G : 0, b ? pixel.B : 0);
+                        Vector3 proj = Vector3.Dot(colorVec - opaqueOCVec, projVec) / Vector3.Dot(projVec, projVec) * projVec + opaqueOCVec;
+                        Vector3 closestGradientVec;
                         if (proj.X < opaqueOCVec.X) {
                             closestGradientVec = opaqueOCVec;
                         } else if (proj.X > opaqueICVec.X) {
@@ -208,28 +215,29 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
                         } else {
                             closestGradientVec = proj;
                         }
+
                         gradientDist = (colorVec - closestGradientVec).LengthSquared;
-                        borderDist = (colorVec - sBColVec).LengthSquared;
-                        blackDist = colorVec.LengthSquared;
+                        double borderDist = (colorVec - sBColVec).LengthSquared;
+                        double blackDist = colorVec.LengthSquared;
                         // Test if border color would be better
-                        if (BORDER_OFF || gradientDist < borderDist) {
+                        if (borderOff || gradientDist < borderDist) {
                             // Test if black would be better
-                            if (!BLACK_OFF && blackDist < gradientDist) {
+                            if (!blackOff && blackDist < gradientDist) {
                                 pixDist[i, j] = 1.2;
                             } else {
-                                pixDist[i, j] = Math.Round(quality * Math.Clamp(1 - (closestGradientVec - opaqueOCVec).Length / projVecLen, 0, 1)) * (101 / quality) / 128;
+                                pixDist[i, j] = Math.Round(quality * Math.Clamp(1 - (closestGradientVec - opaqueOCVec).Length / projVecLen, 0, 1)) * (101d / quality) / 128;
                             }
                         } else {
                             // Test if black would be better
-                            if (!BLACK_OFF && blackDist < borderDist) {
+                            if (!blackOff && blackDist < borderDist) {
                                 pixDist[i, j] = 1.2;
                             } else {
                                 pixDist[i, j] = 111.0 / 128;
                             }
                         }
-
                     }
                 }
+
                 img.UnlockBits(imgData);
             }
 
@@ -237,24 +245,24 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
             // (16+20n, 8+20m) for matching editor to gameplay. Require 8+20m>=-56 for the bounding box to not be cropped down to be entirely inside the playfield during gameplay (which changes how the distortion is applied).
             // 16+20n >= x is  required for some x depending on resolution. It's probably the case that x <= -104 for all resolutions. If resY is not a multiple of 60, the distortion will look different in gameplay and in editor.
             // Currently there are no plans to support resolutions whose heights are not multiples of 60.
-            Vector2 topLeftOsuPxImage = new Vector2(-104, -52);
+            var topLeftOsuPxImage = new Vector2(-104, -52);
             Vector2 startSliderCoordinate = startPos;
             // For now we will ignore the fact that this may interfere with the sample points
             Vector2 topLeftOsuPxSlider = new Vector2(Math.Ceiling(objectRadius * 1.15)) + topLeftOsuPxImage;
-            Vector2 bottomRightOsuPxSlider = new Vector2(Math.Floor(OSUPX_BETWEEN_ROWS * GPU - 1.15 * objectRadius)) + topLeftOsuPxImage;
+            Vector2 bottomRightOsuPxSlider = new Vector2(Math.Floor(OsupxBetweenRows * gpu - 1.15 * objectRadius)) + topLeftOsuPxImage;
             // To get screenpx from osupx topLeftOsuPxImage to osupx startPosPic we do the following:
             // the game window is 480 osupx tall and resY-16 screenpx tall, so the ratio is (resY-16)/480 screenpx per osupx.
             startPosPic -= topLeftOsuPxImage;
             startPosPic *= (resY - 16) / 480;
             startPosPic.Round();
-            Vector2 imageStartOsuPx = topLeftOsuPxImage + OSUPX_BETWEEN_ROWS * startPosPic;
+            Vector2 imageStartOsuPx = topLeftOsuPxImage + OsupxBetweenRows * startPosPic;
 
 
             // Handle sliderball control calculations
             Vector2[] sbPositions = null;
             Vector2[] msLastSegStart = null;
             int duration = 0;
-            if (slider != null && slider.IsSlider == true) {
+            if (slider is { IsSlider: true }) {
                 duration = (int) Math.Floor(slider.TemporalLength);
                 sbPositions = new Vector2[duration + 1];
                 for (int i = 0; i < duration + 1; i++) {
@@ -263,7 +271,6 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
 
                 // Before rounding sbPositions, calculate starting coordinate for each ms' final segment to make the sliderball rotate appropriately
                 msLastSegStart = new Vector2[duration + 1];
-                double ang;
                 // We don't care about msLastSegStart[0] so we'll leave it at 0. Technically we could save one Vector2's worth of space here but it would make indexing harder to read than necessary.
                 // Find the first angle - we can't calculate the angle between points that are the same, but the sliderball's rotation should be the same as it was before.
                 double savedAng = 0;
@@ -272,14 +279,18 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
                         savedAng = Math.Atan2(sbPositions[i - 1].Y - sbPositions[i].Y, sbPositions[i - 1].X - sbPositions[i].X);
                     }
                 }
+
                 for (int i = 1; i < duration + 1; i++) {
+                    double ang;
                     if (sbPositions[i - 1] == sbPositions[i]) {
                         ang = savedAng;
                     } else {
                         ang = Math.Atan2(sbPositions[i - 1].Y - sbPositions[i].Y, sbPositions[i - 1].X - sbPositions[i].X);
                         savedAng = ang;
                     }
-                    msLastSegStart[i] = new Vector2((float) (SNAPTOL * Math.Cos(ang) + (float) sbPositions[i].Rounded().X), (float) (SNAPTOL * Math.Sin(ang) + (float) sbPositions[i].Rounded().Y));
+
+                    msLastSegStart[i] = new Vector2((float) (Snaptol * Math.Cos(ang) + (float) sbPositions[i].Rounded().X),
+                        (float) (Snaptol * Math.Sin(ang) + (float) sbPositions[i].Rounded().Y));
                 }
 
                 // Round all positions to float precision values
@@ -292,27 +303,25 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
                         msLastSegStart[i] = new Vector2((float) (sbPositions[i].Rounded().X + 60), (float) sbPositions[i].Rounded().Y);
                     } else {
                         msLastSegStart[i] = new Vector2((float) msLastSegStart[i].X, (float) msLastSegStart[i].Y);
-
                     }
                 }
             }
 
 
-            int columnStartCoordinate, columnEndCoordinate, columnStartOffset, relativeStartX, relativeStartY, absoluteStartX, absoluteStartY;
             int leftToRight = -1;
-            double segmentSlope;
 
-            List<Vector2> sliderPath = new List<Vector2>();
+            var sliderPath = new List<Vector2>();
             // sliderPaths is the sliderPath broken up into segments that end nearest to the play area
-            List<List<Vector2>> sliderPaths = new List<List<Vector2>>();
+            var sliderPaths = new List<List<Vector2>>();
             // curPath is the currently processing element of sliderPaths
-            List<Vector2> curPath = new List<Vector2>();
-            curPath.Add(startSliderCoordinate);
-            curPath.Add(new Vector2(startSliderCoordinate.X, topLeftOsuPxSlider.Y));
-            curPath.Add(new Vector2(bottomRightOsuPxSlider.X, topLeftOsuPxSlider.Y));
-            curPath.Add(bottomRightOsuPxSlider);
-            curPath.Add(new Vector2(bottomRightOsuPxSlider.X, topLeftOsuPxSlider.Y));
-            curPath.Add(topLeftOsuPxSlider);
+            var curPath = new List<Vector2> {
+                startSliderCoordinate,
+                new(startSliderCoordinate.X, topLeftOsuPxSlider.Y),
+                new(bottomRightOsuPxSlider.X, topLeftOsuPxSlider.Y),
+                bottomRightOsuPxSlider,
+                new(bottomRightOsuPxSlider.X, topLeftOsuPxSlider.Y),
+                topLeftOsuPxSlider
+            };
             sliderPaths.Add(curPath.Copy());
             curPath.Clear();
             // Move to the start of the image, avoiding sample points (could be done better)
@@ -320,16 +329,16 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
                 curPath.Add(new Vector2(topLeftOsuPxSlider.X, imageStartOsuPx.Y));
                 curPath.Add(imageStartOsuPx);
             }
-            absoluteStartX = 0;
-            columnStartOffset = 0;
-            absoluteStartY = 0;
+
+            int absoluteStartX = 0;
+            int columnStartOffset = 0;
+            int absoluteStartY = 0;
             gradientDist = 0;
             // In the below loop, gradientDist means something completely different from what it means in the above loop. Here, it is being used to mean the distance in the gradient between two or more points that are evenly distributed along the slider body
             for (int i = 0; i < imgHeight; i++) {
                 leftToRight = -leftToRight;
-                columnStartCoordinate = (leftToRight == 1) ? 0 : (imgWidth - 1);
-                columnEndCoordinate = columnStartCoordinate;
-                while ((leftToRight == 1) ? (columnStartCoordinate < imgWidth) : (columnStartCoordinate >= 0)) {
+                int columnStartCoordinate = leftToRight == 1 ? 0 : imgWidth - 1;
+                while (leftToRight == 1 ? columnStartCoordinate < imgWidth : columnStartCoordinate >= 0) {
                     // Look for gradients
                     columnStartOffset = 0;
                     gradientDist = 0;
@@ -337,11 +346,14 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
                         gradientDist = pixDist[columnStartCoordinate + leftToRight, i] - pixDist[columnStartCoordinate, i];
                         columnStartOffset += leftToRight;
                         while (0 <= columnStartCoordinate + columnStartOffset + leftToRight && columnStartCoordinate + columnStartOffset + leftToRight < imgWidth
-                            && Math.Abs(pixDist[columnStartCoordinate + columnStartOffset + leftToRight, i] - pixDist[columnStartCoordinate + columnStartOffset, i] - gradientDist) <= 0.001) {
+                                                                                            && Math.Abs(pixDist[columnStartCoordinate + columnStartOffset + leftToRight, i] -
+                                                                                                        pixDist[columnStartCoordinate + columnStartOffset, i] - gradientDist) <=
+                                                                                            0.001) {
                             columnStartOffset += leftToRight;
                         }
                     }
-                    columnEndCoordinate = columnStartCoordinate + columnStartOffset;
+
+                    int columnEndCoordinate = columnStartCoordinate + columnStartOffset;
                     // First handle the case if columnStartCoordinate = columnEndCoordinate
                     // I belive this is being handled in the below case by simply setting gradientDist = 0
 
@@ -376,80 +388,82 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
                     // mean([Math.Pow(1+segmentSlope*segmentSlope, 0.5)*pixDist[columnStartCoordinate+j, i]*objectRadius - segmentSlope*j*OSUPX_BETWEEN_ROWS for j in range(0, columnStartOffset+1)])
                     // which is simplified to:
                     // Math.Pow(1+segmentSlope*segmentSlope, 0.5)*objectRadius*(pixDist[columnStartCoordinate, i] + gradientDist*(columnStartOffset+1)/2)-round(gradientDist*(columnStartOffset+1/2))/(columnStartOffset+1/2)*(columnStartOffset+1)/2
-                    double flatSlope = Math.Round(gradientDist * (columnStartOffset + 0.5)) / ((columnStartOffset + 0.5) * OSUPX_BETWEEN_ROWS);
+                    double flatSlope = Math.Round(gradientDist * (columnStartOffset + 0.5)) / ((columnStartOffset + 0.5) * OsupxBetweenRows);
+                    double segmentSlope;
                     if (flatSlope == 0) {
                         segmentSlope = 0;
                     } else {
                         segmentSlope = flatSlope / Math.Pow(1 - flatSlope * flatSlope, 0.5); // This works because flatSlope <= 1/OSUPX_BETWEEN_ROWS << 1
                     }
 
-                    relativeStartX = -leftToRight * OSUPX_BETWEEN_ROWS / 4; // This only works because OSUPX_BETWEEN_ROWS is a multiple of 4
-                    relativeStartY = (int) (segmentSlope * relativeStartX + Math.Pow(1 + segmentSlope * segmentSlope, 0.5) * objectRadius * (pixDist[columnStartCoordinate, i] + gradientDist * (columnStartOffset + 1) / 2) - segmentSlope * OSUPX_BETWEEN_ROWS * (columnStartOffset + 1) / 2);
-                    absoluteStartX = (int) (relativeStartX + OSUPX_BETWEEN_ROWS * (columnStartCoordinate + 0.5) + imageStartOsuPx.X);
-                    absoluteStartY = (int) (relativeStartY + OSUPX_BETWEEN_ROWS * (i + 0.5) + imageStartOsuPx.Y);
+                    int relativeStartX = -leftToRight * OsupxBetweenRows / 4;
+                    int relativeStartY = (int) (segmentSlope * relativeStartX +
+                                                Math.Pow(1 + segmentSlope * segmentSlope, 0.5) * objectRadius *
+                                                (pixDist[columnStartCoordinate, i] + gradientDist * (columnStartOffset + 1) / 2) -
+                                                segmentSlope * OsupxBetweenRows * (columnStartOffset + 1) / 2);
+                    absoluteStartX = (int) (relativeStartX + OsupxBetweenRows * (columnStartCoordinate + 0.5) + imageStartOsuPx.X);
+                    absoluteStartY = (int) (relativeStartY + OsupxBetweenRows * (i + 0.5) + imageStartOsuPx.Y);
                     curPath.Add(new Vector2(absoluteStartX, absoluteStartY));
-                    curPath.Add(new Vector2(absoluteStartX + (columnStartOffset + leftToRight * 0.5) * OSUPX_BETWEEN_ROWS, Math.Round(absoluteStartY + gradientDist * columnStartOffset)));
+                    curPath.Add(new Vector2(absoluteStartX + (columnStartOffset + leftToRight * 0.5) * OsupxBetweenRows,
+                        Math.Round(absoluteStartY + gradientDist * columnStartOffset)));
 
                     columnStartCoordinate = columnEndCoordinate + leftToRight;
-
                 }
 
-                curPath.Add(new Vector2(absoluteStartX + (columnStartOffset + 0.5) * OSUPX_BETWEEN_ROWS, absoluteStartY + gradientDist * columnStartOffset + OSUPX_BETWEEN_ROWS));
+                curPath.Add(new Vector2(absoluteStartX + (columnStartOffset + 0.5) * OsupxBetweenRows, absoluteStartY + gradientDist * columnStartOffset + OsupxBetweenRows));
                 if (leftToRight == 1) {
                     sliderPaths.Add(curPath.Copy());
                     curPath.Clear();
                 }
             }
+
             sliderPaths.Add(curPath.Copy());
 
             // The first element of sliderPaths is going to be the longest, probably by a lot
             // We need the smallest length such that the duration exceeds the total length divided by the framedist
             // so that we don't have to worry about running out of duration and needing to draw more image
-            List<Vector2> totalPath = new List<Vector2>();
+            var totalPath = new List<Vector2>();
             foreach (List<Vector2> path in sliderPaths) {
                 totalPath.AddRange(path);
             }
+
             if (duration == 0) {
                 return (totalPath, 0);
             }
+
             double totalDist = OsuStableDistance(totalPath);
             double frameDist = 0;
-            int pathIdx = 0;
+            const int pathIdx = 0;
             while (duration * frameDist < totalDist) {
                 if (frameDist > 0) {
                     sliderPath.RemoveRange(sliderPath.Count - 2, 2);
                 }
+
                 sliderPath.AddRange(sliderPaths[pathIdx]);
                 sliderPath.AddRange(sliderPaths[0]);
                 sliderPath.Add(msLastSegStart[1]);
                 sliderPath.Add(sbPositions[1]);
 
-                frameDist = OsuStableDistance(sliderPath) - SNAPTOL / 2;
+                frameDist = OsuStableDistance(sliderPath) - Snaptol / 2d;
             }
 
             double curMsDist = 0;
-            double curPathDist = 0;
             double correction = 0;
             double availableDist = 0;
             int totRepeats = 0;
             int curMs = 2;
-            List<Vector2> curMsPath = new List<Vector2>();
-            curMsPath.Add(sliderPath.Last());
-            int lastAddedIdx = 0;
+            var curMsPath = new List<Vector2> { sliderPath.Last() };
             // v is just a Vector2 that I can use to briefly store vector differences
             Vector2 v;
             for (int i = 1; i < sliderPaths.Count && curMs < duration; i++) {
                 // Add sliderball path while we can make use of the image to get distance
                 curPath.Clear();
-                if (curMsDist > 0) {
-                    curPath.Add(sliderPaths[i - 1].Last());
-                } else {
-                    curPath.Add(sliderPath.Last());
-                }
+                curPath.Add(curMsDist > 0 ? sliderPaths[i - 1].Last() : sliderPath.Last());
+
                 curPath.AddRange(sliderPaths[i]);
-                curPathDist = OsuStableDistance(curPath);
+                double curPathDist = OsuStableDistance(curPath);
                 v = curPath.Last() - msLastSegStart[curMs];
-                if (curMsDist + curPathDist + Math.Abs(v.X) + Math.Abs(v.Y) + SNAPTOL > frameDist) {
+                if (curMsDist + curPathDist + Math.Abs(v.X) + Math.Abs(v.Y) + Snaptol > frameDist) {
                     // We can't go directly from curMsPath.Last() to msLastSegStart[curMs] because this could run over sample points.
                     // Instead we use an additional segment to avoid any sample points between the two anchors.
                     v = curMsPath.Last() - msLastSegStart[curMs];
@@ -461,7 +475,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
                     curMsPath.Add(new Vector2(curMsPath.Last().X, msLastSegStart[curMs].Y));
                     curMsPath.Add(msLastSegStart[curMs]);
                     // We know we will be adding this at the end, need it now for calculation
-                    curMsDist += SNAPTOL;
+                    curMsDist += Snaptol;
                     // TODO: We could get more distance per segment than this but I can't be bothered
                     availableDist = 2 * (bottomRightOsuPxSlider.X - msLastSegStart[curMs].X);
                     totRepeats = (int)Math.Floor((frameDist - curMsDist) / availableDist);
@@ -472,6 +486,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
                         curMsPath.Add(msLastSegStart[curMs]);
                         curMsDist += availableDist;
                     }
+
                     curMsPath.Add(new Vector2(msLastSegStart[curMs].X + Math.Round((frameDist - curMsDist + correction) / 2), msLastSegStart[curMs].Y));
                     curMsPath.Add(msLastSegStart[curMs]);
                     curMsPath.Add(sbPositions[curMs]);
@@ -479,17 +494,16 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
                     correction += frameDist - OsuStableDistance(curMsPath);
                     curMsPath.RemoveAt(0);
                     sliderPath.AddRange(curMsPath.Copy());
-                    lastAddedIdx = i;
                     curMsPath.Clear();
                     curMsPath.Add(sliderPath.Last());
                     curMsPath.AddRange(sliderPaths[i]);
                     curMsDist = OsuStableDistance(curMsPath);
-
                 } else {
                     curMsDist += curPathDist;
                     curMsPath.AddRange(sliderPaths[i]);
                 }
             }
+
             // Add sliderball path once (if) you run out of image to get distance
             if (curMs < duration) {
                 // First use remainder of image (code duplication)
@@ -497,7 +511,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
                 curMsDist += Math.Abs(v.X) + Math.Abs(v.Y);
                 curMsPath.Add(new Vector2(curMsPath.Last().X, msLastSegStart[curMs].Y));
                 curMsPath.Add(msLastSegStart[curMs]);
-                curMsDist += SNAPTOL;
+                curMsDist += Snaptol;
                 availableDist = 2 * (bottomRightOsuPxSlider.X - msLastSegStart[curMs].X);
                 totRepeats = (int) Math.Floor((frameDist - curMsDist) / availableDist);
                 for (int j = 0; j < totRepeats; j++) {
@@ -505,6 +519,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
                     curMsPath.Add(msLastSegStart[curMs]);
                     curMsDist += availableDist;
                 }
+
                 curMsPath.Add(new Vector2(msLastSegStart[curMs].X + Math.Round((frameDist - curMsDist + correction) / 2), msLastSegStart[curMs].Y));
                 curMsPath.Add(msLastSegStart[curMs]);
                 curMsPath.Add(sbPositions[curMs]);
@@ -515,20 +530,21 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
                 curMsPath.Clear();
                 curMsPath.Add(sliderPath.Last());
                 // Next just spam segments to get length
-                double generousLength;
                 while (curMs < duration) {
                     v = curMsPath[0] - msLastSegStart[curMs];
-                    generousLength = Math.Abs(v.X) + Math.Abs(v.Y);
+                    double generousLength = Math.Abs(v.X) + Math.Abs(v.Y);
                     availableDist = 2 * (bottomRightOsuPxSlider.X - msLastSegStart[curMs].X);
                     // Why does generousLength exist? I want to account for the additional length that I know will occur
                     // getting from the endpoint of the previous ms's path to msLastSegStart[curMs]. The additional length over
                     // first moving to msLastSegStart (which is what the below calculation otherwise assumes is happening)
                     // is at most generousLength due to the triangle inequality.
-                    for (int j = 0; j < Math.Floor((frameDist - SNAPTOL - generousLength) / availableDist); j++) {
+                    for (int j = 0; j < Math.Floor((frameDist - Snaptol - generousLength) / availableDist); j++) {
                         curMsPath.Add(new Vector2(bottomRightOsuPxSlider.X, msLastSegStart[curMs].Y));
                         curMsPath.Add(msLastSegStart[curMs]);
                     }
-                    curMsPath.Add(new Vector2(msLastSegStart[curMs].X + Math.Round((frameDist - OsuStableDistance(curMsPath) - SNAPTOL + correction) / 2), msLastSegStart[curMs].Y));
+
+                    curMsPath.Add(new Vector2(msLastSegStart[curMs].X + Math.Round((frameDist - OsuStableDistance(curMsPath) - Snaptol + correction) / 2),
+                        msLastSegStart[curMs].Y));
                     curMsPath.Add(msLastSegStart[curMs]);
                     curMsPath.Add(sbPositions[curMs]);
                     curMs++;
@@ -539,26 +555,23 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff
                     curMsPath.Add(sliderPath.Last());
                 }
             }
+
             return (sliderPath, frameDist);
         }
 
-        private static double OsuStableDistance(List<Vector2> controlPoints)
-        {
+        private static double OsuStableDistance(List<Vector2> controlPoints) {
             double length = 0;
-            Vector2 cp, lp;
-            float num1, num2, num3;
             for (int i = 1; i < controlPoints.Count; i++) {
-                lp = controlPoints.ElementAt(i - 1);
-                cp = controlPoints.ElementAt(i);
-                num1 = (float) Math.Round(lp.X) - (float) Math.Round(cp.X);
-                num2 = (float) Math.Round(lp.Y) - (float) Math.Round(cp.Y);
-                num3 = num1 * num1 + num2 * num2;
+                Vector2 lp = controlPoints.ElementAt(i - 1);
+                Vector2 cp = controlPoints.ElementAt(i);
+                float num1 = (float) Math.Round(lp.X) - (float) Math.Round(cp.X);
+                float num2 = (float) Math.Round(lp.Y) - (float) Math.Round(cp.Y);
+                float num3 = num1 * num1 + num2 * num2;
 
                 length += (float) Math.Sqrt(num3);
             }
+
             return length;
         }
     }
-
-
 }
