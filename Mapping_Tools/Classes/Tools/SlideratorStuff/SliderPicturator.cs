@@ -449,7 +449,8 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
 
             double curMsDist = 0;
             double correction = 0;
-            double availableDist;
+            double availableDist = 0;
+            int totRepeats = 0;
             int curMs = 2;
             var curMsPath = new List<Vector2> { sliderPath.Last() };
             // v is just a Vector2 that I can use to briefly store vector differences
@@ -477,7 +478,8 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
                     curMsDist += Snaptol;
                     // TODO: We could get more distance per segment than this but I can't be bothered
                     availableDist = 2 * (bottomRightOsuPxSlider.X - msLastSegStart[curMs].X);
-                    for (int j = 0; j < Math.Floor((frameDist - curMsDist) / availableDist); j++) {
+                    totRepeats = (int)Math.Floor((frameDist - curMsDist) / availableDist);
+                    for (int j = 0; j < totRepeats; j++) {
                         // We are assuming all slider positions are in the top left quadrant of the box centered on
                         // the top left sample point, so adding segments like this does not interfere with the picture.
                         curMsPath.Add(new Vector2(bottomRightOsuPxSlider.X, msLastSegStart[curMs].Y));
@@ -511,7 +513,8 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
                 curMsPath.Add(msLastSegStart[curMs]);
                 curMsDist += Snaptol;
                 availableDist = 2 * (bottomRightOsuPxSlider.X - msLastSegStart[curMs].X);
-                for (int j = 0; j < Math.Floor((frameDist - curMsDist) / availableDist); j++) {
+                totRepeats = (int) Math.Floor((frameDist - curMsDist) / availableDist);
+                for (int j = 0; j < totRepeats; j++) {
                     curMsPath.Add(new Vector2(bottomRightOsuPxSlider.X, msLastSegStart[curMs].Y));
                     curMsPath.Add(msLastSegStart[curMs]);
                     curMsDist += availableDist;
