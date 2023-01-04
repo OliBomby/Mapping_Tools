@@ -161,6 +161,7 @@ namespace Mapping_Tools.Classes.SystemTools {
             string path;
             try {
                 var reader = EditorReaderStuff.GetEditorReader();
+                reader.SetProcess(EditorReaderStuff.GetOsuProcess());
                 reader.FetchHOM();
                 reader.FetchBeatmap();
                 path = EditorReaderStuff.GetCurrentBeatmap(reader);

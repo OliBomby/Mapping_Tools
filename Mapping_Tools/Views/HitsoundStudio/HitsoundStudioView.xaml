@@ -27,7 +27,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="90"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid Name="TitleGrid" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
           <StackPanel Orientation="Horizontal">
@@ -52,18 +52,14 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
 
-            <GridSplitter Grid.Column="1" Grid.RowSpan="2" 
+            <GridSplitter Grid.Column="1"
                 VerticalAlignment="Stretch"
                 ResizeBehavior="PreviousAndNext"
                 Width="1" Background="{DynamicResource MaterialDesignDivider}"
                 Margin="0,10,0,10"/>
 
-            <Grid Grid.RowSpan="2" Grid.Column="0" Margin="0,0,10,0">
+            <Grid Grid.Column="0" Margin="0,0,10,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
@@ -275,7 +271,7 @@
                 </ScrollViewer>
             </Grid>
 
-            <ListView x:Name="LayersList" Grid.Row="0" Grid.Column="2" Margin="10,0,0,0" ScrollViewer.VerticalScrollBarVisibility="Visible"
+            <ListView x:Name="LayersList" Grid.Column="2" Margin="10,0,0,0" ScrollViewer.VerticalScrollBarVisibility="Visible"
                         ScrollViewer.HorizontalScrollBarVisibility="Auto" SelectionChanged="LayersList_SelectionChanged"
                         ItemsSource="{Binding HitsoundLayers}" SelectionMode="Extended">
                 <ListView.ItemContainerStyle>
@@ -293,23 +289,9 @@
                     </GridView>
                 </ListView.View>
             </ListView>
-            <StackPanel Grid.Column="2" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Import layers..." Click="Add_Click" Margin="5">
-                    <materialDesign:PackIcon Kind="Plus" Height="24" Width="24" />
-                </Button>
-                <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove selected layers." Click="Delete_Click" Margin="5">
-                    <materialDesign:PackIcon Kind="Trashcan" Height="24" Width="24" />
-                </Button>
-                <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Raise selected layers to higher priority." Click="Raise_Click" Margin="5">
-                    <materialDesign:PackIcon Kind="KeyboardArrowUp" Height="24" Width="24" />
-                </Button>
-                <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Drop selected layers to lower priority." Click="Lower_Click" Margin="5">
-                    <materialDesign:PackIcon Kind="KeyboardArrowDown" Height="24" Width="24" />
-                </Button>
-            </StackPanel>
         </Grid>
         <Grid Name="SecondGrid" Grid.Row="2" Grid.Column="1">
-            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Right" Orientation="Horizontal">
+            <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal" Height="90" Margin="0 0 5 0">
                 <Viewbox Margin="10">
                     <Button
                         IsEnabled="{Binding ElementName=This, Path=CanRun}"
@@ -322,6 +304,20 @@
                 </Viewbox>
             </StackPanel>
         </Grid>
+        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0 5 0 0">
+            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Import layers..." Click="Add_Click" Margin="5">
+                <materialDesign:PackIcon Kind="Plus" Height="24" Width="24" />
+            </Button>
+            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Remove selected layers." Click="Delete_Click" Margin="5">
+                <materialDesign:PackIcon Kind="Trashcan" Height="24" Width="24" />
+            </Button>
+            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Raise selected layers to higher priority." Click="Raise_Click" Margin="5">
+                <materialDesign:PackIcon Kind="KeyboardArrowUp" Height="24" Width="24" />
+            </Button>
+            <Button Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" ToolTip="Drop selected layers to lower priority." Click="Lower_Click" Margin="5">
+                <materialDesign:PackIcon Kind="KeyboardArrowDown" Height="24" Width="24" />
+            </Button>
+        </StackPanel>
         <Grid Name="ThirdGrid" Grid.Row="2" Grid.Column="0">
             <Grid>
                 <Grid.RowDefinitions>
@@ -329,59 +325,60 @@
                     <RowDefinition Height="20"/>
                 </Grid.RowDefinitions>
 
-                <Grid Grid.Row="0">
-                    <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="30"/>
-                                <ColumnDefinition Width="5"/>
-                                <ColumnDefinition Width="30"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock FontSize="14" Margin="0,8,0,0" Text="Base beatmap:"
-                                       ToolTip="This beatmap serves as the base for exported hitsounds diff. Timing, volumes, and metadata will all come from this beatmap."/>
-                            <TextBox Grid.Column="1" x:Name="BaseBeatmapPathBox" Text="{Binding BaseBeatmap, Mode=TwoWay}" Margin="5,0,5,0"
-                                     ToolTip="Path to the base beatmap. This beatmap serves as the base for exported hitsounds diff. Timing, volumes, and metadata will all come from this beatmap."/>
-                            <Button Grid.Column="2" Cursor="Hand" Click="BaseBeatmapLoad_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
-                                    ToolTip="Fetch the selected beatmap from your osu! client.">
-                                <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="RestoreFromTrash" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
-                            </Button >
-                            <Button Grid.Column="4" Cursor="Hand" Click="BaseBeatmapBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
-                                    ToolTip="Select beatmaps with File Explorer.">
-                                <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
-                            </Button >
-                        </Grid>
-                        <Grid DataContext="{Binding DefaultSample}">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="30"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock FontSize="14" Margin="0,8,0,0" Text="Default sample:"
-                                       ToolTip="This sample will be used fill up any hitnormal hitsounds which get left over by the hitsound layers."/>
-                            <TextBox Grid.Column="1" x:Name="DefaultSamplePathBox" Text="{Binding SampleArgs.Path, Mode=TwoWay}" Margin="5,0,5,0"
-                                     ToolTip="Path to the default sound sample. This sample will be used fill up any hitnormal hitsounds which get left over by the hitsound layers."/>
-                            <TextBox Grid.Column="3" x:Name="DefaultSampleVolumeBox" Width="50" Text="{Binding SampleArgs.Volume, Mode=TwoWay, Converter={StaticResource V2PConverter}, ConverterParameter=100}" Margin="0,0,5,0"
-                                        ToolTip="Volume % of the default sample. Use -1 for invariant volume." materialDesign:HintAssist.Hint="Volume"/>
-                            <Button Grid.Column="4" Cursor="Hand" Click="DefaultSampleBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
-                                    ToolTip="Select files with File Explorer.">
-                                <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
-                            </Button >
-                            <ComboBox Grid.Column="2" x:Name="DefaultSampleSetBox" Width="70" VerticalAlignment="Stretch" Margin="0,0,5,0" 
-                                      SelectedValue="{Binding SampleSet, Mode=TwoWay, Converter={StaticResource SS2SConverter}}" 
-                                      SelectedValuePath="Content" Cursor="Hand"
-                                      ToolTip="Sample set of the default sample.">
-                                <ComboBoxItem Content="None" Cursor="Hand"/>
-                                <ComboBoxItem Content="Normal" Cursor="Hand"/>
-                                <ComboBoxItem Content="Soft" Cursor="Hand"/>
-                                <ComboBoxItem Content="Drum" Cursor="Hand"/>
-                            </ComboBox>
-                        </Grid>
-                    </StackPanel>
-                </Grid>
+                <materialDesign:Card Grid.Row="0" Padding="10" Margin="0 10">
+                     <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                         <Grid Margin="5">
+                             <Grid.ColumnDefinitions>
+                                 <ColumnDefinition Width="Auto"/>
+                                 <ColumnDefinition Width="*"/>
+                                 <ColumnDefinition Width="30"/>
+                                 <ColumnDefinition Width="5"/>
+                                 <ColumnDefinition Width="30"/>
+                             </Grid.ColumnDefinitions>
+                             <TextBlock FontSize="14" Margin="0,8,0,0" Text="Base beatmap:"
+                                         ToolTip="This beatmap serves as the base for exported hitsounds diff. Timing, volumes, and metadata will all come from this beatmap."/>
+                             <TextBox Grid.Column="1" x:Name="BaseBeatmapPathBox" Text="{Binding BaseBeatmap, Mode=TwoWay}" Margin="5,0,5,0"
+                                      ToolTip="Path to the base beatmap. This beatmap serves as the base for exported hitsounds diff. Timing, volumes, and metadata will all come from this beatmap."/>
+                             <Button Grid.Column="2" Cursor="Hand" Click="BaseBeatmapLoad_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                                     ToolTip="Fetch the selected beatmap from your osu! client.">
+                                 <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="RestoreFromTrash" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                             </Button >
+                             <Button Grid.Column="4" Cursor="Hand" Click="BaseBeatmapBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                                     ToolTip="Select beatmaps with File Explorer.">
+                                 <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                             </Button >
+                         </Grid>
+                         <Grid DataContext="{Binding DefaultSample}" Margin="5">
+                             <Grid.ColumnDefinitions>
+                                 <ColumnDefinition Width="Auto"/>
+                                 <ColumnDefinition Width="*"/>
+                                 <ColumnDefinition Width="Auto"/>
+                                 <ColumnDefinition Width="Auto"/>
+                                 <ColumnDefinition Width="30"/>
+                             </Grid.ColumnDefinitions>
+                             <TextBlock FontSize="14" Margin="0,8,0,0" Text="Default sample:"
+                                        ToolTip="This sample will be used fill up any hitnormal hitsounds which get left over by the hitsound layers."/>
+                             <TextBox Grid.Column="1" x:Name="DefaultSamplePathBox" Text="{Binding SampleArgs.Path, Mode=TwoWay}" Margin="5,0,5,0"
+                                      ToolTip="Path to the default sound sample. This sample will be used fill up any hitnormal hitsounds which get left over by the hitsound layers."/>
+                             <TextBox Grid.Column="3" x:Name="DefaultSampleVolumeBox" Width="50" Text="{Binding SampleArgs.Volume, Mode=TwoWay, Converter={StaticResource V2PConverter}, ConverterParameter=100}" Margin="0,0,5,0"
+                                         ToolTip="Volume % of the default sample. Use -1 for invariant volume." materialDesign:HintAssist.Hint="Volume"/>
+                             <Button Grid.Column="4" Cursor="Hand" Click="DefaultSampleBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
+                                     ToolTip="Select files with File Explorer.">
+                                 <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                             </Button >
+                             <ComboBox Grid.Column="2" x:Name="DefaultSampleSetBox" Width="70" VerticalAlignment="Stretch" Margin="0,0,5,0"
+                                       SelectedValue="{Binding SampleSet, Mode=TwoWay, Converter={StaticResource SS2SConverter}}"
+                                       SelectedValuePath="Content" Cursor="Hand"
+                                       ToolTip="Sample set of the default sample.">
+                                 <ComboBoxItem Content="None" Cursor="Hand"/>
+                                 <ComboBoxItem Content="Normal" Cursor="Hand"/>
+                                 <ComboBoxItem Content="Soft" Cursor="Hand"/>
+                                 <ComboBoxItem Content="Drum" Cursor="Hand"/>
+                             </ComboBox>
+                         </Grid>
+                     </StackPanel>
+                </materialDesign:Card>
+
                 <Grid Grid.Row="1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>

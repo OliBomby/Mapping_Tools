@@ -19,7 +19,7 @@ namespace Mapping_Tools.Classes.ToolHelpers {
 
     public static class EditorReaderStuff
     {
-        private static readonly EditorReader editorReader = new EditorReader();
+        private static readonly EditorReader editorReader = new();
         public static string DontCoolSaveWhenMD5EqualsThisString = "";
 
         /// <summary>
@@ -32,14 +32,28 @@ namespace Mapping_Tools.Classes.ToolHelpers {
         }
 
         /// <summary>
+        /// Gets the first osu! stable process.
+        /// </summary>
+        public static System.Diagnostics.Process GetOsuProcess() {
+            return System.Diagnostics.Process.GetProcessesByName("osu!").FirstOrDefault(p => p.MainModule?.ModuleName == "osu!.exe" && p.MainModule.FileVersionInfo.ProductName == "osu!");
+        }
+
+        /// <summary>
+        /// Determines whether the editor is open in the osu! client by checking if the window title ends with ".osu".
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsEditorOpen(System.Diagnostics.Process process) {
+            var processSharp = new ProcessSharp(process, MemoryType.Remote);
+            var osuWindow = processSharp.WindowFactory.MainWindow;
+            return osuWindow.Title.EndsWith(@".osu");
+        }
+
+        /// <summary>
         /// Determines whether the editor is open in the osu! client by checking if the window title ends with ".osu".
         /// </summary>
         /// <returns></returns>
         public static bool IsEditorOpen() {
-            var process = System.Diagnostics.Process.GetProcessesByName("osu!").FirstOrDefault();
-            var processSharp = new ProcessSharp(process, MemoryType.Remote);
-            var osuWindow = processSharp.WindowFactory.MainWindow;
-            return osuWindow.Title.EndsWith(@".osu");
+            return IsEditorOpen(GetOsuProcess());
         }
 
         /// <summary>
@@ -53,12 +67,13 @@ namespace Mapping_Tools.Classes.ToolHelpers {
                 throw new EditorReaderDisabledException();
             }
 
-            if (!IsEditorOpen()) {
+            var process = GetOsuProcess();
+            if (!IsEditorOpen(process)) {
                 throw new Exception("No active editor detected.");
             }
 
             var reader = GetEditorReader();
-
+            reader.SetProcess(process);
             reader.autoDeStack = autoDeStack;
 
             /*editorReader.FetchEditor();
@@ -178,6 +193,7 @@ namespace Mapping_Tools.Classes.ToolHelpers {
 
         public static int GetEditorTime() {
             var reader = GetEditorReader();
+            reader.SetProcess(GetOsuProcess());
             if (reader.ProcessNeedsReload() || reader.EditorNeedsReload())
                 reader.FetchEditor();
             return reader.EditorTime();

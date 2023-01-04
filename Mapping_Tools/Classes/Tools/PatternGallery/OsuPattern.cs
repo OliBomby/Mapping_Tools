@@ -68,9 +68,5 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
         }
 
         #endregion
-
-        public Beatmap GetPatternBeatmap(OsuPatternFileHandler fileHandler) {
-            return new BeatmapEditor(fileHandler.GetPatternPath(FileName)).Beatmap;
-        }
     }
 }

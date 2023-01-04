@@ -374,7 +374,7 @@ namespace Mapping_Tools.Viewmodels {
             if (!ProjectManager.IsSavable(View))
                 return;
             dynamic data = View;
-            ProjectManager.SaveProject(data, true);
+            ProjectManager.SaveProjectDialog(data);
         }
 
         private void NewProject(object sender, RoutedEventArgs e) {

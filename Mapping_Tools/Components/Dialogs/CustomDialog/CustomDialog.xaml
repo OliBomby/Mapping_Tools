@@ -18,6 +18,7 @@
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" Grid.Row="1"
+                    HorizontalAlignment="Center"
                     Margin="0 16 0 0">
             <Button x:Name="AcceptButton" IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}">
                 <Button.CommandParameter>

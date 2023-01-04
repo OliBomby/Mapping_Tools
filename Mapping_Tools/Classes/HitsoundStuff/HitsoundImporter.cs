@@ -217,7 +217,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 string samplePath = Path.Combine(mapDir, filepath);
                 var filename = Path.GetFileNameWithoutExtension(filepath);
 
-                var volume = volumes ? sbSample.Volume : 1;
+                var volume = volumes ? sbSample.Volume / 100 : 1;
 
                 SampleSet sampleSet = GetSamplesetFromFilename(filename);
                 Hitsound hitsound = GetHitsoundFromFilename(filename);

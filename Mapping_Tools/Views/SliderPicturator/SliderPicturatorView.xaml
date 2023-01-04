@@ -234,9 +234,29 @@
                         <CheckBox Content="Set beatmap colors"
                                   IsChecked="{Binding SetBeatmapColors}"
                                   ToolTip="Whether to set the beatmap's slider track and border color to the specified colors."/>
+                        
+                        <Slider Value="{Binding Quality}" Margin="5 10 15 10"
+                                Style="{StaticResource MaterialDesignDiscreteSlider}"
+                                TickPlacement="BottomRight" TickFrequency="10"
+                                Minimum="1" Maximum="101" SmallChange="1" LargeChange="10"
+                                ToolTip="Image Quality"/>
+                        <TextBlock Text="{Binding Path=SegmentCount, StringFormat='Segment Count: {0}'}" Margin="5"
+                                   ToolTip="The approximate number of slider segments required for this picture. Lower is better."/>
+                        <StackPanel Orientation="Horizontal" >
+                            <Button Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding RemoveCommand}" Margin="5"
+                                    ToolTip="Remove the slider being used for its sliderball path." HorizontalAlignment="Left" VerticalAlignment="Top">
+                                Remove slider
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding ImportCommand}" Margin="5"
+                                ToolTip="Import a slider for its sliderball path. This imports the slider you have selected in the editor." HorizontalAlignment="Right" VerticalAlignment="Top">
+                                Import slider
+                            </Button>
+                        </StackPanel>
                     </StackPanel>
 
-                    <Image Name="ImageViewer" Width="440" Source="{Binding BMImage}" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+                    <StackPanel>
+                        <Image Name="ImageViewer" Width="440" Source="{Binding BMImage}" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+                    </StackPanel>
                 </StackPanel>
                 
 

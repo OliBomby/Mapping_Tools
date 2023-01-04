@@ -24,10 +24,12 @@ namespace Mapping_Tools.Views.PatternGallery {
     /// </summary>
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
     //[HiddenTool]
-    public partial class PatternGalleryView : ISavable<PatternGalleryVm>, IQuickRun, IHaveExtraProjectMenuItems {
+    public partial class PatternGalleryView : ISavable<PatternGalleryVm>, IHasExtraAutoSaveTarget, IQuickRun, IHaveExtraProjectMenuItems {
         public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "patterngalleryproject.json");
 
         public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Pattern Gallery Projects");
+
+        public string ExtraAutoSavePath => Path.Combine(ViewModel.FileHandler.GetCollectionFolderPath(), "project.json");
 
         public static readonly string ToolName = "Pattern Gallery";
         public static readonly string ToolDescription =
@@ -124,7 +126,7 @@ namespace Mapping_Tools.Views.PatternGallery {
 
             var patternPlacer = args.OsuPatternPlacer;
             foreach (var pattern in args.Patterns.Where(o => o.IsSelected)) {
-                var patternBeatmap = pattern.GetPatternBeatmap(args.FileHandler);
+                var patternBeatmap = args.FileHandler.GetPatternBeatmap(pattern.FileName);
 
                 if (usePatternOffset) {
                     patternPlacer.PlaceOsuPattern(patternBeatmap, editor.Beatmap, protectBeatmapPattern:false);
@@ -163,6 +165,11 @@ namespace Mapping_Tools.Views.PatternGallery {
 
         public void SetSaveData(PatternGalleryVm saveData)
         {
+            // Save the current project to its collection folder if it has patterns
+            if (ViewModel.Patterns.Count > 0) {
+                ProjectManager.SaveProject(this, ExtraAutoSavePath);
+            }
+
             DataContext = saveData;
             InitializeOsuPatternFileHandler();
         }
@@ -215,26 +222,48 @@ namespace Mapping_Tools.Views.PatternGallery {
                 var path = IOHelper.ZipFileDialog();
                 if (string.IsNullOrEmpty(path)) return;
 
-                string archiveFolderName;
-                using (ZipArchive archive = ZipFile.Open(path, ZipArchiveMode.Read)) {
-                    // Assuming the first folder in the zip file is the collection folder
-                    archiveFolderName = archive.Entries[0].FullName.Split('\\')[0];
+                var result1 = MessageBox.Show(
+                    "Do you want to merge the imported collection into your current collection?",
+                    "Load new collection",
+                    MessageBoxButton.YesNo);
 
-                    if (ViewModel.FileHandler.CollectionFolderExists(archiveFolderName)) {
-                        throw new DuplicateNameException($"A collection with the name \"{archiveFolderName}\" already exists in {ViewModel.FileHandler.BasePath}.");
+                if (result1 == MessageBoxResult.Yes) {
+                    using ZipArchive archive = ZipFile.Open(path, ZipArchiveMode.Read);
+                    foreach (var patternEntry in archive.Entries.Where(o => o.FullName.EndsWith(".osu"))) {
+                        patternEntry.ExtractToFile(ViewModel.FileHandler.GetPatternPath(patternEntry.Name));
+                    }
+                    // Load project from zip archive
+                    var projectEntry = archive.Entries.Single(o => o.FullName.EndsWith(".json"));
+                    var project = ProjectManager.LoadJson<PatternGalleryVm>(projectEntry.Open());
+
+                    // Add the patterns from the imported project to the current project
+                    foreach (var pattern in project.Patterns) {
+                        ViewModel.Patterns.Add(pattern);
+                    }
+                } else {
+                    string archiveFolderName;
+                    using (ZipArchive archive = ZipFile.Open(path, ZipArchiveMode.Read)) {
+                        // Assuming the first folder in the zip file is the collection folder
+                        archiveFolderName = archive.Entries[0].FullName.Split(new[] {'/', '\\'}, StringSplitOptions.RemoveEmptyEntries)[0];
+
+                        if (ViewModel.FileHandler.CollectionFolderExists(archiveFolderName)) {
+                            throw new DuplicateNameException($"A collection with the name \"{archiveFolderName}\" already exists in {ViewModel.FileHandler.BasePath}.");
+                        }
+
+                        archive.ExtractToDirectory(ViewModel.FileHandler.BasePath);
                     }
 
-                    archive.ExtractToDirectory(ViewModel.FileHandler.BasePath);
-                }
+                    await Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue("Successfully imported the collection!"));
 
-                await Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue("Successfully imported the collection!"));
-
-                var result = MessageBox.Show(
+                    var result2 = MessageBox.Show(
                         "Do you want to load the newly imported collection right now?\n Warning: Unsaved changes will be lost.",
                         "Load new collection",
                         MessageBoxButton.YesNo);
 
-                if (result == MessageBoxResult.Yes) {
+                    if (result2 != MessageBoxResult.Yes) {
+                        return;
+                    }
+
                     string collectionFolderPath = Path.Combine(ViewModel.FileHandler.BasePath, archiveFolderName);
                     // Get the first .json file in the imported collection folder
                     string savePath = Directory.GetFiles(collectionFolderPath).First(o => Path.GetExtension(o).ToLower() == ".json");
@@ -290,10 +319,7 @@ namespace Mapping_Tools.Views.PatternGallery {
         }
 
         private void CollectionName_MouseDown(object sender, MouseButtonEventArgs e) {
-            // Check for double-click, because there is no MouseDoubleClick event
-            if (e.ClickCount == 2) {
-                DoRenameCollection(sender, e);
-            }
+            DoRenameCollection(sender, e);
         }
     }
 }
