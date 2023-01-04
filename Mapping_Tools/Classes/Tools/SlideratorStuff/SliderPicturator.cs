@@ -449,8 +449,8 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
 
             double curMsDist = 0;
             double correction = 0;
-            double availableDist = 0;
-            int totRepeats = 0;
+            double availableDist;
+            int totRepeats;
             int curMs = 2;
             var curMsPath = new List<Vector2> { sliderPath.Last() };
             // v is just a Vector2 that I can use to briefly store vector differences
