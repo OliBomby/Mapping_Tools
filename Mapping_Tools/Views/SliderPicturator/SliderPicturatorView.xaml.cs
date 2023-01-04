@@ -6,7 +6,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using System.Drawing;
-using System.Drawing.Imaging;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.MathUtil;
@@ -14,7 +13,6 @@ using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Viewmodels;
-using System.Runtime.InteropServices;
 
 namespace Mapping_Tools.Views.SliderPicturator {
     /// <summary>
@@ -101,7 +99,7 @@ namespace Mapping_Tools.Views.SliderPicturator {
             double startPosY = arg.SliderStartY;
             double startPosPicX = arg.ImageStartX;
             double startPosPicY = arg.ImageStartY;
-            double duration = arg.SelectedSlider == null ? arg.Duration : arg.SelectedSlider.TemporalLength;
+            double duration = arg.SelectedSlider?.TemporalLength ?? arg.Duration;
             double resY = arg.YResolution;
             Vector2 startPos = new Vector2(startPosX, startPosY);
             Vector2 startPosPic = new Vector2(startPosPicX, startPosPicY);
@@ -219,7 +217,7 @@ namespace Mapping_Tools.Views.SliderPicturator {
             editor.SaveFile();
 
             // Complete progressbar
-            if (worker != null && worker.WorkerReportsProgress)
+            if (worker is { WorkerReportsProgress: true })
             {
                 worker.ReportProgress(100);
             }
@@ -243,14 +241,12 @@ namespace Mapping_Tools.Views.SliderPicturator {
         private static double OsuStableDistance(List<Vector2> controlPoints)
         {
             double length = 0;
-            Vector2 cp, lp;
-            float num1, num2, num3;
             for (int i = 1; i < controlPoints.Count; i++) {
-                lp = controlPoints.ElementAt(i - 1);
-                cp = controlPoints.ElementAt(i);
-                num1 = (float)Math.Round(lp.X) - (float)Math.Round(cp.X);
-                num2 = (float)Math.Round(lp.Y) - (float)Math.Round(cp.Y);
-                num3 = num1 * num1 + num2 * num2;
+                Vector2 lp = controlPoints.ElementAt(i - 1);
+                Vector2 cp = controlPoints.ElementAt(i);
+                float num1 = (float)Math.Round(lp.X) - (float)Math.Round(cp.X);
+                float num2 = (float)Math.Round(lp.Y) - (float)Math.Round(cp.Y);
+                float num3 = num1 * num1 + num2 * num2;
 
                 length += (float)Math.Sqrt(num3);
             }
