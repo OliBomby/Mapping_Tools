@@ -1,6 +1,6 @@
-# Mapping Tools
-Collection of tools for manipulating osu! beatmaps
+# Mapping Tools [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/V7V2HPH5F)
 
+Mapping Tools is a collection of tools which help you create osu! beatmaps more easily! 
 [Website](https://mappingtools.github.io/)
 
 
@@ -8,8 +8,6 @@ Collection of tools for manipulating osu! beatmaps
   <img src="https://i.imgur.com/7JqvlNY.png" alt="Mapping Tools logo"/>
   <br/>Logo by <a href="https://osu.ppy.sh/users/1882522">Karoo</a>
 </p>
-
-[![CodeFactor](https://www.codefactor.io/repository/github/olibomby/mapping_tools/badge/master)](https://www.codefactor.io/repository/github/olibomby/mapping_tools/overview/master)
 
 ## Tools included
 - [Map Cleaner](https://github.com/OliBomby/Map-Cleaner) by [OliBomby](https://github.com/OliBomby) 
@@ -47,4 +45,5 @@ See the [Trello board](https://trello.com/b/iTmmw3eP/mapping-tools).
 - [.NET Ogg Vorbis Encoder](https://github.com/SteveLillis/.NET-Ogg-Vorbis-Encoder)
 - [Onova](https://github.com/Tyrrrz/Onova)
 - [Extended WPF Toolkit](https://github.com/xceedsoftware/wpftoolkit)
+- [VirtualizingWrapPanel](https://github.com/sbaeumlisberger/VirtualizingWrapPanel)
 
