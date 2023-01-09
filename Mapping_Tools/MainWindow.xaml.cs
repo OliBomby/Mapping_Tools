@@ -339,6 +339,11 @@ namespace Mapping_Tools {
             System.Diagnostics.Process.Start("explorer.exe", "https://github.com/OliBomby/Mapping_Tools");
         }
 
+        //Open project in browser
+        private void OpenDonate(object sender, RoutedEventArgs e) {
+            System.Diagnostics.Process.Start("explorer.exe", "https://ko-fi.com/olibomby ");
+        }
+
         //Open info screen
         private void OpenInfo(object sender, RoutedEventArgs e) {
             var version = Assembly.GetEntryAssembly()?.GetName().Version;
