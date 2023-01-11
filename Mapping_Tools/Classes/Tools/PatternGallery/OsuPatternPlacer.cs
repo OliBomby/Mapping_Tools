@@ -36,7 +36,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
         public bool SnapToNewTiming = true;
         public IBeatDivisor[] BeatDivisors = RationalBeatDivisor.GetDefaultBeatDivisors();
         public bool FixGlobalSv = true;
-        public bool FixBpmSv = true;
+        public bool FixBpmSv = false;
         public bool FixColourHax = true;
         public bool FixStackLeniency = false;
         public bool FixTickRate = false;
