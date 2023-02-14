@@ -307,11 +307,23 @@ namespace Mapping_Tools.Views.PatternGallery {
             }
         }
 
+        private void PatternRow_PreviewMouseUp(object sender, MouseButtonEventArgs e) {
+            try {
+                if (sender is not ListBoxItem { Content: OsuPattern pattern } || e.ChangedButton != MouseButton.Left) {
+                    return;
+                }
+
+                // Select only this pattern
+                ViewModel.SetSelectAll(false);
+                pattern.IsSelected = true;
+            } catch (Exception ex) { ex.Show(); }
+        }
+
         private void PatternRow_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
             try {
-                if (sender is DataGridRow row && row.Item is OsuPattern pattern) {
+                if (sender is ListBoxItem { Content: OsuPattern pattern }) {
                     // Select only this pattern
-                    ViewModel.IsAllItemsSelected = false;
+                    ViewModel.SetSelectAll(false);
                     pattern.IsSelected = true;
                 }
                 QuickRun();

@@ -36,18 +36,6 @@ namespace Mapping_Tools.Viewmodels {
 
         public OsuPatternFileHandler FileHandler { get; set; }
 
-        private bool? _isAllItemsSelected = false;
-        [JsonIgnore]
-        public bool? IsAllItemsSelected {
-            get => _isAllItemsSelected;
-            set {
-                if (Set(ref _isAllItemsSelected, value)) {
-                    if (_isAllItemsSelected.HasValue)
-                        SelectAll(_isAllItemsSelected.Value, Patterns);
-                }
-            }
-        }
-
         [JsonIgnore]
         public OsuPatternMaker OsuPatternMaker { get; set; }
 
@@ -358,8 +346,8 @@ namespace Mapping_Tools.Viewmodels {
                 });
         }
 
-        private static void SelectAll(bool select, IEnumerable<OsuPattern> patterns) {
-            foreach (var model in patterns) {
+        public void SetSelectAll(bool select) {
+            foreach (var model in Patterns) {
                 model.IsSelected = select;
             }
         }

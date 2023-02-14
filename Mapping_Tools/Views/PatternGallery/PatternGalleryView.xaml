@@ -83,7 +83,7 @@
                             Grid.Row="0"
                             ItemsSource="{Binding Patterns}"
                             VerticalAlignment="Stretch"
-                            SelectionMode="Extended"
+                            SelectionMode="Single"
                             VirtualizingPanel.CacheLengthUnit="Page"
                             VirtualizingPanel.CacheLength="1,1"
                             VirtualizingPanel.ScrollUnit="Pixel"
@@ -119,6 +119,7 @@
                             <ListBox.ItemContainerStyle>
                                 <Style TargetType="ListBoxItem" BasedOn="{StaticResource MaterialDesignListBoxItem}">
                                     <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    <EventSetter Event="PreviewMouseUp" Handler="PatternRow_PreviewMouseUp"/>
                                     <EventSetter Event="MouseDoubleClick" Handler="PatternRow_MouseDoubleClick"/>
                                 </Style>
                             </ListBox.ItemContainerStyle>
