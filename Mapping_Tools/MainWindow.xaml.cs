@@ -24,6 +24,10 @@ namespace Mapping_Tools {
     public partial class MainWindow {
         private bool autoSave = true;
         private UpdaterWindow _updaterWindow;
+        private bool updateAfterClose;
+        private Task downloadUpdateTask;
+        private UpdateManager updateManager;
+
         private MainWindowVm ViewModel => (MainWindowVm)DataContext;
 
         public ListenerManager ListenerManager;
@@ -100,7 +104,7 @@ namespace Mapping_Tools {
         private async Task Update(bool allowSkip = true, bool notifyUser = false) {
             try {
                 var assetNamePattern = Environment.Is64BitProcess ? "release_x64.zip" : "release.zip";
-                var updateManager = new UpdateManager("OliBomby", "Mapping_Tools", assetNamePattern);
+                updateManager = new UpdateManager("OliBomby", "Mapping_Tools", assetNamePattern);
                 var hasUpdate = await updateManager.FetchUpdateAsync();
 
                 if (!hasUpdate) {
@@ -122,9 +126,12 @@ namespace Mapping_Tools {
                         ShowActivated = true
                     };
 
-                    _updaterWindow.ActionSelected += async (sender, action) => {
+                    _updaterWindow.Closed += DisposeUpdateManager;
+
+                    _updaterWindow.ActionSelected += async (_, action) => {
                         switch (action) {
                             case UpdateAction.Restart:
+                                updateAfterClose = false;
                                 await updateManager.DownloadUpdateAsync();
                                 updateManager.RestartAfterUpdate = true;
                                 updateManager.StartUpdateProcess();
@@ -134,14 +141,18 @@ namespace Mapping_Tools {
                                 break;
 
                             case UpdateAction.Wait:
-                                await updateManager.DownloadUpdateAsync();
+                                updateAfterClose = true;
                                 updateManager.RestartAfterUpdate = false;
-                                updateManager.StartUpdateProcess();
+                                downloadUpdateTask = updateManager.DownloadUpdateAsync();
+
+                                // Preserve the update manager so it can be used later to download the update
+                                _updaterWindow.Closed -= DisposeUpdateManager;
 
                                 _updaterWindow.Close();
                                 break;
 
                             case UpdateAction.Skip:
+                                updateAfterClose = false;
                                 // Update the skip version so we skip this version in the future
                                 SettingsManager.Settings.SkipVersion = updateManager.UpdatesResult.LastVersion;
                                 _updaterWindow.Close();
@@ -153,9 +164,10 @@ namespace Mapping_Tools {
                         }
                     };
 
-                    _updaterWindow.Closed += (sender, e) => {
+                    void DisposeUpdateManager(object o, EventArgs eventArgs) {
                         updateManager.Dispose();
-                    };
+                        updateManager = null;
+                    }
 
                     _updaterWindow.Show();
                 });
@@ -165,6 +177,33 @@ namespace Mapping_Tools {
                     MessageQueue.Enqueue("Error fetching update: " + e.Message);
                 }
             }
+        }
+
+        private void AutoUpdateOnClose() {
+            if (!updateAfterClose || updateManager == null) {
+                return;
+            }
+
+            if (downloadUpdateTask is { IsCompletedSuccessfully: true }) {
+                updateManager.StartUpdateProcess();
+                return;
+            }
+
+            if (downloadUpdateTask is null or { IsFaulted: true }) {
+                downloadUpdateTask = updateManager.DownloadUpdateAsync();
+            }
+
+            _updaterWindow = new UpdaterWindow(updateManager.Progress, true) {
+                ShowActivated = true
+            };
+
+            _ = Dispatcher.Invoke(async () => {
+                await downloadUpdateTask;
+                updateManager.StartUpdateProcess();
+                _updaterWindow.Close();
+            });
+
+            _updaterWindow.ShowDialog();
         }
 
         private void Window_Closing(object sender, EventArgs e) {
@@ -177,6 +216,7 @@ namespace Mapping_Tools {
                 SettingsManager.UpdateSettings();
                 SettingsManager.WriteToJson();
             }
+            AutoUpdateOnClose();
         }
 
         //Close window

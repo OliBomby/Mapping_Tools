@@ -16,12 +16,16 @@ namespace Mapping_Tools.Updater {
 
         public event EventHandler<UpdateAction> ActionSelected;
 
-        public UpdaterWindow(Progress<double> progress) {
+        public UpdaterWindow(Progress<double> progress, bool downloadImmediately = false) {
             InitializeComponent();
 
             progress.ProgressChanged += OnDownloadProgressChanged;
 
-            _ = LoadReleaseNotes();
+            if (downloadImmediately) {
+                GoToDownload();
+            } else {
+                _ = LoadReleaseNotes();
+            }
         }
 
         private async Task LoadReleaseNotes() {
@@ -46,16 +50,15 @@ namespace Mapping_Tools.Updater {
 
         private void RestartBtn_Click(object sender, RoutedEventArgs _) {
             ActionSelected?.Invoke(this, UpdateAction.Restart);
-
-            Dispatcher.Invoke(() => {
-                ReadyPanel.Visibility = Visibility.Collapsed;
-                DownloadPanel.Visibility = Visibility.Visible;
-            });
+            GoToDownload();
         }
 
         private void WaitBtn_Click(object sender, RoutedEventArgs _) {
             ActionSelected?.Invoke(this, UpdateAction.Wait);
+            GoToDownload();
+        }
 
+        private void GoToDownload() {
             Dispatcher.Invoke(() => {
                 ReadyPanel.Visibility = Visibility.Collapsed;
                 DownloadPanel.Visibility = Visibility.Visible;
