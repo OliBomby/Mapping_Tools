@@ -242,31 +242,31 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public bool Equals(TimingPoint tp) {
-            return Offset == tp.Offset &&
-                MpB == tp.MpB &&
-                Meter == tp.Meter &&
-                SampleSet == tp.SampleSet &&
-                SampleIndex == tp.SampleIndex &&
-                Volume == tp.Volume &&
-                Uninherited == tp.Uninherited &&
-                Kiai == tp.Kiai &&
-                OmitFirstBarLine == tp.OmitFirstBarLine;
+            return Precision.AlmostEquals(Offset, tp.Offset) &&
+                   Precision.AlmostEquals(MpB, tp.MpB) &&
+                   Meter == tp.Meter &&
+                   SampleSet == tp.SampleSet &&
+                   SampleIndex == tp.SampleIndex &&
+                   Precision.AlmostEquals(Volume, tp.Volume) &&
+                   Uninherited == tp.Uninherited &&
+                   Kiai == tp.Kiai &&
+                   OmitFirstBarLine == tp.OmitFirstBarLine;
         }
 
         public bool SameEffect(TimingPoint tp) {
             if (tp.Uninherited && !Uninherited) {
-                return MpB == -100 &&
+                return Precision.AlmostEquals(MpB, -100) &&
                        Meter == tp.Meter &&
                        SampleSet == tp.SampleSet &&
                        SampleIndex == tp.SampleIndex &&
-                       Volume == tp.Volume &&
+                       Precision.AlmostEquals(Volume, tp.Volume) &&
                        Kiai == tp.Kiai;
             }
-            return MpB == tp.MpB &&
+            return Precision.AlmostEquals(MpB, tp.MpB) &&
                    Meter == tp.Meter &&
                    SampleSet == tp.SampleSet &&
                    SampleIndex == tp.SampleIndex &&
-                   Volume == tp.Volume &&
+                   Precision.AlmostEquals(Volume, tp.Volume) &&
                    Kiai == tp.Kiai;
         }
 
