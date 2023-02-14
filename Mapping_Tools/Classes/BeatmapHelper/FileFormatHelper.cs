@@ -54,6 +54,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public static void FillDictionary(Dictionary<string, TValue> dict, IEnumerable<string> lines) {
             foreach (var split in lines.Select(SplitKeyValue)) {
+                if (split.Length != 2)
+                    continue;
                 dict[split[0]] = new TValue(split[1]);
             }
         }
