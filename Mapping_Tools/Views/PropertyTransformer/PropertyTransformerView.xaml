@@ -116,6 +116,13 @@
                             <TextBox x:Name="SBSampleTimeOffsetBox" Text="{Binding Path=SBSampleTimeOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0, UpdateSourceTrigger=LostFocus}" MinWidth="120"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="SB sample volume" MinWidth="150"/>
+                            <TextBlock Text="x "/>
+                            <TextBox x:Name="SBSampleVolumeMultiplierBox" Text="{Binding Path=SBSampleVolumeMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1, UpdateSourceTrigger=LostFocus}" MinWidth="120"/>
+                            <TextBlock Text=" + "/>
+                            <TextBox x:Name="SBSampleVolumeOffsetBox" Text="{Binding Path=SBSampleVolumeOffset, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=0, UpdateSourceTrigger=LostFocus}" MinWidth="120"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Break time" MinWidth="150"/>
                             <TextBlock Text="x "/>
                             <TextBox x:Name="BreakTimeMultiplierBox" Text="{Binding Path=BreakTimeMultiplier, Mode=TwoWay, Converter={StaticResource D2SConverter}, ConverterParameter=1, UpdateSourceTrigger=LostFocus}" MinWidth="120"/>

@@ -183,6 +183,18 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                         }
                     }
 
+                    UpdateProgressBar(worker, 55);
+
+                    // Storyboarded sample time
+                    if (vm.SBSampleVolumeMultiplier != 1 || vm.SBSampleVolumeOffset != 0) {
+                        foreach (StoryboardSoundSample ss in beatmap.StoryboardSoundSamples) {
+                            if (Filter(ss.Volume, ss.StartTime, vm)) {
+                                int newVolume = (int) Math.Round(ss.Volume * vm.SBSampleVolumeMultiplier + vm.SBSampleVolumeOffset);
+                                ss.Volume = vm.ClipProperties ? MathHelper.Clamp(newVolume, 8, 100) : newVolume;
+                            }
+                        }
+                    }
+
                     UpdateProgressBar(worker, 60);
 
                     // Break time

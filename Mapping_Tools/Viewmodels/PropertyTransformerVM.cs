@@ -154,6 +154,18 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
+        private double _sbSampleVolumeMultiplier;
+        public double SBSampleVolumeMultiplier {
+            get => _sbSampleVolumeMultiplier;
+            set => Set(ref _sbSampleVolumeMultiplier, value);
+        }
+
+        private double _sbSampleVolumeOffset;
+        public double SBSampleVolumeOffset {
+            get => _sbSampleVolumeOffset;
+            set => Set(ref _sbSampleVolumeOffset, value);
+        }
+
         private double _breakTimeMultiplier;
         public double BreakTimeMultiplier {
             get => _breakTimeMultiplier;
@@ -303,6 +315,8 @@ namespace Mapping_Tools.Viewmodels {
             VideoTimeOffset = 0;
             PreviewTimeMultiplier = 1;
             PreviewTimeOffset = 0;
+            SBSampleVolumeMultiplier = 1;
+            SBSampleVolumeOffset = 0;
         }
 
         private void SetAllTimeMultipliers(double value) {
