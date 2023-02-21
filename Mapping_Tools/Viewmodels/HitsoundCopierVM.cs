@@ -26,6 +26,7 @@ namespace Mapping_Tools.Viewmodels {
         private bool _alwaysPreserve5Volume;
         private bool _copyStoryboardedSamples;
         private bool _ignoreHitsoundSatisfiedSamples;
+        private bool _ignoreWheneverHitsound;
         private bool _copyToSliderTicks;
         private bool _copyToSliderSlides;
         public int _startIndex;
@@ -96,6 +97,11 @@ namespace Mapping_Tools.Viewmodels {
         public bool IgnoreHitsoundSatisfiedSamples {
             get => _ignoreHitsoundSatisfiedSamples;
             set => Set(ref _ignoreHitsoundSatisfiedSamples, value);
+        }
+
+        public bool IgnoreWheneverHitsound {
+            get => _ignoreWheneverHitsound;
+            set => Set(ref _ignoreWheneverHitsound, value);
         }
 
         public bool CopyToSliderTicks {

@@ -243,6 +243,12 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                                 continue;
                         }
 
+                        if (arg.IgnoreWheneverHitsound) {
+                            if (processedTimeline.TimelineObjects.Any(o => Math.Abs(o.Time - sampleFrom.StartTime) <= arg.TemporalLeniency)) {
+                                continue;
+                            }
+                        }
+
                         // Add the StoryboardSoundSamples from beatmapFrom to beatmapTo if it doesn't already have the sample
                         if (!samplesTo.Contains(sampleFrom)) {
                             beatmapTo.StoryboardSoundSamples.Add(sampleFrom);
