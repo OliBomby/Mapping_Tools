@@ -38,8 +38,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     channels.Add(new Tuple<int, int>(bankNumbers[i], patchNumbers[i]));
 
                     channelIndex = channels.Count;
-                    collection.AddEvent(new ControlChangeEvent(Time, channelIndex, MidiController.BankSelect, bankNumbers[i] >> 8 << 8), TrackNumber);
-                    collection.AddEvent(new ControlChangeEvent(Time, channelIndex, MidiController.BankSelectLsb, (byte)bankNumbers[i]), TrackNumber);
+                    collection.AddEvent(new ControlChangeEvent(Time, channelIndex, MidiController.BankSelect, bankNumbers[i] >> 7), TrackNumber);
+                    collection.AddEvent(new ControlChangeEvent(Time, channelIndex, MidiController.BankSelectLsb, (byte)bankNumbers[i] & 0x01111111), TrackNumber);
                     collection.AddEvent(new PatchChangeEvent(Time, channelIndex, patchNumbers[i]), TrackNumber);
                 }
 
