@@ -483,7 +483,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 }
             }
             if (prev == null) {
-                return absoluteTime;
+                return 500d * absoluteTime / dtpq;  // Equates to 120 bpm
             }
 
             double deltaTime = prev.MicrosecondsPerQuarterNote / 1000d * (absoluteTime - prev.AbsoluteTime) / dtpq;
